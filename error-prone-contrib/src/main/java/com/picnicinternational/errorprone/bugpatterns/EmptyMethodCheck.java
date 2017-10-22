@@ -1,6 +1,7 @@
 package com.picnicinternational.errorprone.bugpatterns;
 
 import com.google.errorprone.BugPattern;
+import com.google.errorprone.BugPattern.LinkType;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
@@ -14,6 +15,7 @@ import com.sun.source.tree.MethodTree;
 @BugPattern(
     name = "EmptyMethod",
     summary = "Empty method can likely be deleted",
+    linkType = LinkType.NONE,
     severity = SeverityLevel.WARNING,
     tags = StandardTags.LIKELY_ERROR
 )

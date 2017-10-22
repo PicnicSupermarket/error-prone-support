@@ -3,6 +3,7 @@ package com.picnicinternational.errorprone.bugpatterns;
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
+import com.google.errorprone.BugPattern.LinkType;
 import com.google.errorprone.BugPattern.ProvidesFix;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.BugPattern.StandardTags;
@@ -28,6 +29,7 @@ import java.util.function.BiFunction;
 @BugPattern(
     name = "CanonicalAnnotationSyntax",
     summary = "Omit redundant syntax from annotation declarations",
+    linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
     tags = StandardTags.STYLE,
     providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
@@ -100,8 +102,7 @@ public final class CanonicalAnnotationSyntaxCheck extends BugChecker
         /* Replace the assignment with (the simplified representation of) just its value. */
         ExpressionTree expr = assignment.getExpression();
         return Optional.of(
-                SuggestedFix.replace(
-                        arg, simplifyAttributeValue(expr, state).orElseGet(expr::toString)));
+                SuggestedFix.replace(arg, simplifyAttributeValue(expr).orElseGet(expr::toString)));
     }
 
     private static Optional<Fix> dropRedundantCurlies(AnnotationTree tree, VisitorState state) {
@@ -117,15 +118,14 @@ public final class CanonicalAnnotationSyntaxCheck extends BugChecker
                             : arg;
 
             /* Store a fix for each expression that was successfully simplified. */
-            simplifyAttributeValue(value, state)
+            simplifyAttributeValue(value)
                     .ifPresent(expr -> fixes.add(SuggestedFix.builder().replace(value, expr)));
         }
 
         return fixes.stream().reduce(SuggestedFix.Builder::merge).map(SuggestedFix.Builder::build);
     }
 
-    private static Optional<String> simplifyAttributeValue(
-            ExpressionTree expr, VisitorState state) {
+    private static Optional<String> simplifyAttributeValue(ExpressionTree expr) {
         if (expr.getKind() != Kind.NEW_ARRAY) {
             /* There are no curly braces to be dropped here. */
             return Optional.empty();

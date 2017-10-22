@@ -6,6 +6,7 @@ import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
 import com.google.errorprone.BugPattern;
+import com.google.errorprone.BugPattern.LinkType;
 import com.google.errorprone.BugPattern.ProvidesFix;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.BugPattern.StandardTags;
@@ -42,6 +43,7 @@ import javax.annotation.CheckForNull;
     summary =
             "Ensure invocations of `Comparator#comparing{,Double,Int,Long}` match the return type"
                     + " of the provided function",
+    linkType = LinkType.NONE,
     severity = SeverityLevel.WARNING,
     tags = StandardTags.LIKELY_ERROR,
     providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
