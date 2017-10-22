@@ -1,0 +1,806 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.picnicinternational.errorprone-contrib</groupId>
+    <artifactId>errorprone-contrib</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <name>Picnic Error Prone Contrib</name>
+    <inceptionYear>2017</inceptionYear>
+    <organization>
+        <name>Picnic International</name>
+        <url>https://www.picnic.nl</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <developerConnection>scm:git:git@github.com:PicnicSupermarket/error-prone-contrib.git</developerConnection>
+        <url>https://github.com/PicnicSupermarket/error-prone-contrib</url>
+        <tag>HEAD</tag>
+    </scm>
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/PicnicSupermarket/error-prone-contrib/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>https://travis-ci.com/PicnicSupermarket/error-prone-contrib</url>
+    </ciManagement>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version.checkstyle>8.3</version.checkstyle>
+        <version.error-prone>2.1.2</version.error-prone>
+        <version.extra-enforcer-rules>1.0-beta-6</version.extra-enforcer-rules>
+        <version.javac>9-dev-r4023-3</version.javac>
+        <version.javadoc>2.10.4</version.javadoc>
+        <version.jdk>1.8</version.jdk>
+        <version.maven>3.5.0</version.maven>
+        <version.plexus-compiler>2.8.2</version.plexus-compiler>
+        <version.slf4j>1.7.25</version.slf4j>
+        <version.surefire>2.20.1</version.surefire>
+        <!-- Our build system (Travis CI) provides a monotonically increasing
+        build number. When building locally, this number is obviously absent.
+        So we provide a default value. -->
+        <build.number>LOCAL</build.number>
+        <!-- Arguments to the JVMs forked by Surefire. The specification of
+        this 'argLine' property instead of the definition of the 'argLine'
+        configuration setting allows users or plugins to specify additional
+        arguments. In particular, JaCoCo relies on this for the configuration
+        of its Java agent. -->
+        <argLine><!--
+            The test JVMs are short-running. By disabling certain expensive JIT
+            optimizations we actually speed up most tests. -->
+            -XX:TieredStopAtLevel=1
+            <!-- We cap memory usage. This is especially relevant on Travis CI,
+            but locally this should also be more than enough. -->
+            -Xmx512m
+            <!-- This argument cannot be set through Surefire's
+            'systemPropertyVariables' configuration setting. Setting the file
+            encoding is necessary because forked unit test invocations
+            otherwise use the environment's file encoding. -->
+            -Dfile.encoding=${project.build.sourceEncoding}
+            <!-- This argument *can* be set through Surefire's
+            'systemPropertyVariables' configuration setting, but by placing it
+            here it automatically also applies to the Failsafe plugin. On Unix
+            systems we use a lower-quality source of randomness, so as to avoid
+            potential slowdown of tests relying on java.security.SecureRandom.
+            Note that it is not fatal for the file to not exist, so this
+            setting is Windows-compatible. The '/./' syntax is no accident; see
+            https://bugs.openjdk.java.net/browse/JDK-6202721 for details. -->
+            -Djava.security.egd=file:/dev/./urandom
+            <!-- On Mac OS X, running in headless mode prevents the forked JVMs
+            from showing up in the dock and capturing window focus. -->
+            -Djava.awt.headless=true
+            <!-- When slf4j-test is used for the interception of log messages,
+            we also want them to be logged. -->
+            -Dslf4jtest.print.level=DEBUG
+            <!-- XXX: EXPLAIN -->
+            -Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${version.javac}/javac-${version.javac}.jar 
+        </argLine>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service</artifactId>
+                <version>1.0-rc3</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotation</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_check_api</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_test_helpers</artifactId>
+                <version>${version.error-prone}</version>
+                <exclusions>
+                    <!-- We're using `com.google.errorprone:javac` instead. -->
+                    <exclusion>
+                        <groupId>com.sun</groupId>
+                        <artifactId>tools</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>javac</artifactId>
+                <version>${version.javac}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>23.2-jre</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.truth</groupId>
+                <artifactId>truth</artifactId>
+                <version>0.36</version>
+            </dependency>
+            <dependency>
+                <groupId>com.puppycrawl.tools</groupId>
+                <artifactId>checkstyle</artifactId>
+                <version>${version.checkstyle}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.13-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>extra-enforcer-rules</artifactId>
+                <version>${version.extra-enforcer-rules}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${version.slf4j}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotation</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_check_api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_test_helpers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>javac</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <!-- Turn on filtering by default for application properties. -->
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/application.properties</include>
+                    <include>**/config.env</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <excludes>
+                    <exclude>**/application.properties</exclude>
+                    <exclude>**/config.env</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/docker</directory>
+                <targetPath>${project.build.directory}</targetPath>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.github.PicnicSupermarket</groupId>
+                    <artifactId>googleformatter-maven-plugin</artifactId>
+                    <version>1.0.6-picnic-1-gjf-3b7ec93449</version>
+                    <executions>
+                        <execution>
+                            <id>format-sources</id>
+                            <phase>process-sources</phase>
+                            <goals>
+                                <goal>format</goal>
+                            </goals>
+                            <configuration>
+                                <!-- We enable but skip the plugin by default.
+                                This way `format.sh` can resolve its
+                                dependencies in order to determine the version
+                                of google-java-format used. Actual formatting
+                                is done through explicit invocation by
+                                `format.sh`. -->
+                                <skip>true</skip>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <style>AOSP</style>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.lewisd</groupId>
+                    <artifactId>lint-maven-plugin</artifactId>
+                    <version>0.0.11</version>
+                    <executions>
+                        <execution>
+                            <id>validate-pom</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <rules>
+                            <excludes>
+                                <exclude>OSS*</exclude>
+                            </excludes>
+                        </rules>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>de.thetaphi</groupId>
+                    <artifactId>forbiddenapis</artifactId>
+                    <version>2.4.1</version>
+                    <executions>
+                        <execution>
+                            <id>detect-forbidden-api-usage</id>
+                            <goals>
+                                <goal>check</goal>
+                                <goal>testCheck</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <bundledSignatures>
+                            <bundledSignature>jdk-system-out</bundledSignature>
+                        </bundledSignatures>
+                        <!-- The plugin tries to load all supertypes of any
+                        class it analyzes. Some of those types may be absent
+                        from the compilation classpath, because the module that
+                        contains them has the `runtime` or `test` scope. When
+                        this happens, we don't want to fail the build. (The
+                        alternative is to declare all those dependencies
+                        `provided`, but we'd rather not do that.) -->
+                        <failOnMissingClasses>false</failOnMissingClasses>
+                        <targetVersion>${version.jdk}</targetVersion>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>2.17</version>
+                    <executions>
+                        <execution>
+                            <id>run-checkstyle</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <checkstyleRules>
+                            <!-- We only enable rules that are not enforced by
+                            error-prone or automatically corrected through
+                            application of google-java-format. -->
+                            <module name="Checker">
+                                <module name="UniqueProperties" />
+                                <module name="TreeWalker">
+                                    <module name="AnnotationUseStyleCheck">
+                                        <!-- XXX: Right now this check doesn't
+                                        completely enforce the desired style.
+                                        See https://github.com/checkstyle/checkstyle/issues/4972;
+                                        we're looking for the proposed `compact
+                                        = ALWAYS` and `singleArrayCurlies =
+                                        NEVER` style. -->
+                                    </module>
+                                    <module name="DeclarationOrder">
+                                        <!-- We don't enforce sorting fields by
+                                        their visibility modifier, for two
+                                        reasons:
+                                        - During (class) initialization
+                                          declaration order matters. Though the
+                                          plugin does not warn about fields
+                                          with obvious dependencies, its
+                                          dependency analysis is necessarily
+                                          incomplete; NPEs may result if some
+                                          of its advice is followed.
+                                        - Sometimes a field is annotated
+                                          `@VisibleForTesting`. It may then be
+                                          preferable not to reorder. The plugin
+                                          does not current respect this
+                                          annotation. -->
+                                        <property name="ignoreModifiers" value="true" />
+                                    </module>
+                                    <module name="DefaultComesLast" />
+                                    <module name="FinalClass" />
+                                    <module name="IllegalImport">
+                                        <!-- These packages are found in some
+                                        of the dependencies declared above. -->
+                                        <property name="illegalClasses" value="javax.xml.bind.DatatypeConverter" />
+                                        <property name="illegalClasses" value="org.springframework.context.annotation.ComponentScan" />
+                                        <property name="illegalPkgs" value="com.amazonaws.annotation" />
+                                        <property name="illegalPkgs" value="com.beust.jcommander.internal" />
+                                        <property name="illegalPkgs" value="com.newrelic.agent.deps" />
+                                        <property name="illegalPkgs" value="jdk" />
+                                        <property name="illegalPkgs" value="jersey.repackaged" />
+                                        <property name="illegalPkgs" value="nl.jqno.equalsverifier.internal" />
+                                        <property name="illegalPkgs" value="org.apache.commons.lang3">
+                                            <!-- Please use Guava or a custom
+                                            helper method instead. -->
+                                        </property>
+                                        <property name="illegalPkgs" value="org.mutabilitydetector.internal" />
+                                    </module>
+                                    <module name="IllegalImport">
+                                        <!-- XXX: This config uses
+                                        regexes so as to disallow static
+                                        imports. Once `illegalClasses`
+                                        disallows static imports by default,
+                                        this config can be merged into the one
+                                        above. See
+                                        https://github.com/checkstyle/checkstyle/issues/4954. -->
+                                        <property name="illegalClasses" value="org\.testng\.AssertJUnit(\..*?)?" />
+                                        <property name="regexp" value="true" />
+                                    </module>
+                                    <module name="MutableException" />
+                                    <module name="NeedBraces" />
+                                    <module name="NoClone" />
+                                    <module name="NoFinalizer" />
+                                    <module name="ParameterAssignmentCheck" />
+                                    <module name="RedundantModifier" />
+                                    <module name="SimplifyBooleanExpression" />
+                                    <module name="SimplifyBooleanReturn" />
+                                    <module name="WriteTag">
+                                        <property name="tag" value="@author" />
+                                        <property name="tagFormat" value="\S" />
+                                        <property name="tagSeverity" value="error" />
+                                        <property name="severity" value="ignore" />
+                                    </module>
+                                    <module name="UnnecessaryParentheses" />
+                                    <module name="UnusedImports">
+                                        <!-- Error-prone also detects these,
+                                        but (currently) doesn't warn about
+                                        JavaDoc-only imports. -->
+                                    </module>
+                                </module>
+                            </module>
+                        </checkstyleRules>
+                        <excludes>**/data/schema/**/*</excludes>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <!-- The plugin's "excludes" property accepts an Ant
+                        pattern, but does not match against the full path. So
+                        rather than explicitly excluding generated sources, we
+                        have to explicitly include "original" sources. -->
+                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                        <testSourceDirectories>${project.build.testSourceDirectory}</testSourceDirectories>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${version.checkstyle}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.7.0</version>
+                    <configuration>
+                        <compilerArgs>
+                            <!-- XXX: Here, we could pass
+                            -J-XX:TieredStopAtLevel=1, like we do for most
+                            other JVMs started during the build. But that
+                            doesn't seem to yield a noticable speedup. -->
+                        </compilerArgs>
+                        <maxmem>256m</maxmem>
+                        <parameters>true</parameters>
+                        <source>${version.jdk}</source>
+                        <target>${version.jdk}</target>
+                        <!-- Erroneously inverted logic... for details, see
+                        https://jira.codehaus.org/browse/MCOMPILER-209 -->
+                        <useIncrementalCompilation>false</useIncrementalCompilation>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.0.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.0.0-M1</version>
+                    <executions>
+                        <execution>
+                            <id>apply-enforcement-rules</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <rules>
+                            <banDuplicatePomDependencyVersions />
+                            <dependencyConvergence />
+                            <requireJavaVersion>
+                                <version>${version.jdk}</version>
+                            </requireJavaVersion>
+                            <requireMavenVersion>
+                                <version>${version.maven}</version>
+                            </requireMavenVersion>
+                            <requirePluginVersions />
+                            <requireSameVersionsReactor />
+                            <requireUpperBoundDeps />
+                        </rules>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>extra-enforcer-rules</artifactId>
+                            <version>${version.extra-enforcer-rules}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.0.2</version>
+                    <executions>
+                        <execution>
+                            <id>create-test-jar</id>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <skipIfEmpty>true</skipIfEmpty>
+                        <archive>
+                            <manifest>
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            </manifest>
+                            <manifestEntries>
+                                <Implementation-Title>${project.name}</Implementation-Title>
+                                <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                                <Implementation-Version>${project.version}.${build.number}.${build.revision}</Implementation-Version>
+                            </manifestEntries>
+                        </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${version.javadoc}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.5.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.0.2</version>
+                    <configuration>
+                        <delimiters>
+                            <delimiter>@</delimiter>
+                        </delimiters>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.6</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.0.1</version>
+                    <executions>
+                        <execution>
+                            <id>generate-source-jar</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${version.surefire}</version>
+                    <configuration>
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
+                        <!-- Timing measurements indicate that it's not
+                        beneficial to perform method-level parallelization for
+                        unit tests. -->
+                        <parallel>classes</parallel>
+                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <threadCount>2</threadCount>
+                        <trimStackTrace>false</trimStackTrace>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>buildnumber-maven-plugin</artifactId>
+                    <version>1.4</version>
+                    <executions>
+                        <execution>
+                            <id>determine-build-number</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>create</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <buildNumberPropertyName>build.revision</buildNumberPropertyName>
+                        <revisionOnScmFailure>UNKNOWN</revisionOnScmFailure>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>tidy-maven-plugin</artifactId>
+                    <version>1.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.gaul</groupId>
+                    <artifactId>modernizer-maven-plugin</artifactId>
+                    <version>1.5.0</version>
+                    <executions>
+                        <execution>
+                            <id>modernize</id>
+                            <phase>process-test-classes</phase>
+                            <goals>
+                                <goal>modernizer</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <javaVersion>${version.jdk}</javaVersion>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <!-- By default we verify various aspects of a module and the
+            artifact(s) it produces. We define these in checks in a profile
+            so that they can be disabled during development. -->
+            <id>verify-project</id>
+            <activation>
+                <property>
+                    <name>!verification.skip</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.lewisd</groupId>
+                        <artifactId>lint-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>de.thetaphi</groupId>
+                        <artifactId>forbiddenapis</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <compilerArgs combine.children="append">
+                                <arg>-Werror</arg>
+                                <arg>-Xdoclint:reference</arg>
+                                <arg>-Xlint:all</arg>
+                                <!-- Some generated jOOQ code performs a
+                                redundant cast. Until that is resolved we
+                                suppress this warning. See
+                                https://github.com/jOOQ/jOOQ/issues/6705. -->
+                                <arg>-Xlint:-cast</arg>
+                                <!-- Some of the dependencies we pull in
+                                declare additional non-existent dependencies in
+                                their MANIFEST.MF file. Since we're using Maven
+                                this doesn't impact us. As such the resultant
+                                compiler warnings are irrelevant. -->
+                                <arg>-Xlint:-path</arg>
+                                <!-- The Immutables.org annotation processor
+                                does not handle all annotations present on the
+                                classpath, and javac complains about this. That
+                                doesn't make a lot of sense. From time to time
+                                we should review whether this issue has been
+                                resolved. -->
+                                <arg>-Xlint:-processing</arg>
+                                <!-- The JAXB-generated classes implement
+                                java.io.Serializable, yet do not declare the
+                                serialVersionUID field. Until that's solved, we
+                                cannot enable "serial" warnings. -->
+                                <arg>-Xlint:-serial</arg>
+                                <!-- We want to enable almost all error-prone
+                                bug pattern checkers, so we enable all and then
+                                selectively deactivate some. -->
+                                <arg>-XepAllDisabledChecksAsWarnings</arg>
+                                <!-- The JAXB-generated classes exhibit some
+                                error-prone bug patterns. Nothing we can do
+                                about that, so we simply tell error-prone not
+                                to warn about generated code. -->
+                                <arg>-XepDisableWarningsInGeneratedCode</arg>
+                                <!-- XXX: A whole bunch of JPA entities violate
+                                this pattern. Revisit this once we phased out
+                                Hibernate. See
+                                https://picnic.atlassian.net/browse/PRP-6035. -->
+                                <arg>-Xep:ConstructorInvokesOverridable:OFF</arg>
+                                <!-- See https://github.com/google/error-prone/issues/655. -->
+                                <arg>-Xep:ConstructorLeaksThis:OFF</arg>
+                                <!-- See https://github.com/google/error-prone/issues/708. -->
+                                <arg>-Xep:FieldMissingNullable:OFF</arg>
+                                <!-- Disabled for now, but TBD. -->
+                                <arg>-Xep:MethodCanBeStatic:OFF</arg>
+                                <!-- See https://github.com/google/error-prone/issues/723. -->
+                                <arg>-Xep:ReturnMissingNullable:OFF</arg>
+                                <!-- Deals with an Android-specific limitation
+                                not applicable to us. See also
+                                https://github.com/google/error-prone/issues/488. -->
+                                <arg>-Xep:StaticOrDefaultInterfaceMethod:OFF</arg>
+                                <!-- Interesting idea, but way too much work for now. -->
+                                <arg>-Xep:Var:OFF</arg>
+                                <!-- The following bug patterns by default have
+                                "SUGGESTION" severity. We raise them to the
+                                "WARNING" level. See also
+                                https://github.com/google/error-prone/issues/486. -->
+                                <arg>-Xep:ConstantField:WARN</arg>
+                                <arg>-Xep:EmptySetMultibindingContributions:WARN</arg>
+                                <arg>-Xep:MixedArrayDimensions:WARN</arg>
+                                <arg>-Xep:MultipleTopLevelClasses:WARN</arg>
+                                <arg>-Xep:MultipleUnaryOperatorsInMethodCall:WARN</arg>
+                                <arg>-Xep:MultiVariableDeclaration:WARN</arg>
+                                <arg>-Xep:PackageLocation:WARN</arg>
+                                <arg>-Xep:ParameterComment:WARN</arg>
+                                <arg>-Xep:ParameterNotNullable:WARN</arg>
+                                <arg>-Xep:PrivateConstructorForNoninstantiableModuleTest:WARN</arg>
+                                <arg>-Xep:RemoveUnusedImports:WARN</arg>
+                                <arg>-Xep:ThrowsUncheckedException:WARN</arg>
+                                <arg>-Xep:UngroupedOverloads:WARN</arg>
+                                <arg>-Xep:UnnecessarySetDefault:WARN</arg>
+                                <arg>-Xep:UnnecessaryStaticImport:WARN</arg>
+                                <arg>-Xep:UseBinds:WARN</arg>
+                                <arg>-Xep:WildcardImport:WARN</arg>
+                            </compilerArgs>
+                            <compilerId>javac-with-errorprone</compilerId>
+                            <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                            <showWarnings>true</showWarnings>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.google.errorprone</groupId>
+                                <artifactId>error_prone_core</artifactId>
+                                <version>${version.error-prone}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.codehaus.plexus</groupId>
+                                <artifactId>plexus-compiler-javac</artifactId>
+                                <version>${version.plexus-compiler}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.codehaus.plexus</groupId>
+                                <artifactId>plexus-compiler-javac-errorprone</artifactId>
+                                <version>${version.plexus-compiler}</version>
+                                <!-- XXX: Drop this exclusion once we get rid
+                                of our error-prone fork. -->
+                                <exclusions>
+                                    <exclusion>
+                                        <groupId>com.google.errorprone</groupId>
+                                        <artifactId>error_prone_core</artifactId>
+                                    </exclusion>
+                                </exclusions>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>analyze-dependencies</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>analyze-dep-mgt</goal>
+                                    <goal>analyze-duplicate</goal>
+                                    <goal>analyze-only</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <failBuild>true</failBuild>
+                            <failOnWarning>true</failOnWarning>
+                            <ignoreDirect>false</ignoreDirect>
+                            <ignoreNonCompile>true</ignoreNonCompile>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.gaul</groupId>
+                        <artifactId>modernizer-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
