@@ -7,12 +7,12 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public final class EmptyMethodCheckTest {
-    private final CompilationTestHelper testHelper =
+    private final CompilationTestHelper compilationTestHelper =
             CompilationTestHelper.newInstance(EmptyMethodCheck.class, getClass());
 
     @Test
     public void testNegative() {
-        testHelper
+        compilationTestHelper
                 .addSourceLines(
                         "A.java",
                         "class A {",
@@ -33,7 +33,7 @@ public final class EmptyMethodCheckTest {
 
     @Test
     public void testPositive() {
-        testHelper
+        compilationTestHelper
                 .addSourceLines(
                         "A.java",
                         "class A {",
