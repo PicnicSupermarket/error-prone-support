@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 
-// XXX: Also flag/drop trailing commas?
 @AutoService(BugChecker.class)
 @BugPattern(
   name = "CanonicalAnnotationSyntax",
@@ -37,6 +37,7 @@ import java.util.function.BiFunction;
 public final class CanonicalAnnotationSyntaxCheck extends BugChecker
     implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
+  private static final Pattern TRAILING_ARRAY_COMMA = Pattern.compile(",\\s*}$");
   private static final ImmutableSet<BiFunction<AnnotationTree, VisitorState, Optional<Fix>>>
       FIX_FACTORIES =
           ImmutableSet.of(
@@ -103,7 +104,7 @@ public final class CanonicalAnnotationSyntaxCheck extends BugChecker
     /* Replace the assignment with (the simplified representation of) just its value. */
     ExpressionTree expr = assignment.getExpression();
     return Optional.of(
-        SuggestedFix.replace(arg, simplifyAttributeValue(expr).orElseGet(expr::toString)));
+        SuggestedFix.replace(arg, simplifyAttributeValue(expr, state).orElseGet(expr::toString)));
   }
 
   private static Optional<Fix> dropRedundantCurlies(AnnotationTree tree, VisitorState state) {
@@ -117,26 +118,34 @@ public final class CanonicalAnnotationSyntaxCheck extends BugChecker
           (arg.getKind() == Kind.ASSIGNMENT) ? ((AssignmentTree) arg).getExpression() : arg;
 
       /* Store a fix for each expression that was successfully simplified. */
-      simplifyAttributeValue(value)
+      simplifyAttributeValue(value, state)
           .ifPresent(expr -> fixes.add(SuggestedFix.builder().replace(value, expr)));
     }
 
     return fixes.stream().reduce(SuggestedFix.Builder::merge).map(SuggestedFix.Builder::build);
   }
 
-  private static Optional<String> simplifyAttributeValue(ExpressionTree expr) {
+  private static Optional<String> simplifyAttributeValue(ExpressionTree expr, VisitorState state) {
     if (expr.getKind() != Kind.NEW_ARRAY) {
-      /* There are no curly braces to be dropped here. */
+      /* There are no curly braces or commas to be dropped here. */
       return Optional.empty();
     }
 
     NewArrayTree newArray = (NewArrayTree) expr;
-    if (newArray.getInitializers().size() != 1) {
-      /* Only singleton arrays can be simplified. */
-      return Optional.empty();
+    if (newArray.getInitializers().size() == 1) {
+      /* Return the expression describing the array's sole element. */
+      return Optional.of(newArray.getInitializers().get(0).toString());
     }
 
-    /* Return the expression describing the array's sole element. */
-    return Optional.of(newArray.getInitializers().get(0).toString());
+    String src = state.getSourceForNode(newArray);
+    if (src != null && TRAILING_ARRAY_COMMA.matcher(src).find()) {
+      /*
+       * Drop a trailing command from the source code by returning the expression's
+       * "prettified" representation.
+       */
+      return Optional.of(newArray.toString());
+    }
+
+    return Optional.empty();
   }
 }

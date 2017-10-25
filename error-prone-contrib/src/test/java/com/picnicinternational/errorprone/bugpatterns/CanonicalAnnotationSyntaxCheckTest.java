@@ -1,6 +1,7 @@
 package com.picnicinternational.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import java.io.IOException;
 import org.junit.Test;
@@ -76,6 +77,13 @@ public final class CanonicalAnnotationSyntaxCheckTest {
             "  @pkg.A.Foo(value = 1, value2 = 2) A extended1();",
             "  @A.Foo(value = 1, value2 = 2) A extended2();",
             "  @Foo(value = 1, value2 = 2) A extended3();",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  @pkg.A.Foo({1, 1,}) A trailingComma1();",
+            "  // BUG: Diagnostic contains:",
+            "  @A.Foo({1, 1,}) A trailingComma2();",
+            "  // BUG: Diagnostic contains:",
+            "  @Foo({1, 1,}) A trailingComma3();",
             "}")
         .doTest();
   }
@@ -110,6 +118,10 @@ public final class CanonicalAnnotationSyntaxCheckTest {
             "  @pkg.A.Foo(value = {1, 1}, value2 = {2}) A extended1();",
             "  @A.Foo(value = {1, 1}, value2 = {2}) A extended2();",
             "  @Foo(value = {1, 1}, value2 = {2}) A extended3();",
+            "",
+            "  @pkg.A.Foo({1, 1,}) A trailingComma1();",
+            "  @A.Foo({1, 1,}) A trailingComma2();",
+            "  @Foo({1, 1,}) A trailingComma3();",
             "}")
         .addOutputLines(
             "out/pkg/A.java",
@@ -138,7 +150,11 @@ public final class CanonicalAnnotationSyntaxCheckTest {
             "  @pkg.A.Foo(value = {1, 1}, value2 = 2) A extended1();",
             "  @A.Foo(value = {1, 1}, value2 = 2) A extended2();",
             "  @Foo(value = {1, 1}, value2 = 2) A extended3();",
+            "",
+            "  @pkg.A.Foo({1, 1}) A trailingComma1();",
+            "  @A.Foo({1, 1}) A trailingComma2();",
+            "  @Foo({1, 1}) A trailingComma3();",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 }
