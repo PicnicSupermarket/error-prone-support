@@ -280,6 +280,20 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <groupId>com.theoryinpractise</groupId>
+                    <artifactId>googleformatter-maven-plugin</artifactId>
+                    <version>1.5.1</version>
+                    <executions>
+                        <execution>
+                            <id>format-sources</id>
+                            <phase>process-sources</phase>
+                            <goals>
+                                <goal>format</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
                     <version>2.4.1</version>
@@ -665,59 +679,24 @@
                         <configuration>
                             <compilerArgs combine.children="append">
                                 <arg>-Werror</arg>
-                                <arg>-Xdoclint:reference</arg>
                                 <arg>-Xlint:all</arg>
-                                <!-- Some generated jOOQ code performs a
-                                redundant cast. Until that is resolved we
-                                suppress this warning. See
-                                https://github.com/jOOQ/jOOQ/issues/6705. -->
-                                <arg>-Xlint:-cast</arg>
-                                <!-- Some of the dependencies we pull in
-                                declare additional non-existent dependencies in
-                                their MANIFEST.MF file. Since we're using Maven
-                                this doesn't impact us. As such the resultant
-                                compiler warnings are irrelevant. -->
-                                <arg>-Xlint:-path</arg>
-                                <!-- The Immutables.org annotation processor
-                                does not handle all annotations present on the
-                                classpath, and javac complains about this. That
-                                doesn't make a lot of sense. From time to time
-                                we should review whether this issue has been
+                                <!-- Not all annotations present on the
+                                classpath are handled by annotation processors,
+                                and javac complains about this. That doesn't
+                                make a lot of sense. From time to time we
+                                should review whether this issue has been
                                 resolved. -->
                                 <arg>-Xlint:-processing</arg>
-                                <!-- The JAXB-generated classes implement
-                                java.io.Serializable, yet do not declare the
-                                serialVersionUID field. Until that's solved, we
-                                cannot enable "serial" warnings. -->
-                                <arg>-Xlint:-serial</arg>
                                 <!-- We want to enable almost all error-prone
                                 bug pattern checkers, so we enable all and then
                                 selectively deactivate some. -->
                                 <arg>-XepAllDisabledChecksAsWarnings</arg>
-                                <!-- The JAXB-generated classes exhibit some
-                                error-prone bug patterns. Nothing we can do
-                                about that, so we simply tell error-prone not
-                                to warn about generated code. -->
-                                <arg>-XepDisableWarningsInGeneratedCode</arg>
-                                <!-- XXX: A whole bunch of JPA entities violate
-                                this pattern. Revisit this once we phased out
-                                Hibernate. See
-                                https://picnic.atlassian.net/browse/PRP-6035. -->
-                                <arg>-Xep:ConstructorInvokesOverridable:OFF</arg>
                                 <!-- See https://github.com/google/error-prone/issues/655. -->
                                 <arg>-Xep:ConstructorLeaksThis:OFF</arg>
                                 <!-- See https://github.com/google/error-prone/issues/708. -->
                                 <arg>-Xep:FieldMissingNullable:OFF</arg>
-                                <!-- Disabled for now, but TBD. -->
-                                <arg>-Xep:MethodCanBeStatic:OFF</arg>
                                 <!-- See https://github.com/google/error-prone/issues/723. -->
                                 <arg>-Xep:ReturnMissingNullable:OFF</arg>
-                                <!-- Deals with an Android-specific limitation
-                                not applicable to us. See also
-                                https://github.com/google/error-prone/issues/488. -->
-                                <arg>-Xep:StaticOrDefaultInterfaceMethod:OFF</arg>
-                                <!-- Interesting idea, but way too much work for now. -->
-                                <arg>-Xep:Var:OFF</arg>
                                 <!-- The following bug patterns by default have
                                 "SUGGESTION" severity. We raise them to the
                                 "WARNING" level. See also
