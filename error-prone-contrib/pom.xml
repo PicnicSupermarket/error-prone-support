@@ -161,6 +161,13 @@
                 <artifactId>slf4j-api</artifactId>
                 <version>${version.slf4j}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>4.3.12.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -204,6 +211,11 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -232,32 +244,6 @@
         </resources>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>com.github.PicnicSupermarket</groupId>
-                    <artifactId>googleformatter-maven-plugin</artifactId>
-                    <version>1.0.6-picnic-1-gjf-3b7ec93449</version>
-                    <executions>
-                        <execution>
-                            <id>format-sources</id>
-                            <phase>process-sources</phase>
-                            <goals>
-                                <goal>format</goal>
-                            </goals>
-                            <configuration>
-                                <!-- We enable but skip the plugin by default.
-                                This way `format.sh` can resolve its
-                                dependencies in order to determine the version
-                                of google-java-format used. Actual formatting
-                                is done through explicit invocation by
-                                `format.sh`. -->
-                                <skip>true</skip>
-                            </configuration>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <style>AOSP</style>
-                    </configuration>
-                </plugin>
                 <plugin>
                     <groupId>com.lewisd</groupId>
                     <artifactId>lint-maven-plugin</artifactId>
