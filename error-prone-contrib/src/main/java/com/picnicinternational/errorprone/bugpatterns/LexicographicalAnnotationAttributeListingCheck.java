@@ -69,21 +69,13 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
      * We loop over the array's attributes, trying to sort each array associated with a
      * non-blacklisted attribute. A single compound fix, if any, is returned.
      */
-    String annotationType = ASTHelpers.getType(tree.getAnnotationType()).toString();
-    return tree.getArguments()
-        .stream()
-        .filter(a -> this.matcher.matches(annotationType, extractAttributeName(a)))
+    return this.matcher
+        .extractMatchingArguments(tree)
         .map(expr -> extractArray(expr).flatMap(arr -> suggestSorting(arr, state)))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .reduce(SuggestedFix.Builder::merge)
         .map(SuggestedFix.Builder::build);
-  }
-
-  private static String extractAttributeName(ExpressionTree expr) {
-    return (expr.getKind() == Kind.ASSIGNMENT)
-        ? ASTHelpers.getSymbol(((AssignmentTree) expr).getVariable()).getSimpleName().toString()
-        : "value";
   }
 
   private static Optional<NewArrayTree> extractArray(ExpressionTree expr) {

@@ -1,14 +1,22 @@
 package com.picnicinternational.errorprone.bugpatterns;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
+import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.AssignmentTree;
+import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.Tree.Kind;
+import com.sun.tools.javac.code.Type;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 // XXX: Redefine using auto-value
 // XXX: Document design decision that the project stays as close as possible to Error Prone.
@@ -90,6 +98,28 @@ final class AnnotationAttributeMatcher implements Serializable {
     }
   }
 
+  Stream<? extends ExpressionTree> extractMatchingArguments(AnnotationTree tree) {
+    Type type = ASTHelpers.getType(tree.getAnnotationType());
+    if (type == null) {
+      return Stream.empty();
+    }
+
+    String annotationType = type.toString();
+    return tree.getArguments()
+        .stream()
+        .filter(a -> matches(annotationType, extractAttributeName(a)));
+  }
+
+  private static String extractAttributeName(ExpressionTree expr) {
+    return (expr.getKind() == Kind.ASSIGNMENT)
+        ? ASTHelpers.getSymbol(((AssignmentTree) expr).getVariable()).getSimpleName().toString()
+        : "value";
+  }
+
+  // XXX: The caller of this method can be implemented more efficiently in case of a "wholeTypes"
+  // match.
+  // XXX: Make this method private; re-implement the tests in terms of `#extractMatchingArguments`.
+  @VisibleForTesting
   boolean matches(String annotationType, String attribute) {
     if (this.complement) {
       return !this.wholeTypes.contains(annotationType)
