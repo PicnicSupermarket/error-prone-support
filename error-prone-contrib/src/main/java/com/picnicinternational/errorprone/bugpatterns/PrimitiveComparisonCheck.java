@@ -49,7 +49,7 @@ import javax.annotation.CheckForNull;
   tags = StandardTags.LIKELY_ERROR,
   providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
 )
-public class BoxingComparisonCheck extends BugChecker implements MethodInvocationTreeMatcher {
+public class PrimitiveComparisonCheck extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> STATIC_MATCH = getStaticTargetMatcher();
   private static final Matcher<ExpressionTree> INSTANCE_MATCH = getInstanceTargetMatcher();
@@ -73,7 +73,7 @@ public class BoxingComparisonCheck extends BugChecker implements MethodInvocatio
     }
 
     Description.Builder description = buildDescription(tree);
-    tryFix(description, tree, preferredMethodName);
+    tryFix(description, tree, preferredMethodName, state);
     return description.build();
   }
 
@@ -113,8 +113,14 @@ public class BoxingComparisonCheck extends BugChecker implements MethodInvocatio
     }
   }
 
+  // XXX: We drop explicitly specified generic type information. In case the number of type
+  // arguments before and after doesn't match, that's for the better. But if we e.g. replace
+  // `comparingLong` with `comparingInt`, then we should retain it.
   private static void tryFix(
-      Description.Builder description, MethodInvocationTree tree, String preferredMethodName) {
+      Description.Builder description,
+      MethodInvocationTree tree,
+      String preferredMethodName,
+      VisitorState state) {
     ExpressionTree expr = tree.getMethodSelect();
     switch (expr.getKind()) {
       case IDENTIFIER:
@@ -126,7 +132,8 @@ public class BoxingComparisonCheck extends BugChecker implements MethodInvocatio
       case MEMBER_SELECT:
         MemberSelectTree ms = (MemberSelectTree) tree.getMethodSelect();
         description.addFix(
-            SuggestedFix.replace(ms, ms.getExpression() + "." + preferredMethodName));
+            SuggestedFix.replace(
+                ms, Util.treeToString(ms.getExpression(), state) + "." + preferredMethodName));
         return;
       default:
         throw new VerifyException("Unexpected type of expression: " + expr.getKind());

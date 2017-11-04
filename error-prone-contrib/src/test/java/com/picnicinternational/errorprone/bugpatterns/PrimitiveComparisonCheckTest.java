@@ -1,6 +1,7 @@
 package com.picnicinternational.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import java.io.IOException;
 import org.junit.Test;
@@ -8,11 +9,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public final class BoxingComparisonCheckTest {
+public final class PrimitiveComparisonCheckTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(BoxingComparisonCheck.class, getClass());
+      CompilationTestHelper.newInstance(PrimitiveComparisonCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new BoxingComparisonCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(new PrimitiveComparisonCheck(), getClass());
 
   // XXX: There are no tests for multiple replacements within the same expression:
   // - Error Prone doesn't currently support this, it seems.
@@ -429,6 +430,8 @@ public final class BoxingComparisonCheckTest {
         .doTest();
   }
 
+  // XXX: If the explicit `<A, BoxedPrimitive>` generic type information was necessary, then this
+  // replacement drops too much information.
   @Test
   public void testReplacementWithPrimitiveVariants() throws IOException {
     refactoringTestHelper
@@ -436,16 +439,16 @@ public final class BoxingComparisonCheckTest {
             "in/A.java",
             "import java.util.Comparator;",
             "",
-            "class A {",
-            "  Comparator<Object> bCmp = Comparator.comparing(o -> (byte) 0);",
-            "  Comparator<Object> cCmp = Comparator.comparing(o -> (char) 0);",
-            "  Comparator<Object> sCmp = Comparator.comparing(o -> (short) 0);",
-            "  Comparator<Object> iCmp = Comparator.comparing(o -> 0);",
-            "  Comparator<Object> lCmp = Comparator.comparing(o -> 0L);",
-            "  Comparator<Object> fCmp = Comparator.comparing(o -> 0.0f);",
-            "  Comparator<Object> dCmp = Comparator.comparing(o -> 0.0);",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> bCmp = Comparator.<A, Byte>comparing(o -> (byte) 0);",
+            "  Comparator<A> cCmp = Comparator.<A, Character>comparing(o -> (char) 0);",
+            "  Comparator<A> sCmp = Comparator.<A, Short>comparing(o -> (short) 0);",
+            "  Comparator<A> iCmp = Comparator.<A, Integer>comparing(o -> 0);",
+            "  Comparator<A> lCmp = Comparator.<A, Long>comparing(o -> 0L);",
+            "  Comparator<A> fCmp = Comparator.<A, Float>comparing(o -> 0.0f);",
+            "  Comparator<A> dCmp = Comparator.<A, Double>comparing(o -> 0.0);",
             "",
-            "  {",
+            "  default void m() {",
             "    bCmp.thenComparing(o -> (byte) 0);",
             "    cCmp.thenComparing(o -> (char) 0);",
             "    sCmp.thenComparing(o -> (short) 0);",
@@ -459,16 +462,16 @@ public final class BoxingComparisonCheckTest {
             "out/A.java",
             "import java.util.Comparator;",
             "",
-            "class A {",
-            "  Comparator<Object> bCmp = Comparator.comparingInt(o -> (byte) 0);",
-            "  Comparator<Object> cCmp = Comparator.comparingInt(o -> (char) 0);",
-            "  Comparator<Object> sCmp = Comparator.comparingInt(o -> (short) 0);",
-            "  Comparator<Object> iCmp = Comparator.comparingInt(o -> 0);",
-            "  Comparator<Object> lCmp = Comparator.comparingLong(o -> 0L);",
-            "  Comparator<Object> fCmp = Comparator.comparingDouble(o -> 0.0f);",
-            "  Comparator<Object> dCmp = Comparator.comparingDouble(o -> 0.0);",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> bCmp = Comparator.comparingInt(o -> (byte) 0);",
+            "  Comparator<A> cCmp = Comparator.comparingInt(o -> (char) 0);",
+            "  Comparator<A> sCmp = Comparator.comparingInt(o -> (short) 0);",
+            "  Comparator<A> iCmp = Comparator.comparingInt(o -> 0);",
+            "  Comparator<A> lCmp = Comparator.comparingLong(o -> 0L);",
+            "  Comparator<A> fCmp = Comparator.comparingDouble(o -> 0.0f);",
+            "  Comparator<A> dCmp = Comparator.comparingDouble(o -> 0.0);",
             "",
-            "  {",
+            "  default void m() {",
             "    bCmp.thenComparingInt(o -> (byte) 0);",
             "    cCmp.thenComparingInt(o -> (char) 0);",
             "    sCmp.thenComparingInt(o -> (short) 0);",
@@ -478,9 +481,11 @@ public final class BoxingComparisonCheckTest {
             "    dCmp.thenComparingDouble(o -> 0.0);",
             "  }",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 
+  // XXX: If the explicit `<A>` generic type information was necessary, then this replacement drops
+  // too much information.
   @Test
   public void testReplacementWithBoxedVariants() throws IOException {
     refactoringTestHelper
@@ -488,16 +493,16 @@ public final class BoxingComparisonCheckTest {
             "in/A.java",
             "import java.util.Comparator;",
             "",
-            "class A {",
-            "  Comparator<Object> bCmp = Comparator.comparingInt(o -> Byte.valueOf((byte) 0));",
-            "  Comparator<Object> cCmp = Comparator.comparingInt(o -> Character.valueOf((char) 0));",
-            "  Comparator<Object> sCmp = Comparator.comparingInt(o -> Short.valueOf((short) 0));",
-            "  Comparator<Object> iCmp = Comparator.comparingInt(o -> Integer.valueOf(0));",
-            "  Comparator<Object> lCmp = Comparator.comparingLong(o -> Long.valueOf(0));",
-            "  Comparator<Object> fCmp = Comparator.comparingDouble(o -> Float.valueOf(0));",
-            "  Comparator<Object> dCmp = Comparator.comparingDouble(o -> Double.valueOf(0));",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> bCmp = Comparator.<A>comparingInt(o -> Byte.valueOf((byte) 0));",
+            "  Comparator<A> cCmp = Comparator.<A>comparingInt(o -> Character.valueOf((char) 0));",
+            "  Comparator<A> sCmp = Comparator.<A>comparingInt(o -> Short.valueOf((short) 0));",
+            "  Comparator<A> iCmp = Comparator.<A>comparingInt(o -> Integer.valueOf(0));",
+            "  Comparator<A> lCmp = Comparator.<A>comparingLong(o -> Long.valueOf(0));",
+            "  Comparator<A> fCmp = Comparator.<A>comparingDouble(o -> Float.valueOf(0));",
+            "  Comparator<A> dCmp = Comparator.<A>comparingDouble(o -> Double.valueOf(0));",
             "",
-            "  {",
+            "  default void m() {",
             "    bCmp.thenComparingInt(o -> Byte.valueOf((byte) 0));",
             "    cCmp.thenComparingInt(o -> Character.valueOf((char) 0));",
             "    sCmp.thenComparingInt(o -> Short.valueOf((short) 0));",
@@ -511,16 +516,16 @@ public final class BoxingComparisonCheckTest {
             "out/A.java",
             "import java.util.Comparator;",
             "",
-            "class A {",
-            "  Comparator<Object> bCmp = Comparator.comparing(o -> Byte.valueOf((byte) 0));",
-            "  Comparator<Object> cCmp = Comparator.comparing(o -> Character.valueOf((char) 0));",
-            "  Comparator<Object> sCmp = Comparator.comparing(o -> Short.valueOf((short) 0));",
-            "  Comparator<Object> iCmp = Comparator.comparing(o -> Integer.valueOf(0));",
-            "  Comparator<Object> lCmp = Comparator.comparing(o -> Long.valueOf(0));",
-            "  Comparator<Object> fCmp = Comparator.comparing(o -> Float.valueOf(0));",
-            "  Comparator<Object> dCmp = Comparator.comparing(o -> Double.valueOf(0));",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> bCmp = Comparator.comparing(o -> Byte.valueOf((byte) 0));",
+            "  Comparator<A> cCmp = Comparator.comparing(o -> Character.valueOf((char) 0));",
+            "  Comparator<A> sCmp = Comparator.comparing(o -> Short.valueOf((short) 0));",
+            "  Comparator<A> iCmp = Comparator.comparing(o -> Integer.valueOf(0));",
+            "  Comparator<A> lCmp = Comparator.comparing(o -> Long.valueOf(0));",
+            "  Comparator<A> fCmp = Comparator.comparing(o -> Float.valueOf(0));",
+            "  Comparator<A> dCmp = Comparator.comparing(o -> Double.valueOf(0));",
             "",
-            "  {",
+            "  default void m() {",
             "    bCmp.thenComparing(o -> Byte.valueOf((byte) 0));",
             "    cCmp.thenComparing(o -> Character.valueOf((char) 0));",
             "    sCmp.thenComparing(o -> Short.valueOf((short) 0));",
@@ -530,7 +535,7 @@ public final class BoxingComparisonCheckTest {
             "    dCmp.thenComparing(o -> Double.valueOf(0));",
             "  }",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
@@ -542,14 +547,14 @@ public final class BoxingComparisonCheckTest {
             "",
             "import java.util.Comparator;",
             "",
-            "class A {",
-            "  Comparator<Object> bCmp = comparing(o -> (byte) 0);",
-            "  Comparator<Object> cCmp = comparing(o -> (char) 0);",
-            "  Comparator<Object> sCmp = comparing(o -> (short) 0);",
-            "  Comparator<Object> iCmp = comparing(o -> 0);",
-            "  Comparator<Object> lCmp = comparing(o -> 0L);",
-            "  Comparator<Object> fCmp = comparing(o -> 0.0f);",
-            "  Comparator<Object> dCmp = comparing(o -> 0.0);",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> bCmp = comparing(o -> (byte) 0);",
+            "  Comparator<A> cCmp = comparing(o -> (char) 0);",
+            "  Comparator<A> sCmp = comparing(o -> (short) 0);",
+            "  Comparator<A> iCmp = comparing(o -> 0);",
+            "  Comparator<A> lCmp = comparing(o -> 0L);",
+            "  Comparator<A> fCmp = comparing(o -> 0.0f);",
+            "  Comparator<A> dCmp = comparing(o -> 0.0);",
             "}")
         .addOutputLines(
             "out/A.java",
@@ -560,16 +565,16 @@ public final class BoxingComparisonCheckTest {
             "",
             "import java.util.Comparator;",
             "",
-            "class A {",
-            "  Comparator<Object> bCmp = comparingInt(o -> (byte) 0);",
-            "  Comparator<Object> cCmp = comparingInt(o -> (char) 0);",
-            "  Comparator<Object> sCmp = comparingInt(o -> (short) 0);",
-            "  Comparator<Object> iCmp = comparingInt(o -> 0);",
-            "  Comparator<Object> lCmp = comparingLong(o -> 0L);",
-            "  Comparator<Object> fCmp = comparingDouble(o -> 0.0f);",
-            "  Comparator<Object> dCmp = comparingDouble(o -> 0.0);",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> bCmp = comparingInt(o -> (byte) 0);",
+            "  Comparator<A> cCmp = comparingInt(o -> (char) 0);",
+            "  Comparator<A> sCmp = comparingInt(o -> (short) 0);",
+            "  Comparator<A> iCmp = comparingInt(o -> 0);",
+            "  Comparator<A> lCmp = comparingLong(o -> 0L);",
+            "  Comparator<A> fCmp = comparingDouble(o -> 0.0f);",
+            "  Comparator<A> dCmp = comparingDouble(o -> 0.0);",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
@@ -583,14 +588,14 @@ public final class BoxingComparisonCheckTest {
             "",
             "import java.util.Comparator;",
             "",
-            "class A {",
-            "  Comparator<Object> bCmp = comparingInt(o -> Byte.valueOf((byte) 0));",
-            "  Comparator<Object> cCmp = comparingInt(o -> Character.valueOf((char) 0));",
-            "  Comparator<Object> sCmp = comparingInt(o -> Short.valueOf((short) 0));",
-            "  Comparator<Object> iCmp = comparingInt(o -> Integer.valueOf(0));",
-            "  Comparator<Object> lCmp = comparingLong(o -> Long.valueOf(0));",
-            "  Comparator<Object> fCmp = comparingDouble(o -> Float.valueOf(0));",
-            "  Comparator<Object> dCmp = comparingDouble(o -> Double.valueOf(0));",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> bCmp = comparingInt(o -> Byte.valueOf((byte) 0));",
+            "  Comparator<A> cCmp = comparingInt(o -> Character.valueOf((char) 0));",
+            "  Comparator<A> sCmp = comparingInt(o -> Short.valueOf((short) 0));",
+            "  Comparator<A> iCmp = comparingInt(o -> Integer.valueOf(0));",
+            "  Comparator<A> lCmp = comparingLong(o -> Long.valueOf(0));",
+            "  Comparator<A> fCmp = comparingDouble(o -> Float.valueOf(0));",
+            "  Comparator<A> dCmp = comparingDouble(o -> Double.valueOf(0));",
             "}")
         .addOutputLines(
             "out/A.java",
@@ -601,15 +606,79 @@ public final class BoxingComparisonCheckTest {
             "",
             "import java.util.Comparator;",
             "",
-            "class A {",
-            "  Comparator<Object> bCmp = comparing(o -> Byte.valueOf((byte) 0));",
-            "  Comparator<Object> cCmp = comparing(o -> Character.valueOf((char) 0));",
-            "  Comparator<Object> sCmp = comparing(o -> Short.valueOf((short) 0));",
-            "  Comparator<Object> iCmp = comparing(o -> Integer.valueOf(0));",
-            "  Comparator<Object> lCmp = comparing(o -> Long.valueOf(0));",
-            "  Comparator<Object> fCmp = comparing(o -> Float.valueOf(0));",
-            "  Comparator<Object> dCmp = comparing(o -> Double.valueOf(0));",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> bCmp = comparing(o -> Byte.valueOf((byte) 0));",
+            "  Comparator<A> cCmp = comparing(o -> Character.valueOf((char) 0));",
+            "  Comparator<A> sCmp = comparing(o -> Short.valueOf((short) 0));",
+            "  Comparator<A> iCmp = comparing(o -> Integer.valueOf(0));",
+            "  Comparator<A> lCmp = comparing(o -> Long.valueOf(0));",
+            "  Comparator<A> fCmp = comparing(o -> Float.valueOf(0));",
+            "  Comparator<A> dCmp = comparing(o -> Double.valueOf(0));",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  public void testReplacementWithPrimitiveVariantsInComplexSyntacticalContext() throws IOException {
+    refactoringTestHelper
+        .addInputLines(
+            "in/A.java",
+            "import java.util.Comparator;",
+            "",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> bCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> (byte) 0);",
+            "  Comparator<A> cCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> (char) 0);",
+            "  Comparator<A> sCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> (short) 0);",
+            "  Comparator<A> iCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> 0);",
+            "  Comparator<A> lCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> 0L);",
+            "  Comparator<A> fCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> 0.0f);",
+            "  Comparator<A> dCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> 0.0);",
+            "}")
+        .addOutputLines(
+            "out/A.java",
+            "import java.util.Comparator;",
+            "",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> bCmp = Comparator.<A, A>comparing(o -> o).thenComparingInt(o -> (byte) 0);",
+            "  Comparator<A> cCmp = Comparator.<A, A>comparing(o -> o).thenComparingInt(o -> (char) 0);",
+            "  Comparator<A> sCmp = Comparator.<A, A>comparing(o -> o).thenComparingInt(o -> (short) 0);",
+            "  Comparator<A> iCmp = Comparator.<A, A>comparing(o -> o).thenComparingInt(o -> 0);",
+            "  Comparator<A> lCmp = Comparator.<A, A>comparing(o -> o).thenComparingLong(o -> 0L);",
+            "  Comparator<A> fCmp = Comparator.<A, A>comparing(o -> o).thenComparingDouble(o -> 0.0f);",
+            "  Comparator<A> dCmp = Comparator.<A, A>comparing(o -> o).thenComparingDouble(o -> 0.0);",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  public void testReplacementWithBoxedVariantsInComplexSyntacticalContext() throws IOException {
+    refactoringTestHelper
+        .addInputLines(
+            "in/A.java",
+            "import java.util.Comparator;",
+            "",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> bCmp = Comparator.<A, A>comparing(o -> o).thenComparingInt(o -> Byte.valueOf((byte) 0));",
+            "  Comparator<A> cCmp = Comparator.<A, A>comparing(o -> o).thenComparingInt(o -> Character.valueOf((char) 0));",
+            "  Comparator<A> sCmp = Comparator.<A, A>comparing(o -> o).thenComparingInt(o -> Short.valueOf((short) 0));",
+            "  Comparator<A> iCmp = Comparator.<A, A>comparing(o -> o).thenComparingInt(o -> Integer.valueOf(0));",
+            "  Comparator<A> lCmp = Comparator.<A, A>comparing(o -> o).thenComparingLong(o -> Long.valueOf(0));",
+            "  Comparator<A> fCmp = Comparator.<A, A>comparing(o -> o).thenComparingDouble(o -> Float.valueOf(0));",
+            "  Comparator<A> dCmp = Comparator.<A, A>comparing(o -> o).thenComparingDouble(o -> Double.valueOf(0));",
+            "}")
+        .addOutputLines(
+            "out/A.java",
+            "import java.util.Comparator;",
+            "",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> bCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> Byte.valueOf((byte) 0));",
+            "  Comparator<A> cCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> Character.valueOf((char) 0));",
+            "  Comparator<A> sCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> Short.valueOf((short) 0));",
+            "  Comparator<A> iCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> Integer.valueOf(0));",
+            "  Comparator<A> lCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> Long.valueOf(0));",
+            "  Comparator<A> fCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> Float.valueOf(0));",
+            "  Comparator<A> dCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> Double.valueOf(0));",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
   }
 }

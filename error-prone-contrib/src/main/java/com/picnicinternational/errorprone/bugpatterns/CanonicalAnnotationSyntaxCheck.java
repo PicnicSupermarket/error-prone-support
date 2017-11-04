@@ -18,7 +18,6 @@ import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.NewArrayTree;
-import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,7 +106,8 @@ public final class CanonicalAnnotationSyntaxCheck extends BugChecker
     ExpressionTree expr = assignment.getExpression();
     return Optional.of(
         SuggestedFix.replace(
-            arg, simplifyAttributeValue(expr, state).orElseGet(() -> treeToString(expr, state))));
+            arg,
+            simplifyAttributeValue(expr, state).orElseGet(() -> Util.treeToString(expr, state))));
   }
 
   private static Optional<Fix> dropRedundantCurlies(AnnotationTree tree, VisitorState state) {
@@ -144,23 +144,13 @@ public final class CanonicalAnnotationSyntaxCheck extends BugChecker
   private static Optional<String> simplifySingletonArray(NewArrayTree array, VisitorState state) {
     return Optional.of(array.getInitializers())
         .filter(initializers -> initializers.size() == 1)
-        .map(initializers -> treeToString(initializers.get(0), state));
+        .map(initializers -> Util.treeToString(initializers.get(0), state));
   }
 
   private static Optional<String> dropTrailingComma(NewArrayTree array, VisitorState state) {
-    String src = treeToString(array, state);
+    String src = Util.treeToString(array, state);
     return Optional.of(TRAILING_ARRAY_COMMA.matcher(src))
         .filter(Matcher::find)
         .map(m -> src.substring(0, m.start()) + '}');
-  }
-
-  /**
-   * Returns a string representation of the given {@link Tree}, preferring the original source code
-   * over its prettified representation.
-   */
-  // XXX: This method should be factored out for reuse.
-  private static String treeToString(Tree tree, VisitorState state) {
-    String src = state.getSourceForNode(tree);
-    return src != null ? src : tree.toString();
   }
 }
