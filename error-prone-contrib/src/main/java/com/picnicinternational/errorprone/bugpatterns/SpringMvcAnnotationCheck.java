@@ -55,6 +55,7 @@ public class SpringMvcAnnotationCheck extends BugChecker implements AnnotationTr
 
   @Override
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
+    // XXX: We could remove the `@RequestMapping` import if not other usages remain.
     return ARGUMENT_SELECTOR
         .extractMatchingArguments(tree)
         .findFirst()
