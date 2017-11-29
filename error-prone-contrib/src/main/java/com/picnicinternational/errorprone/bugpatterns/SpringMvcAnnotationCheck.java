@@ -36,7 +36,7 @@ import java.util.Optional;
   tags = StandardTags.STYLE,
   providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
 )
-public class SpringMvcAnnotationCheck extends BugChecker implements AnnotationTreeMatcher {
+public final class SpringMvcAnnotationCheck extends BugChecker implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String ANN_PACKAGE_PREFIX = "org.springframework.web.bind.annotation.";
   private static final String REQUEST_METHOD = ANN_PACKAGE_PREFIX + "RequestMethod";
@@ -60,7 +60,7 @@ public class SpringMvcAnnotationCheck extends BugChecker implements AnnotationTr
         .extractMatchingArguments(tree)
         .findFirst()
         .flatMap(arg -> trySimplification(tree, arg))
-        .map(fix -> buildDescription(tree).addFix(fix).build())
+        .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 

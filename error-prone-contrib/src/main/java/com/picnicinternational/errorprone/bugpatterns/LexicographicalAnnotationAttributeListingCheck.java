@@ -7,6 +7,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Comparators;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
+import com.google.errorprone.BugPattern.ProvidesFix;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.ErrorProneFlags;
@@ -37,7 +38,8 @@ import java.util.stream.Stream;
   summary = "Where possible, sort annotation array attributes lexicographically",
   linkType = LinkType.NONE,
   severity = SeverityLevel.SUGGESTION,
-  tags = StandardTags.STYLE
+  tags = StandardTags.STYLE,
+  providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
 )
 public final class LexicographicalAnnotationAttributeListingCheck extends BugChecker
     implements AnnotationTreeMatcher {
@@ -60,7 +62,7 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
   @Override
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
     return sortArrayElements(tree, state)
-        .map(fix -> buildDescription(tree).addFix(fix).build())
+        .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 

@@ -54,7 +54,7 @@ public final class CanonicalAnnotationSyntaxCheck extends BugChecker
         .filter(Optional::isPresent)
         .map(Optional::get)
         .findFirst()
-        .map(fix -> buildDescription(tree).addFix(fix).build())
+        .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 

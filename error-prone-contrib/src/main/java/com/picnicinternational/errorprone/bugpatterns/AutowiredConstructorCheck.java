@@ -29,7 +29,7 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
   tags = StandardTags.STYLE,
   providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
 )
-public class AutowiredConstructorCheck extends BugChecker implements AnnotationTreeMatcher {
+public final class AutowiredConstructorCheck extends BugChecker implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<AnnotationTree> AUTOWIRED_ANNOTATION =
       new AnnotationType("org.springframework.beans.factory.annotation.Autowired");
@@ -48,8 +48,8 @@ public class AutowiredConstructorCheck extends BugChecker implements AnnotationT
       return Description.NO_MATCH;
     }
 
-    // XXX: We could remove the `@Autowired` import if not other usages remain.
-    return buildDescription(tree).addFix(SuggestedFix.delete(tree)).build();
+    // XXX: We could remove the `@Autowired` import if no other usages remain.
+    return describeMatch(tree, SuggestedFix.delete(tree));
   }
 
   private static boolean withinConstructor(VisitorState state) {

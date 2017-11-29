@@ -13,6 +13,7 @@ import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
+import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
@@ -49,7 +50,8 @@ import javax.annotation.CheckForNull;
   tags = StandardTags.LIKELY_ERROR,
   providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
 )
-public class PrimitiveComparisonCheck extends BugChecker implements MethodInvocationTreeMatcher {
+public final class PrimitiveComparisonCheck extends BugChecker
+    implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> STATIC_MATCH = getStaticTargetMatcher();
   private static final Matcher<ExpressionTree> INSTANCE_MATCH = getInstanceTargetMatcher();
@@ -72,9 +74,7 @@ public class PrimitiveComparisonCheck extends BugChecker implements MethodInvoca
       return Description.NO_MATCH;
     }
 
-    Description.Builder description = buildDescription(tree);
-    tryFix(description, tree, preferredMethodName, state);
-    return description.build();
+    return describeMatch(tree, suggestFix(tree, preferredMethodName, state));
   }
 
   private static String getPreferredMethod(VisitorState state, Type cmpType, boolean isStatic) {
@@ -116,25 +116,19 @@ public class PrimitiveComparisonCheck extends BugChecker implements MethodInvoca
   // XXX: We drop explicitly specified generic type information. In case the number of type
   // arguments before and after doesn't match, that's for the better. But if we e.g. replace
   // `comparingLong` with `comparingInt`, then we should retain it.
-  private static void tryFix(
-      Description.Builder description,
-      MethodInvocationTree tree,
-      String preferredMethodName,
-      VisitorState state) {
+  private static Fix suggestFix(
+      MethodInvocationTree tree, String preferredMethodName, VisitorState state) {
     ExpressionTree expr = tree.getMethodSelect();
     switch (expr.getKind()) {
       case IDENTIFIER:
-        SuggestedFix.Builder fix = SuggestedFix.builder();
-        fix.addStaticImport(java.util.Comparator.class.getName() + '.' + preferredMethodName);
-        fix.replace(expr, preferredMethodName);
-        description.addFix(fix.build());
-        return;
+        return SuggestedFix.builder()
+            .addStaticImport(java.util.Comparator.class.getName() + '.' + preferredMethodName)
+            .replace(expr, preferredMethodName)
+            .build();
       case MEMBER_SELECT:
         MemberSelectTree ms = (MemberSelectTree) tree.getMethodSelect();
-        description.addFix(
-            SuggestedFix.replace(
-                ms, Util.treeToString(ms.getExpression(), state) + "." + preferredMethodName));
-        return;
+        return SuggestedFix.replace(
+            ms, Util.treeToString(ms.getExpression(), state) + "." + preferredMethodName);
       default:
         throw new VerifyException("Unexpected type of expression: " + expr.getKind());
     }
