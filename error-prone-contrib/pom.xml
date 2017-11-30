@@ -688,27 +688,6 @@
                                 <arg>-Xep:FieldMissingNullable:OFF</arg>
                                 <!-- See https://github.com/google/error-prone/issues/723. -->
                                 <arg>-Xep:ReturnMissingNullable:OFF</arg>
-                                <!-- The following bug patterns by default have
-                                "SUGGESTION" severity. We raise them to the
-                                "WARNING" level. See also
-                                https://github.com/google/error-prone/issues/486. -->
-                                <arg>-Xep:ConstantField:WARN</arg>
-                                <arg>-Xep:EmptySetMultibindingContributions:WARN</arg>
-                                <arg>-Xep:MixedArrayDimensions:WARN</arg>
-                                <arg>-Xep:MultipleTopLevelClasses:WARN</arg>
-                                <arg>-Xep:MultipleUnaryOperatorsInMethodCall:WARN</arg>
-                                <arg>-Xep:MultiVariableDeclaration:WARN</arg>
-                                <arg>-Xep:PackageLocation:WARN</arg>
-                                <arg>-Xep:ParameterComment:WARN</arg>
-                                <arg>-Xep:ParameterNotNullable:WARN</arg>
-                                <arg>-Xep:PrivateConstructorForNoninstantiableModuleTest:WARN</arg>
-                                <arg>-Xep:RemoveUnusedImports:WARN</arg>
-                                <arg>-Xep:ThrowsUncheckedException:WARN</arg>
-                                <arg>-Xep:UngroupedOverloads:WARN</arg>
-                                <arg>-Xep:UnnecessarySetDefault:WARN</arg>
-                                <arg>-Xep:UnnecessaryStaticImport:WARN</arg>
-                                <arg>-Xep:UseBinds:WARN</arg>
-                                <arg>-Xep:WildcardImport:WARN</arg>
                             </compilerArgs>
                             <compilerId>javac-with-errorprone</compilerId>
                             <forceJavacCompilerUse>true</forceJavacCompilerUse>
