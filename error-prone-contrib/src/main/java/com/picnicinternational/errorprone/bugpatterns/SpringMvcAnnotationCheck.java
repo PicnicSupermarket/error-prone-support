@@ -71,10 +71,11 @@ public final class SpringMvcAnnotationCheck extends BugChecker implements Annota
   }
 
   private static Optional<String> extractUniqueMethod(ExpressionTree arg) {
+    // XXX: Drop the `new Object[] { }` wrapper once Error Prone depends on Guava 23.1+.
     verify(
         arg.getKind() == Kind.ASSIGNMENT,
         "Annotation attribute is not an assignment: %s",
-        arg.getKind());
+        new Object[] {arg.getKind()});
 
     ExpressionTree expr = ((AssignmentTree) arg).getExpression();
     if (expr.getKind() != Kind.NEW_ARRAY) {

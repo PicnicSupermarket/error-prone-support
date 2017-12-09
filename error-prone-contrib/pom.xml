@@ -36,7 +36,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.checkstyle>8.3</version.checkstyle>
+        <version.checkstyle>8.5</version.checkstyle>
         <version.error-prone>2.1.3</version.error-prone>
         <version.extra-enforcer-rules>1.0-beta-6</version.extra-enforcer-rules>
         <version.javac>9-dev-r4023-3</version.javac>
@@ -95,6 +95,11 @@
                 <version>1.0-rc3</version>
             </dependency>
             <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.2</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotation</artifactId>
                 <version>${version.error-prone}</version>
@@ -122,11 +127,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.google.code.findbugs</groupId>
-                <artifactId>jsr305</artifactId>
-                <version>3.0.2</version>
-            </dependency>
-            <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>javac</artifactId>
                 <version>${version.javac}</version>
@@ -134,7 +134,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>23.2-jre</version>
+                <version>23.5-jre</version>
             </dependency>
             <dependency>
                 <groupId>com.google.truth</groupId>
@@ -164,7 +164,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>4.3.12.RELEASE</version>
+                <version>5.0.2.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -751,14 +751,6 @@
                                 <groupId>org.codehaus.plexus</groupId>
                                 <artifactId>plexus-compiler-javac-errorprone</artifactId>
                                 <version>${version.plexus-compiler}</version>
-                                <!-- XXX: Drop this exclusion once we get rid
-                                of our error-prone fork. -->
-                                <exclusions>
-                                    <exclusion>
-                                        <groupId>com.google.errorprone</groupId>
-                                        <artifactId>error_prone_core</artifactId>
-                                    </exclusion>
-                                </exclusions>
                             </dependency>
                         </dependencies>
                     </plugin>
