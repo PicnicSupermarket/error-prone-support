@@ -630,6 +630,31 @@
                         <javaVersion>${version.jdk}</javaVersion>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.pitest</groupId>
+                    <artifactId>pitest-maven</artifactId>
+                    <version>1.2.5</version>
+                    <executions>
+                        <execution>
+                            <id>compute-mutation-coverage</id>
+                            <goals>
+                                <goal>mutationCoverage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <jvmArgs>-Xbootclasspath/p:-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${version.javac}/javac-${version.javac}.jar</jvmArgs>
+                        <mutators>
+                            <mutator>ALL</mutator>
+                        </mutators>
+                        <mutateStaticInitializers>true</mutateStaticInitializers>
+                        <!-- Use multple threads to speed things up. Extend
+                        timeouts to prevent false positives as a result of
+                        contention. -->
+                        <threads>4</threads>
+                        <timeoutFactor>4</timeoutFactor>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -645,6 +670,19 @@
     </build>
 
     <profiles>
+        <profile>
+            <!-- If explicitly enabled using `-Pcoverage` we use PIT to
+            establish coverage through mutation testing. -->
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-maven</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <!-- By default we verify various aspects of a module and the
             artifact(s) it produces. We define these in checks in a profile
