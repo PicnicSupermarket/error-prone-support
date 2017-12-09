@@ -12,7 +12,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 import java.util.regex.Pattern;
 
-// XXX: Document, add tests.
+// XXX: Document.
 final class MethodMatcherFactory {
   private static final Splitter ARGUMENT_TYPE_SPLITTER =
       Splitter.on(',').trimResults().omitEmptyStrings();

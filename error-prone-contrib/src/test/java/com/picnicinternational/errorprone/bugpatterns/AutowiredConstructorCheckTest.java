@@ -19,9 +19,12 @@ public final class AutowiredConstructorCheckTest {
     compilationTestHelper
         .addSourceLines(
             "Container.java",
+            "import com.google.errorprone.annotations.Immutable;",
+            "import java.util.List;",
             "import org.springframework.beans.factory.annotation.Autowired;",
             "",
             "interface Container {",
+            "  @Immutable",
             "  class A {",
             "    A() {}",
             "  }",
@@ -52,6 +55,10 @@ public final class AutowiredConstructorCheckTest {
             "",
             "  class G {",
             "    @Autowired private Object o;",
+            "  }",
+            "",
+            "  class H {",
+            "    @SafeVarargs H(List<String>... lists) {}",
             "  }",
             "}")
         .doTest();

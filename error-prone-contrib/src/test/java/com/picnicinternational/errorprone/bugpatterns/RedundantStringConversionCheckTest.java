@@ -8,6 +8,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+// XXX: The tests below show that `String.valueOf((String) null)` may be simplified,
+// but `String.valueOf(null)` may not. That is because the latter matches `String#valueOf(char[])`.
+// We could special-case `null` arguments, but that doesn't seem worth the trouble.
 @RunWith(JUnit4.class)
 public final class RedundantStringConversionCheckTest {
   private final CompilationTestHelper compilationTestHelper =
@@ -16,11 +19,10 @@ public final class RedundantStringConversionCheckTest {
       CompilationTestHelper.newInstance(RedundantStringConversionCheck.class, getClass())
           .setArgs(
               ImmutableList.of(
-                  "-XepOpt:RedundantStringConversionCheck:ExtraConversionMethods=java.lang.Enum#name(),A.B#toString(int)"));
+                  "-XepOpt:RedundantStringConversionCheck:ExtraConversionMethods=java.lang.Enum#name(),A#name(),A.B#toString(int)"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(new RedundantStringConversionCheck(), getClass());
 
-  // XXX: Here and in the tests below: add tests for the static `#toString` methods on boxed types.
   @Test
   public void testIdentificationOfIdentityTransformation() {
     compilationTestHelper
@@ -43,7 +45,7 @@ public final class RedundantStringConversionCheckTest {
   }
 
   @Test
-  public void testIdentificationWithinConcatenatingAssignment() {
+  public void testIdentificationWithinMutatingAssignment() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -51,9 +53,9 @@ public final class RedundantStringConversionCheckTest {
             "",
             "class A {",
             "  private final BigInteger i = BigInteger.ZERO;",
-            "  private String s = i.toString();",
             "",
-            "  void m() {",
+            "  void m1() {",
+            "    String s = i.toString();",
             "    // BUG: Diagnostic contains:",
             "    s += this.toString();",
             "    s += super.toString();",
@@ -64,15 +66,37 @@ public final class RedundantStringConversionCheckTest {
             "    s += String.valueOf(i);",
             "    // BUG: Diagnostic contains:",
             "    s += String.valueOf((String) null);",
-            "    // BUG: Diagnostic contains:",
             "    s += String.valueOf(null);",
+            "    s += String.valueOf(new char[0]);",
+            "    // BUG: Diagnostic contains:",
+            "    s += Byte.toString((byte) 0);",
+            "    // BUG: Diagnostic contains:",
+            "    s += Character.toString((char) 0);",
+            "    // BUG: Diagnostic contains:",
+            "    s += Short.toString((short) 0);",
+            "    // BUG: Diagnostic contains:",
+            "    s += Integer.toString(0);",
+            "    // BUG: Diagnostic contains:",
+            "    s += Long.toString(0);",
+            "    // BUG: Diagnostic contains:",
+            "    s += Float.toString((float) 0.0);",
+            "    // BUG: Diagnostic contains:",
+            "    s += Double.toString(0.0);",
+            "  }",
+            "",
+            "  void m2() {",
+            "    int i = 0;",
+            "    i += 1;",
+            "    i -= 1;",
+            "    i *= 1;",
+            "    i /= 1;",
             "  }",
             "}")
         .doTest();
   }
 
   @Test
-  public void testIdentificationWithinConcatenation() {
+  public void testIdentificationWithinBinaryOperation() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -82,7 +106,7 @@ public final class RedundantStringConversionCheckTest {
             "  private final BigInteger i = BigInteger.ZERO;",
             "  private final String s = i.toString();",
             "",
-            "  String[] m() {",
+            "  String[] m1() {",
             "    return new String[] {",
             "      // BUG: Diagnostic contains:",
             "      s + this.toString(),",
@@ -94,8 +118,8 @@ public final class RedundantStringConversionCheckTest {
             "      s + String.valueOf(i),",
             "      // BUG: Diagnostic contains:",
             "      s + String.valueOf((String) null),",
-            "      // BUG: Diagnostic contains:",
             "      s + String.valueOf(null),",
+            "      s + String.valueOf(new char[0]),",
             "",
             "      42 + this.toString(),",
             "      42 + super.toString(),",
@@ -105,6 +129,7 @@ public final class RedundantStringConversionCheckTest {
             "      // BUG: Diagnostic contains:",
             "      42 + String.valueOf((String) null),",
             "      42 + String.valueOf(null),",
+            "      42 + String.valueOf(new char[0]),",
             "",
             "      // BUG: Diagnostic contains:",
             "      this.toString() + s,",
@@ -116,8 +141,8 @@ public final class RedundantStringConversionCheckTest {
             "      String.valueOf(i) + s,",
             "      // BUG: Diagnostic contains:",
             "      String.valueOf((String) null) + s,",
-            "      // BUG: Diagnostic contains:",
             "      String.valueOf(null) + s,",
+            "      String.valueOf(new char[0]) + s,",
             "",
             "      this.toString() + 42,",
             "      super.toString() + 42,",
@@ -127,6 +152,7 @@ public final class RedundantStringConversionCheckTest {
             "      // BUG: Diagnostic contains:",
             "      String.valueOf((String) null) + 42,",
             "      String.valueOf(null) + 42,",
+            "      String.valueOf(new char[0]) + 42,",
             "",
             "      // BUG: Diagnostic contains:",
             "      this.toString() + this.toString(),",
@@ -138,15 +164,70 @@ public final class RedundantStringConversionCheckTest {
             "      String.valueOf(i) + String.valueOf(i),",
             "      // BUG: Diagnostic contains:",
             "      String.valueOf((String) null) + String.valueOf((String) null),",
-            "      // BUG: Diagnostic contains:",
             "      String.valueOf(null) + String.valueOf(null),",
+            "      String.valueOf(new char[0]) + String.valueOf(new char[0]),",
+            "    };",
+            "  }",
+            "",
+            "  int[] m2() {",
+            "    return new int[] {",
+            "      1 + 1,",
+            "      1 - 1,",
+            "      1 * 1,",
+            "      1 / 1,",
             "    };",
             "  }",
             "}")
         .doTest();
   }
 
-  // XXX: Test StringBuilder methods.
+  @Test
+  public void testIdentificationWithinStringBuilderMethod() {
+    compilationTestHelper
+        .addSourceLines(
+            "A.java",
+            "import java.math.BigInteger;",
+            "",
+            "class A {",
+            "  private final BigInteger i = BigInteger.ZERO;",
+            "  private final String s = i.toString();",
+            "",
+            "  void m() {",
+            "    StringBuilder sb = new StringBuilder();",
+            "",
+            "    sb.append(1);",
+            "    sb.append(i);",
+            "    // BUG: Diagnostic contains:",
+            "    sb.append(i.toString());",
+            "    sb.append(i.toString(16));",
+            "    // BUG: Diagnostic contains:",
+            "    sb.append(String.valueOf(i));",
+            "    // BUG: Diagnostic contains:",
+            "    sb.append(String.valueOf((String) null));",
+            "    sb.append(String.valueOf(null));",
+            "    sb.append(String.valueOf(new char[0]));",
+            "    sb.append(s);",
+            "    sb.append(\"constant\");",
+            "",
+            "    sb.insert(0, 1);",
+            "    sb.insert(0, i);",
+            "    // BUG: Diagnostic contains:",
+            "    sb.insert(0, i.toString());",
+            "    sb.insert(0, i.toString(16));",
+            "    // BUG: Diagnostic contains:",
+            "    sb.insert(0, String.valueOf(i));",
+            "    // BUG: Diagnostic contains:",
+            "    sb.insert(0, String.valueOf((String) null));",
+            "    sb.insert(0, String.valueOf(null));",
+            "    sb.insert(0, String.valueOf(new char[0]));",
+            "    sb.insert(0, s);",
+            "    sb.insert(0, \"constant\");",
+            "",
+            "    sb.replace(0, 1, i.toString());",
+            "  }",
+            "}")
+        .doTest();
+  }
 
   // XXX: Also test the other formatter methods.
   @Test
@@ -254,7 +335,6 @@ public final class RedundantStringConversionCheckTest {
         .doTest();
   }
 
-  // XXX: Also test the other log methods.
   @Test
   public void testIdentificationWithinSlf4jLoggerMethod() {
     compilationTestHelper
@@ -275,31 +355,35 @@ public final class RedundantStringConversionCheckTest {
             "  private final Throwable t = new Throwable();",
             "",
             "  void m() {",
-            "    LOG.info(s, f);",
+            "    LOG.trace(s, f);",
             "    // BUG: Diagnostic contains:",
-            "    LOG.info(s, f.toString());",
+            "    LOG.debug(s, f.toString());",
             "    LOG.info(s, t.toString());",
-            "    LOG.info(s, o, t.toString());",
+            "    LOG.warn(s, o, t.toString());",
             "    // BUG: Diagnostic contains:",
-            "    LOG.info(s, t.toString(), o);",
+            "    LOG.error(s, o.toString(), t.toString());",
+            "    // BUG: Diagnostic contains:",
+            "    LOG.trace(s, t.toString(), o);",
             "",
-            "    LOG.info(marker, s, f);",
+            "    LOG.trace(marker, s, f);",
             "    // BUG: Diagnostic contains:",
-            "    LOG.info(marker, s, f.toString());",
+            "    LOG.debug(marker, s, f.toString());",
             "    LOG.info(marker, s, t.toString());",
-            "    LOG.info(marker, s, o, t.toString());",
+            "    LOG.warn(marker, s, o, t.toString());",
             "    // BUG: Diagnostic contains:",
-            "    LOG.info(marker, s, t.toString(), o);",
+            "    LOG.error(marker, s, o.toString(), t.toString());",
+            "    // BUG: Diagnostic contains:",
+            "    LOG.trace(marker, s, t.toString(), o);",
             "",
-            "    LOG.info(f.toString(), f);",
+            "    LOG.trace(f.toString(), f);",
             "    // BUG: Diagnostic contains:",
-            "    LOG.info(s.toString(), f);",
+            "    LOG.debug(s.toString(), f);",
             "    LOG.info(t.toString(), f);",
-            "    LOG.info(marker.toString(), s, f);",
-            "    LOG.info(marker, o.toString(), f);",
+            "    LOG.warn(marker.toString(), s, f);",
+            "    LOG.error(marker, o.toString(), f);",
             "    // BUG: Diagnostic contains:",
-            "    LOG.info(marker, s.toString(), f);",
-            "    LOG.info(marker, t.toString(), f);",
+            "    LOG.trace(marker, s.toString(), f);",
+            "    LOG.debug(marker, t.toString(), f);",
             "  }",
             "}")
         .doTest();
@@ -322,22 +406,57 @@ public final class RedundantStringConversionCheckTest {
             "    static String toString(int i) {",
             "      return Integer.toString(i);",
             "    }",
+            "",
+            "    static String toString(int i, int j) {",
+            "      return Integer.toString(i * j);",
+            "    }",
             "  }",
             "",
             "  private final B b = new B();",
             "  private final String s = b.toString();",
             "",
-            "  String[] m() {",
+            "  String[] builtin() {",
+            "    return new String[] {",
+            "      // BUG: Diagnostic contains:",
+            "      s + b.toString(),",
+            "      // BUG: Diagnostic contains:",
+            "      s + String.valueOf(b),",
+            "      // BUG: Diagnostic contains:",
+            "      s + Byte.toString((byte) 0),",
+            "      // BUG: Diagnostic contains:",
+            "      s + Character.toString((char) 0),",
+            "      // BUG: Diagnostic contains:",
+            "      s + Short.toString((short) 0),",
+            "      // BUG: Diagnostic contains:",
+            "      s + Integer.toString(0),",
+            "      s + Integer.toString(0, 16),",
+            "      // BUG: Diagnostic contains:",
+            "      s + Long.toString(0),",
+            "      s + Long.toString(0, 16),",
+            "      // BUG: Diagnostic contains:",
+            "      s + Float.toString((float) 0.0),",
+            "      // BUG: Diagnostic contains:",
+            "      s + Double.toString(0.0),",
+            "    };",
+            "  }",
+            "",
+            "  String[] custom() {",
             "    return new String[] {",
             "      s + b.name(),",
             "      // BUG: Diagnostic contains:",
             "      s + RoundingMode.UP.name(),",
             "      // BUG: Diagnostic contains:",
             "      s + mode().name(),",
+            "      s + A.name(),",
             "      s + A.toString(42),",
             "      // BUG: Diagnostic contains:",
             "      s + B.toString(42),",
+            "      s + B.toString(42, 42),",
             "    };",
+            "  }",
+            "",
+            "  static String name() {",
+            "    return A.class.toString();",
             "  }",
             "",
             "  RoundingMode mode() {",

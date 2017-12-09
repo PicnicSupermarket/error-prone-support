@@ -1,9 +1,10 @@
 package com.picnicinternational.errorprone.bugpatterns;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Verify.verify;
 import static java.util.stream.Collectors.joining;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.BugPattern;
@@ -17,7 +18,6 @@ import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
-import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
@@ -71,40 +71,31 @@ public final class SpringMvcAnnotationCheck extends BugChecker implements Annota
   }
 
   private static Optional<String> extractUniqueMethod(ExpressionTree arg) {
-    checkArgument(
+    verify(
         arg.getKind() == Kind.ASSIGNMENT,
         "Annotation attribute is not an assignment: %s",
         arg.getKind());
 
     ExpressionTree expr = ((AssignmentTree) arg).getExpression();
     if (expr.getKind() != Kind.NEW_ARRAY) {
-      return extractMethod(expr);
+      return Optional.of(extractMethod(expr));
     }
 
     NewArrayTree newArray = (NewArrayTree) expr;
-    if (newArray.getInitializers().size() == 1) {
-      return extractMethod(newArray.getInitializers().get(0));
-    }
-
-    return Optional.empty();
+    return Optional.of(newArray.getInitializers())
+        .filter(args -> args.size() == 1)
+        .map(args -> extractMethod(args.get(0)));
   }
 
-  private static Optional<String> extractMethod(ExpressionTree expr) {
-    if (expr.getKind() == Kind.IDENTIFIER) {
-      // XXX: Not quite correct. This _could_ be some custom constant...
-      return Optional.of(expr.toString());
+  private static String extractMethod(ExpressionTree expr) {
+    switch (expr.getKind()) {
+      case IDENTIFIER:
+        return expr.toString();
+      case MEMBER_SELECT:
+        return ((MemberSelectTree) expr).getIdentifier().toString();
+      default:
+        throw new VerifyException("Unexpected type of expression: " + expr.getKind());
     }
-
-    if (expr.getKind() != Kind.MEMBER_SELECT) {
-      return Optional.empty();
-    }
-
-    MemberSelectTree memberSelect = (MemberSelectTree) expr;
-    if (!REQUEST_METHOD.equals(String.valueOf(ASTHelpers.getType(memberSelect.getExpression())))) {
-      return Optional.empty();
-    }
-
-    return Optional.of(memberSelect.getIdentifier().toString());
   }
 
   private static Fix replaceAnnotation(

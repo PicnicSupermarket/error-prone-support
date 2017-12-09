@@ -44,7 +44,7 @@ public final class AutowiredConstructorCheck extends BugChecker implements Annot
       return Description.NO_MATCH;
     }
 
-    if (ASTHelpers.getConstructors(state.findEnclosing(ClassTree.class)).size() > 1) {
+    if (ASTHelpers.getConstructors(state.findEnclosing(ClassTree.class)).size() != 1) {
       return Description.NO_MATCH;
     }
 

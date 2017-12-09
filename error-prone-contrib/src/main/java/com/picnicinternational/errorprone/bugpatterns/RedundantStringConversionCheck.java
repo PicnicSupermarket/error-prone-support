@@ -10,7 +10,6 @@ import static com.google.errorprone.matchers.method.MethodMatchers.instanceMetho
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
@@ -69,24 +68,52 @@ public final class RedundantStringConversionCheck extends BugChecker
   private static final Matcher<ExpressionTree> WELL_KNOWN_STRING_CONVERSION_METHODS =
       anyOf(
           instanceMethod().onDescendantOfAny(Object.class.getName()).named("toString"),
-          staticMethod().onClass(String.class.getName()).named("valueOf"),
-          staticMethod().onClass(Byte.class.getName()).named("toString"),
-          staticMethod().onClass(Character.class.getName()).named("toString"),
-          staticMethod().onClass(Short.class.getName()).named("toString"),
-          staticMethod().onClass(Integer.class.getName()).named("toString"),
-          staticMethod().onClass(Long.class.getName()).named("toString"),
-          staticMethod().onClass(Float.class.getName()).named("toString"),
-          staticMethod().onClass(Double.class.getName()).named("toString"));
+          staticMethod()
+              .onClass(String.class.getName())
+              .named("valueOf")
+              .withParameters(Object.class.getName()),
+          staticMethod()
+              .onClass(String.class.getName())
+              .named("valueOf")
+              .withParameters(String.class.getName()),
+          staticMethod()
+              .onClass(Byte.class.getName())
+              .named("toString")
+              .withParameters(byte.class.getName()),
+          staticMethod()
+              .onClass(Character.class.getName())
+              .named("toString")
+              .withParameters(char.class.getName()),
+          staticMethod()
+              .onClass(Short.class.getName())
+              .named("toString")
+              .withParameters(short.class.getName()),
+          staticMethod()
+              .onClass(Integer.class.getName())
+              .named("toString")
+              .withParameters(int.class.getName()),
+          staticMethod()
+              .onClass(Long.class.getName())
+              .named("toString")
+              .withParameters(long.class.getName()),
+          staticMethod()
+              .onClass(Float.class.getName())
+              .named("toString")
+              .withParameters(float.class.getName()),
+          staticMethod()
+              .onClass(Double.class.getName())
+              .named("toString")
+              .withParameters(double.class.getName()));
   private static final Matcher<ExpressionTree> STRINGBUILDER_APPEND_INVOCATION =
       instanceMethod()
           .onDescendantOf(StringBuilder.class.getName())
           .named("append")
-          .withParameters(Object.class.getName());
+          .withParameters(String.class.getName());
   private static final Matcher<ExpressionTree> STRINGBUILDER_INSERT_INVOCATION =
       instanceMethod()
           .onDescendantOf(StringBuilder.class.getName())
           .named("insert")
-          .withParameters(int.class.getName(), Object.class.getName());
+          .withParameters(int.class.getName(), String.class.getName());
   private static final Matcher<ExpressionTree> FORMATTER_INVOCATION =
       anyOf(
           staticMethod().onClass(String.class.getName()).named("format"),
@@ -128,7 +155,7 @@ public final class RedundantStringConversionCheck extends BugChecker
   }
 
   public RedundantStringConversionCheck(ErrorProneFlags flags) {
-    this.conversionMethodMatcher = createAnnotationAttributeMatcher(flags);
+    this.conversionMethodMatcher = createConversionMethodMatcher(flags);
   }
 
   @Override
@@ -298,9 +325,6 @@ public final class RedundantStringConversionCheck extends BugChecker
   private Optional<ExpressionTree> trySimplify(ExpressionTree tree, VisitorState state) {
     if (tree.getKind() != Kind.METHOD_INVOCATION
         || !this.conversionMethodMatcher.matches(tree, state)) {
-      new MethodMatcherFactory()
-          .create(ImmutableList.of("java.lang.Enum#name()"))
-          .matches(tree, state);
       return Optional.empty();
     }
 
@@ -311,7 +335,8 @@ public final class RedundantStringConversionCheck extends BugChecker
       case 1:
         return trySimplifyUnaryMethod(methodInvocation, state);
       default:
-        return Optional.empty();
+        throw new IllegalStateException(
+            "Cannot simplify method call with two or more arguments: " + tree);
     }
   }
 
@@ -343,7 +368,9 @@ public final class RedundantStringConversionCheck extends BugChecker
         .orElse(Description.NO_MATCH);
   }
 
-  private static Matcher<ExpressionTree> createAnnotationAttributeMatcher(ErrorProneFlags flags) {
+  private static Matcher<ExpressionTree> createConversionMethodMatcher(ErrorProneFlags flags) {
+    // XXX: ErrorProneFlags#getList splits by comma, but method signatures may also contain commas.
+    // For this class methods accepting more than one argument are not valid, but still: not nice.
     return flags
         .getList(EXTRA_STRING_CONVERSION_METHODS_FLAG)
         .map(new MethodMatcherFactory()::create)
