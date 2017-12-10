@@ -18,8 +18,8 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
               LexicographicalAnnotationAttributeListingCheck.class, getClass())
           .setArgs(
               ImmutableList.of(
-                  "-XepOpt:LexicographicalAnnotationAttributeListingCheck:Includes=pkg.A.Foo,pkg.A.Bar",
-                  "-XepOpt:LexicographicalAnnotationAttributeListingCheck:Excludes=pkg.A.Bar#value"));
+                  "-XepOpt:LexicographicalAnnotationAttributeListing:Includes=pkg.A.Foo,pkg.A.Bar",
+                  "-XepOpt:LexicographicalAnnotationAttributeListing:Excludes=pkg.A.Bar#value"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(
           new LexicographicalAnnotationAttributeListingCheck(), getClass());

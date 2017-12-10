@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
 public final class RedundantStringConversionCheck extends BugChecker
     implements BinaryTreeMatcher, CompoundAssignmentTreeMatcher, MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final String FLAG_PREFIX = "RedundantStringConversionCheck:";
+  private static final String FLAG_PREFIX = "RedundantStringConversion:";
   private static final String EXTRA_STRING_CONVERSION_METHODS_FLAG =
       FLAG_PREFIX + "ExtraConversionMethods";
   private static final Matcher<ExpressionTree> ANY_EXPR = (t, s) -> true;

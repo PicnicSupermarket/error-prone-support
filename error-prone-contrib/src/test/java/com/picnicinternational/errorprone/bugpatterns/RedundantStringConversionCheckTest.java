@@ -19,7 +19,7 @@ public final class RedundantStringConversionCheckTest {
       CompilationTestHelper.newInstance(RedundantStringConversionCheck.class, getClass())
           .setArgs(
               ImmutableList.of(
-                  "-XepOpt:RedundantStringConversionCheck:ExtraConversionMethods=java.lang.Enum#name(),A#name(),A.B#toString(int)"));
+                  "-XepOpt:RedundantStringConversion:ExtraConversionMethods=java.lang.Enum#name(),A#name(),A.B#toString(int)"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(new RedundantStringConversionCheck(), getClass());
 
@@ -409,6 +409,14 @@ public final class RedundantStringConversionCheckTest {
             "",
             "    static String toString(int i, int j) {",
             "      return Integer.toString(i * j);",
+            "    }",
+            "  }",
+            "",
+            "  enum E {",
+            "    ELEM;",
+            "",
+            "    public String toString() {",
+            "      return \"__\" + name() + \"__\";",
             "    }",
             "  }",
             "",

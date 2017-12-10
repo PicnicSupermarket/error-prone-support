@@ -44,7 +44,7 @@ import java.util.stream.Stream;
 public final class LexicographicalAnnotationAttributeListingCheck extends BugChecker
     implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final String FLAG_PREFIX = "LexicographicalAnnotationAttributeListingCheck:";
+  private static final String FLAG_PREFIX = "LexicographicalAnnotationAttributeListing:";
   private static final String INCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Includes";
   private static final String EXCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Excludes";
 
