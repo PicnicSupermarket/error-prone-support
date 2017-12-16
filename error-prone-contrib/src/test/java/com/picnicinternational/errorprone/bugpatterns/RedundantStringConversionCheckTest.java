@@ -50,6 +50,7 @@ public final class RedundantStringConversionCheckTest {
         .addSourceLines(
             "A.java",
             "import java.math.BigInteger;",
+            "import java.util.Objects;",
             "",
             "class A {",
             "  private final BigInteger i = BigInteger.ZERO;",
@@ -62,6 +63,10 @@ public final class RedundantStringConversionCheckTest {
             "    // BUG: Diagnostic contains:",
             "    s += i.toString();",
             "    s += i.toString(16);",
+            "    // BUG: Diagnostic contains:",
+            "    s += Objects.toString(i);",
+            "    // BUG: Diagnostic contains:",
+            "    s += Objects.toString(null);",
             "    // BUG: Diagnostic contains:",
             "    s += String.valueOf(i);",
             "    // BUG: Diagnostic contains:",
@@ -394,8 +399,9 @@ public final class RedundantStringConversionCheckTest {
     customizedCompilationTestHelper
         .addSourceLines(
             "A.java",
-            "import java.util.Locale;",
             "import java.math.RoundingMode;",
+            "import java.util.Locale;",
+            "import java.util.Objects;",
             "",
             "class A {",
             "  static class B {",
@@ -427,6 +433,8 @@ public final class RedundantStringConversionCheckTest {
             "    return new String[] {",
             "      // BUG: Diagnostic contains:",
             "      s + b.toString(),",
+            "      // BUG: Diagnostic contains:",
+            "      s + Objects.toString(b),",
             "      // BUG: Diagnostic contains:",
             "      s + String.valueOf(b),",
             "      // BUG: Diagnostic contains:",

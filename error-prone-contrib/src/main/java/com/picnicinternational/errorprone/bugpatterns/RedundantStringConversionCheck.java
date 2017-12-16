@@ -39,6 +39,7 @@ import java.util.Formattable;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -68,6 +69,10 @@ public final class RedundantStringConversionCheck extends BugChecker
   private static final Matcher<ExpressionTree> WELL_KNOWN_STRING_CONVERSION_METHODS =
       anyOf(
           instanceMethod().onDescendantOfAny(Object.class.getName()).named("toString"),
+          staticMethod()
+              .onClass(Objects.class.getName())
+              .named("toString")
+              .withParameters(Object.class.getName()),
           staticMethod()
               .onClass(String.class.getName())
               .named("valueOf")
