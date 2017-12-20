@@ -660,7 +660,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.2.5</version>
+                    <version>1.3.0</version>
                     <executions>
                         <execution>
                             <id>compute-mutation-coverage</id>
@@ -674,7 +674,6 @@
                         <mutators>
                             <mutator>ALL</mutator>
                         </mutators>
-                        <mutateStaticInitializers>true</mutateStaticInitializers>
                         <!-- Use multple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->
