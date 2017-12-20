@@ -88,6 +88,22 @@
         </argLine>
     </properties>
 
+    <!-- XXX: Like Error Prone itself, this module's tests depend on
+    `junit:junit:jar:4.13-SNAPSHOT`. Find a better solution. -->
+    <repositories>
+        <repository>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -664,6 +680,7 @@
                         contention. -->
                         <threads>4</threads>
                         <timeoutFactor>4</timeoutFactor>
+                        <timestampedReports>false</timestampedReports>
                     </configuration>
                 </plugin>
             </plugins>
