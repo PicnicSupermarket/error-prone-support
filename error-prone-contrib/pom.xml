@@ -341,6 +341,7 @@
                         alternative is to declare all those dependencies
                         `provided`, but we'd rather not do that.) -->
                         <failOnMissingClasses>false</failOnMissingClasses>
+                        <failOnViolation>false</failOnViolation>
                         <targetVersion>${version.jdk}</targetVersion>
                     </configuration>
                 </plugin>
@@ -444,6 +445,7 @@
                             </module>
                         </checkstyleRules>
                         <excludes>**/data/schema/**/*</excludes>
+                        <failOnViolation>false</failOnViolation>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <!-- The plugin's "excludes" property accepts an Ant
                         pattern, but does not match against the full path. So
@@ -489,6 +491,10 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>3.0.2</version>
+                    <configuration>
+                        <ignoreDirect>false</ignoreDirect>
+                        <ignoreNonCompile>true</ignoreNonCompile>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -508,6 +514,7 @@
                         </execution>
                     </executions>
                     <configuration>
+                        <fail>false</fail>
                         <rules>
                             <banDuplicatePomDependencyVersions />
                             <dependencyConvergence />
@@ -654,6 +661,7 @@
                         </execution>
                     </executions>
                     <configuration>
+                        <failOnViolations>false</failOnViolations>
                         <javaVersion>${version.jdk}</javaVersion>
                     </configuration>
                 </plugin>
@@ -725,9 +733,9 @@
         </profile>
         <profile>
             <!-- By default we verify various aspects of a module and the
-            artifact(s) it produces. We define these in checks in a profile
-            so that they can be disabled during development. -->
-            <id>verify-project</id>
+            artifact(s) it produces. We define these checks in a profile so
+            that they can be disabled during development. -->
+            <id>build-checks</id>
             <activation>
                 <property>
                     <name>!verification.skip</name>
@@ -759,7 +767,6 @@
                                 </path>
                             </annotationProcessorPaths>
                             <compilerArgs combine.children="append">
-                                <arg>-Werror</arg>
                                 <arg>-Xlint:all</arg>
                                 <!-- Not all annotations present on the
                                 classpath are handled by annotation processors,
@@ -817,12 +824,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                        <configuration>
-                            <failBuild>true</failBuild>
-                            <failOnWarning>true</failOnWarning>
-                            <ignoreDirect>false</ignoreDirect>
-                            <ignoreNonCompile>true</ignoreNonCompile>
-                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -833,6 +834,76 @@
                         <artifactId>modernizer-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- The `build-checks` profile enables a whole bunch of additional
+            compile checks. By default those warnings break the build. This
+            profile allows one to collect all build warnings without failing
+            the build. -->
+            <id>disallow-warnings</id>
+            <activation>
+                <property>
+                    <name>!verification.warn</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.lewisd</groupId>
+                            <artifactId>lint-maven-plugin</artifactId>
+                            <configuration>
+                                <failOnViolation>true</failOnViolation>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>de.thetaphi</groupId>
+                            <artifactId>forbiddenapis</artifactId>
+                            <configuration>
+                                <failOnViolation>true</failOnViolation>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-checkstyle-plugin</artifactId>
+                            <configuration>
+                                <failOnViolation>true</failOnViolation>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <compilerArgs combine.children="append">
+                                    <arg>-Werror</arg>
+                                </compilerArgs>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-dependency-plugin</artifactId>
+                            <configuration>
+                                <failBuild>true</failBuild>
+                                <failOnWarning>true</failOnWarning>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-enforcer-plugin</artifactId>
+                            <configuration>
+                                <fail>true</fail>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.gaul</groupId>
+                            <artifactId>modernizer-maven-plugin</artifactId>
+                            <configuration>
+                                <failOnViolations>true</failOnViolations>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
     </profiles>
