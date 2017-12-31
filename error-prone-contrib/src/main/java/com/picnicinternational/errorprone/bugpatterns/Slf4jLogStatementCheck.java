@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-// XXX: The special-casing of Throwable applies only to SLF4J 1.6.0+; see https://www.slf4j.org/faq.html#paramException.
-//      That should be documented.
+// XXX: The special-casing of Throwable applies only to SLF4J 1.6.0+; see
+// https://www.slf4j.org/faq.html#paramException. That should be documented.
 // XXX: Also simplify `LOG.error(String.format("Something %s", arg), throwable)`.
 // XXX: Write a similar checker for Spring RestTemplates, String.format and friends, Guava
 // preconditions, ...
