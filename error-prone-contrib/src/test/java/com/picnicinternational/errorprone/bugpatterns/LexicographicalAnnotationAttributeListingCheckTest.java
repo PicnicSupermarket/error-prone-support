@@ -3,6 +3,7 @@ package com.picnicinternational.errorprone.bugpatterns;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.CompilationTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import java.io.IOException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -139,7 +140,7 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
             "  @Foo(anns = {@Bar(value = \"a\"), @Bar(value = \"b\")}) A unsortedAnns();",
             "  @Foo(anns = {@Bar(\"a\"), @Bar({\"a\", \"b\"})}) A unsortedInnderAnns();",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test

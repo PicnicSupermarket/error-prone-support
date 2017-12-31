@@ -2,6 +2,7 @@ package com.picnicinternational.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.CompilationTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import java.io.IOException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -101,6 +102,6 @@ public final class SpringMvcAnnotationCheckTest {
             "  @PutMapping(path = \"/foo/bar\", consumes = {\"a\", \"b\"}) A surrounded();",
             "  @PatchMapping() A curly();",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 }
