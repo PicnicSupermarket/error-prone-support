@@ -35,6 +35,9 @@ import java.util.List;
 import java.util.Optional;
 import javax.lang.model.element.Name;
 
+/**
+ * A {@link BugChecker} which flags lambda expressions that can be replaced with method references.
+ */
 // XXX: Other custom expressions we could rewrite:
 // - `a -> "str" + a` to `"str"::concat`. But only if `str` is provably non-null.
 // - `(a, b) -> a + b` to `String::concat` or `{Integer,Long,Float,Double}::sum`. Also requires null

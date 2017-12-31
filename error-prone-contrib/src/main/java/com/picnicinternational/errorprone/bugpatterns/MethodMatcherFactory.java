@@ -12,7 +12,9 @@ import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 import java.util.regex.Pattern;
 
-// XXX: Document.
+/** A method invocation expression {@link Matcher} factory. */
+// XXX: Document better. The expressions accepted here could also be defined using `MethodMatchers`.
+// So explain why this class is still useful.
 final class MethodMatcherFactory {
   private static final Splitter ARGUMENT_TYPE_SPLITTER =
       Splitter.on(',').trimResults().omitEmptyStrings();

@@ -43,6 +43,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+/** A {@link BugChecker} which flags redundant explicit string conversions. */
 @AutoService(BugChecker.class)
 @BugPattern(
   name = "RedundantStringConversion",
@@ -155,10 +156,15 @@ public final class RedundantStringConversionCheck extends BugChecker
 
   private final Matcher<ExpressionTree> conversionMethodMatcher;
 
-  public RedundantStringConversionCheck() {
+  RedundantStringConversionCheck() {
     this(ErrorProneFlags.empty());
   }
 
+  /**
+   * Instantiates a customized {@link RedundantStringConversionCheck}.
+   *
+   * @param flags Any provided command line flags.
+   */
   public RedundantStringConversionCheck(ErrorProneFlags flags) {
     this.conversionMethodMatcher = createConversionMethodMatcher(flags);
   }

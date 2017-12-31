@@ -10,6 +10,7 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.MethodTree;
 
+/** A {@link BugChecker} which flags empty methods. */
 // XXX: Disable until fixed.
 // @AutoService(BugChecker.class)
 @BugPattern(

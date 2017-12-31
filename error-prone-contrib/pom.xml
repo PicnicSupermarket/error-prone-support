@@ -758,6 +758,21 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-testCompile</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>testCompile</goal>
+                                </goals>
+                                <configuration>
+                                    <compilerArgs combine.children="append">
+                                        <!-- Test code doesn't require Javadoc. -->
+                                        <arg>-Xdoclint:-missing</arg>
+                                    </compilerArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
                         <configuration>
                             <annotationProcessorPaths combine.children="append">
                                 <path>
@@ -767,6 +782,11 @@
                                 </path>
                             </annotationProcessorPaths>
                             <compilerArgs combine.children="append">
+                                <!-- We enable nearly all doclint checks,
+                                except that we don't care about missing Javadoc
+                                on non-public classes and members. -->
+                                <arg>-Xdoclint:all</arg>
+                                <arg>-Xdoclint:missing/protected</arg>
                                 <arg>-Xlint:all</arg>
                                 <!-- Not all annotations present on the
                                 classpath are handled by annotation processors,

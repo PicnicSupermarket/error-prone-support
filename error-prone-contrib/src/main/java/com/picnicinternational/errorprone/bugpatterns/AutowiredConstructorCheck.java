@@ -20,6 +20,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 
+/** A {@link BugChecker} which flags redundant {@code @Autowired} constructor annotations. */
 @AutoService(BugChecker.class)
 @BugPattern(
   name = "AutowiredConstructor",

@@ -26,6 +26,10 @@ import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.Tree.Kind;
 import java.util.Optional;
 
+/**
+ * A {@link BugChecker} which flags {@code @RequestMapping} annotations that can be written more
+ * concisely.
+ */
 @AutoService(BugChecker.class)
 @BugPattern(
   name = "SpringMvcAnnotation",

@@ -30,8 +30,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-// XXX: Add documentation. Explain that sorting reduces chances of conflicts and simplifies their
-// resolution when they do happen.
+/**
+ * A {@link BugChecker} which flags annotation array listings which aren't sorted lexicographically.
+ */
+// XXX: Add more documentation. Explain that sorting reduces chances of conflicts and simplifies
+// their resolution when they do happen.
 @AutoService(BugChecker.class)
 @BugPattern(
   name = "LexicographicalAnnotationAttributeListing",
@@ -50,10 +53,15 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
 
   private final AnnotationAttributeMatcher matcher;
 
-  public LexicographicalAnnotationAttributeListingCheck() {
+  LexicographicalAnnotationAttributeListingCheck() {
     this(ErrorProneFlags.empty());
   }
 
+  /**
+   * Instantiates a customized {@link LexicographicalAnnotationAttributeListingCheck}.
+   *
+   * @param flags Any provided command line flags.
+   */
   public LexicographicalAnnotationAttributeListingCheck(ErrorProneFlags flags) {
     this.matcher = createAnnotationAttributeMatcher(flags);
   }
