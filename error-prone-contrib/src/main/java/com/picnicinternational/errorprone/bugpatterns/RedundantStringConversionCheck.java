@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
   summary = "Avoid redundant string conversions when possible",
   linkType = LinkType.NONE,
   severity = SeverityLevel.SUGGESTION,
-  tags = StandardTags.STYLE,
+  tags = StandardTags.SIMPLIFICATION,
   providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
 )
 public final class RedundantStringConversionCheck extends BugChecker

@@ -26,7 +26,7 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
   summary = "Omit `@Autowired` on a class' sole constuctor, as it is redundant",
   linkType = LinkType.NONE,
   severity = SeverityLevel.SUGGESTION,
-  tags = StandardTags.STYLE,
+  tags = StandardTags.SIMPLIFICATION,
   providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
 )
 public final class AutowiredConstructorCheck extends BugChecker implements AnnotationTreeMatcher {

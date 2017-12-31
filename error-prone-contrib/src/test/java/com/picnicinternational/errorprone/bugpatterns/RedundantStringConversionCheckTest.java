@@ -353,6 +353,7 @@ public final class RedundantStringConversionCheckTest {
             "",
             "class A {",
             "  private static final Logger LOG = LoggerFactory.getLogger(A.class);",
+            "",
             "  private final Marker marker = MarkerFactory.getMarker(A.class.getName());",
             "  private final Formattable f = (formatter, flags, width, precision) -> {};",
             "  private final Object o = new Object();",

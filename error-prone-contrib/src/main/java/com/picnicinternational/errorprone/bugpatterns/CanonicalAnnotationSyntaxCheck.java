@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
   summary = "Omit redundant syntax from annotation declarations",
   linkType = LinkType.NONE,
   severity = SeverityLevel.SUGGESTION,
-  tags = StandardTags.STYLE,
+  tags = StandardTags.SIMPLIFICATION,
   providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
 )
 public final class CanonicalAnnotationSyntaxCheck extends BugChecker

@@ -47,7 +47,7 @@ import javax.annotation.CheckForNull;
           + " of the provided function",
   linkType = LinkType.NONE,
   severity = SeverityLevel.WARNING,
-  tags = StandardTags.LIKELY_ERROR,
+  tags = StandardTags.PERFORMANCE,
   providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
 )
 public final class PrimitiveComparisonCheck extends BugChecker

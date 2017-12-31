@@ -33,7 +33,7 @@ import java.util.Optional;
       "Prefer the conciseness of `@{Get,Put,Post,Delete,Patch}Mapping` over `@RequestMapping`",
   linkType = LinkType.NONE,
   severity = SeverityLevel.SUGGESTION,
-  tags = StandardTags.STYLE,
+  tags = StandardTags.SIMPLIFICATION,
   providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
 )
 public final class SpringMvcAnnotationCheck extends BugChecker implements AnnotationTreeMatcher {
