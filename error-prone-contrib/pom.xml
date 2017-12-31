@@ -36,7 +36,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.checkstyle>8.5</version.checkstyle>
+        <version.checkstyle>8.7</version.checkstyle>
         <version.error-prone>2.1.3</version.error-prone>
         <version.extra-enforcer-rules>1.0-beta-6</version.extra-enforcer-rules>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
