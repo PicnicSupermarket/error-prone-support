@@ -371,7 +371,7 @@
                             <module name="Checker">
                                 <module name="UniqueProperties" />
                                 <module name="TreeWalker">
-                                    <module name="AnnotationUseStyleCheck">
+                                    <module name="AnnotationUseStyle">
                                         <!-- XXX: Right now this check doesn't
                                         completely enforce the desired style.
                                         See https://github.com/checkstyle/checkstyle/issues/4972;
@@ -398,7 +398,14 @@
                                         <property name="ignoreModifiers" value="true" />
                                     </module>
                                     <module name="DefaultComesLast" />
+                                    <module name="DesignForExtension" />
+                                    <module name="EmptyBlock" />
+                                    <module name="EmptyCatchBlock" />
                                     <module name="FinalClass" />
+                                    <module name="HiddenFieldCheck">
+                                        <property name="ignoreConstructorParameter" value="true" />
+                                        <property name="ignoreSetter" value="true" />
+                                    </module>
                                     <module name="IllegalImport">
                                         <!-- These packages are found in some
                                         of the dependencies declared above. -->
@@ -427,14 +434,20 @@
                                         <property name="illegalClasses" value="org\.testng\.AssertJUnit(\..*?)?" />
                                         <property name="regexp" value="true" />
                                     </module>
+                                    <module name="IllegalCatch" />
+                                    <module name="IllegalThrows" />
+                                    <module name="InnerAssignment" />
+                                    <module name="MissingDeprecated" />
                                     <module name="MutableException" />
                                     <module name="NeedBraces" />
                                     <module name="NoClone" />
                                     <module name="NoFinalizer" />
-                                    <module name="ParameterAssignmentCheck" />
+                                    <module name="PackageDeclaration" />
+                                    <module name="ParameterAssignment" />
                                     <module name="RedundantModifier" />
                                     <module name="SimplifyBooleanExpression" />
                                     <module name="SimplifyBooleanReturn" />
+                                    <module name="TrailingComment" />
                                     <module name="WriteTag">
                                         <property name="tag" value="@author" />
                                         <property name="tagFormat" value="\S" />

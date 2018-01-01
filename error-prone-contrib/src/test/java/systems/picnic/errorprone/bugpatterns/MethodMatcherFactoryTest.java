@@ -25,7 +25,7 @@ public final class MethodMatcherFactoryTest {
     severity = SeverityLevel.SUGGESTION,
     summary = "Flags methods matched by the test matcher."
   )
-  public static class MatchedMethodsFlagger extends BugChecker
+  public static final class MatchedMethodsFlagger extends BugChecker
       implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
 
