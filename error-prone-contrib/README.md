@@ -54,6 +54,11 @@ project:
   regressions can be caught this way as well.
 - Create a tool which converts a collection of Refaster Templates into an Error
   Prone check. Ideally this tool is contributed upstream.
+- Have the repository be analyzed by [Better Code Hub][bettercodehub] and
+  potentially publish the results.
+- Review all places in the code where a `Description` is currently created, and
+  see whether a custom error message (`Description.Builder#setMessage`) is
+  warranted.
 - Improve an existing check (see `XXX`-marked comments in the code) or write a
   new one (see the list of suggestions below.)
 
@@ -62,15 +67,18 @@ project:
 The following is a list of checks we'd like to see implemented:
 
 - A check with functionality equivalent to the "[Policeman's Forbidden API
-  Checker][forbidden-apis]" Maven plugin. Using method matchers forbidden
-  method calls can easily be identified. But Error Prone can go one step
-  further by auto-patching violations. For each violation two fixes can be
-  proposed: a purely behavior-preserving fix which make the platform-dependent
-  behavior explicit, and another which replaces the platform-dependent behavior
-  with the preferred alternative. (Such as using `UTF-8` instead of the system
-  default charset.)
+  Checker][forbidden-apis]" Maven plugin, with a focus on disallowing usage of
+  the methods and fields listed by the "JDK System Out" and "JDK Unsafe"
+  signature groups. Using Error Prone's method matchers forbidden method calls
+  can easily be identified. But Error Prone can go one step further by
+  auto-patching violations. For each violation two fixes can be proposed: a
+  purely behavior-preserving fix which make the platform-dependent behavior
+  explicit, and another which replaces the platform-dependent behavior with the
+  preferred alternative. (Such as using `UTF-8` instead of the system default
+  charset.)
 - A check which replaces fully qualified types with simple types in context
-  where this does not introduce ambiguity.
+  where this does not introduce ambiguity. Should consider both actual Java
+  code and Javadoc `@link` references.
 - A check which simplifies array expressions. It would replace empty array
   expressions of the form `new int[] {}` with `new int[0]`. Statements of the
   form `byte[] arr = new byte[] {'c'};` would be shortened to `byte[] arr =
@@ -92,8 +100,20 @@ The following is a list of checks we'd like to see implemented:
   instead.
 - A check which flags (and ideally, replaces) `try-finally` constructs with
   equivalent `try-with-resources` constructs.
+- A check which drops exceptions declared in `throws` clauses if they are (a)
+  not actually thrown and (b) the associated method cannot be overridden.
+- A check which tries to statically import certain methods whenever used, if
+  possible. The set of targeted methods should be configurable, but may default
+  to e.g. `java.util.Function.identity()`, the static methods exposed by
+  `java.util.stream.Collectors` and the various Guava collector factory
+  methods.
 - A Guava-specific check which replaces `Joiner.join` calls with `String.join`
   calls in those cases where the latter is a proper substitute for the former.
+- A Guava-specific check which flags `{Immutable,}Multimap` type usages
+  where `{Immutable,}{List,Set}Multimap` would be more appropriate.
+- A Guava-specific check which rewrites `if (conditional) { throw new
+  IllegalArgumentException(); }` and variants to an equivalent `checkArgument`
+  statement. Idem for other exception types.
 - A Spring-specific check which enforces that methods with the `@Scheduled`
   annotation are also annotated with New Relic's `@Trace` annotation.
 - A Spring-specific check which enforces that `@RequestMapping` annotations,
@@ -111,13 +131,30 @@ The following is a list of checks we'd like to see implemented:
   behavior preserving, but could be used for a one-off code base migration.
 - A Spring-specific check which disallows field injection, except in
   `AbstractTestNGSpringContextTests` subclasses.
+- A Spring-specific check which verifies that public methods on all classes
+  whose name matches a certain pattern, e.g. `.*Service`, are annotated
+  `@Secured`.
 - A Hibernate Validator-specific check which looks for `@UnwrapValidatedValue`
   usages and migrates the associated constraint annotations to the generic type
   argument to which they (are presumed to) apply.
 - A TestNG-specific check which drops method-level `@Test` annotations if a
   matching/more specific annotation is already present at the class level.
 - A TestNG-specific check which enforces that all tests are in a group.
+- A TestNG-specific check which flags field assignments in
+  `@BeforeMethod`-annotated methods unless the class is annotated
+  `@Test(singleThreaded = true)`.
+- A TestNG-specific check which flags usages of the `expectedExceptions`
+  attribute of the `@Test` annotation, pointing to `assertThrows`.
+- A Jongo-specific check which disallows the creation of spare indices, in
+  favour of partial indices.
+- An Immutables-specific check which replaces
+  `checkState`/`IllegalStateException` usages inside a `@Value.Check`-annotated
+  method with `checkArgument`/`IllegalArgument`, since the method is invoked
+  when a caller attempts to create an immutable instance.
+- An SLF4J-specific check which drops or adds a trailing dot from log messages,
+  as applicable.
 
+[bettercodehub]: https://bettercodehub.com
 [coveralls]: https://coveralls.io
 [error-prone-bug-patterns]: http://errorprone.info/bugpatterns
 [error-prone-criteria]: http://errorprone.info/docs/criteria
