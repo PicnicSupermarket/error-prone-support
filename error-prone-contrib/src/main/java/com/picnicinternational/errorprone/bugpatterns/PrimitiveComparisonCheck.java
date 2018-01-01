@@ -34,7 +34,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 import java.util.stream.Stream;
-import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 
 /**
  * A {@link BugChecker} which flags {@code Comparator#comparing*} invocations that can be replaced
@@ -100,7 +100,7 @@ public final class PrimitiveComparisonCheck extends BugChecker
     return isStatic ? "comparing" : "thenComparing";
   }
 
-  @CheckForNull
+  @Nullable
   private static Type getPotentiallyBoxedReturnType(ExpressionTree tree) {
     switch (tree.getKind()) {
       case LAMBDA_EXPRESSION:

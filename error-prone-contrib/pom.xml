@@ -44,6 +44,7 @@
         <version.javadoc>2.10.4</version.javadoc>
         <version.jdk>1.8</version.jdk>
         <version.maven>3.5.0</version.maven>
+        <version.nullaway>0.3.0</version.nullaway>
         <version.plexus-compiler>2.8.2</version.plexus-compiler>
         <version.slf4j>1.7.25</version.slf4j>
         <version.surefire>2.20.1</version.surefire>
@@ -167,6 +168,11 @@
                 <groupId>com.puppycrawl.tools</groupId>
                 <artifactId>checkstyle</artifactId>
                 <version>${version.checkstyle}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.uber.nullaway</groupId>
+                <artifactId>nullaway</artifactId>
+                <version>${version.nullaway}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -780,6 +786,11 @@
                                     <artifactId>guava-beta-checker</artifactId>
                                     <version>${version.guava-beta-checker}</version>
                                 </path>
+                                <path>
+                                    <groupId>com.uber.nullaway</groupId>
+                                    <artifactId>nullaway</artifactId>
+                                    <version>${version.nullaway}</version>
+                                </path>
                             </annotationProcessorPaths>
                             <compilerArgs combine.children="append">
                                 <!-- We enable nearly all doclint checks,
@@ -803,10 +814,9 @@
                                 <arg>-Xep:ConstructorLeaksThis:OFF</arg>
                                 <!-- See https://github.com/google/error-prone/issues/708. -->
                                 <arg>-Xep:FieldMissingNullable:OFF</arg>
-                                <!-- See https://github.com/google/error-prone/issues/723. -->
-                                <arg>-Xep:ReturnMissingNullable:OFF</arg>
                                 <!-- XXX: Enable this once we open-source this library. -->
                                 <arg>-Xep:BetaApi:OFF</arg>
+                                <arg>-XepOpt:NullAway:AnnotatedPackages=com.picnicinternational</arg>
                             </compilerArgs>
                             <compilerId>javac-with-errorprone</compilerId>
                             <forceJavacCompilerUse>true</forceJavacCompilerUse>
