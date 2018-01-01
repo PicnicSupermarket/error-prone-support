@@ -29,12 +29,12 @@ import com.sun.tools.javac.code.Type.MethodType;
 import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.tree.JCTree.JCMemberReference;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 
 /**
  * A {@link BugChecker} which flags {@code Comparator#comparing*} invocations that can be replaced
@@ -67,18 +67,18 @@ public final class PrimitiveComparisonCheck extends BugChecker
       return Description.NO_MATCH;
     }
 
-    Type potentiallyBoxedType = getPotentiallyBoxedReturnType(tree.getArguments().get(0));
-    if (potentiallyBoxedType == null) {
-      return Description.NO_MATCH;
-    }
+    return getPotentiallyBoxedReturnType(tree.getArguments().get(0))
+        .flatMap(cmpType -> tryFix(tree, state, cmpType, isStatic))
+        .map(fix -> describeMatch(tree, fix))
+        .orElse(Description.NO_MATCH);
+  }
 
+  private static Optional<Fix> tryFix(
+      MethodInvocationTree tree, VisitorState state, Type cmpType, boolean isStatic) {
     String actualMethodName = ASTHelpers.getSymbol(tree).getSimpleName().toString();
-    String preferredMethodName = getPreferredMethod(state, potentiallyBoxedType, isStatic);
-    if (actualMethodName.equals(preferredMethodName)) {
-      return Description.NO_MATCH;
-    }
-
-    return describeMatch(tree, suggestFix(tree, preferredMethodName, state));
+    return Optional.of(getPreferredMethod(state, cmpType, isStatic))
+        .filter(preferredMethodName -> !preferredMethodName.equals(actualMethodName))
+        .map(preferredMethodName -> suggestFix(tree, preferredMethodName, state));
   }
 
   private static String getPreferredMethod(VisitorState state, Type cmpType, boolean isStatic) {
@@ -100,20 +100,19 @@ public final class PrimitiveComparisonCheck extends BugChecker
     return isStatic ? "comparing" : "thenComparing";
   }
 
-  @Nullable
-  private static Type getPotentiallyBoxedReturnType(ExpressionTree tree) {
+  private static Optional<Type> getPotentiallyBoxedReturnType(ExpressionTree tree) {
     switch (tree.getKind()) {
       case LAMBDA_EXPRESSION:
         /* Return the lambda expression's actual return type. */
-        return ASTHelpers.getType(((LambdaExpressionTree) tree).getBody());
+        return Optional.ofNullable(ASTHelpers.getType(((LambdaExpressionTree) tree).getBody()));
       case MEMBER_REFERENCE:
         /* Return the method's declared return type. */
         // XXX: Very fragile. Do better.
         Type subType2 = ((JCMemberReference) tree).referentType;
-        return ((MethodType) subType2).getReturnType();
+        return Optional.of(((MethodType) subType2).getReturnType());
       default:
         /* This appears to be a genuine `{,ToInt,ToLong,ToDouble}Function`. */
-        return null;
+        return Optional.empty();
     }
   }
 
