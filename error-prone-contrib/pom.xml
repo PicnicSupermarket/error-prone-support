@@ -44,7 +44,7 @@
         <version.javadoc>2.10.4</version.javadoc>
         <version.jdk>1.8</version.jdk>
         <version.maven>3.5.0</version.maven>
-        <version.nullaway>0.3.0</version.nullaway>
+        <version.nullaway>0.3.2</version.nullaway>
         <version.plexus-compiler>2.8.2</version.plexus-compiler>
         <version.slf4j>1.7.25</version.slf4j>
         <version.surefire>2.20.1</version.surefire>
