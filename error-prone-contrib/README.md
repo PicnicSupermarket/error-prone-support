@@ -26,6 +26,10 @@ Some pointers:
 - Make sure that a checks's (mutation) coverage is or remains about as high as
   it can be. Not only does this lead to better tests, it also points out
   opportunities to simplify the code.
+- Please restrict the scope of a pull request to a single feature or fix. Don't
+  sneak in unrelated changes.
+- If in doubt about whether a pull request will be accepted, please first file
+  an issue to discuss it.
 
 ### Our wishlist
 
@@ -56,6 +60,7 @@ project:
   Prone check. Ideally this tool is contributed upstream.
 - Have the repository be analyzed by [Better Code Hub][bettercodehub] and
   potentially publish the results.
+- Consider integrating with [FOSSA][fossa].
 - Review all places in the code where a `Description` is currently created, and
   see whether a custom error message (`Description.Builder#setMessage`) is
   warranted.
@@ -107,6 +112,10 @@ The following is a list of checks we'd like to see implemented:
   to e.g. `java.util.Function.identity()`, the static methods exposed by
   `java.util.stream.Collectors` and the various Guava collector factory
   methods.
+- A check which flags non-`@SafeVarargs` methods accepting an array of some
+  generic type. See Effective Java Third Edition, item 32 (page 149). (This
+  might require special-casing Java 8, where this annotation isn't allowed on
+  private methods.)
 - A Guava-specific check which replaces `Joiner.join` calls with `String.join`
   calls in those cases where the latter is a proper substitute for the former.
 - A Guava-specific check which flags `{Immutable,}Multimap` type usages
@@ -115,7 +124,8 @@ The following is a list of checks we'd like to see implemented:
   IllegalArgumentException(); }` and variants to an equivalent `checkArgument`
   statement. Idem for other exception types.
 - A Spring-specific check which enforces that methods with the `@Scheduled`
-  annotation are also annotated with New Relic's `@Trace` annotation.
+  annotation are also annotated with New Relic's `@Trace` annotation. Such
+  methods should ideally not also represent Spring MVC endpoints.
 - A Spring-specific check which enforces that `@RequestMapping` annotations,
   when applied to a method, explicitly specify one or more target HTTP methods.
 - A Spring-specific check which looks for classes in which all
@@ -151,8 +161,15 @@ The following is a list of checks we'd like to see implemented:
   `checkState`/`IllegalStateException` usages inside a `@Value.Check`-annotated
   method with `checkArgument`/`IllegalArgument`, since the method is invoked
   when a caller attempts to create an immutable instance.
+- An Immutables-specific check which disallows references to collection types
+  other that the Guava immutable collections, including inside generic type
+  arguments.
 - An SLF4J-specific check which drops or adds a trailing dot from log messages,
   as applicable.
+- A Mockito-specific check which identifies sequences of statements which mock
+  a significant number of methods on a single object with "default data"; such
+  constructions can often benefit from a different type of default answer, such
+  as `Answers.RETURNS_MOCKS`.
 
 [bettercodehub]: https://bettercodehub.com
 [coveralls]: https://coveralls.io
@@ -161,4 +178,5 @@ The following is a list of checks we'd like to see implemented:
 [error-prone]: http://errorprone.info
 [error-prone-repo]: https://github.com/google/error-prone
 [forbidden-apis]: https://github.com/policeman-tools/forbidden-apis
+[fossa]: https://fossa.io
 [sonarcloud]: https://sonarcloud.io
