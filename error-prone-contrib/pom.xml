@@ -262,29 +262,6 @@
     </dependencies>
 
     <build>
-        <resources>
-            <!-- Turn on filtering by default for application properties. -->
-            <resource>
-                <directory>${basedir}/src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/application.properties</include>
-                    <include>**/config.env</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>${basedir}/src/main/resources</directory>
-                <excludes>
-                    <exclude>**/application.properties</exclude>
-                    <exclude>**/config.env</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>${basedir}/src/main/docker</directory>
-                <targetPath>${project.build.directory}</targetPath>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -315,11 +292,7 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <rules>
-                            <excludes>
-                                <exclude>OSS*</exclude>
-                            </excludes>
-                        </rules>
+                        <failOnViolation>false</failOnViolation>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -354,7 +327,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.17</version>
+                    <version>3.0.0</version>
                     <executions>
                         <execution>
                             <id>run-checkstyle</id>
@@ -463,15 +436,8 @@
                                 </module>
                             </module>
                         </checkstyleRules>
-                        <excludes>**/data/schema/**/*</excludes>
                         <failOnViolation>false</failOnViolation>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                        <!-- The plugin's "excludes" property accepts an Ant
-                        pattern, but does not match against the full path. So
-                        rather than explicitly excluding generated sources, we
-                        have to explicitly include "original" sources. -->
-                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-                        <testSourceDirectories>${project.build.testSourceDirectory}</testSourceDirectories>
                     </configuration>
                     <dependencies>
                         <dependency>
@@ -610,7 +576,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.6</version>
+                    <version>3.7</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -669,7 +635,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>1.5.0</version>
+                    <version>1.6.0</version>
                     <executions>
                         <execution>
                             <id>modernize</id>
@@ -918,9 +884,7 @@
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
                             <configuration>
-                                <compilerArgs combine.children="append">
-                                    <arg>-Werror</arg>
-                                </compilerArgs>
+                                <failOnWarning>true</failOnWarning>
                             </configuration>
                         </plugin>
                         <plugin>
