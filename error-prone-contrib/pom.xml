@@ -37,10 +37,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.checkstyle>8.7</version.checkstyle>
-        <version.error-prone>2.1.3</version.error-prone>
+        <version.error-prone>2.2.0</version.error-prone>
         <version.extra-enforcer-rules>1.0-beta-6</version.extra-enforcer-rules>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
-        <version.javac>9-dev-r4023-3</version.javac>
+        <version.javac>9+181-r4173-1</version.javac>
         <version.javadoc>2.10.4</version.javadoc>
         <version.jdk>1.8</version.jdk>
         <version.maven>3.5.0</version.maven>
@@ -108,6 +108,11 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.google.auto</groupId>
+                <artifactId>auto-common</artifactId>
+                <version>0.9</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.auto.service</groupId>
                 <artifactId>auto-service</artifactId>
                 <version>1.0-rc3</version>
@@ -162,7 +167,7 @@
             <dependency>
                 <groupId>com.google.truth</groupId>
                 <artifactId>truth</artifactId>
-                <version>0.36</version>
+                <version>0.37</version>
             </dependency>
             <dependency>
                 <groupId>com.puppycrawl.tools</groupId>
