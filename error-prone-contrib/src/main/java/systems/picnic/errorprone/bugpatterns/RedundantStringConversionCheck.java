@@ -156,7 +156,8 @@ public final class RedundantStringConversionCheck extends BugChecker
 
   private final Matcher<ExpressionTree> conversionMethodMatcher;
 
-  RedundantStringConversionCheck() {
+  /** Instantiates the default {@link RedundantStringConversionCheck}. */
+  public RedundantStringConversionCheck() {
     this(ErrorProneFlags.empty());
   }
 
