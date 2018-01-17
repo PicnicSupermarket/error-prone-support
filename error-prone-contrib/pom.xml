@@ -52,11 +52,14 @@
         So we provide a default value. -->
         <build.number>LOCAL</build.number>
         <!-- Arguments to the JVMs forked by Surefire. The specification of
-        this 'argLine' property instead of the definition of the 'argLine'
-        configuration setting allows users or plugins to specify additional
-        arguments. In particular, JaCoCo relies on this for the configuration
-        of its Java agent. -->
-        <argLine><!--
+        this 'argLine.base' property instead of the definition of the 'argLine'
+        configuration setting provides two benefits:
+        - It allows us to append additional parameters, as is done in the
+          `jdk8` profile.
+        - It allows users or plugins to specify additional arguments. In
+          particular, JaCoCo relies on this for the configuration of its Java
+          agent. -->
+        <argLine.base><!--
             The test JVMs are short-running. By disabling certain expensive JIT
             optimizations we actually speed up most tests. -->
             -XX:TieredStopAtLevel=1
@@ -80,9 +83,8 @@
             <!-- On Mac OS X, running in headless mode prevents the forked JVMs
             from showing up in the dock and capturing window focus. -->
             -Djava.awt.headless=true
-            <!-- XXX: EXPLAIN -->
-            -Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${version.javac}/javac-${version.javac}.jar
-        </argLine>
+        </argLine.base>
+        <argLine>${argLine.base}</argLine>
     </properties>
 
     <!-- XXX: Like Error Prone itself, this module's tests depend on
@@ -666,7 +668,6 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <jvmArgs>-Xbootclasspath/p:-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${version.javac}/javac-${version.javac}.jar</jvmArgs>
                         <mutators>
                             <mutator>ALL</mutator>
                         </mutators>
@@ -693,6 +694,32 @@
     </build>
 
     <profiles>
+        <profile>
+            <!-- When running tests with JDK 8, Error Prone requires that the
+            specific version of `javac` it integrates against is on the
+            bootclasspath. -->
+            <id>jdk8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <properties>
+                <bootclasspath>-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${version.javac}/javac-${version.javac}.jar</bootclasspath>
+                <argLine>${argLine.base} ${bootclasspath}</argLine>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.pitest</groupId>
+                            <artifactId>pitest-maven</artifactId>
+                            <configuration>
+                                <jvmArgs>${bootclasspath}</jvmArgs>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
         <profile>
             <!-- If explicitly enabled using `-Pcoverage` we use PIT to
             establish coverage through mutation testing. -->
