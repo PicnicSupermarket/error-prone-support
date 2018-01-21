@@ -2,15 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>systems.picnic.errorprone-contrib</groupId>
+    <groupId>tech.picnic.errorprone-contrib</groupId>
     <artifactId>errorprone-contrib</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <name>Picnic Error Prone Contrib</name>
     <inceptionYear>2017</inceptionYear>
     <organization>
-        <name>Picnic International</name>
-        <url>https://www.picnic.nl</url>
+        <name>Picnic Technologies</name>
+        <url>http://picnic.tech</url>
     </organization>
     <licenses>
         <license>
@@ -800,7 +800,7 @@
                                 <arg>-Xep:FieldMissingNullable:OFF</arg>
                                 <!-- XXX: Enable this once we open-source this library. -->
                                 <arg>-Xep:BetaApi:OFF</arg>
-                                <arg>-XepOpt:NullAway:AnnotatedPackages=systems.picnic</arg>
+                                <arg>-XepOpt:NullAway:AnnotatedPackages=tech.picnic</arg>
                             </compilerArgs>
                             <compilerId>javac-with-errorprone</compilerId>
                             <forceJavacCompilerUse>true</forceJavacCompilerUse>
