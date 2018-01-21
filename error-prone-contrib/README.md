@@ -116,6 +116,9 @@ The following is a list of checks we'd like to see implemented:
   generic type. See Effective Java Third Edition, item 32 (page 149). (This
   might require special-casing Java 8, where this annotation isn't allowed on
   private methods.)
+- A check which replaces `new Random().someMethod()` calls with
+  `ThreadLocalRandom.current().someMethod()` calls, so as to avoid unnecessary
+  synchronization.
 - A Guava-specific check which replaces `Joiner.join` calls with `String.join`
   calls in those cases where the latter is a proper substitute for the former.
 - A Guava-specific check which flags `{Immutable,}Multimap` type usages
