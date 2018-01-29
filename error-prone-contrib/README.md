@@ -119,6 +119,11 @@ The following is a list of checks we'd like to see implemented:
 - A check which replaces `new Random().someMethod()` calls with
   `ThreadLocalRandom.current().someMethod()` calls, so as to avoid unnecessary
   synchronization.
+- A check which drops `this.` from `this.someMethod()` calls and which
+  optionally does the same for fields, if no ambiguity arises.
+- A check which replaces `Integer.valueOf` calls with `Integer.parseInt` or
+  vice versa in order to prevent auto (un)boxing, and likewise for other number
+  types.
 - A Guava-specific check which replaces `Joiner.join` calls with `String.join`
   calls in those cases where the latter is a proper substitute for the former.
 - A Guava-specific check which flags `{Immutable,}Multimap` type usages
@@ -173,6 +178,10 @@ The following is a list of checks we'd like to see implemented:
   a significant number of methods on a single object with "default data"; such
   constructions can often benefit from a different type of default answer, such
   as `Answers.RETURNS_MOCKS`.
+- An RxJava-specific check which flags `.toCompletable()` calls on expressions
+  of type `Single<Completable>` etc., as most likely
+  `.flatMapCompletable(Functions.identity())` was meant instead. Idem for other
+  variations.
 
 [bettercodehub]: https://bettercodehub.com
 [coveralls]: https://coveralls.io
