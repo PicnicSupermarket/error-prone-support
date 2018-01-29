@@ -36,9 +36,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.checkstyle>8.7</version.checkstyle>
+        <version.checkstyle>8.8</version.checkstyle>
         <version.error-prone>2.2.0</version.error-prone>
-        <version.extra-enforcer-rules>1.0-beta-6</version.extra-enforcer-rules>
+        <version.extra-enforcer-rules>1.0-beta-7</version.extra-enforcer-rules>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.javac>9+181-r4173-1</version.javac>
         <version.javadoc>2.10.4</version.javadoc>
@@ -197,7 +197,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>5.0.2.RELEASE</version>
+                <version>5.0.3.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
