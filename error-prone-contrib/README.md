@@ -81,6 +81,8 @@ The following is a list of checks we'd like to see implemented:
   explicit, and another which replaces the platform-dependent behavior with the
   preferred alternative. (Such as using `UTF-8` instead of the system default
   charset.)
+- A subset of the refactor operations provided by the Eclipse-specific
+  [AutoRefactor][autorefactor] plugin.
 - A check which replaces fully qualified types with simple types in context
   where this does not introduce ambiguity. Should consider both actual Java
   code and Javadoc `@link` references.
@@ -124,6 +126,18 @@ The following is a list of checks we'd like to see implemented:
 - A check which replaces `Integer.valueOf` calls with `Integer.parseInt` or
   vice versa in order to prevent auto (un)boxing, and likewise for other number
   types.
+- A check which flags nullable collections.
+- A check which flags _any_ `AutoCloseable` resource not managed by a
+  `try-with-resources` construct.
+- A check which flags `java.time` methods which implicitly consult the system
+  clock, suggesting that a passed-in `Clock` is used instead.
+- A check which flags public methods on public classes which reference
+  non-public types. This can cause `IllegalAccessError`s and
+  `BootstrapMethodError`s are runtime.
+- A check which swaps the LHS and RHS in expressions of the form
+  `nonConstant.equals(someNonNullConstant)`.
+- A check which annotates methods which only throw an exception with
+  `@Deprecated` or ` @DoNotCall`.
 - A Guava-specific check which replaces `Joiner.join` calls with `String.join`
   calls in those cases where the latter is a proper substitute for the former.
 - A Guava-specific check which flags `{Immutable,}Multimap` type usages
@@ -131,6 +145,8 @@ The following is a list of checks we'd like to see implemented:
 - A Guava-specific check which rewrites `if (conditional) { throw new
   IllegalArgumentException(); }` and variants to an equivalent `checkArgument`
   statement. Idem for other exception types.
+- A Guava-specific check which replaces simple anonymous `CacheLoader` subclass
+  declarations with `CacheLoader.from(someLambda)`.
 - A Spring-specific check which enforces that methods with the `@Scheduled`
   annotation are also annotated with New Relic's `@Trace` annotation. Such
   methods should ideally not also represent Spring MVC endpoints.
@@ -182,7 +198,11 @@ The following is a list of checks we'd like to see implemented:
   of type `Single<Completable>` etc., as most likely
   `.flatMapCompletable(Functions.identity())` was meant instead. Idem for other
   variations.
+- An RxJava-specific check which flags `expr.firstOrError()` calls and suggests
+  `expr.switchIfEmpty(Single.error(...))`, so that an application-specific
+  exception is thrown instead of `NoSuchElementException`.
 
+[autorefactor]: https://autorefactor.org
 [bettercodehub]: https://bettercodehub.com
 [coveralls]: https://coveralls.io
 [error-prone-bug-patterns]: http://errorprone.info/bugpatterns
