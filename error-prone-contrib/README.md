@@ -138,6 +138,7 @@ The following is a list of checks we'd like to see implemented:
   `nonConstant.equals(someNonNullConstant)`.
 - A check which annotates methods which only throw an exception with
   `@Deprecated` or ` @DoNotCall`.
+- A check which flags imports from other test classes.
 - A Guava-specific check which replaces `Joiner.join` calls with `String.join`
   calls in those cases where the latter is a proper substitute for the former.
 - A Guava-specific check which flags `{Immutable,}Multimap` type usages
@@ -168,6 +169,8 @@ The following is a list of checks we'd like to see implemented:
 - A Spring-specific check which verifies that public methods on all classes
   whose name matches a certain pattern, e.g. `.*Service`, are annotated
   `@Secured`.
+- A Spring-specific check which verifies that annotations such as
+  `@ResponseStatus` are only present in `@RestController` classes.
 - A Hibernate Validator-specific check which looks for `@UnwrapValidatedValue`
   usages and migrates the associated constraint annotations to the generic type
   argument to which they (are presumed to) apply.
