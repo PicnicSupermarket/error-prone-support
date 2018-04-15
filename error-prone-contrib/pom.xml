@@ -36,7 +36,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.checkstyle>8.8</version.checkstyle>
+        <version.checkstyle>8.9</version.checkstyle>
         <version.error-prone>2.2.0</version.error-prone>
         <version.extra-enforcer-rules>1.0-beta-7</version.extra-enforcer-rules>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
@@ -44,9 +44,9 @@
         <version.javadoc>2.10.4</version.javadoc>
         <version.jdk>1.8</version.jdk>
         <version.maven>3.5.0</version.maven>
-        <version.nullaway>0.3.5</version.nullaway>
-        <version.plexus-compiler>2.8.3</version.plexus-compiler>
-        <version.surefire>2.20.1</version.surefire>
+        <version.nullaway>0.4.2</version.nullaway>
+        <version.plexus-compiler>2.8.4</version.plexus-compiler>
+        <version.surefire>2.21.0</version.surefire>
         <!-- Our build system (Travis CI) provides a monotonically increasing
         build number. When building locally, this number is obviously absent.
         So we provide a default value. -->
@@ -153,7 +153,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>24.0-jre</version>
+                <version>24.1-jre</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -163,7 +163,7 @@
             <dependency>
                 <groupId>com.google.truth</groupId>
                 <artifactId>truth</artifactId>
-                <version>0.37</version>
+                <version>0.40</version>
             </dependency>
             <dependency>
                 <groupId>com.puppycrawl.tools</groupId>
@@ -193,7 +193,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>5.0.4.RELEASE</version>
+                <version>5.0.5.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -268,7 +268,7 @@
                 <plugin>
                     <groupId>com.coveo</groupId>
                     <artifactId>fmt-maven-plugin</artifactId>
-                    <version>2.3.0</version>
+                    <version>2.4.0</version>
                     <executions>
                         <execution>
                             <id>format-sources</id>
@@ -299,7 +299,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>2.4.1</version>
+                    <version>2.5</version>
                     <executions>
                         <execution>
                             <id>detect-forbidden-api-usage</id>
