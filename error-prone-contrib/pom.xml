@@ -37,14 +37,14 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.checkstyle>8.9</version.checkstyle>
-        <version.error-prone>2.2.0</version.error-prone>
+        <version.error-prone>2.3.1</version.error-prone>
         <version.extra-enforcer-rules>1.0-beta-7</version.extra-enforcer-rules>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.javac>9+181-r4173-1</version.javac>
         <version.javadoc>2.10.4</version.javadoc>
         <version.jdk>1.8</version.jdk>
         <version.maven>3.5.0</version.maven>
-        <version.nullaway>0.4.2</version.nullaway>
+        <version.nullaway>0.4.3</version.nullaway>
         <version.plexus-compiler>2.8.4</version.plexus-compiler>
         <version.surefire>2.21.0</version.surefire>
         <!-- Our build system (Travis CI) provides a monotonically increasing
@@ -81,7 +81,7 @@
             from showing up in the dock and capturing window focus. -->
             -Djava.awt.headless=true
             <!-- XXX: EXPLAIN -->
-            -Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${version.javac}/javac-${version.javac}.jar 
+            -Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${version.javac}/javac-${version.javac}.jar
         </argLine>
     </properties>
 
@@ -153,7 +153,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>24.1-jre</version>
+                <version>25.0-jre</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
