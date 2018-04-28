@@ -1,0 +1,21 @@
+language: java
+jdk:
+  - oraclejdk8
+before_install:
+  - mvn io.takari:maven:wrapper
+install:
+  - ./mvnw clean install -DskipTests
+script:
+  - ./mvnw jacoco:prepare-agent surefire:test jacoco:report
+before_cache:
+  # Don't cache the artifacts we just generated, for multiple reasons: (1) we
+  # shouldn't need them next time around and (2) if we do, that indicates a
+  # dependency issue which might otherwise go unnoticed until next time we bump
+  # the project's version (i.e., when tagging).
+  - find "${HOME}/.m2/repository" -depth -name '*-SNAPSHOT' -exec rm -r '{}' \;
+cache:
+  directories:
+    # The local Maven repository in which third party dependencies are stored.
+    - ${HOME}/.m2/repository
+    # The Takari Maven Wrapper's storage for downloaded Maven distributions.
+    - ${HOME}/.m2/wrapper
