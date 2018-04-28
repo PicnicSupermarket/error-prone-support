@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>tech.picnic.errorprone-support</groupId>
-        <artifactId>errorprone-support</artifactId>
+        <groupId>tech.picnic.error-prone-support</groupId>
+        <artifactId>error-prone-support</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>errorprone-contrib</artifactId>
+    <artifactId>error-prone-contrib</artifactId>
 
     <name>Picnic :: Error Prone Support :: Contrib</name>
     <description>Extra Error Prone plugins by Picnic.</description>
