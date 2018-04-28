@@ -792,4 +792,39 @@ final class PrimitiveComparisonTest {
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
+
+  // XXX: This still fails: all replacements start at the same place...
+  @Test
+  void testReplacementOfMultipleSubexpressions() {
+    refactoringTestHelper
+        .addInputLines(
+            "in/A.java",
+            "import java.util.Comparator;",
+            "",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> cmp = Comparator.<A, A>comparing(o -> o)",
+            "      .thenComparingInt(o -> Byte.valueOf((byte) 0))",
+            "      .thenComparingInt(o -> Character.valueOf((char) 0))",
+            "      .thenComparingInt(o -> Short.valueOf((short) 0))",
+            "      .thenComparingInt(o -> Integer.valueOf(0))",
+            "      .thenComparingLong(o -> Long.valueOf(0))",
+            "      .thenComparingDouble(o -> Float.valueOf(0))",
+            "      .thenComparingDouble(o -> Double.valueOf(0));",
+            "}")
+        .addOutputLines(
+            "out/A.java",
+            "import java.util.Comparator;",
+            "",
+            "interface A extends Comparable<A> {",
+            "  Comparator<A> cmp = Comparator.<A, A>comparing(o -> o) ",
+            "      .thenComparing(o -> Byte.valueOf((byte) 0))",
+            "      .thenComparing(o -> Character.valueOf((char) 0))",
+            "      .thenComparing(o -> Short.valueOf((short) 0))",
+            "      .thenComparing(o -> Integer.valueOf(0))",
+            "      .thenComparing(o -> Long.valueOf(0))",
+            "      .thenComparing(o -> Float.valueOf(0))",
+            "      .thenComparing(o -> Double.valueOf(0));",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
 }
