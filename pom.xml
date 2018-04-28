@@ -811,6 +811,11 @@
                                 <version>${version.error-prone}</version>
                             </path>
                             <path>
+                                <groupId>${groupId.error-prone}</groupId>
+                                <artifactId>error_prone_docgen_processor</artifactId>
+                                <version>${version.error-prone}</version>
+                            </path>
+                            <path>
                                 <groupId>com.google.auto.value</groupId>
                                 <artifactId>auto-value</artifactId>
                                 <version>${version.auto-value}</version>
@@ -1088,6 +1093,37 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>3.3.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <configuration>
+                        <mainClass>com.google.errorprone.DocGenTool</mainClass>
+                        <arguments>
+                            <argument>-bug_patterns=${project.build.directory}/generated-sources/annotations/bugPatterns.txt</argument>
+                            <argument>-docs_repository=${project.build.directory}/generated-wiki/</argument>
+                            <argument>-explanations=${basedir}/src/main/docs/bugpattern/</argument>
+                            <argument>-target=external</argument>
+                        </arguments>
+                        <includePluginDependencies>true</includePluginDependencies>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_docgen</artifactId>
+                            <version>${version.error-prone}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>generate-bugpattern-docs</id>
+                            <goals>
+                                <goal>java</goal>
+                            </goals>
+                            <phase>process-classes</phase>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
