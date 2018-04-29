@@ -21,7 +21,7 @@ matrix:
       # https://github.com/google/error-prone/issues/860.
       script: ./mvnw install -Dverification.warn
     - env: JDK='OpenJDK 10'
-      install: . ./install-jdk.sh -F 10 -L GPL -C foo
+      install: . ./install-jdk.sh -F 10 -L GPL -C
       # XXX: On JDK 10 Error Prone causes warnings to be emitted; see
       # https://github.com/google/error-prone/issues/860.
       script: ./mvnw install -Dverification.warn
@@ -30,7 +30,7 @@ matrix:
       # XXX: Error Prone is not yet compatible with JDK 11.
       script: ./mvnw install -Dverification.skip -DskipTests
     - env: JDK='OpenJDK 11'
-      install: . ./install-jdk.sh -F 11 -L GPL -C foo
+      install: . ./install-jdk.sh -F 11 -L GPL -C
       # XXX: Error Prone is not yet compatible with JDK 11.
       script: ./mvnw install -Dverification.skip -DskipTests
 addons:
@@ -40,9 +40,7 @@ addons:
 before_install:
   # XXX: Direct usage of `install-jdk.sh` might be superseded by
   # https://github.com/travis-ci/travis-build/pull/1347
-  # XXX: Above the `-C foo` flags can be simplified to just `-C` once
-  # https://github.com/sormuras/bach/pull/17 is merged and released.
-  - wget https://github.com/sormuras/bach/raw/1.0.1/install-jdk.sh
+  - wget https://github.com/sormuras/bach/raw/1.0.2/install-jdk.sh
   - mvn io.takari:maven:wrapper
 before_cache:
   # Don't cache the artifacts we just generated, for multiple reasons: (1) we
