@@ -15,6 +15,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>refaster-resource-compiler</artifactId>
+            <!-- This dependency is declared only as a hint to Maven that
+            compilation depends on it; see the `maven-compiler-plugin`'s
+            `annotationProcessorPaths` configuration below. -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
             <scope>provided</scope>
@@ -37,6 +45,11 @@
         <dependency>
             <groupId>com.google.errorprone</groupId>
             <artifactId>error_prone_check_api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_core</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -75,4 +88,27 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <annotationProcessorPaths combine.children="append">
+                            <path>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>refaster-resource-compiler</artifactId>
+                                <version>${project.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                        <compilerArgs combine.children="append">
+                            <arg>-Xplugin:RefasterRuleResourceCompiler</arg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

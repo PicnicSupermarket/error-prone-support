@@ -34,6 +34,7 @@
 
     <modules>
         <module>error-prone-contrib</module>
+        <module>refaster-resource-compiler</module>
     </modules>
 
     <scm>
@@ -114,6 +115,11 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>refaster-resource-compiler</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.auto</groupId>
                 <artifactId>auto-common</artifactId>
                 <version>0.10</version>
@@ -141,6 +147,11 @@
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_check_api</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_core</artifactId>
                 <version>${version.error-prone}</version>
             </dependency>
             <dependency>
