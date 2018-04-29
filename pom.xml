@@ -9,6 +9,7 @@
 
     <name>Picnic :: Error Prone Support</name>
     <description>Error Prone support library by Picnic.</description>
+    <url>https://github.com/PicnicSupermarket/error-prone-support</url>
     <inceptionYear>2017</inceptionYear>
     <organization>
         <name>Picnic Technologies BV</name>
@@ -640,6 +641,17 @@
                     <groupId>org.eluder.coveralls</groupId>
                     <artifactId>coveralls-maven-plugin</artifactId>
                     <version>4.3.0</version>
+                    <!-- XXX: This dependency declaration ensures JDK 9
+                    compatibility. Drop it once
+                    https://github.com/trautonen/coveralls-maven-plugin/issues/112
+                    has been resolved and released. -->
+                    <dependencies>
+                        <dependency>
+                            <groupId>javax.xml.bind</groupId>
+                            <artifactId>jaxb-api</artifactId>
+                            <version>2.3.0</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.gaul</groupId>
@@ -960,6 +972,26 @@
                         </plugin>
                     </plugins>
                 </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <!-- This profile is auto-activated when performing a release. -->
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <!-- Lexicographically this plugin is listed out-of-order
+                    because it must be executed after the
+                    `maven-javadoc-plugin`; otherwise not all artifacts will be
+                    signed. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
     </profiles>
