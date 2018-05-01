@@ -62,7 +62,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.checkstyle>8.9</version.checkstyle>
+        <version.checkstyle>8.10</version.checkstyle>
         <version.error-prone>2.3.1</version.error-prone>
         <version.extra-enforcer-rules>1.0-beta-7</version.extra-enforcer-rules>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
@@ -70,7 +70,7 @@
         <version.javadoc>2.10.4</version.javadoc>
         <version.jdk>1.8</version.jdk>
         <version.maven>3.5.3</version.maven>
-        <version.nullaway>0.4.3</version.nullaway>
+        <version.nullaway>0.4.4</version.nullaway>
         <version.plexus-compiler>2.8.4</version.plexus-compiler>
         <version.surefire>2.21.0</version.surefire>
         <!-- Our build system (Travis CI) provides a monotonically increasing
@@ -571,7 +571,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>3.1.0</version>
                     <configuration>
                         <delimiters>
                             <delimiter>@</delimiter>
@@ -679,7 +679,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.3.2</version>
+                    <version>1.4.0</version>
                     <executions>
                         <execution>
                             <id>compute-mutation-coverage</id>
