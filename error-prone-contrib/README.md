@@ -204,6 +204,9 @@ The following is a list of checks we'd like to see implemented:
 - An RxJava-specific check which flags `expr.firstOrError()` calls and suggests
   `expr.switchIfEmpty(Single.error(...))`, so that an application-specific
   exception is thrown instead of `NoSuchElementException`.
+- An RxJava-specific check which flags use of `#assertValueSet` without
+  `#assertValueCount`, as the former method doesn't do what one may intuitivily
+  expect it to do. See ReactiveX/RxJava#6151.
 
 [autorefactor]: https://autorefactor.org
 [bettercodehub]: https://bettercodehub.com
