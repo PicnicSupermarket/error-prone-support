@@ -1,6 +1,11 @@
 language: java
 matrix:
   include:
+    # XXX: JDKs `openjdk9` and `openjdk10` are currently not targeted because
+    # in those environments attempts to download
+    # `junit:junit:jar:4.13-SNAPSHOT` from the Sonatype Nexus Snapshots
+    # repository trigger the issue described at
+    # https://github.com/travis-ci/travis-ci/issues/9368#issuecomment-405035447.
     - jdk: oraclejdk8
       # This is the primary target platform. In this build we track test
       # coverage and perform a SonarQube analysis.
@@ -13,20 +18,8 @@ matrix:
       script: ./mvnw install
     - jdk: oraclejdk9
       script: ./mvnw install
-    - jdk: openjdk9
-      # Test compilation is skipped altogether because attempts to download
-      # `junit:junit:jar:4.13-SNAPSHOT` from the Sonatype Nexus Snapshots
-      # repository trigger the issue described at
-      # https://github.com/travis-ci/travis-ci/issues/9368#issuecomment-405035447.
-      script: ./mvnw install -Dmaven.tests.skip
     - jdk: oraclejdk10
       script: ./mvnw install
-    - jdk: openjdk10
-      # Test compilation is skipped altogether because attempts to download
-      # `junit:junit:jar:4.13-SNAPSHOT` from the Sonatype Nexus Snapshots
-      # repository trigger the issue described at
-      # https://github.com/travis-ci/travis-ci/issues/9368#issuecomment-405035447.
-      script: ./mvnw install -Dmaven.tests.skip
     - jdk: openjdk-ea
       # XXX: When running the tests under JDK 11 they fail because expected
       # errors are not reported. Investigate.
