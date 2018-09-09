@@ -62,17 +62,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.checkstyle>8.10</version.checkstyle>
         <version.error-prone>2.3.1</version.error-prone>
-        <version.extra-enforcer-rules>1.0-beta-7</version.extra-enforcer-rules>
+        <version.error-prone-javac>9+181-r4173-1</version.error-prone-javac>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
-        <version.javac>9+181-r4173-1</version.javac>
-        <version.javadoc>2.10.4</version.javadoc>
+        <version.javadoc>3.0.1</version.javadoc>
         <version.jdk>1.8</version.jdk>
         <version.maven>3.5.3</version.maven>
-        <version.nullaway>0.4.4</version.nullaway>
-        <version.plexus-compiler>2.8.4</version.plexus-compiler>
-        <version.surefire>2.21.0</version.surefire>
+        <version.nullaway>0.5.5</version.nullaway>
+        <version.surefire>2.22.0</version.surefire>
         <!-- Our build system (Travis CI) provides a monotonically increasing
         build number. When building locally, this number is obviously absent.
         So we provide a default value. -->
@@ -176,13 +173,15 @@
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>javac</artifactId>
-                <version>${version.javac}</version>
+                <version>${version.error-prone-javac}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>25.0-jre</version>
+                <version>26.0-jre</version>
             </dependency>
+            <!-- Specified as a workaround for
+            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-beta-checker</artifactId>
@@ -191,13 +190,10 @@
             <dependency>
                 <groupId>com.google.truth</groupId>
                 <artifactId>truth</artifactId>
-                <version>0.40</version>
+                <version>0.42</version>
             </dependency>
-            <dependency>
-                <groupId>com.puppycrawl.tools</groupId>
-                <artifactId>checkstyle</artifactId>
-                <version>${version.checkstyle}</version>
-            </dependency>
+            <!-- Specified as a workaround for
+            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway</artifactId>
@@ -209,9 +205,9 @@
                 <version>4.13-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>extra-enforcer-rules</artifactId>
-                <version>${version.extra-enforcer-rules}</version>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>2.5.5</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -221,7 +217,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>5.0.5.RELEASE</version>
+                <version>4.3.19.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -234,7 +230,7 @@
                 <plugin>
                     <groupId>com.coveo</groupId>
                     <artifactId>fmt-maven-plugin</artifactId>
-                    <version>2.4.0</version>
+                    <version>2.5.1</version>
                     <executions>
                         <execution>
                             <id>format-sources</id>
@@ -294,7 +290,7 @@
                 <plugin>
                     <groupId>io.takari</groupId>
                     <artifactId>maven</artifactId>
-                    <version>0.6.0</version>
+                    <version>0.6.1</version>
                     <configuration>
                         <maven>${version.maven}</maven>
                     </configuration>
@@ -420,19 +416,19 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>${version.checkstyle}</version>
+                            <version>8.12</version>
                         </dependency>
                     </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.7.0</version>
+                    <version>3.8.0</version>
                     <configuration>
                         <compilerArgs>
                             <!-- XXX: Here, we could pass
@@ -452,7 +448,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>3.1.1</version>
                     <configuration>
                         <ignoreDirect>false</ignoreDirect>
                         <ignoreNonCompile>true</ignoreNonCompile>
@@ -495,7 +491,7 @@
                         <dependency>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>extra-enforcer-rules</artifactId>
-                            <version>${version.extra-enforcer-rules}</version>
+                            <version>1.0-beta-9</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -520,7 +516,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>3.1.0</version>
                     <executions>
                         <execution>
                             <id>create-test-jar</id>
@@ -581,7 +577,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.7</version>
+                    <version>3.7.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -635,7 +631,12 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>tidy-maven-plugin</artifactId>
-                    <version>1.0.0</version>
+                    <version>1.1.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.7</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eluder.coveralls</groupId>
@@ -674,12 +675,12 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.1</version>
+                    <version>0.8.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.4.0</version>
+                    <version>1.4.2</version>
                     <executions>
                         <execution>
                             <id>compute-mutation-coverage</id>
@@ -703,7 +704,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.4.0.905</version>
+                    <version>3.5.0.1254</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -721,20 +722,33 @@
 
     <profiles>
         <profile>
-            <!-- When running tests with JDK 8, Error Prone requires that the
-            specific version of `javac` it integrates against is on the
-            bootclasspath. -->
+            <!-- When using JDK 8, Error Prone requires that the specific (JDK
+            9-based) version of `javac` it integrates against is on the boot
+            classpath. (This custom Error Prone `javac` is resolved implicitly
+            as a dependency of `error_prone_core`; as such the path configured
+            below is guaranteed to exist by the time the classpath is
+            consulted.) -->
             <id>jdk8</id>
             <activation>
                 <jdk>1.8</jdk>
             </activation>
             <properties>
-                <bootclasspath>-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${version.javac}/javac-${version.javac}.jar</bootclasspath>
+                <bootclasspath>-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${version.error-prone-javac}/javac-${version.error-prone-javac}.jar</bootclasspath>
                 <argLine>${argLine.base} ${bootclasspath}</argLine>
             </properties>
             <build>
                 <pluginManagement>
                     <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <fork>true</fork>
+                                <compilerArgs combine.children="append">
+                                    <arg>-J${bootclasspath}</arg>
+                                </compilerArgs>
+                            </configuration>
+                        </plugin>
                         <plugin>
                             <groupId>org.pitest</groupId>
                             <artifactId>pitest-maven</artifactId>
@@ -817,6 +831,11 @@
                         <configuration>
                             <annotationProcessorPaths combine.children="append">
                                 <path>
+                                    <groupId>com.google.errorprone</groupId>
+                                    <artifactId>error_prone_core</artifactId>
+                                    <version>${version.error-prone}</version>
+                                </path>
+                                <path>
                                     <groupId>com.google.guava</groupId>
                                     <artifactId>guava-beta-checker</artifactId>
                                     <version>${version.guava-beta-checker}</version>
@@ -831,54 +850,37 @@
                                 <!-- We enable nearly all doclint checks,
                                 except that we don't care about missing Javadoc
                                 on non-public classes and members. -->
-                                <arg>-Xdoclint:all</arg>
-                                <arg>-Xdoclint:missing/protected</arg>
+                                <arg>-Xdoclint:all,-missing/package</arg>
                                 <arg>-Xlint:all</arg>
-                                <!-- Not all annotations present on the
-                                classpath are handled by annotation processors,
-                                and javac complains about this. That doesn't
-                                make a lot of sense. From time to time we
-                                should review whether this issue has been
-                                resolved. -->
-                                <arg>-Xlint:-processing</arg>
-                                <!-- We want to enable almost all error-prone
-                                bug pattern checkers, so we enable all and then
-                                selectively deactivate some. -->
-                                <arg>-XepAllDisabledChecksAsWarnings</arg>
-                                <!-- See https://github.com/google/error-prone/issues/655. -->
-                                <arg>-Xep:ConstructorLeaksThis:OFF</arg>
-                                <!-- See https://github.com/google/error-prone/issues/708. -->
-                                <arg>-Xep:FieldMissingNullable:OFF</arg>
-                                <!-- XXX: Enable this once we open-source this library. -->
-                                <arg>-Xep:BetaApi:OFF</arg>
-                                <arg>-XepOpt:NullAway:AnnotatedPackages=tech.picnic</arg>
+                                <!-- Enable and configure Error Prone. -->
+                                <!-- XXX: The awkward comment formatting used
+                                here ensures that the plugin arguments are
+                                separated only by spaces. Once we drop support
+                                for JDK 8 we can clean this up; later versions
+                                do properly handle newline separators. See
+                                https://github.com/google/error-prone/pull/1115. -->
+                                <arg>
+                                    -Xplugin:ErrorProne <!--
+                                    We want to enable almost all Error
+                                    Prone bug pattern checkers, so we enable
+                                    all and then selectively deactivate some.
+                                    --> -XepAllDisabledChecksAsWarnings <!--
+                                    See https://github.com/google/error-prone/issues/708.
+                                    --> -Xep:FieldMissingNullable:OFF <!--
+                                    XXX: Enable this once we open-source this library.
+                                    --> -Xep:BetaApi:OFF <!--
+                                    --> -XepOpt:NullAway:AnnotatedPackages=tech.picnic
+                                </arg>
+                                <!-- The Error Prone plugin makes certain
+                                assumptions about the state of the AST at the
+                                moment it is invoked. This can be ensured by
+                                using the `simple` compile policy. This flag
+                                may be dropped after resolution of
+                                https://bugs.openjdk.java.net/browse/JDK-8155674. -->
+                                <arg>-XDcompilePolicy=simple</arg>
                             </compilerArgs>
-                            <compilerId>javac-with-errorprone</compilerId>
-                            <forceJavacCompilerUse>true</forceJavacCompilerUse>
                             <showWarnings>true</showWarnings>
                         </configuration>
-                        <dependencies>
-                            <dependency>
-                                <groupId>com.google.errorprone</groupId>
-                                <artifactId>error_prone_core</artifactId>
-                                <version>${version.error-prone}</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.codehaus.plexus</groupId>
-                                <artifactId>plexus-compiler-api</artifactId>
-                                <version>${version.plexus-compiler}</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.codehaus.plexus</groupId>
-                                <artifactId>plexus-compiler-javac</artifactId>
-                                <version>${version.plexus-compiler}</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.codehaus.plexus</groupId>
-                                <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                                <version>${version.plexus-compiler}</version>
-                            </dependency>
-                        </dependencies>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -945,6 +947,13 @@
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
                             <configuration>
+                                <compilerArgs combine.children="append">
+                                    <!-- When using a JDK other than the one
+                                    specified using `-source`, `javac` warns
+                                    that the bootstrap classpath will not be
+                                    set. We don't want to fail on that warning. -->
+                                    <arg>-Xlint:-options</arg>
+                                </compilerArgs>
                                 <failOnWarning>true</failOnWarning>
                             </configuration>
                         </plugin>

@@ -1,9 +1,7 @@
 language: java
 matrix:
   include:
-    - env: JDK='Oracle JDK 8'
-      jdk: oraclejdk8
-      install: true
+    - jdk: oraclejdk8
       # This is the primary target platform. In this build we track test
       # coverage and perform a SonarQube analysis.
       script:
@@ -11,37 +9,25 @@ matrix:
         # XXX: Enable Coveralls and SonarCloud once we "go public".
         # ./mvnw jacoco:prepare-agent surefire:test jacoco:report coveralls:report sonar:sonar
         - ./mvnw jacoco:prepare-agent surefire:test jacoco:report
-    - env: JDK='Oracle JDK 9'
-      jdk: oraclejdk9
-      install: true
+    - jdk: openjdk8
       script: ./mvnw install
-    - env: JDK='Oracle JDK 10'
-      install: . ./install-jdk.sh -F 10 -L BCL
-      # XXX: On JDK 10 Error Prone causes warnings to be emitted; see
-      # https://github.com/google/error-prone/issues/860.
-      script: ./mvnw install -Dverification.warn
-    - env: JDK='OpenJDK 10'
-      install: . ./install-jdk.sh -F 10 -L GPL -C
-      # XXX: On JDK 10 Error Prone causes warnings to be emitted; see
-      # https://github.com/google/error-prone/issues/860.
-      script: ./mvnw install -Dverification.warn
-    - env: JDK='Oracle JDK 11'
-      install: . ./install-jdk.sh -F 11 -L BCL
-      # XXX: Error Prone is not yet compatible with JDK 11.
-      script: ./mvnw install -Dverification.skip -DskipTests
-    - env: JDK='OpenJDK 11'
-      install: . ./install-jdk.sh -F 11 -L GPL -C
-      # XXX: Error Prone is not yet compatible with JDK 11.
-      script: ./mvnw install -Dverification.skip -DskipTests
+    - jdk: oraclejdk9
+      script: ./mvnw install
+    - jdk: openjdk9
+      script: ./mvnw install
+    - jdk: oraclejdk10
+      script: ./mvnw install
+    - jdk: openjdk10
+      script: ./mvnw install
+    - jdk: openjdk-ea
+      # XXX: When running the tests under JDK 11 they fail because expected
+      # errors are not reported. Investigate.
+      script: ./mvnw install -DskipTests
 addons:
   sonarcloud:
     organization: picnic-technologies
     token: "${SONARCLOUD_TOKEN}"
-before_install:
-  # XXX: Direct usage of `install-jdk.sh` might be superseded by
-  # https://github.com/travis-ci/travis-build/pull/1347
-  - wget https://github.com/sormuras/bach/raw/1.0.2/install-jdk.sh
-  - mvn io.takari:maven:wrapper
+install: mvn io.takari:maven:wrapper
 before_cache:
   # Don't cache the artifacts we just generated, for multiple reasons: (1) we
   # shouldn't need them next time around and (2) if we do, that indicates a
