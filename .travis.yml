@@ -14,11 +14,19 @@ matrix:
     - jdk: oraclejdk9
       script: ./mvnw install
     - jdk: openjdk9
-      script: ./mvnw install
+      # Test compilation is skipped altogether because attempts to download
+      # `junit:junit:jar:4.13-SNAPSHOT` from the Sonatype Nexus Snapshots
+      # repository trigger the issue described at
+      # https://github.com/travis-ci/travis-ci/issues/9368#issuecomment-405035447.
+      script: ./mvnw install -Dmaven.tests.skip
     - jdk: oraclejdk10
       script: ./mvnw install
     - jdk: openjdk10
-      script: ./mvnw install
+      # Test compilation is skipped altogether because attempts to download
+      # `junit:junit:jar:4.13-SNAPSHOT` from the Sonatype Nexus Snapshots
+      # repository trigger the issue described at
+      # https://github.com/travis-ci/travis-ci/issues/9368#issuecomment-405035447.
+      script: ./mvnw install -Dmaven.tests.skip
     - jdk: openjdk-ea
       # XXX: When running the tests under JDK 11 they fail because expected
       # errors are not reported. Investigate.
