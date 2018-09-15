@@ -430,13 +430,6 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.0</version>
                     <configuration>
-                        <compilerArgs>
-                            <!-- XXX: Here, we could pass
-                            -J-XX:TieredStopAtLevel=1, like we do for most
-                            other JVMs started during the build. But that
-                            doesn't seem to yield a noticable speedup. -->
-                        </compilerArgs>
-                        <maxmem>256m</maxmem>
                         <parameters>true</parameters>
                         <source>${version.jdk}</source>
                         <target>${version.jdk}</target>
@@ -743,10 +736,12 @@
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
                             <configuration>
-                                <fork>true</fork>
                                 <compilerArgs combine.children="append">
+                                    <arg>-J-XX:TieredStopAtLevel=1</arg>
                                     <arg>-J${bootclasspath}</arg>
                                 </compilerArgs>
+                                <fork>true</fork>
+                                <maxmem>256m</maxmem>
                             </configuration>
                         </plugin>
                         <plugin>
