@@ -14,12 +14,11 @@ import com.sun.source.tree.MethodTree;
 // XXX: Disable until fixed.
 // @AutoService(BugChecker.class)
 @BugPattern(
-  name = "EmptyMethod",
-  summary = "Empty method can likely be deleted",
-  linkType = LinkType.NONE,
-  severity = SeverityLevel.WARNING,
-  tags = StandardTags.LIKELY_ERROR
-)
+    name = "EmptyMethod",
+    summary = "Empty method can likely be deleted",
+    linkType = LinkType.NONE,
+    severity = SeverityLevel.WARNING,
+    tags = StandardTags.LIKELY_ERROR)
 public final class EmptyMethodCheck extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
 

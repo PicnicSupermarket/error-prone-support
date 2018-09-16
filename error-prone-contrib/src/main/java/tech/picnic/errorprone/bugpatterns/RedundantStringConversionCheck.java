@@ -46,13 +46,12 @@ import java.util.regex.Pattern;
 /** A {@link BugChecker} which flags redundant explicit string conversions. */
 @AutoService(BugChecker.class)
 @BugPattern(
-  name = "RedundantStringConversion",
-  summary = "Avoid redundant string conversions when possible",
-  linkType = LinkType.NONE,
-  severity = SeverityLevel.SUGGESTION,
-  tags = StandardTags.SIMPLIFICATION,
-  providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
-)
+    name = "RedundantStringConversion",
+    summary = "Avoid redundant string conversions when possible",
+    linkType = LinkType.NONE,
+    severity = SeverityLevel.SUGGESTION,
+    tags = StandardTags.SIMPLIFICATION,
+    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class RedundantStringConversionCheck extends BugChecker
     implements BinaryTreeMatcher, CompoundAssignmentTreeMatcher, MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;

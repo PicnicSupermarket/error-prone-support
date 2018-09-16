@@ -43,18 +43,18 @@ import java.util.stream.Stream;
 // XXX: Add more documentation. Explain how this is useful in the face of refactoring to more
 // specific types.
 // XXX: Change this checker's name?
-// XXX: Introduce a companion checker (or Refaster template?) for https://youtrack.jetbrains.com/issue/IDEA-185548.
+// XXX: Introduce a companion checker (or Refaster template?) for
+// https://youtrack.jetbrains.com/issue/IDEA-185548.
 @AutoService(BugChecker.class)
 @BugPattern(
-  name = "PrimitiveComparison",
-  summary =
-      "Ensure invocations of `Comparator#comparing{,Double,Int,Long}` match the return type"
-          + " of the provided function",
-  linkType = LinkType.NONE,
-  severity = SeverityLevel.WARNING,
-  tags = StandardTags.PERFORMANCE,
-  providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
-)
+    name = "PrimitiveComparison",
+    summary =
+        "Ensure invocations of `Comparator#comparing{,Double,Int,Long}` match the return type"
+            + " of the provided function",
+    linkType = LinkType.NONE,
+    severity = SeverityLevel.WARNING,
+    tags = StandardTags.PERFORMANCE,
+    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class PrimitiveComparisonCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;

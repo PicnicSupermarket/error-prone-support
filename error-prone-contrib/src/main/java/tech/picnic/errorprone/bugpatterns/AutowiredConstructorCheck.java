@@ -23,13 +23,12 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
 /** A {@link BugChecker} which flags redundant {@code @Autowired} constructor annotations. */
 @AutoService(BugChecker.class)
 @BugPattern(
-  name = "AutowiredConstructor",
-  summary = "Omit `@Autowired` on a class' sole constuctor, as it is redundant",
-  linkType = LinkType.NONE,
-  severity = SeverityLevel.SUGGESTION,
-  tags = StandardTags.SIMPLIFICATION,
-  providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
-)
+    name = "AutowiredConstructor",
+    summary = "Omit `@Autowired` on a class' sole constuctor, as it is redundant",
+    linkType = LinkType.NONE,
+    severity = SeverityLevel.SUGGESTION,
+    tags = StandardTags.SIMPLIFICATION,
+    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class AutowiredConstructorCheck extends BugChecker implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<AnnotationTree> AUTOWIRED_ANNOTATION =

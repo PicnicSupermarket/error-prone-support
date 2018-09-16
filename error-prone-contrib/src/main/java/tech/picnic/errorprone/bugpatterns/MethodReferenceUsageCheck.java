@@ -49,13 +49,12 @@ import javax.lang.model.element.Name;
 // black-and-white. Maybe we can more closely approximate it?
 @AutoService(BugChecker.class)
 @BugPattern(
-  name = "MethodReferenceUsage",
-  summary = "Prefer method references over lambda expressions",
-  linkType = LinkType.NONE,
-  severity = SeverityLevel.SUGGESTION,
-  tags = StandardTags.STYLE,
-  providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
-)
+    name = "MethodReferenceUsage",
+    summary = "Prefer method references over lambda expressions",
+    linkType = LinkType.NONE,
+    severity = SeverityLevel.SUGGESTION,
+    tags = StandardTags.STYLE,
+    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class MethodReferenceUsageCheck extends BugChecker
     implements LambdaExpressionTreeMatcher {
   private static final long serialVersionUID = 1L;

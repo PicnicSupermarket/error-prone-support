@@ -21,10 +21,9 @@ import org.junit.runners.JUnit4;
 public final class MethodMatcherFactoryTest {
   /** A {@link BugChecker} which flags method invocations matched by {@link #TEST_MATCHER}. */
   @BugPattern(
-    name = "MatchedMethodsFlagger",
-    severity = SeverityLevel.SUGGESTION,
-    summary = "Flags methods matched by the test matcher."
-  )
+      name = "MatchedMethodsFlagger",
+      severity = SeverityLevel.SUGGESTION,
+      summary = "Flags methods matched by the test matcher.")
   public static final class MatchedMethodsFlagger extends BugChecker
       implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;

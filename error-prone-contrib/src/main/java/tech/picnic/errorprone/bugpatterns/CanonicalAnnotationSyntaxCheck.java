@@ -29,13 +29,12 @@ import java.util.regex.Pattern;
 /** A {@link BugChecker} which flags annotations that could be written more concisely. */
 @AutoService(BugChecker.class)
 @BugPattern(
-  name = "CanonicalAnnotationSyntax",
-  summary = "Omit redundant syntax from annotation declarations",
-  linkType = LinkType.NONE,
-  severity = SeverityLevel.SUGGESTION,
-  tags = StandardTags.SIMPLIFICATION,
-  providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
-)
+    name = "CanonicalAnnotationSyntax",
+    summary = "Omit redundant syntax from annotation declarations",
+    linkType = LinkType.NONE,
+    severity = SeverityLevel.SUGGESTION,
+    tags = StandardTags.SIMPLIFICATION,
+    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class CanonicalAnnotationSyntaxCheck extends BugChecker
     implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;

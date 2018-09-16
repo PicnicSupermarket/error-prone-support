@@ -37,13 +37,12 @@ import java.util.stream.Stream;
 // their resolution when they do happen.
 @AutoService(BugChecker.class)
 @BugPattern(
-  name = "LexicographicalAnnotationAttributeListing",
-  summary = "Where possible, sort annotation array attributes lexicographically",
-  linkType = LinkType.NONE,
-  severity = SeverityLevel.SUGGESTION,
-  tags = StandardTags.STYLE,
-  providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
-)
+    name = "LexicographicalAnnotationAttributeListing",
+    summary = "Where possible, sort annotation array attributes lexicographically",
+    linkType = LinkType.NONE,
+    severity = SeverityLevel.SUGGESTION,
+    tags = StandardTags.STYLE,
+    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class LexicographicalAnnotationAttributeListingCheck extends BugChecker
     implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;

@@ -34,13 +34,12 @@ import java.util.regex.Pattern;
 // preconditions, ...
 @AutoService(BugChecker.class)
 @BugPattern(
-  name = "Slf4jLogStatement",
-  summary = "Make sure SLF4J log statements contain proper placeholders with matching arguments",
-  linkType = LinkType.NONE,
-  severity = SeverityLevel.WARNING,
-  tags = StandardTags.LIKELY_ERROR,
-  providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION
-)
+    name = "Slf4jLogStatement",
+    summary = "Make sure SLF4J log statements contain proper placeholders with matching arguments",
+    linkType = LinkType.NONE,
+    severity = SeverityLevel.WARNING,
+    tags = StandardTags.LIKELY_ERROR,
+    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class Slf4jLogStatementCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
