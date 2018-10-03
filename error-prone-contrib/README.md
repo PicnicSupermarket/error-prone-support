@@ -81,6 +81,10 @@ The following is a list of checks we'd like to see implemented:
   explicit, and another which replaces the platform-dependent behavior with the
   preferred alternative. (Such as using `UTF-8` instead of the system default
   charset.)
+- The [Modernizer Maven Plugin][modernizer-maven-plugin] can similarly be
+  replaced with an equivalent Error Prone check. The latter would allow
+  automatic replacement of outdated APIs through Error Prone's patch
+  functionality.
 - A subset of the refactor operations provided by the Eclipse-specific
   [AutoRefactor][autorefactor] plugin.
 - A check which replaces fully qualified types with simple types in context
@@ -217,4 +221,5 @@ The following is a list of checks we'd like to see implemented:
 [error-prone-repo]: https://github.com/google/error-prone
 [forbidden-apis]: https://github.com/policeman-tools/forbidden-apis
 [fossa]: https://fossa.io
+[modernizer-maven-plugin]: https://github.com/gaul/modernizer-maven-plugin
 [sonarcloud]: https://sonarcloud.io
