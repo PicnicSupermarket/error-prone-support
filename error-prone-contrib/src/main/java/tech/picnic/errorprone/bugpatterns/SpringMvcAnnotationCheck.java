@@ -42,7 +42,6 @@ import java.util.Optional;
 public final class SpringMvcAnnotationCheck extends BugChecker implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String ANN_PACKAGE_PREFIX = "org.springframework.web.bind.annotation.";
-  private static final String REQUEST_METHOD = ANN_PACKAGE_PREFIX + "RequestMethod";
   private static final AnnotationAttributeMatcher ARGUMENT_SELECTOR =
       AnnotationAttributeMatcher.create(
           Optional.of(ImmutableList.of(ANN_PACKAGE_PREFIX + "RequestMapping#method")),

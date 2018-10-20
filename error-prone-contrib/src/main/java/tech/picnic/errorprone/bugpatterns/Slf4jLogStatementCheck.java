@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.base.Verify.verify;
-import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 
@@ -44,7 +43,6 @@ public final class Slf4jLogStatementCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> MARKER = isSubtypeOf("org.slf4j.Marker");
-  private static final Matcher<ExpressionTree> STRING = isSameType(String.class);
   private static final Matcher<ExpressionTree> THROWABLE = isSubtypeOf(Throwable.class);
   private static final Matcher<ExpressionTree> SLF4J_LOGGER_INVOCATION =
       instanceMethod()
@@ -58,7 +56,7 @@ public final class Slf4jLogStatementCheck extends BugChecker
     }
 
     List<? extends ExpressionTree> args = getTrimmedArguments(tree, state);
-    Optional<String> formatString = getFormatString(args, state);
+    Optional<String> formatString = getFormatString(args);
     if (!formatString.isPresent()) {
       return Description.NO_MATCH;
     }
@@ -90,8 +88,7 @@ public final class Slf4jLogStatementCheck extends BugChecker
     return args.subList(lTrim, args.size() - rTrim);
   }
 
-  private static Optional<String> getFormatString(
-      List<? extends ExpressionTree> args, VisitorState state) {
+  private static Optional<String> getFormatString(List<? extends ExpressionTree> args) {
     verify(!args.isEmpty(), "Failed to identify SLF4J log method format string");
     return Optional.ofNullable(ASTHelpers.constValue(args.get(0), String.class));
   }

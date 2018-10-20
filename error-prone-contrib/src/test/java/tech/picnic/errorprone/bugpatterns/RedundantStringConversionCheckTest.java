@@ -38,6 +38,8 @@ public final class RedundantStringConversionCheckTest {
             "      o.toString(),",
             "      // BUG: Diagnostic contains:",
             "      s.toString(),",
+            "      String.valueOf(o),",
+            "      // BUG: Diagnostic contains:",
             "      String.valueOf(s),",
             "    };",
             "  }",

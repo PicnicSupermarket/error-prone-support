@@ -63,7 +63,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.auto-service>1.0-rc4</version.auto-service>
-        <version.error-prone>2.3.1</version.error-prone>
+        <version.error-prone>2.3.2</version.error-prone>
         <version.error-prone-javac>9+181-r4173-1</version.error-prone-javac>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.javadoc>3.0.1</version.javadoc>
@@ -873,8 +873,12 @@
                                     Prone bug pattern checkers, so we enable
                                     all and then selectively deactivate some.
                                     --> -XepAllDisabledChecksAsWarnings <!--
-                                    See https://github.com/google/error-prone/issues/708.
-                                    --> -Xep:FieldMissingNullable:OFF <!--
+                                    We don't target Android.
+                                    --> -Xep:AndroidJdkLibsChecker:OFF <!--
+                                    We target JDK 8+.
+                                    --> -Xep:Java7ApiChecker:OFF <!--
+                                    See https://github.com/google/error-prone/issues/1138.
+                                    --> -Xep:NullableDereference:OFF <!--
                                     XXX: Enable this once we open-source this library.
                                     --> -Xep:BetaApi:OFF <!--
                                     --> -XepOpt:NullAway:AnnotatedPackages=tech.picnic
