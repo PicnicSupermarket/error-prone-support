@@ -70,7 +70,7 @@
         <version.jdk>1.8</version.jdk>
         <version.maven>3.5.3</version.maven>
         <version.nullaway>0.6.0</version.nullaway>
-        <version.surefire>2.22.0</version.surefire>
+        <version.surefire>2.22.1</version.surefire>
         <!-- Our build system (Travis CI) provides a monotonically increasing
         build number. When building locally, this number is obviously absent.
         So we provide a default value. -->
