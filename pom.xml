@@ -262,7 +262,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>2.5</version>
+                    <version>2.6</version>
                     <executions>
                         <execution>
                             <id>detect-forbidden-api-usage</id>
@@ -274,7 +274,25 @@
                     </executions>
                     <configuration>
                         <bundledSignatures>
+                            <bundledSignature>jdk-internal</bundledSignature>
+                            <bundledSignature>jdk-reflection</bundledSignature>
                             <bundledSignature>jdk-system-out</bundledSignature>
+                            <!-- Other bundles are available but currently not
+                            enabled:
+                            - commons-io-unsafe-*: while we may indirectly rely
+                              on Apache Commons IO, we avoid direct
+                              dependencies.
+                            - jdk-deprecated: we compile with `-Xlint:all`,
+                              which causes the build to fail when _any_
+                              deprecated method is called.
+                            - jdk-non-portable: the Error Prone integration
+                              crucially relies on some of these APIs.
+                            - jdk-unsafe: see
+                              https://github.com/policeman-tools/forbidden-apis/issues/119.
+                            Note that this whole plugin could be replaced with
+                            an Error Prone check; that would also make it
+                            possible to resolve issue #119 linked above. See
+                            https://github.com/google/error-prone/issues/632. -->
                         </bundledSignatures>
                         <!-- The plugin tries to load all supertypes of any
                         class it analyzes. Some of those types may be absent
