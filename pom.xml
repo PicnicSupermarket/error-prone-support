@@ -893,7 +893,7 @@
                                     --> -XepAllDisabledChecksAsWarnings <!--
                                     We don't target Android.
                                     --> -Xep:AndroidJdkLibsChecker:OFF <!--
-                                    We target JDK 8+.
+                                    We don't target JDK 7.
                                     --> -Xep:Java7ApiChecker:OFF <!--
                                     See https://github.com/google/error-prone/issues/1138.
                                     --> -Xep:NullableDereference:OFF <!--
