@@ -69,7 +69,7 @@
         <version.javadoc>3.0.1</version.javadoc>
         <version.jdk>1.8</version.jdk>
         <version.maven>3.5.3</version.maven>
-        <version.nullaway>0.6.0</version.nullaway>
+        <version.nullaway>0.6.3</version.nullaway>
         <version.surefire>2.22.1</version.surefire>
         <!-- Our build system (Travis CI) provides a monotonically increasing
         build number. When building locally, this number is obviously absent.
@@ -192,7 +192,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>2.5.6</version>
+                <version>2.5.7</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -435,7 +435,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>8.13</version>
+                            <version>8.14</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -676,7 +676,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>1.7.0</version>
                     <executions>
                         <execution>
                             <id>modernize</id>
@@ -743,10 +743,10 @@
         <profile>
             <!-- When using JDK 8, Error Prone requires that the specific (JDK
             9-based) version of `javac` it integrates against is on the boot
-            classpath. (This custom Error Prone `javac` is resolved implicitly
+            classpath. This custom Error Prone `javac` is resolved implicitly
             as a dependency of `error_prone_core`; as such the path configured
             below is guaranteed to exist by the time the classpath is
-            consulted.) -->
+            consulted. -->
             <id>jdk8</id>
             <activation>
                 <jdk>1.8</jdk>
@@ -903,9 +903,9 @@
                                 </arg>
                                 <!-- The Error Prone plugin makes certain
                                 assumptions about the state of the AST at the
-                                moment it is invoked. This can be ensured by
-                                using the `simple` compile policy. This flag
-                                may be dropped after resolution of
+                                moment it is invoked. Those assumptions are met
+                                when using the `simple` compile policy. This
+                                flag may be dropped after resolution of
                                 https://bugs.openjdk.java.net/browse/JDK-8155674. -->
                                 <arg>-XDcompilePolicy=simple</arg>
                             </compilerArgs>
