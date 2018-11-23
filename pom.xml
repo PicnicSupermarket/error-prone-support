@@ -232,15 +232,6 @@
                     <groupId>com.coveo</groupId>
                     <artifactId>fmt-maven-plugin</artifactId>
                     <version>2.6.0</version>
-                    <executions>
-                        <execution>
-                            <id>format-sources</id>
-                            <phase>process-sources</phase>
-                            <goals>
-                                <goal>format</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>com.lewisd</groupId>
@@ -661,7 +652,7 @@
                     <groupId>org.eluder.coveralls</groupId>
                     <artifactId>coveralls-maven-plugin</artifactId>
                     <version>4.3.0</version>
-                    <!-- XXX: This dependency declaration ensures JDK 9
+                    <!-- XXX: This dependency declaration ensures JDK 9+
                     compatibility. Drop it once
                     https://github.com/trautonen/coveralls-maven-plugin/issues/112
                     has been resolved and released. -->
@@ -819,6 +810,18 @@
             </activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>com.coveo</groupId>
+                        <artifactId>fmt-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>check-source-format</id>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>com.lewisd</groupId>
                         <artifactId>lint-maven-plugin</artifactId>
@@ -1007,6 +1010,31 @@
                             <artifactId>modernizer-maven-plugin</artifactId>
                             <configuration>
                                 <failOnViolations>true</failOnViolations>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <!-- A counterpart to the `disallow-warnings` profile which
+            explicitly "tones down" plugins enabled by the `build-checks`
+            profile. Necessary for dealing with plugins that default to failing
+            the build upon encountering a violation. -->
+            <id>avoid-errors</id>
+            <activation>
+                <property>
+                    <name>verification.warn</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.coveo</groupId>
+                            <artifactId>fmt-maven-plugin</artifactId>
+                            <configuration>
+                                <skip>true</skip>
                             </configuration>
                         </plugin>
                     </plugins>
