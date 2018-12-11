@@ -93,6 +93,7 @@
             --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+            --add-exports=jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED
@@ -113,7 +114,7 @@
             -Xmx${argLine.xmx}
             <!-- Configure the Byte Buddy Java agent used by Mockito to create
             mocks. -->
-            -javaagent:${org.mockito:mockito-core:jar}
+            <!-- -javaagent:${org.mockito:mockito-core:jar} -->
             <!-- This argument cannot be set through Surefire's
             'systemPropertyVariables' configuration setting. Setting the file
             encoding is necessary because forked unit test invocations
@@ -453,6 +454,11 @@
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
                 <version>3.48.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.gaul</groupId>
+                <artifactId>modernizer-maven-plugin</artifactId>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -979,6 +985,7 @@
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
@@ -1355,6 +1362,7 @@
                                 <!-- XXX: Get projects referencing just "BSD"
                                 to explicitly state the clause count. -->
                                 BSD-2-Clause
+                                | The BSD 2-Clause License
                                 | The BSD License
                             </licenseMerge>
                             <licenseMerge>
