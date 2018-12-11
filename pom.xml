@@ -88,6 +88,7 @@
             -XX:+UseParallelGC
             --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+            --add-exports=jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED
@@ -358,12 +359,14 @@
                 <artifactId>junit</artifactId>
                 <version>4.13.2</version>
             </dependency>
-            <!-- Specified so that Renovate will file Maven upgrade PRs, which
-            subsequently will cause `maven-enforcer-plugin` to require that
-            developers build the project using the latest Maven release. -->
             <dependency>
                 <groupId>org.apache.maven</groupId>
-                <artifactId>maven-plugin-api</artifactId>
+                <artifactId>maven-artifact</artifactId>
+                <version>${version.maven}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-model</artifactId>
                 <version>${version.maven}</version>
             </dependency>
             <dependency>
@@ -380,6 +383,29 @@
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
                 <version>3.24.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-classworlds</artifactId>
+                <version>2.6.0</version>
+            </dependency>
+            <!-- XXX: This one is declared only to appease the
+            `license-maven-plugin`. File a PR upstream to pull in a more recent
+            version. -->
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-container-default</artifactId>
+                <version>2.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>3.4.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.gaul</groupId>
+                <artifactId>modernizer-maven-plugin</artifactId>
+                <version>2.4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -1108,6 +1134,7 @@
                             non-distributed (i.e. Picnic-internal) deployable
                             artifacts (i.e. web services). -->
                             <includedLicense>Apache-2.0</includedLicense>
+                            <includedLicense>BSD-2-Clause</includedLicense>
                             <includedLicense>BSD-3-Clause</includedLicense>
                             <includedLicense>CC0-1.0</includedLicense>
                             <includedLicense>CDDL-1.1</includedLicense>
@@ -1134,6 +1161,11 @@
                                 | Apache License, Version 2.0
                                 | The Apache License, Version 2.0
                                 | The Apache Software License, Version 2.0
+                            </licenseMerge>
+                            <licenseMerge>
+                                <!-- -->
+                                BSD-2-Clause
+                                | The BSD License
                             </licenseMerge>
                             <licenseMerge>
                                 <!-- -->
@@ -1741,6 +1773,8 @@
                                     <arg>jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                                     <arg>--add-exports</arg>
                                     <arg>jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                                    <arg>--add-exports</arg>
+                                    <arg>jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED</arg>
                                     <arg>--add-exports</arg>
                                     <arg>jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
                                     <arg>--add-exports</arg>
