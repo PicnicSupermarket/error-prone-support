@@ -256,6 +256,10 @@ public final class RedundantStringConversionCheck extends BugChecker
      * provided format string, then the associated format specifier must have been `%s`, which
      * performs simple string conversion for all other types, including all primitive types.
      */
+    // XXX: since we don't know the runtime type of the arguments, it may be that arguments which
+    // *do* implement `java.util.Formattable` are not recognized as such. We could make the check
+    // more conservative, but `Formattable` is rarely used... consider at least flagging this
+    // caveat.
     return tryFixFormatterArguments(arguments, state, LOCALE, NOT_FORMATTABLE);
   }
 

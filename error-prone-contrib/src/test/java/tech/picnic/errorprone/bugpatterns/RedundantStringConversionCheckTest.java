@@ -404,7 +404,6 @@ public final class RedundantStringConversionCheckTest {
         .addSourceLines(
             "A.java",
             "import java.math.RoundingMode;",
-            "import java.util.Locale;",
             "import java.util.Objects;",
             "",
             "class A {",
@@ -495,10 +494,7 @@ public final class RedundantStringConversionCheckTest {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
-            "import java.util.Locale;",
-            "",
             "class A {",
-            "  private final Locale locale = Locale.ROOT;",
             "  private final Object o = new Object();",
             "  private final String s = o.toString();",
             "",
@@ -512,10 +508,7 @@ public final class RedundantStringConversionCheckTest {
             "}")
         .addOutputLines(
             "out/A.java",
-            "import java.util.Locale;",
-            "",
             "class A {",
-            "  private final Locale locale = Locale.ROOT;",
             "  private final Object o = new Object();",
             "  private final String s = o.toString();",
             "",

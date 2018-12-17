@@ -11,7 +11,7 @@ request.
 
 ### Contribution guidelines
 
-To the extend possible the pull request process guards our coding guidelines.
+To the extend possible, the pull request process guards our coding guidelines.
 Some pointers:
 - Checks should we _topical_: Ideally they address a single concern.
 - Where possible checks should provide _fixes_, and ideally these are
@@ -43,7 +43,6 @@ project:
 - Document each of the checks.
 - Add Travis CI, [SonarQube][sonarcloud] and [Coveralls][coveralls]
   integrations.
-- Validate formatting upon PR builds.
 - Investigate whether it makes sense to include license headers in each file.
   If so, set that up and enforce it.
 - Add non-Java file formatting support, like we have internally at Picnic.
@@ -55,7 +54,8 @@ project:
 - Set up a script/procedure for testing the plugin against other open source
   projects. By running the checks against a variety of code bases we are more
   likely to catch errors due to unexpected code constructs. False positives and
-  regressions can be caught this way as well.
+  regressions can be caught this way as well. For inspiration, review how
+  [Checkstyle does this][checkstyle-external-project-tests].
 - Create a tool which converts a collection of Refaster Templates into an Error
   Prone check. Ideally this tool is contributed upstream.
 - Have the repository be analyzed by [Better Code Hub][bettercodehub] and
@@ -65,7 +65,7 @@ project:
   see whether a custom error message (`Description.Builder#setMessage`) is
   warranted.
 - Improve an existing check (see `XXX`-marked comments in the code) or write a
-  new one (see the list of suggestions below.)
+  new one (see the list of suggestions below).
 
 ### Ideas for new checks
 
@@ -77,7 +77,7 @@ The following is a list of checks we'd like to see implemented:
   signature groups. Using Error Prone's method matchers forbidden method calls
   can easily be identified. But Error Prone can go one step further by
   auto-patching violations. For each violation two fixes can be proposed: a
-  purely behavior-preserving fix which make the platform-dependent behavior
+  purely behavior-preserving fix which makes the platform-dependent behavior
   explicit, and another which replaces the platform-dependent behavior with the
   preferred alternative. (Such as using `UTF-8` instead of the system default
   charset.)
@@ -103,7 +103,7 @@ The following is a list of checks we'd like to see implemented:
   concatenations.
 - A check which adds or removes the first `Locale` argument to `String.format`
   and similar calls as necessary. (For example, a format string containing only
-  `%s` placeholders is local-insensitive unless any of the arguments is a
+  `%s` placeholders is locale-insensitive unless any of the arguments is a
   `Formattable`, while `%f` placeholders _are_ locale-sensitive.)
 - A check which replaces `String.replaceAll` with `String.replace` if the first
   argument is certainly not a regular expression. And if both arguments are
@@ -137,7 +137,7 @@ The following is a list of checks we'd like to see implemented:
   clock, suggesting that a passed-in `Clock` is used instead.
 - A check which flags public methods on public classes which reference
   non-public types. This can cause `IllegalAccessError`s and
-  `BootstrapMethodError`s are runtime.
+  `BootstrapMethodError`s at runtime.
 - A check which swaps the LHS and RHS in expressions of the form
   `nonConstant.equals(someNonNullConstant)`.
 - A check which annotates methods which only throw an exception with
@@ -169,12 +169,15 @@ The following is a list of checks we'd like to see implemented:
   one which uses constructor injection. This check wouldn't be strictly
   behavior preserving, but could be used for a one-off code base migration.
 - A Spring-specific check which disallows field injection, except in
-  `AbstractTestNGSpringContextTests` subclasses.
+  `AbstractTestNGSpringContextTests` subclasses. (One known edge case:
+  self-injections so that a bean can call itself through an implicit proxy.)
 - A Spring-specific check which verifies that public methods on all classes
   whose name matches a certain pattern, e.g. `.*Service`, are annotated
   `@Secured`.
 - A Spring-specific check which verifies that annotations such as
-  `@ResponseStatus` are only present in `@RestController` classes.
+  `@RequestParam` are only present in `@RestController` classes.
+- A Spring-specific check which disallows `@ResponseStatus` on MVC endpoint
+  methods, as this prevents communication of error status codes.
 - A Hibernate Validator-specific check which looks for `@UnwrapValidatedValue`
   usages and migrates the associated constraint annotations to the generic type
   argument to which they (are presumed to) apply.
@@ -193,7 +196,7 @@ The following is a list of checks we'd like to see implemented:
   method with `checkArgument`/`IllegalArgument`, since the method is invoked
   when a caller attempts to create an immutable instance.
 - An Immutables-specific check which disallows references to collection types
-  other that the Guava immutable collections, including inside generic type
+  other than the Guava immutable collections, including inside generic type
   arguments.
 - An SLF4J-specific check which drops or adds a trailing dot from log messages,
   as applicable.
@@ -223,3 +226,4 @@ The following is a list of checks we'd like to see implemented:
 [fossa]: https://fossa.io
 [modernizer-maven-plugin]: https://github.com/gaul/modernizer-maven-plugin
 [sonarcloud]: https://sonarcloud.io
+[checkstyle-external-project-tests]: https://github.com/checkstyle/checkstyle/blob/master/wercker.yml
