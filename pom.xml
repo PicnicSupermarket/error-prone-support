@@ -304,7 +304,7 @@
                     <configuration>
                         <checkstyleRules>
                             <!-- We only enable rules that are not enforced by
-                            error-prone or automatically corrected through
+                            Error Prone or automatically corrected through
                             application of google-java-format. -->
                             <module name="Checker">
                                 <module name="UniqueProperties" />
@@ -431,6 +431,12 @@
                                 <version>${version.auto-service}</version>
                             </path>
                         </annotationProcessorPaths>
+                        <compilerArgs>
+                            <arg>-Xmaxerrs</arg>
+                            <arg>10000</arg>
+                            <arg>-Xmaxwarns</arg>
+                            <arg>10000</arg>
+                        </compilerArgs>
                         <parameters>true</parameters>
                         <source>${version.jdk}</source>
                         <target>${version.jdk}</target>
@@ -510,7 +516,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.1.1</version>
                     <executions>
                         <execution>
                             <id>create-test-jar</id>
@@ -651,7 +657,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>1.7.0</version>
+                    <version>1.7.1</version>
                     <executions>
                         <execution>
                             <id>modernize</id>
@@ -662,6 +668,14 @@
                         </execution>
                     </executions>
                     <configuration>
+                        <exclusionPatterns>
+                            <!-- The plugin suggests replacing Guava's
+                            immutable collection factory methods with
+                            `java.util.{List,Map,Set}.{copyOf,of}`, but those
+                            methods don't allow one to convey immutability at
+                            the type system level. -->
+                            <exclusionPattern>com/google/common/collect/Immutable(List|Map|Set)\.(copyOf|of):.*</exclusionPattern>
+                        </exclusionPatterns>
                         <failOnViolations>false</failOnViolations>
                         <javaVersion>${version.jdk}</javaVersion>
                     </configuration>
