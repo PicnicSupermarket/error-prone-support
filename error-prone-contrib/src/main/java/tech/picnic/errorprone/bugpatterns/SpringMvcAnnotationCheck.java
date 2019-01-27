@@ -104,8 +104,7 @@ public final class SpringMvcAnnotationCheck extends BugChecker implements Annota
   private static Fix replaceAnnotation(
       AnnotationTree tree, ExpressionTree arg, String newAnnotation) {
     String newArguments =
-        tree.getArguments()
-            .stream()
+        tree.getArguments().stream()
             .filter(a -> !a.equals(arg))
             .map(Object::toString)
             .collect(joining(", "));

@@ -48,8 +48,7 @@ public final class CanonicalAnnotationSyntaxCheck extends BugChecker
 
   @Override
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
-    return FIX_FACTORIES
-        .stream()
+    return FIX_FACTORIES.stream()
         .map(op -> op.apply(tree, state))
         .filter(Optional::isPresent)
         .map(Optional::get)

@@ -313,8 +313,7 @@ public final class RedundantStringConversionCheck extends BugChecker
     }
 
     /* Simplify the values to be plugged into the format pattern, if possible. */
-    return arguments
-        .stream()
+    return arguments.stream()
         .skip(patternIndex + 1)
         .map(arg -> tryFix(arg, state, remainingArgFilter))
         .filter(Optional::isPresent)

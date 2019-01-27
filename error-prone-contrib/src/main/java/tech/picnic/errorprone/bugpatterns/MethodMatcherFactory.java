@@ -23,8 +23,7 @@ final class MethodMatcherFactory {
 
   Matcher<ExpressionTree> create(ImmutableList<String> signatures) {
     return anyOf(
-        signatures
-            .stream()
+        signatures.stream()
             .map(MethodMatcherFactory::createMethodMatcher)
             .collect(toImmutableSet()));
   }

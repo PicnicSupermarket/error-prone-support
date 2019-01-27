@@ -105,8 +105,7 @@ final class AnnotationAttributeMatcher implements Serializable {
     }
 
     String annotationType = type.toString();
-    return tree.getArguments()
-        .stream()
+    return tree.getArguments().stream()
         .filter(a -> matches(annotationType, extractAttributeName(a)));
   }
 
