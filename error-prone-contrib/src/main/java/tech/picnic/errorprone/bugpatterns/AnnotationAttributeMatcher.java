@@ -2,7 +2,6 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
@@ -14,6 +13,7 @@ import com.sun.source.tree.Tree.Kind;
 import com.sun.tools.javac.code.Type;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -60,7 +60,7 @@ final class AnnotationAttributeMatcher implements Serializable {
    * @return A non-{@code null} {@link AnnotationAttributeMatcher}.
    */
   static AnnotationAttributeMatcher create(
-      Optional<ImmutableList<String>> inclusions, Optional<ImmutableList<String>> exclusions) {
+      Optional<? extends List<String>> inclusions, Optional<? extends List<String>> exclusions) {
     Set<String> includedWholeTypes = new HashSet<>();
     Set<String> excludedWholeTypes = new HashSet<>();
     SetMultimap<String, String> includedAttributes = HashMultimap.create();
@@ -82,7 +82,7 @@ final class AnnotationAttributeMatcher implements Serializable {
   }
 
   private static void update(
-      ImmutableList<String> enumeration,
+      List<String> enumeration,
       Set<String> wholeTypes,
       SetMultimap<String, String> attributeRestrictions) {
     for (String entry : enumeration) {

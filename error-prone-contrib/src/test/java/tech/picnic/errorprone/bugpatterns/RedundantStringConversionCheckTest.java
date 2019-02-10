@@ -9,9 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-// XXX: The tests below show that `String.valueOf((String) null)` may be simplified,
-// but `String.valueOf(null)` may not. That is because the latter matches `String#valueOf(char[])`.
-// We could special-case `null` arguments, but that doesn't seem worth the trouble.
+// XXX: The tests below show that `String.valueOf((String) null)` may be simplified, but
+// `String.valueOf(null)` may not. That is because the latter matches `String#valueOf(char[])`. We
+// could special-case `null` arguments, but that doesn't seem worth the trouble.
 @RunWith(JUnit4.class)
 public final class RedundantStringConversionCheckTest {
   private final CompilationTestHelper compilationTestHelper =

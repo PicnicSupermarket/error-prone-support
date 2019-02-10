@@ -272,10 +272,10 @@ public final class RedundantStringConversionCheck extends BugChecker
     return tryFixFormatterArguments(arguments, state, ANY_EXPR, ANY_EXPR);
   }
 
-  // XXX: Write another check which checks that SLF4J patterns don't use `%s` and have a
-  // matching number of arguments of the appropriate type. Also flag explicit conversions from
-  // `Throwable` to string as the last logger argument. Suggests either dropping the converison
-  // or going with `Throwable#getMessage()` instead.
+  // XXX: Write another check which checks that SLF4J patterns don't use `%s` and have a matching
+  // number of arguments of the appropriate type. Also flag explicit conversions from `Throwable` to
+  // string as the last logger argument. Suggests either dropping the converison or going with
+  // `Throwable#getMessage()` instead.
   private Optional<SuggestedFix.Builder> tryFixSlf4jLogger(
       List<? extends ExpressionTree> arguments, VisitorState state) {
     /*
@@ -350,7 +350,8 @@ public final class RedundantStringConversionCheck extends BugChecker
         return trySimplifyUnaryMethod(methodInvocation, state);
       default:
         throw new IllegalStateException(
-            "Cannot simplify method call with two or more arguments: " + tree);
+            "Cannot simplify method call with two or more arguments: "
+                + Util.treeToString(tree, state));
     }
   }
 
@@ -363,7 +364,7 @@ public final class RedundantStringConversionCheck extends BugChecker
     return Optional.of(methodInvocation.getMethodSelect())
         .filter(methodSelect -> methodSelect.getKind() == Kind.MEMBER_SELECT)
         .map(methodSelect -> ((MemberSelectTree) methodSelect).getExpression())
-        .filter(expr -> !"super".equals(expr.toString()));
+        .filter(expr -> !"super".equals(Util.treeToString(expr, state)));
   }
 
   private static Optional<ExpressionTree> trySimplifyUnaryMethod(

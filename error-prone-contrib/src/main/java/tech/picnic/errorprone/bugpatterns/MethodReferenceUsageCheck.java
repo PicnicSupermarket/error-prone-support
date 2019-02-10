@@ -148,9 +148,9 @@ public final class MethodReferenceUsageCheck extends BugChecker
       return Optional.empty();
     }
 
-    // XXX: Dropping generic type information is in most cases fine or even more likely to
-    // yield a valid expression, but in some cases it's necessary to keep them.
-    // Maybe return multiple variants?
+    // XXX: Dropping generic type information is in most cases fine or even more likely to yield a
+    // valid expression, but in some cases it's necessary to keep them. Maybe return multiple
+    // variants?
     return constructFix(lambdaExpr, lhsType.tsym, subTree.getIdentifier());
   }
 

@@ -7,9 +7,9 @@ import static com.google.errorprone.matchers.method.MethodMatchers.instanceMetho
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /** A method invocation expression {@link Matcher} factory. */
@@ -21,7 +21,7 @@ final class MethodMatcherFactory {
   private static final Pattern METHOD_SIGNATURE =
       Pattern.compile("([^\\s#(,)]+)#([^\\s#(,)]+)\\(((?:[^\\s#(,)]+(?:,[^\\s#(,)]+)*)?)\\)");
 
-  Matcher<ExpressionTree> create(ImmutableList<String> signatures) {
+  Matcher<ExpressionTree> create(List<String> signatures) {
     return anyOf(
         signatures.stream()
             .map(MethodMatcherFactory::createMethodMatcher)

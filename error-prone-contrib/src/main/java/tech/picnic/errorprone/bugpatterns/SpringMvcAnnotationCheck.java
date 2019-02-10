@@ -61,39 +61,39 @@ public final class SpringMvcAnnotationCheck extends BugChecker implements Annota
     return ARGUMENT_SELECTOR
         .extractMatchingArguments(tree)
         .findFirst()
-        .flatMap(arg -> trySimplification(tree, arg))
+        .flatMap(arg -> trySimplification(tree, arg, state))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 
-  private static Optional<Fix> trySimplification(AnnotationTree tree, ExpressionTree arg) {
-    return extractUniqueMethod(arg)
+  private static Optional<Fix> trySimplification(
+      AnnotationTree tree, ExpressionTree arg, VisitorState state) {
+    return extractUniqueMethod(arg, state)
         .map(REPLACEMENTS::get)
         .map(newAnnotation -> replaceAnnotation(tree, arg, newAnnotation));
   }
 
-  private static Optional<String> extractUniqueMethod(ExpressionTree arg) {
-    // XXX: Drop the `new Object[] { }` wrapper once Error Prone depends on Guava 23.1+.
+  private static Optional<String> extractUniqueMethod(ExpressionTree arg, VisitorState state) {
     verify(
         arg.getKind() == Kind.ASSIGNMENT,
         "Annotation attribute is not an assignment: %s",
-        new Object[] {arg.getKind()});
+        arg.getKind());
 
     ExpressionTree expr = ((AssignmentTree) arg).getExpression();
     if (expr.getKind() != Kind.NEW_ARRAY) {
-      return Optional.of(extractMethod(expr));
+      return Optional.of(extractMethod(expr, state));
     }
 
     NewArrayTree newArray = (NewArrayTree) expr;
     return Optional.of(newArray.getInitializers())
         .filter(args -> args.size() == 1)
-        .map(args -> extractMethod(args.get(0)));
+        .map(args -> extractMethod(args.get(0), state));
   }
 
-  private static String extractMethod(ExpressionTree expr) {
+  private static String extractMethod(ExpressionTree expr, VisitorState state) {
     switch (expr.getKind()) {
       case IDENTIFIER:
-        return expr.toString();
+        return Util.treeToString(expr, state);
       case MEMBER_SELECT:
         return ((MemberSelectTree) expr).getIdentifier().toString();
       default:

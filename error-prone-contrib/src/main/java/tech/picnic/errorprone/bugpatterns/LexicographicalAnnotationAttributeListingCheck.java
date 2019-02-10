@@ -107,7 +107,7 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
     /* We're sorting based on each expression's string representation. */
     List<String> expressions = new ArrayList<>();
     for (ExpressionTree expr : array.getInitializers()) {
-      expressions.add(expr.toString());
+      expressions.add(Util.treeToString(expr, state));
     }
 
     if (Comparators.isInOrder(expressions, naturalOrder())) {

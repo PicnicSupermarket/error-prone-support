@@ -83,10 +83,8 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
   }
 
   // XXX: Note that in the output below in one instance redundant `value = ` assignments are
-  // introduced.
-  // Avoiding that might make the code too complex. Instead, users can have the
-  // `CanonicalAnnotationSyntaxCheck`
-  // correct the situation in a subsequent run.
+  // introduced. Avoiding that might make the code too complex. Instead, users can have the
+  // `CanonicalAnnotationSyntaxCheck` correct the situation in a subsequent run.
   @Test
   public void testReplacement() throws IOException {
     refactoringTestHelper
@@ -137,7 +135,7 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
             "  @Foo({\"a\", \"b\"}) A unsortedString();",
             "  @Foo(cls = {int.class, long.class}) A unsortedClasses();",
             "  @Foo(enums = {DOWN, UP}) A unsortedEnums();",
-            "  @Foo(anns = {@Bar(value = \"a\"), @Bar(value = \"b\")}) A unsortedAnns();",
+            "  @Foo(anns = {@Bar(\"a\"), @Bar(\"b\")}) A unsortedAnns();",
             "  @Foo(anns = {@Bar(\"a\"), @Bar({\"a\", \"b\"})}) A unsortedInnderAnns();",
             "}")
         .doTest(TestMode.TEXT_MATCH);
