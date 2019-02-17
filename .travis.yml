@@ -1,23 +1,18 @@
+---
+dist: xenial
 language: java
-matrix:
-  include:
-    - jdk: oraclejdk8
-      # This is the primary target platform. In this build we track test
-      # coverage and perform a SonarQube analysis.
-      script:
-        - ./mvnw install
-        # XXX: Enable Coveralls and SonarCloud once we "go public".
-        # ./mvnw jacoco:prepare-agent surefire:test jacoco:report coveralls:report sonar:sonar
-        - ./mvnw jacoco:prepare-agent surefire:test jacoco:report
-    - jdk: openjdk8
-      script: ./mvnw install
-    - jdk: openjdk11
-      script: ./mvnw install
+jdk: openjdk11
 addons:
   sonarcloud:
     organization: picnic-technologies
     token: "${SONARCLOUD_TOKEN}"
-install: mvn io.takari:maven:wrapper
+install:
+  - mvn io.takari:maven:wrapper
+script:
+  - ./mvnw install
+  # XXX: Enable Coveralls and SonarCloud once we "go public".
+  # ./mvnw jacoco:prepare-agent surefire:test jacoco:report coveralls:report sonar:sonar
+  - ./mvnw jacoco:prepare-agent surefire:test jacoco:report
 before_cache:
   # Don't cache the artifacts we just generated, for multiple reasons: (1) we
   # shouldn't need them next time around and (2) if we do, that indicates a

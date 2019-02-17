@@ -68,8 +68,8 @@
         <version.error-prone-javac>9+181-r4173-1</version.error-prone-javac>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.javadoc>3.0.1</version.javadoc>
-        <version.jdk>1.8</version.jdk>
-        <version.maven>3.5.3</version.maven>
+        <version.jdk>11</version.jdk>
+        <version.maven>3.6.0</version.maven>
         <version.nullaway>0.6.5</version.nullaway>
         <version.surefire>2.22.1</version.surefire>
         <!-- Our build system (Travis CI) provides a monotonically increasing
@@ -77,14 +77,11 @@
         So we provide a default value. -->
         <build.number>LOCAL</build.number>
         <!-- Arguments to the JVMs forked by Surefire. The specification of
-        this 'argLine.base' property instead of the definition of the 'argLine'
-        configuration setting provides two benefits:
-        - It allows us to append additional parameters, as is done in the
-          `jdk8` profile.
-        - It allows users or plugins to specify additional arguments. In
-          particular, JaCoCo relies on this for the configuration of its Java
-          agent. -->
-        <argLine.base><!--
+        this 'argLine' property instead of the definition of the 'argLine'
+        configuration setting allows users or plugins to specify additional
+        arguments. In particular, JaCoCo relies on this for the configuration
+        of its Java agent. -->
+        <argLine><!--
             The test JVMs are short-running. By disabling certain expensive JIT
             optimizations we actually speed up most tests. -->
             -XX:TieredStopAtLevel=1
@@ -108,8 +105,7 @@
             <!-- On Mac OS X, running in headless mode prevents the forked JVMs
             from showing up in the dock and capturing window focus. -->
             -Djava.awt.headless=true
-        </argLine.base>
-        <argLine>${argLine.base}</argLine>
+        </argLine>
     </properties>
 
     <dependencyManagement>
@@ -356,10 +352,15 @@
                                         <property name="ignoreSetter" value="true" />
                                     </module>
                                     <module name="IllegalImport">
-                                        <!-- These packages are found in some
-                                        of the dependencies declared above. -->
+                                        <property name="illegalClasses" value="javax.annotation.concurrent.Immutable">
+                                            <!-- Instead, please use
+                                            `com.google.errorprone.annotations.Immutable`. -->
+                                        </property>
                                         <property name="illegalClasses" value="javax.xml.bind.DatatypeConverter" />
-                                        <property name="illegalClasses" value="org.springframework.context.annotation.ComponentScan" />
+                                        <property name="illegalClasses" value="org.springframework.context.annotation.ComponentScan">
+                                            <!-- Instead, please explicitly
+                                            `@Import` the components. -->
+                                        </property>
                                         <property name="illegalPkgs" value="com.amazonaws.annotation" />
                                         <property name="illegalPkgs" value="com.beust.jcommander.internal" />
                                         <property name="illegalPkgs" value="com.google.api.client.repackaged" />
@@ -368,8 +369,8 @@
                                         <property name="illegalPkgs" value="jersey.repackaged" />
                                         <property name="illegalPkgs" value="nl.jqno.equalsverifier.internal" />
                                         <property name="illegalPkgs" value="org.apache.commons.lang3">
-                                            <!-- Please use Guava or a custom
-                                            helper method instead. -->
+                                            <!-- Instead, please use Guava or a
+                                            custom helper method. -->
                                         </property>
                                         <property name="illegalPkgs" value="org.immutables.value.internal" />
                                         <property name="illegalPkgs" value="org.mutabilitydetector.internal" />
@@ -449,6 +450,11 @@
                             <arg>10000</arg>
                         </compilerArgs>
                         <parameters>true</parameters>
+                        <release>${version.jdk}</release>
+                        <!-- Even though `-release X` implies `-source X` and
+                        `-target X`, we need to configure these properties
+                        explicitily, for otherwise the plugin's default value
+                        of `1.6` is passed on. -->
                         <source>${version.jdk}</source>
                         <target>${version.jdk}</target>
                         <!-- Erroneously inverted logic... for details, see
@@ -464,6 +470,16 @@
                         <ignoreDirect>false</ignoreDirect>
                         <ignoreNonCompile>true</ignoreNonCompile>
                     </configuration>
+                    <dependencies>
+                        <!-- XXX: This dependency is declared for compatibility
+                        with JDK 11. See
+                        https://jira.apache.org/jira/browse/MDEP-613. -->
+                        <dependency>
+                            <groupId>org.apache.maven.shared</groupId>
+                            <artifactId>maven-dependency-analyzer</artifactId>
+                            <version>1.11.1</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -688,6 +704,12 @@
                             <exclusionPattern>com/google/common/collect/Immutable(List|Map|Set)\.(copyOf|of):.*</exclusionPattern>
                         </exclusionPatterns>
                         <failOnViolations>false</failOnViolations>
+                        <ignorePackages>
+                            <!-- Some Refaster templates purposefully use
+                            outdated patterns in their `@BeforeTemplate`
+                            methods. -->
+                            <ignorePackage>tech.picnic.errorprone.refastertemplates</ignorePackage>
+                        </ignorePackages>
                         <javaVersion>${version.jdk}</javaVersion>
                     </configuration>
                 </plugin>
@@ -740,47 +762,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <!-- When using JDK 8, Error Prone requires that the specific (JDK
-            9-based) version of `javac` it integrates against is on the boot
-            classpath. This custom Error Prone `javac` is resolved implicitly
-            as a dependency of `error_prone_core`; as such the path configured
-            below is guaranteed to exist by the time the classpath is
-            consulted. -->
-            <id>jdk8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <bootclasspath>-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${version.error-prone-javac}/javac-${version.error-prone-javac}.jar</bootclasspath>
-                <argLine>${argLine.base} ${bootclasspath}</argLine>
-            </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <compilerArgs combine.children="append">
-                                    <arg>-J-XX:TieredStopAtLevel=1</arg>
-                                    <arg>-J${bootclasspath}</arg>
-                                </compilerArgs>
-                                <fork>true</fork>
-                                <maxmem>256m</maxmem>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.pitest</groupId>
-                            <artifactId>pitest-maven</artifactId>
-                            <configuration>
-                                <jvmArgs>${bootclasspath}</jvmArgs>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
         <profile>
             <!-- If explicitly enabled using `-Pcoverage` we use PIT to
             establish coverage through mutation testing. -->
@@ -880,16 +861,20 @@
                                 </path>
                             </annotationProcessorPaths>
                             <compilerArgs combine.children="append">
-                                <!-- We enable nearly all doclint checks,
-                                except that we don't care about missing Javadoc
+                                <!-- We first enable all doclint checks and
+                                then selectively disable a subset below. -->
+                                <arg>-Xdoclint:all</arg>
+                                <!-- We don't care about missing Javadoc
                                 on non-public classes and members. -->
-                                <arg>-Xdoclint:all,-missing/package</arg>
-                                <!-- We enable nearly all lint checks, except
-                                that we don't care about the fact that not all
-                                annotations present on the classpath are
-                                handled by annotation processors. See
+                                <arg>-Xdoclint:-missing/package</arg>
+                                <!-- We first enable all lint checks and then
+                                selectively disable a subset below. -->
+                                <arg>-Xlint:all</arg>
+                                <!-- The annotation processors do not handle
+                                all annotations present on the classpath, and
+                                javac complains about this. See
                                 https://bugs.openjdk.java.net/browse/JDK-6999068. -->
-                                <arg>-Xlint:all,-processing</arg>
+                                <arg>-Xlint:-processing</arg>
                                 <!-- Enable and configure Error Prone. -->
                                 <!-- XXX: The awkward comment formatting used
                                 here ensures that the plugin arguments are
