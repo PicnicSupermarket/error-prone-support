@@ -29,6 +29,8 @@ final class MethodMatcherFactory {
   }
 
   // XXX: It seems parse errors are silently swallowed. Double-check; if true, file a ticket.
+  // XXX: This (probably) doesn't work for methods with array type arguments; if true, implement a
+  // fix.
   private static Matcher<ExpressionTree> createMethodMatcher(String signature) {
     java.util.regex.Matcher m = METHOD_SIGNATURE.matcher(signature);
     checkArgument(m.matches(), "Not a valid method signature: %s", signature);
