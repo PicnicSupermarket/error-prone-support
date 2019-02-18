@@ -579,6 +579,11 @@
                             </goals>
                         </execution>
                     </executions>
+                    <configuration>
+                        <!-- XXX: This is a workaround for
+                        https://bugs.openjdk.java.net/browse/JDK-8212233. -->
+                        <source>8</source>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
