@@ -888,20 +888,20 @@
                                 do properly handle newline separators. See
                                 https://github.com/google/error-prone/pull/1115. -->
                                 <arg>
-                                    -Xplugin:ErrorProne <!--
-                                    We want to enable almost all Error
-                                    Prone bug pattern checkers, so we enable
-                                    all and then selectively deactivate some.
-                                    --> -XepAllDisabledChecksAsWarnings <!--
-                                    We don't target Android.
-                                    --> -Xep:AndroidJdkLibsChecker:OFF <!--
-                                    We don't target JDK 7.
-                                    --> -Xep:Java7ApiChecker:OFF <!--
-                                    See https://github.com/google/error-prone/issues/1138.
-                                    --> -Xep:NullableDereference:OFF <!--
-                                    XXX: Enable this once we open-source this library.
-                                    --> -Xep:BetaApi:OFF <!--
-                                    --> -XepOpt:NullAway:AnnotatedPackages=tech.picnic
+                                    -Xplugin:ErrorProne
+                                      <!-- We want to enable almost all Error
+                                      Prone bug pattern checkers, so we enable
+                                      all and then selectively deactivate some. -->
+                                      -XepAllDisabledChecksAsWarnings
+                                      <!-- We don't target Android. -->
+                                      -Xep:AndroidJdkLibsChecker:OFF
+                                      <!-- We don't target JDK 7. -->
+                                      -Xep:Java7ApiChecker:OFF
+                                      <!-- See https://github.com/google/error-prone/issues/1138. -->
+                                      -Xep:NullableDereference:OFF
+                                      <!-- XXX: Enable this once we open-source this library. -->
+                                      -Xep:BetaApi:OFF
+                                      -XepOpt:NullAway:AnnotatedPackages=tech.picnic
                                 </arg>
                                 <!-- The Error Prone plugin makes certain
                                 assumptions about the state of the AST at the
