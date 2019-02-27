@@ -8,8 +8,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * Flatten a stream of {@link Optional}s using {@link Optional#stream()} instead of the more verbose
- * alternative.
+ * Flatten a stream of {@link Optional}s using {@link Optional#stream()}, rather than using one of
+ * the more verbose alternatives.
  */
 final class FlatmapOptionalToStream<T> {
   @BeforeTemplate
