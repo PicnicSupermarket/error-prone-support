@@ -3,7 +3,6 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
-import java.io.IOException;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,31 +46,10 @@ public final class RefasterCheckTest {
    * </ul>
    */
   @Test
-  public void testReplacement() throws IOException {
+  public void testReplacement() {
     refactoringTestHelper
-        .addInputLines(
-            "in/A.java",
-            "import java.time.ZoneId;",
-            "import java.util.Optional;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    boolean b = !Optional.empty().isPresent();",
-            "    ZoneId z = ZoneId.of(\"UTC\");",
-            "  }",
-            "}")
-        .addOutputLines(
-            "out/A.java",
-            "import java.time.ZoneId;",
-            "import java.time.ZoneOffset;",
-            "import java.util.Optional;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    boolean b = Optional.empty().isEmpty();",
-            "    ZoneId z = ZoneOffset.UTC;",
-            "  }",
-            "}")
+        .addInput("RefasterCheckPositiveCasesInput.java")
+        .addOutput("RefasterCheckPositiveCasesOutput.java")
         .doTest(TestMode.TEXT_MATCH);
   }
 }

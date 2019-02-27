@@ -93,6 +93,15 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>com.coveo</groupId>
+                    <artifactId>fmt-maven-plugin</artifactId>
+                    <configuration>
+                        <additionalSourceDirectories>
+                            <additionalSourceDirectory>${basedir}/src/test/resources</additionalSourceDirectory>
+                        </additionalSourceDirectories>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
