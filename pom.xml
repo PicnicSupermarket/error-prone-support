@@ -182,7 +182,7 @@
             <dependency>
                 <groupId>com.google.truth</groupId>
                 <artifactId>truth</artifactId>
-                <version>0.42</version>
+                <version>0.43</version>
             </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
@@ -204,7 +204,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.25</version>
+                <version>1.7.26</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -291,7 +291,7 @@
                 <plugin>
                     <groupId>io.takari</groupId>
                     <artifactId>maven</artifactId>
-                    <version>0.7.2</version>
+                    <version>0.7.4</version>
                     <configuration>
                         <maven>${version.maven}</maven>
                     </configuration>
@@ -422,7 +422,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>8.17</version>
+                            <version>8.18</version>
                         </dependency>
                     </dependencies>
                 </plugin>
