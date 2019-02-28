@@ -35,66 +35,84 @@ final class RefasterCheckPositiveCases {
   //    collection.asList().stream();
   //  }
 
-  boolean testChronoLocalDateIsAfter() {
-    return LocalDate.MIN.compareTo(LocalDate.MAX) > 0;
-  }
+  static final class Time {
+    ImmutableSet<Instant> testEpochInstant() {
+      return ImmutableSet.of(
+          Instant.ofEpochMilli(0),
+          Instant.ofEpochMilli(0L),
+          Instant.ofEpochSecond(0),
+          Instant.ofEpochSecond(0, 0));
+    }
 
-  boolean testChronoLocalDateIsBefore() {
-    return LocalDate.MIN.compareTo(LocalDate.MAX) < 0;
-  }
+    Instant testClockInstant() {
+      return Instant.now(Clock.systemUTC());
+    }
 
-  boolean testChronoLocalDateTimeIsAfter() {
-    return LocalDateTime.MIN.compareTo(LocalDateTime.MAX) > 0;
-  }
+    ImmutableSet<Boolean> testInstantIsBefore() {
+      return ImmutableSet.of(
+          Instant.MIN.compareTo(Instant.MAX) < 0, Instant.MIN.compareTo(Instant.MAX) >= 0);
+    }
 
-  boolean testChronoLocalDateTimeIsBefore() {
-    return LocalDateTime.MIN.compareTo(LocalDateTime.MAX) < 0;
-  }
+    ImmutableSet<Boolean> testInstantIsAfter() {
+      return ImmutableSet.of(
+          Instant.MIN.compareTo(Instant.MAX) > 0, Instant.MIN.compareTo(Instant.MAX) <= 0);
+    }
 
-  boolean testChronoZonedDateTimeIsAfter() {
-    return ZonedDateTime.now().compareTo(ZonedDateTime.now()) > 0;
-  }
+    ImmutableSet<Boolean> testChronoLocalDateIsBefore() {
+      return ImmutableSet.of(
+          LocalDate.MIN.compareTo(LocalDate.MAX) < 0, LocalDate.MIN.compareTo(LocalDate.MAX) >= 0);
+    }
 
-  boolean testChronoZonedDateTimeIsBefore() {
-    return ZonedDateTime.now().compareTo(ZonedDateTime.now()) < 0;
-  }
+    ImmutableSet<Boolean> testChronoLocalDateIsAfter() {
+      return ImmutableSet.of(
+          LocalDate.MIN.compareTo(LocalDate.MAX) > 0, LocalDate.MIN.compareTo(LocalDate.MAX) <= 0);
+    }
 
-  Instant testClockInstant() {
-    return Instant.now(Clock.systemUTC());
-  }
+    ImmutableSet<Boolean> testChronoLocalDateTimeIsBefore() {
+      return ImmutableSet.of(
+          LocalDateTime.MIN.compareTo(LocalDateTime.MAX) < 0,
+          LocalDateTime.MIN.compareTo(LocalDateTime.MAX) >= 0);
+    }
 
-  Duration testDurationBetweenInstants() {
-    return Duration.ofMillis(Instant.MAX.toEpochMilli() - Instant.MIN.toEpochMilli());
-  }
+    ImmutableSet<Boolean> testChronoLocalDateTimeIsAfter() {
+      return ImmutableSet.of(
+          LocalDateTime.MIN.compareTo(LocalDateTime.MAX) > 0,
+          LocalDateTime.MIN.compareTo(LocalDateTime.MAX) <= 0);
+    }
 
-  Duration testDurationBetweenOffsetDateTimes() {
-    return Duration.between(OffsetDateTime.MIN.toInstant(), OffsetDateTime.MAX.toInstant())
-        .plus(
-            Duration.ofSeconds(
-                OffsetDateTime.MAX.toEpochSecond() - OffsetDateTime.MIN.toEpochSecond()));
-  }
+    ImmutableSet<Boolean> testChronoZonedDateTimeIsBefore() {
+      return ImmutableSet.of(
+          ZonedDateTime.now().compareTo(ZonedDateTime.now()) < 0,
+          ZonedDateTime.now().compareTo(ZonedDateTime.now()) >= 0);
+    }
 
-  ImmutableSet<Instant> testEpochInstant() {
-    return ImmutableSet.of(
-        Instant.ofEpochMilli(0),
-        Instant.ofEpochMilli(0L),
-        Instant.ofEpochSecond(0),
-        Instant.ofEpochSecond(0, 0));
-  }
+    ImmutableSet<Boolean> testChronoZonedDateTimeIsAfter() {
+      return ImmutableSet.of(
+          ZonedDateTime.now().compareTo(ZonedDateTime.now()) > 0,
+          ZonedDateTime.now().compareTo(ZonedDateTime.now()) <= 0);
+    }
 
-  boolean testInstantIsAfter() {
-    return Instant.MIN.compareTo(Instant.MAX) > 0;
-  }
+    ImmutableSet<Boolean> testOffsetDateTimeIsAfter() {
+      return ImmutableSet.of(
+          OffsetDateTime.MIN.compareTo(OffsetDateTime.MAX) > 0,
+          OffsetDateTime.MIN.compareTo(OffsetDateTime.MAX) <= 0);
+    }
 
-  boolean testInstantIsBefore() {
-    return Instant.MIN.compareTo(Instant.MAX) < 0;
-  }
+    ImmutableSet<Boolean> testOffsetDateTimeIsBefore() {
+      return ImmutableSet.of(
+          OffsetDateTime.MIN.compareTo(OffsetDateTime.MAX) < 0,
+          OffsetDateTime.MIN.compareTo(OffsetDateTime.MAX) >= 0);
+    }
 
-  boolean testOffsetDateTimeIsAfter() {
-    return OffsetDateTime.MIN.compareTo(OffsetDateTime.MAX) > 0;
-  }
+    Duration testDurationBetweenInstants() {
+      return Duration.ofMillis(Instant.MAX.toEpochMilli() - Instant.MIN.toEpochMilli());
+    }
 
-  boolean testOffsetDateTimeIsBefore() {
-    return OffsetDateTime.MIN.compareTo(OffsetDateTime.MAX) < 0;
+    Duration testDurationBetweenOffsetDateTimes() {
+      return Duration.between(OffsetDateTime.MIN.toInstant(), OffsetDateTime.MAX.toInstant())
+          .plus(
+              Duration.ofSeconds(
+                  OffsetDateTime.MAX.toEpochSecond() - OffsetDateTime.MIN.toEpochSecond()));
+    }
   }
 }

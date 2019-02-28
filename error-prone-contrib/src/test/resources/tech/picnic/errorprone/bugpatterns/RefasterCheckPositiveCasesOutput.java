@@ -36,60 +36,76 @@ final class RefasterCheckPositiveCases {
   //    collection.asList().stream();
   //  }
 
-  boolean testChronoLocalDateIsAfter() {
-    return LocalDate.MIN.isAfter(LocalDate.MAX);
-  }
+  static final class Time {
+    ImmutableSet<Instant> testEpochInstant() {
+      return ImmutableSet.of(Instant.EPOCH, Instant.EPOCH, Instant.EPOCH, Instant.EPOCH);
+    }
 
-  boolean testChronoLocalDateIsBefore() {
-    return LocalDate.MIN.isBefore(LocalDate.MAX);
-  }
+    Instant testClockInstant() {
+      return Clock.systemUTC().instant();
+    }
 
-  boolean testChronoLocalDateTimeIsAfter() {
-    return LocalDateTime.MIN.isAfter(LocalDateTime.MAX);
-  }
+    ImmutableSet<Boolean> testInstantIsBefore() {
+      return ImmutableSet.of(Instant.MIN.isBefore(Instant.MAX), !Instant.MIN.isBefore(Instant.MAX));
+    }
 
-  boolean testChronoLocalDateTimeIsBefore() {
-    return LocalDateTime.MIN.isBefore(LocalDateTime.MAX);
-  }
+    ImmutableSet<Boolean> testInstantIsAfter() {
+      return ImmutableSet.of(Instant.MIN.isAfter(Instant.MAX), !Instant.MIN.isAfter(Instant.MAX));
+    }
 
-  boolean testChronoZonedDateTimeIsAfter() {
-    return ZonedDateTime.now().isAfter(ZonedDateTime.now());
-  }
+    ImmutableSet<Boolean> testChronoLocalDateIsBefore() {
+      return ImmutableSet.of(
+          LocalDate.MIN.isBefore(LocalDate.MAX), !LocalDate.MIN.isBefore(LocalDate.MAX));
+    }
 
-  boolean testChronoZonedDateTimeIsBefore() {
-    return ZonedDateTime.now().isBefore(ZonedDateTime.now());
-  }
+    ImmutableSet<Boolean> testChronoLocalDateIsAfter() {
+      return ImmutableSet.of(
+          LocalDate.MIN.isAfter(LocalDate.MAX), !LocalDate.MIN.isAfter(LocalDate.MAX));
+    }
 
-  Instant testClockInstant() {
-    return Clock.systemUTC().instant();
-  }
+    ImmutableSet<Boolean> testChronoLocalDateTimeIsBefore() {
+      return ImmutableSet.of(
+          LocalDateTime.MIN.isBefore(LocalDateTime.MAX),
+          !LocalDateTime.MIN.isBefore(LocalDateTime.MAX));
+    }
 
-  Duration testDurationBetweenInstants() {
-    return Duration.between(Instant.MIN, Instant.MAX);
-  }
+    ImmutableSet<Boolean> testChronoLocalDateTimeIsAfter() {
+      return ImmutableSet.of(
+          LocalDateTime.MIN.isAfter(LocalDateTime.MAX),
+          !LocalDateTime.MIN.isAfter(LocalDateTime.MAX));
+    }
 
-  Duration testDurationBetweenOffsetDateTimes() {
-    return Duration.between(OffsetDateTime.MIN, OffsetDateTime.MAX)
-        .plus(Duration.between(OffsetDateTime.MIN, OffsetDateTime.MAX));
-  }
+    ImmutableSet<Boolean> testChronoZonedDateTimeIsBefore() {
+      return ImmutableSet.of(
+          ZonedDateTime.now().isBefore(ZonedDateTime.now()),
+          !ZonedDateTime.now().isBefore(ZonedDateTime.now()));
+    }
 
-  ImmutableSet<Instant> testEpochInstant() {
-    return ImmutableSet.of(Instant.EPOCH, Instant.EPOCH, Instant.EPOCH, Instant.EPOCH);
-  }
+    ImmutableSet<Boolean> testChronoZonedDateTimeIsAfter() {
+      return ImmutableSet.of(
+          ZonedDateTime.now().isAfter(ZonedDateTime.now()),
+          !ZonedDateTime.now().isAfter(ZonedDateTime.now()));
+    }
 
-  boolean testInstantIsAfter() {
-    return Instant.MIN.isAfter(Instant.MAX);
-  }
+    ImmutableSet<Boolean> testOffsetDateTimeIsAfter() {
+      return ImmutableSet.of(
+          OffsetDateTime.MIN.isAfter(OffsetDateTime.MAX),
+          !OffsetDateTime.MIN.isAfter(OffsetDateTime.MAX));
+    }
 
-  boolean testInstantIsBefore() {
-    return Instant.MIN.isBefore(Instant.MAX);
-  }
+    ImmutableSet<Boolean> testOffsetDateTimeIsBefore() {
+      return ImmutableSet.of(
+          OffsetDateTime.MIN.isBefore(OffsetDateTime.MAX),
+          !OffsetDateTime.MIN.isBefore(OffsetDateTime.MAX));
+    }
 
-  boolean testOffsetDateTimeIsAfter() {
-    return OffsetDateTime.MIN.isAfter(OffsetDateTime.MAX);
-  }
+    Duration testDurationBetweenInstants() {
+      return Duration.between(Instant.MIN, Instant.MAX);
+    }
 
-  boolean testOffsetDateTimeIsBefore() {
-    return OffsetDateTime.MIN.isBefore(OffsetDateTime.MAX);
+    Duration testDurationBetweenOffsetDateTimes() {
+      return Duration.between(OffsetDateTime.MIN, OffsetDateTime.MAX)
+          .plus(Duration.between(OffsetDateTime.MIN, OffsetDateTime.MAX));
+    }
   }
 }
