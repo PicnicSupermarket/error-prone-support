@@ -8,6 +8,8 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
 import java.time.chrono.ChronoZonedDateTime;
@@ -43,6 +45,19 @@ final class Time {
     @AfterTemplate
     Instant after(Clock clock) {
       return clock.instant();
+    }
+  }
+
+  /** Use {@link ZoneOffset#UTC} when possible. */
+  static final class UtcConstant {
+    @BeforeTemplate
+    ZoneId before() {
+      return ZoneId.of("UTC");
+    }
+
+    @AfterTemplate
+    ZoneOffset after() {
+      return ZoneOffset.UTC;
     }
   }
 

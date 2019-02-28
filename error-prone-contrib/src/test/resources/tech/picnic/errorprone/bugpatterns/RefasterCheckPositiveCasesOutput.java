@@ -24,10 +24,6 @@ final class RefasterCheckPositiveCases {
     return Optional.empty().isEmpty();
   }
 
-  ZoneId testUtcConstant() {
-    return ZoneOffset.UTC;
-  }
-
   // XXX: Doesn't work. Why is `.asList()` not dropped?
   //  void testImmutableCollectionAsListToStream() {
   //    ImmutableSet.of(1, 2).asList().stream().collect(toImmutableMap(identity(), identity()));
@@ -62,6 +58,10 @@ final class RefasterCheckPositiveCases {
 
     Instant testClockInstant() {
       return Clock.systemUTC().instant();
+    }
+
+    ZoneId testUtcConstant() {
+      return ZoneOffset.UTC;
     }
 
     ImmutableSet<Boolean> testInstantIsBefore() {
