@@ -1,5 +1,6 @@
 import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -9,16 +10,17 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 final class RefasterCheckPositiveCases {
-  boolean testEqualBooleans(boolean b1, boolean b2) {
-    return b1 == b2;
-  }
-
-  boolean testEqualBooleansNegation(boolean b1, boolean b2) {
-    return b1 != b2;
-  }
+  /**
+   * These types may be fully replaced by some of the Refaster templates user test. Refaster does
+   * not remove the associated imports, while Google Java Formatter does. This type listing ensures
+   * that any imports present in the input file are also present in the output file .
+   */
+  private static final ImmutableSet<Class<?>> ELIDED_TYPES = ImmutableSet.of(Objects.class);
 
   boolean testOptionalIsEmpty() {
     return Optional.empty().isEmpty();
@@ -48,6 +50,45 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSet<BigDecimal> testBigDecimalFactoryMethod() {
       return ImmutableSet.of(BigDecimal.valueOf(0), BigDecimal.valueOf(0L));
+    }
+  }
+
+  static final class Equality {
+    ImmutableSet<Boolean> testPrimitiveEquals() {
+      // XXX: The negated variants of the primitive expressions below trigger an "overlapping
+      // replacements" bug. Figure out how/why and fix. Then add these:
+      // !Objects.equals(0, 1),
+      // !Objects.equals(0L, 1L),
+      return ImmutableSet.of(
+          0 == 1,
+          0L == 1L,
+          Objects.equals(Integer.valueOf(0), Integer.valueOf(1)),
+          Objects.equals(Long.valueOf(0), Long.valueOf(1)),
+          !Objects.equals(Integer.valueOf(0), Integer.valueOf(1)),
+          !Objects.equals(Long.valueOf(0), Long.valueOf(1)));
+    }
+
+    ImmutableSet<Boolean> testEnumEquals() {
+      // XXX: The negated variants of the expressions below trigger an "overlapping
+      // replacements" bug. Figure out how/why and fix. Then add these:
+      // !RoundingMode.UP.equals(RoundingMode.DOWN)
+      // !Objects.equals(RoundingMode.UP, RoundingMode.DOWN)
+      return ImmutableSet.of(
+          RoundingMode.UP == RoundingMode.DOWN, RoundingMode.UP == RoundingMode.DOWN);
+    }
+
+    boolean testEqualsPredicate() {
+      // XXX: When boxing is involved this rule seems to break. Example:
+      // Stream.of(1).anyMatch(e -> Integer.MIN_VALUE.equals(e));
+      return Stream.of("foo").anyMatch("bar"::equals);
+    }
+
+    boolean testEqualBooleans(boolean b1, boolean b2) {
+      return b1 == b2;
+    }
+
+    boolean testUnequalBooleans(boolean b1, boolean b2) {
+      return b1 != b2;
     }
   }
 
