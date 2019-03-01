@@ -15,17 +15,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 final class RefasterCheckPositiveCases {
-  /**
-   * These types may be fully replaced by some of the Refaster templates user test. Refaster does
-   * not remove the associated imports, while Google Java Formatter does. This type listing ensures
-   * that any imports present in the input file are also present in the output file .
-   */
-  private static final ImmutableSet<Class<?>> ELIDED_TYPES = ImmutableSet.of(Objects.class);
-
-  boolean testOptionalIsEmpty() {
-    return Optional.empty().isEmpty();
-  }
-
   // XXX: Doesn't work. Why is `.asList()` not dropped?
   //  void testImmutableCollectionAsListToStream() {
   //    ImmutableSet.of(1, 2).asList().stream().collect(toImmutableMap(identity(), identity()));
@@ -89,6 +78,26 @@ final class RefasterCheckPositiveCases {
 
     boolean testUnequalBooleans(boolean b1, boolean b2) {
       return b1 != b2;
+    }
+  }
+
+  static final class Optionals {
+    ImmutableSet<Boolean> testOptionalIsEmpty() {
+      return ImmutableSet.of(Optional.empty().isEmpty(), Optional.of("foo").isEmpty());
+    }
+
+    ImmutableSet<Boolean> testOptionalIsPresent() {
+      return ImmutableSet.of(Optional.empty().isPresent(), Optional.of("foo").isPresent());
+    }
+
+    Stream<Object> testOptionalToStream() {
+      return Stream.concat(Optional.empty().stream(), Optional.of("foo").stream());
+    }
+
+    Stream<Object> testFlatmapOptionalToStream() {
+      return Stream.concat(
+          Stream.of(Optional.empty()).flatMap(Optional::stream),
+          Stream.of(Optional.of("foo")).flatMap(Optional::stream));
     }
   }
 

@@ -5,7 +5,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.math.BigDecimal;
 
-/** Refaster templates related to expressions dealing with {@link BigDecimals}. */
+/** Refaster templates related to expressions dealing with {@link BigDecimal}s. */
 final class BigDecimals {
   private BigDecimals() {}
 
