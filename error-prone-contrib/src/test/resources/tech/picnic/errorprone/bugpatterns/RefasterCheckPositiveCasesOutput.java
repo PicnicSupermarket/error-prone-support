@@ -1,4 +1,16 @@
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSortedMultiset;
+import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
+import static java.util.Comparator.naturalOrder;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedMultiset;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Streams;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Clock;
@@ -15,14 +27,10 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 final class RefasterCheckPositiveCases {
-  // XXX: Doesn't work. Why is `.asList()` not dropped?
-  //  void testImmutableCollectionAsListToStream() {
-  //    ImmutableSet.of(1, 2).asList().stream().collect(toImmutableMap(identity(), identity()));
-  //  }
-  //
-  //  <T> void testImmutableCollectionAsListToStream(ImmutableCollection<T> collection) {
-  //    collection.asList().stream();
-  //  }
+  // XXX: Move down.
+  Stream<Integer> testImmutableCollectionAsListToStream() {
+    return ImmutableSet.of(1).stream();
+  }
 
   static final class BigDecimals {
     ImmutableSet<BigDecimal> testBigDecimalZero() {
@@ -98,6 +106,40 @@ final class RefasterCheckPositiveCases {
       return Stream.concat(
           Stream.of(Optional.empty()).flatMap(Optional::stream),
           Stream.of(Optional.of("foo")).flatMap(Optional::stream));
+    }
+  }
+
+  static final class StreamTemplates {
+    Stream<Integer> testConcatOneStream() {
+      return Stream.of(1);
+    }
+
+    Stream<Integer> testConcatTwoStreams() {
+      return Stream.concat(Stream.of(1), Stream.of(2));
+    }
+
+    Stream<Integer> testConcatThreeStreams() {
+      return Streams.concat(Stream.of(1), Stream.of(2), Stream.of(3));
+    }
+
+    ImmutableList<Integer> testStreamToImmutableList() {
+      return Stream.of(1).collect(toImmutableList());
+    }
+
+    ImmutableSet<Integer> testStreamToImmutableSet() {
+      return Stream.of(1).collect(toImmutableSet());
+    }
+
+    ImmutableSortedSet<Integer> testStreamToImmutableSortedSet() {
+      return Stream.of(1).collect(toImmutableSortedSet(naturalOrder()));
+    }
+
+    ImmutableMultiset<Integer> testStreamToImmutableMultiset() {
+      return Stream.of(1).collect(toImmutableMultiset());
+    }
+
+    ImmutableSortedMultiset<Integer> testStreamToImmutableSortedMultiset() {
+      return Stream.of(1).collect(toImmutableSortedMultiset(naturalOrder()));
     }
   }
 

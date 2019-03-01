@@ -1,4 +1,8 @@
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedMultiset;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Streams;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -15,14 +19,10 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 final class RefasterCheckPositiveCases {
-  // XXX: Doesn't work. Why is `.asList()` not dropped?
-  //  void testImmutableCollectionAsListToStream() {
-  //    ImmutableSet.of(1, 2).asList().stream().collect(toImmutableMap(identity(), identity()));
-  //  }
-  //
-  //  <T> void testImmutableCollectionAsListToStream(ImmutableCollection<T> collection) {
-  //    collection.asList().stream();
-  //  }
+  // XXX: Move down.
+  Stream<Integer> testImmutableCollectionAsListToStream() {
+    return ImmutableSet.of(1).asList().stream();
+  }
 
   static final class BigDecimals {
     ImmutableSet<BigDecimal> testBigDecimalZero() {
@@ -99,6 +99,40 @@ final class RefasterCheckPositiveCases {
       return Stream.concat(
           Stream.of(Optional.empty()).filter(Optional::isPresent).map(Optional::get),
           Stream.of(Optional.of("foo")).flatMap(Streams::stream));
+    }
+  }
+
+  static final class StreamTemplates {
+    Stream<Integer> testConcatOneStream() {
+      return Streams.concat(Stream.of(1));
+    }
+
+    Stream<Integer> testConcatTwoStreams() {
+      return Streams.concat(Stream.of(1), Stream.of(2));
+    }
+
+    Stream<Integer> testConcatThreeStreams() {
+      return Streams.concat(Stream.of(1), Stream.of(2), Stream.of(3));
+    }
+
+    ImmutableList<Integer> testStreamToImmutableList() {
+      return ImmutableList.copyOf(Stream.of(1).iterator());
+    }
+
+    ImmutableSet<Integer> testStreamToImmutableSet() {
+      return ImmutableSet.copyOf(Stream.of(1).iterator());
+    }
+
+    ImmutableSortedSet<Integer> testStreamToImmutableSortedSet() {
+      return ImmutableSortedSet.copyOf(Stream.of(1).iterator());
+    }
+
+    ImmutableMultiset<Integer> testStreamToImmutableMultiset() {
+      return ImmutableMultiset.copyOf(Stream.of(1).iterator());
+    }
+
+    ImmutableSortedMultiset<Integer> testStreamToImmutableSortedMultiset() {
+      return ImmutableSortedMultiset.copyOf(Stream.of(1).iterator());
     }
   }
 
