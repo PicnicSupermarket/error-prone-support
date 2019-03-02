@@ -11,6 +11,8 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
@@ -26,6 +28,8 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,11 +42,7 @@ final class RefasterCheckPositiveCases {
    * that any imports present in the input file are also present in the output file .
    */
   private static final ImmutableSet<Class<?>> ELIDED_TYPES =
-      ImmutableSet.of(AbstractMap.class, Maps.class, MoreObjects.class);
-
-  Stream<Integer> testImmutableCollectionAsListToStream() {
-    return ImmutableSet.of(1).stream();
-  }
+      ImmutableSet.of(AbstractMap.class, Lists.class, Maps.class, MoreObjects.class);
 
   ImmutableSet<Map.Entry<String, Integer>> testMapEntry() {
     return ImmutableSet.of(Map.entry("foo", 1), Map.entry("bar", 2));
@@ -65,6 +65,22 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSet<BigDecimal> testBigDecimalFactoryMethod() {
       return ImmutableSet.of(BigDecimal.valueOf(0), BigDecimal.valueOf(0L));
+    }
+  }
+
+  static final class CollectionTemplates {
+    ImmutableSet<Boolean> testCollectionAddAllFromCollection() {
+      return ImmutableSet.of(
+          new ArrayList<>().addAll(new HashSet<>()),
+          Iterables.addAll(new ArrayList<>(), new HashSet<>()::iterator));
+    }
+
+    ArrayList<String> testNewArrayListFromCollection() {
+      return new ArrayList<>(ImmutableList.of("foo"));
+    }
+
+    Stream<Integer> testImmutableCollectionAsListToStream() {
+      return ImmutableSet.of(1).stream();
     }
   }
 

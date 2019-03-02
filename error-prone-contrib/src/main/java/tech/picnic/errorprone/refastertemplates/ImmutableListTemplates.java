@@ -21,7 +21,6 @@ final class ImmutableListTemplates {
   }
 
   /** Don't call {@link ImmutableList#asList()}; it is a no-op. */
-  // XXX: Maybe file a Guava PR to mark this method deprecated?
   static final class ImmutableListAsList<T> {
     @BeforeTemplate
     ImmutableList<T> before(ImmutableList<T> list) {

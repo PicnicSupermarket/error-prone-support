@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
@@ -18,6 +20,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,11 +34,7 @@ final class RefasterCheckPositiveCases {
    * that any imports present in the input file are also present in the output file .
    */
   private static final ImmutableSet<Class<?>> ELIDED_TYPES =
-      ImmutableSet.of(AbstractMap.class, Maps.class, MoreObjects.class);
-
-  Stream<Integer> testImmutableCollectionAsListToStream() {
-    return ImmutableSet.of(1).asList().stream();
-  }
+      ImmutableSet.of(AbstractMap.class, Lists.class, Maps.class, MoreObjects.class);
 
   ImmutableSet<Map.Entry<String, Integer>> testMapEntry() {
     return ImmutableSet.of(
@@ -58,6 +58,22 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSet<BigDecimal> testBigDecimalFactoryMethod() {
       return ImmutableSet.of(new BigDecimal(0), new BigDecimal(0L));
+    }
+  }
+
+  static final class CollectionTemplates {
+    ImmutableSet<Boolean> testCollectionAddAllFromCollection() {
+      return ImmutableSet.of(
+          Iterables.addAll(new ArrayList<>(), new HashSet<>()),
+          Iterables.addAll(new ArrayList<>(), new HashSet<>()::iterator));
+    }
+
+    ArrayList<String> testNewArrayListFromCollection() {
+      return Lists.newArrayList(ImmutableList.of("foo"));
+    }
+
+    Stream<Integer> testImmutableCollectionAsListToStream() {
+      return ImmutableSet.of(1).asList().stream();
     }
   }
 
