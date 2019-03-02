@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Streams;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,15 +23,30 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 final class RefasterCheckPositiveCases {
-  // XXX: Move down.
+  /**
+   * These types may be fully replaced by some of the Refaster templates user test. Refaster does
+   * not remove the associated imports, while Google Java Formatter does. This type listing ensures
+   * that any imports present in the input file are also present in the output file .
+   */
+  private static final ImmutableSet<Class<?>> ELIDED_TYPES =
+      ImmutableSet.of(AbstractMap.class, Maps.class);
+
   Stream<Integer> testImmutableCollectionAsListToStream() {
     return ImmutableSet.of(1).stream();
   }
+
+  ImmutableSet<Map.Entry<String, Integer>> testMapEntry() {
+    return ImmutableSet.of(Map.entry("foo", 1), Map.entry("bar", 2));
+  }
+
+  // XXX: The ones above should be moved down.
 
   static final class BigDecimals {
     ImmutableSet<BigDecimal> testBigDecimalZero() {
