@@ -7,8 +7,8 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /** Refaster templates related to expressions dealing with (possibly) null values. */
-final class Nulls {
-  private Nulls() {}
+final class NullTemplates {
+  private NullTemplates() {}
 
   /** Prefer {@link Objects#requireNonNullElse(Object, Object)} over the Guava alternative. */
   static final class RequireNonNullElse<T> {

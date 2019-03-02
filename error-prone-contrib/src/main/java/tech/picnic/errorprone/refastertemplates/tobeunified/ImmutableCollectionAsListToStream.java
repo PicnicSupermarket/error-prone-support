@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refastertemplates.collections;
+package tech.picnic.errorprone.refastertemplates.tobeunified;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;

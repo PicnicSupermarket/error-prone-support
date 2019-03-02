@@ -9,8 +9,8 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /** Refaster templates related to expressions dealing with (in)equalities. */
-final class Equality {
-  private Equality() {}
+final class EqualityTemplates {
+  private EqualityTemplates() {}
 
   /** Avoid boxing when comparing primitive values. */
   static final class PrimitiveEquals {

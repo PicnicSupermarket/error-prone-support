@@ -8,8 +8,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link Optional}s. */
-final class Optionals {
-  private Optionals() {}
+final class OptionalTemplates {
+  private OptionalTemplates() {}
 
   /** Prefer {@link Optional#isEmpty()} over the more verbose alternative. */
   static final class OptionalIsEmpty<T> {

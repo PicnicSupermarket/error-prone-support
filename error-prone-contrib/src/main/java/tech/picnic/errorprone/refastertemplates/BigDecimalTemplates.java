@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refastertemplates.bigdecimals;
+package tech.picnic.errorprone.refastertemplates;
 
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -6,8 +6,8 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.math.BigDecimal;
 
 /** Refaster templates related to expressions dealing with {@link BigDecimal}s. */
-final class BigDecimals {
-  private BigDecimals() {}
+final class BigDecimalTemplates {
+  private BigDecimalTemplates() {}
 
   /** Prefer using the constant {@link BigDecimal#ZERO} when possible. */
   static final class BigDecimalZero {

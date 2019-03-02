@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refastertemplates;
+package tech.picnic.errorprone.refastertemplates.tobeunified;
 
 import com.google.common.base.Preconditions;
 import com.google.errorprone.refaster.annotation.AfterTemplate;

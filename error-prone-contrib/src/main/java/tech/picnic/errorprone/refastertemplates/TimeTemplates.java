@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refastertemplates.time;
+package tech.picnic.errorprone.refastertemplates;
 
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -15,8 +15,8 @@ import java.time.chrono.ChronoLocalDateTime;
 import java.time.chrono.ChronoZonedDateTime;
 
 /** Refaster templates related to expressions dealing with time. */
-final class Time {
-  private Time() {}
+final class TimeTemplates {
+  private TimeTemplates() {}
 
   /** Prefer {@link Instant#EPOCH} over alternative representations. */
   static final class EpochInstant {

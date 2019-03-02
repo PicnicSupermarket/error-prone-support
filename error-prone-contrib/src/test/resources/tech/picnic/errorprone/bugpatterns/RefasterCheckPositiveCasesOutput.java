@@ -49,7 +49,7 @@ final class RefasterCheckPositiveCases {
 
   // XXX: The ones above should be moved down.
 
-  static final class BigDecimals {
+  static final class BigDecimalTemplates {
     ImmutableSet<BigDecimal> testBigDecimalZero() {
       return ImmutableSet.of(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
     }
@@ -67,7 +67,7 @@ final class RefasterCheckPositiveCases {
     }
   }
 
-  static final class Equality {
+  static final class EqualityTemplates {
     ImmutableSet<Boolean> testPrimitiveEquals() {
       // XXX: The negated variants of the primitive expressions below trigger an "overlapping
       // replacements" bug. Figure out how/why and fix. Then add these:
@@ -106,7 +106,7 @@ final class RefasterCheckPositiveCases {
     }
   }
 
-  static final class Nulls {
+  static final class NullTemplates {
     String testRequireNonNullElse() {
       return Objects.requireNonNullElse("foo", "bar");
     }
@@ -120,7 +120,7 @@ final class RefasterCheckPositiveCases {
     }
   }
 
-  static final class Optionals {
+  static final class OptionalTemplates {
     ImmutableSet<Boolean> testOptionalIsEmpty() {
       return ImmutableSet.of(Optional.empty().isEmpty(), Optional.of("foo").isEmpty());
     }
@@ -174,7 +174,7 @@ final class RefasterCheckPositiveCases {
     }
   }
 
-  static final class Time {
+  static final class TimeTemplates {
     ImmutableSet<Instant> testEpochInstant() {
       return ImmutableSet.of(Instant.EPOCH, Instant.EPOCH, Instant.EPOCH, Instant.EPOCH);
     }
