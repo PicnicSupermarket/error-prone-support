@@ -154,13 +154,6 @@
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_test_helpers</artifactId>
                 <version>${version.error-prone}</version>
-                <exclusions>
-                    <!-- We're using `com.google.errorprone:javac` instead. -->
-                    <exclusion>
-                        <groupId>com.sun</groupId>
-                        <artifactId>tools</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.google.errorprone</groupId>
