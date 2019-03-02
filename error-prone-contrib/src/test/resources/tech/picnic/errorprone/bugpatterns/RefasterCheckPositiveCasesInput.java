@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -97,6 +98,26 @@ final class RefasterCheckPositiveCases {
 
     boolean testUnequalBooleans(boolean b1, boolean b2) {
       return b1 ? !b2 : b2;
+    }
+  }
+
+  static final class ImmutableListTemplates {
+    ImmutableList.Builder<String> testImmutableListBuilder() {
+      return new ImmutableList.Builder<>();
+    }
+
+    ImmutableList<Integer> testImmutableListAsList() {
+      return ImmutableList.of(1, 2, 3).asList();
+    }
+  }
+
+  static final class ImmutableSetTemplates {
+    ImmutableSet.Builder<String> testImmutableSetBuilder() {
+      return new ImmutableSet.Builder<>();
+    }
+
+    ImmutableSet<Integer> testImmutableSetCopyOfSetView() {
+      return ImmutableSet.copyOf(Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)));
     }
   }
 
