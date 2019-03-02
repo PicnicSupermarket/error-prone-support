@@ -5,6 +5,7 @@ import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSorte
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static java.util.Comparator.naturalOrder;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
@@ -36,7 +37,7 @@ final class RefasterCheckPositiveCases {
    * that any imports present in the input file are also present in the output file .
    */
   private static final ImmutableSet<Class<?>> ELIDED_TYPES =
-      ImmutableSet.of(AbstractMap.class, Maps.class);
+      ImmutableSet.of(AbstractMap.class, Maps.class, MoreObjects.class);
 
   Stream<Integer> testImmutableCollectionAsListToStream() {
     return ImmutableSet.of(1).stream();
@@ -102,6 +103,20 @@ final class RefasterCheckPositiveCases {
 
     boolean testUnequalBooleans(boolean b1, boolean b2) {
       return b1 != b2;
+    }
+  }
+
+  static final class Nulls {
+    String testRequireNonNullElse() {
+      return Objects.requireNonNullElse("foo", "bar");
+    }
+
+    long testIsNullFunction() {
+      return Stream.of("foo").filter(Objects::isNull).count();
+    }
+
+    long testNonNullFunction() {
+      return Stream.of("foo").filter(Objects::nonNull).count();
     }
   }
 
