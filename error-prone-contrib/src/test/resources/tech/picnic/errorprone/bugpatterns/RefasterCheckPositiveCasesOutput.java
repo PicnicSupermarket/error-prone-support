@@ -6,6 +6,7 @@ import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static java.util.Comparator.naturalOrder;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
@@ -42,13 +43,18 @@ final class RefasterCheckPositiveCases {
    * that any imports present in the input file are also present in the output file .
    */
   private static final ImmutableSet<Class<?>> ELIDED_TYPES =
-      ImmutableSet.of(AbstractMap.class, Lists.class, Maps.class, MoreObjects.class);
+      ImmutableSet.of(
+          AbstractMap.class, Lists.class, Maps.class, MoreObjects.class, Preconditions.class);
 
-  ImmutableSet<Map.Entry<String, Integer>> testMapEntry() {
-    return ImmutableSet.of(Map.entry("foo", 1), Map.entry("bar", 2));
+  static final class AssortedTemplates {
+    ImmutableSet<Map.Entry<String, Integer>> testMapEntry() {
+      return ImmutableSet.of(Map.entry("foo", 1), Map.entry("bar", 2));
+    }
+
+    int testCheckIndex() {
+      return Objects.checkIndex(0, 1);
+    }
   }
-
-  // XXX: The ones above should be moved down.
 
   static final class BigDecimalTemplates {
     ImmutableSet<BigDecimal> testBigDecimalZero() {

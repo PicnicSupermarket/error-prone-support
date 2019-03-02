@@ -1,4 +1,5 @@
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
@@ -34,14 +35,19 @@ final class RefasterCheckPositiveCases {
    * that any imports present in the input file are also present in the output file .
    */
   private static final ImmutableSet<Class<?>> ELIDED_TYPES =
-      ImmutableSet.of(AbstractMap.class, Lists.class, Maps.class, MoreObjects.class);
+      ImmutableSet.of(
+          AbstractMap.class, Lists.class, Maps.class, MoreObjects.class, Preconditions.class);
 
-  ImmutableSet<Map.Entry<String, Integer>> testMapEntry() {
-    return ImmutableSet.of(
-        Maps.immutableEntry("foo", 1), new AbstractMap.SimpleImmutableEntry<>("bar", 2));
+  static final class AssortedTemplates {
+    ImmutableSet<Map.Entry<String, Integer>> testMapEntry() {
+      return ImmutableSet.of(
+          Maps.immutableEntry("foo", 1), new AbstractMap.SimpleImmutableEntry<>("bar", 2));
+    }
+
+    int testCheckIndex() {
+      return Preconditions.checkElementIndex(0, 1);
+    }
   }
-
-  // XXX: The ones above should be moved down.
 
   static final class BigDecimalTemplates {
     ImmutableSet<BigDecimal> testBigDecimalZero() {
