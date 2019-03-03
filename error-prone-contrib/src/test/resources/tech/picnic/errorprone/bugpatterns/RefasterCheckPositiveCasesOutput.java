@@ -1,13 +1,16 @@
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSortedMultiset;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static java.util.Comparator.naturalOrder;
+import static java.util.function.Function.identity;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMultiset;
@@ -38,13 +41,18 @@ import java.util.stream.Stream;
 
 final class RefasterCheckPositiveCases {
   /**
-   * These types may be fully replaced by some of the Refaster templates user test. Refaster does
-   * not remove the associated imports, while Google Java Formatter does. This type listing ensures
-   * that any imports present in the input file are also present in the output file .
+   * These types and statically imported methods may be fully replaced by some of the Refaster
+   * templates under test. Refaster does not remove the associated imports, while Google Java
+   * Formatter does. This listing ensures that any imports present in the input file are also
+   * present in the output file.
    */
-  private static final ImmutableSet<Class<?>> ELIDED_TYPES =
+  private static final ImmutableSet<?> ELIDED_TYPES_AND_STATIC_IMPORTS =
       ImmutableSet.of(
-          AbstractMap.class, Lists.class, Maps.class, MoreObjects.class, Preconditions.class);
+          AbstractMap.class,
+          Lists.class,
+          MoreObjects.class,
+          Preconditions.class,
+          (Runnable) () -> identity());
 
   static final class AssortedTemplates {
     ImmutableSet<Map.Entry<String, Integer>> testMapEntry() {
@@ -53,6 +61,18 @@ final class RefasterCheckPositiveCases {
 
     int testCheckIndex() {
       return Objects.checkIndex(0, 1);
+    }
+
+    ImmutableMap<Integer, String> testStreamOfMapEntriesImmutableMap() {
+      // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
+      // Looks like a @Placeholder limitation. Try to track down and fix.
+      return Stream.of(1, 2, 3).collect(toImmutableMap(n -> Integer.valueOf(n), n -> n.toString()));
+    }
+
+    ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToMap() {
+      return ImmutableSet.of(
+          Maps.toMap(ImmutableList.of(1), n -> n * 2),
+          Maps.toMap(ImmutableList.of(1)::iterator, n -> n / 3));
     }
   }
 

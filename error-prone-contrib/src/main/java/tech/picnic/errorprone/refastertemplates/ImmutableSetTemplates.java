@@ -9,6 +9,8 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 final class ImmutableSetTemplates {
   private ImmutableSetTemplates() {}
 
+  // XXX: This drops generic type information, sometimes leading to non-compilable code. Anything we
+  // can do about that?
   static final class ImmutableSetBuilder<T> {
     @BeforeTemplate
     ImmutableSet.Builder<T> before() {
