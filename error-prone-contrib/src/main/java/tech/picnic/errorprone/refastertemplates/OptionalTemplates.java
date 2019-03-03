@@ -13,6 +13,20 @@ import java.util.stream.Stream;
 final class OptionalTemplates {
   private OptionalTemplates() {}
 
+  static final class OptionalOfNullable<T> {
+    @BeforeTemplate
+    // XXX: Refaster should be smart enough to also rewrite occurrences in which there are
+    // parentheses around the null check, but that's currently not the case. Try to fix that.
+    Optional<T> before(T object) {
+      return object == null ? Optional.empty() : Optional.of(object);
+    }
+
+    @AfterTemplate
+    Optional<T> after(T object) {
+      return Optional.ofNullable(object);
+    }
+  }
+
   /** Prefer {@link Optional#isEmpty()} over the more verbose alternative. */
   static final class OptionalIsEmpty<T> {
     @BeforeTemplate

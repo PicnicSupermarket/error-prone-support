@@ -319,6 +319,10 @@ final class RefasterCheckPositiveCases {
   }
 
   static final class OptionalTemplates {
+    Optional<String> testOptionalOfNullable() {
+      return toString() == null ? Optional.empty() : Optional.of(toString());
+    }
+
     ImmutableSet<Boolean> testOptionalIsEmpty() {
       return ImmutableSet.of(!Optional.empty().isPresent(), !Optional.of("foo").isPresent());
     }
