@@ -9,6 +9,7 @@ import static java.util.function.Function.identity;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
@@ -337,6 +338,30 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSortedMultiset<Integer> testStreamToImmutableSortedMultiset() {
       return Stream.of(1).collect(toImmutableSortedMultiset(naturalOrder()));
+    }
+  }
+
+  static final class StringTemplates {
+    ImmutableSet<Boolean> testStringIsEmpty() {
+      return ImmutableSet.of(
+          "foo".isEmpty(),
+          "bar".isEmpty(),
+          "baz".isEmpty(),
+          !"foo".isEmpty(),
+          !"bar".isEmpty(),
+          !"baz".isEmpty());
+    }
+
+    ImmutableSet<Boolean> testStringIsNullOrEmpty() {
+      return ImmutableSet.of(
+          Strings.isNullOrEmpty(getClass().getName()),
+          !Strings.isNullOrEmpty(getClass().getName()));
+    }
+
+    ImmutableSet<Optional<String>> testOptionalNonEmptyString() {
+      return ImmutableSet.of(
+          Optional.ofNullable(toString()).filter(s -> !s.isEmpty()),
+          Optional.ofNullable(toString()).filter(s -> !s.isEmpty()));
     }
   }
 

@@ -7,6 +7,7 @@ import static java.util.function.Function.identity;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
@@ -349,6 +350,30 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSortedMultiset<Integer> testStreamToImmutableSortedMultiset() {
       return ImmutableSortedMultiset.copyOf(Stream.of(1).iterator());
+    }
+  }
+
+  static final class StringTemplates {
+    ImmutableSet<Boolean> testStringIsEmpty() {
+      return ImmutableSet.of(
+          "foo".length() == 0,
+          "bar".length() <= 0,
+          "baz".length() < 1,
+          "foo".length() != 0,
+          "bar".length() > 0,
+          "baz".length() >= 1);
+    }
+
+    ImmutableSet<Boolean> testStringIsNullOrEmpty() {
+      return ImmutableSet.of(
+          getClass().getName() == null || getClass().getName().isEmpty(),
+          getClass().getName() != null && !getClass().getName().isEmpty());
+    }
+
+    ImmutableSet<Optional<String>> testOptionalNonEmptyString() {
+      return ImmutableSet.of(
+          Strings.isNullOrEmpty(toString()) ? Optional.empty() : Optional.of(toString()),
+          Strings.isNullOrEmpty(toString()) ? Optional.empty() : Optional.ofNullable(toString()));
     }
   }
 
