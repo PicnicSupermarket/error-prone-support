@@ -16,8 +16,11 @@ import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.AbstractMap;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -95,27 +98,34 @@ final class AssortedTemplates {
    * Prefer {@link Maps#toMap(Iterable, com.google.common.base.Function)} over the stream-based
    * alternative.
    */
-  // XXX: There's also an Iterator variant. Worth the hassle?
-  // XXX: `Refaster.anyOf(identity(), k -> k)` instead of `identity()` doesn't cause the second
-  // variant to be supported. Why?
+  // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
   // XXX: Also cover collection to multimaps.
-  abstract static class IterableToMap<K, V> {
-    @Placeholder
-    abstract V valueFunction(@MayOptionallyUse K element);
-
+  static final class IterableToMap<K, V> {
     @BeforeTemplate
-    ImmutableMap<K, V> before(Iterable<K> iterable) {
-      return Streams.stream(iterable).collect(toImmutableMap(identity(), k -> valueFunction(k)));
+    ImmutableMap<K, V> before(
+        Iterator<K> iterable, Function<? super K, ? extends V> valueFunction) {
+      return Streams.stream(iterable)
+          .collect(toImmutableMap(Refaster.anyOf(identity(), k -> k), valueFunction));
     }
 
     @BeforeTemplate
-    ImmutableMap<K, V> before(Collection<K> iterable) {
-      return iterable.stream().collect(toImmutableMap(identity(), k -> valueFunction(k)));
+    ImmutableMap<K, V> before(
+        Iterable<K> iterable, Function<? super K, ? extends V> valueFunction) {
+      return Streams.stream(iterable)
+          .collect(toImmutableMap(Refaster.anyOf(identity(), k -> k), valueFunction));
+    }
+
+    @BeforeTemplate
+    ImmutableMap<K, V> before(
+        Collection<K> iterable, Function<? super K, ? extends V> valueFunction) {
+      return iterable.stream()
+          .collect(toImmutableMap(Refaster.anyOf(identity(), k -> k), valueFunction));
     }
 
     @AfterTemplate
-    ImmutableMap<K, V> after(Collection<K> iterable) {
-      return Maps.toMap(iterable, k -> valueFunction(k));
+    ImmutableMap<K, V> after(
+        Iterable<K> iterable, com.google.common.base.Function<? super K, V> valueFunction) {
+      return Maps.toMap(iterable, valueFunction);
     }
   }
 
@@ -123,27 +133,48 @@ final class AssortedTemplates {
    * Prefer {@link Maps#uniqueIndex(Iterable, com.google.common.base.Function)} over the
    * stream-based alternative.
    */
-  // XXX: There's also an Iterator variant. Worth the hassle?
-  // XXX: `Refaster.anyOf(identity(), k -> k)` instead of `identity()` doesn't cause the second
-  // variant to be supported. Why?
+  // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
   // XXX: Also cover collection to multimaps.
-  abstract static class IterableUniqueIndex<K, V> {
-    @Placeholder
-    abstract K keyFunction(@MayOptionallyUse V element);
-
+  static final class IterableUniqueIndex<K, V> {
     @BeforeTemplate
-    ImmutableMap<K, V> before(Iterable<V> iterable) {
-      return Streams.stream(iterable).collect(toImmutableMap(v -> keyFunction(v), identity()));
+    ImmutableMap<K, V> before(Iterator<V> iterable, Function<? super V, ? extends K> keyFunction) {
+      return Streams.stream(iterable)
+          .collect(toImmutableMap(keyFunction, Refaster.anyOf(identity(), v -> v)));
     }
 
     @BeforeTemplate
-    ImmutableMap<K, V> before(Collection<V> iterable) {
-      return iterable.stream().collect(toImmutableMap(v -> keyFunction(v), identity()));
+    ImmutableMap<K, V> before(Iterable<V> iterable, Function<? super V, ? extends K> keyFunction) {
+      return Streams.stream(iterable)
+          .collect(toImmutableMap(keyFunction, Refaster.anyOf(identity(), v -> v)));
+    }
+
+    @BeforeTemplate
+    ImmutableMap<K, V> before(
+        Collection<V> iterable, Function<? super V, ? extends K> keyFunction) {
+      return iterable.stream()
+          .collect(toImmutableMap(keyFunction, Refaster.anyOf(identity(), v -> v)));
     }
 
     @AfterTemplate
-    ImmutableMap<K, V> after(Collection<V> iterable) {
-      return Maps.uniqueIndex(iterable, v -> keyFunction(v));
+    ImmutableMap<K, V> after(
+        Iterable<V> iterable, com.google.common.base.Function<? super V, K> keyFunction) {
+      return Maps.uniqueIndex(iterable, keyFunction);
+    }
+  }
+
+  /**
+   * Prefer {@link Maps#toMap(Iterable, com.google.common.base.Function)} over the alternative if
+   * the resultant map should be immutable anyway.
+   */
+  static final class SetToImmutableMap<K, V> {
+    @BeforeTemplate
+    ImmutableMap<K, V> before(Set<K> set, com.google.common.base.Function<? super K, V> fun) {
+      return ImmutableMap.copyOf(Maps.asMap(set, fun));
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after(Set<K> set, com.google.common.base.Function<? super K, V> fun) {
+      return Maps.toMap(set, fun);
     }
   }
 }

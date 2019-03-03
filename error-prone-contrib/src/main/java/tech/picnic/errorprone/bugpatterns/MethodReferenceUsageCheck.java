@@ -47,6 +47,8 @@ import javax.lang.model.element.Name;
 // XXX: For JDK 9, add support for "var handles"!
 // XXX: Link to Effective Java, Third Edition, Item 43. In there the suggested approach is not so
 // black-and-white. Maybe we can more closely approximate it?
+// XXX: With Java 9's introduction of `not`, we could write many lambda expressions to
+// `not(some::reference)`.
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "MethodReferenceUsage",

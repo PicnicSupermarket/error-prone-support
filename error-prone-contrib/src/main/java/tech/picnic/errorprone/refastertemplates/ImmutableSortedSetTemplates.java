@@ -1,9 +1,19 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
+import static java.util.Comparator.naturalOrder;
+
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link ImmutableSortedSet}s. */
 final class ImmutableSortedSetTemplates {
@@ -33,8 +43,65 @@ final class ImmutableSortedSetTemplates {
     }
 
     @AfterTemplate
-    ImmutableSortedSet.Builder<T> after(Comparator<T> cmp) {
+    ImmutableSortedSet.Builder<T> after() {
       return ImmutableSortedSet.naturalOrder();
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSortedSet#reverseOrder()} over the alternative that requires explicitly
+   * providing the {@link Comparator}.
+   */
+  static final class ImmutableSortedSetReverseOrderBuilder<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    ImmutableSortedSet.Builder<T> before() {
+      return ImmutableSortedSet.orderedBy(Comparator.<T>reverseOrder());
+    }
+
+    @AfterTemplate
+    ImmutableSortedSet.Builder<T> after(Comparator<T> cmp) {
+      return ImmutableSortedSet.reverseOrder();
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSortedSet#copyOf(Iterable)} and variants over the stream-based
+   * alternative.
+   */
+  // XXX: There's also a variant with a customer Comparator. Worth the hassle?
+  static final class IterableToImmutableSortedSet<T extends Comparable<? super T>> {
+    // XXX: Drop the inner `Refaster.anyOf` if/when we introduce a rule to choose between one and
+    // the other.
+    @BeforeTemplate
+    ImmutableSet<T> before(T[] iterable) {
+      return Refaster.anyOf(
+          ImmutableSortedSet.<T>naturalOrder().add(iterable).build(),
+          Refaster.anyOf(Stream.of(iterable), Arrays.stream(iterable))
+              .collect(toImmutableSortedSet(naturalOrder())));
+    }
+
+    @BeforeTemplate
+    ImmutableSet<T> before(Iterator<T> iterable) {
+      return Refaster.anyOf(
+          ImmutableSortedSet.<T>naturalOrder().addAll(iterable).build(),
+          Streams.stream(iterable).collect(toImmutableSortedSet(naturalOrder())));
+    }
+
+    @BeforeTemplate
+    ImmutableSet<T> before(Iterable<T> iterable) {
+      return Refaster.anyOf(
+          ImmutableSortedSet.<T>naturalOrder().addAll(iterable).build(),
+          Streams.stream(iterable).collect(toImmutableSortedSet(naturalOrder())));
+    }
+
+    @BeforeTemplate
+    ImmutableSortedSet<T> before(Collection<T> iterable) {
+      return iterable.stream().collect(toImmutableSortedSet(naturalOrder()));
+    }
+
+    @AfterTemplate
+    ImmutableSortedSet<T> after(Iterable<T> iterable) {
+      return ImmutableSortedSet.copyOf(iterable);
     }
   }
 }

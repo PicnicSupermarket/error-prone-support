@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.ImportPolicy;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
@@ -77,7 +78,8 @@ final class StreamTemplates {
   static final class StreamToImmutableSet<T> {
     @BeforeTemplate
     ImmutableSet<T> before(Stream<T> stream) {
-      return ImmutableSet.copyOf(stream.iterator());
+      return Refaster.anyOf(
+          ImmutableSet.copyOf(stream.iterator()), stream.distinct().collect(toImmutableSet()));
     }
 
     @AfterTemplate

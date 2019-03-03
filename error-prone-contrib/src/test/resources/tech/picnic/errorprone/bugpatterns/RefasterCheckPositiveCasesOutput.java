@@ -33,6 +33,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,6 +51,7 @@ final class RefasterCheckPositiveCases {
   private static final ImmutableSet<?> ELIDED_TYPES_AND_STATIC_IMPORTS =
       ImmutableSet.of(
           AbstractMap.class,
+          Arrays.class,
           Lists.class,
           MoreObjects.class,
           Preconditions.class,
@@ -73,7 +75,21 @@ final class RefasterCheckPositiveCases {
     ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToMap() {
       return ImmutableSet.of(
           Maps.toMap(ImmutableList.of(1), n -> n * 2),
-          Maps.toMap(ImmutableList.of(1)::iterator, n -> n / 3));
+          Maps.toMap(ImmutableList.of(2)::iterator, Integer::valueOf),
+          Maps.toMap(ImmutableList.of(3).iterator(), n -> n.intValue()));
+    }
+
+    ImmutableSet<ImmutableMap<Integer, Integer>> testIterableUniqueIndex() {
+      return ImmutableSet.of(
+          Maps.uniqueIndex(ImmutableList.of(1), n -> n * 2),
+          Maps.uniqueIndex(ImmutableList.of(2)::iterator, Integer::valueOf),
+          Maps.uniqueIndex(ImmutableList.of(3).iterator(), n -> n.intValue()));
+    }
+
+    ImmutableSet<ImmutableMap<Integer, Integer>> testSetToImmutableMap() {
+      return ImmutableSet.of(
+          Maps.toMap(ImmutableSet.of(1), n -> n + 2),
+          Maps.toMap(ImmutableSet.of(2), Integer::valueOf));
     }
   }
 
@@ -96,6 +112,16 @@ final class RefasterCheckPositiveCases {
   }
 
   static final class CollectionTemplates {
+    ImmutableSet<Boolean> testCollectionIsEmpty() {
+      return ImmutableSet.of(
+          ImmutableSet.of(1).isEmpty(),
+          ImmutableSet.of(2).isEmpty(),
+          ImmutableSet.of(3).isEmpty(),
+          !ImmutableSet.of(4).isEmpty(),
+          !ImmutableSet.of(5).isEmpty(),
+          !ImmutableSet.of(6).isEmpty());
+    }
+
     ImmutableSet<Boolean> testCollectionAddAllFromCollection() {
       return ImmutableSet.of(
           new ArrayList<>().addAll(new HashSet<>()),
@@ -155,14 +181,54 @@ final class RefasterCheckPositiveCases {
       return ImmutableList.builder();
     }
 
+    ImmutableList<ImmutableList<Integer>> testIterableToImmutableList() {
+      return ImmutableList.of(
+          ImmutableList.copyOf(ImmutableList.of(1)),
+          ImmutableList.copyOf(ImmutableList.of(2)::iterator),
+          ImmutableList.copyOf(ImmutableList.of(3).iterator()),
+          ImmutableList.copyOf(ImmutableList.of(4)),
+          ImmutableList.copyOf(ImmutableList.of(5)::iterator),
+          ImmutableList.copyOf(ImmutableList.of(6).iterator()),
+          ImmutableList.copyOf(new Integer[] {7}),
+          ImmutableList.copyOf(new Integer[] {8}),
+          ImmutableList.copyOf(new Integer[] {9}));
+    }
+
     ImmutableSet<ImmutableList<Integer>> testImmutableListCopyOfImmutableList() {
       return ImmutableSet.of(ImmutableList.of(1, 2), ImmutableList.of(1, 2, 3));
+    }
+
+    ImmutableSet<ImmutableList<Integer>> testImmutableListSortedCopyOf() {
+      return ImmutableSet.of(
+          ImmutableList.sortedCopyOf(ImmutableSet.of(1)),
+          ImmutableList.sortedCopyOf(ImmutableSet.of(2)),
+          ImmutableList.sortedCopyOf(ImmutableSet.of(3)::iterator));
+    }
+
+    ImmutableSet<ImmutableList<String>> testImmutableListSortedCopyOfWithCustomComparator() {
+      return ImmutableSet.of(
+          ImmutableList.sortedCopyOf(Comparator.comparing(String::length), ImmutableSet.of("foo")),
+          ImmutableList.sortedCopyOf(
+              Comparator.comparing(String::isEmpty), ImmutableSet.of("bar")::iterator));
     }
   }
 
   static final class ImmutableSetTemplates {
     ImmutableSet.Builder<String> testImmutableSetBuilder() {
       return ImmutableSet.builder();
+    }
+
+    ImmutableSet<ImmutableSet<Integer>> testIterableToImmutableSet() {
+      return ImmutableSet.of(
+          ImmutableSet.copyOf(ImmutableList.of(1)),
+          ImmutableSet.copyOf(ImmutableList.of(2)::iterator),
+          ImmutableSet.copyOf(ImmutableList.of(3).iterator()),
+          ImmutableSet.copyOf(ImmutableSet.of(4)),
+          ImmutableSet.copyOf(ImmutableSet.of(5)::iterator),
+          ImmutableSet.copyOf(ImmutableSet.of(6).iterator()),
+          ImmutableSet.copyOf(new Integer[] {7}),
+          ImmutableSet.copyOf(new Integer[] {8}),
+          ImmutableSet.copyOf(new Integer[] {9}));
     }
 
     ImmutableSet<Integer> testImmutableSetCopyOfImmutableSet() {
@@ -181,6 +247,23 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSortedSet.Builder<String> testImmutableSortedSetNaturalOrderBuilder() {
       return ImmutableSortedSet.naturalOrder();
+    }
+
+    ImmutableSortedSet.Builder<String> testImmutableSortedSetReverseOrderBuilder() {
+      return ImmutableSortedSet.reverseOrder();
+    }
+
+    ImmutableSet<ImmutableSortedSet<Integer>> testIterableToImmutableSortedSet() {
+      return ImmutableSet.of(
+          ImmutableSortedSet.copyOf(ImmutableList.of(1)),
+          ImmutableSortedSet.copyOf(ImmutableList.of(2)::iterator),
+          ImmutableSortedSet.copyOf(ImmutableList.of(3).iterator()),
+          ImmutableSortedSet.copyOf(ImmutableSet.of(4)),
+          ImmutableSortedSet.copyOf(ImmutableSet.of(5)::iterator),
+          ImmutableSortedSet.copyOf(ImmutableSet.of(6).iterator()),
+          ImmutableSortedSet.copyOf(new Integer[] {7}),
+          ImmutableSortedSet.copyOf(new Integer[] {8}),
+          ImmutableSortedSet.copyOf(new Integer[] {9}));
     }
   }
 
@@ -216,6 +299,10 @@ final class RefasterCheckPositiveCases {
           Stream.of(Optional.empty()).flatMap(Optional::stream),
           Stream.of(Optional.of("foo")).flatMap(Optional::stream));
     }
+
+    Stream<String> testMapToOptionalGet(Map<Integer, Optional<String>> map) {
+      return Stream.of(1).flatMap(n -> map.get(n).stream());
+    }
   }
 
   static final class StreamTemplates {
@@ -235,8 +322,9 @@ final class RefasterCheckPositiveCases {
       return Stream.of(1).collect(toImmutableList());
     }
 
-    ImmutableSet<Integer> testStreamToImmutableSet() {
-      return Stream.of(1).collect(toImmutableSet());
+    ImmutableSet<ImmutableSet<Integer>> testStreamToImmutableSet() {
+      return ImmutableSet.of(
+          Stream.of(1).collect(toImmutableSet()), Stream.of(2).collect(toImmutableSet()));
     }
 
     ImmutableSortedSet<Integer> testStreamToImmutableSortedSet() {

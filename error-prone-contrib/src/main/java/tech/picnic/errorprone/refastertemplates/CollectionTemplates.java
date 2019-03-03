@@ -3,7 +3,9 @@ package tech.picnic.errorprone.refastertemplates;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +14,20 @@ import java.util.stream.Stream;
 /** Refaster templates related to expressions dealing with (arbitrary) collections. */
 final class CollectionTemplates {
   private CollectionTemplates() {}
+
+  /** Prefer {@link Collection#isEmpty()} over alternatives that consult the collection's size. */
+  static final class CollectionIsEmpty<T> {
+    @BeforeTemplate
+    boolean before(Collection<T> collection) {
+      return Refaster.anyOf(collection.size() == 0, collection.size() <= 0, collection.size() < 1);
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(Collection<T> collection) {
+      return collection.isEmpty();
+    }
+  }
 
   /**
    * Don't call {@link Iterables#addAll(Collection, Iterable)} when the elements to be added are
@@ -42,6 +58,10 @@ final class CollectionTemplates {
     }
   }
 
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if the result is going to be streamed; stream
+   * directly.
+   */
   static final class ImmutableCollectionAsListToStream<T> {
     @BeforeTemplate
     Stream<T> before(ImmutableCollection<T> collection) {

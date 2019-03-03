@@ -4,6 +4,8 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.Placeholder;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -64,6 +66,24 @@ final class OptionalTemplates {
     @AfterTemplate
     Stream<T> after(Stream<Optional<T>> stream) {
       return stream.flatMap(Optional::stream);
+    }
+  }
+
+  /** Within a stream's map operation unconditional {@link Optional#get()} calls can be avoided. */
+  // XXX: An alternative approach is to `.flatMap(Optional::stream)`. That may be a bit longer, but
+  // yield nicer code. Think about it.
+  abstract static class MapToOptionalGet<T, S> {
+    @Placeholder
+    abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
+
+    @BeforeTemplate
+    Stream<S> before(Stream<T> stream, Optional<S> optional) {
+      return stream.map(e -> toOptionalFunction(e).get());
+    }
+
+    @AfterTemplate
+    Stream<S> after(Stream<T> stream, Optional<S> optional) {
+      return stream.flatMap(e -> toOptionalFunction(e).stream());
     }
   }
 }

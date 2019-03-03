@@ -1,9 +1,17 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets.SetView;
+import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link ImmutableSet}s. */
 final class ImmutableSetTemplates {
@@ -21,6 +29,44 @@ final class ImmutableSetTemplates {
     @AfterTemplate
     ImmutableSet.Builder<T> after() {
       return ImmutableSet.builder();
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#copyOf(Iterable)} and variants over the stream-based alternative.
+   */
+  static final class IterableToImmutableSet<T> {
+    // XXX: Drop the inner `Refaster.anyOf` if/when we introduce a rule to choose between one and
+    // the other.
+    @BeforeTemplate
+    ImmutableSet<T> before(T[] iterable) {
+      return Refaster.anyOf(
+          ImmutableSet.<T>builder().add(iterable).build(),
+          Refaster.anyOf(Stream.of(iterable), Arrays.stream(iterable)).collect(toImmutableSet()));
+    }
+
+    @BeforeTemplate
+    ImmutableSet<T> before(Iterator<T> iterable) {
+      return Refaster.anyOf(
+          ImmutableSet.<T>builder().addAll(iterable).build(),
+          Streams.stream(iterable).collect(toImmutableSet()));
+    }
+
+    @BeforeTemplate
+    ImmutableSet<T> before(Iterable<T> iterable) {
+      return Refaster.anyOf(
+          ImmutableSet.<T>builder().addAll(iterable).build(),
+          Streams.stream(iterable).collect(toImmutableSet()));
+    }
+
+    @BeforeTemplate
+    ImmutableSet<T> before(Collection<T> iterable) {
+      return iterable.stream().collect(toImmutableSet());
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(Iterable<T> iterable) {
+      return ImmutableSet.copyOf(iterable);
     }
   }
 
