@@ -7,6 +7,7 @@ import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.common.collect.Sets.toImmutableEnumSet;
 import static com.google.common.collect.Streams.stream;
 import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.reverseOrder;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.function.Function.identity;
@@ -144,6 +145,22 @@ final class RefasterCheckPositiveCases {
 
     ImmutableList<Integer> testImmutableCollectionAsList() {
       return ImmutableSet.of(1).asList();
+    }
+  }
+
+  static final class ComparatorTemplates {
+    ImmutableSet<Comparator<String>> testNaturalOrderComparator() {
+      return ImmutableSet.of(naturalOrder(), naturalOrder());
+    }
+
+    ImmutableSet<Comparator<String>> testNaturalOrderComparatorFallback() {
+      return ImmutableSet.of(
+          Comparator.<String>naturalOrder().thenComparing(naturalOrder()),
+          Comparator.<String>naturalOrder().thenComparing(naturalOrder()));
+    }
+
+    Comparator<String> testReverseOrder() {
+      return reverseOrder();
     }
   }
 
