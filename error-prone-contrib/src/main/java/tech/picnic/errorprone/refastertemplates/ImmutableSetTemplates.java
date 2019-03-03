@@ -9,8 +9,9 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 final class ImmutableSetTemplates {
   private ImmutableSetTemplates() {}
 
-  // XXX: This drops generic type information, sometimes leading to non-compilable code. Anything we
-  // can do about that?
+  /** Prefer {@link ImmutableSet#builder()} over the associated constructor. */
+  // XXX: This drops generic type information, sometimes leading to non-compilable code. Anything
+  // we can do about that?
   static final class ImmutableSetBuilder<T> {
     @BeforeTemplate
     ImmutableSet.Builder<T> before() {
@@ -20,6 +21,19 @@ final class ImmutableSetTemplates {
     @AfterTemplate
     ImmutableSet.Builder<T> after() {
       return ImmutableSet.builder();
+    }
+  }
+
+  /** Don't unnecessarily copy an {@link ImmutableSet}. */
+  static final class ImmutableSetCopyOfImmutableSet<T> {
+    @BeforeTemplate
+    ImmutableSet<T> before(ImmutableSet<T> set) {
+      return ImmutableSet.copyOf(set);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(ImmutableSet<T> set) {
+      return set;
     }
   }
 

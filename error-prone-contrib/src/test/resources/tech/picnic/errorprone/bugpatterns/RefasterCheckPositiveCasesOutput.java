@@ -33,6 +33,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -154,8 +155,8 @@ final class RefasterCheckPositiveCases {
       return ImmutableList.builder();
     }
 
-    ImmutableList<Integer> testImmutableListAsList() {
-      return ImmutableList.of(1, 2, 3);
+    ImmutableSet<ImmutableList<Integer>> testImmutableListCopyOfImmutableList() {
+      return ImmutableSet.of(ImmutableList.of(1, 2), ImmutableList.of(1, 2, 3));
     }
   }
 
@@ -164,8 +165,22 @@ final class RefasterCheckPositiveCases {
       return ImmutableSet.builder();
     }
 
+    ImmutableSet<Integer> testImmutableSetCopyOfImmutableSet() {
+      return ImmutableSet.of(1, 2);
+    }
+
     ImmutableSet<Integer> testImmutableSetCopyOfSetView() {
       return Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)).immutableCopy();
+    }
+  }
+
+  static final class ImmutableSortedSetTemplates {
+    ImmutableSortedSet.Builder<String> testImmutableSortedSetBuilder() {
+      return ImmutableSortedSet.orderedBy(Comparator.comparingInt(String::length));
+    }
+
+    ImmutableSortedSet.Builder<String> testImmutableSortedSetNaturalOrderBuilder() {
+      return ImmutableSortedSet.naturalOrder();
     }
   }
 

@@ -26,6 +26,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -152,8 +153,9 @@ final class RefasterCheckPositiveCases {
       return new ImmutableList.Builder<>();
     }
 
-    ImmutableList<Integer> testImmutableListAsList() {
-      return ImmutableList.of(1, 2, 3).asList();
+    ImmutableSet<ImmutableList<Integer>> testImmutableListCopyOfImmutableList() {
+      return ImmutableSet.of(
+          ImmutableList.copyOf(ImmutableList.of(1, 2)), ImmutableList.of(1, 2, 3).asList());
     }
   }
 
@@ -162,8 +164,22 @@ final class RefasterCheckPositiveCases {
       return new ImmutableSet.Builder<>();
     }
 
+    ImmutableSet<Integer> testImmutableSetCopyOfImmutableSet() {
+      return ImmutableSet.copyOf(ImmutableSet.of(1, 2));
+    }
+
     ImmutableSet<Integer> testImmutableSetCopyOfSetView() {
       return ImmutableSet.copyOf(Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)));
+    }
+  }
+
+  static final class ImmutableSortedSetTemplates {
+    ImmutableSortedSet.Builder<String> testImmutableSortedSetBuilder() {
+      return new ImmutableSortedSet.Builder<>(Comparator.comparingInt(String::length));
+    }
+
+    ImmutableSortedSet.Builder<String> testImmutableSortedSetNaturalOrderBuilder() {
+      return ImmutableSortedSet.orderedBy(Comparator.<String>naturalOrder());
     }
   }
 

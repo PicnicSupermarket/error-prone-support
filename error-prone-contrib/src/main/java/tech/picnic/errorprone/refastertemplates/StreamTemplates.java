@@ -52,6 +52,10 @@ final class StreamTemplates {
   }
 
   /** Prefer {@link ImmutableList#toImmutableList()} over the more verbose alternative. */
+  // XXX: Once the code base has been sufficiently cleaned up, we might want to also rewrite
+  // `Collectors.toList(`), with the caveat that it allows mutation (though this cannot be relied
+  // upon) as well as nulls. Another option is to explicitly rewrite those variants to
+  // `Collectors.toSet(ArrayList::new)`.
   static final class StreamToImmutableList<T> {
     @BeforeTemplate
     ImmutableList<T> before(Stream<T> stream) {
@@ -66,6 +70,10 @@ final class StreamTemplates {
   }
 
   /** Prefer {@link ImmutableSet#toImmutableSet()} over the more verbose alternative. */
+  // XXX: Once the code base has been sufficiently cleaned up, we might want to also rewrite
+  // `Collectors.toSet(`), with the caveat that it allows mutation (though this cannot be relied
+  // upon) as well as nulls. Another option is to explicitly rewrite those variants to
+  // `Collectors.toSet(HashSet::new)`.
   static final class StreamToImmutableSet<T> {
     @BeforeTemplate
     ImmutableSet<T> before(Stream<T> stream) {
