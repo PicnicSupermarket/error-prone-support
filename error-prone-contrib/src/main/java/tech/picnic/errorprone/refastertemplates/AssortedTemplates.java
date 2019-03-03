@@ -1,11 +1,14 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.function.Function.identity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
@@ -151,6 +154,27 @@ final class AssortedTemplates {
     @AfterTemplate
     ImmutableMap<K, V> after(Set<K> set, com.google.common.base.Function<? super K, V> fun) {
       return Maps.toMap(set, fun);
+    }
+  }
+
+  /**
+   * Use {@link Sets#toImmutableEnumSet()} when possible, as it is more efficient than {@link
+   * ImmutableSet#toImmutableSet()} and produces a more compact object.
+   *
+   * <p><strong>Warning:</strong> this rewrite rule is not completely behavior preserving: while the
+   * original code produces a set which iterates over the elements in encounter order, the
+   * replacement code iterates over the elements in enum definition order.
+   */
+  static final class StreamToImmutableEnumSet<T extends Enum<T>> {
+    @BeforeTemplate
+    ImmutableSet<T> before(Stream<T> stream) {
+      return stream.collect(toImmutableSet());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ImmutableSet<T> after(Stream<T> stream) {
+      return stream.collect(Sets.toImmutableEnumSet());
     }
   }
 }

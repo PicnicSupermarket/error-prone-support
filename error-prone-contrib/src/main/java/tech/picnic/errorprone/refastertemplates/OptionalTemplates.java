@@ -1,11 +1,16 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -63,6 +68,44 @@ final class OptionalTemplates {
     @AfterTemplate
     Stream<T> after(Optional<T> optional) {
       return optional.stream();
+    }
+  }
+
+  /**
+   * Don't use the ternary operator to extract the first element of a possibly-empty {@link
+   * Collection} as an {@link Optional}.
+   */
+  static final class OptionalFirstCollectionElement<T> {
+    @BeforeTemplate
+    Optional<T> before(Collection<T> collection) {
+      return collection.isEmpty() ? Optional.empty() : Optional.of(collection.iterator().next());
+    }
+
+    @BeforeTemplate
+    Optional<T> before(List<T> collection) {
+      return collection.isEmpty() ? Optional.empty() : Optional.of(collection.get(0));
+    }
+
+    @AfterTemplate
+    Optional<T> after(Collection<T> collection) {
+      return collection.stream().findFirst();
+    }
+  }
+
+  /**
+   * Don't use the ternary operator to extract the first element of a possibly-empty {@link
+   * Iterator} as an {@link Optional}.
+   */
+  static final class OptionalFirstIteratorElement<T> {
+    @BeforeTemplate
+    Optional<T> before(Iterator<T> it) {
+      return it.hasNext() ? Optional.of(it.next()) : Optional.empty();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    Optional<T> after(Iterator<T> it) {
+      return Streams.stream(it).findFirst();
     }
   }
 

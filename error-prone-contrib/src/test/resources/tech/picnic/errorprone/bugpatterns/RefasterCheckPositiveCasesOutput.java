@@ -4,6 +4,8 @@ import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSortedMultiset;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
+import static com.google.common.collect.Sets.toImmutableEnumSet;
+import static com.google.common.collect.Streams.stream;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.Map.Entry.comparingByValue;
@@ -12,6 +14,7 @@ import static java.util.function.Function.identity;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
@@ -89,6 +92,10 @@ final class RefasterCheckPositiveCases {
       return ImmutableSet.of(
           Maps.toMap(ImmutableSet.of(1), n -> n + 2),
           Maps.toMap(ImmutableSet.of(2), Integer::valueOf));
+    }
+
+    ImmutableSet<BoundType> testStreamToImmutableEnumSet() {
+      return Stream.of(BoundType.OPEN).collect(toImmutableEnumSet());
     }
   }
 
@@ -327,6 +334,15 @@ final class RefasterCheckPositiveCases {
       return Stream.concat(
           Stream.of(Optional.empty()).flatMap(Optional::stream),
           Stream.of(Optional.of("foo")).flatMap(Optional::stream));
+    }
+
+    ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
+      return ImmutableSet.of(
+          ImmutableSet.of(1).stream().findFirst(), ImmutableList.of(2).stream().findFirst());
+    }
+
+    Optional<String> testOptionalFirstIteratorElement() {
+      return stream(ImmutableSet.of("foo").iterator()).findFirst();
     }
 
     Stream<String> testMapToOptionalGet(Map<Integer, Optional<String>> map) {

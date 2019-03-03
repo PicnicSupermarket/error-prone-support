@@ -8,6 +8,7 @@ import static java.util.function.Function.identity;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
@@ -90,6 +91,10 @@ final class RefasterCheckPositiveCases {
       return ImmutableSet.of(
           ImmutableMap.copyOf(Maps.asMap(ImmutableSet.of(1), n -> n + 2)),
           ImmutableMap.copyOf(Maps.asMap(ImmutableSet.of(2), Integer::valueOf)));
+    }
+
+    ImmutableSet<BoundType> testStreamToImmutableEnumSet() {
+      return Stream.of(BoundType.OPEN).collect(toImmutableSet());
     }
   }
 
@@ -339,6 +344,22 @@ final class RefasterCheckPositiveCases {
       return Stream.concat(
           Stream.of(Optional.empty()).filter(Optional::isPresent).map(Optional::get),
           Stream.of(Optional.of("foo")).flatMap(Streams::stream));
+    }
+
+    ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
+      return ImmutableSet.of(
+          ImmutableSet.of(1).isEmpty()
+              ? Optional.empty()
+              : Optional.of(ImmutableSet.of(1).iterator().next()),
+          ImmutableList.of(2).isEmpty()
+              ? Optional.empty()
+              : Optional.of(ImmutableList.of(2).get(0)));
+    }
+
+    Optional<String> testOptionalFirstIteratorElement() {
+      return ImmutableSet.of("foo").iterator().hasNext()
+          ? Optional.of(ImmutableSet.of("foo").iterator().next())
+          : Optional.empty();
     }
 
     Stream<String> testMapToOptionalGet(Map<Integer, Optional<String>> map) {
