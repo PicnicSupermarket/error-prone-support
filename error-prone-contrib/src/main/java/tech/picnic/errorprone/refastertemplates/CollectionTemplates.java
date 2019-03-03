@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.errorprone.refaster.Refaster;
@@ -55,6 +56,19 @@ final class CollectionTemplates {
     @AfterTemplate
     ArrayList<T> after(Collection<T> collection) {
       return new ArrayList<>(collection);
+    }
+  }
+
+  /** Prefer {@link ImmutableCollection#asList()} over the more verbose alternative. */
+  static final class ImmutableCollectionAsList<T> {
+    @BeforeTemplate
+    ImmutableList<T> before(ImmutableCollection<T> collection) {
+      return ImmutableList.copyOf(collection);
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after(ImmutableCollection<T> collection) {
+      return collection.asList();
     }
   }
 

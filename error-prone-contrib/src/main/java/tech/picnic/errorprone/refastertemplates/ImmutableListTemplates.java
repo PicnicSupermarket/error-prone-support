@@ -71,11 +71,11 @@ final class ImmutableListTemplates {
     }
   }
 
-  /** Don't unnecessarily copy an {@link ImmutableList}. */
-  static final class ImmutableListCopyOfImmutableList<T> {
+  /** Don't call {@link ImmutableList#asList()}; it is a no-op. */
+  static final class ImmutableListAsList<T> {
     @BeforeTemplate
     ImmutableList<T> before(ImmutableList<T> list) {
-      return Refaster.anyOf(ImmutableList.copyOf(list), list.asList());
+      return list.asList();
     }
 
     @AfterTemplate

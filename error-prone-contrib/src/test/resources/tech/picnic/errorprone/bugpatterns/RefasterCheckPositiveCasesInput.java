@@ -140,6 +140,10 @@ final class RefasterCheckPositiveCases {
     Stream<Integer> testImmutableCollectionAsListToStream() {
       return ImmutableSet.of(1).asList().stream();
     }
+
+    ImmutableList<Integer> testImmutableCollectionAsList() {
+      return ImmutableList.copyOf(ImmutableSet.of(1));
+    }
   }
 
   static final class EqualityTemplates {
@@ -200,9 +204,8 @@ final class RefasterCheckPositiveCases {
           Arrays.stream(new Integer[] {9}).collect(toImmutableList()));
     }
 
-    ImmutableSet<ImmutableList<Integer>> testImmutableListCopyOfImmutableList() {
-      return ImmutableSet.of(
-          ImmutableList.copyOf(ImmutableList.of(1, 2)), ImmutableList.of(1, 2, 3).asList());
+    ImmutableList<Integer> testImmutableListAsList() {
+      return ImmutableList.of(1, 2, 3).asList();
     }
 
     ImmutableSet<ImmutableList<Integer>> testImmutableListSortedCopyOf() {
