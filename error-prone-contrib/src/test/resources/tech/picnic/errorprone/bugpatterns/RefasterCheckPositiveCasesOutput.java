@@ -5,6 +5,8 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSortedMultiset;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static java.util.Comparator.naturalOrder;
+import static java.util.Map.Entry.comparingByKey;
+import static java.util.Map.Entry.comparingByValue;
 import static java.util.function.Function.identity;
 
 import com.google.common.base.MoreObjects;
@@ -59,10 +61,6 @@ final class RefasterCheckPositiveCases {
           (Runnable) () -> identity());
 
   static final class AssortedTemplates {
-    ImmutableSet<Map.Entry<String, Integer>> testMapEntry() {
-      return ImmutableSet.of(Map.entry("foo", 1), Map.entry("bar", 2));
-    }
-
     int testCheckIndex() {
       return Objects.checkIndex(0, 1);
     }
@@ -269,6 +267,28 @@ final class RefasterCheckPositiveCases {
           ImmutableSortedSet.copyOf(new Integer[] {7}),
           ImmutableSortedSet.copyOf(new Integer[] {8}),
           ImmutableSortedSet.copyOf(new Integer[] {9}));
+    }
+  }
+
+  static final class MapEntryTemplates {
+    ImmutableSet<Map.Entry<String, Integer>> testMapEntry() {
+      return ImmutableSet.of(Map.entry("foo", 1), Map.entry("bar", 2));
+    }
+
+    ImmutableSet<Comparator<Map.Entry<Integer, String>>> testMapEntryComparingByKey() {
+      return ImmutableSet.of(comparingByKey(), comparingByKey());
+    }
+
+    Comparator<Map.Entry<Integer, String>> testMapEntryComparingByKeyWithCustomComparator() {
+      return comparingByKey(Comparator.comparingInt(i -> i * 2));
+    }
+
+    ImmutableSet<Comparator<Map.Entry<Integer, String>>> testMapEntryComparingByValue() {
+      return ImmutableSet.of(comparingByValue(), comparingByValue());
+    }
+
+    Comparator<Map.Entry<Integer, String>> testMapEntryComparingByValueWithCustomComparator() {
+      return comparingByValue(Comparator.comparingInt(String::length));
     }
   }
 
