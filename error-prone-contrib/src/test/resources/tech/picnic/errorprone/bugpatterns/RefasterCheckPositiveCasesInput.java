@@ -169,27 +169,23 @@ final class RefasterCheckPositiveCases {
 
   static final class EqualityTemplates {
     ImmutableSet<Boolean> testPrimitiveEquals() {
-      // XXX: The negated variants of the primitive expressions below trigger an "overlapping
-      // replacements" bug. Figure out how/why and fix. Then add these:
-      // !Objects.equals(0, 1),
-      // !Objects.equals(0L, 1L),
       return ImmutableSet.of(
           Objects.equals(0, 1),
           Objects.equals(0L, 1L),
           Objects.equals(Integer.valueOf(0), Integer.valueOf(1)),
           Objects.equals(Long.valueOf(0), Long.valueOf(1)),
+          !Objects.equals(0, 1),
+          !Objects.equals(0L, 1L),
           !Objects.equals(Integer.valueOf(0), Integer.valueOf(1)),
           !Objects.equals(Long.valueOf(0), Long.valueOf(1)));
     }
 
     ImmutableSet<Boolean> testEnumEquals() {
-      // XXX: The negated variants of the expressions below trigger an "overlapping
-      // replacements" bug. Figure out how/why and fix. Then add these:
-      // !RoundingMode.UP.equals(RoundingMode.DOWN)
-      // !Objects.equals(RoundingMode.UP, RoundingMode.DOWN)
       return ImmutableSet.of(
           RoundingMode.UP.equals(RoundingMode.DOWN),
-          Objects.equals(RoundingMode.UP, RoundingMode.DOWN));
+          Objects.equals(RoundingMode.UP, RoundingMode.DOWN),
+          !RoundingMode.UP.equals(RoundingMode.DOWN),
+          !Objects.equals(RoundingMode.UP, RoundingMode.DOWN));
     }
 
     boolean testEqualsPredicate() {

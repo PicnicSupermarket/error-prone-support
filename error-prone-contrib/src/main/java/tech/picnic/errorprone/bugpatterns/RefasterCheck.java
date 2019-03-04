@@ -1,10 +1,15 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableRangeSet.toImmutableRangeSet;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableRangeSet;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.RangeSet;
 import com.google.common.collect.Streams;
+import com.google.common.collect.TreeRangeSet;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ResourceInfo;
 import com.google.errorprone.BugPattern;
@@ -18,13 +23,20 @@ import com.google.errorprone.SubContext;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
+import com.google.errorprone.fixes.Replacement;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.tools.javac.tree.EndPosTable;
+import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * A {@link BugChecker} which flags code which can be simplified using a Refaster template located
@@ -48,13 +60,61 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
-    codeTransformer.apply(state.getPath(), new SubContext(state.context), state::reportMatch);
+    /* First, collect all matches. */
+    List<Description> matches = new ArrayList<>();
+    codeTransformer.apply(state.getPath(), new SubContext(state.context), matches::add);
+    /* Then apply them. */
+    applyMatches(matches, state);
 
-    /*
-     * Any matches (there may be multiple) were already reported above by the `CodeTransformer`,
-     * directly to the `VisitorState`.
-     */
+    /* Any matches were already reported by the code above, directly to the `VisitorState`. */
     return Description.NO_MATCH;
+  }
+
+  /**
+   * Reports a subset of the given matches, such that no two reported matches suggest a replacement
+   * of the same part of the source code.
+   *
+   * <p>Generally all matches will be reported. In case of overlap the match which replaces the
+   * largest piece of source code is preferred.
+   */
+  // XXX: Consider contributing this selection logic back upstream.
+  private static void applyMatches(List<Description> allMatches, VisitorState state) {
+    JCCompilationUnit compilationUnit = (JCCompilationUnit) state.getPath().getCompilationUnit();
+    EndPosTable endPositions = compilationUnit.endPositions;
+
+    ImmutableList<Description> byReplacementSize =
+        ImmutableList.sortedCopyOf(
+            Comparator.<Description>comparingInt(d -> getReplacedCodeSize(d, endPositions))
+                .reversed(),
+            allMatches);
+
+    RangeSet<Integer> replacedSections = TreeRangeSet.create();
+    for (Description description : byReplacementSize) {
+      ImmutableRangeSet<Integer> ranges = getReplacementRanges(description, endPositions);
+      if (ranges.asRanges().stream().noneMatch(replacedSections::intersects)) {
+        /* This suggested fix does not overlap with any ("larger") replacement seen until now. Apply it. */
+        state.reportMatch(description);
+        replacedSections.addAll(ranges);
+      }
+    }
+  }
+
+  private static int getReplacedCodeSize(Description description, EndPosTable endPositions) {
+    return getReplacements(description, endPositions).mapToInt(Replacement::length).sum();
+  }
+
+  private static ImmutableRangeSet<Integer> getReplacementRanges(
+      Description description, EndPosTable endPositions) {
+    return getReplacements(description, endPositions)
+        .map(Replacement::range)
+        .collect(toImmutableRangeSet());
+  }
+
+  private static Stream<Replacement> getReplacements(
+      Description description, EndPosTable endPositions) {
+    return description.fixes.stream()
+        .limit(1)
+        .flatMap(fix -> fix.getReplacements(endPositions).stream());
   }
 
   private static CodeTransformer loadCompositeCodeTransformer() {

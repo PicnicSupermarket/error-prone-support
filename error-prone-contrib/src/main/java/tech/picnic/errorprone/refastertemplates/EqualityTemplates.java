@@ -32,19 +32,18 @@ final class EqualityTemplates {
    * because if the type is ever converted to a non-enum, then Error-Prone will complain about any
    * remaining reference-based equality checks.
    */
-  // XXX: This Refaster rule is defined in terms of an inequality because of
-  // https://github.com/google/error-prone/issues/559
+  // XXX: This Refaster rule is the topic of https://github.com/google/error-prone/issues/559. We
+  // work around the issue by selecting the "largest replacements". See RefasterCheck.
   static final class EnumEquals<T extends Enum<T>> {
     @BeforeTemplate
-    @SuppressWarnings("boxing")
     boolean before(T a, T b) {
-      return !Refaster.anyOf(a.equals(b), Objects.equals(a, b));
+      return Refaster.anyOf(a.equals(b), Objects.equals(a, b));
     }
 
     @AlsoNegation
     @AfterTemplate
     boolean after(T a, T b) {
-      return a != b;
+      return a == b;
     }
   }
 
