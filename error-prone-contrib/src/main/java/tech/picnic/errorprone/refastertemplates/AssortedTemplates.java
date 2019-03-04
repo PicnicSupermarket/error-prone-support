@@ -177,4 +177,27 @@ final class AssortedTemplates {
       return stream.collect(Sets.toImmutableEnumSet());
     }
   }
+
+  /**
+   * Prefer creating an immutable copy of the result of {@link Maps#transformValues(Map,
+   * com.google.common.base.Function)} over creating and directly collecting a stream.
+   */
+  abstract static class TransformMapValueToImmutableMap<K, V1, V2> {
+    @Placeholder
+    abstract V2 valueTransformation(@MayOptionallyUse V1 value);
+
+    // XXX: Instead of `Map.Entry::getKey` we could also match `e -> e.getKey()`. But for some
+    // reason Refaster doesn't handle that case. This doesn't matter if we roll out use of
+    // `MethodReferenceUsageCheck`.
+    @BeforeTemplate
+    ImmutableMap<K, V2> before(Map<K, V1> map) {
+      return map.entrySet().stream()
+          .collect(toImmutableMap(Map.Entry::getKey, e -> valueTransformation(e.getValue())));
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V2> after(Map<K, V1> map) {
+      return ImmutableMap.copyOf(Maps.transformValues(map, v -> valueTransformation(v)));
+    }
+  }
 }

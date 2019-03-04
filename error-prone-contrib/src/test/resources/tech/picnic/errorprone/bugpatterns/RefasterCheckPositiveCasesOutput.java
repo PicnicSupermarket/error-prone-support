@@ -98,6 +98,11 @@ final class RefasterCheckPositiveCases {
     ImmutableSet<BoundType> testStreamToImmutableEnumSet() {
       return Stream.of(BoundType.OPEN).collect(toImmutableEnumSet());
     }
+
+    ImmutableMap<String, Integer> testTransformMapValueToImmutableMap() {
+      return ImmutableMap.copyOf(
+          Maps.transformValues(ImmutableMap.of("foo", 1L), v -> Math.toIntExact(v)));
+    }
   }
 
   static final class BigDecimalTemplates {
