@@ -32,9 +32,21 @@ final class ImmutableSetTemplates {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableSet#copyOf(Iterable)} and variants over the stream-based alternative.
-   */
+  /** Prefer {@link ImmutableSet#of()} over more contrived alternatives. */
+  static final class EmptyImmutableSet<T> {
+    @BeforeTemplate
+    ImmutableSet<T> before() {
+      return Refaster.anyOf(
+          ImmutableSet.<T>builder().build(), Stream.<T>empty().collect(toImmutableSet()));
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after() {
+      return ImmutableSet.of();
+    }
+  }
+
+  /** Prefer {@link ImmutableSet#copyOf(Iterable)} and variants over more contrived alternatives. */
   static final class IterableToImmutableSet<T> {
     // XXX: Drop the inner `Refaster.anyOf` if/when we introduce a rule to choose between one and
     // the other.

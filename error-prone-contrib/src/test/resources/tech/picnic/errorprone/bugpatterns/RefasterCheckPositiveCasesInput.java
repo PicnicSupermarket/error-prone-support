@@ -208,8 +208,14 @@ final class RefasterCheckPositiveCases {
       return new ImmutableList.Builder<>();
     }
 
-    ImmutableList<ImmutableList<Integer>> testIterableToImmutableList() {
-      return ImmutableList.of(
+    ImmutableSet<ImmutableList<Integer>> testEmptyImmutableList() {
+      return ImmutableSet.of(
+          ImmutableList.<Integer>builder().build(),
+          Stream.<Integer>empty().collect(toImmutableList()));
+    }
+
+    ImmutableSet<ImmutableList<Integer>> testIterableToImmutableList() {
+      return ImmutableSet.of(
           ImmutableList.of(1).stream().collect(toImmutableList()),
           Streams.stream(ImmutableList.of(2)::iterator).collect(toImmutableList()),
           Streams.stream(ImmutableList.of(3).iterator()).collect(toImmutableList()),
@@ -243,9 +249,51 @@ final class RefasterCheckPositiveCases {
     }
   }
 
+  static final class ImmutableMapTemplates {
+    ImmutableMap.Builder<String, Integer> testImmutableMapBuilder() {
+      return new ImmutableMap.Builder<>();
+    }
+
+    ImmutableMap<String, Integer> testEmptyImmutableMap() {
+      return ImmutableMap.<String, Integer>builder().build();
+    }
+
+    ImmutableMap<String, Integer> testPairToImmutableMap() {
+      return ImmutableMap.<String, Integer>builder().put("foo", 1).build();
+    }
+
+    ImmutableSet<ImmutableMap<String, Integer>> testEntryToImmutableMap() {
+      return ImmutableSet.of(
+          ImmutableMap.<String, Integer>builder().put(Map.entry("foo", 1)).build(),
+          Stream.of(Map.entry("foo", 1))
+              .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
+    }
+
+    ImmutableSet<ImmutableMap<String, Integer>> testIterableToImmutableMap() {
+      return ImmutableSet.of(
+          ImmutableMap.<String, Integer>builder()
+              .putAll(ImmutableMap.of("foo", 1).entrySet())
+              .build(),
+          ImmutableMap.of("foo", 1).entrySet().stream()
+              .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)),
+          Streams.stream(Iterables.cycle(Map.entry("foo", 1)))
+              .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
+    }
+
+    ImmutableMap<String, Integer> testImmutableMapCopyOfImmutableMap() {
+      return ImmutableMap.copyOf(ImmutableMap.of("foo", 1));
+    }
+  }
+
   static final class ImmutableSetTemplates {
     ImmutableSet.Builder<String> testImmutableSetBuilder() {
       return new ImmutableSet.Builder<>();
+    }
+
+    ImmutableSet<ImmutableSet<Integer>> testEmptyImmutableList() {
+      return ImmutableSet.of(
+          ImmutableSet.<Integer>builder().build(),
+          Stream.<Integer>empty().collect(toImmutableSet()));
     }
 
     ImmutableSet<ImmutableSet<Integer>> testIterableToImmutableSet() {
@@ -281,6 +329,12 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSortedSet.Builder<String> testImmutableSortedSetReverseOrderBuilder() {
       return ImmutableSortedSet.orderedBy(Comparator.<String>reverseOrder());
+    }
+
+    ImmutableSet<ImmutableSortedSet<Integer>> testEmptyImmutableList() {
+      return ImmutableSet.of(
+          ImmutableSortedSet.<Integer>naturalOrder().build(),
+          Stream.<Integer>empty().collect(toImmutableSortedSet(naturalOrder())));
     }
 
     ImmutableSet<ImmutableSortedSet<Integer>> testIterableToImmutableSortedSet() {

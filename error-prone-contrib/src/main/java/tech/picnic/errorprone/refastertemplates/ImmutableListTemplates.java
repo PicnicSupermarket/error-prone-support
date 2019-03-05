@@ -33,8 +33,22 @@ final class ImmutableListTemplates {
     }
   }
 
+  /** Prefer {@link ImmutableList#of()} over more contrived alternatives. */
+  static final class EmptyImmutableList<T> {
+    @BeforeTemplate
+    ImmutableList<T> before() {
+      return Refaster.anyOf(
+          ImmutableList.<T>builder().build(), Stream.<T>empty().collect(toImmutableList()));
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after() {
+      return ImmutableList.of();
+    }
+  }
+
   /**
-   * Prefer {@link ImmutableList#copyOf(Iterable)} and variants over the stream-based alternative.
+   * Prefer {@link ImmutableList#copyOf(Iterable)} and variants over more contrived alternatives.
    */
   static final class IterableToImmutableList<T> {
     // XXX: Drop the inner `Refaster.anyOf` if/when we introduce a rule to choose between one and

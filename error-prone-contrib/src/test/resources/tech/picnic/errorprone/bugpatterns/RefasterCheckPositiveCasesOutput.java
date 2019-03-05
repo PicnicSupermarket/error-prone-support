@@ -210,8 +210,12 @@ final class RefasterCheckPositiveCases {
       return ImmutableList.builder();
     }
 
-    ImmutableList<ImmutableList<Integer>> testIterableToImmutableList() {
-      return ImmutableList.of(
+    ImmutableSet<ImmutableList<Integer>> testEmptyImmutableList() {
+      return ImmutableSet.of(ImmutableList.of(), ImmutableList.of());
+    }
+
+    ImmutableSet<ImmutableList<Integer>> testIterableToImmutableList() {
+      return ImmutableSet.of(
           ImmutableList.copyOf(ImmutableList.of(1)),
           ImmutableList.copyOf(ImmutableList.of(2)::iterator),
           ImmutableList.copyOf(ImmutableList.of(3).iterator()),
@@ -242,9 +246,44 @@ final class RefasterCheckPositiveCases {
     }
   }
 
+  static final class ImmutableMapTemplates {
+    ImmutableMap.Builder<String, Integer> testImmutableMapBuilder() {
+      return ImmutableMap.builder();
+    }
+
+    ImmutableMap<String, Integer> testEmptyImmutableMap() {
+      return ImmutableMap.of();
+    }
+
+    ImmutableMap<String, Integer> testPairToImmutableMap() {
+      return ImmutableMap.of("foo", 1);
+    }
+
+    ImmutableSet<ImmutableMap<String, Integer>> testEntryToImmutableMap() {
+      return ImmutableSet.of(
+          ImmutableMap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()),
+          ImmutableMap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()));
+    }
+
+    ImmutableSet<ImmutableMap<String, Integer>> testIterableToImmutableMap() {
+      return ImmutableSet.of(
+          ImmutableMap.copyOf(ImmutableMap.of("foo", 1).entrySet()),
+          ImmutableMap.copyOf(ImmutableMap.of("foo", 1).entrySet()),
+          ImmutableMap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
+    }
+
+    ImmutableMap<String, Integer> testImmutableMapCopyOfImmutableMap() {
+      return ImmutableMap.of("foo", 1);
+    }
+  }
+
   static final class ImmutableSetTemplates {
     ImmutableSet.Builder<String> testImmutableSetBuilder() {
       return ImmutableSet.builder();
+    }
+
+    ImmutableSet<ImmutableSet<Integer>> testEmptyImmutableList() {
+      return ImmutableSet.of(ImmutableSet.of(), ImmutableSet.of());
     }
 
     ImmutableSet<ImmutableSet<Integer>> testIterableToImmutableSet() {
@@ -280,6 +319,10 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSortedSet.Builder<String> testImmutableSortedSetReverseOrderBuilder() {
       return ImmutableSortedSet.reverseOrder();
+    }
+
+    ImmutableSet<ImmutableSortedSet<Integer>> testEmptyImmutableList() {
+      return ImmutableSet.of(ImmutableSortedSet.of(), ImmutableSortedSet.of());
     }
 
     ImmutableSet<ImmutableSortedSet<Integer>> testIterableToImmutableSortedSet() {

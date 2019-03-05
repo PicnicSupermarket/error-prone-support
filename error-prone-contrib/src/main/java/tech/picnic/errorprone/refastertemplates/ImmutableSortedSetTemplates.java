@@ -64,9 +64,24 @@ final class ImmutableSortedSetTemplates {
     }
   }
 
+  /** Prefer {@link ImmutableSortedSet#of()} over more contrived alternatives. */
+  static final class EmptyImmutableSortedSet<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    ImmutableSortedSet<T> before() {
+      return Refaster.anyOf(
+          ImmutableSortedSet.<T>naturalOrder().build(),
+          Stream.<T>empty().collect(toImmutableSortedSet(naturalOrder())));
+    }
+
+    @AfterTemplate
+    ImmutableSortedSet<T> after() {
+      return ImmutableSortedSet.of();
+    }
+  }
+
   /**
-   * Prefer {@link ImmutableSortedSet#copyOf(Iterable)} and variants over the stream-based
-   * alternative.
+   * Prefer {@link ImmutableSortedSet#copyOf(Iterable)} and variants over more contrived
+   * alternatives.
    */
   // XXX: There's also a variant with a customer Comparator. Worth the hassle?
   static final class IterableToImmutableSortedSet<T extends Comparable<? super T>> {
