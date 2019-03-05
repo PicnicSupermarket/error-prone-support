@@ -64,7 +64,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
     List<Description> matches = new ArrayList<>();
     codeTransformer.apply(state.getPath(), new SubContext(state.context), matches::add);
     /* Then apply them. */
-    applyMatches(matches, state);
+    applyMatches(matches, ((JCCompilationUnit) tree).endPositions, state);
 
     /* Any matches were already reported by the code above, directly to the `VisitorState`. */
     return Description.NO_MATCH;
@@ -77,11 +77,10 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
    * <p>Generally all matches will be reported. In case of overlap the match which replaces the
    * largest piece of source code is preferred.
    */
-  // XXX: Consider contributing this selection logic back upstream.
-  private static void applyMatches(List<Description> allMatches, VisitorState state) {
-    JCCompilationUnit compilationUnit = (JCCompilationUnit) state.getPath().getCompilationUnit();
-    EndPosTable endPositions = compilationUnit.endPositions;
-
+  // XXX: This selection logic solves an issue described in
+  // https://github.com/google/error-prone/issues/559. Consider contributing it back upstream.
+  private static void applyMatches(
+      List<Description> allMatches, EndPosTable endPositions, VisitorState state) {
     ImmutableList<Description> byReplacementSize =
         ImmutableList.sortedCopyOf(
             Comparator.<Description>comparingInt(d -> getReplacedCodeSize(d, endPositions))
