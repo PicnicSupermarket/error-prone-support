@@ -40,7 +40,6 @@ final class StringTemplates {
   }
 
   /** Don't use the ternary operator to create an optionally-absent string. */
-  // XXX: Can also write a generalization of this rule.
   static final class OptionalNonEmptyString {
     @BeforeTemplate
     Optional<String> before(String str) {

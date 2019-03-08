@@ -75,7 +75,8 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
    * of the same part of the source code.
    *
    * <p>Generally all matches will be reported. In case of overlap the match which replaces the
-   * largest piece of source code is preferred.
+   * largest piece of source code is preferred. In case two matches wish to replace exactly the same
+   * piece of code, preference is given to the match which suggests the shortest replacement.
    */
   // XXX: This selection logic solves an issue described in
   // https://github.com/google/error-prone/issues/559. Consider contributing it back upstream.
@@ -84,7 +85,8 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
     ImmutableList<Description> byReplacementSize =
         ImmutableList.sortedCopyOf(
             Comparator.<Description>comparingInt(d -> getReplacedCodeSize(d, endPositions))
-                .reversed(),
+                .reversed()
+                .thenComparing(d -> getInsertedCodeSize(d, endPositions)),
             allMatches);
 
     RangeSet<Integer> replacedSections = TreeRangeSet.create();
@@ -100,6 +102,11 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
 
   private static int getReplacedCodeSize(Description description, EndPosTable endPositions) {
     return getReplacements(description, endPositions).mapToInt(Replacement::length).sum();
+  }
+
+  // XXX: Strictly speaking we should prefer the shortest replacement *post formatting*!
+  private static int getInsertedCodeSize(Description description, EndPosTable endPositions) {
+    return getReplacements(description, endPositions).mapToInt(r -> r.replaceWith().length()).sum();
   }
 
   private static ImmutableRangeSet<Integer> getReplacementRanges(

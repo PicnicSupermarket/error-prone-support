@@ -168,22 +168,38 @@ final class RefasterCheckPositiveCases {
   }
 
   static final class EqualityTemplates {
-    ImmutableSet<Boolean> testPrimitiveEquals() {
+    ImmutableSet<Boolean> testPrimitiveOrReferenceEquality() {
       return ImmutableSet.of(
+          Objects.equals(true, false),
+          Objects.equals((byte) 0, (byte) 1),
+          Objects.equals((short) 0, (short) 1),
           Objects.equals(0, 1),
           Objects.equals(0L, 1L),
+          Objects.equals(0F, 1F),
+          Objects.equals(0.0, 1.0),
+          Objects.equals(Boolean.TRUE, Boolean.FALSE),
+          Objects.equals(Byte.valueOf((byte) 0), Byte.valueOf((byte) 1)),
+          Objects.equals(Short.valueOf((short) 0), Short.valueOf((short) 1)),
           Objects.equals(Integer.valueOf(0), Integer.valueOf(1)),
-          Objects.equals(Long.valueOf(0), Long.valueOf(1)),
-          !Objects.equals(0, 1),
-          !Objects.equals(0L, 1L),
-          !Objects.equals(Integer.valueOf(0), Integer.valueOf(1)),
-          !Objects.equals(Long.valueOf(0), Long.valueOf(1)));
-    }
-
-    ImmutableSet<Boolean> testEnumEquals() {
-      return ImmutableSet.of(
+          Objects.equals(Long.valueOf(0L), Long.valueOf(1L)),
+          Objects.equals(Float.valueOf(0F), Float.valueOf(1F)),
+          Objects.equals(Double.valueOf(0.0), Double.valueOf(1.0)),
           RoundingMode.UP.equals(RoundingMode.DOWN),
           Objects.equals(RoundingMode.UP, RoundingMode.DOWN),
+          !Objects.equals(true, false),
+          !Objects.equals((byte) 0, (byte) 1),
+          !Objects.equals((short) 0, (short) 1),
+          !Objects.equals(0, 1),
+          !Objects.equals(0L, 1L),
+          !Objects.equals(0F, 1F),
+          !Objects.equals(0.0, 1.0),
+          !Objects.equals(Boolean.TRUE, Boolean.FALSE),
+          !Objects.equals(Byte.valueOf((byte) 0), Byte.valueOf((byte) 1)),
+          !Objects.equals(Short.valueOf((short) 0), Short.valueOf((short) 1)),
+          !Objects.equals(Integer.valueOf(0), Integer.valueOf(1)),
+          !Objects.equals(Long.valueOf(0L), Long.valueOf(1L)),
+          !Objects.equals(Float.valueOf(0F), Float.valueOf(1F)),
+          !Objects.equals(Double.valueOf(0.0), Double.valueOf(1.0)),
           !RoundingMode.UP.equals(RoundingMode.DOWN),
           !Objects.equals(RoundingMode.UP, RoundingMode.DOWN));
     }
@@ -194,12 +210,34 @@ final class RefasterCheckPositiveCases {
       return Stream.of("foo").anyMatch(s -> "bar".equals(s));
     }
 
-    boolean testEqualBooleans(boolean b1, boolean b2) {
-      return b1 ? b2 : !b2;
+    boolean testDoubleNegation() {
+      return !!true;
     }
 
-    boolean testUnequalBooleans(boolean b1, boolean b2) {
-      return b1 ? !b2 : b2;
+    ImmutableSet<Boolean> testNegation() {
+      return ImmutableSet.of(
+          true ? !false : false,
+          !(true == false),
+          !((byte) 3 == (byte) 4),
+          !((short) 3 == (short) 4),
+          !(3 == 4),
+          !(3L == 4L),
+          !(3F == 4F),
+          !(3.0 == 4.0),
+          !(BoundType.OPEN == BoundType.CLOSED));
+    }
+
+    ImmutableSet<Boolean> testIndirectDoubleNegation() {
+      return ImmutableSet.of(
+          true ? false : !false,
+          !(true != false),
+          !((byte) 3 != (byte) 4),
+          !((short) 3 != (short) 4),
+          !(3 != 4),
+          !(3L != 4L),
+          !(3F != 4F),
+          !(3.0 != 4.0),
+          !(BoundType.OPEN != BoundType.CLOSED));
     }
   }
 
@@ -338,18 +376,20 @@ final class RefasterCheckPositiveCases {
     }
 
     ImmutableSet<ImmutableSortedSet<Integer>> testIterableToImmutableSortedSet() {
+      // XXX: The first element is not rewritten (`naturalOrder()` isn't dropped). WHY!?
       return ImmutableSet.of(
-          ImmutableList.of(1).stream().collect(toImmutableSortedSet(naturalOrder())),
-          Streams.stream(ImmutableList.of(2)::iterator)
+          ImmutableSortedSet.copyOf(naturalOrder(), ImmutableList.of(1)),
+          ImmutableList.of(2).stream().collect(toImmutableSortedSet(naturalOrder())),
+          Streams.stream(ImmutableList.of(3)::iterator)
               .collect(toImmutableSortedSet(naturalOrder())),
-          Streams.stream(ImmutableList.of(3).iterator())
+          Streams.stream(ImmutableList.of(4).iterator())
               .collect(toImmutableSortedSet(naturalOrder())),
-          ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(4)).build(),
-          ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(5)::iterator).build(),
-          ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(6).iterator()).build(),
-          ImmutableSortedSet.<Integer>naturalOrder().add(new Integer[] {7}).build(),
-          Stream.of(new Integer[] {8}).collect(toImmutableSortedSet(naturalOrder())),
-          Arrays.stream(new Integer[] {9}).collect(toImmutableSortedSet(naturalOrder())));
+          ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(5)).build(),
+          ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(6)::iterator).build(),
+          ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(7).iterator()).build(),
+          ImmutableSortedSet.<Integer>naturalOrder().add(new Integer[] {8}).build(),
+          Stream.of(new Integer[] {9}).collect(toImmutableSortedSet(naturalOrder())),
+          Arrays.stream(new Integer[] {10}).collect(toImmutableSortedSet(naturalOrder())));
     }
   }
 
@@ -411,12 +451,6 @@ final class RefasterCheckPositiveCases {
       return Stream.concat(Streams.stream(Optional.empty()), Streams.stream(Optional.of("foo")));
     }
 
-    Stream<Object> testFlatmapOptionalToStream() {
-      return Stream.concat(
-          Stream.of(Optional.empty()).filter(Optional::isPresent).map(Optional::get),
-          Stream.of(Optional.of("foo")).flatMap(Streams::stream));
-    }
-
     ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
       return ImmutableSet.of(
           ImmutableSet.of(1).isEmpty()
@@ -433,8 +467,74 @@ final class RefasterCheckPositiveCases {
           : Optional.empty();
     }
 
+    ImmutableSet<Optional<String>> testTernaryOperatorOptionalPositiveFiltering() {
+      return ImmutableSet.of(
+          "foo".length() > 5 ? Optional.of("foo") : Optional.empty(),
+          !"bar".contains("baz") ? Optional.of("bar") : Optional.empty());
+    }
+
+    ImmutableSet<Optional<String>> testTernaryOperatorOptionalNegativeFiltering() {
+      return ImmutableSet.of(
+          "foo".length() > 5 ? Optional.empty() : Optional.of("foo"),
+          !"bar".contains("baz") ? Optional.empty() : Optional.of("bar"));
+    }
+
+    ImmutableSet<Boolean> testMapOptionalToBoolean() {
+      return ImmutableSet.of(
+          Optional.of("foo").map(String::isEmpty).orElse(false),
+          Optional.of("bar").map(s -> s.isEmpty()).orElse(Boolean.FALSE));
+    }
+
+    Stream<Object> testFlatmapOptionalToStream() {
+      return Stream.concat(
+          Stream.of(Optional.empty()).filter(Optional::isPresent).map(Optional::get),
+          Stream.of(Optional.of("foo")).flatMap(Streams::stream));
+    }
+
     Stream<String> testMapToOptionalGet(Map<Integer, Optional<String>> map) {
       return Stream.of(1).map(n -> map.get(n).get());
+    }
+  }
+
+  static final class PrimitiveTemplates {
+    ImmutableSet<Boolean> testLessThan() {
+      return ImmutableSet.of(
+          !((byte) 3 >= (byte) 4),
+          !((short) 3 >= (short) 4),
+          !(3 >= 4),
+          !(3L >= 4L),
+          !(3F >= 4F),
+          !(3.0 >= 4.0));
+    }
+
+    ImmutableSet<Boolean> testLessThanOrEqualTo() {
+      return ImmutableSet.of(
+          !((byte) 3 > (byte) 4),
+          !((short) 3 > (short) 4),
+          !(3 > 4),
+          !(3L > 4L),
+          !(3F > 4F),
+          !(3.0 > 4.0));
+    }
+
+    ImmutableSet<Boolean> testGreaterThan() {
+      return ImmutableSet.of(
+          !((byte) 3 <= (byte) 4),
+          !((short) 3 <= (short) 4),
+          !(3 <= 4),
+          !(3L <= 4L),
+          !(3F <= 4F),
+          !(3.0 <= 4.0));
+    }
+
+    ImmutableSet<Boolean> testGreaterThanOrEqualTo() {
+      return ImmutableSet.of(
+          !((byte) 3 < (byte) 4),
+          !((short) 3 < (short) 4),
+          !(3 < 4),
+          !(3L < 4L),
+          !(3F < 4F),
+          !(3.0 < 4.0));
     }
   }
 

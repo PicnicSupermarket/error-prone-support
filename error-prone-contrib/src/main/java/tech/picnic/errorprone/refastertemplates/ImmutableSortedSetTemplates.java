@@ -105,6 +105,7 @@ final class ImmutableSortedSetTemplates {
     @BeforeTemplate
     ImmutableSet<T> before(Iterable<T> iterable) {
       return Refaster.anyOf(
+          ImmutableSortedSet.copyOf(naturalOrder(), iterable),
           ImmutableSortedSet.<T>naturalOrder().addAll(iterable).build(),
           Streams.stream(iterable).collect(toImmutableSortedSet(naturalOrder())));
     }

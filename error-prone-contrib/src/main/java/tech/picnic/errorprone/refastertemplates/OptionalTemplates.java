@@ -12,6 +12,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link Optional}s. */
@@ -106,6 +108,65 @@ final class OptionalTemplates {
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     Optional<T> after(Iterator<T> it) {
       return Streams.stream(it).findFirst();
+    }
+  }
+
+  /** Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator. */
+  // XXX: This rule may introduce a compilation error: the `test` expression may reference a
+  // non-effectively final variable, which is not allowed in the replacement lambda expression.
+  // Maybe our RefasterCheck should test `compiledWithFix`?
+  abstract static class TernaryOperatorOptionalPositiveFiltering<T> {
+    @Placeholder
+    abstract boolean test(T value);
+
+    @BeforeTemplate
+    Optional<T> before(T input) {
+      return test(input) ? Optional.of(input) : Optional.empty();
+    }
+
+    @AfterTemplate
+    Optional<T> after(T input) {
+      return Refaster.emitCommentBefore(
+          "Or Optional.ofNullable (can't auto-infer).", Optional.of(input).filter(v -> test(v)));
+    }
+  }
+
+  /** Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator. */
+  // XXX: This rule may introduce a compilation error: the `test` expression may reference a
+  // non-effectively final variable, which is not allowed in the replacement lambda expression.
+  // Maybe our RefasterCheck should test `compiledWithFix`?
+  abstract static class TernaryOperatorOptionalNegativeFiltering<T> {
+    @Placeholder
+    abstract boolean test(T value);
+
+    @BeforeTemplate
+    Optional<T> before(T input) {
+      return test(input) ? Optional.empty() : Optional.of(input);
+    }
+
+    @AfterTemplate
+    Optional<T> after(T input) {
+      return Refaster.emitCommentBefore(
+          "Or Optional.ofNullable (can't auto-infer).", Optional.of(input).filter(v -> !test(v)));
+    }
+  }
+
+  /**
+   * Prefer {@link Optional#filter(Predicate)} over {@link Optional#map(Function)} when converting
+   * an {@link Optional} to a boolean.
+   */
+  abstract static class MapOptionalToBoolean<T> {
+    @Placeholder
+    abstract boolean test(T value);
+
+    @BeforeTemplate
+    boolean before(Optional<T> optional, Function<T, Boolean> predicate) {
+      return optional.map(predicate).orElse(Refaster.anyOf(false, Boolean.FALSE));
+    }
+
+    @AfterTemplate
+    boolean after(Optional<T> optional, Predicate<T> predicate) {
+      return optional.filter(predicate).isPresent();
     }
   }
 
