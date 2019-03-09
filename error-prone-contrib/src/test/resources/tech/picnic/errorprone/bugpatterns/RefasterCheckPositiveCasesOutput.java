@@ -324,6 +324,8 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSet<ImmutableMap<String, Integer>> testIterableToImmutableMap() {
       return ImmutableSet.of(
+          ImmutableMap.copyOf(ImmutableMap.of("foo", 1)),
+          ImmutableMap.copyOf(ImmutableMap.of("foo", 1)),
           ImmutableMap.copyOf(ImmutableMap.of("foo", 1).entrySet()),
           ImmutableMap.copyOf(ImmutableMap.of("foo", 1).entrySet()),
           ImmutableMap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
@@ -393,9 +395,10 @@ final class RefasterCheckPositiveCases {
     }
 
     ImmutableSet<ImmutableSortedMap<String, Integer>> testIterableToImmutableSortedMap() {
-      // XXX: The first subexpression is not rewritten (`naturalOrder()` isn't dropped). WHY!?
       return ImmutableSet.of(
-          ImmutableSortedMap.copyOf(ImmutableSortedMap.of("foo", 1), naturalOrder()),
+          ImmutableSortedMap.copyOf(ImmutableSortedMap.of("foo", 1)),
+          ImmutableSortedMap.copyOf(ImmutableSortedMap.of("foo", 1)),
+          ImmutableSortedMap.copyOf(ImmutableSortedMap.of("foo", 1)),
           ImmutableSortedMap.copyOf(ImmutableSortedMap.of("foo", 1).entrySet()),
           ImmutableSortedMap.copyOf(ImmutableSortedMap.of("foo", 1).entrySet()),
           ImmutableSortedMap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
@@ -423,15 +426,16 @@ final class RefasterCheckPositiveCases {
       // XXX: The first subexpression is not rewritten (`naturalOrder()` isn't dropped). WHY!?
       return ImmutableSet.of(
           ImmutableSortedSet.copyOf(naturalOrder(), ImmutableList.of(1)),
-          ImmutableSortedSet.copyOf(ImmutableList.of(2)),
-          ImmutableSortedSet.copyOf(ImmutableList.of(3)::iterator),
-          ImmutableSortedSet.copyOf(ImmutableList.of(4).iterator()),
-          ImmutableSortedSet.copyOf(ImmutableSet.of(5)),
-          ImmutableSortedSet.copyOf(ImmutableSet.of(6)::iterator),
-          ImmutableSortedSet.copyOf(ImmutableSet.of(7).iterator()),
-          ImmutableSortedSet.copyOf(new Integer[] {8}),
+          ImmutableSortedSet.copyOf(ImmutableList.of(2).iterator()),
+          ImmutableSortedSet.copyOf(ImmutableList.of(3)),
+          ImmutableSortedSet.copyOf(ImmutableList.of(4)::iterator),
+          ImmutableSortedSet.copyOf(ImmutableList.of(5).iterator()),
+          ImmutableSortedSet.copyOf(ImmutableSet.of(6)),
+          ImmutableSortedSet.copyOf(ImmutableSet.of(7)::iterator),
+          ImmutableSortedSet.copyOf(ImmutableSet.of(8).iterator()),
           ImmutableSortedSet.copyOf(new Integer[] {9}),
-          ImmutableSortedSet.copyOf(new Integer[] {10}));
+          ImmutableSortedSet.copyOf(new Integer[] {10}),
+          ImmutableSortedSet.copyOf(new Integer[] {11}));
     }
   }
 

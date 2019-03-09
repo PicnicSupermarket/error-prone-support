@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refastertemplates;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static java.util.Comparator.naturalOrder;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
@@ -84,7 +85,8 @@ final class ImmutableSortedMapTemplates {
   // XXX: One can define variants for more than one key-value pair, but at some point the builder
   // actually produces nicer code. So it's not clear we should add Refaster templates for those
   // variants.
-  // XXX: We could also rewrite builders with non-natural orders, but that would affect `ImmutableSortedMap#comparator()`.
+  // XXX: We could also rewrite builders with non-natural orders, but that would affect
+  // `ImmutableSortedMap#comparator()`.
   static final class PairToImmutableSortedMap<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     ImmutableSortedMap<K, V> before(K key, V value) {
@@ -98,7 +100,8 @@ final class ImmutableSortedMapTemplates {
   }
 
   /** Prefer {@link ImmutableSortedMap#of(Object, Object)} over more contrived alternatives. */
-  // XXX: We could also rewrite builders with non-natural orders, but that would affect `ImmutableSortedMap#comparator()`.
+  // XXX: We could also rewrite builders with non-natural orders, but that would affect
+  // `ImmutableSortedMap#comparator()`.
   static final class EntryToImmutableSortedMap<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     ImmutableSortedMap<K, V> before(Map.Entry<? extends K, ? extends V> entry) {
@@ -120,6 +123,14 @@ final class ImmutableSortedMapTemplates {
   // XXX: There's also a variant with a custom Comparator. (And some special cases with
   // `reverseOrder`.) Worth the hassle?
   static final class IterableToImmutableSortedMap<K extends Comparable<? super K>, V> {
+    @BeforeTemplate
+    ImmutableMap<K, V> before(Map<? extends K, ? extends V> iterable) {
+      return Refaster.anyOf(
+          ImmutableSortedMap.copyOf(iterable, naturalOrder()),
+          ImmutableSortedMap.copyOf(iterable.entrySet()),
+          ImmutableSortedMap.<K, V>naturalOrder().putAll(iterable).build());
+    }
+
     @BeforeTemplate
     ImmutableSortedMap<K, V> before(
         Iterable<? extends Map.Entry<? extends K, ? extends V>> iterable) {

@@ -330,6 +330,8 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSet<ImmutableMap<String, Integer>> testIterableToImmutableMap() {
       return ImmutableSet.of(
+          ImmutableMap.copyOf(ImmutableMap.of("foo", 1).entrySet()),
+          ImmutableMap.<String, Integer>builder().putAll(ImmutableMap.of("foo", 1)).build(),
           ImmutableMap.<String, Integer>builder()
               .putAll(ImmutableMap.of("foo", 1).entrySet())
               .build(),
@@ -407,9 +409,12 @@ final class RefasterCheckPositiveCases {
     }
 
     ImmutableSet<ImmutableSortedMap<String, Integer>> testIterableToImmutableSortedMap() {
-      // XXX: The first subexpression is not rewritten (`naturalOrder()` isn't dropped). WHY!?
       return ImmutableSet.of(
           ImmutableSortedMap.copyOf(ImmutableSortedMap.of("foo", 1), naturalOrder()),
+          ImmutableSortedMap.copyOf(ImmutableSortedMap.of("foo", 1).entrySet()),
+          ImmutableSortedMap.<String, Integer>naturalOrder()
+              .putAll(ImmutableSortedMap.of("foo", 1))
+              .build(),
           ImmutableSortedMap.<String, Integer>naturalOrder()
               .putAll(ImmutableSortedMap.of("foo", 1).entrySet())
               .build(),
@@ -445,17 +450,18 @@ final class RefasterCheckPositiveCases {
       // XXX: The first subexpression is not rewritten (`naturalOrder()` isn't dropped). WHY!?
       return ImmutableSet.of(
           ImmutableSortedSet.copyOf(naturalOrder(), ImmutableList.of(1)),
-          ImmutableList.of(2).stream().collect(toImmutableSortedSet(naturalOrder())),
-          Streams.stream(ImmutableList.of(3)::iterator)
+          ImmutableSortedSet.copyOf(naturalOrder(), ImmutableList.of(2).iterator()),
+          ImmutableList.of(3).stream().collect(toImmutableSortedSet(naturalOrder())),
+          Streams.stream(ImmutableList.of(4)::iterator)
               .collect(toImmutableSortedSet(naturalOrder())),
-          Streams.stream(ImmutableList.of(4).iterator())
+          Streams.stream(ImmutableList.of(5).iterator())
               .collect(toImmutableSortedSet(naturalOrder())),
-          ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(5)).build(),
-          ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(6)::iterator).build(),
-          ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(7).iterator()).build(),
-          ImmutableSortedSet.<Integer>naturalOrder().add(new Integer[] {8}).build(),
-          Stream.of(new Integer[] {9}).collect(toImmutableSortedSet(naturalOrder())),
-          Arrays.stream(new Integer[] {10}).collect(toImmutableSortedSet(naturalOrder())));
+          ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(6)).build(),
+          ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(7)::iterator).build(),
+          ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(8).iterator()).build(),
+          ImmutableSortedSet.<Integer>naturalOrder().add(new Integer[] {9}).build(),
+          Stream.of(new Integer[] {10}).collect(toImmutableSortedSet(naturalOrder())),
+          Arrays.stream(new Integer[] {11}).collect(toImmutableSortedSet(naturalOrder())));
     }
   }
 

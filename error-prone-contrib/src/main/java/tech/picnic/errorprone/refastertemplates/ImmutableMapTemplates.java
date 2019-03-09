@@ -77,6 +77,13 @@ final class ImmutableMapTemplates {
   /** Prefer {@link ImmutableMap#copyOf(Iterable)} over more contrived alternatives. */
   static final class IterableToImmutableMap<K, V> {
     @BeforeTemplate
+    ImmutableMap<K, V> before(Map<? extends K, ? extends V> iterable) {
+      return Refaster.anyOf(
+          ImmutableMap.copyOf(iterable.entrySet()),
+          ImmutableMap.<K, V>builder().putAll(iterable).build());
+    }
+
+    @BeforeTemplate
     ImmutableMap<K, V> before(Iterable<? extends Map.Entry<? extends K, ? extends V>> iterable) {
       return Refaster.anyOf(
           ImmutableMap.<K, V>builder().putAll(iterable).build(),
