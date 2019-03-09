@@ -536,25 +536,33 @@ final class RefasterCheckPositiveCases {
       return Stream.of("foo").flatMap(v -> Stream.of(v.length())).flatMap(Stream::of);
     }
 
-    ImmutableList<Integer> testStreamToImmutableList() {
-      return Stream.of(1).collect(toImmutableList());
+    ImmutableSet<ImmutableList<Integer>> testStreamToImmutableList() {
+      return ImmutableSet.of(
+          Stream.of(1).collect(toImmutableList()), Stream.of(2).collect(toImmutableList()));
     }
 
     ImmutableSet<ImmutableSet<Integer>> testStreamToImmutableSet() {
       return ImmutableSet.of(
-          Stream.of(1).collect(toImmutableSet()), Stream.of(2).collect(toImmutableSet()));
+          Stream.of(1).collect(toImmutableSet()),
+          Stream.of(2).collect(toImmutableSet()),
+          Stream.of(3).collect(toImmutableSet()));
     }
 
-    ImmutableSortedSet<Integer> testStreamToImmutableSortedSet() {
-      return Stream.of(1).collect(toImmutableSortedSet(naturalOrder()));
+    ImmutableSet<ImmutableSortedSet<Integer>> testStreamToImmutableSortedSet() {
+      return ImmutableSet.of(
+          Stream.of(1).collect(toImmutableSortedSet(naturalOrder())),
+          Stream.of(2).collect(toImmutableSortedSet(naturalOrder())));
     }
 
-    ImmutableMultiset<Integer> testStreamToImmutableMultiset() {
-      return Stream.of(1).collect(toImmutableMultiset());
+    ImmutableSet<ImmutableMultiset<Integer>> testStreamToImmutableMultiset() {
+      return ImmutableSet.of(
+          Stream.of(1).collect(toImmutableMultiset()), Stream.of(2).collect(toImmutableMultiset()));
     }
 
-    ImmutableSortedMultiset<Integer> testStreamToImmutableSortedMultiset() {
-      return Stream.of(1).collect(toImmutableSortedMultiset(naturalOrder()));
+    ImmutableSet<ImmutableSortedMultiset<Integer>> testStreamToImmutableSortedMultiset() {
+      return ImmutableSet.of(
+          Stream.of(1).collect(toImmutableSortedMultiset(naturalOrder())),
+          Stream.of(2).collect(toImmutableSortedMultiset(naturalOrder())));
     }
   }
 

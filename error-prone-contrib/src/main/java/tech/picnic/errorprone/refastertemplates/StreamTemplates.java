@@ -132,7 +132,8 @@ final class StreamTemplates {
   static final class StreamToImmutableList<T> {
     @BeforeTemplate
     ImmutableList<T> before(Stream<T> stream) {
-      return ImmutableList.copyOf(stream.iterator());
+      return Refaster.anyOf(
+          ImmutableList.copyOf(stream.iterator()), ImmutableList.copyOf(stream::iterator));
     }
 
     @AfterTemplate
@@ -142,7 +143,7 @@ final class StreamTemplates {
     }
   }
 
-  /** Prefer {@link ImmutableSet#toImmutableSet()} over the more verbose alternative. */
+  /** Prefer {@link ImmutableSet#toImmutableSet()} over less idiomatic alternatives. */
   // XXX: Once the code base has been sufficiently cleaned up, we might want to also rewrite
   // `Collectors.toSet(`), with the caveat that it allows mutation (though this cannot be relied
   // upon) as well as nulls. Another option is to explicitly rewrite those variants to
@@ -151,7 +152,9 @@ final class StreamTemplates {
     @BeforeTemplate
     ImmutableSet<T> before(Stream<T> stream) {
       return Refaster.anyOf(
-          ImmutableSet.copyOf(stream.iterator()), stream.distinct().collect(toImmutableSet()));
+          ImmutableSet.copyOf(stream.iterator()),
+          ImmutableSet.copyOf(stream::iterator),
+          stream.distinct().collect(toImmutableSet()));
     }
 
     @AfterTemplate
@@ -162,13 +165,15 @@ final class StreamTemplates {
   }
 
   /**
-   * Prefer {@link ImmutableSortedSet#toImmutableSortedSet(java.util.Comparator)} over the less
-   * idiomatic alternative.
+   * Prefer {@link ImmutableSortedSet#toImmutableSortedSet(java.util.Comparator)} over less
+   * idiomatic alternatives.
    */
   static final class StreamToImmutableSortedSet<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedSet<T> before(Stream<T> stream) {
-      return ImmutableSortedSet.copyOf(stream.iterator());
+      return Refaster.anyOf(
+          ImmutableSortedSet.copyOf(stream.iterator()),
+          ImmutableSortedSet.copyOf(stream::iterator));
     }
 
     @AfterTemplate
@@ -178,11 +183,12 @@ final class StreamTemplates {
     }
   }
 
-  /** Prefer {@link ImmutableMultiset#toImmutableMultiset()} over the more verbose alternative. */
+  /** Prefer {@link ImmutableMultiset#toImmutableMultiset()} over less idiomatic alternatives. */
   static final class StreamToImmutableMultiset<T> {
     @BeforeTemplate
     ImmutableMultiset<T> before(Stream<T> stream) {
-      return ImmutableMultiset.copyOf(stream.iterator());
+      return Refaster.anyOf(
+          ImmutableMultiset.copyOf(stream.iterator()), ImmutableMultiset.copyOf(stream::iterator));
     }
 
     @AfterTemplate
@@ -193,13 +199,15 @@ final class StreamTemplates {
   }
 
   /**
-   * Prefer {@link ImmutableSortedMultiset#toImmutableSortedMultiset(java.util.Comparator)} over the
-   * less idiomatic alternative.
+   * Prefer {@link ImmutableSortedMultiset#toImmutableSortedMultiset(java.util.Comparator)} over
+   * less idiomatic alternatives.
    */
   static final class StreamToImmutableSortedMultiset<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedMultiset<T> before(Stream<T> stream) {
-      return ImmutableSortedMultiset.copyOf(stream.iterator());
+      return Refaster.anyOf(
+          ImmutableSortedMultiset.copyOf(stream.iterator()),
+          ImmutableSortedMultiset.copyOf(stream::iterator));
     }
 
     @AfterTemplate
