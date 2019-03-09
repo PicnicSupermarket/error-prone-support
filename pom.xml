@@ -162,8 +162,10 @@
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>27.0.1-jre</version>
+                <artifactId>guava-bom</artifactId>
+                <version>27.1-jre</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
