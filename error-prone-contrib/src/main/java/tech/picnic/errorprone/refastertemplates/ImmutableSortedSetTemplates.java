@@ -20,7 +20,7 @@ final class ImmutableSortedSetTemplates {
   private ImmutableSortedSetTemplates() {}
 
   /** Prefer {@link ImmutableSortedSet#orderedBy(Comparator)} over the associated constructor. */
-  static final class ImmutableSortedSetBuilder<T extends Comparable<? super T>> {
+  static final class ImmutableSortedSetBuilder<T> {
     @BeforeTemplate
     ImmutableSortedSet.Builder<T> before(Comparator<T> cmp) {
       return new ImmutableSortedSet.Builder<>(cmp);
@@ -59,7 +59,7 @@ final class ImmutableSortedSetTemplates {
     }
 
     @AfterTemplate
-    ImmutableSortedSet.Builder<T> after(Comparator<T> cmp) {
+    ImmutableSortedSet.Builder<T> after() {
       return ImmutableSortedSet.reverseOrder();
     }
   }
@@ -83,7 +83,8 @@ final class ImmutableSortedSetTemplates {
    * Prefer {@link ImmutableSortedSet#copyOf(Iterable)} and variants over more contrived
    * alternatives.
    */
-  // XXX: There's also a variant with a customer Comparator. Worth the hassle?
+  // XXX: There's also a variant with a custom Comparator. (And some special cases with
+  // `reverseOrder`.) Worth the hassle?
   static final class IterableToImmutableSortedSet<T extends Comparable<? super T>> {
     // XXX: Drop the inner `Refaster.anyOf` if/when we introduce a rule to choose between one and
     // the other.

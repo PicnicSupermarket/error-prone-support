@@ -1,6 +1,7 @@
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static java.util.Comparator.naturalOrder;
 import static java.util.function.Function.identity;
@@ -15,6 +16,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
@@ -63,7 +65,8 @@ final class RefasterCheckPositiveCases {
           Preconditions.class,
           Streams.class,
           (Runnable) () -> identity(),
-          (Runnable) () -> joining());
+          (Runnable) () -> joining(),
+          (Runnable) () -> toImmutableSortedMap(null, null, null));
 
   static final class AssortedTemplates {
     int testCheckIndex() {
@@ -374,6 +377,51 @@ final class RefasterCheckPositiveCases {
     }
   }
 
+  static final class ImmutableSortedMapBuilder {
+    ImmutableSortedMap.Builder<String, Integer> testImmutableSortedMapBuilder() {
+      return new ImmutableSortedMap.Builder<>(Comparator.comparingInt(String::length));
+    }
+
+    ImmutableSortedMap.Builder<String, Integer> testImmutableSortedMapNaturalOrderBuilder() {
+      return ImmutableSortedMap.orderedBy(Comparator.<String>naturalOrder());
+    }
+
+    ImmutableSortedMap.Builder<String, Integer> testImmutableSortedMapReverseOrderBuilder() {
+      return ImmutableSortedMap.orderedBy(Comparator.<String>reverseOrder());
+    }
+
+    ImmutableSortedMap<String, Integer> testEmptyImmutableSortedMap() {
+      return ImmutableSortedMap.<String, Integer>naturalOrder().build();
+    }
+
+    ImmutableSortedMap<String, Integer> testPairToImmutableSortedMap() {
+      return ImmutableSortedMap.<String, Integer>naturalOrder().put("foo", 1).build();
+    }
+
+    ImmutableSet<ImmutableSortedMap<String, Integer>> testEntryToImmutableSortedMap() {
+      return ImmutableSet.of(
+          ImmutableSortedMap.<String, Integer>naturalOrder().put(Map.entry("foo", 1)).build(),
+          Stream.of(Map.entry("foo", 1))
+              .collect(
+                  toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)));
+    }
+
+    ImmutableSet<ImmutableSortedMap<String, Integer>> testIterableToImmutableSortedMap() {
+      // XXX: The first subexpression is not rewritten (`naturalOrder()` isn't dropped). WHY!?
+      return ImmutableSet.of(
+          ImmutableSortedMap.copyOf(ImmutableSortedMap.of("foo", 1), naturalOrder()),
+          ImmutableSortedMap.<String, Integer>naturalOrder()
+              .putAll(ImmutableSortedMap.of("foo", 1).entrySet())
+              .build(),
+          ImmutableSortedMap.of("foo", 1).entrySet().stream()
+              .collect(
+                  toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)),
+          Streams.stream(Iterables.cycle(Map.entry("foo", 1)))
+              .collect(
+                  toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)));
+    }
+  }
+
   static final class ImmutableSortedSetTemplates {
     ImmutableSortedSet.Builder<String> testImmutableSortedSetBuilder() {
       return new ImmutableSortedSet.Builder<>(Comparator.comparingInt(String::length));
@@ -394,7 +442,7 @@ final class RefasterCheckPositiveCases {
     }
 
     ImmutableSet<ImmutableSortedSet<Integer>> testIterableToImmutableSortedSet() {
-      // XXX: The first element is not rewritten (`naturalOrder()` isn't dropped). WHY!?
+      // XXX: The first subexpression is not rewritten (`naturalOrder()` isn't dropped). WHY!?
       return ImmutableSet.of(
           ImmutableSortedSet.copyOf(naturalOrder(), ImmutableList.of(1)),
           ImmutableList.of(2).stream().collect(toImmutableSortedSet(naturalOrder())),

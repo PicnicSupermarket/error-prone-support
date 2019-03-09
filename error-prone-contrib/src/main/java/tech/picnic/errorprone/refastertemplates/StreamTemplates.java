@@ -168,6 +168,7 @@ final class StreamTemplates {
    * Prefer {@link ImmutableSortedSet#toImmutableSortedSet(java.util.Comparator)} over less
    * idiomatic alternatives.
    */
+  // XXX: Also handle the variant with a custom comparator.
   static final class StreamToImmutableSortedSet<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedSet<T> before(Stream<T> stream) {
@@ -202,6 +203,7 @@ final class StreamTemplates {
    * Prefer {@link ImmutableSortedMultiset#toImmutableSortedMultiset(java.util.Comparator)} over
    * less idiomatic alternatives.
    */
+  // XXX: Also handle the variant with a custom comparator.
   static final class StreamToImmutableSortedMultiset<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedMultiset<T> before(Stream<T> stream) {
