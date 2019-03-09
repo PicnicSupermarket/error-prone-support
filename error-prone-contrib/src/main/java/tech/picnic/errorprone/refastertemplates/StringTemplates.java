@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -51,6 +52,27 @@ final class StringTemplates {
     @AfterTemplate
     Optional<String> after(String str) {
       return Optional.ofNullable(str).filter(s -> !s.isEmpty());
+    }
+  }
+
+  /** Prefer {@link String#join(CharSequence, Iterable)} and variants over the Guava alternative. */
+  // XXX: Joiner.on(char) isn't rewritten. Add separate rule?
+  // XXX: Joiner#join(@Nullable Object first, @Nullable Object second, Object... rest) isn't
+  // rewritten.
+  static final class JoinStrings {
+    @BeforeTemplate
+    String before(String delimiter, CharSequence[] elements) {
+      return Joiner.on(delimiter).join(elements);
+    }
+
+    @BeforeTemplate
+    String before(String delimiter, Iterable<? extends CharSequence> elements) {
+      return Joiner.on(delimiter).join(elements);
+    }
+
+    @AfterTemplate
+    String after(String delimiter, Iterable<? extends CharSequence> elements) {
+      return String.join(delimiter, elements);
     }
   }
 }

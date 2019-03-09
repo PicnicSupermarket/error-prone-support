@@ -12,6 +12,7 @@ import static java.util.Map.Entry.comparingByKey;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.function.Function.identity;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -59,6 +60,7 @@ final class RefasterCheckPositiveCases {
       ImmutableSet.of(
           AbstractMap.class,
           Arrays.class,
+          Joiner.class,
           Lists.class,
           MoreObjects.class,
           Preconditions.class,
@@ -472,6 +474,18 @@ final class RefasterCheckPositiveCases {
     Stream<String> testMapToOptionalGet(Map<Integer, Optional<String>> map) {
       return Stream.of(1).flatMap(n -> map.get(n).stream());
     }
+
+    Optional<Integer> testFilterOuterOptionalAfterFlatMap() {
+      return Optional.of("foo").flatMap(v -> Optional.of(v.length())).filter(len -> len > 0);
+    }
+
+    Optional<Integer> testMapOuterOptionalAfterFlatMap() {
+      return Optional.of("foo").flatMap(v -> Optional.of(v.length())).map(len -> len * 0);
+    }
+
+    Optional<Integer> testFlatMapOuterOptionalAfterFlatMap() {
+      return Optional.of("foo").flatMap(v -> Optional.of(v.length())).flatMap(Optional::of);
+    }
   }
 
   static final class PrimitiveTemplates {
@@ -552,6 +566,13 @@ final class RefasterCheckPositiveCases {
       return ImmutableSet.of(
           Optional.ofNullable(toString()).filter(s -> !s.isEmpty()),
           Optional.ofNullable(toString()).filter(s -> !s.isEmpty()));
+    }
+
+    ImmutableSet<String> testJoinStrings() {
+      return ImmutableSet.of(
+          String.join("a", new String[] {"foo", "bar"}),
+          String.join("b", new CharSequence[] {"baz", "quux"}),
+          String.join("c", ImmutableList.of("1", "4")));
     }
   }
 

@@ -5,6 +5,7 @@ import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static java.util.Comparator.naturalOrder;
 import static java.util.function.Function.identity;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -51,6 +52,7 @@ final class RefasterCheckPositiveCases {
       ImmutableSet.of(
           AbstractMap.class,
           Arrays.class,
+          Joiner.class,
           Lists.class,
           MoreObjects.class,
           Preconditions.class,
@@ -494,6 +496,18 @@ final class RefasterCheckPositiveCases {
     Stream<String> testMapToOptionalGet(Map<Integer, Optional<String>> map) {
       return Stream.of(1).map(n -> map.get(n).get());
     }
+
+    Optional<Integer> testFilterOuterOptionalAfterFlatMap() {
+      return Optional.of("foo").flatMap(v -> Optional.of(v.length()).filter(len -> len > 0));
+    }
+
+    Optional<Integer> testMapOuterOptionalAfterFlatMap() {
+      return Optional.of("foo").flatMap(v -> Optional.of(v.length()).map(len -> len * 0));
+    }
+
+    Optional<Integer> testFlatMapOuterOptionalAfterFlatMap() {
+      return Optional.of("foo").flatMap(v -> Optional.of(v.length()).flatMap(Optional::of));
+    }
   }
 
   static final class PrimitiveTemplates {
@@ -595,6 +609,13 @@ final class RefasterCheckPositiveCases {
       return ImmutableSet.of(
           Strings.isNullOrEmpty(toString()) ? Optional.empty() : Optional.of(toString()),
           Strings.isNullOrEmpty(toString()) ? Optional.empty() : Optional.ofNullable(toString()));
+    }
+
+    ImmutableSet<String> testJoinStrings() {
+      return ImmutableSet.of(
+          Joiner.on("a").join(new String[] {"foo", "bar"}),
+          Joiner.on("b").join(new CharSequence[] {"baz", "quux"}),
+          Joiner.on("c").join(ImmutableList.of("1", "4")));
     }
   }
 

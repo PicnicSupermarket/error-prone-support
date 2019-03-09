@@ -204,4 +204,53 @@ final class OptionalTemplates {
       return stream.flatMap(e -> toOptionalFunction(e).stream());
     }
   }
+
+  /** Avoid unnecessary nesting of {@link Optional#filter(Predicate)} operations. */
+  abstract static class FilterOuterOptionalAfterFlatMap<T, S> {
+    @Placeholder
+    abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
+
+    @BeforeTemplate
+    Optional<S> before(Optional<T> optional, Predicate<? super S> predicate) {
+      return optional.flatMap(v -> toOptionalFunction(v).filter(predicate));
+    }
+
+    @AfterTemplate
+    Optional<S> after(Optional<T> optional, Predicate<? super S> predicate) {
+      return optional.flatMap(v -> toOptionalFunction(v)).filter(predicate);
+    }
+  }
+
+  /** Avoid unnecessary nesting of {@link Optional#map(Function)} operations. */
+  abstract static class MapOuterOptionalAfterFlatMap<T, S, R> {
+    @Placeholder
+    abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
+
+    @BeforeTemplate
+    Optional<R> before(Optional<T> optional, Function<? super S, ? extends R> function) {
+      return optional.flatMap(v -> toOptionalFunction(v).map(function));
+    }
+
+    @AfterTemplate
+    Optional<R> after(Optional<T> optional, Function<? super S, ? extends R> function) {
+      return optional.flatMap(v -> toOptionalFunction(v)).map(function);
+    }
+  }
+  /** Avoid unnecessary nesting of {@link Optional#flatMap(Function)} operations. */
+  abstract static class FlatMapOuterOptionalAfterFlatMap<T, S, R> {
+    @Placeholder
+    abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
+
+    @BeforeTemplate
+    Optional<R> before(
+        Optional<T> optional, Function<? super S, ? extends Optional<? extends R>> function) {
+      return optional.flatMap(v -> toOptionalFunction(v).flatMap(function));
+    }
+
+    @AfterTemplate
+    Optional<R> after(
+        Optional<T> optional, Function<? super S, ? extends Optional<? extends R>> function) {
+      return optional.flatMap(v -> toOptionalFunction(v)).flatMap(function);
+    }
+  }
 }
