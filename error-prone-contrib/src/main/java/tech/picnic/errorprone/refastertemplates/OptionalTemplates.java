@@ -236,6 +236,7 @@ final class OptionalTemplates {
       return optional.flatMap(v -> toOptionalFunction(v)).map(function);
     }
   }
+
   /** Avoid unnecessary nesting of {@link Optional#flatMap(Function)} operations. */
   abstract static class FlatMapOuterOptionalAfterFlatMap<T, S, R> {
     @Placeholder

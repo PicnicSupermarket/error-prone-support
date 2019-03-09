@@ -64,6 +64,7 @@ final class RefasterCheckPositiveCases {
           Lists.class,
           MoreObjects.class,
           Preconditions.class,
+          Streams.class,
           (Runnable) () -> identity());
 
   static final class AssortedTemplates {
@@ -511,6 +512,10 @@ final class RefasterCheckPositiveCases {
   }
 
   static final class StreamTemplates {
+    ImmutableSet<Stream<String>> testStreamOfNullable() {
+      return ImmutableSet.of(Stream.ofNullable("a"), Stream.ofNullable("b"));
+    }
+
     Stream<Integer> testConcatOneStream() {
       return Stream.of(1);
     }
@@ -519,8 +524,16 @@ final class RefasterCheckPositiveCases {
       return Stream.concat(Stream.of(1), Stream.of(2));
     }
 
-    Stream<Integer> testConcatThreeStreams() {
-      return Streams.concat(Stream.of(1), Stream.of(2), Stream.of(3));
+    Stream<Integer> testFilterOuterStreamAfterFlatMap() {
+      return Stream.of("foo").flatMap(v -> Stream.of(v.length())).filter(len -> len > 0);
+    }
+
+    Stream<Integer> testMapOuterStreamAfterFlatMap() {
+      return Stream.of("foo").flatMap(v -> Stream.of(v.length())).map(len -> len * 0);
+    }
+
+    Stream<Integer> testFlatMapOuterStreamAfterFlatMap() {
+      return Stream.of("foo").flatMap(v -> Stream.of(v.length())).flatMap(Stream::of);
     }
 
     ImmutableList<Integer> testStreamToImmutableList() {
