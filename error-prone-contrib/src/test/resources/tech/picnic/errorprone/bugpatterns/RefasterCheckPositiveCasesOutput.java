@@ -1,7 +1,9 @@
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSortedMultiset;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
@@ -20,9 +22,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.ImmutableSortedSet;
@@ -76,6 +81,8 @@ final class RefasterCheckPositiveCases {
           Streams.class,
           (Runnable) () -> identity(),
           (Runnable) () -> joining(),
+          (Runnable) () -> toImmutableListMultimap(null, null),
+          (Runnable) () -> toImmutableSetMultimap(null, null),
           (Runnable) () -> toImmutableSortedMap(null, null, null));
 
   static final class AssortedTemplates {
@@ -317,6 +324,53 @@ final class RefasterCheckPositiveCases {
     }
   }
 
+  static final class ImmutableListMultimapTemplates {
+    ImmutableSet<ImmutableMultimap.Builder<String, Integer>> testImmutableListMultimapBuilder() {
+      return ImmutableSet.of(
+          ImmutableListMultimap.builder(),
+          ImmutableListMultimap.builder(),
+          ImmutableListMultimap.builder());
+    }
+
+    ImmutableSet<ImmutableMultimap<String, Integer>> testEmptyImmutableListMultimap() {
+      return ImmutableSet.of(
+          ImmutableListMultimap.of(), ImmutableListMultimap.of(), ImmutableListMultimap.of());
+    }
+
+    ImmutableSet<ImmutableMultimap<String, Integer>> testPairToImmutableListMultimap() {
+      return ImmutableSet.of(
+          ImmutableListMultimap.of("foo", 1),
+          ImmutableListMultimap.of("bar", 2),
+          ImmutableListMultimap.of("baz", 3));
+    }
+
+    ImmutableList<ImmutableMultimap<String, Integer>> testEntryToImmutableListMultimap() {
+      return ImmutableList.of(
+          ImmutableListMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()),
+          ImmutableListMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()),
+          ImmutableListMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()),
+          ImmutableListMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()));
+    }
+
+    ImmutableList<ImmutableMultimap<String, Integer>> testIterableToImmutableListMultimap() {
+      return ImmutableList.of(
+          ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1)),
+          ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1)),
+          ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1).entries()),
+          ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1).entries()),
+          ImmutableListMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))),
+          ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1)),
+          ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1)),
+          ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1)),
+          ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1).entries()),
+          ImmutableListMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
+    }
+
+    ImmutableListMultimap<String, Integer> testImmutableListMultimapCopyOfImmutableListMultimap() {
+      return ImmutableListMultimap.of("foo", 1);
+    }
+  }
+
   static final class ImmutableListTemplates {
     ImmutableList.Builder<String> testImmutableListBuilder() {
       return ImmutableList.builder();
@@ -415,6 +469,39 @@ final class RefasterCheckPositiveCases {
 
     ImmutableMultiset<Integer> testImmutableMultisetCopyOfImmutableMultiset() {
       return ImmutableMultiset.of(1, 2);
+    }
+  }
+
+  static final class ImmutableSetMultimapTemplates {
+    ImmutableSetMultimap.Builder<String, Integer> testImmutableSetMultimapBuilder() {
+      return ImmutableSetMultimap.builder();
+    }
+
+    ImmutableSetMultimap<String, Integer> testEmptyImmutableSetMultimap() {
+      return ImmutableSetMultimap.of();
+    }
+
+    ImmutableSetMultimap<String, Integer> testPairToImmutableSetMultimap() {
+      return ImmutableSetMultimap.of("foo", 1);
+    }
+
+    ImmutableSet<ImmutableSetMultimap<String, Integer>> testEntryToImmutableSetMultimap() {
+      return ImmutableSet.of(
+          ImmutableSetMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()),
+          ImmutableSetMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()));
+    }
+
+    ImmutableSet<ImmutableSetMultimap<String, Integer>> testIterableToImmutableSetMultimap() {
+      return ImmutableSet.of(
+          ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("foo", 1)),
+          ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("foo", 1)),
+          ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("foo", 1).entries()),
+          ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("foo", 1).entries()),
+          ImmutableSetMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
+    }
+
+    ImmutableSetMultimap<String, Integer> testImmutableSetMultimapCopyOfImmutableSetMultimap() {
+      return ImmutableSetMultimap.of("foo", 1);
     }
   }
 
