@@ -148,6 +148,24 @@ final class OptionalTemplates {
     }
   }
 
+  abstract static class MapToNullable<T, S> {
+    @Placeholder
+    abstract S toNullableFunction(@MayOptionallyUse T element);
+
+    @BeforeTemplate
+    Optional<S> before(Optional<T> optional, S object) {
+      return optional.flatMap(
+          v ->
+              Refaster.anyOf(
+                  Optional.of(toNullableFunction(v)), Optional.ofNullable(toNullableFunction(v))));
+    }
+
+    @AfterTemplate
+    Optional<S> after(Optional<T> optional, S object) {
+      return optional.map(v -> toNullableFunction(v));
+    }
+  }
+
   /**
    * Flatten a stream of {@link Optional}s using {@link Optional#stream()}, rather than using one of
    * the more verbose alternatives.

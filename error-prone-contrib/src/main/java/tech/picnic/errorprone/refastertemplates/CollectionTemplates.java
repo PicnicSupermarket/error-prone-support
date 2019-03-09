@@ -81,6 +81,16 @@ final class CollectionTemplates {
    * Don't call {@link ImmutableCollection#asList()} if the result is going to be streamed; stream
    * directly.
    */
+  // XXX: Similar rules could be implemented for the following variants:
+  // collection.asList().contains(null);
+  // collection.asList().isEmpty();
+  // collection.asList().iterator();
+  // collection.asList().parallelStream();
+  // collection.asList().size();
+  // collection.asList().toArray();
+  // collection.asList().toArray(Object[]::new);
+  // collection.asList().toArray(new Object[0]);
+  // collection.asList().toString();
   static final class ImmutableCollectionAsListToStream<T> {
     @BeforeTemplate
     Stream<T> before(ImmutableCollection<T> collection) {

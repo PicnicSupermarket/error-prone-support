@@ -639,6 +639,12 @@ final class RefasterCheckPositiveCases {
           Optional.of("bar").map(s -> s.isEmpty()).orElse(Boolean.FALSE));
     }
 
+    ImmutableSet<Optional<String>> testMapToNullable() {
+      return ImmutableSet.of(
+          Optional.of(1).flatMap(n -> Optional.of(String.valueOf(n))),
+          Optional.of(2).flatMap(n -> Optional.ofNullable(String.valueOf(n))));
+    }
+
     Stream<Object> testFlatmapOptionalToStream() {
       return Stream.concat(
           Stream.of(Optional.empty()).filter(Optional::isPresent).map(Optional::get),
