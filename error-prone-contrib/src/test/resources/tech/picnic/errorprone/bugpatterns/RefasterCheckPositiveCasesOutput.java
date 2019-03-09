@@ -11,6 +11,7 @@ import static java.util.Comparator.reverseOrder;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.joining;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
@@ -24,10 +25,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
+import com.google.common.primitives.Ints;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Clock;
@@ -60,12 +63,15 @@ final class RefasterCheckPositiveCases {
       ImmutableSet.of(
           AbstractMap.class,
           Arrays.class,
+          Ints.class,
+          Iterators.class,
           Joiner.class,
           Lists.class,
           MoreObjects.class,
           Preconditions.class,
           Streams.class,
-          (Runnable) () -> identity());
+          (Runnable) () -> identity(),
+          (Runnable) () -> joining());
 
   static final class AssortedTemplates {
     int testCheckIndex() {
@@ -105,6 +111,13 @@ final class RefasterCheckPositiveCases {
     ImmutableMap<String, Integer> testTransformMapValueToImmutableMap() {
       return ImmutableMap.copyOf(
           Maps.transformValues(ImmutableMap.of("foo", 1L), v -> Math.toIntExact(v)));
+    }
+
+    ImmutableSet<String> testIteratorGetNextOrDefault() {
+      return ImmutableSet.of(
+          Iterators.getNext(ImmutableList.of("a").iterator(), "foo"),
+          Iterators.getNext(ImmutableList.of("b").iterator(), "bar"),
+          Iterators.getNext(ImmutableList.of("c").iterator(), "baz"));
     }
   }
 
@@ -509,6 +522,10 @@ final class RefasterCheckPositiveCases {
       return ImmutableSet.of(
           (byte) 3 >= (byte) 4, (short) 3 >= (short) 4, 3 >= 4, 3L >= 4L, 3F >= 4F, 3.0 >= 4.0);
     }
+
+    int testLongToIntExact() {
+      return Math.toIntExact(Long.MAX_VALUE);
+    }
   }
 
   static final class StreamTemplates {
@@ -593,7 +610,11 @@ final class RefasterCheckPositiveCases {
       return ImmutableSet.of(
           String.join("a", new String[] {"foo", "bar"}),
           String.join("b", new CharSequence[] {"baz", "quux"}),
-          String.join("c", ImmutableList.of("1", "4")));
+          String.join("c", new String[] {"foo", "bar"}),
+          String.join("d", new CharSequence[] {"baz", "quux"}),
+          String.join("e", ImmutableList.of("foo", "bar")),
+          String.join("f", Iterables.cycle(ImmutableList.of("foo", "bar"))),
+          String.join("g", ImmutableList.of("baz", "quux")));
     }
   }
 

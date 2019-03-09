@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import com.google.common.primitives.Ints;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 
@@ -76,6 +77,19 @@ final class PrimitiveTemplates {
     @AfterTemplate
     boolean after(long a, long b) {
       return a >= b;
+    }
+  }
+
+  /** Prefer {@link Math#toIntExact(long)} over the Guava alternative. */
+  static final class LongToIntExact {
+    @BeforeTemplate
+    int before(long a) {
+      return Ints.checkedCast(a);
+    }
+
+    @AfterTemplate
+    int after(long a) {
+      return Math.toIntExact(a);
     }
   }
 }

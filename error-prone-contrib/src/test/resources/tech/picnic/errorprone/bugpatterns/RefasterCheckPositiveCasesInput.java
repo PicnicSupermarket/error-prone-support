@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static java.util.Comparator.naturalOrder;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.joining;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
@@ -17,10 +18,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
+import com.google.common.primitives.Ints;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Clock;
@@ -52,12 +55,15 @@ final class RefasterCheckPositiveCases {
       ImmutableSet.of(
           AbstractMap.class,
           Arrays.class,
+          Ints.class,
+          Iterators.class,
           Joiner.class,
           Lists.class,
           MoreObjects.class,
           Preconditions.class,
           Streams.class,
-          (Runnable) () -> identity());
+          (Runnable) () -> identity(),
+          (Runnable) () -> joining());
 
   static final class AssortedTemplates {
     int testCheckIndex() {
@@ -103,6 +109,15 @@ final class RefasterCheckPositiveCases {
     ImmutableMap<String, Integer> testTransformMapValueToImmutableMap() {
       return ImmutableMap.of("foo", 1L).entrySet().stream()
           .collect(toImmutableMap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue())));
+    }
+
+    ImmutableSet<String> testIteratorGetNextOrDefault() {
+      return ImmutableSet.of(
+          ImmutableList.of("a").iterator().hasNext()
+              ? ImmutableList.of("a").iterator().next()
+              : "foo",
+          Streams.stream(ImmutableList.of("b").iterator()).findFirst().orElse("bar"),
+          Streams.stream(ImmutableList.of("c").iterator()).findAny().orElse("baz"));
     }
   }
 
@@ -551,6 +566,10 @@ final class RefasterCheckPositiveCases {
           !(3F < 4F),
           !(3.0 < 4.0));
     }
+
+    int testLongToIntExact() {
+      return Ints.checkedCast(Long.MAX_VALUE);
+    }
   }
 
   static final class StreamTemplates {
@@ -638,7 +657,11 @@ final class RefasterCheckPositiveCases {
       return ImmutableSet.of(
           Joiner.on("a").join(new String[] {"foo", "bar"}),
           Joiner.on("b").join(new CharSequence[] {"baz", "quux"}),
-          Joiner.on("c").join(ImmutableList.of("1", "4")));
+          Stream.of(new String[] {"foo", "bar"}).collect(joining("c")),
+          Arrays.stream(new CharSequence[] {"baz", "quux"}).collect(joining("d")),
+          Joiner.on("e").join(ImmutableList.of("foo", "bar")),
+          Streams.stream(Iterables.cycle(ImmutableList.of("foo", "bar"))).collect(joining("f")),
+          ImmutableList.of("baz", "quux").stream().collect(joining("g")));
     }
   }
 

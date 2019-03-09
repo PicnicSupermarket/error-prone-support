@@ -24,6 +24,7 @@ final class OptionalTemplates {
     @BeforeTemplate
     // XXX: Refaster should be smart enough to also rewrite occurrences in which there are
     // parentheses around the null check, but that's currently not the case. Try to fix that.
+    // XXX: This is a special case of `TernaryOperatorOptionalNegativeFiltering`.
     Optional<T> before(T object) {
       return object == null ? Optional.empty() : Optional.of(object);
     }

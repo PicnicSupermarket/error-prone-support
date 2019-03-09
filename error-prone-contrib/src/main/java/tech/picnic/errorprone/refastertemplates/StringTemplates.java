@@ -1,12 +1,18 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static java.util.stream.Collectors.joining;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link String}s. */
 final class StringTemplates {
@@ -41,6 +47,7 @@ final class StringTemplates {
   }
 
   /** Don't use the ternary operator to create an optionally-absent string. */
+  // XXX: This is a special case of `TernaryOperatorOptionalNegativeFiltering`.
   static final class OptionalNonEmptyString {
     @BeforeTemplate
     Optional<String> before(String str) {
@@ -60,14 +67,24 @@ final class StringTemplates {
   // XXX: Joiner#join(@Nullable Object first, @Nullable Object second, Object... rest) isn't
   // rewritten.
   static final class JoinStrings {
+    // XXX: Drop the inner `Refaster.anyOf` if/when we decide to rewrite one to the other.
     @BeforeTemplate
     String before(String delimiter, CharSequence[] elements) {
-      return Joiner.on(delimiter).join(elements);
+      return Refaster.anyOf(
+          Joiner.on(delimiter).join(elements),
+          Refaster.anyOf(Stream.of(elements), Arrays.stream(elements)).collect(joining(delimiter)));
     }
 
     @BeforeTemplate
     String before(String delimiter, Iterable<? extends CharSequence> elements) {
-      return Joiner.on(delimiter).join(elements);
+      return Refaster.anyOf(
+          Joiner.on(delimiter).join(elements),
+          Streams.stream(elements).collect(joining(delimiter)));
+    }
+
+    @BeforeTemplate
+    String before(String delimiter, Collection<? extends CharSequence> elements) {
+      return elements.stream().collect(joining(delimiter));
     }
 
     @AfterTemplate

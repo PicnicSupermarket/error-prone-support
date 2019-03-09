@@ -7,6 +7,7 @@ import static java.util.function.Function.identity;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
@@ -24,6 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 /**
  * Assorted Refaster templates that do not (yet) belong in one of the other classes with more
@@ -198,6 +200,22 @@ final class AssortedTemplates {
     @AfterTemplate
     ImmutableMap<K, V2> after(Map<K, V1> map) {
       return ImmutableMap.copyOf(Maps.transformValues(map, v -> valueTransformation(v)));
+    }
+  }
+
+  static final class IteratorGetNextOrDefault<T> {
+    @BeforeTemplate
+    T before(Iterator<T> iterator, T defaultValue) {
+      return Refaster.anyOf(
+          iterator.hasNext() ? iterator.next() : defaultValue,
+          Streams.stream(iterator).findFirst().orElse(defaultValue),
+          Streams.stream(iterator).findAny().orElse(defaultValue));
+    }
+
+    @Nullable
+    @AfterTemplate
+    T after(Iterator<T> iterator, T defaultValue) {
+      return Iterators.getNext(iterator, defaultValue);
     }
   }
 }
