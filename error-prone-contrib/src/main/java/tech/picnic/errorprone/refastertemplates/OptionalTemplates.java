@@ -8,9 +8,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -71,27 +69,6 @@ final class OptionalTemplates {
     @AfterTemplate
     Stream<T> after(Optional<T> optional) {
       return optional.stream();
-    }
-  }
-
-  /**
-   * Don't use the ternary operator to extract the first element of a possibly-empty {@link
-   * Collection} as an {@link Optional}.
-   */
-  static final class OptionalFirstCollectionElement<T> {
-    @BeforeTemplate
-    Optional<T> before(Collection<T> collection) {
-      return collection.isEmpty() ? Optional.empty() : Optional.of(collection.iterator().next());
-    }
-
-    @BeforeTemplate
-    Optional<T> before(List<T> collection) {
-      return collection.isEmpty() ? Optional.empty() : Optional.of(collection.get(0));
-    }
-
-    @AfterTemplate
-    Optional<T> after(Collection<T> collection) {
-      return collection.stream().findFirst();
     }
   }
 

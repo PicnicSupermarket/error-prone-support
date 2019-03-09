@@ -10,6 +10,11 @@ import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.NavigableSet;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.SortedSet;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with (arbitrary) collections. */
@@ -85,6 +90,80 @@ final class CollectionTemplates {
     @AfterTemplate
     Stream<T> after(ImmutableCollection<T> collection) {
       return collection.stream();
+    }
+  }
+
+  /**
+   * Don't use the ternary operator to extract the first element of a possibly-empty {@link
+   * Collection} as an {@link Optional}.
+   */
+  static final class OptionalFirstCollectionElement<T> {
+    @BeforeTemplate
+    Optional<T> before(Collection<T> collection) {
+      return Refaster.anyOf(
+          collection.stream().findAny(),
+          collection.isEmpty() ? Optional.empty() : Optional.of(collection.iterator().next()));
+    }
+
+    @BeforeTemplate
+    Optional<T> before(List<T> collection) {
+      return collection.isEmpty() ? Optional.empty() : Optional.of(collection.get(0));
+    }
+
+    @BeforeTemplate
+    Optional<T> before(SortedSet<T> collection) {
+      return collection.isEmpty() ? Optional.empty() : Optional.of(collection.first());
+    }
+
+    @AfterTemplate
+    Optional<T> after(Collection<T> collection) {
+      return collection.stream().findFirst();
+    }
+  }
+
+  static final class OptionalFirstQueueElement<T> {
+    @BeforeTemplate
+    Optional<T> before(Queue<T> queue) {
+      return Refaster.anyOf(
+          queue.stream().findFirst(),
+          queue.isEmpty()
+              ? Optional.empty()
+              : Refaster.anyOf(Optional.of(queue.peek()), Optional.ofNullable(queue.peek())));
+    }
+
+    @AfterTemplate
+    Optional<T> after(Queue<T> queue) {
+      return Optional.ofNullable(queue.peek());
+    }
+  }
+
+  static final class RemoveOptionalFirstNavigableSetElement<T> {
+    @BeforeTemplate
+    Optional<T> before(NavigableSet<T> set) {
+      return set.isEmpty()
+          ? Optional.empty()
+          : Refaster.anyOf(Optional.of(set.pollFirst()), Optional.ofNullable(set.pollFirst()));
+    }
+
+    @AfterTemplate
+    Optional<T> after(NavigableSet<T> set) {
+      return Optional.ofNullable(set.pollFirst());
+    }
+  }
+
+  static final class RemoveOptionalFirstQueueElement<T> {
+    @BeforeTemplate
+    Optional<T> before(Queue<T> queue) {
+      return queue.isEmpty()
+          ? Optional.empty()
+          : Refaster.anyOf(
+              Optional.of(Refaster.anyOf(queue.poll(), queue.remove())),
+              Optional.ofNullable(Refaster.anyOf(queue.poll(), queue.remove())));
+    }
+
+    @AfterTemplate
+    Optional<T> after(Queue<T> queue) {
+      return Optional.ofNullable(queue.poll());
     }
   }
 }

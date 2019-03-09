@@ -49,9 +49,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
 final class RefasterCheckPositiveCases {
@@ -169,6 +171,46 @@ final class RefasterCheckPositiveCases {
 
     ImmutableList<Integer> testImmutableCollectionAsList() {
       return ImmutableSet.of(1).asList();
+    }
+
+    ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
+      return ImmutableSet.of(
+          ImmutableSet.of(0).stream().findFirst(),
+          ImmutableSet.of(1).stream().findFirst(),
+          ImmutableList.of(2).stream().findFirst(),
+          ImmutableSortedSet.of(3).stream().findFirst(),
+          ImmutableSet.of(1).stream().findFirst(),
+          ImmutableList.of(2).stream().findFirst(),
+          ImmutableSortedSet.of(3).stream().findFirst());
+    }
+
+    ImmutableSet<Optional<String>> testOptionalFirstQueueElement() {
+      return ImmutableSet.of(
+          new LinkedList<String>().stream().findFirst(),
+          Optional.ofNullable(new LinkedList<String>().peek()),
+          Optional.ofNullable(new LinkedList<String>().peek()),
+          Optional.ofNullable(new LinkedList<String>().peek()),
+          Optional.ofNullable(new LinkedList<String>().peek()));
+    }
+
+    ImmutableSet<Optional<String>> testRemoveOptionalFirstNavigableSetElement() {
+      return ImmutableSet.of(
+          Optional.ofNullable(new TreeSet<String>().pollFirst()),
+          Optional.ofNullable(new TreeSet<String>().pollFirst()),
+          Optional.ofNullable(new TreeSet<String>().pollFirst()),
+          Optional.ofNullable(new TreeSet<String>().pollFirst()));
+    }
+
+    ImmutableSet<Optional<String>> testRemoveOptionalFirstQueueElement() {
+      return ImmutableSet.of(
+          Optional.ofNullable(new LinkedList<String>().poll()),
+          Optional.ofNullable(new LinkedList<String>().poll()),
+          Optional.ofNullable(new LinkedList<String>().poll()),
+          Optional.ofNullable(new LinkedList<String>().poll()),
+          Optional.ofNullable(new LinkedList<String>().poll()),
+          Optional.ofNullable(new LinkedList<String>().poll()),
+          Optional.ofNullable(new LinkedList<String>().poll()),
+          Optional.ofNullable(new LinkedList<String>().poll()));
     }
   }
 
@@ -490,14 +532,6 @@ final class RefasterCheckPositiveCases {
 
     Stream<Object> testOptionalToStream() {
       return Stream.concat(Optional.empty().stream(), Optional.of("foo").stream());
-    }
-
-    ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
-      return ImmutableSet.of(
-          ImmutableSet.of(1).stream().findFirst(),
-          ImmutableList.of(2).stream().findFirst(),
-          ImmutableSet.of(1).stream().findFirst(),
-          ImmutableList.of(2).stream().findFirst());
     }
 
     ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {

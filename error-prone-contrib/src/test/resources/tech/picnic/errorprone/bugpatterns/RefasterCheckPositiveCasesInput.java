@@ -41,9 +41,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
 final class RefasterCheckPositiveCases {
@@ -169,6 +171,90 @@ final class RefasterCheckPositiveCases {
 
     ImmutableList<Integer> testImmutableCollectionAsList() {
       return ImmutableList.copyOf(ImmutableSet.of(1));
+    }
+
+    ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
+      return ImmutableSet.of(
+          ImmutableSet.of(0).stream().findAny(),
+          ImmutableSet.of(1).isEmpty()
+              ? Optional.empty()
+              : Optional.of(ImmutableSet.of(1).iterator().next()),
+          ImmutableList.of(2).isEmpty()
+              ? Optional.empty()
+              : Optional.of(ImmutableList.of(2).get(0)),
+          ImmutableSortedSet.of(3).isEmpty()
+              ? Optional.empty()
+              : Optional.of(ImmutableSortedSet.of(3).first()),
+          !ImmutableSet.of(1).isEmpty()
+              ? Optional.of(ImmutableSet.of(1).iterator().next())
+              : Optional.empty(),
+          !ImmutableList.of(2).isEmpty()
+              ? Optional.of(ImmutableList.of(2).get(0))
+              : Optional.empty(),
+          !ImmutableSortedSet.of(3).isEmpty()
+              ? Optional.of(ImmutableSortedSet.of(3).first())
+              : Optional.empty());
+    }
+
+    ImmutableSet<Optional<String>> testOptionalFirstQueueElement() {
+      return ImmutableSet.of(
+          new LinkedList<String>().stream().findAny(),
+          new LinkedList<String>().isEmpty()
+              ? Optional.empty()
+              : Optional.of(new LinkedList<String>().peek()),
+          new LinkedList<String>().isEmpty()
+              ? Optional.empty()
+              : Optional.ofNullable(new LinkedList<String>().peek()),
+          !new LinkedList<String>().isEmpty()
+              ? Optional.of(new LinkedList<String>().peek())
+              : Optional.empty(),
+          !new LinkedList<String>().isEmpty()
+              ? Optional.ofNullable(new LinkedList<String>().peek())
+              : Optional.empty());
+    }
+
+    ImmutableSet<Optional<String>> testRemoveOptionalFirstNavigableSetElement() {
+      return ImmutableSet.of(
+          new TreeSet<String>().isEmpty()
+              ? Optional.empty()
+              : Optional.of(new TreeSet<String>().pollFirst()),
+          new TreeSet<String>().isEmpty()
+              ? Optional.empty()
+              : Optional.ofNullable(new TreeSet<String>().pollFirst()),
+          !new TreeSet<String>().isEmpty()
+              ? Optional.of(new TreeSet<String>().pollFirst())
+              : Optional.empty(),
+          !new TreeSet<String>().isEmpty()
+              ? Optional.ofNullable(new TreeSet<String>().pollFirst())
+              : Optional.empty());
+    }
+
+    ImmutableSet<Optional<String>> testRemoveOptionalFirstQueueElement() {
+      return ImmutableSet.of(
+          new LinkedList<String>().isEmpty()
+              ? Optional.empty()
+              : Optional.of(new LinkedList<String>().poll()),
+          new LinkedList<String>().isEmpty()
+              ? Optional.empty()
+              : Optional.of(new LinkedList<String>().remove()),
+          new LinkedList<String>().isEmpty()
+              ? Optional.empty()
+              : Optional.ofNullable(new LinkedList<String>().poll()),
+          new LinkedList<String>().isEmpty()
+              ? Optional.empty()
+              : Optional.ofNullable(new LinkedList<String>().remove()),
+          !new LinkedList<String>().isEmpty()
+              ? Optional.of(new LinkedList<String>().poll())
+              : Optional.empty(),
+          !new LinkedList<String>().isEmpty()
+              ? Optional.of(new LinkedList<String>().remove())
+              : Optional.empty(),
+          !new LinkedList<String>().isEmpty()
+              ? Optional.ofNullable(new LinkedList<String>().poll())
+              : Optional.empty(),
+          !new LinkedList<String>().isEmpty()
+              ? Optional.ofNullable(new LinkedList<String>().remove())
+              : Optional.empty());
     }
   }
 
@@ -523,22 +609,6 @@ final class RefasterCheckPositiveCases {
 
     Stream<Object> testOptionalToStream() {
       return Stream.concat(Streams.stream(Optional.empty()), Streams.stream(Optional.of("foo")));
-    }
-
-    ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
-      return ImmutableSet.of(
-          ImmutableSet.of(1).isEmpty()
-              ? Optional.empty()
-              : Optional.of(ImmutableSet.of(1).iterator().next()),
-          ImmutableList.of(2).isEmpty()
-              ? Optional.empty()
-              : Optional.of(ImmutableList.of(2).get(0)),
-          !ImmutableSet.of(1).isEmpty()
-              ? Optional.of(ImmutableSet.of(1).iterator().next())
-              : Optional.empty(),
-          !ImmutableList.of(2).isEmpty()
-              ? Optional.of(ImmutableList.of(2).get(0))
-              : Optional.empty());
     }
 
     ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
