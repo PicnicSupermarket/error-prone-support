@@ -83,6 +83,10 @@ final class RefasterCheckPositiveCases {
       return Objects.checkIndex(0, 1);
     }
 
+    String testMapGetOrNull() {
+      return ImmutableMap.of(1, "foo").get("bar");
+    }
+
     ImmutableMap<Integer, String> testStreamOfMapEntriesImmutableMap() {
       // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
       // Looks like a @Placeholder limitation. Try to track down and fix.
@@ -123,6 +127,15 @@ final class RefasterCheckPositiveCases {
           Iterators.getNext(ImmutableList.of("a").iterator(), "foo"),
           Iterators.getNext(ImmutableList.of("b").iterator(), "bar"),
           Iterators.getNext(ImmutableList.of("c").iterator(), "baz"));
+    }
+
+    // XXX: Only the first statement is rewritten. Make smarter.
+    ImmutableSet<Boolean> testLogicalImplication() {
+      return ImmutableSet.of(
+          toString().isEmpty() || true,
+          !toString().isEmpty() || (toString().isEmpty() && true),
+          3 < 4 || (3 >= 4 && true),
+          3 >= 4 || (3 < 4 && true));
     }
   }
 

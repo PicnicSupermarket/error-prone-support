@@ -14,6 +14,7 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
@@ -44,6 +45,18 @@ final class AssortedTemplates {
     @AfterTemplate
     int after(int index, int size) {
       return Objects.checkIndex(index, size);
+    }
+  }
+
+  static final class MapGetOrNull<K, V, L> {
+    @BeforeTemplate
+    V before(Map<K, V> map, L key) {
+      return map.getOrDefault(key, null);
+    }
+
+    @AfterTemplate
+    V after(Map<K, V> map, L key) {
+      return map.get(key);
     }
   }
 
@@ -216,6 +229,22 @@ final class AssortedTemplates {
     @AfterTemplate
     T after(Iterator<T> iterator, T defaultValue) {
       return Iterators.getNext(iterator, defaultValue);
+    }
+  }
+
+  // XXX: This template only captures only the simplest case. `@AlsoNegation` doesn't help. Consider
+  // contributing a Refaster patch which handles the negation in the `@BeforeTemplate` more
+  // intelligently.
+  static final class LogicalImplication {
+    @BeforeTemplate
+    boolean before(boolean firstTest, boolean secondTest) {
+      return firstTest || (!firstTest && secondTest);
+    }
+
+    @AlsoNegation
+    @AfterTemplate
+    boolean after(boolean firstTest, boolean secondTest) {
+      return firstTest || secondTest;
     }
   }
 }
