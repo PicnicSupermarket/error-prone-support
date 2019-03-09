@@ -391,12 +391,39 @@ final class RefasterCheckPositiveCases {
     }
   }
 
+  static final class ImmutableMultisetTemplates {
+    ImmutableMultiset.Builder<String> testImmutableMultisetBuilder() {
+      return ImmutableMultiset.builder();
+    }
+
+    ImmutableMultiset<ImmutableMultiset<Integer>> testEmptyImmutableMultiset() {
+      return ImmutableMultiset.of(ImmutableMultiset.of(), ImmutableMultiset.of());
+    }
+
+    ImmutableMultiset<ImmutableMultiset<Integer>> testIterableToImmutableMultiset() {
+      return ImmutableMultiset.of(
+          ImmutableMultiset.copyOf(ImmutableList.of(1)),
+          ImmutableMultiset.copyOf(ImmutableList.of(2)::iterator),
+          ImmutableMultiset.copyOf(ImmutableList.of(3).iterator()),
+          ImmutableMultiset.copyOf(ImmutableMultiset.of(4)),
+          ImmutableMultiset.copyOf(ImmutableMultiset.of(5)::iterator),
+          ImmutableMultiset.copyOf(ImmutableMultiset.of(6).iterator()),
+          ImmutableMultiset.copyOf(new Integer[] {7}),
+          ImmutableMultiset.copyOf(new Integer[] {8}),
+          ImmutableMultiset.copyOf(new Integer[] {9}));
+    }
+
+    ImmutableMultiset<Integer> testImmutableMultisetCopyOfImmutableMultiset() {
+      return ImmutableMultiset.of(1, 2);
+    }
+  }
+
   static final class ImmutableSetTemplates {
     ImmutableSet.Builder<String> testImmutableSetBuilder() {
       return ImmutableSet.builder();
     }
 
-    ImmutableSet<ImmutableSet<Integer>> testEmptyImmutableList() {
+    ImmutableSet<ImmutableSet<Integer>> testEmptyImmutableSet() {
       return ImmutableSet.of(ImmutableSet.of(), ImmutableSet.of());
     }
 
@@ -460,6 +487,39 @@ final class RefasterCheckPositiveCases {
     }
   }
 
+  static final class ImmutableSortedMultisetTemplates {
+    ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetBuilder() {
+      return ImmutableSortedMultiset.orderedBy(Comparator.comparingInt(String::length));
+    }
+
+    ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetNaturalOrderBuilder() {
+      return ImmutableSortedMultiset.naturalOrder();
+    }
+
+    ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetReverseOrderBuilder() {
+      return ImmutableSortedMultiset.reverseOrder();
+    }
+
+    ImmutableMultiset<ImmutableSortedMultiset<Integer>> testEmptyImmutableSortedMultiset() {
+      return ImmutableMultiset.of(ImmutableSortedMultiset.of(), ImmutableSortedMultiset.of());
+    }
+
+    ImmutableMultiset<ImmutableSortedMultiset<Integer>> testIterableToImmutableSortedMultiset() {
+      return ImmutableMultiset.of(
+          ImmutableSortedMultiset.copyOf(ImmutableList.of(1)),
+          ImmutableSortedMultiset.copyOf(ImmutableList.of(2).iterator()),
+          ImmutableSortedMultiset.copyOf(ImmutableList.of(3)),
+          ImmutableSortedMultiset.copyOf(ImmutableList.of(4)::iterator),
+          ImmutableSortedMultiset.copyOf(ImmutableList.of(5).iterator()),
+          ImmutableSortedMultiset.copyOf(ImmutableMultiset.of(6)),
+          ImmutableSortedMultiset.copyOf(ImmutableMultiset.of(7)::iterator),
+          ImmutableSortedMultiset.copyOf(ImmutableMultiset.of(8).iterator()),
+          ImmutableSortedMultiset.copyOf(new Integer[] {9}),
+          ImmutableSortedMultiset.copyOf(new Integer[] {10}),
+          ImmutableSortedMultiset.copyOf(new Integer[] {11}));
+    }
+  }
+
   static final class ImmutableSortedSetTemplates {
     ImmutableSortedSet.Builder<String> testImmutableSortedSetBuilder() {
       return ImmutableSortedSet.orderedBy(Comparator.comparingInt(String::length));
@@ -473,7 +533,7 @@ final class RefasterCheckPositiveCases {
       return ImmutableSortedSet.reverseOrder();
     }
 
-    ImmutableSet<ImmutableSortedSet<Integer>> testEmptyImmutableList() {
+    ImmutableSet<ImmutableSortedSet<Integer>> testEmptyImmutableSortedSet() {
       return ImmutableSet.of(ImmutableSortedSet.of(), ImmutableSortedSet.of());
     }
 

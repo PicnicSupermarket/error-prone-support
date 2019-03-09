@@ -49,11 +49,13 @@ final class AssortedTemplates {
   }
 
   static final class MapGetOrNull<K, V, L> {
+    @Nullable
     @BeforeTemplate
     V before(Map<K, V> map, L key) {
       return map.getOrDefault(key, null);
     }
 
+    @Nullable
     @AfterTemplate
     V after(Map<K, V> map, L key) {
       return map.get(key);

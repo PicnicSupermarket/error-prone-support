@@ -1,7 +1,9 @@
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
+import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSortedMultiset;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static java.util.Comparator.naturalOrder;
 import static java.util.function.Function.identity;
@@ -445,12 +447,41 @@ final class RefasterCheckPositiveCases {
     }
   }
 
+  static final class ImmutableMultisetTemplates {
+    ImmutableMultiset.Builder<String> testImmutableMultisetBuilder() {
+      return new ImmutableMultiset.Builder<>();
+    }
+
+    ImmutableMultiset<ImmutableMultiset<Integer>> testEmptyImmutableMultiset() {
+      return ImmutableMultiset.of(
+          ImmutableMultiset.<Integer>builder().build(),
+          Stream.<Integer>empty().collect(toImmutableMultiset()));
+    }
+
+    ImmutableMultiset<ImmutableMultiset<Integer>> testIterableToImmutableMultiset() {
+      return ImmutableMultiset.of(
+          ImmutableList.of(1).stream().collect(toImmutableMultiset()),
+          Streams.stream(ImmutableList.of(2)::iterator).collect(toImmutableMultiset()),
+          Streams.stream(ImmutableList.of(3).iterator()).collect(toImmutableMultiset()),
+          ImmutableMultiset.<Integer>builder().addAll(ImmutableMultiset.of(4)).build(),
+          ImmutableMultiset.<Integer>builder().addAll(ImmutableMultiset.of(5)::iterator).build(),
+          ImmutableMultiset.<Integer>builder().addAll(ImmutableMultiset.of(6).iterator()).build(),
+          ImmutableMultiset.<Integer>builder().add(new Integer[] {7}).build(),
+          Stream.of(new Integer[] {8}).collect(toImmutableMultiset()),
+          Arrays.stream(new Integer[] {9}).collect(toImmutableMultiset()));
+    }
+
+    ImmutableMultiset<Integer> testImmutableMultisetCopyOfImmutableMultiset() {
+      return ImmutableMultiset.copyOf(ImmutableMultiset.of(1, 2));
+    }
+  }
+
   static final class ImmutableSetTemplates {
     ImmutableSet.Builder<String> testImmutableSetBuilder() {
       return new ImmutableSet.Builder<>();
     }
 
-    ImmutableSet<ImmutableSet<Integer>> testEmptyImmutableList() {
+    ImmutableSet<ImmutableSet<Integer>> testEmptyImmutableSet() {
       return ImmutableSet.of(
           ImmutableSet.<Integer>builder().build(),
           Stream.<Integer>empty().collect(toImmutableSet()));
@@ -526,6 +557,47 @@ final class RefasterCheckPositiveCases {
     }
   }
 
+  static final class ImmutableSortedMultisetTemplates {
+    ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetBuilder() {
+      return new ImmutableSortedMultiset.Builder<>(Comparator.comparingInt(String::length));
+    }
+
+    ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetNaturalOrderBuilder() {
+      return ImmutableSortedMultiset.orderedBy(Comparator.<String>naturalOrder());
+    }
+
+    ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetReverseOrderBuilder() {
+      return ImmutableSortedMultiset.orderedBy(Comparator.<String>reverseOrder());
+    }
+
+    ImmutableMultiset<ImmutableSortedMultiset<Integer>> testEmptyImmutableSortedMultiset() {
+      return ImmutableMultiset.of(
+          ImmutableSortedMultiset.<Integer>naturalOrder().build(),
+          Stream.<Integer>empty().collect(toImmutableSortedMultiset(naturalOrder())));
+    }
+
+    ImmutableMultiset<ImmutableSortedMultiset<Integer>> testIterableToImmutableSortedMultiset() {
+      return ImmutableMultiset.of(
+          ImmutableSortedMultiset.copyOf(naturalOrder(), ImmutableList.of(1)),
+          ImmutableSortedMultiset.copyOf(naturalOrder(), ImmutableList.of(2).iterator()),
+          ImmutableList.of(3).stream().collect(toImmutableSortedMultiset(naturalOrder())),
+          Streams.stream(ImmutableList.of(4)::iterator)
+              .collect(toImmutableSortedMultiset(naturalOrder())),
+          Streams.stream(ImmutableList.of(5).iterator())
+              .collect(toImmutableSortedMultiset(naturalOrder())),
+          ImmutableSortedMultiset.<Integer>naturalOrder().addAll(ImmutableMultiset.of(6)).build(),
+          ImmutableSortedMultiset.<Integer>naturalOrder()
+              .addAll(ImmutableMultiset.of(7)::iterator)
+              .build(),
+          ImmutableSortedMultiset.<Integer>naturalOrder()
+              .addAll(ImmutableMultiset.of(8).iterator())
+              .build(),
+          ImmutableSortedMultiset.<Integer>naturalOrder().add(new Integer[] {9}).build(),
+          Stream.of(new Integer[] {10}).collect(toImmutableSortedMultiset(naturalOrder())),
+          Arrays.stream(new Integer[] {11}).collect(toImmutableSortedMultiset(naturalOrder())));
+    }
+  }
+
   static final class ImmutableSortedSetTemplates {
     ImmutableSortedSet.Builder<String> testImmutableSortedSetBuilder() {
       return new ImmutableSortedSet.Builder<>(Comparator.comparingInt(String::length));
@@ -539,7 +611,7 @@ final class RefasterCheckPositiveCases {
       return ImmutableSortedSet.orderedBy(Comparator.<String>reverseOrder());
     }
 
-    ImmutableSet<ImmutableSortedSet<Integer>> testEmptyImmutableList() {
+    ImmutableSet<ImmutableSortedSet<Integer>> testEmptyImmutableSortedSet() {
       return ImmutableSet.of(
           ImmutableSortedSet.<Integer>naturalOrder().build(),
           Stream.<Integer>empty().collect(toImmutableSortedSet(naturalOrder())));
