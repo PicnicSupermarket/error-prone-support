@@ -507,8 +507,10 @@ final class RefasterCheckPositiveCases {
   }
 
   static final class OptionalTemplates {
-    Optional<String> testOptionalOfNullable() {
-      return toString() == null ? Optional.empty() : Optional.of(toString());
+    ImmutableSet<Optional<String>> testOptionalOfNullable() {
+      return ImmutableSet.of(
+          toString() == null ? Optional.empty() : Optional.of(toString()),
+          toString() != null ? Optional.of(toString()) : Optional.empty());
     }
 
     ImmutableSet<Boolean> testOptionalIsEmpty() {
@@ -530,13 +532,23 @@ final class RefasterCheckPositiveCases {
               : Optional.of(ImmutableSet.of(1).iterator().next()),
           ImmutableList.of(2).isEmpty()
               ? Optional.empty()
-              : Optional.of(ImmutableList.of(2).get(0)));
+              : Optional.of(ImmutableList.of(2).get(0)),
+          !ImmutableSet.of(1).isEmpty()
+              ? Optional.of(ImmutableSet.of(1).iterator().next())
+              : Optional.empty(),
+          !ImmutableList.of(2).isEmpty()
+              ? Optional.of(ImmutableList.of(2).get(0))
+              : Optional.empty());
     }
 
-    Optional<String> testOptionalFirstIteratorElement() {
-      return ImmutableSet.of("foo").iterator().hasNext()
-          ? Optional.of(ImmutableSet.of("foo").iterator().next())
-          : Optional.empty();
+    ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
+      return ImmutableSet.of(
+          ImmutableSet.of("foo").iterator().hasNext()
+              ? Optional.of(ImmutableSet.of("foo").iterator().next())
+              : Optional.empty(),
+          !ImmutableSet.of("foo").iterator().hasNext()
+              ? Optional.empty()
+              : Optional.of(ImmutableSet.of("foo").iterator().next()));
     }
 
     ImmutableSet<Optional<String>> testTernaryOperatorOptionalPositiveFiltering() {
@@ -704,7 +716,9 @@ final class RefasterCheckPositiveCases {
     ImmutableSet<Optional<String>> testOptionalNonEmptyString() {
       return ImmutableSet.of(
           Strings.isNullOrEmpty(toString()) ? Optional.empty() : Optional.of(toString()),
-          Strings.isNullOrEmpty(toString()) ? Optional.empty() : Optional.ofNullable(toString()));
+          Strings.isNullOrEmpty(toString()) ? Optional.empty() : Optional.ofNullable(toString()),
+          !Strings.isNullOrEmpty(toString()) ? Optional.of(toString()) : Optional.empty(),
+          !Strings.isNullOrEmpty(toString()) ? Optional.ofNullable(toString()) : Optional.empty());
     }
 
     ImmutableSet<String> testJoinStrings() {

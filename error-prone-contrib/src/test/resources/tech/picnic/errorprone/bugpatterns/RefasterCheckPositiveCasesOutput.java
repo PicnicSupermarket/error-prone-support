@@ -476,8 +476,8 @@ final class RefasterCheckPositiveCases {
   }
 
   static final class OptionalTemplates {
-    Optional<String> testOptionalOfNullable() {
-      return Optional.ofNullable(toString());
+    ImmutableSet<Optional<String>> testOptionalOfNullable() {
+      return ImmutableSet.of(Optional.ofNullable(toString()), Optional.ofNullable(toString()));
     }
 
     ImmutableSet<Boolean> testOptionalIsEmpty() {
@@ -494,11 +494,16 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
       return ImmutableSet.of(
-          ImmutableSet.of(1).stream().findFirst(), ImmutableList.of(2).stream().findFirst());
+          ImmutableSet.of(1).stream().findFirst(),
+          ImmutableList.of(2).stream().findFirst(),
+          ImmutableSet.of(1).stream().findFirst(),
+          ImmutableList.of(2).stream().findFirst());
     }
 
-    Optional<String> testOptionalFirstIteratorElement() {
-      return stream(ImmutableSet.of("foo").iterator()).findFirst();
+    ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
+      return ImmutableSet.of(
+          stream(ImmutableSet.of("foo").iterator()).findFirst(),
+          stream(ImmutableSet.of("foo").iterator()).findFirst());
     }
 
     ImmutableSet<Optional<String>> testTernaryOperatorOptionalPositiveFiltering() {
@@ -646,6 +651,8 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSet<Optional<String>> testOptionalNonEmptyString() {
       return ImmutableSet.of(
+          Optional.ofNullable(toString()).filter(s -> !s.isEmpty()),
+          Optional.ofNullable(toString()).filter(s -> !s.isEmpty()),
           Optional.ofNullable(toString()).filter(s -> !s.isEmpty()),
           Optional.ofNullable(toString()).filter(s -> !s.isEmpty()));
     }
