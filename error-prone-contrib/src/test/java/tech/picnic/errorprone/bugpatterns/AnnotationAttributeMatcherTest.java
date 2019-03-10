@@ -14,14 +14,14 @@ public final class AnnotationAttributeMatcherTest {
   @Test
   public void testWithoutListings() {
     AnnotationAttributeMatcher matcher =
-        AnnotationAttributeMatcher.create(Optional.empty(), Optional.empty());
+        AnnotationAttributeMatcher.create(Optional.empty(), ImmutableList.of());
     assertTrue(matcher.matches("foo", "bar"));
   }
 
   @Test
   public void testWithSingleFullAnnotationWhitelist() {
     AnnotationAttributeMatcher matcher =
-        AnnotationAttributeMatcher.create(Optional.of(ImmutableList.of("foo")), Optional.empty());
+        AnnotationAttributeMatcher.create(Optional.of(ImmutableList.of("foo")), ImmutableList.of());
     assertTrue(matcher.matches("foo", "bar"));
     assertTrue(matcher.matches("foo", "baz"));
     assertFalse(matcher.matches("quux", "bar"));
@@ -31,7 +31,7 @@ public final class AnnotationAttributeMatcherTest {
   public void testWithSingleAnnotationAttributeWhitelist() {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(
-            Optional.of(ImmutableList.of("foo#bar")), Optional.empty());
+            Optional.of(ImmutableList.of("foo#bar")), ImmutableList.of());
     assertTrue(matcher.matches("foo", "bar"));
     assertFalse(matcher.matches("foo", "baz"));
     assertFalse(matcher.matches("quux", "bar"));
@@ -40,7 +40,7 @@ public final class AnnotationAttributeMatcherTest {
   @Test
   public void testWithSingleFullAnnotationBlacklist() {
     AnnotationAttributeMatcher matcher =
-        AnnotationAttributeMatcher.create(Optional.empty(), Optional.of(ImmutableList.of("foo")));
+        AnnotationAttributeMatcher.create(Optional.empty(), ImmutableList.of("foo"));
     assertFalse(matcher.matches("foo", "bar"));
     assertFalse(matcher.matches("foo", "baz"));
     assertTrue(matcher.matches("quux", "bar"));
@@ -49,8 +49,7 @@ public final class AnnotationAttributeMatcherTest {
   @Test
   public void testWithSingleAnnotationAttributeBlacklist() {
     AnnotationAttributeMatcher matcher =
-        AnnotationAttributeMatcher.create(
-            Optional.empty(), Optional.of(ImmutableList.of("foo#bar")));
+        AnnotationAttributeMatcher.create(Optional.empty(), ImmutableList.of("foo#bar"));
     assertFalse(matcher.matches("foo", "bar"));
     assertTrue(matcher.matches("foo", "baz"));
     assertTrue(matcher.matches("quux", "bar"));
@@ -61,7 +60,7 @@ public final class AnnotationAttributeMatcherTest {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(
             Optional.of(ImmutableList.of("foo", "bar", "baz", "baz#1", "baz#2", "quux#1")),
-            Optional.of(ImmutableList.of("foo", "baz#2")));
+            ImmutableList.of("foo", "baz#2"));
     assertFalse(matcher.matches("foo", "1"));
     assertFalse(matcher.matches("foo", "2"));
     assertTrue(matcher.matches("bar", "1"));

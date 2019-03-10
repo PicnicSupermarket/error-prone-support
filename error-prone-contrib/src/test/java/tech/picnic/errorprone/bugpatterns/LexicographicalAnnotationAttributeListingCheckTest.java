@@ -33,6 +33,9 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
             "import static java.math.RoundingMode.UP;",
             "import static java.math.RoundingMode.DOWN;",
             "",
+            "import com.fasterxml.jackson.annotation.JsonPropertyOrder;",
+            "import io.swagger.annotations.ApiImplicitParam;",
+            "import io.swagger.annotations.ApiImplicitParams;",
             "import java.math.RoundingMode;",
             "",
             "interface A {",
@@ -78,6 +81,13 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
             "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) A unsortedAnns();",
             "  // BUG: Diagnostic contains:",
             "  @Foo(anns = {@Bar(\"a\"), @Bar({\"b\", \"a\"})}) A unsortedInnderAnns();",
+            "",
+            "  @Foo({\"a=foo\", \"a.b=bar\", \"a.c=baz\"}) A hierarchicallySorted();",
+            "  // BUG: Diagnostic contains:",
+            "  @Foo({\"a.b=bar\", \"a.c=baz\", \"a=foo\"}) A hierarchicallyUnsorted();",
+            "",
+            "  @JsonPropertyOrder({\"field2\", \"field1\"}) A dto();",
+            "  @ApiImplicitParams({@ApiImplicitParam(\"p2\"), @ApiImplicitParam(\"p1\")}) A endpoint();",
             "}")
         .doTest();
   }

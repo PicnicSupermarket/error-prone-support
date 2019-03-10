@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
@@ -55,19 +56,18 @@ final class AnnotationAttributeMatcher implements Serializable {
    *
    * @param inclusions If specified, only the listed annotations or annotation attributes are
    *     matched.
-   * @param exclusions If specified, the listed annotations or annotation attributes are not
-   *     matched.
+   * @param exclusions The listed annotations or annotation attributes are not matched.
    * @return A non-{@code null} {@link AnnotationAttributeMatcher}.
    */
   static AnnotationAttributeMatcher create(
-      Optional<? extends List<String>> inclusions, Optional<? extends List<String>> exclusions) {
+      Optional<? extends List<String>> inclusions, ImmutableList<String> exclusions) {
     Set<String> includedWholeTypes = new HashSet<>();
     Set<String> excludedWholeTypes = new HashSet<>();
     SetMultimap<String, String> includedAttributes = HashMultimap.create();
     SetMultimap<String, String> excludedAttributes = HashMultimap.create();
 
     inclusions.ifPresent(incl -> update(incl, includedWholeTypes, includedAttributes));
-    exclusions.ifPresent(excl -> update(excl, excludedWholeTypes, excludedAttributes));
+    update(exclusions, excludedWholeTypes, excludedAttributes);
     includedWholeTypes.removeAll(excludedWholeTypes);
     includedAttributes.keySet().removeAll(includedWholeTypes);
     includedAttributes.keySet().removeAll(excludedWholeTypes);

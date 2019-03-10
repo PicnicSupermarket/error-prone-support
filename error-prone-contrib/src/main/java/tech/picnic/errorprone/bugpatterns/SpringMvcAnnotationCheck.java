@@ -45,7 +45,7 @@ public final class SpringMvcAnnotationCheck extends BugChecker implements Annota
   private static final AnnotationAttributeMatcher ARGUMENT_SELECTOR =
       AnnotationAttributeMatcher.create(
           Optional.of(ImmutableList.of(ANN_PACKAGE_PREFIX + "RequestMapping#method")),
-          Optional.empty());
+          ImmutableList.of());
   private static final ImmutableMap<String, String> REPLACEMENTS =
       ImmutableMap.<String, String>builder()
           .put("DELETE", "DeleteMapping")
