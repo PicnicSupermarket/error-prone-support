@@ -55,7 +55,7 @@ final class EqualityTemplates {
   // XXX: As it stands, this rule is a special case of what `MethodReferenceUsageCheck` tries to
   // achieve. If/when `MethodReferenceUsageCheck` becomes production ready, we should simply drop
   // this check.
-  // XXX: Alternatively, rule should be replaced with a plugin which also identifies cases where
+  // XXX: Alternatively, the rule should be replaced with a plugin which also identifies cases where
   // the arguments are swapped but simplification is possible anyway, by virtue of `v` being
   // non-null.
   static final class EqualsPredicate<T> {

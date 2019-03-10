@@ -5,9 +5,11 @@ import static java.util.Comparator.naturalOrder;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -82,6 +84,25 @@ final class ImmutableListTemplates {
     @AfterTemplate
     ImmutableList<T> after(Iterable<T> iterable) {
       return ImmutableList.copyOf(iterable);
+    }
+  }
+
+  /** Prefer {@link ImmutableList#toImmutableList()} over the more verbose alternative. */
+  // XXX: Once the code base has been sufficiently cleaned up, we might want to also rewrite
+  // `Collectors.toList(`), with the caveat that it allows mutation (though this cannot be relied
+  // upon) as well as nulls. Another option is to explicitly rewrite those variants to
+  // `Collectors.toSet(ArrayList::new)`.
+  static final class StreamToImmutableList<T> {
+    @BeforeTemplate
+    ImmutableList<T> before(Stream<T> stream) {
+      return Refaster.anyOf(
+          ImmutableList.copyOf(stream.iterator()), ImmutableList.copyOf(stream::iterator));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ImmutableList<T> after(Stream<T> stream) {
+      return stream.collect(toImmutableList());
     }
   }
 

@@ -6,9 +6,11 @@ import static java.util.Comparator.naturalOrder;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -122,6 +124,26 @@ final class ImmutableSortedMultisetTemplates {
     @AfterTemplate
     ImmutableSortedMultiset<T> after(Iterable<T> iterable) {
       return ImmutableSortedMultiset.copyOf(iterable);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSortedMultiset#toImmutableSortedMultiset(java.util.Comparator)} over
+   * less idiomatic alternatives.
+   */
+  // XXX: Also handle the variant with a custom comparator.
+  static final class StreamToImmutableSortedMultiset<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    ImmutableSortedMultiset<T> before(Stream<T> stream) {
+      return Refaster.anyOf(
+          ImmutableSortedMultiset.copyOf(stream.iterator()),
+          ImmutableSortedMultiset.copyOf(stream::iterator));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ImmutableSortedMultiset<T> after(Stream<T> stream) {
+      return stream.collect(toImmutableSortedMultiset(naturalOrder()));
     }
   }
 }

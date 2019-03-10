@@ -6,9 +6,11 @@ import static java.util.Comparator.naturalOrder;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -120,6 +122,26 @@ final class ImmutableSortedSetTemplates {
     @AfterTemplate
     ImmutableSortedSet<T> after(Iterable<T> iterable) {
       return ImmutableSortedSet.copyOf(iterable);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSortedSet#toImmutableSortedSet(java.util.Comparator)} over less
+   * idiomatic alternatives.
+   */
+  // XXX: Also handle the variant with a custom comparator.
+  static final class StreamToImmutableSortedSet<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    ImmutableSortedSet<T> before(Stream<T> stream) {
+      return Refaster.anyOf(
+          ImmutableSortedSet.copyOf(stream.iterator()),
+          ImmutableSortedSet.copyOf(stream::iterator));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ImmutableSortedSet<T> after(Stream<T> stream) {
+      return stream.collect(toImmutableSortedSet(naturalOrder()));
     }
   }
 }

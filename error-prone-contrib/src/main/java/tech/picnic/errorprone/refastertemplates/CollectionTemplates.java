@@ -131,6 +131,10 @@ final class CollectionTemplates {
     }
   }
 
+  /**
+   * Avoid contrived constructions when peeking at the first element of a possibly empty {@link
+   * Queue}.
+   */
   static final class OptionalFirstQueueElement<T> {
     @BeforeTemplate
     Optional<T> before(Queue<T> queue) {
@@ -147,6 +151,10 @@ final class CollectionTemplates {
     }
   }
 
+  /**
+   * Avoid contrived constructions when extracting the first element from a possibly empty {@link
+   * NavigableSet}.
+   */
   static final class RemoveOptionalFirstNavigableSetElement<T> {
     @BeforeTemplate
     Optional<T> before(NavigableSet<T> set) {
@@ -161,6 +169,10 @@ final class CollectionTemplates {
     }
   }
 
+  /**
+   * Avoid contrived constructions when extracting the first element from a possibly empty {@link
+   * Queue}.
+   */
   static final class RemoveOptionalFirstQueueElement<T> {
     @BeforeTemplate
     Optional<T> before(Queue<T> queue) {

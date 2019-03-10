@@ -92,7 +92,7 @@ final class OptionalTemplates {
   /** Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator. */
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
-  // Maybe our RefasterCheck should test `compiledWithFix`?
+  // Maybe our RefasterCheck should test `compilesWithFix`?
   abstract static class TernaryOperatorOptionalPositiveFiltering<T> {
     @Placeholder
     abstract boolean test(T value);
@@ -112,7 +112,7 @@ final class OptionalTemplates {
   /** Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator. */
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
-  // Maybe our RefasterCheck should test `compiledWithFix`?
+  // Maybe our RefasterCheck should test `compilesWithFix`?
   abstract static class TernaryOperatorOptionalNegativeFiltering<T> {
     @Placeholder
     abstract boolean test(T value);

@@ -7,6 +7,7 @@ import static java.util.function.Function.identity;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -14,7 +15,6 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
-import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
@@ -205,7 +205,7 @@ final class AssortedTemplates {
 
     // XXX: Instead of `Map.Entry::getKey` we could also match `e -> e.getKey()`. But for some
     // reason Refaster doesn't handle that case. This doesn't matter if we roll out use of
-    // `MethodReferenceUsageCheck`.
+    // `MethodReferenceUsageCheck`. Same observation applies to a lot of other Refaster checks.
     @BeforeTemplate
     ImmutableMap<K, V2> before(Map<K, V1> map) {
       return map.entrySet().stream()
@@ -218,6 +218,7 @@ final class AssortedTemplates {
     }
   }
 
+  /** Prefer {@link Iterators#getNext(Iterator, Object)} over more contrived alternatives. */
   static final class IteratorGetNextOrDefault<T> {
     @BeforeTemplate
     T before(Iterator<T> iterator, T defaultValue) {
@@ -234,6 +235,7 @@ final class AssortedTemplates {
     }
   }
 
+  /** Don't unnecessarily repeat boolean expressions. */
   // XXX: This template only captures only the simplest case. `@AlsoNegation` doesn't help. Consider
   // contributing a Refaster patch which handles the negation in the `@BeforeTemplate` more
   // intelligently.
@@ -243,10 +245,24 @@ final class AssortedTemplates {
       return firstTest || (!firstTest && secondTest);
     }
 
-    @AlsoNegation
     @AfterTemplate
     boolean after(boolean firstTest, boolean secondTest) {
       return firstTest || secondTest;
+    }
+  }
+
+  /**
+   * Prefer {@link Stream#generate(java.util.function.Supplier)} over more contrived alternatives.
+   */
+  static final class UnboundedSingleElementStream<T> {
+    @BeforeTemplate
+    Stream<T> before(T object) {
+      return Streams.stream(Iterables.cycle(object));
+    }
+
+    @AfterTemplate
+    Stream<T> after(T object) {
+      return Stream.generate(() -> object);
     }
   }
 }

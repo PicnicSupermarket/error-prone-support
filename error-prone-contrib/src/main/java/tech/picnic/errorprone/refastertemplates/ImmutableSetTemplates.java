@@ -5,9 +5,11 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets.SetView;
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -79,6 +81,27 @@ final class ImmutableSetTemplates {
     @AfterTemplate
     ImmutableSet<T> after(Iterable<T> iterable) {
       return ImmutableSet.copyOf(iterable);
+    }
+  }
+
+  /** Prefer {@link ImmutableSet#toImmutableSet()} over less idiomatic alternatives. */
+  // XXX: Once the code base has been sufficiently cleaned up, we might want to also rewrite
+  // `Collectors.toSet(`), with the caveat that it allows mutation (though this cannot be relied
+  // upon) as well as nulls. Another option is to explicitly rewrite those variants to
+  // `Collectors.toSet(HashSet::new)`.
+  static final class StreamToImmutableSet<T> {
+    @BeforeTemplate
+    ImmutableSet<T> before(Stream<T> stream) {
+      return Refaster.anyOf(
+          ImmutableSet.copyOf(stream.iterator()),
+          ImmutableSet.copyOf(stream::iterator),
+          stream.distinct().collect(toImmutableSet()));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ImmutableSet<T> after(Stream<T> stream) {
+      return stream.collect(toImmutableSet());
     }
   }
 

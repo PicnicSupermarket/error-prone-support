@@ -15,8 +15,8 @@ final class ComparatorTemplates {
   private ComparatorTemplates() {}
 
   /** Prefer {@link Comparator#naturalOrder()} over more complicated constructs. */
-  // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
   static final class NaturalOrderComparator<T extends Comparable<? super T>> {
+    // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
     @BeforeTemplate
     Comparator<T> before() {
       return Refaster.anyOf(Comparator.comparing(Refaster.anyOf(identity(), v -> v)));
@@ -34,6 +34,7 @@ final class ComparatorTemplates {
    * it more clearly states intent.
    */
   static final class NaturalOrderComparatorFallback<T extends Comparable<? super T>> {
+    // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
     @BeforeTemplate
     Comparator<T> before(Comparator<T> cmp) {
       return cmp.thenComparing(Refaster.anyOf(identity(), v -> v));

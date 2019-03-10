@@ -146,6 +146,10 @@ final class RefasterCheckPositiveCases {
           3 < 4 || (3 >= 4 && true),
           3 >= 4 || (3 < 4 && true));
     }
+
+    Stream<String> testUnboundedSingleElementStream() {
+      return Streams.stream(Iterables.cycle("foo"));
+    }
   }
 
   static final class BigDecimalTemplates {
@@ -454,6 +458,12 @@ final class RefasterCheckPositiveCases {
           Arrays.stream(new Integer[] {9}).collect(toImmutableList()));
     }
 
+    ImmutableSet<ImmutableList<Integer>> testStreamToImmutableList() {
+      return ImmutableSet.of(
+          ImmutableList.copyOf(Stream.of(1).iterator()),
+          ImmutableList.copyOf(Stream.of(2).iterator()));
+    }
+
     ImmutableList<Integer> testImmutableListAsList() {
       return ImmutableList.of(1, 2, 3).asList();
     }
@@ -538,6 +548,12 @@ final class RefasterCheckPositiveCases {
           Arrays.stream(new Integer[] {9}).collect(toImmutableMultiset()));
     }
 
+    ImmutableSet<ImmutableMultiset<Integer>> testStreamToImmutableMultiset() {
+      return ImmutableSet.of(
+          ImmutableMultiset.copyOf(Stream.of(1).iterator()),
+          ImmutableMultiset.copyOf(Stream.of(2)::iterator));
+    }
+
     ImmutableMultiset<Integer> testImmutableMultisetCopyOfImmutableMultiset() {
       return ImmutableMultiset.copyOf(ImmutableMultiset.of(1, 2));
     }
@@ -605,6 +621,13 @@ final class RefasterCheckPositiveCases {
           ImmutableSet.<Integer>builder().add(new Integer[] {7}).build(),
           Stream.of(new Integer[] {8}).collect(toImmutableSet()),
           Arrays.stream(new Integer[] {9}).collect(toImmutableSet()));
+    }
+
+    ImmutableSet<ImmutableSet<Integer>> testStreamToImmutableSet() {
+      return ImmutableSet.of(
+          ImmutableSet.copyOf(Stream.of(1).iterator()),
+          ImmutableSet.copyOf(Stream.of(2)::iterator),
+          Stream.of(3).distinct().collect(toImmutableSet()));
     }
 
     ImmutableSet<Integer> testImmutableSetCopyOfImmutableSet() {
@@ -703,6 +726,12 @@ final class RefasterCheckPositiveCases {
           Stream.of(new Integer[] {10}).collect(toImmutableSortedMultiset(naturalOrder())),
           Arrays.stream(new Integer[] {11}).collect(toImmutableSortedMultiset(naturalOrder())));
     }
+
+    ImmutableSet<ImmutableSortedMultiset<Integer>> testStreamToImmutableSortedMultiset() {
+      return ImmutableSet.of(
+          ImmutableSortedMultiset.copyOf(Stream.of(1).iterator()),
+          ImmutableSortedMultiset.copyOf(Stream.of(2)::iterator));
+    }
   }
 
   static final class ImmutableSortedSetTemplates {
@@ -740,6 +769,12 @@ final class RefasterCheckPositiveCases {
           ImmutableSortedSet.<Integer>naturalOrder().add(new Integer[] {9}).build(),
           Stream.of(new Integer[] {10}).collect(toImmutableSortedSet(naturalOrder())),
           Arrays.stream(new Integer[] {11}).collect(toImmutableSortedSet(naturalOrder())));
+    }
+
+    ImmutableSet<ImmutableSortedSet<Integer>> testStreamToImmutableSortedSet() {
+      return ImmutableSet.of(
+          ImmutableSortedSet.copyOf(Stream.of(1).iterator()),
+          ImmutableSortedSet.copyOf(Stream.of(2)::iterator));
     }
   }
 
@@ -930,37 +965,6 @@ final class RefasterCheckPositiveCases {
 
     Stream<Integer> testFlatMapOuterStreamAfterFlatMap() {
       return Stream.of("foo").flatMap(v -> Stream.of(v.length()).flatMap(Stream::of));
-    }
-
-    ImmutableSet<ImmutableList<Integer>> testStreamToImmutableList() {
-      return ImmutableSet.of(
-          ImmutableList.copyOf(Stream.of(1).iterator()),
-          ImmutableList.copyOf(Stream.of(2).iterator()));
-    }
-
-    ImmutableSet<ImmutableSet<Integer>> testStreamToImmutableSet() {
-      return ImmutableSet.of(
-          ImmutableSet.copyOf(Stream.of(1).iterator()),
-          ImmutableSet.copyOf(Stream.of(2)::iterator),
-          Stream.of(3).distinct().collect(toImmutableSet()));
-    }
-
-    ImmutableSet<ImmutableSortedSet<Integer>> testStreamToImmutableSortedSet() {
-      return ImmutableSet.of(
-          ImmutableSortedSet.copyOf(Stream.of(1).iterator()),
-          ImmutableSortedSet.copyOf(Stream.of(2)::iterator));
-    }
-
-    ImmutableSet<ImmutableMultiset<Integer>> testStreamToImmutableMultiset() {
-      return ImmutableSet.of(
-          ImmutableMultiset.copyOf(Stream.of(1).iterator()),
-          ImmutableMultiset.copyOf(Stream.of(2)::iterator));
-    }
-
-    ImmutableSet<ImmutableSortedMultiset<Integer>> testStreamToImmutableSortedMultiset() {
-      return ImmutableSet.of(
-          ImmutableSortedMultiset.copyOf(Stream.of(1).iterator()),
-          ImmutableSortedMultiset.copyOf(Stream.of(2)::iterator));
     }
   }
 

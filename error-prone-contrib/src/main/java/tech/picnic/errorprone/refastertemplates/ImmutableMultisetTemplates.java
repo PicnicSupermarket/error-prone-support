@@ -4,9 +4,11 @@ import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
 
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -82,6 +84,21 @@ final class ImmutableMultisetTemplates {
     @AfterTemplate
     ImmutableMultiset<T> after(Iterable<T> iterable) {
       return ImmutableMultiset.copyOf(iterable);
+    }
+  }
+
+  /** Prefer {@link ImmutableMultiset#toImmutableMultiset()} over less idiomatic alternatives. */
+  static final class StreamToImmutableMultiset<T> {
+    @BeforeTemplate
+    ImmutableMultiset<T> before(Stream<T> stream) {
+      return Refaster.anyOf(
+          ImmutableMultiset.copyOf(stream.iterator()), ImmutableMultiset.copyOf(stream::iterator));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ImmutableMultiset<T> after(Stream<T> stream) {
+      return stream.collect(toImmutableMultiset());
     }
   }
 
