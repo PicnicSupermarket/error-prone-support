@@ -42,6 +42,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -1018,8 +1019,19 @@ final class RefasterCheckPositiveCases {
       return Instant.now(Clock.systemUTC());
     }
 
-    ZoneId testUtcConstant() {
-      return ZoneId.of("UTC");
+    ImmutableSet<ZoneId> testUtcConstant() {
+      return ImmutableSet.of(
+          ZoneId.of("GMT"),
+          ZoneId.of("UTC"),
+          ZoneId.of("Z"),
+          ZoneId.of("+0"),
+          ZoneId.of("-0"),
+          ZoneOffset.UTC,
+          ZoneId.from(ZoneOffset.UTC));
+    }
+
+    Clock testUtcClock() {
+      return Clock.system(ZoneOffset.UTC);
     }
 
     ImmutableSet<Boolean> testInstantIsBefore() {

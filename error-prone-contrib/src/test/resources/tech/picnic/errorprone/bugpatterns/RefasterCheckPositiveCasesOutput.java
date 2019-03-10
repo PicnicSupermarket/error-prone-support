@@ -881,8 +881,19 @@ final class RefasterCheckPositiveCases {
       return Clock.systemUTC().instant();
     }
 
-    ZoneId testUtcConstant() {
-      return ZoneOffset.UTC;
+    ImmutableSet<ZoneId> testUtcConstant() {
+      return ImmutableSet.of(
+          ZoneOffset.UTC,
+          ZoneOffset.UTC,
+          ZoneOffset.UTC,
+          ZoneOffset.UTC,
+          ZoneOffset.UTC,
+          ZoneOffset.UTC,
+          ZoneOffset.UTC);
+    }
+
+    Clock testUtcClock() {
+      return Clock.systemUTC();
     }
 
     ImmutableSet<Boolean> testInstantIsBefore() {

@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.refastertemplates;
 
-
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;

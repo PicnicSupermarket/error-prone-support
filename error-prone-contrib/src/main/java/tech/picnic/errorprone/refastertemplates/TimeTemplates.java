@@ -52,12 +52,32 @@ final class TimeTemplates {
   static final class UtcConstant {
     @BeforeTemplate
     ZoneId before() {
-      return ZoneId.of("UTC");
+      return Refaster.anyOf(
+          ZoneId.of("GMT"),
+          ZoneId.of("UTC"),
+          ZoneId.of("Z"),
+          ZoneId.of("+0"),
+          ZoneId.of("-0"),
+          ZoneOffset.UTC.normalized(),
+          ZoneId.from(ZoneOffset.UTC));
     }
 
     @AfterTemplate
     ZoneOffset after() {
       return ZoneOffset.UTC;
+    }
+  }
+
+  /** Use {@link Clock#systemUTC()} when possible. */
+  static final class UtcClock {
+    @BeforeTemplate
+    Clock before() {
+      return Clock.system(ZoneOffset.UTC);
+    }
+
+    @AfterTemplate
+    Clock after() {
+      return Clock.systemUTC();
     }
   }
 
