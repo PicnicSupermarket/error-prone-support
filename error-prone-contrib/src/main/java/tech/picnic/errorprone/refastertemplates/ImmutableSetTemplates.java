@@ -1,6 +1,9 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets.SetView;
@@ -95,7 +98,9 @@ final class ImmutableSetTemplates {
       return Refaster.anyOf(
           ImmutableSet.copyOf(stream.iterator()),
           ImmutableSet.copyOf(stream::iterator),
-          stream.distinct().collect(toImmutableSet()));
+          stream.distinct().collect(toImmutableSet()),
+          stream.collect(collectingAndThen(toList(), ImmutableSet::copyOf)),
+          stream.collect(collectingAndThen(toSet(), ImmutableSet::copyOf)));
     }
 
     @AfterTemplate

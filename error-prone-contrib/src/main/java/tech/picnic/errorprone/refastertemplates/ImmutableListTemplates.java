@@ -2,6 +2,8 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Comparator.naturalOrder;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
@@ -96,7 +98,9 @@ final class ImmutableListTemplates {
     @BeforeTemplate
     ImmutableList<T> before(Stream<T> stream) {
       return Refaster.anyOf(
-          ImmutableList.copyOf(stream.iterator()), ImmutableList.copyOf(stream::iterator));
+          ImmutableList.copyOf(stream.iterator()),
+          ImmutableList.copyOf(stream::iterator),
+          stream.collect(collectingAndThen(toList(), ImmutableList::copyOf)));
     }
 
     @AfterTemplate

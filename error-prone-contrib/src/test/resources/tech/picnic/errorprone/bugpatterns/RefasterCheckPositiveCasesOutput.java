@@ -14,7 +14,10 @@ import static java.util.Comparator.reverseOrder;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
@@ -79,11 +82,14 @@ final class RefasterCheckPositiveCases {
           MoreObjects.class,
           Preconditions.class,
           Streams.class,
+          (Runnable) () -> collectingAndThen(null, null),
           (Runnable) () -> identity(),
           (Runnable) () -> joining(),
           (Runnable) () -> toImmutableListMultimap(null, null),
           (Runnable) () -> toImmutableSetMultimap(null, null),
-          (Runnable) () -> toImmutableSortedMap(null, null, null));
+          (Runnable) () -> toImmutableSortedMap(null, null, null),
+          (Runnable) () -> toList(),
+          (Runnable) () -> toSet());
 
   static final class AssortedTemplates {
     int testCheckIndex() {
@@ -399,7 +405,9 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSet<ImmutableList<Integer>> testStreamToImmutableList() {
       return ImmutableSet.of(
-          Stream.of(1).collect(toImmutableList()), Stream.of(2).collect(toImmutableList()));
+          Stream.of(1).collect(toImmutableList()),
+          Stream.of(2).collect(toImmutableList()),
+          Stream.of(3).collect(toImmutableList()));
     }
 
     ImmutableList<Integer> testImmutableListAsList() {
@@ -478,7 +486,9 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSet<ImmutableMultiset<Integer>> testStreamToImmutableMultiset() {
       return ImmutableSet.of(
-          Stream.of(1).collect(toImmutableMultiset()), Stream.of(2).collect(toImmutableMultiset()));
+          Stream.of(1).collect(toImmutableMultiset()),
+          Stream.of(2).collect(toImmutableMultiset()),
+          Stream.of(3).collect(toImmutableMultiset()));
     }
 
     ImmutableMultiset<Integer> testImmutableMultisetCopyOfImmutableMultiset() {
@@ -545,7 +555,9 @@ final class RefasterCheckPositiveCases {
       return ImmutableSet.of(
           Stream.of(1).collect(toImmutableSet()),
           Stream.of(2).collect(toImmutableSet()),
-          Stream.of(3).collect(toImmutableSet()));
+          Stream.of(3).collect(toImmutableSet()),
+          Stream.of(4).collect(toImmutableSet()),
+          Stream.of(5).collect(toImmutableSet()));
     }
 
     ImmutableSet<Integer> testImmutableSetCopyOfImmutableSet() {
@@ -630,7 +642,8 @@ final class RefasterCheckPositiveCases {
     ImmutableSet<ImmutableSortedMultiset<Integer>> testStreamToImmutableSortedMultiset() {
       return ImmutableSet.of(
           Stream.of(1).collect(toImmutableSortedMultiset(naturalOrder())),
-          Stream.of(2).collect(toImmutableSortedMultiset(naturalOrder())));
+          Stream.of(2).collect(toImmutableSortedMultiset(naturalOrder())),
+          Stream.of(3).collect(toImmutableSortedMultiset(naturalOrder())));
     }
   }
 
@@ -670,7 +683,8 @@ final class RefasterCheckPositiveCases {
     ImmutableSet<ImmutableSortedSet<Integer>> testStreamToImmutableSortedSet() {
       return ImmutableSet.of(
           Stream.of(1).collect(toImmutableSortedSet(naturalOrder())),
-          Stream.of(2).collect(toImmutableSortedSet(naturalOrder())));
+          Stream.of(2).collect(toImmutableSortedSet(naturalOrder())),
+          Stream.of(3).collect(toImmutableSortedSet(naturalOrder())));
     }
   }
 

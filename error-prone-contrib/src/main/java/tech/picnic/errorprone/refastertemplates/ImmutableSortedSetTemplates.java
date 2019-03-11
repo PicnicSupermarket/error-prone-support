@@ -2,6 +2,8 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static java.util.Comparator.naturalOrder;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
@@ -130,12 +132,15 @@ final class ImmutableSortedSetTemplates {
    * idiomatic alternatives.
    */
   // XXX: Also handle the variant with a custom comparator.
+  // XXX: Note that this rule rewrites fewer expressions than `StreamToImmutableSet`, because
+  // `#compareTo` and `#equals` may be inconsistent. We should separately flag such cases.
   static final class StreamToImmutableSortedSet<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedSet<T> before(Stream<T> stream) {
       return Refaster.anyOf(
           ImmutableSortedSet.copyOf(stream.iterator()),
-          ImmutableSortedSet.copyOf(stream::iterator));
+          ImmutableSortedSet.copyOf(stream::iterator),
+          stream.collect(collectingAndThen(toList(), ImmutableSortedSet::copyOf)));
     }
 
     @AfterTemplate

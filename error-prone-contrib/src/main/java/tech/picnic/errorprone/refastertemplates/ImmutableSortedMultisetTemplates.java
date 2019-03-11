@@ -2,6 +2,8 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSortedMultiset;
 import static java.util.Comparator.naturalOrder;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSortedMultiset;
@@ -137,7 +139,8 @@ final class ImmutableSortedMultisetTemplates {
     ImmutableSortedMultiset<T> before(Stream<T> stream) {
       return Refaster.anyOf(
           ImmutableSortedMultiset.copyOf(stream.iterator()),
-          ImmutableSortedMultiset.copyOf(stream::iterator));
+          ImmutableSortedMultiset.copyOf(stream::iterator),
+          stream.collect(collectingAndThen(toList(), ImmutableSortedMultiset::copyOf)));
     }
 
     @AfterTemplate

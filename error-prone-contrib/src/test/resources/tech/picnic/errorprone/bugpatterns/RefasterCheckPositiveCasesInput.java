@@ -9,7 +9,10 @@ import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSorte
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static java.util.Comparator.naturalOrder;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
@@ -74,11 +77,14 @@ final class RefasterCheckPositiveCases {
           MoreObjects.class,
           Preconditions.class,
           Streams.class,
+          (Runnable) () -> collectingAndThen(null, null),
           (Runnable) () -> identity(),
           (Runnable) () -> joining(),
           (Runnable) () -> toImmutableListMultimap(null, null),
           (Runnable) () -> toImmutableSetMultimap(null, null),
-          (Runnable) () -> toImmutableSortedMap(null, null, null));
+          (Runnable) () -> toImmutableSortedMap(null, null, null),
+          (Runnable) () -> toList(),
+          (Runnable) () -> toSet());
 
   static final class AssortedTemplates {
     int testCheckIndex() {
@@ -462,7 +468,8 @@ final class RefasterCheckPositiveCases {
     ImmutableSet<ImmutableList<Integer>> testStreamToImmutableList() {
       return ImmutableSet.of(
           ImmutableList.copyOf(Stream.of(1).iterator()),
-          ImmutableList.copyOf(Stream.of(2).iterator()));
+          ImmutableList.copyOf(Stream.of(2).iterator()),
+          Stream.of(3).collect(collectingAndThen(toList(), ImmutableList::copyOf)));
     }
 
     ImmutableList<Integer> testImmutableListAsList() {
@@ -552,7 +559,8 @@ final class RefasterCheckPositiveCases {
     ImmutableSet<ImmutableMultiset<Integer>> testStreamToImmutableMultiset() {
       return ImmutableSet.of(
           ImmutableMultiset.copyOf(Stream.of(1).iterator()),
-          ImmutableMultiset.copyOf(Stream.of(2)::iterator));
+          ImmutableMultiset.copyOf(Stream.of(2)::iterator),
+          Stream.of(3).collect(collectingAndThen(toList(), ImmutableMultiset::copyOf)));
     }
 
     ImmutableMultiset<Integer> testImmutableMultisetCopyOfImmutableMultiset() {
@@ -628,7 +636,9 @@ final class RefasterCheckPositiveCases {
       return ImmutableSet.of(
           ImmutableSet.copyOf(Stream.of(1).iterator()),
           ImmutableSet.copyOf(Stream.of(2)::iterator),
-          Stream.of(3).distinct().collect(toImmutableSet()));
+          Stream.of(3).distinct().collect(toImmutableSet()),
+          Stream.of(4).collect(collectingAndThen(toList(), ImmutableSet::copyOf)),
+          Stream.of(5).collect(collectingAndThen(toSet(), ImmutableSet::copyOf)));
     }
 
     ImmutableSet<Integer> testImmutableSetCopyOfImmutableSet() {
@@ -731,7 +741,8 @@ final class RefasterCheckPositiveCases {
     ImmutableSet<ImmutableSortedMultiset<Integer>> testStreamToImmutableSortedMultiset() {
       return ImmutableSet.of(
           ImmutableSortedMultiset.copyOf(Stream.of(1).iterator()),
-          ImmutableSortedMultiset.copyOf(Stream.of(2)::iterator));
+          ImmutableSortedMultiset.copyOf(Stream.of(2)::iterator),
+          Stream.of(3).collect(collectingAndThen(toList(), ImmutableSortedMultiset::copyOf)));
     }
   }
 
@@ -775,7 +786,8 @@ final class RefasterCheckPositiveCases {
     ImmutableSet<ImmutableSortedSet<Integer>> testStreamToImmutableSortedSet() {
       return ImmutableSet.of(
           ImmutableSortedSet.copyOf(Stream.of(1).iterator()),
-          ImmutableSortedSet.copyOf(Stream.of(2)::iterator));
+          ImmutableSortedSet.copyOf(Stream.of(2)::iterator),
+          Stream.of(3).collect(collectingAndThen(toList(), ImmutableSortedSet::copyOf)));
     }
   }
 
