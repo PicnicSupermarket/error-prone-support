@@ -166,11 +166,38 @@ final class OptionalTemplates {
     }
   }
 
+  abstract static class MapToOptionalGet<T, S> {
+    @Placeholder
+    abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
+
+    @BeforeTemplate
+    Optional<S> before(Optional<T> optional) {
+      return optional.map(v -> toOptionalFunction(v).get());
+    }
+
+    @AfterTemplate
+    Optional<S> after(Optional<T> optional) {
+      return optional.flatMap(v -> toOptionalFunction(v));
+    }
+  }
+
+  static final class OrElseGetToOptionalGet<T> {
+    @BeforeTemplate
+    T before(Optional<T> o1, Optional<T> o2) {
+      return o1.orElseGet(() -> o2.get());
+    }
+
+    @AfterTemplate
+    T after(Optional<T> o1, Optional<T> o2) {
+      return o1.or(() -> o2).get();
+    }
+  }
+
   /**
    * Flatten a stream of {@link Optional}s using {@link Optional#stream()}, rather than using one of
    * the more verbose alternatives.
    */
-  static final class FlatmapOptionalToStream<T> {
+  static final class StreamFlatmapOptional<T> {
     @BeforeTemplate
     Stream<T> before(Stream<Optional<T>> stream) {
       return Refaster.anyOf(
@@ -186,7 +213,7 @@ final class OptionalTemplates {
   /** Within a stream's map operation unconditional {@link Optional#get()} calls can be avoided. */
   // XXX: An alternative approach is to `.flatMap(Optional::stream)`. That may be a bit longer, but
   // yield nicer code. Think about it.
-  abstract static class MapToOptionalGet<T, S> {
+  abstract static class StreamMapToOptionalGet<T, S> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 

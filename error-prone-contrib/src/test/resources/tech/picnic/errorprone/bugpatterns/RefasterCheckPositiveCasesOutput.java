@@ -774,14 +774,22 @@ final class RefasterCheckPositiveCases {
           Optional.of(1).map(n -> String.valueOf(n)), Optional.of(2).map(n -> String.valueOf(n)));
     }
 
-    Stream<Object> testFlatmapOptionalToStream() {
+    Optional<String> testMapToOptionalGet() {
+      return Optional.of(1).flatMap(n -> Optional.of(String.valueOf(n)));
+    }
+
+    String testOrElseGetToOptionalGet() {
+      return Optional.of("foo").or(() -> Optional.of("bar")).get();
+    }
+
+    Stream<Object> testStreamFlatmapOptional() {
       return Stream.concat(
           Stream.of(Optional.empty()).flatMap(Optional::stream),
           Stream.of(Optional.of("foo")).flatMap(Optional::stream));
     }
 
-    Stream<String> testMapToOptionalGet(Map<Integer, Optional<String>> map) {
-      return Stream.of(1).flatMap(n -> map.get(n).stream());
+    Stream<String> testStreamMapToOptionalGet() {
+      return Stream.of(1).flatMap(n -> Optional.of(String.valueOf(n)).stream());
     }
 
     Optional<Integer> testFilterOuterOptionalAfterFlatMap() {
