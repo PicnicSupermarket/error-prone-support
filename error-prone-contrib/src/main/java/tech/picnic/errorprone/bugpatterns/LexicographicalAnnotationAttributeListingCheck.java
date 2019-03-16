@@ -58,7 +58,8 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
       ImmutableSet.of(
           // XXX: unless JsonPropertyOrder#alphabetic is true...
           "com.fasterxml.jackson.annotation.JsonPropertyOrder#value",
-          "io.swagger.annotations.ApiImplicitParams#value");
+          "io.swagger.annotations.ApiImplicitParams#value",
+          "javax.xml.bind.annotation.XmlType#propOrder");
   private static final String FLAG_PREFIX = "LexicographicalAnnotationAttributeListing:";
   private static final String INCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Includes";
   private static final String EXCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Excludes";

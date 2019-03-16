@@ -37,6 +37,7 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
             "import io.swagger.annotations.ApiImplicitParam;",
             "import io.swagger.annotations.ApiImplicitParams;",
             "import java.math.RoundingMode;",
+            "import javax.xml.bind.annotation.XmlType;",
             "",
             "interface A {",
             "  @interface Foo {",
@@ -88,6 +89,9 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
             "",
             "  @JsonPropertyOrder({\"field2\", \"field1\"}) A dto();",
             "  @ApiImplicitParams({@ApiImplicitParam(\"p2\"), @ApiImplicitParam(\"p1\")}) A endpoint();",
+            "",
+            "  @XmlType(propOrder = {\"field2\", \"field1\"})",
+            "  class Dummy {}",
             "}")
         .doTest();
   }
