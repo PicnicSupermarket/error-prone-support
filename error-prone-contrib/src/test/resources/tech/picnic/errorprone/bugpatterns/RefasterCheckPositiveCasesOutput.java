@@ -13,6 +13,7 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.Map.Entry.comparingByValue;
+import static java.util.Objects.requireNonNullElse;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.joining;
@@ -712,7 +713,7 @@ final class RefasterCheckPositiveCases {
 
   static final class NullTemplates {
     String testRequireNonNullElse() {
-      return Objects.requireNonNullElse("foo", "bar");
+      return requireNonNullElse("foo", "bar");
     }
 
     long testIsNullFunction() {

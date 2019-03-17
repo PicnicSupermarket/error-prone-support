@@ -1,8 +1,10 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import com.google.common.base.MoreObjects;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -18,6 +20,7 @@ final class NullTemplates {
     }
 
     @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     T after(T first, T second) {
       return Objects.requireNonNullElse(first, second);
     }
