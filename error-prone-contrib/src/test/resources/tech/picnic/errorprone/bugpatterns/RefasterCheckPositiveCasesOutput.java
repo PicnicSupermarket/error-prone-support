@@ -15,6 +15,7 @@ import static java.util.Map.Entry.comparingByKey;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.Objects.requireNonNullElse;
 import static java.util.function.Function.identity;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -86,6 +87,7 @@ final class RefasterCheckPositiveCases {
           (Runnable) () -> collectingAndThen(null, null),
           (Runnable) () -> identity(),
           (Runnable) () -> joining(),
+          (Runnable) () -> not(null),
           (Runnable) () -> toImmutableListMultimap(null, null),
           (Runnable) () -> toImmutableSetMultimap(null, null),
           (Runnable) () -> toImmutableSortedMap(null, null, null),
@@ -855,6 +857,59 @@ final class RefasterCheckPositiveCases {
 
     Stream<Integer> testFlatMapOuterStreamAfterFlatMap() {
       return Stream.of("foo").flatMap(v -> Stream.of(v.length())).flatMap(Stream::of);
+    }
+
+    ImmutableSet<Optional<Integer>> testStreamMapFirst() {
+      return ImmutableSet.of(
+          Stream.of("foo").findFirst().map(s -> s.length()),
+          Stream.of("bar").findFirst().map(String::length));
+    }
+
+    ImmutableSet<Boolean> testStreamIsEmpty() {
+      return ImmutableSet.of(
+          Stream.of(1).findAny().isEmpty(),
+          Stream.of(2).findAny().isEmpty(),
+          Stream.of(3).findAny().isEmpty(),
+          Stream.of(4).findAny().isEmpty());
+    }
+
+    ImmutableSet<Boolean> testStreamIsNotEmpty() {
+      return ImmutableSet.of(
+          Stream.of(1).findAny().isPresent(),
+          Stream.of(2).findAny().isPresent(),
+          Stream.of(3).findAny().isPresent(),
+          Stream.of(4).findAny().isPresent());
+    }
+
+    ImmutableSet<Boolean> testStreamNoneMatch() {
+      return ImmutableSet.of(
+          Stream.of("foo").noneMatch(s -> s.length() > 1),
+          Stream.of("bar").noneMatch(String::isBlank),
+          Stream.of("baz").noneMatch(String::isEmpty));
+    }
+
+    boolean testStreamNoneMatch2() {
+      return Stream.of("foo").noneMatch(s -> s.isBlank());
+    }
+
+    ImmutableSet<Boolean> testStreamAnyMatch() {
+      return ImmutableSet.of(
+          Stream.of("foo").anyMatch(s -> s.length() > 1),
+          Stream.of("bar").anyMatch(String::isEmpty));
+    }
+
+    ImmutableSet<Boolean> testStreamAllMatch() {
+      return ImmutableSet.of(
+          Stream.of("foo").allMatch(String::isBlank),
+          Stream.of("bar").allMatch(s -> s.length() > 1),
+          Stream.of("baz").allMatch(String::isEmpty));
+    }
+
+    ImmutableSet<Boolean> testStreamAllMatch2() {
+      return ImmutableSet.of(
+          Stream.of("foo").allMatch(s -> s.isBlank()),
+          Stream.of("bar").allMatch(s -> s.isEmpty()),
+          Stream.of("baz").allMatch(s -> s.isBlank()));
     }
   }
 

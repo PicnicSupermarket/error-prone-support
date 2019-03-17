@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static java.util.function.Predicate.not;
+
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -107,6 +109,136 @@ final class StreamTemplates {
     @AfterTemplate
     Stream<R> after(Stream<T> stream, Function<? super S, ? extends Stream<? extends R>> function) {
       return stream.flatMap(v -> toStreamFunction(v)).flatMap(function);
+    }
+  }
+
+  /**
+   * Where possible, clarify that a mapping operation will be applied only to a single stream
+   * element.
+   */
+  // XXX: Consider whether to have a similar rule for `.findAny()`. For parallel streams it wouldn't
+  // be quite the same....
+  static final class StreamMapFirst<T, S> {
+    @BeforeTemplate
+    Optional<S> before(Stream<T> stream, Function<T, S> function) {
+      return stream.map(function).findFirst();
+    }
+
+    @AfterTemplate
+    Optional<S> after(Stream<T> stream, Function<T, S> function) {
+      return stream.findFirst().map(function);
+    }
+  }
+
+  /** In order to test whether a stream has any element, simply try to find one. */
+  static final class StreamIsEmpty<T> {
+    @BeforeTemplate
+    boolean before(Stream<T> stream) {
+      return Refaster.anyOf(
+          stream.count() == 0,
+          stream.count() <= 0,
+          stream.count() < 1,
+          stream.findFirst().isEmpty());
+    }
+
+    @AfterTemplate
+    boolean after(Stream<T> stream) {
+      return stream.findAny().isEmpty();
+    }
+  }
+
+  /** In order to test whether a stream has any element, simply try to find one. */
+  static final class StreamIsNotEmpty<T> {
+    @BeforeTemplate
+    boolean before(Stream<T> stream) {
+      return Refaster.anyOf(
+          stream.count() != 0,
+          stream.count() > 0,
+          stream.count() >= 1,
+          stream.findFirst().isPresent());
+    }
+
+    @AfterTemplate
+    boolean after(Stream<T> stream) {
+      return stream.findAny().isPresent();
+    }
+  }
+
+  /** Prefer {@link Stream#noneMatch(Predicate)} over more contrived alternatives. */
+  static final class StreamNoneMatch<T> {
+    @BeforeTemplate
+    boolean before(Stream<T> stream, Predicate<T> predicate) {
+      return Refaster.anyOf(
+          !stream.anyMatch(predicate),
+          stream.allMatch(not(predicate)),
+          stream.filter(predicate).findAny().isEmpty());
+    }
+
+    @AfterTemplate
+    boolean after(Stream<T> stream, Predicate<T> predicate) {
+      return stream.noneMatch(predicate);
+    }
+  }
+
+  abstract static class StreamNoneMatch2<T> {
+    @Placeholder
+    abstract boolean test(@MayOptionallyUse T element);
+
+    @BeforeTemplate
+    boolean before(Stream<T> stream) {
+      return stream.allMatch(e -> !test(e));
+    }
+
+    @AfterTemplate
+    boolean after(Stream<T> stream) {
+      return stream.noneMatch(e -> test(e));
+    }
+  }
+
+  /** Prefer {@link Stream#anyMatch(Predicate)} over more contrived alternatives. */
+  static final class StreamAnyMatch<T> {
+    @BeforeTemplate
+    boolean before(Stream<T> stream, Predicate<T> predicate) {
+      return Refaster.anyOf(
+          !stream.noneMatch(predicate), stream.filter(predicate).findAny().isPresent());
+    }
+
+    @AfterTemplate
+    boolean after(Stream<T> stream, Predicate<T> predicate) {
+      return stream.anyMatch(predicate);
+    }
+  }
+
+  static final class StreamAllMatch<T> {
+    @BeforeTemplate
+    boolean before(Stream<T> stream, Predicate<T> predicate) {
+      return Refaster.anyOf(
+          stream.noneMatch(not(predicate)),
+          !stream.anyMatch(not(predicate)),
+          stream.filter(not(predicate)).findAny().isEmpty());
+    }
+
+    @AfterTemplate
+    boolean after(Stream<T> stream, Predicate<T> predicate) {
+      return stream.allMatch(predicate);
+    }
+  }
+
+  abstract static class StreamAllMatch2<T> {
+    @Placeholder
+    abstract boolean test(@MayOptionallyUse T element);
+
+    @BeforeTemplate
+    boolean before(Stream<T> stream) {
+      return Refaster.anyOf(
+          stream.noneMatch(e -> !test(e)),
+          !stream.anyMatch(e -> !test(e)),
+          stream.filter(e -> !test(e)).findAny().isEmpty());
+    }
+
+    @AfterTemplate
+    boolean after(Stream<T> stream) {
+      return stream.allMatch(e -> test(e));
     }
   }
 }
