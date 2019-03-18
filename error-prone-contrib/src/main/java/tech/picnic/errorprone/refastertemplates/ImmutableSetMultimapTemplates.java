@@ -1,15 +1,25 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutableSetMultimap;
 import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 
 import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.SetMultimap;
+import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.Placeholder;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link ImmutableSetMultimap}s. */
@@ -104,6 +114,105 @@ final class ImmutableSetMultimapTemplates {
     ImmutableSetMultimap<K, V> after(
         Iterable<? extends Map.Entry<? extends K, ? extends V>> iterable) {
       return ImmutableSetMultimap.copyOf(iterable);
+    }
+  }
+
+  /**
+   * Don't map a a stream's elements to map entries, only to subsequently collect them into an
+   * {@link ImmutableSetMultimap}. The collection can be performed directly.
+   */
+  abstract static class StreamOfMapEntriesToImmutableSetMultimap<E, K, V> {
+    @Placeholder
+    abstract K keyFunction(@MayOptionallyUse E element);
+
+    @Placeholder
+    abstract V valueFunction(@MayOptionallyUse E element);
+
+    // XXX: We could add variants in which the entry is created some other way, but we have another
+    // rule which covers canonicalization to `Map.entry`.
+    @BeforeTemplate
+    ImmutableSetMultimap<K, V> before(Stream<E> stream) {
+      return stream
+          .map(e -> Map.entry(keyFunction(e), valueFunction(e)))
+          .collect(toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ImmutableSetMultimap<K, V> after(Stream<E> stream) {
+      return stream.collect(toImmutableSetMultimap(e -> keyFunction(e), e -> valueFunction(e)));
+    }
+  }
+
+  /**
+   * Prefer creating an immutable copy of the result of {@link Multimaps#transformValues(Multimap,
+   * com.google.common.base.Function)} over creating and directly collecting a stream.
+   */
+  abstract static class TransformMultimapValuesToImmutableSetMultimap<K, V1, V2> {
+    @Placeholder
+    abstract V2 valueTransformation(@MayOptionallyUse V1 value);
+
+    @BeforeTemplate
+    ImmutableSetMultimap<K, V2> before(Multimap<K, V1> multimap) {
+      return multimap.entries().stream()
+          .collect(
+              toImmutableSetMultimap(Map.Entry::getKey, e -> valueTransformation(e.getValue())));
+    }
+
+    @AfterTemplate
+    ImmutableSetMultimap<K, V2> after(Multimap<K, V1> multimap) {
+      return ImmutableSetMultimap.copyOf(
+          Multimaps.transformValues(multimap, v -> valueTransformation(v)));
+    }
+  }
+
+  /**
+   * Prefer creating an immutable copy of the result of {@link Multimaps#transformValues(Multimap,
+   * com.google.common.base.Function)} over creating and directly collecting a stream.
+   */
+  static final class TransformMultimapValuesToImmutableSetMultimap2<K, V1, V2> {
+    // XXX: Drop the `Refaster.anyOf` if we decide to rewrite one to the other.
+    @BeforeTemplate
+    ImmutableSetMultimap<K, V2> before(
+        Multimap<K, V1> multimap, Function<? super V1, ? extends V2> transformation) {
+      return Refaster.anyOf(multimap.asMap(), Multimaps.asMap(multimap)).entrySet().stream()
+          .collect(
+              flatteningToImmutableSetMultimap(
+                  Map.Entry::getKey, e -> e.getValue().stream().map(transformation)));
+    }
+
+    @BeforeTemplate
+    ImmutableSetMultimap<K, V2> before(
+        ListMultimap<K, V1> multimap, Function<? super V1, ? extends V2> transformation) {
+      return Multimaps.asMap(multimap).entrySet().stream()
+          .collect(
+              flatteningToImmutableSetMultimap(
+                  Map.Entry::getKey, e -> e.getValue().stream().map(transformation)));
+    }
+
+    @BeforeTemplate
+    ImmutableSetMultimap<K, V2> before(
+        SetMultimap<K, V1> multimap, Function<? super V1, ? extends V2> transformation) {
+      return Multimaps.asMap(multimap).entrySet().stream()
+          .collect(
+              flatteningToImmutableSetMultimap(
+                  Map.Entry::getKey, e -> e.getValue().stream().map(transformation)));
+    }
+
+    @BeforeTemplate
+    ImmutableSetMultimap<K, V2> before(
+        SortedSetMultimap<K, V1> multimap, Function<? super V1, ? extends V2> transformation) {
+      return Multimaps.asMap(multimap).entrySet().stream()
+          .collect(
+              flatteningToImmutableSetMultimap(
+                  Map.Entry::getKey, e -> e.getValue().stream().map(transformation)));
+    }
+
+    @AfterTemplate
+    ImmutableSetMultimap<K, V2> after(
+        Multimap<K, V1> multimap,
+        com.google.common.base.Function<? super V1, ? extends V2> transformation) {
+      return ImmutableSetMultimap.copyOf(Multimaps.transformValues(multimap, transformation));
     }
   }
 

@@ -1,8 +1,10 @@
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableListMultimap.flatteningToImmutableListMultimap;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutableSetMultimap;
 import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSortedMultiset;
@@ -40,8 +42,11 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
+import com.google.common.collect.TreeMultimap;
 import com.google.common.primitives.Ints;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -84,6 +89,8 @@ final class RefasterCheckPositiveCases {
           Preconditions.class,
           Streams.class,
           (Runnable) () -> collectingAndThen(null, null),
+          (Runnable) () -> flatteningToImmutableListMultimap(null, null),
+          (Runnable) () -> flatteningToImmutableSetMultimap(null, null),
           (Runnable) () -> identity(),
           (Runnable) () -> joining(),
           (Runnable) () -> not(null),
@@ -102,39 +109,8 @@ final class RefasterCheckPositiveCases {
       return ImmutableMap.of(1, "foo").get("bar");
     }
 
-    ImmutableMap<Integer, String> testStreamOfMapEntriesImmutableMap() {
-      // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
-      // Looks like a @Placeholder limitation. Try to track down and fix.
-      return Stream.of(1, 2, 3).collect(toImmutableMap(n -> Integer.valueOf(n), n -> n.toString()));
-    }
-
-    ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToMap() {
-      return ImmutableSet.of(
-          Maps.toMap(ImmutableList.of(1), n -> n * 2),
-          Maps.toMap(ImmutableList.of(2)::iterator, Integer::valueOf),
-          Maps.toMap(ImmutableList.of(3).iterator(), n -> n.intValue()));
-    }
-
-    ImmutableSet<ImmutableMap<Integer, Integer>> testIterableUniqueIndex() {
-      return ImmutableSet.of(
-          Maps.uniqueIndex(ImmutableList.of(1), n -> n * 2),
-          Maps.uniqueIndex(ImmutableList.of(2)::iterator, Integer::valueOf),
-          Maps.uniqueIndex(ImmutableList.of(3).iterator(), n -> n.intValue()));
-    }
-
-    ImmutableSet<ImmutableMap<Integer, Integer>> testSetToImmutableMap() {
-      return ImmutableSet.of(
-          Maps.toMap(ImmutableSet.of(1), n -> n + 2),
-          Maps.toMap(ImmutableSet.of(2), Integer::valueOf));
-    }
-
     ImmutableSet<BoundType> testStreamToImmutableEnumSet() {
       return Stream.of(BoundType.OPEN).collect(toImmutableEnumSet());
-    }
-
-    ImmutableMap<String, Integer> testTransformMapValueToImmutableMap() {
-      return ImmutableMap.copyOf(
-          Maps.transformValues(ImmutableMap.of("foo", 1L), v -> Math.toIntExact(v)));
     }
 
     ImmutableSet<String> testIteratorGetNextOrDefault() {
@@ -382,6 +358,44 @@ final class RefasterCheckPositiveCases {
           ImmutableListMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
     }
 
+    ImmutableListMultimap<Integer, String> testStreamOfMapEntriesToImmutableListMultimap() {
+      // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
+      // Looks like a @Placeholder limitation. Try to track down and fix.
+      return Stream.of(1, 2, 3)
+          .collect(toImmutableListMultimap(n -> Integer.valueOf(n), n -> n.toString()));
+    }
+
+    ImmutableSet<ImmutableListMultimap<Integer, Integer>>
+        testIndexIterableToImmutableListMultimap() {
+      return ImmutableSet.of(
+          Multimaps.index(ImmutableList.of(1), n -> n * 2),
+          Multimaps.index(ImmutableList.of(2)::iterator, Integer::valueOf),
+          Multimaps.index(ImmutableList.of(3).iterator(), n -> n.intValue()));
+    }
+
+    ImmutableListMultimap<String, Integer> testTransformMultimapValuesToImmutableListMultimap() {
+      return ImmutableListMultimap.copyOf(
+          Multimaps.transformValues(ImmutableListMultimap.of("foo", 1L), v -> Math.toIntExact(v)));
+    }
+
+    ImmutableSet<ImmutableListMultimap<String, Integer>>
+        testTransformMultimapValuesToImmutableListMultimap2() {
+      return ImmutableSet.of(
+          ImmutableListMultimap.copyOf(
+              Multimaps.transformValues(ImmutableSetMultimap.of("foo", 1L), Math::toIntExact)),
+          ImmutableListMultimap.copyOf(
+              Multimaps.transformValues(
+                  (Multimap<String, Long>) ImmutableSetMultimap.of("bar", 2L),
+                  n -> Math.toIntExact(n))),
+          ImmutableListMultimap.copyOf(
+              Multimaps.transformValues(ImmutableListMultimap.of("baz", 3L), Math::toIntExact)),
+          ImmutableListMultimap.copyOf(
+              Multimaps.transformValues(
+                  ImmutableSetMultimap.of("quux", 4L), n -> Math.toIntExact(n))),
+          ImmutableListMultimap.copyOf(
+              Multimaps.transformValues(TreeMultimap.<String, Long>create(), Math::toIntExact)));
+    }
+
     ImmutableListMultimap<String, Integer> testImmutableListMultimapCopyOfImmutableListMultimap() {
       return ImmutableListMultimap.of("foo", 1);
     }
@@ -454,13 +468,39 @@ final class RefasterCheckPositiveCases {
           ImmutableMap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()));
     }
 
-    ImmutableSet<ImmutableMap<String, Integer>> testIterableToImmutableMap() {
+    ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToImmutableMap() {
+      return ImmutableSet.of(
+          Maps.toMap(ImmutableList.of(1), n -> n * 2),
+          Maps.toMap(ImmutableList.of(2)::iterator, Integer::valueOf),
+          Maps.toMap(ImmutableList.of(3).iterator(), n -> n.intValue()),
+          Maps.toMap(ImmutableSet.of(4), Integer::valueOf));
+    }
+
+    ImmutableSet<ImmutableMap<String, Integer>> testEntryIterableToImmutableMap() {
       return ImmutableSet.of(
           ImmutableMap.copyOf(ImmutableMap.of("foo", 1)),
           ImmutableMap.copyOf(ImmutableMap.of("foo", 1)),
           ImmutableMap.copyOf(ImmutableMap.of("foo", 1).entrySet()),
           ImmutableMap.copyOf(ImmutableMap.of("foo", 1).entrySet()),
           ImmutableMap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
+    }
+
+    ImmutableMap<Integer, String> testStreamOfMapEntriesToImmutableMap() {
+      // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
+      // Looks like a @Placeholder limitation. Try to track down and fix.
+      return Stream.of(1, 2, 3).collect(toImmutableMap(n -> Integer.valueOf(n), n -> n.toString()));
+    }
+
+    ImmutableSet<ImmutableMap<Integer, Integer>> testIndexIterableToImmutableMap() {
+      return ImmutableSet.of(
+          Maps.uniqueIndex(ImmutableList.of(1), n -> n * 2),
+          Maps.uniqueIndex(ImmutableList.of(2)::iterator, Integer::valueOf),
+          Maps.uniqueIndex(ImmutableList.of(3).iterator(), n -> n.intValue()));
+    }
+
+    ImmutableMap<String, Integer> testTransformMapValuesToImmutableMap() {
+      return ImmutableMap.copyOf(
+          Maps.transformValues(ImmutableMap.of("foo", 1L), v -> Math.toIntExact(v)));
     }
 
     ImmutableMap<String, Integer> testImmutableMapCopyOfImmutableMap() {
@@ -528,6 +568,36 @@ final class RefasterCheckPositiveCases {
           ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("foo", 1).entries()),
           ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("foo", 1).entries()),
           ImmutableSetMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
+    }
+
+    ImmutableSetMultimap<Integer, String> testStreamOfMapEntriesToImmutableSetMultimap() {
+      // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
+      // Looks like a @Placeholder limitation. Try to track down and fix.
+      return Stream.of(1, 2, 3)
+          .collect(toImmutableSetMultimap(n -> Integer.valueOf(n), n -> n.toString()));
+    }
+
+    ImmutableSetMultimap<String, Integer> testTransformMultimapValuesToImmutableSetMultimap() {
+      return ImmutableSetMultimap.copyOf(
+          Multimaps.transformValues(ImmutableSetMultimap.of("foo", 1L), v -> Math.toIntExact(v)));
+    }
+
+    ImmutableSet<ImmutableSetMultimap<String, Integer>>
+        testTransformMultimapValuesToImmutableSetMultimap2() {
+      return ImmutableSet.of(
+          ImmutableSetMultimap.copyOf(
+              Multimaps.transformValues(ImmutableSetMultimap.of("foo", 1L), Math::toIntExact)),
+          ImmutableSetMultimap.copyOf(
+              Multimaps.transformValues(
+                  (Multimap<String, Long>) ImmutableSetMultimap.of("bar", 2L),
+                  n -> Math.toIntExact(n))),
+          ImmutableSetMultimap.copyOf(
+              Multimaps.transformValues(ImmutableListMultimap.of("baz", 3L), Math::toIntExact)),
+          ImmutableSetMultimap.copyOf(
+              Multimaps.transformValues(
+                  ImmutableSetMultimap.of("quux", 4L), n -> Math.toIntExact(n))),
+          ImmutableSetMultimap.copyOf(
+              Multimaps.transformValues(TreeMultimap.<String, Long>create(), Math::toIntExact)));
     }
 
     ImmutableSetMultimap<String, Integer> testImmutableSetMultimapCopyOfImmutableSetMultimap() {

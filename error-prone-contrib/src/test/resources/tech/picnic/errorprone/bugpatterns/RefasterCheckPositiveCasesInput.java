@@ -1,8 +1,10 @@
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableListMultimap.flatteningToImmutableListMultimap;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutableSetMultimap;
 import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSortedMultiset;
@@ -34,8 +36,11 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
+import com.google.common.collect.TreeMultimap;
 import com.google.common.primitives.Ints;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -78,6 +83,8 @@ final class RefasterCheckPositiveCases {
           Preconditions.class,
           Streams.class,
           (Runnable) () -> collectingAndThen(null, null),
+          (Runnable) () -> flatteningToImmutableListMultimap(null, null),
+          (Runnable) () -> flatteningToImmutableSetMultimap(null, null),
           (Runnable) () -> identity(),
           (Runnable) () -> joining(),
           (Runnable) () -> not(null),
@@ -96,45 +103,8 @@ final class RefasterCheckPositiveCases {
       return ImmutableMap.of(1, "foo").getOrDefault("bar", null);
     }
 
-    ImmutableMap<Integer, String> testStreamOfMapEntriesImmutableMap() {
-      // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
-      // Looks like a @Placeholder limitation. Try to track down and fix.
-      return Stream.of(1, 2, 3)
-          .map(n -> Map.entry(Integer.valueOf(n), n.toString()))
-          .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToMap() {
-      return ImmutableSet.of(
-          ImmutableList.of(1).stream().collect(toImmutableMap(identity(), n -> n * 2)),
-          Streams.stream(ImmutableList.of(2)::iterator)
-              .collect(toImmutableMap(n -> n, Integer::valueOf)),
-          Streams.stream(ImmutableList.of(3).iterator())
-              .collect(toImmutableMap(identity(), n -> n.intValue())));
-    }
-
-    ImmutableSet<ImmutableMap<Integer, Integer>> testIterableUniqueIndex() {
-      return ImmutableSet.of(
-          ImmutableList.of(1).stream().collect(toImmutableMap(n -> n * 2, identity())),
-          Streams.stream(ImmutableList.of(2)::iterator)
-              .collect(toImmutableMap(Integer::valueOf, n -> n)),
-          Streams.stream(ImmutableList.of(3).iterator())
-              .collect(toImmutableMap(n -> n.intValue(), identity())));
-    }
-
-    ImmutableSet<ImmutableMap<Integer, Integer>> testSetToImmutableMap() {
-      return ImmutableSet.of(
-          ImmutableMap.copyOf(Maps.asMap(ImmutableSet.of(1), n -> n + 2)),
-          ImmutableMap.copyOf(Maps.asMap(ImmutableSet.of(2), Integer::valueOf)));
-    }
-
     ImmutableSet<BoundType> testStreamToImmutableEnumSet() {
       return Stream.of(BoundType.OPEN).collect(toImmutableSet());
-    }
-
-    ImmutableMap<String, Integer> testTransformMapValueToImmutableMap() {
-      return ImmutableMap.of("foo", 1L).entrySet().stream()
-          .collect(toImmutableMap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue())));
     }
 
     ImmutableSet<String> testIteratorGetNextOrDefault() {
@@ -445,6 +415,55 @@ final class RefasterCheckPositiveCases {
           ImmutableMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
     }
 
+    ImmutableListMultimap<Integer, String> testStreamOfMapEntriesToImmutableListMultimap() {
+      // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
+      // Looks like a @Placeholder limitation. Try to track down and fix.
+      return Stream.of(1, 2, 3)
+          .map(n -> Map.entry(Integer.valueOf(n), n.toString()))
+          .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    ImmutableSet<ImmutableListMultimap<Integer, Integer>>
+        testIndexIterableToImmutableListMultimap() {
+      return ImmutableSet.of(
+          ImmutableList.of(1).stream().collect(toImmutableListMultimap(n -> n * 2, identity())),
+          Streams.stream(ImmutableList.of(2)::iterator)
+              .collect(toImmutableListMultimap(Integer::valueOf, n -> n)),
+          Streams.stream(ImmutableList.of(3).iterator())
+              .collect(toImmutableListMultimap(n -> n.intValue(), identity())));
+    }
+
+    ImmutableListMultimap<String, Integer> testTransformMultimapValuesToImmutableListMultimap() {
+      return ImmutableListMultimap.of("foo", 1L).entries().stream()
+          .collect(toImmutableListMultimap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue())));
+    }
+
+    ImmutableSet<ImmutableListMultimap<String, Integer>>
+        testTransformMultimapValuesToImmutableListMultimap2() {
+      return ImmutableSet.of(
+          ImmutableSetMultimap.of("foo", 1L).asMap().entrySet().stream()
+              .collect(
+                  flatteningToImmutableListMultimap(
+                      Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))),
+          Multimaps.asMap((Multimap<String, Long>) ImmutableSetMultimap.of("bar", 2L)).entrySet()
+              .stream()
+              .collect(
+                  flatteningToImmutableListMultimap(
+                      Map.Entry::getKey, e -> e.getValue().stream().map(n -> Math.toIntExact(n)))),
+          Multimaps.asMap(ImmutableListMultimap.of("baz", 3L)).entrySet().stream()
+              .collect(
+                  flatteningToImmutableListMultimap(
+                      Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))),
+          Multimaps.asMap(ImmutableSetMultimap.of("quux", 4L)).entrySet().stream()
+              .collect(
+                  flatteningToImmutableListMultimap(
+                      Map.Entry::getKey, e -> e.getValue().stream().map(n -> Math.toIntExact(n)))),
+          Multimaps.asMap(TreeMultimap.<String, Long>create()).entrySet().stream()
+              .collect(
+                  flatteningToImmutableListMultimap(
+                      Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))));
+    }
+
     ImmutableListMultimap<String, Integer> testImmutableListMultimapCopyOfImmutableListMultimap() {
       return ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1));
     }
@@ -523,7 +542,17 @@ final class RefasterCheckPositiveCases {
               .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
-    ImmutableSet<ImmutableMap<String, Integer>> testIterableToImmutableMap() {
+    ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToImmutableMap() {
+      return ImmutableSet.of(
+          ImmutableList.of(1).stream().collect(toImmutableMap(identity(), n -> n * 2)),
+          Streams.stream(ImmutableList.of(2)::iterator)
+              .collect(toImmutableMap(n -> n, Integer::valueOf)),
+          Streams.stream(ImmutableList.of(3).iterator())
+              .collect(toImmutableMap(identity(), n -> n.intValue())),
+          ImmutableMap.copyOf(Maps.asMap(ImmutableSet.of(4), Integer::valueOf)));
+    }
+
+    ImmutableSet<ImmutableMap<String, Integer>> testEntryIterableToImmutableMap() {
       return ImmutableSet.of(
           ImmutableMap.copyOf(ImmutableMap.of("foo", 1).entrySet()),
           ImmutableMap.<String, Integer>builder().putAll(ImmutableMap.of("foo", 1)).build(),
@@ -534,6 +563,28 @@ final class RefasterCheckPositiveCases {
               .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)),
           Streams.stream(Iterables.cycle(Map.entry("foo", 1)))
               .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
+    }
+
+    ImmutableMap<Integer, String> testStreamOfMapEntriesToImmutableMap() {
+      // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
+      // Looks like a @Placeholder limitation. Try to track down and fix.
+      return Stream.of(1, 2, 3)
+          .map(n -> Map.entry(Integer.valueOf(n), n.toString()))
+          .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    ImmutableSet<ImmutableMap<Integer, Integer>> testIndexIterableToImmutableMap() {
+      return ImmutableSet.of(
+          ImmutableList.of(1).stream().collect(toImmutableMap(n -> n * 2, identity())),
+          Streams.stream(ImmutableList.of(2)::iterator)
+              .collect(toImmutableMap(Integer::valueOf, n -> n)),
+          Streams.stream(ImmutableList.of(3).iterator())
+              .collect(toImmutableMap(n -> n.intValue(), identity())));
+    }
+
+    ImmutableMap<String, Integer> testTransformMapValuesToImmutableMap() {
+      return ImmutableMap.of("foo", 1L).entrySet().stream()
+          .collect(toImmutableMap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue())));
     }
 
     ImmutableMap<String, Integer> testImmutableMapCopyOfImmutableMap() {
@@ -610,6 +661,45 @@ final class RefasterCheckPositiveCases {
               .collect(toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue)),
           Streams.stream(Iterables.cycle(Map.entry("foo", 1)))
               .collect(toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue)));
+    }
+
+    ImmutableSetMultimap<Integer, String> testStreamOfMapEntriesToImmutableSetMultimap() {
+      // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
+      // Looks like a @Placeholder limitation. Try to track down and fix.
+      return Stream.of(1, 2, 3)
+          .map(n -> Map.entry(Integer.valueOf(n), n.toString()))
+          .collect(toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    ImmutableSetMultimap<String, Integer> testTransformMultimapValuesToImmutableSetMultimap() {
+      return ImmutableSetMultimap.of("foo", 1L).entries().stream()
+          .collect(toImmutableSetMultimap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue())));
+    }
+
+    ImmutableSet<ImmutableSetMultimap<String, Integer>>
+        testTransformMultimapValuesToImmutableSetMultimap2() {
+      return ImmutableSet.of(
+          ImmutableSetMultimap.of("foo", 1L).asMap().entrySet().stream()
+              .collect(
+                  flatteningToImmutableSetMultimap(
+                      Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))),
+          Multimaps.asMap((Multimap<String, Long>) ImmutableSetMultimap.of("bar", 2L)).entrySet()
+              .stream()
+              .collect(
+                  flatteningToImmutableSetMultimap(
+                      Map.Entry::getKey, e -> e.getValue().stream().map(n -> Math.toIntExact(n)))),
+          Multimaps.asMap(ImmutableListMultimap.of("baz", 3L)).entrySet().stream()
+              .collect(
+                  flatteningToImmutableSetMultimap(
+                      Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))),
+          Multimaps.asMap(ImmutableSetMultimap.of("quux", 4L)).entrySet().stream()
+              .collect(
+                  flatteningToImmutableSetMultimap(
+                      Map.Entry::getKey, e -> e.getValue().stream().map(n -> Math.toIntExact(n)))),
+          Multimaps.asMap(TreeMultimap.<String, Long>create()).entrySet().stream()
+              .collect(
+                  flatteningToImmutableSetMultimap(
+                      Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))));
     }
 
     ImmutableSetMultimap<String, Integer> testImmutableSetMultimapCopyOfImmutableSetMultimap() {
