@@ -120,12 +120,12 @@ final class StreamTemplates {
   // be quite the same....
   static final class StreamMapFirst<T, S> {
     @BeforeTemplate
-    Optional<S> before(Stream<T> stream, Function<T, S> function) {
+    Optional<S> before(Stream<T> stream, Function<? super T, S> function) {
       return stream.map(function).findFirst();
     }
 
     @AfterTemplate
-    Optional<S> after(Stream<T> stream, Function<T, S> function) {
+    Optional<S> after(Stream<T> stream, Function<? super T, S> function) {
       return stream.findFirst().map(function);
     }
   }
@@ -167,7 +167,7 @@ final class StreamTemplates {
   /** Prefer {@link Stream#noneMatch(Predicate)} over more contrived alternatives. */
   static final class StreamNoneMatch<T> {
     @BeforeTemplate
-    boolean before(Stream<T> stream, Predicate<T> predicate) {
+    boolean before(Stream<T> stream, Predicate<? super T> predicate) {
       return Refaster.anyOf(
           !stream.anyMatch(predicate),
           stream.allMatch(not(predicate)),
@@ -175,7 +175,7 @@ final class StreamTemplates {
     }
 
     @AfterTemplate
-    boolean after(Stream<T> stream, Predicate<T> predicate) {
+    boolean after(Stream<T> stream, Predicate<? super T> predicate) {
       return stream.noneMatch(predicate);
     }
   }
@@ -198,20 +198,20 @@ final class StreamTemplates {
   /** Prefer {@link Stream#anyMatch(Predicate)} over more contrived alternatives. */
   static final class StreamAnyMatch<T> {
     @BeforeTemplate
-    boolean before(Stream<T> stream, Predicate<T> predicate) {
+    boolean before(Stream<T> stream, Predicate<? super T> predicate) {
       return Refaster.anyOf(
           !stream.noneMatch(predicate), stream.filter(predicate).findAny().isPresent());
     }
 
     @AfterTemplate
-    boolean after(Stream<T> stream, Predicate<T> predicate) {
+    boolean after(Stream<T> stream, Predicate<? super T> predicate) {
       return stream.anyMatch(predicate);
     }
   }
 
   static final class StreamAllMatch<T> {
     @BeforeTemplate
-    boolean before(Stream<T> stream, Predicate<T> predicate) {
+    boolean before(Stream<T> stream, Predicate<? super T> predicate) {
       return Refaster.anyOf(
           stream.noneMatch(not(predicate)),
           !stream.anyMatch(not(predicate)),
@@ -219,7 +219,7 @@ final class StreamTemplates {
     }
 
     @AfterTemplate
-    boolean after(Stream<T> stream, Predicate<T> predicate) {
+    boolean after(Stream<T> stream, Predicate<? super T> predicate) {
       return stream.allMatch(predicate);
     }
   }

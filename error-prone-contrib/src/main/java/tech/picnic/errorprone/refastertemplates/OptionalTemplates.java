@@ -138,12 +138,12 @@ final class OptionalTemplates {
     abstract boolean test(T value);
 
     @BeforeTemplate
-    boolean before(Optional<T> optional, Function<T, Boolean> predicate) {
+    boolean before(Optional<T> optional, Function<? super T, Boolean> predicate) {
       return optional.map(predicate).orElse(Refaster.anyOf(false, Boolean.FALSE));
     }
 
     @AfterTemplate
-    boolean after(Optional<T> optional, Predicate<T> predicate) {
+    boolean after(Optional<T> optional, Predicate<? super T> predicate) {
       return optional.filter(predicate).isPresent();
     }
   }

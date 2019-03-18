@@ -51,6 +51,34 @@ final class CollectionTemplates {
     }
   }
 
+  static final class CollectionAddAllToCollection<T, S extends T> {
+    @BeforeTemplate
+    void before(Collection<T> addTo, Collection<S> elementsToAdd) {
+      elementsToAdd.forEach(addTo::add);
+    }
+
+    @BeforeTemplate
+    void before2(Collection<T> addTo, Collection<S> elementsToAdd) {
+      for (T element : elementsToAdd) {
+        addTo.add(element);
+      }
+    }
+
+    // XXX: This method is identical to `before2` except for the loop type. Make Refaster smarter so
+    // that this is supported out of the box.
+    @BeforeTemplate
+    void before3(Collection<T> addTo, Collection<S> elementsToAdd) {
+      for (S element : elementsToAdd) {
+        addTo.add(element);
+      }
+    }
+
+    @AfterTemplate
+    void after(Collection<T> addTo, Collection<S> elementsToAdd) {
+      addTo.addAll(elementsToAdd);
+    }
+  }
+
   /** Prefer {@link ArrayList#ArrayList(Collection)} over the Guava alternative. */
   static final class NewArrayListFromCollection<T> {
     @BeforeTemplate

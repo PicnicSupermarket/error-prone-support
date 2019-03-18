@@ -52,7 +52,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
@@ -190,10 +189,18 @@ final class RefasterCheckPositiveCases {
           ImmutableSet.of(6).size() >= 1);
     }
 
-    ImmutableSet<Boolean> testCollectionAddAllFromCollection() {
-      return ImmutableSet.of(
-          Iterables.addAll(new ArrayList<>(), new HashSet<>()),
-          Iterables.addAll(new ArrayList<>(), new HashSet<>()::iterator));
+    boolean testCollectionAddAllFromCollection() {
+      return Iterables.addAll(new ArrayList<>(), ImmutableSet.of("foo"));
+    }
+
+    void testCollectionAddAllToCollection() {
+      ImmutableSet.of("foo").forEach(new ArrayList<>()::add);
+      for (Number element : ImmutableSet.of(1)) {
+        new ArrayList<Number>().add(element);
+      }
+      for (Integer element : ImmutableSet.of(2)) {
+        new ArrayList<Number>().add(element);
+      }
     }
 
     ArrayList<String> testNewArrayListFromCollection() {
