@@ -1436,6 +1436,10 @@ final class RefasterCheckPositiveCases {
           !Strings.isNullOrEmpty(toString()) ? Optional.ofNullable(toString()) : Optional.empty());
     }
 
+    Optional<String> testFilterEmptyString() {
+      return Optional.of("foo").map(Strings::emptyToNull);
+    }
+
     ImmutableSet<String> testJoinStrings() {
       return ImmutableSet.of(
           Joiner.on("a").join(new String[] {"foo", "bar"}),

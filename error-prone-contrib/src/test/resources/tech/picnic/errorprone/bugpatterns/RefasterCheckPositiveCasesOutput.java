@@ -1278,6 +1278,10 @@ final class RefasterCheckPositiveCases {
           Optional.ofNullable(toString()).filter(s -> !s.isEmpty()));
     }
 
+    Optional<String> testFilterEmptyString() {
+      return Optional.of("foo").filter(s -> !s.isEmpty());
+    }
+
     ImmutableSet<String> testJoinStrings() {
       return ImmutableSet.of(
           String.join("a", new String[] {"foo", "bar"}),

@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link String}s. */
+// XXX: Should we prefer `s -> !s.isEmpty()` or `not(String::isEmpty)`?
 final class StringTemplates {
   private StringTemplates() {}
 
@@ -59,6 +60,18 @@ final class StringTemplates {
     @AfterTemplate
     Optional<String> after(String str) {
       return Optional.ofNullable(str).filter(s -> !s.isEmpty());
+    }
+  }
+
+  static final class FilterEmptyString {
+    @BeforeTemplate
+    Optional<String> before(Optional<String> optional) {
+      return optional.map(Strings::emptyToNull);
+    }
+
+    @AfterTemplate
+    Optional<String> after(Optional<String> optional) {
+      return optional.filter(s -> !s.isEmpty());
     }
   }
 
