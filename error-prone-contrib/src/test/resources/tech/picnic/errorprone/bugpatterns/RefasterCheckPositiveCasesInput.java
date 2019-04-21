@@ -62,6 +62,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 final class RefasterCheckPositiveCases {
@@ -454,7 +455,7 @@ final class RefasterCheckPositiveCases {
               .collect(
                   flatteningToImmutableListMultimap(
                       Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))),
-          Multimaps.asMap(ImmutableSetMultimap.of("quux", 4L)).entrySet().stream()
+          Multimaps.asMap(ImmutableSetMultimap.of("qux", 4L)).entrySet().stream()
               .collect(
                   flatteningToImmutableListMultimap(
                       Map.Entry::getKey, e -> e.getValue().stream().map(n -> Math.toIntExact(n)))),
@@ -692,7 +693,7 @@ final class RefasterCheckPositiveCases {
               .collect(
                   flatteningToImmutableSetMultimap(
                       Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))),
-          Multimaps.asMap(ImmutableSetMultimap.of("quux", 4L)).entrySet().stream()
+          Multimaps.asMap(ImmutableSetMultimap.of("qux", 4L)).entrySet().stream()
               .collect(
                   flatteningToImmutableSetMultimap(
                       Map.Entry::getKey, e -> e.getValue().stream().map(n -> Math.toIntExact(n)))),
@@ -1110,10 +1111,12 @@ final class RefasterCheckPositiveCases {
     }
 
     ImmutableSet<Boolean> testStreamNoneMatch() {
+      Predicate<String> pred = String::isBlank;
       return ImmutableSet.of(
           !Stream.of("foo").anyMatch(s -> s.length() > 1),
           Stream.of("bar").allMatch(not(String::isBlank)),
-          Stream.of("baz").filter(String::isEmpty).findAny().isEmpty());
+          Stream.of("baz").allMatch(pred.negate()),
+          Stream.of("qux").filter(String::isEmpty).findAny().isEmpty());
     }
 
     boolean testStreamNoneMatch2() {
@@ -1127,10 +1130,14 @@ final class RefasterCheckPositiveCases {
     }
 
     ImmutableSet<Boolean> testStreamAllMatch() {
+      Predicate<String> pred = String::isBlank;
       return ImmutableSet.of(
           Stream.of("foo").noneMatch(not(String::isBlank)),
-          !Stream.of("bar").anyMatch(not(s -> s.length() > 1)),
-          Stream.of("baz").filter(not(String::isEmpty)).findAny().isEmpty());
+          Stream.of("bar").noneMatch(pred.negate()),
+          !Stream.of("baz").anyMatch(not(s -> s.length() > 1)),
+          !Stream.of("qux").anyMatch(pred.negate()),
+          Stream.of("quux").filter(not(String::isEmpty)).findAny().isEmpty(),
+          Stream.of("quuz").filter(pred.negate()).findAny().isEmpty());
     }
 
     ImmutableSet<Boolean> testStreamAllMatch2() {
@@ -1169,12 +1176,12 @@ final class RefasterCheckPositiveCases {
     ImmutableSet<String> testJoinStrings() {
       return ImmutableSet.of(
           Joiner.on("a").join(new String[] {"foo", "bar"}),
-          Joiner.on("b").join(new CharSequence[] {"baz", "quux"}),
+          Joiner.on("b").join(new CharSequence[] {"baz", "qux"}),
           Stream.of(new String[] {"foo", "bar"}).collect(joining("c")),
-          Arrays.stream(new CharSequence[] {"baz", "quux"}).collect(joining("d")),
+          Arrays.stream(new CharSequence[] {"baz", "qux"}).collect(joining("d")),
           Joiner.on("e").join(ImmutableList.of("foo", "bar")),
           Streams.stream(Iterables.cycle(ImmutableList.of("foo", "bar"))).collect(joining("f")),
-          ImmutableList.of("baz", "quux").stream().collect(joining("g")));
+          ImmutableList.of("baz", "qux").stream().collect(joining("g")));
     }
   }
 

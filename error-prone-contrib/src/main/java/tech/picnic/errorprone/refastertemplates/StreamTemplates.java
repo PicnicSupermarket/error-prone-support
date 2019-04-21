@@ -33,7 +33,6 @@ final class StreamTemplates {
   }
 
   /** Don't unnecessarily call {@link Streams#concat(Stream...)}. */
-  // XXX: There are int, long and double variants to this rule. Probably not worth the hassle.
   static final class ConcatOneStream<T> {
     @BeforeTemplate
     Stream<T> before(Stream<T> stream) {
@@ -47,7 +46,6 @@ final class StreamTemplates {
   }
 
   /** Prefer {@link Stream#concat(Stream, Stream)} over the Guava alternative. */
-  // XXX: There are int, long and double variants to this rule. Worth the hassle?
   static final class ConcatTwoStreams<T> {
     @BeforeTemplate
     Stream<T> before(Stream<T> s1, Stream<T> s2) {
@@ -61,7 +59,6 @@ final class StreamTemplates {
   }
 
   /** Avoid unnecessary nesting of {@link Stream#filter(Predicate)} operations. */
-  // XXX: There are int, long and double variants to this rule. Worth the hassle?
   abstract static class FilterOuterStreamAfterFlatMap<T, S> {
     @Placeholder
     abstract Stream<S> toStreamFunction(@MayOptionallyUse T element);
@@ -78,7 +75,6 @@ final class StreamTemplates {
   }
 
   /** Avoid unnecessary nesting of {@link Stream#map(Function)} operations. */
-  // XXX: There are int, long and double variants to this rule. Worth the hassle?
   abstract static class MapOuterStreamAfterFlatMap<T, S, R> {
     @Placeholder
     abstract Stream<S> toStreamFunction(@MayOptionallyUse T element);
@@ -95,7 +91,6 @@ final class StreamTemplates {
   }
 
   /** Avoid unnecessary nesting of {@link Stream#flatMap(Function)} operations. */
-  // XXX: There are int, long and double variants to this rule. Worth the hassle?
   abstract static class FlatMapOuterStreamAfterFlatMap<T, S, R> {
     @Placeholder
     abstract Stream<S> toStreamFunction(@MayOptionallyUse T element);
@@ -116,8 +111,8 @@ final class StreamTemplates {
    * Where possible, clarify that a mapping operation will be applied only to a single stream
    * element.
    */
-  // XXX: Consider whether to have a similar rule for `.findAny()`. For parallel streams it wouldn't
-  // be quite the same....
+  // XXX: Consider whether to have a similar rule for `.findAny()`. For parallel streams it
+  // wouldn't be quite the same....
   static final class StreamMapFirst<T, S> {
     @BeforeTemplate
     Optional<S> before(Stream<T> stream, Function<? super T, S> function) {
@@ -170,7 +165,7 @@ final class StreamTemplates {
     boolean before(Stream<T> stream, Predicate<? super T> predicate) {
       return Refaster.anyOf(
           !stream.anyMatch(predicate),
-          stream.allMatch(not(predicate)),
+          stream.allMatch(Refaster.anyOf(not(predicate), predicate.negate())),
           stream.filter(predicate).findAny().isEmpty());
     }
 
@@ -213,9 +208,9 @@ final class StreamTemplates {
     @BeforeTemplate
     boolean before(Stream<T> stream, Predicate<? super T> predicate) {
       return Refaster.anyOf(
-          stream.noneMatch(not(predicate)),
-          !stream.anyMatch(not(predicate)),
-          stream.filter(not(predicate)).findAny().isEmpty());
+          stream.noneMatch(Refaster.anyOf(not(predicate), predicate.negate())),
+          !stream.anyMatch(Refaster.anyOf(not(predicate), predicate.negate())),
+          stream.filter(Refaster.anyOf(not(predicate), predicate.negate())).findAny().isEmpty());
     }
 
     @AfterTemplate
