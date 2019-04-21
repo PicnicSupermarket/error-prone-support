@@ -68,7 +68,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.function.DoublePredicate;
+import java.util.function.IntPredicate;
+import java.util.function.LongPredicate;
 import java.util.function.Predicate;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 final class RefasterCheckPositiveCases {
@@ -240,6 +246,88 @@ final class RefasterCheckPositiveCases {
 
     Comparator<String> testReverseOrder() {
       return reverseOrder();
+    }
+  }
+
+  static final class DoubleStreamTemplates {
+    DoubleStream testConcatOneDoubleStream() {
+      return DoubleStream.of(1);
+    }
+
+    DoubleStream testConcatTwoDoubleStreams() {
+      return DoubleStream.concat(DoubleStream.of(1), DoubleStream.of(2));
+    }
+
+    DoubleStream testFilterOuterDoubleStreamAfterFlatMap() {
+      return DoubleStream.of(1).flatMap(v -> DoubleStream.of(v * v)).filter(n -> n > 1);
+    }
+
+    DoubleStream testFilterOuterStreamAfterFlatMapToDouble() {
+      return Stream.of(1).flatMapToDouble(v -> DoubleStream.of(v * v)).filter(n -> n > 1);
+    }
+
+    DoubleStream testMapOuterDoubleStreamAfterFlatMap() {
+      return DoubleStream.of(1).flatMap(v -> DoubleStream.of(v * v)).map(n -> n * 1);
+    }
+
+    DoubleStream testMapOuterStreamAfterFlatMapToDouble() {
+      return Stream.of(1).flatMapToDouble(v -> DoubleStream.of(v * v)).map(n -> n * 1);
+    }
+
+    DoubleStream testFlatMapOuterDoubleStreamAfterFlatMap() {
+      return DoubleStream.of(1).flatMap(v -> DoubleStream.of(v * v)).flatMap(DoubleStream::of);
+    }
+
+    DoubleStream testFlatMapOuterStreamAfterFlatMapToDouble() {
+      return Stream.of(1).flatMapToDouble(v -> DoubleStream.of(v * v)).flatMap(DoubleStream::of);
+    }
+
+    ImmutableSet<Boolean> testDoubleStreamIsEmpty() {
+      return ImmutableSet.of(
+          DoubleStream.of(1).findAny().isEmpty(),
+          DoubleStream.of(2).findAny().isEmpty(),
+          DoubleStream.of(3).findAny().isEmpty(),
+          DoubleStream.of(4).findAny().isEmpty());
+    }
+
+    ImmutableSet<Boolean> testDoubleStreamIsNotEmpty() {
+      return ImmutableSet.of(
+          DoubleStream.of(1).findAny().isPresent(),
+          DoubleStream.of(2).findAny().isPresent(),
+          DoubleStream.of(3).findAny().isPresent(),
+          DoubleStream.of(4).findAny().isPresent());
+    }
+
+    ImmutableSet<Boolean> testDoubleStreamNoneMatch() {
+      DoublePredicate pred = i -> i > 0;
+      return ImmutableSet.of(
+          DoubleStream.of(1).noneMatch(n -> n > 1),
+          DoubleStream.of(2).noneMatch(pred),
+          DoubleStream.of(3).noneMatch(pred));
+    }
+
+    boolean testDoubleStreamNoneMatch2() {
+      return DoubleStream.of(1).noneMatch(n -> n > 1);
+    }
+
+    ImmutableSet<Boolean> testDoubleStreamAnyMatch() {
+      return ImmutableSet.of(
+          DoubleStream.of(1).anyMatch(n -> n > 1), DoubleStream.of(2).anyMatch(n -> n > 2));
+    }
+
+    ImmutableSet<Boolean> testDoubleStreamAllMatch() {
+      DoublePredicate pred = i -> i > 0;
+      return ImmutableSet.of(
+          DoubleStream.of(1).allMatch(pred),
+          DoubleStream.of(2).allMatch(pred),
+          DoubleStream.of(3).allMatch(pred));
+    }
+
+    ImmutableSet<Boolean> testDoubleStreamAllMatch2() {
+      return ImmutableSet.of(
+          DoubleStream.of(1).allMatch(n -> n > 1),
+          DoubleStream.of(2).allMatch(n -> n > 2),
+          DoubleStream.of(3).allMatch(n -> n > 3));
     }
   }
 
@@ -762,6 +850,178 @@ final class RefasterCheckPositiveCases {
           Stream.of(1).collect(toImmutableSortedSet(naturalOrder())),
           Stream.of(2).collect(toImmutableSortedSet(naturalOrder())),
           Stream.of(3).collect(toImmutableSortedSet(naturalOrder())));
+    }
+  }
+
+  static final class IntStreamTemplates {
+    IntStream testIntStreamClosedOpenRange() {
+      return IntStream.range(0, 42);
+    }
+
+    IntStream testConcatOneIntStream() {
+      return IntStream.of(1);
+    }
+
+    IntStream testConcatTwoIntStreams() {
+      return IntStream.concat(IntStream.of(1), IntStream.of(2));
+    }
+
+    IntStream testFilterOuterIntStreamAfterFlatMap() {
+      return IntStream.of(1).flatMap(v -> IntStream.of(v * v)).filter(n -> n > 1);
+    }
+
+    IntStream testFilterOuterStreamAfterFlatMapToInt() {
+      return Stream.of(1).flatMapToInt(v -> IntStream.of(v * v)).filter(n -> n > 1);
+    }
+
+    IntStream testMapOuterIntStreamAfterFlatMap() {
+      return IntStream.of(1).flatMap(v -> IntStream.of(v * v)).map(n -> n * 1);
+    }
+
+    IntStream testMapOuterStreamAfterFlatMapToInt() {
+      return Stream.of(1).flatMapToInt(v -> IntStream.of(v * v)).map(n -> n * 1);
+    }
+
+    IntStream testFlatMapOuterIntStreamAfterFlatMap() {
+      return IntStream.of(1).flatMap(v -> IntStream.of(v * v)).flatMap(IntStream::of);
+    }
+
+    IntStream testFlatMapOuterStreamAfterFlatMapToInt() {
+      return Stream.of(1).flatMapToInt(v -> IntStream.of(v * v)).flatMap(IntStream::of);
+    }
+
+    ImmutableSet<Boolean> testIntStreamIsEmpty() {
+      return ImmutableSet.of(
+          IntStream.of(1).findAny().isEmpty(),
+          IntStream.of(2).findAny().isEmpty(),
+          IntStream.of(3).findAny().isEmpty(),
+          IntStream.of(4).findAny().isEmpty());
+    }
+
+    ImmutableSet<Boolean> testIntStreamIsNotEmpty() {
+      return ImmutableSet.of(
+          IntStream.of(1).findAny().isPresent(),
+          IntStream.of(2).findAny().isPresent(),
+          IntStream.of(3).findAny().isPresent(),
+          IntStream.of(4).findAny().isPresent());
+    }
+
+    ImmutableSet<Boolean> testIntStreamNoneMatch() {
+      IntPredicate pred = i -> i > 0;
+      return ImmutableSet.of(
+          IntStream.of(1).noneMatch(n -> n > 1),
+          IntStream.of(2).noneMatch(pred),
+          IntStream.of(3).noneMatch(pred));
+    }
+
+    boolean testIntStreamNoneMatch2() {
+      return IntStream.of(1).noneMatch(n -> n > 1);
+    }
+
+    ImmutableSet<Boolean> testIntStreamAnyMatch() {
+      return ImmutableSet.of(
+          IntStream.of(1).anyMatch(n -> n > 1), IntStream.of(2).anyMatch(n -> n > 2));
+    }
+
+    ImmutableSet<Boolean> testIntStreamAllMatch() {
+      IntPredicate pred = i -> i > 0;
+      return ImmutableSet.of(
+          IntStream.of(1).allMatch(pred),
+          IntStream.of(2).allMatch(pred),
+          IntStream.of(3).allMatch(pred));
+    }
+
+    ImmutableSet<Boolean> testIntStreamAllMatch2() {
+      return ImmutableSet.of(
+          IntStream.of(1).allMatch(n -> n > 1),
+          IntStream.of(2).allMatch(n -> n > 2),
+          IntStream.of(3).allMatch(n -> n > 3));
+    }
+  }
+
+  static final class LongStreamTemplates {
+    LongStream testLongStreamClosedOpenRange() {
+      return LongStream.range(0, 42);
+    }
+
+    LongStream testConcatOneLongStream() {
+      return LongStream.of(1);
+    }
+
+    LongStream testConcatTwoLongStreams() {
+      return LongStream.concat(LongStream.of(1), LongStream.of(2));
+    }
+
+    LongStream testFilterOuterLongStreamAfterFlatMap() {
+      return LongStream.of(1).flatMap(v -> LongStream.of(v * v)).filter(n -> n > 1);
+    }
+
+    LongStream testFilterOuterStreamAfterFlatMapToLong() {
+      return Stream.of(1).flatMapToLong(v -> LongStream.of(v * v)).filter(n -> n > 1);
+    }
+
+    LongStream testMapOuterLongStreamAfterFlatMap() {
+      return LongStream.of(1).flatMap(v -> LongStream.of(v * v)).map(n -> n * 1);
+    }
+
+    LongStream testMapOuterStreamAfterFlatMapToLong() {
+      return Stream.of(1).flatMapToLong(v -> LongStream.of(v * v)).map(n -> n * 1);
+    }
+
+    LongStream testFlatMapOuterLongStreamAfterFlatMap() {
+      return LongStream.of(1).flatMap(v -> LongStream.of(v * v)).flatMap(LongStream::of);
+    }
+
+    LongStream testFlatMapOuterStreamAfterFlatMapToLong() {
+      return Stream.of(1).flatMapToLong(v -> LongStream.of(v * v)).flatMap(LongStream::of);
+    }
+
+    ImmutableSet<Boolean> testLongStreamIsEmpty() {
+      return ImmutableSet.of(
+          LongStream.of(1).findAny().isEmpty(),
+          LongStream.of(2).findAny().isEmpty(),
+          LongStream.of(3).findAny().isEmpty(),
+          LongStream.of(4).findAny().isEmpty());
+    }
+
+    ImmutableSet<Boolean> testLongStreamIsNotEmpty() {
+      return ImmutableSet.of(
+          LongStream.of(1).findAny().isPresent(),
+          LongStream.of(2).findAny().isPresent(),
+          LongStream.of(3).findAny().isPresent(),
+          LongStream.of(4).findAny().isPresent());
+    }
+
+    ImmutableSet<Boolean> testLongStreamNoneMatch() {
+      LongPredicate pred = i -> i > 0;
+      return ImmutableSet.of(
+          LongStream.of(1).noneMatch(n -> n > 1),
+          LongStream.of(2).noneMatch(pred),
+          LongStream.of(3).noneMatch(pred));
+    }
+
+    boolean testLongStreamNoneMatch2() {
+      return LongStream.of(1).noneMatch(n -> n > 1);
+    }
+
+    ImmutableSet<Boolean> testLongStreamAnyMatch() {
+      return ImmutableSet.of(
+          LongStream.of(1).anyMatch(n -> n > 1), LongStream.of(2).anyMatch(n -> n > 2));
+    }
+
+    ImmutableSet<Boolean> testLongStreamAllMatch() {
+      LongPredicate pred = i -> i > 0;
+      return ImmutableSet.of(
+          LongStream.of(1).allMatch(pred),
+          LongStream.of(2).allMatch(pred),
+          LongStream.of(3).allMatch(pred));
+    }
+
+    ImmutableSet<Boolean> testLongStreamAllMatch2() {
+      return ImmutableSet.of(
+          LongStream.of(1).allMatch(n -> n > 1),
+          LongStream.of(2).allMatch(n -> n > 2),
+          LongStream.of(3).allMatch(n -> n > 3));
     }
   }
 
