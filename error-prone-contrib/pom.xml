@@ -29,7 +29,7 @@
         </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
+            <artifactId>auto-service-annotations</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

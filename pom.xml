@@ -129,7 +129,7 @@
             </dependency>
             <dependency>
                 <groupId>com.google.auto.service</groupId>
-                <artifactId>auto-service</artifactId>
+                <artifactId>auto-service-annotations</artifactId>
                 <version>${version.auto-service}</version>
             </dependency>
             <dependency>
