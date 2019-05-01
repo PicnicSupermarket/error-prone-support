@@ -188,6 +188,7 @@ final class OptionalTemplates {
     }
 
     @AfterTemplate
+    @SuppressWarnings("NullAway")
     T after(Optional<T> o1, Optional<T> o2) {
       return o1.or(() -> o2).get();
     }

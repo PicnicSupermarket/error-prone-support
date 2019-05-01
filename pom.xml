@@ -909,6 +909,7 @@
                                       <!-- XXX: Enable this once we open-source this library. -->
                                       -Xep:BetaApi:OFF
                                       -XepOpt:NullAway:AnnotatedPackages=tech.picnic
+                                      -XepOpt:NullAway:CheckOptionalEmptiness=true
                                 </arg>
                                 <!-- The Error Prone plugin makes certain
                                 assumptions about the state of the AST at the
