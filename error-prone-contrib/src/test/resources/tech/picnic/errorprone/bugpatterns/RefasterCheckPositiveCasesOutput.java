@@ -63,6 +63,8 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
@@ -88,6 +90,7 @@ final class RefasterCheckPositiveCases {
       ImmutableSet.of(
           AbstractMap.class,
           Arrays.class,
+          HashMap.class,
           Ints.class,
           Iterators.class,
           Joiner.class,
@@ -110,6 +113,10 @@ final class RefasterCheckPositiveCases {
   static final class AssortedTemplates {
     int testCheckIndex() {
       return Objects.checkIndex(0, 1);
+    }
+
+    Map<RoundingMode, String> testCreateEnumMap() {
+      return new EnumMap<>(RoundingMode.class);
     }
 
     String testMapGetOrNull() {

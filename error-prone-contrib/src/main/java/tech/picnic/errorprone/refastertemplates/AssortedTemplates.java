@@ -13,6 +13,8 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -36,6 +38,20 @@ final class AssortedTemplates {
     @AfterTemplate
     int after(int index, int size) {
       return Objects.checkIndex(index, size);
+    }
+  }
+
+  // XXX: We could add a rule for `new EnumMap(Map<K, ? extends V> m)`, but that constructor does
+  // not allow an empty non-EnumMap to be provided.
+  static final class CreateEnumMap<K extends Enum<K>, V> {
+    @BeforeTemplate
+    Map<K, V> before() {
+      return new HashMap<>();
+    }
+
+    @AfterTemplate
+    Map<K, V> after() {
+      return new EnumMap<>(Refaster.<K>clazz());
     }
   }
 
