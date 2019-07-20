@@ -13,11 +13,14 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
@@ -135,6 +138,26 @@ final class AssortedTemplates {
     @AfterTemplate
     Stream<T> after(T object) {
       return Stream.generate(() -> object);
+    }
+  }
+
+  /**
+   * Prefer {@link Collections#disjoint(Collection, Collection)} over more contrived alternatives.
+   */
+  static final class DisjointSets<T> {
+    @BeforeTemplate
+    boolean before(Set<T> set1, Set<T> set2) {
+      return Sets.intersection(set1, set2).isEmpty();
+    }
+
+    @BeforeTemplate
+    boolean before2(Set<T> set1, Set<T> set2) {
+      return set1.stream().noneMatch(set2::contains);
+    }
+
+    @AfterTemplate
+    boolean after(Set<T> set1, Set<T> set2) {
+      return Collections.disjoint(set1, set2);
     }
   }
 }

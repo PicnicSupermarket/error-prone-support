@@ -62,6 +62,8 @@ import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -69,6 +71,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.DoublePredicate;
 import java.util.function.IntPredicate;
@@ -145,6 +148,12 @@ final class RefasterCheckPositiveCases {
 
     Stream<String> testUnboundedSingleElementStream() {
       return Stream.generate(() -> "foo");
+    }
+
+    ImmutableSet<Boolean> testDisjointSets() {
+      return ImmutableSet.of(
+          Collections.disjoint(ImmutableSet.of(1), ImmutableSet.of(2)),
+          Collections.disjoint(ImmutableSet.of(3), ImmutableSet.of(4)));
     }
   }
 
@@ -542,6 +551,10 @@ final class RefasterCheckPositiveCases {
           ImmutableList.sortedCopyOf(Comparator.comparing(String::length), ImmutableSet.of("foo")),
           ImmutableList.sortedCopyOf(
               Comparator.comparing(String::isEmpty), ImmutableSet.of("bar")::iterator));
+    }
+
+    ImmutableList<Integer> testStreamToDistinctImmutableList() {
+      return Stream.of(1).collect(toImmutableSet()).asList();
     }
   }
 
@@ -1054,6 +1067,22 @@ final class RefasterCheckPositiveCases {
     }
   }
 
+  static final class MultimapTemplates {
+    Set<String> testMultimapKeySet() {
+      return ImmutableSetMultimap.of("foo", "bar").keySet();
+    }
+
+    int testMultimapSize() {
+      return ImmutableSetMultimap.of().size();
+    }
+
+    ImmutableSet<Collection<Integer>> testMultimapGet() {
+      return ImmutableSet.of(
+          ImmutableSetMultimap.of(1, 2).get(1),
+          ((Multimap<Integer, Integer>) ImmutableSetMultimap.of(1, 2)).get(1));
+    }
+  }
+
   static final class NullTemplates {
     String testRequireNonNullElse() {
       return requireNonNullElse("foo", "bar");
@@ -1176,6 +1205,10 @@ final class RefasterCheckPositiveCases {
   }
 
   static final class StreamTemplates {
+    Stream<String> testEmptyStream() {
+      return Stream.empty();
+    }
+
     ImmutableSet<Stream<String>> testStreamOfNullable() {
       return ImmutableSet.of(Stream.ofNullable("a"), Stream.ofNullable("b"));
     }

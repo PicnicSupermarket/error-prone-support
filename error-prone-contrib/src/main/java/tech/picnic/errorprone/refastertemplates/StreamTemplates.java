@@ -18,6 +18,19 @@ import java.util.stream.Stream;
 final class StreamTemplates {
   private StreamTemplates() {}
 
+  /** Prefer {@link Stream#empty()} over less clear alternatives. */
+  static final class EmptyStream<T> {
+    @BeforeTemplate
+    Stream<T> before() {
+      return Stream.of();
+    }
+
+    @AfterTemplate
+    Stream<T> after() {
+      return Stream.empty();
+    }
+  }
+
   /** Prefer {@link Stream#ofNullable(Object)} over more contrived alternatives. */
   static final class StreamOfNullable<T> {
     @BeforeTemplate

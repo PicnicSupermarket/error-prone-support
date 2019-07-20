@@ -56,12 +56,14 @@ import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.DoublePredicate;
 import java.util.function.IntPredicate;
@@ -140,6 +142,12 @@ final class RefasterCheckPositiveCases {
 
     Stream<String> testUnboundedSingleElementStream() {
       return Streams.stream(Iterables.cycle("foo"));
+    }
+
+    ImmutableSet<Boolean> testDisjointSets() {
+      return ImmutableSet.of(
+          Sets.intersection(ImmutableSet.of(1), ImmutableSet.of(2)).isEmpty(),
+          ImmutableSet.of(3).stream().noneMatch(ImmutableSet.of(4)::contains));
     }
   }
 
@@ -615,6 +623,10 @@ final class RefasterCheckPositiveCases {
           Streams.stream(ImmutableSet.of("bar")::iterator)
               .sorted(Comparator.comparing(String::isEmpty))
               .collect(toImmutableList()));
+    }
+
+    ImmutableList<Integer> testStreamToDistinctImmutableList() {
+      return Stream.of(1).distinct().collect(toImmutableList());
     }
   }
 
@@ -1187,6 +1199,22 @@ final class RefasterCheckPositiveCases {
     }
   }
 
+  static final class MultimapTemplates {
+    Set<String> testMultimapKeySet() {
+      return ImmutableSetMultimap.of("foo", "bar").asMap().keySet();
+    }
+
+    int testMultimapSize() {
+      return ImmutableSetMultimap.of().values().size();
+    }
+
+    ImmutableSet<Collection<Integer>> testMultimapGet() {
+      return ImmutableSet.of(
+          ImmutableSetMultimap.of(1, 2).asMap().get(1),
+          Multimaps.asMap((Multimap<Integer, Integer>) ImmutableSetMultimap.of(1, 2)).get(1));
+    }
+  }
+
   static final class NullTemplates {
     String testRequireNonNullElse() {
       return MoreObjects.firstNonNull("foo", "bar");
@@ -1332,6 +1360,10 @@ final class RefasterCheckPositiveCases {
   }
 
   static final class StreamTemplates {
+    Stream<String> testEmptyStream() {
+      return Stream.of();
+    }
+
     ImmutableSet<Stream<String>> testStreamOfNullable() {
       return ImmutableSet.of(
           Stream.of("a").filter(Objects::nonNull), Optional.ofNullable("b").stream());

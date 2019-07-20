@@ -1,11 +1,13 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
@@ -161,6 +163,24 @@ final class ImmutableListTemplates {
     @AfterTemplate
     ImmutableList<T> after(Collection<T> iterable, Comparator<? super T> cmp) {
       return ImmutableList.sortedCopyOf(cmp, iterable);
+    }
+  }
+
+  /**
+   * Collecting to an {@link ImmutableSet} and converting the result to an {@link ImmutableList} may
+   * be more efficient than deduplicating a stream and collecting the result to an {@link
+   * ImmutableList}.
+   */
+  static final class StreamToDistinctImmutableList<T> {
+    @BeforeTemplate
+    ImmutableList<T> before(Stream<T> stream) {
+      return stream.distinct().collect(toImmutableList());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ImmutableList<T> after(Stream<T> stream) {
+      return stream.collect(toImmutableSet()).asList();
     }
   }
 }
