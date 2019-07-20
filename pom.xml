@@ -357,6 +357,7 @@
                                     <module name="DefaultComesLast" />
                                     <module name="DesignForExtension" />
                                     <module name="EmptyBlock" />
+                                    <module name="EmptyStatement" />
                                     <module name="EmptyCatchBlock" />
                                     <module name="FinalClass" />
                                     <module name="HiddenFieldCheck">
@@ -419,6 +420,8 @@
                                         <property name="severity" value="ignore" />
                                     </module>
                                     <module name="UnnecessaryParentheses" />
+                                    <module name="UnnecessarySemicolonInEnumeration" />
+                                    <module name="UnnecessarySemicolonInTryWithResources" />
                                     <module name="UnusedImports">
                                         <!-- Error-prone also detects these,
                                         but (currently) doesn't warn about
