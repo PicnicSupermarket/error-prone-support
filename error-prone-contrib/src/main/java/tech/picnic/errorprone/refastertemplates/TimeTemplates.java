@@ -288,4 +288,17 @@ final class TimeTemplates {
       return Duration.between(a, b);
     }
   }
+
+  /** Prefer {@link Duration#isZero()} over more contrived alternatives. */
+  static final class DurationIsZero {
+    @BeforeTemplate
+    boolean before(Duration duration) {
+      return Refaster.anyOf(duration.equals(Duration.ZERO), Duration.ZERO.equals(duration));
+    }
+
+    @AfterTemplate
+    boolean after(Duration duration) {
+      return duration.isZero();
+    }
+  }
 }

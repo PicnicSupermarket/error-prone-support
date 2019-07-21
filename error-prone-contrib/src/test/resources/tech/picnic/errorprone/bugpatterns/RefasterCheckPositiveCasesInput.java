@@ -1584,5 +1584,10 @@ final class RefasterCheckPositiveCases {
               Duration.ofSeconds(
                   OffsetDateTime.MAX.toEpochSecond() - OffsetDateTime.MIN.toEpochSecond()));
     }
+
+    ImmutableSet<Boolean> testDurationIsZero() {
+      return ImmutableSet.of(
+          Duration.ofDays(1).equals(Duration.ZERO), Duration.ZERO.equals(Duration.ofDays(2)));
+    }
   }
 }

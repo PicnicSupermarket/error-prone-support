@@ -1420,5 +1420,9 @@ final class RefasterCheckPositiveCases {
       return Duration.between(OffsetDateTime.MIN, OffsetDateTime.MAX)
           .plus(Duration.between(OffsetDateTime.MIN, OffsetDateTime.MAX));
     }
+
+    ImmutableSet<Boolean> testDurationIsZero() {
+      return ImmutableSet.of(Duration.ofDays(1).isZero(), Duration.ofDays(2).isZero());
+    }
   }
 }
