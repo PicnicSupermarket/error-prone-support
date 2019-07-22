@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.data.Offset.offset;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertEqualsNoOrder;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertNotNull;
@@ -270,9 +271,59 @@ final class AssertJTemplates {
     }
   }
 
-  static final class XXXAssertEqualObjects {
+  static final class XXXAssertEquals {
+    @BeforeTemplate
+    void before(boolean actual, boolean expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(byte actual, byte expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(char actual, char expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(short actual, short expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(int actual, int expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(long actual, long expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(float actual, float expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(double actual, double expected) {
+      assertEquals(actual, expected);
+    }
+
     @BeforeTemplate
     void before(Object actual, Object expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(String actual, String expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Map<?, ?> actual, Map<?, ?> expected) {
       assertEquals(actual, expected);
     }
 
@@ -283,353 +334,65 @@ final class AssertJTemplates {
     }
   }
 
-  static final class XXXAssertEqualObjectsWithMessage {
+  static final class XXXAssertEqualsWithMessage {
+    @BeforeTemplate
+    void before(boolean actual, boolean expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(byte actual, byte expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(char actual, char expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(short actual, short expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(int actual, int expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(long actual, long expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(float actual, float expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(double actual, double expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
     @BeforeTemplate
     void before(Object actual, Object expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(String actual, String expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Map<?, ?> actual, Map<?, ?> expected, String message) {
       assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     void after(Object actual, Object expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualBooleans {
-    @BeforeTemplate
-    void before(boolean actual, boolean expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(boolean actual, boolean expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualBooleansWithMessage {
-    @BeforeTemplate
-    void before(boolean actual, boolean expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(boolean actual, boolean expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualBooleanArrays {
-    @BeforeTemplate
-    void before(boolean[] actual, boolean[] expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(boolean[] actual, boolean[] expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualBooleanArraysWithMessage {
-    @BeforeTemplate
-    void before(boolean[] actual, boolean[] expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(boolean[] actual, boolean[] expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualBytes {
-    @BeforeTemplate
-    void before(byte actual, byte expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(byte actual, byte expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualBytesWithMessage {
-    @BeforeTemplate
-    void before(byte actual, byte expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(byte actual, byte expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualByteArrays {
-    @BeforeTemplate
-    void before(byte[] actual, byte[] expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(byte[] actual, byte[] expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualByteArraysWithMessage {
-    @BeforeTemplate
-    void before(byte[] actual, byte[] expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(byte[] actual, byte[] expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualChars {
-    @BeforeTemplate
-    void before(char actual, char expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(char actual, char expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualCharsWithMessage {
-    @BeforeTemplate
-    void before(char actual, char expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(char actual, char expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualCharArrays {
-    @BeforeTemplate
-    void before(char[] actual, char[] expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(char[] actual, char[] expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualCharArraysWithMessage {
-    @BeforeTemplate
-    void before(char[] actual, char[] expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(char[] actual, char[] expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualShorts {
-    @BeforeTemplate
-    void before(short actual, short expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(short actual, short expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualShortsWithMessage {
-    @BeforeTemplate
-    void before(short actual, short expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(short actual, short expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualShortArrays {
-    @BeforeTemplate
-    void before(short[] actual, short[] expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(short[] actual, short[] expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualShortArraysWithMessage {
-    @BeforeTemplate
-    void before(short[] actual, short[] expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(short[] actual, short[] expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualInts {
-    @BeforeTemplate
-    void before(int actual, int expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(int actual, int expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualIntsWithMessage {
-    @BeforeTemplate
-    void before(int actual, int expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(int actual, int expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualIntArrays {
-    @BeforeTemplate
-    void before(int[] actual, int[] expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(int[] actual, int[] expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualIntArraysWithMessage {
-    @BeforeTemplate
-    void before(int[] actual, int[] expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(int[] actual, int[] expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualLongs {
-    @BeforeTemplate
-    void before(long actual, long expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(long actual, long expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualLongsWithMessage {
-    @BeforeTemplate
-    void before(long actual, long expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(long actual, long expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualLongArrays {
-    @BeforeTemplate
-    void before(long[] actual, long[] expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(long[] actual, long[] expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualLongArraysWithMessage {
-    @BeforeTemplate
-    void before(long[] actual, long[] expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(long[] actual, long[] expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualFloats {
-    @BeforeTemplate
-    void before(float actual, float expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(float actual, float expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualFloatsWithMessage {
-    @BeforeTemplate
-    void before(float actual, float expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(float actual, float expected, String message) {
       assertThat(actual).withFailMessage(message).isEqualTo(expected);
     }
   }
@@ -660,58 +423,6 @@ final class AssertJTemplates {
     }
   }
 
-  static final class XXXAssertEqualFloatArrays {
-    @BeforeTemplate
-    void before(float[] actual, float[] expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(float[] actual, float[] expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualFloatArraysWithMessage {
-    @BeforeTemplate
-    void before(float[] actual, float[] expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(float[] actual, float[] expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualDoubles {
-    @BeforeTemplate
-    void before(double actual, double expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(double actual, double expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualDoublesWithMessage {
-    @BeforeTemplate
-    void before(double actual, double expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(double actual, double expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
   static final class XXXAssertEqualDoublesWithDelta {
     @BeforeTemplate
     void before(double actual, double expected, double delta) {
@@ -738,132 +449,232 @@ final class AssertJTemplates {
     }
   }
 
-  static final class XXXAssertEqualDoubleArrays {
+  static final class XXXAssertEqualArrayIterationOrder {
+    @BeforeTemplate
+    void before(boolean[] actual, boolean[] expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(byte[] actual, byte[] expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(char[] actual, char[] expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(short[] actual, short[] expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(int[] actual, int[] expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(long[] actual, long[] expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(float[] actual, float[] expected) {
+      assertEquals(actual, expected);
+    }
+
     @BeforeTemplate
     void before(double[] actual, double[] expected) {
       assertEquals(actual, expected);
     }
 
+    @BeforeTemplate
+    void before(Object[] actual, Object[] expected) {
+      assertEquals(actual, expected);
+    }
+
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(double[] actual, double[] expected) {
-      assertThat(actual).isEqualTo(expected);
+    void after(Object[] actual, Object[] expected) {
+      assertThat(actual).containsExactly(expected);
     }
   }
 
-  static final class XXXAssertEqualDoubleArraysWithMessage {
+  static final class XXXAssertEqualArrayIterationOrderWithMessage {
+    @BeforeTemplate
+    void before(boolean[] actual, boolean[] expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(byte[] actual, byte[] expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(char[] actual, char[] expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(short[] actual, short[] expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(int[] actual, int[] expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(long[] actual, long[] expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(float[] actual, float[] expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
     @BeforeTemplate
     void before(double[] actual, double[] expected, String message) {
       assertEquals(actual, expected, message);
     }
 
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(double[] actual, double[] expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualStrings {
     @BeforeTemplate
-    void before(String actual, String expected) {
-      assertEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(String actual, String expected) {
-      assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class XXXAssertEqualStringsWithMessage {
-    @BeforeTemplate
-    void before(String actual, String expected, String message) {
+    void before(Object[] actual, Object[] expected, String message) {
       assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(String actual, String expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
+    void after(Object[] actual, Object[] expected, String message) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
     }
   }
 
-  // BELOW: Experiment with more concise syntax.
-
-  // XXX: Merge the assertions above into this one!
-  static final class XXXAssertEquals {
+  static final class XXXAssertEqualArraysIrrespectiveOfOrder {
     @BeforeTemplate
-    void before(Iterator<?> actual, Iterator<?> expected) {
-      assertEquals(actual, expected);
+    void before(Object[] actual, Object[] expected) {
+      assertEqualsNoOrder(actual, expected);
     }
 
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    void after(Object[] actual, Object[] expected) {
+      assertThat(actual).containsExactlyInAnyOrder(expected);
+    }
+  }
+
+  static final class XXXAssertEqualArraysIrrespectiveOfOrderWithMessage {
     @BeforeTemplate
-    void before(Iterable<?> actual, Iterable<?> expected) {
-      assertEquals(actual, expected);
+    void before(Object[] actual, Object[] expected, String message) {
+      assertEqualsNoOrder(actual, expected, message);
     }
 
-    @BeforeTemplate
-    void before(Collection<?> actual, Collection<?> expected) {
-      assertEquals(actual, expected);
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    void after(Object[] actual, Object[] expected, String message) {
+      assertThat(actual).withFailMessage(message).containsExactlyInAnyOrder(expected);
     }
+  }
 
+  static final class XXXAssertEqualIteratorIterationOrder<E> {
     @BeforeTemplate
-    void before(Set<?> actual, Set<?> expected) {
-      assertEquals(actual, expected);
-    }
-
-    @BeforeTemplate
-    void before(Map<?, ?> actual, Map<?, ?> expected) {
+    void before(Iterator<E> actual, Iterator<E> expected) {
       assertEquals(actual, expected);
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected) {
-      assertThat(actual).isEqualTo(expected);
+    void after(Iterator<E> actual, Iterator<E> expected) {
+      // XXX: This is not `null`-safe.
+      assertThat(actual).toIterable().containsExactlyElementsOf(ImmutableList.copyOf(expected));
     }
   }
 
-  static final class XXXAssertEqualsWithMessage {
+  static final class XXXAssertEqualIteratorIterationOrderWithMessage<E> {
     @BeforeTemplate
-    void before(Iterator<?> actual, Iterator<?> expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @BeforeTemplate
-    void before(Iterable<?> actual, Iterable<?> expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @BeforeTemplate
-    void before(Collection<?> actual, Collection<?> expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @BeforeTemplate
-    void before(Set<?> actual, Set<?> expected, String message) {
-      assertEquals(actual, expected, message);
-    }
-
-    @BeforeTemplate
-    void before(Map<?, ?> actual, Map<?, ?> expected, String message) {
+    void before(Iterator<E> actual, Iterator<E> expected, String message) {
       assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
+    void after(Iterator<E> actual, Iterator<E> expected, String message) {
+      // XXX: This is not `null`-safe.
+      assertThat(actual)
+          .toIterable()
+          .withFailMessage(message)
+          .containsExactlyElementsOf(ImmutableList.copyOf(expected));
     }
   }
 
-  // XXX: Skipped:
-  // assertEquals Object[] Object[]
-  // assertEquals Object[] Object[] msg
-  // assertEqualsNoOrder Object[] Object[]
-  // assertEqualsNoOrder Object[] Object[] msg
+  static final class XXXAssertEqualIterableIterationOrder<E> {
+    @BeforeTemplate
+    void before(Iterable<E> actual, Iterable<E> expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Collection<E> actual, Collection<E> expected) {
+      assertEquals(actual, expected);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    void after(Iterable<E> actual, Iterable<E> expected) {
+      assertThat(actual).containsExactlyElementsOf(expected);
+    }
+  }
+
+  static final class XXXAssertEqualIterableIterationOrderWithMessage<E> {
+    @BeforeTemplate
+    void before(Iterable<E> actual, Iterable<E> expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Collection<E> actual, Collection<E> expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    void after(Iterable<E> actual, Iterable<E> expected, String message) {
+      assertThat(actual).withFailMessage(message).containsExactlyElementsOf(expected);
+    }
+  }
+
+  static final class XXXAssertEqualSets<E> {
+    @BeforeTemplate
+    void before(Set<E> actual, Set<E> expected) {
+      assertEquals(actual, expected);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    void after(Set<E> actual, Set<E> expected) {
+      assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+    }
+  }
+
+  static final class XXXAssertEqualSetsWithMessage<E> {
+    @BeforeTemplate
+    void before(Set<E> actual, Set<E> expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    void after(Set<E> actual, Set<E> expected, String message) {
+      assertThat(actual).withFailMessage(message).containsExactlyInAnyOrderElementsOf(expected);
+    }
+  }
+
+  // XXX: Skipped methods (these test array equality of elements/values if applicable):
   // assertEqualsDeep Set Set
   // assertEqualsDeep Set Set msg
   // assertEqualsDeep Map Map
