@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.data.Offset.offset;
@@ -40,6 +42,8 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractDoubleAssert;
@@ -1008,6 +1012,19 @@ final class AssertJTemplates {
   /// XXX: Above this line: context-independent rewrite rules. Should be applied first.
   // XXX: Below this line: context-dependent rewrite rules.
 
+  static final class AssertThatOptional<T> {
+    @BeforeTemplate
+    ObjectAssert<T> before(Optional<T> optional) {
+      return assertThat(optional.get());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    AbstractObjectAssert<?, T> after(Optional<T> optional) {
+      return assertThat(optional).get();
+    }
+  }
+
   static final class AssertThatOptionalIsPresent<T> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Optional<T> optional) {
@@ -1053,16 +1070,16 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatOptional<T> {
+  static final class AssertThatOptionalHasValueMatching<T> {
     @BeforeTemplate
-    ObjectAssert<T> before(Optional<T> optional) {
-      return assertThat(optional.get());
+    OptionalAssert<T> before(Optional<T> optional, Predicate<? super T> predicate) {
+      return assertThat(optional.filter(predicate)).isPresent();
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, T> after(Optional<T> optional) {
-      return assertThat(optional).get();
+    AbstractObjectAssert<?, T> after(Optional<T> optional, Predicate<? super T> predicate) {
+      return assertThat(optional).get().matches(predicate);
     }
   }
 
@@ -1459,6 +1476,7 @@ final class AssertJTemplates {
   // XXX: There's a bunch of variations on this theme.
   // XXX: The `Iterables.getOnlyElement` variant doesn't match in
   // `analytics/analytics-message-listener`. Why?
+  // XXX: Here and elsewhere: make sure `Arrays.asList` is migrated away from, then drop it here.
   static final class AssertThatOnlyElementIsEqualTo<E> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Iterable<E> iterable, E expected) {
@@ -1499,6 +1517,265 @@ final class AssertJTemplates {
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     IterableAssert<E> after(Iterable<E> iterable, E expected) {
       return assertThat(iterable).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatIterableContainsTwoSpecificElementsInOrder<E> {
+    @BeforeTemplate
+    IterableAssert<E> before(Iterable<E> iterable, E e1, E e2) {
+      return assertThat(iterable)
+          .isEqualTo(Refaster.anyOf(ImmutableList.of(e1, e2), Arrays.asList(e1, e2)));
+    }
+
+    @BeforeTemplate
+    ListAssert<E> before(List<E> iterable, E e1, E e2) {
+      return assertThat(iterable)
+          .isEqualTo(Refaster.anyOf(ImmutableList.of(e1, e2), Arrays.asList(e1, e2)));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable, E e1, E e2) {
+      return assertThat(iterable).containsExactly(e1, e2);
+    }
+  }
+
+  static final class AssertThatIterableContainsThreeSpecificElementsInOrder<E> {
+    @BeforeTemplate
+    IterableAssert<E> before(Iterable<E> iterable, E e1, E e2, E e3) {
+      return assertThat(iterable)
+          .isEqualTo(Refaster.anyOf(ImmutableList.of(e1, e2, e3), Arrays.asList(e1, e2, e3)));
+    }
+
+    @BeforeTemplate
+    ListAssert<E> before(List<E> iterable, E e1, E e2, E e3) {
+      return assertThat(iterable)
+          .isEqualTo(Refaster.anyOf(ImmutableList.of(e1, e2, e3), Arrays.asList(e1, e2, e3)));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable, E e1, E e2, E e3) {
+      return assertThat(iterable).containsExactly(e1, e2, e3);
+    }
+  }
+
+  static final class AssertThatIterableContainsFourSpecificElementsInOrder<E> {
+    @BeforeTemplate
+    IterableAssert<E> before(Iterable<E> iterable, E e1, E e2, E e3, E e4) {
+      return assertThat(iterable)
+          .isEqualTo(
+              Refaster.anyOf(ImmutableList.of(e1, e2, e3, e4), Arrays.asList(e1, e2, e3, e4)));
+    }
+
+    @BeforeTemplate
+    ListAssert<E> before(List<E> iterable, E e1, E e2, E e3, E e4) {
+      return assertThat(iterable)
+          .isEqualTo(
+              Refaster.anyOf(ImmutableList.of(e1, e2, e3, e4), Arrays.asList(e1, e2, e3, e4)));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable, E e1, E e2, E e3, E e4) {
+      return assertThat(iterable).containsExactly(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Up to 12...? :)
+  static final class AssertThatIterableContainsFiveSpecificElementsInOrder<E> {
+    @BeforeTemplate
+    IterableAssert<E> before(Iterable<E> iterable, E e1, E e2, E e3, E e4, E e5) {
+      return assertThat(iterable)
+          .isEqualTo(
+              Refaster.anyOf(
+                  ImmutableList.of(e1, e2, e3, e4, e5), Arrays.asList(e1, e2, e3, e4, e5)));
+    }
+
+    @BeforeTemplate
+    ListAssert<E> before(List<E> iterable, E e1, E e2, E e3, E e4, E e5) {
+      return assertThat(iterable)
+          .isEqualTo(
+              Refaster.anyOf(
+                  ImmutableList.of(e1, e2, e3, e4, e5), Arrays.asList(e1, e2, e3, e4, e5)));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable, E e1, E e2, E e3, E e4, E e5) {
+      return assertThat(iterable).containsExactly(e1, e2, e3, e4, e5);
+    }
+  }
+
+  // XXX: For this and other variants we could also match other behavior-preserving collection
+  // operations.
+  static final class AssertThatStreamContainsTwoSpecificElementsInOrder<E> {
+    @BeforeTemplate
+    ListAssert<E> before(Stream<E> stream, E e1, E e2) {
+      return Refaster.anyOf(
+          assertThat(stream.collect(toImmutableList()))
+              .isEqualTo(Refaster.anyOf(ImmutableList.of(e1, e2), Arrays.asList(e1, e2))),
+          assertThat(stream.collect(toImmutableList())).containsExactly(e1, e2));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ListAssert<E> after(Stream<E> stream, E e1, E e2) {
+      return assertThat(stream).containsExactly(e1, e2);
+    }
+  }
+
+  static final class AssertThatStreamContainsThreeSpecificElementsInOrder<E> {
+    @BeforeTemplate
+    ListAssert<E> before(Stream<E> stream, E e1, E e2, E e3) {
+      return Refaster.anyOf(
+          assertThat(stream.collect(toImmutableList()))
+              .isEqualTo(Refaster.anyOf(ImmutableList.of(e1, e2, e3), Arrays.asList(e1, e2, e3))),
+          assertThat(stream.collect(toImmutableList())).containsExactly(e1, e2, e3));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ListAssert<E> after(Stream<E> stream, E e1, E e2, E e3) {
+      return assertThat(stream).containsExactly(e1, e2, e3);
+    }
+  }
+
+  static final class AssertThatStreamContainsFourSpecificElementsInOrder<E> {
+    @BeforeTemplate
+    ListAssert<E> before(Stream<E> stream, E e1, E e2, E e3, E e4) {
+      return Refaster.anyOf(
+          assertThat(stream.collect(toImmutableList()))
+              .isEqualTo(
+                  Refaster.anyOf(ImmutableList.of(e1, e2, e3, e4), Arrays.asList(e1, e2, e3, e4))),
+          assertThat(stream.collect(toImmutableList())).containsExactly(e1, e2, e3, e4));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ListAssert<E> after(Stream<E> stream, E e1, E e2, E e3, E e4) {
+      return assertThat(stream).containsExactly(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Up to 12...? :)
+  static final class AssertThatStreamContainsFiveSpecificElementsInOrder<E> {
+    @BeforeTemplate
+    ListAssert<E> before(Stream<E> stream, E e1, E e2, E e3, E e4, E e5) {
+      return Refaster.anyOf(
+          assertThat(stream.collect(toImmutableList()))
+              .isEqualTo(
+                  Refaster.anyOf(
+                      ImmutableList.of(e1, e2, e3, e4, e5), Arrays.asList(e1, e2, e3, e4, e5))),
+          assertThat(stream.collect(toImmutableList())).containsExactly(e1, e2, e3, e4, e5));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ListAssert<E> after(Stream<E> stream, E e1, E e2, E e3, E e4, E e5) {
+      return assertThat(stream).containsExactly(e1, e2, e3, e4, e5);
+    }
+  }
+
+  static final class AssertThatIterableContainsTwoSpecificElements<E> {
+    @BeforeTemplate
+    IterableAssert<E> before(Iterable<E> iterable, E e1, E e2) {
+      return assertThat(iterable)
+          .isEqualTo(Refaster.anyOf(ImmutableSet.of(e1, e2), ImmutableMultiset.of(e1, e2)));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable, E e1, E e2) {
+      return assertThat(iterable).containsExactlyInAnyOrder(e1, e2);
+    }
+  }
+
+  static final class AssertThatIterableContainsThreeSpecificElements<E> {
+    @BeforeTemplate
+    IterableAssert<E> before(Iterable<E> iterable, E e1, E e2, E e3) {
+      return assertThat(iterable)
+          .isEqualTo(Refaster.anyOf(ImmutableSet.of(e1, e2, e3), ImmutableMultiset.of(e1, e2, e3)));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable, E e1, E e2, E e3) {
+      return assertThat(iterable).containsExactlyInAnyOrder(e1, e2, e3);
+    }
+  }
+
+  static final class AssertThatIterableContainsFourSpecificElements<E> {
+    @BeforeTemplate
+    IterableAssert<E> before(Iterable<E> iterable, E e1, E e2, E e3, E e4) {
+      return assertThat(iterable)
+          .isEqualTo(
+              Refaster.anyOf(
+                  ImmutableSet.of(e1, e2, e3, e4), ImmutableMultiset.of(e1, e2, e3, e4)));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable, E e1, E e2, E e3, E e4) {
+      return assertThat(iterable).containsExactlyInAnyOrder(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Up to 12...? :)
+  static final class AssertThatIterableContainsFiveSpecificElements<E> {
+    @BeforeTemplate
+    IterableAssert<E> before(Iterable<E> iterable, E e1, E e2, E e3, E e4, E e5) {
+      return assertThat(iterable)
+          .isEqualTo(
+              Refaster.anyOf(
+                  ImmutableSet.of(e1, e2, e3, e4, e5), ImmutableMultiset.of(e1, e2, e3, e4, e5)));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable, E e1, E e2, E e3, E e4, E e5) {
+      return assertThat(iterable).containsExactlyInAnyOrder(e1, e2, e3, e4, e5);
+    }
+  }
+
+  static final class AssertThatStreamContainsTwoSpecificElements<E> {
+    @BeforeTemplate
+    IterableAssert<E> before(Stream<E> stream, E e1, E e2) {
+      return assertThat(stream.collect(toImmutableSet())).isEqualTo(ImmutableSet.of(e1, e2));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ListAssert<E> after(Stream<E> stream, E e1, E e2) {
+      return assertThat(stream).containsOnly(e1, e2);
+    }
+  }
+
+  static final class AssertThatStreamContainsThreeSpecificElements<E> {
+    @BeforeTemplate
+    IterableAssert<E> before(Stream<E> stream, E e1, E e2, E e3) {
+      return assertThat(stream.collect(toImmutableSet())).isEqualTo(ImmutableSet.of(e1, e2, e3));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ListAssert<E> after(Stream<E> stream, E e1, E e2, E e3) {
+      return assertThat(stream).containsOnly(e1, e2, e3);
+    }
+  }
+
+  // XXX: Up to 12...? :)
+  static final class AssertThatStreamContainsFiveSpecificElements<E> {
+    @BeforeTemplate
+    IterableAssert<E> before(Stream<E> stream, E e1, E e2, E e3, E e4, E e5) {
+      return assertThat(stream.collect(toImmutableSet()))
+          .isEqualTo(ImmutableSet.of(e1, e2, e3, e4, e5));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ListAssert<E> after(Stream<E> stream, E e1, E e2, E e3, E e4, E e5) {
+      return assertThat(stream).containsOnly(e1, e2, e3, e4, e5);
     }
   }
 }
