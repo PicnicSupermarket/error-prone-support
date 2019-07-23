@@ -631,7 +631,7 @@ final class TestNGToAssertJTemplates {
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     <S, T extends S> void after(Set<S> actual, Set<T> expected) {
-      assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+      assertThat(actual).hasSameElementsAs(expected);
     }
   }
 
@@ -644,7 +644,7 @@ final class TestNGToAssertJTemplates {
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     <S, T extends S> void after(Set<S> actual, Set<T> expected, String message) {
-      assertThat(actual).withFailMessage(message).containsExactlyInAnyOrderElementsOf(expected);
+      assertThat(actual).withFailMessage(message).hasSameElementsAs(expected);
     }
   }
 

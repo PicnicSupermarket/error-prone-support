@@ -4,15 +4,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedMultiset;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multiset;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Predicate;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractBooleanAssert;
@@ -22,6 +36,8 @@ import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractStringAssert;
+import org.assertj.core.api.IterableAssert;
+import org.assertj.core.api.ListAssert;
 import org.assertj.core.api.ObjectAssert;
 import org.assertj.core.api.OptionalAssert;
 import org.assertj.core.api.OptionalDoubleAssert;
@@ -472,146 +488,259 @@ final class AssertJTemplates {
   ////////////////////////////////////////////////////////////////////////////
   // To be organized.
 
-  //    // XXX: Most/all of these Iterable rules can also be applied to arrays.
-  //    // XXX: Elsewhere add a rule to disallow `Collection.emptyList()` and variants as well as
-  //    // `Arrays.asList()`.
-  //    static final class AssertThatIterableIsEmpty<E> {
-  //        @BeforeTemplate
-  //        void before(Iterable<E> iterable) {
-  //            Refaster.anyOf(
-  //                    assertThat(iterable)
-  //                            .isEqualTo(
-  //                                    Refaster.anyOf(
-  //                                            ImmutableList.of(),
-  //                                            new ArrayList<>(),
-  //                                            ImmutableSet.of(),
-  //                                            ImmutableSortedSet.of(),
-  //                                            ImmutableMultiset.of(),
-  //                                            ImmutableSortedMultiset.of())),
-  //                    assertThat(iterable).hasSize(0),
-  //                    assertThat(iterable).hasSizeLessThan(1),
-  //                    assertThat(Iterables.isEmpty(iterable)).isTrue(),
-  //                    assertThat(iterable.iterator().hasNext()).isFalse(),
-  //                    assertThat(Iterables.size(iterable)).isZero(),
-  //                    assertThat(Iterables.size(iterable)).isNotPositive());
-  //        }
   //
-  //        @BeforeTemplate
-  //        void before(Collection<E> iterable) {
-  //            Refaster.anyOf(
-  //                    assertThat(iterable.isEmpty()).isTrue(),
-  //                    assertThat(iterable.size()).isZero(),
-  //                    assertThat(iterable.size()).isNotPositive());
-  //        }
+  // List
   //
-  //        @BeforeTemplate
-  //        void before(List<E> iterable) {
-  //            Refaster.anyOf(
-  //                    assertThat(iterable)
-  //                            .isEqualTo(Refaster.anyOf(ImmutableList.of(), new ArrayList<>())),
-  //                    assertThat(iterable).hasSize(0),
-  //                    assertThat(iterable).hasSizeLessThan(1));
-  //        }
+
+  static final class AssertThatListsAreEqual<S, T extends S> {
+    @BeforeTemplate
+    ListAssert<S> before(List<S> list1, List<T> list2) {
+      return assertThat(list1).isEqualTo(list2);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ListAssert<S> after(List<S> list1, List<T> list2) {
+      return assertThat(list1).containsExactlyElementsOf(list2);
+    }
+  }
+
   //
-  //        @AfterTemplate
-  //        @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //        void after(Collection<E> iterable) {
-  //            assertThat(iterable).isEmpty();
-  //        }
-  //    }
+  // Set
   //
-  //    static final class AssertThatIterableIsNotEmpty<E> {
-  //        @BeforeTemplate
-  //        AbstractAssert<?, ?> before(Iterable<E> iterable) {
-  //            return Refaster.anyOf(
-  //                    assertThat(iterable)
-  //                            .isNotEqualTo(
-  //                                    Refaster.anyOf(
-  //                                            ImmutableList.of(),
-  //                                            new ArrayList<>(),
-  //                                            ImmutableSet.of(),
-  //                                            ImmutableSortedSet.of(),
-  //                                            ImmutableMultiset.of(),
-  //                                            ImmutableSortedMultiset.of())),
-  //                    assertThat(iterable).hasSizeGreaterThan(0),
-  //                    assertThat(iterable).hasSizeGreaterThanOrEqualTo(1),
-  //                    assertThat(Iterables.isEmpty(iterable)).isFalse(),
-  //                    assertThat(iterable.iterator().hasNext()).isTrue(),
-  //                    assertThat(Iterables.size(iterable)).isNotZero(),
-  //                    assertThat(Iterables.size(iterable)).isPositive());
-  //        }
+
+  static final class AssertThatSetsAreEqual<S, T extends S> {
+    @BeforeTemplate
+    IterableAssert<S> before(Set<S> set1, Set<T> set2) {
+      return assertThat(set1).isEqualTo(set2);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<S> after(Set<S> set1, Set<T> set2) {
+      return assertThat(set1).containsExactlyInAnyOrderElementsOf(set2);
+    }
+  }
+
   //
-  //        @BeforeTemplate
-  //        AbstractAssert<?, ?> before(Collection<E> iterable) {
-  //            return Refaster.anyOf(
-  //                    assertThat(iterable.isEmpty()).isFalse(),
-  //                    assertThat(iterable.size()).isNotZero(),
-  //                    assertThat(iterable.size()).isPositive());
-  //        }
+  // Mutliset
   //
-  //        @BeforeTemplate
-  //        ListAssert<E> before(List<E> iterable) {
-  //            return Refaster.anyOf(
-  //                    assertThat(iterable)
-  //                            .isNotEqualTo(Refaster.anyOf(ImmutableList.of(), new
-  // ArrayList<>())),
-  //                    assertThat(iterable).hasSizeGreaterThan(0),
-  //                    assertThat(iterable).hasSizeGreaterThanOrEqualTo(1));
-  //        }
+
+  static final class AssertThatMultisetsAreEqual<S, T extends S> {
+    @BeforeTemplate
+    IterableAssert<S> before(Multiset<S> multiset1, Multiset<T> multiset2) {
+      return assertThat(multiset1).isEqualTo(multiset2);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<S> after(Multiset<S> multiset1, Multiset<T> multiset2) {
+      return assertThat(multiset1).containsExactlyInAnyOrderElementsOf(multiset2);
+    }
+  }
+
   //
-  //        @AfterTemplate
-  //        @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //        IterableAssert<E> after(Iterable<E> iterable) {
-  //            return assertThat(iterable).isNotEmpty();
-  //        }
-  //    }
+  // Iterable
   //
-  //    static final class AssertThatIterableHasSize<E> {
-  //        @BeforeTemplate
-  //        AbstractIntegerAssert<?> before(Iterable<E> iterable, int length) {
-  //            return assertThat(Iterables.size(iterable)).isEqualTo(length);
-  //        }
-  //
-  //        @BeforeTemplate
-  //        AbstractIntegerAssert<?> before(Collection<E> iterable, int length) {
-  //            return assertThat(iterable.size()).isEqualTo(length);
-  //        }
-  //
-  //        @AfterTemplate
-  //        @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //        IterableAssert<E> after(Iterable<E> iterable, int length) {
-  //            return assertThat(iterable).hasSize(length);
-  //        }
-  //    }
-  //
-  //    static final class AssertThatIterablesHaveSameSize<E> {
-  //        @BeforeTemplate
-  //        IterableAssert<E> before(Iterable<E> iterable1, Iterable<E> iterable2) {
-  //            return assertThat(iterable1).hasSize(Iterables.size(iterable2));
-  //        }
-  //
-  //        @BeforeTemplate
-  //        IterableAssert<E> before(Iterable<E> iterable1, Collection<E> iterable2) {
-  //            return assertThat(iterable1).hasSize(iterable2.size());
-  //        }
-  //
-  //        @BeforeTemplate
-  //        ListAssert<E> before(List<E> iterable1, Iterable<E> iterable2) {
-  //            return assertThat(iterable1).hasSize(Iterables.size(iterable2));
-  //        }
-  //
-  //        @BeforeTemplate
-  //        ListAssert<E> before(List<E> iterable1, Collection<E> iterable2) {
-  //            return assertThat(iterable1).hasSize(iterable2.size());
-  //        }
-  //
-  //        @AfterTemplate
-  //        @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //        IterableAssert<E> after(Iterable<E> iterable1, Iterable<E> iterable2) {
-  //            return assertThat(iterable1).hasSameSizeAs(iterable2);
-  //        }
-  //    }
-  //
+
+  static final class AssertThatIterableHasSameElementsAsSet<S, T extends S> {
+    @BeforeTemplate
+    IterableAssert<S> before(Iterable<S> set1, Set<T> set2) {
+      return assertThat(set1).containsExactlyInAnyOrderElementsOf(set2);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<S> after(Iterable<S> set1, Set<T> set2) {
+      return assertThat(set1).hasSameElementsAs(set2);
+    }
+  }
+
+  // XXX: Most/all of these Iterable rules can also be applied to arrays.
+  // XXX: Elsewhere add a rule to disallow `Collection.emptyList()` and variants as well as
+  // `Arrays.asList()`.
+  // XXX: We could also match against `#hasSameSizeAs` and `#isSubsetOf`, but that's pushing it.
+  // Let's add those once Refaster supports a way of deduplicating repetition.
+  static final class AssertThatIterableIsEmpty<E> {
+    @BeforeTemplate
+    void before(Iterable<E> iterable) {
+      Refaster.anyOf(
+          assertThat(iterable)
+              .containsExactlyElementsOf(
+                  Refaster.anyOf(
+                      ImmutableList.of(),
+                      new ArrayList<>(),
+                      ImmutableSet.of(),
+                      new HashSet<>(),
+                      new LinkedHashSet<>(),
+                      ImmutableSortedSet.of(),
+                      new TreeSet<>(),
+                      ImmutableMultiset.of(),
+                      ImmutableSortedMultiset.of())),
+          assertThat(iterable)
+              .containsExactlyInAnyOrderElementsOf(
+                  Refaster.anyOf(
+                      ImmutableList.of(),
+                      new ArrayList<>(),
+                      ImmutableSet.of(),
+                      new HashSet<>(),
+                      new LinkedHashSet<>(),
+                      ImmutableSortedSet.of(),
+                      new TreeSet<>(),
+                      ImmutableMultiset.of(),
+                      ImmutableSortedMultiset.of())),
+          assertThat(iterable)
+              .containsOnlyElementsOf(
+                  Refaster.anyOf(
+                      ImmutableList.of(),
+                      new ArrayList<>(),
+                      ImmutableSet.of(),
+                      new HashSet<>(),
+                      new LinkedHashSet<>(),
+                      ImmutableSortedSet.of(),
+                      new TreeSet<>(),
+                      ImmutableMultiset.of(),
+                      ImmutableSortedMultiset.of())),
+          assertThat(iterable)
+              .hasSameElementsAs(
+                  Refaster.anyOf(
+                      ImmutableList.of(),
+                      new ArrayList<>(),
+                      ImmutableSet.of(),
+                      new HashSet<>(),
+                      new LinkedHashSet<>(),
+                      ImmutableSortedSet.of(),
+                      new TreeSet<>(),
+                      ImmutableMultiset.of(),
+                      ImmutableSortedMultiset.of())),
+          assertThat(iterable).hasSize(0),
+          assertThat(iterable).hasSizeLessThan(1),
+          assertThat(iterable).containsExactly(),
+          assertThat(iterable).containsExactlyInAnyOrder(),
+          assertThat(iterable).containsOnly(),
+          assertThat(iterable).isSubsetOf(),
+          assertThat(Iterables.isEmpty(iterable)).isTrue(),
+          assertThat(iterable.iterator().hasNext()).isFalse(),
+          assertThat(Iterables.size(iterable)).isZero(),
+          assertThat(Iterables.size(iterable)).isNotPositive());
+    }
+
+    @BeforeTemplate
+    void before(Collection<E> iterable) {
+      Refaster.anyOf(
+          assertThat(iterable.isEmpty()).isTrue(),
+          assertThat(iterable.size()).isZero(),
+          assertThat(iterable.size()).isNotPositive());
+    }
+
+    @BeforeTemplate
+    void before(List<E> iterable) {
+      Refaster.anyOf(
+          assertThat(iterable).isEqualTo(Refaster.anyOf(ImmutableList.of(), new ArrayList<>())),
+          assertThat(iterable).hasSize(0),
+          assertThat(iterable).hasSizeLessThan(1));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    void after(Collection<E> iterable) {
+      assertThat(iterable).isEmpty();
+    }
+  }
+
+  static final class AssertThatIterableIsNotEmpty<E> {
+    @BeforeTemplate
+    AbstractAssert<?, ?> before(Iterable<E> iterable) {
+      return Refaster.anyOf(
+          assertThat(iterable)
+              .isNotEqualTo(
+                  Refaster.anyOf(
+                      ImmutableList.of(),
+                      new ArrayList<>(),
+                      ImmutableSet.of(),
+                      new HashSet<>(),
+                      new LinkedHashSet<>(),
+                      ImmutableSortedSet.of(),
+                      new TreeSet<>(),
+                      ImmutableMultiset.of(),
+                      ImmutableSortedMultiset.of())),
+          assertThat(iterable).hasSizeGreaterThan(0),
+          assertThat(iterable).hasSizeGreaterThanOrEqualTo(1),
+          assertThat(Iterables.isEmpty(iterable)).isFalse(),
+          assertThat(iterable.iterator().hasNext()).isTrue(),
+          assertThat(Iterables.size(iterable)).isNotZero(),
+          assertThat(Iterables.size(iterable)).isPositive());
+    }
+
+    @BeforeTemplate
+    AbstractAssert<?, ?> before(Collection<E> iterable) {
+      return Refaster.anyOf(
+          assertThat(iterable.isEmpty()).isFalse(),
+          assertThat(iterable.size()).isNotZero(),
+          assertThat(iterable.size()).isPositive());
+    }
+
+    @BeforeTemplate
+    ListAssert<E> before(List<E> iterable) {
+      return Refaster.anyOf(
+          assertThat(iterable).isNotEqualTo(Refaster.anyOf(ImmutableList.of(), new ArrayList<>())),
+          assertThat(iterable).hasSizeGreaterThan(0),
+          assertThat(iterable).hasSizeGreaterThanOrEqualTo(1));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable) {
+      return assertThat(iterable).isNotEmpty();
+    }
+  }
+
+  static final class AssertThatIterableHasSize<E> {
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before(Iterable<E> iterable, int length) {
+      return assertThat(Iterables.size(iterable)).isEqualTo(length);
+    }
+
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before(Collection<E> iterable, int length) {
+      return assertThat(iterable.size()).isEqualTo(length);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable, int length) {
+      return assertThat(iterable).hasSize(length);
+    }
+  }
+
+  static final class AssertThatIterablesHaveSameSize<S, T> {
+    @BeforeTemplate
+    IterableAssert<S> before(Iterable<S> iterable1, Iterable<T> iterable2) {
+      return assertThat(iterable1).hasSize(Iterables.size(iterable2));
+    }
+
+    @BeforeTemplate
+    IterableAssert<S> before(Iterable<S> iterable1, Collection<T> iterable2) {
+      return assertThat(iterable1).hasSize(iterable2.size());
+    }
+
+    @BeforeTemplate
+    ListAssert<S> before(List<S> iterable1, Iterable<T> iterable2) {
+      return assertThat(iterable1).hasSize(Iterables.size(iterable2));
+    }
+
+    @BeforeTemplate
+    ListAssert<S> before(List<S> iterable1, Collection<T> iterable2) {
+      return assertThat(iterable1).hasSize(iterable2.size());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<S> after(Iterable<S> iterable1, Iterable<T> iterable2) {
+      return assertThat(iterable1).hasSameSizeAs(iterable2);
+    }
+  }
+
   //    // XXX: Add a variant which checks the exact size.
   //    static final class AssertThatMapIsEmpty<K, V> {
   //        @BeforeTemplate
