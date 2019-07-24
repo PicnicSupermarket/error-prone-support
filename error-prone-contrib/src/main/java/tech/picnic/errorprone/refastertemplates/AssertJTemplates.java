@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
 
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
@@ -17,15 +20,20 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 import org.assertj.core.api.AbstractAssert;
@@ -38,7 +46,9 @@ import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.IterableAssert;
 import org.assertj.core.api.ListAssert;
+import org.assertj.core.api.MapAssert;
 import org.assertj.core.api.ObjectAssert;
+import org.assertj.core.api.ObjectEnumerableAssert;
 import org.assertj.core.api.OptionalAssert;
 import org.assertj.core.api.OptionalDoubleAssert;
 import org.assertj.core.api.OptionalIntAssert;
@@ -51,6 +61,8 @@ import org.assertj.core.api.OptionalLongAssert;
 // XXX: Consider splitting this class into multiple classes.
 // XXX: Some of these rules may not apply given the updated TestNG rewrite rules. Review.
 // XXX: Use `S, T extends S` bounds to avoid re-applying incompatible constructs.
+// XXX: For the templates which "unwrap" explicitly enumerated collections, also introduce variants
+// with explicitly enumerated sorted collections. (Requires that the type bound is Comparable.)
 final class AssertJTemplates {
   private AssertJTemplates() {}
 
@@ -484,61 +496,6 @@ final class AssertJTemplates {
     }
   }
 
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  // To be organized.
-
-  //
-  // List
-  //
-
-  static final class AssertThatListsAreEqual<S, T extends S> {
-    @BeforeTemplate
-    ListAssert<S> before(List<S> list1, List<T> list2) {
-      return assertThat(list1).isEqualTo(list2);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(List<S> list1, List<T> list2) {
-      return assertThat(list1).containsExactlyElementsOf(list2);
-    }
-  }
-
-  //
-  // Set
-  //
-
-  static final class AssertThatSetsAreEqual<S, T extends S> {
-    @BeforeTemplate
-    IterableAssert<S> before(Set<S> set1, Set<T> set2) {
-      return assertThat(set1).isEqualTo(set2);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    IterableAssert<S> after(Set<S> set1, Set<T> set2) {
-      return assertThat(set1).containsExactlyInAnyOrderElementsOf(set2);
-    }
-  }
-
-  //
-  // Mutliset
-  //
-
-  static final class AssertThatMultisetsAreEqual<S, T extends S> {
-    @BeforeTemplate
-    IterableAssert<S> before(Multiset<S> multiset1, Multiset<T> multiset2) {
-      return assertThat(multiset1).isEqualTo(multiset2);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    IterableAssert<S> after(Multiset<S> multiset1, Multiset<T> multiset2) {
-      return assertThat(multiset1).containsExactlyInAnyOrderElementsOf(multiset2);
-    }
-  }
-
   //
   // Iterable
   //
@@ -741,151 +698,534 @@ final class AssertJTemplates {
     }
   }
 
-  //    // XXX: Add a variant which checks the exact size.
-  //    static final class AssertThatMapIsEmpty<K, V> {
-  //        @BeforeTemplate
-  //        void before(Map<K, V> map) {
-  //            Refaster.anyOf(
-  //                    assertThat(map)
-  //                            .isEqualTo(
-  //                                    Refaster.anyOf(
-  //                                            ImmutableMap.of(),
-  //                                            ImmutableBiMap.of(),
-  //                                            ImmutableSortedMap.of(),
-  //                                            new HashMap<>(),
-  //                                            new LinkedHashMap<>(),
-  //                                            new TreeMap<>())),
-  //                    assertThat(map).hasSize(0),
-  //                    assertThat(Refaster.anyOf(map.keySet(), map.values())).hasSize(0),
-  //                    assertThat(map).hasSizeLessThan(1),
-  //                    assertThat(Refaster.anyOf(map.keySet(), map.values())).hasSizeLessThan(1),
-  //                    assertThat(map.isEmpty()).isTrue(),
-  //                    assertThat(Refaster.anyOf(map.keySet(), map.values()).isEmpty()).isTrue(),
-  //                    assertThat(Refaster.anyOf(map.size(), map.keySet().size(),
-  // map.values().size()))
-  //                            .isZero(),
-  //                    assertThat(Refaster.anyOf(map.size(), map.keySet().size(),
-  // map.values().size()))
-  //                            .isNotPositive());
-  //        }
   //
-  //        @BeforeTemplate
-  //        void before2(Map<K, V> map) {
-  //            assertThat(Refaster.anyOf(map.keySet(), map.values())).isEmpty();
-  //        }
+  // List
   //
-  //        @AfterTemplate
-  //        @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //        void after(Map<K, V> map) {
-  //            assertThat(map).isEmpty();
-  //        }
-  //    }
+
+  static final class AssertThatListsAreEqual<S, T extends S> {
+    @BeforeTemplate
+    ListAssert<S> before(List<S> list1, List<T> list2) {
+      return assertThat(list1).isEqualTo(list2);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ListAssert<S> after(List<S> list1, List<T> list2) {
+      return assertThat(list1).containsExactlyElementsOf(list2);
+    }
+  }
+
   //
-  //    static final class AssertThatMapIsNotEmpty<K, V> {
-  //        @BeforeTemplate
-  //        AbstractAssert<?, ?> before(Map<K, V> map) {
-  //            return Refaster.anyOf(
-  //                    assertThat(map)
-  //                            .isNotEqualTo(
-  //                                    Refaster.anyOf(
-  //                                            ImmutableMap.of(),
-  //                                            ImmutableBiMap.of(),
-  //                                            ImmutableSortedMap.of(),
-  //                                            new HashMap<>(),
-  //                                            new LinkedHashMap<>(),
-  //                                            new TreeMap<>())),
-  //                    assertThat(map).hasSizeGreaterThan(0),
-  //                    assertThat(Refaster.anyOf(map.keySet(),
-  // map.values())).hasSizeGreaterThan(0),
-  //                    assertThat(map.isEmpty()).isFalse(),
-  //                    assertThat(Refaster.anyOf(map.keySet(), map.values()).isEmpty()).isFalse(),
-  //                    assertThat(Refaster.anyOf(map.size(), map.keySet().size(),
-  // map.values().size()))
-  //                            .isNotZero(),
-  //                    assertThat(Refaster.anyOf(map.size(), map.keySet().size(),
-  // map.values().size()))
-  //                            .isPositive());
-  //        }
+  // Set
   //
-  //        @BeforeTemplate
-  //        IterableAssert<?> before2(Map<K, V> map) {
-  //            return assertThat(Refaster.anyOf(map.keySet(), map.values())).isNotEmpty();
-  //        }
+
+  static final class AssertThatSetsAreEqual<S, T extends S> {
+    @BeforeTemplate
+    IterableAssert<S> before(Set<S> set1, Set<T> set2) {
+      return assertThat(set1).isEqualTo(set2);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<S> after(Set<S> set1, Set<T> set2) {
+      return assertThat(set1).containsExactlyInAnyOrderElementsOf(set2);
+    }
+  }
+
   //
-  //        @AfterTemplate
-  //        @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //        MapAssert<K, V> after(Map<K, V> map) {
-  //            return assertThat(map).isNotEmpty();
-  //        }
-  //    }
+  // Mutliset
   //
-  //    static final class AssertThatMapHasSize<K, V> {
-  //        @BeforeTemplate
-  //        AbstractIntegerAssert<?> before(Map<K, V> map, int length) {
-  //            return assertThat(Refaster.anyOf(map.size(), map.keySet().size(),
-  // map.values().size()))
-  //                    .isEqualTo(length);
-  //        }
+
+  static final class AssertThatMultisetsAreEqual<S, T extends S> {
+    @BeforeTemplate
+    IterableAssert<S> before(Multiset<S> multiset1, Multiset<T> multiset2) {
+      return assertThat(multiset1).isEqualTo(multiset2);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    IterableAssert<S> after(Multiset<S> multiset1, Multiset<T> multiset2) {
+      return assertThat(multiset1).containsExactlyInAnyOrderElementsOf(multiset2);
+    }
+  }
+
   //
-  //        @AfterTemplate
-  //        @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //        MapAssert<K, V> after(Map<K, V> map, int length) {
-  //            return assertThat(map).hasSize(length);
-  //        }
-  //    }
+  // Map
   //
-  //    static final class AssertThatMapsHaveSameSize<K, V> {
-  //        @BeforeTemplate
-  //        AbstractAssert<?, ?> before(Map<K, V> map1, Map<K, V> map2) {
-  //            return Refaster.anyOf(
-  //                    assertThat(map1)
-  //                            .hasSize(
-  //                                    Refaster.anyOf(
-  //                                            map2.size(),
-  //                                            map2.keySet().size(),
-  //                                            map2.values().size())),
-  //                    assertThat(Refaster.anyOf(map1.keySet(), map1.values()))
-  //                            .hasSize(
-  //                                    Refaster.anyOf(
-  //                                            map2.size(),
-  //                                            map2.keySet().size(),
-  //                                            map2.values().size())));
-  //        }
+
+  // XXX: We could also match against `#containsOnlyKeys(Iterable)` and `#hasSameSizeAs`, but that's
+  // pushing it. Let's add those once Refaster supports a way of deduplicating repetition.
+  static final class AssertThatMapIsEmpty<K, V> {
+    @BeforeTemplate
+    void before(Map<K, V> map) {
+      Refaster.anyOf(
+          assertThat(map)
+              .isEqualTo(
+                  Refaster.anyOf(
+                      ImmutableMap.of(),
+                      ImmutableBiMap.of(),
+                      ImmutableSortedMap.of(),
+                      new HashMap<>(),
+                      new LinkedHashMap<>(),
+                      new TreeMap<>())),
+          assertThat(map)
+              .containsExactlyEntriesOf(
+                  Refaster.anyOf(
+                      ImmutableMap.of(),
+                      ImmutableBiMap.of(),
+                      ImmutableSortedMap.of(),
+                      new HashMap<>(),
+                      new LinkedHashMap<>(),
+                      new TreeMap<>())),
+          assertThat(map).hasSize(0),
+          assertThat(map).containsExactly(),
+          assertThat(map).containsOnly(),
+          assertThat(map).containsOnlyKeys(),
+          assertThat(Refaster.anyOf(map.keySet(), map.values())).hasSize(0),
+          assertThat(map).hasSizeLessThan(1),
+          assertThat(Refaster.anyOf(map.keySet(), map.values())).hasSizeLessThan(1),
+          assertThat(map.isEmpty()).isTrue(),
+          assertThat(Refaster.anyOf(map.keySet(), map.values()).isEmpty()).isTrue(),
+          assertThat(Refaster.anyOf(map.size(), map.keySet().size(), map.values().size())).isZero(),
+          assertThat(Refaster.anyOf(map.size(), map.keySet().size(), map.values().size()))
+              .isNotPositive());
+    }
+
+    @BeforeTemplate
+    void before2(Map<K, V> map) {
+      assertThat(Refaster.anyOf(map.keySet(), map.values())).isEmpty();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    void after(Map<K, V> map) {
+      assertThat(map).isEmpty();
+    }
+  }
+
+  static final class AssertThatMapIsNotEmpty<K, V> {
+    @BeforeTemplate
+    AbstractAssert<?, ?> before(Map<K, V> map) {
+      return Refaster.anyOf(
+          assertThat(map)
+              .isNotEqualTo(
+                  Refaster.anyOf(
+                      ImmutableMap.of(),
+                      ImmutableBiMap.of(),
+                      ImmutableSortedMap.of(),
+                      new HashMap<>(),
+                      new LinkedHashMap<>(),
+                      new TreeMap<>())),
+          assertThat(Refaster.anyOf(map.keySet(), map.values())).isNotEmpty(),
+          assertThat(map).hasSizeGreaterThan(0),
+          assertThat(Refaster.anyOf(map.keySet(), map.values())).hasSizeGreaterThan(0),
+          assertThat(map.isEmpty()).isFalse(),
+          assertThat(Refaster.anyOf(map.keySet(), map.values()).isEmpty()).isFalse(),
+          assertThat(Refaster.anyOf(map.size(), map.keySet().size(), map.values().size()))
+              .isNotZero(),
+          assertThat(Refaster.anyOf(map.size(), map.keySet().size(), map.values().size()))
+              .isPositive());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    MapAssert<K, V> after(Map<K, V> map) {
+      return assertThat(map).isNotEmpty();
+    }
+  }
+
+  static final class AssertThatMapHasSize<K, V> {
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before(Map<K, V> map, int length) {
+      return assertThat(Refaster.anyOf(map.size(), map.keySet().size(), map.values().size()))
+          .isEqualTo(length);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    MapAssert<K, V> after(Map<K, V> map, int length) {
+      return assertThat(map).hasSize(length);
+    }
+  }
+
+  static final class AssertThatMapsHaveSameSize<K, V> {
+    @BeforeTemplate
+    AbstractAssert<?, ?> before(Map<K, V> map1, Map<K, V> map2) {
+      return Refaster.anyOf(
+          assertThat(map1)
+              .hasSize(Refaster.anyOf(map2.size(), map2.keySet().size(), map2.values().size())),
+          assertThat(Refaster.anyOf(map1.keySet(), map1.values()))
+              .hasSize(Refaster.anyOf(map2.size(), map2.keySet().size(), map2.values().size())));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    MapAssert<K, V> after(Map<K, V> map1, Map<K, V> map2) {
+      return assertThat(map1).hasSameSizeAs(map2);
+    }
+  }
+
+  // XXX: Should also add a rule (elsewhere) to simplify `map.keySet().contains(key)`.
+  static final class AssertThatMapContainsKey<K, V> {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(Map<K, V> map, K key) {
+      return assertThat(map.containsKey(key)).isTrue();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    MapAssert<K, V> after(Map<K, V> map, K key) {
+      return assertThat(map).containsKey(key);
+    }
+  }
+
+  static final class AssertThatMapDoesNotContainKey<K, V> {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(Map<K, V> map, K key) {
+      return assertThat(map.containsKey(key)).isFalse();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    MapAssert<K, V> after(Map<K, V> map, K key) {
+      return assertThat(map).doesNotContainKey(key);
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  // To be organized.
+
+  static final class ObjectEnumerableHasSameElementsAs<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, Iterable<T> iterable) {
+      return iterAssert.containsOnlyElementsOf(iterable);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, Iterable<T> iterable) {
+      return iterAssert.hasSameElementsAs(iterable);
+    }
+  }
+
   //
-  //        @AfterTemplate
-  //        @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //        MapAssert<K, V> after(Map<K, V> map1, Map<K, V> map2) {
-  //            return assertThat(map1).hasSameSizeAs(map2);
-  //        }
-  //    }
+  // ObjectEnumerableAssert: containsAnyOf
   //
-  //    // XXX: Should also add a rule (elsewhere) to simplify `map.keySet().contains(key)`.
-  //    static final class AssertThatMapContainsKey<K, V> {
-  //        @BeforeTemplate
-  //        AbstractBooleanAssert<?> before(Map<K, V> map, K key) {
-  //            return assertThat(map.containsKey(key)).isTrue();
-  //        }
+
+  static final class ObjectEnumerableContainsAnyOfTwoElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.containsAnyElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2),
+              Arrays.asList(e1, e2),
+              ImmutableSet.of(e1, e2),
+              ImmutableMultiset.of(e1, e2)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.containsAnyOf(e1, e2);
+    }
+  }
+
+  static final class ObjectEnumerableContainsAnyOfThreeElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.containsAnyElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3),
+              Arrays.asList(e1, e2, e3),
+              ImmutableSet.of(e1, e2, e3),
+              ImmutableMultiset.of(e1, e2, e3)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.containsAnyOf(e1, e2, e3);
+    }
+  }
+
+  static final class ObjectEnumerableContainsAnyOfFourElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.containsAnyElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4),
+              Arrays.asList(e1, e2, e3, e4),
+              ImmutableSet.of(e1, e2, e3, e4),
+              ImmutableMultiset.of(e1, e2, e3, e4)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.containsAnyOf(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Add variants for 6+ elements?
+  static final class ObjectEnumerableContainsAnyOfFiveElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.containsAnyElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4, e5),
+              Arrays.asList(e1, e2, e3, e4, e5),
+              ImmutableSet.of(e1, e2, e3, e4, e5),
+              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.containsAnyOf(e1, e2, e3, e4, e5);
+    }
+  }
+
   //
-  //        @AfterTemplate
-  //        @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //        MapAssert<K, V> after(Map<K, V> map, K key) {
-  //            return assertThat(map).containsKey(key);
-  //        }
-  //    }
+  // ObjectEnumerableAssert: contains
   //
-  //    static final class AssertThatMapDoesNotContainKey<K, V> {
-  //        @BeforeTemplate
-  //        AbstractBooleanAssert<?> before(Map<K, V> map, K key) {
-  //            return assertThat(map.containsKey(key)).isFalse();
-  //        }
+
+  static final class ObjectEnumerableContainsTwoElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.containsAll(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2),
+              Arrays.asList(e1, e2),
+              ImmutableSet.of(e1, e2),
+              ImmutableMultiset.of(e1, e2)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.contains(e1, e2);
+    }
+  }
+
+  // XXX: Add variants for 4+ elements.
+  static final class ObjectEnumerableContainsThreeElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.containsAll(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3),
+              Arrays.asList(e1, e2, e3),
+              ImmutableSet.of(e1, e2, e3),
+              ImmutableMultiset.of(e1, e2, e3)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.contains(e1, e2, e3);
+    }
+  }
+
   //
-  //        @AfterTemplate
-  //        @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //        MapAssert<K, V> after(Map<K, V> map, K key) {
-  //            return assertThat(map).doesNotContainKey(key);
-  //        }
-  //    }
+  // ObjectEnumerableAssert: containsExactlyInAnyOrder
   //
+
+  static final class ObjectEnumerableContainsExactlyInAnyOrderTwoElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.containsExactlyInAnyOrderElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2),
+              Arrays.asList(e1, e2),
+              ImmutableSet.of(e1, e2),
+              ImmutableMultiset.of(e1, e2)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.containsExactlyInAnyOrder(e1, e2);
+    }
+  }
+
+  // XXX: Add variants for 4+ elements.
+  static final class ObjectEnumerableContainsExactlyInAnyOrderThreeElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.containsExactlyInAnyOrderElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3),
+              Arrays.asList(e1, e2, e3),
+              ImmutableSet.of(e1, e2, e3),
+              ImmutableMultiset.of(e1, e2, e3)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.containsExactlyInAnyOrder(e1, e2, e3);
+    }
+  }
+
+  //
+  // ObjectEnumerableAssert: containsSequence
+  //
+
+  // XXX: Add variants for 3+ elements.
+  static final class ObjectEnumerableContainsSequenceTwoElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.containsSequence(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2),
+              Arrays.asList(e1, e2),
+              ImmutableSet.of(e1, e2),
+              ImmutableMultiset.of(e1, e2)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.containsSequence(e1, e2);
+    }
+  }
+
+  //
+  // ObjectEnumerableAssert: containsSubsequence
+  //
+
+  // XXX: Add variants for 3+ elements.
+  static final class ObjectEnumerableContainsSubsequenceTwoElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.containsSubsequence(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2),
+              Arrays.asList(e1, e2),
+              ImmutableSet.of(e1, e2),
+              ImmutableMultiset.of(e1, e2)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.containsSubsequence(e1, e2);
+    }
+  }
+
+  //
+  // ObjectEnumerableAssert: doesNotContain
+  //
+
+  // XXX: Add variants for 3+ elements.
+  static final class ObjectEnumerableDoesNotContainTwoElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.doesNotContainAnyElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2),
+              Arrays.asList(e1, e2),
+              ImmutableSet.of(e1, e2),
+              ImmutableMultiset.of(e1, e2)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.doesNotContain(e1, e2);
+    }
+  }
+
+  //
+  // ObjectEnumerableAssert: doesNotContainSequence
+  //
+
+  // XXX: Add variants for 3+ elements.
+  static final class ObjectEnumerableDoesNotContainSequenceTwoElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.doesNotContainSequence(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2),
+              Arrays.asList(e1, e2),
+              ImmutableSet.of(e1, e2),
+              ImmutableMultiset.of(e1, e2)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.doesNotContainSequence(e1, e2);
+    }
+  }
+
+  //
+  // ObjectEnumerableAssert: containsOnly
+  //
+
+  // XXX: Add variants for 3+ elements.
+  static final class ObjectEnumerableContainsOnlyTwoElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.hasSameElementsAs(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2),
+              Arrays.asList(e1, e2),
+              ImmutableSet.of(e1, e2),
+              ImmutableMultiset.of(e1, e2)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.containsOnly(e1, e2);
+    }
+  }
+
+  //
+  // ObjectEnumerableAssert: isSubsetOf
+  //
+
+  // XXX: Add variants for 3+ elements.
+  static final class ObjectEnumerableIsSubsetOfTwoElementsXXX<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.isSubsetOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2),
+              Arrays.asList(e1, e2),
+              ImmutableSet.of(e1, e2),
+              ImmutableMultiset.of(e1, e2)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.isSubsetOf(e1, e2);
+    }
+  }
+
   //    // XXX: There's a bunch of variations on this theme.
   //    // XXX: The `Iterables.getOnlyElement` variant doesn't match in
   //    // `analytics/analytics-message-listener`. Why?
