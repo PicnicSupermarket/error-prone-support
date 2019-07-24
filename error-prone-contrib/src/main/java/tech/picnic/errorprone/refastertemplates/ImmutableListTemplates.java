@@ -16,8 +16,10 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link ImmutableList}s. */
@@ -50,6 +52,22 @@ final class ImmutableListTemplates {
     @AfterTemplate
     ImmutableList<T> after() {
       return ImmutableList.of();
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableList#of(Object)} over alternatives that don't communicate the
+   * immutability of the resulting list at the type level.
+   */
+  static final class SingletonImmutableList<T> {
+    @BeforeTemplate
+    List<T> before(T element) {
+      return Collections.singletonList(element);
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after(T element) {
+      return ImmutableList.of(element);
     }
   }
 

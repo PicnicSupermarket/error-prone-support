@@ -15,7 +15,9 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link ImmutableSet}s. */
@@ -48,6 +50,22 @@ final class ImmutableSetTemplates {
     @AfterTemplate
     ImmutableSet<T> after() {
       return ImmutableSet.of();
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#of(Object)} over alternatives that don't communicate the
+   * immutability of the resulting set at the type level.
+   */
+  static final class SingletonImmutableSet<T> {
+    @BeforeTemplate
+    Set<T> before(T element) {
+      return Collections.singleton(element);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T element) {
+      return ImmutableSet.of(element);
     }
   }
 

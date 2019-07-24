@@ -14,6 +14,7 @@ import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -52,14 +53,19 @@ final class ImmutableMapTemplates {
     }
   }
 
-  /** Prefer {@link ImmutableMap#of(Object, Object)} over more contrived alternatives. */
+  /**
+   * Prefer {@link ImmutableMap#of(Object, Object)} over more contrived alternatives and
+   * alternatives that don't communicate the immutability of the resulting map at the type level..
+   */
   // XXX: One can define variants for more than one key-value pair, but at some point the builder
   // actually produces nicer code. So it's not clear we should add Refaster templates for those
   // variants.
   static final class PairToImmutableMap<K, V> {
     @BeforeTemplate
-    ImmutableMap<K, V> before(K key, V value) {
-      return ImmutableMap.<K, V>builder().put(key, value).build();
+    Map<K, V> before(K key, V value) {
+      return Refaster.anyOf(
+          ImmutableMap.<K, V>builder().put(key, value).build(),
+          Collections.singletonMap(key, value));
     }
 
     @AfterTemplate

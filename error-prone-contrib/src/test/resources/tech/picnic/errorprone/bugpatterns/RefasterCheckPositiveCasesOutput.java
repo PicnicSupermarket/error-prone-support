@@ -68,6 +68,7 @@ import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -515,6 +516,10 @@ final class RefasterCheckPositiveCases {
       return ImmutableSet.of(ImmutableList.of(), ImmutableList.of());
     }
 
+    List<String> testSingletonImmutableList() {
+      return ImmutableList.of("foo");
+    }
+
     ImmutableSet<ImmutableList<Integer>> testIterableToImmutableList() {
       return ImmutableSet.of(
           ImmutableList.copyOf(ImmutableList.of(1)),
@@ -567,8 +572,8 @@ final class RefasterCheckPositiveCases {
       return ImmutableMap.of();
     }
 
-    ImmutableMap<String, Integer> testPairToImmutableMap() {
-      return ImmutableMap.of("foo", 1);
+    ImmutableSet<Map<String, Integer>> testPairToImmutableMap() {
+      return ImmutableSet.of(ImmutableMap.of("foo", 1), ImmutableMap.of("bar", 2));
     }
 
     ImmutableSet<ImmutableMap<String, Integer>> testEntryToImmutableMap() {
@@ -721,6 +726,10 @@ final class RefasterCheckPositiveCases {
 
     ImmutableSet<ImmutableSet<Integer>> testEmptyImmutableSet() {
       return ImmutableSet.of(ImmutableSet.of(), ImmutableSet.of());
+    }
+
+    Set<String> testSingletonImmutableSet() {
+      return ImmutableSet.of("foo");
     }
 
     ImmutableSet<ImmutableSet<Integer>> testIterableToImmutableSet() {

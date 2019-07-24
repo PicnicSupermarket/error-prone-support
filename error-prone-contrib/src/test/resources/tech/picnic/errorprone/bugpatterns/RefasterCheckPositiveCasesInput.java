@@ -57,9 +57,11 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -584,6 +586,10 @@ final class RefasterCheckPositiveCases {
           Stream.<Integer>empty().collect(toImmutableList()));
     }
 
+    List<String> testSingletonImmutableList() {
+      return Collections.singletonList("foo");
+    }
+
     ImmutableSet<ImmutableList<Integer>> testIterableToImmutableList() {
       return ImmutableSet.of(
           ImmutableList.of(1).stream().collect(toImmutableList()),
@@ -639,8 +645,10 @@ final class RefasterCheckPositiveCases {
       return ImmutableMap.<String, Integer>builder().build();
     }
 
-    ImmutableMap<String, Integer> testPairToImmutableMap() {
-      return ImmutableMap.<String, Integer>builder().put("foo", 1).build();
+    ImmutableSet<Map<String, Integer>> testPairToImmutableMap() {
+      return ImmutableSet.of(
+          ImmutableMap.<String, Integer>builder().put("foo", 1).build(),
+          Collections.singletonMap("bar", 2));
     }
 
     ImmutableSet<ImmutableMap<String, Integer>> testEntryToImmutableMap() {
@@ -824,6 +832,10 @@ final class RefasterCheckPositiveCases {
       return ImmutableSet.of(
           ImmutableSet.<Integer>builder().build(),
           Stream.<Integer>empty().collect(toImmutableSet()));
+    }
+
+    Set<String> testSingletonImmutableSet() {
+      return Collections.singleton("foo");
     }
 
     ImmutableSet<ImmutableSet<Integer>> testIterableToImmutableSet() {
