@@ -896,6 +896,10 @@ final class AssertJTemplates {
   ////////////////////////////////////////////////////////////////////////////
   // To be organized.
 
+  //
+  // ObjectEnumerableAssert
+  //
+
   static final class ObjectEnumerableHasSameElementsAs<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(
@@ -1019,7 +1023,6 @@ final class AssertJTemplates {
     }
   }
 
-  // XXX: Add variants for 4+ elements.
   static final class ObjectEnumerableContainsThreeElements<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
@@ -1036,6 +1039,49 @@ final class AssertJTemplates {
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
       return iterAssert.contains(e1, e2, e3);
+    }
+  }
+
+  static final class ObjectEnumerableContainsFourElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.containsAll(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4),
+              Arrays.asList(e1, e2, e3, e4),
+              ImmutableSet.of(e1, e2, e3, e4),
+              ImmutableMultiset.of(e1, e2, e3, e4)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.contains(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Add variants for 6+ elements?
+  static final class ObjectEnumerableContainsFiveElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.containsAll(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4, e5),
+              Arrays.asList(e1, e2, e3, e4, e5),
+              ImmutableSet.of(e1, e2, e3, e4, e5),
+              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.contains(e1, e2, e3, e4, e5);
     }
   }
 
@@ -1062,7 +1108,6 @@ final class AssertJTemplates {
     }
   }
 
-  // XXX: Add variants for 4+ elements.
   static final class ObjectEnumerableContainsExactlyInAnyOrderThreeElements<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
@@ -1082,11 +1127,53 @@ final class AssertJTemplates {
     }
   }
 
+  static final class ObjectEnumerableContainsExactlyInAnyOrderFourElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.containsExactlyInAnyOrderElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4),
+              Arrays.asList(e1, e2, e3, e4),
+              ImmutableSet.of(e1, e2, e3, e4),
+              ImmutableMultiset.of(e1, e2, e3, e4)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.containsExactlyInAnyOrder(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Add variants for 6+ elements?
+  static final class ObjectEnumerableContainsExactlyInAnyOrderFiveElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.containsExactlyInAnyOrderElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4, e5),
+              Arrays.asList(e1, e2, e3, e4, e5),
+              ImmutableSet.of(e1, e2, e3, e4, e5),
+              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.containsExactlyInAnyOrder(e1, e2, e3, e4, e5);
+    }
+  }
+
   //
   // ObjectEnumerableAssert: containsSequence
   //
 
-  // XXX: Add variants for 3+ elements.
   static final class ObjectEnumerableContainsSequenceTwoElements<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
@@ -1106,11 +1193,72 @@ final class AssertJTemplates {
     }
   }
 
+  static final class ObjectEnumerableContainsSequenceThreeElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.containsSequence(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3),
+              Arrays.asList(e1, e2, e3),
+              ImmutableSet.of(e1, e2, e3),
+              ImmutableMultiset.of(e1, e2, e3)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.containsSequence(e1, e2, e3);
+    }
+  }
+
+  static final class ObjectEnumerableContainsSequenceFourElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.containsSequence(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4),
+              Arrays.asList(e1, e2, e3, e4),
+              ImmutableSet.of(e1, e2, e3, e4),
+              ImmutableMultiset.of(e1, e2, e3, e4)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.containsSequence(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Add variants for 6+ elements?
+  static final class ObjectEnumerableContainsSequenceFiveElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.containsSequence(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4, e5),
+              Arrays.asList(e1, e2, e3, e4, e5),
+              ImmutableSet.of(e1, e2, e3, e4, e5),
+              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.containsSequence(e1, e2, e3, e4, e5);
+    }
+  }
+
   //
   // ObjectEnumerableAssert: containsSubsequence
   //
 
-  // XXX: Add variants for 3+ elements.
   static final class ObjectEnumerableContainsSubsequenceTwoElements<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
@@ -1130,11 +1278,72 @@ final class AssertJTemplates {
     }
   }
 
+  static final class ObjectEnumerableContainsSubsequenceThreeElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.containsSubsequence(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3),
+              Arrays.asList(e1, e2, e3),
+              ImmutableSet.of(e1, e2, e3),
+              ImmutableMultiset.of(e1, e2, e3)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.containsSubsequence(e1, e2, e3);
+    }
+  }
+
+  static final class ObjectEnumerableContainsSubsequenceFourElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.containsSubsequence(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4),
+              Arrays.asList(e1, e2, e3, e4),
+              ImmutableSet.of(e1, e2, e3, e4),
+              ImmutableMultiset.of(e1, e2, e3, e4)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.containsSubsequence(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Add variants for 6+ elements?
+  static final class ObjectEnumerableContainsSubsequenceFiveElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.containsSubsequence(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4, e5),
+              Arrays.asList(e1, e2, e3, e4, e5),
+              ImmutableSet.of(e1, e2, e3, e4, e5),
+              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.containsSubsequence(e1, e2, e3, e4, e5);
+    }
+  }
+
   //
   // ObjectEnumerableAssert: doesNotContain
   //
 
-  // XXX: Add variants for 3+ elements.
   static final class ObjectEnumerableDoesNotContainTwoElements<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
@@ -1154,11 +1363,72 @@ final class AssertJTemplates {
     }
   }
 
+  static final class ObjectEnumerableDoesNotContainThreeElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.doesNotContainAnyElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3),
+              Arrays.asList(e1, e2, e3),
+              ImmutableSet.of(e1, e2, e3),
+              ImmutableMultiset.of(e1, e2, e3)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.doesNotContain(e1, e2, e3);
+    }
+  }
+
+  static final class ObjectEnumerableDoesNotContainFourElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.doesNotContainAnyElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4),
+              Arrays.asList(e1, e2, e3, e4),
+              ImmutableSet.of(e1, e2, e3, e4),
+              ImmutableMultiset.of(e1, e2, e3, e4)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.doesNotContain(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Add variants for 6+ elements?
+  static final class ObjectEnumerableDoesNotContainFiveElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.doesNotContainAnyElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4, e5),
+              Arrays.asList(e1, e2, e3, e4, e5),
+              ImmutableSet.of(e1, e2, e3, e4, e5),
+              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.doesNotContain(e1, e2, e3, e4, e5);
+    }
+  }
+
   //
   // ObjectEnumerableAssert: doesNotContainSequence
   //
 
-  // XXX: Add variants for 3+ elements.
   static final class ObjectEnumerableDoesNotContainSequenceTwoElements<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
@@ -1178,11 +1448,72 @@ final class AssertJTemplates {
     }
   }
 
+  static final class ObjectEnumerableDoesNotContainSequenceThreeElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.doesNotContainSequence(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3),
+              Arrays.asList(e1, e2, e3),
+              ImmutableSet.of(e1, e2, e3),
+              ImmutableMultiset.of(e1, e2, e3)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.doesNotContainSequence(e1, e2, e3);
+    }
+  }
+
+  static final class ObjectEnumerableDoesNotContainSequenceFourElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.doesNotContainSequence(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4),
+              Arrays.asList(e1, e2, e3, e4),
+              ImmutableSet.of(e1, e2, e3, e4),
+              ImmutableMultiset.of(e1, e2, e3, e4)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.doesNotContainSequence(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Add variants for 6+ elements?
+  static final class ObjectEnumerableDoesNotContainSequenceFiveElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.doesNotContainSequence(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4, e5),
+              Arrays.asList(e1, e2, e3, e4, e5),
+              ImmutableSet.of(e1, e2, e3, e4, e5),
+              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.doesNotContainSequence(e1, e2, e3, e4, e5);
+    }
+  }
+
   //
   // ObjectEnumerableAssert: containsOnly
   //
 
-  // XXX: Add variants for 3+ elements.
   static final class ObjectEnumerableContainsOnlyTwoElements<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
@@ -1202,12 +1533,73 @@ final class AssertJTemplates {
     }
   }
 
+  static final class ObjectEnumerableContainsOnlyThreeElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.hasSameElementsAs(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3),
+              Arrays.asList(e1, e2, e3),
+              ImmutableSet.of(e1, e2, e3),
+              ImmutableMultiset.of(e1, e2, e3)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.containsOnly(e1, e2, e3);
+    }
+  }
+
+  static final class ObjectEnumerableContainsOnlyFourElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.hasSameElementsAs(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4),
+              Arrays.asList(e1, e2, e3, e4),
+              ImmutableSet.of(e1, e2, e3, e4),
+              ImmutableMultiset.of(e1, e2, e3, e4)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.containsOnly(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Add variants for 6+ elements?
+  static final class ObjectEnumerableContainsOnlyFiveElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.hasSameElementsAs(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4, e5),
+              Arrays.asList(e1, e2, e3, e4, e5),
+              ImmutableSet.of(e1, e2, e3, e4, e5),
+              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.containsOnly(e1, e2, e3, e4, e5);
+    }
+  }
+
   //
   // ObjectEnumerableAssert: isSubsetOf
   //
 
-  // XXX: Add variants for 3+ elements.
-  static final class ObjectEnumerableIsSubsetOfTwoElementsXXX<S, T extends S> {
+  static final class ObjectEnumerableIsSubsetOfTwoElements<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
       return iterAssert.isSubsetOf(
@@ -1223,6 +1615,68 @@ final class AssertJTemplates {
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
       return iterAssert.isSubsetOf(e1, e2);
+    }
+  }
+
+  static final class ObjectEnumerableIsSubsetOfThreeElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.isSubsetOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3),
+              Arrays.asList(e1, e2, e3),
+              ImmutableSet.of(e1, e2, e3),
+              ImmutableMultiset.of(e1, e2, e3)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.isSubsetOf(e1, e2, e3);
+    }
+  }
+
+  static final class ObjectEnumerableIsSubsetOfFourElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.isSubsetOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4),
+              Arrays.asList(e1, e2, e3, e4),
+              ImmutableSet.of(e1, e2, e3, e4),
+              ImmutableMultiset.of(e1, e2, e3, e4)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.isSubsetOf(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Add variants for 6+ elements?
+  static final class ObjectEnumerableIsSubsetOfFiveElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.isSubsetOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4, e5),
+              Arrays.asList(e1, e2, e3, e4, e5),
+              ImmutableSet.of(e1, e2, e3, e4, e5),
+              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.isSubsetOf(e1, e2, e3, e4, e5);
     }
   }
 
