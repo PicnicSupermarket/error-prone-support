@@ -550,7 +550,7 @@ final class AssertJTemplates {
                       ImmutableMultiset.of(),
                       ImmutableSortedMultiset.of())),
           assertThat(iterable)
-              .containsOnlyElementsOf(
+              .hasSameElementsAs(
                   Refaster.anyOf(
                       ImmutableList.of(),
                       new ArrayList<>(),
@@ -562,7 +562,7 @@ final class AssertJTemplates {
                       ImmutableMultiset.of(),
                       ImmutableSortedMultiset.of())),
           assertThat(iterable)
-              .hasSameElementsAs(
+              .isSubsetOf(
                   Refaster.anyOf(
                       ImmutableList.of(),
                       new ArrayList<>(),
@@ -1085,6 +1085,91 @@ final class AssertJTemplates {
     ObjectEnumerableAssert<?, S> after(
         ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
       return iterAssert.contains(e1, e2, e3, e4, e5);
+    }
+  }
+
+  //
+  // ObjectEnumerableAssert: containsExactly
+  //
+
+  static final class ObjectEnumerableContainsExactlyTwoElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.containsExactlyElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2),
+              Arrays.asList(e1, e2),
+              ImmutableSet.of(e1, e2),
+              ImmutableMultiset.of(e1, e2)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
+      return iterAssert.containsExactly(e1, e2);
+    }
+  }
+
+  static final class ObjectEnumerableContainsExactlyThreeElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.containsExactlyElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3),
+              Arrays.asList(e1, e2, e3),
+              ImmutableSet.of(e1, e2, e3),
+              ImmutableMultiset.of(e1, e2, e3)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
+      return iterAssert.containsExactly(e1, e2, e3);
+    }
+  }
+
+  static final class ObjectEnumerableContainsExactlyFourElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.containsExactlyElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4),
+              Arrays.asList(e1, e2, e3, e4),
+              ImmutableSet.of(e1, e2, e3, e4),
+              ImmutableMultiset.of(e1, e2, e3, e4)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
+      return iterAssert.containsExactly(e1, e2, e3, e4);
+    }
+  }
+
+  // XXX: Add variants for 6+ elements?
+  static final class ObjectEnumerableContainsExactlyFiveElements<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.containsExactlyElementsOf(
+          Refaster.anyOf(
+              ImmutableList.of(e1, e2, e3, e4, e5),
+              Arrays.asList(e1, e2, e3, e4, e5),
+              ImmutableSet.of(e1, e2, e3, e4, e5),
+              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(
+        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
+      return iterAssert.containsExactly(e1, e2, e3, e4, e5);
     }
   }
 
@@ -1761,6 +1846,13 @@ final class AssertJTemplates {
     @SuppressWarnings("unchecked")
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
       return Refaster.anyOf(
+          iterAssert.containsExactlyElementsOf(
+              Refaster.anyOf(
+                  ImmutableList.of(element),
+                  Arrays.asList(element),
+                  ImmutableSet.of(element),
+                  ImmutableMultiset.of(element))),
+          iterAssert.containsExactly(element),
           iterAssert.containsExactlyInAnyOrderElementsOf(
               Refaster.anyOf(
                   ImmutableList.of(element),
