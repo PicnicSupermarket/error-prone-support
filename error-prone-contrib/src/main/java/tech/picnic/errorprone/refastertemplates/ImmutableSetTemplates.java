@@ -57,6 +57,7 @@ final class ImmutableSetTemplates {
    * Prefer {@link ImmutableSet#of(Object)} over alternatives that don't communicate the
    * immutability of the resulting set at the type level.
    */
+  // XXX: Note that this rewrite rule is incorrect for nullable elements.
   static final class SingletonImmutableSet<T> {
     @BeforeTemplate
     Set<T> before(T element) {

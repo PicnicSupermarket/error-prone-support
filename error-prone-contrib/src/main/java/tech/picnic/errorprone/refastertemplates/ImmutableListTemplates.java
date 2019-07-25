@@ -59,6 +59,7 @@ final class ImmutableListTemplates {
    * Prefer {@link ImmutableList#of(Object)} over alternatives that don't communicate the
    * immutability of the resulting list at the type level.
    */
+  // XXX: Note that this rewrite rule is incorrect for nullable elements.
   static final class SingletonImmutableList<T> {
     @BeforeTemplate
     List<T> before(T element) {

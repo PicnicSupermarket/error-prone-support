@@ -63,6 +63,9 @@ import org.assertj.core.api.OptionalLongAssert;
 // XXX: Use `S, T extends S` bounds to avoid re-applying incompatible constructs.
 // XXX: For the templates which "unwrap" explicitly enumerated collections, also introduce variants
 // with explicitly enumerated sorted collections. (Requires that the type bound is Comparable.)
+// XXX: Handle `.isEqualTo(explicitlyEnumeratedCollection)`. Can be considered equivalent to
+// `.containsOnly(elements)`. (This does mean the auto-generated code needs to be more advanced.
+// Ponder this.)
 final class AssertJTemplates {
   private AssertJTemplates() {}
 
@@ -1677,6 +1680,128 @@ final class AssertJTemplates {
     ObjectEnumerableAssert<?, S> after(
         ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
       return iterAssert.isSubsetOf(e1, e2, e3, e4, e5);
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  static final class ObjectEnumerableContainsOneElement<S, T extends S> {
+    @BeforeTemplate
+    @SuppressWarnings("unchecked")
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
+      return Refaster.anyOf(
+          iterAssert.containsAnyElementsOf(
+              Refaster.anyOf(
+                  ImmutableList.of(element),
+                  Arrays.asList(element),
+                  ImmutableSet.of(element),
+                  ImmutableMultiset.of(element))),
+          iterAssert.containsAnyOf(element),
+          iterAssert.containsAll(
+              Refaster.anyOf(
+                  ImmutableList.of(element),
+                  Arrays.asList(element),
+                  ImmutableSet.of(element),
+                  ImmutableMultiset.of(element))),
+          iterAssert.containsSequence(
+              Refaster.anyOf(
+                  ImmutableList.of(element),
+                  Arrays.asList(element),
+                  ImmutableSet.of(element),
+                  ImmutableMultiset.of(element))),
+          iterAssert.containsSequence(element),
+          iterAssert.containsSubsequence(
+              Refaster.anyOf(
+                  ImmutableList.of(element),
+                  Arrays.asList(element),
+                  ImmutableSet.of(element),
+                  ImmutableMultiset.of(element))),
+          iterAssert.containsSubsequence(element));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
+      return iterAssert.contains(element);
+    }
+  }
+
+  static final class ObjectEnumerableDoesNotContainOneElement<S, T extends S> {
+    @BeforeTemplate
+    @SuppressWarnings("unchecked")
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
+      return Refaster.anyOf(
+          iterAssert.doesNotContainAnyElementsOf(
+              Refaster.anyOf(
+                  ImmutableList.of(element),
+                  Arrays.asList(element),
+                  ImmutableSet.of(element),
+                  ImmutableMultiset.of(element))),
+          iterAssert.doesNotContainSequence(
+              Refaster.anyOf(
+                  ImmutableList.of(element),
+                  Arrays.asList(element),
+                  ImmutableSet.of(element),
+                  ImmutableMultiset.of(element))),
+          iterAssert.doesNotContainSequence(element));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
+      return iterAssert.doesNotContain(element);
+    }
+  }
+
+  static final class ObjectEnumerableContainsOnlyOneElement<S, T extends S> {
+    @BeforeTemplate
+    @SuppressWarnings("unchecked")
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
+      return Refaster.anyOf(
+          iterAssert.containsExactlyInAnyOrderElementsOf(
+              Refaster.anyOf(
+                  ImmutableList.of(element),
+                  Arrays.asList(element),
+                  ImmutableSet.of(element),
+                  ImmutableMultiset.of(element))),
+          iterAssert.containsExactlyInAnyOrder(element),
+          iterAssert.hasSameElementsAs(
+              Refaster.anyOf(
+                  ImmutableList.of(element),
+                  Arrays.asList(element),
+                  ImmutableSet.of(element),
+                  ImmutableMultiset.of(element))));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
+      return iterAssert.containsOnly(element);
+    }
+  }
+
+  static final class ObjectEnumerableIsSubsetOfOneElement<S, T extends S> {
+    @BeforeTemplate
+    @SuppressWarnings("unchecked")
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
+      return Refaster.anyOf(
+          iterAssert.isSubsetOf(
+              Refaster.anyOf(
+                  ImmutableList.of(element),
+                  Arrays.asList(element),
+                  ImmutableSet.of(element),
+                  ImmutableMultiset.of(element))));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
+      return iterAssert.isSubsetOf(element);
     }
   }
 

@@ -60,6 +60,7 @@ final class ImmutableMapTemplates {
   // XXX: One can define variants for more than one key-value pair, but at some point the builder
   // actually produces nicer code. So it's not clear we should add Refaster templates for those
   // variants.
+  // XXX: Note that the `singletonMap` rewrite rule is incorrect for nullable elements.
   static final class PairToImmutableMap<K, V> {
     @BeforeTemplate
     Map<K, V> before(K key, V value) {
