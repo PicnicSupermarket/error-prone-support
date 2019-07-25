@@ -43,7 +43,10 @@ import org.assertj.core.api.AbstractFloatAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractObjectAssert;
+import org.assertj.core.api.AbstractOptionalAssert;
 import org.assertj.core.api.AbstractStringAssert;
+import org.assertj.core.api.Assert;
+import org.assertj.core.api.EnumerableAssert;
 import org.assertj.core.api.IterableAssert;
 import org.assertj.core.api.ListAssert;
 import org.assertj.core.api.MapAssert;
@@ -66,6 +69,11 @@ import org.assertj.core.api.OptionalLongAssert;
 // XXX: Handle `.isEqualTo(explicitlyEnumeratedCollection)`. Can be considered equivalent to
 // `.containsOnly(elements)`. (This does mean the auto-generated code needs to be more advanced.
 // Ponder this.)
+// XXX: For `isZero()` and other numeric variants: collapse into a single rule coded against
+// `NumberAssert`.
+// XXX: Most/all of those Iterable rules can also be applied to arrays.
+// XXX: Elsewhere add a rule to disallow `Collection.emptyList()` and variants as well as
+// `Arrays.asList()`.
 final class AssertJTemplates {
   private AssertJTemplates() {}
 
@@ -73,7 +81,7 @@ final class AssertJTemplates {
   // Boolean
   //
 
-  static final class AssertThatBooleanIsEqualTo<E> {
+  static final class AssertThatBooleanIsEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(AbstractBooleanAssert<?> boolAssert, boolean other) {
       return boolAssert.isNotEqualTo(!other);
@@ -85,7 +93,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatBooleanIsNotEqualTo<E> {
+  static final class AssertThatBooleanIsNotEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(AbstractBooleanAssert<?> boolAssert, boolean other) {
       return boolAssert.isEqualTo(!other);
@@ -97,7 +105,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatBooleanIsTrue<E> {
+  static final class AssertThatBooleanIsTrue {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(AbstractBooleanAssert<?> boolAssert) {
       return Refaster.anyOf(
@@ -113,7 +121,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatBooleanIsFalse<E> {
+  static final class AssertThatBooleanIsFalse {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(AbstractBooleanAssert<?> boolAssert) {
       return Refaster.anyOf(
@@ -133,7 +141,7 @@ final class AssertJTemplates {
   // Integer
   //
 
-  static final class AssertThatIntegerIsEqualTo<E> {
+  static final class AssertThatIntegerIsEqualTo {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int n) {
       return intAssert.isEqualTo(Integer.valueOf(n));
@@ -150,7 +158,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatIntegerIsNotEqualTo<E> {
+  static final class AssertThatIntegerIsNotEqualTo {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int n) {
       return intAssert.isNotEqualTo(Integer.valueOf(n));
@@ -162,7 +170,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatIntegerIsZero<E> {
+  static final class AssertThatIntegerIsZero {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
       return intAssert.isEqualTo(0);
@@ -174,7 +182,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatIntegerIsNotZero<E> {
+  static final class AssertThatIntegerIsNotZero {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
       return intAssert.isNotEqualTo(0);
@@ -186,7 +194,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatIntegerIsPositive<E> {
+  static final class AssertThatIntegerIsPositive {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
       return Refaster.anyOf(intAssert.isGreaterThan(0), intAssert.isGreaterThanOrEqualTo(1));
@@ -198,7 +206,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatIntegerIsNotPositive<E> {
+  static final class AssertThatIntegerIsNotPositive {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
       return Refaster.anyOf(intAssert.isLessThanOrEqualTo(0), intAssert.isLessThan(1));
@@ -210,7 +218,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatIntegerIsNegative<E> {
+  static final class AssertThatIntegerIsNegative {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
       return Refaster.anyOf(intAssert.isLessThan(0), intAssert.isLessThanOrEqualTo(-1));
@@ -222,7 +230,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatIntegerIsNotNegative<E> {
+  static final class AssertThatIntegerIsNotNegative {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
       return Refaster.anyOf(intAssert.isGreaterThanOrEqualTo(0), intAssert.isGreaterThan(-1));
@@ -238,7 +246,7 @@ final class AssertJTemplates {
   // Float
   //
 
-  static final class AssertThatFloatIsEqualTo<E> {
+  static final class AssertThatFloatIsEqualTo {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert, float n) {
       return Refaster.anyOf(
@@ -261,7 +269,7 @@ final class AssertJTemplates {
   // Double
   //
 
-  static final class AssertThatDoubleIsEqualTo<E> {
+  static final class AssertThatDoubleIsEqualTo {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert, double n) {
       return Refaster.anyOf(
@@ -319,11 +327,21 @@ final class AssertJTemplates {
 
   static final class AssertThatStringIsEmpty {
     @BeforeTemplate
+    void before(Assert<?, String> stringAssert) {
+      stringAssert.isEqualTo("");
+    }
+
+    @AfterTemplate
+    void after(EnumerableAssert<?, String> charAssert) {
+      charAssert.isEmpty();
+    }
+  }
+
+  // XXX: Find a better name.
+  static final class AssertThatStringIsEmpty2 {
+    @BeforeTemplate
     void before(String string) {
       Refaster.anyOf(
-          assertThat(string).isEqualTo(""),
-          assertThat(string).hasSize(0),
-          assertThat(string).hasSizeLessThan(1),
           assertThat(string.isEmpty()).isTrue(),
           assertThat(string.length()).isZero(),
           assertThat(string.length()).isNotPositive());
@@ -338,10 +356,21 @@ final class AssertJTemplates {
 
   static final class AssertThatStringIsNotEmpty {
     @BeforeTemplate
+    void before(AbstractAssert<?, String> stringAssert) {
+      stringAssert.isNotEqualTo("");
+    }
+
+    @AfterTemplate
+    void after(EnumerableAssert<?, String> charAssert) {
+      charAssert.isNotEmpty();
+    }
+  }
+
+  // XXX: Find a better name.
+  static final class AssertThatStringIsNotEmpty2 {
+    @BeforeTemplate
     AbstractAssert<?, ?> before(String string) {
       return Refaster.anyOf(
-          assertThat(string).isNotEqualTo(""),
-          assertThat(string).hasSizeGreaterThan(0),
           assertThat(string.isEmpty()).isFalse(),
           assertThat(string.length()).isNotZero(),
           assertThat(string.length()).isPositive());
@@ -386,11 +415,23 @@ final class AssertJTemplates {
 
   static final class AssertThatOptionalIsPresent<T> {
     @BeforeTemplate
+    AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert) {
+      return Refaster.anyOf(
+          optionalAssert.isNotEmpty(), optionalAssert.isNotEqualTo(Optional.empty()));
+    }
+
+    @AfterTemplate
+    AbstractOptionalAssert<?, T> after(AbstractOptionalAssert<?, T> optionalAssert) {
+      return optionalAssert.isPresent();
+    }
+  }
+
+  // XXX: Find a better name.
+  static final class AssertThatOptionalIsPresent2<T> {
+    @BeforeTemplate
     AbstractAssert<?, ?> before(Optional<T> optional) {
       return Refaster.anyOf(
-          assertThat(optional.isPresent()).isTrue(),
-          assertThat(optional.isEmpty()).isFalse(),
-          assertThat(optional).isNotEqualTo(Optional.empty()));
+          assertThat(optional.isPresent()).isTrue(), assertThat(optional.isEmpty()).isFalse());
     }
 
     @AfterTemplate
@@ -402,11 +443,23 @@ final class AssertJTemplates {
 
   static final class AssertThatOptionalIsEmpty<T> {
     @BeforeTemplate
+    AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert) {
+      return Refaster.anyOf(
+          optionalAssert.isNotPresent(), optionalAssert.isEqualTo(Optional.empty()));
+    }
+
+    @AfterTemplate
+    AbstractOptionalAssert<?, T> after(AbstractOptionalAssert<?, T> optionalAssert) {
+      return optionalAssert.isEmpty();
+    }
+  }
+
+  // XXX: Find a better name.
+  static final class AssertThatOptionalIsEmpty2<T> {
+    @BeforeTemplate
     AbstractAssert<?, ?> before(Optional<T> optional) {
       return Refaster.anyOf(
-          assertThat(optional.isEmpty()).isTrue(),
-          assertThat(optional.isPresent()).isFalse(),
-          assertThat(optional).isEqualTo(Optional.empty()));
+          assertThat(optional.isEmpty()).isTrue(), assertThat(optional.isPresent()).isFalse());
     }
 
     @AfterTemplate
@@ -418,20 +471,20 @@ final class AssertJTemplates {
 
   static final class AssertThatOptionalHasValue<T> {
     @BeforeTemplate
-    OptionalAssert<T> before(Optional<T> optional, T value) {
-      return assertThat(optional).isEqualTo(Optional.of(value));
+    AbstractOptionalAssert<?, T> before(AbstractOptionalAssert<?, T> optionalAssert, T value) {
+      return optionalAssert.isEqualTo(Optional.of(value));
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    OptionalAssert<T> after(Optional<T> optional, T value) {
-      return assertThat(optional).hasValue(value);
+    AbstractOptionalAssert<?, T> after(AbstractOptionalAssert<?, T> optionalAssert, T value) {
+      return optionalAssert.hasValue(value);
     }
   }
 
   static final class AssertThatOptionalHasValueMatching<T> {
     @BeforeTemplate
-    OptionalAssert<T> before(Optional<T> optional, Predicate<? super T> predicate) {
+    AbstractOptionalAssert<?, T> before(Optional<T> optional, Predicate<? super T> predicate) {
       return assertThat(optional.filter(predicate)).isPresent();
     }
 
@@ -500,86 +553,140 @@ final class AssertJTemplates {
   }
 
   //
-  // Iterable
+  // Enumerable
   //
 
-  static final class AssertThatIterableHasSameElementsAsSet<S, T extends S> {
+  static final class AssertThatEnumerableIsEmpty<E> {
     @BeforeTemplate
-    IterableAssert<S> before(Iterable<S> set1, Set<T> set2) {
-      return assertThat(set1).containsExactlyInAnyOrderElementsOf(set2);
+    void before(EnumerableAssert<?, E> enumAssert) {
+      Refaster.anyOf(enumAssert.hasSize(0), enumAssert.hasSizeLessThan(1));
+    }
+
+    @AfterTemplate
+    void after(EnumerableAssert<?, E> enumAssert) {
+      enumAssert.isEmpty();
+    }
+  }
+
+  static final class AssertThatEnumerableIsNotEmpty<E> {
+    @BeforeTemplate
+    void before(EnumerableAssert<?, E> enumAssert) {
+      Refaster.anyOf(enumAssert.hasSizeGreaterThan(0), enumAssert.hasSizeGreaterThanOrEqualTo(1));
+    }
+
+    @AfterTemplate
+    void after(EnumerableAssert<?, E> enumAssert) {
+      enumAssert.isNotEmpty();
+    }
+  }
+
+  static final class AssertThatEnumerableHasSameSizeAs<S, T> {
+    @BeforeTemplate
+    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, Iterable<T> iterable) {
+      return enumAssert.hasSize(Iterables.size(iterable));
+    }
+
+    @BeforeTemplate
+    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, Collection<T> iterable) {
+      return enumAssert.hasSize(iterable.size());
+    }
+
+    @BeforeTemplate
+    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, T[] iterable) {
+      return enumAssert.hasSize(iterable.length);
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    IterableAssert<S> after(Iterable<S> set1, Set<T> set2) {
-      return assertThat(set1).hasSameElementsAs(set2);
+    EnumerableAssert<?, S> after(EnumerableAssert<?, S> enumAssert, Iterable<T> iterable) {
+      return enumAssert.hasSameSizeAs(iterable);
     }
   }
 
-  // XXX: Most/all of these Iterable rules can also be applied to arrays.
-  // XXX: Elsewhere add a rule to disallow `Collection.emptyList()` and variants as well as
-  // `Arrays.asList()`.
-  // XXX: We could also match against `#hasSameSizeAs` and `#isSubsetOf`, but that's pushing it.
-  // Let's add those once Refaster supports a way of deduplicating repetition.
+  //
+  // ObjectEnumerable
+  //
+
+  static final class AssertThatObjectEnumerableIsEmpty<E> {
+    @BeforeTemplate
+    @SuppressWarnings("unchecked")
+    void before(ObjectEnumerableAssert<?, E> enumAssert) {
+      Refaster.anyOf(
+          enumAssert.containsExactlyElementsOf(
+              Refaster.anyOf(
+                  ImmutableList.of(),
+                  new ArrayList<>(),
+                  ImmutableSet.of(),
+                  new HashSet<>(),
+                  new LinkedHashSet<>(),
+                  ImmutableSortedSet.of(),
+                  new TreeSet<>(),
+                  ImmutableMultiset.of(),
+                  ImmutableSortedMultiset.of())),
+          enumAssert.containsExactlyInAnyOrderElementsOf(
+              Refaster.anyOf(
+                  ImmutableList.of(),
+                  new ArrayList<>(),
+                  ImmutableSet.of(),
+                  new HashSet<>(),
+                  new LinkedHashSet<>(),
+                  ImmutableSortedSet.of(),
+                  new TreeSet<>(),
+                  ImmutableMultiset.of(),
+                  ImmutableSortedMultiset.of())),
+          enumAssert.hasSameElementsAs(
+              Refaster.anyOf(
+                  ImmutableList.of(),
+                  new ArrayList<>(),
+                  ImmutableSet.of(),
+                  new HashSet<>(),
+                  new LinkedHashSet<>(),
+                  ImmutableSortedSet.of(),
+                  new TreeSet<>(),
+                  ImmutableMultiset.of(),
+                  ImmutableSortedMultiset.of())),
+          enumAssert.hasSameSizeAs(
+              Refaster.anyOf(
+                  ImmutableList.of(),
+                  new ArrayList<>(),
+                  ImmutableSet.of(),
+                  new HashSet<>(),
+                  new LinkedHashSet<>(),
+                  ImmutableSortedSet.of(),
+                  new TreeSet<>(),
+                  ImmutableMultiset.of(),
+                  ImmutableSortedMultiset.of())),
+          enumAssert.isSubsetOf(
+              Refaster.anyOf(
+                  ImmutableList.of(),
+                  new ArrayList<>(),
+                  ImmutableSet.of(),
+                  new HashSet<>(),
+                  new LinkedHashSet<>(),
+                  ImmutableSortedSet.of(),
+                  new TreeSet<>(),
+                  ImmutableMultiset.of(),
+                  ImmutableSortedMultiset.of())),
+          enumAssert.containsExactly(),
+          enumAssert.containsExactlyInAnyOrder(),
+          enumAssert.containsOnly(),
+          enumAssert.isSubsetOf());
+    }
+
+    @AfterTemplate
+    void after(ObjectEnumerableAssert<?, E> enumAssert) {
+      enumAssert.isEmpty();
+    }
+  }
+
+  //
+  // Iterable
+  //
+
   static final class AssertThatIterableIsEmpty<E> {
     @BeforeTemplate
     void before(Iterable<E> iterable) {
       Refaster.anyOf(
-          assertThat(iterable)
-              .containsExactlyElementsOf(
-                  Refaster.anyOf(
-                      ImmutableList.of(),
-                      new ArrayList<>(),
-                      ImmutableSet.of(),
-                      new HashSet<>(),
-                      new LinkedHashSet<>(),
-                      ImmutableSortedSet.of(),
-                      new TreeSet<>(),
-                      ImmutableMultiset.of(),
-                      ImmutableSortedMultiset.of())),
-          assertThat(iterable)
-              .containsExactlyInAnyOrderElementsOf(
-                  Refaster.anyOf(
-                      ImmutableList.of(),
-                      new ArrayList<>(),
-                      ImmutableSet.of(),
-                      new HashSet<>(),
-                      new LinkedHashSet<>(),
-                      ImmutableSortedSet.of(),
-                      new TreeSet<>(),
-                      ImmutableMultiset.of(),
-                      ImmutableSortedMultiset.of())),
-          assertThat(iterable)
-              .hasSameElementsAs(
-                  Refaster.anyOf(
-                      ImmutableList.of(),
-                      new ArrayList<>(),
-                      ImmutableSet.of(),
-                      new HashSet<>(),
-                      new LinkedHashSet<>(),
-                      ImmutableSortedSet.of(),
-                      new TreeSet<>(),
-                      ImmutableMultiset.of(),
-                      ImmutableSortedMultiset.of())),
-          assertThat(iterable)
-              .isSubsetOf(
-                  Refaster.anyOf(
-                      ImmutableList.of(),
-                      new ArrayList<>(),
-                      ImmutableSet.of(),
-                      new HashSet<>(),
-                      new LinkedHashSet<>(),
-                      ImmutableSortedSet.of(),
-                      new TreeSet<>(),
-                      ImmutableMultiset.of(),
-                      ImmutableSortedMultiset.of())),
-          assertThat(iterable).hasSize(0),
-          assertThat(iterable).hasSizeLessThan(1),
-          assertThat(iterable).containsExactly(),
-          assertThat(iterable).containsExactlyInAnyOrder(),
-          assertThat(iterable).containsOnly(),
-          assertThat(iterable).isSubsetOf(),
-          assertThat(Iterables.isEmpty(iterable)).isTrue(),
           assertThat(iterable.iterator().hasNext()).isFalse(),
           assertThat(Iterables.size(iterable)).isZero(),
           assertThat(Iterables.size(iterable)).isNotPositive());
@@ -593,14 +700,6 @@ final class AssertJTemplates {
           assertThat(iterable.size()).isNotPositive());
     }
 
-    @BeforeTemplate
-    void before(List<E> iterable) {
-      Refaster.anyOf(
-          assertThat(iterable).isEqualTo(Refaster.anyOf(ImmutableList.of(), new ArrayList<>())),
-          assertThat(iterable).hasSize(0),
-          assertThat(iterable).hasSizeLessThan(1));
-    }
-
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     void after(Collection<E> iterable) {
@@ -612,21 +711,6 @@ final class AssertJTemplates {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Iterable<E> iterable) {
       return Refaster.anyOf(
-          assertThat(iterable)
-              .isNotEqualTo(
-                  Refaster.anyOf(
-                      ImmutableList.of(),
-                      new ArrayList<>(),
-                      ImmutableSet.of(),
-                      new HashSet<>(),
-                      new LinkedHashSet<>(),
-                      ImmutableSortedSet.of(),
-                      new TreeSet<>(),
-                      ImmutableMultiset.of(),
-                      ImmutableSortedMultiset.of())),
-          assertThat(iterable).hasSizeGreaterThan(0),
-          assertThat(iterable).hasSizeGreaterThanOrEqualTo(1),
-          assertThat(Iterables.isEmpty(iterable)).isFalse(),
           assertThat(iterable.iterator().hasNext()).isTrue(),
           assertThat(Iterables.size(iterable)).isNotZero(),
           assertThat(Iterables.size(iterable)).isPositive());
@@ -638,14 +722,6 @@ final class AssertJTemplates {
           assertThat(iterable.isEmpty()).isFalse(),
           assertThat(iterable.size()).isNotZero(),
           assertThat(iterable.size()).isPositive());
-    }
-
-    @BeforeTemplate
-    ListAssert<E> before(List<E> iterable) {
-      return Refaster.anyOf(
-          assertThat(iterable).isNotEqualTo(Refaster.anyOf(ImmutableList.of(), new ArrayList<>())),
-          assertThat(iterable).hasSizeGreaterThan(0),
-          assertThat(iterable).hasSizeGreaterThanOrEqualTo(1));
     }
 
     @AfterTemplate
@@ -670,34 +746,6 @@ final class AssertJTemplates {
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     IterableAssert<E> after(Iterable<E> iterable, int length) {
       return assertThat(iterable).hasSize(length);
-    }
-  }
-
-  static final class AssertThatIterablesHaveSameSize<S, T> {
-    @BeforeTemplate
-    IterableAssert<S> before(Iterable<S> iterable1, Iterable<T> iterable2) {
-      return assertThat(iterable1).hasSize(Iterables.size(iterable2));
-    }
-
-    @BeforeTemplate
-    IterableAssert<S> before(Iterable<S> iterable1, Collection<T> iterable2) {
-      return assertThat(iterable1).hasSize(iterable2.size());
-    }
-
-    @BeforeTemplate
-    ListAssert<S> before(List<S> iterable1, Iterable<T> iterable2) {
-      return assertThat(iterable1).hasSize(Iterables.size(iterable2));
-    }
-
-    @BeforeTemplate
-    ListAssert<S> before(List<S> iterable1, Collection<T> iterable2) {
-      return assertThat(iterable1).hasSize(iterable2.size());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    IterableAssert<S> after(Iterable<S> iterable1, Iterable<T> iterable2) {
-      return assertThat(iterable1).hasSameSizeAs(iterable2);
     }
   }
 
@@ -731,7 +779,7 @@ final class AssertJTemplates {
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     IterableAssert<S> after(Set<S> set1, Set<T> set2) {
-      return assertThat(set1).containsExactlyInAnyOrderElementsOf(set2);
+      return assertThat(set1).hasSameElementsAs(set2);
     }
   }
 
@@ -751,6 +799,8 @@ final class AssertJTemplates {
       return assertThat(multiset1).containsExactlyInAnyOrderElementsOf(multiset2);
     }
   }
+
+  //////////////////////////// Generalize above this line.
 
   //
   // Map
