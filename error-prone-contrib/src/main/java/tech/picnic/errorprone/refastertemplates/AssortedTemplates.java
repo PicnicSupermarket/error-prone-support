@@ -160,4 +160,17 @@ final class AssortedTemplates {
       return Collections.disjoint(set1, set2);
     }
   }
+
+  /** Avoid {@link Iterables#isEmpty(Iterable)}; the JDK alternative is just as well. */
+  static final class IterableIsEmpty<T> {
+    @BeforeTemplate
+    boolean before(Iterable<T> iterable) {
+      return Iterables.isEmpty(iterable);
+    }
+
+    @AfterTemplate
+    boolean after(Iterable<T> iterable) {
+      return iterable.iterator().hasNext();
+    }
+  }
 }

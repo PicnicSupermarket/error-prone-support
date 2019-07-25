@@ -156,6 +156,10 @@ final class RefasterCheckPositiveCases {
           Collections.disjoint(ImmutableSet.of(1), ImmutableSet.of(2)),
           Collections.disjoint(ImmutableSet.of(3), ImmutableSet.of(4)));
     }
+
+    boolean testIterableIsEmpty() {
+      return ImmutableList.of().iterator().hasNext();
+    }
   }
 
   static final class BigDecimalTemplates {

@@ -151,6 +151,10 @@ final class RefasterCheckPositiveCases {
           Sets.intersection(ImmutableSet.of(1), ImmutableSet.of(2)).isEmpty(),
           ImmutableSet.of(3).stream().noneMatch(ImmutableSet.of(4)::contains));
     }
+
+    boolean testIterableIsEmpty() {
+      return Iterables.isEmpty(ImmutableList.of());
+    }
   }
 
   static final class BigDecimalTemplates {
