@@ -39,7 +39,7 @@ final class CollectionTemplates {
    * Don't call {@link Iterables#addAll(Collection, Iterable)} when the elements to be added are
    * already part of a {@link Collection}.
    */
-  static final class CollectionAddAllFromCollection<T, S extends T> {
+  static final class CollectionAddAllToCollectionExpression<T, S extends T> {
     @BeforeTemplate
     boolean before(Collection<T> addTo, Collection<S> elementsToAdd) {
       return Iterables.addAll(addTo, elementsToAdd);
@@ -51,7 +51,7 @@ final class CollectionTemplates {
     }
   }
 
-  static final class CollectionAddAllToCollection<T, S extends T> {
+  static final class CollectionAddAllToCollectionBlock<T, S extends T> {
     @BeforeTemplate
     void before(Collection<T> addTo, Collection<S> elementsToAdd) {
       elementsToAdd.forEach(addTo::add);
@@ -76,6 +76,50 @@ final class CollectionTemplates {
     @AfterTemplate
     void after(Collection<T> addTo, Collection<S> elementsToAdd) {
       addTo.addAll(elementsToAdd);
+    }
+  }
+
+  /**
+   * Don't call {@link Iterables#removeAll(Iterable, Collection)} when the elements to be removed
+   * are already part of a {@link Collection}.
+   */
+  static final class CollectionRemoveAllFromCollectionExpression<T, S extends T> {
+    @BeforeTemplate
+    boolean before(Collection<T> removeTo, Collection<S> elementsToRemove) {
+      return Iterables.removeAll(removeTo, elementsToRemove);
+    }
+
+    @AfterTemplate
+    boolean after(Collection<T> removeTo, Collection<S> elementsToRemove) {
+      return removeTo.removeAll(elementsToRemove);
+    }
+  }
+
+  static final class CollectionRemoveAllFromCollectionBlock<T, S extends T> {
+    @BeforeTemplate
+    void before(Collection<T> removeTo, Collection<S> elementsToRemove) {
+      elementsToRemove.forEach(removeTo::remove);
+    }
+
+    @BeforeTemplate
+    void before2(Collection<T> removeTo, Collection<S> elementsToRemove) {
+      for (T element : elementsToRemove) {
+        removeTo.remove(element);
+      }
+    }
+
+    // XXX: This method is identical to `before2` except for the loop type. Make Refaster smarter so
+    // that this is supported out of the box.
+    @BeforeTemplate
+    void before3(Collection<T> removeTo, Collection<S> elementsToRemove) {
+      for (S element : elementsToRemove) {
+        removeTo.remove(element);
+      }
+    }
+
+    @AfterTemplate
+    void after(Collection<T> removeTo, Collection<S> elementsToRemove) {
+      removeTo.removeAll(elementsToRemove);
     }
   }
 

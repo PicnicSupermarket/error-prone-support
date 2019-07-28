@@ -186,17 +186,31 @@ final class RefasterCheckPositiveCases {
           ImmutableSet.of(6).size() >= 1);
     }
 
-    boolean testCollectionAddAllFromCollection() {
+    boolean testCollectionAddAllToCollectionExpression() {
       return Iterables.addAll(new ArrayList<>(), ImmutableSet.of("foo"));
     }
 
-    void testCollectionAddAllToCollection() {
+    void testCollectionAddAllToCollectionBlock() {
       ImmutableSet.of("foo").forEach(new ArrayList<>()::add);
       for (Number element : ImmutableSet.of(1)) {
         new ArrayList<Number>().add(element);
       }
       for (Integer element : ImmutableSet.of(2)) {
         new ArrayList<Number>().add(element);
+      }
+    }
+
+    boolean testCollectionRemoveAllToCollectionExpression() {
+      return Iterables.removeAll(new ArrayList<>(), ImmutableSet.of("foo"));
+    }
+
+    void testCollectionRemoveAllToCollectionBlock() {
+      ImmutableSet.of("foo").forEach(new ArrayList<>()::remove);
+      for (Number element : ImmutableSet.of(1)) {
+        new ArrayList<Number>().remove(element);
+      }
+      for (Integer element : ImmutableSet.of(2)) {
+        new ArrayList<Number>().remove(element);
       }
     }
 

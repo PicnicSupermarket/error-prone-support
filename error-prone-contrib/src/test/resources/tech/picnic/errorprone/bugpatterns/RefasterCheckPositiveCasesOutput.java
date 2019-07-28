@@ -191,14 +191,24 @@ final class RefasterCheckPositiveCases {
           !ImmutableSet.of(6).isEmpty());
     }
 
-    boolean testCollectionAddAllFromCollection() {
+    boolean testCollectionAddAllToCollectionExpression() {
       return new ArrayList<>().addAll(ImmutableSet.of("foo"));
     }
 
-    void testCollectionAddAllToCollection() {
+    void testCollectionAddAllToCollectionBlock() {
       new ArrayList<>().addAll(ImmutableSet.of("foo"));
       new ArrayList<Number>().addAll(ImmutableSet.of(1));
       new ArrayList<Number>().addAll(ImmutableSet.of(2));
+    }
+
+    boolean testCollectionRemoveAllToCollectionExpression() {
+      return new ArrayList<>().removeAll(ImmutableSet.of("foo"));
+    }
+
+    void testCollectionRemoveAllToCollectionBlock() {
+      new ArrayList<>().removeAll(ImmutableSet.of("foo"));
+      new ArrayList<Number>().removeAll(ImmutableSet.of(1));
+      new ArrayList<Number>().removeAll(ImmutableSet.of(2));
     }
 
     ArrayList<String> testNewArrayListFromCollection() {
