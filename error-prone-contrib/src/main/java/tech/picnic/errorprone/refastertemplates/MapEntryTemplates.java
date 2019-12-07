@@ -38,6 +38,7 @@ final class MapEntryTemplates {
   }
 
   /** Prefer {@link Map.Entry#comparingByKey()} over more verbose alternatives. */
+  // XXX: Also rewrite `Comparator.comparing{Double,Int,Long}(Map.Entry::getKey)`.
   static final class MapEntryComparingByKey<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     Comparator<Map.Entry<K, V>> before() {
@@ -68,6 +69,7 @@ final class MapEntryTemplates {
   }
 
   /** Prefer {@link Map.Entry#comparingByValue()} over more verbose alternatives. */
+  // XXX: Also rewrite `Comparator.comparing{Double,Int,Long}(Map.Entry::getValue)`.
   static final class MapEntryComparingByValue<K, V extends Comparable<? super V>> {
     @BeforeTemplate
     Comparator<Map.Entry<K, V>> before() {

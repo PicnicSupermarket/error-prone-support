@@ -251,4 +251,18 @@ final class ImmutableMapTemplates {
       return map;
     }
   }
+
+  // XXX: Add a template for this:
+  // Maps.transformValues(streamOfEntries.collect(groupBy(fun)), ImmutableMap::copyOf)
+  // ->
+  // streamOfEntries.collect(groupBy(fun, toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)))
+  //
+  // map.entrySet().stream().filter(keyPred).forEach(mapBuilder::put)
+  // ->
+  // mapBuilder.putAll(Maps.filterKeys(map, pred))
+  //
+  // map.entrySet().stream().filter(entry ->
+  // pred(entry.getKey())).collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue))
+  // ->
+  // ImmutableMap.copyOf(Maps.filterKeys(map, pred))
 }

@@ -89,11 +89,6 @@ import org.assertj.core.api.OptionalLongAssert;
 // XXX: `assertThat(...).isEqualTo((Object) someCollection)` ->
 // `assertThat(...).containsExactlyInAnyOrder(someCollection)` (not so in general for sorted
 // collections)
-// XXX: Why are the `.collect(toList())` calls in `SelectionStrategyTest` not replaced? Idem
-// elsewhere of `toImmutableList`.
-// XXX: Why is a `.get().isEqualTo(...)` calls in `DeliveryRepositoryTest` not replaced?
-// XXX: Why is `AbstractIndexingServiceImplIntegrationTest#assertAmountOfIndicesEquals` not
-// simplified further?
 // XXX: `assertThat(optional.map(fun)).hasValue(v)` ->
 // `assertThat(optional).get().extracting(fun).isEqualTo(v)` (if the get fails the map was useless)
 // XXX: `someAssert.extracting(pred).isEqualTo(true)` -> `someAssert.matches(pred)`
@@ -103,6 +98,7 @@ import org.assertj.core.api.OptionalLongAssert;
 // XXX: `assertThat(n > k).isTrue()` -> assertThat(n).isGreaterThan(k)` (etc. Also `==`!)
 // XXX: `assertThat(n > k && n < m).isTrue()` -> assertThat(n).isStrictlyBetween(k, m)` (etc.)
 // XXX: `assertThat(ImmutableList.copyOf(iterable))` -> assertThat(iterable)` (etc.)
+// XXX: `intAssert.isEqualTo(integer.intValue())` -> `intAssert.isEqualTo(integer)` (etc.)
 // XXX: The `assertThat` rules currently don't handle the case where there's a `failMessage`. Decide
 // what to do with that.
 // XXX: Also cater for `hasSameElementsAs(Sets.newHashSet(...))` and variants?
@@ -125,6 +121,8 @@ import org.assertj.core.api.OptionalLongAssert;
 // operations are not available...
 // XXX: Write plugin which identifies repeated `assertThat(someProp.xxx)` calls and bundles these
 // somehow.
+// XXX: `abstractOptionalAssert.get().satisfies(pred)` ->
+// `abstractOptionalAssert.hasValueSatisfying(pred)`.
 final class AssertJTemplates {
   private AssertJTemplates() {}
 
@@ -507,6 +505,7 @@ final class AssertJTemplates {
 
   static final class AssertThatOptional<T> {
     @BeforeTemplate
+    @SuppressWarnings("NullAway")
     ObjectAssert<T> before(Optional<T> optional) {
       return assertThat(optional.get());
     }
@@ -578,7 +577,9 @@ final class AssertJTemplates {
     @BeforeTemplate
     AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert, T value) {
       return Refaster.anyOf(
-          optionalAssert.get().isEqualTo(value), optionalAssert.isEqualTo(Optional.of(value)));
+          optionalAssert.get().isEqualTo(value),
+          optionalAssert.isEqualTo(Optional.of(value)),
+          optionalAssert.contains(value));
     }
 
     @AfterTemplate
@@ -852,6 +853,7 @@ final class AssertJTemplates {
     }
   }
 
+  // XXX: !! THIS SEEMS WRONG !! `containsOnly` allows duplicates.
   static final class ObjectEnumerableContainsOnlyOneElement<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
@@ -903,20 +905,6 @@ final class AssertJTemplates {
     @SuppressWarnings("unchecked")
     ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
       return iterAssert.isSubsetOf(element);
-    }
-  }
-
-  static final class ObjectEnumerableHasSameElementsAs<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, Iterable<T> iterable) {
-      return iterAssert.containsOnlyElementsOf(iterable);
-    }
-
-    @AfterTemplate
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, Iterable<T> iterable) {
-      return iterAssert.hasSameElementsAs(iterable);
     }
   }
 
@@ -1238,6 +1226,19 @@ final class AssertJTemplates {
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     MapAssert<K, V> after(Map<K, V> map, K key) {
       return assertThat(map).doesNotContainKey(key);
+    }
+  }
+
+  static final class AssertThatMapContainsEntry<K, V> {
+    @BeforeTemplate
+    ObjectAssert<?> before(Map<K, V> map, K key, V value) {
+      return assertThat(map.get(key)).isEqualTo(value);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    MapAssert<K, V> after(Map<K, V> map, K key, V value) {
+      return assertThat(map).containsEntry(key, value);
     }
   }
 
@@ -1807,6 +1808,19 @@ final class AssertJTemplates {
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     void after(Stream<S> stream) {
       assertThat(stream).isNotEmpty();
+    }
+  }
+
+  static final class AssertThatStreamHasSize<T> {
+    @BeforeTemplate
+    void before(Stream<T> stream, int size) {
+      assertThat(stream.count()).isEqualTo(size);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    void after(Stream<T> stream, int size) {
+      assertThat(stream).hasSize(size);
     }
   }
 

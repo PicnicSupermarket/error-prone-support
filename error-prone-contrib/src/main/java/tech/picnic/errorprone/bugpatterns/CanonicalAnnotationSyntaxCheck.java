@@ -50,8 +50,7 @@ public final class CanonicalAnnotationSyntaxCheck extends BugChecker
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
     return FIX_FACTORIES.stream()
         .map(op -> op.apply(tree, state))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .findFirst()
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);

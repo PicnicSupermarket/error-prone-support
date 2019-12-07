@@ -88,15 +88,14 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
   }
 
   private Optional<Fix> sortArrayElements(AnnotationTree tree, VisitorState state) {
-    /**
+    /*
      * We loop over the array's attributes, trying to sort each array associated with a
      * non-blacklisted attribute. A single compound fix, if any, is returned.
      */
     return this.matcher
         .extractMatchingArguments(tree)
         .map(expr -> extractArray(expr).flatMap(arr -> suggestSorting(arr, state)))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .reduce(SuggestedFix.Builder::merge)
         .map(SuggestedFix.Builder::build);
   }

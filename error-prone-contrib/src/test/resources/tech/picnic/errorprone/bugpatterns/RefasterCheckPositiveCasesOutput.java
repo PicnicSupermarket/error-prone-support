@@ -160,6 +160,14 @@ final class RefasterCheckPositiveCases {
     boolean testIterableIsEmpty() {
       return ImmutableList.of().iterator().hasNext();
     }
+
+    Stream<String> testMapKeyStream() {
+      return ImmutableMap.of("foo", 1).keySet().stream();
+    }
+
+    Stream<Integer> testMapValueStream() {
+      return ImmutableMap.of("foo", 1).values().stream();
+    }
   }
 
   static final class BigDecimalTemplates {

@@ -173,4 +173,32 @@ final class AssortedTemplates {
       return iterable.iterator().hasNext();
     }
   }
+
+  /** Don't unnecessarily use {@link Map#entrySet()}. */
+  static final class MapKeyStream<K, V> {
+    @BeforeTemplate
+    Stream<K> before(Map<K, V> map) {
+      return map.entrySet().stream().map(Map.Entry::getKey);
+    }
+
+    @AfterTemplate
+    Stream<K> after(Map<K, V> map) {
+      return map.keySet().stream();
+    }
+  }
+
+  /** Don't unnecessarily use {@link Map#entrySet()}. */
+  static final class MapValueStream<K, V> {
+    @BeforeTemplate
+    Stream<V> before(Map<K, V> map) {
+      return map.entrySet().stream().map(Map.Entry::getValue);
+    }
+
+    @AfterTemplate
+    Stream<V> after(Map<K, V> map) {
+      return map.values().stream();
+    }
+  }
+
+  // XXX: Add a rule for `comparing(identity())` -> `naturalOrder()`.
 }

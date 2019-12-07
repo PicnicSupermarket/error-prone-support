@@ -17,7 +17,6 @@ import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
-import com.google.errorprone.matchers.method.MethodMatchers.MethodClassMatcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LambdaExpressionTree;
@@ -31,9 +30,6 @@ import com.sun.tools.javac.tree.JCTree.JCMemberReference;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
 import java.util.stream.Stream;
 
 /**
@@ -139,33 +135,29 @@ public final class PrimitiveComparisonCheck extends BugChecker
   }
 
   private static Matcher<ExpressionTree> getStaticTargetMatcher() {
-    MethodClassMatcher clazz = staticMethod().onClass(Comparator.class.getName());
-
+    String clazz = Comparator.class.getName();
     return anyMatch(
-        unaryMethod(clazz, "comparingInt", ToIntFunction.class),
-        unaryMethod(clazz, "comparingLong", ToLongFunction.class),
-        unaryMethod(clazz, "comparingDouble", ToDoubleFunction.class),
-        unaryMethod(clazz, "comparing", Function.class));
+        staticMethod()
+            .onClass(clazz)
+            .namedAnyOf("comparingInt", "comparingLong", "comparingDouble"),
+        staticMethod().onClass(clazz).named("comparing").withParameters(Function.class.getName()));
   }
 
   private static Matcher<ExpressionTree> getInstanceTargetMatcher() {
-    MethodClassMatcher instance = instanceMethod().onDescendantOf(Comparator.class.getName());
-
+    String clazz = Comparator.class.getName();
     return anyMatch(
-        unaryMethod(instance, "thenComparingInt", ToIntFunction.class),
-        unaryMethod(instance, "thenComparingLong", ToLongFunction.class),
-        unaryMethod(instance, "thenComparingDouble", ToDoubleFunction.class),
-        unaryMethod(instance, "thenComparing", Function.class));
+        instanceMethod()
+            .onDescendantOf(clazz)
+            .namedAnyOf("thenComparingInt", "thenComparingLong", "thenComparingDouble"),
+        instanceMethod()
+            .onDescendantOf(clazz)
+            .named("thenComparing")
+            .withParameters(Function.class.getName()));
   }
 
   @SafeVarargs
   @SuppressWarnings("varargs")
   private static Matcher<ExpressionTree> anyMatch(Matcher<ExpressionTree>... matchers) {
     return (ExpressionTree t, VisitorState s) -> Stream.of(matchers).anyMatch(m -> m.matches(t, s));
-  }
-
-  private static Matcher<ExpressionTree> unaryMethod(
-      MethodClassMatcher classMatcher, String name, Class<?> paramType) {
-    return classMatcher.named(name).withParameters(paramType.getName());
   }
 }

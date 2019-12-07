@@ -30,6 +30,7 @@ import com.sun.source.tree.CompoundAssignmentTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import java.io.Console;
 import java.io.PrintStream;
@@ -58,7 +59,10 @@ public final class RedundantStringConversionCheck extends BugChecker
   private static final String FLAG_PREFIX = "RedundantStringConversion:";
   private static final String EXTRA_STRING_CONVERSION_METHODS_FLAG =
       FLAG_PREFIX + "ExtraConversionMethods";
+
+  @SuppressWarnings("UnnecessaryLambda")
   private static final Matcher<ExpressionTree> ANY_EXPR = (t, s) -> true;
+
   private static final Matcher<ExpressionTree> LOCALE = isSameType(Locale.class);
   private static final Matcher<ExpressionTree> MARKER = isSubtypeOf("org.slf4j.Marker");
   private static final Matcher<ExpressionTree> STRING = isSameType(String.class);
@@ -316,8 +320,7 @@ public final class RedundantStringConversionCheck extends BugChecker
     return arguments.stream()
         .skip(patternIndex + 1)
         .map(arg -> tryFix(arg, state, remainingArgFilter))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .reduce(SuggestedFix.Builder::merge);
   }
 
@@ -376,10 +379,10 @@ public final class RedundantStringConversionCheck extends BugChecker
     return Optional.of(Iterables.getOnlyElement(methodInvocation.getArguments()));
   }
 
-  private Description finalize(ExpressionTree tree, Optional<SuggestedFix.Builder> fixes) {
+  private Description finalize(Tree tree, Optional<SuggestedFix.Builder> fixes) {
     return fixes
         .map(SuggestedFix.Builder::build)
-        .map(fix -> buildDescription(tree).addFix(fix).build())
+        .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 

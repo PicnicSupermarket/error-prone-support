@@ -171,6 +171,7 @@ final class OptionalTemplates {
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
+    @SuppressWarnings("NullAway")
     Optional<S> before(Optional<T> optional) {
       return optional.map(v -> toOptionalFunction(v).get());
     }
@@ -183,6 +184,7 @@ final class OptionalTemplates {
 
   static final class OrElseGetToOptionalGet<T> {
     @BeforeTemplate
+    @SuppressWarnings("NullAway")
     T before(Optional<T> o1, Optional<T> o2) {
       return o1.orElseGet(() -> o2.get());
     }
@@ -198,6 +200,8 @@ final class OptionalTemplates {
    * Flatten a stream of {@link Optional}s using {@link Optional#stream()}, rather than using one of
    * the more verbose alternatives.
    */
+  // XXX: Do we need the `.filter(Optional::isPresent)`? If it's absent the caller probably assumed
+  // that the values are present. (If we drop it, we should rewrite vacuous filter steps.)
   static final class StreamFlatmapOptional<T> {
     @BeforeTemplate
     Stream<T> before(Stream<Optional<T>> stream) {
@@ -219,6 +223,7 @@ final class OptionalTemplates {
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
+    @SuppressWarnings("NullAway")
     Stream<S> before(Stream<T> stream, Optional<S> optional) {
       return stream.map(e -> toOptionalFunction(e).get());
     }
@@ -278,4 +283,13 @@ final class OptionalTemplates {
       return optional.flatMap(v -> toOptionalFunction(v)).flatMap(function);
     }
   }
+
+  // XXX: Add a rule for:
+  // `optional.flatMap(x -> pred(x) ? Optional.empty() : Optional.of(x))` and variants.
+  // (Maybe canonicalize the inner expression. Maybe we rewrite already.)
+
+  // XXX: Add a rule for:
+  // `optional.map(Stream::of).orElse(Stream.empty())`
+  // `optional.map(Stream::of).orElseGet(Stream::empty)`
+  // -> `optional.stream()`
 }
