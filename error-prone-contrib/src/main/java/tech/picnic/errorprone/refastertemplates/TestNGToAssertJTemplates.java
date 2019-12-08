@@ -1,6 +1,8 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.data.Offset.offset;
 import static org.testng.Assert.assertEquals;
@@ -11,6 +13,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNotSame;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
@@ -22,6 +25,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.testng.Assert.ThrowingRunnable;
 
 /**
  * Refaster templates which replace TestNG assertions with equivalent AssertJ assertions.
@@ -700,6 +705,11 @@ final class TestNGToAssertJTemplates {
     }
 
     @BeforeTemplate
+    void before(Set<?> actual, Set<?> expected) {
+      assertNotEquals(actual, expected);
+    }
+
+    @BeforeTemplate
     void before(Map<?, ?> actual, Map<?, ?> expected) {
       assertNotEquals(actual, expected);
     }
@@ -707,7 +717,7 @@ final class TestNGToAssertJTemplates {
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     void after(Object actual, Object expected) {
-      assertThat(actual).isEqualTo(expected);
+      assertThat(actual).isNotEqualTo(expected);
     }
   }
 
@@ -759,6 +769,11 @@ final class TestNGToAssertJTemplates {
 
     @BeforeTemplate
     void before(String actual, String expected, String message) {
+      assertNotEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Set<?> actual, Set<?> expected, String message) {
       assertNotEquals(actual, expected, message);
     }
 
@@ -932,113 +947,40 @@ final class TestNGToAssertJTemplates {
     }
   }
 
-  // XXX: The assertions below are WRONG! Figure out how we _should_ implement them.
-  //  static final class AssertUnequalIteratorIterationOrder {
-  //    @BeforeTemplate
-  //    void before(Iterator<?> actual, Iterator<?> expected) {
-  //      assertNotEquals(actual, expected);
-  //    }
-  //
-  //    @AfterTemplate
-  //    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //    <S, T extends S> void after(Iterator<S> actual, Iterator<T> expected) {
-  //      // XXX: This is not `null`-safe.
-  //      // XXX: The `ImmutableList.copyOf` should actually *not* be imported statically.
-  //      assertThat(actual).toIterable().containsExactlyElementsOf(ImmutableList.copyOf(expected));
-  //    }
-  //  }
-  //
-  //  static final class AssertUnequalIteratorIterationOrderWithMessage {
-  //    @BeforeTemplate
-  //    void before(Iterator<?> actual, Iterator<?> expected, String message) {
-  //      assertNotEquals(actual, expected, message);
-  //    }
-  //
-  //    @AfterTemplate
-  //    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //    <S, T extends S> void after(Iterator<S> actual, Iterator<T> expected, String message) {
-  //      // XXX: This is not `null`-safe.
-  //      // XXX: The `ImmutableList.copyOf` should actually *not* be imported statically.
-  //      assertThat(actual)
-  //          .toIterable()
-  //          .withFailMessage(message)
-  //          .containsExactlyElementsOf(ImmutableList.copyOf(expected));
-  //    }
-  //  }
-  //
-  //  // XXX This rule fails for `java.nio.file.Path` as it is `Iterable`, but AssertJ's
-  //  // `assertThat(Path)` does not support `.containsExactlyElementsOf`.
-  //  static final class AssertUnequalIterableIterationOrder {
-  //    @BeforeTemplate
-  //    void before(Iterable<?> actual, Iterable<?> expected) {
-  //      assertNotEquals(actual, expected);
-  //    }
-  //
-  //    @BeforeTemplate
-  //    void before(Collection<?> actual, Collection<?> expected) {
-  //      assertNotEquals(actual, expected);
-  //    }
-  //
-  //    @AfterTemplate
-  //    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //    <S, T extends S> void after(Iterable<S> actual, Iterable<T> expected) {
-  //      assertThat(actual).containsExactlyElementsOf(expected);
-  //    }
-  //  }
-  //
-  //  static final class AssertUnequalIterableIterationOrderWithMessage {
-  //    @BeforeTemplate
-  //    void before(Iterable<?> actual, Iterable<?> expected, String message) {
-  //      assertNotEquals(actual, expected, message);
-  //    }
-  //
-  //    @BeforeTemplate
-  //    void before(Collection<?> actual, Collection<?> expected, String message) {
-  //      assertNotEquals(actual, expected, message);
-  //    }
-  //
-  //    @AfterTemplate
-  //    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //    <S, T extends S> void after(Iterable<S> actual, Iterable<T> expected, String message) {
-  //      assertThat(actual).withFailMessage(message).containsExactlyElementsOf(expected);
-  //    }
-  //  }
-  //
-  //  static final class AssertUnequalSets {
-  //    @BeforeTemplate
-  //    void before(Set<?> actual, Set<?> expected) {
-  //      assertNotEquals(actual, expected);
-  //    }
-  //
-  //    @AfterTemplate
-  //    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //    <S, T extends S> void after(Set<S> actual, Set<T> expected) {
-  //      assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
-  //    }
-  //  }
-  //
-  //  static final class AssertUnequalSetsWithMessage {
-  //    @BeforeTemplate
-  //    void before(Set<?> actual, Set<?> expected, String message) {
-  //      assertNotEquals(actual, expected, message);
-  //    }
-  //
-  //    @AfterTemplate
-  //    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-  //    <S, T extends S> void after(Set<S> actual, Set<T> expected, String message) {
-  //      assertThat(actual).withFailMessage(message).containsExactlyInAnyOrderElementsOf(expected);
-  //    }
-  //  }
+  static final class AssertThrows {
+    @BeforeTemplate
+    void before(ThrowingRunnable runnable) {
+      assertThrows(runnable);
+    }
 
-  // XXX: Skipped methods (these test array equality of elements/values if applicable):
-  // assertEqualsDeep Set Set
-  // assertEqualsDeep Set Set msg
-  // assertEqualsDeep Map Map
-  // assertEqualsDeep Map Map msg
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    void after(ThrowingCallable runnabe) {
+      assertThatThrownBy(runnabe).isInstanceOf(Throwable.class);
+    }
+  }
 
-  // Also still TBD:
-  // assertThrows
-  // expectThrows
+  static final class AssertThrowsWithType<T extends Throwable> {
+    @BeforeTemplate
+    void before(ThrowingRunnable runnable, Class<T> clazz) {
+      assertThrows(clazz, runnable);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    void after(ThrowingCallable runnable, Class<T> clazz) {
+      assertThatThrownBy(runnable).isInstanceOf(clazz);
+    }
+  }
+
+  // XXX: Skipped methods that cannot be ported:
+  // - These test array equality of elements/values if applicable:
+  //   - assertEqualsDeep Set Set
+  //   - assertEqualsDeep Set Set msg
+  //   - assertEqualsDeep Map Map
+  //   - assertEqualsDeep Map Map msg
+  // - This one returns the caught exception:
+  //   - expectThrows
 
   // XXX: Not matched:
   // - Stuff with comments (Check whether we should fork Refaster...)
