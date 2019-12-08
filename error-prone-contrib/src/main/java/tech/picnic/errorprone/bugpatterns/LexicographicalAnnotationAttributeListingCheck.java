@@ -66,7 +66,7 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
 
   private final AnnotationAttributeMatcher matcher;
 
-  /** Instantiates default {@link LexicographicalAnnotationAttributeListingCheck}. */
+  /** Instantiates the default {@link LexicographicalAnnotationAttributeListingCheck}. */
   public LexicographicalAnnotationAttributeListingCheck() {
     this(ErrorProneFlags.empty());
   }

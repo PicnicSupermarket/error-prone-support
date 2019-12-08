@@ -19,6 +19,7 @@ import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.CompositeCodeTransformer;
+import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.SubContext;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -36,14 +37,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
- * A {@link BugChecker} which flags code which can be simplified using a Refaster template located
- * on the classpath.
+ * A {@link BugChecker} which flags code which can be simplified using Refaster templates located on
+ * the classpath.
  *
  * <p>This checker locates all {@code *.refaster} classpath resources and assumes they contain a
- * {@link CodeTransformer}.
+ * {@link CodeTransformer}. The set of loaded Refaster templates can be restricted by passing {@code
+ * -XepOpt:Refaster:NamePattern=<someRegex>}.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -54,9 +58,26 @@ import java.util.stream.Stream;
     tags = StandardTags.SIMPLIFICATION,
     providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class RefasterCheck extends BugChecker implements CompilationUnitTreeMatcher {
+  private static final Pattern REFASTER_TEMPLATE_RESOURCE =
+      Pattern.compile("^.*?([^/]+)\\.refaster");
+  private static final String INCLUDED_TEMPLATES_PATTERN_FLAG = "Refaster:NamePattern";
   private static final long serialVersionUID = 1L;
 
-  private final CodeTransformer codeTransformer = loadCompositeCodeTransformer();
+  private final CodeTransformer codeTransformer;
+
+  /** Instantiates the default {@link RefasterCheck}. */
+  public RefasterCheck() {
+    this(ErrorProneFlags.empty());
+  }
+
+  /**
+   * Instantiates a customized {@link RefasterCheck}.
+   *
+   * @param flags Any provided command line flags.
+   */
+  public RefasterCheck(ErrorProneFlags flags) {
+    this.codeTransformer = loadCompositeCodeTransformer(flags);
+  }
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
@@ -123,10 +144,11 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
         .flatMap(fix -> fix.getReplacements(endPositions).stream());
   }
 
-  private static CodeTransformer loadCompositeCodeTransformer() {
+  private static CodeTransformer loadCompositeCodeTransformer(ErrorProneFlags flags) {
+    Optional<Pattern> nameFilter = flags.get(INCLUDED_TEMPLATES_PATTERN_FLAG).map(Pattern::compile);
     return CompositeCodeTransformer.compose(
         getClassPathResources().stream()
-            .filter(ri -> ri.getResourceName().endsWith(".refaster"))
+            .filter(resource -> shouldLoad(resource, nameFilter))
             .map(RefasterCheck::loadCodeTransformer)
             .flatMap(Streams::stream)
             .collect(toImmutableList()));
@@ -138,6 +160,12 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
     } catch (IOException e) {
       throw new IllegalStateException("Failed to scan classpath for resources", e);
     }
+  }
+
+  private static boolean shouldLoad(ResourceInfo resource, Optional<Pattern> nameFilter) {
+    Matcher matcher = REFASTER_TEMPLATE_RESOURCE.matcher(resource.getResourceName());
+    return matcher.matches()
+        && nameFilter.filter(filter -> !filter.matcher(matcher.group(1)).matches()).isEmpty();
   }
 
   private static Optional<CodeTransformer> loadCodeTransformer(ResourceInfo resource) {
