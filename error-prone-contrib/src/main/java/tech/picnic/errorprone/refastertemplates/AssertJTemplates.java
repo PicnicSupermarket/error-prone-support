@@ -107,6 +107,7 @@ import org.assertj.core.api.OptionalLongAssert;
 // methods instead. (Also in the TestNG migration.)
 //      ^ Also for `Tuple`!
 // XXX: Use `assertThatIllegalArgumentException` and variants.
+// XXX: `assertThatCode(x).isInstanceOf(clazz)` -> `assertThatThrownBy(x).isInstanceOf(clazz)` (etc.)
 // XXX: Look into using Assertions#contentOf(URL url, Charset charset) instead of our own test
 // method.
 // XXX: Write Optional templates also for `OptionalInt` and variants.
@@ -853,8 +854,7 @@ final class AssertJTemplates {
     }
   }
 
-  // XXX: !! THIS SEEMS WRONG !! `containsOnly` allows duplicates.
-  static final class ObjectEnumerableContainsOnlyOneElement<S, T extends S> {
+  static final class ObjectEnumerableContainsExactlyOneElement<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
@@ -865,14 +865,27 @@ final class AssertJTemplates {
                   Arrays.asList(element),
                   ImmutableSet.of(element),
                   ImmutableMultiset.of(element))),
-          iterAssert.containsExactly(element),
           iterAssert.containsExactlyInAnyOrderElementsOf(
               Refaster.anyOf(
                   ImmutableList.of(element),
                   Arrays.asList(element),
                   ImmutableSet.of(element),
                   ImmutableMultiset.of(element))),
-          iterAssert.containsExactlyInAnyOrder(element),
+          iterAssert.containsExactlyInAnyOrder(element));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
+      return iterAssert.containsExactly(element);
+    }
+  }
+
+  static final class ObjectEnumerableContainsOneDistinctElement<S, T extends S> {
+    @BeforeTemplate
+    @SuppressWarnings("unchecked")
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
+      return Refaster.anyOf(
           iterAssert.hasSameElementsAs(
               Refaster.anyOf(
                   ImmutableList.of(element),
@@ -1032,7 +1045,9 @@ final class AssertJTemplates {
   static final class AssertThatSetsAreEqual<S, T extends S> {
     @BeforeTemplate
     IterableAssert<S> before(Set<S> set1, Set<T> set2) {
-      return assertThat(set1).isEqualTo(set2);
+      return Refaster.anyOf(
+          assertThat(set1).isEqualTo(set2),
+          assertThat(set1).containsExactlyInAnyOrderElementsOf(set2));
     }
 
     @AfterTemplate
