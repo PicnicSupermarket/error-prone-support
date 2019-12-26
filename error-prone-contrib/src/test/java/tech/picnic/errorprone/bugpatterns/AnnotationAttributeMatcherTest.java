@@ -1,30 +1,26 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 
-@RunWith(JUnit4.class)
 public final class AnnotationAttributeMatcherTest {
   @Test
   public void testWithoutListings() {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(Optional.empty(), ImmutableList.of());
-    assertTrue(matcher.matches("foo", "bar"));
+    assertThat(matcher.matches("foo", "bar")).isTrue();
   }
 
   @Test
   public void testWithSingleFullAnnotationWhitelist() {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(Optional.of(ImmutableList.of("foo")), ImmutableList.of());
-    assertTrue(matcher.matches("foo", "bar"));
-    assertTrue(matcher.matches("foo", "baz"));
-    assertFalse(matcher.matches("quux", "bar"));
+    assertThat(matcher.matches("foo", "bar")).isTrue();
+    assertThat(matcher.matches("foo", "baz")).isTrue();
+    assertThat(matcher.matches("quux", "bar")).isFalse();
   }
 
   @Test
@@ -32,27 +28,27 @@ public final class AnnotationAttributeMatcherTest {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(
             Optional.of(ImmutableList.of("foo#bar")), ImmutableList.of());
-    assertTrue(matcher.matches("foo", "bar"));
-    assertFalse(matcher.matches("foo", "baz"));
-    assertFalse(matcher.matches("quux", "bar"));
+    assertThat(matcher.matches("foo", "bar")).isTrue();
+    assertThat(matcher.matches("foo", "baz")).isFalse();
+    assertThat(matcher.matches("quux", "bar")).isFalse();
   }
 
   @Test
   public void testWithSingleFullAnnotationBlacklist() {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(Optional.empty(), ImmutableList.of("foo"));
-    assertFalse(matcher.matches("foo", "bar"));
-    assertFalse(matcher.matches("foo", "baz"));
-    assertTrue(matcher.matches("quux", "bar"));
+    assertThat(matcher.matches("foo", "bar")).isFalse();
+    assertThat(matcher.matches("foo", "baz")).isFalse();
+    assertThat(matcher.matches("quux", "bar")).isTrue();
   }
 
   @Test
   public void testWithSingleAnnotationAttributeBlacklist() {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(Optional.empty(), ImmutableList.of("foo#bar"));
-    assertFalse(matcher.matches("foo", "bar"));
-    assertTrue(matcher.matches("foo", "baz"));
-    assertTrue(matcher.matches("quux", "bar"));
+    assertThat(matcher.matches("foo", "bar")).isFalse();
+    assertThat(matcher.matches("foo", "baz")).isTrue();
+    assertThat(matcher.matches("quux", "bar")).isTrue();
   }
 
   @Test
@@ -61,13 +57,13 @@ public final class AnnotationAttributeMatcherTest {
         AnnotationAttributeMatcher.create(
             Optional.of(ImmutableList.of("foo", "bar", "baz", "baz#1", "baz#2", "quux#1")),
             ImmutableList.of("foo", "baz#2"));
-    assertFalse(matcher.matches("foo", "1"));
-    assertFalse(matcher.matches("foo", "2"));
-    assertTrue(matcher.matches("bar", "1"));
-    assertTrue(matcher.matches("bar", "2"));
-    assertTrue(matcher.matches("baz", "1"));
-    assertFalse(matcher.matches("baz", "2"));
-    assertTrue(matcher.matches("quux", "1"));
-    assertFalse(matcher.matches("quux", "2"));
+    assertThat(matcher.matches("foo", "1")).isFalse();
+    assertThat(matcher.matches("foo", "2")).isFalse();
+    assertThat(matcher.matches("bar", "1")).isTrue();
+    assertThat(matcher.matches("bar", "2")).isTrue();
+    assertThat(matcher.matches("baz", "1")).isTrue();
+    assertThat(matcher.matches("baz", "2")).isFalse();
+    assertThat(matcher.matches("quux", "1")).isTrue();
+    assertThat(matcher.matches("quux", "2")).isFalse();
   }
 }

@@ -5,14 +5,11 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import java.io.IOException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 
 // XXX: The tests below show that `String.valueOf((String) null)` may be simplified, but
 // `String.valueOf(null)` may not. That is because the latter matches `String#valueOf(char[])`. We
 // could special-case `null` arguments, but that doesn't seem worth the trouble.
-@RunWith(JUnit4.class)
 public final class RedundantStringConversionCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(RedundantStringConversionCheck.class, getClass());

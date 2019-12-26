@@ -219,6 +219,13 @@
                 <version>3.0.1</version>
             </dependency>
             <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.5.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>1.7.30</version>
@@ -688,14 +695,27 @@
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
-                        <!-- Timing measurements indicate that it's not
-                        beneficial to perform method-level parallelization for
-                        unit tests. -->
-                        <parallel>classes</parallel>
+                        <properties>
+                            <configurationParameters>
+                                junit.jupiter.execution.parallel.config.strategy=dynamic
+                                junit.jupiter.execution.parallel.enabled=true
+                                junit.jupiter.execution.parallel.mode.default = concurrent
+                            </configurationParameters>
+                        </properties>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                        <threadCount>2</threadCount>
                         <trimStackTrace>false</trimStackTrace>
                     </configuration>
+                    <dependencies>
+                        <!-- Some dependencies pull in JUnit 4; having it on
+                        the classpath confuses Surefire. By declaring this
+                        dependency we ensure that the JUnit 5 test runner is
+                        used. -->
+                        <dependency>
+                            <groupId>org.apache.maven.surefire</groupId>
+                            <artifactId>surefire-junit-platform</artifactId>
+                            <version>${version.surefire}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -746,6 +766,7 @@
                             <includedLicense>BSD-3-Clause</includedLicense>
                             <includedLicense>CDDL-1.1</includedLicense>
                             <includedLicense>EPL-1.0</includedLicense>
+                            <includedLicense>EPL-2.0</includedLicense>
                             <includedLicense>GPL-2.0-with-classpath-exception</includedLicense>
                             <includedLicense>LGPL-3.0+</includedLicense>
                             <includedLicense>MIT</includedLicense>
@@ -762,6 +783,7 @@
                                 | Apache 2.0
                                 | Apache License 2.0
                                 | Apache License, Version 2.0
+                                | The Apache License, Version 2.0
                                 | The Apache Software License, Version 2.0
                             </licenseMerge>
                             <licenseMerge>
@@ -777,6 +799,10 @@
                             <licenseMerge>
                                 EPL-1.0
                                 | Eclipse Public License 1.0
+                            </licenseMerge>
+                            <licenseMerge>
+                                EPL-2.0
+                                | Eclipse Public License v2.0
                             </licenseMerge>
                             <licenseMerge>
                                 GPL-2.0-with-classpath-exception
@@ -1035,12 +1061,14 @@
                                       -XepAllDisabledChecksAsWarnings
                                       <!-- We don't target Android. -->
                                       -Xep:AndroidJdkLibsChecker:OFF
+                                      <!-- XXX: Enable this once we open-source this library. -->
+                                      -Xep:BetaApi:OFF
                                       <!-- We don't target JDK 7. -->
                                       -Xep:Java7ApiChecker:OFF
                                       <!-- See https://github.com/google/error-prone/issues/1138. -->
                                       -Xep:NullableDereference:OFF
-                                      <!-- XXX: Enable this once we open-source this library. -->
-                                      -Xep:BetaApi:OFF
+                                      <!-- We don't target Android. -->
+                                      -Xep:StaticOrDefaultInterfaceMethod:OFF
                                       -XepOpt:NullAway:AnnotatedPackages=tech.picnic
                                       -XepOpt:NullAway:CheckOptionalEmptiness=true
                                 </arg>

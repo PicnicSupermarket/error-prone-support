@@ -1,6 +1,9 @@
 package tech.picnic.errorprone.refaster.plugin;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimaps;
 import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.refaster.RefasterRuleBuilderScanner;
@@ -14,14 +17,16 @@ import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Symbol.PackageSymbol;
 import com.sun.tools.javac.main.JavaCompiler;
 import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.Name;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.UncheckedIOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
@@ -52,15 +57,13 @@ final class RefasterRuleResourceCompilerTaskListener implements TaskListener {
       return;
     }
 
-    ImmutableList<CodeTransformer> rules = compileRefasterTemplates(tree);
-    if (rules.isEmpty()) {
-      return;
-    }
-
-    try {
-      outputCodeTransformers(rules, getOutputFile(taskEvent, tree));
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
+    ImmutableListMultimap<ClassTree, CodeTransformer> rules = compileRefasterTemplates(tree);
+    for (Map.Entry<ClassTree, List<CodeTransformer>> rule : Multimaps.asMap(rules).entrySet()) {
+      try {
+        outputCodeTransformers(rule.getValue(), getOutputFile(taskEvent, rule.getKey()));
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
     }
   }
 
@@ -82,16 +85,17 @@ final class RefasterRuleResourceCompilerTaskListener implements TaskListener {
         }.scan(tree, null));
   }
 
-  private ImmutableList<CodeTransformer> compileRefasterTemplates(ClassTree tree) {
-    List<CodeTransformer> rules = new ArrayList<>();
+  private ImmutableListMultimap<ClassTree, CodeTransformer> compileRefasterTemplates(
+      ClassTree tree) {
+    ListMultimap<ClassTree, CodeTransformer> rules = ArrayListMultimap.create();
     new TreeScanner<Void, Context>() {
       @Override
       public Void visitClass(ClassTree node, Context ctx) {
-        rules.addAll(RefasterRuleBuilderScanner.extractRules(node, ctx));
+        rules.putAll(node, RefasterRuleBuilderScanner.extractRules(node, ctx));
         return super.visitClass(node, ctx);
       }
     }.scan(tree, context);
-    return ImmutableList.copyOf(rules);
+    return ImmutableListMultimap.copyOf(rules);
   }
 
   private FileObject getOutputFile(TaskEvent taskEvent, ClassTree tree) throws IOException {
@@ -100,15 +104,25 @@ final class RefasterRuleResourceCompilerTaskListener implements TaskListener {
             .map(ASTHelpers::enclosingPackage)
             .map(PackageSymbol::toString)
             .orElse("");
-    String relativeName = tree.getSimpleName() + ".refaster";
+    CharSequence className =
+        Optional.ofNullable(ASTHelpers.getSymbol(tree))
+            .map(RefasterRuleResourceCompilerTaskListener::toSimpleFlatName)
+            .orElseGet(tree::getSimpleName);
+    String relativeName = className + ".refaster";
 
     JavaFileManager fileManager = context.get(JavaFileManager.class);
     return fileManager.getFileForOutput(
         StandardLocation.CLASS_OUTPUT, packageName, relativeName, taskEvent.getSourceFile());
   }
 
-  private static void outputCodeTransformers(
-      ImmutableList<CodeTransformer> rules, FileObject target) throws IOException {
+  private static CharSequence toSimpleFlatName(ClassSymbol classSymbol) {
+    Name flatName = classSymbol.flatName();
+    int lastDot = flatName.lastIndexOf((byte) '.');
+    return lastDot < 0 ? flatName : flatName.subSequence(lastDot + 1, flatName.length());
+  }
+
+  private static void outputCodeTransformers(List<CodeTransformer> rules, FileObject target)
+      throws IOException {
     try (ObjectOutputStream output = new ObjectOutputStream(target.openOutputStream())) {
       output.writeObject(CompositeCodeTransformer.compose(rules));
     }

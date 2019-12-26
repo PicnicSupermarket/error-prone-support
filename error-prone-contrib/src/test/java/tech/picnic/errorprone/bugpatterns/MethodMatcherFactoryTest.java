@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static org.junit.Assert.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
@@ -13,11 +13,8 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 
-@RunWith(JUnit4.class)
 public final class MethodMatcherFactoryTest {
   /** A {@link BugChecker} which flags method invocations matched by {@link #TEST_MATCHER}. */
   @BugPattern(
@@ -52,15 +49,14 @@ public final class MethodMatcherFactoryTest {
   @Test
   public void testCreateWithMalformedSignatures() {
     MethodMatcherFactory factory = new MethodMatcherFactory();
-    assertThrows(IllegalArgumentException.class, () -> factory.create(ImmutableList.of("foo.bar")));
-    assertThrows(
-        IllegalArgumentException.class, () -> factory.create(ImmutableList.of("foo.bar#baz")));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> factory.create(ImmutableList.of("a", "foo.bar#baz()")));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> factory.create(ImmutableList.of("foo.bar#baz()", "a")));
+    assertThatThrownBy(() -> factory.create(ImmutableList.of("foo.bar")))
+        .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> factory.create(ImmutableList.of("foo.bar#baz")))
+        .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> factory.create(ImmutableList.of("a", "foo.bar#baz()")))
+        .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> factory.create(ImmutableList.of("foo.bar#baz()", "a")))
+        .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test

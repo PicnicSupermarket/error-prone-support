@@ -4,11 +4,13 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableRangeSet.toImmutableRangeSet;
 
 import com.google.auto.service.AutoService;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableRangeSet;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.RangeSet;
-import com.google.common.collect.Streams;
 import com.google.common.collect.TreeRangeSet;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ResourceInfo;
@@ -35,6 +37,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -145,13 +148,37 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   }
 
   private static CodeTransformer loadCompositeCodeTransformer(ErrorProneFlags flags) {
-    Optional<Pattern> nameFilter = flags.get(INCLUDED_TEMPLATES_PATTERN_FLAG).map(Pattern::compile);
+    ImmutableListMultimap<String, CodeTransformer> allTransformers = loadAllCodeTransformers();
     return CompositeCodeTransformer.compose(
-        getClassPathResources().stream()
-            .filter(resource -> shouldLoad(resource, nameFilter))
-            .map(RefasterCheck::loadCodeTransformer)
-            .flatMap(Streams::stream)
-            .collect(toImmutableList()));
+        flags
+            .get(INCLUDED_TEMPLATES_PATTERN_FLAG)
+            .map(Pattern::compile)
+            .map(nameFilter -> filterCodeTransformers(allTransformers, nameFilter))
+            .orElseGet(allTransformers::values));
+  }
+
+  private static ImmutableCollection<CodeTransformer> filterCodeTransformers(
+      ImmutableListMultimap<String, CodeTransformer> transformers, Pattern nameFilter) {
+    return transformers.entries().stream()
+        .filter(e -> nameFilter.matcher(e.getKey()).matches())
+        .map(Map.Entry::getValue)
+        .collect(toImmutableList());
+  }
+
+  @VisibleForTesting
+  static ImmutableListMultimap<String, CodeTransformer> loadAllCodeTransformers() {
+    ImmutableListMultimap.Builder<String, CodeTransformer> transformers =
+        ImmutableListMultimap.builder();
+
+    for (ResourceInfo resource : getClassPathResources()) {
+      Matcher matcher = REFASTER_TEMPLATE_RESOURCE.matcher(resource.getResourceName());
+      if (matcher.matches()) {
+        loadCodeTransformer(resource)
+            .ifPresent(transformer -> transformers.put(matcher.group(1), transformer));
+      }
+    }
+
+    return transformers.build();
   }
 
   private static ImmutableSet<ResourceInfo> getClassPathResources() {
@@ -160,12 +187,6 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
     } catch (IOException e) {
       throw new IllegalStateException("Failed to scan classpath for resources", e);
     }
-  }
-
-  private static boolean shouldLoad(ResourceInfo resource, Optional<Pattern> nameFilter) {
-    Matcher matcher = REFASTER_TEMPLATE_RESOURCE.matcher(resource.getResourceName());
-    return matcher.matches()
-        && nameFilter.filter(filter -> !filter.matcher(matcher.group(1)).matches()).isEmpty();
   }
 
   private static Optional<CodeTransformer> loadCodeTransformer(ResourceInfo resource) {
