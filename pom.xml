@@ -69,7 +69,7 @@
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.javadoc>3.1.1</version.javadoc>
         <version.jdk>11</version.jdk>
-        <version.maven>3.6.0</version.maven>
+        <version.maven>3.6.3</version.maven>
         <version.nullaway>0.7.9</version.nullaway>
         <version.surefire>2.22.2</version.surefire>
         <!-- Our build system (Travis CI) provides a monotonically increasing
@@ -221,19 +221,19 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.29</version>
+                <version>1.7.30</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>4.3.24.RELEASE</version>
+                <version>5.2.2.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>6.14.3</version>
+                <version>7.1.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -549,7 +549,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M2</version>
+                    <version>3.0.0-M3</version>
                     <executions>
                         <execution>
                             <id>apply-enforcement-rules</id>
@@ -669,7 +669,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.2.1</version>
                     <executions>
                         <execution>
                             <id>generate-source-jar</id>
@@ -749,6 +749,7 @@
                             <includedLicense>GPL-2.0-with-classpath-exception</includedLicense>
                             <includedLicense>LGPL-3.0+</includedLicense>
                             <includedLicense>MIT</includedLicense>
+                            <includedLicense>Public Domain</includedLicense>
                         </includedLicenses>
                         <licenseMerges>
                             <!-- License aliases. Each section corresponds to a
@@ -878,9 +879,6 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <mutators>
-                            <mutator>ALL</mutator>
-                        </mutators>
                         <!-- Use multple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->

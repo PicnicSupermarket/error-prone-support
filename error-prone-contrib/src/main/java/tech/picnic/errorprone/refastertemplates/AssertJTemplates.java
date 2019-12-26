@@ -107,7 +107,8 @@ import org.assertj.core.api.OptionalLongAssert;
 // methods instead. (Also in the TestNG migration.)
 //      ^ Also for `Tuple`!
 // XXX: Use `assertThatIllegalArgumentException` and variants.
-// XXX: `assertThatCode(x).isInstanceOf(clazz)` -> `assertThatThrownBy(x).isInstanceOf(clazz)` (etc.)
+// XXX: `assertThatCode(x).isInstanceOf(clazz)` -> `assertThatThrownBy(x).isInstanceOf(clazz)`
+// (etc.)
 // XXX: Look into using Assertions#contentOf(URL url, Charset charset) instead of our own test
 // method.
 // XXX: Write Optional templates also for `OptionalInt` and variants.
