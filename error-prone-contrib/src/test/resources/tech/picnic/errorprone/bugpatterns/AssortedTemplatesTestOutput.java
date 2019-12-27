@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Sets.toImmutableEnumSet;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -28,6 +29,7 @@ final class AssortedTemplatesTest implements RefasterTemplateTestCase {
         Iterables.class,
         Preconditions.class,
         Sets.class,
+        Splitter.class,
         Streams.class,
         (Runnable) () -> toImmutableSet());
   }
@@ -84,5 +86,11 @@ final class AssortedTemplatesTest implements RefasterTemplateTestCase {
 
   Stream<Integer> testMapValueStream() {
     return ImmutableMap.of("foo", 1).values().stream();
+  }
+
+  ImmutableSet<Stream<String>> testSplitToStream() {
+    return ImmutableSet.of(
+        Splitter.on(':').splitToStream("foo"),
+        Splitter.on(',').splitToStream(new StringBuilder("bar")));
   }
 }

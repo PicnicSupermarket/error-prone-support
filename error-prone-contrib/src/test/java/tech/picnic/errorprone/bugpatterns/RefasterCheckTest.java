@@ -112,6 +112,8 @@ public final class RefasterCheckTest {
   @MethodSource("templatesUnderTest")
   public void testCoverage(String group, String template) {
     assertThatThrownBy(() -> verifyRefactoring(group, namePattern(group, template)))
+        .withFailMessage(
+            "Template %s does not affect the tests for group %s; is it tested?", template, group)
         .isInstanceOf(AssertionError.class)
         .hasMessageFindingMatch("^(diff|expected):");
   }

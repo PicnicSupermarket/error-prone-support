@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refastertemplates;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
@@ -200,5 +201,18 @@ final class AssortedTemplates {
     }
   }
 
-  // XXX: Add a rule for `comparing(identity())` -> `naturalOrder()`.
+  /** Prefer {@link Splitter#splitToStream(CharSequence)} over less efficient alternatives. */
+  static final class SplitToStream {
+    @BeforeTemplate
+    Stream<String> before(Splitter splitter, CharSequence charSequence) {
+      return Refaster.anyOf(
+          Streams.stream(splitter.split(charSequence)),
+          splitter.splitToList(charSequence).stream());
+    }
+
+    @AfterTemplate
+    Stream<String> after(Splitter splitter, CharSequence charSequence) {
+      return splitter.splitToStream(charSequence);
+    }
+  }
 }
