@@ -46,6 +46,7 @@ public final class RefasterCheckTest {
           "Null",
           "Optional",
           "Primitive",
+          "RxJava2Adapter",
           "Stream",
           "String",
           "TestNGToAssertJ",

@@ -194,6 +194,18 @@
                 <version>${version.nullaway}</version>
             </dependency>
             <dependency>
+                <groupId>io.projectreactor</groupId>
+                <artifactId>reactor-bom</artifactId>
+                <version>Dysprosium-SR2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.reactivex.rxjava2</groupId>
+                <artifactId>rxjava</artifactId>
+                <version>2.2.16</version>
+            </dependency>
+            <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-annotations</artifactId>
                 <version>1.6.0</version>
@@ -764,6 +776,7 @@
                             artifacts (i.e. web services). -->
                             <includedLicense>Apache-2.0</includedLicense>
                             <includedLicense>BSD-3-Clause</includedLicense>
+                            <includedLicense>CC0-1.0</includedLicense>
                             <includedLicense>CDDL-1.1</includedLicense>
                             <includedLicense>EPL-1.0</includedLicense>
                             <includedLicense>EPL-2.0</includedLicense>
@@ -790,6 +803,10 @@
                                 BSD-3-Clause
                                 | 3-Clause BSD License
                                 | New BSD License
+                            </licenseMerge>
+                            <licenseMerge>
+                                CC0-1.0
+                                | CC0
                             </licenseMerge>
                             <licenseMerge>
                                 CDDL-1.1
