@@ -7,6 +7,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,14 +19,17 @@ final class RxJava2AdapterTemplatesTest implements RefasterTemplateTestCase {
         Completable.complete().to(RxJava2Adapter::completableToMono));
   }
 
-  ImmutableSet<Flux<Integer>> testFlowableToFlux() {
+  ImmutableSet<Publisher<Integer>> testFlowableToFlux() {
     return ImmutableSet.of(
         RxJava2Adapter.flowableToFlux(Flowable.just(1)),
-        Flowable.just(2).to(RxJava2Adapter::flowableToFlux));
+        Flowable.just(2).compose(RxJava2Adapter::flowableToFlux),
+        Flowable.just(3).to(RxJava2Adapter::flowableToFlux));
   }
 
-  Flowable<String> testFluxToFlowable() {
-    return RxJava2Adapter.fluxToFlowable(Flux.just("foo"));
+  ImmutableSet<Publisher<String>> testFluxToFlowable() {
+    return ImmutableSet.of(
+        RxJava2Adapter.fluxToFlowable(Flux.just("foo")),
+        Flux.just("bar").transform(RxJava2Adapter::fluxToFlowable));
   }
 
   Observable<Integer> testFluxToObservable() {
@@ -42,8 +46,10 @@ final class RxJava2AdapterTemplatesTest implements RefasterTemplateTestCase {
     return RxJava2Adapter.monoToCompletable(Mono.empty());
   }
 
-  Flowable<Integer> testMonoToFlowable() {
-    return RxJava2Adapter.monoToFlowable(Mono.just(1));
+  ImmutableSet<Publisher<Integer>> testMonoToFlowable() {
+    return ImmutableSet.of(
+        RxJava2Adapter.monoToFlowable(Mono.just(1)),
+        Mono.just(2).transform(RxJava2Adapter::monoToFlowable));
   }
 
   Maybe<String> testMonoToMaybe() {

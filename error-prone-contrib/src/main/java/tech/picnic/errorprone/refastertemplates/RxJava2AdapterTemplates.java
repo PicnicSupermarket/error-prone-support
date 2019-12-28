@@ -9,6 +9,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,9 +36,11 @@ final class RxJava2AdapterTemplates {
   /** Use the fluent API style when using {@link RxJava2Adapter#flowableToFlux}. */
   static final class FlowableToFlux<T> {
     @BeforeTemplate
-    Flux<T> before(Flowable<T> flowable) {
+    Publisher<T> before(Flowable<T> flowable) {
       return Refaster.anyOf(
-          RxJava2Adapter.flowableToFlux(flowable), flowable.to(RxJava2Adapter::flowableToFlux));
+          RxJava2Adapter.flowableToFlux(flowable),
+          flowable.compose(RxJava2Adapter::flowableToFlux),
+          flowable.to(RxJava2Adapter::flowableToFlux));
     }
 
     @AfterTemplate
@@ -49,8 +52,9 @@ final class RxJava2AdapterTemplates {
   /** Use the fluent API style when using {@link RxJava2Adapter#fluxToFlowable}. */
   static final class FluxToFlowable<T> {
     @BeforeTemplate
-    Flowable<T> before(Flux<T> flux) {
-      return RxJava2Adapter.fluxToFlowable(flux);
+    Publisher<T> before(Flux<T> flux) {
+      return Refaster.anyOf(
+          RxJava2Adapter.fluxToFlowable(flux), flux.transform(RxJava2Adapter::fluxToFlowable));
     }
 
     @AfterTemplate
@@ -102,8 +106,9 @@ final class RxJava2AdapterTemplates {
   /** Use the fluent API style when using {@link RxJava2Adapter#monoToFlowable}. */
   static final class MonoToFlowable<T> {
     @BeforeTemplate
-    Flowable<T> before(Mono<T> mono) {
-      return RxJava2Adapter.monoToFlowable(mono);
+    Publisher<T> before(Mono<T> mono) {
+      return Refaster.anyOf(
+          RxJava2Adapter.monoToFlowable(mono), mono.transform(RxJava2Adapter::monoToFlowable));
     }
 
     @AfterTemplate
