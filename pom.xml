@@ -39,8 +39,8 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:PicnicSupermarket/error-prone-support.git</developerConnection>
-        <url>https://github.com/PicnicSupermarket/error-prone-support</url>
         <tag>HEAD</tag>
+        <url>https://github.com/PicnicSupermarket/error-prone-support</url>
     </scm>
     <issueManagement>
         <system>Github</system>
@@ -51,39 +51,25 @@
         <url>https://travis-ci.org/PicnicSupermarket/error-prone-support</url>
     </ciManagement>
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.auto-service>1.0-rc6</version.auto-service>
-        <version.error-prone>2.3.4</version.error-prone>
-        <version.error-prone-javac>9+181-r4173-1</version.error-prone-javac>
-        <version.guava-beta-checker>1.0</version.guava-beta-checker>
-        <version.javadoc>3.1.1</version.javadoc>
-        <version.jdk>11</version.jdk>
-        <version.maven>3.6.3</version.maven>
-        <version.nullaway>0.7.9</version.nullaway>
-        <version.surefire>2.22.2</version.surefire>
-        <!-- Our build system (Travis CI) provides a monotonically increasing
-        build number. When building locally, this number is obviously absent.
-        So we provide a default value. -->
-        <build.number>LOCAL</build.number>
         <!-- Arguments to the JVMs forked by Surefire. The specification of
         this 'argLine' property instead of the definition of the 'argLine'
         configuration setting allows users or plugins to specify additional
         arguments. In particular, JaCoCo relies on this for the configuration
         of its Java agent. -->
-        <argLine><!--
-            The test JVMs are short-running. By disabling certain expensive JIT
-            optimizations we actually speed up most tests. -->
+        <argLine>
+            <!-- The test JVMs are short-running. By disabling certain
+            expensive JIT optimizations we actually speed up most tests. -->
             -XX:TieredStopAtLevel=1
             <!-- We cap memory usage. This is especially relevant on Travis CI,
             but locally this should also be more than enough. -->
@@ -106,6 +92,23 @@
             from showing up in the dock and capturing window focus. -->
             -Djava.awt.headless=true
         </argLine>
+        <!-- Our build system (Travis CI) provides a monotonically increasing
+        build number. When building locally, this number is obviously absent.
+        So we provide a default value. -->
+        <build.number>LOCAL</build.number>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Dependency and plugin versions that are referenced in more than
+        one place. We use these to keep dependencies in sync. Version numbers
+        that need to be referenced only once should *not* be listed here. -->
+        <version.auto-service>1.0-rc6</version.auto-service>
+        <version.error-prone>2.3.4</version.error-prone>
+        <version.error-prone-javac>9+181-r4173-1</version.error-prone-javac>
+        <version.guava-beta-checker>1.0</version.guava-beta-checker>
+        <version.javadoc>3.1.1</version.javadoc>
+        <version.jdk>11</version.jdk>
+        <version.maven>3.6.3</version.maven>
+        <version.nullaway>0.7.9</version.nullaway>
+        <version.surefire>2.22.2</version.surefire>
     </properties>
 
     <dependencyManagement>
@@ -167,19 +170,19 @@
                 <artifactId>javac</artifactId>
                 <version>${version.error-prone-javac}</version>
             </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava-bom</artifactId>
-                <version>28.2-jre</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-beta-checker</artifactId>
                 <version>${version.guava-beta-checker}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava-bom</artifactId>
+                <version>28.2-jre</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.google.truth</groupId>
@@ -269,37 +272,61 @@
                     <groupId>com.coveo</groupId>
                     <artifactId>fmt-maven-plugin</artifactId>
                     <version>2.9</version>
+                    <executions>
+                        <execution>
+                            <id>check-source-format</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.ekryd.sortpom</groupId>
+                    <artifactId>sortpom-maven-plugin</artifactId>
+                    <version>2.8.0</version>
+                    <configuration>
+                        <createBackupFile>false</createBackupFile>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <expandEmptyElements>false</expandEmptyElements>
+                        <nrOfIndentSpace>4</nrOfIndentSpace>
+                        <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
+                        <sortDependencies>groupId,artifactId</sortDependencies>
+                        <sortModules>true</sortModules>
+                        <sortPlugins>groupId,artifactId</sortPlugins>
+                        <sortProperties>true</sortProperties>
+                        <verifyFail>warn</verifyFail>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                            <phase>verify</phase>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>com.lewisd</groupId>
                     <artifactId>lint-maven-plugin</artifactId>
                     <version>0.0.11</version>
-                    <executions>
-                        <execution>
-                            <id>validate-pom</id>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <configuration>
                         <failOnViolation>false</failOnViolation>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>validate-pom</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <phase>validate</phase>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
                     <version>2.7</version>
-                    <executions>
-                        <execution>
-                            <id>detect-forbidden-api-usage</id>
-                            <goals>
-                                <goal>check</goal>
-                                <goal>testCheck</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <configuration>
                         <bundledSignatures>
                             <bundledSignature>jdk-internal</bundledSignature>
@@ -333,6 +360,15 @@
                         <failOnViolation>false</failOnViolation>
                         <targetVersion>${version.jdk}</targetVersion>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>detect-forbidden-api-usage</id>
+                            <goals>
+                                <goal>check</goal>
+                                <goal>testCheck</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>io.takari</groupId>
@@ -346,14 +382,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>3.1.0</version>
-                    <executions>
-                        <execution>
-                            <id>run-checkstyle</id>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <configuration>
                         <checkstyleRules>
                             <!-- We only enable rules that are not enforced by
@@ -509,6 +537,14 @@
                             <version>8.27</version>
                         </dependency>
                     </dependencies>
+                    <executions>
+                        <execution>
+                            <id>run-checkstyle</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -574,14 +610,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
                     <version>3.0.0-M3</version>
-                    <executions>
-                        <execution>
-                            <id>apply-enforcement-rules</id>
-                            <goals>
-                                <goal>enforce</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <configuration>
                         <fail>false</fail>
                         <rules>
@@ -605,6 +633,14 @@
                             <version>1.2</version>
                         </dependency>
                     </dependencies>
+                    <executions>
+                        <execution>
+                            <id>apply-enforcement-rules</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -628,14 +664,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.2.0</version>
-                    <executions>
-                        <execution>
-                            <id>create-test-jar</id>
-                            <goals>
-                                <goal>test-jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <configuration>
                         <skipIfEmpty>true</skipIfEmpty>
                         <archive>
@@ -649,6 +677,14 @@
                             </manifestEntries>
                         </archive>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>create-test-jar</id>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -657,10 +693,10 @@
                     <executions>
                         <execution>
                             <id>generate-javadoc-jar</id>
-                            <phase>verify</phase>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
+                            <phase>verify</phase>
                         </execution>
                     </executions>
                 </plugin>
@@ -697,10 +733,10 @@
                     <executions>
                         <execution>
                             <id>generate-source-jar</id>
-                            <phase>verify</phase>
                             <goals>
                                 <goal>jar-no-fork</goal>
                             </goals>
+                            <phase>verify</phase>
                         </execution>
                     </executions>
                 </plugin>
@@ -713,11 +749,9 @@
                             <include>**/*Test.java</include>
                         </includes>
                         <properties>
-                            <configurationParameters>
-                                junit.jupiter.execution.parallel.config.strategy=dynamic
+                            <configurationParameters>junit.jupiter.execution.parallel.config.strategy=dynamic
                                 junit.jupiter.execution.parallel.enabled=true
-                                junit.jupiter.execution.parallel.mode.default = concurrent
-                            </configurationParameters>
+                                junit.jupiter.execution.parallel.mode.default = concurrent</configurationParameters>
                         </properties>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <trimStackTrace>false</trimStackTrace>
@@ -738,19 +772,19 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
                     <version>1.4</version>
-                    <executions>
-                        <execution>
-                            <id>determine-build-number</id>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>create</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <configuration>
                         <buildNumberPropertyName>build.revision</buildNumberPropertyName>
                         <revisionOnScmFailure>UNKNOWN</revisionOnScmFailure>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>determine-build-number</id>
+                            <goals>
+                                <goal>create</goal>
+                            </goals>
+                            <phase>validate</phase>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -797,6 +831,7 @@
                             were) declared by one or more third-party
                             dependencies. -->
                             <licenseMerge>
+                                <!-- -->
                                 Apache-2.0
                                 | Apache 2.0
                                 | Apache License 2.0
@@ -805,28 +840,34 @@
                                 | The Apache Software License, Version 2.0
                             </licenseMerge>
                             <licenseMerge>
+                                <!-- -->
                                 BSD-3-Clause
                                 | 3-Clause BSD License
                                 | New BSD License
                             </licenseMerge>
                             <licenseMerge>
+                                <!-- -->
                                 CC0-1.0
                                 | CC0
                             </licenseMerge>
                             <licenseMerge>
+                                <!-- -->
                                 CDDL-1.1
                                 | CDDL 1.1
                                 | Dual license consisting of the CDDL v1.1 and GPL v2
                             </licenseMerge>
                             <licenseMerge>
+                                <!-- -->
                                 EPL-1.0
                                 | Eclipse Public License 1.0
                             </licenseMerge>
                             <licenseMerge>
+                                <!-- -->
                                 EPL-2.0
                                 | Eclipse Public License v2.0
                             </licenseMerge>
                             <licenseMerge>
+                                <!-- -->
                                 GPL-2.0-with-classpath-exception
                                 | CDDL/GPLv2+CE
                                 | GNU General Public License, version 2 (GPL2), with the classpath exception
@@ -834,10 +875,12 @@
                                 | GPL2 w/ CPE
                             </licenseMerge>
                             <licenseMerge>
+                                <!-- -->
                                 LGPL-3.0+
                                 | GNU Lesser Public License
                             </licenseMerge>
                             <licenseMerge>
+                                <!-- -->
                                 MIT
                                 | MIT license
                                 | MIT License
@@ -881,15 +924,6 @@
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
                     <version>2.0.0</version>
-                    <executions>
-                        <execution>
-                            <id>modernize</id>
-                            <phase>process-test-classes</phase>
-                            <goals>
-                                <goal>modernizer</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <configuration>
                         <exclusionPatterns>
                             <!-- The plugin suggests replacing Guava's
@@ -908,6 +942,15 @@
                         </ignorePackages>
                         <javaVersion>${version.jdk}</javaVersion>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>modernize</id>
+                            <goals>
+                                <goal>modernizer</goal>
+                            </goals>
+                            <phase>process-test-classes</phase>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -918,14 +961,6 @@
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
                     <version>1.4.10</version>
-                    <executions>
-                        <execution>
-                            <id>compute-mutation-coverage</id>
-                            <goals>
-                                <goal>mutationCoverage</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <configuration>
                         <!-- Use multple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
@@ -941,6 +976,14 @@
                             <version>0.11</version>
                         </dependency>
                     </dependencies>
+                    <executions>
+                        <execution>
+                            <id>compute-mutation-coverage</id>
+                            <goals>
+                                <goal>mutationCoverage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
@@ -976,19 +1019,6 @@
             </build>
         </profile>
         <profile>
-            <!-- If explicitly enabled using `-Pformat` the source code is
-            formatted. -->
-            <id>format</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.coveo</groupId>
-                        <artifactId>fmt-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <!-- By default we verify various aspects of a module and the
             artifact(s) it produces. We define these checks in a profile so
             that they can be disabled during development. -->
@@ -1003,14 +1033,10 @@
                     <plugin>
                         <groupId>com.coveo</groupId>
                         <artifactId>fmt-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>check-source-format</id>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
-                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.ekryd.sortpom</groupId>
+                        <artifactId>sortpom-maven-plugin</artifactId>
                     </plugin>
                     <plugin>
                         <groupId>com.lewisd</groupId>
@@ -1027,21 +1053,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>default-testCompile</id>
-                                <phase>test-compile</phase>
-                                <goals>
-                                    <goal>testCompile</goal>
-                                </goals>
-                                <configuration>
-                                    <compilerArgs combine.children="append">
-                                        <!-- Test code doesn't require Javadoc. -->
-                                        <arg>-Xdoclint:-missing</arg>
-                                    </compilerArgs>
-                                </configuration>
-                            </execution>
-                        </executions>
                         <configuration>
                             <annotationProcessorPaths combine.children="append">
                                 <path>
@@ -1084,22 +1095,23 @@
                                 https://github.com/google/error-prone/pull/1115. -->
                                 <arg>
                                     -Xplugin:ErrorProne
-                                      <!-- We want to enable almost all Error
-                                      Prone bug pattern checkers, so we enable
-                                      all and then selectively deactivate some. -->
-                                      -XepAllDisabledChecksAsWarnings
-                                      <!-- We don't target Android. -->
-                                      -Xep:AndroidJdkLibsChecker:OFF
-                                      <!-- XXX: Enable this once we open-source this library. -->
-                                      -Xep:BetaApi:OFF
-                                      <!-- We don't target JDK 7. -->
-                                      -Xep:Java7ApiChecker:OFF
-                                      <!-- See https://github.com/google/error-prone/issues/1138. -->
-                                      -Xep:NullableDereference:OFF
-                                      <!-- We don't target Android. -->
-                                      -Xep:StaticOrDefaultInterfaceMethod:OFF
-                                      -XepOpt:NullAway:AnnotatedPackages=tech.picnic
-                                      -XepOpt:NullAway:CheckOptionalEmptiness=true
+                                    <!-- We want to enable almost all Error
+                                    Prone bug pattern checkers, so we enable
+                                    all and then selectively deactivate some. -->
+                                    -XepAllDisabledChecksAsWarnings
+                                    <!-- We don't target Android. -->
+                                    -Xep:AndroidJdkLibsChecker:OFF
+                                    <!-- XXX: Enable this once we open-source
+                                    this library. -->
+                                    -Xep:BetaApi:OFF
+                                    <!-- We don't target JDK 7. -->
+                                    -Xep:Java7ApiChecker:OFF
+                                    <!-- See https://github.com/google/error-prone/issues/1138. -->
+                                    -Xep:NullableDereference:OFF
+                                    <!-- We don't target Android. -->
+                                    -Xep:StaticOrDefaultInterfaceMethod:OFF
+                                    -XepOpt:NullAway:AnnotatedPackages=tech.picnic
+                                    -XepOpt:NullAway:CheckOptionalEmptiness=true
                                 </arg>
                                 <!-- The Error Prone plugin makes certain
                                 assumptions about the state of the AST at the
@@ -1111,6 +1123,21 @@
                             </compilerArgs>
                             <showWarnings>true</showWarnings>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <id>default-testCompile</id>
+                                <goals>
+                                    <goal>testCompile</goal>
+                                </goals>
+                                <phase>test-compile</phase>
+                                <configuration>
+                                    <compilerArgs combine.children="append">
+                                        <!-- Test code doesn't require Javadoc. -->
+                                        <arg>-Xdoclint:-missing</arg>
+                                    </compilerArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -1118,12 +1145,12 @@
                         <executions>
                             <execution>
                                 <id>analyze-dependencies</id>
-                                <phase>process-test-classes</phase>
                                 <goals>
                                     <goal>analyze-dep-mgt</goal>
                                     <goal>analyze-duplicate</goal>
                                     <goal>analyze-only</goal>
                                 </goals>
+                                <phase>process-test-classes</phase>
                             </execution>
                         </executions>
                     </plugin>
@@ -1164,6 +1191,13 @@
             <build>
                 <pluginManagement>
                     <plugins>
+                        <plugin>
+                            <groupId>com.github.ekryd.sortpom</groupId>
+                            <artifactId>sortpom-maven-plugin</artifactId>
+                            <configuration>
+                                <verifyFail>stop</verifyFail>
+                            </configuration>
+                        </plugin>
                         <plugin>
                             <groupId>com.lewisd</groupId>
                             <artifactId>lint-maven-plugin</artifactId>
@@ -1271,10 +1305,12 @@
                     because it must be executed after the
                     `maven-javadoc-plugin`; otherwise not all artifacts will be
                     signed. -->
+                    <?SORTPOM IGNORE?>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                     </plugin>
+                    <?SORTPOM RESUME?>
                 </plugins>
             </build>
         </profile>

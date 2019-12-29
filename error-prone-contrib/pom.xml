@@ -15,17 +15,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-resource-compiler</artifactId>
             <!-- This dependency is declared only as a hint to Maven that
             compilation depends on it; see the `maven-compiler-plugin`'s
             `annotationProcessorPaths` configuration below. -->
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>
