@@ -21,19 +21,25 @@ final class RxJava2AdapterTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableSet<Publisher<Integer>> testFlowableToFlux() {
     return ImmutableSet.of(
-        RxJava2Adapter.flowableToFlux(Flowable.just(1)),
-        Flowable.just(2).compose(RxJava2Adapter::flowableToFlux),
-        Flowable.just(3).to(RxJava2Adapter::flowableToFlux));
+        Flowable.just(1).compose(Flux::from),
+        Flowable.just(2).to(Flux::from),
+        Flowable.just(3).as(Flux::from),
+        RxJava2Adapter.flowableToFlux(Flowable.just(4)),
+        Flowable.just(5).compose(RxJava2Adapter::flowableToFlux),
+        Flowable.just(6).to(RxJava2Adapter::flowableToFlux));
   }
 
   ImmutableSet<Publisher<String>> testFluxToFlowable() {
     return ImmutableSet.of(
-        RxJava2Adapter.fluxToFlowable(Flux.just("foo")),
-        Flux.just("bar").transform(RxJava2Adapter::fluxToFlowable));
+        Flux.just("foo").transform(Flowable::fromPublisher),
+        Flux.just("bar").as(Flowable::fromPublisher),
+        RxJava2Adapter.fluxToFlowable(Flux.just("baz")),
+        Flux.just("qux").transform(RxJava2Adapter::fluxToFlowable));
   }
 
-  Observable<Integer> testFluxToObservable() {
-    return RxJava2Adapter.fluxToObservable(Flux.just(1));
+  ImmutableSet<Observable<Integer>> testFluxToObservable() {
+    return ImmutableSet.of(
+        Flux.just(1).as(Observable::fromPublisher), RxJava2Adapter.fluxToObservable(Flux.just(2)));
   }
 
   ImmutableSet<Mono<String>> testMaybeToMono() {
@@ -42,22 +48,27 @@ final class RxJava2AdapterTemplatesTest implements RefasterTemplateTestCase {
         Maybe.just("bar").to(RxJava2Adapter::maybeToMono));
   }
 
-  Completable testMonoToCompletable() {
-    return RxJava2Adapter.monoToCompletable(Mono.empty());
+  ImmutableSet<Completable> testMonoToCompletable() {
+    return ImmutableSet.of(
+        Mono.empty().as(Completable::fromPublisher),
+        RxJava2Adapter.monoToCompletable(Mono.empty()));
   }
 
   ImmutableSet<Publisher<Integer>> testMonoToFlowable() {
     return ImmutableSet.of(
-        RxJava2Adapter.monoToFlowable(Mono.just(1)),
-        Mono.just(2).transform(RxJava2Adapter::monoToFlowable));
+        Mono.just(1).transform(Flowable::fromPublisher),
+        Mono.just(2).as(Flowable::fromPublisher),
+        RxJava2Adapter.monoToFlowable(Mono.just(3)),
+        Mono.just(4).transform(RxJava2Adapter::monoToFlowable));
   }
 
   Maybe<String> testMonoToMaybe() {
     return RxJava2Adapter.monoToMaybe(Mono.just("foo"));
   }
 
-  Single<Integer> testMonoToSingle() {
-    return RxJava2Adapter.monoToSingle(Mono.just(1));
+  ImmutableSet<Single<Integer>> testMonoToSingle() {
+    return ImmutableSet.of(
+        Mono.just(1).as(Single::fromPublisher), RxJava2Adapter.monoToSingle(Mono.just(2)));
   }
 
   ImmutableSet<Flux<String>> testObservableToFlux() {

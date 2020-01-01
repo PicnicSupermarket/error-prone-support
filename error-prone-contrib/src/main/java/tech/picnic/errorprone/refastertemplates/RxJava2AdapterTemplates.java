@@ -33,11 +33,17 @@ final class RxJava2AdapterTemplates {
     }
   }
 
-  /** Use the fluent API style when using {@link RxJava2Adapter#flowableToFlux}. */
+  /**
+   * Use {@link RxJava2Adapter#flowableToFlux} to convert a {@link Flowable} to a {@link Flux}, and
+   * do so using the fluent API style.
+   */
   static final class FlowableToFlux<T> {
     @BeforeTemplate
     Publisher<T> before(Flowable<T> flowable) {
       return Refaster.anyOf(
+          flowable.compose(Flux::from),
+          flowable.to(Flux::from),
+          flowable.as(Flux::from),
           RxJava2Adapter.flowableToFlux(flowable),
           flowable.compose(RxJava2Adapter::flowableToFlux),
           flowable.to(RxJava2Adapter::flowableToFlux));
@@ -49,12 +55,18 @@ final class RxJava2AdapterTemplates {
     }
   }
 
-  /** Use the fluent API style when using {@link RxJava2Adapter#fluxToFlowable}. */
+  /**
+   * Use {@link RxJava2Adapter#fluxToFlowable} to convert a {@link Flux} to a {@link Flowable}, and
+   * do so using the fluent API style.
+   */
   static final class FluxToFlowable<T> {
     @BeforeTemplate
     Publisher<T> before(Flux<T> flux) {
       return Refaster.anyOf(
-          RxJava2Adapter.fluxToFlowable(flux), flux.transform(RxJava2Adapter::fluxToFlowable));
+          flux.transform(Flowable::fromPublisher),
+          flux.as(Flowable::fromPublisher),
+          RxJava2Adapter.fluxToFlowable(flux),
+          flux.transform(RxJava2Adapter::fluxToFlowable));
     }
 
     @AfterTemplate
@@ -63,11 +75,15 @@ final class RxJava2AdapterTemplates {
     }
   }
 
-  /** Use the fluent API style when using {@link RxJava2Adapter#fluxToObservable}. */
+  /**
+   * Use {@link RxJava2Adapter#fluxToObservable} to convert a {@link Flux} to a {@link Observable},
+   * and do so using the fluent API style.
+   */
   static final class FluxToObservable<T> {
     @BeforeTemplate
     Observable<T> before(Flux<T> flux) {
-      return RxJava2Adapter.fluxToObservable(flux);
+      return Refaster.anyOf(
+          flux.as(Observable::fromPublisher), RxJava2Adapter.fluxToObservable(flux));
     }
 
     @AfterTemplate
@@ -90,11 +106,15 @@ final class RxJava2AdapterTemplates {
     }
   }
 
-  /** Use the fluent API style when using {@link RxJava2Adapter#monoToCompletable}. */
+  /**
+   * Use {@link RxJava2Adapter#monoToCompletable} to convert a {@link Mono} to a {@link
+   * Completable}, and do so using the fluent API style.
+   */
   static final class MonoToCompletable<T> {
     @BeforeTemplate
     Completable before(Mono<T> mono) {
-      return RxJava2Adapter.monoToCompletable(mono);
+      return Refaster.anyOf(
+          mono.as(Completable::fromPublisher), RxJava2Adapter.monoToCompletable(mono));
     }
 
     @AfterTemplate
@@ -103,12 +123,18 @@ final class RxJava2AdapterTemplates {
     }
   }
 
-  /** Use the fluent API style when using {@link RxJava2Adapter#monoToFlowable}. */
+  /**
+   * Use {@link RxJava2Adapter#monoToFlowable} to convert a {@link Mono} to a {@link Flowable}, and
+   * do so using the fluent API style.
+   */
   static final class MonoToFlowable<T> {
     @BeforeTemplate
     Publisher<T> before(Mono<T> mono) {
       return Refaster.anyOf(
-          RxJava2Adapter.monoToFlowable(mono), mono.transform(RxJava2Adapter::monoToFlowable));
+          mono.transform(Flowable::fromPublisher),
+          mono.as(Flowable::fromPublisher),
+          RxJava2Adapter.monoToFlowable(mono),
+          mono.transform(RxJava2Adapter::monoToFlowable));
     }
 
     @AfterTemplate
@@ -130,11 +156,14 @@ final class RxJava2AdapterTemplates {
     }
   }
 
-  /** Use the fluent API style when using {@link RxJava2Adapter#monoToSingle}. */
+  /**
+   * Use {@link RxJava2Adapter#monoToSingle} to convert a {@link Mono} to a {@link Single}, and do
+   * so using the fluent API style.
+   */
   static final class MonoToSingle<T> {
     @BeforeTemplate
     Single<T> before(Mono<T> mono) {
-      return RxJava2Adapter.monoToSingle(mono);
+      return Refaster.anyOf(mono.as(Single::fromPublisher), RxJava2Adapter.monoToSingle(mono));
     }
 
     @AfterTemplate
