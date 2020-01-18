@@ -60,7 +60,7 @@ final class DoubleStreamTemplates {
 
   /** Avoid unnecessary nesting of {@link DoubleStream#filter(DoublePredicate)} operations. */
   abstract static class FilterOuterStreamAfterFlatMapToDouble<T> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
@@ -92,7 +92,7 @@ final class DoubleStreamTemplates {
 
   /** Avoid unnecessary nesting of {@link DoubleStream#map(DoubleUnaryOperator)} operations. */
   abstract static class MapOuterStreamAfterFlatMapToDouble<T> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
@@ -124,7 +124,7 @@ final class DoubleStreamTemplates {
 
   /** Avoid unnecessary nesting of {@link DoubleStream#flatMap(DoubleFunction)} operations. */
   abstract static class FlatMapOuterStreamAfterFlatMapToDouble<T> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate

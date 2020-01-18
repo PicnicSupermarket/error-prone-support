@@ -189,7 +189,7 @@ final class StreamTemplates {
   }
 
   abstract static class StreamNoneMatch2<T> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract boolean test(@MayOptionallyUse T element);
 
     @BeforeTemplate
@@ -233,7 +233,7 @@ final class StreamTemplates {
   }
 
   abstract static class StreamAllMatch2<T> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract boolean test(@MayOptionallyUse T element);
 
     @BeforeTemplate

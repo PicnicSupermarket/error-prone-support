@@ -49,10 +49,7 @@ final class ImmutableSetMultimapTemplatesTest implements RefasterTemplateTestCas
   }
 
   ImmutableSetMultimap<Integer, String> testStreamOfMapEntriesToImmutableSetMultimap() {
-    // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
-    // Looks like a @Placeholder limitation. Try to track down and fix.
-    return Stream.of(1, 2, 3)
-        .collect(toImmutableSetMultimap(n -> Integer.valueOf(n), n -> n.toString()));
+    return Stream.of(1, 2, 3).collect(toImmutableSetMultimap(n -> n, n -> n.toString()));
   }
 
   ImmutableSetMultimap<String, Integer> testTransformMultimapValuesToImmutableSetMultimap() {

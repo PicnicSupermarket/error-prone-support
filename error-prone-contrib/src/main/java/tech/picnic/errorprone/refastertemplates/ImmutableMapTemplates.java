@@ -162,10 +162,10 @@ final class ImmutableMapTemplates {
    * {@link ImmutableMap}. The collection can be performed directly.
    */
   abstract static class StreamOfMapEntriesToImmutableMap<E, K, V> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract K keyFunction(@MayOptionallyUse E element);
 
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract V valueFunction(@MayOptionallyUse E element);
 
     // XXX: We could add variants in which the entry is created some other way, but we have another
@@ -221,7 +221,7 @@ final class ImmutableMapTemplates {
    * com.google.common.base.Function)} over creating and directly collecting a stream.
    */
   abstract static class TransformMapValuesToImmutableMap<K, V1, V2> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract V2 valueTransformation(@MayOptionallyUse V1 value);
 
     // XXX: Instead of `Map.Entry::getKey` we could also match `e -> e.getKey()`. But for some

@@ -81,10 +81,8 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
   }
 
   ImmutableListMultimap<Integer, String> testStreamOfMapEntriesToImmutableListMultimap() {
-    // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
-    // Looks like a @Placeholder limitation. Try to track down and fix.
     return Stream.of(1, 2, 3)
-        .map(n -> Map.entry(Integer.valueOf(n), n.toString()))
+        .map(n -> Map.entry(n, n.toString()))
         .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue));
   }
 

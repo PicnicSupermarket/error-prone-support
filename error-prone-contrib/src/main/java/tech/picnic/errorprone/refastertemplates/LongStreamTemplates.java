@@ -73,7 +73,7 @@ final class LongStreamTemplates {
 
   /** Avoid unnecessary nesting of {@link LongStream#filter(LongPredicate)} operations. */
   abstract static class FilterOuterStreamAfterFlatMapToLong<T> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
@@ -105,7 +105,7 @@ final class LongStreamTemplates {
 
   /** Avoid unnecessary nesting of {@link LongStream#map(LongUnaryOperator)} operations. */
   abstract static class MapOuterStreamAfterFlatMapToLong<T> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
@@ -137,7 +137,7 @@ final class LongStreamTemplates {
 
   /** Avoid unnecessary nesting of {@link LongStream#flatMap(LongFunction)} operations. */
   abstract static class FlatMapOuterStreamAfterFlatMapToLong<T> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate

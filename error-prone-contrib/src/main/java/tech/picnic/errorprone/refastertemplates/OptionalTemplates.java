@@ -134,9 +134,6 @@ final class OptionalTemplates {
    * an {@link Optional} to a boolean.
    */
   abstract static class MapOptionalToBoolean<T> {
-    @Placeholder
-    abstract boolean test(T value);
-
     @BeforeTemplate
     boolean before(Optional<T> optional, Function<? super T, Boolean> predicate) {
       return optional.map(predicate).orElse(Refaster.anyOf(false, Boolean.FALSE));

@@ -73,7 +73,7 @@ final class IntStreamTemplates {
 
   /** Avoid unnecessary nesting of {@link IntStream#filter(IntPredicate)} operations. */
   abstract static class FilterOuterStreamAfterFlatMapToInt<T> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
@@ -105,7 +105,7 @@ final class IntStreamTemplates {
 
   /** Avoid unnecessary nesting of {@link IntStream#map(IntUnaryOperator)} operations. */
   abstract static class MapOuterStreamAfterFlatMapToInt<T> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
@@ -137,7 +137,7 @@ final class IntStreamTemplates {
 
   /** Avoid unnecessary nesting of {@link IntStream#flatMap(IntFunction)} operations. */
   abstract static class FlatMapOuterStreamAfterFlatMapToInt<T> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate

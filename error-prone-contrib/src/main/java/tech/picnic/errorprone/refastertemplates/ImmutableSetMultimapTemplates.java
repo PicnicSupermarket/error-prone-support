@@ -122,10 +122,10 @@ final class ImmutableSetMultimapTemplates {
    * {@link ImmutableSetMultimap}. The collection can be performed directly.
    */
   abstract static class StreamOfMapEntriesToImmutableSetMultimap<E, K, V> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract K keyFunction(@MayOptionallyUse E element);
 
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract V valueFunction(@MayOptionallyUse E element);
 
     // XXX: We could add variants in which the entry is created some other way, but we have another
@@ -149,7 +149,7 @@ final class ImmutableSetMultimapTemplates {
    * com.google.common.base.Function)} over creating and directly collecting a stream.
    */
   abstract static class TransformMultimapValuesToImmutableSetMultimap<K, V1, V2> {
-    @Placeholder
+    @Placeholder(allowsIdentity = true)
     abstract V2 valueTransformation(@MayOptionallyUse V1 value);
 
     @BeforeTemplate

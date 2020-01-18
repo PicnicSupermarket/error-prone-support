@@ -64,10 +64,8 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
   }
 
   ImmutableMap<Integer, String> testStreamOfMapEntriesToImmutableMap() {
-    // XXX: If `Integer.valueOf(n)` is replaced with `n` this doesn't work, even though it should.
-    // Looks like a @Placeholder limitation. Try to track down and fix.
     return Stream.of(1, 2, 3)
-        .map(n -> Map.entry(Integer.valueOf(n), n.toString()))
+        .map(n -> Map.entry(n, n.toString()))
         .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
