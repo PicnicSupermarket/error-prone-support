@@ -215,4 +215,32 @@ final class AssortedTemplates {
       return splitter.splitToStream(charSequence);
     }
   }
+
+  // /**
+  //  * Don't unnecessarily pass a method reference to {@link Supplier#get()} or wrap this method
+  //  * in a lambda expression.
+  //  */
+  // // XXX: This rule rewrites both expressions and statements (good), but does not ensure that the
+  // // actually `anyStatement` accepts a `Supplier<T>`. For example, it will also match if the
+  // // statement requires a `com.google.common.base.Supplier` rather than a
+  // // `java.util.function.Supplier`. Investigate how we can improve Refaster matching support.
+  // abstract static class SupplierAsSupplier<T> {
+  //   @Placeholder
+  //   abstract void anyStatement(Supplier<T> supplier);
+  //
+  //   @BeforeTemplate
+  //   void before(Supplier<T> supplier) {
+  //     anyStatement(supplier::get);
+  //   }
+  //
+  //   @BeforeTemplate
+  //   void before2(Supplier<T> supplier) {
+  //     anyStatement(() -> supplier.get());
+  //   }
+  //
+  //   @AfterTemplate
+  //   void after(Supplier<T> supplier) {
+  //     anyStatement(supplier);
+  //   }
+  // }
 }

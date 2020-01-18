@@ -46,6 +46,7 @@ public final class RefasterCheckTest {
           "Null",
           "Optional",
           "Primitive",
+          "Reactor",
           "RxJava2Adapter",
           "Stream",
           "String",
