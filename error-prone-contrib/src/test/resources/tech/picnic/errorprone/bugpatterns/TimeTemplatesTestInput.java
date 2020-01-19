@@ -124,8 +124,8 @@ final class TimeTemplatesTest implements RefasterTemplateTestCase {
         Duration.ofSeconds(0),
         Duration.ofSeconds(0, 0),
         Duration.ofMinutes(0),
-        Duration.ofHours(1),
-        Duration.ofDays(1),
+        Duration.ofHours(0),
+        Duration.ofDays(0),
         Duration.of(0, ChronoUnit.MILLIS));
   }
 
