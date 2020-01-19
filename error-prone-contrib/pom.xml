@@ -78,6 +78,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>io.projectreactor.addons</groupId>
             <artifactId>reactor-adapter</artifactId>
             <scope>provided</scope>

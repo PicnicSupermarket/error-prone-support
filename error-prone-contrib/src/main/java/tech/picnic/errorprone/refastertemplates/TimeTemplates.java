@@ -7,30 +7,21 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
 import java.time.chrono.ChronoZonedDateTime;
+import java.time.temporal.TemporalUnit;
 
 /** Refaster templates related to expressions dealing with time. */
 final class TimeTemplates {
   private TimeTemplates() {}
-
-  /** Prefer {@link Instant#EPOCH} over alternative representations. */
-  static final class EpochInstant {
-    @BeforeTemplate
-    Instant before() {
-      return Refaster.anyOf(
-          Instant.ofEpochMilli(0), Instant.ofEpochSecond(0), Instant.ofEpochSecond(0, 0));
-    }
-
-    @AfterTemplate
-    Instant after() {
-      return Instant.EPOCH;
-    }
-  }
 
   /**
    * Prefer {@link Clock#instant()} over {@link Instant#now(Clock)}, as it is more concise and more
@@ -81,6 +72,20 @@ final class TimeTemplates {
     }
   }
 
+  /** Prefer {@link Instant#EPOCH} over alternative representations. */
+  static final class EpochInstant {
+    @BeforeTemplate
+    Instant before() {
+      return Refaster.anyOf(
+          Instant.ofEpochMilli(0), Instant.ofEpochSecond(0), Instant.ofEpochSecond(0, 0));
+    }
+
+    @AfterTemplate
+    Instant after() {
+      return Instant.EPOCH;
+    }
+  }
+
   /**
    * Prefer {@link Instant#isBefore(Instant)} over explicit comparison, as it yields more readable
    * code.
@@ -112,6 +117,38 @@ final class TimeTemplates {
     @AfterTemplate
     boolean after(Instant a, Instant b) {
       return a.isAfter(b);
+    }
+  }
+
+  /** Prefer the {@link LocalTime#MIN} over alternative representations. */
+  static final class LocalTimeMin {
+    @BeforeTemplate
+    LocalTime before() {
+      return Refaster.anyOf(
+          LocalTime.MIDNIGHT,
+          LocalTime.of(0, 0),
+          LocalTime.of(0, 0, 0),
+          LocalTime.of(0, 0, 0, 0),
+          LocalTime.ofNanoOfDay(0),
+          LocalTime.ofSecondOfDay(0));
+    }
+
+    @AfterTemplate
+    LocalTime after() {
+      return LocalTime.MIN;
+    }
+  }
+
+  /** Prefer {@link LocalDate#atStartOfDay()} over more contrived alternatives. */
+  static final class LocalDateAtStartOfDay {
+    @BeforeTemplate
+    LocalDateTime before(LocalDate localDate) {
+      return localDate.atTime(LocalTime.MIN);
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDate localDate) {
+      return localDate.atStartOfDay();
     }
   }
 
@@ -251,6 +288,26 @@ final class TimeTemplates {
     }
   }
 
+  static final class ZeroDuration {
+    @BeforeTemplate
+    Duration before(TemporalUnit temporalUnit) {
+      return Refaster.anyOf(
+          Duration.ofNanos(0),
+          Duration.ofMillis(0),
+          Duration.ofSeconds(0),
+          Duration.ofSeconds(0, 0),
+          Duration.ofMinutes(0),
+          Duration.ofHours(1),
+          Duration.ofDays(1),
+          Duration.of(0, temporalUnit));
+    }
+
+    @AfterTemplate
+    Duration after() {
+      return Duration.ZERO;
+    }
+  }
+
   /**
    * Don't unnecessarily convert two and from milliseconds. (This way nanosecond precision is
    * retained.)
@@ -299,6 +356,23 @@ final class TimeTemplates {
     @AfterTemplate
     boolean after(Duration duration) {
       return duration.isZero();
+    }
+  }
+
+  static final class ZeroPeriod {
+    @BeforeTemplate
+    Period before() {
+      return Refaster.anyOf(
+          Period.ofDays(0),
+          Period.ofWeeks(0),
+          Period.ofMonths(0),
+          Period.ofYears(0),
+          Period.of(0, 0, 0));
+    }
+
+    @AfterTemplate
+    Period after() {
+      return Period.ZERO;
     }
   }
 }

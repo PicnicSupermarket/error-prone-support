@@ -57,4 +57,8 @@ final class StringTemplatesTest implements RefasterTemplateTestCase {
         Streams.stream(Iterables.cycle(ImmutableList.of("foo", "bar"))).collect(joining("f")),
         ImmutableList.of("baz", "qux").stream().collect(joining("g")));
   }
+
+  String testSubstringRemainder() {
+    return "foo".substring(1, "foo".length());
+  }
 }

@@ -105,4 +105,17 @@ final class StringTemplates {
       return String.join(delimiter, elements);
     }
   }
+
+  /** Don't unnecessarily use the two-argument {@link String#substring(int, int)}. */
+  static final class SubstringRemainder {
+    @BeforeTemplate
+    String before(String str, int index) {
+      return str.substring(index, str.length());
+    }
+
+    @AfterTemplate
+    String after(String str, int index) {
+      return str.substring(index);
+    }
+  }
 }
