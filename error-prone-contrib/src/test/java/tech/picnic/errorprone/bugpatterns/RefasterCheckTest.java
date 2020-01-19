@@ -4,7 +4,7 @@ import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMulti
 import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -65,10 +65,8 @@ public final class RefasterCheckTest {
   /** Returns every known template group name as a parameterized test argument. */
   @SuppressWarnings("UnusedMethod" /* Used as a `@MethodSource`. */)
   private static Stream<Arguments> templateGroupsUnderTest() {
-    // XXX: Drop the filter once we have added tests for {TestNGTo,AssertJ}!
-    return TEMPLATES_BY_GROUP.keySet().stream()
-        .filter(not(ImmutableSet.of("AssertJ", "TestNGToAssertJ")::contains))
-        .map(Arguments::of);
+    // XXX: Drop the filter once we have added tests for AssertJ!
+    return TEMPLATES_BY_GROUP.keySet().stream().filter(not("AssertJ"::equals)).map(Arguments::of);
   }
 
   /**
@@ -76,9 +74,9 @@ public final class RefasterCheckTest {
    */
   @SuppressWarnings("UnusedMethod" /* Used as a `@MethodSource`. */)
   private static Stream<Arguments> templatesUnderTest() {
-    // XXX: Drop the filter once we have added tests for {TestNGTo,AssertJ}!
+    // XXX: Drop the filter once we have added tests for AssertJ!
     return TEMPLATES_BY_GROUP.entries().stream()
-        .filter(e -> !ImmutableSet.of("AssertJ", "TestNGToAssertJ").contains(e.getKey()))
+        .filter(e -> !"AssertJ".equals(e.getKey()))
         .map(e -> Arguments.of(e.getKey(), e.getValue()));
   }
 
@@ -113,7 +111,7 @@ public final class RefasterCheckTest {
   @ParameterizedTest
   @MethodSource("templatesUnderTest")
   public void testCoverage(String group, String template) {
-    assertThatThrownBy(() -> verifyRefactoring(group, namePattern(group, template)))
+    assertThatCode(() -> verifyRefactoring(group, namePattern(group, template)))
         .withFailMessage(
             "Template %s does not affect the tests for group %s; is it tested?", template, group)
         .isInstanceOf(AssertionError.class)

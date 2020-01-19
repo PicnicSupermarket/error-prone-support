@@ -45,7 +45,31 @@ import org.testng.Assert.ThrowingRunnable;
  * List<Map<String, Object>> myMaps = new ArrayList<>();
  * assertEquals(myMaps, ImmutableList.of(ImmutableMap.of()));
  * }</pre>
+ *
+ * <p>A few {@link org.testng.Assert} methods are not rewritten:
+ *
+ * <ul>
+ *   <li>These methods cannot (easily) be expressed using AssertJ because they mix regular equality
+ *       and array equality:
+ *       <ul>
+ *         <li>{@link org.testng.Assert#assertEqualsDeep(Map, Map)}
+ *         <li>{@link org.testng.Assert#assertEqualsDeep(Map, Map, String)}
+ *         <li>{@link org.testng.Assert#assertEqualsDeep(Set, Set, String)}
+ *         <li>{@link org.testng.Assert#assertNotEqualsDeep(Map, Map)}
+ *         <li>{@link org.testng.Assert#assertNotEqualsDeep(Map, Map, String)}
+ *         <li>{@link org.testng.Assert#assertNotEqualsDeep(Set, Set)}
+ *         <li>{@link org.testng.Assert#assertNotEqualsDeep(Set, Set, String)}
+ *       </ul>
+ *   <li>This method returns the caugth exception; there is no direct counterpart for this in
+ *       AssertJ:
+ *       <ul>
+ *         <li>{@link org.testng.Assert#expectThrows(Class, ThrowingRunnable)}
+ *       </ul>
+ * </ul>
  */
+// XXX: As-is these templates do not result in a complete migration:
+// - Expressions containing comments are skipped due to a limitation of Refaster.
+// - Assertions inside lambda expressions are also skipped. Unclear why.
 final class TestNGToAssertJTemplates {
   private TestNGToAssertJTemplates() {}
 
@@ -840,112 +864,6 @@ final class TestNGToAssertJTemplates {
     }
   }
 
-  static final class AssertUnequalArrayIterationOrder {
-    @BeforeTemplate
-    void before(boolean[] actual, boolean[] expected) {
-      assertNotEquals(actual, expected);
-    }
-
-    @BeforeTemplate
-    void before(byte[] actual, byte[] expected) {
-      assertNotEquals(actual, expected);
-    }
-
-    @BeforeTemplate
-    void before(char[] actual, char[] expected) {
-      assertNotEquals(actual, expected);
-    }
-
-    @BeforeTemplate
-    void before(short[] actual, short[] expected) {
-      assertNotEquals(actual, expected);
-    }
-
-    @BeforeTemplate
-    void before(int[] actual, int[] expected) {
-      assertNotEquals(actual, expected);
-    }
-
-    @BeforeTemplate
-    void before(long[] actual, long[] expected) {
-      assertNotEquals(actual, expected);
-    }
-
-    @BeforeTemplate
-    void before(float[] actual, float[] expected) {
-      assertNotEquals(actual, expected);
-    }
-
-    @BeforeTemplate
-    void before(double[] actual, double[] expected) {
-      assertNotEquals(actual, expected);
-    }
-
-    @BeforeTemplate
-    void before(Object[] actual, Object[] expected) {
-      assertNotEquals(actual, expected);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(Object[] actual, Object[] expected) {
-      assertThat(actual).isNotEqualTo(expected);
-    }
-  }
-
-  static final class AssertUnequalArrayIterationOrderWithMessage {
-    @BeforeTemplate
-    void before(boolean[] actual, boolean[] expected, String message) {
-      assertNotEquals(actual, expected, message);
-    }
-
-    @BeforeTemplate
-    void before(byte[] actual, byte[] expected, String message) {
-      assertNotEquals(actual, expected, message);
-    }
-
-    @BeforeTemplate
-    void before(char[] actual, char[] expected, String message) {
-      assertNotEquals(actual, expected, message);
-    }
-
-    @BeforeTemplate
-    void before(short[] actual, short[] expected, String message) {
-      assertNotEquals(actual, expected, message);
-    }
-
-    @BeforeTemplate
-    void before(int[] actual, int[] expected, String message) {
-      assertNotEquals(actual, expected, message);
-    }
-
-    @BeforeTemplate
-    void before(long[] actual, long[] expected, String message) {
-      assertNotEquals(actual, expected, message);
-    }
-
-    @BeforeTemplate
-    void before(float[] actual, float[] expected, String message) {
-      assertNotEquals(actual, expected, message);
-    }
-
-    @BeforeTemplate
-    void before(double[] actual, double[] expected, String message) {
-      assertNotEquals(actual, expected, message);
-    }
-
-    @BeforeTemplate
-    void before(Object[] actual, Object[] expected, String message) {
-      assertNotEquals(actual, expected, message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(Object[] actual, Object[] expected, String message) {
-      assertThat(actual).withFailMessage(message).isNotEqualTo(expected);
-    }
-  }
-
   static final class AssertThrows {
     @BeforeTemplate
     void before(ThrowingRunnable runnable) {
@@ -954,8 +872,8 @@ final class TestNGToAssertJTemplates {
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable runnabe) {
-      assertThatThrownBy(runnabe).isInstanceOf(Throwable.class);
+    void after(ThrowingCallable runnable) {
+      assertThatThrownBy(runnable);
     }
   }
 
@@ -971,17 +889,4 @@ final class TestNGToAssertJTemplates {
       assertThatThrownBy(runnable).isInstanceOf(clazz);
     }
   }
-
-  // XXX: Skipped methods that cannot be ported:
-  // - These test array equality of elements/values if applicable:
-  //   - assertEqualsDeep Set Set
-  //   - assertEqualsDeep Set Set msg
-  //   - assertEqualsDeep Map Map
-  //   - assertEqualsDeep Map Map msg
-  // - This one returns the caught exception:
-  //   - expectThrows
-
-  // XXX: Not matched:
-  // - Stuff with comments (Check whether we should fork Refaster...)
-  // - Assertions inside lambda expressions (why?)
 }
