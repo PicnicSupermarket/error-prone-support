@@ -106,7 +106,8 @@ public final class RefasterCheckTest {
    * Verifies that all loaded Refaster templates are covered by at least one test.
    *
    * <p>Note that this doesn't guarantee full coverage: this test cannot ascertain that all {@link
-   * com.google.errorprone.refaster.Refaster#anyOf} branches are tested.
+   * com.google.errorprone.refaster.Refaster#anyOf} branches are tested. Idem for {@link
+   * com.google.errorprone.refaster.annotation.BeforeTemplate} methods in case there are multiple .
    */
   @ParameterizedTest
   @MethodSource("templatesUnderTest")
