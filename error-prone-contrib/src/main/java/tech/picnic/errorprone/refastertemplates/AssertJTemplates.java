@@ -67,6 +67,7 @@ import org.assertj.core.api.OptionalLongAssert;
 // these in separate files.
 // XXX: Also do for BigInteger/BigDecimal?
 // XXX: `assertThat(cmp.compare(a, b)).isZero()` -> make something nicer.
+// ^ And variants.
 // XXX: Consider splitting this class into multiple classes.
 // XXX: Some of these rules may not apply given the updated TestNG rewrite rules. Review.
 // XXX: For the templates which "unwrap" explicitly enumerated collections, also introduce variants

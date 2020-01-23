@@ -8,8 +8,10 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.test.publisher.PublisherProbe;
 
 /** Refaster templates related to Reactor expressions and statements. */
 final class ReactorTemplates {
@@ -45,6 +47,19 @@ final class ReactorTemplates {
     }
   }
 
+  /** Don't unnecessarily defer {@link Flux#error(Throwable)}. */
+  static final class FluxDeferredError<T> {
+    @BeforeTemplate
+    Flux<T> before(Throwable throwable) {
+      return Flux.defer(() -> Flux.error(throwable));
+    }
+
+    @AfterTemplate
+    Flux<T> after(Throwable throwable) {
+      return Flux.error(() -> throwable);
+    }
+  }
+
   /**
    * Don't unnecessarily pass {@link Mono#error(Supplier)} a method reference or lambda expression.
    */
@@ -62,6 +77,23 @@ final class ReactorTemplates {
     }
   }
 
+  /**
+   * Don't unnecessarily pass {@link Flux#error(Supplier)} a method reference or lambda expression.
+   */
+  // XXX: Drop this rule once the more general rule `AssortedTemplates#SupplierAsSupplier` works
+  // reliably.
+  static final class FluxErrorSupplier<T, E extends Throwable> {
+    @BeforeTemplate
+    Flux<T> before(Supplier<E> supplier) {
+      return Refaster.anyOf(Flux.error(supplier::get), Flux.error(() -> supplier.get()));
+    }
+
+    @AfterTemplate
+    Flux<T> after(Supplier<E> supplier) {
+      return Flux.error(supplier);
+    }
+  }
+
   /** Prefer {@link Mono#thenReturn(Object)} over more verbose alternatives. */
   static final class MonoThenReturn<T, S> {
     @BeforeTemplate
@@ -72,6 +104,19 @@ final class ReactorTemplates {
     @AfterTemplate
     Mono<S> after(Mono<T> mono, S object) {
       return mono.thenReturn(object);
+    }
+  }
+
+  /** Prefer {@link PublisherProbe#empty()}} over more verbose alternatives. */
+  static final class PublisherProbeEmpty<T> {
+    @BeforeTemplate
+    PublisherProbe<T> before() {
+      return Refaster.anyOf(PublisherProbe.of(Mono.empty()), PublisherProbe.of(Flux.empty()));
+    }
+
+    @AfterTemplate
+    PublisherProbe<T> after() {
+      return PublisherProbe.empty();
     }
   }
 

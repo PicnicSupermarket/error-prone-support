@@ -4,8 +4,10 @@ import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Supplier;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.test.publisher.PublisherProbe;
 
 final class ReactorTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<Mono<Integer>> testMonoFromOptional() {
@@ -18,14 +20,28 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return Mono.error(() -> new IllegalStateException());
   }
 
+  Flux<Void> testFluxDeferredError() {
+    return Flux.error(() -> new IllegalStateException());
+  }
+
   ImmutableSet<Mono<Void>> testMonoErrorSupplier() {
     return ImmutableSet.of(
         Mono.error(((Supplier<RuntimeException>) null)),
         Mono.error(((Supplier<RuntimeException>) null)));
   }
 
+  ImmutableSet<Flux<Void>> testFluxErrorSupplier() {
+    return ImmutableSet.of(
+        Flux.error(((Supplier<RuntimeException>) null)),
+        Flux.error(((Supplier<RuntimeException>) null)));
+  }
+
   Mono<String> testMonoThenReturn() {
     return Mono.empty().thenReturn("foo");
+  }
+
+  ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
+    return ImmutableSet.of(PublisherProbe.empty(), PublisherProbe.empty());
   }
 
   StepVerifier.Step<Integer> testStepVerifierStepExpectNextEmpty() {
