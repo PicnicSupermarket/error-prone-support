@@ -9,7 +9,10 @@ addons:
 install:
   - mvn io.takari:maven:wrapper
 script:
-  - ./mvnw install
+  # We run the build twice: once against the original Error Prone release, and
+  # once against the Picnic Error Prone fork.
+  - ./mvnw clean install
+  - ./mvnw clean install -Perror-prone-fork
   # XXX: Enable Coveralls and SonarCloud once we "go public".
   # ./mvnw jacoco:prepare-agent surefire:test jacoco:report coveralls:report sonar:sonar
   - ./mvnw jacoco:prepare-agent surefire:test jacoco:report

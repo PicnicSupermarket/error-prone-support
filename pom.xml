@@ -96,13 +96,17 @@
         build number. When building locally, this number is obviously absent.
         So we provide a default value. -->
         <build.number>LOCAL</build.number>
+        <!-- The Maven `groupId` under which Error Prone dependencies are
+        published. By default we use an official Error Prone release. This
+        property allows the `error-prone-fork` profile below to build the
+        project using Picnic's Error Prone fork instead. -->
+        <groupId.error-prone>com.google.errorprone</groupId.error-prone>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Dependency and plugin versions that are referenced in more than
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.0-rc6</version.auto-service>
         <version.error-prone>2.3.4</version.error-prone>
-        <version.error-prone-javac>9+181-r4173-1</version.error-prone-javac>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.javadoc>3.1.1</version.javadoc>
         <version.jdk>11</version.jdk>
@@ -113,6 +117,31 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>${groupId.error-prone}</groupId>
+                <artifactId>error_prone_annotation</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
+                <groupId>${groupId.error-prone}</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
+                <groupId>${groupId.error-prone}</groupId>
+                <artifactId>error_prone_check_api</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
+                <groupId>${groupId.error-prone}</groupId>
+                <artifactId>error_prone_core</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
+                <groupId>${groupId.error-prone}</groupId>
+                <artifactId>error_prone_test_helpers</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>refaster-resource-compiler</artifactId>
@@ -142,33 +171,8 @@
             </dependency>
             <dependency>
                 <groupId>com.google.errorprone</groupId>
-                <artifactId>error_prone_annotation</artifactId>
-                <version>${version.error-prone}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.errorprone</groupId>
-                <artifactId>error_prone_annotations</artifactId>
-                <version>${version.error-prone}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.errorprone</groupId>
-                <artifactId>error_prone_check_api</artifactId>
-                <version>${version.error-prone}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.errorprone</groupId>
-                <artifactId>error_prone_core</artifactId>
-                <version>${version.error-prone}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.errorprone</groupId>
-                <artifactId>error_prone_test_helpers</artifactId>
-                <version>${version.error-prone}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.errorprone</groupId>
                 <artifactId>javac</artifactId>
-                <version>${version.error-prone-javac}</version>
+                <version>9+181-r4173-1</version>
             </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
@@ -754,6 +758,13 @@
                                 junit.jupiter.execution.parallel.mode.default = concurrent</configurationParameters>
                         </properties>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <systemPropertyVariables>
+                            <!-- By passing along the version of Error Prone
+                            used, we can disable tests which require the Picnic
+                            Error Prone fork to function when building against
+                            the official release. -->
+                            <error-prone-version>${version.error-prone}</error-prone-version>
+                        </systemPropertyVariables>
                         <trimStackTrace>false</trimStackTrace>
                     </configuration>
                     <dependencies>
@@ -1006,17 +1017,24 @@
 
     <profiles>
         <profile>
-            <!-- If explicitly enabled using `-Pcoverage` we use PIT to
-            establish coverage through mutation testing. -->
-            <id>coverage</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.pitest</groupId>
-                        <artifactId>pitest-maven</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
+            <id>error-prone-fork</id>
+            <properties>
+                <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>
+                <version.error-prone>v2.3.4-picnic-2</version.error-prone>
+            </properties>
+            <dependencyManagement>
+                <!-- Even when we directly depend on the Picnic Error Prone
+                fork, some other dependencies depend on the official (i.e.,
+                non-forked) `error_prone_annotations`. Here we fix which
+                version is pulled in. -->
+                <dependencies>
+                    <dependency>
+                        <groupId>com.google.errorprone</groupId>
+                        <artifactId>error_prone_annotations</artifactId>
+                        <version>2.3.4</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
         </profile>
         <profile>
             <!-- By default we verify various aspects of a module and the
@@ -1056,7 +1074,7 @@
                         <configuration>
                             <annotationProcessorPaths combine.children="append">
                                 <path>
-                                    <groupId>com.google.errorprone</groupId>
+                                    <groupId>${groupId.error-prone}</groupId>
                                     <artifactId>error_prone_core</artifactId>
                                     <version>${version.error-prone}</version>
                                 </path>
