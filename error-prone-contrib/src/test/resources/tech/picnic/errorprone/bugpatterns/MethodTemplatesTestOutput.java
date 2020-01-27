@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 final class MethodTemplateTest implements RefasterTemplateTestCase {
   String testObjectReturn() {
