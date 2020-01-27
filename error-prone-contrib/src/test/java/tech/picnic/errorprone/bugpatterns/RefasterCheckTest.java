@@ -57,6 +57,7 @@ public final class RefasterCheckTest {
           "JUnit",
           "LongStream",
           "MapEntry",
+          "Method",
           "Mockito",
           "Multimap",
           "Null",
