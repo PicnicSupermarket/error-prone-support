@@ -2,7 +2,6 @@ package tech.picnic.errorprone.refastertemplates;
 
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import java.util.Objects;
 
 /** Refaster templates related to expressions dealing with (possibly) null values. */
 final class MethodTemplates {
