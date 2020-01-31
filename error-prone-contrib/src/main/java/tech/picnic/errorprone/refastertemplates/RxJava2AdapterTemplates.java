@@ -41,6 +41,7 @@ final class RxJava2AdapterTemplates {
     @BeforeTemplate
     Publisher<T> before(Flowable<T> flowable) {
       return Refaster.anyOf(
+          Flux.from(flowable),
           flowable.compose(Flux::from),
           flowable.to(Flux::from),
           flowable.as(Flux::from),
@@ -63,6 +64,7 @@ final class RxJava2AdapterTemplates {
     @BeforeTemplate
     Publisher<T> before(Flux<T> flux) {
       return Refaster.anyOf(
+          Flowable.fromPublisher(flux),
           flux.transform(Flowable::fromPublisher),
           flux.as(Flowable::fromPublisher),
           RxJava2Adapter.fluxToFlowable(flux),
@@ -83,7 +85,9 @@ final class RxJava2AdapterTemplates {
     @BeforeTemplate
     Observable<T> before(Flux<T> flux) {
       return Refaster.anyOf(
-          flux.as(Observable::fromPublisher), RxJava2Adapter.fluxToObservable(flux));
+          Observable.fromPublisher(flux),
+          flux.as(Observable::fromPublisher),
+          RxJava2Adapter.fluxToObservable(flux));
     }
 
     @AfterTemplate
@@ -114,7 +118,9 @@ final class RxJava2AdapterTemplates {
     @BeforeTemplate
     Completable before(Mono<T> mono) {
       return Refaster.anyOf(
-          mono.as(Completable::fromPublisher), RxJava2Adapter.monoToCompletable(mono));
+          Completable.fromPublisher(mono),
+          mono.as(Completable::fromPublisher),
+          RxJava2Adapter.monoToCompletable(mono));
     }
 
     @AfterTemplate
@@ -131,6 +137,7 @@ final class RxJava2AdapterTemplates {
     @BeforeTemplate
     Publisher<T> before(Mono<T> mono) {
       return Refaster.anyOf(
+          Flowable.fromPublisher(mono),
           mono.transform(Flowable::fromPublisher),
           mono.as(Flowable::fromPublisher),
           RxJava2Adapter.monoToFlowable(mono),
@@ -163,7 +170,10 @@ final class RxJava2AdapterTemplates {
   static final class MonoToSingle<T> {
     @BeforeTemplate
     Single<T> before(Mono<T> mono) {
-      return Refaster.anyOf(mono.as(Single::fromPublisher), RxJava2Adapter.monoToSingle(mono));
+      return Refaster.anyOf(
+          Single.fromPublisher(mono),
+          mono.as(Single::fromPublisher),
+          RxJava2Adapter.monoToSingle(mono));
     }
 
     @AfterTemplate
