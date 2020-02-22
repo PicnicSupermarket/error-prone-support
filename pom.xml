@@ -1107,12 +1107,6 @@
                                 https://bugs.openjdk.java.net/browse/JDK-6999068. -->
                                 <arg>-Xlint:-processing</arg>
                                 <!-- Enable and configure Error Prone. -->
-                                <!-- XXX: The awkward comment formatting used
-                                here ensures that the plugin arguments are
-                                separated only by spaces. Once we drop support
-                                for JDK 8 we can clean this up; later versions
-                                do properly handle newline separators. See
-                                https://github.com/google/error-prone/pull/1115. -->
                                 <arg>
                                     -Xplugin:ErrorProne
                                     <!-- We want to enable almost all Error
