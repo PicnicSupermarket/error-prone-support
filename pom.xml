@@ -918,22 +918,6 @@
                     <version>2.7</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.eluder.coveralls</groupId>
-                    <artifactId>coveralls-maven-plugin</artifactId>
-                    <version>4.3.0</version>
-                    <!-- XXX: This dependency declaration ensures JDK 9+
-                    compatibility. Drop it once
-                    https://github.com/trautonen/coveralls-maven-plugin/issues/112
-                    has been resolved and released. -->
-                    <dependencies>
-                        <dependency>
-                            <groupId>javax.xml.bind</groupId>
-                            <artifactId>jaxb-api</artifactId>
-                            <version>2.3.1</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-                <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
                     <version>2.0.0</version>

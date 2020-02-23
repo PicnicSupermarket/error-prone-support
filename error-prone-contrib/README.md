@@ -28,8 +28,8 @@ Some pointers:
   opportunities to simplify the code.
 - Please restrict the scope of a pull request to a single feature or fix. Don't
   sneak in unrelated changes.
-- If in doubt about whether a pull request will be accepted, please first file
-  an issue to discuss it.
+- When in doubt about whether a pull request will be accepted, please first
+  file an issue to discuss it.
 
 ### Our wishlist
 
@@ -41,7 +41,7 @@ project:
 - Document how to enable the checks.
 - Document how to apply patches.
 - Document each of the checks.
-- Add Travis CI, [SonarQube][sonarcloud] and [Coveralls][coveralls]
+- Add Travis CI, [SonarQube][sonarcloud] and [Codecov][codecov]
   integrations.
 - Investigate whether it makes sense to include license headers in each file.
   If so, set that up and enforce it.
@@ -56,8 +56,6 @@ project:
   likely to catch errors due to unexpected code constructs. False positives and
   regressions can be caught this way as well. For inspiration, review how
   [Checkstyle does this][checkstyle-external-project-tests].
-- Create a tool which converts a collection of Refaster Templates into an Error
-  Prone check. Ideally this tool is contributed upstream.
 - Have the repository be analyzed by [Better Code Hub][bettercodehub] and
   potentially publish the results.
 - Consider integrating with [FOSSA][fossa].
@@ -87,7 +85,7 @@ The following is a list of checks we'd like to see implemented:
   functionality.
 - A subset of the refactor operations provided by the Eclipse-specific
   [AutoRefactor][autorefactor] plugin.
-- A check which replaces fully qualified types with simple types in context
+- A check which replaces fully qualified types with simple types in contexts
   where this does not introduce ambiguity. Should consider both actual Java
   code and Javadoc `@link` references.
 - A check which simplifies array expressions. It would replace empty array
@@ -118,10 +116,6 @@ The following is a list of checks we'd like to see implemented:
   to e.g. `java.util.Function.identity()`, the static methods exposed by
   `java.util.stream.Collectors` and the various Guava collector factory
   methods.
-- A check which flags non-`@SafeVarargs` methods accepting an array of some
-  generic type. See Effective Java Third Edition, item 32 (page 149). (This
-  might require special-casing Java 8, where this annotation isn't allowed on
-  private methods.)
 - A check which replaces `new Random().someMethod()` calls with
   `ThreadLocalRandom.current().someMethod()` calls, so as to avoid unnecessary
   synchronization.
@@ -131,8 +125,9 @@ The following is a list of checks we'd like to see implemented:
   vice versa in order to prevent auto (un)boxing, and likewise for other number
   types.
 - A check which flags nullable collections.
-- A check which flags _any_ `AutoCloseable` resource not managed by a
-  `try-with-resources` construct.
+- A check which flags `AutoCloseable` resources not managed by a
+  `try-with-resources` construct. Certain subtypes, such as jOOQ's `DSLContext`
+  should be excluded.
 - A check which flags `java.time` methods which implicitly consult the system
   clock, suggesting that a passed-in `Clock` is used instead.
 - A check which flags public methods on public classes which reference
@@ -189,7 +184,7 @@ The following is a list of checks we'd like to see implemented:
   `@Test(singleThreaded = true)`.
 - A TestNG-specific check which flags usages of the `expectedExceptions`
   attribute of the `@Test` annotation, pointing to `assertThrows`.
-- A Jongo-specific check which disallows the creation of spare indices, in
+- A Jongo-specific check which disallows the creation of sparse indices, in
   favour of partial indices.
 - An Immutables-specific check which replaces
   `checkState`/`IllegalStateException` usages inside a `@Value.Check`-annotated
@@ -217,7 +212,7 @@ The following is a list of checks we'd like to see implemented:
 
 [autorefactor]: https://autorefactor.org
 [bettercodehub]: https://bettercodehub.com
-[coveralls]: https://coveralls.io
+[codecov]: https://codecov.io
 [error-prone-bug-patterns]: http://errorprone.info/bugpatterns
 [error-prone-criteria]: http://errorprone.info/docs/criteria
 [error-prone]: http://errorprone.info
