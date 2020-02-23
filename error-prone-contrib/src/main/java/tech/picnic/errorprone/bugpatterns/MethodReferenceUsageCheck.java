@@ -141,12 +141,12 @@ public final class MethodReferenceUsageCheck extends BugChecker
     }
 
     Name lhs = ((IdentifierTree) subTree.getExpression()).getName();
-    if (!expectedInstance.isPresent()) {
+    if (expectedInstance.isEmpty()) {
       return constructFix(lambdaExpr, lhs, subTree.getIdentifier());
     }
 
     Type lhsType = ASTHelpers.getType(subTree.getExpression());
-    if (lhsType == null || !expectedInstance.get().equals(lhs)) {
+    if (lhsType == null || !expectedInstance.orElseThrow().equals(lhs)) {
       return Optional.empty();
     }
 

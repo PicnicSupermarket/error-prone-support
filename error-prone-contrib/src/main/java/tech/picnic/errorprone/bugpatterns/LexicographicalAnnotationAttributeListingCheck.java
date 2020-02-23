@@ -133,9 +133,14 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
     return Optional.of(SuggestedFix.builder().replace(array, suggestion));
   }
 
-  private static boolean canSort(NewArrayTree array, VisitorState state) {
-    Type elemType = state.getTypes().elemtype(ASTHelpers.getType(array));
+  private static boolean canSort(Tree array, VisitorState state) {
+    Type type = ASTHelpers.getType(array);
+    if (type == null) {
+      return false;
+    }
+
     Symtab symtab = state.getSymtab();
+    Type elemType = state.getTypes().elemtype(type);
 
     /* For now we don't force sorting on numeric types. */
     return Stream.of(
@@ -144,7 +149,7 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
   }
 
   private static ImmutableList<? extends ExpressionTree> doSort(
-      List<? extends ExpressionTree> elements, VisitorState state) {
+      Iterable<? extends ExpressionTree> elements, VisitorState state) {
     return ImmutableList.sortedCopyOf(
         Comparator.comparing(
             e -> getStructure(e, state),

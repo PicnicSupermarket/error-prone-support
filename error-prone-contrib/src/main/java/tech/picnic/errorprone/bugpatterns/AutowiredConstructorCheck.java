@@ -39,11 +39,12 @@ public final class AutowiredConstructorCheck extends BugChecker implements Annot
       return Description.NO_MATCH;
     }
 
-    if (!withinConstructor(state)) {
+    if (!isWithinConstructor(state)) {
       return Description.NO_MATCH;
     }
 
-    if (ASTHelpers.getConstructors(state.findEnclosing(ClassTree.class)).size() != 1) {
+    ClassTree clazz = state.findEnclosing(ClassTree.class);
+    if (clazz == null || ASTHelpers.getConstructors(clazz).size() != 1) {
       return Description.NO_MATCH;
     }
 
@@ -55,7 +56,7 @@ public final class AutowiredConstructorCheck extends BugChecker implements Annot
     return describeMatch(tree, SuggestedFix.delete(tree));
   }
 
-  private static boolean withinConstructor(VisitorState state) {
+  private static boolean isWithinConstructor(VisitorState state) {
     MethodTree method = state.findEnclosing(MethodTree.class);
     if (method == null) {
       return false;

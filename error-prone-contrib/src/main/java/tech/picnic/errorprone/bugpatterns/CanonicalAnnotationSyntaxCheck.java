@@ -133,9 +133,7 @@ public final class CanonicalAnnotationSyntaxCheck extends BugChecker
     }
 
     NewArrayTree array = (NewArrayTree) expr;
-    return simplifySingletonArray(array, state)
-        .map(Optional::of)
-        .orElseGet(() -> dropTrailingComma(array, state));
+    return simplifySingletonArray(array, state).or(() -> dropTrailingComma(array, state));
   }
 
   /** Returns the expression describing the array's sole element, if any. */

@@ -105,7 +105,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   // XXX: This selection logic solves an issue described in
   // https://github.com/google/error-prone/issues/559. Consider contributing it back upstream.
   private static void applyMatches(
-      List<Description> allMatches, EndPosTable endPositions, VisitorState state) {
+      Iterable<Description> allMatches, EndPosTable endPositions, VisitorState state) {
     ImmutableList<Description> byReplacementSize =
         ImmutableList.sortedCopyOf(
             Comparator.<Description>comparingInt(d -> getReplacedCodeSize(d, endPositions))

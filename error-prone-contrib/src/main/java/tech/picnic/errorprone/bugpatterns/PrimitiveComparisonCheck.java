@@ -71,10 +71,13 @@ public final class PrimitiveComparisonCheck extends BugChecker
 
   private static Optional<Fix> tryFix(
       MethodInvocationTree tree, VisitorState state, Type cmpType, boolean isStatic) {
-    String actualMethodName = ASTHelpers.getSymbol(tree).getSimpleName().toString();
-    return Optional.of(getPreferredMethod(state, cmpType, isStatic))
-        .filter(preferredMethodName -> !preferredMethodName.equals(actualMethodName))
-        .map(preferredMethodName -> suggestFix(tree, preferredMethodName, state));
+    return Optional.ofNullable(ASTHelpers.getSymbol(tree))
+        .map(methodSymbol -> methodSymbol.getSimpleName().toString())
+        .flatMap(
+            actualMethodName ->
+                Optional.of(getPreferredMethod(state, cmpType, isStatic))
+                    .filter(preferredMethodName -> !preferredMethodName.equals(actualMethodName))
+                    .map(preferredMethodName -> suggestFix(tree, preferredMethodName, state)));
   }
 
   private static String getPreferredMethod(VisitorState state, Type cmpType, boolean isStatic) {
@@ -127,7 +130,7 @@ public final class PrimitiveComparisonCheck extends BugChecker
       case MEMBER_SELECT:
         MemberSelectTree ms = (MemberSelectTree) tree.getMethodSelect();
         return SuggestedFix.replace(
-            ms, Util.treeToString(ms.getExpression(), state) + "." + preferredMethodName);
+            ms, Util.treeToString(ms.getExpression(), state) + '.' + preferredMethodName);
       default:
         throw new VerifyException("Unexpected type of expression: " + expr.getKind());
     }

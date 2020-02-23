@@ -56,16 +56,9 @@ public final class Slf4jLogStatementCheck extends BugChecker
     }
 
     List<? extends ExpressionTree> args = getTrimmedArguments(tree, state);
-    Optional<String> formatString = getFormatString(args);
-    if (!formatString.isPresent()) {
-      return Description.NO_MATCH;
-    }
-
-    Description.Builder description = buildDescription(tree);
-    return validateFormatString(formatString.get(), args.get(0), state, description)
-            && validateArguments(formatString.get(), args.subList(1, args.size()), description)
-        ? Description.NO_MATCH
-        : description.build();
+    return getFormatString(args)
+        .map(formatString -> validateFormatString(formatString, tree, args, state))
+        .orElse(Description.NO_MATCH);
   }
 
   private static List<? extends ExpressionTree> getTrimmedArguments(
@@ -93,7 +86,19 @@ public final class Slf4jLogStatementCheck extends BugChecker
     return Optional.ofNullable(ASTHelpers.constValue(args.get(0), String.class));
   }
 
-  private static boolean validateFormatString(
+  private Description validateFormatString(
+      String formatString,
+      MethodInvocationTree tree,
+      List<? extends ExpressionTree> args,
+      VisitorState state) {
+    Description.Builder description = buildDescription(tree);
+    return isFormatString(formatString, args.get(0), state, description)
+            && hasValidArguments(formatString, args.subList(1, args.size()), description)
+        ? Description.NO_MATCH
+        : description.build();
+  }
+
+  private static boolean isFormatString(
       String formatString,
       ExpressionTree tree,
       VisitorState state,
@@ -118,8 +123,10 @@ public final class Slf4jLogStatementCheck extends BugChecker
     return false;
   }
 
-  private static boolean validateArguments(
-      String formatString, List<? extends ExpressionTree> args, Description.Builder description) {
+  private static boolean hasValidArguments(
+      CharSequence formatString,
+      List<? extends ExpressionTree> args,
+      Description.Builder description) {
     int placeholders = Splitter.on("{}").splitToList(formatString).size() - 1;
     if (placeholders == args.size()) {
       return true;

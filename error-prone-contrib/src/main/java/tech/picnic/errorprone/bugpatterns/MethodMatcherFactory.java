@@ -9,7 +9,7 @@ import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import com.google.common.base.Splitter;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
-import java.util.List;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 /** A method invocation expression {@link Matcher} factory. */
@@ -21,7 +21,7 @@ final class MethodMatcherFactory {
   private static final Pattern METHOD_SIGNATURE =
       Pattern.compile("([^\\s#(,)]+)#([^\\s#(,)]+)\\(((?:[^\\s#(,)]+(?:,[^\\s#(,)]+)*)?)\\)");
 
-  Matcher<ExpressionTree> create(List<String> signatures) {
+  Matcher<ExpressionTree> create(Collection<String> signatures) {
     return anyOf(
         signatures.stream()
             .map(MethodMatcherFactory::createMethodMatcher)
@@ -31,7 +31,7 @@ final class MethodMatcherFactory {
   // XXX: It seems parse errors are silently swallowed. Double-check; if true, file a ticket.
   // XXX: This (probably) doesn't work for methods with array type arguments; if true, implement a
   // fix.
-  private static Matcher<ExpressionTree> createMethodMatcher(String signature) {
+  private static Matcher<ExpressionTree> createMethodMatcher(CharSequence signature) {
     java.util.regex.Matcher m = METHOD_SIGNATURE.matcher(signature);
     checkArgument(m.matches(), "Not a valid method signature: %s", signature);
     String className = m.group(1);
