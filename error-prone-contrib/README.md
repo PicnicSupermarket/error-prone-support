@@ -9,6 +9,24 @@ Contributions are more than welcome! Below we list tasks that are on our TODO
 list. If you have others ideas/plans, feel free to file an issue or open a pull
 request.
 
+### Building
+
+This is a [Maven][maven] project, so running `mvn clean install` performs a
+full clean build. Some relevant flags:
+- `-Dverification.warn` makes the warnings and errors emitted by various
+  plugins and the Java compiler non-fatal, where possible.
+- `-Dverification.skip` disables various non-essential plugins and compiles the code with
+  minimal checks (i.e. without linting, Error Prone checks, etc.)
+- `-Perror-prone-fork` builds the code and runs the tests against Picnic's
+  [Error Prone fork][error-prone-fork-repo] (hosted on
+  [Jitpack][error-prone-fork-jitpack]). Refaster templates are only tested when
+  the fork is used, because they rely on changes in the unmerged PR
+  [google/error-prone#1239][[error-prone-issue-1239].
+
+When loading the project in IntelliJ IDEA (and perhaps other IDEs) errors about
+the inaccessibility of `com.sun.tools.javac.*` classes may be reported. If this
+happens, configure your IDE to enable the `add-exports` profile.
+
 ### Contribution guidelines
 
 To the extend possible, the pull request process guards our coding guidelines.
@@ -212,13 +230,17 @@ The following is a list of checks we'd like to see implemented:
 
 [autorefactor]: https://autorefactor.org
 [bettercodehub]: https://bettercodehub.com
+[checkstyle-external-project-tests]: https://github.com/checkstyle/checkstyle/blob/master/wercker.yml
 [codecov]: https://codecov.io
 [error-prone-bug-patterns]: http://errorprone.info/bugpatterns
 [error-prone-criteria]: http://errorprone.info/docs/criteria
+[error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
+[error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
 [error-prone]: http://errorprone.info
+[error-prone-issue-1239]: https://github.com/google/error-prone/pull/1239
 [error-prone-repo]: https://github.com/google/error-prone
 [forbidden-apis]: https://github.com/policeman-tools/forbidden-apis
 [fossa]: https://fossa.io
+[maven]: https://maven.apache.org
 [modernizer-maven-plugin]: https://github.com/gaul/modernizer-maven-plugin
 [sonarcloud]: https://sonarcloud.io
-[checkstyle-external-project-tests]: https://github.com/checkstyle/checkstyle/blob/master/wercker.yml
