@@ -40,9 +40,10 @@ import java.util.stream.Stream;
 
 /**
  * A {@link BugChecker} which flags annotation array listings which aren't sorted lexicographically.
+ *
+ * <p>The idea behind this checker is that maintaining a sorted sequence simplifies conflict
+ * resolution, and can even avoid it if two branches add the same entry.
  */
-// XXX: Add more documentation. Explain that sorting reduces chances of conflicts and simplifies
-// their resolution when they do happen.
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "LexicographicalAnnotationAttributeListing",
