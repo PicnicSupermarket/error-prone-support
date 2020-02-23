@@ -24,7 +24,7 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "AutowiredConstructor",
-    summary = "Omit `@Autowired` on a class' sole constuctor, as it is redundant",
+    summary = "Omit `@Autowired` on a class' sole constructor, as it is redundant",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
     tags = StandardTags.SIMPLIFICATION,
@@ -48,7 +48,11 @@ public final class AutowiredConstructorCheck extends BugChecker implements Annot
       return Description.NO_MATCH;
     }
 
-    // XXX: We could remove the `@Autowired` import if no other usages remain.
+    /*
+     * This is the only `@Autowired` constructor: suggest that it be removed. Note that this likely
+     * means that the associated import can be removed as well. Rather than adding code for this case we
+     * leave flagging the unused import to Error Prone's `RemoveUnusedImports` check.
+     */
     return describeMatch(tree, SuggestedFix.delete(tree));
   }
 
