@@ -78,7 +78,7 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
    * @param flags Any provided command line flags.
    */
   public LexicographicalAnnotationAttributeListingCheck(ErrorProneFlags flags) {
-    this.matcher = createAnnotationAttributeMatcher(flags);
+    matcher = createAnnotationAttributeMatcher(flags);
   }
 
   @Override
@@ -93,7 +93,7 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
      * We loop over the array's attributes, trying to sort each array associated with a
      * non-blacklisted attribute. A single compound fix, if any, is returned.
      */
-    return this.matcher
+    return matcher
         .extractMatchingArguments(tree)
         .map(expr -> extractArray(expr).flatMap(arr -> suggestSorting(arr, state)))
         .flatMap(Optional::stream)

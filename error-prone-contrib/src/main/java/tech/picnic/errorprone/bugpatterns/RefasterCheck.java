@@ -79,7 +79,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
    * @param flags Any provided command line flags.
    */
   public RefasterCheck(ErrorProneFlags flags) {
-    this.codeTransformer = loadCompositeCodeTransformer(flags);
+    codeTransformer = loadCompositeCodeTransformer(flags);
   }
 
   @Override

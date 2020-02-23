@@ -24,7 +24,6 @@ import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.Type.MethodType;
 import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.tree.JCTree.JCMemberReference;
 import java.util.Comparator;
@@ -106,7 +105,7 @@ public final class PrimitiveComparisonCheck extends BugChecker
         /* Return the method's declared return type. */
         // XXX: Very fragile. Do better.
         Type subType2 = ((JCMemberReference) tree).referentType;
-        return Optional.of(((MethodType) subType2).getReturnType());
+        return Optional.of(subType2.getReturnType());
       default:
         /* This appears to be a genuine `{,ToInt,ToLong,ToDouble}Function`. */
         return Optional.empty();
@@ -122,7 +121,7 @@ public final class PrimitiveComparisonCheck extends BugChecker
     switch (expr.getKind()) {
       case IDENTIFIER:
         return SuggestedFix.builder()
-            .addStaticImport(java.util.Comparator.class.getName() + '.' + preferredMethodName)
+            .addStaticImport(Comparator.class.getName() + '.' + preferredMethodName)
             .replace(expr, preferredMethodName)
             .build();
       case MEMBER_SELECT:

@@ -170,7 +170,7 @@ public final class RedundantStringConversionCheck extends BugChecker
    * @param flags Any provided command line flags.
    */
   public RedundantStringConversionCheck(ErrorProneFlags flags) {
-    this.conversionMethodMatcher = createConversionMethodMatcher(flags);
+    conversionMethodMatcher = createConversionMethodMatcher(flags);
   }
 
   @Override
@@ -340,8 +340,7 @@ public final class RedundantStringConversionCheck extends BugChecker
   }
 
   private Optional<ExpressionTree> trySimplify(ExpressionTree tree, VisitorState state) {
-    if (tree.getKind() != Kind.METHOD_INVOCATION
-        || !this.conversionMethodMatcher.matches(tree, state)) {
+    if (tree.getKind() != Kind.METHOD_INVOCATION || !conversionMethodMatcher.matches(tree, state)) {
       return Optional.empty();
     }
 

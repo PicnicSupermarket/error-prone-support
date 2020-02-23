@@ -120,13 +120,13 @@ final class AnnotationAttributeMatcher implements Serializable {
   // XXX: Make this method private; re-implement the tests in terms of `#extractMatchingArguments`.
   @VisibleForTesting
   boolean matches(String annotationType, String attribute) {
-    if (this.complement) {
-      return !this.wholeTypes.contains(annotationType)
-          && !this.excludedAttributes.containsEntry(annotationType, attribute);
+    if (complement) {
+      return !wholeTypes.contains(annotationType)
+          && !excludedAttributes.containsEntry(annotationType, attribute);
     }
 
-    return (this.wholeTypes.contains(annotationType)
-            && !this.excludedAttributes.containsEntry(annotationType, attribute))
-        || this.includedAttributes.containsEntry(annotationType, attribute);
+    return (wholeTypes.contains(annotationType)
+            && !excludedAttributes.containsEntry(annotationType, attribute))
+        || includedAttributes.containsEntry(annotationType, attribute);
   }
 }

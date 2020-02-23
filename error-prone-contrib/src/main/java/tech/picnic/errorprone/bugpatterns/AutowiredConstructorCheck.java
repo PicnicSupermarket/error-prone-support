@@ -17,7 +17,6 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
-import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 
 /** A {@link BugChecker} which flags redundant {@code @Autowired} constructor annotations. */
@@ -62,7 +61,7 @@ public final class AutowiredConstructorCheck extends BugChecker implements Annot
       return false;
     }
 
-    Symbol sym = ASTHelpers.getSymbol(method);
-    return sym instanceof MethodSymbol && ((MethodSymbol) sym).isConstructor();
+    MethodSymbol sym = ASTHelpers.getSymbol(method);
+    return sym != null && sym.isConstructor();
   }
 }
