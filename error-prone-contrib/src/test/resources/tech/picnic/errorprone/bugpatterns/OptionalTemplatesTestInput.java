@@ -71,8 +71,8 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
     return Optional.of("foo").orElseGet(() -> Optional.of("bar").get());
   }
 
-  Stream<Object> testStreamFlatmapOptional() {
-    return Stream.concat(
+  ImmutableSet<Object> testStreamFlatmapOptional() {
+    return ImmutableSet.of(
         Stream.of(Optional.empty()).filter(Optional::isPresent).map(Optional::get),
         Stream.of(Optional.of("foo")).flatMap(Streams::stream));
   }
@@ -91,5 +91,11 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
 
   Optional<Integer> testFlatMapOuterOptionalAfterFlatMap() {
     return Optional.of("foo").flatMap(v -> Optional.of(v.length()).flatMap(Optional::of));
+  }
+
+  ImmutableSet<Optional<String>> testOptionalOrOtherOptional() {
+    return ImmutableSet.of(
+        Optional.of("foo").map(Optional::of).orElse(Optional.of("bar")),
+        Optional.of("baz").map(Optional::of).orElseGet(() -> Optional.of("qux")));
   }
 }

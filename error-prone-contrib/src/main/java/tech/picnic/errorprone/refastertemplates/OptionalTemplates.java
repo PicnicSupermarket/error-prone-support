@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link Optional}s. */
@@ -278,6 +279,23 @@ final class OptionalTemplates {
     Optional<R> after(
         Optional<T> optional, Function<? super S, ? extends Optional<? extends R>> function) {
       return optional.flatMap(v -> toOptionalFunction(v)).flatMap(function);
+    }
+  }
+
+  /** Prefer {@link Optional#or(Supplier)} over more verbose alternatives. */
+  abstract static class OptionalOrOtherOptional<T> {
+    @BeforeTemplate
+    Optional<T> before(Optional<T> optional1, Optional<T> optional2) {
+      // XXX: Note that rewriting the first variant will change the code's behavior if `optional2`
+      // has side-effects.
+      return Refaster.anyOf(
+          optional1.map(Optional::of).orElse(optional2),
+          optional1.map(Optional::of).orElseGet(() -> optional2));
+    }
+
+    @AfterTemplate
+    Optional<T> after(Optional<T> optional1, Optional<T> optional2) {
+      return optional1.or(() -> optional2);
     }
   }
 
