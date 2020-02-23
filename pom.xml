@@ -1291,6 +1291,41 @@
             </build>
         </profile>
         <profile>
+            <!-- Some code in this project interfaces directly with the Java
+            compiler. The following `add-exports` arguments are not necessary
+            for the code to compile because `com.google.errorprone:javac` is on
+            the classpath. In fact, enabling this profile when building with
+            Maven on the command line with cause a build failure, because these
+            flags are incompatible with the `release` flag. This profile exists
+            solely to be enabled within an IDE: without them IntelliJ IDEA
+            reports compilation errors. -->
+            <id>add-exports</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <compilerArgs combine.children="append">
+                                    <arg>--add-exports</arg>
+                                    <arg>jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                                    <arg>--add-exports</arg>
+                                    <arg>jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                                    <arg>--add-exports</arg>
+                                    <arg>jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                                    <arg>--add-exports</arg>
+                                    <arg>jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                                    <arg>--add-exports</arg>
+                                    <arg>jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                                </compilerArgs>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
             <!-- This profile is auto-activated when performing a release. -->
             <id>release</id>
             <build>
