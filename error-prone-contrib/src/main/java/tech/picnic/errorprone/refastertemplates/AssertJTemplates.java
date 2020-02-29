@@ -85,7 +85,7 @@ import org.assertj.core.api.OptionalLongAssert;
 // XXX: assertThat(stream.anyMatch(pred)).isTrue() -> simplify.
 // XXX: For the generated code, go up to at least 8.
 // XXX: Try to fix Refaster so that the `assertThat(Comparable)` overload is matched.
-// XXX: Look for `.test()` expressions and see which AssertJ/RxJava combose can be written nicer.
+// XXX: Look for `.test()` expressions and see which AssertJ/RxJava combos can be written nicer.
 // XXX: Drop String.format inside `.withFailureMessage` and similar variants.
 // XXX: `assertThat(...).isEqualTo((Object) someCollection)` ->
 // `assertThat(...).containsExactlyInAnyOrder(someCollection)` (not so in general for sorted
@@ -128,94 +128,6 @@ import org.assertj.core.api.OptionalLongAssert;
 // `abstractOptionalAssert.hasValueSatisfying(pred)`.
 final class AssertJTemplates {
   private AssertJTemplates() {}
-
-  //
-  // Boolean
-  //
-
-  static final class AssertThatBooleanIsEqualTo {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(AbstractBooleanAssert<?> boolAssert, boolean other) {
-      return boolAssert.isNotEqualTo(!other);
-    }
-
-    @AfterTemplate
-    AbstractBooleanAssert<?> after(AbstractBooleanAssert<?> boolAssert, boolean other) {
-      return boolAssert.isEqualTo(other);
-    }
-  }
-
-  static final class AssertThatBooleanIsNotEqualTo {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(AbstractBooleanAssert<?> boolAssert, boolean other) {
-      return boolAssert.isEqualTo(!other);
-    }
-
-    @AfterTemplate
-    AbstractBooleanAssert<?> after(AbstractBooleanAssert<?> boolAssert, boolean other) {
-      return boolAssert.isNotEqualTo(other);
-    }
-  }
-
-  static final class AssertThatBooleanIsTrue {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(AbstractBooleanAssert<?> boolAssert) {
-      return Refaster.anyOf(
-          boolAssert.isEqualTo(true),
-          boolAssert.isEqualTo(Boolean.TRUE),
-          boolAssert.isNotEqualTo(false),
-          boolAssert.isNotEqualTo(Boolean.FALSE));
-    }
-
-    @AfterTemplate
-    AbstractBooleanAssert<?> after(AbstractBooleanAssert<?> boolAssert) {
-      return boolAssert.isTrue();
-    }
-  }
-
-  // XXX: Find a better name.
-  static final class AssertThatBooleanIsTrue2 {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(boolean b) {
-      return assertThat(!b).isFalse();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    AbstractBooleanAssert<?> after(boolean b) {
-      return assertThat(b).isTrue();
-    }
-  }
-
-  static final class AssertThatBooleanIsFalse {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(AbstractBooleanAssert<?> boolAssert) {
-      return Refaster.anyOf(
-          boolAssert.isEqualTo(false),
-          boolAssert.isEqualTo(Boolean.FALSE),
-          boolAssert.isNotEqualTo(true),
-          boolAssert.isNotEqualTo(Boolean.TRUE));
-    }
-
-    @AfterTemplate
-    AbstractBooleanAssert<?> after(AbstractBooleanAssert<?> boolAssert) {
-      return boolAssert.isFalse();
-    }
-  }
-
-  // XXX: Find a better name.
-  static final class AssertThatBooleanIsFalse2 {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(boolean b) {
-      return assertThat(!b).isTrue();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    AbstractBooleanAssert<?> after(boolean b) {
-      return assertThat(b).isFalse();
-    }
-  }
 
   //
   // Integer
