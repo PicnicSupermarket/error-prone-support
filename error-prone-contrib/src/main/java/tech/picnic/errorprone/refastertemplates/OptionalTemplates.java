@@ -200,7 +200,7 @@ final class OptionalTemplates {
    */
   // XXX: Do we need the `.filter(Optional::isPresent)`? If it's absent the caller probably assumed
   // that the values are present. (If we drop it, we should rewrite vacuous filter steps.)
-  static final class StreamFlatmapOptional<T> {
+  static final class StreamFlatMapOptional<T> {
     @BeforeTemplate
     Stream<T> before(Stream<Optional<T>> stream) {
       return Refaster.anyOf(
