@@ -150,7 +150,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.10.2.20200130</version>
+                <version>2.10.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -235,7 +235,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.1.1</version>
+                <version>3.2.0</version>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
@@ -469,6 +469,9 @@
                                         <property name="illegalPkgs" value="com.amazonaws.annotation" />
                                         <property name="illegalPkgs" value="com.beust.jcommander.internal" />
                                         <property name="illegalPkgs" value="com.google.api.client.repackaged" />
+                                        <property name="illegalPkgs" value="com.google.common.cache">
+                                            <!-- Instead, please use Caffeine. -->
+                                        </property>
                                         <property name="illegalPkgs" value="com.newrelic.agent.deps" />
                                         <property name="illegalPkgs" value="com.tngtech.archunit.thirdparty" />
                                         <property name="illegalPkgs" value="jdk" />
