@@ -1,8 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.data.Offset.offset;
-import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
@@ -43,7 +41,6 @@ import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractComparableAssert;
 import org.assertj.core.api.AbstractDoubleAssert;
-import org.assertj.core.api.AbstractFloatAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractMapAssert;
@@ -99,7 +96,6 @@ import org.assertj.core.api.OptionalLongAssert;
 // XXX: `assertThat(n > k).isTrue()` -> assertThat(n).isGreaterThan(k)` (etc. Also `==`!)
 // XXX: `assertThat(n > k && n < m).isTrue()` -> assertThat(n).isStrictlyBetween(k, m)` (etc.)
 // XXX: `assertThat(ImmutableList.copyOf(iterable))` -> assertThat(iterable)` (etc.)
-// XXX: `intAssert.isEqualTo(integer.intValue())` -> `intAssert.isEqualTo(integer)` (etc.)
 // XXX: The `assertThat` rules currently don't handle the case where there's a `failMessage`. Decide
 // what to do with that.
 // XXX: Also cater for `hasSameElementsAs(Sets.newHashSet(...))` and variants?
@@ -128,160 +124,6 @@ import org.assertj.core.api.OptionalLongAssert;
 // `abstractOptionalAssert.hasValueSatisfying(pred)`.
 final class AssertJTemplates {
   private AssertJTemplates() {}
-
-  //
-  // Integer
-  //
-
-  static final class AssertThatIntegerIsEqualTo {
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int n) {
-      return intAssert.isEqualTo(Integer.valueOf(n));
-    }
-
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, long n) {
-      return intAssert.isEqualTo(Long.valueOf(n));
-    }
-
-    @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert, int n) {
-      return intAssert.isEqualTo(n);
-    }
-  }
-
-  static final class AssertThatIntegerIsNotEqualTo {
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int n) {
-      return intAssert.isNotEqualTo(Integer.valueOf(n));
-    }
-
-    @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert, int n) {
-      return intAssert.isNotEqualTo(n);
-    }
-  }
-
-  static final class AssertThatIntegerIsZero {
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isEqualTo(0);
-    }
-
-    @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isZero();
-    }
-  }
-
-  static final class AssertThatIntegerIsNotZero {
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isNotEqualTo(0);
-    }
-
-    @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isNotZero();
-    }
-  }
-
-  static final class AssertThatIntegerIsPositive {
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
-      return Refaster.anyOf(intAssert.isGreaterThan(0), intAssert.isGreaterThanOrEqualTo(1));
-    }
-
-    @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isPositive();
-    }
-  }
-
-  static final class AssertThatIntegerIsNotPositive {
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
-      return Refaster.anyOf(intAssert.isLessThanOrEqualTo(0), intAssert.isLessThan(1));
-    }
-
-    @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isNotPositive();
-    }
-  }
-
-  static final class AssertThatIntegerIsNegative {
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
-      return Refaster.anyOf(intAssert.isLessThan(0), intAssert.isLessThanOrEqualTo(-1));
-    }
-
-    @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isNegative();
-    }
-  }
-
-  static final class AssertThatIntegerIsNotNegative {
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
-      return Refaster.anyOf(intAssert.isGreaterThanOrEqualTo(0), intAssert.isGreaterThan(-1));
-    }
-
-    @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isNotNegative();
-    }
-  }
-
-  //
-  // Float
-  //
-
-  static final class AssertThatFloatIsEqualTo {
-    @BeforeTemplate
-    AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert, float n) {
-      return Refaster.anyOf(
-          floatAssert.isCloseTo(n, offset(0F)),
-          floatAssert.isCloseTo(Float.valueOf(n), offset(0F)),
-          floatAssert.isCloseTo(n, withPercentage(0F)),
-          floatAssert.isCloseTo(Float.valueOf(n), withPercentage(0F)),
-          floatAssert.isEqualTo(n, offset(0F)),
-          floatAssert.isEqualTo(Float.valueOf(n)),
-          floatAssert.isEqualTo(Float.valueOf(n), offset(0F)));
-    }
-
-    @AfterTemplate
-    AbstractFloatAssert<?> after(AbstractFloatAssert<?> floatAssert, float n) {
-      return floatAssert.isEqualTo(n);
-    }
-  }
-
-  //
-  // Double
-  //
-
-  static final class AssertThatDoubleIsEqualTo {
-    @BeforeTemplate
-    AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert, double n) {
-      return Refaster.anyOf(
-          doubleAssert.isCloseTo(n, offset(0.0)),
-          doubleAssert.isCloseTo(Double.valueOf(n), offset(0.0)),
-          doubleAssert.isCloseTo(n, withPercentage(0.0)),
-          doubleAssert.isCloseTo(Double.valueOf(n), withPercentage(0.0)),
-          doubleAssert.isEqualTo(n, offset(0.0)),
-          doubleAssert.isEqualTo(Double.valueOf(n)),
-          doubleAssert.isEqualTo(Double.valueOf(n), offset(0.0)));
-    }
-
-    @AfterTemplate
-    AbstractDoubleAssert<?> after(AbstractDoubleAssert<?> doubleAssert, double n) {
-      return doubleAssert.isEqualTo(n);
-    }
-  }
-
-  /// XXX: Above this line: context-independent rewrite rules. Should be applied first.
-  // XXX: Below this line: context-dependent rewrite rules.
 
   //
   // Object

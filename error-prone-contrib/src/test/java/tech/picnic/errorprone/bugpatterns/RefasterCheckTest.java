@@ -25,7 +25,16 @@ public final class RefasterCheckTest {
   private static final ImmutableSet<String> TEMPLATE_GROUPS =
       ImmutableSet.of(
           "AssertJ",
+          "AssertJBigDecimal",
+          "AssertJBigInteger",
           "AssertJBoolean",
+          "AssertJByte",
+          "AssertJDouble",
+          "AssertJFloat",
+          "AssertJInteger",
+          "AssertJLong",
+          "AssertJNumber",
+          "AssertJShort",
           "Assorted",
           "BigDecimal",
           "Collection",
