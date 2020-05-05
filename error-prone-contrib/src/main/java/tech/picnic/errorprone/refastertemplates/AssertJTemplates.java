@@ -27,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
@@ -44,17 +43,12 @@ import org.assertj.core.api.AbstractDoubleAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractMapAssert;
-import org.assertj.core.api.AbstractObjectAssert;
-import org.assertj.core.api.AbstractOptionalAssert;
-import org.assertj.core.api.AbstractStringAssert;
-import org.assertj.core.api.Assert;
 import org.assertj.core.api.EnumerableAssert;
 import org.assertj.core.api.IterableAssert;
 import org.assertj.core.api.ListAssert;
 import org.assertj.core.api.MapAssert;
 import org.assertj.core.api.ObjectAssert;
 import org.assertj.core.api.ObjectEnumerableAssert;
-import org.assertj.core.api.OptionalAssert;
 import org.assertj.core.api.OptionalDoubleAssert;
 import org.assertj.core.api.OptionalIntAssert;
 import org.assertj.core.api.OptionalLongAssert;
@@ -72,8 +66,6 @@ import org.assertj.core.api.OptionalLongAssert;
 // XXX: Handle `.isEqualTo(explicitlyEnumeratedCollection)`. Can be considered equivalent to
 // `.containsOnly(elements)`. (This does mean the auto-generated code needs to be more advanced.
 // Ponder this.)
-// XXX: For `isZero()` and other numeric variants: collapse into a single rule coded against
-// `NumberAssert`.
 // XXX: Most/all of those Iterable rules can also be applied to arrays.
 // XXX: Elsewhere add a rule to disallow `Collection.emptyList()` and variants as well as
 // `Arrays.asList()` and `Arrays.asList(singleElement)`, maybe other obviously-varargs cases.
@@ -124,240 +116,6 @@ import org.assertj.core.api.OptionalLongAssert;
 // `abstractOptionalAssert.hasValueSatisfying(pred)`.
 final class AssertJTemplates {
   private AssertJTemplates() {}
-
-  //
-  // Object
-  //
-
-  static final class AssertThatIsInstanceOf<S, T> {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(S object) {
-      return assertThat(Refaster.<T>isInstance(object)).isTrue();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    ObjectAssert<S> after(S object) {
-      return assertThat(object).isInstanceOf(Refaster.<T>clazz());
-    }
-  }
-
-  static final class AssertThatIsNotInstanceOf<S, T> {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(S object) {
-      return assertThat(Refaster.<T>isInstance(object)).isFalse();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    ObjectAssert<S> after(S object) {
-      return assertThat(object).isNotInstanceOf(Refaster.<T>clazz());
-    }
-  }
-
-  static final class AssertThatIsIsEqualTo<S, T> {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(S object1, T object2) {
-      return assertThat(object1.equals(object2)).isTrue();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    ObjectAssert<S> after(S object1, T object2) {
-      return assertThat(object1).isEqualTo(object2);
-    }
-  }
-
-  static final class AssertThatIsIsNotEqualTo<S, T> {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(S object1, T object2) {
-      return assertThat(object1.equals(object2)).isFalse();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    ObjectAssert<S> after(S object1, T object2) {
-      return assertThat(object1).isNotEqualTo(object2);
-    }
-  }
-
-  //
-  // String
-  //
-
-  static final class AssertThatStringIsEmpty {
-    @BeforeTemplate
-    void before(Assert<?, String> stringAssert) {
-      stringAssert.isEqualTo("");
-    }
-
-    @AfterTemplate
-    void after(EnumerableAssert<?, String> charAssert) {
-      charAssert.isEmpty();
-    }
-  }
-
-  // XXX: Find a better name.
-  static final class AssertThatStringIsEmpty2 {
-    @BeforeTemplate
-    void before(String string) {
-      Refaster.anyOf(
-          assertThat(string.isEmpty()).isTrue(),
-          assertThat(string.length()).isZero(),
-          assertThat(string.length()).isNotPositive());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    void after(String string) {
-      assertThat(string).isEmpty();
-    }
-  }
-
-  static final class AssertThatStringIsNotEmpty {
-    @BeforeTemplate
-    void before(AbstractAssert<?, String> stringAssert) {
-      stringAssert.isNotEqualTo("");
-    }
-
-    @AfterTemplate
-    void after(EnumerableAssert<?, String> charAssert) {
-      charAssert.isNotEmpty();
-    }
-  }
-
-  // XXX: Find a better name.
-  static final class AssertThatStringIsNotEmpty2 {
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(String string) {
-      return Refaster.anyOf(
-          assertThat(string.isEmpty()).isFalse(),
-          assertThat(string.length()).isNotZero(),
-          assertThat(string.length()).isPositive());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string) {
-      return assertThat(string).isNotEmpty();
-    }
-  }
-
-  static final class AssertThatStringHasLength {
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(String string, int length) {
-      return assertThat(string.length()).isEqualTo(length);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, int length) {
-      return assertThat(string).hasSize(length);
-    }
-  }
-
-  //
-  // Optional
-  //
-
-  static final class AssertThatOptional<T> {
-    @BeforeTemplate
-    @SuppressWarnings("NullAway")
-    ObjectAssert<T> before(Optional<T> optional) {
-      return assertThat(optional.get());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, T> after(Optional<T> optional) {
-      return assertThat(optional).get();
-    }
-  }
-
-  static final class AssertThatOptionalIsPresent<T> {
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert) {
-      return Refaster.anyOf(
-          optionalAssert.isNotEmpty(), optionalAssert.isNotEqualTo(Optional.empty()));
-    }
-
-    @AfterTemplate
-    AbstractOptionalAssert<?, T> after(AbstractOptionalAssert<?, T> optionalAssert) {
-      return optionalAssert.isPresent();
-    }
-  }
-
-  // XXX: Find a better name.
-  static final class AssertThatOptionalIsPresent2<T> {
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(Optional<T> optional) {
-      return Refaster.anyOf(
-          assertThat(optional.isPresent()).isTrue(), assertThat(optional.isEmpty()).isFalse());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    OptionalAssert<T> after(Optional<T> optional) {
-      return assertThat(optional).isPresent();
-    }
-  }
-
-  static final class AssertThatOptionalIsEmpty<T> {
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert) {
-      return Refaster.anyOf(
-          optionalAssert.isNotPresent(), optionalAssert.isEqualTo(Optional.empty()));
-    }
-
-    @AfterTemplate
-    AbstractOptionalAssert<?, T> after(AbstractOptionalAssert<?, T> optionalAssert) {
-      return optionalAssert.isEmpty();
-    }
-  }
-
-  // XXX: Find a better name.
-  static final class AssertThatOptionalIsEmpty2<T> {
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(Optional<T> optional) {
-      return Refaster.anyOf(
-          assertThat(optional.isEmpty()).isTrue(), assertThat(optional.isPresent()).isFalse());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    OptionalAssert<T> after(Optional<T> optional) {
-      return assertThat(optional).isEmpty();
-    }
-  }
-
-  static final class AssertThatOptionalHasValue<T> {
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert, T value) {
-      return Refaster.anyOf(
-          optionalAssert.get().isEqualTo(value),
-          optionalAssert.isEqualTo(Optional.of(value)),
-          optionalAssert.contains(value));
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    AbstractOptionalAssert<?, T> after(AbstractOptionalAssert<?, T> optionalAssert, T value) {
-      return optionalAssert.hasValue(value);
-    }
-  }
-
-  static final class AssertThatOptionalHasValueMatching<T> {
-    @BeforeTemplate
-    AbstractOptionalAssert<?, T> before(Optional<T> optional, Predicate<? super T> predicate) {
-      return assertThat(optional.filter(predicate)).isPresent();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, T> after(Optional<T> optional, Predicate<? super T> predicate) {
-      return assertThat(optional).get().matches(predicate);
-    }
-  }
 
   //
   // OptionalDouble
@@ -686,7 +444,8 @@ final class AssertJTemplates {
     void before(Iterable<E> iterable) {
       Refaster.anyOf(
           assertThat(iterable.iterator().hasNext()).isFalse(),
-          assertThat(Iterables.size(iterable)).isZero(),
+          assertThat(Iterables.size(iterable)).isEqualTo(0),
+          assertThat(Iterables.size(iterable)).isEqualTo(0L),
           assertThat(Iterables.size(iterable)).isNotPositive());
     }
 
@@ -694,7 +453,8 @@ final class AssertJTemplates {
     void before(Collection<E> iterable) {
       Refaster.anyOf(
           assertThat(iterable.isEmpty()).isTrue(),
-          assertThat(iterable.size()).isZero(),
+          assertThat(iterable.size()).isEqualTo(0),
+          assertThat(iterable.size()).isEqualTo(0L),
           assertThat(iterable.size()).isNotPositive());
     }
 
@@ -710,7 +470,7 @@ final class AssertJTemplates {
     AbstractAssert<?, ?> before(Iterable<E> iterable) {
       return Refaster.anyOf(
           assertThat(iterable.iterator().hasNext()).isTrue(),
-          assertThat(Iterables.size(iterable)).isNotZero(),
+          assertThat(Iterables.size(iterable)).isNotEqualTo(0),
           assertThat(Iterables.size(iterable)).isPositive());
     }
 
@@ -718,7 +478,7 @@ final class AssertJTemplates {
     AbstractAssert<?, ?> before(Collection<E> iterable) {
       return Refaster.anyOf(
           assertThat(iterable.isEmpty()).isFalse(),
-          assertThat(iterable.size()).isNotZero(),
+          assertThat(iterable.size()).isNotEqualTo(0),
           assertThat(iterable.size()).isPositive());
     }
 
@@ -891,7 +651,8 @@ final class AssertJTemplates {
     void before(Map<K, V> map) {
       Refaster.anyOf(
           assertThat(map.isEmpty()).isTrue(),
-          assertThat(map.size()).isZero(),
+          assertThat(map.size()).isEqualTo(0),
+          assertThat(map.size()).isEqualTo(0L),
           assertThat(map.size()).isNotPositive());
     }
 
@@ -932,7 +693,7 @@ final class AssertJTemplates {
     AbstractAssert<?, ?> before(Map<K, V> map) {
       return Refaster.anyOf(
           assertThat(map.isEmpty()).isFalse(),
-          assertThat(map.size()).isNotZero(),
+          assertThat(map.size()).isNotEqualTo(0),
           assertThat(map.size()).isPositive(),
           assertThat(Refaster.anyOf(map.keySet(), map.values())).isNotEmpty());
     }
