@@ -43,7 +43,6 @@ import org.assertj.core.api.AbstractDoubleAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractMapAssert;
-import org.assertj.core.api.EnumerableAssert;
 import org.assertj.core.api.IterableAssert;
 import org.assertj.core.api.ListAssert;
 import org.assertj.core.api.MapAssert;
@@ -171,56 +170,6 @@ final class AssertJTemplates {
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     OptionalLongAssert after(OptionalLong optional, long expected) {
       return assertThat(optional).hasValue(expected);
-    }
-  }
-
-  //
-  // Enumerable
-  //
-
-  static final class AssertThatEnumerableIsEmpty<E> {
-    @BeforeTemplate
-    void before(EnumerableAssert<?, E> enumAssert) {
-      Refaster.anyOf(enumAssert.hasSize(0), enumAssert.hasSizeLessThan(1));
-    }
-
-    @AfterTemplate
-    void after(EnumerableAssert<?, E> enumAssert) {
-      enumAssert.isEmpty();
-    }
-  }
-
-  static final class AssertThatEnumerableIsNotEmpty<E> {
-    @BeforeTemplate
-    void before(EnumerableAssert<?, E> enumAssert) {
-      Refaster.anyOf(enumAssert.hasSizeGreaterThan(0), enumAssert.hasSizeGreaterThanOrEqualTo(1));
-    }
-
-    @AfterTemplate
-    void after(EnumerableAssert<?, E> enumAssert) {
-      enumAssert.isNotEmpty();
-    }
-  }
-
-  static final class AssertThatEnumerableHasSameSizeAs<S, T> {
-    @BeforeTemplate
-    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, Iterable<T> iterable) {
-      return enumAssert.hasSize(Iterables.size(iterable));
-    }
-
-    @BeforeTemplate
-    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, Collection<T> iterable) {
-      return enumAssert.hasSize(iterable.size());
-    }
-
-    @BeforeTemplate
-    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, T[] iterable) {
-      return enumAssert.hasSize(iterable.length);
-    }
-
-    @AfterTemplate
-    EnumerableAssert<?, S> after(EnumerableAssert<?, S> enumAssert, Iterable<T> iterable) {
-      return enumAssert.hasSameSizeAs(iterable);
     }
   }
 

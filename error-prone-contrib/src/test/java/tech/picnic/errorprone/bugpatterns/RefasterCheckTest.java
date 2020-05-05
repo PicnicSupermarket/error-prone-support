@@ -31,6 +31,7 @@ public final class RefasterCheckTest {
           "AssertJByte",
           "AssertJCharSequence",
           "AssertJDouble",
+          "AssertJEnumerable",
           "AssertJFloat",
           "AssertJInteger",
           "AssertJLong",
