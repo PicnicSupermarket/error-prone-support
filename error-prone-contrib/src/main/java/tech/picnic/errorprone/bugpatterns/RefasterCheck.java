@@ -77,7 +77,13 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
    * @param flags Any provided command line flags.
    */
   public RefasterCheck(ErrorProneFlags flags) {
-    codeTransformer = loadCompositeCodeTransformer(flags);
+    codeTransformer = createCompositeCodeTransformer(flags, loadAllCodeTransformers());
+  }
+
+  @VisibleForTesting
+  RefasterCheck(
+      ErrorProneFlags flags, ImmutableListMultimap<String, CodeTransformer> allTransformers) {
+    codeTransformer = createCompositeCodeTransformer(flags, allTransformers);
   }
 
   @Override
@@ -145,8 +151,8 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
         .flatMap(fix -> fix.getReplacements(endPositions).stream());
   }
 
-  private static CodeTransformer loadCompositeCodeTransformer(ErrorProneFlags flags) {
-    ImmutableListMultimap<String, CodeTransformer> allTransformers = loadAllCodeTransformers();
+  private static CodeTransformer createCompositeCodeTransformer(
+      ErrorProneFlags flags, ImmutableListMultimap<String, CodeTransformer> allTransformers) {
     return CompositeCodeTransformer.compose(
         flags
             .get(INCLUDED_TEMPLATES_PATTERN_FLAG)

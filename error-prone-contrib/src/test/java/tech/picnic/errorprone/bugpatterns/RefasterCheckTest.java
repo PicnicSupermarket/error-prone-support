@@ -6,11 +6,13 @@ import static java.util.function.Predicate.not;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
+import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.ErrorProneFlags;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -68,15 +70,17 @@ public final class RefasterCheckTest {
           "String",
           "TestNGToAssertJ",
           "Time");
+  /** All Refaster templates on the classpath, indexed by their name. */
+  private static final ImmutableListMultimap<String, CodeTransformer> ALL_CODE_TRANSFORMERS =
+      RefasterCheck.loadAllCodeTransformers();
   /**
-   * A mapping from template group names to associated template names, as constructed by {@link
-   * RefasterCheck} (i.e., by the code under test).
+   * A mapping from template group names to associated template names.
    *
    * <p>In effect, the values correspond to nested classes that represent individual Refaster
    * templates, while the keys correspond to the associated top-level "aggregator" classes.
    */
   private static final ImmutableSetMultimap<String, String> TEMPLATES_BY_GROUP =
-      loadTemplateNames();
+      indexTemplateNamesByGroup(ALL_CODE_TRANSFORMERS.keySet());
 
   /** Returns every known template group name as a parameterized test argument. */
   @SuppressWarnings("UnusedMethod" /* Used as a `@MethodSource`. */)
@@ -141,10 +145,11 @@ public final class RefasterCheckTest {
         .hasMessageFindingMatch("^(diff|expected):");
   }
 
-  private static ImmutableSetMultimap<String, String> loadTemplateNames() {
+  private static ImmutableSetMultimap<String, String> indexTemplateNamesByGroup(
+      ImmutableSet<String> templateNames) {
     Pattern toTrim = Pattern.compile(".*\\.|Templates\\$.*");
 
-    return RefasterCheck.loadAllCodeTransformers().keySet().stream()
+    return templateNames.stream()
         .collect(toImmutableSetMultimap(n -> toTrim.matcher(n).replaceAll(""), identity()));
   }
 
@@ -167,7 +172,8 @@ public final class RefasterCheckTest {
       String namePattern) {
     return BugCheckerRefactoringTestHelper.newInstance(
         new RefasterCheck(
-            ErrorProneFlags.fromMap(ImmutableMap.of("Refaster:NamePattern", namePattern))),
+            ErrorProneFlags.fromMap(ImmutableMap.of("Refaster:NamePattern", namePattern)),
+            ALL_CODE_TRANSFORMERS),
         getClass());
   }
 }
