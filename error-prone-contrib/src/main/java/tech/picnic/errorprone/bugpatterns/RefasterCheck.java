@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -61,8 +60,7 @@ import java.util.stream.Stream;
     tags = StandardTags.SIMPLIFICATION,
     providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class RefasterCheck extends BugChecker implements CompilationUnitTreeMatcher {
-  private static final Pattern REFASTER_TEMPLATE_RESOURCE =
-      Pattern.compile("^.*?([^/]+)\\.refaster");
+  private static final String REFASTER_TEMPLATE_SUFFIX = ".refaster";
   private static final String INCLUDED_TEMPLATES_PATTERN_FLAG = "Refaster:NamePattern";
   private static final long serialVersionUID = 1L;
 
@@ -171,11 +169,11 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
         ImmutableListMultimap.builder();
 
     for (ResourceInfo resource : getClassPathResources()) {
-      Matcher matcher = REFASTER_TEMPLATE_RESOURCE.matcher(resource.getResourceName());
-      if (matcher.matches()) {
-        loadCodeTransformer(resource)
-            .ifPresent(transformer -> transformers.put(matcher.group(1), transformer));
-      }
+      getRefasterTemplateName(resource)
+          .ifPresent(
+              templateName ->
+                  loadCodeTransformer(resource)
+                      .ifPresent(transformer -> transformers.put(templateName, transformer)));
     }
 
     return transformers.build();
@@ -187,6 +185,18 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
     } catch (IOException e) {
       throw new IllegalStateException("Failed to scan classpath for resources", e);
     }
+  }
+
+  private static Optional<String> getRefasterTemplateName(ResourceInfo resource) {
+    String resourceName = resource.getResourceName();
+    if (!resourceName.endsWith(REFASTER_TEMPLATE_SUFFIX)) {
+      return Optional.empty();
+    }
+
+    int lastPathSeparator = resourceName.lastIndexOf('/');
+    int beginIndex = lastPathSeparator < 0 ? 0 : lastPathSeparator + 1;
+    int endIndex = resourceName.length() - REFASTER_TEMPLATE_SUFFIX.length();
+    return Optional.of(resourceName.substring(beginIndex, endIndex));
   }
 
   private static Optional<CodeTransformer> loadCodeTransformer(ResourceInfo resource) {
