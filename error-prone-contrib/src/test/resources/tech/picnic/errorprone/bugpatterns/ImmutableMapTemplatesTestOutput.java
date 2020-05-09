@@ -65,9 +65,12 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
         Maps.uniqueIndex(ImmutableList.of(3).iterator(), n -> n.intValue()));
   }
 
-  ImmutableMap<String, Integer> testTransformMapValuesToImmutableMap() {
-    return ImmutableMap.copyOf(
-        Maps.transformValues(ImmutableMap.of("foo", 1L), v -> Math.toIntExact(v)));
+  ImmutableSet<ImmutableMap<String, Integer>> testTransformMapValuesToImmutableMap() {
+    return ImmutableSet.of(
+        ImmutableMap.copyOf(
+            Maps.transformValues(ImmutableMap.of("foo", 1L), v -> Math.toIntExact(v))),
+        ImmutableMap.copyOf(
+            Maps.transformValues(ImmutableMap.of("bar", 2L), v -> Math.toIntExact(v))));
   }
 
   ImmutableMap<String, Integer> testImmutableMapCopyOfImmutableMap() {

@@ -286,11 +286,12 @@ final class OptionalTemplates {
   abstract static class OptionalOrOtherOptional<T> {
     @BeforeTemplate
     Optional<T> before(Optional<T> optional1, Optional<T> optional2) {
-      // XXX: Note that rewriting the first variant will change the code's behavior if `optional2`
-      // has side-effects.
+      // XXX: Note that rewriting the first and third variant will change the code's behavior if
+      // `optional2` has side-effects.
       return Refaster.anyOf(
           optional1.map(Optional::of).orElse(optional2),
-          optional1.map(Optional::of).orElseGet(() -> optional2));
+          optional1.map(Optional::of).orElseGet(() -> optional2),
+          Stream.of(optional1, optional2).flatMap(Optional::stream).findFirst());
     }
 
     @AfterTemplate

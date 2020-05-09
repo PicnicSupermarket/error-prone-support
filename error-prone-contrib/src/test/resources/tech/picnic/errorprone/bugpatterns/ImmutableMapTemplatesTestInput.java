@@ -78,9 +78,13 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
             .collect(toImmutableMap(n -> n.intValue(), identity())));
   }
 
-  ImmutableMap<String, Integer> testTransformMapValuesToImmutableMap() {
-    return ImmutableMap.of("foo", 1L).entrySet().stream()
-        .collect(toImmutableMap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue())));
+  ImmutableSet<ImmutableMap<String, Integer>> testTransformMapValuesToImmutableMap() {
+    return ImmutableSet.of(
+        ImmutableMap.of("foo", 1L).entrySet().stream()
+            .collect(toImmutableMap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue()))),
+        Maps.toMap(
+            ImmutableMap.of("bar", 2L).keySet(),
+            k -> Math.toIntExact(ImmutableMap.of("bar", 2L).get(k))));
   }
 
   ImmutableMap<String, Integer> testImmutableMapCopyOfImmutableMap() {

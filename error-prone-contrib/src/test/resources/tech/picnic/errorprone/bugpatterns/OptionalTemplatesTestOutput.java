@@ -95,6 +95,7 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<Optional<String>> testOptionalOrOtherOptional() {
     return ImmutableSet.of(
         Optional.of("foo").or(() -> Optional.of("bar")),
-        Optional.of("baz").or(() -> Optional.of("qux")));
+        Optional.of("baz").or(() -> Optional.of("qux")),
+        Optional.of("quux").or(() -> Optional.of("quuz")));
   }
 }

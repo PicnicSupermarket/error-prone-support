@@ -218,7 +218,7 @@ final class ImmutableMapTemplates {
 
   /**
    * Prefer creating an immutable copy of the result of {@link Maps#transformValues(Map,
-   * com.google.common.base.Function)} over creating and directly collecting a stream.
+   * com.google.common.base.Function)} over more contrived alternatives.
    */
   abstract static class TransformMapValuesToImmutableMap<K, V1, V2> {
     @Placeholder(allowsIdentity = true)
@@ -228,9 +228,12 @@ final class ImmutableMapTemplates {
     // reason Refaster doesn't handle that case. This doesn't matter if we roll out use of
     // `MethodReferenceUsageCheck`. Same observation applies to a lot of other Refaster checks.
     @BeforeTemplate
+    @SuppressWarnings("NullAway")
     ImmutableMap<K, V2> before(Map<K, V1> map) {
-      return map.entrySet().stream()
-          .collect(toImmutableMap(Map.Entry::getKey, e -> valueTransformation(e.getValue())));
+      return Refaster.anyOf(
+          map.entrySet().stream()
+              .collect(toImmutableMap(Map.Entry::getKey, e -> valueTransformation(e.getValue()))),
+          Maps.toMap(map.keySet(), key -> valueTransformation(map.get(key))));
     }
 
     @AfterTemplate
