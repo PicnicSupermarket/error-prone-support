@@ -8,6 +8,8 @@ import com.google.errorprone.FileObjects;
 import com.sun.tools.javac.api.JavacTaskImpl;
 import com.sun.tools.javac.api.JavacTool;
 import com.sun.tools.javac.file.JavacFileManager;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,22 +55,25 @@ public final class Compilation {
   }
 
   private static void compile(ImmutableList<String> options, JavaFileObject javaFileObject) {
-    JavacFileManager javacFileManager = FileManagers.testFileManager();
-    JavaCompiler compiler = JavacTool.create();
+    try (JavacFileManager javacFileManager = FileManagers.testFileManager()) {
+      JavaCompiler compiler = JavacTool.create();
 
-    List<Diagnostic<?>> diagnostics = new ArrayList<>();
-    JavacTaskImpl task =
-        (JavacTaskImpl)
-            compiler.getTask(
-                null,
-                javacFileManager,
-                diagnostics::add,
-                options,
-                ImmutableList.of(),
-                ImmutableList.of(javaFileObject));
+      List<Diagnostic<?>> diagnostics = new ArrayList<>();
+      JavacTaskImpl task =
+          (JavacTaskImpl)
+              compiler.getTask(
+                  null,
+                  javacFileManager,
+                  diagnostics::add,
+                  options,
+                  ImmutableList.of(),
+                  ImmutableList.of(javaFileObject));
 
-    Boolean result = task.call();
-    assertThat(diagnostics).isEmpty();
-    assertThat(result).isTrue();
+      Boolean result = task.call();
+      assertThat(diagnostics).isEmpty();
+      assertThat(result).isTrue();
+    } catch (IOException e) {
+      throw new UncheckedIOException("Failed to close `JavaCompiler`", e);
+    }
   }
 }

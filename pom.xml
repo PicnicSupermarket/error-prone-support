@@ -203,6 +203,7 @@
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.1.1</version.auto-service>
         <version.auto-value>1.10.4</version.auto-value>
+        <version.checker-framework>3.42.0</version.checker-framework>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.24.0</version.error-prone-orig>
@@ -411,7 +412,17 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.42.0</version>
+                <version>${version.checker-framework}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-util</artifactId>
+                <version>${version.checker-framework}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>dataflow-shaded</artifactId>
+                <version>${version.checker-framework}</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -481,6 +492,22 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <!-- These two dependencies are implicitly used by all submodules because
+    the Checker Framework enriches the compiled code with inferred annotations. -->
+    <!-- XXX: Move these if we decide to move the Checker Framework code to a
+    separate profile. -->
+    <dependencies>
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-qual</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>dataflow-shaded</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <pluginManagement>
@@ -931,11 +958,53 @@
                                 <version>${version.error-prone-slf4j}</version>
                             </path>
                             <path>
+                                <groupId>org.checkerframework</groupId>
+                                <artifactId>checker</artifactId>
+                                <version>${version.checker-framework}</version>
+                            </path>
+                            <!-- This dependency is listed explicitly because
+                            Auto Service depends on an older incompatible
+                            version of this artifact. -->
+                            <path>
+                                <groupId>org.checkerframework</groupId>
+                                <artifactId>checker-qual</artifactId>
+                                <version>${version.checker-framework}</version>
+                            </path>
+                            <path>
                                 <groupId>org.mockito</groupId>
                                 <artifactId>mockito-errorprone</artifactId>
                                 <version>${version.mockito}</version>
                             </path>
                         </annotationProcessorPaths>
+                        <annotationProcessors>
+                            <annotationProcessor>com.google.auto.service.processor.AutoServiceProcessor</annotationProcessor>
+                            <annotationProcessor>com.google.auto.value.processor.AutoAnnotationProcessor</annotationProcessor>
+                            <annotationProcessor>com.google.auto.value.processor.AutoValueProcessor</annotationProcessor>
+                            <annotationProcessor>org.checkerframework.checker.calledmethods.CalledMethodsChecker</annotationProcessor>
+                            <!-- XXX: This check seems to trigger some false
+                            positives.
+                            <annotationProcessor>org.checkerframework.checker.lock.LockChecker</annotationProcessor> -->
+                            <annotationProcessor>org.checkerframework.checker.formatter.FormatterChecker</annotationProcessor>
+                            <!-- XXX: This check triggers false positives, at
+                            least in part because it doesn't respect invariants
+                            guarded by `check{Argument,State}`.
+                            <annotationProcessor>org.checkerframework.checker.index.IndexChecker</annotationProcessor> -->
+                            <annotationProcessor>org.checkerframework.checker.interning.InterningChecker</annotationProcessor>
+                            <!-- XXX: Flag some good stuff, but also a bunch of
+                            false positives.
+                            <annotationProcessor>org.checkerframework.checker.nullness.NullnessChecker</annotationProcessor> -->
+                            <!-- XXX: This checker also flags `Optional` fields
+                            and method method parameters. Consider introducing
+                            a derivative checker which _does_ allow this.
+                            <annotationProcessor>org.checkerframework.checker.optional.OptionalChecker</annotationProcessor> -->
+                            <annotationProcessor>org.checkerframework.checker.regex.RegexChecker</annotationProcessor>
+                            <!-- XXX: This check seems to trigger some false
+                            positives, with suppressions being reported as
+                            redundant.
+                            <annotationProcessor>org.checkerframework.checker.resourceleak.ResourceLeakChecker</annotationProcessor> -->
+                            <annotationProcessor>org.checkerframework.checker.signature.SignatureChecker</annotationProcessor>
+                            <annotationProcessor>org.checkerframework.common.initializedfields.InitializedFieldsChecker</annotationProcessor>
+                        </annotationProcessors>
                         <compilerArgs>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
@@ -944,10 +1013,41 @@
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                            <arg>-AskipDefs=\.Auto(Annotation|Value)_</arg>
+                            <!-- XXX: This prevents the nullness checker from
+                            flagging nullable arguments to `requireNonull`.
+                            Review this approach. -->
+                            <arg>-AskipUses=^java\.util\.Objects$</arg>
+                            <!-- XXX: This flag triggers a crash.
+                            <arg>-AcheckCastElementType</arg>-->
+                            <arg>-AcheckPurityAnnotations</arg>
+                            <arg>-AconcurrentSemantics</arg>
+                            <!-- XXX: This flag triggers a crash.
+                            <arg>-AconservativeUninferredTypeArguments</arg>-->
+                            <arg>-AignoreRawTypeArguments=false</arg>
+                            <!-- XXX: Odd impact on arrays; review.
+                            <arg>-AinvariantArrays</arg>-->
+                            <arg>-AresolveReflection</arg>
+                            <arg>-AshowSuppressWarningsStrings</arg>
+                            <arg>-AwarnRedundantAnnotations</arg>
+                            <arg>-AwarnUnneededSuppressions</arg>
+                            <arg>-ArequirePrefixInWarningSuppressions</arg>
+                            <arg>-AshowPrefixInWarningMessages</arg>
+                            <!-- XXX: Ponder.
+                            <arg>-AsuggestPureMethods</arg> -->
+                            <!-- XXX: Seemingly redundant null checks may be
+                            necessary when interacting with an unannotated,
+                            partially annotated or incorrectly annotated API.
+                            So ideally we specify
+                            `-Alint=all,-redundantNullComparison` or
+                            `-Alint=all -ANullnessChecker_lint=-redundantNullComparison`,
+                            but neither of these options has the desired
+                            effect. -->
                             <arg>-Xmaxerrs</arg>
                             <arg>10000</arg>
                             <arg>-Xmaxwarns</arg>
                             <arg>10000</arg>
+                            <!-- XXX: Move <arg>-Awarn</arg>-->
                         </compilerArgs>
                         <parameters>true</parameters>
                         <source>${version.jdk}</source>

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.checkerframework.checker.mustcall.qual.MustCall;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -149,7 +150,7 @@ final class AnnotatedCompositeCodeTransformerTest {
       ImmutableSet<? extends Annotation> annotations,
       Context expectedContext,
       Description returnedDescription) {
-    CodeTransformer codeTransformer = mock();
+    @MustCall CodeTransformer codeTransformer = mock();
 
     when(codeTransformer.annotations()).thenReturn(indexAnnotations(annotations));
     doAnswer(
@@ -183,7 +184,7 @@ final class AnnotatedCompositeCodeTransformerTest {
   private static Context context() {
     // XXX: Use `ErrorProneOptions#processArgs` to test the
     // `AnnotatedCompositeCodeTransformer#overrideSeverity` logic.
-    Context context = mock();
+    @MustCall Context context = mock();
     when(context.get(ErrorProneOptions.class)).thenReturn(ErrorProneOptions.empty());
     return context;
   }

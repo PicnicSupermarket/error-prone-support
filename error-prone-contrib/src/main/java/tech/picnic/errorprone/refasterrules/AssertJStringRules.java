@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractStringAssert;
+import org.checkerframework.checker.regex.qual.Regex;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 @OnlineDocumentation
@@ -71,26 +72,26 @@ final class AssertJStringRules {
 
   static final class AssertThatMatches {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(String string, String regex) {
+    AbstractAssert<?, ?> before(String string, @Regex String regex) {
       return assertThat(string.matches(regex)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(String string, String regex) {
+    AbstractAssert<?, ?> after(String string, @Regex String regex) {
       return assertThat(string).matches(regex);
     }
   }
 
   static final class AssertThatDoesNotMatch {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(String string, String regex) {
+    AbstractAssert<?, ?> before(String string, @Regex String regex) {
       return assertThat(string.matches(regex)).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(String string, String regex) {
+    AbstractAssert<?, ?> after(String string, @Regex String regex) {
       return assertThat(string).doesNotMatch(regex);
     }
   }

@@ -31,6 +31,7 @@ import com.sun.source.tree.ParenthesizedTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.SimpleTreeVisitor;
+import com.sun.tools.javac.code.Type;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
@@ -208,7 +209,9 @@ public final class FormatStringConcatenation extends BugChecker
   }
 
   private static boolean isStringTyped(ExpressionTree tree, VisitorState state) {
-    return ASTHelpers.isSameType(ASTHelpers.getType(tree), state.getSymtab().stringType, state);
+    // XXX: Open Error Prone PR to improve the `@Nullable` annotations on `ASTHelpers`.
+    Type type = ASTHelpers.getType(tree);
+    return type != null && ASTHelpers.isSameType(type, state.getSymtab().stringType, state);
   }
 
   private static class ReplacementArgumentsConstructor

@@ -171,6 +171,9 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
     return findMatchingSibling(tree, m -> m.getName().contentEquals(methodName), state);
   }
 
+  // XXX: File ticket for the `@SuppressWarnings`: the checker incorrectly claims that the predicate
+  // only accepts `@InternedDistinct @SignatureBottom MethodTree` values (IIUC).
+  @SuppressWarnings({"interning:argument", "signature:argument"})
   private static Optional<MethodTree> findMatchingSibling(
       MethodTree tree, Predicate<? super MethodTree> predicate, VisitorState state) {
     return state.findEnclosing(ClassTree.class).getMembers().stream()

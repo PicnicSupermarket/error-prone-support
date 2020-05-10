@@ -35,7 +35,9 @@ abstract class AbstractMatcherTestChecker extends BugChecker implements Compilat
   @Override
   public Description matchCompilationUnit(CompilationUnitTree compilationUnit, VisitorState state) {
     new TreePathScanner<@Nullable Void, @Nullable Void>() {
+      // XXX: Update `TreePathScanner#scan` stub to declare its first parameter `@Nullable`.
       @Override
+      @SuppressWarnings("nullness:argument")
       public @Nullable Void scan(@Nullable Tree tree, @Nullable Void unused) {
         if (tree instanceof ExpressionTree) {
           TreePath path = new TreePath(getCurrentPath(), tree);

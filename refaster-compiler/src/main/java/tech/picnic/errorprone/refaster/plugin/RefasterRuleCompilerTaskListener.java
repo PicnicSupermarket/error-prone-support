@@ -25,6 +25,7 @@ import com.sun.tools.javac.util.Name;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -145,7 +146,8 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
 
   private static void outputCodeTransformer(CodeTransformer codeTransformer, FileObject target)
       throws IOException {
-    try (ObjectOutput output = new ObjectOutputStream(target.openOutputStream())) {
+    try (OutputStream stream = target.openOutputStream();
+        ObjectOutput output = new ObjectOutputStream(stream)) {
       output.writeObject(codeTransformer);
     }
   }

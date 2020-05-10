@@ -42,6 +42,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.inject.Inject;
+import org.checkerframework.checker.regex.util.RegexUtil;
 
 /**
  * A {@link BugChecker} that flags code that can be simplified using Refaster rules located on the
@@ -210,7 +211,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     return CompositeCodeTransformer.compose(
         flags
             .get(INCLUDED_RULES_PATTERN_FLAG)
-            .map(Pattern::compile)
+            .map(pattern -> Pattern.compile(RegexUtil.asRegex(pattern)))
             .<ImmutableCollection<CodeTransformer>>map(
                 nameFilter -> filterCodeTransformers(allTransformers, nameFilter))
             .orElseGet(allTransformers::values));

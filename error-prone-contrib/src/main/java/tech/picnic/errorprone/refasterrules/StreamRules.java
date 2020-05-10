@@ -452,7 +452,11 @@ final class StreamRules {
 
   static final class StreamMapToIntSum<T> {
     @BeforeTemplate
-    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
+    @SuppressWarnings({
+      "interning:return" /* Handle inference failure. */,
+      "java:S4266" /* This violation will be rewritten. */,
+      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     long before(Stream<T> stream, ToIntFunction<T> mapper) {
       return stream.collect(summingInt(mapper));
     }
@@ -472,7 +476,11 @@ final class StreamRules {
 
   static final class StreamMapToDoubleSum<T> {
     @BeforeTemplate
-    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
+    @SuppressWarnings({
+      "interning:return" /* Handle inference failure. */,
+      "java:S4266" /* This violation will be rewritten. */,
+      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     double before(Stream<T> stream, ToDoubleFunction<T> mapper) {
       return stream.collect(summingDouble(mapper));
     }
@@ -492,7 +500,11 @@ final class StreamRules {
 
   static final class StreamMapToLongSum<T> {
     @BeforeTemplate
-    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
+    @SuppressWarnings({
+      "interning:return" /* Handle inference failure. */,
+      "java:S4266" /* This violation will be rewritten. */,
+      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     long before(Stream<T> stream, ToLongFunction<T> mapper) {
       return stream.collect(summingLong(mapper));
     }
@@ -548,7 +560,11 @@ final class StreamRules {
 
   static final class StreamCount<T> {
     @BeforeTemplate
-    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
+    @SuppressWarnings({
+      "interning:return" /* Handle inference failure. */,
+      "java:S4266" /* This violation will be rewritten. */,
+      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     long before(Stream<T> stream) {
       return stream.collect(counting());
     }

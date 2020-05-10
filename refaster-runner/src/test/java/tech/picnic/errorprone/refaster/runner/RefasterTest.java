@@ -178,6 +178,7 @@ final class RefasterTest {
     }
   }
 
+  @SuppressWarnings({"regex:argument", "regex:group.count"})
   private static ImmutableList<SeverityLevel> extractRefasterSeverities(
       String fileName, String message) {
     return Pattern.compile(

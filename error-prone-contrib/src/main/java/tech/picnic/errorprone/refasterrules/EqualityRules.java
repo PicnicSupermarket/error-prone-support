@@ -12,6 +12,7 @@ import com.google.errorprone.refaster.annotation.Placeholder;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
+import org.checkerframework.checker.interning.qual.Interned;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with (in)equalities. */
@@ -21,7 +22,7 @@ final class EqualityRules {
 
   /** Prefer reference-based quality for enums. */
   // Primitive value comparisons are not listed, because Error Prone flags those out of the box.
-  static final class PrimitiveOrReferenceEquality<T extends Enum<T>> {
+  static final class PrimitiveOrReferenceEquality<T extends @Interned Enum<T>> {
     /**
      * Enums can be compared by reference. It is safe to do so even in the face of refactorings,
      * because if the type is ever converted to a non-enum, then Error-Prone will complain about any
@@ -30,6 +31,7 @@ final class EqualityRules {
     // XXX: This Refaster rule is the topic of https://github.com/google/error-prone/issues/559. We
     // work around the issue by selecting the "largest replacements". See the `Refaster` check.
     @BeforeTemplate
+    @SuppressWarnings("interning:unnecessary.equals" /* This violation will be rewritten. */)
     boolean before(T a, T b) {
       return Refaster.anyOf(a.equals(b), Objects.equals(a, b));
     }
@@ -96,7 +98,7 @@ final class EqualityRules {
     }
 
     @BeforeTemplate
-    boolean before(Object a, Object b) {
+    boolean before(@Interned Object a, @Interned Object b) {
       return !(a == b);
     }
 
@@ -127,7 +129,7 @@ final class EqualityRules {
     }
 
     @BeforeTemplate
-    boolean before(Object a, Object b) {
+    boolean before(@Interned Object a, @Interned Object b) {
       return !(a != b);
     }
 

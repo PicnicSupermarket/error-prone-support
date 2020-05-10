@@ -34,6 +34,7 @@ import com.sun.tools.javac.code.Type;
 import java.util.List;
 import java.util.Optional;
 import javax.lang.model.element.Name;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A {@link BugChecker} that flags lambda expressions that can be replaced with method references.
@@ -189,7 +190,12 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
       }
     }
 
-    return Optional.of(diff == 0 ? Optional.empty() : Optional.of(expectedArguments.get(0)));
+    // XXX: These type hints shouldn't be necessary; see
+    // https://github.com/typetools/checker-framework/issues/4007.
+    return Optional.of(
+        diff == 0
+            ? Optional.<@NonNull Name>empty()
+            : Optional.<@NonNull Name>of(expectedArguments.get(0)));
   }
 
   private static ImmutableList<Name> getVariables(LambdaExpressionTree tree) {

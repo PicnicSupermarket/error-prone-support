@@ -45,6 +45,9 @@ public final class MethodMatcherFactory {
   // XXX: It seems parse errors are silently swallowed. Double-check; if true, file a ticket.
   // XXX: This (probably) doesn't work for methods with array type arguments; if true, implement a
   // fix.
+  // XXX: The `nullness` warning suppression shouldn't be necessary. See
+  // https://github.com/typetools/checker-framework/issues/4006.
+  @SuppressWarnings("nullness:argument")
   private static Matcher<ExpressionTree> createMethodMatcher(CharSequence signature) {
     java.util.regex.Matcher m = METHOD_SIGNATURE.matcher(signature);
     checkArgument(m.matches(), "Not a valid method signature: %s", signature);

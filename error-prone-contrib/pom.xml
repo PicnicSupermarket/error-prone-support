@@ -147,6 +147,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-util</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.immutables</groupId>
             <artifactId>value-annotations</artifactId>
             <scope>test</scope>

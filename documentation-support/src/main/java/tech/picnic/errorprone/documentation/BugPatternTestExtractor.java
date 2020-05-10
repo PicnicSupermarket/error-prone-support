@@ -2,6 +2,7 @@ package tech.picnic.errorprone.documentation;
 
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
@@ -17,7 +18,9 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.util.TreeScanner;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestCases;
 
@@ -157,7 +160,7 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
          * is safe, because this code is guarded by an earlier call to `#getClassUnderTest(..)`,
          * which ensures that `tree` is part of a longer method invocation chain.
          */
-        MethodInvocationTree inputTree = (MethodInvocationTree) ASTHelpers.getReceiver(tree);
+        MethodInvocationTree inputTree = (MethodInvocationTree) requireNonNull(ASTHelpers.getReceiver(tree));
 
         String path = ASTHelpers.constValue(inputTree.getArguments().get(0), String.class);
         Optional<String> inputCode = getSourceCode(inputTree);

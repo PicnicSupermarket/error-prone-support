@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.documentation;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
@@ -46,7 +47,7 @@ public final class DocumentationGenerator implements Plugin {
     checkArgument(
         matcher.matches(), "'%s' must be of the form '%s=<value>'", pathArg, OUTPUT_DIRECTORY_FLAG);
 
-    String path = matcher.group(1);
+    String path = requireNonNull(matcher.group(1), "Path must be present");
     try {
       return Path.of(path);
     } catch (InvalidPathException e) {

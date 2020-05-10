@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.documentation;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -93,7 +94,7 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
     }
   }
 
-  private <T> void writeToFile(String identifier, String className, T data) {
+  private <T extends Object> void writeToFile(String identifier, String className, T data) {
     File file = docsPath.resolve(String.format("%s-%s.json", identifier, className)).toFile();
 
     try (FileWriter fileWriter = new FileWriter(file, UTF_8)) {
@@ -104,6 +105,8 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   }
 
   private static String getSimpleClassName(URI path) {
-    return Paths.get(path).getFileName().toString().replace(".java", "");
+    return requireNonNull(Paths.get(path).getFileName(), "Path lacks filename")
+        .toString()
+        .replace(".java", "");
   }
 }

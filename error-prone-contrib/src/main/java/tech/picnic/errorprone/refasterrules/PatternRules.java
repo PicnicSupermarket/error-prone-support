@@ -7,6 +7,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import org.checkerframework.checker.regex.qual.Regex;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to code dealing with regular expressions. */
@@ -34,12 +35,12 @@ final class PatternRules {
   /** Prefer {@link Pattern#asPredicate()} over non-JDK alternatives. */
   static final class PatternCompileAsPredicate {
     @BeforeTemplate
-    Predicate<CharSequence> before(String pattern) {
+    Predicate<CharSequence> before(@Regex String pattern) {
       return containsPattern(pattern);
     }
 
     @AfterTemplate
-    Predicate<String> after(String pattern) {
+    Predicate<String> after(@Regex String pattern) {
       return Pattern.compile(pattern).asPredicate();
     }
   }

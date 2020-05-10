@@ -16,6 +16,7 @@ import java.io.IOException;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.checkerframework.checker.formatter.qual.FormatMethod;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /**
@@ -591,6 +592,7 @@ final class AssertJThrowingCallableRules {
   // arguments to a wide range of format methods.
   static final class AbstractThrowableAssertHasMessage {
     @BeforeTemplate
+    @FormatMethod
     AbstractThrowableAssert<?, ? extends Throwable> before(
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
         String message,
@@ -599,6 +601,7 @@ final class AssertJThrowingCallableRules {
     }
 
     @AfterTemplate
+    @FormatMethod
     AbstractThrowableAssert<?, ? extends Throwable> after(
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
         String message,
@@ -611,6 +614,7 @@ final class AssertJThrowingCallableRules {
   // arguments to a wide range of format methods.
   static final class AbstractThrowableAssertWithFailMessage {
     @BeforeTemplate
+    @FormatMethod
     AbstractThrowableAssert<?, ? extends Throwable> before(
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
         String message,
@@ -619,6 +623,7 @@ final class AssertJThrowingCallableRules {
     }
 
     @AfterTemplate
+    @FormatMethod
     AbstractThrowableAssert<?, ? extends Throwable> after(
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
         String message,
