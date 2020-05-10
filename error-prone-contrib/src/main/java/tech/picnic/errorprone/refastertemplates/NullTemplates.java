@@ -13,6 +13,8 @@ final class NullTemplates {
   private NullTemplates() {}
 
   /** Prefer {@link Objects#requireNonNullElse(Object, Object)} over the Guava alternative. */
+  // XXX: This rule is not valid in case `second` is `@Nullable`: in that case the Guava variant
+  // will return `null`, while the JDK variant will throw an NPE.
   static final class RequireNonNullElse<T> {
     @BeforeTemplate
     T before(T first, T second) {

@@ -70,6 +70,12 @@ public final class RefasterCheckTest {
           "String",
           "TestNGToAssertJ",
           "Time");
+  /**
+   * Matches the parts of the fully-qualified name of a template class that should be removed in
+   * order to produce the associated {@link #TEMPLATE_GROUPS template group name}.
+   */
+  private static final Pattern TEMPLATE_FQCN_TRIM_FOR_GROUP_NAME =
+      Pattern.compile(".*\\.|Templates\\$.*");
   /** All Refaster templates on the classpath, indexed by their name. */
   private static final ImmutableListMultimap<String, CodeTransformer> ALL_CODE_TRANSFORMERS =
       RefasterCheck.loadAllCodeTransformers();
@@ -147,10 +153,10 @@ public final class RefasterCheckTest {
 
   private static ImmutableSetMultimap<String, String> indexTemplateNamesByGroup(
       ImmutableSet<String> templateNames) {
-    Pattern toTrim = Pattern.compile(".*\\.|Templates\\$.*");
-
     return templateNames.stream()
-        .collect(toImmutableSetMultimap(n -> toTrim.matcher(n).replaceAll(""), identity()));
+        .collect(
+            toImmutableSetMultimap(
+                n -> TEMPLATE_FQCN_TRIM_FOR_GROUP_NAME.matcher(n).replaceAll(""), identity()));
   }
 
   private static String namePattern(String groupName, String excludedTemplate) {
@@ -158,7 +164,7 @@ public final class RefasterCheckTest {
   }
 
   private static String namePattern(String groupName) {
-    return Pattern.compile(groupName) + "Templates.*";
+    return Pattern.compile(Pattern.quote(groupName)) + "Templates.*";
   }
 
   private void verifyRefactoring(String groupName, String templateNamePattern) {

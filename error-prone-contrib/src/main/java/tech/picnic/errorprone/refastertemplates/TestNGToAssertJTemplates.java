@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.testng.Assert;
 import org.testng.Assert.ThrowingRunnable;
 
 /**
@@ -46,24 +47,24 @@ import org.testng.Assert.ThrowingRunnable;
  * assertEquals(myMaps, ImmutableList.of(ImmutableMap.of()));
  * }</pre>
  *
- * <p>A few {@link org.testng.Assert} methods are not rewritten:
+ * <p>A few {@link Assert} methods are not rewritten:
  *
  * <ul>
  *   <li>These methods cannot (easily) be expressed using AssertJ because they mix regular equality
  *       and array equality:
  *       <ul>
- *         <li>{@link org.testng.Assert#assertEqualsDeep(Map, Map)}
- *         <li>{@link org.testng.Assert#assertEqualsDeep(Map, Map, String)}
- *         <li>{@link org.testng.Assert#assertEqualsDeep(Set, Set, String)}
- *         <li>{@link org.testng.Assert#assertNotEqualsDeep(Map, Map)}
- *         <li>{@link org.testng.Assert#assertNotEqualsDeep(Map, Map, String)}
- *         <li>{@link org.testng.Assert#assertNotEqualsDeep(Set, Set)}
- *         <li>{@link org.testng.Assert#assertNotEqualsDeep(Set, Set, String)}
+ *         <li>{@link Assert#assertEqualsDeep(Map, Map)}
+ *         <li>{@link Assert#assertEqualsDeep(Map, Map, String)}
+ *         <li>{@link Assert#assertEqualsDeep(Set, Set, String)}
+ *         <li>{@link Assert#assertNotEqualsDeep(Map, Map)}
+ *         <li>{@link Assert#assertNotEqualsDeep(Map, Map, String)}
+ *         <li>{@link Assert#assertNotEqualsDeep(Set, Set)}
+ *         <li>{@link Assert#assertNotEqualsDeep(Set, Set, String)}
  *       </ul>
  *   <li>This method returns the caugth exception; there is no direct counterpart for this in
  *       AssertJ:
  *       <ul>
- *         <li>{@link org.testng.Assert#expectThrows(Class, ThrowingRunnable)}
+ *         <li>{@link Assert#expectThrows(Class, ThrowingRunnable)}
  *       </ul>
  * </ul>
  */
@@ -76,7 +77,7 @@ final class TestNGToAssertJTemplates {
   static final class Fail {
     @BeforeTemplate
     void before() {
-      org.testng.Assert.fail();
+      Assert.fail();
     }
 
     @AfterTemplate
@@ -89,7 +90,7 @@ final class TestNGToAssertJTemplates {
   static final class FailWithMessage {
     @BeforeTemplate
     void before(String message) {
-      org.testng.Assert.fail(message);
+      Assert.fail(message);
     }
 
     @AfterTemplate
@@ -103,7 +104,7 @@ final class TestNGToAssertJTemplates {
   static final class FailWithMessageAndThrowable {
     @BeforeTemplate
     void before(String message, Throwable throwable) {
-      org.testng.Assert.fail(message, throwable);
+      Assert.fail(message, throwable);
     }
 
     @AfterTemplate

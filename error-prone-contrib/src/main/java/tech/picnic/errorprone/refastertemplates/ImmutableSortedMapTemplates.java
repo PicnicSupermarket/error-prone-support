@@ -12,7 +12,6 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link ImmutableSortedMap}s. */
@@ -114,7 +113,7 @@ final class ImmutableSortedMapTemplates {
     }
 
     @AfterTemplate
-    ImmutableSortedMap<K, V> after(SortedMap.Entry<? extends K, ? extends V> entry) {
+    ImmutableSortedMap<K, V> after(Map.Entry<? extends K, ? extends V> entry) {
       return ImmutableSortedMap.of(entry.getKey(), entry.getValue());
     }
   }

@@ -39,6 +39,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -187,7 +188,10 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
 
   private static ImmutableSet<ResourceInfo> getClassPathResources() {
     try {
-      return ClassPath.from(RefasterCheck.class.getClassLoader()).getResources();
+      return ClassPath.from(
+              Objects.requireNonNullElseGet(
+                  RefasterCheck.class.getClassLoader(), () -> ClassLoader.getSystemClassLoader()))
+          .getResources();
     } catch (IOException e) {
       throw new IllegalStateException("Failed to scan classpath for resources", e);
     }
