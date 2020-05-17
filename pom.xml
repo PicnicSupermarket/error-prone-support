@@ -1204,8 +1204,6 @@
                                     -Xep:BetaApi:OFF
                                     <!-- We don't target JDK 7. -->
                                     -Xep:Java7ApiChecker:OFF
-                                    <!-- See https://github.com/google/error-prone/issues/1138. -->
-                                    -Xep:NullableDereference:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
