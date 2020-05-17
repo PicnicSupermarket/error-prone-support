@@ -13,7 +13,7 @@
     <inceptionYear>2017</inceptionYear>
     <organization>
         <name>Picnic Technologies BV</name>
-        <url>http://picnic.tech</url>
+        <url>https://picnic.tech</url>
     </organization>
     <licenses>
         <license>
@@ -96,6 +96,9 @@
         build number. When building locally, this number is obviously absent.
         So we provide a default value. -->
         <build.number>LOCAL</build.number>
+        <!-- Property using which additional Error Prone flags can be
+        specified. Used by the `patch` profile to enable patching. -->
+        <error-prone.args />
         <!-- The Maven `groupId` under which Error Prone dependencies are
         published. By default we use an official Error Prone release. This
         property allows the `error-prone-fork` profile below to build the
@@ -493,6 +496,13 @@
                                         above. See
                                         https://github.com/checkstyle/checkstyle/issues/4954. -->
                                         <property name="illegalClasses" value="org\.testng\.AssertJUnit(\..*?)?" />
+                                        <property name="illegalClasses" value="org\.springframework\.stereotype\.(Component|Controller|Service)">
+                                            <!-- We don't use Spring's
+                                            component scanning, so `@Component`
+                                            and `@Service` have no effect.
+                                            Instead of `@Controller` use
+                                            `@RestController`. -->
+                                        </property>
                                         <property name="regexp" value="true" />
                                     </module>
                                     <module name="IllegalCatch" />
@@ -1018,7 +1028,8 @@
         <profile>
             <!-- By default we verify various aspects of a module and the
             artifact(s) it produces. We define these checks in a profile so
-            that they can be disabled during development. -->
+            that they can be disabled during development. See also the
+            `error-prone` profile defined below. -->
             <id>build-checks</id>
             <activation>
                 <property>
@@ -1051,38 +1062,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
-                            <annotationProcessorPaths combine.children="append">
-                                <path>
-                                    <groupId>${groupId.error-prone}</groupId>
-                                    <artifactId>error_prone_core</artifactId>
-                                    <version>${version.error-prone}</version>
-                                </path>
-                                <path>
-                                    <groupId>com.github.lhotari</groupId>
-                                    <artifactId>reactor-error-prone</artifactId>
-                                    <version>0.1.4</version>
-                                </path>
-                                <path>
-                                    <groupId>com.google.guava</groupId>
-                                    <artifactId>guava-beta-checker</artifactId>
-                                    <version>${version.guava-beta-checker}</version>
-                                </path>
-                                <path>
-                                    <groupId>com.jakewharton.nopen</groupId>
-                                    <artifactId>nopen-checker</artifactId>
-                                    <version>1.0.1</version>
-                                </path>
-                                <path>
-                                    <groupId>com.uber.nullaway</groupId>
-                                    <artifactId>nullaway</artifactId>
-                                    <version>${version.nullaway}</version>
-                                </path>
-                                <path>
-                                    <groupId>jp.skypencil.errorprone.slf4j</groupId>
-                                    <artifactId>errorprone-slf4j</artifactId>
-                                    <version>0.1.4</version>
-                                </path>
-                            </annotationProcessorPaths>
                             <compilerArgs combine.children="append">
                                 <!-- We first enable all doclint checks and
                                 then selectively disable a subset below. -->
@@ -1098,34 +1077,6 @@
                                 javac complains about this. See
                                 https://bugs.openjdk.java.net/browse/JDK-6999068. -->
                                 <arg>-Xlint:-processing</arg>
-                                <!-- Enable and configure Error Prone. -->
-                                <arg>
-                                    -Xplugin:ErrorProne
-                                    <!-- We want to enable almost all Error
-                                    Prone bug pattern checkers, so we enable
-                                    all and then selectively deactivate some. -->
-                                    -XepAllDisabledChecksAsWarnings
-                                    <!-- We don't target Android. -->
-                                    -Xep:AndroidJdkLibsChecker:OFF
-                                    <!-- XXX: Enable this once we open-source
-                                    this library. -->
-                                    -Xep:BetaApi:OFF
-                                    <!-- We don't target JDK 7. -->
-                                    -Xep:Java7ApiChecker:OFF
-                                    <!-- See https://github.com/google/error-prone/issues/1138. -->
-                                    -Xep:NullableDereference:OFF
-                                    <!-- We don't target Android. -->
-                                    -Xep:StaticOrDefaultInterfaceMethod:OFF
-                                    -XepOpt:NullAway:AnnotatedPackages=tech.picnic
-                                    -XepOpt:NullAway:CheckOptionalEmptiness=true
-                                </arg>
-                                <!-- The Error Prone plugin makes certain
-                                assumptions about the state of the AST at the
-                                moment it is invoked. Those assumptions are met
-                                when using the `simple` compile policy. This
-                                flag may be dropped after resolution of
-                                https://bugs.openjdk.java.net/browse/JDK-8155674. -->
-                                <arg>-XDcompilePolicy=simple</arg>
                             </compilerArgs>
                             <showWarnings>true</showWarnings>
                         </configuration>
@@ -1184,10 +1135,116 @@
             </build>
         </profile>
         <profile>
-            <!-- The `build-checks` profile enables a whole bunch of additional
-            compile checks. By default those warnings break the build. This
-            profile allows one to collect all build warnings without failing
-            the build. -->
+            <!-- An extension of the `build-checks` profile which configures
+            Error Prone. This configuration is defined in a separate profile so
+            that it can be combined with the `patch` profile below, without
+            introducing the overhead of other build checks. -->
+            <id>error-prone</id>
+            <activation>
+                <property>
+                    <name>!verification.skip</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <annotationProcessorPaths combine.children="append">
+                                <path>
+                                    <groupId>${groupId.error-prone}</groupId>
+                                    <artifactId>error_prone_core</artifactId>
+                                    <version>${version.error-prone}</version>
+                                </path>
+                                <path>
+                                    <groupId>com.github.lhotari</groupId>
+                                    <artifactId>reactor-error-prone</artifactId>
+                                    <version>0.1.4</version>
+                                </path>
+                                <path>
+                                    <groupId>com.google.guava</groupId>
+                                    <artifactId>guava-beta-checker</artifactId>
+                                    <version>${version.guava-beta-checker}</version>
+                                </path>
+                                <path>
+                                    <groupId>com.jakewharton.nopen</groupId>
+                                    <artifactId>nopen-checker</artifactId>
+                                    <version>1.0.1</version>
+                                </path>
+                                <path>
+                                    <groupId>com.uber.nullaway</groupId>
+                                    <artifactId>nullaway</artifactId>
+                                    <version>${version.nullaway}</version>
+                                </path>
+                                <path>
+                                    <groupId>jp.skypencil.errorprone.slf4j</groupId>
+                                    <artifactId>errorprone-slf4j</artifactId>
+                                    <version>0.1.4</version>
+                                </path>
+                            </annotationProcessorPaths>
+                            <compilerArgs combine.children="append">
+                                <!-- Enable and configure Error Prone. -->
+                                <arg>
+                                    -Xplugin:ErrorProne
+                                    <!-- We use a separate Maven profile to
+                                    raise all warnings as errors. This way one
+                                    can optionally collect all warnings without
+                                    failing the build on the first error
+                                    encountered. -->
+                                    -XepAllErrorsAsWarnings
+                                    <!-- We want to enable almost all Error
+                                    Prone bug pattern checkers, so we enable
+                                    all and then selectively deactivate some. -->
+                                    -XepAllDisabledChecksAsWarnings
+                                    <!-- We don't target Android. -->
+                                    -Xep:AndroidJdkLibsChecker:OFF
+                                    <!-- XXX: Enable this once we open-source
+                                    this library. -->
+                                    -Xep:BetaApi:OFF
+                                    <!-- We don't target JDK 7. -->
+                                    -Xep:Java7ApiChecker:OFF
+                                    <!-- See https://github.com/google/error-prone/issues/1138. -->
+                                    -Xep:NullableDereference:OFF
+                                    <!-- We don't target Android. -->
+                                    -Xep:StaticOrDefaultInterfaceMethod:OFF
+                                    -XepOpt:NullAway:AnnotatedPackages=tech.picnic
+                                    -XepOpt:NullAway:CheckOptionalEmptiness=true
+                                    <!-- Append additional custom arguments. -->
+                                    ${error-prone.args}
+                                </arg>
+                                <!-- The Error Prone plugin makes certain
+                                assumptions about the state of the AST at the
+                                moment it is invoked. Those assumptions are met
+                                when using the `simple` compile policy. This
+                                flag may be dropped after resolution of
+                                https://bugs.openjdk.java.net/browse/JDK-8155674. -->
+                                <arg>-XDcompilePolicy=simple</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- If combined with the `error-prone` profile above, this profile
+            configures Error Prone to try and automatically fix (rather than
+            merely flag) bug pattern violations in the source code. -->
+            <id>patch</id>
+            <activation>
+                <property>
+                    <name>error-prone.patch-checks</name>
+                </property>
+            </activation>
+            <properties>
+                <error-prone.args>-XepPatchChecks:${error-prone.patch-checks} -XepPatchLocation:IN_PLACE</error-prone.args>
+            </properties>
+        </profile>
+        <profile>
+            <!-- The `build-checks` and `error-prone` profiles enable a whole
+            bunch of additional compile checks. This profile ensures that by
+            default those warnings break the build. Disabling this profile
+            allows one to collect all build warnings without failing the build. -->
             <id>disallow-warnings</id>
             <activation>
                 <property>
