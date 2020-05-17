@@ -115,7 +115,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
         ImmutableList.sortedCopyOf(
             Comparator.<Description>comparingInt(d -> getReplacedCodeSize(d, endPositions))
                 .reversed()
-                .thenComparing(d -> getInsertedCodeSize(d, endPositions)),
+                .thenComparingInt(d -> getInsertedCodeSize(d, endPositions)),
             allMatches);
 
     RangeSet<Integer> replacedSections = TreeRangeSet.create();

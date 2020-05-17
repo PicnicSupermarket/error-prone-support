@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
@@ -76,8 +77,8 @@ public final class PrimitiveComparisonCheck extends BugChecker
         .flatMap(
             actualMethodName ->
                 Optional.of(getPreferredMethod(state, cmpType, isStatic))
-                    .filter(preferredMethodName -> !preferredMethodName.equals(actualMethodName))
-                    .map(preferredMethodName -> suggestFix(tree, preferredMethodName, state)));
+                    .filter(not(actualMethodName::equals)))
+        .map(preferredMethodName -> suggestFix(tree, preferredMethodName, state));
   }
 
   private static String getPreferredMethod(VisitorState state, Type cmpType, boolean isStatic) {

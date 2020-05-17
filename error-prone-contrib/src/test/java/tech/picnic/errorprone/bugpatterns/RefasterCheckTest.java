@@ -115,7 +115,7 @@ public final class RefasterCheckTest {
    */
   @Test
   public void testLoadAllCodeTransformers() {
-    assertThat(TEMPLATES_BY_GROUP.keySet()).containsExactlyInAnyOrderElementsOf(TEMPLATE_GROUPS);
+    assertThat(TEMPLATES_BY_GROUP.keySet()).hasSameElementsAs(TEMPLATE_GROUPS);
   }
 
   /**

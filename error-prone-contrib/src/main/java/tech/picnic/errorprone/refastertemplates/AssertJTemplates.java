@@ -1228,8 +1228,8 @@ final class AssertJTemplates {
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, U[] array) {
-      return assertThat(stream).isSubsetOf(array);
+    ListAssert<S> after(Stream<S> stream, U[] iterable) {
+      return assertThat(stream).isSubsetOf(iterable);
     }
   }
 
