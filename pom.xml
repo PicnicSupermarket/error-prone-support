@@ -1057,15 +1057,11 @@
                                     <artifactId>error_prone_core</artifactId>
                                     <version>${version.error-prone}</version>
                                 </path>
-                                <!-- XXX: Consider enabling this plugin once
-                                the following issues are resolved and released:
-                                - https://github.com/lhotari/reactor-error-prone/pull/3
-                                - https://github.com/lhotari/reactor-error-prone/pull/4
                                 <path>
-                                    <groupId>com.github.lhotari.reactor-error-prone</groupId>
+                                    <groupId>com.github.lhotari</groupId>
                                     <artifactId>reactor-error-prone</artifactId>
-                                    <version>0.0.1-SNAPSHOT</version>
-                                </path> -->
+                                    <version>0.1.4</version>
+                                </path>
                                 <path>
                                     <groupId>com.google.guava</groupId>
                                     <artifactId>guava-beta-checker</artifactId>
