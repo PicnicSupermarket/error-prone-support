@@ -105,13 +105,13 @@
         <!-- Dependency and plugin versions that are referenced in more than
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
-        <version.auto-service>1.0-rc6</version.auto-service>
+        <version.auto-service>1.0-rc7</version.auto-service>
         <version.error-prone>2.3.4</version.error-prone>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.javadoc>3.2.0</version.javadoc>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
-        <version.nullaway>0.7.9</version.nullaway>
+        <version.nullaway>0.7.10</version.nullaway>
         <version.surefire>2.22.2</version.surefire>
     </properties>
 
@@ -230,12 +230,12 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.15.0</version>
+                <version>3.16.1</version>
             </dependency>
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
@@ -950,7 +950,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.5.1</version>
+                    <version>1.5.2</version>
                     <configuration>
                         <!-- Use multple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
