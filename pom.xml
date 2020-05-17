@@ -109,7 +109,7 @@
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.0-rc7</version.auto-service>
-        <version.error-prone>2.3.4</version.error-prone>
+        <version.error-prone>2.4.0</version.error-prone>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
@@ -165,6 +165,11 @@
                 <groupId>com.google.auto.service</groupId>
                 <artifactId>auto-service-annotations</artifactId>
                 <version>${version.auto-service}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.value</groupId>
+                <artifactId>auto-value-annotations</artifactId>
+                <version>1.7.3</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
@@ -754,13 +759,6 @@
                                 junit.jupiter.execution.parallel.mode.default = concurrent</configurationParameters>
                         </properties>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                        <systemPropertyVariables>
-                            <!-- By passing along the version of Error Prone
-                            used, we can disable tests which require the Picnic
-                            Error Prone fork to function when building against
-                            the official release. -->
-                            <error-prone-version>${version.error-prone}</error-prone-version>
-                        </systemPropertyVariables>
                         <trimStackTrace>false</trimStackTrace>
                     </configuration>
                     <dependencies>
@@ -850,6 +848,7 @@
                                 <!-- -->
                                 BSD-3-Clause
                                 | 3-Clause BSD License
+                                | BSD 3-clause
                                 | New BSD License
                             </licenseMerge>
                             <licenseMerge>
@@ -1000,7 +999,7 @@
             <id>error-prone-fork</id>
             <properties>
                 <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>
-                <version.error-prone>v2.3.4-picnic-2</version.error-prone>
+                <version.error-prone>v2.4.0-picnic-1</version.error-prone>
             </properties>
             <dependencyManagement>
                 <!-- Even when we directly depend on the Picnic Error Prone
@@ -1011,7 +1010,7 @@
                     <dependency>
                         <groupId>com.google.errorprone</groupId>
                         <artifactId>error_prone_annotations</artifactId>
-                        <version>2.3.4</version>
+                        <version>2.4.0</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -1203,6 +1202,10 @@
                                     -Xep:BetaApi:OFF
                                     <!-- We don't target JDK 7. -->
                                     -Xep:Java7ApiChecker:OFF
+                                    <!-- Too many false positives. See
+                                    https://github.com/google/error-prone/issues/1610 and
+                                    https://github.com/google/error-prone/issues/1646. -->
+                                    -Xep:JdkObsolete:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic

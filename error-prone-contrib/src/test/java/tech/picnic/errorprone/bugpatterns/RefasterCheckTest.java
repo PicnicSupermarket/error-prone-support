@@ -17,7 +17,6 @@ import com.google.errorprone.ErrorProneFlags;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -124,9 +123,6 @@ public final class RefasterCheckTest {
    */
   @ParameterizedTest
   @MethodSource("templateGroupsUnderTest")
-  // XXX: Until https://github.com/google/error-prone/pull/1239 is merged and released this test
-  // will only pass when using the Picnic Error Prone fork.
-  @DisabledIfSystemProperty(named = "error-prone-version", matches = "2\\.3\\.4")
   public void testReplacement(String group) {
     verifyRefactoring(group, namePattern(group));
   }
@@ -140,9 +136,6 @@ public final class RefasterCheckTest {
    */
   @ParameterizedTest
   @MethodSource("templatesUnderTest")
-  // XXX: Until https://github.com/google/error-prone/pull/1239 is merged and released this test
-  // will only pass when using the Picnic Error Prone fork.
-  @DisabledIfSystemProperty(named = "error-prone-version", matches = "2\\.3\\.4")
   public void testCoverage(String group, String template) {
     assertThatCode(() -> verifyRefactoring(group, namePattern(group, template)))
         .withFailMessage(
