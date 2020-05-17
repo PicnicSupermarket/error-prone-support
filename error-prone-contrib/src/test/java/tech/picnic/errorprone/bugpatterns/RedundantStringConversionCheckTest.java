@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
-import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
 // XXX: The tests below show that `String.valueOf((String) null)` may be simplified, but
@@ -487,7 +486,7 @@ public final class RedundantStringConversionCheckTest {
   }
 
   @Test
-  public void testReplacement() throws IOException {
+  public void testReplacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

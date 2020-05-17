@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
-import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
 public final class LexicographicalAnnotationAttributeListingCheckTest {
@@ -97,7 +96,7 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
   // introduced. Avoiding that might make the code too complex. Instead, users can have the
   // `CanonicalAnnotationSyntaxCheck` correct the situation in a subsequent run.
   @Test
-  public void testReplacement() throws IOException {
+  public void testReplacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

@@ -3,7 +3,6 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
-import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
 public final class MethodReferenceUsageCheckTest {
@@ -202,7 +201,7 @@ public final class MethodReferenceUsageCheckTest {
   }
 
   @Test
-  public void testReplacement() throws IOException {
+  public void testReplacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

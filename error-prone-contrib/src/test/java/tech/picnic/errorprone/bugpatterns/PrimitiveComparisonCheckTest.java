@@ -3,7 +3,6 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
-import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
 public final class PrimitiveComparisonCheckTest {
@@ -430,7 +429,7 @@ public final class PrimitiveComparisonCheckTest {
   // XXX: If the explicit `<A, BoxedPrimitive>` generic type information was necessary, then this
   // replacement drops too much information.
   @Test
-  public void testReplacementWithPrimitiveVariants() throws IOException {
+  public void testReplacementWithPrimitiveVariants() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
@@ -484,7 +483,7 @@ public final class PrimitiveComparisonCheckTest {
   // XXX: If the explicit `<A>` generic type information was necessary, then this replacement drops
   // too much information.
   @Test
-  public void testReplacementWithBoxedVariants() throws IOException {
+  public void testReplacementWithBoxedVariants() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
@@ -536,7 +535,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testReplacementWithPrimitiveVariantsUsingStaticImports() throws IOException {
+  public void testReplacementWithPrimitiveVariantsUsingStaticImports() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
@@ -575,7 +574,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testReplacementWithBoxedVariantsUsingStaticImports() throws IOException {
+  public void testReplacementWithBoxedVariantsUsingStaticImports() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
@@ -616,7 +615,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testReplacementWithPrimitiveVariantsInComplexSyntacticalContext() throws IOException {
+  public void testReplacementWithPrimitiveVariantsInComplexSyntacticalContext() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
@@ -648,7 +647,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testReplacementWithBoxedVariantsInComplexSyntacticalContext() throws IOException {
+  public void testReplacementWithBoxedVariantsInComplexSyntacticalContext() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
