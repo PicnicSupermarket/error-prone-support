@@ -1030,6 +1030,78 @@
             </dependencyManagement>
         </profile>
         <profile>
+            <!-- Error Prone checks which are not availabe from Maven Central;
+            these are therefore not enabled by default. -->
+            <id>non-maven-central</id>
+            <!-- XXX: Two other dependencies are potentially of interest:
+            `com.palantir.assertj-automation:assertj-refaster-rules` and
+            `com.palantir.baseline:baseline-refaster-rules` contain Refaster
+            rules which aren't currently applied. We should use
+            `RefasterRuleBuilderScanner` to convert those to `.refaster` files
+            so that we can pick them up. (But in case of
+            `baseline-refaster-rules` perhaps we can simply incorporate all of
+            them.) -->
+            <properties>
+                <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
+                <version.palantir-baseline>3.26.0</version.palantir-baseline>
+                <version.reactor-error-prone>0.1.4</version.reactor-error-prone>
+            </properties>
+            <dependencyManagement>
+                <!-- All these dependencies are specified as a workaround for
+                https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.lhotari</groupId>
+                        <artifactId>reactor-error-prone</artifactId>
+                        <version>${version.reactor-error-prone}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.palantir.assertj-automation</groupId>
+                        <artifactId>assertj-error-prone</artifactId>
+                        <version>${version.palantir-assertj-automation}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.palantir.baseline</groupId>
+                        <artifactId>baseline-error-prone</artifactId>
+                        <version>${version.palantir-baseline}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <annotationProcessorPaths combine.children="append">
+                                <path>
+                                    <groupId>com.github.lhotari</groupId>
+                                    <artifactId>reactor-error-prone</artifactId>
+                                    <version>${version.reactor-error-prone}</version>
+                                </path>
+                                <!-- XXX: Before enabling these checks we'll
+                                need to resolve some violations. Some of the
+                                checks will need to be disabled; check how to
+                                best do this, given that this configuration is
+                                defined in an optional profile.
+                                <path>
+                                    <groupId>com.palantir.assertj-automation</groupId>
+                                    <artifactId>assertj-error-prone</artifactId>
+                                    <version>${version.palantir-assertj-automation}</version>
+                                </path>
+                                <path>
+                                    <groupId>com.palantir.baseline</groupId>
+                                    <artifactId>baseline-error-prone</artifactId>
+                                    <version>${version.palantir-baseline}</version>
+                                </path>
+                                -->
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <!-- By default we verify various aspects of a module and the
             artifact(s) it produces. We define these checks in a profile so
             that they can be disabled during development. See also the
@@ -1168,11 +1240,6 @@
                                     <groupId>${groupId.error-prone}</groupId>
                                     <artifactId>error_prone_core</artifactId>
                                     <version>${version.error-prone}</version>
-                                </path>
-                                <path>
-                                    <groupId>com.github.lhotari</groupId>
-                                    <artifactId>reactor-error-prone</artifactId>
-                                    <version>0.1.4</version>
                                 </path>
                                 <path>
                                     <groupId>com.google.guava</groupId>

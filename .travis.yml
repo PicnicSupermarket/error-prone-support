@@ -9,10 +9,12 @@ addons:
 install:
   - mvn io.takari:maven:wrapper
 script:
-  # We run the build twice: once against the original Error Prone release, and
-  # once against the Picnic Error Prone fork.
+  # We run the build twice: once against the original Error Prone release,
+  # using only Error Prone checks available on Maven Central, and once against
+  # the Picnic Error Prone fork, additionally enabling Error Prone checks
+  # available from other artifact repositories.
   - ./mvnw clean install
-  - ./mvnw clean install -Perror-prone-fork -s settings.xml
+  - ./mvnw clean install -Perror-prone-fork -Pnon-maven-central -s settings.xml
   # XXX: Enable SonarCloud once we "go public".
   # ./mvnw jacoco:prepare-agent surefire:test jacoco:report sonar:sonar
   - ./mvnw jacoco:prepare-agent surefire:test jacoco:report
