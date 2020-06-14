@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import java.util.OptionalInt;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -62,6 +63,10 @@ final class IntStreamTemplatesTest implements RefasterTemplateTestCase {
         IntStream.of(2).count() > 0,
         IntStream.of(3).count() >= 1,
         IntStream.of(4).findFirst().isPresent());
+  }
+
+  OptionalInt testIntStreamMin() {
+    return IntStream.of(1).sorted().findFirst();
   }
 
   ImmutableSet<Boolean> testIntStreamNoneMatch() {

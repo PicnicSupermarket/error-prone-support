@@ -34,6 +34,7 @@ import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -193,7 +194,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
                   RefasterCheck.class.getClassLoader(), () -> ClassLoader.getSystemClassLoader()))
           .getResources();
     } catch (IOException e) {
-      throw new IllegalStateException("Failed to scan classpath for resources", e);
+      throw new UncheckedIOException("Failed to scan classpath for resources", e);
     }
   }
 

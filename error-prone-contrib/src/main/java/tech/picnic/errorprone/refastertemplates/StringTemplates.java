@@ -4,11 +4,13 @@ import static java.util.stream.Collectors.joining;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.base.Utf8;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
@@ -96,12 +98,12 @@ final class StringTemplates {
     }
 
     @BeforeTemplate
-    String before(String delimiter, Collection<? extends CharSequence> elements) {
+    String before(CharSequence delimiter, Collection<? extends CharSequence> elements) {
       return elements.stream().collect(joining(delimiter));
     }
 
     @AfterTemplate
-    String after(String delimiter, Iterable<? extends CharSequence> elements) {
+    String after(CharSequence delimiter, Iterable<? extends CharSequence> elements) {
       return String.join(delimiter, elements);
     }
   }
@@ -116,6 +118,19 @@ final class StringTemplates {
     @AfterTemplate
     String after(String str, int index) {
       return str.substring(index);
+    }
+  }
+
+  /** Prefer {@link Utf8#encodedLength(CharSequence)} over less efficient alternatives. */
+  static final class Utf8EncodedLength {
+    @BeforeTemplate
+    int before(String str) {
+      return str.getBytes(StandardCharsets.UTF_8).length;
+    }
+
+    @AfterTemplate
+    int after(String str) {
+      return Utf8.encodedLength(str);
     }
   }
 }

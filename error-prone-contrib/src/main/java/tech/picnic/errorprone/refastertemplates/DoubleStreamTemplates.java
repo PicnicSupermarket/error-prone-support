@@ -6,6 +6,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import java.util.OptionalDouble;
 import java.util.function.DoubleFunction;
 import java.util.function.DoublePredicate;
 import java.util.function.DoubleUnaryOperator;
@@ -169,6 +170,18 @@ final class DoubleStreamTemplates {
     @AfterTemplate
     boolean after(DoubleStream stream) {
       return stream.findAny().isPresent();
+    }
+  }
+
+  static final class DoubleStreamMin {
+    @BeforeTemplate
+    OptionalDouble before(DoubleStream stream) {
+      return stream.sorted().findFirst();
+    }
+
+    @AfterTemplate
+    OptionalDouble after(DoubleStream stream) {
+      return stream.min();
     }
   }
 

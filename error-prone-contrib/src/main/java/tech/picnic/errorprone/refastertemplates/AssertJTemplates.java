@@ -115,6 +115,9 @@ import org.assertj.core.api.OptionalLongAssert;
 // `abstractOptionalAssert.hasValueSatisfying(pred)`.
 // XXX: `assertThat(ImmutableList.sortedCopyOf(cmp, values)).somethingExactOrder` -> just compare
 // "in any order".
+// XXX: Turns out a lot of this is also covered by https://github.com/palantir/assertj-automation.
+// See how we can combine these things. Do note that (at present) their Refaster templates don't
+// show up as Error Prone checks. So we'd have to build an integration for that.
 final class AssertJTemplates {
   private AssertJTemplates() {}
 

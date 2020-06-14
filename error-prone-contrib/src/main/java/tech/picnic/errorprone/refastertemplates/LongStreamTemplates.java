@@ -6,6 +6,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import java.util.OptionalLong;
 import java.util.function.LongFunction;
 import java.util.function.LongPredicate;
 import java.util.function.LongUnaryOperator;
@@ -182,6 +183,18 @@ final class LongStreamTemplates {
     @AfterTemplate
     boolean after(LongStream stream) {
       return stream.findAny().isPresent();
+    }
+  }
+
+  static final class LongStreamMin {
+    @BeforeTemplate
+    OptionalLong before(LongStream stream) {
+      return stream.sorted().findFirst();
+    }
+
+    @AfterTemplate
+    OptionalLong after(LongStream stream) {
+      return stream.min();
     }
   }
 

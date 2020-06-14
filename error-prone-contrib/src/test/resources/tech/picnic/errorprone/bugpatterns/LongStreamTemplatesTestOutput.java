@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import java.util.OptionalLong;
 import java.util.function.LongPredicate;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -62,6 +63,10 @@ final class LongStreamTemplatesTest implements RefasterTemplateTestCase {
         LongStream.of(2).findAny().isPresent(),
         LongStream.of(3).findAny().isPresent(),
         LongStream.of(4).findAny().isPresent());
+  }
+
+  OptionalLong testLongStreamMin() {
+    return LongStream.of(1).min();
   }
 
   ImmutableSet<Boolean> testLongStreamNoneMatch() {

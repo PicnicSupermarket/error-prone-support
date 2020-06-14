@@ -1,13 +1,18 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.not;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -169,6 +174,58 @@ final class StreamTemplates {
     @AfterTemplate
     boolean after(Stream<T> stream) {
       return stream.findAny().isPresent();
+    }
+  }
+
+  static final class StreamMin<T> {
+    @BeforeTemplate
+    Optional<T> before(Stream<T> stream, Comparator<? super T> comparator) {
+      return Refaster.anyOf(
+          stream.max(comparator.reversed()), stream.sorted(comparator).findFirst());
+    }
+
+    @AfterTemplate
+    Optional<T> after(Stream<T> stream, Comparator<? super T> comparator) {
+      return stream.min(comparator);
+    }
+  }
+
+  static final class StreamMinNaturalOrder<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Optional<T> before(Stream<T> stream) {
+      return Refaster.anyOf(stream.max(reverseOrder()), stream.sorted().findFirst());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    Optional<T> after(Stream<T> stream) {
+      return stream.min(naturalOrder());
+    }
+  }
+
+  static final class StreamMax<T> {
+    @BeforeTemplate
+    Optional<T> before(Stream<T> stream, Comparator<? super T> comparator) {
+      return Refaster.anyOf(
+          stream.min(comparator.reversed()), Streams.findLast(stream.sorted(comparator)));
+    }
+
+    @AfterTemplate
+    Optional<T> after(Stream<T> stream, Comparator<? super T> comparator) {
+      return stream.max(comparator);
+    }
+  }
+
+  static final class StreamMaxNaturalOrder<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Optional<T> before(Stream<T> stream) {
+      return Refaster.anyOf(stream.min(reverseOrder()), Streams.findLast(stream.sorted()));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    Optional<T> after(Stream<T> stream) {
+      return stream.max(naturalOrder());
     }
   }
 

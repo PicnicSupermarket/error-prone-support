@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import java.util.OptionalDouble;
 import java.util.function.DoublePredicate;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
@@ -58,6 +59,10 @@ final class DoubleStreamTemplatesTest implements RefasterTemplateTestCase {
         DoubleStream.of(2).count() > 0,
         DoubleStream.of(3).count() >= 1,
         DoubleStream.of(4).findFirst().isPresent());
+  }
+
+  OptionalDouble testDoubleStreamMin() {
+    return DoubleStream.of(1).sorted().findFirst();
   }
 
   ImmutableSet<Boolean> testDoubleStreamNoneMatch() {

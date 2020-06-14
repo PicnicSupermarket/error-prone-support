@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link Optional}s. */
+// XXX: Add a `get` -> `orElseThrow` rule, then update all other templates that reference `get`.
 final class OptionalTemplates {
   private OptionalTemplates() {}
 
@@ -151,7 +152,7 @@ final class OptionalTemplates {
     abstract S toNullableFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    Optional<S> before(Optional<T> optional, S object) {
+    Optional<S> before(Optional<T> optional) {
       return optional.flatMap(
           v ->
               Refaster.anyOf(
@@ -159,7 +160,7 @@ final class OptionalTemplates {
     }
 
     @AfterTemplate
-    Optional<S> after(Optional<T> optional, S object) {
+    Optional<S> after(Optional<T> optional) {
       return optional.map(v -> toNullableFunction(v));
     }
   }
@@ -222,12 +223,12 @@ final class OptionalTemplates {
 
     @BeforeTemplate
     @SuppressWarnings("NullAway")
-    Stream<S> before(Stream<T> stream, Optional<S> optional) {
+    Stream<S> before(Stream<T> stream) {
       return stream.map(e -> toOptionalFunction(e).get());
     }
 
     @AfterTemplate
-    Stream<S> after(Stream<T> stream, Optional<S> optional) {
+    Stream<S> after(Stream<T> stream) {
       return stream.flatMap(e -> toOptionalFunction(e).stream());
     }
   }

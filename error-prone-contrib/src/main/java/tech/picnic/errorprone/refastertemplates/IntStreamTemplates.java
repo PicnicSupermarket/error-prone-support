@@ -6,6 +6,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import java.util.OptionalInt;
 import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
@@ -182,6 +183,18 @@ final class IntStreamTemplates {
     @AfterTemplate
     boolean after(IntStream stream) {
       return stream.findAny().isPresent();
+    }
+  }
+
+  static final class IntStreamMin {
+    @BeforeTemplate
+    OptionalInt before(IntStream stream) {
+      return stream.sorted().findFirst();
+    }
+
+    @AfterTemplate
+    OptionalInt after(IntStream stream) {
+      return stream.min();
     }
   }
 

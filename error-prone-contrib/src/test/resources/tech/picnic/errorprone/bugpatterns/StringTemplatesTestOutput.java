@@ -4,10 +4,12 @@ import static java.util.stream.Collectors.joining;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.base.Utf8;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -16,7 +18,12 @@ final class StringTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Arrays.class, Joiner.class, Stream.class, Streams.class, (Runnable) () -> joining());
+        Arrays.class,
+        Joiner.class,
+        StandardCharsets.class,
+        Stream.class,
+        Streams.class,
+        (Runnable) () -> joining());
   }
 
   ImmutableSet<Boolean> testStringIsEmpty() {
@@ -59,5 +66,9 @@ final class StringTemplatesTest implements RefasterTemplateTestCase {
 
   String testSubstringRemainder() {
     return "foo".substring(1);
+  }
+
+  int testUtf8EncodedLength() {
+    return Utf8.encodedLength("foo");
   }
 }

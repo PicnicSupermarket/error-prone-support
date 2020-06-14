@@ -1,5 +1,8 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static java.util.Comparator.comparingInt;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.not;
 
 import com.google.common.collect.ImmutableSet;
@@ -12,7 +15,8 @@ import java.util.stream.Stream;
 final class StreamTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Objects.class, Streams.class, (Runnable) () -> not(null));
+    return ImmutableSet.of(
+        Objects.class, Streams.class, (Runnable) () -> not(null), (Runnable) () -> reverseOrder());
   }
 
   Stream<String> testEmptyStream() {
@@ -63,6 +67,28 @@ final class StreamTemplatesTest implements RefasterTemplateTestCase {
         Stream.of(2).findAny().isPresent(),
         Stream.of(3).findAny().isPresent(),
         Stream.of(4).findAny().isPresent());
+  }
+
+  ImmutableSet<Optional<String>> testStreamMin() {
+    return ImmutableSet.of(
+        Stream.of("foo").min(comparingInt(String::length)),
+        Stream.of("bar").min(comparingInt(String::length)));
+  }
+
+  ImmutableSet<Optional<String>> testStreamMinNaturalOrder() {
+    return ImmutableSet.of(
+        Stream.of("foo").min(naturalOrder()), Stream.of("bar").min(naturalOrder()));
+  }
+
+  ImmutableSet<Optional<String>> testStreamMax() {
+    return ImmutableSet.of(
+        Stream.of("foo").max(comparingInt(String::length)),
+        Stream.of("bar").max(comparingInt(String::length)));
+  }
+
+  ImmutableSet<Optional<String>> testStreamMaxNaturalOrder() {
+    return ImmutableSet.of(
+        Stream.of("foo").max(naturalOrder()), Stream.of("bar").max(naturalOrder()));
   }
 
   ImmutableSet<Boolean> testStreamNoneMatch() {
