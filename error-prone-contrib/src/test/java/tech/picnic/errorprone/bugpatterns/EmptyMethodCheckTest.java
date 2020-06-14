@@ -36,12 +36,29 @@ public final class EmptyMethodCheckTest {
             "}")
         .addSourceLines(
             "B.java",
+            "import org.aspectj.lang.annotation.Pointcut;",
+            "",
             "final class B implements A.F {",
             "  @Override",
             "  public void fun() {}",
             "",
             "  // BUG: Diagnostic contains:",
             "  void m3() {}",
+            "",
+            "  /** Javadoc. */",
+            "  // BUG: Diagnostic contains:",
+            "  void m4() {}",
+            "",
+            "  void m5() {",
+            "    // Single-line comment.",
+            "  }",
+            "",
+            "  void m6() {",
+            "    /* Multi-line comment. */",
+            "  }",
+            "",
+            "  @Pointcut",
+            "  void m7() {}",
             "}")
         .doTest();
   }

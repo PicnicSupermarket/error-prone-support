@@ -35,7 +35,9 @@ public final class EmptyMethodCheck extends BugChecker implements MethodTreeMatc
     MethodSymbol sym = ASTHelpers.getSymbol(tree);
     if (sym == null
         || ASTHelpers.methodCanBeOverridden(sym)
-        || ASTHelpers.hasAnnotation(sym, "java.lang.Override", state)) {
+        || ASTHelpers.hasAnnotation(sym, "java.lang.Override", state)
+        || ASTHelpers.containsComments(tree, state)
+        || ASTHelpers.hasAnnotation(tree, "org.aspectj.lang.annotation.Pointcut", state)) {
       return Description.NO_MATCH;
     }
 

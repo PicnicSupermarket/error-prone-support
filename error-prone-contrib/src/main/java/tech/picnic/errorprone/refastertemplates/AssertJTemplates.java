@@ -113,6 +113,8 @@ import org.assertj.core.api.OptionalLongAssert;
 // somehow.
 // XXX: `abstractOptionalAssert.get().satisfies(pred)` ->
 // `abstractOptionalAssert.hasValueSatisfying(pred)`.
+// XXX: `assertThat(ImmutableList.sortedCopyOf(cmp, values)).somethingExactOrder` -> just compare
+// "in any order".
 final class AssertJTemplates {
   private AssertJTemplates() {}
 

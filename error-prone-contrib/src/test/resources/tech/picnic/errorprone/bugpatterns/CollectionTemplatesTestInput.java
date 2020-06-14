@@ -24,7 +24,12 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
         ImmutableSet.of(3).size() < 1,
         ImmutableSet.of(4).size() != 0,
         ImmutableSet.of(5).size() > 0,
-        ImmutableSet.of(6).size() >= 1);
+        ImmutableSet.of(6).size() >= 1,
+        Iterables.isEmpty(ImmutableSet.of(7)));
+  }
+
+  int testCollectionSize() {
+    return Iterables.size(ImmutableSet.of());
   }
 
   boolean testCollectionAddAllToCollectionExpression() {

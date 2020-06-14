@@ -18,20 +18,42 @@ import java.util.SortedSet;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with (arbitrary) collections. */
+// XXX: There are other Guava `Iterables` methods that should not be called if the input is known to
+// be a `Collection`. Add those here.
 final class CollectionTemplates {
   private CollectionTemplates() {}
 
-  /** Prefer {@link Collection#isEmpty()} over alternatives that consult the collection's size. */
+  /**
+   * Prefer {@link Collection#isEmpty()} over alternatives that consult the collection's size or are
+   * otherwise more contrived.
+   */
   static final class CollectionIsEmpty<T> {
     @BeforeTemplate
     boolean before(Collection<T> collection) {
-      return Refaster.anyOf(collection.size() == 0, collection.size() <= 0, collection.size() < 1);
+      return Refaster.anyOf(
+          collection.size() == 0,
+          collection.size() <= 0,
+          collection.size() < 1,
+          Iterables.isEmpty(collection));
     }
 
     @AfterTemplate
     @AlsoNegation
     boolean after(Collection<T> collection) {
       return collection.isEmpty();
+    }
+  }
+
+  /** Prefer {@link Collection#size()} over more contrived alternatives. */
+  static final class CollectionSize<T> {
+    @BeforeTemplate
+    int before(Collection<T> collection) {
+      return Iterables.size(collection);
+    }
+
+    @AfterTemplate
+    int after(Collection<T> collection) {
+      return collection.size();
     }
   }
 

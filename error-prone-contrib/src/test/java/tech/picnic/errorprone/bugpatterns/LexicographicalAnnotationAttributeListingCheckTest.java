@@ -32,6 +32,8 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
             "import com.fasterxml.jackson.annotation.JsonPropertyOrder;",
             "import io.swagger.annotations.ApiImplicitParam;",
             "import io.swagger.annotations.ApiImplicitParams;",
+            "import io.swagger.v3.oas.annotations.Parameter;",
+            "import io.swagger.v3.oas.annotations.Parameters;",
             "import java.math.RoundingMode;",
             "import javax.xml.bind.annotation.XmlType;",
             "",
@@ -53,6 +55,12 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
             "  @Foo({\"a\", \"b\"}) A sortedStrings();",
             "  // BUG: Diagnostic contains:",
             "  @Foo({\"b\", \"a\"}) A unsortedString();",
+            "  @Foo({\"ab\", \"Ac\"}) A sortedStringCaseInsensitive();",
+            "  // BUG: Diagnostic contains:",
+            "  @Foo({\"ac\", \"Ab\"}) A unsortedStringCaseInsensitive();",
+            "  @Foo({\"A\", \"a\"}) A sortedStringCaseInsensitiveWithTotalOrderFallback();",
+            "  // BUG: Diagnostic contains:",
+            "  @Foo({\"a\", \"A\"}) A unsortedStringCaseInsensitiveWithTotalOrderFallback();",
             "",
             "  @Foo(ints = {}) A noInts();",
             "  @Foo(ints = {0}) A oneInt();",
@@ -72,7 +80,7 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
             "  @Foo(enums = {UP, DOWN}) A unsortedEnums();",
             "",
             "  @Foo(anns = {}) A noAnns();",
-            "  @Foo(anns = {@Bar(\"a\")}) A oneAnnd();",
+            "  @Foo(anns = {@Bar(\"a\")}) A oneAnn();",
             "  @Foo(anns = {@Bar(\"a\"), @Bar(\"b\")}) A sortedAnns();",
             "  // BUG: Diagnostic contains:",
             "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) A unsortedAnns();",
@@ -84,7 +92,8 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
             "  @Foo({\"a.b=bar\", \"a.c=baz\", \"a=foo\"}) A hierarchicallyUnsorted();",
             "",
             "  @JsonPropertyOrder({\"field2\", \"field1\"}) A dto();",
-            "  @ApiImplicitParams({@ApiImplicitParam(\"p2\"), @ApiImplicitParam(\"p1\")}) A endpoint();",
+            "  @ApiImplicitParams({@ApiImplicitParam(\"p2\"), @ApiImplicitParam(\"p1\")}) A firstEndpoint();",
+            "  @Parameters({@Parameter(name = \"p2\"), @Parameter(name = \"p1\")}) A secondEndpoint();",
             "",
             "  @XmlType(propOrder = {\"field2\", \"field1\"})",
             "  class Dummy {}",
@@ -92,7 +101,7 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
         .doTest();
   }
 
-  // XXX: Note that in the output below in one instance redundant `value = ` assignments are
+  // XXX: Note that in the output below in one instance redundant `value =` assignments are
   // introduced. Avoiding that might make the code too complex. Instead, users can have the
   // `CanonicalAnnotationSyntaxCheck` correct the situation in a subsequent run.
   @Test

@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -81,6 +82,7 @@ final class AssortedTemplates {
    * original code produces a set which iterates over the elements in encounter order, the
    * replacement code iterates over the elements in enum definition order.
    */
+  // XXX: ^ Consider emitting a comment warning about this fact?
   static final class StreamToImmutableEnumSet<T extends Enum<T>> {
     @BeforeTemplate
     ImmutableSet<T> before(Stream<T> stream) {
@@ -112,7 +114,7 @@ final class AssortedTemplates {
   }
 
   /** Don't unnecessarily repeat boolean expressions. */
-  // XXX: This template only captures only the simplest case. `@AlsoNegation` doesn't help. Consider
+  // XXX: This template captures only the simplest case. `@AlsoNegation` doesn't help. Consider
   // contributing a Refaster patch which handles the negation in the `@BeforeTemplate` more
   // intelligently.
   static final class LogicalImplication {
@@ -162,16 +164,39 @@ final class AssortedTemplates {
     }
   }
 
-  /** Avoid {@link Iterables#isEmpty(Iterable)}; the JDK alternative is just as well. */
+  /**
+   * Don't unnecessarily copy collections before passing them to {@link
+   * Collections#disjoint(Collection, Collection)}.
+   */
+  // XXX: Other copy operations could be elided too, but these are most common after application of
+  // the `DisjointSets` template defined above. If we ever introduce a generic "makes a copy"
+  // standin, use it here.
+  static final class DisjointCollections<T> {
+    @BeforeTemplate
+    boolean before(Collection<T> collection1, Collection<T> collection2) {
+      return Refaster.anyOf(
+          Collections.disjoint(ImmutableSet.copyOf(collection1), collection2),
+          Collections.disjoint(new HashSet<>(collection1), collection2),
+          Collections.disjoint(collection1, ImmutableSet.copyOf(collection2)),
+          Collections.disjoint(collection1, new HashSet<>(collection2)));
+    }
+
+    @AfterTemplate
+    boolean after(Collection<T> collection1, Collection<T> collection2) {
+      return Collections.disjoint(collection1, collection2);
+    }
+  }
+
+  /** Prefer {@link Iterables#isEmpty(Iterable)} over more contrived alternatives. */
   static final class IterableIsEmpty<T> {
     @BeforeTemplate
     boolean before(Iterable<T> iterable) {
-      return Iterables.isEmpty(iterable);
+      return !iterable.iterator().hasNext();
     }
 
     @AfterTemplate
     boolean after(Iterable<T> iterable) {
-      return iterable.iterator().hasNext();
+      return Iterables.isEmpty(iterable);
     }
   }
 

@@ -17,6 +17,7 @@ import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -26,6 +27,7 @@ final class AssortedTemplatesTest implements RefasterTemplateTestCase {
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         HashMap.class,
+        HashSet.class,
         Iterables.class,
         Preconditions.class,
         Sets.class,
@@ -76,8 +78,16 @@ final class AssortedTemplatesTest implements RefasterTemplateTestCase {
         Collections.disjoint(ImmutableSet.of(3), ImmutableSet.of(4)));
   }
 
+  ImmutableSet<Boolean> testDisjointCollections() {
+    return ImmutableSet.of(
+        Collections.disjoint(ImmutableList.of(1), ImmutableList.of(2)),
+        Collections.disjoint(ImmutableList.of(3), ImmutableList.of(4)),
+        Collections.disjoint(ImmutableList.of(5), ImmutableList.of(6)),
+        Collections.disjoint(ImmutableList.of(7), ImmutableList.of(8)));
+  }
+
   boolean testIterableIsEmpty() {
-    return ImmutableList.of().iterator().hasNext();
+    return Iterables.isEmpty(ImmutableList.of());
   }
 
   Stream<String> testMapKeyStream() {

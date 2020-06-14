@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
 
 import com.google.auto.service.AutoService;
@@ -60,6 +61,7 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
           // XXX: unless JsonPropertyOrder#alphabetic is true...
           "com.fasterxml.jackson.annotation.JsonPropertyOrder#value",
           "io.swagger.annotations.ApiImplicitParams#value",
+          "io.swagger.v3.oas.annotations.Parameters#value",
           "javax.xml.bind.annotation.XmlType#propOrder");
   private static final String FLAG_PREFIX = "LexicographicalAnnotationAttributeListing:";
   private static final String INCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Includes";
@@ -150,11 +152,14 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
 
   private static ImmutableList<? extends ExpressionTree> doSort(
       Iterable<? extends ExpressionTree> elements, VisitorState state) {
+    // XXX: Perhaps we should use `Collator` with `.setStrength(Collator.PRIMARY)` and
+    // `getCollationKey`. Not clear whether that's worth the hassle at this point.
     return ImmutableList.sortedCopyOf(
         Comparator.comparing(
             e -> getStructure(e, state),
             Comparators.lexicographical(
-                Comparators.lexicographical(Comparator.<String>naturalOrder()))),
+                Comparators.lexicographical(
+                    String.CASE_INSENSITIVE_ORDER.thenComparing(naturalOrder())))),
         elements);
   }
 
