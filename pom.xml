@@ -73,7 +73,10 @@
             -XX:TieredStopAtLevel=1
             <!-- We cap memory usage. This is especially relevant on Travis CI,
             but locally this should also be more than enough. -->
-            -Xmx512m
+            <!-- XXX: RefasterCheckTest` requires more memory, so here we use
+            more than in other projects. Review how to reconcile this. (Extra
+            property?) -->
+            -Xmx1024m
             <!-- This argument cannot be set through Surefire's
             'systemPropertyVariables' configuration setting. Setting the file
             encoding is necessary because forked unit test invocations
