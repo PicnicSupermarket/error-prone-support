@@ -59,6 +59,7 @@ public final class RefasterCheckTest {
           "IntStream",
           "LongStream",
           "MapEntry",
+          "Mockito",
           "Multimap",
           "Null",
           "Optional",

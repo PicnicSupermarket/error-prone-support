@@ -116,6 +116,7 @@
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
+        <version.mockito>3.3.3</version.mockito>
         <version.nullaway>0.7.10</version.nullaway>
         <version.surefire>2.22.2</version.surefire>
     </properties>
@@ -263,6 +264,11 @@
                 <version>5.6.2</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${version.mockito}</version>
             </dependency>
             <dependency>
                 <groupId>org.reactivestreams</groupId>
@@ -851,6 +857,7 @@
                             <licenseMerge>
                                 <!-- -->
                                 Apache-2.0
+                                | Apache 2
                                 | Apache 2.0
                                 | Apache License 2.0
                                 | Apache License, Version 2.0
@@ -1260,6 +1267,11 @@
                                     <groupId>jp.skypencil.errorprone.slf4j</groupId>
                                     <artifactId>errorprone-slf4j</artifactId>
                                     <version>0.1.4</version>
+                                </path>
+                                <path>
+                                    <groupId>org.mockito</groupId>
+                                    <artifactId>mockito-errorprone</artifactId>
+                                    <version>${version.mockito}</version>
                                 </path>
                             </annotationProcessorPaths>
                             <compilerArgs combine.children="append">
