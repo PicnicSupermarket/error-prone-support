@@ -14,11 +14,7 @@ import java.util.stream.Stream;
 final class ImmutableMultisetTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(
-        Arrays.class,
-        Streams.class,
-        (Runnable) () -> collectingAndThen(null, null),
-        (Runnable) () -> toList());
+    return ImmutableSet.of(Arrays.class, Streams.class, collectingAndThen(null, null), toList());
   }
 
   ImmutableMultiset.Builder<String> testImmutableMultisetBuilder() {

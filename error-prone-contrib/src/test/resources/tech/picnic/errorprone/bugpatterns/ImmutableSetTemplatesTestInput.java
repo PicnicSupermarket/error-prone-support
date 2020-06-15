@@ -21,9 +21,9 @@ final class ImmutableSetTemplatesTest implements RefasterTemplateTestCase {
         Arrays.class,
         Collections.class,
         Streams.class,
-        (Runnable) () -> collectingAndThen(null, null),
-        (Runnable) () -> toList(),
-        (Runnable) () -> toSet());
+        collectingAndThen(null, null),
+        toList(),
+        toSet());
   }
 
   ImmutableSet.Builder<String> testImmutableSetBuilder() {

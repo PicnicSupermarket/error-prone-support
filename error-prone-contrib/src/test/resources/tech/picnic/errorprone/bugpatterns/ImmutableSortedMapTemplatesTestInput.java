@@ -15,10 +15,7 @@ final class ImmutableSortedMapTemplatesTest implements RefasterTemplateTestCase 
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Stream.class,
-        Streams.class,
-        (Runnable) () -> naturalOrder(),
-        (Runnable) () -> toImmutableSortedMap(null, null, null));
+        Stream.class, Streams.class, naturalOrder(), toImmutableSortedMap(null, null, null));
   }
 
   ImmutableSortedMap.Builder<String, Integer> testImmutableSortedMapBuilder() {

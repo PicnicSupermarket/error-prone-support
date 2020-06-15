@@ -33,7 +33,7 @@ final class AssortedTemplatesTest implements RefasterTemplateTestCase {
         Sets.class,
         Splitter.class,
         Streams.class,
-        (Runnable) () -> toImmutableSet());
+        toImmutableSet());
   }
 
   int testCheckIndex() {

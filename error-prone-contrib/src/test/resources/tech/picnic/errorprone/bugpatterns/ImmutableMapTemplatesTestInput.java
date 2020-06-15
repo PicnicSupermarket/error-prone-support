@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Collections.class, Streams.class, (Runnable) () -> identity());
+    return ImmutableSet.of(Collections.class, Streams.class, identity());
   }
 
   ImmutableMap.Builder<String, Integer> testImmutableMapBuilder() {

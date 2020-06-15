@@ -18,12 +18,7 @@ final class StringTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Arrays.class,
-        Joiner.class,
-        StandardCharsets.class,
-        Stream.class,
-        Streams.class,
-        (Runnable) () -> joining());
+        Arrays.class, Joiner.class, StandardCharsets.class, Stream.class, Streams.class, joining());
   }
 
   ImmutableSet<Boolean> testStringIsEmpty() {

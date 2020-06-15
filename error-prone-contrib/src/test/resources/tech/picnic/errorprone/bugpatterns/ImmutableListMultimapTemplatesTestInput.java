@@ -21,9 +21,7 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Streams.class,
-        (Runnable) () -> flatteningToImmutableListMultimap(null, null),
-        (Runnable) () -> identity());
+        Streams.class, flatteningToImmutableListMultimap(null, null), identity());
   }
 
   ImmutableSet<ImmutableMultimap.Builder<String, Integer>> testImmutableListMultimapBuilder() {

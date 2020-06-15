@@ -17,8 +17,7 @@ import java.util.stream.Stream;
 final class ImmutableSetMultimapTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(
-        Streams.class, (Runnable) () -> flatteningToImmutableSetMultimap(null, null));
+    return ImmutableSet.of(Streams.class, flatteningToImmutableSetMultimap(null, null));
   }
 
   ImmutableSetMultimap.Builder<String, Integer> testImmutableSetMultimapBuilder() {

@@ -8,7 +8,7 @@ import java.util.Comparator;
 final class ComparatorTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of((Runnable) () -> identity());
+    return ImmutableSet.of(identity());
   }
 
   ImmutableSet<Comparator<String>> testNaturalOrderComparator() {

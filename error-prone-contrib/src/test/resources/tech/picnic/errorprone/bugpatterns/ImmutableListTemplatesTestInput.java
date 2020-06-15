@@ -22,9 +22,9 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
         Collections.class,
         Comparator.class,
         Streams.class,
-        (Runnable) () -> collectingAndThen(null, null),
-        (Runnable) () -> naturalOrder(),
-        (Runnable) () -> toList());
+        collectingAndThen(null, null),
+        naturalOrder(),
+        toList());
   }
 
   ImmutableList.Builder<String> testImmutableListBuilder() {
