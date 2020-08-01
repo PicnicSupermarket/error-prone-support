@@ -116,8 +116,8 @@
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
-        <version.mockito>3.4.4</version.mockito>
-        <version.nullaway>0.7.10</version.nullaway>
+        <version.mockito>3.4.6</version.mockito>
+        <version.nullaway>0.8.0</version.nullaway>
         <version.surefire>2.22.2</version.surefire>
     </properties>
 
@@ -1051,7 +1051,7 @@
             them.) -->
             <properties>
                 <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
-                <version.palantir-baseline>3.35.0</version.palantir-baseline>
+                <version.palantir-baseline>3.36.0</version.palantir-baseline>
                 <version.reactor-error-prone>0.1.4</version.reactor-error-prone>
             </properties>
             <dependencyManagement>
