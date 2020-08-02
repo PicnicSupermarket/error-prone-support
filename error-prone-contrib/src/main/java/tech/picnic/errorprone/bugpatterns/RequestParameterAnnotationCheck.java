@@ -19,7 +19,6 @@ import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
-import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.MethodTree;
@@ -84,9 +83,6 @@ public final class RequestParameterAnnotationCheck extends BugChecker implements
     return HAS_MAPPING_ANNOTATION.matches(tree, state)
             && LACKS_PARAMETER_ANNOTATION.matches(tree, state)
         ? buildDescription(tree)
-            // XXX: Drop this `addFix`. (I added this to quickly find all violations in downstream
-            // code using `./patch.sh RequestParameterAnnotation`.)
-            .addFix(SuggestedFix.prefixWith(tree, "/* HIT */"))
             .setMessage(
                 "Not all parameters of this request mapping method are annotated; this may be a mistake. "
                     + "If the unannotated parameters represent query string parameters, annotate them with `@RequestParam`.")
