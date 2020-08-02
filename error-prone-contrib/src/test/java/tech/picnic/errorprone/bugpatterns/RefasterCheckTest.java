@@ -57,6 +57,7 @@ public final class RefasterCheckTest {
           "ImmutableSortedMultiset",
           "ImmutableSortedSet",
           "IntStream",
+          "JUnitArguments",
           "LongStream",
           "MapEntry",
           "Mockito",
