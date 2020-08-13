@@ -9,12 +9,9 @@ import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.junit.jupiter.params.provider.Arguments;
 
-/**
- * Refaster templates which replaces argument creation for parametrized JUnit tests using {@link
- * Arguments#of} with statically imported {@link Arguments#arguments} calls.
- */
-final class JUnitArgumentsTemplates {
-  private JUnitArgumentsTemplates() {}
+/** Refaster templates related to JUnit expressions and statements. */
+final class JUnitTemplates {
+  private JUnitTemplates() {}
 
   /** Prefer statically imported {@link Arguments#arguments} over {@link Arguments#of} calls. */
   static final class ArgumentsReplace<T> {
