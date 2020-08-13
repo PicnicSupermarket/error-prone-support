@@ -14,16 +14,16 @@ final class JUnitTemplates {
   private JUnitTemplates() {}
 
   /** Prefer statically imported {@link Arguments#arguments} over {@link Arguments#of} calls. */
-  static final class ArgumentsReplace<T> {
+  static final class ArgumentsEnumeration<T> {
     @BeforeTemplate
-    Arguments before(@Repeated T objs) {
-      return Arguments.of(objs);
+    Arguments before(@Repeated T objects) {
+      return Arguments.of(objects);
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    Arguments after(@Repeated T objs) {
-      return arguments(objs);
+    Arguments after(@Repeated T objects) {
+      return arguments(objects);
     }
   }
 }
