@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableSet;
-import java.util.stream.Stream;
 import org.junit.jupiter.params.provider.Arguments;
 
 final class JUnitTemplatesTest implements RefasterTemplateTestCase {
