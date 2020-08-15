@@ -128,8 +128,8 @@ final class ImmutableSortedSetTemplates {
   }
 
   /**
-   * Prefer {@link ImmutableSortedSet#toImmutableSortedSet(java.util.Comparator)} over less
-   * idiomatic alternatives.
+   * Prefer {@link ImmutableSortedSet#toImmutableSortedSet(Comparator)} over less idiomatic
+   * alternatives.
    */
   // XXX: Also handle the variant with a custom comparator.
   // XXX: Note that this rule rewrites fewer expressions than `StreamToImmutableSet`, because

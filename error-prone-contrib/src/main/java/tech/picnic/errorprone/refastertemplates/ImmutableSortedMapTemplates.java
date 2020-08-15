@@ -108,8 +108,7 @@ final class ImmutableSortedMapTemplates {
           ImmutableSortedMap.<K, V>naturalOrder().put(entry).build(),
           Stream.of(entry)
               .collect(
-                  toImmutableSortedMap(
-                      Comparator.<K>naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)));
+                  toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     @AfterTemplate

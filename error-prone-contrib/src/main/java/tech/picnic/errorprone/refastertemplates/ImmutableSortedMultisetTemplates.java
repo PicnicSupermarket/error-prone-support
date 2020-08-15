@@ -130,8 +130,8 @@ final class ImmutableSortedMultisetTemplates {
   }
 
   /**
-   * Prefer {@link ImmutableSortedMultiset#toImmutableSortedMultiset(java.util.Comparator)} over
-   * less idiomatic alternatives.
+   * Prefer {@link ImmutableSortedMultiset#toImmutableSortedMultiset(Comparator)} over less
+   * idiomatic alternatives.
    */
   // XXX: Also handle the variant with a custom comparator.
   static final class StreamToImmutableSortedMultiset<T extends Comparable<? super T>> {

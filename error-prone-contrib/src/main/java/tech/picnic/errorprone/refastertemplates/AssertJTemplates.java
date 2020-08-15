@@ -100,7 +100,7 @@ import org.assertj.core.api.OptionalLongAssert;
 // XXX: Look into using Assertions#contentOf(URL url, Charset charset) instead of our own test
 // method.
 // XXX: Write Optional templates also for `OptionalInt` and variants.
-// XXX: Write plugin to flag `assertThat(compileTimeContant)` occurrences. Also other likely
+// XXX: Write plugin to flag `assertThat(compileTimeConstant)` occurrences. Also other likely
 // candidates, such as `assertThat(ImmutableSet(foo, bar)).XXX`
 // XXX: Write generic plugin to replace explicit array parameters with varargs (`new int[] {1, 2}`
 // -> `1, 2`).
@@ -351,7 +351,6 @@ final class AssertJTemplates {
 
   static final class ObjectEnumerableContainsOneDistinctElement<S, T extends S> {
     @BeforeTemplate
-    @SuppressWarnings("unchecked")
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
       return Refaster.anyOf(
           iterAssert.hasSameElementsAs(
@@ -371,7 +370,6 @@ final class AssertJTemplates {
 
   static final class ObjectEnumerableIsSubsetOfOneElement<S, T extends S> {
     @BeforeTemplate
-    @SuppressWarnings("unchecked")
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
       return Refaster.anyOf(
           iterAssert.isSubsetOf(
@@ -528,7 +526,7 @@ final class AssertJTemplates {
   }
 
   //
-  // Mutliset
+  // Multiset
   //
 
   static final class AssertThatMultisetsAreEqual<S, T extends S> {

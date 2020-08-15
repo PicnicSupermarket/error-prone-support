@@ -170,7 +170,7 @@ final class AssortedTemplates {
    */
   // XXX: Other copy operations could be elided too, but these are most common after application of
   // the `DisjointSets` template defined above. If we ever introduce a generic "makes a copy"
-  // standin, use it here.
+  // stand-in, use it here.
   static final class DisjointCollections<T> {
     @BeforeTemplate
     boolean before(Collection<T> collection1, Collection<T> collection2) {

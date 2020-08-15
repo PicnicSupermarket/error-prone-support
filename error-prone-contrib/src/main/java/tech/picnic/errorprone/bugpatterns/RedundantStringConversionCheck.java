@@ -191,11 +191,10 @@ public final class RedundantStringConversionCheck extends BugChecker
     ExpressionTree preferredRhs = trySimplify(rhs, state).orElse(rhs);
     if (STRING.matches(preferredRhs, state)) {
       tryFix(lhs, state, ANY_EXPR).ifPresent(fixes::add);
-      tryFix(rhs, state, ANY_EXPR).ifPresent(fixes::add);
     } else {
       tryFix(lhs, state, STRING).ifPresent(fixes::add);
-      tryFix(rhs, state, ANY_EXPR).ifPresent(fixes::add);
     }
+    tryFix(rhs, state, ANY_EXPR).ifPresent(fixes::add);
 
     return finalize(tree, fixes.stream().reduce(SuggestedFix.Builder::merge));
   }

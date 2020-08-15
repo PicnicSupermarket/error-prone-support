@@ -61,7 +61,7 @@ import org.testng.Assert.ThrowingRunnable;
  *         <li>{@link Assert#assertNotEqualsDeep(Set, Set)}
  *         <li>{@link Assert#assertNotEqualsDeep(Set, Set, String)}
  *       </ul>
- *   <li>This method returns the caugth exception; there is no direct counterpart for this in
+ *   <li>This method returns the caught exception; there is no direct counterpart for this in
  *       AssertJ:
  *       <ul>
  *         <li>{@link Assert#expectThrows(Class, ThrowingRunnable)}
