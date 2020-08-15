@@ -42,6 +42,18 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return Mono.empty().thenReturn("foo");
   }
 
+  Mono<Integer> testMonoSwitchIfEmptyOfEmptyPublisher() {
+    return Mono.just(1);
+  }
+
+  ImmutableSet<Flux<Integer>> testFluxSwitchIfEmptyOfEmptyPublisher() {
+    return ImmutableSet.of(Flux.just(1), Flux.just(2));
+  }
+
+  Flux<String> testMonoFlatMapToFlux() {
+    return Mono.just("foo").flatMap(s -> Mono.just(s + s)).flux();
+  }
+
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
     return ImmutableSet.of(PublisherProbe.empty(), PublisherProbe.empty());
   }

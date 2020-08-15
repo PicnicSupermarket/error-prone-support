@@ -3,11 +3,15 @@ package tech.picnic.errorprone.refastertemplates;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.Placeholder;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -106,6 +110,51 @@ final class ReactorTemplates {
     @AfterTemplate
     Mono<S> after(Mono<T> mono, S object) {
       return mono.thenReturn(object);
+    }
+  }
+
+  /** Don't unnecessarily pass an empty publisher to {@link Mono#switchIfEmpty(Mono)}. */
+  static final class MonoSwitchIfEmptyOfEmptyPublisher<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono) {
+      return mono.switchIfEmpty(Mono.empty());
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono) {
+      return mono;
+    }
+  }
+
+  /** Don't unnecessarily pass an empty publisher to {@link Flux#switchIfEmpty(Publisher)}. */
+  static final class FluxSwitchIfEmptyOfEmptyPublisher<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux) {
+      return flux.switchIfEmpty(Refaster.anyOf(Mono.empty(), Flux.empty()));
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux) {
+      return flux;
+    }
+  }
+
+  /**
+   * Don't use {@link Mono#flatMapMany(Function)} to implicitly convert a {@link Mono} to a {@link
+   * Flux}.
+   */
+  abstract static class MonoFlatMapToFlux<T, S> {
+    @Placeholder(allowsIdentity = true)
+    abstract Mono<S> valueTransformation(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Flux<S> before(Mono<T> mono) {
+      return mono.flatMapMany(v -> valueTransformation(v));
+    }
+
+    @AfterTemplate
+    Flux<S> after(Mono<T> mono) {
+      return mono.flatMap(v -> valueTransformation(v)).flux();
     }
   }
 
