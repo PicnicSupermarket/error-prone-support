@@ -116,7 +116,7 @@
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
-        <version.mockito>3.4.6</version.mockito>
+        <version.mockito>3.5.5</version.mockito>
         <version.nullaway>0.8.0</version.nullaway>
         <version.surefire>2.22.2</version.surefire>
     </properties>
@@ -251,7 +251,7 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.16.1</version>
+                <version>3.17.0</version>
             </dependency>
             <dependency>
                 <groupId>org.checkerframework</groupId>
@@ -1051,7 +1051,7 @@
             them.) -->
             <properties>
                 <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
-                <version.palantir-baseline>3.36.1</version.palantir-baseline>
+                <version.palantir-baseline>3.37.0</version.palantir-baseline>
                 <version.reactor-error-prone>0.1.4</version.reactor-error-prone>
             </properties>
             <dependencyManagement>
