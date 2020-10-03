@@ -92,7 +92,8 @@ final class AssertJOptionalTemplates {
       return Refaster.anyOf(
           optionalAssert.get().isEqualTo(value),
           optionalAssert.isEqualTo(Optional.of(value)),
-          optionalAssert.contains(value));
+          optionalAssert.contains(value),
+          optionalAssert.isPresent().hasValue(value));
     }
 
     @AfterTemplate
