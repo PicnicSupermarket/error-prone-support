@@ -116,7 +116,7 @@
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
-        <version.mockito>3.5.11</version.mockito>
+        <version.mockito>3.5.13</version.mockito>
         <version.nullaway>0.8.0</version.nullaway>
         <version.surefire>2.22.2</version.surefire>
     </properties>
@@ -156,7 +156,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.11.2</version>
+                <version>2.11.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -195,7 +195,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>29.0-jre</version>
+                <version>30.0-jre</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -221,7 +221,7 @@
             <dependency>
                 <groupId>io.reactivex.rxjava2</groupId>
                 <artifactId>rxjava</artifactId>
-                <version>2.2.19</version>
+                <version>2.2.20</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger</groupId>
@@ -231,7 +231,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.1.4</version>
+                <version>2.1.5</version>
             </dependency>
             <dependency>
                 <groupId>javax.xml.bind</groupId>
@@ -241,7 +241,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.13</version>
+                <version>4.13.1</version>
             </dependency>
             <dependency>
                 <groupId>org.aspectj</groupId>
@@ -256,7 +256,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.6.1</version>
+                <version>3.7.0</version>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
@@ -348,7 +348,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1</version>
                     <configuration>
                         <bundledSignatures>
                             <bundledSignature>jdk-internal</bundledSignature>
@@ -569,7 +569,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>8.36.1</version>
+                            <version>8.36.2</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1051,7 +1051,7 @@
             them.) -->
             <properties>
                 <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
-                <version.palantir-baseline>3.39.0</version.palantir-baseline>
+                <version.palantir-baseline>3.43.0</version.palantir-baseline>
                 <version.reactor-error-prone>0.1.4</version.reactor-error-prone>
             </properties>
             <dependencyManagement>
