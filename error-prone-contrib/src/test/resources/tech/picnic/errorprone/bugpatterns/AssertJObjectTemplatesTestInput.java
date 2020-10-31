@@ -20,4 +20,8 @@ final class AssertJObjectTemplatesTest implements RefasterTemplateTestCase {
   AbstractAssert<?, ?> testAssertThatIsIsNotEqualTo() {
     return assertThat("foo".equals("bar")).isFalse();
   }
+
+  AbstractAssert<?, ?> testAssertThatHasToString() {
+    return assertThat(new Object().toString()).isEqualTo("foo");
+  }
 }

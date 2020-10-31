@@ -8,6 +8,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.assertj.core.api.AbstractBooleanAssert;
+import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.ObjectAssert;
 
 final class AssertJObjectTemplates {
@@ -62,6 +63,19 @@ final class AssertJObjectTemplates {
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     ObjectAssert<S> after(S object1, T object2) {
       return assertThat(object1).isNotEqualTo(object2);
+    }
+  }
+
+  static final class AssertThatHasToString<T> {
+    @BeforeTemplate
+    AbstractStringAssert<?> before(T object, String str) {
+      return assertThat(object.toString()).isEqualTo(str);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    ObjectAssert<T> after(T object, String str) {
+      return assertThat(object).hasToString(str);
     }
   }
 }
