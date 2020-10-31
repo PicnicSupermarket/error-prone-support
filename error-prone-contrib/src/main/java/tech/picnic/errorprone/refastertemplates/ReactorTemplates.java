@@ -14,8 +14,6 @@ import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 
@@ -297,20 +295,6 @@ final class ReactorTemplates {
     @AfterTemplate
     Duration after(StepVerifier.LastStep step, Duration duration) {
       return step.verifyTimeout(duration);
-    }
-  }
-
-  /** Prefer {@link Schedulers#boundedElastic()} over the unbounded alternative. */
-  // XXX: Also add templates for the `Schedulers#newElastic` variants.
-  static final class BoundedElasticScheduler {
-    @BeforeTemplate
-    Scheduler before() {
-      return Schedulers.elastic();
-    }
-
-    @AfterTemplate
-    Scheduler after() {
-      return Schedulers.boundedElastic();
     }
   }
 }

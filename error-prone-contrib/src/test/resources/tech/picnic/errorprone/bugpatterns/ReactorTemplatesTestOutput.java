@@ -6,8 +6,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 
@@ -95,9 +93,5 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Duration testStepVerifierLastStepVerifyTimeout() {
     return StepVerifier.create(Mono.empty()).verifyTimeout(Duration.ZERO);
-  }
-
-  Scheduler testBoundedElasticScheduler() {
-    return Schedulers.boundedElastic();
   }
 }
