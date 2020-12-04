@@ -1,14 +1,14 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Description.NO_MATCH;
 import static com.google.errorprone.matchers.Matchers.allOf;
+import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.hasArgumentWithValue;
 import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.isType;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
 import com.google.errorprone.BugPattern.ProvidesFix;
@@ -16,13 +16,15 @@ import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
-import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.matchers.MultiMatcher;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ImportTree;
+import com.sun.source.tree.Tree;
 
 /** A {@link BugChecker} which flags classes importing Mockito, but not enforcing strict mocks. */
 @AutoService(BugChecker.class)
@@ -33,58 +35,41 @@ import com.sun.source.tree.CompilationUnitTree;
     severity = SeverityLevel.SUGGESTION,
     tags = StandardTags.STYLE,
     providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
-public final class MockitoAnnotationCheck extends BugChecker implements CompilationUnitTreeMatcher {
+public final class MockitoAnnotationCheck extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String MOCKITO_SETTINGS = "org.mockito.junit.jupiter.MockitoSettings";
   private static final String STRICT_STUBS = "org.mockito.quality.Strictness.STRICT_STUBS";
   private static final String MOCKITO_ANNOTATION = "@MockitoSettings(strictness = STRICT_STUBS)";
-  private static final Matcher<AnnotationTree> MOCKITO_ANNOTATION_MATCHER =
-      allOf(isType(MOCKITO_SETTINGS), hasArgumentWithValue("strictness", isSameType(STRICT_STUBS)));
+  private static final MultiMatcher<Tree, AnnotationTree> HAS_STRICT_STUBS_ANNOTATION =
+      annotations(
+          AT_LEAST_ONE,
+          allOf(
+              isType(MOCKITO_SETTINGS),
+              hasArgumentWithValue("strictness", isSameType(STRICT_STUBS))));
 
   @Override
-  public Description matchCompilationUnit(
-      CompilationUnitTree compilationUnitTree, VisitorState state) {
-    // Pattern matching using "packageStartsWith" doesn't work, because it only
-    // looks at the visitor and not the tree
-    boolean importsMockito =
-        compilationUnitTree.getImports().stream()
-            .map(Object::toString)
-            .anyMatch(
-                importLine ->
-                    importLine.startsWith("import org.mockito")
-                        || importLine.startsWith("import static org.mockito"));
-    if (!importsMockito) {
+  public Description matchClass(ClassTree clazz, VisitorState state) {
+    if (ASTHelpers.findEnclosingNode(state.getPath(), ClassTree.class) != null
+        || HAS_STRICT_STUBS_ANNOTATION.matches(clazz, state)
+        || !importsMockito(state)) {
       return NO_MATCH;
     }
 
-    ImmutableList<ClassTree> classDeclarations =
-        compilationUnitTree.getTypeDecls().stream()
-            .filter(ClassTree.class::isInstance)
-            .map(ClassTree.class::cast)
-            .collect(toImmutableList());
-
-    ImmutableList<ClassTree> violatingClasses =
-        classDeclarations.stream()
-            .filter(clazz -> !hasMockitoAnnotation(clazz, state))
-            .collect(toImmutableList());
-
-    return violatingClasses.stream()
-        .findFirst()
-        .map(MockitoAnnotationCheck::buildFix)
-        .map(builder -> describeMatch(compilationUnitTree, builder))
-        .orElse(NO_MATCH);
+    return describeMatch(clazz, buildFix(clazz));
   }
 
-  private static SuggestedFix buildFix(ClassTree violatingClass) {
+  private static boolean importsMockito(VisitorState state) {
+    return state.getPath().getCompilationUnit().getImports().stream()
+        .map(ImportTree::getQualifiedIdentifier)
+        .map(Object::toString)
+        .anyMatch(importLine -> importLine.startsWith("org.mockito"));
+  }
+
+  private static SuggestedFix buildFix(ClassTree clazz) {
     return SuggestedFix.builder()
         .addImport(MOCKITO_SETTINGS)
         .addStaticImport(STRICT_STUBS)
-        .prefixWith(violatingClass, MOCKITO_ANNOTATION)
+        .prefixWith(clazz, MOCKITO_ANNOTATION)
         .build();
-  }
-
-  private boolean hasMockitoAnnotation(ClassTree classTree, VisitorState state) {
-    return classTree.getModifiers().getAnnotations().stream()
-        .anyMatch(tree -> MOCKITO_ANNOTATION_MATCHER.matches(tree, state));
   }
 }

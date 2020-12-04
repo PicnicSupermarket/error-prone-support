@@ -16,13 +16,13 @@ public final class MockitoAnnotationCheckTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains:",
             "import static org.mockito.Mockito.mock;",
             "",
             "import org.junit.jupiter.api.Tag;",
             "import org.junit.jupiter.api.Test;",
             "",
             "@Tag(\"unit\")",
+            "// BUG: Diagnostic contains:",
             "class MockitoTest {",
             "    @Test",
             "    void mockitoTest() {",
