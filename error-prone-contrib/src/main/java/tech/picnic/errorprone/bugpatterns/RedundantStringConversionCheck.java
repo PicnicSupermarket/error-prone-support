@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 /** A {@link BugChecker} which flags redundant explicit string conversions. */
 @AutoService(BugChecker.class)
@@ -129,33 +128,33 @@ public final class RedundantStringConversionCheck extends BugChecker
           instanceMethod().onDescendantOf(Formatter.class.getName()).named("format"),
           instanceMethod()
               .onDescendantOf(PrintStream.class.getName())
-              .withNameMatching(Pattern.compile("format|printf")),
+              .namedAnyOf("format", "printf"),
           instanceMethod()
               .onDescendantOf(PrintStream.class.getName())
-              .withNameMatching(Pattern.compile("print|println"))
+              .namedAnyOf("print", "println")
               .withParameters(Object.class.getName()),
           instanceMethod()
               .onDescendantOf(PrintWriter.class.getName())
-              .withNameMatching(Pattern.compile("format|printf")),
+              .namedAnyOf("format", "printf"),
           instanceMethod()
               .onDescendantOf(PrintWriter.class.getName())
-              .withNameMatching(Pattern.compile("print|println"))
+              .namedAnyOf("print", "println")
               .withParameters(Object.class.getName()),
           staticMethod()
               .onClass(Console.class.getName())
-              .withNameMatching(Pattern.compile("format|printf|readline|readPassword")));
+              .namedAnyOf("format", "printf", "readline", "readPassword"));
   private static final Matcher<ExpressionTree> GUAVA_GUARD_INVOCATION =
       anyOf(
           staticMethod()
               .onClass("com.google.common.base.Preconditions")
-              .withNameMatching(Pattern.compile("checkArgument|checkState|checkNotNull")),
+              .namedAnyOf("checkArgument", "checkState", "checkNotNull"),
           staticMethod()
               .onClass("com.google.common.base.Verify")
-              .withNameMatching(Pattern.compile("verify|verifyNotNull")));
+              .namedAnyOf("verify", "verifyNotNull"));
   private static final Matcher<ExpressionTree> SLF4J_LOGGER_INVOCATION =
       instanceMethod()
           .onDescendantOf("org.slf4j.Logger")
-          .withNameMatching(Pattern.compile("trace|debug|info|warn|error"));
+          .namedAnyOf("trace", "debug", "info", "warn", "error");
 
   private final Matcher<ExpressionTree> conversionMethodMatcher;
 

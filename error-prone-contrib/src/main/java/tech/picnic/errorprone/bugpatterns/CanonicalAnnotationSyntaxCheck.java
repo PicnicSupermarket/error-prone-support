@@ -12,11 +12,11 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.matchers.AnnotationMatcherUtils;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.Tree.Kind;
 import java.util.ArrayList;
@@ -86,22 +86,21 @@ public final class CanonicalAnnotationSyntaxCheck extends BugChecker
     }
 
     ExpressionTree arg = args.get(0);
-    if (arg.getKind() != Kind.ASSIGNMENT) {
-      /* Evidently `value` isn't assigned to explicitly. */
+    if (state.getSourceForNode(arg) == null) {
+      /*
+       * The annotation argument isn't doesn't have a source representation, e.g. because `value`
+       * isn't assigned to explicitly.
+       */
       return Optional.empty();
     }
 
-    AssignmentTree assignment = (AssignmentTree) arg;
-    ExpressionTree variable = assignment.getVariable();
-    if (variable.getKind() != Kind.IDENTIFIER
-        || !((IdentifierTree) variable).getName().contentEquals("value")
-        || state.getSourceForNode(variable) == null) {
+    ExpressionTree expr = AnnotationMatcherUtils.getArgument(tree, "value");
+    if (expr == null) {
       /* This is not an explicit assignment to the `value` attribute. */
       return Optional.empty();
     }
 
     /* Replace the assignment with (the simplified representation of) just its value. */
-    ExpressionTree expr = assignment.getExpression();
     return Optional.of(
         SuggestedFix.replace(
             arg,

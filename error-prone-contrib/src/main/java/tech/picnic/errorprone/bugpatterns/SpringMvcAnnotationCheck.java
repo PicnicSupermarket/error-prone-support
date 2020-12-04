@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.base.Verify.verify;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 
 import com.google.auto.service.AutoService;
@@ -70,7 +71,7 @@ public final class SpringMvcAnnotationCheck extends BugChecker implements Annota
       AnnotationTree tree, ExpressionTree arg, VisitorState state) {
     return extractUniqueMethod(arg, state)
         .map(REPLACEMENTS::get)
-        .map(newAnnotation -> replaceAnnotation(tree, arg, newAnnotation));
+        .map(newAnnotation -> replaceAnnotation(tree, arg, newAnnotation, state));
   }
 
   private static Optional<String> extractUniqueMethod(ExpressionTree arg, VisitorState state) {
@@ -102,11 +103,11 @@ public final class SpringMvcAnnotationCheck extends BugChecker implements Annota
   }
 
   private static Fix replaceAnnotation(
-      AnnotationTree tree, ExpressionTree arg, String newAnnotation) {
+      AnnotationTree tree, ExpressionTree argToRemove, String newAnnotation, VisitorState state) {
     String newArguments =
         tree.getArguments().stream()
-            .filter(a -> !a.equals(arg))
-            .map(Object::toString)
+            .filter(not(argToRemove::equals))
+            .map(arg -> Util.treeToString(arg, state))
             .collect(joining(", "));
 
     return SuggestedFix.builder()

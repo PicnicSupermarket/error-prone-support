@@ -23,7 +23,6 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree.Kind;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 /** A {@link BugChecker} which flags SLF4J usages that are likely to be in error. */
 // XXX: The special-casing of Throwable applies only to SLF4J 1.6.0+; see
@@ -47,7 +46,7 @@ public final class Slf4jLogStatementCheck extends BugChecker
   private static final Matcher<ExpressionTree> SLF4J_LOGGER_INVOCATION =
       instanceMethod()
           .onDescendantOf("org.slf4j.Logger")
-          .withNameMatching(Pattern.compile("trace|debug|info|warn|error"));
+          .namedAnyOf("trace", "debug", "info", "warn", "error");
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {

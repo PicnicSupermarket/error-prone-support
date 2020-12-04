@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 // XXX: Redefine using auto-value
 // XXX: Document design decision that the project stays as close as possible to Error Prone.
 //      ^ ... and *therefore* uses Google Auto Value rather than Immutables.org.
+// XXX: Make this class implement the `MultiMatcher` interface.
 /**
  * A matcher of (annotation, attribute) pairs.
  *
@@ -88,7 +89,6 @@ final class AnnotationAttributeMatcher implements Serializable {
       int hash = entry.indexOf('#');
       if (hash < 0) {
         wholeTypes.add(entry);
-
       } else {
         String annotationType = entry.substring(0, hash);
         String attribute = entry.substring(hash + 1);
