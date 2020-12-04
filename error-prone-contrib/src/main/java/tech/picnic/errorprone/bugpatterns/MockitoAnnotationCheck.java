@@ -49,7 +49,10 @@ public final class MockitoAnnotationCheck extends BugChecker implements Compilat
     boolean importsMockito =
         compilationUnitTree.getImports().stream()
             .map(Object::toString)
-            .anyMatch(importLine -> importLine.startsWith("org.mockito"));
+            .anyMatch(
+                importLine ->
+                    importLine.startsWith("import org.mockito")
+                        || importLine.startsWith("import static org.mockito"));
     if (!importsMockito) {
       return NO_MATCH;
     }
