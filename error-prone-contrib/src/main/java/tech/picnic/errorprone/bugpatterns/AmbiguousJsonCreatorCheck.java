@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.matchers.Matchers.isType;
+
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
@@ -10,7 +12,6 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
-import com.google.errorprone.matchers.AnnotationType;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
@@ -29,13 +30,13 @@ import javax.lang.model.element.AnnotationValue;
     name = "AmbiguousJsonCreator",
     summary = "JsonCreator.Mode should be set for single-argument creators",
     linkType = LinkType.NONE,
-    severity = SeverityLevel.SUGGESTION,
+    severity = SeverityLevel.WARNING,
     tags = StandardTags.LIKELY_ERROR,
     providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class AmbiguousJsonCreatorCheck extends BugChecker implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<AnnotationTree> JSON_CREATOR_ANNOTATION =
-      new AnnotationType("com.fasterxml.jackson.annotation.JsonCreator");
+      isType("com.fasterxml.jackson.annotation.JsonCreator");
 
   @Override
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
@@ -59,7 +60,7 @@ public final class AmbiguousJsonCreatorCheck extends BugChecker implements Annot
             .map(Map.Entry::getValue)
             .map(AnnotationValue::getValue)
             .filter(Symbol.VarSymbol.class::isInstance)
-            .map(o -> (Symbol.VarSymbol) o)
+            .map(Symbol.VarSymbol.class::cast)
             .filter(varSymbol -> !varSymbol.getSimpleName().contentEquals("DEFAULT"))
             .findFirst();
 
