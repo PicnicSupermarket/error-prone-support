@@ -11,6 +11,24 @@ final class CanonicalAnnotationSyntaxTest {
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(CanonicalAnnotationSyntax.class, getClass());
 
+  // XXX: Merge with code below
+  @Test
+  public void testIdentificationSpring() {
+    compilationTestHelper
+        .addSourceLines(
+            "pkg/A.java",
+            "package pkg;",
+            "",
+            "import org.springframework.web.bind.annotation.RequestMapping;",
+            "",
+            "// BUG: Diagnostic contains:",
+            //            "@RequestMapping(path = \"/path\")",
+            "@RequestMapping(value = \"/path\", consumes = \"text/plain\")",
+            "class A {",
+            "}")
+        .doTest();
+  }
+
   @Test
   void identification() {
     compilationTestHelper
