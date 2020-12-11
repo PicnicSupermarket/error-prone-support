@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static java.util.function.Predicate.not;
@@ -30,7 +31,6 @@ import com.sun.tools.javac.tree.JCTree.JCMemberReference;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 /**
  * A {@link BugChecker} which flags {@code Comparator#comparing*} invocations that can be replaced
@@ -54,13 +54,29 @@ import java.util.stream.Stream;
 public final class PrimitiveComparisonCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<ExpressionTree> STATIC_MATCH = getStaticTargetMatcher();
-  private static final Matcher<ExpressionTree> INSTANCE_MATCH = getInstanceTargetMatcher();
+  private static final Matcher<ExpressionTree> STATIC_COMPARISION_METHOD =
+      anyOf(
+          staticMethod()
+              .onClass(Comparator.class.getName())
+              .namedAnyOf("comparingInt", "comparingLong", "comparingDouble"),
+          staticMethod()
+              .onClass(Comparator.class.getName())
+              .named("comparing")
+              .withParameters(Function.class.getName()));
+  private static final Matcher<ExpressionTree> INSTANCE_COMPARISION_METHOD =
+      anyOf(
+          instanceMethod()
+              .onDescendantOf(Comparator.class.getName())
+              .namedAnyOf("thenComparingInt", "thenComparingLong", "thenComparingDouble"),
+          instanceMethod()
+              .onDescendantOf(Comparator.class.getName())
+              .named("thenComparing")
+              .withParameters(Function.class.getName()));
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    boolean isStatic = STATIC_MATCH.matches(tree, state);
-    if (!isStatic && !INSTANCE_MATCH.matches(tree, state)) {
+    boolean isStatic = STATIC_COMPARISION_METHOD.matches(tree, state);
+    if (!isStatic && !INSTANCE_COMPARISION_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
@@ -135,32 +151,5 @@ public final class PrimitiveComparisonCheck extends BugChecker
       default:
         throw new VerifyException("Unexpected type of expression: " + expr.getKind());
     }
-  }
-
-  private static Matcher<ExpressionTree> getStaticTargetMatcher() {
-    String clazz = Comparator.class.getName();
-    return anyMatch(
-        staticMethod()
-            .onClass(clazz)
-            .namedAnyOf("comparingInt", "comparingLong", "comparingDouble"),
-        staticMethod().onClass(clazz).named("comparing").withParameters(Function.class.getName()));
-  }
-
-  private static Matcher<ExpressionTree> getInstanceTargetMatcher() {
-    String clazz = Comparator.class.getName();
-    return anyMatch(
-        instanceMethod()
-            .onDescendantOf(clazz)
-            .namedAnyOf("thenComparingInt", "thenComparingLong", "thenComparingDouble"),
-        instanceMethod()
-            .onDescendantOf(clazz)
-            .named("thenComparing")
-            .withParameters(Function.class.getName()));
-  }
-
-  @SafeVarargs
-  @SuppressWarnings("varargs")
-  private static Matcher<ExpressionTree> anyMatch(Matcher<ExpressionTree>... matchers) {
-    return (ExpressionTree t, VisitorState s) -> Stream.of(matchers).anyMatch(m -> m.matches(t, s));
   }
 }
