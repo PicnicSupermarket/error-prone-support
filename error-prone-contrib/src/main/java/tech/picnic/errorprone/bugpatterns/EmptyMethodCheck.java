@@ -27,7 +27,7 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
     name = "EmptyMethod",
     summary = "Empty method can likely be deleted",
     linkType = LinkType.NONE,
-    severity = SeverityLevel.WARNING,
+    severity = SeverityLevel.SUGGESTION,
     tags = StandardTags.SIMPLIFICATION,
     providesFix = BugPattern.ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class EmptyMethodCheck extends BugChecker implements MethodTreeMatcher {
