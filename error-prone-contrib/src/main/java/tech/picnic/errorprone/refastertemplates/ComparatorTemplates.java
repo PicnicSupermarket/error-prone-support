@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 
 import com.google.common.collect.Comparators;
@@ -14,41 +15,28 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
+import java.util.function.ToLongFunction;
 
 /** Refaster templates related to expressions dealing with {@link Comparator}s. */
 final class ComparatorTemplates {
   private ComparatorTemplates() {}
 
   /** Prefer {@link Comparator#naturalOrder()} over more complicated constructs. */
-  static final class NaturalOrderComparator<T extends Comparable<? super T>> {
+  static final class NaturalOrder<T extends Comparable<? super T>> {
     // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
     @BeforeTemplate
     Comparator<T> before() {
-      return Refaster.anyOf(Comparator.comparing(Refaster.anyOf(identity(), v -> v)));
+      return Refaster.anyOf(
+          Comparator.comparing(Refaster.anyOf(identity(), v -> v)),
+          Comparator.<T>reverseOrder().reversed());
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     Comparator<T> after() {
       return Comparator.naturalOrder();
-    }
-  }
-
-  /**
-   * Where applicable, prefer {@link Comparator#naturalOrder()} over {@link Function#identity()}, as
-   * it more clearly states intent.
-   */
-  static final class NaturalOrderComparatorFallback<T extends Comparable<? super T>> {
-    // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
-    @BeforeTemplate
-    Comparator<T> before(Comparator<T> cmp) {
-      return cmp.thenComparing(Refaster.anyOf(identity(), v -> v));
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    Comparator<T> after(Comparator<T> cmp) {
-      return cmp.thenComparing(Comparator.naturalOrder());
     }
   }
 
@@ -62,7 +50,135 @@ final class ComparatorTemplates {
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     Comparator<T> after() {
-      return Comparator.reverseOrder();
+      return reverseOrder();
+    }
+  }
+
+  static final class CustomComparator<T> {
+    // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
+    @BeforeTemplate
+    Comparator<T> before(Comparator<T> cmp) {
+      return Comparator.comparing(Refaster.anyOf(identity(), v -> v), cmp);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    Comparator<T> after(Comparator<T> cmp) {
+      return cmp;
+    }
+  }
+
+  /** Don't explicitly create {@link Comparator}s unnecessarily. */
+  static final class ThenComparing<S, T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Comparator<S> before(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+      return cmp.thenComparing(Comparator.comparing(function));
+    }
+
+    @AfterTemplate
+    Comparator<S> after(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+      return cmp.thenComparing(function);
+    }
+  }
+
+  /** Don't explicitly create {@link Comparator}s unnecessarily. */
+  static final class ThenComparingReversed<S, T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Comparator<S> before(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+      return cmp.thenComparing(Comparator.comparing(function).reversed());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    Comparator<S> after(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+      return cmp.thenComparing(function, reverseOrder());
+    }
+  }
+
+  /** Don't explicitly create {@link Comparator}s unnecessarily. */
+  static final class ThenComparingCustom<S, T> {
+    @BeforeTemplate
+    Comparator<S> before(
+        Comparator<S> cmp, Function<? super S, ? extends T> function, Comparator<? super T> cmp2) {
+      return cmp.thenComparing(Comparator.comparing(function, cmp2));
+    }
+
+    @AfterTemplate
+    Comparator<S> after(
+        Comparator<S> cmp, Function<? super S, ? extends T> function, Comparator<? super T> cmp2) {
+      return cmp.thenComparing(function, cmp2);
+    }
+  }
+
+  /** Don't explicitly create {@link Comparator}s unnecessarily. */
+  static final class ThenComparingCustomReversed<S, T> {
+    @BeforeTemplate
+    Comparator<S> before(
+        Comparator<S> cmp, Function<? super S, ? extends T> function, Comparator<? super T> cmp2) {
+      return cmp.thenComparing(Comparator.comparing(function, cmp2).reversed());
+    }
+
+    @AfterTemplate
+    Comparator<S> after(
+        Comparator<S> cmp, Function<? super S, ? extends T> function, Comparator<? super T> cmp2) {
+      return cmp.thenComparing(function, cmp2.reversed());
+    }
+  }
+
+  /** Don't explicitly create {@link Comparator}s unnecessarily. */
+  static final class ThenComparingDouble<T> {
+    @BeforeTemplate
+    Comparator<T> before(Comparator<T> cmp, ToDoubleFunction<? super T> function) {
+      return cmp.thenComparing(Comparator.comparingDouble(function));
+    }
+
+    @AfterTemplate
+    Comparator<T> after(Comparator<T> cmp, ToDoubleFunction<? super T> function) {
+      return cmp.thenComparingDouble(function);
+    }
+  }
+
+  /** Don't explicitly create {@link Comparator}s unnecessarily. */
+  static final class ThenComparingInt<T> {
+    @BeforeTemplate
+    Comparator<T> before(Comparator<T> cmp, ToIntFunction<? super T> function) {
+      return cmp.thenComparing(Comparator.comparingInt(function));
+    }
+
+    @AfterTemplate
+    Comparator<T> after(Comparator<T> cmp, ToIntFunction<? super T> function) {
+      return cmp.thenComparingInt(function);
+    }
+  }
+
+  /** Don't explicitly create {@link Comparator}s unnecessarily. */
+  static final class ThenComparingLong<T> {
+    @BeforeTemplate
+    Comparator<T> before(Comparator<T> cmp, ToLongFunction<? super T> function) {
+      return cmp.thenComparing(Comparator.comparingLong(function));
+    }
+
+    @AfterTemplate
+    Comparator<T> after(Comparator<T> cmp, ToLongFunction<? super T> function) {
+      return cmp.thenComparingLong(function);
+    }
+  }
+
+  /**
+   * Where applicable, prefer {@link Comparator#naturalOrder()} over {@link Function#identity()}, as
+   * it more clearly states intent.
+   */
+  static final class ThenComparingNaturalOrder<T extends Comparable<? super T>> {
+    // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
+    @BeforeTemplate
+    Comparator<T> before(Comparator<T> cmp) {
+      return cmp.thenComparing(Refaster.anyOf(identity(), v -> v));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    Comparator<T> after(Comparator<T> cmp) {
+      return cmp.thenComparing(Comparator.naturalOrder());
     }
   }
 

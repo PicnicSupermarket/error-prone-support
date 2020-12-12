@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 
 import com.google.common.collect.ImmutableList;
@@ -15,18 +16,62 @@ final class ComparatorTemplatesTest implements RefasterTemplateTestCase {
         Arrays.class, Collections.class, ImmutableList.class, ImmutableSet.class, identity());
   }
 
-  ImmutableSet<Comparator<String>> testNaturalOrderComparator() {
-    return ImmutableSet.of(Comparator.comparing(identity()), Comparator.comparing(s -> s));
-  }
-
-  ImmutableSet<Comparator<String>> testNaturalOrderComparatorFallback() {
+  ImmutableSet<Comparator<String>> testNaturalOrder() {
     return ImmutableSet.of(
-        Comparator.<String>naturalOrder().thenComparing(identity()),
-        Comparator.<String>naturalOrder().thenComparing(s -> s));
+        Comparator.comparing(identity()),
+        Comparator.comparing(s -> s),
+        Comparator.<String>reverseOrder().reversed());
   }
 
   Comparator<String> testReverseOrder() {
     return Comparator.<String>naturalOrder().reversed();
+  }
+
+  ImmutableSet<Comparator<String>> testCustomComparator() {
+    return ImmutableSet.of(
+        Comparator.comparing(identity(), Comparator.comparingInt(String::length)),
+        Comparator.comparing(s -> s, Comparator.comparingInt(String::length)));
+  }
+
+  Comparator<String> testThenComparing() {
+    return Comparator.<String>naturalOrder().thenComparing(Comparator.comparing(String::isEmpty));
+  }
+
+  Comparator<String> testThenComparingReversed() {
+    return Comparator.<String>naturalOrder()
+        .thenComparing(Comparator.comparing(String::isEmpty).reversed());
+  }
+
+  Comparator<String> testThenComparingCustom() {
+    return Comparator.<String>naturalOrder()
+        .thenComparing(Comparator.comparing(String::isEmpty, reverseOrder()));
+  }
+
+  Comparator<String> testThenComparingCustomReversed() {
+    return Comparator.<String>naturalOrder()
+        .thenComparing(
+            Comparator.comparing(String::isEmpty, Comparator.<Boolean>reverseOrder()).reversed());
+  }
+
+  Comparator<Integer> testThenComparingDouble() {
+    return Comparator.<Integer>naturalOrder()
+        .thenComparing(Comparator.comparingDouble(Integer::doubleValue));
+  }
+
+  Comparator<Integer> testThenComparingInt() {
+    return Comparator.<Integer>naturalOrder()
+        .thenComparing(Comparator.comparingInt(Integer::intValue));
+  }
+
+  Comparator<Integer> testThenComparingLong() {
+    return Comparator.<Integer>naturalOrder()
+        .thenComparing(Comparator.comparingLong(Integer::longValue));
+  }
+
+  ImmutableSet<Comparator<String>> testThenComparingNaturalOrder() {
+    return ImmutableSet.of(
+        Comparator.<String>naturalOrder().thenComparing(identity()),
+        Comparator.<String>naturalOrder().thenComparing(s -> s));
   }
 
   ImmutableSet<String> testMinOfPairNaturalOrder() {
