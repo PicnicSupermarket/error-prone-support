@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,12 @@ public final class StaticImportCheckTest {
       BugCheckerRefactoringTestHelper.newInstance(new StaticImportCheck(), getClass());
 
   @Test
+  public void testCandidateMethodsAreNotRedundant() {
+    assertThat(StaticImportCheck.STATIC_IMPORT_CANDIDATE_METHODS.keySet())
+        .doesNotContainAnyElementsOf(StaticImportCheck.STATIC_IMPORT_CANDIDATE_CLASSES);
+  }
+
+  @Test
   public void testIdentification() {
     compilationTestHelper
         .addSourceLines(
@@ -18,16 +26,21 @@ public final class StaticImportCheckTest {
             "import static com.google.common.collect.ImmutableMap.toImmutableMap;",
             "import static com.google.common.collect.ImmutableSet.toImmutableSet;",
             "import static java.nio.charset.StandardCharsets.UTF_8;",
+            "import static java.util.function.Predicate.not;",
             "",
+            "import com.google.common.base.Predicates;",
             "import com.google.common.collect.ImmutableMap;",
+            "import com.google.common.collect.ImmutableMultiset;",
             "import com.google.common.collect.ImmutableSet;",
             "import java.nio.charset.StandardCharsets;",
+            "import java.util.Optional;",
+            "import java.util.function.Predicate;",
             "",
             "class A {",
             "  void m() {",
             "    // BUG: Diagnostic contains:",
             "    ImmutableMap.toImmutableMap(v -> v, v -> v);",
-            "    ImmutableMap.<String, String,  String>toImmutableMap(v -> v, v -> v);",
+            "    ImmutableMap.<String, String, String>toImmutableMap(v -> v, v -> v);",
             "    toImmutableMap(v -> v, v -> v);",
             "",
             "    // BUG: Diagnostic contains:",
@@ -35,10 +48,30 @@ public final class StaticImportCheckTest {
             "    ImmutableSet.<String>toImmutableSet();",
             "    toImmutableSet();",
             "",
+            "    // Not flagged because we define `#toImmutableMultiset` below.",
+            "    ImmutableMultiset.toImmutableMultiset();",
+            "    ImmutableMultiset.<String>toImmutableMultiset();",
+            "    toImmutableMultiset();",
+            "",
+            "    // BUG: Diagnostic contains:",
+            "    Predicate.not(null);",
+            "    not(null);",
+            "",
+            "    // BUG: Diagnostic contains:",
+            "    Predicates.alwaysTrue();",
+            "    // BUG: Diagnostic contains:",
+            "    Predicates.alwaysFalse();",
+            "    // Not flagged because of `java.util.function.Predicate.not` import.",
+            "    Predicates.not(null);",
+            "",
             "    // BUG: Diagnostic contains:",
             "    Object o1 = StandardCharsets.UTF_8;",
             "    Object o2 = UTF_8;",
+            "",
+            "    Optional.empty();",
             "  }",
+            "",
+            "  void toImmutableMultiset() {}",
             "}")
         .doTest();
   }
@@ -48,6 +81,9 @@ public final class StaticImportCheckTest {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
+            "import static java.util.function.Predicate.not;",
+            "",
+            "import com.google.common.base.Predicates;",
             "import com.google.common.collect.ImmutableMap;",
             "import com.google.common.collect.ImmutableSet;",
             "import java.nio.charset.StandardCharsets;",
@@ -57,10 +93,13 @@ public final class StaticImportCheckTest {
             "class A {",
             "  void m1() {",
             "    ImmutableMap.toImmutableMap(v -> v, v -> v);",
-            "    ImmutableMap.<String, String,  String>toImmutableMap(v -> v, v -> v);",
+            "    ImmutableMap.<String, String, String>toImmutableMap(v -> v, v -> v);",
             "",
             "    ImmutableSet.toImmutableSet();",
             "    ImmutableSet.<String>toImmutableSet();",
+            "",
+            "    Predicates.not(null);",
+            "    not(null);",
             "",
             "    Object o = StandardCharsets.UTF_8;",
             "  }",
@@ -80,10 +119,12 @@ public final class StaticImportCheckTest {
             "import static com.google.common.collect.ImmutableMap.toImmutableMap;",
             "import static com.google.common.collect.ImmutableSet.toImmutableSet;",
             "import static java.nio.charset.StandardCharsets.UTF_8;",
+            "import static java.util.function.Predicate.not;",
             "import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;",
             "import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME;",
             "import static org.springframework.format.annotation.DateTimeFormat.ISO.TIME;",
             "",
+            "import com.google.common.base.Predicates;",
             "import com.google.common.collect.ImmutableMap;",
             "import com.google.common.collect.ImmutableSet;",
             "import java.nio.charset.StandardCharsets;",
@@ -93,10 +134,13 @@ public final class StaticImportCheckTest {
             "class A {",
             "  void m1() {",
             "    toImmutableMap(v -> v, v -> v);",
-            "    ImmutableMap.<String, String,  String>toImmutableMap(v -> v, v -> v);",
+            "    ImmutableMap.<String, String, String>toImmutableMap(v -> v, v -> v);",
             "",
             "    toImmutableSet();",
             "    ImmutableSet.<String>toImmutableSet();",
+            "",
+            "    Predicates.not(null);",
+            "    not(null);",
             "",
             "    Object o = UTF_8;",
             "  }",

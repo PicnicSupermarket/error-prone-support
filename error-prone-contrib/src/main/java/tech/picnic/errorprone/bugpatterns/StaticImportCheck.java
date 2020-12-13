@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.auto.service.AutoService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.errorprone.BugPattern;
@@ -23,23 +24,20 @@ import java.util.Objects;
 import java.util.Optional;
 
 /** A {@link BugChecker} which flags methods that can and should be statically imported. */
-// XXX: Improve test coverage.
-// - Verify that non-listed methods/constants aren't rewritten.
-// - Verify that conflicting imports are avoided.
 // XXX: Tricky cases:
 // - `org.springframework.http.MediaType` (do except for `ALL`?)
 // - `org.springframework.http.HttpStatus` (not always an improvement, and `valueOf` must
-// certainly be excluded)
-// `com.google.common.collect.Tables`
+//    certainly be excluded)
+// - `com.google.common.collect.Tables`
 // - `ch.qos.logback.classic.Level.{DEBUG, ERROR, INFO, TRACE, WARN"}`
 // XXX: Also introduce a check which disallows static imports of certain methods. Candidates:
-// `com.google.common.base.Strings`
-// `java.util.Optional.empty`
-// `java.util.Locale.ROOT`
-// `ZoneOffset.ofHours` and other `ofXXX`-style methods.
-// `java.time.Clock`.
-// Several other `java.time` classes.
-// Likely any of `*.{ZERO, ONE, MIX, MAX, MIN_VALUE, MAX_VALUE}`.
+// - `com.google.common.base.Strings`
+// - `java.util.Optional.empty`
+// - `java.util.Locale.ROOT`
+// - `ZoneOffset.ofHours` and other `ofXXX`-style methods.
+// - `java.time.Clock`.
+// - Several other `java.time` classes.
+// - Likely any of `*.{ZERO, ONE, MIX, MAX, MIN_VALUE, MAX_VALUE}`.
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "StaticImport",
@@ -50,7 +48,9 @@ import java.util.Optional;
     providesFix = BugPattern.ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class StaticImportCheck extends BugChecker implements MemberSelectTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final ImmutableSet<String> STATIC_IMPORT_CANDIDATE_CLASSES =
+
+  @VisibleForTesting
+  static final ImmutableSet<String> STATIC_IMPORT_CANDIDATE_CLASSES =
       ImmutableSet.of(
           "com.google.common.base.Preconditions",
           "com.google.common.base.Predicates",
@@ -85,7 +85,9 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           "org.springframework.http.HttpMethod",
           "org.testng.Assert",
           "reactor.function.TupleUtils");
-  private static final ImmutableSetMultimap<String, String> STATIC_IMPORT_CANDIDATE_METHODS =
+
+  @VisibleForTesting
+  static final ImmutableSetMultimap<String, String> STATIC_IMPORT_CANDIDATE_METHODS =
       ImmutableSetMultimap.<String, String>builder()
           .putAll(
               "com.google.common.collect.ImmutableListMultimap",
@@ -131,7 +133,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
     }
 
     return getCandidateSimpleName(importInfo)
-        .map(name -> tryStaticImport(tree, importInfo.canonicalName() + '.' + name, name, state))
+        .flatMap(n -> tryStaticImport(tree, importInfo.canonicalName() + '.' + n, n, state))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
