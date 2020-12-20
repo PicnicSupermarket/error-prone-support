@@ -9,7 +9,7 @@ import org.assertj.core.api.OptionalAssert;
 
 final class AssertJOptionalTemplatesTest implements RefasterTemplateTestCase {
   AbstractAssert<?, ?> testAssertThatOptional() {
-    return assertThat(Optional.of(new Object()).get());
+    return assertThat(Optional.of(new Object()).orElseThrow());
   }
 
   ImmutableSet<OptionalAssert<Integer>> testAbstractOptionalAssertIsPresent() {
