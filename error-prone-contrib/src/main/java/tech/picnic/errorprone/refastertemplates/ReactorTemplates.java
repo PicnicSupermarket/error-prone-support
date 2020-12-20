@@ -1,10 +1,15 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.common.collect.MoreCollectors.toOptional;
+
+import com.google.common.collect.MoreCollectors;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -153,6 +158,26 @@ final class ReactorTemplates {
     @AfterTemplate
     Flux<S> after(Mono<T> mono) {
       return mono.flatMap(v -> valueTransformation(v)).flux();
+    }
+  }
+
+  /**
+   * Prefer a collection using {@link MoreCollectors#toOptional()} over more contrived alternatives.
+   */
+  // XXX: Consider creating a plugin which flags/discourages `Mono<Optional<T>>` method return
+  // types, just as we discourage nullable `Boolean`s and `Optional`s.
+  static final class MonoCollectToOptional<T> {
+    @BeforeTemplate
+    Mono<Optional<T>> before(Mono<T> mono) {
+      return Refaster.anyOf(
+          mono.map(Optional::of).defaultIfEmpty(Optional.empty()),
+          mono.map(Optional::of).switchIfEmpty(Mono.just(Optional.empty())));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    Mono<Optional<T>> after(Mono<T> mono) {
+      return mono.flux().collect(toOptional());
     }
   }
 

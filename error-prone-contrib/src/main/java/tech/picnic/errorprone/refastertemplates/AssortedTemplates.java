@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.Sets.toImmutableEnumSet;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -92,7 +93,7 @@ final class AssortedTemplates {
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     ImmutableSet<T> after(Stream<T> stream) {
-      return stream.collect(Sets.toImmutableEnumSet());
+      return stream.collect(toImmutableEnumSet());
     }
   }
 

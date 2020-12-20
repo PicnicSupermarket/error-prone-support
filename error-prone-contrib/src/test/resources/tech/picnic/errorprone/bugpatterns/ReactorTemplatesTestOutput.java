@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.collect.MoreCollectors.toOptional;
+
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
 import java.util.Optional;
@@ -50,6 +52,12 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Flux<String> testMonoFlatMapToFlux() {
     return Mono.just("foo").flatMap(s -> Mono.just(s + s)).flux();
+  }
+
+  ImmutableSet<Mono<Optional<String>>> testMonoCollectToOptional() {
+    return ImmutableSet.of(
+        Mono.just("foo").flux().collect(toOptional()),
+        Mono.just("bar").flux().collect(toOptional()));
   }
 
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
