@@ -195,7 +195,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>30.0-jre</version>
+                <version>30.1-jre</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -480,14 +480,42 @@
                                         <property name="setterCanReturnItsClass" value="true" />
                                     </module>
                                     <module name="IllegalImport">
+                                        <property name="illegalClasses" value="com.google.api.client.util.Preconditions">
+                                            <!-- Instead, please use
+                                            `com.google.common.base.Preconditions`. -->
+                                        </property>
+                                        <property name="illegalClasses" value="com.mongodb.lang.Nullable">
+                                            <!-- Instead, please use
+                                            `javax.annotation.Nullable`. -->
+                                        </property>
+                                        <property name="illegalClasses" value="com.nimbusds.jose.util.StandardCharset">
+                                            <!-- Instead, please use
+                                            `java.nio.charset.StandardCharsets`. -->
+                                        </property>
+                                        <property name="illegalClasses" value="io.micrometer.core.lang.Nullable">
+                                            <!-- Instead, please use
+                                            `javax.annotation.Nullable`. -->
+                                        </property>
                                         <property name="illegalClasses" value="javax.annotation.concurrent.Immutable">
                                             <!-- Instead, please use
                                             `com.google.errorprone.annotations.Immutable`. -->
                                         </property>
                                         <property name="illegalClasses" value="javax.xml.bind.DatatypeConverter" />
+                                        <property name="illegalClasses" value="org.assertj.core.util.Preconditions">
+                                            <!-- Instead, please use
+                                            `com.google.common.base.Preconditions`. -->
+                                        </property>
+                                        <property name="illegalClasses" value="org.jetbrains.annotations.VisibleForTesting">
+                                            <!-- Instead, please use
+                                            `com.google.common.annotations.VisibleForTesting`. -->
+                                        </property>
                                         <property name="illegalClasses" value="org.springframework.context.annotation.ComponentScan">
                                             <!-- Instead, please explicitly
                                             `@Import` the components. -->
+                                        </property>
+                                        <property name="illegalClasses" value="org.springframework.lang.Nullable">
+                                            <!-- Instead, please use
+                                            `javax.annotation.Nullable`. -->
                                         </property>
                                         <property name="illegalPkgs" value="com.amazonaws.annotation" />
                                         <property name="illegalPkgs" value="com.beust.jcommander.internal" />
@@ -506,6 +534,8 @@
                                         </property>
                                         <property name="illegalPkgs" value="org.immutables.value.internal" />
                                         <property name="illegalPkgs" value="org.mutabilitydetector.internal" />
+                                        <property name="illegalPkgs" value="org.testcontainers.shaded" />
+                                        <property name="illegalPkgs" value="org.testng.internal" />
                                     </module>
                                     <module name="IllegalImport">
                                         <!-- XXX: This config uses
@@ -645,6 +675,11 @@
                         <rules>
                             <banDuplicatePomDependencyVersions />
                             <dependencyConvergence />
+                            <requireEncoding>
+                                <acceptAsciiSubset>true</acceptAsciiSubset>
+                                <encoding>ISO-8859-1</encoding>
+                                <includes>src/main/resources/**/*.properties,src/test/resources/**/*.properties</includes>
+                            </requireEncoding>
                             <requireJavaVersion>
                                 <version>${version.jdk}</version>
                             </requireJavaVersion>
@@ -749,6 +784,7 @@
                         <delimiters>
                             <delimiter>@</delimiter>
                         </delimiters>
+                        <propertiesEncoding>ISO-8859-1</propertiesEncoding>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -821,23 +857,6 @@
                     <artifactId>license-maven-plugin</artifactId>
                     <version>2.0.0</version>
                     <configuration>
-                        <!-- Some Maven artifacts do not explicitly state the
-                        license under which they are published. At this time
-                        the following dependencies are explicitly excluded from
-                        the license validation process:
-                        - commons-logging: We use version
-                          `99.0-does-not-exist`, an empty implementation. See
-                          http://version99.grons.nl/.
-                        - ing-iac: This is our custom packaging of the ING
-                          iDEAL Java Connector library. Its exact license
-                          status is unclear, but it is provided by ING for the
-                          express purpose of integrating with their platform.
-                        - snowplow-java-tracker: This software is licensed as
-                          Apache-2.0, see
-                          https://github.com/snowplow/snowplow-java-tracker.
-                          XXX: File a PR to make sure this license information
-                          is included in `pom.xml`.
-                        -->
                         <includedLicenses>
                             <!-- The SPDX IDs of licenses of third-party
                             software that may be bundled as part of
@@ -1056,7 +1075,7 @@
             them.) -->
             <properties>
                 <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
-                <version.palantir-baseline>3.59.0</version.palantir-baseline>
+                <version.palantir-baseline>3.60.0</version.palantir-baseline>
                 <version.reactor-error-prone>0.1.4</version.reactor-error-prone>
             </properties>
             <dependencyManagement>
@@ -1301,7 +1320,7 @@
                                     -Xep:BetaApi:OFF
                                     <!-- We don't target JDK 7. -->
                                     -Xep:Java7ApiChecker:OFF
-                                    <!-- Too many false positives. See
+                                    <!-- Too many false positives for now. See
                                     https://github.com/google/error-prone/issues/1610 and
                                     https://github.com/google/error-prone/issues/1646. -->
                                     -Xep:JdkObsolete:OFF
