@@ -16,7 +16,6 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link Optional}s. */
-// XXX: Add a `get` -> `orElseThrow` rule, then update all other templates that reference `get`.
 final class OptionalTemplates {
   private OptionalTemplates() {}
 
@@ -58,6 +57,37 @@ final class OptionalTemplates {
     @AfterTemplate
     boolean after(Optional<T> optional) {
       return optional.isPresent();
+    }
+  }
+
+  /** Prefer {@link Optional#orElseThrow()} over the less explicit {@link Optional#get()}. */
+  static final class OptionalOrElseThrow<T> {
+    @BeforeTemplate
+    @SuppressWarnings("NullAway")
+    T before(Optional<T> optional) {
+      return optional.get();
+    }
+
+    @AfterTemplate
+    T after(Optional<T> optional) {
+      return optional.orElseThrow();
+    }
+  }
+
+  /** Prefer {@link Optional#orElseThrow()} over the less explicit {@link Optional#get()}. */
+  // XXX: This template is analogous to `OptionalOrElseThrow` above. Arguably this is its
+  // generalization. If/when Refaster is extended to understand this, delete the template above.
+  static final class OptionalOrElseThrowMethodReference<T> {
+    @BeforeTemplate
+    @SuppressWarnings("NoFunctionalReturnType")
+    Function<Optional<T>, T> before() {
+      return Optional::get;
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("NoFunctionalReturnType")
+    Function<Optional<T>, T> after() {
+      return Optional::orElseThrow;
     }
   }
 
@@ -165,14 +195,14 @@ final class OptionalTemplates {
     }
   }
 
-  abstract static class MapToOptionalGet<T, S> {
+  abstract static class FlatMapToOptional<T, S> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
     @SuppressWarnings("NullAway")
     Optional<S> before(Optional<T> optional) {
-      return optional.map(v -> toOptionalFunction(v).get());
+      return optional.map(v -> toOptionalFunction(v).orElseThrow());
     }
 
     @AfterTemplate
@@ -181,17 +211,17 @@ final class OptionalTemplates {
     }
   }
 
-  static final class OrElseGetToOptionalGet<T> {
+  static final class OrOrElseThrow<T> {
     @BeforeTemplate
     @SuppressWarnings("NullAway")
     T before(Optional<T> o1, Optional<T> o2) {
-      return o1.orElseGet(() -> o2.get());
+      return o1.orElseGet(() -> o2.orElseThrow());
     }
 
     @AfterTemplate
     @SuppressWarnings("NullAway")
     T after(Optional<T> o1, Optional<T> o2) {
-      return o1.or(() -> o2).get();
+      return o1.or(() -> o2).orElseThrow();
     }
   }
 
@@ -205,7 +235,8 @@ final class OptionalTemplates {
     @BeforeTemplate
     Stream<T> before(Stream<Optional<T>> stream) {
       return Refaster.anyOf(
-          stream.filter(Optional::isPresent).map(Optional::get), stream.flatMap(Streams::stream));
+          stream.filter(Optional::isPresent).map(Optional::orElseThrow),
+          stream.flatMap(Streams::stream));
     }
 
     @AfterTemplate
@@ -224,7 +255,7 @@ final class OptionalTemplates {
     @BeforeTemplate
     @SuppressWarnings("NullAway")
     Stream<S> before(Stream<T> stream) {
-      return stream.map(e -> toOptionalFunction(e).get());
+      return stream.map(e -> toOptionalFunction(e).orElseThrow());
     }
 
     @AfterTemplate

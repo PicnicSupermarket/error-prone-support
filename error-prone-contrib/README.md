@@ -15,13 +15,23 @@ This is a [Maven][maven] project, so running `mvn clean install` performs a
 full clean build. Some relevant flags:
 - `-Dverification.warn` makes the warnings and errors emitted by various
   plugins and the Java compiler non-fatal, where possible.
-- `-Dverification.skip` disables various non-essential plugins and compiles the code with
-  minimal checks (i.e. without linting, Error Prone checks, etc.)
-- `-Perror-prone-fork` builds the code and runs the tests against Picnic's
-  [Error Prone fork][error-prone-fork-repo] (hosted on
-  [Jitpack][error-prone-fork-jitpack]). Refaster templates are only tested when
-  the fork is used, because they rely on changes in the unmerged PR
-  [google/error-prone#1239][[error-prone-issue-1239].
+- `-Dverification.skip` disables various non-essential plugins and compiles the
+  code with minimal checks (i.e. without linting, Error Prone checks, etc.)
+- `-Dversion.error-prone=some-version` runs the build using the specified
+  version of Error Prone. This is useful e.g. when testing a locally built
+  Error Prone SNAPSHOT.
+- `-Perror-prone-fork` run the build using Picnic's [Error Prone
+  fork][error-prone-fork-repo], hosted on [Jitpack][error-prone-fork-jitpack].
+  This fork generally contains a few changes on top of the latest Error Prone
+  release.
+
+Two other goals that one may find relevant:
+- `mvn fmt:format` formats the code using
+  [`google-java-format`][google-java-format].
+- `mvn pitest:mutationCoverage` runs mutation tests using [PIT][pitest]. The
+  results can be reviewed by opening the respective
+  `target/pit-reports/index.html` files. For more information check the [PIT
+  Maven plugin][pitest-maven].
 
 When loading the project in IntelliJ IDEA (and perhaps other IDEs) errors about
 the inaccessibility of `com.sun.tools.javac.*` classes may be reported. If this
@@ -41,7 +51,7 @@ Some pointers:
   checks][error-prone-criteria]. Most guidelines described there apply to this
   project as well, except that this project _does_ focus quite heavy on style
   enforcement. But that just makes the previous point doubly important.
-- Make sure that a checks's (mutation) coverage is or remains about as high as
+- Make sure that a check's (mutation) coverage is or remains about as high as
   it can be. Not only does this lead to better tests, it also points out
   opportunities to simplify the code.
 - Please restrict the scope of a pull request to a single feature or fix. Don't
@@ -228,19 +238,109 @@ The following is a list of checks we'd like to see implemented:
   `#assertValueCount`, as the former method doesn't do what one may intuitivily
   expect it to do. See ReactiveX/RxJava#6151.
 
+### Refaster extension ideas
+
+XXX: This section should live elsewhere.
+
+It's much easier to implement a Refaster rule than an Error Prone bug checker,
+but on the flip side Refaster is much less expressive. While this gap can never
+be fully closed, there are some ways in which Refaster's scope of utility could
+be extended. The following is a non-exhaustive list of ideas on how to extend
+Refaster's expressiveness:
+- Allow more control over _which_ methods are statically imported by
+  `@UseImportPolicy`. Sometimes the `@AfterTemplate` contains more than one
+  static method invocation, and only a subset should be statically imported.
+- Provide a way to express that a lambda expression should also match an
+  equivalent method reference and/or vice versa.
+- Provide a way to express that certain method invocations should also be
+  replaced when expressed as a method reference, or vice versa. (The latter may
+  be simpler: perhaps the rule `T::m1` -> `T::m2` can optionally be interpreted
+  to also cover `T.m1(..)` -> `T.m2(...)`.)
+- Some Refaster refactorings (e.g. when dealing with lazy evaluation) are valid
+  only when some free parameter is a constant, variable reference or some other
+  pure expression. Introduce a way to express such a constraint. For example,
+  rewriting `optional1.map(Optional::of).orElse(optional2)` to `optional1.or(()
+  -> optional2)` is not behavior preserving if evaluation of `optional2` has
+  side-effects.
+- Similarly, ceratin refactoring operations are only valid if one of the
+  matches expressions is not `@Nullable`. It'd be nice to be able to express
+  this.
+- Generalize `@Placeholder` support such that rules can reference e.g. "any
+  concrete unary method". This would allow refactorings such as
+  `Mono.just(constant).flatmap(this::someFun)` -> `Mono.defer(() ->
+  someFun(constant))`.
+- Sometimes a Refaster refactoring can cause the resulting code not to compile
+  due to a lack of generic type information. Identify and resolve such
+  occurrences. For example, an `@AfterTemplate` may require the insertion of a
+  statically imported method, which can cause required generic type information
+  to be lost. In such a case don't statically import the method, so that the
+  generic type information can be retained. (There may be cases where generic
+  type information should even be _added_. Find an example.)
+- Upon application of a template Refaster can throw a _No binding for
+  Key{identifier=someAfterTemplateParam}_ exception. When this happens the
+  template is invalid. Instead perform this check at compile time, such that
+  such malformed templates cannot be defined in the first place.
+- Provide a way to express "match if (not) annotated (with _X_)". See #1 for a
+  motivating example.
+- Provide a way to place match constraints on compile time constants. For
+  example, "match if this integer is less than 2" or "match if this string
+  matches the regular expression `X`".
+- Provide a way to express transformations of compile-time constants. This
+  would allow one to e.g. rewrite single-character strings to chars or vice
+  versa, thereby accommodating a target API. Another example would be to
+  replace SLF4J's `{}` place holders with `%s` or vice versa. Yet another
+  example would be to rewrite `BigDecimal.valueOf("<some-long-value>")` to
+  `BigDecimal.valueOf(theParsedLongValue)`.
+- More generally, investigate ways to plug in in fully dynamic behavior, e.g.
+  by providing hooks using which arbitrary predicates/transformations can be
+  plugged in. The result would be a Refaster/`BugChecker` hybrid. A feature
+  such as this could form the basis for many other features listed here. (As a
+  concrete example, consider the ability to reference
+  `com.google.errorprone.matchers.Matcher` implementations.)
+- Provide a way to match lambda expressions and method references which match a
+  specified functional interface. This would allow rewrites such as
+  `Mono.fromCallable(this::doesNotThrowCheckException)` ->
+  `Mono.fromSupplier(this::doesNotThrowCheckException)`.
+- Provide an extension API using which methods or expressions can be defined
+  based on functional properties. A motivating example is the Java Collections
+  framework, which allows many ways to define (im)mutable (un)ordered
+  collections with(out) duplicates. One could then express things like "match
+  any method call with collects its inputs into an immutable ordered list". An
+  enum analogous to `java.util.stream.Collector.Characteristics` could be used.
+  Out of the box JDK and Guava collection factory methods could be classified,
+  with the user having the option to extend the classification.
+- Refaster currently unconditionally ignores expressions containing comments.
+  Provide two additional modes: (a) match and drop the comments or (b)
+  transport the comments to before/after the replaced expression.
+- Extend Refaster to drop imports that come become unnecessary as a result of a
+  refactoring. This e.g. allows one to replace a statically import TestNG
+  `fail(...)` invocation with a statically imported equivalent AssertJ
+  `fail(...)` invocation. (Observe that without an impor cleanup this
+  replacement would cause a compilation error.)
+- Extend the `@Repeated` match semantics such that it also covers non-varargs
+  methods. For a motivating example see google/error-prone#568.
+- When matching explicit type references, also match super types. For a
+  motivating example, see the two subtly difference loop definitions in
+  `CollectionRemoveAllFromCollectionBlock`.
+- Figure out why Refaster sometimes doesn't match the correct generic overload.
+  See the `AssertThatIterableHasOneComparableElementEqualTo` template for an
+  example.
+
 [autorefactor]: https://autorefactor.org
 [bettercodehub]: https://bettercodehub.com
 [checkstyle-external-project-tests]: https://github.com/checkstyle/checkstyle/blob/master/wercker.yml
 [codecov]: https://codecov.io
-[error-prone-bug-patterns]: http://errorprone.info/bugpatterns
-[error-prone-criteria]: http://errorprone.info/docs/criteria
+[error-prone-bug-patterns]: https://errorprone.info/bugpatterns
+[error-prone-criteria]: https://errorprone.info/docs/criteria
 [error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
 [error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
-[error-prone]: http://errorprone.info
-[error-prone-issue-1239]: https://github.com/google/error-prone/pull/1239
+[error-prone]: https://errorprone.info
 [error-prone-repo]: https://github.com/google/error-prone
 [forbidden-apis]: https://github.com/policeman-tools/forbidden-apis
 [fossa]: https://fossa.io
+[google-java-format]: https://github.com/google/google-java-format
 [maven]: https://maven.apache.org
 [modernizer-maven-plugin]: https://github.com/gaul/modernizer-maven-plugin
 [sonarcloud]: https://sonarcloud.io
+[pitest]: https://pitest.org
+[pitest-maven]: https://pitest.org/quickstart/maven

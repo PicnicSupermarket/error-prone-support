@@ -5,6 +5,7 @@ import static com.google.common.collect.Streams.stream;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 final class OptionalTemplatesTest implements RefasterTemplateTestCase {
@@ -23,6 +24,14 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableSet<Boolean> testOptionalIsPresent() {
     return ImmutableSet.of(Optional.empty().isPresent(), Optional.of("foo").isPresent());
+  }
+
+  String testOptionalOrElseThrow() {
+    return Optional.of("foo").orElseThrow();
+  }
+
+  Function<Optional<Integer>, Integer> testOptionalOrElseThrowMethodReference() {
+    return Optional::orElseThrow;
   }
 
   Stream<Object> testOptionalToStream() {
@@ -62,12 +71,12 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
         Optional.of(1).map(n -> String.valueOf(n)), Optional.of(2).map(n -> String.valueOf(n)));
   }
 
-  Optional<String> testMapToOptionalGet() {
+  Optional<String> testFlatMapToOptional() {
     return Optional.of(1).flatMap(n -> Optional.of(String.valueOf(n)));
   }
 
-  String testOrElseGetToOptionalGet() {
-    return Optional.of("foo").or(() -> Optional.of("bar")).get();
+  String testOrOrElseThrow() {
+    return Optional.of("foo").or(() -> Optional.of("bar")).orElseThrow();
   }
 
   ImmutableSet<Object> testStreamFlatMapOptional() {

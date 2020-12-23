@@ -22,7 +22,7 @@ final class AssertJOptionalTemplates {
     @BeforeTemplate
     @SuppressWarnings("NullAway")
     ObjectAssert<T> before(Optional<T> optional) {
-      return assertThat(optional.get());
+      return assertThat(optional.orElseThrow());
     }
 
     @AfterTemplate

@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 final class OptionalTemplatesTest implements RefasterTemplateTestCase {
@@ -23,6 +24,14 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableSet<Boolean> testOptionalIsPresent() {
     return ImmutableSet.of(!Optional.empty().isEmpty(), !Optional.of("foo").isEmpty());
+  }
+
+  String testOptionalOrElseThrow() {
+    return Optional.of("foo").get();
+  }
+
+  Function<Optional<Integer>, Integer> testOptionalOrElseThrowMethodReference() {
+    return Optional::get;
   }
 
   Stream<Object> testOptionalToStream() {
@@ -63,22 +72,22 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
         Optional.of(2).flatMap(n -> Optional.ofNullable(String.valueOf(n))));
   }
 
-  Optional<String> testMapToOptionalGet() {
-    return Optional.of(1).map(n -> Optional.of(String.valueOf(n)).get());
+  Optional<String> testFlatMapToOptional() {
+    return Optional.of(1).map(n -> Optional.of(String.valueOf(n)).orElseThrow());
   }
 
-  String testOrElseGetToOptionalGet() {
-    return Optional.of("foo").orElseGet(() -> Optional.of("bar").get());
+  String testOrOrElseThrow() {
+    return Optional.of("foo").orElseGet(() -> Optional.of("bar").orElseThrow());
   }
 
   ImmutableSet<Object> testStreamFlatMapOptional() {
     return ImmutableSet.of(
-        Stream.of(Optional.empty()).filter(Optional::isPresent).map(Optional::get),
+        Stream.of(Optional.empty()).filter(Optional::isPresent).map(Optional::orElseThrow),
         Stream.of(Optional.of("foo")).flatMap(Streams::stream));
   }
 
   Stream<String> testStreamMapToOptionalGet() {
-    return Stream.of(1).map(n -> Optional.of(String.valueOf(n)).get());
+    return Stream.of(1).map(n -> Optional.of(String.valueOf(n)).orElseThrow());
   }
 
   Optional<Integer> testFilterOuterOptionalAfterFlatMap() {

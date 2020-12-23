@@ -53,6 +53,12 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return Mono.just("foo").flatMapMany(s -> Mono.just(s + s));
   }
 
+  ImmutableSet<Mono<Optional<String>>> testMonoCollectToOptional() {
+    return ImmutableSet.of(
+        Mono.just("foo").map(Optional::of).defaultIfEmpty(Optional.empty()),
+        Mono.just("bar").map(Optional::of).switchIfEmpty(Mono.just(Optional.empty())));
+  }
+
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
     return ImmutableSet.of(PublisherProbe.of(Mono.empty()), PublisherProbe.of(Flux.empty()));
   }
