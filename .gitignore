@@ -42,12 +42,6 @@
 *.iml
 *.ipr
 
-# CMake
-cmake-build-*/
-
-# Mongo Explorer plugin
-.idea/**/mongoSettings.xml
-
 # File-based project format
 *.iws
 
@@ -57,27 +51,8 @@ out/
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 
-# JIRA plugin
-atlassian-ide-plugin.xml
-
-# Cursive Clojure plugin
-.idea/replstate.xml
-
-# Crashlytics plugin (for Android Studio and IntelliJ)
-com_crashlytics_export_strings.xml
-crashlytics.properties
-crashlytics-build.properties
-fabric.properties
-
-# Editor-based Rest Client
-.idea/httpRequests
-
-# Android studio 3.1+ serialized cache file
-.idea/caches/build_file_checksums.ser
-
 ### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
-
 # *.iml
 # modules.xml
 .idea/misc.xml
@@ -101,23 +76,13 @@ fabric.properties
 # Cache file creation bug
 # See https://youtrack.jetbrains.com/issue/JBR-2257
 .idea/$CACHE_FILE$
-
-# CodeStream plugin
-# https://plugins.jetbrains.com/plugin/12206-codestream
-.idea/codestream.xml
-
+ 
 ### Java ###
 # Compiled class file
 *.class
 
 # Log file
 *.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
 
 # Package Files #
 *.jar
@@ -127,8 +92,5 @@ fabric.properties
 *.zip
 *.tar.gz
 *.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,java
