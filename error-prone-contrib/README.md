@@ -235,7 +235,7 @@ The following is a list of checks we'd like to see implemented:
   `expr.switchIfEmpty(Single.error(...))`, so that an application-specific
   exception is thrown instead of `NoSuchElementException`.
 - An RxJava-specific check which flags use of `#assertValueSet` without
-  `#assertValueCount`, as the former method doesn't do what one may intuitivily
+  `#assertValueCount`, as the former method doesn't do what one may intuitively
   expect it to do. See ReactiveX/RxJava#6151.
 
 ### Refaster extension ideas
@@ -262,7 +262,7 @@ Refaster's expressiveness:
   rewriting `optional1.map(Optional::of).orElse(optional2)` to `optional1.or(()
   -> optional2)` is not behavior preserving if evaluation of `optional2` has
   side-effects.
-- Similarly, ceratin refactoring operations are only valid if one of the
+- Similarly, certain refactoring operations are only valid if one of the
   matches expressions is not `@Nullable`. It'd be nice to be able to express
   this.
 - Generalize `@Placeholder` support such that rules can reference e.g. "any
