@@ -177,7 +177,6 @@ final class CollectionTemplates {
    */
   // XXX: Similar rules could be implemented for the following variants:
   // collection.asList().contains(null);
-  // collection.asList().isEmpty();
   // collection.asList().iterator();
   // collection.asList().parallelStream();
   // collection.asList().size();
@@ -194,6 +193,24 @@ final class CollectionTemplates {
     @AfterTemplate
     Stream<T> after(ImmutableCollection<T> collection) {
       return collection.stream();
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#isEmpty()} is
+   * called on the result; call it directly.
+   */
+  static final class ImmutableCollectionAsListIsEmpty<T> {
+    @BeforeTemplate
+    boolean before(ImmutableCollection<T> collection) {
+      // XXX: @Stephan this one can also fit in at: CollectionIsEmpty in the @Before, ~line 25.
+      // I don't know what the convention would be for that.
+      return collection.asList().isEmpty();
+    }
+
+    @AfterTemplate
+    boolean after(ImmutableCollection<T> collection) {
+      return collection.isEmpty();
     }
   }
 

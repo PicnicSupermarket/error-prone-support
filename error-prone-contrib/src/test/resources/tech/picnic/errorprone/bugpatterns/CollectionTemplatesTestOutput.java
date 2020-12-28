@@ -60,6 +60,10 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(1).stream();
   }
 
+  boolean testImmutableCollectionAsListIsEmpty() {
+    return ImmutableSet.of(1).isEmpty();
+  }
+
   ImmutableList<Integer> testImmutableCollectionAsList() {
     return ImmutableSet.of(1).asList();
   }
