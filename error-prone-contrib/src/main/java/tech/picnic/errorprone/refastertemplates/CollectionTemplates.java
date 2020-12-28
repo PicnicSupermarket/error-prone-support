@@ -176,9 +176,7 @@ final class CollectionTemplates {
    * directly.
    */
   // XXX: Similar rules could be implemented for the following variants:
-  // collection.asList().contains(null);
   // collection.asList().iterator();
-  // collection.asList().parallelStream();
   // collection.asList().size();
   // collection.asList().toArray();
   // collection.asList().toArray(Object[]::new);
@@ -197,8 +195,8 @@ final class CollectionTemplates {
   }
 
   /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#isEmpty()} is
-   * called on the result; call it directly.
+   * Don't call {@link ImmutableCollection#asList()} if `isEmpty()` is called on the result; call it
+   * directly.
    */
   static final class ImmutableCollectionAsListIsEmpty<T> {
     @BeforeTemplate
@@ -211,6 +209,22 @@ final class CollectionTemplates {
     @AfterTemplate
     boolean after(ImmutableCollection<T> collection) {
       return collection.isEmpty();
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if `contains(null)` is called on the result;
+   * call it directly.
+   */
+  static final class ImmutableCollectionAsListContainsNull<T> {
+    @BeforeTemplate
+    boolean before(ImmutableCollection<T> collection) {
+      return collection.asList().contains(null);
+    }
+
+    @AfterTemplate
+    boolean after(ImmutableCollection<T> collection) {
+      return collection.contains(null);
     }
   }
 
