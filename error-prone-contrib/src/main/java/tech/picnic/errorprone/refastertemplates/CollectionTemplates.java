@@ -10,6 +10,7 @@ import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
@@ -175,9 +176,7 @@ final class CollectionTemplates {
    * Don't call {@link ImmutableCollection#asList()} if the result is going to be streamed; stream
    * directly.
    */
-  // XXX: Similar rules could be implemented for the following variants:
-  // collection.asList().iterator();
-   static final class ImmutableCollectionAsListToStream<T> {
+  static final class ImmutableCollectionAsListToStream<T> {
     @BeforeTemplate
     Stream<T> before(ImmutableCollection<T> collection) {
       return collection.asList().stream();
@@ -302,6 +301,23 @@ final class CollectionTemplates {
     @AfterTemplate
     Object[] after(ImmutableCollection<T> collection) {
       return collection.toArray();
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if `iterator()` is called on the result; call
+   * it directly.
+   */
+  static final class ImmutableCollectionAsListIterator<T> {
+    @BeforeTemplate
+    Iterator<T> before(ImmutableCollection<T> collection) {
+      // XXX: @Stephan, I'm not sure about this one. Since it is actually an UnmodifiableIterator...
+      return collection.asList().iterator();
+    }
+
+    @AfterTemplate
+    Iterator<T> after(ImmutableCollection<T> collection) {
+      return collection.iterator();
     }
   }
 

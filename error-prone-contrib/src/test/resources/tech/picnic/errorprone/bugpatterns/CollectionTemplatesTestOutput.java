@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -94,6 +95,10 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
 
   Object[] testImmutableCollectionAsListToArray() {
     return ImmutableSet.of(1).toArray();
+  }
+
+  Iterator<Integer> testImmutableCollectionAsListIterator() {
+    return ImmutableSet.of(1).iterator();
   }
 
   ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
