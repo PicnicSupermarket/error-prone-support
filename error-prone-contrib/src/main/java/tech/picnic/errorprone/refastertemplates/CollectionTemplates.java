@@ -177,11 +177,6 @@ final class CollectionTemplates {
    */
   // XXX: Similar rules could be implemented for the following variants:
   // collection.asList().iterator();
-  // collection.asList().size();
-  // collection.asList().toArray();
-  // collection.asList().toArray(Object[]::new);
-  // collection.asList().toArray(new Object[0]);
-  // collection.asList().toString();
   static final class ImmutableCollectionAsListToStream<T> {
     @BeforeTemplate
     Stream<T> before(ImmutableCollection<T> collection) {
@@ -225,6 +220,55 @@ final class CollectionTemplates {
     @AfterTemplate
     boolean after(ImmutableCollection<T> collection) {
       return collection.contains(null);
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if `parallelStream()` is called on the result;
+   * call it directly.
+   */
+  static final class ImmutableCollectionAsListParallelStream<T> {
+    @BeforeTemplate
+    Stream<T> before(ImmutableCollection<T> collection) {
+      return collection.asList().parallelStream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(ImmutableCollection<T> collection) {
+      return collection.parallelStream();
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if `size()` is called on the result; call it
+   * directly.
+   */
+  static final class ImmutableCollectionAsListSize<T> {
+    @BeforeTemplate
+    int before(ImmutableCollection<T> collection) {
+      // XXX: Again, this one can also be added to the CollectionSize example, ~line 44.
+      return collection.asList().size();
+    }
+
+    @AfterTemplate
+    int after(ImmutableCollection<T> collection) {
+      return collection.size();
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if `toString()` is called on the result; call
+   * it directly.
+   */
+  static final class ImmutableCollectionAsListToString<T> {
+    @BeforeTemplate
+    String before(ImmutableCollection<T> collection) {
+      return collection.asList().toString();
+    }
+
+    @AfterTemplate
+    String after(ImmutableCollection<T> collection) {
+      return collection.toString();
     }
   }
 

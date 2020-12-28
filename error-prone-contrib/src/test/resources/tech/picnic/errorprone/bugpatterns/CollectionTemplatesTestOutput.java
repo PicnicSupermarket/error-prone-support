@@ -72,6 +72,18 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(ImmutableSet.of(1).contains(null), ImmutableSet.of().contains(null));
   }
 
+  Stream<Integer> testImmutableCollectionAsListParallelStream() {
+    return ImmutableSet.of(1).parallelStream();
+  }
+
+  int testImmutableCollectionAsListSize() {
+    return ImmutableSet.of(1).size();
+  }
+
+  String testImmutableCollectionAsListToString() {
+    return ImmutableSet.of(1).toString();
+  }
+
   ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
     return ImmutableSet.of(
         ImmutableSet.of(0).stream().findFirst(),
