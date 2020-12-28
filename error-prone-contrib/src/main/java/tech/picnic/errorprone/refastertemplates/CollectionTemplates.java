@@ -177,6 +177,9 @@ final class CollectionTemplates {
    */
   // XXX: Similar rules could be implemented for the following variants:
   // collection.asList().iterator();
+  // collection.asList().toArray();
+  // collection.asList().toArray(Object[]::new);
+  // collection.asList().toArray(new Object[0]);
   static final class ImmutableCollectionAsListToStream<T> {
     @BeforeTemplate
     Stream<T> before(ImmutableCollection<T> collection) {
