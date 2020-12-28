@@ -102,6 +102,10 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
         ImmutableSet.of().asList().toArray(new Object[0]));
   }
 
+  Object[] testImmutableCollectionAsListToArray() {
+    return ImmutableSet.of(1).asList().toArray();
+  }
+
   ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
     return ImmutableSet.of(
         ImmutableSet.of(0).stream().findAny(),

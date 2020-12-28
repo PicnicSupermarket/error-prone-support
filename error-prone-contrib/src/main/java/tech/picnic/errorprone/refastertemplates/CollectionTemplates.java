@@ -177,10 +177,7 @@ final class CollectionTemplates {
    */
   // XXX: Similar rules could be implemented for the following variants:
   // collection.asList().iterator();
-  // collection.asList().toArray();
-  // collection.asList().toArray(Object[]::new);
-  // collection.asList().toArray(new Object[0]);
-  static final class ImmutableCollectionAsListToStream<T> {
+   static final class ImmutableCollectionAsListToStream<T> {
     @BeforeTemplate
     Stream<T> before(ImmutableCollection<T> collection) {
       return collection.asList().stream();
@@ -289,6 +286,22 @@ final class CollectionTemplates {
     @AfterTemplate
     Object[] after(ImmutableCollection<T> collection) {
       return collection.toArray(Object[]::new);
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if `toArray()` is called on the result; call it
+   * directly.
+   */
+  static final class ImmutableCollectionAsListToArray<T> {
+    @BeforeTemplate
+    Object[] before(ImmutableCollection<T> collection) {
+      return collection.asList().toArray();
+    }
+
+    @AfterTemplate
+    Object[] after(ImmutableCollection<T> collection) {
+      return collection.toArray();
     }
   }
 
