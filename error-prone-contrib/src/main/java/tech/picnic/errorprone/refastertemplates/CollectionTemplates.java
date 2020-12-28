@@ -276,6 +276,23 @@ final class CollectionTemplates {
   }
 
   /**
+   * Don't call {@link ImmutableCollection#asList()} if `toArray(...)` is called on the result; call
+   * it directly.
+   */
+  static final class ImmutableCollectionAsListToNewArrayObject<T> {
+    @BeforeTemplate
+    Object[] before(ImmutableCollection<T> collection) {
+      return Refaster.anyOf(
+          collection.asList().toArray(Object[]::new), collection.asList().toArray(new Object[0]));
+    }
+
+    @AfterTemplate
+    Object[] after(ImmutableCollection<T> collection) {
+      return collection.toArray(Object[]::new);
+    }
+  }
+
+  /**
    * Don't use the ternary operator to extract the first element of a possibly-empty {@link
    * Collection} as an {@link Optional}.
    */

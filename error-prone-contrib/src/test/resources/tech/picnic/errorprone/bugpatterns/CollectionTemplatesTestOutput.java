@@ -56,12 +56,12 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
     return new ArrayList<>(ImmutableList.of("foo"));
   }
 
-  ImmutableList<Integer> testImmutableCollectionAsList() {
-    return ImmutableSet.of(1).asList();
-  }
-
   Stream<Integer> testImmutableCollectionAsListToStream() {
     return ImmutableSet.of(1).stream();
+  }
+
+  ImmutableList<Integer> testImmutableCollectionAsList() {
+    return ImmutableSet.of(1).asList();
   }
 
   ImmutableSet<Boolean> testImmutableCollectionAsListIsEmpty() {
@@ -82,6 +82,14 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
 
   String testImmutableCollectionAsListToString() {
     return ImmutableSet.of(1).toString();
+  }
+
+  ImmutableSet<Object[]> testImmutableCollectionAsListToNewArrayObject() {
+    return ImmutableSet.of(
+        ImmutableSet.of(1).toArray(Object[]::new),
+        ImmutableSet.of().toArray(Object[]::new),
+        ImmutableSet.of(1).toArray(Object[]::new),
+        ImmutableSet.of().toArray(Object[]::new));
   }
 
   ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
