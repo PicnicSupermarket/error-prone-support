@@ -37,7 +37,7 @@ import javax.tools.StandardLocation;
  * compiled Refaster rules in a {@code .refaster} file next to the compiled {@code .class} file,
  * rather than at a fixed location.
  *
- * <p>This {@link TaskListener} thus supports compulation of multiple Refaster rules.
+ * <p>This {@link TaskListener} thus supports compilation of multiple Refaster rules.
  */
 final class RefasterRuleResourceCompilerTaskListener implements TaskListener {
   private final Context context;
