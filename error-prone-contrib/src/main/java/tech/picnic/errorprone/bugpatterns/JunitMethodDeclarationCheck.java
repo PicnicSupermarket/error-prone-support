@@ -43,7 +43,7 @@ public final class JunitMethodDeclarationCheck extends BugChecker implements Met
     MethodSymbol sym = ASTHelpers.getSymbol(tree);
 
     if (sym == null
-        || !OVERRIDE_ANNOTATION.multiMatchResult(tree, state).matchingNodes().isEmpty()
+        || OVERRIDE_ANNOTATION.matches(tree, state)
         || !ASTHelpers.isJUnitTestCode(state)
         || (!hasTestPrefix(sym.getQualifiedName().toString()) && !hasIllegalModifiers(tree))) {
       return Description.NO_MATCH;
@@ -62,21 +62,20 @@ public final class JunitMethodDeclarationCheck extends BugChecker implements Met
   /** Renames the method removing the 'test' prefix, if possible. */
   private static Optional<SuggestedFix> renameMethod(
       MethodTree tree, VisitorState state, String methodName) {
-    if (hasTestPrefix(methodName)) {
-      String newMethodName = removeTestPrefix(methodName);
-
-      return isValidMethodName(newMethodName)
-          ? Optional.of(SuggestedFixes.renameMethod(tree, newMethodName, state))
-          : Optional.empty();
+    if (!hasTestPrefix(methodName)) {
+      return Optional.empty();
     }
 
-    return Optional.empty();
+    String newMethodName = removeTestPrefix(methodName);
+    return isValidMethodName(newMethodName)
+        ? Optional.of(SuggestedFixes.renameMethod(tree, newMethodName, state))
+        : Optional.empty();
   }
 
   /** Removes the 'test' prefix from the method name, if possible. */
   private static String removeTestPrefix(String methodName) {
     StringBuilder sb = new StringBuilder(methodName);
-    sb.delete(0, 4);
+    sb.delete(0, TEST_PREFIX.length());
     sb.setCharAt(0, Character.toLowerCase(sb.charAt(0)));
 
     return sb.toString();
@@ -89,7 +88,7 @@ public final class JunitMethodDeclarationCheck extends BugChecker implements Met
 
   /** Determines whether the provided method name starts with the word 'test'. */
   private static boolean hasTestPrefix(String methodName) {
-    return methodName.length() > 4 && methodName.startsWith(TEST_PREFIX);
+    return methodName.length() > TEST_PREFIX.length() && methodName.startsWith(TEST_PREFIX);
   }
 
   /** Determines whether the method tree has any modifier that is not allowed. */
