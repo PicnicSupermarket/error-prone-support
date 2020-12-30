@@ -69,8 +69,8 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(ImmutableSet.of(1).isEmpty(), ImmutableSet.of().isEmpty());
   }
 
-  ImmutableSet<Boolean> testImmutableCollectionAsListContainsNull() {
-    return ImmutableSet.of(ImmutableSet.of(1).contains(null), ImmutableSet.of().contains(null));
+  ImmutableSet<Boolean> testImmutableCollectionContains() {
+    return ImmutableSet.of(ImmutableSet.of(1).contains("foo"), ImmutableSet.of(2).contains("bar"));
   }
 
   Stream<Integer> testImmutableCollectionAsListParallelStream() {

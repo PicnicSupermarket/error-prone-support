@@ -207,18 +207,18 @@ final class CollectionTemplates {
   }
 
   /**
-   * Don't call {@link ImmutableCollection#asList()} if `contains(null)` is called on the result;
-   * call it directly.
+   * Don't call {@link ImmutableCollection#asList()} if {@link Collection#contains(Object)} is
+   * called on the result; call it directly.
    */
-  static final class ImmutableCollectionAsListContainsNull<T> {
+  static final class ImmutableCollectionContains<T, S> {
     @BeforeTemplate
-    boolean before(ImmutableCollection<T> collection) {
-      return collection.asList().contains(null);
+    boolean before(ImmutableCollection<T> collection, S elem) {
+      return collection.asList().contains(elem);
     }
 
     @AfterTemplate
-    boolean after(ImmutableCollection<T> collection) {
-      return collection.contains(null);
+    boolean after(ImmutableCollection<T> collection, S elem) {
+      return collection.contains(elem);
     }
   }
 
