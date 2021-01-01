@@ -33,7 +33,7 @@ import javax.lang.model.element.Modifier;
 // XXX: If implemented, the current logic could flag only `private` JUnit methods.
 @AutoService(BugChecker.class)
 @BugPattern(
-    name = "JUnitMethodDeclarationCheck",
+    name = "JUnitMethodDeclaration",
     summary = "JUnit method declaration can likely be improved",
     linkType = BugPattern.LinkType.NONE,
     severity = BugPattern.SeverityLevel.SUGGESTION,
