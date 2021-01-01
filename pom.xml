@@ -604,7 +604,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>8.38</version>
+                            <version>8.39</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -996,7 +996,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.6.1</version>
+                    <version>1.6.2</version>
                     <configuration>
                         <!-- Use multple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
@@ -1045,7 +1045,7 @@
             <id>error-prone-fork</id>
             <properties>
                 <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>
-                <version.error-prone>v2.4.0-picnic-1</version.error-prone>
+                <version.error-prone>v2.4.0-picnic-3</version.error-prone>
             </properties>
             <dependencyManagement>
                 <!-- Even when we directly depend on the Picnic Error Prone
