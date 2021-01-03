@@ -189,8 +189,8 @@ final class CollectionTemplates {
   }
 
   /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link Collection#isEmpty()} is called on the result; call it
-   * directly.
+   * Don't call {@link ImmutableCollection#asList()} if {@link Collection#isEmpty()} is called on
+   * the result; call it directly.
    */
   static final class ImmutableCollectionIsEmpty<T> {
     @BeforeTemplate
@@ -221,8 +221,8 @@ final class CollectionTemplates {
   }
 
   /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#parallelStream()} is called on the result;
-   * call it directly.
+   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#parallelStream()}
+   * is called on the result; call it directly.
    */
   static final class ImmutableCollectionParallelStream<T> {
     @BeforeTemplate
@@ -237,8 +237,8 @@ final class CollectionTemplates {
   }
 
   /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#size()} is called on the result; call it
-   * directly.
+   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#size()} is called
+   * on the result; call it directly.
    */
   static final class ImmutableCollectionSize<T> {
     @BeforeTemplate
@@ -253,8 +253,8 @@ final class CollectionTemplates {
   }
 
   /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#toString()} is called on the result; call
-   * it directly.
+   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#toString()} is
+   * called on the result; call it directly.
    */
   static final class ImmutableCollectionToString<T> {
     @BeforeTemplate
@@ -269,10 +269,10 @@ final class CollectionTemplates {
   }
 
   /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#toArray(Object[] a)}` is called on the result; call
-   * it directly.
+   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#toArray(Object[]
+   * a)}` is called on the result; call it directly.
    */
-  static final class ImmutableCollectionToArray<T, S> {
+  static final class ImmutableCollectionToArrayWithObject<T, S> {
     @BeforeTemplate
     Object[] before(ImmutableCollection<T> immutableCollection, S[] elem) {
       return Refaster.anyOf(
@@ -286,13 +286,30 @@ final class CollectionTemplates {
   }
 
   /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#iterator()} is called on the result; call
-   * it directly.
+   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#toArray()} is
+   * called on the result; call it directly.
+   */
+  static final class ImmutableCollectionToArray<T> {
+    @BeforeTemplate
+    Object[] before(ImmutableCollection<T> collection) {
+      return collection.asList().toArray();
+    }
+
+    @AfterTemplate
+    Object[] after(ImmutableCollection<T> collection) {
+      return collection.toArray();
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#iterator()} is
+   * called on the result; call it directly.
    */
   static final class ImmutableCollectionIterator<T> {
     @BeforeTemplate
     Iterator<T> before(ImmutableCollection<T> immutableCollection) {
-      // XXX: @Stephan, I'm still not sure about this one. Since it is actually an UnmodifiableIterator...
+      // XXX: @Stephan, I'm still not sure about this one. Since it is actually an
+      // UnmodifiableIterator...
       return immutableCollection.asList().iterator();
     }
 
