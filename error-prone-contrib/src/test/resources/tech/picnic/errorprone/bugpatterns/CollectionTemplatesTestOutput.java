@@ -89,6 +89,8 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(
         ImmutableSet.of(1).toArray(Object[]::new),
         ImmutableSet.of().toArray(Object[]::new),
+        ImmutableSet.of(1).toArray(Integer[]::new),
+        ImmutableSet.of().toArray(Integer[]::new),
         ImmutableSet.of(1).toArray(Object[]::new),
         ImmutableSet.of().toArray(Object[]::new));
   }

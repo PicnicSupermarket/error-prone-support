@@ -16,6 +16,7 @@ import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.SortedSet;
+import java.util.function.IntFunction;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with (arbitrary) collections. */
@@ -265,6 +266,41 @@ final class CollectionTemplates {
     @AfterTemplate
     String after(ImmutableCollection<T> immutableCollection) {
       return immutableCollection.toString();
+    }
+  }
+
+  static final class CollectionToArray<T> {
+    @BeforeTemplate
+    Object[] before(Collection<T> collection, int size) {
+      return collection.toArray(new Object[size]);
+    }
+
+    @AfterTemplate
+    Object[] after(Collection<T> collection, int size) {
+      return collection.toArray(Object[]::new);
+    }
+  }
+
+  static final class CollectionToObjectArray<T> {
+    @BeforeTemplate
+    Object[] before(Collection<T> collection) {
+      return collection.toArray(Object[]::new);
+    }
+
+    @AfterTemplate
+    Object[] after(Collection<T> collection) {
+      return collection.toArray();
+    }
+  }
+
+  static final class ImmutableCollectionAsListToNewArrayObject<T, S> {
+    @BeforeTemplate
+    S[] before(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
+      return collection.asList().toArray(generator);
+    }
+
+    S[] after(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
+      return collection.toArray(generator);
     }
   }
 
