@@ -104,9 +104,9 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
    * Reports a subset of the given matches, such that no two reported matches suggest a replacement
    * of the same part of the source code.
    *
-   * <p>Generally all matches will be reported. In case of overlap the match which replaces the
-   * largest piece of source code is preferred. In case two matches wish to replace exactly the same
-   * piece of code, preference is given to the match which suggests the shortest replacement.
+   * <p>In the common case all matches will be reported. In case of overlap the match which replaces
+   * the largest piece of source code is preferred. In case two matches wish to replace exactly the
+   * same piece of code, preference is given to the match which suggests the shortest replacement.
    */
   // XXX: This selection logic solves an issue described in
   // https://github.com/google/error-prone/issues/559. Consider contributing it back upstream.
@@ -134,7 +134,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
     return getReplacements(description, endPositions).mapToInt(Replacement::length).sum();
   }
 
-  // XXX: Strictly speaking we should prefer the shortest replacement *post formatting*!
+  // XXX: It might be nicer to prefer the shortest replacement _post formatting_.
   private static int getInsertedCodeSize(Description description, EndPosTable endPositions) {
     return getReplacements(description, endPositions).mapToInt(r -> r.replaceWith().length()).sum();
   }
@@ -148,9 +148,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
 
   private static Stream<Replacement> getReplacements(
       Description description, EndPosTable endPositions) {
-    return description.fixes.stream()
-        .limit(1)
-        .flatMap(fix -> fix.getReplacements(endPositions).stream());
+    return description.fixes.stream().flatMap(fix -> fix.getReplacements(endPositions).stream());
   }
 
   private static CodeTransformer createCompositeCodeTransformer(
