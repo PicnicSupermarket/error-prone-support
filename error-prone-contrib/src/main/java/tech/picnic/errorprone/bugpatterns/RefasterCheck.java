@@ -143,6 +143,11 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
       Description description, EndPosTable endPositions) {
     return getReplacements(description, endPositions)
         .map(Replacement::range)
+                .filter(e -> !e.isEmpty())
+        // If I add this, the test wont crash, but not succeed.
+        // Later on an ImmutableRangeSet adds an empty range
+        // which causes it to throw an IllegalArgumentException. `An exception was thrown by EP:
+        // range must not be empty but was was [3774..3774)
         .collect(toImmutableRangeSet());
   }
 

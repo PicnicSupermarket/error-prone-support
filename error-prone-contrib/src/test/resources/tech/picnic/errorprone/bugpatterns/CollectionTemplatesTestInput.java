@@ -95,7 +95,26 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(1).asList().toString();
   }
 
-  ImmutableSet<Object[]> testImmutableCollectionAsListToNewArrayObject() {
+  ImmutableSet<Object[]> testCollectionToObjectArray() {
+    return ImmutableSet.of(
+        ImmutableSet.of(1, 2).toArray(new Object[4]),
+        ImmutableSet.of().toArray(new Object[0]),
+        ImmutableSet.of(1).toArray(new Object[1]));
+  }
+
+  ImmutableSet<Object[]> testCollectionToArray() {
+    return ImmutableSet.of(
+            ImmutableSet.of(1, 2).toArray(Object[]::new),
+            ImmutableSet.of().toArray(Object[]::new),
+            ImmutableSet.of(1).toArray(Object[]::new));
+  }
+
+  ImmutableSet<Object[]> testImmutableCollectionToArrayGenerator() {
+    return ImmutableSet.of(ImmutableSet.of(1).asList().toArray(size -> new Integer[size + 1]),
+            ImmutableSet.of().asList().toArray(size -> new String[size]));
+  }
+
+  ImmutableSet<Object[]> testImmutableCollectionToArrayWithObject() {
     return ImmutableSet.of(
         ImmutableSet.of(1).asList().toArray(Object[]::new),
         ImmutableSet.of().asList().toArray(Object[]::new),

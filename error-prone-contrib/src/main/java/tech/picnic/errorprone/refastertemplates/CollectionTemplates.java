@@ -269,41 +269,6 @@ final class CollectionTemplates {
     }
   }
 
-  static final class CollectionToArray<T> {
-    @BeforeTemplate
-    Object[] before(Collection<T> collection, int size) {
-      return collection.toArray(new Object[size]);
-    }
-
-    @AfterTemplate
-    Object[] after(Collection<T> collection, int size) {
-      return collection.toArray(Object[]::new);
-    }
-  }
-
-  static final class CollectionToObjectArray<T> {
-    @BeforeTemplate
-    Object[] before(Collection<T> collection) {
-      return collection.toArray(Object[]::new);
-    }
-
-    @AfterTemplate
-    Object[] after(Collection<T> collection) {
-      return collection.toArray();
-    }
-  }
-
-  static final class ImmutableCollectionAsListToNewArrayObject<T, S> {
-    @BeforeTemplate
-    S[] before(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
-      return collection.asList().toArray(generator);
-    }
-
-    S[] after(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
-      return collection.toArray(generator);
-    }
-  }
-
   /**
    * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#toArray(Object[]
    * a)}` is called on the result; call it directly.
@@ -318,6 +283,47 @@ final class CollectionTemplates {
     @AfterTemplate
     Object[] after(ImmutableCollection<T> immutableCollection, S[] elem) {
       return immutableCollection.toArray(elem);
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if {@link
+   * ImmutableCollection#toArray(IntFunction)} ()} is called on the result; call it directly.
+   */
+  static final class ImmutableCollectionToArrayGenerator<T, S> {
+    @BeforeTemplate
+    S[] before(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
+      return collection.asList().toArray(generator);
+    }
+
+    S[] after(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
+      return collection.toArray(generator);
+    }
+  }
+
+  /** Prefer calling {@link Collection#toArray(Object[])} without a size parameter. */
+  static final class CollectionToObjectArray<T> {
+    @BeforeTemplate
+    Object[] before(Collection<T> collection, int size) {
+      return collection.toArray(new Object[size]);
+    }
+
+    @AfterTemplate
+    Object[] after(Collection<T> collection, int size) {
+      return collection.toArray(Object[]::new);
+    }
+  }
+
+  /** Prefer {@link Collection#toArray()} over {@link Collection#toArray(Object[])}. */
+  static final class CollectionToArray<T> {
+    @BeforeTemplate
+    Object[] before(Collection<T> collection) {
+      return collection.toArray(Object[]::new);
+    }
+
+    @AfterTemplate
+    Object[] after(Collection<T> collection) {
+      return collection.toArray();
     }
   }
 
