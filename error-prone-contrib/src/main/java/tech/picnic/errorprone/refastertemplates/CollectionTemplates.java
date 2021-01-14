@@ -39,6 +39,11 @@ final class CollectionTemplates {
           Iterables.isEmpty(collection));
     }
 
+    @BeforeTemplate
+    boolean before(ImmutableCollection<T> collection) {
+      return collection.asList().isEmpty();
+    }
+
     @AfterTemplate
     @AlsoNegation
     boolean after(Collection<T> collection) {
@@ -190,22 +195,6 @@ final class CollectionTemplates {
   }
 
   /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link Collection#isEmpty()} is called on
-   * the result; call it directly.
-   */
-  static final class ImmutableCollectionIsEmpty<T> {
-    @BeforeTemplate
-    boolean before(ImmutableCollection<T> immutableCollection) {
-      return immutableCollection.asList().isEmpty();
-    }
-
-    @AfterTemplate
-    boolean after(ImmutableCollection<T> immutableCollection) {
-      return immutableCollection.isEmpty();
-    }
-  }
-
-  /**
    * Don't call {@link ImmutableCollection#asList()} if {@link Collection#contains(Object)} is
    * called on the result; call it directly.
    */
@@ -227,13 +216,13 @@ final class CollectionTemplates {
    */
   static final class ImmutableCollectionParallelStream<T> {
     @BeforeTemplate
-    Stream<T> before(ImmutableCollection<T> immutableCollection) {
-      return immutableCollection.asList().parallelStream();
+    Stream<T> before(ImmutableCollection<T> collection) {
+      return collection.asList().parallelStream();
     }
 
     @AfterTemplate
-    Stream<T> after(ImmutableCollection<T> immutableCollection) {
-      return immutableCollection.parallelStream();
+    Stream<T> after(ImmutableCollection<T> collection) {
+      return collection.parallelStream();
     }
   }
 
@@ -243,13 +232,13 @@ final class CollectionTemplates {
    */
   static final class ImmutableCollectionSize<T> {
     @BeforeTemplate
-    int before(ImmutableCollection<T> immutableCollection) {
-      return immutableCollection.asList().size();
+    int before(ImmutableCollection<T> collection) {
+      return collection.asList().size();
     }
 
     @AfterTemplate
-    int after(ImmutableCollection<T> immutableCollection) {
-      return immutableCollection.size();
+    int after(ImmutableCollection<T> collection) {
+      return collection.size();
     }
   }
 
@@ -259,66 +248,27 @@ final class CollectionTemplates {
    */
   static final class ImmutableCollectionToString<T> {
     @BeforeTemplate
-    String before(ImmutableCollection<T> immutableCollection) {
-      return immutableCollection.asList().toString();
+    String before(ImmutableCollection<T> collection) {
+      return collection.asList().toString();
     }
 
     @AfterTemplate
-    String after(ImmutableCollection<T> immutableCollection) {
-      return immutableCollection.toString();
+    String after(ImmutableCollection<T> collection) {
+      return collection.toString();
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#toArray(Object[]
-   * a)}` is called on the result; call it directly.
-   */
-  static final class ImmutableCollectionToArrayWithObject<T, S> {
-    @BeforeTemplate
-    Object[] before(ImmutableCollection<T> immutableCollection, S[] elem) {
-      return Refaster.anyOf(
-          immutableCollection.asList().toArray(elem), immutableCollection.asList().toArray(elem));
-    }
-
-    @AfterTemplate
-    Object[] after(ImmutableCollection<T> immutableCollection, S[] elem) {
-      return immutableCollection.toArray(elem);
-    }
-  }
-
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link
-   * ImmutableCollection#toArray(IntFunction)} ()} is called on the result; call it directly.
-   */
-  static final class ImmutableCollectionToArrayGenerator<T, S> {
-    @BeforeTemplate
-    S[] before(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
-      return collection.asList().toArray(generator);
-    }
-
-    S[] after(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
-      return collection.toArray(generator);
-    }
-  }
-
-  /** Prefer calling {@link Collection#toArray(Object[])} without a size parameter. */
-  static final class CollectionToObjectArray<T> {
-    @BeforeTemplate
-    Object[] before(Collection<T> collection, int size) {
-      return collection.toArray(new Object[size]);
-    }
-
-    @AfterTemplate
-    Object[] after(Collection<T> collection, int size) {
-      return collection.toArray(Object[]::new);
-    }
-  }
-
-  /** Prefer {@link Collection#toArray()} over {@link Collection#toArray(Object[])}. */
+  /** Prefer calling {@link Collection#toArray()} over more contrived alternatives. */
   static final class CollectionToArray<T> {
     @BeforeTemplate
-    Object[] before(Collection<T> collection) {
-      return collection.toArray(Object[]::new);
+    Object[] before(Collection<T> collection, int size) {
+      return Refaster.anyOf(
+          collection.toArray(new Object[size]), collection.toArray(Object[]::new));
+    }
+
+    @BeforeTemplate
+    Object[] before(ImmutableCollection<T> collection) {
+      return collection.asList().toArray();
     }
 
     @AfterTemplate
@@ -328,18 +278,34 @@ final class CollectionTemplates {
   }
 
   /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#toArray()} is
-   * called on the result; call it directly.
+   * Don't call {@link ImmutableCollection#asList()} if {@link
+   * ImmutableCollection#toArray(Object[])}` is called on the result; call it directly.
    */
-  static final class ImmutableCollectionToArray<T> {
+  static final class ImmutableCollectionToArrayWithArray<T, S> {
     @BeforeTemplate
-    Object[] before(ImmutableCollection<T> collection) {
-      return collection.asList().toArray();
+    Object[] before(ImmutableCollection<T> collection, S[] array) {
+      return collection.asList().toArray(array);
     }
 
     @AfterTemplate
-    Object[] after(ImmutableCollection<T> collection) {
-      return collection.toArray();
+    Object[] after(ImmutableCollection<T> collection, S[] array) {
+      return collection.toArray(array);
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if {@link
+   * ImmutableCollection#toArray(IntFunction)}} is called on the result; call it directly.
+   */
+  static final class ImmutableCollectionToArrayWithGenerator<T, S> {
+    @BeforeTemplate
+    S[] before(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
+      return collection.asList().toArray(generator);
+    }
+
+    @AfterTemplate
+    S[] after(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
+      return collection.toArray(generator);
     }
   }
 
@@ -349,15 +315,13 @@ final class CollectionTemplates {
    */
   static final class ImmutableCollectionIterator<T> {
     @BeforeTemplate
-    Iterator<T> before(ImmutableCollection<T> immutableCollection) {
-      // XXX: @Stephan, I'm still not sure about this one. Since it is actually an
-      // UnmodifiableIterator...
-      return immutableCollection.asList().iterator();
+    Iterator<T> before(ImmutableCollection<T> collection) {
+      return collection.asList().iterator();
     }
 
     @AfterTemplate
-    Iterator<T> after(ImmutableCollection<T> immutableCollection) {
-      return immutableCollection.iterator();
+    Iterator<T> after(ImmutableCollection<T> collection) {
+      return collection.iterator();
     }
   }
 

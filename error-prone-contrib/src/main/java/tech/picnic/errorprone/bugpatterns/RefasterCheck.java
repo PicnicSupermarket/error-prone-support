@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableRangeSet.toImmutableRangeSet;
+import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
@@ -10,6 +11,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableRangeSet;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import com.google.common.reflect.ClassPath;
@@ -143,11 +145,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
       Description description, EndPosTable endPositions) {
     return getReplacements(description, endPositions)
         .map(Replacement::range)
-                .filter(e -> !e.isEmpty())
-        // If I add this, the test wont crash, but not succeed.
-        // Later on an ImmutableRangeSet adds an empty range
-        // which causes it to throw an IllegalArgumentException. `An exception was thrown by EP:
-        // range must not be empty but was was [3774..3774)
+        .filter(not(Range::isEmpty))
         .collect(toImmutableRangeSet());
   }
 
