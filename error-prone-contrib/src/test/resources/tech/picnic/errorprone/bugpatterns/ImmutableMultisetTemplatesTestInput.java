@@ -42,8 +42,7 @@ final class ImmutableMultisetTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<ImmutableMultiset<Integer>> testStreamToImmutableMultiset() {
     return ImmutableSet.of(
         ImmutableMultiset.copyOf(Stream.of(1).iterator()),
-        ImmutableMultiset.copyOf(Stream.of(2)::iterator),
-        Stream.of(3).collect(collectingAndThen(toList(), ImmutableMultiset::copyOf)));
+        Stream.of(2).collect(collectingAndThen(toList(), ImmutableMultiset::copyOf)));
   }
 
   ImmutableMultiset<Integer> testImmutableMultisetCopyOfImmutableMultiset() {

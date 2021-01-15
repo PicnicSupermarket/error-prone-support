@@ -16,6 +16,7 @@ import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -80,6 +81,7 @@ final class TestNGToAssertJTemplates {
       Assert.fail();
     }
 
+    @DoNotCall
     @AfterTemplate
     void after() {
       throw new AssertionError();

@@ -31,7 +31,6 @@ final class TimeTemplatesTest implements RefasterTemplateTestCase {
         ZoneOffset.UTC,
         ZoneOffset.UTC,
         ZoneOffset.UTC,
-        ZoneOffset.UTC,
         ZoneOffset.UTC);
   }
 

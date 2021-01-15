@@ -256,11 +256,6 @@ final class AssortedTemplates {
   //
   //   @BeforeTemplate
   //   void before(Supplier<T> supplier) {
-  //     anyStatement(supplier::get);
-  //   }
-  //
-  //   @BeforeTemplate
-  //   void before2(Supplier<T> supplier) {
   //     anyStatement(() -> supplier.get());
   //   }
   //

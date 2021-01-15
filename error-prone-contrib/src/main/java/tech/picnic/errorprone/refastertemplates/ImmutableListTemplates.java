@@ -118,7 +118,6 @@ final class ImmutableListTemplates {
     ImmutableList<T> before(Stream<T> stream) {
       return Refaster.anyOf(
           ImmutableList.copyOf(stream.iterator()),
-          ImmutableList.copyOf(stream::iterator),
           stream.collect(collectingAndThen(toList(), ImmutableList::copyOf)));
     }
 

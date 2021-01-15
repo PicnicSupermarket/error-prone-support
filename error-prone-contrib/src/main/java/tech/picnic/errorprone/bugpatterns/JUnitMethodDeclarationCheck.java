@@ -102,7 +102,7 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
   private static Matcher<AnnotationTree> hasMetaAnnotation(String annotationClassName) {
     TypePredicate typePredicate = hasAnnotation(annotationClassName);
     return (tree, state) -> {
-      Symbol sym = ASTHelpers.getDeclaredSymbol(tree);
+      Symbol sym = ASTHelpers.getSymbol(tree);
       return sym != null && typePredicate.apply(sym.type, state);
     };
   }

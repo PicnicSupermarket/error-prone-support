@@ -212,7 +212,9 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   private static Optional<CodeTransformer> loadCodeTransformer(ResourceInfo resource) {
     try (InputStream in = resource.url().openStream();
         ObjectInputStream ois = new ObjectInputStream(in)) {
-      return Optional.of((CodeTransformer) ois.readObject());
+      @SuppressWarnings("BanSerializableRead" /* Part of the Refaster API. */)
+      CodeTransformer codeTransformer = (CodeTransformer) ois.readObject();
+      return Optional.of(codeTransformer);
     } catch (NoSuchElementException e) {
       /* For some reason we can't load the resource. Skip it. */
       // XXX: Should we log this?

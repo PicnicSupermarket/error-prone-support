@@ -61,7 +61,6 @@ final class ImmutableSortedMultisetTemplatesTest implements RefasterTemplateTest
   ImmutableSet<ImmutableSortedMultiset<Integer>> testStreamToImmutableSortedMultiset() {
     return ImmutableSet.of(
         ImmutableSortedMultiset.copyOf(Stream.of(1).iterator()),
-        ImmutableSortedMultiset.copyOf(Stream.of(2)::iterator),
-        Stream.of(3).collect(collectingAndThen(toList(), ImmutableSortedMultiset::copyOf)));
+        Stream.of(2).collect(collectingAndThen(toList(), ImmutableSortedMultiset::copyOf)));
   }
 }

@@ -43,10 +43,10 @@ final class TimeTemplates {
   static final class UtcConstant {
     @BeforeTemplate
     ZoneId before() {
+      // `ZoneId.of("Z")` is not listed, because Error Prone flags it out of the box.
       return Refaster.anyOf(
           ZoneId.of("GMT"),
           ZoneId.of("UTC"),
-          ZoneId.of("Z"),
           ZoneId.of("+0"),
           ZoneId.of("-0"),
           ZoneOffset.UTC.normalized(),

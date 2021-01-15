@@ -114,7 +114,6 @@ final class ImmutableSetTemplates {
     ImmutableSet<T> before(Stream<T> stream) {
       return Refaster.anyOf(
           ImmutableSet.copyOf(stream.iterator()),
-          ImmutableSet.copyOf(stream::iterator),
           stream.distinct().collect(toImmutableSet()),
           stream.collect(collectingAndThen(toList(), ImmutableSet::copyOf)),
           stream.collect(collectingAndThen(toSet(), ImmutableSet::copyOf)));

@@ -7,38 +7,15 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 final class EqualityTemplatesTest implements RefasterTemplateTestCase {
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(Objects.class);
+  }
+
   ImmutableSet<Boolean> testPrimitiveOrReferenceEquality() {
     return ImmutableSet.of(
-        Objects.equals(true, false),
-        Objects.equals((byte) 0, (byte) 1),
-        Objects.equals((short) 0, (short) 1),
-        Objects.equals(0, 1),
-        Objects.equals(0L, 1L),
-        Objects.equals(0F, 1F),
-        Objects.equals(0.0, 1.0),
-        Objects.equals(Boolean.TRUE, Boolean.FALSE),
-        Objects.equals(Byte.valueOf((byte) 0), Byte.valueOf((byte) 1)),
-        Objects.equals(Short.valueOf((short) 0), Short.valueOf((short) 1)),
-        Objects.equals(Integer.valueOf(0), Integer.valueOf(1)),
-        Objects.equals(Long.valueOf(0L), Long.valueOf(1L)),
-        Objects.equals(Float.valueOf(0F), Float.valueOf(1F)),
-        Objects.equals(Double.valueOf(0.0), Double.valueOf(1.0)),
         RoundingMode.UP.equals(RoundingMode.DOWN),
         Objects.equals(RoundingMode.UP, RoundingMode.DOWN),
-        !Objects.equals(true, false),
-        !Objects.equals((byte) 0, (byte) 1),
-        !Objects.equals((short) 0, (short) 1),
-        !Objects.equals(0, 1),
-        !Objects.equals(0L, 1L),
-        !Objects.equals(0F, 1F),
-        !Objects.equals(0.0, 1.0),
-        !Objects.equals(Boolean.TRUE, Boolean.FALSE),
-        !Objects.equals(Byte.valueOf((byte) 0), Byte.valueOf((byte) 1)),
-        !Objects.equals(Short.valueOf((short) 0), Short.valueOf((short) 1)),
-        !Objects.equals(Integer.valueOf(0), Integer.valueOf(1)),
-        !Objects.equals(Long.valueOf(0L), Long.valueOf(1L)),
-        !Objects.equals(Float.valueOf(0F), Float.valueOf(1F)),
-        !Objects.equals(Double.valueOf(0.0), Double.valueOf(1.0)),
         !RoundingMode.UP.equals(RoundingMode.DOWN),
         !Objects.equals(RoundingMode.UP, RoundingMode.DOWN));
   }

@@ -77,7 +77,7 @@ final class ReactorTemplates {
   static final class MonoErrorSupplier<T, E extends Throwable> {
     @BeforeTemplate
     Mono<T> before(Supplier<E> supplier) {
-      return Refaster.anyOf(Mono.error(supplier::get), Mono.error(() -> supplier.get()));
+      return Mono.error(() -> supplier.get());
     }
 
     @AfterTemplate
@@ -94,7 +94,7 @@ final class ReactorTemplates {
   static final class FluxErrorSupplier<T, E extends Throwable> {
     @BeforeTemplate
     Flux<T> before(Supplier<E> supplier) {
-      return Refaster.anyOf(Flux.error(supplier::get), Flux.error(() -> supplier.get()));
+      return Flux.error(() -> supplier.get());
     }
 
     @AfterTemplate

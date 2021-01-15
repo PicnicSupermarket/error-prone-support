@@ -112,8 +112,10 @@
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.0-rc7</version.auto-service>
-        <version.error-prone>2.4.0</version.error-prone>
+        <version.error-prone>2.5.1</version.error-prone>
         <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
+        <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
+        <version.guava>30.1-jre</version.guava>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
@@ -177,6 +179,13 @@
                 <artifactId>auto-value-annotations</artifactId>
                 <version>1.7.4</version>
             </dependency>
+            <!-- Specified as a workaround for
+            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jFormatString</artifactId>
+                <version>${version.findbugs-format-string}</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>jsr305</artifactId>
@@ -197,7 +206,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>30.1-jre</version>
+                <version>${version.guava}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -709,7 +718,18 @@
                             </requireMavenVersion>
                             <requirePluginVersions />
                             <requireSameVersionsReactor />
-                            <requireUpperBoundDeps />
+                            <requireUpperBoundDeps>
+                                <excludes>
+                                    <!-- XXX:
+                                    `com.google.errorprone:error_prone_test_helpers`
+                                    pulls in a more recent version of Truth
+                                    than
+                                    `com.google.testing.compile:compile-testing`,
+                                    but the latter is incompatible with said
+                                    never version. -->
+                                    <exclude>com.google.truth:truth</exclude>
+                                </excludes>
+                            </requireUpperBoundDeps>
                         </rules>
                     </configuration>
                     <dependencies>
@@ -915,6 +935,7 @@
                                 BSD-3-Clause
                                 | 3-Clause BSD License
                                 | BSD 3-clause
+                                | Eclipse Distribution License (New BSD License)
                                 | New BSD License
                             </licenseMerge>
                             <licenseMerge>
@@ -1294,6 +1315,23 @@
                                     <artifactId>error_prone_core</artifactId>
                                     <version>${version.error-prone}</version>
                                 </path>
+                                <!-- This is a dependency of some Error Prone
+                                plugins, but for licensing reasons it is not
+                                packaged with the artifact. -->
+                                <path>
+                                    <groupId>com.google.code.findbugs</groupId>
+                                    <artifactId>jFormatString</artifactId>
+                                    <version>${version.findbugs-format-string}</version>
+                                </path>
+                                <!-- XXX: Error Prone relies on a more recent
+                                version of Guava than pulled in by Google Auto
+                                Service. Drop this dependency after the next
+                                Auto Service upgrade. -->
+                                <path>
+                                    <groupId>com.google.guava</groupId>
+                                    <artifactId>guava</artifactId>
+                                    <version>${version.guava}</version>
+                                </path>
                                 <path>
                                     <groupId>com.google.guava</groupId>
                                     <artifactId>guava-beta-checker</artifactId>
@@ -1341,10 +1379,6 @@
                                     -Xep:BetaApi:OFF
                                     <!-- We don't target JDK 7. -->
                                     -Xep:Java7ApiChecker:OFF
-                                    <!-- Too many false positives for now. See
-                                    https://github.com/google/error-prone/issues/1610 and
-                                    https://github.com/google/error-prone/issues/1646. -->
-                                    -Xep:JdkObsolete:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic

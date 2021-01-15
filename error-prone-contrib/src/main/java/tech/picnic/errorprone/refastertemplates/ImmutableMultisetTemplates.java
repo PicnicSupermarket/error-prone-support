@@ -92,7 +92,6 @@ final class ImmutableMultisetTemplates {
     ImmutableMultiset<T> before(Stream<T> stream) {
       return Refaster.anyOf(
           ImmutableMultiset.copyOf(stream.iterator()),
-          ImmutableMultiset.copyOf(stream::iterator),
           stream.collect(collectingAndThen(toList(), ImmutableMultiset::copyOf)));
     }
 

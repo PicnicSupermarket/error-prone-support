@@ -4,7 +4,6 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import com.google.errorprone.refaster.annotation.NoAutoboxing;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -12,26 +11,9 @@ import java.util.function.Predicate;
 final class EqualityTemplates {
   private EqualityTemplates() {}
 
-  /** Prefer primitive/reference-based quality for primitives and enums. */
-  static final class PrimitiveOrReferenceEquality {
-    @NoAutoboxing
-    @BeforeTemplate
-    boolean before(boolean a, boolean b) {
-      return Objects.equals(a, b);
-    }
-
-    @NoAutoboxing
-    @BeforeTemplate
-    boolean before(long a, long b) {
-      return Objects.equals(a, b);
-    }
-
-    @NoAutoboxing
-    @BeforeTemplate
-    boolean before(double a, double b) {
-      return Objects.equals(a, b);
-    }
-
+  /** Prefer reference-based quality for enums. */
+  // Primitive value comparisons are not listed, because Error Prone flags those out of the box.
+  static final class PrimitiveOrReferenceEquality<T extends Enum<T>> {
     /**
      * Enums can be compared by reference. It is safe to do so even in the face of refactorings,
      * because if the type is ever converted to a non-enum, then Error-Prone will complain about any
@@ -40,13 +22,13 @@ final class EqualityTemplates {
     // XXX: This Refaster rule is the topic of https://github.com/google/error-prone/issues/559. We
     // work around the issue by selecting the "largest replacements". See RefasterCheck.
     @BeforeTemplate
-    <T extends Enum<T>> boolean before(T a, T b) {
+    boolean before(T a, T b) {
       return Refaster.anyOf(a.equals(b), Objects.equals(a, b));
     }
 
     @AlsoNegation
     @AfterTemplate
-    boolean after(boolean a, boolean b) {
+    boolean after(T a, T b) {
       return a == b;
     }
   }

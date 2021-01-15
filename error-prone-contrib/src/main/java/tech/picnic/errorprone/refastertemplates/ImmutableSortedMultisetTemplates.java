@@ -136,7 +136,6 @@ final class ImmutableSortedMultisetTemplates {
     ImmutableSortedMultiset<T> before(Stream<T> stream) {
       return Refaster.anyOf(
           ImmutableSortedMultiset.copyOf(stream.iterator()),
-          ImmutableSortedMultiset.copyOf(stream::iterator),
           stream.collect(collectingAndThen(toList(), ImmutableSortedMultiset::copyOf)));
     }
 

@@ -56,7 +56,6 @@ final class ImmutableSortedSetTemplatesTest implements RefasterTemplateTestCase 
   ImmutableSet<ImmutableSortedSet<Integer>> testStreamToImmutableSortedSet() {
     return ImmutableSet.of(
         ImmutableSortedSet.copyOf(Stream.of(1).iterator()),
-        ImmutableSortedSet.copyOf(Stream.of(2)::iterator),
-        Stream.of(3).collect(collectingAndThen(toList(), ImmutableSortedSet::copyOf)));
+        Stream.of(2).collect(collectingAndThen(toList(), ImmutableSortedSet::copyOf)));
   }
 }

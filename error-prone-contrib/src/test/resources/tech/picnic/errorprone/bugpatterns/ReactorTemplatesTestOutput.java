@@ -26,16 +26,12 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return Flux.error(() -> new IllegalStateException());
   }
 
-  ImmutableSet<Mono<Void>> testMonoErrorSupplier() {
-    return ImmutableSet.of(
-        Mono.error(((Supplier<RuntimeException>) null)),
-        Mono.error(((Supplier<RuntimeException>) null)));
+  Mono<Void> testMonoErrorSupplier() {
+    return Mono.error(((Supplier<RuntimeException>) null));
   }
 
-  ImmutableSet<Flux<Void>> testFluxErrorSupplier() {
-    return ImmutableSet.of(
-        Flux.error(((Supplier<RuntimeException>) null)),
-        Flux.error(((Supplier<RuntimeException>) null)));
+  Flux<Void> testFluxErrorSupplier() {
+    return Flux.error(((Supplier<RuntimeException>) null));
   }
 
   Mono<String> testMonoThenReturn() {

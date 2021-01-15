@@ -28,7 +28,6 @@ final class TimeTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(
         ZoneId.of("GMT"),
         ZoneId.of("UTC"),
-        ZoneId.of("Z"),
         ZoneId.of("+0"),
         ZoneId.of("-0"),
         ZoneOffset.UTC,

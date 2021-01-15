@@ -136,7 +136,6 @@ final class ImmutableSortedSetTemplates {
     ImmutableSortedSet<T> before(Stream<T> stream) {
       return Refaster.anyOf(
           ImmutableSortedSet.copyOf(stream.iterator()),
-          ImmutableSortedSet.copyOf(stream::iterator),
           stream.collect(collectingAndThen(toList(), ImmutableSortedSet::copyOf)));
     }
 
