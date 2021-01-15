@@ -113,10 +113,12 @@
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.0-rc7</version.auto-service>
         <version.error-prone>2.4.0</version.error-prone>
+        <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
         <version.mockito>3.7.0</version.mockito>
+        <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.8.0</version.nullaway>
         <version.surefire>2.22.2</version.surefire>
     </properties>
@@ -207,6 +209,13 @@
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
+                <groupId>com.jakewharton.nopen</groupId>
+                <artifactId>nopen-checker</artifactId>
+                <version>${version.nopen-checker}</version>
+            </dependency>
+            <!-- Specified as a workaround for
+            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
+            <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway</artifactId>
                 <version>${version.nullaway}</version>
@@ -237,6 +246,13 @@
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
                 <version>2.3.1</version>
+            </dependency>
+            <!-- Specified as a workaround for
+            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
+            <dependency>
+                <groupId>jp.skypencil.errorprone.slf4j</groupId>
+                <artifactId>errorprone-slf4j</artifactId>
+                <version>${version.error-prone-slf4j}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -1281,7 +1297,7 @@
                                 <path>
                                     <groupId>com.jakewharton.nopen</groupId>
                                     <artifactId>nopen-checker</artifactId>
-                                    <version>1.0.1</version>
+                                    <version>${version.nopen-checker}</version>
                                 </path>
                                 <path>
                                     <groupId>com.uber.nullaway</groupId>
@@ -1291,7 +1307,7 @@
                                 <path>
                                     <groupId>jp.skypencil.errorprone.slf4j</groupId>
                                     <artifactId>errorprone-slf4j</artifactId>
-                                    <version>0.1.4</version>
+                                    <version>${version.error-prone-slf4j}</version>
                                 </path>
                                 <path>
                                     <groupId>org.mockito</groupId>
