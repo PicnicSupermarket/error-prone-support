@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
 import com.google.errorprone.BugPattern.ProvidesFix;
@@ -18,6 +19,9 @@ import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.util.List;
 
+import java.util.Comparator;
+
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
 
@@ -37,13 +41,18 @@ import static com.google.errorprone.matchers.Matchers.annotations;
     providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class LexicographicalAnnotationCheck extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
-
+//  https://github.com/google/error-prone/pull/2125/files
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
     List<Attribute.Compound> rawAttributes = ASTHelpers.getSymbol(tree).getRawAttributes();
     if (rawAttributes.length() < 2) {
       return Description.NO_MATCH;
     }
+
+    ImmutableSet<Attribute.Compound> collect = ASTHelpers.getSymbol(tree).getRawAttributes().stream()
+            .sorted(Comparator.comparing(e -> e.type.tsym.getQualifiedName().toString()))
+            .collect(toImmutableSet());
+
     Attribute.Compound value = rawAttributes.get(0).getValue();
 
     return Description.NO_MATCH;
