@@ -109,7 +109,7 @@ public class MockBeanAnnotationCheck extends BugChecker implements BugChecker.Cl
 
         String templateString = imports.size() > 1 ? "@MockBean({%s})" : "@MockBean(%s)";
         return classLevelMockBean
-                // What to do if "classes" was used?
+                // XXX: What to do if "classes" was used?
                 .map(
                         annotationTree ->
                                 SuggestedFixes.updateAnnotationArgumentValues(annotationTree, "value", imports))
@@ -185,6 +185,8 @@ public class MockBeanAnnotationCheck extends BugChecker implements BugChecker.Cl
                 .isSameType(ASTHelpers.getType(tree), state.getTypeFromString(MOCKBEAN_FQN));
     }
 
+    // XXX: Should cover more cases. This only covers `unused#member` and `unused = ...`,
+    // but not instanceof, if etc.
     private static final class UsedVariableScanner extends TreePathScanner<Void, Void> {
         private final Set<Symbol> unusedVariables;
 

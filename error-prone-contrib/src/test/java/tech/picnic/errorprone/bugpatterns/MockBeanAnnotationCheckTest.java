@@ -45,7 +45,7 @@ public final class MockBeanAnnotationCheckTest {
             "",
             "  void method() {",
             "     used = \"assignment\";",
-            "     used.toString();",
+            "     boolean a = used instanceof String;",
             "  }",
             "}")
         .addOutputLines(
@@ -61,7 +61,7 @@ public final class MockBeanAnnotationCheckTest {
             "",
             "  void method() {",
             "     used = \"assignment\";",
-            "     used.toString();",
+            "     boolean a = used instanceof String;",
             "  }",
             "}")
         .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
