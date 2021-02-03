@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
@@ -10,6 +11,7 @@ import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
+import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.MultiMatcher;
 import com.google.errorprone.util.ASTHelpers;
@@ -20,7 +22,10 @@ import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.util.List;
 
 import java.util.Comparator;
+import java.util.Optional;
+import java.util.stream.IntStream;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
@@ -49,16 +54,22 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
       return Description.NO_MATCH;
     }
 
-    ImmutableSet<Attribute.Compound> collect = ASTHelpers.getSymbol(tree).getRawAttributes().stream()
+    ImmutableList<Attribute.Compound> collect = rawAttributes.stream()
             .sorted(Comparator.comparing(e -> e.type.tsym.getQualifiedName().toString()))
-            .collect(toImmutableSet());
+            .collect(toImmutableList());
+
+    boolean doAnnotationsMatch = IntStream.range(0, rawAttributes.size())
+            .allMatch(i -> collect.get(i).equals(rawAttributes.get(i)));
 
     Attribute.Compound value = rawAttributes.get(0).getValue();
+
+
+
 
     return Description.NO_MATCH;
   }
 
-  //  private Optional<Fix> sortArrayElements(AnnotationTree tree, VisitorState state) {
+//    private Optional<Fix> sortArrayElements(AnnotationTree tree, VisitorState state) {
   //    /*
   //     * We loop over the array's attributes, trying to sort each array associated with a
   //     * non-blacklisted attribute. A single compound fix, if any, is returned.
