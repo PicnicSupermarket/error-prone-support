@@ -16,12 +16,6 @@ public final class LexicographicalAnnotationCheckTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
-            "import com.fasterxml.jackson.annotation.JsonPropertyOrder;",
-            "import io.swagger.annotations.ApiImplicitParam;",
-            "import io.swagger.annotations.ApiImplicitParams;",
-            "import io.swagger.v3.oas.annotations.Parameter;",
-            "import io.swagger.v3.oas.annotations.Parameters;",
-            "import javax.xml.bind.annotation.XmlType;",
             "import java.lang.annotation.Repeatable;",
             "",
             "interface A {",
