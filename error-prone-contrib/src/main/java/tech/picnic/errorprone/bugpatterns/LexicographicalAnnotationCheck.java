@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
 import com.google.errorprone.BugPattern.ProvidesFix;
@@ -11,25 +12,19 @@ import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
+import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
-import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
-import com.google.errorprone.matchers.MultiMatcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
-import com.sun.tools.javac.code.Attribute;
-import com.sun.tools.javac.util.List;
 
-import javax.lang.model.element.Modifier;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.ALL;
-import static com.google.errorprone.matchers.Matchers.annotations;
-import static com.google.errorprone.matchers.Matchers.anything;
 
 /**
  * A {@link BugChecker} which flags annotations which aren't sorted lexicographically.
@@ -57,38 +52,39 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
 
     ImmutableList<? extends AnnotationTree> sortedAnnotations =
         annotations.stream()
-            .sorted(
-                Comparator.comparing(
-                    annotationTree -> ASTHelpers.getAnnotationName(annotationTree)))
+            .sorted(Comparator.comparing(ASTHelpers::getAnnotationName))
             .collect(toImmutableList());
 
     if (Iterators.elementsEqual(annotations.iterator(), sortedAnnotations.iterator())) {
       return Description.NO_MATCH;
     }
 
-    SuggestedFix.Builder fix = SuggestedFix.builder();
-    for (int i = 0; i < annotations.size(); i++) {
-      SuggestedFix.Builder test = SuggestedFix.builder();
-      test.replace(annotations.get(i), sortedAnnotations.get(i).toString());
-      fix = fix.merge(test);
+    Optional<Fix> fix = orderAnnotations(annotations, sortedAnnotations);
+    if (fix.isEmpty()) {
+      return Description.NO_MATCH;
     }
+    return describeMatch(tree, fix);
+  }
 
-    return describeMatch(tree, fix.build());
+  @SuppressWarnings("UnstableApiUsage")
+  private Optional<Fix> orderAnnotations(
+      List<? extends AnnotationTree> annotations,
+      ImmutableList<? extends AnnotationTree> sortedAnnotations) {
+    List<SuggestedFix.Builder> collect =
+        Streams.mapWithIndex(
+                annotations.stream(),
+                (annotation, i) ->
+                    SuggestedFix.builder()
+                        .replace(annotation, sortedAnnotations.get(Math.toIntExact(i)).toString()))
+            .collect(Collectors.toUnmodifiableList());
+
+    return collect.stream().reduce(SuggestedFix.Builder::merge).map(SuggestedFix.Builder::build);
+
+    // Other option:
     //    SuggestedFix.Builder fix = SuggestedFix.builder();
-    //    relevantMembers.forEach(
-    //            m -> SuggestedFixes.removeModifiers(m, state,
-    // Modifier.PROTECTED).ifPresent(fix::merge));
-
-    //    SuggestedFixes.removeModifiers(tree.getModifiers(), state);
-    //    SuggestedFixes.addModifiers(sortedAnnotations, state);
-    //    SuggestedFixes.removeModifiers(tree.getModifiers(), state, ILLEGAL_MODIFIERS)
-    //            .ifPresent(builder::merge);
-
-//    String suggestion =
-    //            collect.stream()
-    //                        .map(comp -> Util.treeToString(comp, state))
-    //            //            .collect(joining(", ", "{", "}"));
-    //            //    return Optional.of(SuggestedFix.builder().replace(array, suggestion));
-
+    //    for (int i = 0; i < annotations.size(); i++) {
+    //      fix.replace(annotations.get(i), sortedAnnotations.get(i).toString());
+    //    }
+    //    return describeMatch(tree, fix.build());
   }
 }
