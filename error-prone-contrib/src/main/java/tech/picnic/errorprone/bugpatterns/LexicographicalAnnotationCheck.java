@@ -14,19 +14,17 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
-import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
- * A {@link BugChecker} which flags annotations which aren't sorted lexicographically.
+ * A {@link BugChecker} that flags annotations that are not lexicographically sorted.
  *
  * <p>The idea behind this checker is that maintaining a sorted sequence simplifies conflict
  * resolution, and can even avoid it if two branches add the same entry.
@@ -34,11 +32,10 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "LexicographicalAnnotation",
-    summary = "Where possible, sort annotations lexicographically",
+    summary = "Sort annotations lexicographically where possible",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.STYLE,
-    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
+    tags = StandardTags.STYLE)
 public final class LexicographicalAnnotationCheck extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
 
@@ -49,13 +46,12 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
       return Description.NO_MATCH;
     }
 
-    ImmutableList<? extends AnnotationTree> sortedAnnotations = doSort(originalOrdering);
-
+    ImmutableList<? extends AnnotationTree> sortedAnnotations = doSort(originalOrdering, state);
     if (originalOrdering.equals(sortedAnnotations)) {
       return Description.NO_MATCH;
     }
 
-    Optional<Fix> fix = orderAnnotations(originalOrdering, sortedAnnotations);
+    Optional<Fix> fix = sortAnnotations(originalOrdering, sortedAnnotations, state);
 
     Description.Builder description = buildDescription(tree);
     fix.ifPresent(description::addFix);
@@ -63,31 +59,22 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
   }
 
   private ImmutableList<? extends AnnotationTree> doSort(
-      List<? extends AnnotationTree> annotations) {
+      List<? extends AnnotationTree> annotations, VisitorState state) {
     return annotations.stream()
-        .sorted(Comparator.comparing(ASTHelpers::getAnnotationName))
+        .sorted(Comparator.comparing(annotation -> Util.treeToString(annotation, state)))
         .collect(toImmutableList());
   }
 
-  @SuppressWarnings("UnstableApiUsage")
-  private Optional<Fix> orderAnnotations(
+  private Optional<Fix> sortAnnotations(
       List<? extends AnnotationTree> annotations,
-      ImmutableList<? extends AnnotationTree> sortedAnnotations) {
-    List<SuggestedFix.Builder> collect =
-        Streams.mapWithIndex(
-                annotations.stream(),
-                (annotation, i) ->
-                    SuggestedFix.builder()
-                        .replace(annotation, sortedAnnotations.get(Math.toIntExact(i)).toString()))
-            .collect(Collectors.toUnmodifiableList());
-
-    return collect.stream().reduce(SuggestedFix.Builder::merge).map(SuggestedFix.Builder::build);
-
-    // Other option:
-    //    SuggestedFix.Builder fix = SuggestedFix.builder();
-    //    for (int i = 0; i < annotations.size(); i++) {
-    //      fix.replace(annotations.get(i), sortedAnnotations.get(i).toString());
-    //    }
-    //    return describeMatch(tree, fix.build());
+      ImmutableList<? extends AnnotationTree> sortedAnnotations,
+      VisitorState state) {
+    return Streams.zip(
+            annotations.stream(),
+            sortedAnnotations.stream(),
+            (original, replacement) ->
+                SuggestedFix.builder().replace(original, Util.treeToString(replacement, state)))
+        .reduce(SuggestedFix.Builder::merge)
+        .map(SuggestedFix.Builder::build);
   }
 }

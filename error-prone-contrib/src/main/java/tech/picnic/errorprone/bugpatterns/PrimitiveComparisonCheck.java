@@ -72,7 +72,7 @@ public final class PrimitiveComparisonCheck extends BugChecker
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     boolean isStatic = STATIC_COMPARISON_METHOD.matches(tree, state);
-    if (!isStatic && !INSTANCE_COMPARISON_METHOD.matches(tree, state)) {
+    if (!isStatic && !INSTANCE_COMPARISION_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 

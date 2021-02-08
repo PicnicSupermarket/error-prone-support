@@ -42,6 +42,7 @@ public final class LexicographicalAnnotationCheckTest {
             "",
             " // BUG: Diagnostic contains:",
             "  @Foo @Bar A unsortedSimpleCase();",
+            //repeatable
             " // BUG: Diagnostic contains:",
             "  @Foo() @Bar() A unsortedWithBrackets();",
             "  @Foo() A onlyOneAnnotation();",
