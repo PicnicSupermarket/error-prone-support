@@ -60,10 +60,10 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
     }
 
     Optional<Fix> fix = orderAnnotations(annotations, sortedAnnotations);
-    if (fix.isEmpty()) {
-      return Description.NO_MATCH;
-    }
-    return describeMatch(tree, fix);
+
+    Description.Builder description = buildDescription(tree);
+    fix.ifPresent(description::addFix);
+    return description.build();
   }
 
   @SuppressWarnings("UnstableApiUsage")
