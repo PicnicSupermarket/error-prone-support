@@ -45,7 +45,7 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    java.util.List<? extends AnnotationTree> annotations = tree.getModifiers().getAnnotations();
+    List<? extends AnnotationTree> annotations = tree.getModifiers().getAnnotations();
     if (annotations.size() < 2) {
       return Description.NO_MATCH;
     }
