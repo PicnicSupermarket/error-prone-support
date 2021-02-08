@@ -50,13 +50,6 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    //    List<Attribute.Compound> rawAttributes = ASTHelpers.getSymbol(tree).getRawAttributes();
-
-    //    Stream<Attribute.Compound> declarationAndTypeAttributes =
-    // ASTHelpers.getDeclarationAndTypeAttributes(ASTHelpers.getSymbol(tree));
-    //    java.util.List<Attribute.Compound> collect1 =
-    // declarationAndTypeAttributes.collect(Collectors.toList());
-
     java.util.List<? extends AnnotationTree> annotations = tree.getModifiers().getAnnotations();
     if (annotations.size() < 2) {
       return Description.NO_MATCH;
@@ -91,35 +84,11 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
     //    SuggestedFixes.removeModifiers(tree.getModifiers(), state, ILLEGAL_MODIFIERS)
     //            .ifPresent(builder::merge);
 
-    //    tree.
-
-    //    java.util.List<? extends AnnotationTree> getAnnotations();
-    // 2 copy, 1ste hou je. 2de, sorteer je by string represantation.
-    // loop n -1 , tree index 0 vervangen string repr
-    //    MultiMatcher.MultiMatchResult<AnnotationTree> annotationTreeMultiMatchResult =
-    // FINDER.multiMatchResult(tree, state);
-    //    if (annotationTreeMultiMatchResult.matches())
-    //    AssignmentTree assignmentTree = (AssignmentTree) argumentTree;
-    //    if (ASTHelpers.getSymbol(assignmentTree.getVariable())
-    //            .getSimpleName()
-    //            .contentEquals("value")) {
-
-    //    String suggestion =
-    //        collect.stream()
-    //            .map(annotation -> "@" + annotation.type.tsym.name.toString() + "()")
-    //            .collect(Collectors.joining("\r\n"));
-    //    String suggestion =
+//    String suggestion =
     //            collect.stream()
     //                        .map(comp -> Util.treeToString(comp, state))
     //            //            .collect(joining(", ", "{", "}"));
     //            //    return Optional.of(SuggestedFix.builder().replace(array, suggestion));
 
-    //    SuggestedFix.builder().replace()
-
-    //    return Description.NO_MATCH;
   }
-
-  //    SuggestedFix.builder().
-  //    return describeMatch(collect, SuggestedFix.replace(, ));
-
 }
