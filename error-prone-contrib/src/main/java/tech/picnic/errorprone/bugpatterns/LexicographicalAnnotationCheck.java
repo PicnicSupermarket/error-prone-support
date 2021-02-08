@@ -2,7 +2,6 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
@@ -45,25 +44,29 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    List<? extends AnnotationTree> annotations = tree.getModifiers().getAnnotations();
-    if (annotations.size() < 2) {
+    List<? extends AnnotationTree> originalOrdering = tree.getModifiers().getAnnotations();
+    if (originalOrdering.size() < 2) {
       return Description.NO_MATCH;
     }
 
-    ImmutableList<? extends AnnotationTree> sortedAnnotations =
-        annotations.stream()
-            .sorted(Comparator.comparing(ASTHelpers::getAnnotationName))
-            .collect(toImmutableList());
+    ImmutableList<? extends AnnotationTree> sortedAnnotations = doSort(originalOrdering);
 
-    if (Iterators.elementsEqual(annotations.iterator(), sortedAnnotations.iterator())) {
+    if (originalOrdering.equals(sortedAnnotations)) {
       return Description.NO_MATCH;
     }
 
-    Optional<Fix> fix = orderAnnotations(annotations, sortedAnnotations);
+    Optional<Fix> fix = orderAnnotations(originalOrdering, sortedAnnotations);
 
     Description.Builder description = buildDescription(tree);
     fix.ifPresent(description::addFix);
     return description.build();
+  }
+
+  private ImmutableList<? extends AnnotationTree> doSort(
+      List<? extends AnnotationTree> annotations) {
+    return annotations.stream()
+        .sorted(Comparator.comparing(ASTHelpers::getAnnotationName))
+        .collect(toImmutableList());
   }
 
   @SuppressWarnings("UnstableApiUsage")
