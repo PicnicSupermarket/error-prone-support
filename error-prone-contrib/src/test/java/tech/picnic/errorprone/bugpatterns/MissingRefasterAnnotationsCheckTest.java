@@ -8,88 +8,71 @@ import org.junit.jupiter.api.Test;
 public final class MissingRefasterAnnotationsCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(MissingRefasterAnnotationsCheck.class, getClass());
-//  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-//      BugCheckerRefactoringTestHelper.newInstance(new AutowiredConstructorCheck(), getClass());
+  //  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
+  //      BugCheckerRefactoringTestHelper.newInstance(new AutowiredConstructorCheck(), getClass());
 
   @Test
   public void testIdentification() {
     compilationTestHelper
         .addSourceLines(
-            "Container.java",
-            "import com.google.errorprone.annotations.Immutable;",
-            "import java.util.List;",
-            "import org.springframework.beans.factory.annotation.Autowired;",
+            "RefasterTemplateStringIsEmpty.java",
+            "import com.google.errorprone.refaster.annotation.AfterTemplate;",
+            "import com.google.errorprone.refaster.annotation.AlsoNegation;",
+            "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
             "",
-            "interface Container {",
-            "  @Immutable",
-            "  class A {",
-            "    A() {}",
-            "  }",
+            "final class RefasterTemplateStringIsEmpty {",
+            "  private RefasterTemplateStringIsEmpty() {}",
             "",
-            "  class B {",
-            "    @Autowired void setProperty(Object o) {}",
-            "  }",
+            "  static final class StringIsEmpty {",
+            "    @BeforeTemplate",
+            "    boolean equalsEmptyString(String string) {",
+            "      return string.equals(\"\");",
+            "    }",
             "",
-            "  class C {",
-            "    // BUG: Diagnostic contains:",
-            "    @Autowired C() {}",
-            "  }",
+            "    // @BeforeTemplate, line is empty now, this should say bug!",
+            "    boolean lengthEquals0(String string) {",
+            "      return string.length() == 0;",
+            "    }",
             "",
-            "  class D {",
-            "    // BUG: Diagnostic contains:",
-            "    @Autowired D(String x) {}",
-            "  }",
-            "",
-            "  class E {",
-            "    @Autowired E() {}",
-            "    E(String x) {}",
-            "  }",
-            "",
-            "  class F {",
-            "    F() {}",
-            "    @Autowired F(String x) {}",
-            "  }",
-            "",
-            "  class G {",
-            "    @Autowired private Object o;",
-            "  }",
-            "",
-            "  class H {",
-            "    @SafeVarargs H(List<String>... lists) {}",
+            "    @AfterTemplate",
+//            "    @AlsoNegation",
+            "    boolean optimizedMethod(String string) {",
+            "      return string.isEmpty();",
+            "    }",
             "  }",
             "}")
         .doTest();
   }
 
-//  @Test
-//  public void testReplacement() {
-//    refactoringTestHelper
-//        .addInputLines(
-//            "in/Container.java",
-//            "import org.springframework.beans.factory.annotation.Autowired;",
-//            "",
-//            "interface Container {",
-//            "  class A {",
-//            "    @Autowired @Deprecated A() {}",
-//            "  }",
-//            "",
-//            "  class B {",
-//            "    @Autowired B(String x) {}",
-//            "  }",
-//            "}")
-//        .addOutputLines(
-//            "out/Container.java",
-//            "import org.springframework.beans.factory.annotation.Autowired;",
-//            "",
-//            "interface Container {",
-//            "  class A {",
-//            "    @Deprecated A() {}",
-//            "  }",
-//            "",
-//            "  class B {",
-//            "    B(String x) {}",
-//            "  }",
-//            "}")
-//        .doTest(TestMode.TEXT_MATCH);
-//  }
+  //  @Test
+  //  public void testReplacement() {
+  //    refactoringTestHelper
+  //        .addInputLines(
+  //            "in/Container.java",
+  //            "import org.springframework.beans.factory.annotation.Autowired;",
+  //            "",
+  //            "interface Container {",
+  //            "  class A {",
+  //            "    @Autowired @Deprecated A() {}",
+  //            "  }",
+  //            "",
+  //            "  class B {",
+  //            "    @Autowired B(String x) {}",
+  //            "  }",
+  //            "}")
+  //        .addOutputLines(
+  //            "out/Container.java",
+  //            "import org.springframework.beans.factory.annotation.Autowired;",
+  //            "",
+  //            "interface Container {",
+  //            "  class A {",
+  //            "    @Deprecated A() {}",
+  //            "  }",
+  //            "",
+  //            "  class B {",
+  //            "    B(String x) {}",
+  //            "  }",
+  //            "}")
+  //        .doTest(TestMode.TEXT_MATCH);
+  //  }
 }
