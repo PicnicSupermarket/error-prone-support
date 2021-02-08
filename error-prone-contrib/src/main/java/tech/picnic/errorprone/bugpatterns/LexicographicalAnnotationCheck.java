@@ -11,6 +11,8 @@ import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
+import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.MultiMatcher;
 import com.google.errorprone.util.ASTHelpers;
@@ -19,6 +21,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.util.List;
 
+import javax.lang.model.element.Modifier;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -44,24 +47,20 @@ import static com.google.errorprone.matchers.Matchers.anything;
     providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class LexicographicalAnnotationCheck extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
-  //  https://github.com/google/error-prone/pull/2125/files
-
-  private static final MultiMatcher<MethodTree, AnnotationTree> FINDER =
-      annotations(ALL, anything());
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    List<Attribute.Compound> rawAttributes = ASTHelpers.getSymbol(tree).getRawAttributes();
+    //    List<Attribute.Compound> rawAttributes = ASTHelpers.getSymbol(tree).getRawAttributes();
 
     //    Stream<Attribute.Compound> declarationAndTypeAttributes =
     // ASTHelpers.getDeclarationAndTypeAttributes(ASTHelpers.getSymbol(tree));
     //    java.util.List<Attribute.Compound> collect1 =
     // declarationAndTypeAttributes.collect(Collectors.toList());
-    if (rawAttributes.length() < 2) {
-      return Description.NO_MATCH;
-    }
 
     java.util.List<? extends AnnotationTree> annotations = tree.getModifiers().getAnnotations();
+    if (annotations.size() < 2) {
+      return Description.NO_MATCH;
+    }
 
     ImmutableList<? extends AnnotationTree> sortedAnnotations =
         annotations.stream()
@@ -74,6 +73,26 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
       return Description.NO_MATCH;
     }
 
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+    for (int i = 0; i < annotations.size(); i++) {
+      SuggestedFix.Builder test = SuggestedFix.builder();
+      test.replace(annotations.get(i), sortedAnnotations.get(i).toString());
+      fix = fix.merge(test);
+    }
+
+    return describeMatch(tree, fix.build());
+    //    SuggestedFix.Builder fix = SuggestedFix.builder();
+    //    relevantMembers.forEach(
+    //            m -> SuggestedFixes.removeModifiers(m, state,
+    // Modifier.PROTECTED).ifPresent(fix::merge));
+
+    //    SuggestedFixes.removeModifiers(tree.getModifiers(), state);
+    //    SuggestedFixes.addModifiers(sortedAnnotations, state);
+    //    SuggestedFixes.removeModifiers(tree.getModifiers(), state, ILLEGAL_MODIFIERS)
+    //            .ifPresent(builder::merge);
+
+    //    tree.
+
     //    java.util.List<? extends AnnotationTree> getAnnotations();
     // 2 copy, 1ste hou je. 2de, sorteer je by string represantation.
     // loop n -1 , tree index 0 vervangen string repr
@@ -85,10 +104,10 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
     //            .getSimpleName()
     //            .contentEquals("value")) {
 
-//    String suggestion =
-//        collect.stream()
-//            .map(annotation -> "@" + annotation.type.tsym.name.toString() + "()")
-//            .collect(Collectors.joining("\r\n"));
+    //    String suggestion =
+    //        collect.stream()
+    //            .map(annotation -> "@" + annotation.type.tsym.name.toString() + "()")
+    //            .collect(Collectors.joining("\r\n"));
     //    String suggestion =
     //            collect.stream()
     //                        .map(comp -> Util.treeToString(comp, state))
@@ -97,7 +116,7 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
 
     //    SuggestedFix.builder().replace()
 
-    return Description.NO_MATCH;
+    //    return Description.NO_MATCH;
   }
 
   //    SuggestedFix.builder().
