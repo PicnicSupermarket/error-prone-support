@@ -72,6 +72,7 @@ public final class MissingRefasterAnnotationsCheck extends BugChecker implements
     }
 //  THIS WORKS::::::::
 //    REFASTER_ANNOTATION.matches(member, state);
+//Now try to get it to work with this: 
 //    REFASTER_ANNOTATION.multiMatchResult()
 
     //    List<AnnotationTree> annotations =
