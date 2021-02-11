@@ -59,8 +59,7 @@ public final class LexicographicalAnnotationCheckTest {
             "  @Bar @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Baz A unsortedWithNestedBar();",
             "  @Bar @Baz @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})  A sortedWithNestedBar();",
             "",
-            //            " @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Foo({\"b\"}) @Foo(ints = {1,
-            // 2}) A sortedRepeatableAnnotation();",
+            " @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Foo(ints = {1, 2}) @Foo({\"b\"}) A sortedRepeatableAnnotation();",
             "  // BUG: Diagnostic contains:",
             " @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Bar @Foo(ints = {1, 2}) A unsortedRepeatableAnnotation();",
             "}")

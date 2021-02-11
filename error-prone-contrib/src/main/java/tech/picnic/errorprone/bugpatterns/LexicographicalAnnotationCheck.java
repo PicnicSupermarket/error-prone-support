@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
@@ -15,12 +17,9 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * A {@link BugChecker} that flags annotations that are not lexicographically sorted.
