@@ -46,19 +46,20 @@ public final class MissingRefasterAnnotationsCheck extends BugChecker implements
               isType("com.google.errorprone.refaster.annotation.BeforeTemplate"),
               isType("com.google.errorprone.refaster.annotation.AfterTemplate"),
               isType("com.google.errorprone.refaster.annotation.Placeholder")));
+  // this one is more performant. 
 
-  protected static final MultiMatcher<Tree, AnnotationTree> HAS_REFASTER_ANNOTATION =
-      annotations(
-          AT_LEAST_ONE,
-          anyOf(
-              symbolHasAnnotation(BeforeTemplate.class.getCanonicalName()),
-              symbolHasAnnotation(AfterTemplate.class.getCanonicalName()),
-              symbolHasAnnotation(Placeholder.class.getCanonicalName())));
+//  protected static final MultiMatcher<Tree, AnnotationTree> HAS_REFASTER_ANNOTATION =
+//      annotations(
+//          AT_LEAST_ONE,
+//          anyOf(
+//              symbolHasAnnotation(BeforeTemplate.class.getCanonicalName()),
+//              symbolHasAnnotation(AfterTemplate.class.getCanonicalName()),
+//              symbolHasAnnotation(Placeholder.class.getCanonicalName())));
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
     MultiMatcher.MultiMatchResult<AnnotationTree> annotationTreeMultiMatchResult =
-            HAS_REFASTER_ANNOTATION.multiMatchResult(tree, state);
+            REFASTER_ANNOTATION.multiMatchResult(tree, state);
     //    if () {
     //      System.err.println("IS een refaster template?");
     //    }
