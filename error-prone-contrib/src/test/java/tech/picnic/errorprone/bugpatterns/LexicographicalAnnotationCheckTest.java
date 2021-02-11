@@ -101,7 +101,7 @@ public final class LexicographicalAnnotationCheckTest {
             "  @Bar @Baz(str = {\"a\", \"b\"}) @Foo() A unsortedAnnotationsOneContainingAttributes();",
             "  @Baz(str = {\"a\", \"b\"}) @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Bar({\"b\"}) A unsortedAnnotationsWithAttributes();",
             "",
-            " @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Foo({\"b\"}) @Foo(ints = {1, 2}) A sortedRepeatableAnnotation();",
+            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Foo(ints = {1, 2}) @Foo({\"b\"}) A sortedRepeatableAnnotation();",
             "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Bar @Foo(ints = {1, 2}) A unsortedRepeatableAnnotation();",
             "",
             "}")
@@ -135,7 +135,7 @@ public final class LexicographicalAnnotationCheckTest {
             "  @Bar @Baz(str = {\"a\", \"b\"}) @Foo() A unsortedAnnotationsOneContainingAttributes();",
             "  @Bar({\"b\"}) @Baz(str = {\"a\", \"b\"}) @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) A unsortedAnnotationsWithAttributes();",
             "",
-            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Foo({\"b\"}) @Foo(ints = {1, 2}) A sortedRepeatableAnnotation();",
+            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Foo(ints = {1, 2}) @Foo({\"b\"}) A sortedRepeatableAnnotation();",
             "  @Bar @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Foo(ints = {1, 2}) A unsortedRepeatableAnnotation();",
             "",
             "}")
