@@ -24,26 +24,25 @@ import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 
-// XXX: TODOs for Stephan (besides the other XXXes):
-// 1. Tweak documentation and class name.
-// 2. Review tests.
 /**
- * A {@link BugChecker} which flags Spring HTTP request parameter or body annotations as missing if
- * Spring HTTP request mapping annotations are present.
+ * A {@link BugChecker} which flags {@code @RequestMapping} methods that have one or more parameters
+ * that appear to lack a relevant annotation.
  *
  * <p>Matched mappings are {@code @{Delete,Get,Patch,Post,Put,Request}Mapping}.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    name = "RequestParameterAnnotation",
-    summary = "Flag missing parameter annotations for Spring HTTP request mappings.",
+    name = "RequestMappingAnnotation",
+    summary = "Make sure all `@RequestMapping` method parameters are annotated",
     linkType = LinkType.NONE,
     severity = SeverityLevel.WARNING,
     tags = StandardTags.LIKELY_ERROR,
     providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
-public final class RequestParameterAnnotationCheck extends BugChecker implements MethodTreeMatcher {
+public final class RequestMappingAnnotationCheck extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String ANN_PACKAGE_PREFIX = "org.springframework.web.bind.annotation.";
+  // XXX: Generalize this logic to fully support Spring meta-annotations, then update the class
+  // documentation.
   private static final Matcher<Tree> HAS_MAPPING_ANNOTATION =
       annotations(
           AT_LEAST_ONE,
@@ -67,8 +66,7 @@ public final class RequestParameterAnnotationCheck extends BugChecker implements
                           isType(ANN_PACKAGE_PREFIX + "PathVariable"),
                           isType(ANN_PACKAGE_PREFIX + "RequestBody"),
                           isType(ANN_PACKAGE_PREFIX + "RequestHeader"),
-                          isType(ANN_PACKAGE_PREFIX + "RequestParam"),
-                          isType("tech.picnic.webapp.JsonParam"))),
+                          isType(ANN_PACKAGE_PREFIX + "RequestParam"))),
                   isSameType("java.io.InputStream"),
                   isSameType("javax.servlet.http.HttpServletRequest"),
                   isSameType("javax.servlet.http.HttpServletResponse"),
