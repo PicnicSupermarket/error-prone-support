@@ -21,26 +21,25 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import java.util.Map;
-import java.util.Optional;
 import javax.lang.model.element.AnnotationValue;
 
 /** A {@link BugChecker} which flags ambiguous {@code @JsonCreator}s in enums. */
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "AmbiguousJsonCreator",
-    summary = "JsonCreator.Mode should be set for single-argument creators",
+    summary = "`JsonCreator.Mode` should be set for single-argument creators",
     linkType = LinkType.NONE,
     severity = SeverityLevel.WARNING,
     tags = StandardTags.LIKELY_ERROR,
     providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
 public final class AmbiguousJsonCreatorCheck extends BugChecker implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<AnnotationTree> JSON_CREATOR_ANNOTATION =
+  private static final Matcher<AnnotationTree> IS_JSON_CREATOR_ANNOTATION =
       isType("com.fasterxml.jackson.annotation.JsonCreator");
 
   @Override
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
-    if (!JSON_CREATOR_ANNOTATION.matches(tree, state)) {
+    if (!IS_JSON_CREATOR_ANNOTATION.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
@@ -54,21 +53,18 @@ public final class AmbiguousJsonCreatorCheck extends BugChecker implements Annot
       return Description.NO_MATCH;
     }
 
-    Optional<Symbol.VarSymbol> mode =
+    boolean customMode =
         ASTHelpers.getAnnotationMirror(tree).getElementValues().entrySet().stream()
             .filter(entry -> entry.getKey().getSimpleName().contentEquals("mode"))
             .map(Map.Entry::getValue)
             .map(AnnotationValue::getValue)
             .filter(Symbol.VarSymbol.class::isInstance)
             .map(Symbol.VarSymbol.class::cast)
-            .filter(varSymbol -> !varSymbol.getSimpleName().contentEquals("DEFAULT"))
-            .findFirst();
+            .anyMatch(varSymbol -> !varSymbol.getSimpleName().contentEquals("DEFAULT"));
 
-    if (mode.isPresent()) {
-      return Description.NO_MATCH;
-    }
-
-    return describeMatch(
-        tree, SuggestedFix.replace(tree, "@JsonCreator(mode = JsonCreator.Mode.DELEGATING)"));
+    return customMode
+        ? Description.NO_MATCH
+        : describeMatch(
+            tree, SuggestedFix.replace(tree, "@JsonCreator(mode = JsonCreator.Mode.DELEGATING)"));
   }
 }
