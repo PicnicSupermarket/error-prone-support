@@ -25,14 +25,15 @@ import java.time.LocalTime;
 /** A {@link BugChecker} which flags illegal time-zone related operations. */
 @AutoService(BugChecker.class)
 @BugPattern(
-    name = "TimeZoneUsageCheck",
-    summary = "Avoid illegal operations on assorted time related objects",
+    name = "TimeZoneUsage",
+    summary =
+        "Derive the current time from a `Clock` Spring bean, and don't rely on a `Clock`'s time zone",
     linkType = LinkType.NONE,
     severity = SeverityLevel.WARNING,
     tags = StandardTags.FRAGILE_CODE)
 public final class TimeZoneUsageCheck extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<ExpressionTree> ILLEGAL_CLOCK_USAGES =
+  private static final Matcher<ExpressionTree> IS_BANNED_TIME_METHOD =
       anyOf(
           instanceMethod().onDescendantOf(Clock.class.getName()).namedAnyOf("getZone", "withZone"),
           staticMethod()
@@ -43,24 +44,24 @@ public final class TimeZoneUsageCheck extends BugChecker implements MethodInvoca
                   "systemUTC",
                   "tickMillis",
                   "tickMinutes",
-                  "tickSeconds"));
-  private static final Matcher<ExpressionTree> NOW_USAGES =
-      anyOf(
+                  "tickSeconds"),
           staticMethod()
               .onClassAny(
                   Instant.class.getName(),
                   LocalDate.class.getName(),
                   LocalDateTime.class.getName(),
                   LocalTime.class.getName())
-              .namedAnyOf("now"));
+              .named("now"));
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!ILLEGAL_CLOCK_USAGES.matches(tree, state) && !NOW_USAGES.matches(tree, state)) {
+    if (!IS_BANNED_TIME_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
+
     return buildDescription(tree)
-        .setMessage("This operation is not recommended, please refactor it")
+        .setMessage(
+            "Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone")
         .build();
   }
 }
