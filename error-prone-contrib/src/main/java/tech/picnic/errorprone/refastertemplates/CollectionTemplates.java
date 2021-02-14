@@ -58,6 +58,11 @@ final class CollectionTemplates {
       return Iterables.size(collection);
     }
 
+    @BeforeTemplate
+    int before(ImmutableCollection<T> collection) {
+      return collection.asList().size();
+    }
+
     @AfterTemplate
     int after(Collection<T> collection) {
       return collection.size();
@@ -223,22 +228,6 @@ final class CollectionTemplates {
     @AfterTemplate
     Stream<T> after(ImmutableCollection<T> collection) {
       return collection.parallelStream();
-    }
-  }
-
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#size()} is called
-   * on the result; call it directly.
-   */
-  static final class ImmutableCollectionSize<T> {
-    @BeforeTemplate
-    int before(ImmutableCollection<T> collection) {
-      return collection.asList().size();
-    }
-
-    @AfterTemplate
-    int after(ImmutableCollection<T> collection) {
-      return collection.size();
     }
   }
 

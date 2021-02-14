@@ -30,8 +30,8 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
         ImmutableSet.of(8).isEmpty());
   }
 
-  int testCollectionSize() {
-    return ImmutableSet.of().size();
+  ImmutableSet<Integer> testCollectionSize() {
+    return ImmutableSet.of(ImmutableSet.of(1).size(), ImmutableSet.of(2).size());
   }
 
   boolean testCollectionAddAllToCollectionExpression() {
@@ -72,10 +72,6 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
 
   Stream<Integer> testImmutableCollectionParallelStream() {
     return ImmutableSet.of(1).parallelStream();
-  }
-
-  int testImmutableCollectionSize() {
-    return ImmutableSet.of(1).size();
   }
 
   String testImmutableCollectionToString() {
