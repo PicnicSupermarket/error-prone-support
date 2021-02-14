@@ -10,11 +10,13 @@ import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.SortedSet;
+import java.util.function.IntFunction;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with (arbitrary) collections. */
@@ -37,6 +39,11 @@ final class CollectionTemplates {
           Iterables.isEmpty(collection));
     }
 
+    @BeforeTemplate
+    boolean before(ImmutableCollection<T> collection) {
+      return collection.asList().isEmpty();
+    }
+
     @AfterTemplate
     @AlsoNegation
     boolean after(Collection<T> collection) {
@@ -49,6 +56,11 @@ final class CollectionTemplates {
     @BeforeTemplate
     int before(Collection<T> collection) {
       return Iterables.size(collection);
+    }
+
+    @BeforeTemplate
+    int before(ImmutableCollection<T> collection) {
+      return collection.asList().size();
     }
 
     @AfterTemplate
@@ -175,16 +187,6 @@ final class CollectionTemplates {
    * Don't call {@link ImmutableCollection#asList()} if the result is going to be streamed; stream
    * directly.
    */
-  // XXX: Similar rules could be implemented for the following variants:
-  // collection.asList().contains(null);
-  // collection.asList().isEmpty();
-  // collection.asList().iterator();
-  // collection.asList().parallelStream();
-  // collection.asList().size();
-  // collection.asList().toArray();
-  // collection.asList().toArray(Object[]::new);
-  // collection.asList().toArray(new Object[0]);
-  // collection.asList().toString();
   static final class ImmutableCollectionAsListToStream<T> {
     @BeforeTemplate
     Stream<T> before(ImmutableCollection<T> collection) {
@@ -194,6 +196,121 @@ final class CollectionTemplates {
     @AfterTemplate
     Stream<T> after(ImmutableCollection<T> collection) {
       return collection.stream();
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if {@link Collection#contains(Object)} is
+   * called on the result; call it directly.
+   */
+  static final class ImmutableCollectionContains<T, S> {
+    @BeforeTemplate
+    boolean before(ImmutableCollection<T> collection, S elem) {
+      return collection.asList().contains(elem);
+    }
+
+    @AfterTemplate
+    boolean after(ImmutableCollection<T> collection, S elem) {
+      return collection.contains(elem);
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#parallelStream()}
+   * is called on the result; call it directly.
+   */
+  static final class ImmutableCollectionParallelStream<T> {
+    @BeforeTemplate
+    Stream<T> before(ImmutableCollection<T> collection) {
+      return collection.asList().parallelStream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(ImmutableCollection<T> collection) {
+      return collection.parallelStream();
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#toString()} is
+   * called on the result; call it directly.
+   */
+  static final class ImmutableCollectionToString<T> {
+    @BeforeTemplate
+    String before(ImmutableCollection<T> collection) {
+      return collection.asList().toString();
+    }
+
+    @AfterTemplate
+    String after(ImmutableCollection<T> collection) {
+      return collection.toString();
+    }
+  }
+
+  /** Prefer calling {@link Collection#toArray()} over more contrived alternatives. */
+  static final class CollectionToArray<T> {
+    @BeforeTemplate
+    Object[] before(Collection<T> collection, int size) {
+      return Refaster.anyOf(
+          collection.toArray(new Object[size]), collection.toArray(Object[]::new));
+    }
+
+    @BeforeTemplate
+    Object[] before(ImmutableCollection<T> collection) {
+      return collection.asList().toArray();
+    }
+
+    @AfterTemplate
+    Object[] after(Collection<T> collection) {
+      return collection.toArray();
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if {@link
+   * ImmutableCollection#toArray(Object[])}` is called on the result; call it directly.
+   */
+  static final class ImmutableCollectionToArrayWithArray<T, S> {
+    @BeforeTemplate
+    Object[] before(ImmutableCollection<T> collection, S[] array) {
+      return collection.asList().toArray(array);
+    }
+
+    @AfterTemplate
+    Object[] after(ImmutableCollection<T> collection, S[] array) {
+      return collection.toArray(array);
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if {@link
+   * ImmutableCollection#toArray(IntFunction)}} is called on the result; call it directly.
+   */
+  static final class ImmutableCollectionToArrayWithGenerator<T, S> {
+    @BeforeTemplate
+    S[] before(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
+      return collection.asList().toArray(generator);
+    }
+
+    @AfterTemplate
+    S[] after(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
+      return collection.toArray(generator);
+    }
+  }
+
+  /**
+   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#iterator()} is
+   * called on the result; call it directly.
+   */
+  static final class ImmutableCollectionIterator<T> {
+    @BeforeTemplate
+    Iterator<T> before(ImmutableCollection<T> collection) {
+      return collection.asList().iterator();
+    }
+
+    @AfterTemplate
+    Iterator<T> after(ImmutableCollection<T> collection) {
+      return collection.iterator();
     }
   }
 

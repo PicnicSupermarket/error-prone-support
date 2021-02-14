@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -25,11 +26,12 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
         ImmutableSet.of(4).size() != 0,
         ImmutableSet.of(5).size() > 0,
         ImmutableSet.of(6).size() >= 1,
-        Iterables.isEmpty(ImmutableSet.of(7)));
+        Iterables.isEmpty(ImmutableSet.of(7)),
+        ImmutableSet.of(8).asList().isEmpty());
   }
 
-  int testCollectionSize() {
-    return Iterables.size(ImmutableSet.of());
+  ImmutableSet<Integer> testCollectionSize() {
+    return ImmutableSet.of(Iterables.size(ImmutableSet.of(1)), ImmutableSet.of(2).asList().size());
   }
 
   boolean testCollectionAddAllToCollectionExpression() {
@@ -64,12 +66,43 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
     return Lists.newArrayList(ImmutableList.of("foo"));
   }
 
-  Stream<Integer> testImmutableCollectionAsListToStream() {
+  Stream<Integer> testImmutableCollectionStream() {
     return ImmutableSet.of(1).asList().stream();
   }
 
   ImmutableList<Integer> testImmutableCollectionAsList() {
     return ImmutableList.copyOf(ImmutableSet.of(1));
+  }
+
+  boolean testImmutableCollectionContains() {
+    return ImmutableSet.of(1).asList().contains("foo");
+  }
+
+  Stream<Integer> testImmutableCollectionParallelStream() {
+    return ImmutableSet.of(1).asList().parallelStream();
+  }
+
+  String testImmutableCollectionToString() {
+    return ImmutableSet.of(1).asList().toString();
+  }
+
+  ImmutableSet<Object[]> testCollectionToArray() {
+    return ImmutableSet.of(
+        ImmutableSet.of(1).toArray(new Object[1]),
+        ImmutableSet.of(2).toArray(Object[]::new),
+        ImmutableSet.of(3).asList().toArray());
+  }
+
+  Integer[] testImmutableCollectionToArrayWithArray() {
+    return ImmutableSet.of(1).asList().toArray(new Integer[0]);
+  }
+
+  Integer[] testImmutableCollectionToArrayWithGenerator() {
+    return ImmutableSet.of(1).asList().toArray(Integer[]::new);
+  }
+
+  Iterator<Integer> testImmutableCollectionIterator() {
+    return ImmutableSet.of(1).asList().iterator();
   }
 
   ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {

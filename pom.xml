@@ -1014,7 +1014,7 @@
                     <artifactId>pitest-maven</artifactId>
                     <version>1.6.2</version>
                     <configuration>
-                        <!-- Use multple threads to speed things up. Extend
+                        <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->
                         <threads>4</threads>
