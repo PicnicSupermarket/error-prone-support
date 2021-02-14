@@ -25,16 +25,17 @@ import java.util.Optional;
  * A {@link BugChecker} that flags annotations that are not lexicographically sorted.
  *
  * <p>The idea behind this checker is that maintaining a sorted sequence simplifies conflict
- * resolution, and can even avoid it if two branches add the same entry.
+ * resolution, and can even avoid it if two branches add the same annotation.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    name = "LexicographicalAnnotation",
+    name = "LexicographicalAnnotationListing",
     summary = "Sort annotations lexicographically where possible",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
     tags = StandardTags.STYLE)
-public final class LexicographicalAnnotationCheck extends BugChecker implements MethodTreeMatcher {
+public final class LexicographicalAnnotationListingCheck extends BugChecker
+    implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
 
   @Override
@@ -44,31 +45,31 @@ public final class LexicographicalAnnotationCheck extends BugChecker implements 
       return Description.NO_MATCH;
     }
 
-    ImmutableList<? extends AnnotationTree> sortedAnnotations = doSort(originalOrdering, state);
+    ImmutableList<? extends AnnotationTree> sortedAnnotations = sort(originalOrdering, state);
     if (originalOrdering.equals(sortedAnnotations)) {
       return Description.NO_MATCH;
     }
 
-    Optional<Fix> fix = sortAnnotations(originalOrdering, sortedAnnotations, state);
+    Optional<Fix> fix = tryFixOrdering(originalOrdering, sortedAnnotations, state);
 
     Description.Builder description = buildDescription(tree);
     fix.ifPresent(description::addFix);
     return description.build();
   }
 
-  private ImmutableList<? extends AnnotationTree> doSort(
+  private static ImmutableList<? extends AnnotationTree> sort(
       List<? extends AnnotationTree> annotations, VisitorState state) {
     return annotations.stream()
         .sorted(Comparator.comparing(annotation -> Util.treeToString(annotation, state)))
         .collect(toImmutableList());
   }
 
-  private Optional<Fix> sortAnnotations(
-      List<? extends AnnotationTree> annotations,
+  private static Optional<Fix> tryFixOrdering(
+      List<? extends AnnotationTree> originalAnnotations,
       ImmutableList<? extends AnnotationTree> sortedAnnotations,
       VisitorState state) {
     return Streams.zip(
-            annotations.stream(),
+            originalAnnotations.stream(),
             sortedAnnotations.stream(),
             (original, replacement) ->
                 SuggestedFix.builder().replace(original, Util.treeToString(replacement, state)))

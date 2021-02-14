@@ -5,11 +5,12 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class LexicographicalAnnotationCheckTest {
+public final class LexicographicalAnnotationListingCheckTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(LexicographicalAnnotationCheck.class, getClass());
+      CompilationTestHelper.newInstance(LexicographicalAnnotationListingCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new LexicographicalAnnotationCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(
+          new LexicographicalAnnotationListingCheck(), getClass());
 
   @Test
   public void testIdentification() {
