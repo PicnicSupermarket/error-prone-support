@@ -29,22 +29,22 @@ import java.util.List;
     name = "MissingRefasterAnnotation",
     summary = "The Refaster template contains a method without Refaster annotation",
     linkType = LinkType.NONE,
-    severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.SIMPLIFICATION)
+    severity = SeverityLevel.WARNING,
+    tags = StandardTags.LIKELY_ERROR)
 public final class MissingRefasterAnnotationCheck extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final MultiMatcher<Tree, AnnotationTree> HAS_REFASTER_ANNOTATION =
       annotations(
           AT_LEAST_ONE,
           anyOf(
+              isType("com.google.errorprone.refaster.annotation.Placeholder"),
               isType("com.google.errorprone.refaster.annotation.BeforeTemplate"),
-              isType("com.google.errorprone.refaster.annotation.AfterTemplate"),
-              isType("com.google.errorprone.refaster.annotation.Placeholder")));
+              isType("com.google.errorprone.refaster.annotation.AfterTemplate")));
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    List<MethodTree> normalMethods = new ArrayList<>();
     List<MethodTree> refasterAnnotatedMethods = new ArrayList<>();
+    List<MethodTree> otherMethods = new ArrayList<>();
 
     tree.getMembers().stream()
         .filter(member -> member.getKind() == Tree.Kind.METHOD)
@@ -55,11 +55,11 @@ public final class MissingRefasterAnnotationCheck extends BugChecker implements 
               if (HAS_REFASTER_ANNOTATION.matches(member, state)) {
                 refasterAnnotatedMethods.add(member);
               } else {
-                normalMethods.add(member);
+                otherMethods.add(member);
               }
             });
 
-    if (refasterAnnotatedMethods.isEmpty() || normalMethods.isEmpty()) {
+    if (refasterAnnotatedMethods.isEmpty() || otherMethods.isEmpty()) {
       return Description.NO_MATCH;
     }
 
