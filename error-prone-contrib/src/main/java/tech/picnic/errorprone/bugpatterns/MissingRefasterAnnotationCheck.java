@@ -1,5 +1,10 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
+import static com.google.errorprone.matchers.Matchers.annotations;
+import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.isType;
+
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
@@ -15,14 +20,8 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
-import static com.google.errorprone.matchers.Matchers.annotations;
-import static com.google.errorprone.matchers.Matchers.isType;
-import static com.google.errorprone.matchers.Matchers.anyOf;
 
 /** A {@link BugChecker} which flags probable missing Refaster annotations. */
 @AutoService(BugChecker.class)
@@ -56,6 +55,12 @@ public final class MissingRefasterAnnotationCheck extends BugChecker implements 
         }
       }
     }
+
+    //    tree.getMembers().stream()
+    //            .filter(member -> member instanceof MethodTree &&
+    // !ASTHelpers.getSymbol((MethodTree) tree).isConstructor())
+    //            .forEach(member -> HAS_REFASTER_ANNOTATION.matches(member, state) ?
+    // refasterAnnotatedMethods.add((MethodTree)member) : normalMethods.add((MethodTree)member));
 
     if (refasterAnnotatedMethods.isEmpty() || normalMethods.isEmpty()) {
       return Description.NO_MATCH;
