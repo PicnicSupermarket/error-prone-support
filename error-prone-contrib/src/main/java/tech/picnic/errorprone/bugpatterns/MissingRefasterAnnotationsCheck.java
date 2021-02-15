@@ -33,64 +33,39 @@ import static com.google.errorprone.matchers.Matchers.*;
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "MissingRefasterAnnotations",
-    summary = "The Refaster template contains a method without annotation",
+    summary = "The Refaster template contains a method without Refaster annotation",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
     tags = StandardTags.SIMPLIFICATION)
 public final class MissingRefasterAnnotationsCheck extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final MultiMatcher<Tree, AnnotationTree> REFASTER_ANNOTATION =
+  private static final MultiMatcher<Tree, AnnotationTree> HAS_REFASTER_ANNOTATION =
       annotations(
           AT_LEAST_ONE,
           anyOf(
               isType("com.google.errorprone.refaster.annotation.BeforeTemplate"),
               isType("com.google.errorprone.refaster.annotation.AfterTemplate"),
               isType("com.google.errorprone.refaster.annotation.Placeholder")));
-  // this one is more performant. 
-
-//  protected static final MultiMatcher<Tree, AnnotationTree> HAS_REFASTER_ANNOTATION =
-//      annotations(
-//          AT_LEAST_ONE,
-//          anyOf(
-//              symbolHasAnnotation(BeforeTemplate.class.getCanonicalName()),
-//              symbolHasAnnotation(AfterTemplate.class.getCanonicalName()),
-//              symbolHasAnnotation(Placeholder.class.getCanonicalName())));
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    MultiMatcher.MultiMatchResult<AnnotationTree> annotationTreeMultiMatchResult =
-            REFASTER_ANNOTATION.multiMatchResult(tree, state);
-    //    if () {
-    //      System.err.println("IS een refaster template?");
-    //    }
-    // now it checks the class annotations.
-    List<MethodTree> methods = new ArrayList<>();
+    List<MethodTree> normalMethods = new ArrayList<>();
+    List<MethodTree> refasterAnnotatedMethods = new ArrayList<>();
     for (Tree member : tree.getMembers()) {
-      if (member instanceof MethodTree) {
-        MethodTree methodTree = (MethodTree) member;
-        methods.add(methodTree);
+      if (member instanceof MethodTree
+          && !ASTHelpers.getSymbol((MethodTree) member).isConstructor()) {
+        if (HAS_REFASTER_ANNOTATION.matches(member, state)) {
+          refasterAnnotatedMethods.add((MethodTree) member);
+        } else {
+          normalMethods.add((MethodTree) member);
+        }
       }
     }
-//  THIS WORKS::::::::
-//    REFASTER_ANNOTATION.matches(member, state);
-//Now try to get it to work with this: 
-//    REFASTER_ANNOTATION.multiMatchResult()
 
-    //    List<AnnotationTree> annotations =
-    //        AUTOWIRED_ANNOTATION
-    //            .multiMatchResult(Iterables.getOnlyElement(constructors), state)
-    //            .matchingNodes();
-    //    if (annotations.size() != 1) {
-    //      return Description.NO_MATCH;
-    //    }
+    if (refasterAnnotatedMethods.isEmpty() || normalMethods.isEmpty()) {
+      return Description.NO_MATCH;
+    }
 
-    /*
-     * This is the only `@Autowired` constructor: suggest that it be removed. Note that this likely
-     * means that the associated import can be removed as well. Rather than adding code for this case we
-     * leave flagging the unused import to Error Prone's `RemoveUnusedImports` check.
-     */
-    //    AnnotationTree annotation = Iterables.getOnlyElement(annotations);
-    //    return describeMatch(annotation, SuggestedFix.delete(annotation));
-    return Description.NO_MATCH;
+    return buildDescription(tree).build();
   }
 }
