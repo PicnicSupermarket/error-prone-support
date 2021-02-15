@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
-import static com.google.errorprone.matchers.Matchers.*;
+import static com.google.errorprone.matchers.Matchers.annotations;
+import static com.google.errorprone.matchers.Matchers.isType;
+import static com.google.errorprone.matchers.Matchers.anyOf;
 
 /** A {@link BugChecker} which flags probable missing Refaster annotations. */
 @AutoService(BugChecker.class)
