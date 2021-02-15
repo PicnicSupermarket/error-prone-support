@@ -28,8 +28,7 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
     summary = "Empty method can likely be deleted",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.SIMPLIFICATION,
-    providesFix = BugPattern.ProvidesFix.REQUIRES_HUMAN_ATTENTION)
+    tags = StandardTags.SIMPLIFICATION)
 public final class EmptyMethodCheck extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> HAS_PERMITTED_ANNOTATION =

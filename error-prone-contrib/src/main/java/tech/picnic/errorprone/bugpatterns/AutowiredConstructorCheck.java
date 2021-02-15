@@ -8,7 +8,6 @@ import com.google.auto.service.AutoService;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.ProvidesFix;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
@@ -31,8 +30,7 @@ import java.util.List;
     summary = "Omit `@Autowired` on a class' sole constructor, as it is redundant",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.SIMPLIFICATION,
-    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
+    tags = StandardTags.SIMPLIFICATION)
 public final class AutowiredConstructorCheck extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final MultiMatcher<Tree, AnnotationTree> AUTOWIRED_ANNOTATION =

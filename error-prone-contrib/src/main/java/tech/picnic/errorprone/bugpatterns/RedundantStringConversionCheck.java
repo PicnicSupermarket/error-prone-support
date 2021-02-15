@@ -13,7 +13,6 @@ import com.google.auto.service.AutoService;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.ProvidesFix;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.ErrorProneFlags;
@@ -50,8 +49,7 @@ import java.util.Optional;
     summary = "Avoid redundant string conversions when possible",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.SIMPLIFICATION,
-    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
+    tags = StandardTags.SIMPLIFICATION)
 public final class RedundantStringConversionCheck extends BugChecker
     implements BinaryTreeMatcher, CompoundAssignmentTreeMatcher, MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;

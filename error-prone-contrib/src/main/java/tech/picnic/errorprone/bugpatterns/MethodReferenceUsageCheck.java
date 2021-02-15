@@ -7,7 +7,6 @@ import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.ProvidesFix;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
@@ -54,8 +53,7 @@ import javax.lang.model.element.Name;
     summary = "Prefer method references over lambda expressions",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.STYLE,
-    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
+    tags = StandardTags.STYLE)
 public final class MethodReferenceUsageCheck extends BugChecker
     implements LambdaExpressionTreeMatcher {
   private static final long serialVersionUID = 1L;
