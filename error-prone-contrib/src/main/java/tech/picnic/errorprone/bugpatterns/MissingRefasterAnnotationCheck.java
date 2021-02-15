@@ -23,7 +23,7 @@ import com.sun.source.tree.Tree;
 import java.util.ArrayList;
 import java.util.List;
 
-/** A {@link BugChecker} which flags probable missing Refaster annotations. */
+/** A {@link BugChecker} that flags likely missing Refaster annotations. */
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "MissingRefasterAnnotation",
@@ -45,22 +45,19 @@ public final class MissingRefasterAnnotationCheck extends BugChecker implements 
   public Description matchClass(ClassTree tree, VisitorState state) {
     List<MethodTree> normalMethods = new ArrayList<>();
     List<MethodTree> refasterAnnotatedMethods = new ArrayList<>();
-    for (Tree member : tree.getMembers()) {
-      if (member instanceof MethodTree
-          && !ASTHelpers.getSymbol((MethodTree) member).isConstructor()) {
-        if (HAS_REFASTER_ANNOTATION.matches(member, state)) {
-          refasterAnnotatedMethods.add((MethodTree) member);
-        } else {
-          normalMethods.add((MethodTree) member);
-        }
-      }
-    }
 
-    //    tree.getMembers().stream()
-    //            .filter(member -> member instanceof MethodTree &&
-    // !ASTHelpers.getSymbol((MethodTree) tree).isConstructor())
-    //            .forEach(member -> HAS_REFASTER_ANNOTATION.matches(member, state) ?
-    // refasterAnnotatedMethods.add((MethodTree)member) : normalMethods.add((MethodTree)member));
+    tree.getMembers().stream()
+        .filter(member -> member.getKind() == Tree.Kind.METHOD)
+        .map(MethodTree.class::cast)
+        .filter(member -> !ASTHelpers.getSymbol(member).isConstructor())
+        .forEach(
+            member -> {
+              if (HAS_REFASTER_ANNOTATION.matches(member, state)) {
+                refasterAnnotatedMethods.add(member);
+              } else {
+                normalMethods.add(member);
+              }
+            });
 
     if (refasterAnnotatedMethods.isEmpty() || normalMethods.isEmpty()) {
       return Description.NO_MATCH;
