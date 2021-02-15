@@ -44,8 +44,7 @@ import java.util.Optional;
     summary = "Method should be statically imported",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.SIMPLIFICATION,
-    providesFix = BugPattern.ProvidesFix.REQUIRES_HUMAN_ATTENTION)
+    tags = StandardTags.SIMPLIFICATION)
 public final class StaticImportCheck extends BugChecker implements MemberSelectTreeMatcher {
   private static final long serialVersionUID = 1L;
 

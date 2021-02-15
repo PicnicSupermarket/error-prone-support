@@ -8,7 +8,6 @@ import com.google.auto.service.AutoService;
 import com.google.common.base.Splitter;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.ProvidesFix;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
@@ -36,8 +35,7 @@ import java.util.Optional;
     summary = "Make sure SLF4J log statements contain proper placeholders with matching arguments",
     linkType = LinkType.NONE,
     severity = SeverityLevel.WARNING,
-    tags = StandardTags.LIKELY_ERROR,
-    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
+    tags = StandardTags.LIKELY_ERROR)
 public final class Slf4jLogStatementCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;

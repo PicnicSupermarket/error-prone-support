@@ -9,7 +9,6 @@ import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.ProvidesFix;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
@@ -47,12 +46,11 @@ import java.util.function.Function;
             + " of the provided function",
     linkType = LinkType.NONE,
     severity = SeverityLevel.WARNING,
-    tags = StandardTags.PERFORMANCE,
-    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
+    tags = StandardTags.PERFORMANCE)
 public final class PrimitiveComparisonCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<ExpressionTree> STATIC_COMPARISION_METHOD =
+  private static final Matcher<ExpressionTree> STATIC_COMPARISON_METHOD =
       anyOf(
           staticMethod()
               .onClass(Comparator.class.getName())
@@ -61,7 +59,7 @@ public final class PrimitiveComparisonCheck extends BugChecker
               .onClass(Comparator.class.getName())
               .named("comparing")
               .withParameters(Function.class.getName()));
-  private static final Matcher<ExpressionTree> INSTANCE_COMPARISION_METHOD =
+  private static final Matcher<ExpressionTree> INSTANCE_COMPARISON_METHOD =
       anyOf(
           instanceMethod()
               .onDescendantOf(Comparator.class.getName())
@@ -73,8 +71,8 @@ public final class PrimitiveComparisonCheck extends BugChecker
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    boolean isStatic = STATIC_COMPARISION_METHOD.matches(tree, state);
-    if (!isStatic && !INSTANCE_COMPARISION_METHOD.matches(tree, state)) {
+    boolean isStatic = STATIC_COMPARISON_METHOD.matches(tree, state);
+    if (!isStatic && !INSTANCE_COMPARISON_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 

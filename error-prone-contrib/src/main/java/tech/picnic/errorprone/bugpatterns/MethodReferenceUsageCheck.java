@@ -54,8 +54,7 @@ import javax.lang.model.element.Name;
     summary = "Prefer method references over lambda expressions",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.STYLE,
-    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
+    tags = StandardTags.STYLE)
 public final class MethodReferenceUsageCheck extends BugChecker
     implements LambdaExpressionTreeMatcher {
   private static final long serialVersionUID = 1L;
