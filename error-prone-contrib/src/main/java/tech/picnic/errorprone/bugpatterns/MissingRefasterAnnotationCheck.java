@@ -27,12 +27,12 @@ import static com.google.errorprone.matchers.Matchers.anyOf;
 /** A {@link BugChecker} which flags probable missing Refaster annotations. */
 @AutoService(BugChecker.class)
 @BugPattern(
-    name = "MissingRefasterAnnotations",
+    name = "MissingRefasterAnnotation",
     summary = "The Refaster template contains a method without Refaster annotation",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
     tags = StandardTags.SIMPLIFICATION)
-public final class MissingRefasterAnnotationsCheck extends BugChecker implements ClassTreeMatcher {
+public final class MissingRefasterAnnotationCheck extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final MultiMatcher<Tree, AnnotationTree> HAS_REFASTER_ANNOTATION =
       annotations(

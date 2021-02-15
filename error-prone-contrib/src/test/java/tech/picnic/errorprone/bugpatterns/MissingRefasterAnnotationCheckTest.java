@@ -4,9 +4,9 @@ import com.google.common.base.Predicates;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class MissingRefasterAnnotationsCheckTest {
+public final class MissingRefasterAnnotationCheckTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(MissingRefasterAnnotationsCheck.class, getClass())
+      CompilationTestHelper.newInstance(MissingRefasterAnnotationCheck.class, getClass())
           .expectErrorMessage(
               "X",
               Predicates.containsPattern(
@@ -16,17 +16,17 @@ public final class MissingRefasterAnnotationsCheckTest {
   public void testIdentification() {
     compilationTestHelper
         .addSourceLines(
-            "RefasterTemplateStringIsEmpty.java",
+            "RefasterTemplatesWithMissingAnnotations.java",
             "import com.google.errorprone.refaster.annotation.AfterTemplate;",
             "import com.google.errorprone.refaster.annotation.AlsoNegation;",
             "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
             "import java.util.Map;",
             "",
-            "final class RefasterTemplateStringIsEmpty {",
-            "  private RefasterTemplateStringIsEmpty() {}",
+            "final class RefasterTemplatesWithMissingAnnotations {",
+            "  private RefasterTemplatesWithMissingAnnotations() {}",
             "",
             "  // BUG: Diagnostic matches: X",
-            "  static final class StringIsEmpty {",
+            "  static final class MethodMissesBeforeTemplateAnnotation {",
             "    @BeforeTemplate",
             "    boolean equalsEmptyString(String string) {",
             "      return string.equals(\"\");",
@@ -45,7 +45,7 @@ public final class MissingRefasterAnnotationsCheckTest {
             "  }",
             "",
             "  // BUG: Diagnostic matches: X",
-            "  static final class SecondStringIsEmpty {",
+            "  static final class MethodMissesAfterTemplateAnnotation {",
             "    @BeforeTemplate",
             "    boolean equalsEmptyString(String string) {",
             "      return string.equals(\"\");",
@@ -63,7 +63,7 @@ public final class MissingRefasterAnnotationsCheckTest {
             "  }",
             "",
             "  // BUG: Diagnostic matches: X",
-            "  abstract class ComputeIfAbsent<K, V> {",
+            "  abstract class MethodMissesPlaceholderAnnotation<K, V> {",
             "",
             "", // @Placeholder is missing
             "    abstract V function(K key);",
