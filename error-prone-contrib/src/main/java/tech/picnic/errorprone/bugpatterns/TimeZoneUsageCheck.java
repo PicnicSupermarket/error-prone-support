@@ -55,9 +55,8 @@ public final class TimeZoneUsageCheck extends BugChecker implements MethodInvoca
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!IS_BANNED_TIME_METHOD.matches(tree, state)) {
-      return Description.NO_MATCH;
-    }
-    return buildDescription(tree).build();
+    return IS_BANNED_TIME_METHOD.matches(tree, state)
+        ? buildDescription(tree).build()
+        : Description.NO_MATCH;
   }
 }
