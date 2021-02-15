@@ -32,7 +32,7 @@ public final class MissingRefasterAnnotationCheckTest {
             "      return string.equals(\"\");",
             "    }",
             "",
-            "", // @BeforeTemplate is missing
+            // @BeforeTemplate is missing
             "    boolean lengthEquals0(String string) {",
             "      return string.length() == 0;",
             "    }",
@@ -56,7 +56,7 @@ public final class MissingRefasterAnnotationCheckTest {
             "      return string.length() == 0;",
             "    }",
             "",
-            "", // @AfterTemplate is missing
+            // @AfterTemplate is missing
             "    boolean optimizedMethod(String string) {",
             "      return string.isEmpty();",
             "    }",
@@ -65,7 +65,7 @@ public final class MissingRefasterAnnotationCheckTest {
             "  // BUG: Diagnostic matches: X",
             "  abstract class MethodMissesPlaceholderAnnotation<K, V> {",
             "",
-            "", // @Placeholder is missing
+            // @Placeholder is missing
             "    abstract V function(K key);",
             "",
             "    @BeforeTemplate",
