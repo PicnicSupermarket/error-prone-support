@@ -27,7 +27,7 @@ import java.time.LocalTime;
 @BugPattern(
     name = "TimeZoneUsage",
     summary =
-        "Derive the current time from a `Clock` Spring bean, and don't rely on a `Clock`'s time zone",
+        "Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone",
     linkType = LinkType.NONE,
     severity = SeverityLevel.WARNING,
     tags = StandardTags.FRAGILE_CODE)
@@ -59,9 +59,6 @@ public final class TimeZoneUsageCheck extends BugChecker implements MethodInvoca
       return Description.NO_MATCH;
     }
 
-    return buildDescription(tree)
-        .setMessage(
-            "Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone")
-        .build();
+    return buildDescription(tree).build();
   }
 }
