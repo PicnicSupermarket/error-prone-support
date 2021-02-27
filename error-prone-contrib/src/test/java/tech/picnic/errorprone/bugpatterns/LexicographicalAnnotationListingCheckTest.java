@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import com.google.common.base.Predicates;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -7,7 +8,9 @@ import org.junit.jupiter.api.Test;
 
 public final class LexicographicalAnnotationListingCheckTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(LexicographicalAnnotationListingCheck.class, getClass());
+      CompilationTestHelper.newInstance(LexicographicalAnnotationListingCheck.class, getClass())
+          .expectErrorMessage(
+              "X", Predicates.containsPattern("Sort annotations lexicographically where possible"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(
           new LexicographicalAnnotationListingCheck(), getClass());
@@ -20,7 +23,7 @@ public final class LexicographicalAnnotationListingCheckTest {
             "import java.lang.annotation.Repeatable;",
             "",
             "interface A {",
-            "  @Repeatable(FooRepeat.class)",
+            "  @Repeatable(Foos.class)",
             "  @interface Foo {",
             "    String[] value() default {};",
             "    int[] ints() default {};",
@@ -35,33 +38,33 @@ public final class LexicographicalAnnotationListingCheckTest {
             "    String[] str() default {};",
             "  }",
             "",
-            "  @interface FooRepeat {",
+            "  @interface Foos {",
             "     Foo[] value();",
             "  }",
             "",
-            " // BUG: Diagnostic contains:",
+            "  // BUG: Diagnostic matches: X",
             "  @Foo @Bar A unsortedSimpleCase();",
-            " // BUG: Diagnostic contains:",
-            "  @Foo() @Bar() A unsortedWithBrackets();",
+            "  // BUG: Diagnostic matches: X",
+            "  @Foo() @Bar() A unsortedWithParens();",
             "  @Foo() A onlyOneAnnotation();",
-            "  @Bar @Foo() A sortedAnnotationsOneWithBrackets();",
+            "  @Bar @Foo() A sortedAnnotationsOneWithParens();",
             "",
-            " // BUG: Diagnostic contains:",
-            "  @Foo @Baz @Bar A threeUnsortedAnnotationsSameStartLetters();",
-            " // BUG: Diagnostic contains:",
+            "  // BUG: Diagnostic matches: X",
+            "  @Foo @Baz @Bar A threeUnsortedAnnotationsSameInitialLetter();",
+            "  // BUG: Diagnostic matches: X",
             "  @Bar @Foo() @Baz A firstOrderedWithTwoUnsortedAnnotations();",
             "  @Bar @Baz @Foo() A threeSortedAnnotations();",
             "",
-            "  // BUG: Diagnostic contains:",
+            "  // BUG: Diagnostic matches: X",
             "  @Foo({\"b\"}) @Bar({\"a\"}) A unsortedWithStringAttributes();",
-            "  // BUG: Diagnostic contains:",
+            "  // BUG: Diagnostic matches: X",
             "  @Baz(str = {\"a\", \"b\"}) @Foo(ints = {1, 0}) @Bar A unsortedWithAttributes();",
-            "  // BUG: Diagnostic contains:",
+            "  // BUG: Diagnostic matches: X",
             "  @Bar @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Baz A unsortedWithNestedBar();",
             "  @Bar @Baz @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})  A sortedWithNestedBar();",
             "",
             " @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Foo(ints = {1, 2}) @Foo({\"b\"}) A sortedRepeatableAnnotation();",
-            "  // BUG: Diagnostic contains:",
+            "  // BUG: Diagnostic matches: X",
             " @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Bar @Foo(ints = {1, 2}) A unsortedRepeatableAnnotation();",
             "}")
         .doTest();
@@ -74,7 +77,7 @@ public final class LexicographicalAnnotationListingCheckTest {
             "in/A.java",
             "import java.lang.annotation.Repeatable;",
             "interface A {",
-            "  @Repeatable(FooRepeat.class)",
+            "  @Repeatable(Foos.class)",
             "  @interface Foo {",
             "    String[] value() default {};",
             "    int[] ints() default {};",
@@ -89,14 +92,14 @@ public final class LexicographicalAnnotationListingCheckTest {
             "    String[] str() default {};",
             "  }",
             "",
-            "  @interface FooRepeat {",
+            "  @interface Foos {",
             "     Foo[] value();",
             "  }",
             "",
             "  @Bar A singleAnnotation();",
             "  @Bar @Foo A sortedAnnotations();",
             "  @Foo @Bar A unsortedAnnotations();",
-            "  @Foo() @Baz() @Bar A unsortedAnnotationsWithSomeBrackets();",
+            "  @Foo() @Baz() @Bar A unsortedAnnotationsWithSomeParens();",
             "",
             "  @Bar @Baz(str = {\"a\", \"b\"}) @Foo() A unsortedAnnotationsOneContainingAttributes();",
             "  @Baz(str = {\"a\", \"b\"}) @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) @Bar({\"b\"}) A unsortedAnnotationsWithAttributes();",
@@ -109,7 +112,7 @@ public final class LexicographicalAnnotationListingCheckTest {
             "out/A.java",
             "import java.lang.annotation.Repeatable;",
             "interface A {",
-            "  @Repeatable(FooRepeat.class)",
+            "  @Repeatable(Foos.class)",
             "  @interface Foo {",
             "    String[] value() default {};",
             "    int[] ints() default {};",
@@ -124,13 +127,13 @@ public final class LexicographicalAnnotationListingCheckTest {
             "    String[] str() default {};",
             "  }",
             "",
-            "  @interface FooRepeat {",
+            "  @interface Foos {",
             "     Foo[] value();",
             "  }",
             "  @Bar A singleAnnotation();",
             "  @Bar @Foo A sortedAnnotations();",
             "  @Bar @Foo A unsortedAnnotations();",
-            "  @Bar @Baz() @Foo() A unsortedAnnotationsWithSomeBrackets();",
+            "  @Bar @Baz() @Foo() A unsortedAnnotationsWithSomeParens();",
             "",
             "  @Bar @Baz(str = {\"a\", \"b\"}) @Foo() A unsortedAnnotationsOneContainingAttributes();",
             "  @Bar({\"b\"}) @Baz(str = {\"a\", \"b\"}) @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")}) A unsortedAnnotationsWithAttributes();",
