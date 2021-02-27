@@ -15,19 +15,16 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.MultiMatcher;
-import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
-import java.util.ArrayList;
-import java.util.List;
 
 /** A {@link BugChecker} that flags likely missing Refaster annotations. */
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "MissingRefasterAnnotation",
-    summary = "The Refaster template contains a method without Refaster annotation",
+    summary = "The Refaster template contains a method without any Refaster annotations",
     linkType = LinkType.NONE,
     severity = SeverityLevel.WARNING,
     tags = StandardTags.LIKELY_ERROR)
@@ -43,26 +40,14 @@ public final class MissingRefasterAnnotationCheck extends BugChecker implements 
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    List<MethodTree> refasterAnnotatedMethods = new ArrayList<>();
-    List<MethodTree> otherMethods = new ArrayList<>();
+    long methodTypes =
+        tree.getMembers().stream()
+            .filter(member -> member.getKind() == Tree.Kind.METHOD)
+            .map(MethodTree.class::cast)
+            .map(method -> HAS_REFASTER_ANNOTATION.matches(method, state))
+            .distinct()
+            .count();
 
-    tree.getMembers().stream()
-        .filter(member -> member.getKind() == Tree.Kind.METHOD)
-        .map(MethodTree.class::cast)
-        .filter(member -> !ASTHelpers.getSymbol(member).isConstructor())
-        .forEach(
-            member -> {
-              if (HAS_REFASTER_ANNOTATION.matches(member, state)) {
-                refasterAnnotatedMethods.add(member);
-              } else {
-                otherMethods.add(member);
-              }
-            });
-
-    if (refasterAnnotatedMethods.isEmpty() || otherMethods.isEmpty()) {
-      return Description.NO_MATCH;
-    }
-
-    return buildDescription(tree).build();
+    return methodTypes < 2 ? Description.NO_MATCH : buildDescription(tree).build();
   }
 }
