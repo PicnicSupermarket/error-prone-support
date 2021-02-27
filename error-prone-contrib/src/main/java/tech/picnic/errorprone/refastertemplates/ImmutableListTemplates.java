@@ -76,13 +76,11 @@ final class ImmutableListTemplates {
    * Prefer {@link ImmutableList#copyOf(Iterable)} and variants over more contrived alternatives.
    */
   static final class IterableToImmutableList<T> {
-    // XXX: Drop the inner `Refaster.anyOf` if/when we introduce a rule to choose between one and
-    // the other.
     @BeforeTemplate
     ImmutableList<T> before(T[] iterable) {
       return Refaster.anyOf(
           ImmutableList.<T>builder().add(iterable).build(),
-          Refaster.anyOf(Stream.of(iterable), Arrays.stream(iterable)).collect(toImmutableList()));
+          Arrays.stream(iterable).collect(toImmutableList()));
     }
 
     @BeforeTemplate

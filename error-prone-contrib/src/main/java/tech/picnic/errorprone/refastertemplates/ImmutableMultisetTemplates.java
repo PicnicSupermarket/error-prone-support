@@ -54,14 +54,11 @@ final class ImmutableMultisetTemplates {
    * alternatives.
    */
   static final class IterableToImmutableMultiset<T> {
-    // XXX: Drop the inner `Refaster.anyOf` if/when we introduce a rule to choose between one and
-    // the other.
     @BeforeTemplate
     ImmutableMultiset<T> before(T[] iterable) {
       return Refaster.anyOf(
           ImmutableMultiset.<T>builder().add(iterable).build(),
-          Refaster.anyOf(Stream.of(iterable), Arrays.stream(iterable))
-              .collect(toImmutableMultiset()));
+          Arrays.stream(iterable).collect(toImmutableMultiset()));
     }
 
     @BeforeTemplate

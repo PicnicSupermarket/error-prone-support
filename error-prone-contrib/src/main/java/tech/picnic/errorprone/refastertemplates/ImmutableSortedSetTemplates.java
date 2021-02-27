@@ -90,14 +90,11 @@ final class ImmutableSortedSetTemplates {
   // XXX: There's also a variant with a custom Comparator. (And some special cases with
   // `reverseOrder`.) Worth the hassle?
   static final class IterableToImmutableSortedSet<T extends Comparable<? super T>> {
-    // XXX: Drop the inner `Refaster.anyOf` if/when we introduce a rule to choose between one and
-    // the other.
     @BeforeTemplate
     ImmutableSet<T> before(T[] iterable) {
       return Refaster.anyOf(
           ImmutableSortedSet.<T>naturalOrder().add(iterable).build(),
-          Refaster.anyOf(Stream.of(iterable), Arrays.stream(iterable))
-              .collect(toImmutableSortedSet(naturalOrder())));
+          Arrays.stream(iterable).collect(toImmutableSortedSet(naturalOrder())));
     }
 
     @BeforeTemplate

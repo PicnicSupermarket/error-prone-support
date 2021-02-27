@@ -51,12 +51,11 @@ final class StringTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<String> testJoinStrings() {
     return ImmutableSet.of(
         Joiner.on("a").join(new String[] {"foo", "bar"}),
-        Joiner.on("b").join(new CharSequence[] {"baz", "qux"}),
-        Stream.of(new String[] {"foo", "bar"}).collect(joining("c")),
-        Arrays.stream(new CharSequence[] {"baz", "qux"}).collect(joining("d")),
-        Joiner.on("e").join(ImmutableList.of("foo", "bar")),
-        Streams.stream(Iterables.cycle(ImmutableList.of("foo", "bar"))).collect(joining("f")),
-        ImmutableList.of("baz", "qux").stream().collect(joining("g")));
+        Joiner.on("b").join(new CharSequence[] {"foo", "bar"}),
+        Arrays.stream(new String[] {"foo", "bar"}).collect(joining("c")),
+        Joiner.on("d").join(ImmutableList.of("foo", "bar")),
+        Streams.stream(Iterables.cycle(ImmutableList.of("foo", "bar"))).collect(joining("e")),
+        ImmutableList.of("foo", "bar").stream().collect(joining("f")));
   }
 
   String testSubstringRemainder() {

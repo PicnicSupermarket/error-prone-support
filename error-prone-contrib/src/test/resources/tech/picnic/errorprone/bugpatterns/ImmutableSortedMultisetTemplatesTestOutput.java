@@ -47,8 +47,7 @@ final class ImmutableSortedMultisetTemplatesTest implements RefasterTemplateTest
         ImmutableSortedMultiset.copyOf(ImmutableMultiset.of(7)::iterator),
         ImmutableSortedMultiset.copyOf(ImmutableMultiset.of(8).iterator()),
         ImmutableSortedMultiset.copyOf(new Integer[] {9}),
-        ImmutableSortedMultiset.copyOf(new Integer[] {10}),
-        ImmutableSortedMultiset.copyOf(new Integer[] {11}));
+        ImmutableSortedMultiset.copyOf(new Integer[] {10}));
   }
 
   ImmutableSet<ImmutableSortedMultiset<Integer>> testStreamToImmutableSortedMultiset() {

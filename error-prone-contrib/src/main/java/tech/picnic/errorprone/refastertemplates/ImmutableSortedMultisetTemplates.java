@@ -92,14 +92,11 @@ final class ImmutableSortedMultisetTemplates {
   // XXX: There's also a variant with a custom Comparator. (And some special cases with
   // `reverseOrder`.) Worth the hassle?
   static final class IterableToImmutableSortedMultiset<T extends Comparable<? super T>> {
-    // XXX: Drop the inner `Refaster.anyOf` if/when we introduce a rule to choose between one and
-    // the other.
     @BeforeTemplate
     ImmutableMultiset<T> before(T[] iterable) {
       return Refaster.anyOf(
           ImmutableSortedMultiset.<T>naturalOrder().add(iterable).build(),
-          Refaster.anyOf(Stream.of(iterable), Arrays.stream(iterable))
-              .collect(toImmutableSortedMultiset(naturalOrder())));
+          Arrays.stream(iterable).collect(toImmutableSortedMultiset(naturalOrder())));
     }
 
     @BeforeTemplate

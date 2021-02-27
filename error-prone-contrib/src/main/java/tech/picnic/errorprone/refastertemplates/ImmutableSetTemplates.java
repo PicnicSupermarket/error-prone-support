@@ -72,13 +72,11 @@ final class ImmutableSetTemplates {
 
   /** Prefer {@link ImmutableSet#copyOf(Iterable)} and variants over more contrived alternatives. */
   static final class IterableToImmutableSet<T> {
-    // XXX: Drop the inner `Refaster.anyOf` if/when we introduce a rule to choose between one and
-    // the other.
     @BeforeTemplate
     ImmutableSet<T> before(T[] iterable) {
       return Refaster.anyOf(
           ImmutableSet.<T>builder().add(iterable).build(),
-          Refaster.anyOf(Stream.of(iterable), Arrays.stream(iterable)).collect(toImmutableSet()));
+          Arrays.stream(iterable).collect(toImmutableSet()));
     }
 
     @BeforeTemplate

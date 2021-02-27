@@ -34,8 +34,7 @@ final class ImmutableMultisetTemplatesTest implements RefasterTemplateTestCase {
         ImmutableMultiset.copyOf(ImmutableMultiset.of(5)::iterator),
         ImmutableMultiset.copyOf(ImmutableMultiset.of(6).iterator()),
         ImmutableMultiset.copyOf(new Integer[] {7}),
-        ImmutableMultiset.copyOf(new Integer[] {8}),
-        ImmutableMultiset.copyOf(new Integer[] {9}));
+        ImmutableMultiset.copyOf(new Integer[] {8}));
   }
 
   ImmutableSet<ImmutableMultiset<Integer>> testStreamToImmutableMultiset() {

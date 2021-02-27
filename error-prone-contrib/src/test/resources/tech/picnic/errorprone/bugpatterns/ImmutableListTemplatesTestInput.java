@@ -50,8 +50,7 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
         ImmutableList.<Integer>builder().addAll(ImmutableList.of(5)::iterator).build(),
         ImmutableList.<Integer>builder().addAll(ImmutableList.of(6).iterator()).build(),
         ImmutableList.<Integer>builder().add(new Integer[] {7}).build(),
-        Stream.of(new Integer[] {8}).collect(toImmutableList()),
-        Arrays.stream(new Integer[] {9}).collect(toImmutableList()));
+        Arrays.stream(new Integer[] {8}).collect(toImmutableList()));
   }
 
   ImmutableSet<ImmutableList<Integer>> testStreamToImmutableList() {

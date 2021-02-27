@@ -7,6 +7,7 @@ import static java.util.function.Predicate.not;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -24,6 +25,10 @@ final class StreamTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableSet<Stream<String>> testStreamOfNullable() {
     return ImmutableSet.of(Stream.ofNullable("a"), Stream.ofNullable("b"));
+  }
+
+  Stream<String> testStreamOfArray() {
+    return Arrays.stream(new String[] {"foo", "bar"});
   }
 
   Stream<Integer> testConcatOneStream() {

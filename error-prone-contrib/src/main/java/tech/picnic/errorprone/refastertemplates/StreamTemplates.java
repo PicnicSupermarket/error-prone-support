@@ -12,6 +12,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,6 +48,22 @@ final class StreamTemplates {
     @AfterTemplate
     Stream<T> after(T object) {
       return Stream.ofNullable(object);
+    }
+  }
+
+  /**
+   * Prefer {@link Arrays#stream(Object[])} over {@link Stream#of(Object[])}, as the former is
+   * clearer.
+   */
+  static final class StreamOfArray<T> {
+    @BeforeTemplate
+    Stream<T> before(T[] array) {
+      return Stream.of(array);
+    }
+
+    @AfterTemplate
+    Stream<T> after(T[] array) {
+      return Arrays.stream(array);
     }
   }
 

@@ -36,8 +36,7 @@ final class ImmutableMultisetTemplatesTest implements RefasterTemplateTestCase {
         ImmutableMultiset.<Integer>builder().addAll(ImmutableMultiset.of(5)::iterator).build(),
         ImmutableMultiset.<Integer>builder().addAll(ImmutableMultiset.of(6).iterator()).build(),
         ImmutableMultiset.<Integer>builder().add(new Integer[] {7}).build(),
-        Stream.of(new Integer[] {8}).collect(toImmutableMultiset()),
-        Arrays.stream(new Integer[] {9}).collect(toImmutableMultiset()));
+        Arrays.stream(new Integer[] {8}).collect(toImmutableMultiset()));
   }
 
   ImmutableSet<ImmutableMultiset<Integer>> testStreamToImmutableMultiset() {

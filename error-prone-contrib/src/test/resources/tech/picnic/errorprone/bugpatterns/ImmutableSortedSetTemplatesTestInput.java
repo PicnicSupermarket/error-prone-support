@@ -50,8 +50,7 @@ final class ImmutableSortedSetTemplatesTest implements RefasterTemplateTestCase 
         ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(7)::iterator).build(),
         ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(8).iterator()).build(),
         ImmutableSortedSet.<Integer>naturalOrder().add(new Integer[] {9}).build(),
-        Stream.of(new Integer[] {10}).collect(toImmutableSortedSet(naturalOrder())),
-        Arrays.stream(new Integer[] {11}).collect(toImmutableSortedSet(naturalOrder())));
+        Arrays.stream(new Integer[] {10}).collect(toImmutableSortedSet(naturalOrder())));
   }
 
   ImmutableSet<ImmutableSortedSet<Integer>> testStreamToImmutableSortedSet() {

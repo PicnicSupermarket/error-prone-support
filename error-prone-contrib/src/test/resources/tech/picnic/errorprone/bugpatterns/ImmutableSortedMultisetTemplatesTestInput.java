@@ -55,8 +55,7 @@ final class ImmutableSortedMultisetTemplatesTest implements RefasterTemplateTest
             .addAll(ImmutableMultiset.of(8).iterator())
             .build(),
         ImmutableSortedMultiset.<Integer>naturalOrder().add(new Integer[] {9}).build(),
-        Stream.of(new Integer[] {10}).collect(toImmutableSortedMultiset(naturalOrder())),
-        Arrays.stream(new Integer[] {11}).collect(toImmutableSortedMultiset(naturalOrder())));
+        Arrays.stream(new Integer[] {10}).collect(toImmutableSortedMultiset(naturalOrder())));
   }
 
   ImmutableSet<ImmutableSortedMultiset<Integer>> testStreamToImmutableSortedMultiset() {

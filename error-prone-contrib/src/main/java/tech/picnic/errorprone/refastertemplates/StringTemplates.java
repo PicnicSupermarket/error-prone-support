@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link String}s. */
 // XXX: Should we prefer `s -> !s.isEmpty()` or `not(String::isEmpty)`?
@@ -82,12 +81,10 @@ final class StringTemplates {
   // XXX: Joiner#join(@Nullable Object first, @Nullable Object second, Object... rest) isn't
   // rewritten.
   static final class JoinStrings {
-    // XXX: Drop the inner `Refaster.anyOf` if/when we decide to rewrite one to the other.
     @BeforeTemplate
     String before(String delimiter, CharSequence[] elements) {
       return Refaster.anyOf(
-          Joiner.on(delimiter).join(elements),
-          Refaster.anyOf(Stream.of(elements), Arrays.stream(elements)).collect(joining(delimiter)));
+          Joiner.on(delimiter).join(elements), Arrays.stream(elements).collect(joining(delimiter)));
     }
 
     @BeforeTemplate

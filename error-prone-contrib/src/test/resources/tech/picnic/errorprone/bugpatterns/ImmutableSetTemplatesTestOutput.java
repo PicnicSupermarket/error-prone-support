@@ -47,8 +47,7 @@ final class ImmutableSetTemplatesTest implements RefasterTemplateTestCase {
         ImmutableSet.copyOf(ImmutableSet.of(5)::iterator),
         ImmutableSet.copyOf(ImmutableSet.of(6).iterator()),
         ImmutableSet.copyOf(new Integer[] {7}),
-        ImmutableSet.copyOf(new Integer[] {8}),
-        ImmutableSet.copyOf(new Integer[] {9}));
+        ImmutableSet.copyOf(new Integer[] {8}));
   }
 
   ImmutableSet<ImmutableSet<Integer>> testStreamToImmutableSet() {

@@ -26,6 +26,10 @@ final class StreamTemplatesTest implements RefasterTemplateTestCase {
         Stream.of("a").filter(Objects::nonNull), Optional.ofNullable("b").stream());
   }
 
+  Stream<String> testStreamOfArray() {
+    return Stream.of(new String[] {"foo", "bar"});
+  }
+
   Stream<Integer> testConcatOneStream() {
     return Streams.concat(Stream.of(1));
   }
