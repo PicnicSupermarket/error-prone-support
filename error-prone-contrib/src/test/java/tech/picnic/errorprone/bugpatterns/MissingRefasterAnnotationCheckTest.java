@@ -72,6 +72,20 @@ public final class MissingRefasterAnnotationCheckTest {
             "      map.computeIfAbsent(key, k -> function(k));",
             "    }",
             "  }",
+            "",
+            "  static final class ValidRefasterTemplate {",
+            "    @BeforeTemplate",
+            "    void unusedPureFunctionCall(Object o) {",
+            "      o.toString();",
+            "    }",
+            "  }",
+            "",
+            "  static final class NotARefasterTemplate {",
+            "    @Override",
+            "    public String toString() {",
+            "      return \"This is not a Refaster template\";",
+            "    }",
+            "  }",
             "}")
         .doTest();
   }

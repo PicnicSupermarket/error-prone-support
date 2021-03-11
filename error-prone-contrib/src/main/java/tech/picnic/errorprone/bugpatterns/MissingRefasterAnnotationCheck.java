@@ -15,6 +15,7 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.MultiMatcher;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
@@ -44,6 +45,7 @@ public final class MissingRefasterAnnotationCheck extends BugChecker implements 
         tree.getMembers().stream()
             .filter(member -> member.getKind() == Tree.Kind.METHOD)
             .map(MethodTree.class::cast)
+            .filter(method -> !ASTHelpers.isGeneratedConstructor(method))
             .map(method -> HAS_REFASTER_ANNOTATION.matches(method, state))
             .distinct()
             .count();
