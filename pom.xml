@@ -223,7 +223,7 @@
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2020.0.4</version>
+                <version>2020.0.5</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -309,7 +309,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>5.3.4</version>
+                <version>5.3.5</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -332,7 +332,7 @@
                 <plugin>
                     <groupId>com.github.ekryd.sortpom</groupId>
                     <artifactId>sortpom-maven-plugin</artifactId>
-                    <version>2.13.1</version>
+                    <version>2.14.0</version>
                     <configuration>
                         <createBackupFile>false</createBackupFile>
                         <encoding>${project.build.sourceEncoding}</encoding>
@@ -980,7 +980,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>2.1.0</version>
+                    <version>2.2.0</version>
                     <configuration>
                         <exclusionPatterns>
                             <!-- The plugin suggests replacing Guava's
@@ -1030,7 +1030,7 @@
                         <dependency>
                             <groupId>org.pitest</groupId>
                             <artifactId>pitest-junit5-plugin</artifactId>
-                            <version>0.12</version>
+                            <version>0.14</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1096,7 +1096,7 @@
             them.) -->
             <properties>
                 <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
-                <version.palantir-baseline>3.74.0</version.palantir-baseline>
+                <version.palantir-baseline>3.75.0</version.palantir-baseline>
                 <version.reactor-error-prone>0.1.4</version.reactor-error-prone>
             </properties>
             <dependencyManagement>
