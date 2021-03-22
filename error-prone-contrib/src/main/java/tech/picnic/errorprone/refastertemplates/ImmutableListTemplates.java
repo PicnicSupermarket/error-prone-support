@@ -67,8 +67,8 @@ final class ImmutableListTemplates {
     }
 
     @AfterTemplate
-    ImmutableList<T> after(T element) {
-      return ImmutableList.of(element);
+    ImmutableList<T> after(T secondName) {
+      return ImmutableList.of(secondName);
     }
   }
 
