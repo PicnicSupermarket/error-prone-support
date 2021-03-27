@@ -115,7 +115,7 @@
         <version.error-prone>2.5.1</version.error-prone>
         <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
-        <version.guava>30.1-jre</version.guava>
+        <version.guava>30.1.1-jre</version.guava>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
@@ -177,7 +177,7 @@
             <dependency>
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value-annotations</artifactId>
-                <version>1.7.4</version>
+                <version>1.7.5</version>
             </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
