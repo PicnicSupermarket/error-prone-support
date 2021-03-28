@@ -2,7 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyOf;
-import static com.google.errorprone.matchers.Matchers.isNonNull;
+import static com.google.errorprone.matchers.Matchers.isNonNullUsingDataflow;
 import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.not;
@@ -64,7 +64,8 @@ public final class RedundantStringConversionCheck extends BugChecker
   private static final Matcher<ExpressionTree> MARKER = isSubtypeOf("org.slf4j.Marker");
   private static final Matcher<ExpressionTree> STRING = isSameType(String.class);
   private static final Matcher<ExpressionTree> THROWABLE = isSubtypeOf(Throwable.class);
-  private static final Matcher<ExpressionTree> NON_NULL_STRING = allOf(STRING, isNonNull());
+  private static final Matcher<ExpressionTree> NON_NULL_STRING =
+      allOf(STRING, isNonNullUsingDataflow());
   private static final Matcher<ExpressionTree> NOT_FORMATTABLE =
       not(isSubtypeOf(Formattable.class));
   private static final Matcher<ExpressionTree> WELL_KNOWN_STRING_CONVERSION_METHODS =

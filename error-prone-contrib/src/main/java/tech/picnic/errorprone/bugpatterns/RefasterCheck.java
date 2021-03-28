@@ -6,6 +6,7 @@ import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -43,6 +44,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -66,6 +68,10 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   private static final String REFASTER_TEMPLATE_SUFFIX = ".refaster";
   private static final String INCLUDED_TEMPLATES_PATTERN_FLAG = "Refaster:NamePattern";
 
+  @VisibleForTesting
+  static final Supplier<ImmutableListMultimap<String, CodeTransformer>> ALL_CODE_TRANSFORMERS =
+      Suppliers.memoize(RefasterCheck::loadAllCodeTransformers);
+
   private final CodeTransformer codeTransformer;
 
   /** Instantiates the default {@link RefasterCheck}. */
@@ -79,13 +85,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
    * @param flags Any provided command line flags.
    */
   public RefasterCheck(ErrorProneFlags flags) {
-    codeTransformer = createCompositeCodeTransformer(flags, loadAllCodeTransformers());
-  }
-
-  @VisibleForTesting
-  RefasterCheck(
-      ErrorProneFlags flags, ImmutableListMultimap<String, CodeTransformer> allTransformers) {
-    codeTransformer = createCompositeCodeTransformer(flags, allTransformers);
+    codeTransformer = createCompositeCodeTransformer(flags);
   }
 
   @Override
@@ -152,8 +152,8 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
     return description.fixes.stream().flatMap(fix -> fix.getReplacements(endPositions).stream());
   }
 
-  private static CodeTransformer createCompositeCodeTransformer(
-      ErrorProneFlags flags, ImmutableListMultimap<String, CodeTransformer> allTransformers) {
+  private static CodeTransformer createCompositeCodeTransformer(ErrorProneFlags flags) {
+    ImmutableListMultimap<String, CodeTransformer> allTransformers = ALL_CODE_TRANSFORMERS.get();
     return CompositeCodeTransformer.compose(
         flags
             .get(INCLUDED_TEMPLATES_PATTERN_FLAG)
@@ -170,8 +170,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
         .collect(toImmutableList());
   }
 
-  @VisibleForTesting
-  static ImmutableListMultimap<String, CodeTransformer> loadAllCodeTransformers() {
+  private static ImmutableListMultimap<String, CodeTransformer> loadAllCodeTransformers() {
     ImmutableListMultimap.Builder<String, CodeTransformer> transformers =
         ImmutableListMultimap.builder();
 

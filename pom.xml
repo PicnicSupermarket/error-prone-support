@@ -109,10 +109,9 @@
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.0</version.auto-service>
-        <version.error-prone>2.5.1</version.error-prone>
+        <version.error-prone>2.6.0</version.error-prone>
         <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
-        <version.guava>30.1.1-jre</version.guava>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
@@ -203,7 +202,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>${version.guava}</version>
+                <version>30.1.1-jre</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -1090,7 +1089,7 @@
             <id>error-prone-fork</id>
             <properties>
                 <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>
-                <version.error-prone>v2.5.1-picnic-1</version.error-prone>
+                <version.error-prone>v2.6.0-picnic-1</version.error-prone>
             </properties>
             <dependencyManagement>
                 <!-- Even when we directly depend on the Picnic Error Prone
@@ -1325,15 +1324,6 @@
                                     <groupId>com.google.code.findbugs</groupId>
                                     <artifactId>jFormatString</artifactId>
                                     <version>${version.findbugs-format-string}</version>
-                                </path>
-                                <!-- XXX: Error Prone relies on a more recent
-                                version of Guava than pulled in by Google Auto
-                                Service. Drop this dependency after the next
-                                Auto Service upgrade. -->
-                                <path>
-                                    <groupId>com.google.guava</groupId>
-                                    <artifactId>guava</artifactId>
-                                    <version>${version.guava}</version>
                                 </path>
                                 <path>
                                     <groupId>com.google.guava</groupId>

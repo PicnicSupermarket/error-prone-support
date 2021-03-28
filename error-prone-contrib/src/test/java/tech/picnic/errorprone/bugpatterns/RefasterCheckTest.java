@@ -6,14 +6,10 @@ import static java.util.function.Predicate.not;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
-import com.google.errorprone.CodeTransformer;
-import com.google.errorprone.ErrorProneFlags;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -77,9 +73,6 @@ public final class RefasterCheckTest {
    */
   private static final Pattern TEMPLATE_FQCN_TRIM_FOR_GROUP_NAME =
       Pattern.compile(".*\\.|Templates\\$.*");
-  /** All Refaster templates on the classpath, indexed by their name. */
-  private static final ImmutableListMultimap<String, CodeTransformer> ALL_CODE_TRANSFORMERS =
-      RefasterCheck.loadAllCodeTransformers();
   /**
    * A mapping from template group names to associated template names.
    *
@@ -87,7 +80,7 @@ public final class RefasterCheckTest {
    * templates, while the keys correspond to the associated top-level "aggregator" classes.
    */
   private static final ImmutableSetMultimap<String, String> TEMPLATES_BY_GROUP =
-      indexTemplateNamesByGroup(ALL_CODE_TRANSFORMERS.keySet());
+      indexTemplateNamesByGroup(RefasterCheck.ALL_CODE_TRANSFORMERS.get().keySet());
 
   /** Returns every known template group name as a parameterized test argument. */
   @SuppressWarnings("UnusedMethod" /* Used as a `@MethodSource`. */)
@@ -171,10 +164,7 @@ public final class RefasterCheckTest {
 
   private BugCheckerRefactoringTestHelper createRestrictedRefactoringTestHelper(
       String namePattern) {
-    return BugCheckerRefactoringTestHelper.newInstance(
-        new RefasterCheck(
-            ErrorProneFlags.fromMap(ImmutableMap.of("Refaster:NamePattern", namePattern)),
-            ALL_CODE_TRANSFORMERS),
-        getClass());
+    return BugCheckerRefactoringTestHelper.newInstance(RefasterCheck.class, getClass())
+        .setArgs("-XepOpt:Refaster:NamePattern=" + namePattern);
   }
 }
