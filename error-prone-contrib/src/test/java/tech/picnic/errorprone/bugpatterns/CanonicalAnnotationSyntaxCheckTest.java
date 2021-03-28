@@ -9,7 +9,7 @@ public final class CanonicalAnnotationSyntaxCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(CanonicalAnnotationSyntaxCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new CanonicalAnnotationSyntaxCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(CanonicalAnnotationSyntaxCheck.class, getClass());
 
   @Test
   public void testIdentification() {

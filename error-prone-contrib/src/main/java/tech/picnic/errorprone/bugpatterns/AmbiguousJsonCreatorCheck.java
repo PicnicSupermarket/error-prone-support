@@ -5,7 +5,6 @@ import static com.google.errorprone.matchers.Matchers.isType;
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.ProvidesFix;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
@@ -30,8 +29,7 @@ import javax.lang.model.element.AnnotationValue;
     summary = "`JsonCreator.Mode` should be set for single-argument creators",
     linkType = LinkType.NONE,
     severity = SeverityLevel.WARNING,
-    tags = StandardTags.LIKELY_ERROR,
-    providesFix = ProvidesFix.REQUIRES_HUMAN_ATTENTION)
+    tags = StandardTags.LIKELY_ERROR)
 public final class AmbiguousJsonCreatorCheck extends BugChecker implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<AnnotationTree> IS_JSON_CREATOR_ANNOTATION =

@@ -13,7 +13,7 @@ final class AmbiguousJsonCreatorCheckTest {
               Predicates.containsPattern(
                   "`JsonCreator.Mode` should be set for single-argument creators"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new AmbiguousJsonCreatorCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(AmbiguousJsonCreatorCheck.class, getClass());
 
   @Test
   void testIdentification() {

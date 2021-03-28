@@ -13,7 +13,7 @@ public final class LexicographicalAnnotationListingCheckTest {
               "X", Predicates.containsPattern("Sort annotations lexicographically where possible"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(
-          new LexicographicalAnnotationListingCheck(), getClass());
+          LexicographicalAnnotationListingCheck.class, getClass());
 
   @Test
   public void testIdentification() {

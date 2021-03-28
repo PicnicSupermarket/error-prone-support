@@ -9,7 +9,7 @@ public final class AutowiredConstructorCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(AutowiredConstructorCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new AutowiredConstructorCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(AutowiredConstructorCheck.class, getClass());
 
   @Test
   public void testIdentification() {

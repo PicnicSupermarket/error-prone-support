@@ -10,7 +10,7 @@ public final class StaticImportCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(StaticImportCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new StaticImportCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(StaticImportCheck.class, getClass());
 
   @Test
   public void testCandidateMethodsAreNotRedundant() {

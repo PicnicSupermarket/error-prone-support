@@ -9,7 +9,7 @@ public final class MethodReferenceUsageCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(MethodReferenceUsageCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new MethodReferenceUsageCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(MethodReferenceUsageCheck.class, getClass());
 
   @Test
   public void testIdentification() {

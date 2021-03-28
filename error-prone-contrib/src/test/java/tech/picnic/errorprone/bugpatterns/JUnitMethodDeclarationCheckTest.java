@@ -9,7 +9,7 @@ public final class JUnitMethodDeclarationCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(JUnitMethodDeclarationCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new JUnitMethodDeclarationCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(JUnitMethodDeclarationCheck.class, getClass());
 
   @Test
   public void testIdentification() {

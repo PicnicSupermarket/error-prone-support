@@ -18,7 +18,7 @@ public final class RedundantStringConversionCheckTest {
               ImmutableList.of(
                   "-XepOpt:RedundantStringConversion:ExtraConversionMethods=java.lang.Enum#name(),A#name(),A.B#toString(int)"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new RedundantStringConversionCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(RedundantStringConversionCheck.class, getClass());
 
   @Test
   public void testIdentificationOfIdentityTransformation() {

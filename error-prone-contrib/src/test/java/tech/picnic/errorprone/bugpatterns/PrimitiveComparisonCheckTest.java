@@ -9,7 +9,7 @@ public final class PrimitiveComparisonCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(PrimitiveComparisonCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new PrimitiveComparisonCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(PrimitiveComparisonCheck.class, getClass());
 
   // XXX: There are no tests for multiple replacements within the same expression:
   // - Error Prone doesn't currently support this, it seems.

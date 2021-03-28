@@ -9,7 +9,7 @@ public final class EmptyMethodCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(EmptyMethodCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new EmptyMethodCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(EmptyMethodCheck.class, getClass());
 
   @Test
   public void testIdentification() {

@@ -19,7 +19,7 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
                   "-XepOpt:LexicographicalAnnotationAttributeListing:Excludes=pkg.A.Bar#value"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(
-          new LexicographicalAnnotationAttributeListingCheck(), getClass());
+          LexicographicalAnnotationAttributeListingCheck.class, getClass());
 
   @Test
   public void testIdentification() {

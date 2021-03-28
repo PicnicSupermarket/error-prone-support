@@ -9,7 +9,7 @@ public final class SpringMvcAnnotationCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(SpringMvcAnnotationCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new SpringMvcAnnotationCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(SpringMvcAnnotationCheck.class, getClass());
 
   @Test
   public void testIdentification() {

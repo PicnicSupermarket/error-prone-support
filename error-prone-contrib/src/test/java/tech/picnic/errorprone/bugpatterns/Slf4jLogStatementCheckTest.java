@@ -9,7 +9,7 @@ public final class Slf4jLogStatementCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(Slf4jLogStatementCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(new Slf4jLogStatementCheck(), getClass());
+      BugCheckerRefactoringTestHelper.newInstance(Slf4jLogStatementCheck.class, getClass());
 
   @Test
   public void testIdentification() {
