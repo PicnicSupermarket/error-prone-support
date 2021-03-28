@@ -31,7 +31,7 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
     tags = StandardTags.SIMPLIFICATION)
 public final class EmptyMethodCheck extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<Tree> HAS_PERMITTED_ANNOTATION =
+  private static final Matcher<Tree> PERMITTED_ANNOTATION =
       annotations(
           AT_LEAST_ONE,
           anyOf(isType("java.lang.Override"), isType("org.aspectj.lang.annotation.Pointcut")));
@@ -41,7 +41,7 @@ public final class EmptyMethodCheck extends BugChecker implements MethodTreeMatc
     if (tree.getBody() == null
         || !tree.getBody().getStatements().isEmpty()
         || ASTHelpers.containsComments(tree, state)
-        || HAS_PERMITTED_ANNOTATION.matches(tree, state)) {
+        || PERMITTED_ANNOTATION.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 

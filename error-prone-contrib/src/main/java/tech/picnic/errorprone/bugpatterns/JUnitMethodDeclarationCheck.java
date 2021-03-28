@@ -43,15 +43,15 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
   private static final String TEST_PREFIX = "test";
   private static final ImmutableSet<Modifier> ILLEGAL_MODIFIERS =
       ImmutableSet.of(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC);
-  private static final MultiMatcher<MethodTree, AnnotationTree> IS_OVERRIDE_METHOD =
+  private static final MultiMatcher<MethodTree, AnnotationTree> OVERRIDE_METHOD =
       annotations(AT_LEAST_ONE, isType("java.lang.Override"));
-  private static final MultiMatcher<MethodTree, AnnotationTree> IS_TEST_METHOD =
+  private static final MultiMatcher<MethodTree, AnnotationTree> TEST_METHOD =
       annotations(
           AT_LEAST_ONE,
           anyOf(
               isType("org.junit.jupiter.api.Test"),
               hasMetaAnnotation("org.junit.jupiter.api.TestTemplate")));
-  private static final MultiMatcher<MethodTree, AnnotationTree> IS_SETUP_OR_TEARDOWN_METHOD =
+  private static final MultiMatcher<MethodTree, AnnotationTree> SETUP_OR_TEARDOWN_METHOD =
       annotations(
           AT_LEAST_ONE,
           anyOf(
@@ -64,12 +64,12 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
   public Description matchMethod(MethodTree tree, VisitorState state) {
     // XXX: Perhaps we should also skip analysis of non-`private` non-`final` methods in abstract
     // classes?
-    if (IS_OVERRIDE_METHOD.matches(tree, state)) {
+    if (OVERRIDE_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
-    boolean isTestMethod = IS_TEST_METHOD.matches(tree, state);
-    if (!isTestMethod && !IS_SETUP_OR_TEARDOWN_METHOD.matches(tree, state)) {
+    boolean isTestMethod = TEST_METHOD.matches(tree, state);
+    if (!isTestMethod && !SETUP_OR_TEARDOWN_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 

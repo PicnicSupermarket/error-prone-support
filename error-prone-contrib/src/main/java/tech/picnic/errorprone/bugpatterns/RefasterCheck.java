@@ -62,9 +62,9 @@ import java.util.stream.Stream;
     severity = SeverityLevel.SUGGESTION,
     tags = StandardTags.SIMPLIFICATION)
 public final class RefasterCheck extends BugChecker implements CompilationUnitTreeMatcher {
+  private static final long serialVersionUID = 1L;
   private static final String REFASTER_TEMPLATE_SUFFIX = ".refaster";
   private static final String INCLUDED_TEMPLATES_PATTERN_FLAG = "Refaster:NamePattern";
-  private static final long serialVersionUID = 1L;
 
   private final CodeTransformer codeTransformer;
 

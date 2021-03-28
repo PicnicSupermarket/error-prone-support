@@ -31,7 +31,7 @@ import com.sun.source.tree.Tree;
     tags = StandardTags.LIKELY_ERROR)
 public final class MissingRefasterAnnotationCheck extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final MultiMatcher<Tree, AnnotationTree> HAS_REFASTER_ANNOTATION =
+  private static final MultiMatcher<Tree, AnnotationTree> REFASTER_ANNOTATION =
       annotations(
           AT_LEAST_ONE,
           anyOf(
@@ -46,7 +46,7 @@ public final class MissingRefasterAnnotationCheck extends BugChecker implements 
             .filter(member -> member.getKind() == Tree.Kind.METHOD)
             .map(MethodTree.class::cast)
             .filter(method -> !ASTHelpers.isGeneratedConstructor(method))
-            .map(method -> HAS_REFASTER_ANNOTATION.matches(method, state))
+            .map(method -> REFASTER_ANNOTATION.matches(method, state))
             .distinct()
             .count();
 

@@ -33,7 +33,7 @@ import java.time.LocalTime;
     tags = StandardTags.FRAGILE_CODE)
 public final class TimeZoneUsageCheck extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<ExpressionTree> IS_BANNED_TIME_METHOD =
+  private static final Matcher<ExpressionTree> BANNED_TIME_METHOD =
       anyOf(
           instanceMethod().onDescendantOf(Clock.class.getName()).namedAnyOf("getZone", "withZone"),
           staticMethod()
@@ -55,7 +55,7 @@ public final class TimeZoneUsageCheck extends BugChecker implements MethodInvoca
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    return IS_BANNED_TIME_METHOD.matches(tree, state)
+    return BANNED_TIME_METHOD.matches(tree, state)
         ? buildDescription(tree).build()
         : Description.NO_MATCH;
   }
