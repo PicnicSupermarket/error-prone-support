@@ -108,7 +108,7 @@
         <!-- Dependency and plugin versions that are referenced in more than
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
-        <version.auto-service>1.0-rc7</version.auto-service>
+        <version.auto-service>1.0</version.auto-service>
         <version.error-prone>2.5.1</version.error-prone>
         <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
@@ -116,9 +116,9 @@
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
-        <version.mockito>3.8.0</version.mockito>
+        <version.mockito>3.9.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
-        <version.nullaway>0.9.0</version.nullaway>
+        <version.nullaway>0.9.1</version.nullaway>
         <version.surefire>2.22.2</version.surefire>
     </properties>
 
@@ -157,14 +157,14 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.12.2</version>
+                <version>2.12.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.google.auto</groupId>
                 <artifactId>auto-common</artifactId>
-                <version>0.11</version>
+                <version>1.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.auto.service</groupId>
@@ -174,7 +174,7 @@
             <dependency>
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value-annotations</artifactId>
-                <version>1.7.5</version>
+                <version>1.8</version>
             </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
@@ -229,7 +229,7 @@
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2020.0.5</version>
+                <version>2020.0.6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -246,7 +246,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.1.7</version>
+                <version>2.1.8</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -315,7 +315,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>5.3.5</version>
+                <version>5.3.6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -1114,7 +1114,7 @@
             them.) -->
             <properties>
                 <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
-                <version.palantir-baseline>3.76.0</version.palantir-baseline>
+                <version.palantir-baseline>3.78.0</version.palantir-baseline>
                 <version.reactor-error-prone>0.1.4</version.reactor-error-prone>
             </properties>
             <dependencyManagement>
