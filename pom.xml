@@ -174,7 +174,7 @@
             <dependency>
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value-annotations</artifactId>
-                <version>1.8</version>
+                <version>1.8.1</version>
             </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
@@ -246,7 +246,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.1.8</version>
+                <version>2.1.9</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -338,7 +338,7 @@
                 <plugin>
                     <groupId>com.github.ekryd.sortpom</groupId>
                     <artifactId>sortpom-maven-plugin</artifactId>
-                    <version>2.15.0</version>
+                    <version>3.0.0</version>
                     <configuration>
                         <createBackupFile>false</createBackupFile>
                         <encoding>${project.build.sourceEncoding}</encoding>
@@ -346,6 +346,7 @@
                         <nrOfIndentSpace>4</nrOfIndentSpace>
                         <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
                         <sortDependencies>groupId,artifactId</sortDependencies>
+                        <sortDependencyExclusions>groupId,artifactId</sortDependencyExclusions>
                         <sortModules>true</sortModules>
                         <sortPlugins>groupId,artifactId</sortPlugins>
                         <sortProperties>true</sortProperties>
@@ -506,18 +507,11 @@
                                         <property name="ignoreSetter" value="true" />
                                         <property name="setterCanReturnItsClass" value="true" />
                                     </module>
+                                    <module name="IllegalIdentifierName" />
                                     <module name="IllegalImport">
-                                        <property name="illegalClasses" value="com.google.api.client.util.Preconditions">
-                                            <!-- Instead, please use
-                                            `com.google.common.base.Preconditions`. -->
-                                        </property>
                                         <property name="illegalClasses" value="com.mongodb.lang.Nullable">
                                             <!-- Instead, please use
                                             `javax.annotation.Nullable`. -->
-                                        </property>
-                                        <property name="illegalClasses" value="com.nimbusds.jose.util.StandardCharset">
-                                            <!-- Instead, please use
-                                            `java.nio.charset.StandardCharsets`. -->
                                         </property>
                                         <property name="illegalClasses" value="io.micrometer.core.lang.Nullable">
                                             <!-- Instead, please use
@@ -526,11 +520,6 @@
                                         <property name="illegalClasses" value="javax.annotation.concurrent.Immutable">
                                             <!-- Instead, please use
                                             `com.google.errorprone.annotations.Immutable`. -->
-                                        </property>
-                                        <property name="illegalClasses" value="javax.xml.bind.DatatypeConverter" />
-                                        <property name="illegalClasses" value="org.assertj.core.util.Preconditions">
-                                            <!-- Instead, please use
-                                            `com.google.common.base.Preconditions`. -->
                                         </property>
                                         <property name="illegalClasses" value="org.jetbrains.annotations.VisibleForTesting">
                                             <!-- Instead, please use
@@ -572,7 +561,19 @@
                                         this config can be merged into the one
                                         above. See
                                         https://github.com/checkstyle/checkstyle/issues/4954. -->
-                                        <property name="illegalClasses" value="org\.testng\.AssertJUnit(\..*?)?" />
+                                        <property name="illegalClasses" value="com\.google\.api\.client\.util\.Preconditions(\..*?)?">
+                                            <!-- Instead, please use
+                                            `com.google.common.base.Preconditions`. -->
+                                        </property>
+                                        <property name="illegalClasses" value="com\.nimbusds\.jose\.util\.StandardCharset(\..*?)?">
+                                            <!-- Instead, please use
+                                            `java.nio.charset.StandardCharsets`. -->
+                                        </property>
+                                        <property name="illegalClasses" value="javax\.xml\.bind\.DatatypeConverter(\..*?)?" />
+                                        <property name="illegalClasses" value="org\.assertj\.core\.util\.Preconditions(\..*?)?">
+                                            <!-- Instead, please use
+                                            `com.google.common.base.Preconditions`. -->
+                                        </property>
                                         <property name="illegalClasses" value="org\.springframework\.stereotype\.(Component|Controller|Service)">
                                             <!-- We don't use Spring's
                                             component scanning, so `@Component`
@@ -580,6 +581,11 @@
                                             Instead of `@Controller` use
                                             `@RestController`. -->
                                         </property>
+                                        <property name="illegalClasses" value="org\.springframework\.util\.Assert(\..*?)?">
+                                            <!-- Instead, please use
+                                            `com.google.common.base.Preconditions`. -->
+                                        </property>
+                                        <property name="illegalClasses" value="org\.testng\.AssertJUnit(\..*?)?" />
                                         <property name="regexp" value="true" />
                                     </module>
                                     <module name="IllegalCatch" />
@@ -1035,7 +1041,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.6.4</version>
+                    <version>1.6.5</version>
                     <configuration>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
@@ -1114,7 +1120,7 @@
             them.) -->
             <properties>
                 <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
-                <version.palantir-baseline>3.78.0</version.palantir-baseline>
+                <version.palantir-baseline>3.79.0</version.palantir-baseline>
                 <version.reactor-error-prone>0.1.4</version.reactor-error-prone>
             </properties>
             <dependencyManagement>
