@@ -17,7 +17,7 @@
     </organization>
     <licenses>
         <license>
-            <name>MIT License</name>
+            <name>MIT</name>
             <url>https://opensource.org/licenses/mit-license.php</url>
             <distribution>repo</distribution>
         </license>
@@ -798,6 +798,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.2.0</version>
+                    <configuration>
+                        <!-- All relevant doclint checks are performed during
+                        the compilation phase; no need to recheck during
+                        Javadoc generation. -->
+                        <doclint>none</doclint>
+                        <source>${version.jdk}</source>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>generate-javadoc-jar</id>
@@ -1375,6 +1382,7 @@
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
+                                    -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.args}
