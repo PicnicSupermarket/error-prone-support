@@ -109,13 +109,13 @@
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.0</version.auto-service>
-        <version.error-prone>2.6.0</version.error-prone>
+        <version.error-prone>2.7.1</version.error-prone>
         <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
-        <version.mockito>3.9.0</version.mockito>
+        <version.mockito>3.10.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.9.1</version.nullaway>
         <version.surefire>2.22.2</version.surefire>
@@ -228,7 +228,7 @@
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2020.0.6</version>
+                <version>2020.0.7</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -282,7 +282,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.12.0</version>
+                <version>3.13.0</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -314,7 +314,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>5.3.6</version>
+                <version>5.3.7</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -753,7 +753,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>3.0.1</version>
                     <executions>
                         <execution>
                             <id>sign-artifacts</id>
@@ -1042,12 +1042,12 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.6</version>
+                    <version>0.8.7</version>
                 </plugin>
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.6.5</version>
+                    <version>1.6.6</version>
                     <configuration>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
@@ -1075,7 +1075,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.8.0.2131</version>
+                    <version>3.9.0.2155</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1096,7 +1096,7 @@
             <id>error-prone-fork</id>
             <properties>
                 <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>
-                <version.error-prone>v2.6.0-picnic-1</version.error-prone>
+                <version.error-prone>v2.7.1-picnic-1</version.error-prone>
             </properties>
             <dependencyManagement>
                 <!-- Even when we directly depend on the Picnic Error Prone
@@ -1107,7 +1107,7 @@
                     <dependency>
                         <groupId>com.google.errorprone</groupId>
                         <artifactId>error_prone_annotations</artifactId>
-                        <version>2.5.1</version>
+                        <version>2.7.1</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -1126,7 +1126,7 @@
             them.) -->
             <properties>
                 <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
-                <version.palantir-baseline>3.80.0</version.palantir-baseline>
+                <version.palantir-baseline>3.83.0</version.palantir-baseline>
                 <version.reactor-error-prone>0.1.4</version.reactor-error-prone>
             </properties>
             <dependencyManagement>
@@ -1319,6 +1319,11 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <annotationProcessorPaths combine.children="append">
+                                <path>
+                                    <groupId>${groupId.error-prone}</groupId>
+                                    <artifactId>error_prone_annotations</artifactId>
+                                    <version>${version.error-prone}</version>
+                                </path>
                                 <path>
                                     <groupId>${groupId.error-prone}</groupId>
                                     <artifactId>error_prone_core</artifactId>
