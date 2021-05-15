@@ -13,7 +13,6 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -91,7 +90,10 @@ public final class RefasterCheckTest {
   @SuppressWarnings("UnusedMethod" /* Used as a `@MethodSource`. */)
   private static Stream<Arguments> templateGroupsUnderTest() {
     // XXX: Drop the filter once we have added tests for AssertJ!
-    return TEMPLATES_BY_GROUP.keySet().stream().filter(not("AssertJ"::equals)).filter("RxJavaToReactor"::equals).map(Arguments::of);
+    return TEMPLATES_BY_GROUP.keySet().stream()
+        .filter(not("AssertJ"::equals))
+        .filter("RxJavaToReactor"::equals)
+        .map(Arguments::of);
   }
 
   /**
