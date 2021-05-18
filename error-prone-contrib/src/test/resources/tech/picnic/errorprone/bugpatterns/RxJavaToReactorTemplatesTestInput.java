@@ -6,7 +6,6 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
   Flowable<Object> testFlowableFlatMapInReactor() { // look at the return type...
@@ -17,11 +16,9 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Flowable.just(1).filter(i -> i > 2);
   }
 
-    ImmutableSet<Flowable<Integer>> testFlowableFirstElementInReactor() {
-      return ImmutableSet.of(
-              Flowable<Integer>.toMaybe(::evenFilter).firstElement(),
-              Maybe.<Integer>empty().toFlowable().firstElement());
-    }
+  Maybe<Integer> testFlowableFirstElementInReactor() {
+    return Flowable.just(1).firstElement();
+  }
 
   Single<Integer> testMaybeSwitchIfEmptyInReactor() {
     return Maybe.just(1)

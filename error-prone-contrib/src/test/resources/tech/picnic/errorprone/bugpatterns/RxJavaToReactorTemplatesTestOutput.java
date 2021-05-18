@@ -23,11 +23,12 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .as(RxJava2Adapter::fluxToFlowable);
   }
 
-    ImmutableSet<Maybe<Integer>> testFlowableFirstElementInReactor() {
-      return ImmutableSet.of(
-      Flowable.just(1).as(RxJava2Adapter::flowableToFlux).next().as(RxJava2Adapter::monoToMaybe),
-      Flowable.empty().as(RxJava2Adapter::flowableToFlux).next().as(RxJava2Adapter::monoToMaybe));
-    }
+  Maybe<Integer> testFlowableFirstElementInReactor() {
+    return Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .next()
+        .as(RxJava2Adapter::monoToMaybe);
+  }
 
   Single<Integer> testMaybeSwitchIfEmptyInReactor() {
     return Maybe.just(1)
