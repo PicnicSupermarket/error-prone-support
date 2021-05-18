@@ -6,46 +6,46 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
-  Flowable<Object> testFlowableFlatMapInReactor() { // look at the return type...
+  Flowable<Integer> testFlowableFlatMap() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
         .flatMap(i -> ImmutableSet::of)
         .as(RxJava2Adapter::fluxToFlowable);
   }
 
-  Flowable<Integer> testFlowableFilterInReactor() {
+  Flowable<Integer> testFlowableFilter() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
         .filter(i -> i > 2)
         .as(RxJava2Adapter::fluxToFlowable);
   }
 
-  Maybe<Integer> testFlowableFirstElementInReactor() {
+  Maybe<Integer> testFlowableFirstElement() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
         .next()
         .as(RxJava2Adapter::monoToMaybe);
   }
 
-  Single<Integer> testMaybeSwitchIfEmptyInReactor() {
+  Single<Integer> testMaybeSwitchIfEmpty() {
     return Maybe.just(1)
         .as(RxJava2Adapter::maybeToMono)
         .switchIfEmpty(
-            Mono.error(
-                () -> {
-                  throw new IllegalStateException();
-                }))
+            Single.error(
+                    () -> {
+                      throw new IllegalStateException();
+                    })
+                .as(RxJava2Adapter::singleToMono))
         .as(RxJava2Adapter::monoToSingle);
   }
 
-  Flowable<Integer> testFlowableSwitchIfEmptyInReactor() {
+  Flowable<Integer> testFlowableSwitchIfEmpty() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
         .switchIfEmpty(
-            Flux.error(
+            Flowable.error(
                 () -> {
                   throw new IllegalStateException();
                 }))

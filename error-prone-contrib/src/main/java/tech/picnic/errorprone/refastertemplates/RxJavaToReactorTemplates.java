@@ -19,7 +19,7 @@ final class RxJavaToReactorTemplates {
   private RxJavaToReactorTemplates() {}
 
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
-  static final class FlowableFlatMapInReactor<I, T extends I, O, P extends Publisher<? extends O>> {
+  static final class FlowableFlatMap<I, T extends I, O, P extends Publisher<? extends O>> {
     @BeforeTemplate
     Flowable<O> before(Flowable<T> flowable, Function<I, P> function) {
       return flowable.flatMap(function);
@@ -35,7 +35,7 @@ final class RxJavaToReactorTemplates {
   }
 
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
-  static final class FlowableFilterInReactor<S, T extends S> {
+  static final class FlowableFilter<S, T extends S> {
     @BeforeTemplate
     Flowable<T> before(Flowable<T> flowable, Predicate<S> predicate) {
       return flowable.filter(predicate);
@@ -50,7 +50,7 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  static final class FlowableFirstElementInReactor<T> {
+  static final class FlowableFirstElement<T> {
     @BeforeTemplate
     Maybe<T> before(Flowable<T> flowable) {
       return flowable.firstElement();
@@ -62,7 +62,7 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  static final class MaybeSwitchIfEmptyInReactor<S, T extends S> {
+  static final class MaybeSwitchIfEmpty<S, T extends S> {
     @BeforeTemplate
     Single<S> before(Maybe<S> maybe, Single<T> single) {
       return maybe.switchIfEmpty(single);
@@ -77,7 +77,7 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  static final class FlowableSwitchIfEmptyInReactor<S, T extends S> {
+  static final class FlowableSwitchIfEmptyPublisher<S, T extends S> {
     @BeforeTemplate
     Flowable<S> before(Flowable<S> flowable, Publisher<S> publisher) {
       return flowable.switchIfEmpty(publisher);
@@ -91,6 +91,8 @@ final class RxJavaToReactorTemplates {
           .as(RxJava2Adapter::fluxToFlowable);
     }
   }
+
+  /* Here add a variant for Single to ... */
 
   static final class MonoToFlowableToMono<T> {
     @BeforeTemplate
@@ -128,7 +130,7 @@ final class RxJavaToReactorTemplates {
   }
 
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
-  static final class FlowableToMapInReactor<I, T extends I, O> {
+  static final class FlowableToMap<I, T extends I, O> {
     @BeforeTemplate
     Single<Map<O, T>> before(Flowable<T> flowable, Function<I, O> function) {
       return flowable.toMap(function);

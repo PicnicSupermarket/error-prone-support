@@ -8,19 +8,19 @@ import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
-  Flowable<Object> testFlowableFlatMapInReactor() { // look at the return type...
+  Flowable<Integer> testFlowableFlatMap() {
     return Flowable.just(1).flatMap(i -> ImmutableSet::of);
   }
 
-  Flowable<Integer> testFlowableFilterInReactor() {
+  Flowable<Integer> testFlowableFilter() {
     return Flowable.just(1).filter(i -> i > 2);
   }
 
-  Maybe<Integer> testFlowableFirstElementInReactor() {
+  Maybe<Integer> testFlowableFirstElement() {
     return Flowable.just(1).firstElement();
   }
 
-  Single<Integer> testMaybeSwitchIfEmptyInReactor() {
+  Single<Integer> testMaybeSwitchIfEmpty() {
     return Maybe.just(1)
         .switchIfEmpty(
             Single.error(
@@ -29,7 +29,7 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
                 }));
   }
 
-  Flowable<Integer> testFlowableSwitchIfEmptyInReactor() {
+  Flowable<Integer> testFlowableSwitchIfEmpty() {
     return Flowable.just(1)
         .switchIfEmpty(
             Flowable.error(
