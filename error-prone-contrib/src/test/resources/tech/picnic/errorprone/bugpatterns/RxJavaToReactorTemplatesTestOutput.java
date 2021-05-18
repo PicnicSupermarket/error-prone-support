@@ -8,7 +8,7 @@ import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
-  Flowable<Integer> testFlowableFlatMap() {
+  Flowable<Object> testFlowableFlatMap() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
         .flatMap(i -> ImmutableSet::of)
@@ -33,7 +33,7 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Maybe.just(1)
         .as(RxJava2Adapter::maybeToMono)
         .switchIfEmpty(
-            Single.error(
+            Single.<Integer>error(
                     () -> {
                       throw new IllegalStateException();
                     })
