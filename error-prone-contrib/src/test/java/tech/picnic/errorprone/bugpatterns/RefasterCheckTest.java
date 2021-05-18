@@ -13,9 +13,6 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import io.reactivex.Maybe;
-import io.reactivex.Single;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -167,12 +164,6 @@ public final class RefasterCheckTest {
   }
 
   private void verifyRefactoring(String groupName, String templateNamePattern) {
-    Single<Integer> integerSingle = Maybe.just(1)
-            .switchIfEmpty(
-                    Single.error(
-                            () -> {
-                              throw new IllegalStateException();
-                            }));
     createRestrictedRefactoringTestHelper(templateNamePattern)
         .addInput(groupName + "TemplatesTestInput.java")
         .addOutput(groupName + "TemplatesTestOutput.java")

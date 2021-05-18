@@ -2,21 +2,22 @@ package tech.picnic.errorprone.refastertemplates;
 
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import io.reactivex.*;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.function.Supplier;
-
 final class RxJavaToReactorTemplates {
   private RxJavaToReactorTemplates() {}
 
+  // XXX: `function` type change.
   static final class FlowableFlatMapInReactor<I, O> {
     @BeforeTemplate
     Flowable<O> before(
@@ -35,6 +36,7 @@ final class RxJavaToReactorTemplates {
     }
   }
 
+  // XXX: `function` type change.
   static final class FlowableFilterInReactor<T> {
     @BeforeTemplate
     Flowable<T> before(Flowable<T> flowable, Predicate<? super T> predicate) {
@@ -50,8 +52,6 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: I don't think calling `next()` here is the right way...
-  //  Also look at the tests...
   static final class FlowableFirstElementInReactor<T> {
     @BeforeTemplate
     Maybe<T> before(Flowable<T> flowable) {
@@ -106,39 +106,40 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-//    static final class FlowableToMapInReactor<I, O> {
-//      @BeforeTemplate
-//      Single<Map<O, I>> before(Flowable<I> flowable, Function<? super I, ? extends O> function) {
-//        return flowable.toMap(function);
-//      }
-//
-//      @AfterTemplate
-//      Single<Map<O, I>> after(Flowable<I> flowable, java.util.function.Function<? super I, ?
-//   extends O> function) {
-//        return flowable.as(RxJava2Adapter::flowableToFlux)
-//                .collectMap(function)
-//                .as(RxJava2Adapter::monoToSingle);
-//      }
-//    }
+  //    static final class FlowableToMapInReactor<I, O> {
+  //      @BeforeTemplate
+  //      Single<Map<O, I>> before(Flowable<I> flowable, Function<? super I, ? extends O> function)
+  // {
+  //        return flowable.toMap(function);
+  //      }
+  //
+  //      @AfterTemplate
+  //      Single<Map<O, I>> after(Flowable<I> flowable, java.util.function.Function<? super I, ?
+  //   extends O> function) {
+  //        return flowable.as(RxJava2Adapter::flowableToFlux)
+  //                .collectMap(function)
+  //                .as(RxJava2Adapter::monoToSingle);
+  //      }
+  //    }
 
   // Check this with Stephan.
-//  static final class FlowableMapToFluxMapToFlowable<T, R> {
-//    @BeforeTemplate
-//    Flowable<R> before(Flowable<T> flowable, Function<? super T, ? extends R> function) {
-//      return flowable.map(function);
-//    }
-//
-//    @AfterTemplate
-//    Flowable<R> after(
-//        Flowable<T> flowable, java.util.function.Function<? super T, ? extends R> function) {
-//      return flowable
-//          .as(RxJava2Adapter::flowableToFlux)
-//          .map(function)
-//          .as(RxJava2Adapter::fluxToFlowable); // <Flowable<T>>
-//      // Moeten we hier ook iets doen met Refaster.canBeCoercedTo()
-//      // omdat we moeten weten dat het geen Flux<Object> maar Flux<T> is...
-//    }
-//  }
+  //  static final class FlowableMapToFluxMapToFlowable<T, R> {
+  //    @BeforeTemplate
+  //    Flowable<R> before(Flowable<T> flowable, Function<? super T, ? extends R> function) {
+  //      return flowable.map(function);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Flowable<R> after(
+  //        Flowable<T> flowable, java.util.function.Function<? super T, ? extends R> function) {
+  //      return flowable
+  //          .as(RxJava2Adapter::flowableToFlux)
+  //          .map(function)
+  //          .as(RxJava2Adapter::fluxToFlowable); // <Flowable<T>>
+  //      // Moeten we hier ook iets doen met Refaster.canBeCoercedTo()
+  //      // omdat we moeten weten dat het geen Flux<Object> maar Flux<T> is...
+  //    }
+  //  }
 
   // Stephan: Bad return type in method reference: cannot convert io.reactivex.Flowable<T> to
   // io.reactivex.Flowable<java.lang.Object}
