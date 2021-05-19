@@ -82,4 +82,24 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
     return Mono.just(3).as(RxJava2Adapter::monoToMaybe).as(RxJava2Adapter::maybeToMono);
   }
+
+  Maybe<Integer> testMaybeFlatMap() {
+    return Maybe.just(1).flatMap(xxx());
+  }
+
+  Maybe<Integer> testMaybeFlatMap2() {
+    return Maybe.just(1).flatMap(i -> Maybe.just(i * 2));
+  }
+
+  Maybe<Integer> testMaybeFlatMap3() {
+    return Maybe.just(1).flatMap(this::yyy);
+  }
+
+  private io.reactivex.functions.Function<Integer, Maybe<Integer>> xxx() {
+    return null;
+  }
+
+  private Maybe<Integer> yyy(Integer x) {
+    return null;
+  }
 }
