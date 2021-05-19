@@ -3,6 +3,8 @@ package tech.picnic.errorprone.refastertemplates;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.Placeholder;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -129,21 +131,55 @@ final class RxJavaToReactorTemplates {
   //    }
   //  }
 
-//  XXX: Check with Stephan.
-//  static final class MaybeFlatMap<I, T extends I, R> {
-//    @BeforeTemplate
-//    Maybe<R> before(Maybe<T> maybe, Function<I, Maybe<R>> function) {
-//      return maybe.flatMap(function);
-//    }
-//
-//    @AfterTemplate
-//    Maybe<R> after(Maybe<T> maybe, java.util.function.Function<I, Maybe<R>> function) {
-//      return maybe
-//          .as(RxJava2Adapter::maybeToMono)
-//          .flatMap(function)
-//          .as(RxJava2Adapter::monoToMaybe);
-//    }
-//  }
+  abstract static class MaybeDefer<T> {
+    @Placeholder
+    abstract Maybe<T> maybeProducer();
+
+    @BeforeTemplate
+    Mono<T> before() {
+      return Maybe.defer(() -> maybeProducer()).as(RxJava2Adapter::maybeToMono);
+    }
+
+    @AfterTemplate
+    Mono<T> after() {
+      return Mono.defer(() -> maybeProducer().as(RxJava2Adapter::maybeToMono));
+    }
+  }
+
+  //  XXX: Check with Stephan.
+  static final class MaybeFlatMap<I, T extends I, O> {
+    @BeforeTemplate
+    Maybe<O> before(Maybe<T> maybe, Function<I, Maybe<O>> function) {
+      return maybe.flatMap(function);
+    }
+
+    @AfterTemplate
+    Maybe<O> after(Maybe<T> maybe, java.util.function.Function<I, Maybe<O>> function) {
+      return maybe
+          .as(RxJava2Adapter::maybeToMono)
+          .flatMap(v -> RxJava2Adapter.maybeToMono(function.apply(v)))
+          .as(RxJava2Adapter::monoToMaybe);
+    }
+  }
+
+  // XXX: Name.
+  abstract static class MaybeFlatMap2<S, T> {
+    @Placeholder
+    abstract Maybe<T> toMaybeFunction(@MayOptionallyUse S element);
+
+    @BeforeTemplate
+    Maybe<T> before(Maybe<S> maybe) {
+      return maybe.flatMap(v -> toMaybeFunction(v));
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<S> maybe) {
+      return maybe
+          .as(RxJava2Adapter::maybeToMono)
+          .flatMap(v -> toMaybeFunction(v).as(RxJava2Adapter::maybeToMono))
+          .as(RxJava2Adapter::monoToMaybe);
+    }
+  }
 
   //  static final class MaybeFlatMapSingleElement<
   //      I, T extends I, O, P extends SingleSource<? extends O>> { // <S, T extends S, O> {
