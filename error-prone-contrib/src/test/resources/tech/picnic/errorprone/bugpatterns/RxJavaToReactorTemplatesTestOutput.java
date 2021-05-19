@@ -4,17 +4,12 @@ import com.google.common.collect.ImmutableSet;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import java.util.Map;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
-  Flowable<Object> testFlowableFlatMap() {
-    return Flowable.just(1)
-        .as(RxJava2Adapter::flowableToFlux)
-        .flatMap(i -> ImmutableSet::of)
-        .as(RxJava2Adapter::fluxToFlowable);
-  }
-
   Flowable<Integer> testFlowableFilter() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
@@ -29,15 +24,24 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .as(RxJava2Adapter::monoToMaybe);
   }
 
-  Single<Integer> testMaybeSwitchIfEmpty() {
-    return Maybe.just(1)
-        .as(RxJava2Adapter::maybeToMono)
-        .switchIfEmpty(
-            Single.<Integer>error(
-                    () -> {
-                      throw new IllegalStateException();
-                    })
-                .as(RxJava2Adapter::singleToMono))
+  Flowable<Object> testFlowableFlatMap() {
+    return Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .flatMap(i -> ImmutableSet::of)
+        .as(RxJava2Adapter::fluxToFlowable);
+  }
+
+  Flowable<Integer> testFlowableMap() {
+    return Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .map(i -> i + 1)
+        .as(RxJava2Adapter::fluxToFlowable);
+  }
+
+  Single<Map<Boolean, Integer>> testFlowableToMap() {
+    return Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .collectMap(i -> i > 1)
         .as(RxJava2Adapter::monoToSingle);
   }
 
@@ -52,7 +56,26 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .as(RxJava2Adapter::fluxToFlowable);
   }
 
-  Flux<Integer> testRemoveUnnecessaryConversion() {
+  Single<Integer> testMaybeSwitchIfEmpty() {
+    return Maybe.just(1)
+        .as(RxJava2Adapter::maybeToMono)
+        .switchIfEmpty(
+            Single.<Integer>error(
+                    () -> {
+                      throw new IllegalStateException();
+                    })
+                .as(RxJava2Adapter::singleToMono))
+        .as(RxJava2Adapter::monoToSingle);
+  }
+
+  Maybe<Integer> testSingleFilter() {
+    return Single.just(1)
+        .as(RxJava2Adapter::singleToMono)
+        .filter(i -> i > 2)
+        .as(RxJava2Adapter::monoToMaybe);
+  }
+
+  Flux<Integer> testFluxToFlowableToFlux() {
     Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
         .map(e -> e + e)
@@ -60,5 +83,17 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .as(RxJava2Adapter::fluxToFlowable);
 
     return Flux.just(2);
+  }
+
+  Mono<Integer> testMonoToFlowableToMono() {
+    Single.just(1)
+        .as(RxJava2Adapter::singleToMono)
+        .map(e -> e + e)
+        .filter(i -> i > 2)
+        .as(RxJava2Adapter::monoToSingle);
+
+    Mono.empty().then();
+
+    return Mono.just(3);
   }
 }
