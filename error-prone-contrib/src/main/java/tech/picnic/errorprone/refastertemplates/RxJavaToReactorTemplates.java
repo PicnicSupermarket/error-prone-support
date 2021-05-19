@@ -19,6 +19,8 @@ import reactor.core.publisher.Mono;
 final class RxJavaToReactorTemplates {
   private RxJavaToReactorTemplates() {}
 
+  // Flowable.concatWith.
+
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
   static final class FlowableFilter<S, T extends S> {
     @BeforeTemplate
@@ -110,6 +112,11 @@ final class RxJavaToReactorTemplates {
   }
 
   // XXX: Stephan, this is actually the static method, therefore I don't think it is correct.
+  //  I think we don't want this.
+  //  But what about all the other things; `{Maybe,Flowable,Single}.just()` and these kinds of
+  // methods?
+  //  We will need to rewrite those.
+
   //  static final class MaybeDefer<S, T extends S> {
   //    @BeforeTemplate
   //    Maybe<S> before(Maybe<S> maybe, Callable<? extends Maybe<T>> source) {
@@ -121,6 +128,22 @@ final class RxJavaToReactorTemplates {
   //      return maybe.defer()
   //    }
   //  }
+
+//  XXX: Check with Stephan.
+//  static final class MaybeFlatMap<I, T extends I, R> {
+//    @BeforeTemplate
+//    Maybe<R> before(Maybe<T> maybe, Function<I, Maybe<R>> function) {
+//      return maybe.flatMap(function);
+//    }
+//
+//    @AfterTemplate
+//    Maybe<R> after(Maybe<T> maybe, java.util.function.Function<I, Maybe<R>> function) {
+//      return maybe
+//          .as(RxJava2Adapter::maybeToMono)
+//          .flatMap(function)
+//          .as(RxJava2Adapter::monoToMaybe);
+//    }
+//  }
 
   //  static final class MaybeFlatMapSingleElement<
   //      I, T extends I, O, P extends SingleSource<? extends O>> { // <S, T extends S, O> {
@@ -152,8 +175,6 @@ final class RxJavaToReactorTemplates {
           .as(RxJava2Adapter::monoToCompletable);
     }
   }
-
-  // ignoreelement.
 
   static final class MaybeSwitchIfEmpty<S, T extends S> {
     @BeforeTemplate
