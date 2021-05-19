@@ -31,13 +31,35 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Flowable.just(1).toMap(i -> i > 1);
   }
 
-  Flowable<Integer> testFlowableSwitchIfEmpty() {
+  Flowable<Integer> testFlowableSwitchIfEmptyPublisher() {
     return Flowable.just(1)
         .switchIfEmpty(
             Flowable.error(
                 () -> {
                   throw new IllegalStateException();
                 }));
+  }
+
+  // XXX: This should be fixed later with `Refaster.canBeCoercedTo(...)`
+  Maybe<Integer> testMaybeFlatMapFunction() {
+    return Maybe.just(1).flatMap(exampleFunction());
+  }
+
+  private io.reactivex.functions.Function<Integer, Maybe<Integer>> exampleFunction() {
+    return null;
+  }
+
+  Maybe<Integer> testMaybeFlatMapLambda() {
+    return Maybe.just(1).flatMap(i -> Maybe.just(i * 2));
+  }
+
+  // XXX: This one doesn't work. Need to add suppor for this.
+  Maybe<Integer> testMaybeFlatMapMethodReference() {
+    return Maybe.just(1).flatMap(this::exampleMethod);
+  }
+
+  private Maybe<Integer> exampleMethod(Integer x) {
+    return null;
   }
 
   Completable testMaybeIgnoreElement() {
@@ -81,25 +103,5 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     Mono.empty().then().as(RxJava2Adapter::monoToCompletable).as(RxJava2Adapter::completableToMono);
 
     return Mono.just(3).as(RxJava2Adapter::monoToMaybe).as(RxJava2Adapter::maybeToMono);
-  }
-
-  Maybe<Integer> testMaybeFlatMap() {
-    return Maybe.just(1).flatMap(xxx());
-  }
-
-  Maybe<Integer> testMaybeFlatMap2() {
-    return Maybe.just(1).flatMap(i -> Maybe.just(i * 2));
-  }
-
-  Maybe<Integer> testMaybeFlatMap3() {
-    return Maybe.just(1).flatMap(this::yyy);
-  }
-
-  private io.reactivex.functions.Function<Integer, Maybe<Integer>> xxx() {
-    return null;
-  }
-
-  private Maybe<Integer> yyy(Integer x) {
-    return null;
   }
 }

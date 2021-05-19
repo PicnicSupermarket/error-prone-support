@@ -98,14 +98,14 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  static final class FlowableSwitchIfEmptyPublisher<S, T extends S> {
+  static final class FlowableSwitchIfEmptyPublisher<T> {
     @BeforeTemplate
-    Flowable<S> before(Flowable<S> flowable, Publisher<S> publisher) {
+    Flowable<T> before(Flowable<T> flowable, Publisher<T> publisher) {
       return flowable.switchIfEmpty(publisher);
     }
 
     @AfterTemplate
-    Flowable<S> after(Flowable<S> flowable, Publisher<S> publisher) {
+    Flowable<T> after(Flowable<T> flowable, Publisher<T> publisher) {
       return flowable
           .as(RxJava2Adapter::flowableToFlux)
           .switchIfEmpty(publisher)
@@ -113,25 +113,8 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: Stephan, this is actually the static method, therefore I don't think it is correct.
-  //  I think we don't want this.
-  //  But what about all the other things; `{Maybe,Flowable,Single}.just()` and these kinds of
-  // methods?
-  //  We will need to rewrite those.
-
-  //  static final class MaybeDefer<S, T extends S> {
-  //    @BeforeTemplate
-  //    Maybe<S> before(Maybe<S> maybe, Callable<? extends Maybe<T>> source) {
-  //      return maybe.defer(source);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Maybe<S> after(Maybe<S> maybe, Callable<Maybe<T>> source) {
-  //      return maybe.defer()
-  //    }
-  //  }
-
-  abstract static class MaybeDefer<T> {
+  // XXX: Change location and perhaps omit this one.
+  abstract static class MaybeDeferToMono<T> {
     @Placeholder
     abstract Maybe<T> maybeProducer();
 
@@ -146,24 +129,31 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  //  XXX: Check with Stephan.
-  static final class MaybeFlatMap<I, T extends I, O> {
+  static final class MaybeFlatMapFunction<I, T extends I, O> {
     @BeforeTemplate
     Maybe<O> before(Maybe<T> maybe, Function<I, Maybe<O>> function) {
       return maybe.flatMap(function);
     }
 
     @AfterTemplate
+    @SuppressWarnings({"CatchingUnchecked", "IllegalCatch"})
     Maybe<O> after(Maybe<T> maybe, java.util.function.Function<I, Maybe<O>> function) {
       return maybe
           .as(RxJava2Adapter::maybeToMono)
-          .flatMap(v -> RxJava2Adapter.maybeToMono(function.apply(v)))
+          .flatMap(
+              v -> {
+                try {
+                  return RxJava2Adapter.maybeToMono(function.apply(v));
+                } catch (Exception e) {
+                  Refaster.emitComment("Do nothing");
+                }
+                return null;
+              })
           .as(RxJava2Adapter::monoToMaybe);
     }
   }
 
-  // XXX: Name.
-  abstract static class MaybeFlatMap2<S, T> {
+  abstract static class MaybeFlatLambda<S, T> {
     @Placeholder
     abstract Maybe<T> toMaybeFunction(@MayOptionallyUse S element);
 
