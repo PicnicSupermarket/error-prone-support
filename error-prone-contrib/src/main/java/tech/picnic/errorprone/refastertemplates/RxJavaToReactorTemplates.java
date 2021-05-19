@@ -4,6 +4,7 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -20,7 +21,6 @@ final class RxJavaToReactorTemplates {
 
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
   static final class FlowableFilter<S, T extends S> {
-
     @BeforeTemplate
     Flowable<T> before(Flowable<T> flowable, Predicate<S> predicate) {
       return flowable.filter(predicate);
@@ -36,7 +36,6 @@ final class RxJavaToReactorTemplates {
   }
 
   static final class FlowableFirstElement<T> {
-
     @BeforeTemplate
     Maybe<T> before(Flowable<T> flowable) {
       return flowable.firstElement();
@@ -81,7 +80,6 @@ final class RxJavaToReactorTemplates {
   }
 
   static final class FlowableToMap<I, T extends I, O> {
-
     @BeforeTemplate
     Single<Map<O, T>> before(Flowable<T> flowable, Function<I, O> function) {
       return flowable.toMap(function);
@@ -97,7 +95,6 @@ final class RxJavaToReactorTemplates {
   }
 
   static final class FlowableSwitchIfEmptyPublisher<S, T extends S> {
-
     @BeforeTemplate
     Flowable<S> before(Flowable<S> flowable, Publisher<S> publisher) {
       return flowable.switchIfEmpty(publisher);
@@ -112,8 +109,53 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  static final class MaybeSwitchIfEmpty<S, T extends S> {
+  // XXX: Stephan, this is actually the static method, therefore I don't think it is correct.
+  //  static final class MaybeDefer<S, T extends S> {
+  //    @BeforeTemplate
+  //    Maybe<S> before(Maybe<S> maybe, Callable<? extends Maybe<T>> source) {
+  //      return maybe.defer(source);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Maybe<S> after(Maybe<S> maybe, Callable<Maybe<T>> source) {
+  //      return maybe.defer()
+  //    }
+  //  }
 
+  //  static final class MaybeFlatMapSingleElement<
+  //      I, T extends I, O, P extends SingleSource<? extends O>> { // <S, T extends S, O> {
+  //    @BeforeTemplate
+  //    Maybe<O> before(Maybe<T> maybe, Function<I, P> function) {
+  //      return maybe.flatMapSingleElement(function);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Maybe<O> after(Maybe<T> maybe, java.util.function.Function<I, P> function) {
+  //      return maybe
+  //          .as(RxJava2Adapter::maybeToMono)
+  //          .flatMap(function)
+  //          .as(RxJava2Adapter::monoToMaybe);
+  //    }
+  //  }
+
+  static final class MaybeIgnoreElement<T> {
+    @BeforeTemplate
+    Completable before(Maybe<T> maybe) {
+      return maybe.ignoreElement();
+    }
+
+    @AfterTemplate
+    Completable after(Maybe<T> maybe) {
+      return maybe
+          .as(RxJava2Adapter::maybeToMono)
+          .ignoreElement()
+          .as(RxJava2Adapter::monoToCompletable);
+    }
+  }
+
+  // ignoreelement.
+
+  static final class MaybeSwitchIfEmpty<S, T extends S> {
     @BeforeTemplate
     Single<S> before(Maybe<S> maybe, Single<T> single) {
       return maybe.switchIfEmpty(single);
@@ -127,21 +169,6 @@ final class RxJavaToReactorTemplates {
           .as(RxJava2Adapter::monoToSingle);
     }
   }
-
-  // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
-  //  static final class SingleFlatMap<I, T extends I, O, P extends Single<? extends O>> {
-  //    @BeforeTemplate
-  //    Single<O> before(Single<T> single, Function<I, P> function) {
-  //      return single.flatMap(function);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Single<O> after(Single<T> single, java.util.function.Function<I, P> function) {
-  //      return single
-  //          .as(RxJava2Adapter::singleToMono)
-  //          .flatMap(function)
-  //          .as(RxJava2Adapter::monoToSingle);
-  //    }
 
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
   static final class SingleFilter<S, T extends S> {
@@ -159,8 +186,38 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  static final class FluxToFlowableToFlux<T> {
+  // XXX: Check this one with Stephan:
+  // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
+  //  static final class SingleFlatMap<I, T extends I, O> {  // P extends Single<? extends O>
+  //    @BeforeTemplate
+  //    Single<O> before(Single<T> single, Function<I, Single<? extends O>> function) {
+  //      return single.flatMap(function);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Single<O> after(Single<T> single, java.util.function.Function<I, Mono<? extends O>>
+  // function) {
+  //      return single
+  //          .as(RxJava2Adapter::singleToMono)
+  //          .flatMap(function)
+  //          .as(RxJava2Adapter::monoToSingle);
+  //    }
+  //  }
 
+  // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
+  static final class SingleMap<I, T extends I, O> {
+    @BeforeTemplate
+    Single<O> before(Single<T> single, Function<I, O> function) {
+      return single.map(function);
+    }
+
+    @AfterTemplate
+    Single<O> after(Single<T> single, java.util.function.Function<I, O> function) {
+      return single.as(RxJava2Adapter::singleToMono).map(function).as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
+  static final class FluxToFlowableToFlux<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, BackpressureStrategy strategy) {
       return Refaster.anyOf(

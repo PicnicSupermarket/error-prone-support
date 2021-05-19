@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableSet;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -54,6 +55,13 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
                   throw new IllegalStateException();
                 }))
         .as(RxJava2Adapter::fluxToFlowable);
+  }
+
+  Completable testMaybeIgnoreElement() {
+    return Maybe.just(1)
+        .as(RxJava2Adapter::maybeToMono)
+        .ignoreElement()
+        .as(RxJava2Adapter::monoToCompletable);
   }
 
   Single<Integer> testMaybeSwitchIfEmpty() {
