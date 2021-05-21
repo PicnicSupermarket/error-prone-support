@@ -168,7 +168,8 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: Temporary solution, this could be fixed when we know the function throws an Exception.
+  // XXX: Temporary solution, this could be fixed when we know whether the function throws an
+  // Exception.
   public static class MyUtil {
     public static <I, O> java.util.function.Function<I, O> convert(
         Function<? super I, ? extends O> function) {
