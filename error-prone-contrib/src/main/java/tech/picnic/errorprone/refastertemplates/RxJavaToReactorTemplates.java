@@ -9,12 +9,14 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.Map;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -129,27 +131,71 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  static final class MaybeFlatMapFunction<I, T extends I, O> {
+  static class MyUtil {
+    static <I, O> java.util.function.Function<I, O> convert(
+        Function<? super I, ? extends O> function) {
+      return input -> {
+        try {
+          return function.apply(input);
+        } catch (Exception e) {
+          throw Exceptions.propagate(e);
+        }
+      };
+    }
+  }
+
+  static final class MaybeFlatMapFunction<I, T extends I, O, M extends MaybeSource<? extends O>> {
     @BeforeTemplate
-    Maybe<O> before(Maybe<T> maybe, Function<I, Maybe<O>> function) {
+    Maybe<O> before(Maybe<T> maybe, Function<I, M> function) {
       return maybe.flatMap(function);
     }
 
     @AfterTemplate
     @SuppressWarnings({"CatchingUnchecked", "IllegalCatch"})
-    Maybe<O> after(Maybe<T> maybe, java.util.function.Function<I, Maybe<O>> function) {
+    Maybe<O> after(Maybe<T> maybe, Function<I, M> function) {
       return maybe
           .as(RxJava2Adapter::maybeToMono)
           .flatMap(
-              v -> {
-                try {
-                  return RxJava2Adapter.maybeToMono(function.apply(v));
-                } catch (Exception e) {
-                  Refaster.emitComment("Do nothing");
-                }
-                return null;
-              })
+              v ->
+                  RxJava2Adapter.maybeToMono(
+                      Maybe.wrap((Maybe<O>) MyUtil.convert(function).apply(v))))
           .as(RxJava2Adapter::monoToMaybe);
+    }
+  }
+
+  static final class Cast<T> {
+    @BeforeTemplate
+    T before(T object) {
+      return (T) object;
+    }
+
+    @AfterTemplate
+    T after(T object) {
+      return object;
+    }
+  }
+
+  static final class MaybeCast<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe) {
+      return maybe.cast(Refaster.<T>clazz());
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe) {
+      return maybe;
+    }
+  }
+
+  static final class MaybeWrap<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe) {
+      return Maybe.wrap(maybe);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe) {
+      return maybe;
     }
   }
 
