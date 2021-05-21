@@ -9,8 +9,25 @@ import java.util.Map;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
+  Maybe<String> testRemoveRedundantCast() {
+    return Maybe.just("foo");
+  }
+
+  Maybe<String> testMaybeCastPositive() {
+    return Maybe.just("string");
+  }
+
+  Maybe<Object> testMaybeCastNegative() {
+    return Maybe.just("string").cast(Object.class);
+  }
+
+  Maybe<Integer> testMaybeWrap() {
+    return Maybe.just(1);
+  }
+
   Flowable<Integer> testFlowableFilter() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
@@ -26,6 +43,10 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
   }
 
   Flowable<Object> testFlowableFlatMap() {
+    Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .flatMap(this::exampleMethod2)
+        .as(RxJava2Adapter::fluxToFlowable);
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
         .flatMap(i -> ImmutableSet::of)
@@ -59,17 +80,24 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   // XXX: This should be fixed later with `Refaster.canBeCoercedTo(...)`
   Maybe<Integer> testMaybeFlatMapFunction() {
+    Maybe.just(1)
+        .as(RxJava2Adapter::maybeToMono)
+        .flatMap(
+            v ->
+                RxJava2Adapter.maybeToMono(
+                    Maybe.wrap(
+                        (Maybe<Integer>)
+                            RxJavaToReactorTemplates.MyUtil.convert(this::exampleMethod).apply(v))))
+        .as(RxJava2Adapter::monoToMaybe);
+
     return Maybe.just(1)
         .as(RxJava2Adapter::maybeToMono)
         .flatMap(
-            v -> {
-              try {
-                return RxJava2Adapter.maybeToMono(exampleFunction().apply(v));
-              } catch (Exception e) {
-                // Do nothing
-              }
-              return null;
-            })
+            v ->
+                RxJava2Adapter.maybeToMono(
+                    Maybe.wrap(
+                        (Maybe<Integer>)
+                            RxJavaToReactorTemplates.MyUtil.convert(exampleFunction()).apply(v))))
         .as(RxJava2Adapter::monoToMaybe);
   }
 
@@ -84,12 +112,23 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .as(RxJava2Adapter::monoToMaybe);
   }
 
-  // XXX: This one doesn't work. Need to add suppor for this.
   Maybe<Integer> testMaybeFlatMapMethodReference() {
-    return Maybe.just(1).flatMap(this::exampleMethod);
+    return Maybe.just(1)
+        .as(RxJava2Adapter::maybeToMono)
+        .flatMap(
+            v ->
+                RxJava2Adapter.maybeToMono(
+                    Maybe.wrap(
+                        (Maybe<Integer>)
+                            RxJavaToReactorTemplates.MyUtil.convert(this::exampleMethod).apply(v))))
+        .as(RxJava2Adapter::monoToMaybe);
   }
 
   private Maybe<Integer> exampleMethod(Integer x) {
+    return null;
+  }
+
+  private Flowable<Integer> exampleMethod2(Integer x) {
     return null;
   }
 
@@ -117,6 +156,20 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .as(RxJava2Adapter::singleToMono)
         .filter(i -> i > 2)
         .as(RxJava2Adapter::monoToMaybe);
+  }
+
+  Single<Integer> testSingleFlatMapLambda() {
+    return Single.just(1)
+            .as(RxJava2Adapter::singleToMono)
+            .flatMap(i -> Single.just(i * 2).as(RxJava2Adapter::singleToMono))
+            .as(RxJava2Adapter::monoToSingle);
+  }
+
+  Single<Integer> testSingleMap() {
+    return Single.just(1)
+            .as(RxJava2Adapter::singleToMono)
+            .map(i -> i + 1)
+            .as(RxJava2Adapter::monoToSingle);
   }
 
   Flux<Integer> testFluxToFlowableToFlux() {

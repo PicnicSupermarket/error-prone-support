@@ -11,6 +11,22 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
+  Maybe<String> testRemoveRedundantCast() {
+    return (Maybe<String>) Maybe.just("foo");
+  }
+
+  Maybe<String> testMaybeCastPositive() {
+    return Maybe.just("string").cast(String.class);
+  }
+
+  Maybe<Object> testMaybeCastNegative() {
+    return Maybe.just("string").cast(Object.class);
+  }
+
+  Maybe<Integer> testMaybeWrap() {
+    return Maybe.wrap(Maybe.just(1));
+  }
+
   Flowable<Integer> testFlowableFilter() {
     return Flowable.just(1).filter(i -> i > 2);
   }
@@ -56,7 +72,6 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Maybe.just(1).flatMap(i -> Maybe.just(i * 2));
   }
 
-  // XXX: This one doesn't work. Need to add suppor for this.
   Maybe<Integer> testMaybeFlatMapMethodReference() {
     return Maybe.just(1).flatMap(this::exampleMethod);
   }
@@ -67,18 +82,6 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   private Flowable<Integer> exampleMethod2(Integer x) {
     return null;
-  }
-
-  Maybe<String> testCast() {
-    return (Maybe<String>) Maybe.just("foo");
-  }
-
-  Maybe<String> testCast2() {
-    return Maybe.just("string").cast(String.class);
-  }
-
-  Maybe<Object> testCast3() {
-    return Maybe.just("string").cast(Object.class);
   }
 
   Completable testMaybeIgnoreElement() {
@@ -96,6 +99,14 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Maybe<Integer> testSingleFilter() {
     return Single.just(1).filter(i -> i > 2);
+  }
+
+  Single<Integer> testSingleFlatMapLambda() {
+    return Single.just(1).flatMap(i -> Single.just(i * 2));
+  }
+
+  Single<Integer> testSingleMap() {
+    return Single.just(1).map(i -> i + 1);
   }
 
   Flux<Integer> testFluxToFlowableToFlux() {

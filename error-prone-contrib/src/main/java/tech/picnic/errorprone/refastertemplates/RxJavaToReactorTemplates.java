@@ -11,6 +11,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Single;
+import io.reactivex.SingleSource;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.Map;
@@ -20,8 +21,44 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-final class RxJavaToReactorTemplates {
+public final class RxJavaToReactorTemplates {
   private RxJavaToReactorTemplates() {}
+
+  static final class RemoveRedundantCast<T> {
+    @BeforeTemplate
+    T before(T object) {
+      return (T) object;
+    }
+
+    @AfterTemplate
+    T after(T object) {
+      return object;
+    }
+  }
+
+  static final class MaybeCast<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe) {
+      return maybe.cast(Refaster.<T>clazz());
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe) {
+      return maybe;
+    }
+  }
+
+  static final class MaybeWrap<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe) {
+      return Maybe.wrap(maybe);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe) {
+      return maybe;
+    }
+  }
 
   // Flowable.concatWith.
 
@@ -131,8 +168,9 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  static class MyUtil {
-    static <I, O> java.util.function.Function<I, O> convert(
+  // XXX: Temporary solution, this could be fixed when we know the function throws an Exception.
+  public static class MyUtil {
+    public static <I, O> java.util.function.Function<I, O> convert(
         Function<? super I, ? extends O> function) {
       return input -> {
         try {
@@ -151,7 +189,6 @@ final class RxJavaToReactorTemplates {
     }
 
     @AfterTemplate
-    @SuppressWarnings({"CatchingUnchecked", "IllegalCatch"})
     Maybe<O> after(Maybe<T> maybe, Function<I, M> function) {
       return maybe
           .as(RxJava2Adapter::maybeToMono)
@@ -163,43 +200,7 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  static final class Cast<T> {
-    @BeforeTemplate
-    T before(T object) {
-      return (T) object;
-    }
-
-    @AfterTemplate
-    T after(T object) {
-      return object;
-    }
-  }
-
-  static final class MaybeCast<T> {
-    @BeforeTemplate
-    Maybe<T> before(Maybe<T> maybe) {
-      return maybe.cast(Refaster.<T>clazz());
-    }
-
-    @AfterTemplate
-    Maybe<T> after(Maybe<T> maybe) {
-      return maybe;
-    }
-  }
-
-  static final class MaybeWrap<T> {
-    @BeforeTemplate
-    Maybe<T> before(Maybe<T> maybe) {
-      return Maybe.wrap(maybe);
-    }
-
-    @AfterTemplate
-    Maybe<T> after(Maybe<T> maybe) {
-      return maybe;
-    }
-  }
-
-  abstract static class MaybeFlatLambda<S, T> {
+  abstract static class MaybeFlatMapLambda<S, T> {
     @Placeholder
     abstract Maybe<T> toMaybeFunction(@MayOptionallyUse S element);
 
@@ -217,21 +218,21 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  //  static final class MaybeFlatMapSingleElement<
-  //      I, T extends I, O, P extends SingleSource<? extends O>> { // <S, T extends S, O> {
-  //    @BeforeTemplate
-  //    Maybe<O> before(Maybe<T> maybe, Function<I, P> function) {
-  //      return maybe.flatMapSingleElement(function);
-  //    }
+  //    static final class MaybeFlatMapSingleElement<
+  //        I, T extends I, O, P extends SingleSource<? extends O>> { // <S, T extends S, O> {
+  //      @BeforeTemplate
+  //      Maybe<O> before(Maybe<T> maybe, Function<I, P> function) {
+  //        return maybe.flatMapSingleElement(function);
+  //      }
   //
-  //    @AfterTemplate
-  //    Maybe<O> after(Maybe<T> maybe, java.util.function.Function<I, P> function) {
-  //      return maybe
-  //          .as(RxJava2Adapter::maybeToMono)
-  //          .flatMap(function)
-  //          .as(RxJava2Adapter::monoToMaybe);
+  //      @AfterTemplate
+  //      Maybe<O> after(Maybe<T> maybe, java.util.function.Function<I, P> function) {
+  //        return maybe
+  //            .as(RxJava2Adapter::maybeToMono)
+  //            .flatMap(function)
+  //            .as(RxJava2Adapter::monoToMaybe);
+  //      }
   //    }
-  //  }
 
   static final class MaybeIgnoreElement<T> {
     @BeforeTemplate
@@ -279,23 +280,24 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: Check this one with Stephan:
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
-  //  static final class SingleFlatMap<I, T extends I, O> {  // P extends Single<? extends O>
-  //    @BeforeTemplate
-  //    Single<O> before(Single<T> single, Function<I, Single<? extends O>> function) {
-  //      return single.flatMap(function);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Single<O> after(Single<T> single, java.util.function.Function<I, Mono<? extends O>>
-  // function) {
-  //      return single
-  //          .as(RxJava2Adapter::singleToMono)
-  //          .flatMap(function)
-  //          .as(RxJava2Adapter::monoToSingle);
-  //    }
-  //  }
+  abstract static class SingleFlatMapLambda<S, T> {
+    @Placeholder
+    abstract Single<T> toSingleFunction(@MayOptionallyUse S element);
+
+    @BeforeTemplate
+    Single<T> before(Single<S> single) {
+      return single.flatMap(v -> toSingleFunction(v));
+    }
+
+    @AfterTemplate
+    Single<T> after(Single<S> single) {
+      return single
+          .as(RxJava2Adapter::singleToMono)
+          .flatMap(v -> toSingleFunction(v).as(RxJava2Adapter::singleToMono))
+          .as(RxJava2Adapter::monoToSingle);
+    }
+  }
 
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
   static final class SingleMap<I, T extends I, O> {
