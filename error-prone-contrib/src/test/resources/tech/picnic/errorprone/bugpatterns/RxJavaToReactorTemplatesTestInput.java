@@ -20,6 +20,7 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
   }
 
   Flowable<Object> testFlowableFlatMap() {
+    Flowable.just(1).flatMap(this::exampleMethod2);
     return Flowable.just(1).flatMap(i -> ImmutableSet::of);
   }
 
@@ -42,6 +43,8 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   // XXX: This should be fixed later with `Refaster.canBeCoercedTo(...)`
   Maybe<Integer> testMaybeFlatMapFunction() {
+    Maybe.just(1).flatMap(this::exampleMethod);
+
     return Maybe.just(1).flatMap(exampleFunction());
   }
 
@@ -61,6 +64,11 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
   private Maybe<Integer> exampleMethod(Integer x) {
     return null;
   }
+
+  private Flowable<Integer> exampleMethod2(Integer x) {
+    return null;
+  }
+
 
   Completable testMaybeIgnoreElement() {
     return Maybe.just(1).ignoreElement();
