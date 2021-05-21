@@ -69,6 +69,17 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return null;
   }
 
+  Maybe<String> testCast() {
+    return (Maybe<String>) Maybe.just("foo");
+  }
+
+  Maybe<String> testCast2() {
+    return Maybe.just("string").cast(String.class);
+  }
+
+  Maybe<Object> testCast3() {
+    return Maybe.just("string").cast(Object.class);
+  }
 
   Completable testMaybeIgnoreElement() {
     return Maybe.just(1).ignoreElement();
