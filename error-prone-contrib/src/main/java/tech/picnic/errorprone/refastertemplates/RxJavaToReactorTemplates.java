@@ -374,20 +374,33 @@ public final class RxJavaToReactorTemplates {
   //
   //  abstract static class Test {
   //    @Placeholder
+  //    @DoesNotThrowCheckedException
   //    abstract void operation();
   //
   //    @BeforeTemplate
-  //    void before(ExecutorService es, @DoesNotThrowCheckedException int x) {
+  //    void before(ExecutorService es) {
   //      es.submit(
   //          () -> {
-  //            System.out.println(x);
+  //            operation();
   //            return null;
   //          });
   //    }
   //
   //    @AfterTemplate
-  //    void after(ExecutorService es, int x) {
-  //      es.submit(() -> System.out.println(x));
+  //    void after(ExecutorService es) {
+  //      es.submit(() -> operation());
+  //    }
+  //  }
+  //
+  //  public class MethodThrowsExceptionTemplate<T> {
+  //    @BeforeTemplate
+  //    Mono<T> before(@DoesNotThrowCheckedException T obj) {
+  //      return Mono.fromCallable(() -> obj);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Mono<T> after(T obj) {
+  //      return Mono.fromSupplier(() -> obj);
   //    }
   //  }
   //
