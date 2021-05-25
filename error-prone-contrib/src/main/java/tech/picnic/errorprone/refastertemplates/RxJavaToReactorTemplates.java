@@ -11,7 +11,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.Map;
@@ -201,6 +200,27 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
+  // "Coersion" (find better name):
+  // instanceof (support this?)
+  // two functional interfaces with:
+  // B.return type extends A.return type
+  // A.param 1 type extends B.param 1 type
+  // ....
+  // B throws a subset of the exceptions thrown by A
+
+  //  @CheckParameterCoersion
+  static final class UnnecessaryConversion<I, O> {
+    @BeforeTemplate
+    java.util.function.Function<I, O> before(Function<I, O> function) {
+      return MyUtil.convert(function);
+    }
+
+    @AfterTemplate
+    java.util.function.Function<I, O> after(java.util.function.Function<I, O> function) {
+      return function;
+    }
+  }
+
   abstract static class MaybeFlatMapLambda<S, T> {
     @Placeholder
     abstract Maybe<T> toMaybeFunction(@MayOptionallyUse S element);
@@ -348,4 +368,38 @@ public final class RxJavaToReactorTemplates {
       return mono;
     }
   }
+
+  //  @Matches(value = DoesNotThrowException.class, arguments = "java.lang.Exception")
+  //  @interface DoesNotThrowCheckedException {}
+  //
+  //  abstract static class Test {
+  //    @Placeholder
+  //    abstract void operation();
+  //
+  //    @BeforeTemplate
+  //    void before(ExecutorService es, @DoesNotThrowCheckedException int x) {
+  //      es.submit(
+  //          () -> {
+  //            System.out.println(x);
+  //            return null;
+  //          });
+  //    }
+  //
+  //    @AfterTemplate
+  //    void after(ExecutorService es, int x) {
+  //      es.submit(() -> System.out.println(x));
+  //    }
+  //  }
+  //
+  //  public class MethodThrowsExceptionTemplate<T> {
+  //    @BeforeTemplate
+  //    Mono<T> before(@Matches(DefersToExpressionWhichDoesNotThrow.class) Callable<T> callable) {
+  //      return Mono.fromCallable(callable);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Mono<T> after(Supplier<T> callable) {
+  //      return Mono.fromSupplier(callable);
+  //    }
+  //  }
 }
