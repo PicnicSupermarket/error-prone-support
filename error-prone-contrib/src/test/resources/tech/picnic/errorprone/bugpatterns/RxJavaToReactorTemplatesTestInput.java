@@ -27,6 +27,11 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Maybe.wrap(Maybe.just(1));
   }
 
+  // XXX: Discuss with Stephan, look at the Publisher which is of type Flowable, that won't work...
+  Flowable<Integer> testFlowableConcatWithPublisher() {
+    return Flowable.just(1).concatWith(Flowable.just(2));
+  }
+
   Flowable<Integer> testFlowableFilter() {
     return Flowable.just(1).filter(i -> i > 2);
   }

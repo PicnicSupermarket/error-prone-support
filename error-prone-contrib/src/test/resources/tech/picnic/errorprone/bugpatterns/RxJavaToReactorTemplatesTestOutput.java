@@ -28,6 +28,14 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Maybe.just(1);
   }
 
+  // XXX: Discuss with Stephan, look at the Publisher which is of type Flowable, that won't work...
+  Flowable<Integer> testFlowableConcatWithPublisher() {
+    return Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .concatWith(Flowable.just(2))
+        .as(RxJava2Adapter::fluxToFlowable);
+  }
+
   Flowable<Integer> testFlowableFilter() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
@@ -160,16 +168,16 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Single<Integer> testSingleFlatMapLambda() {
     return Single.just(1)
-            .as(RxJava2Adapter::singleToMono)
-            .flatMap(i -> Single.just(i * 2).as(RxJava2Adapter::singleToMono))
-            .as(RxJava2Adapter::monoToSingle);
+        .as(RxJava2Adapter::singleToMono)
+        .flatMap(i -> Single.just(i * 2).as(RxJava2Adapter::singleToMono))
+        .as(RxJava2Adapter::monoToSingle);
   }
 
   Single<Integer> testSingleMap() {
     return Single.just(1)
-            .as(RxJava2Adapter::singleToMono)
-            .map(i -> i + 1)
-            .as(RxJava2Adapter::monoToSingle);
+        .as(RxJava2Adapter::singleToMono)
+        .map(i -> i + 1)
+        .as(RxJava2Adapter::monoToSingle);
   }
 
   Flux<Integer> testFluxToFlowableToFlux() {
