@@ -7,6 +7,7 @@ import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
@@ -14,6 +15,8 @@ import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.Map;
+import java.util.concurrent.Flow;
+
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.Exceptions;
@@ -59,8 +62,24 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // Flowable.concatWith.
+  static final class FlowableConcatWithPublisher<T> {
+    @BeforeTemplate
+    Flowable<T> before(Flowable<T> flowable, Publisher<T> source) {
+      return flowable.concatWith(source);
+    }
 
+    @AfterTemplate
+    Flowable<T> after(Flowable<T> flowable, Publisher<T> source) {
+      return flowable.as(RxJava2Adapter::flowableToFlux)
+              .concatWith(source)
+              .as(RxJava2Adapter::fluxToFlowable);
+    }
+  }
+
+  // XXX: Flowable.concatWith. -> CompletableSource
+  // XXX: Flowable.concatWith. -> SingleSource
+  // XXX: Flowable.concatWith. -> MaybeSource
+  
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
   static final class FlowableFilter<S, T extends S> {
     @BeforeTemplate
