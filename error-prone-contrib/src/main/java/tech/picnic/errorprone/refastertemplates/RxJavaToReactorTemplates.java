@@ -7,7 +7,6 @@ import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
-import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
@@ -15,19 +14,19 @@ import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.Map;
-import java.util.concurrent.Flow;
-
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/** The Refaster templates for the migration of RxJava to Reactor */
 public final class RxJavaToReactorTemplates {
   private RxJavaToReactorTemplates() {}
 
   static final class RemoveRedundantCast<T> {
     @BeforeTemplate
+    @SuppressWarnings("RedundantCast")
     T before(T object) {
       return (T) object;
     }
@@ -70,16 +69,17 @@ public final class RxJavaToReactorTemplates {
 
     @AfterTemplate
     Flowable<T> after(Flowable<T> flowable, Publisher<T> source) {
-      return flowable.as(RxJava2Adapter::flowableToFlux)
-              .concatWith(source)
-              .as(RxJava2Adapter::fluxToFlowable);
+      return flowable
+          .as(RxJava2Adapter::flowableToFlux)
+          .concatWith(source)
+          .as(RxJava2Adapter::fluxToFlowable);
     }
   }
 
   // XXX: Flowable.concatWith. -> CompletableSource
   // XXX: Flowable.concatWith. -> SingleSource
   // XXX: Flowable.concatWith. -> MaybeSource
-  
+
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
   static final class FlowableFilter<S, T extends S> {
     @BeforeTemplate
@@ -186,9 +186,22 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: Temporary solution, this could be fixed when we know whether the function throws an
-  // Exception.
+  /**
+   * XXX: Temporary solution, this could be fixed when we know whether the function throws an
+   * Exception.
+   */
   public static class MyUtil {
+
+    /**
+     * Temporary construct to convert functions that do not throw an exception
+     *
+     * <p>The idea is to convert a io.reactivex.functions.Function to a java.util.function.Function.
+     *
+     * @param function The function to convert
+     * @param <I> The input type
+     * @param <O> The output type
+     * @return the java.util.function.Function
+     */
     public static <I, O> java.util.function.Function<I, O> convert(
         Function<? super I, ? extends O> function) {
       return input -> {
@@ -208,6 +221,7 @@ public final class RxJavaToReactorTemplates {
     }
 
     @AfterTemplate
+    @SuppressWarnings("unchecked")
     Maybe<O> after(Maybe<T> maybe, Function<I, M> function) {
       return maybe
           .as(RxJava2Adapter::maybeToMono)
@@ -258,21 +272,21 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  //    static final class MaybeFlatMapSingleElement<
-  //        I, T extends I, O, P extends SingleSource<? extends O>> { // <S, T extends S, O> {
-  //      @BeforeTemplate
-  //      Maybe<O> before(Maybe<T> maybe, Function<I, P> function) {
-  //        return maybe.flatMapSingleElement(function);
-  //      }
-  //
-  //      @AfterTemplate
-  //      Maybe<O> after(Maybe<T> maybe, java.util.function.Function<I, P> function) {
-  //        return maybe
-  //            .as(RxJava2Adapter::maybeToMono)
-  //            .flatMap(function)
-  //            .as(RxJava2Adapter::monoToMaybe);
-  //      }
+  //  static final class MaybeFlatMapSingleElement<
+  //      I, T extends I, O, P extends SingleSource<? extends O>> { // <S, T extends S, O> {
+  //    @BeforeTemplate
+  //    Maybe<O> before(Maybe<T> maybe, Function<I, P> function) {
+  //      return maybe.flatMapSingleElement(function);
   //    }
+  //
+  //    @AfterTemplate
+  //    Maybe<O> after(Maybe<T> maybe, java.util.function.Function<I, P> function) {
+  //      return maybe
+  //          .as(RxJava2Adapter::maybeToMono)
+  //          .flatMap(function)
+  //          .as(RxJava2Adapter::monoToMaybe);
+  //    }
+  //  }
 
   static final class MaybeIgnoreElement<T> {
     @BeforeTemplate
