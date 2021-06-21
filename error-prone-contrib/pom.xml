@@ -97,6 +97,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>spring-web-test-client</artifactId>
+            <version>4.4.0</version>
+        </dependency>
+        <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
             <scope>test</scope>
