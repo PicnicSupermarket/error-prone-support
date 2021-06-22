@@ -21,7 +21,8 @@ final class RequestBodySpecTemplates {
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before2(WebTestClient.RequestBodySpec requestBodySpec, T value) {
+    WebTestClient.RequestHeadersSpec<?> before2(
+        WebTestClient.RequestBodySpec requestBodySpec, T value) {
       return requestBodySpec.body(fromValue(value));
     }
 
