@@ -17,4 +17,12 @@ final class WebClientTemplatesTest implements RefasterTemplateTestCase {
         WebClient.create("foo").post().bodyValue("bar"),
         WebTestClient.bindToServer().build().post().bodyValue("bar"));
   }
+
+  public void testBodyValue() {
+    WebClient.create("foo").get().retrieve().bodyToFlux(Integer.class);
+  }
+
+  public void testOther() {
+    WebClient.create("foo").get().retrieve().bodyToFlux(String.class);
+  }
 }
