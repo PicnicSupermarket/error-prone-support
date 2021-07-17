@@ -12,7 +12,7 @@ public final class Slf4jLogStatementCheckTest {
       BugCheckerRefactoringTestHelper.newInstance(Slf4jLogStatementCheck.class, getClass());
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -92,7 +92,7 @@ public final class Slf4jLogStatementCheckTest {
 
   // XXX: Drop what's unused.
   @Test
-  public void testReplacement() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

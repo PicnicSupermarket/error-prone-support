@@ -12,7 +12,7 @@ public final class SpringMvcAnnotationCheckTest {
       BugCheckerRefactoringTestHelper.newInstance(SpringMvcAnnotationCheck.class, getClass());
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -59,7 +59,7 @@ public final class SpringMvcAnnotationCheckTest {
   }
 
   @Test
-  public void testReplacement() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

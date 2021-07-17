@@ -12,7 +12,7 @@ public final class JUnitMethodDeclarationCheckTest {
       BugCheckerRefactoringTestHelper.newInstance(JUnitMethodDeclarationCheck.class, getClass());
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -127,7 +127,7 @@ public final class JUnitMethodDeclarationCheckTest {
   }
 
   @Test
-  public void testReplacement() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

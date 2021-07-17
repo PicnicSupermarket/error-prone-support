@@ -1,9 +1,10 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Sets.toImmutableEnumSet;
+import static java.util.Objects.checkIndex;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -38,12 +39,12 @@ final class AssortedTemplates {
   static final class CheckIndex {
     @BeforeTemplate
     int before(int index, int size) {
-      return Preconditions.checkElementIndex(index, size);
+      return checkElementIndex(index, size);
     }
 
     @AfterTemplate
     int after(int index, int size) {
-      return Objects.checkIndex(index, size);
+      return checkIndex(index, size);
     }
   }
 
@@ -62,14 +63,14 @@ final class AssortedTemplates {
   }
 
   static final class MapGetOrNull<K, V, L> {
-    @Nullable
     @BeforeTemplate
+    @Nullable
     V before(Map<K, V> map, L key) {
       return map.getOrDefault(key, null);
     }
 
-    @Nullable
     @AfterTemplate
+    @Nullable
     V after(Map<K, V> map, L key) {
       return map.get(key);
     }
@@ -107,8 +108,8 @@ final class AssortedTemplates {
           Streams.stream(iterator).findAny().orElse(defaultValue));
     }
 
-    @Nullable
     @AfterTemplate
+    @Nullable
     T after(Iterator<T> iterator, T defaultValue) {
       return Iterators.getNext(iterator, defaultValue);
     }

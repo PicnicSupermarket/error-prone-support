@@ -62,11 +62,13 @@ final class TimeTemplates {
   /** Use {@link Clock#systemUTC()} when possible. */
   static final class UtcClock {
     @BeforeTemplate
+    @SuppressWarnings("TimeZoneUsage")
     Clock before() {
       return Clock.system(ZoneOffset.UTC);
     }
 
     @AfterTemplate
+    @SuppressWarnings("TimeZoneUsage")
     Clock after() {
       return Clock.systemUTC();
     }
@@ -96,8 +98,8 @@ final class TimeTemplates {
       return a.compareTo(b) < 0;
     }
 
-    @AlsoNegation
     @AfterTemplate
+    @AlsoNegation
     boolean after(Instant a, Instant b) {
       return a.isBefore(b);
     }
@@ -113,8 +115,8 @@ final class TimeTemplates {
       return a.compareTo(b) > 0;
     }
 
-    @AlsoNegation
     @AfterTemplate
+    @AlsoNegation
     boolean after(Instant a, Instant b) {
       return a.isAfter(b);
     }
@@ -162,8 +164,8 @@ final class TimeTemplates {
       return a.compareTo(b) < 0;
     }
 
-    @AlsoNegation
     @AfterTemplate
+    @AlsoNegation
     boolean after(ChronoLocalDate a, ChronoLocalDate b) {
       return a.isBefore(b);
     }
@@ -179,8 +181,8 @@ final class TimeTemplates {
       return a.compareTo(b) > 0;
     }
 
-    @AlsoNegation
     @AfterTemplate
+    @AlsoNegation
     boolean after(ChronoLocalDate a, ChronoLocalDate b) {
       return a.isAfter(b);
     }
@@ -196,8 +198,8 @@ final class TimeTemplates {
       return a.compareTo(b) < 0;
     }
 
-    @AlsoNegation
     @AfterTemplate
+    @AlsoNegation
     boolean after(ChronoLocalDateTime<?> a, ChronoLocalDateTime<?> b) {
       return a.isBefore(b);
     }
@@ -213,8 +215,8 @@ final class TimeTemplates {
       return a.compareTo(b) > 0;
     }
 
-    @AlsoNegation
     @AfterTemplate
+    @AlsoNegation
     boolean after(ChronoLocalDateTime<?> a, ChronoLocalDateTime<?> b) {
       return a.isAfter(b);
     }
@@ -230,8 +232,8 @@ final class TimeTemplates {
       return a.compareTo(b) < 0;
     }
 
-    @AlsoNegation
     @AfterTemplate
+    @AlsoNegation
     boolean after(ChronoZonedDateTime<?> a, ChronoZonedDateTime<?> b) {
       return a.isBefore(b);
     }
@@ -247,8 +249,8 @@ final class TimeTemplates {
       return a.compareTo(b) > 0;
     }
 
-    @AlsoNegation
     @AfterTemplate
+    @AlsoNegation
     boolean after(ChronoZonedDateTime<?> a, ChronoZonedDateTime<?> b) {
       return a.isAfter(b);
     }
@@ -264,8 +266,8 @@ final class TimeTemplates {
       return a.compareTo(b) < 0;
     }
 
-    @AlsoNegation
     @AfterTemplate
+    @AlsoNegation
     boolean after(OffsetDateTime a, OffsetDateTime b) {
       return a.isBefore(b);
     }
@@ -281,8 +283,8 @@ final class TimeTemplates {
       return a.compareTo(b) > 0;
     }
 
-    @AlsoNegation
     @AfterTemplate
+    @AlsoNegation
     boolean after(OffsetDateTime a, OffsetDateTime b) {
       return a.isAfter(b);
     }

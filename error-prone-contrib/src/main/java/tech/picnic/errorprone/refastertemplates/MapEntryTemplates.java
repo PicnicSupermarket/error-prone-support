@@ -1,5 +1,10 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Map.Entry.comparingByKey;
+import static java.util.Map.Entry.comparingByValue;
+
 import com.google.common.collect.Maps;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
@@ -42,15 +47,13 @@ final class MapEntryTemplates {
   static final class MapEntryComparingByKey<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     Comparator<Map.Entry<K, V>> before() {
-      return Refaster.anyOf(
-          Comparator.comparing(Map.Entry::getKey),
-          Map.Entry.comparingByKey(Comparator.naturalOrder()));
+      return Refaster.anyOf(comparing(Map.Entry::getKey), comparingByKey(naturalOrder()));
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     Comparator<Map.Entry<K, V>> after() {
-      return Map.Entry.comparingByKey();
+      return comparingByKey();
     }
   }
 
@@ -58,13 +61,13 @@ final class MapEntryTemplates {
   static final class MapEntryComparingByKeyWithCustomComparator<K, V> {
     @BeforeTemplate
     Comparator<Map.Entry<K, V>> before(Comparator<? super K> cmp) {
-      return Comparator.comparing(Map.Entry::getKey, cmp);
+      return comparing(Map.Entry::getKey, cmp);
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     Comparator<Map.Entry<K, V>> after(Comparator<? super K> cmp) {
-      return Map.Entry.comparingByKey(cmp);
+      return comparingByKey(cmp);
     }
   }
 
@@ -73,15 +76,13 @@ final class MapEntryTemplates {
   static final class MapEntryComparingByValue<K, V extends Comparable<? super V>> {
     @BeforeTemplate
     Comparator<Map.Entry<K, V>> before() {
-      return Refaster.anyOf(
-          Comparator.comparing(Map.Entry::getValue),
-          Map.Entry.comparingByValue(Comparator.naturalOrder()));
+      return Refaster.anyOf(comparing(Map.Entry::getValue), comparingByValue(naturalOrder()));
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     Comparator<Map.Entry<K, V>> after() {
-      return Map.Entry.comparingByValue();
+      return comparingByValue();
     }
   }
 
@@ -89,13 +90,13 @@ final class MapEntryTemplates {
   static final class MapEntryComparingByValueWithCustomComparator<K, V> {
     @BeforeTemplate
     Comparator<Map.Entry<K, V>> before(Comparator<? super V> cmp) {
-      return Comparator.comparing(Map.Entry::getValue, cmp);
+      return comparing(Map.Entry::getValue, cmp);
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     Comparator<Map.Entry<K, V>> after(Comparator<? super V> cmp) {
-      return Map.Entry.comparingByValue(cmp);
+      return comparingByValue(cmp);
     }
   }
 }

@@ -81,8 +81,8 @@ final class TestNGToAssertJTemplates {
       Assert.fail();
     }
 
-    @DoNotCall
     @AfterTemplate
+    @DoNotCall
     void after() {
       throw new AssertionError();
     }

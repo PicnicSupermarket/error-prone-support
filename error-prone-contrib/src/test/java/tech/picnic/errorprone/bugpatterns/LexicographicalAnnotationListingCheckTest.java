@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import com.google.common.base.Predicates;
+import static com.google.common.base.Predicates.containsPattern;
+
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -10,13 +11,13 @@ public final class LexicographicalAnnotationListingCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(LexicographicalAnnotationListingCheck.class, getClass())
           .expectErrorMessage(
-              "X", Predicates.containsPattern("Sort annotations lexicographically where possible"));
+              "X", containsPattern("Sort annotations lexicographically where possible"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(
           LexicographicalAnnotationListingCheck.class, getClass());
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -71,7 +72,7 @@ public final class LexicographicalAnnotationListingCheckTest {
   }
 
   @Test
-  public void testReplacement() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

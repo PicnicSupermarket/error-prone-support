@@ -1,5 +1,10 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingDouble;
+import static java.util.Comparator.comparingInt;
+import static java.util.Comparator.comparingLong;
+import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 
@@ -29,14 +34,13 @@ final class ComparatorTemplates {
     @BeforeTemplate
     Comparator<T> before() {
       return Refaster.anyOf(
-          Comparator.comparing(Refaster.anyOf(identity(), v -> v)),
-          Comparator.<T>reverseOrder().reversed());
+          comparing(Refaster.anyOf(identity(), v -> v)), Comparator.<T>reverseOrder().reversed());
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     Comparator<T> after() {
-      return Comparator.naturalOrder();
+      return naturalOrder();
     }
   }
 
@@ -58,7 +62,7 @@ final class ComparatorTemplates {
     // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
     @BeforeTemplate
     Comparator<T> before(Comparator<T> cmp) {
-      return Comparator.comparing(Refaster.anyOf(identity(), v -> v), cmp);
+      return comparing(Refaster.anyOf(identity(), v -> v), cmp);
     }
 
     @AfterTemplate
@@ -72,7 +76,7 @@ final class ComparatorTemplates {
   static final class ThenComparing<S, T extends Comparable<? super T>> {
     @BeforeTemplate
     Comparator<S> before(Comparator<S> cmp, Function<? super S, ? extends T> function) {
-      return cmp.thenComparing(Comparator.comparing(function));
+      return cmp.thenComparing(comparing(function));
     }
 
     @AfterTemplate
@@ -85,7 +89,7 @@ final class ComparatorTemplates {
   static final class ThenComparingReversed<S, T extends Comparable<? super T>> {
     @BeforeTemplate
     Comparator<S> before(Comparator<S> cmp, Function<? super S, ? extends T> function) {
-      return cmp.thenComparing(Comparator.comparing(function).reversed());
+      return cmp.thenComparing(comparing(function).reversed());
     }
 
     @AfterTemplate
@@ -100,7 +104,7 @@ final class ComparatorTemplates {
     @BeforeTemplate
     Comparator<S> before(
         Comparator<S> cmp, Function<? super S, ? extends T> function, Comparator<? super T> cmp2) {
-      return cmp.thenComparing(Comparator.comparing(function, cmp2));
+      return cmp.thenComparing(comparing(function, cmp2));
     }
 
     @AfterTemplate
@@ -115,7 +119,7 @@ final class ComparatorTemplates {
     @BeforeTemplate
     Comparator<S> before(
         Comparator<S> cmp, Function<? super S, ? extends T> function, Comparator<? super T> cmp2) {
-      return cmp.thenComparing(Comparator.comparing(function, cmp2).reversed());
+      return cmp.thenComparing(comparing(function, cmp2).reversed());
     }
 
     @AfterTemplate
@@ -129,7 +133,7 @@ final class ComparatorTemplates {
   static final class ThenComparingDouble<T> {
     @BeforeTemplate
     Comparator<T> before(Comparator<T> cmp, ToDoubleFunction<? super T> function) {
-      return cmp.thenComparing(Comparator.comparingDouble(function));
+      return cmp.thenComparing(comparingDouble(function));
     }
 
     @AfterTemplate
@@ -142,7 +146,7 @@ final class ComparatorTemplates {
   static final class ThenComparingInt<T> {
     @BeforeTemplate
     Comparator<T> before(Comparator<T> cmp, ToIntFunction<? super T> function) {
-      return cmp.thenComparing(Comparator.comparingInt(function));
+      return cmp.thenComparing(comparingInt(function));
     }
 
     @AfterTemplate
@@ -155,7 +159,7 @@ final class ComparatorTemplates {
   static final class ThenComparingLong<T> {
     @BeforeTemplate
     Comparator<T> before(Comparator<T> cmp, ToLongFunction<? super T> function) {
-      return cmp.thenComparing(Comparator.comparingLong(function));
+      return cmp.thenComparing(comparingLong(function));
     }
 
     @AfterTemplate
@@ -178,7 +182,7 @@ final class ComparatorTemplates {
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     Comparator<T> after(Comparator<T> cmp) {
-      return cmp.thenComparing(Comparator.naturalOrder());
+      return cmp.thenComparing(naturalOrder());
     }
   }
 

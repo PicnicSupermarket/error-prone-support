@@ -8,7 +8,7 @@ public final class RequestMappingAnnotationCheckTest {
       CompilationTestHelper.newInstance(RequestMappingAnnotationCheck.class, getClass());
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",

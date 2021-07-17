@@ -21,7 +21,7 @@ public final class RedundantStringConversionCheckTest {
       BugCheckerRefactoringTestHelper.newInstance(RedundantStringConversionCheck.class, getClass());
 
   @Test
-  public void testIdentificationOfIdentityTransformation() {
+  void identificationOfIdentityTransformation() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -44,7 +44,7 @@ public final class RedundantStringConversionCheckTest {
   }
 
   @Test
-  public void testIdentificationWithinMutatingAssignment() {
+  void identificationWithinMutatingAssignment() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -100,7 +100,7 @@ public final class RedundantStringConversionCheckTest {
   }
 
   @Test
-  public void testIdentificationWithinBinaryOperation() {
+  void identificationWithinBinaryOperation() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -186,7 +186,7 @@ public final class RedundantStringConversionCheckTest {
   }
 
   @Test
-  public void testIdentificationWithinStringBuilderMethod() {
+  void identificationWithinStringBuilderMethod() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -235,7 +235,7 @@ public final class RedundantStringConversionCheckTest {
 
   // XXX: Also test the other formatter methods.
   @Test
-  public void testIdentificationWithinFormatterMethod() {
+  void identificationWithinFormatterMethod() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -280,7 +280,7 @@ public final class RedundantStringConversionCheckTest {
   }
 
   @Test
-  public void testIdentificationWithinGuavaGuardMethod() {
+  void identificationWithinGuavaGuardMethod() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -340,7 +340,7 @@ public final class RedundantStringConversionCheckTest {
   }
 
   @Test
-  public void testIdentificationWithinSlf4jLoggerMethod() {
+  void identificationWithinSlf4jLoggerMethod() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -395,7 +395,7 @@ public final class RedundantStringConversionCheckTest {
   }
 
   @Test
-  public void testIdentificationOfCustomConversionMethod() {
+  void identificationOfCustomConversionMethod() {
     customizedCompilationTestHelper
         .addSourceLines(
             "A.java",
@@ -486,7 +486,7 @@ public final class RedundantStringConversionCheckTest {
   }
 
   @Test
-  public void testReplacement() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

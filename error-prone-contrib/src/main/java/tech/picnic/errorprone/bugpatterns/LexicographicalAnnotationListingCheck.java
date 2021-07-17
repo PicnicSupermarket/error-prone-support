@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Comparator.comparing;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
@@ -17,7 +18,6 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +60,7 @@ public final class LexicographicalAnnotationListingCheck extends BugChecker
   private static ImmutableList<? extends AnnotationTree> sort(
       List<? extends AnnotationTree> annotations, VisitorState state) {
     return annotations.stream()
-        .sorted(Comparator.comparing(annotation -> Util.treeToString(annotation, state)))
+        .sorted(comparing(annotation -> Util.treeToString(annotation, state)))
         .collect(toImmutableList());
   }
 

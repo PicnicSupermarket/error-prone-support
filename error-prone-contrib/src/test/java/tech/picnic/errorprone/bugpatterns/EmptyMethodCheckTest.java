@@ -12,7 +12,7 @@ public final class EmptyMethodCheckTest {
       BugCheckerRefactoringTestHelper.newInstance(EmptyMethodCheck.class, getClass());
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -64,7 +64,7 @@ public final class EmptyMethodCheckTest {
   }
 
   @Test
-  public void testReplacement() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

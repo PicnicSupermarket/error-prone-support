@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableRangeSet.toImmutableRangeSet;
+import static java.util.Objects.requireNonNullElseGet;
 import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
@@ -42,7 +43,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -92,7 +92,14 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     /* First, collect all matches. */
     List<Description> matches = new ArrayList<>();
-    codeTransformer.apply(state.getPath(), new SubContext(state.context), matches::add);
+    try {
+      codeTransformer.apply(state.getPath(), new SubContext(state.context), matches::add);
+    } catch (LinkageError e) {
+      // XXX: This `try/catch` block handles the issue described and resolved in
+      // https://github.com/google/error-prone/pull/2456. Drop this block once that change is
+      // released.
+      return Description.NO_MATCH;
+    }
     /* Then apply them. */
     applyMatches(matches, ((JCCompilationUnit) tree).endPositions, state);
 
@@ -188,8 +195,8 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   private static ImmutableSet<ResourceInfo> getClassPathResources() {
     try {
       return ClassPath.from(
-              Objects.requireNonNullElseGet(
-                  RefasterCheck.class.getClassLoader(), () -> ClassLoader.getSystemClassLoader()))
+              requireNonNullElseGet(
+                  RefasterCheck.class.getClassLoader(), ClassLoader::getSystemClassLoader))
           .getResources();
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to scan classpath for resources", e);

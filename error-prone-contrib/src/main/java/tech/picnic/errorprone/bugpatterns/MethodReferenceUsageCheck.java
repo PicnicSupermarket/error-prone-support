@@ -47,6 +47,8 @@ import javax.lang.model.element.Name;
 // black-and-white. Maybe we can more closely approximate it?
 // XXX: With Java 9's introduction of `Predicate.not`, we could write many lambda expressions to
 // `not(some::reference)`.
+// XXX: This check is extremely inefficient due to its reliance on `SuggestedFixes.compilesWithFix`.
+// Palantir's `LambdaMethodReference` check seems to suffer a similar issue at this time.
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "MethodReferenceUsage",

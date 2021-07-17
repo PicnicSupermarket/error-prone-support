@@ -13,13 +13,13 @@ public final class StaticImportCheckTest {
       BugCheckerRefactoringTestHelper.newInstance(StaticImportCheck.class, getClass());
 
   @Test
-  public void testCandidateMethodsAreNotRedundant() {
+  void candidateMethodsAreNotRedundant() {
     assertThat(StaticImportCheck.STATIC_IMPORT_CANDIDATE_METHODS.keySet())
         .doesNotContainAnyElementsOf(StaticImportCheck.STATIC_IMPORT_CANDIDATE_CLASSES);
   }
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -77,7 +77,7 @@ public final class StaticImportCheckTest {
   }
 
   @Test
-  public void testReplacement() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

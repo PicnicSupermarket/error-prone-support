@@ -12,7 +12,7 @@ public final class MethodReferenceUsageCheckTest {
       BugCheckerRefactoringTestHelper.newInstance(MethodReferenceUsageCheck.class, getClass());
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -201,7 +201,7 @@ public final class MethodReferenceUsageCheckTest {
   }
 
   @Test
-  public void testReplacement() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

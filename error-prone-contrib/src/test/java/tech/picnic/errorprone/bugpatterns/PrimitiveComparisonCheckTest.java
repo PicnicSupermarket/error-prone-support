@@ -19,7 +19,7 @@ public final class PrimitiveComparisonCheckTest {
 
   // The logic for `char` and `short` is exactly analogous to the `byte` case.
   @Test
-  public void testByteComparison() {
+  void byteComparison() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -108,7 +108,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testIntComparison() {
+  void intComparison() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -201,7 +201,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testLongComparison() {
+  void longComparison() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -278,7 +278,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testFloatComparison() {
+  void floatComparison() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -335,7 +335,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testDoubleComparison() {
+  void doubleComparison() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -396,7 +396,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testStringComparison() {
+  void stringComparison() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -429,7 +429,7 @@ public final class PrimitiveComparisonCheckTest {
   // XXX: If the explicit `<A, BoxedPrimitive>` generic type information was necessary, then this
   // replacement drops too much information.
   @Test
-  public void testReplacementWithPrimitiveVariants() {
+  void replacementWithPrimitiveVariants() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
@@ -483,7 +483,7 @@ public final class PrimitiveComparisonCheckTest {
   // XXX: If the explicit `<A>` generic type information was necessary, then this replacement drops
   // too much information.
   @Test
-  public void testReplacementWithBoxedVariants() {
+  void replacementWithBoxedVariants() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
@@ -535,7 +535,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testReplacementWithPrimitiveVariantsUsingStaticImports() {
+  void replacementWithPrimitiveVariantsUsingStaticImports() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
@@ -574,7 +574,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testReplacementWithBoxedVariantsUsingStaticImports() {
+  void replacementWithBoxedVariantsUsingStaticImports() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
@@ -615,7 +615,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testReplacementWithPrimitiveVariantsInComplexSyntacticalContext() {
+  void replacementWithPrimitiveVariantsInComplexSyntacticalContext() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
@@ -647,7 +647,7 @@ public final class PrimitiveComparisonCheckTest {
   }
 
   @Test
-  public void testReplacementWithBoxedVariantsInComplexSyntacticalContext() {
+  void replacementWithBoxedVariantsInComplexSyntacticalContext() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

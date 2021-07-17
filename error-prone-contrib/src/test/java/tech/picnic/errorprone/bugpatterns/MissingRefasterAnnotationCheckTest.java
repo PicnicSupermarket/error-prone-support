@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import com.google.common.base.Predicates;
+import static com.google.common.base.Predicates.containsPattern;
+
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -9,11 +10,11 @@ public final class MissingRefasterAnnotationCheckTest {
       CompilationTestHelper.newInstance(MissingRefasterAnnotationCheck.class, getClass())
           .expectErrorMessage(
               "X",
-              Predicates.containsPattern(
+              containsPattern(
                   "The Refaster template contains a method without any Refaster annotations"));
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",

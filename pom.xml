@@ -96,9 +96,10 @@
         build number. When building locally, this number is obviously absent.
         So we provide a default value. -->
         <build.number>LOCAL</build.number>
-        <!-- Property using which additional Error Prone flags can be
-        specified. Used by the `patch` profile to enable patching. -->
-        <error-prone.args />
+        <!-- Properties using which additional Error Prone flags can be
+        specified. Used by the `patch` and `self-check` profiles. -->
+        <error-prone.patch-args />
+        <error-prone.self-check-args />
         <!-- The Maven `groupId` under which Error Prone dependencies are
         published. By default we use an official Error Prone release. This
         property allows the `error-prone-fork` profile below to build the
@@ -1180,6 +1181,42 @@
             </build>
         </profile>
         <profile>
+            <!-- Applies the Error Prone checks defined by this project to the
+            code base itself. Assumes that a prior build has already installed
+            the project in the local Maven repository. -->
+            <id>self-check</id>
+            <properties>
+                <!-- XXX: `MethodReferenceUsage` is an extremely expensive
+                check due to its use of `SuggestedFixes.compilesWithFix`. Maybe
+                we should drop it altogether? -->
+                <!-- XXX: We shouldn't disable the `Refaster` check here.
+                Rather, we should fix whatever bug causes templates to flag
+                their own code. -->
+                <!-- XXX: Find a way to assert that test code (both inline
+                `BugChecker` test code and the Refaster test files) does not
+                exhibit anti-patterns other than those associated with the
+                check/template under test. Ideally all test cases are realistic. -->
+                <error-prone.self-check-args>-Xep:MethodReferenceUsage:OFF -Xep:Refaster:OFF</error-prone.self-check-args>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <annotationProcessorPaths combine.children="append">
+                                <path>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>error-prone-contrib</artifactId>
+                                    <version>${project.version}</version>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <!-- By default we verify various aspects of a module and the
             artifact(s) it produces. We define these checks in a profile so
             that they can be disabled during development. See also the
@@ -1399,7 +1436,8 @@
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
                                     <!-- Append additional custom arguments. -->
-                                    ${error-prone.args}
+                                    ${error-prone.patch-args}
+                                    ${error-prone.self-check-args}
                                 </arg>
                                 <!-- The Error Prone plugin makes certain
                                 assumptions about the state of the AST at the
@@ -1425,7 +1463,7 @@
                 </property>
             </activation>
             <properties>
-                <error-prone.args>-XepPatchChecks:${error-prone.patch-checks} -XepPatchLocation:IN_PLACE</error-prone.args>
+                <error-prone.patch-args>-XepPatchChecks:${error-prone.patch-checks} -XepPatchLocation:IN_PLACE</error-prone.patch-args>
             </properties>
         </profile>
         <profile>

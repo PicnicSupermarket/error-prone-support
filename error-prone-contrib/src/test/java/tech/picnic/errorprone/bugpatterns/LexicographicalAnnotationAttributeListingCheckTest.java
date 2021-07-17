@@ -22,7 +22,7 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
           LexicographicalAnnotationAttributeListingCheck.class, getClass());
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -105,7 +105,7 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
   // introduced. Avoiding that might make the code too complex. Instead, users can have the
   // `CanonicalAnnotationSyntaxCheck` correct the situation in a subsequent run.
   @Test
-  public void testReplacement() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
@@ -161,7 +161,7 @@ public final class LexicographicalAnnotationAttributeListingCheckTest {
   }
 
   @Test
-  public void testFiltering() {
+  void filtering() {
     /* Some violations are not flagged because they are not in- or excluded. */
     restrictedCompilationTestHelper
         .addSourceLines(

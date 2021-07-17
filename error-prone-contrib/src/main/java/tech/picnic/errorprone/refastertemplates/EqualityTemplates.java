@@ -26,8 +26,8 @@ final class EqualityTemplates {
       return Refaster.anyOf(a.equals(b), Objects.equals(a, b));
     }
 
-    @AlsoNegation
     @AfterTemplate
+    @AlsoNegation
     boolean after(T a, T b) {
       return a == b;
     }

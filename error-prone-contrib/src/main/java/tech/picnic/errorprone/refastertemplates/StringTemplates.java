@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 
 import com.google.common.base.Joiner;
@@ -10,7 +11,6 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
@@ -122,7 +122,7 @@ final class StringTemplates {
   static final class Utf8EncodedLength {
     @BeforeTemplate
     int before(String str) {
-      return str.getBytes(StandardCharsets.UTF_8).length;
+      return str.getBytes(UTF_8).length;
     }
 
     @AfterTemplate

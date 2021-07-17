@@ -47,7 +47,7 @@ public final class MethodMatcherFactoryTest {
       CompilationTestHelper.newInstance(MatchedMethodsFlagger.class, getClass());
 
   @Test
-  public void testCreateWithMalformedSignatures() {
+  void createWithMalformedSignatures() {
     MethodMatcherFactory factory = new MethodMatcherFactory();
     assertThatThrownBy(() -> factory.create(ImmutableList.of("foo.bar")))
         .isInstanceOf(IllegalArgumentException.class);
@@ -60,7 +60,7 @@ public final class MethodMatcherFactoryTest {
   }
 
   @Test
-  public void testMatcher() {
+  void matcher() {
     compilationTestHelper
         .addSourceLines(
             "com/example/A.java",

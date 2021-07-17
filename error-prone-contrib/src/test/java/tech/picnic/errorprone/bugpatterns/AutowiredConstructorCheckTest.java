@@ -12,7 +12,7 @@ public final class AutowiredConstructorCheckTest {
       BugCheckerRefactoringTestHelper.newInstance(AutowiredConstructorCheck.class, getClass());
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "Container.java",
@@ -62,7 +62,7 @@ public final class AutowiredConstructorCheckTest {
   }
 
   @Test
-  public void testReplacement() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "in/Container.java",

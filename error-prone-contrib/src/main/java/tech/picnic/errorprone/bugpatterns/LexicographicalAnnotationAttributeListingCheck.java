@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
 
@@ -31,7 +32,6 @@ import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -153,7 +153,7 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
     // XXX: Perhaps we should use `Collator` with `.setStrength(Collator.PRIMARY)` and
     // `getCollationKey`. Not clear whether that's worth the hassle at this point.
     return ImmutableList.sortedCopyOf(
-        Comparator.comparing(
+        comparing(
             e -> getStructure(e, state),
             Comparators.lexicographical(
                 Comparators.lexicographical(

@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import com.google.common.base.Predicates;
+import static com.google.common.base.Predicates.containsPattern;
+
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
@@ -10,13 +11,12 @@ final class AmbiguousJsonCreatorCheckTest {
       CompilationTestHelper.newInstance(AmbiguousJsonCreatorCheck.class, getClass())
           .expectErrorMessage(
               "X",
-              Predicates.containsPattern(
-                  "`JsonCreator.Mode` should be set for single-argument creators"));
+              containsPattern("`JsonCreator.Mode` should be set for single-argument creators"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(AmbiguousJsonCreatorCheck.class, getClass());
 
   @Test
-  void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "Container.java",
@@ -118,7 +118,7 @@ final class AmbiguousJsonCreatorCheckTest {
   }
 
   @Test
-  public void testReplacement() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",

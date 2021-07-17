@@ -12,7 +12,7 @@ public final class CanonicalAnnotationSyntaxCheckTest {
       BugCheckerRefactoringTestHelper.newInstance(CanonicalAnnotationSyntaxCheck.class, getClass());
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "pkg/A.java",
@@ -85,7 +85,7 @@ public final class CanonicalAnnotationSyntaxCheckTest {
   }
 
   @Test
-  public void testReplacement() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "in/pkg/A.java",

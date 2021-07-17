@@ -5,6 +5,7 @@ import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -97,7 +98,7 @@ public final class RefasterCheckTest {
     // XXX: Drop the filter once we have added tests for AssertJ!
     return TEMPLATES_BY_GROUP.entries().stream()
         .filter(e -> !"AssertJ".equals(e.getKey()))
-        .map(e -> Arguments.of(e.getKey(), e.getValue()));
+        .map(e -> arguments(e.getKey(), e.getValue()));
   }
 
   /**
@@ -105,10 +106,10 @@ public final class RefasterCheckTest {
    * for all of the {@link #TEMPLATE_GROUPS}.
    *
    * <p>This test is just as much about ensuring that {@link #TEMPLATE_GROUPS} is exhaustive, so
-   * that in turn {@link #testReplacement}'s coverage is exhaustive.
+   * that in turn {@link #replacement}'s coverage is exhaustive.
    */
   @Test
-  public void testLoadAllCodeTransformers() {
+  void loadAllCodeTransformers() {
     assertThat(TEMPLATES_BY_GROUP.keySet()).hasSameElementsAs(TEMPLATE_GROUPS);
   }
 
@@ -116,9 +117,9 @@ public final class RefasterCheckTest {
    * Verifies for each of the {@link #TEMPLATE_GROUPS} that the associated code transformers have
    * the desired effect.
    */
-  @ParameterizedTest
   @MethodSource("templateGroupsUnderTest")
-  public void testReplacement(String group) {
+  @ParameterizedTest
+  void replacement(String group) {
     verifyRefactoring(group, namePattern(group));
   }
 
@@ -129,9 +130,9 @@ public final class RefasterCheckTest {
    * com.google.errorprone.refaster.Refaster#anyOf} branches are tested. Idem for {@link
    * com.google.errorprone.refaster.annotation.BeforeTemplate} methods in case there are multiple .
    */
-  @ParameterizedTest
   @MethodSource("templatesUnderTest")
-  public void testCoverage(String group, String template) {
+  @ParameterizedTest
+  void coverage(String group, String template) {
     assertThatCode(() -> verifyRefactoring(group, namePattern(group, template)))
         .withFailMessage(
             "Template %s does not affect the tests for group %s; is it tested?", template, group)

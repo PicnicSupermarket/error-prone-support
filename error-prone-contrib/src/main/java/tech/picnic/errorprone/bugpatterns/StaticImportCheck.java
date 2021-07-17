@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
@@ -20,7 +22,6 @@ import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
-import java.util.Objects;
 import java.util.Optional;
 
 /** A {@link BugChecker} which flags methods that can and should be statically imported. */
@@ -140,8 +141,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
 
   private static boolean isCandidate(VisitorState state) {
     Tree parentTree =
-        Objects.requireNonNull(
-                state.getPath().getParentPath(), "MemberSelectTree lacks enclosing node")
+        requireNonNull(state.getPath().getParentPath(), "MemberSelectTree lacks enclosing node")
             .getLeaf();
     switch (parentTree.getKind()) {
       case IMPORT:

@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import com.google.common.base.Predicates;
+import static com.google.common.base.Predicates.containsPattern;
+
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -9,11 +10,11 @@ public final class TimeZoneUsageCheckTest {
       CompilationTestHelper.newInstance(TimeZoneUsageCheck.class, getClass())
           .expectErrorMessage(
               "X",
-              Predicates.containsPattern(
+              containsPattern(
                   "Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone"));
 
   @Test
-  public void testIdentification() {
+  void identification() {
     compilationHelper
         .addSourceLines(
             "A.java",

@@ -8,14 +8,14 @@ import org.junit.jupiter.api.Test;
 
 public final class AnnotationAttributeMatcherTest {
   @Test
-  public void testWithoutListings() {
+  void withoutListings() {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(Optional.empty(), ImmutableList.of());
     assertThat(matcher.matches("foo", "bar")).isTrue();
   }
 
   @Test
-  public void testWithSingleFullAnnotationWhitelist() {
+  void withSingleFullAnnotationWhitelist() {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(Optional.of(ImmutableList.of("foo")), ImmutableList.of());
     assertThat(matcher.matches("foo", "bar")).isTrue();
@@ -24,7 +24,7 @@ public final class AnnotationAttributeMatcherTest {
   }
 
   @Test
-  public void testWithSingleAnnotationAttributeWhitelist() {
+  void withSingleAnnotationAttributeWhitelist() {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(
             Optional.of(ImmutableList.of("foo#bar")), ImmutableList.of());
@@ -34,7 +34,7 @@ public final class AnnotationAttributeMatcherTest {
   }
 
   @Test
-  public void testWithSingleFullAnnotationBlacklist() {
+  void withSingleFullAnnotationBlacklist() {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(Optional.empty(), ImmutableList.of("foo"));
     assertThat(matcher.matches("foo", "bar")).isFalse();
@@ -43,7 +43,7 @@ public final class AnnotationAttributeMatcherTest {
   }
 
   @Test
-  public void testWithSingleAnnotationAttributeBlacklist() {
+  void withSingleAnnotationAttributeBlacklist() {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(Optional.empty(), ImmutableList.of("foo#bar"));
     assertThat(matcher.matches("foo", "bar")).isFalse();
@@ -52,7 +52,7 @@ public final class AnnotationAttributeMatcherTest {
   }
 
   @Test
-  public void testWithComplicatedConfiguration() {
+  void withComplicatedConfiguration() {
     AnnotationAttributeMatcher matcher =
         AnnotationAttributeMatcher.create(
             Optional.of(ImmutableList.of("foo", "bar", "baz", "baz#1", "baz#2", "quux#1")),
