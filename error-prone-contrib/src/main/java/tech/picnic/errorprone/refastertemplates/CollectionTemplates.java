@@ -158,8 +158,10 @@ final class CollectionTemplates {
   }
 
   /** Prefer {@link ArrayList#ArrayList(Collection)} over the Guava alternative. */
+  // XXX: Drop this template if we adopt `baseline-error-prone`.
   static final class NewArrayListFromCollection<T> {
     @BeforeTemplate
+    @SuppressWarnings("PreferCollectionConstructors")
     ArrayList<T> before(Collection<T> collection) {
       return Lists.newArrayList(collection);
     }

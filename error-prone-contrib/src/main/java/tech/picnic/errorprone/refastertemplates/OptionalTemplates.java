@@ -167,6 +167,7 @@ final class OptionalTemplates {
    */
   abstract static class MapOptionalToBoolean<T> {
     @BeforeTemplate
+    @SuppressWarnings("OptionalOrElseMethodInvocation")
     boolean before(Optional<T> optional, Function<? super T, Boolean> predicate) {
       return optional.map(predicate).orElse(Refaster.anyOf(false, Boolean.FALSE));
     }
@@ -317,6 +318,7 @@ final class OptionalTemplates {
   /** Prefer {@link Optional#or(Supplier)} over more verbose alternatives. */
   abstract static class OptionalOrOtherOptional<T> {
     @BeforeTemplate
+    @SuppressWarnings("OptionalOrElseGetValue")
     Optional<T> before(Optional<T> optional1, Optional<T> optional2) {
       // XXX: Note that rewriting the first and third variant will change the code's behavior if
       // `optional2` has side-effects.

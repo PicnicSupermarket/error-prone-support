@@ -17,10 +17,6 @@ final class StreamTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(Objects.class, Streams.class, not(null), reverseOrder());
   }
 
-  Stream<String> testEmptyStream() {
-    return Stream.of();
-  }
-
   ImmutableSet<Stream<String>> testStreamOfNullable() {
     return ImmutableSet.of(
         Stream.of("a").filter(Objects::nonNull), Optional.ofNullable("b").stream());

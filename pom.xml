@@ -1392,12 +1392,12 @@
                                     <artifactId>assertj-error-prone</artifactId>
                                     <version>${version.palantir-assertj-automation}</version>
                                 </path>
+                                -->
                                 <path>
                                     <groupId>com.palantir.baseline</groupId>
                                     <artifactId>baseline-error-prone</artifactId>
                                     <version>${version.palantir-baseline}</version>
                                 </path>
-                                -->
                                 <path>
                                     <groupId>com.uber.nullaway</groupId>
                                     <artifactId>nullaway</artifactId>
@@ -1437,6 +1437,39 @@
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
+                                    <!--
+                                      Flags for `baseline-error-prone`.
+                                    -->
+                                    <!-- We prefer to name loggers name `LOG`,
+                                    rather than `log`. -->
+                                    -Xep:ConsistentLoggerName:OFF
+                                    <!-- XXX: This check discourages use of
+                                    parallel streams, which is good, but also
+                                    suggests a Palantir alternative. Consider
+                                    introducing a similar but less opinionated
+                                    check. -->
+                                    -Xep:DangerousParallelStreamUsage:OFF
+                                    <!-- Nice idea, but too expensive due to
+                                    (recursive) invocation of
+                                    `SuggestedFixes.compilesWithFix`. -->
+                                    -Xep:LambdaMethodReference:OFF
+                                    <!-- We don't use Palantir's `safe-logging`
+                                    library. -->
+                                    -Xep:PreferSafeLoggingPreconditions:OFF
+                                    <!-- We don't use Palantir's `safe-logging`
+                                    library. -->
+                                    -Xep:Slf4jLogsafeArgs:OFF
+                                    <!-- XXX: This check suggests prefixing
+                                    unused parameters with an underscore.
+                                    Discuss this idea within the team. -->
+                                    -Xep:StrictUnusedVariable:OFF
+                                    <!-- Ideally `@VisibleForTesting` members
+                                    are package-private, but there are
+                                    reasonable exceptions. -->
+                                    -Xep:VisibleForTestingPackagePrivate:OFF
+                                    <!--
+                                      Flags for `nullaway`.
+                                    -->
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
