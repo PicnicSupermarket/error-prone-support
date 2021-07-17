@@ -25,10 +25,6 @@
                     <id>jitpack.io</id>
                     <url>https://jitpack.io</url>
                 </repository>
-                <repository>
-                    <id>palantir</id>
-                    <url>https://dl.bintray.com/palantir/releases</url>
-                </repository>
             </repositories>
         </profile>
     </profiles>
