@@ -466,6 +466,23 @@
                     </executions>
                 </plugin>
                 <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>4.7.1.1</version>
+                    <configuration>
+                        <failOnError>false</failOnError>
+                        <fork>false</fork>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>run-spotbugs</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>com.spotify.fmt</groupId>
                     <artifactId>fmt-maven-plugin</artifactId>
                     <version>2.19</version>
@@ -1402,6 +1419,10 @@
                         <artifactId>sortpom-maven-plugin</artifactId>
                     </plugin>
                     <plugin>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
                         <groupId>com.spotify.fmt</groupId>
                         <artifactId>fmt-maven-plugin</artifactId>
                         <executions>
@@ -1600,6 +1621,13 @@
                             <artifactId>sortpom-maven-plugin</artifactId>
                             <configuration>
                                 <verifyFail>stop</verifyFail>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.github.spotbugs</groupId>
+                            <artifactId>spotbugs-maven-plugin</artifactId>
+                            <configuration>
+                                <failOnError>true</failOnError>
                             </configuration>
                         </plugin>
                         <plugin>
