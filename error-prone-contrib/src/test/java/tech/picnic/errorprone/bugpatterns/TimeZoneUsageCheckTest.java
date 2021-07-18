@@ -53,7 +53,7 @@ public final class TimeZoneUsageCheckTest {
             "",
             "    // BUG: Diagnostic matches: X",
             "    Instant.now();",
-            "    // BUG: Diagnostic matches: X",
+            "    // This is equivalent to `clock.instant()`, which is fine.",
             "    Instant.now(clock);",
             "",
             "    // BUG: Diagnostic matches: X",

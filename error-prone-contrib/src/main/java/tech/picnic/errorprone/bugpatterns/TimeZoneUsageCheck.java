@@ -47,11 +47,11 @@ public final class TimeZoneUsageCheck extends BugChecker implements MethodInvoca
                   "tickSeconds"),
           staticMethod()
               .onClassAny(
-                  Instant.class.getName(),
                   LocalDate.class.getName(),
                   LocalDateTime.class.getName(),
                   LocalTime.class.getName())
-              .named("now"));
+              .named("now"),
+          staticMethod().onClassAny(Instant.class.getName()).named("now").withParameters());
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
