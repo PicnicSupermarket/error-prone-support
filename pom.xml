@@ -110,7 +110,9 @@
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.0</version.auto-service>
-        <version.error-prone>2.7.1</version.error-prone>
+        <version.error-prone>${version.error-prone-orig}</version.error-prone>
+        <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
+        <version.error-prone-orig>2.8.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
@@ -1128,7 +1130,7 @@
             <id>error-prone-fork</id>
             <properties>
                 <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>
-                <version.error-prone>v2.7.1-picnic-4</version.error-prone>
+                <version.error-prone>${version.error-prone-fork}</version.error-prone>
             </properties>
             <dependencyManagement>
                 <!-- Even when we directly depend on the Picnic Error Prone
@@ -1139,7 +1141,7 @@
                     <dependency>
                         <groupId>com.google.errorprone</groupId>
                         <artifactId>error_prone_annotations</artifactId>
-                        <version>2.7.1</version>
+                        <version>${version.error-prone-orig}</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
