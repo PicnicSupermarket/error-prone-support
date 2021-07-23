@@ -129,7 +129,7 @@
         that we can pick them up. (But in case of `baseline-refaster-rules`
         perhaps we can simply incorporate all of them.) -->
         <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
-        <version.palantir-baseline>4.0.0</version.palantir-baseline>
+        <version.palantir-baseline>4.4.0</version.palantir-baseline>
         <version.surefire>2.22.2</version.surefire>
     </properties>
 
@@ -335,7 +335,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.31</version>
+                <version>1.7.32</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
