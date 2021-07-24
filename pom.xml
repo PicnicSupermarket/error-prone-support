@@ -1197,14 +1197,11 @@
                 <!-- XXX: `MethodReferenceUsage` is an extremely expensive
                 check due to its use of `SuggestedFixes.compilesWithFix`. Maybe
                 we should drop it altogether? -->
-                <!-- XXX: We shouldn't disable the `Refaster` check here.
-                Rather, we should fix whatever bug causes templates to flag
-                their own code. -->
                 <!-- XXX: Find a way to assert that test code (both inline
                 `BugChecker` test code and the Refaster test files) does not
                 exhibit anti-patterns other than those associated with the
                 check/template under test. Ideally all test cases are realistic. -->
-                <error-prone.self-check-args>-Xep:MethodReferenceUsage:OFF -Xep:Refaster:OFF</error-prone.self-check-args>
+                <error-prone.self-check-args>-Xep:MethodReferenceUsage:OFF</error-prone.self-check-args>
             </properties>
             <build>
                 <plugins>

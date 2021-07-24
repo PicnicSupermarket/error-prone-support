@@ -86,18 +86,12 @@ final class LongStreamTemplatesTest implements RefasterTemplateTestCase {
         LongStream.of(1).anyMatch(n -> n > 1), LongStream.of(2).anyMatch(n -> n > 2));
   }
 
-  ImmutableSet<Boolean> testLongStreamAllMatch() {
+  boolean testLongStreamAllMatch() {
     LongPredicate pred = i -> i > 0;
-    return ImmutableSet.of(
-        LongStream.of(1).allMatch(pred),
-        LongStream.of(2).allMatch(pred),
-        LongStream.of(3).allMatch(pred));
+    return LongStream.of(1).allMatch(pred);
   }
 
-  ImmutableSet<Boolean> testLongStreamAllMatch2() {
-    return ImmutableSet.of(
-        LongStream.of(1).allMatch(n -> n > 1),
-        LongStream.of(2).allMatch(n -> n > 2),
-        LongStream.of(3).allMatch(n -> n > 3));
+  boolean testLongStreamAllMatch2() {
+    return LongStream.of(1).allMatch(n -> n > 1);
   }
 }

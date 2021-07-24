@@ -33,25 +33,20 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
 
   ImmutableSet<ImmutableMultimap<String, Integer>> testEmptyImmutableListMultimap() {
     return ImmutableSet.of(
-        ImmutableListMultimap.<String, Integer>builder().build(),
-        ImmutableMultimap.<String, Integer>builder().build(),
-        ImmutableMultimap.of());
+        ImmutableListMultimap.<String, Integer>builder().build(), ImmutableMultimap.of());
   }
 
   ImmutableSet<ImmutableMultimap<String, Integer>> testPairToImmutableListMultimap() {
     return ImmutableSet.of(
         ImmutableListMultimap.<String, Integer>builder().put("foo", 1).build(),
-        ImmutableMultimap.<String, Integer>builder().put("bar", 2).build(),
-        ImmutableMultimap.of("baz", 3));
+        ImmutableMultimap.of("bar", 2));
   }
 
   ImmutableList<ImmutableMultimap<String, Integer>> testEntryToImmutableListMultimap() {
     return ImmutableList.of(
         ImmutableListMultimap.<String, Integer>builder().put(Map.entry("foo", 1)).build(),
         Stream.of(Map.entry("foo", 1))
-            .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)),
-        ImmutableMultimap.<String, Integer>builder().put(Map.entry("foo", 1)).build(),
-        ImmutableMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()));
+            .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
   ImmutableList<ImmutableMultimap<String, Integer>> testIterableToImmutableListMultimap() {
@@ -69,12 +64,6 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
             .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)),
         ImmutableMultimap.copyOf(ImmutableListMultimap.of("foo", 1)),
         ImmutableMultimap.copyOf(ImmutableListMultimap.of("foo", 1).entries()),
-        ImmutableMultimap.<String, Integer>builder()
-            .putAll(ImmutableListMultimap.of("foo", 1))
-            .build(),
-        ImmutableMultimap.<String, Integer>builder()
-            .putAll(ImmutableListMultimap.of("foo", 1).entries())
-            .build(),
         ImmutableMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
   }
 

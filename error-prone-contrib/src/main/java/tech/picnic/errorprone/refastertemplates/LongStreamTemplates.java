@@ -246,10 +246,7 @@ final class LongStreamTemplates {
   static final class LongStreamAllMatch {
     @BeforeTemplate
     boolean before(LongStream stream, LongPredicate predicate) {
-      return Refaster.anyOf(
-          stream.noneMatch(predicate.negate()),
-          !stream.anyMatch(predicate.negate()),
-          stream.filter(predicate.negate()).findAny().isEmpty());
+      return stream.noneMatch(predicate.negate());
     }
 
     @AfterTemplate
@@ -264,10 +261,7 @@ final class LongStreamTemplates {
 
     @BeforeTemplate
     boolean before(LongStream stream) {
-      return Refaster.anyOf(
-          stream.noneMatch(e -> !test(e)),
-          !stream.anyMatch(e -> !test(e)),
-          stream.filter(e -> !test(e)).findAny().isEmpty());
+      return stream.noneMatch(e -> !test(e));
     }
 
     @AfterTemplate

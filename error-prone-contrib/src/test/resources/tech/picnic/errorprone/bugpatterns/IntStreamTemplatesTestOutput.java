@@ -86,18 +86,12 @@ final class IntStreamTemplatesTest implements RefasterTemplateTestCase {
         IntStream.of(1).anyMatch(n -> n > 1), IntStream.of(2).anyMatch(n -> n > 2));
   }
 
-  ImmutableSet<Boolean> testIntStreamAllMatch() {
+  boolean testIntStreamAllMatch() {
     IntPredicate pred = i -> i > 0;
-    return ImmutableSet.of(
-        IntStream.of(1).allMatch(pred),
-        IntStream.of(2).allMatch(pred),
-        IntStream.of(3).allMatch(pred));
+    return IntStream.of(1).allMatch(pred);
   }
 
-  ImmutableSet<Boolean> testIntStreamAllMatch2() {
-    return ImmutableSet.of(
-        IntStream.of(1).allMatch(n -> n > 1),
-        IntStream.of(2).allMatch(n -> n > 2),
-        IntStream.of(3).allMatch(n -> n > 3));
+  boolean testIntStreamAllMatch2() {
+    return IntStream.of(1).allMatch(n -> n > 1);
   }
 }

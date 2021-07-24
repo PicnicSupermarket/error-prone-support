@@ -32,21 +32,15 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
   }
 
   ImmutableSet<ImmutableMultimap<String, Integer>> testEmptyImmutableListMultimap() {
-    return ImmutableSet.of(
-        ImmutableListMultimap.of(), ImmutableListMultimap.of(), ImmutableListMultimap.of());
+    return ImmutableSet.of(ImmutableListMultimap.of(), ImmutableListMultimap.of());
   }
 
   ImmutableSet<ImmutableMultimap<String, Integer>> testPairToImmutableListMultimap() {
-    return ImmutableSet.of(
-        ImmutableListMultimap.of("foo", 1),
-        ImmutableListMultimap.of("bar", 2),
-        ImmutableListMultimap.of("baz", 3));
+    return ImmutableSet.of(ImmutableListMultimap.of("foo", 1), ImmutableListMultimap.of("bar", 2));
   }
 
   ImmutableList<ImmutableMultimap<String, Integer>> testEntryToImmutableListMultimap() {
     return ImmutableList.of(
-        ImmutableListMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()),
-        ImmutableListMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()),
         ImmutableListMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()),
         ImmutableListMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()));
   }
@@ -60,8 +54,6 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
         ImmutableListMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))),
         ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1)),
         ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1)),
-        ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1)),
-        ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1).entries()),
         ImmutableListMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
   }
 

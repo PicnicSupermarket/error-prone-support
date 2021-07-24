@@ -246,10 +246,7 @@ final class IntStreamTemplates {
   static final class IntStreamAllMatch {
     @BeforeTemplate
     boolean before(IntStream stream, IntPredicate predicate) {
-      return Refaster.anyOf(
-          stream.noneMatch(predicate.negate()),
-          !stream.anyMatch(predicate.negate()),
-          stream.filter(predicate.negate()).findAny().isEmpty());
+      return stream.noneMatch(predicate.negate());
     }
 
     @AfterTemplate
@@ -264,10 +261,7 @@ final class IntStreamTemplates {
 
     @BeforeTemplate
     boolean before(IntStream stream) {
-      return Refaster.anyOf(
-          stream.noneMatch(e -> !test(e)),
-          !stream.anyMatch(e -> !test(e)),
-          stream.filter(e -> !test(e)).findAny().isEmpty());
+      return stream.noneMatch(e -> !test(e));
     }
 
     @AfterTemplate

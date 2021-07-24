@@ -117,21 +117,10 @@ final class StreamTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<Boolean> testStreamAllMatch() {
     Predicate<String> pred = String::isBlank;
     return ImmutableSet.of(
-        Stream.of("foo").allMatch(String::isBlank),
-        Stream.of("bar").allMatch(pred),
-        Stream.of("baz").allMatch(s -> s.length() > 1),
-        Stream.of("qux").allMatch(pred),
-        Stream.of("quux").allMatch(String::isEmpty),
-        Stream.of("quuz").allMatch(pred),
-        Stream.of(Boolean.TRUE).allMatch(b -> b),
-        Stream.of(Boolean.TRUE).allMatch(b -> b),
-        Stream.of(Boolean.TRUE).allMatch(b -> b));
+        Stream.of("foo").allMatch(String::isBlank), Stream.of("bar").allMatch(pred));
   }
 
-  ImmutableSet<Boolean> testStreamAllMatch2() {
-    return ImmutableSet.of(
-        Stream.of("foo").allMatch(s -> s.isBlank()),
-        Stream.of("bar").allMatch(s -> s.isEmpty()),
-        Stream.of("baz").allMatch(s -> s.isBlank()));
+  boolean testStreamAllMatch2() {
+    return Stream.of("foo").allMatch(s -> s.isBlank());
   }
 }

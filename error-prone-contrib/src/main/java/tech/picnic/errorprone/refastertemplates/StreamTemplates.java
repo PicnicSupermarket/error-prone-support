@@ -294,10 +294,7 @@ final class StreamTemplates {
   static final class StreamAllMatch<T> {
     @BeforeTemplate
     boolean before(Stream<T> stream, Predicate<? super T> predicate) {
-      return Refaster.anyOf(
-          stream.noneMatch(Refaster.anyOf(not(predicate), predicate.negate())),
-          !stream.anyMatch(Refaster.anyOf(not(predicate), predicate.negate())),
-          stream.filter(Refaster.anyOf(not(predicate), predicate.negate())).findAny().isEmpty());
+      return stream.noneMatch(Refaster.anyOf(not(predicate), predicate.negate()));
     }
 
     @AfterTemplate
@@ -312,10 +309,7 @@ final class StreamTemplates {
 
     @BeforeTemplate
     boolean before(Stream<T> stream) {
-      return Refaster.anyOf(
-          stream.noneMatch(e -> !test(e)),
-          !stream.anyMatch(e -> !test(e)),
-          stream.filter(e -> !test(e)).findAny().isEmpty());
+      return stream.noneMatch(e -> !test(e));
     }
 
     @AfterTemplate

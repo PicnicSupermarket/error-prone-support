@@ -83,18 +83,12 @@ final class DoubleStreamTemplatesTest implements RefasterTemplateTestCase {
         DoubleStream.of(2).filter(n -> n > 2).findAny().isPresent());
   }
 
-  ImmutableSet<Boolean> testDoubleStreamAllMatch() {
+  boolean testDoubleStreamAllMatch() {
     DoublePredicate pred = i -> i > 0;
-    return ImmutableSet.of(
-        DoubleStream.of(1).noneMatch(pred.negate()),
-        !DoubleStream.of(2).anyMatch(pred.negate()),
-        DoubleStream.of(3).filter(pred.negate()).findAny().isEmpty());
+    return DoubleStream.of(1).noneMatch(pred.negate());
   }
 
-  ImmutableSet<Boolean> testDoubleStreamAllMatch2() {
-    return ImmutableSet.of(
-        DoubleStream.of(1).noneMatch(n -> !(n > 1)),
-        !DoubleStream.of(2).anyMatch(n -> !(n > 2)),
-        DoubleStream.of(3).filter(n -> !(n > 3)).findAny().isEmpty());
+  boolean testDoubleStreamAllMatch2() {
+    return DoubleStream.of(1).noneMatch(n -> !(n > 1));
   }
 }

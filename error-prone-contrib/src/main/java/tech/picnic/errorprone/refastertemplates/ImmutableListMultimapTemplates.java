@@ -56,10 +56,7 @@ final class ImmutableListMultimapTemplates {
   static final class EmptyImmutableListMultimap<K, V> {
     @BeforeTemplate
     ImmutableMultimap<K, V> before() {
-      return Refaster.anyOf(
-          ImmutableListMultimap.<K, V>builder().build(),
-          ImmutableMultimap.<K, V>builder().build(),
-          ImmutableMultimap.of());
+      return Refaster.anyOf(ImmutableListMultimap.<K, V>builder().build(), ImmutableMultimap.of());
     }
 
     @AfterTemplate
@@ -80,7 +77,6 @@ final class ImmutableListMultimapTemplates {
     ImmutableMultimap<K, V> before(K key, V value) {
       return Refaster.anyOf(
           ImmutableListMultimap.<K, V>builder().put(key, value).build(),
-          ImmutableMultimap.<K, V>builder().put(key, value).build(),
           ImmutableMultimap.of(key, value));
     }
 
@@ -99,9 +95,8 @@ final class ImmutableListMultimapTemplates {
     ImmutableMultimap<K, V> before(Map.Entry<? extends K, ? extends V> entry) {
       return Refaster.anyOf(
           ImmutableListMultimap.<K, V>builder().put(entry).build(),
-          Stream.of(entry).collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)),
-          ImmutableMultimap.<K, V>builder().put(entry).build(),
-          ImmutableMultimap.of(entry.getKey(), entry.getValue()));
+          Stream.of(entry)
+              .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     @AfterTemplate
@@ -118,8 +113,7 @@ final class ImmutableListMultimapTemplates {
           ImmutableListMultimap.copyOf(iterable.entries()),
           ImmutableListMultimap.<K, V>builder().putAll(iterable).build(),
           ImmutableMultimap.copyOf(iterable),
-          ImmutableMultimap.copyOf(iterable.entries()),
-          ImmutableMultimap.<K, V>builder().putAll(iterable).build());
+          ImmutableMultimap.copyOf(iterable.entries()));
     }
 
     @BeforeTemplate
@@ -129,7 +123,6 @@ final class ImmutableListMultimapTemplates {
           ImmutableListMultimap.<K, V>builder().putAll(iterable).build(),
           Streams.stream(iterable)
               .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)),
-          ImmutableMultimap.<K, V>builder().putAll(iterable).build(),
           ImmutableMultimap.copyOf(iterable));
     }
 
