@@ -129,7 +129,7 @@
         that we can pick them up. (But in case of `baseline-refaster-rules`
         perhaps we can simply incorporate all of them.) -->
         <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
-        <version.palantir-baseline>4.4.0</version.palantir-baseline>
+        <version.palantir-baseline>4.7.0</version.palantir-baseline>
         <version.surefire>2.22.2</version.surefire>
     </properties>
 
@@ -1588,7 +1588,7 @@
             compiler. The following `add-exports` arguments are not necessary
             for the code to compile because `com.google.errorprone:javac` is on
             the classpath. In fact, enabling this profile when building with
-            Maven on the command line with cause a build failure, because these
+            Maven on the command line will cause a build failure, because these
             flags are incompatible with the `release` flag. This profile exists
             solely to be enabled within an IDE: without them IntelliJ IDEA
             reports compilation errors. -->
