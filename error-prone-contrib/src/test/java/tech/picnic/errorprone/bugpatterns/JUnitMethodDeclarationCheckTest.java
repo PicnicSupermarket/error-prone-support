@@ -91,7 +91,7 @@ public final class JUnitMethodDeclarationCheckTest {
             "import org.junit.jupiter.api.Test;",
             "import org.junit.jupiter.params.ParameterizedTest;",
             "",
-            "final class B extends A {",
+            "class B extends A {",
             "  @Override @BeforeAll void setUp1() {}",
             "  @Override @BeforeAll public void setUp2() {}",
             "  @Override @BeforeAll protected void setUp3() {}",

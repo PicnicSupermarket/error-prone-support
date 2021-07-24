@@ -352,13 +352,12 @@ final class AssertJTemplates {
   static final class ObjectEnumerableContainsOneDistinctElement<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
-      return Refaster.anyOf(
-          iterAssert.hasSameElementsAs(
-              Refaster.anyOf(
-                  ImmutableList.of(element),
-                  Arrays.asList(element),
-                  ImmutableSet.of(element),
-                  ImmutableMultiset.of(element))));
+      return iterAssert.hasSameElementsAs(
+          Refaster.anyOf(
+              ImmutableList.of(element),
+              Arrays.asList(element),
+              ImmutableSet.of(element),
+              ImmutableMultiset.of(element)));
     }
 
     @AfterTemplate
@@ -371,13 +370,12 @@ final class AssertJTemplates {
   static final class ObjectEnumerableIsSubsetOfOneElement<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
-      return Refaster.anyOf(
-          iterAssert.isSubsetOf(
-              Refaster.anyOf(
-                  ImmutableList.of(element),
-                  Arrays.asList(element),
-                  ImmutableSet.of(element),
-                  ImmutableMultiset.of(element))));
+      return iterAssert.isSubsetOf(
+          Refaster.anyOf(
+              ImmutableList.of(element),
+              Arrays.asList(element),
+              ImmutableSet.of(element),
+              ImmutableMultiset.of(element)));
     }
 
     @AfterTemplate
