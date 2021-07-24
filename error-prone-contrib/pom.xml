@@ -48,6 +48,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>refaster-support</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <scope>test</scope>
@@ -201,10 +205,26 @@
                                 <artifactId>refaster-resource-compiler</artifactId>
                                 <version>${project.version}</version>
                             </path>
+                            <path>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>refaster-support</artifactId>
+                                <version>${project.version}</version>
+                            </path>
                         </annotationProcessorPaths>
                         <compilerArgs combine.children="append">
                             <arg>-Xplugin:RefasterRuleResourceCompiler</arg>
                         </compilerArgs>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <configuration>
+                        <ignoredUnusedDeclaredDependencies>
+                            <!-- XXX: Figure out why the plugin thinks this
+                            dependency is unused. -->
+                            <ignoredUnusedDeclaredDependency>${project.groupId}:refaster-support</ignoredUnusedDeclaredDependency>
+                        </ignoredUnusedDeclaredDependencies>
                     </configuration>
                 </plugin>
             </plugins>

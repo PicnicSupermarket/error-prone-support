@@ -16,6 +16,7 @@ import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.ArrayList;
@@ -51,6 +52,7 @@ import org.assertj.core.api.ObjectEnumerableAssert;
 import org.assertj.core.api.OptionalDoubleAssert;
 import org.assertj.core.api.OptionalIntAssert;
 import org.assertj.core.api.OptionalLongAssert;
+import tech.picnic.errorprone.refaster.util.IsArray;
 
 /** Refaster templates related to AssertJ expressions and statements. */
 // XXX: Most `AbstractIntegerAssert` rules can also be applied for other primitive types. Generate
@@ -338,8 +340,14 @@ final class AssertJTemplates {
                   ImmutableList.of(element),
                   Arrays.asList(element),
                   ImmutableSet.of(element),
-                  ImmutableMultiset.of(element))),
-          iterAssert.containsExactlyInAnyOrder(element));
+                  ImmutableMultiset.of(element))));
+    }
+
+    @BeforeTemplate
+    @SuppressWarnings("unchecked")
+    ObjectEnumerableAssert<?, S> before2(
+        ObjectEnumerableAssert<?, S> iterAssert, @NotMatches(IsArray.class) T element) {
+      return iterAssert.containsExactlyInAnyOrder(element);
     }
 
     @AfterTemplate
