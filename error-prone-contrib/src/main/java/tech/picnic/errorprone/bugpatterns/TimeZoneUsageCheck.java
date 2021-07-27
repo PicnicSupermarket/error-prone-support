@@ -1,7 +1,11 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.enclosingClass;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
+import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
+import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 
 import com.google.auto.service.AutoService;
@@ -35,7 +39,11 @@ public final class TimeZoneUsageCheck extends BugChecker implements MethodInvoca
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> BANNED_TIME_METHOD =
       anyOf(
-          instanceMethod().onDescendantOf(Clock.class.getName()).namedAnyOf("getZone", "withZone"),
+          allOf(
+              instanceMethod()
+                  .onDescendantOf(Clock.class.getName())
+                  .namedAnyOf("getZone", "withZone"),
+              not(enclosingClass(isSubtypeOf(Clock.class)))),
           staticMethod()
               .onClass(Clock.class.getName())
               .namedAnyOf(
