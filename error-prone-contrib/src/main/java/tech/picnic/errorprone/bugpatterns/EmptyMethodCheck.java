@@ -17,9 +17,11 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
+import java.util.Optional;
 
 /** A {@link BugChecker} which flags empty methods that seemingly can simply be deleted. */
 @AutoService(BugChecker.class)
@@ -41,7 +43,8 @@ public final class EmptyMethodCheck extends BugChecker implements MethodTreeMatc
     if (tree.getBody() == null
         || !tree.getBody().getStatements().isEmpty()
         || ASTHelpers.containsComments(tree, state)
-        || PERMITTED_ANNOTATION.matches(tree, state)) {
+        || PERMITTED_ANNOTATION.matches(tree, state)
+        || isInPossibleTestHelperClass(state)) {
       return Description.NO_MATCH;
     }
 
@@ -51,5 +54,12 @@ public final class EmptyMethodCheck extends BugChecker implements MethodTreeMatc
     }
 
     return describeMatch(tree, SuggestedFix.delete(tree));
+  }
+
+  private static boolean isInPossibleTestHelperClass(VisitorState state) {
+    return Optional.ofNullable(ASTHelpers.findEnclosingNode(state.getPath(), ClassTree.class))
+        .map(ClassTree::getSimpleName)
+        .filter(name -> name.toString().contains("Test"))
+        .isPresent();
   }
 }

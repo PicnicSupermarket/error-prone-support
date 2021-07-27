@@ -33,6 +33,10 @@ public final class EmptyMethodCheckTest {
             "  interface F {",
             "    void fun();",
             "  }",
+            "",
+            "  final class MyTestClass {",
+            "    void helperMethod() {}",
+            "  }",
             "}")
         .addSourceLines(
             "B.java",
