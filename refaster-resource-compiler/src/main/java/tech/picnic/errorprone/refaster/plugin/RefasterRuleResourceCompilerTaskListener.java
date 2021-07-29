@@ -7,7 +7,7 @@ import com.google.common.collect.Multimaps;
 import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.refaster.RefasterRuleBuilderScanner;
-import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
@@ -74,7 +74,8 @@ final class RefasterRuleResourceCompilerTaskListener implements TaskListener {
           public Boolean visitAnnotation(AnnotationTree node, Void ctx) {
             Symbol sym = ASTHelpers.getSymbol(node);
             return (sym != null
-                    && sym.getQualifiedName().contentEquals(AfterTemplate.class.getCanonicalName()))
+                    && sym.getQualifiedName()
+                        .contentEquals(BeforeTemplate.class.getCanonicalName()))
                 || super.visitAnnotation(node, ctx);
           }
 
