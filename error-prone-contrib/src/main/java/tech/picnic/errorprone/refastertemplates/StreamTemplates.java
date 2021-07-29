@@ -148,6 +148,8 @@ final class StreamTemplates {
    */
   // XXX: Consider whether to have a similar rule for `.findAny()`. For parallel streams it
   // wouldn't be quite the same....
+  // XXX: This change is not equivalent for `null`-returning functions, as the original code throws
+  // an NPE if the first element is `null`, while the latter yields an empty `Optional`.
   static final class StreamMapFirst<T, S> {
     @BeforeTemplate
     Optional<S> before(Stream<T> stream, Function<? super T, S> function) {
