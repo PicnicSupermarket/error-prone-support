@@ -34,18 +34,17 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * A {@link BugChecker} which string concatenations that yield an argument to a format-string
- * accepting method.
+ * A {@link BugChecker} which flags string concatenations that produce a format string; in such
+ * cases the string concatenation should instead be deferred to the invoked method.
  *
  * @implNote This checker is based on the implementation of {@link
  *     com.google.errorprone.bugpatterns.flogger.FloggerStringConcatenation}.
  */
-// XXX: Support `@FormatMethod`-annotated methods.
-// XXX: Support `String.format`?
-// XXX: For methods delegating to `java.util.Formatter` _strictly speaking_ we should introduce
-// special handling of `Formattable` arguments, as this check would replace a `Formattable#toString`
-// invocation with a `Formattable#formatTo` invocation. But likely that should be considered a bug
-// fix, too.
+// XXX: Support arbitrary `@FormatMethod`-annotated methods.
+// XXX: For (explicit or delegated) invocations of `java.util.Formatter` _strictly speaking_ we
+// should introduce special handling of `Formattable` arguments, as this check would replace a
+// `Formattable#toString` invocation with a `Formattable#formatTo` invocation. But likely that
+// should be considered a bug fix, too.
 // XXX: Introduce a separate check which adds/removes the `Locale` parameter to `String.format`
 // invocations, as necessary.
 @AutoService(BugChecker.class)
@@ -118,6 +117,10 @@ public final class FormatStringConcatenationCheck extends BugChecker
               .onClass("com.google.common.base.Preconditions")
               .namedAnyOf("checkArgument", "checkNotNull", "checkState"),
           staticMethod().onClass("com.google.common.base.Verify").named("verify"));
+  private static final Matcher<ExpressionTree> JDK_FORMAT_METHOD =
+      anyOf(
+          staticMethod().onClass("java.lang.String").named("format"),
+          instanceMethod().onExactClass("java.util.Formatter").named("format"));
   private static final Matcher<ExpressionTree> SLF4J_FORMAT_METHOD =
       instanceMethod()
           .onDescendantOf("org.slf4j.Logger")
@@ -125,14 +128,16 @@ public final class FormatStringConcatenationCheck extends BugChecker
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (hasNonConstantStringConcatenationArgument(tree, 0)) {
+    if (hasNonConstantStringConcatenationArgument(tree, 0, state)) {
       return flagViolation(tree, ASSERTJ_FORMAT_METHOD, 0, "%s", state)
+          .or(() -> flagViolation(tree, JDK_FORMAT_METHOD, 0, "%s", state))
           .or(() -> flagViolation(tree, SLF4J_FORMAT_METHOD, 0, "{}", state))
           .orElse(Description.NO_MATCH);
     }
 
-    if (hasNonConstantStringConcatenationArgument(tree, 1)) {
+    if (hasNonConstantStringConcatenationArgument(tree, 1, state)) {
       return flagViolation(tree, GUAVA_FORMAT_METHOD, 1, "%s", state)
+          .or(() -> flagViolation(tree, JDK_FORMAT_METHOD, 1, "%s", state))
           .or(() -> flagViolation(tree, SLF4J_FORMAT_METHOD, 1, "{}", state))
           .orElse(Description.NO_MATCH);
     }
@@ -177,7 +182,7 @@ public final class FormatStringConcatenationCheck extends BugChecker
   }
 
   private static boolean hasNonConstantStringConcatenationArgument(
-      MethodInvocationTree tree, int argPosition) {
+      MethodInvocationTree tree, int argPosition, VisitorState state) {
     List<? extends ExpressionTree> arguments = tree.getArguments();
     if (arguments.size() <= argPosition) {
       /* This method doesn't accept enough parameters. */
@@ -185,7 +190,13 @@ public final class FormatStringConcatenationCheck extends BugChecker
     }
 
     ExpressionTree argument = ASTHelpers.stripParentheses(arguments.get(argPosition));
-    return argument instanceof BinaryTree && ASTHelpers.constValue(argument, String.class) == null;
+    return argument instanceof BinaryTree
+        && isStringTyped(argument, state)
+        && ASTHelpers.constValue(argument, String.class) == null;
+  }
+
+  private static boolean isStringTyped(ExpressionTree tree, VisitorState state) {
+    return ASTHelpers.isSameType(ASTHelpers.getType(tree), state.getSymtab().stringType, state);
   }
 
   private static class ReplacementArgumentsConstructor
@@ -209,8 +220,7 @@ public final class FormatStringConcatenationCheck extends BugChecker
     @Override
     public Void visitParenthesized(ParenthesizedTree tree, VisitorState state) {
       ExpressionTree innerTree = ASTHelpers.stripParentheses(tree);
-      if (ASTHelpers.isSameType(
-          ASTHelpers.getType(innerTree), state.getSymtab().stringType, state)) {
+      if (isStringTyped(innerTree, state)) {
         innerTree.accept(this, state);
       } else {
         appendExpression(innerTree);
