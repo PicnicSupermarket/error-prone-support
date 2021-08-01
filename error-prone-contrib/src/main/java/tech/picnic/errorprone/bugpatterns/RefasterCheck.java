@@ -98,6 +98,8 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
       // XXX: This `try/catch` block handles the issue described and resolved in
       // https://github.com/google/error-prone/pull/2456. Drop this block once that change is
       // released.
+      // XXX: Find a way to identify that we're running Picnic's Error Prone fork and disable this
+      // fallback if so, as it might hide other bugs.
       return Description.NO_MATCH;
     }
     /* Then apply them. */
