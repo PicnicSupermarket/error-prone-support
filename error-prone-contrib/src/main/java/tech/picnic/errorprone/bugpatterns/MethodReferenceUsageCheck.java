@@ -69,7 +69,10 @@ public final class MethodReferenceUsageCheck extends BugChecker
      */
     return constructMethodRef(tree, tree.getBody())
         .map(SuggestedFix.Builder::build)
-        .filter(fix -> SuggestedFixes.compilesWithFix(fix, state))
+        .filter(
+            fix ->
+                SuggestedFixes.compilesWithFix(
+                    fix, state, ImmutableList.of(), /* onlyInSameCompilationUnit= */ true))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
