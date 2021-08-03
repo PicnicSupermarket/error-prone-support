@@ -97,9 +97,21 @@ final class AssertJOptionalTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     AbstractOptionalAssert<?, T> after(AbstractOptionalAssert<?, T> optionalAssert, T value) {
       return optionalAssert.hasValue(value);
+    }
+  }
+
+  static final class AbstractOptionalAssertContainsSame<T> {
+    @BeforeTemplate
+    AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert, T value) {
+      return Refaster.anyOf(
+          optionalAssert.get().isSameAs(value), optionalAssert.isPresent().isSameAs(value));
+    }
+
+    @AfterTemplate
+    AbstractOptionalAssert<?, T> after(AbstractOptionalAssert<?, T> optionalAssert, T value) {
+      return optionalAssert.containsSame(value);
     }
   }
 

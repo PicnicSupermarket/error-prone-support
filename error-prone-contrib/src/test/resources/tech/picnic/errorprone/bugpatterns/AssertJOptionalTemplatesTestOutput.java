@@ -40,6 +40,11 @@ final class AssertJOptionalTemplatesTest implements RefasterTemplateTestCase {
         assertThat(Optional.of(4)).hasValue(4));
   }
 
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractOptionalAssertContainsSame() {
+    return ImmutableSet.of(
+        assertThat(Optional.of(1)).containsSame(1), assertThat(Optional.of(2)).containsSame(2));
+  }
+
   AbstractAssert<?, ?> testAssertThatOptionalHasValueMatching() {
     return assertThat(Optional.of("foo")).get().matches(String::isEmpty);
   }
