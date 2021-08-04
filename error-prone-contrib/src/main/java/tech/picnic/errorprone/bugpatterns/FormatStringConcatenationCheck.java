@@ -117,6 +117,7 @@ public final class FormatStringConcatenationCheck extends BugChecker
               .onClass("com.google.common.base.Preconditions")
               .namedAnyOf("checkArgument", "checkNotNull", "checkState"),
           staticMethod().onClass("com.google.common.base.Verify").named("verify"));
+  // XXX: Add `PrintWriter`, maybe others.
   private static final Matcher<ExpressionTree> JDK_FORMAT_METHOD =
       anyOf(
           staticMethod().onClass("java.lang.String").named("format"),

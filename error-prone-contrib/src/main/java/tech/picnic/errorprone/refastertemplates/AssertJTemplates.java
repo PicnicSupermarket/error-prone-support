@@ -357,6 +357,18 @@ final class AssertJTemplates {
     }
   }
 
+  static final class AssertThatSetContainsExactlyOneElement<S, T extends S> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, S> before(Set<S> set, T element) {
+      return assertThat(set).containsOnly(element);
+    }
+
+    @AfterTemplate
+    ObjectEnumerableAssert<?, S> after(Set<S> set, T element) {
+      return assertThat(set).containsExactly(element);
+    }
+  }
+
   static final class ObjectEnumerableContainsOneDistinctElement<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
