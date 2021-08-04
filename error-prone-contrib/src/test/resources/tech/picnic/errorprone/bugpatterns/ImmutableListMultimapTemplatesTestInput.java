@@ -94,7 +94,8 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
             .collect(
                 flatteningToImmutableListMultimap(
                     Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))),
-        Multimaps.asMap((Multimap<String, Long>) ImmutableSetMultimap.of("bar", 2L)).entrySet()
+        Multimaps.asMap((Multimap<String, Long>) ImmutableSetMultimap.of("bar", 2L))
+            .entrySet()
             .stream()
             .collect(
                 flatteningToImmutableListMultimap(
