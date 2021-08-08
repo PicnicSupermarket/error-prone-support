@@ -129,9 +129,10 @@
         default value. -->
         <build.number>LOCAL</build.number>
         <!-- Properties using which additional Error Prone flags can be
-        specified. Used by the `patch` and `self-check` profiles. -->
+        specified. The first may be used to specify flags on the command line;
+        the second is used by the `patch` profile. -->
+        <error-prone.extra-args />
         <error-prone.patch-args />
-        <error-prone.self-check-args />
         <!-- The Maven `groupId` under which Error Prone dependencies are
         published. By default we use an official Error Prone release. This
         property allows the `error-prone-fork` profile below to build the
@@ -1350,16 +1351,14 @@
             <!-- Applies the Error Prone checks defined by this project to the
             code base itself. Assumes that a prior build has already installed
             the project in the local Maven repository. -->
+            <!-- XXX: Find a way to assert that test code (both inline
+            `BugChecker` test code and the Refaster test files) does not
+            exhibit anti-patterns other than those associated with the
+            check/template under test. Ideally all test cases are
+            realistic. -->
             <id>self-check</id>
             <properties>
-                <!-- XXX: `MethodReferenceUsage` is an extremely expensive
-                check due to its use of `SuggestedFixes.compilesWithFix`. Maybe
-                we should drop it altogether? -->
-                <!-- XXX: Find a way to assert that test code (both inline
-                `BugChecker` test code and the Refaster test files) does not
-                exhibit anti-patterns other than those associated with the
-                check/template under test. Ideally all test cases are realistic. -->
-                <error-prone.self-check-args>-XepAllSuggestionsAsWarnings -Xep:MethodReferenceUsage:OFF</error-prone.self-check-args>
+                <error-prone.self-check-args>-XepAllSuggestionsAsWarnings</error-prone.self-check-args>
             </properties>
             <build>
                 <plugins>
@@ -1552,7 +1551,7 @@
                                     -XepOpt:Nullness:Conservative=false
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
-                                    ${error-prone.self-check-args}
+                                    ${error-prone.extra-args}
                                 </arg>
                                 <!-- The Error Prone plugin makes certain
                                 assumptions about the state of the AST at the

@@ -11,12 +11,16 @@ final class MethodReferenceUsageTest {
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(MethodReferenceUsage.class, getClass());
 
+  // XXX: Disable the `replacement` test and verify using PIT that this test covers all
+  // identification cases.
   @Test
   void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
             "import com.google.common.collect.Streams;",
+            "import com.google.errorprone.refaster.annotation.AfterTemplate;",
+            "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
             "import java.util.HashMap;",
             "import java.util.Map;",
             "import java.util.function.IntConsumer;",
@@ -259,6 +263,18 @@ final class MethodReferenceUsageTest {
             "        i -> {",
             "          Integer.toString(i);",
             "        });",
+            "  }",
+            "",
+            "  @AfterTemplate",
+            "  void refasterBeforeTemplateFunctionCalls() {",
+            "    s.forEach(v -> String.valueOf(v));",
+            "    s.forEach((v) -> { String.valueOf(v); });",
+            "  }",
+            "",
+            "  @BeforeTemplate",
+            "  void refasterAfterTemplateFunctionCalls() {",
+            "    m.forEach((k, v) -> m.put(k, v));",
+            "    m.forEach((Integer k, Integer v) -> { m.put(k, v); });",
             "  }",
             "",
             "  void assortedOtherEdgeCases() {",
