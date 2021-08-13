@@ -365,6 +365,13 @@
                     <groupId>com.coveo</groupId>
                     <artifactId>fmt-maven-plugin</artifactId>
                     <version>2.11</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.google.googlejavaformat</groupId>
+                            <artifactId>google-java-format</artifactId>
+                            <version>1.11.0</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>com.github.ekryd.sortpom</groupId>
@@ -385,27 +392,11 @@
                     </configuration>
                     <executions>
                         <execution>
+                            <id>verify-pom-sorting</id>
                             <goals>
                                 <goal>verify</goal>
                             </goals>
                             <phase>verify</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>com.lewisd</groupId>
-                    <artifactId>lint-maven-plugin</artifactId>
-                    <version>0.0.11</version>
-                    <configuration>
-                        <failOnViolation>false</failOnViolation>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>validate-pom</id>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                            <phase>validate</phase>
                         </execution>
                     </executions>
                 </plugin>
@@ -605,6 +596,10 @@
                                             <!-- Instead, please use
                                             `com.google.common.base.Preconditions`. -->
                                         </property>
+                                        <property name="illegalClasses" value="org\.assertj\.core\.util\.Streams(\..*?)?">
+                                            <!-- Instead, please use
+                                            `com.google.common.collect.Streams`. -->
+                                        </property>
                                         <property name="illegalClasses" value="org\.junit\.jupiter\.api\.Assertions(\..*?)?">
                                             <!-- Instead, please use
                                             `org.assertj.core.api.Assertions`. -->
@@ -622,7 +617,7 @@
                                         </property>
                                         <property name="illegalClasses" value="org\.testng\.AssertJUnit(\..*?)?">
                                             <!-- Instead, please use
-                                            `com.google.common.base.Preconditions`. -->
+                                            `org.assertj.core.api.Assertions`. -->
                                         </property>
                                         <property name="regexp" value="true" />
                                     </module>
@@ -631,6 +626,10 @@
                                     <module name="InnerAssignment" />
                                     <module name="InvalidJavadocPosition" />
                                     <module name="JavadocBlockTagLocation" />
+                                    <module name="MatchXpath">
+                                        <property name="query" value="//BLOCK_COMMENT_BEGIN[./COMMENT_CONTENT[contains(@text, '@author')]]" />
+                                        <message key="matchxpath.match" value="Avoid the `@author` Javadoc tag; Git history suffices." />
+                                    </module>
                                     <module name="MissingDeprecated" />
                                     <module name="MutableException" />
                                     <module name="NeedBraces" />
@@ -648,13 +647,6 @@
                                     <module name="SimplifyBooleanReturn" />
                                     <module name="SuppressWarningsHolder" />
                                     <module name="TrailingComment" />
-                                    <module name="WriteTag">
-                                        <property name="tag" value="@author" />
-                                        <property name="tagFormat" value="\S" />
-                                        <property name="tagSeverity" value="error" />
-                                        <property name="severity" value="ignore" />
-                                    </module>
-                                    <module name="UnnecessaryParentheses" />
                                     <module name="UnnecessarySemicolonAfterTypeMemberDeclaration" />
                                     <module name="UnnecessarySemicolonInEnumeration" />
                                     <module name="UnnecessarySemicolonInTryWithResources" />
@@ -675,7 +667,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>8.41.1</version>
+                            <version>8.45.1</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -736,6 +728,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>2.8.2</version>
+                    <configuration>
+                        <retryFailedDeploymentCount>3</retryFailedDeploymentCount>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1071,7 +1066,7 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <id>modernize</id>
+                            <id>run-modernizer</id>
                             <goals>
                                 <goal>modernizer</goal>
                             </goals>
@@ -1249,10 +1244,6 @@
                     <plugin>
                         <groupId>com.github.ekryd.sortpom</groupId>
                         <artifactId>sortpom-maven-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.lewisd</groupId>
-                        <artifactId>lint-maven-plugin</artifactId>
                     </plugin>
                     <plugin>
                         <groupId>de.thetaphi</groupId>
@@ -1473,9 +1464,9 @@
         </profile>
         <profile>
             <!-- The `build-checks` and `error-prone` profiles enable a whole
-            bunch of additional compile checks. This profile ensures that by
-            default those warnings break the build. Disabling this profile
-            allows one to collect all build warnings without failing the build. -->
+            bunch of additional compile checks. By default those warnings break
+            the build. This profile allows one to collect all build warnings
+            without failing the build. -->
             <id>disallow-warnings</id>
             <activation>
                 <property>
@@ -1490,13 +1481,6 @@
                             <artifactId>sortpom-maven-plugin</artifactId>
                             <configuration>
                                 <verifyFail>stop</verifyFail>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>com.lewisd</groupId>
-                            <artifactId>lint-maven-plugin</artifactId>
-                            <configuration>
-                                <failOnViolation>true</failOnViolation>
                             </configuration>
                         </plugin>
                         <plugin>
