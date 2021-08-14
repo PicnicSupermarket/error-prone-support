@@ -69,6 +69,21 @@
         arguments. In particular, JaCoCo relies on this for the configuration
         of its Java agent. -->
         <argLine>
+            <!-- Error Prone makes extensive use of unsupported
+            `javac`-internal APIs, in some cases even reflectively inspecting
+            them. These APIs are accessed at compile time and when running
+            tests. The former case is covered by flags in `.mvn/jvm.config`;
+            the latter is covered here. -->
+            --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
+            --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+            --add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED
+            --add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED
+            --add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED
+            --add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED
+            --add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED
+            --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
+            --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
+            --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED
             <!-- The test JVMs are short-running. By disabling certain
             expensive JIT optimizations we actually speed up most tests. -->
             -XX:TieredStopAtLevel=1
