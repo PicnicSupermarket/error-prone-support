@@ -63,12 +63,12 @@ public final class RefasterCheckTest {
           "Optional",
           "Primitive",
           "Reactor",
-          "RequestBodySpec",
           "RxJava2Adapter",
           "Stream",
           "String",
           "TestNGToAssertJ",
-          "Time");
+          "Time",
+          "WebClient");
   /**
    * Matches the parts of the fully-qualified name of a template class that should be removed in
    * order to produce the associated {@link #TEMPLATE_GROUPS template group name}.
