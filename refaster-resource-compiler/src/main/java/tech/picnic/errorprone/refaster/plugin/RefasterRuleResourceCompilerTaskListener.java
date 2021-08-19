@@ -23,6 +23,7 @@ import com.sun.tools.javac.main.JavaCompiler;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Name;
 import java.io.IOException;
+import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.UncheckedIOException;
 import java.util.List;
@@ -62,7 +63,7 @@ final class RefasterRuleResourceCompilerTaskListener implements TaskListener {
       try {
         outputCodeTransformers(rule.getValue(), getOutputFile(taskEvent, rule.getKey()));
       } catch (IOException e) {
-        throw new UncheckedIOException(e);
+        throw new UncheckedIOException("Failed to persist compiled Refaster templates", e);
       }
     }
   }
@@ -71,12 +72,12 @@ final class RefasterRuleResourceCompilerTaskListener implements TaskListener {
     return Boolean.TRUE.equals(
         new TreeScanner<Boolean, Void>() {
           @Override
-          public Boolean visitAnnotation(AnnotationTree node, Void ctx) {
+          public Boolean visitAnnotation(AnnotationTree node, Void v) {
             Symbol sym = ASTHelpers.getSymbol(node);
             return (sym != null
                     && sym.getQualifiedName()
                         .contentEquals(BeforeTemplate.class.getCanonicalName()))
-                || super.visitAnnotation(node, ctx);
+                || super.visitAnnotation(node, v);
           }
 
           @Override
@@ -89,13 +90,13 @@ final class RefasterRuleResourceCompilerTaskListener implements TaskListener {
   private ImmutableListMultimap<ClassTree, CodeTransformer> compileRefasterTemplates(
       ClassTree tree) {
     ListMultimap<ClassTree, CodeTransformer> rules = ArrayListMultimap.create();
-    new TreeScanner<Void, Context>() {
+    new TreeScanner<Void, Void>() {
       @Override
-      public Void visitClass(ClassTree node, Context ctx) {
-        rules.putAll(node, RefasterRuleBuilderScanner.extractRules(node, ctx));
-        return super.visitClass(node, ctx);
+      public Void visitClass(ClassTree node, Void v) {
+        rules.putAll(node, RefasterRuleBuilderScanner.extractRules(node, context));
+        return super.visitClass(node, null);
       }
-    }.scan(tree, context);
+    }.scan(tree, null);
     return ImmutableListMultimap.copyOf(rules);
   }
 
@@ -124,7 +125,7 @@ final class RefasterRuleResourceCompilerTaskListener implements TaskListener {
 
   private static void outputCodeTransformers(List<CodeTransformer> rules, FileObject target)
       throws IOException {
-    try (ObjectOutputStream output = new ObjectOutputStream(target.openOutputStream())) {
+    try (ObjectOutput output = new ObjectOutputStream(target.openOutputStream())) {
       output.writeObject(CompositeCodeTransformer.compose(rules));
     }
   }
