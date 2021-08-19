@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyMethod;
 import static com.google.errorprone.matchers.Matchers.anyOf;
@@ -162,10 +161,6 @@ public final class FormatStringConcatenationCheck extends BugChecker
     }
 
     List<? extends ExpressionTree> arguments = tree.getArguments();
-    ExpressionTree formatStringArg = arguments.get(formatStringParam);
-    ReplacementArgumentsConstructor replacementConstructor =
-        new ReplacementArgumentsConstructor(formatSpecifier);
-    formatStringArg.accept(replacementConstructor, state);
 
     if (arguments.size() > formatStringParam + 1) {
       /*
@@ -174,6 +169,11 @@ public final class FormatStringConcatenationCheck extends BugChecker
        */
       return Optional.of(describeMatch(tree));
     }
+
+    ExpressionTree formatStringArg = arguments.get(formatStringParam);
+    ReplacementArgumentsConstructor replacementConstructor =
+        new ReplacementArgumentsConstructor(formatSpecifier);
+    formatStringArg.accept(replacementConstructor, state);
 
     return Optional.of(
         describeMatch(
@@ -212,21 +212,19 @@ public final class FormatStringConcatenationCheck extends BugChecker
 
     @Override
     public Void visitBinary(BinaryTree tree, VisitorState state) {
-      checkState(tree.getKind() == Kind.PLUS, "Unexpected binary operand: %s", tree.getKind());
-      tree.getLeftOperand().accept(this, state);
-      tree.getRightOperand().accept(this, state);
+      if (tree.getKind() == Kind.PLUS && isStringTyped(tree, state)) {
+        tree.getLeftOperand().accept(this, state);
+        tree.getRightOperand().accept(this, state);
+      } else {
+        appendExpression(tree);
+      }
+
       return null;
     }
 
     @Override
     public Void visitParenthesized(ParenthesizedTree tree, VisitorState state) {
-      ExpressionTree innerTree = ASTHelpers.stripParentheses(tree);
-      if (isStringTyped(innerTree, state)) {
-        innerTree.accept(this, state);
-      } else {
-        appendExpression(innerTree);
-      }
-      return null;
+      return tree.getExpression().accept(this, state);
     }
 
     @Override
