@@ -128,13 +128,13 @@
         <version.auto-service>1.0</version.auto-service>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.8.1</version.error-prone-orig>
+        <version.error-prone-orig>2.9.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
-        <version.mockito>3.11.2</version.mockito>
+        <version.mockito>3.12.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.9.2</version.nullaway>
         <!-- XXX: Two other dependencies are potentially of interest:
@@ -145,7 +145,7 @@
         that we can pick them up. (But in case of `baseline-refaster-rules`
         perhaps we can simply incorporate all of them.) -->
         <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
-        <version.palantir-baseline>4.15.0</version.palantir-baseline>
+        <version.palantir-baseline>4.21.0</version.palantir-baseline>
         <version.surefire>2.22.2</version.surefire>
     </properties>
 
@@ -1060,7 +1060,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>2.2.0</version>
+                    <version>2.3.0</version>
                     <configuration>
                         <exclusionPatterns>
                             <!-- The plugin suggests replacing Guava's
@@ -1069,6 +1069,12 @@
                             methods don't allow one to convey immutability at
                             the type system level. -->
                             <exclusionPattern>com/google/common/collect/Immutable(List|Map|Set)\.(copyOf|of):.*</exclusionPattern>
+                            <!-- The plugin suggests replacing usages of
+                            Guava's `Iterables` class with
+                            `java.util.stream.Stream` equivalents, but the
+                            alternative is often more verbose, requiring
+                            unnecessary conversions to and from streams. -->
+                            <exclusionPattern>com/google/common/collect/Iterables\..*</exclusionPattern>
                         </exclusionPatterns>
                         <failOnViolations>false</failOnViolations>
                         <ignorePackages>
