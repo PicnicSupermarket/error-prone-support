@@ -24,39 +24,19 @@ import reactor.core.publisher.Mono;
 public final class RxJavaToReactorTemplates {
   private RxJavaToReactorTemplates() {}
 
-  static final class RemoveRedundantCast<T> {
+  static final class FluxToFlowableToFlux<T> {
     @BeforeTemplate
-    T before(T object) {
-      return (T) object;
+    Flux<T> before(Flux<T> flux, BackpressureStrategy strategy) {
+      return Refaster.anyOf(
+          flux.as(RxJava2Adapter::fluxToObservable)
+              .toFlowable(strategy)
+              .as(RxJava2Adapter::flowableToFlux),
+          flux.as(RxJava2Adapter::fluxToFlowable).as(RxJava2Adapter::flowableToFlux));
     }
 
     @AfterTemplate
-    T after(T object) {
-      return object;
-    }
-  }
-
-  static final class MaybeCast<T> {
-    @BeforeTemplate
-    Maybe<T> before(Maybe<T> maybe) {
-      return maybe.cast(Refaster.<T>clazz());
-    }
-
-    @AfterTemplate
-    Maybe<T> after(Maybe<T> maybe) {
-      return maybe;
-    }
-  }
-
-  static final class MaybeWrap<T> {
-    @BeforeTemplate
-    Maybe<T> before(Maybe<T> maybe) {
-      return Maybe.wrap(maybe);
-    }
-
-    @AfterTemplate
-    Maybe<T> after(Maybe<T> maybe) {
-      return maybe;
+    Flux<T> after(Flux<T> flux) {
+      return flux;
     }
   }
 
@@ -169,7 +149,7 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: Change location and perhaps omit this one.
+  // XXX: Perhaps omit this one.
   abstract static class MaybeDeferToMono<T> {
     @Placeholder
     abstract Maybe<T> maybeProducer();
@@ -185,37 +165,31 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  /**
-   * XXX: Temporary solution, this could be fixed when we know whether the function throws an
-   * Exception.
-   */
-  public static final class MyUtil {
+  static final class MaybeCast<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe) {
+      return maybe.cast(Refaster.<T>clazz());
+    }
 
-    private MyUtil() {}
-
-    /**
-     * Temporary construct to convert functions that do not throw an exception
-     *
-     * <p>The idea is to convert a io.reactivex.functions.Function to a java.util.function.Function.
-     *
-     * @param function The function to convert
-     * @param <I> The input type
-     * @param <O> The output type
-     * @return the java.util.function.Function
-     */
-    @SuppressWarnings({"IllegalCatch", "NoFunctionalReturnType"})
-    public static <I, O> java.util.function.Function<I, O> convert(
-        Function<? super I, ? extends O> function) {
-      return input -> {
-        try {
-          return function.apply(input);
-        } catch (Exception e) {
-          throw Exceptions.propagate(e);
-        }
-      };
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe) {
+      return maybe;
     }
   }
 
+  static final class MaybeWrap<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe) {
+      return Maybe.wrap(maybe);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe) {
+      return maybe;
+    }
+  }
+
+  // See the MyUtil for additional explanation.
   static final class MaybeFlatMapFunction<I, T extends I, O, M extends MaybeSource<? extends O>> {
     @BeforeTemplate
     Maybe<O> before(Maybe<T> maybe, Function<I, M> function) {
@@ -232,28 +206,6 @@ public final class RxJavaToReactorTemplates {
                   RxJava2Adapter.maybeToMono(
                       Maybe.wrap((Maybe<O>) MyUtil.convert(function).apply(v))))
           .as(RxJava2Adapter::monoToMaybe);
-    }
-  }
-
-  // "Coersion" (find better name):
-  // instanceof (support this?)
-  // two functional interfaces with:
-  // B.return type extends A.return type
-  // A.param 1 type extends B.param 1 type
-  // ....
-  // B throws a subset of the exceptions thrown by A
-
-  //  @CheckParameterCoersion
-  @SuppressWarnings("NoFunctionalReturnType")
-  static final class UnnecessaryConversion<I, O> {
-    @BeforeTemplate
-    java.util.function.Function<I, O> before(Function<I, O> function) {
-      return MyUtil.convert(function);
-    }
-
-    @AfterTemplate
-    java.util.function.Function<I, O> after(java.util.function.Function<I, O> function) {
-      return function;
     }
   }
 
@@ -321,6 +273,38 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
+  static final class RemoveRedundantCast<T> {
+    @BeforeTemplate
+    T before(T object) {
+      return (T) object;
+    }
+
+    @AfterTemplate
+    T after(T object) {
+      return object;
+    }
+  }
+
+  // XXX: What should we do with the naming here? Since it is not entirely correct now.
+  static final class MonoToFlowableToMono<T> {
+    @BeforeTemplate
+    Mono<Void> before(Mono<Void> mono) {
+      return mono.as(RxJava2Adapter::monoToCompletable).as(RxJava2Adapter::completableToMono);
+    }
+
+    @BeforeTemplate
+    Mono<T> before2(Mono<T> mono) {
+      return Refaster.anyOf(
+          mono.as(RxJava2Adapter::monoToMaybe).as(RxJava2Adapter::maybeToMono),
+          mono.as(RxJava2Adapter::monoToSingle).as(RxJava2Adapter::singleToMono));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono) {
+      return mono;
+    }
+  }
+
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
   static final class SingleFilter<S, T extends S> {
     @BeforeTemplate
@@ -366,42 +350,6 @@ public final class RxJavaToReactorTemplates {
     @AfterTemplate
     Single<O> after(Single<T> single, java.util.function.Function<I, O> function) {
       return single.as(RxJava2Adapter::singleToMono).map(function).as(RxJava2Adapter::monoToSingle);
-    }
-  }
-
-  static final class FluxToFlowableToFlux<T> {
-    @BeforeTemplate
-    Flux<T> before(Flux<T> flux, BackpressureStrategy strategy) {
-      return Refaster.anyOf(
-          flux.as(RxJava2Adapter::fluxToObservable)
-              .toFlowable(strategy)
-              .as(RxJava2Adapter::flowableToFlux),
-          flux.as(RxJava2Adapter::fluxToFlowable).as(RxJava2Adapter::flowableToFlux));
-    }
-
-    @AfterTemplate
-    Flux<T> after(Flux<T> flux) {
-      return flux;
-    }
-  }
-
-  // XXX: Stephan, what should we do with the naming here? Since it is not entirely correct now.
-  static final class MonoToFlowableToMono<T> {
-    @BeforeTemplate
-    Mono<Void> before(Mono<Void> mono) {
-      return mono.as(RxJava2Adapter::monoToCompletable).as(RxJava2Adapter::completableToMono);
-    }
-
-    @BeforeTemplate
-    Mono<T> before2(Mono<T> mono) {
-      return Refaster.anyOf(
-          mono.as(RxJava2Adapter::monoToMaybe).as(RxJava2Adapter::maybeToMono),
-          mono.as(RxJava2Adapter::monoToSingle).as(RxJava2Adapter::singleToMono));
-    }
-
-    @AfterTemplate
-    Mono<T> after(Mono<T> mono) {
-      return mono;
     }
   }
 
@@ -451,4 +399,57 @@ public final class RxJavaToReactorTemplates {
   //      return Mono.fromSupplier(callable);
   //    }
   //  }
+
+  /**
+   * XXX: Temporary solution, this could be fixed when we know whether the function throws an
+   * Exception.
+   */
+  public static final class MyUtil {
+
+    private MyUtil() {}
+
+    /**
+     * Temporary construct to convert functions that do not throw an exception
+     *
+     * <p>The idea is to convert a io.reactivex.functions.Function to a java.util.function.Function.
+     *
+     * @param function The function to convert
+     * @param <I> The input type
+     * @param <O> The output type
+     * @return the java.util.function.Function
+     */
+    @SuppressWarnings({"IllegalCatch", "NoFunctionalReturnType"})
+    public static <I, O> java.util.function.Function<I, O> convert(
+        Function<? super I, ? extends O> function) {
+      return input -> {
+        try {
+          return function.apply(input);
+        } catch (Exception e) {
+          throw Exceptions.propagate(e);
+        }
+      };
+    }
+  }
+
+  // "Coersion" (find better name):
+  // instanceof (support this?)
+  // two functional interfaces with:
+  // B.return type extends A.return type
+  // A.param 1 type extends B.param 1 type
+  // ....
+  // B throws a subset of the exceptions thrown by A
+
+  //  @CheckParameterCoersion
+  @SuppressWarnings("NoFunctionalReturnType")
+  static final class UnnecessaryConversion<I, O> {
+    @BeforeTemplate
+    java.util.function.Function<I, O> before(Function<I, O> function) {
+      return MyUtil.convert(function);
+    }
+
+    @AfterTemplate
+    java.util.function.Function<I, O> after(java.util.function.Function<I, O> function) {
+      return function;
+    }
+  }
 }
