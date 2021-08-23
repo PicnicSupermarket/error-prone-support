@@ -26,7 +26,6 @@ public final class RxJavaToReactorTemplates {
 
   static final class RemoveRedundantCast<T> {
     @BeforeTemplate
-    @SuppressWarnings("RedundantCast")
     T before(T object) {
       return (T) object;
     }
@@ -190,7 +189,9 @@ public final class RxJavaToReactorTemplates {
    * XXX: Temporary solution, this could be fixed when we know whether the function throws an
    * Exception.
    */
-  public static class MyUtil {
+  public static final class MyUtil {
+
+    private MyUtil() {}
 
     /**
      * Temporary construct to convert functions that do not throw an exception
@@ -202,6 +203,7 @@ public final class RxJavaToReactorTemplates {
      * @param <O> The output type
      * @return the java.util.function.Function
      */
+    @SuppressWarnings({"IllegalCatch", "NoFunctionalReturnType"})
     public static <I, O> java.util.function.Function<I, O> convert(
         Function<? super I, ? extends O> function) {
       return input -> {
@@ -242,6 +244,7 @@ public final class RxJavaToReactorTemplates {
   // B throws a subset of the exceptions thrown by A
 
   //  @CheckParameterCoersion
+  @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryConversion<I, O> {
     @BeforeTemplate
     java.util.function.Function<I, O> before(Function<I, O> function) {
