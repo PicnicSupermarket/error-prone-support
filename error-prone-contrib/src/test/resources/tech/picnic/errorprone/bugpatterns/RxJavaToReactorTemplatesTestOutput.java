@@ -12,20 +12,15 @@ import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
-  Maybe<String> testRemoveRedundantCast() {
-    return Maybe.just("foo");
-  }
 
-  Maybe<String> testMaybeCastPositive() {
-    return Maybe.just("string");
-  }
+  Flux<Integer> testFluxToFlowableToFlux() {
+    Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .map(e -> e + e)
+        .flatMap(e -> ImmutableSet::of)
+        .as(RxJava2Adapter::fluxToFlowable);
 
-  Maybe<Object> testMaybeCastNegative() {
-    return Maybe.just("string").cast(Object.class);
-  }
-
-  Maybe<Integer> testMaybeWrap() {
-    return Maybe.just(1);
+    return Flux.just(2);
   }
 
   // XXX: Discuss with Stephan, look at the Publisher which is of type Flowable, that won't work...
@@ -84,6 +79,23 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
                   throw new IllegalStateException();
                 }))
         .as(RxJava2Adapter::fluxToFlowable);
+  }
+
+  Maybe<String> testMaybeDeferToMono() {
+    return Maybe.just("test");
+    // XXX: Fill this in
+  }
+
+  Maybe<String> testMaybeCastPositive() {
+    return Maybe.just("string");
+  }
+
+  Maybe<Object> testMaybeCastNegative() {
+    return Maybe.just("string").cast(Object.class);
+  }
+
+  Maybe<Integer> testMaybeWrap() {
+    return Maybe.just(1);
   }
 
   // XXX: This should be fixed later with `Refaster.canBeCoercedTo(...)`
@@ -159,6 +171,22 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .as(RxJava2Adapter::monoToSingle);
   }
 
+  Maybe<String> testRemoveRedundantCast() {
+    return Maybe.just("foo");
+  }
+
+  Mono<Integer> testMonoToFlowableToMono() {
+    Single.just(1)
+        .as(RxJava2Adapter::singleToMono)
+        .map(e -> e + e)
+        .filter(i -> i > 2)
+        .as(RxJava2Adapter::monoToSingle);
+
+    Mono.empty().then();
+
+    return Mono.just(3);
+  }
+
   Maybe<Integer> testSingleFilter() {
     return Single.just(1)
         .as(RxJava2Adapter::singleToMono)
@@ -178,27 +206,5 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .as(RxJava2Adapter::singleToMono)
         .map(i -> i + 1)
         .as(RxJava2Adapter::monoToSingle);
-  }
-
-  Flux<Integer> testFluxToFlowableToFlux() {
-    Flowable.just(1)
-        .as(RxJava2Adapter::flowableToFlux)
-        .map(e -> e + e)
-        .flatMap(e -> ImmutableSet::of)
-        .as(RxJava2Adapter::fluxToFlowable);
-
-    return Flux.just(2);
-  }
-
-  Mono<Integer> testMonoToFlowableToMono() {
-    Single.just(1)
-        .as(RxJava2Adapter::singleToMono)
-        .map(e -> e + e)
-        .filter(i -> i > 2)
-        .as(RxJava2Adapter::monoToSingle);
-
-    Mono.empty().then();
-
-    return Mono.just(3);
   }
 }
