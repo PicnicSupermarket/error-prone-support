@@ -27,6 +27,15 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Flux.just(2);
   }
 
+  // XXX: Can this be done with Flowable<Integer> instead of Flowable<Object>
+  Flowable<Integer> testFlowableCombineLatest() {
+    return RxJava2Adapter.fluxToFlowable(
+        Flux.combineLatest(
+            Flowable.just(1),
+            Flowable.just(2),
+            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkBiFunction(Integer::sum)));
+  }
+
   // XXX: Discuss with Stephan, look at the Publisher which is of type Flowable, that won't work...
   Flowable<Integer> testFlowableConcatWithPublisher() {
     return Flowable.just(1)
