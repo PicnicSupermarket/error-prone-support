@@ -699,7 +699,7 @@ public final class RxJavaToReactorTemplates {
     }
 
     @SuppressWarnings("IllegalCatch")
-    static <T, U, R>
+    public static <T, U, R>
         java.util.function.BiFunction<? super T, ? super U, ? extends R> toJdkBiFunction(
             io.reactivex.functions.BiFunction<? super T, ? super U, ? extends R> biFunction) {
       return (t, u) -> {
