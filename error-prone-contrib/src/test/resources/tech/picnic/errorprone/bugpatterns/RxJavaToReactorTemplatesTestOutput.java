@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -55,9 +56,9 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableList<Flowable<Integer>> testFlowableJust() {
     return ImmutableList.of(
-        RxJava2Adapter.fluxToFlowable(Flux.just(1)),
-        RxJava2Adapter.fluxToFlowable(Flux.just(1, 2)),
-        RxJava2Adapter.fluxToFlowable(Flux.just(1, 2, 3)));
+        //        RxJava2Adapter.fluxToFlowable(Flux.just(1)),
+        RxJava2Adapter.fluxToFlowable(Flux.just(1, 2)));
+    //        RxJava2Adapter.fluxToFlowable(Flux.just(1, 2, 3)));
   }
 
   Flowable<Integer> testFlowableFilter() {
@@ -111,10 +112,22 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
   }
 
   Maybe<String> testMaybeAmb() {
-    // Fix this example...
-    //    return Mono.firstWithSignal(ImmutableList.of(Maybe.just(""), Maybe.just("")))
-    //        .as(RxJava2Adapter::monoToMaybe);
-    return Maybe.empty();
+    return RxJava2Adapter.monoToMaybe(
+        Mono.firstWithSignal(
+            Streams.stream(ImmutableList.of(Maybe.just("foo"), Maybe.just("bar")))
+                .map(RxJava2Adapter::maybeToMono)
+                .collect(ImmutableList.toImmutableList())));
+  }
+
+  Maybe<String> testMaybeAmbWith() {
+    return Maybe.just("foo")
+        .as(RxJava2Adapter::maybeToMono)
+        .or(Maybe.just("bar").as(RxJava2Adapter::maybeToMono))
+        .as(RxJava2Adapter::monoToMaybe);
+  }
+
+  Maybe<String> testMaybeAmbArray() {
+    return Maybe.ambArray(Maybe.just("foo"), Maybe.just("bar"));
   }
 
   Mono<String> testMaybeDeferToMono() {
