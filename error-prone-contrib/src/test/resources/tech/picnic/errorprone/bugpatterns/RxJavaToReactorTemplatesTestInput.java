@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -27,6 +28,29 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
   // XXX: Discuss with Stephan, look at the Publisher which is of type Flowable, that won't work...
   Flowable<Integer> testFlowableConcatWithPublisher() {
     return Flowable.just(1).concatWith(Flowable.just(2));
+  }
+
+  Flowable<Integer> testFlowableDefer() {
+    return Flowable.defer(() -> Flowable.just(1));
+  }
+
+  Flowable<Object> testFlowableEmpty() {
+    return Flowable.empty();
+  }
+
+  Flowable<Object> testFlowableErrorThrowable() {
+    return Flowable.error(new IllegalStateException());
+  }
+
+  Flowable<Object> testFlowableErrorCallable() {
+    return Flowable.error(
+        () -> {
+          throw new IllegalStateException();
+        });
+  }
+
+  ImmutableList<Flowable<Integer>> testFlowableJust() {
+    return ImmutableList.of(Flowable.just(1), Flowable.just(1, 2), Flowable.just(1, 2, 3));
   }
 
   Flowable<Integer> testFlowableFilter() {
@@ -59,9 +83,14 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
                 }));
   }
 
-  Maybe<String> testMaybeDeferToMono() {
-    return Maybe.just("test");
-    // XXX: Fill this in
+  Maybe<String> testMaybeAmb() {
+    // Fix this example
+    //    return Maybe.amb(ImmutableList.of(Maybe.just(""), Maybe.just("")));
+    return Maybe.empty();
+  }
+
+  Mono<String> testMaybeDeferToMono() {
+    return Maybe.defer(() -> Maybe.just("test")).as(RxJava2Adapter::maybeToMono);
   }
 
   Maybe<String> testMaybeCastPositive() {
