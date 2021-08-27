@@ -21,6 +21,7 @@ import io.reactivex.functions.Predicate;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
@@ -47,31 +48,46 @@ public final class RxJavaToReactorTemplates {
       return flux;
     }
   }
-//
-//  static final class FlowableAmbArray<T> {
-//    static final class ambArray(Publisher[])
-//  }
+
+  // How do this?
+  //  static final class FlowableAmbArray<T> {
+  //    //    static final class ambArray(Publisher[])
+  //    @BeforeTemplate
+  //    Flowable<T> before(Publisher<? extends T>... sources) {
+  //      return Flowable.ambArray(sources);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Flowable<T> after(Publisher<? extends T>... sources) {
+  //      return RxJava2Adapter.fluxToFlowable(Flux.firstWithSignal(Arrays.stream(sources)
+  //              .map(e -> RxJava2Adapter.flowableToFlux(e))
+  //              .collect(toImmutableList())));
+  //    }
+  //  }
 
   // XXX: This wouldn't work for this case right?
   //     return Flowable.combineLatest(
   //  getEnabledConsentRequests(requiredConsentTopics, locale), // returns Flowable
   //            Flowable.fromIterable(requiredConsentTopics), // returns Flowable
   //          this::filterByTopic)
+  //  XXX: Add test
   static final class FlowableCombineLatest<T1, T2, R> {
     @BeforeTemplate
     Flowable<R> before(
         Publisher<? extends T1> p1,
         Publisher<? extends T2> p2,
-        BiFunction<? super T1, ? super T2, ? extends R> biFunction) {
-      return Flowable.combineLatest(p1, p2, biFunction);
+        BiFunction<? super T1, ? super T2, ? extends R> combiner) {
+      return Flowable.combineLatest(p1, p2, combiner);
     }
 
     @AfterTemplate
     Flowable<R> after(
         Publisher<? extends T1> p1,
         Publisher<? extends T2> p2,
-        java.util.function.BiFunction<? super T1, ? super T2, ? extends R> biFunction) {
-      return RxJava2Adapter.fluxToFlowable(Flux.combineLatest(p1, p2, biFunction));
+        BiFunction<? super T1, ? super T2, ? extends R> combiner) {
+      return RxJava2Adapter.fluxToFlowable(
+          Flux.<T1, T2, R>combineLatest(
+              p1, p2, RxJava2ReactorMigrationUtil.toJdkBiFunction(combiner)));
     }
   }
 
@@ -93,6 +109,20 @@ public final class RxJavaToReactorTemplates {
   // XXX: Flowable.concatWith. -> CompletableSource
   // XXX: Flowable.concatWith. -> SingleSource
   // XXX: Flowable.concatWith. -> MaybeSource
+
+  //  static final class FlowableDeferNew<T> {
+  //
+  //    @BeforeTemplate
+  //    Flowable<T> before(Callable<? extends Publisher<? extends T>> supplier) {
+  //      return Flowable.defer(supplier);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Flowable<T> after(Callable<? extends Publisher<? extends T>> supplier) {
+  //      return Flux.defer(() -> RxJava2ReactorMigrationUtil.callableAsSupplier(supplier))
+  //              .as(RxJava2Adapter::fluxToFlowable);
+  //    }
+  //  }
 
   abstract static class FlowableDefer<T> {
     @Placeholder
@@ -294,10 +324,23 @@ public final class RxJavaToReactorTemplates {
     @AfterTemplate
     Maybe<T> after(Maybe<? extends T>... sources) {
       return RxJava2Adapter.monoToMaybe(
-              Mono.firstWithSignal(
-                      Arrays.stream(sources)
-                              .map(RxJava2Adapter::maybeToMono)
-                              .collect(toImmutableList())));
+          Mono.firstWithSignal(
+              Arrays.stream(sources).map(RxJava2Adapter::maybeToMono).collect(toImmutableList())));
+    }
+  }
+
+  // XXX: The test is not triggering? What did I do wrong? Perhaps it should be a MaybeSource...
+  static final class MaybeConcatArray<T> {
+    @BeforeTemplate
+    Flowable<T> before(Maybe<? extends T>... sources) {
+      return Maybe.concatArray(sources);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Maybe<? extends T>... sources) {
+      return RxJava2Adapter.fluxToFlowable(
+          Flux.concat(
+              Arrays.stream(sources).map(RxJava2Adapter::maybeToMono).collect(toImmutableList())));
     }
   }
 
@@ -379,27 +422,53 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
+  static final class MaybeFromCallable<T> {
+    @BeforeTemplate
+    Maybe<T> before(Callable<? extends T> callable) {
+      return Maybe.fromCallable(callable);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Callable<? extends T> callable) {
+      return RxJava2Adapter.monoToMaybe(
+          Mono.fromSupplier(RxJava2ReactorMigrationUtil.callableAsSupplier(callable)));
+    }
+  }
+
+  // XXX: Also handle `Future`s that don't extend `CompletableFuture`.
+  static final class MaybeFromFuture<T> {
+    @BeforeTemplate
+    Maybe<T> before(CompletableFuture<? extends T> future) {
+      return Maybe.fromFuture(future);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(CompletableFuture<? extends T> future) {
+      return RxJava2Adapter.monoToMaybe(Mono.fromFuture(future));
+    }
+  }
+
   //  The following template is required to rewrite this code from platform:
   //    private Completable verifyTagExists(Optional<String> tagId) {
   //    return Maybe.defer(() -> tagId.map(Maybe::just).orElseGet(Maybe::empty))
   //        .flatMapSingleElement(this::getTagById)
   //        .ignoreElement();
   //    }
-  //    static final class MaybeFlatMapSingleElement<
-  //        I, T extends I, O, P extends SingleSource<? extends O>> { // <S, T extends S, O> {
-  //      @BeforeTemplate
-  //      Maybe<O> before(Maybe<T> maybe, Function<I, P> function) {
-  //        return maybe.flatMapSingleElement(function);
-  //      }
+  //      static final class MaybeFlatMapSingleElement<
+  //          I, T extends I, O, S extends Single<? extends O>> { // <S, T extends S, O> {
+  //        @BeforeTemplate
+  //        Maybe<O> before(Maybe<T> maybe, Function<I, S> function) {
+  //          return maybe.flatMapSingleElement(function);
+  //        }
   //
-  //      @AfterTemplate
-  //      Maybe<O> after(Maybe<T> maybe, java.util.function.Function<I, P> function) {
-  //        return maybe
-  //            .as(RxJava2Adapter::maybeToMono)
-  //            .flatMap(function)
-  //            .as(RxJava2Adapter::monoToMaybe);
+  //        @AfterTemplate
+  //        Maybe<O> after(Maybe<T> maybe, Function<? extends I, S> function) {
+  //          return maybe
+  //              .as(RxJava2Adapter::maybeToMono)
+  //              .flatMap(RxJava2ReactorMigrationUtil.toJdkFunction(function))
+  //              .as(RxJava2Adapter::monoToMaybe);
+  //        }
   //      }
-  //    }
 
   static final class MaybeIgnoreElement<T> {
     @BeforeTemplate
@@ -584,6 +653,60 @@ public final class RxJavaToReactorTemplates {
           return function.apply(input);
         } catch (Exception e) {
           throw Exceptions.propagate(e);
+        }
+      };
+    }
+  }
+
+  // XXX: Move to a separate Maven module.
+  public static final class RxJava2ReactorMigrationUtil {
+    private RxJava2ReactorMigrationUtil() {}
+
+    // XXX: Rename.
+    // XXX: Introduce Refaster rules to drop this wrapper when possible.
+    @SuppressWarnings("IllegalCatch")
+    public static <T> T getUnchecked(Callable<T> callable) {
+      try {
+        return callable.call();
+      } catch (Exception e) {
+        throw new IllegalArgumentException("Callable threw checked exception", e);
+      }
+    }
+
+    // XXX: Rename.
+    // XXX: Introduce Refaster rules to drop this wrapper when possible.
+    @SuppressWarnings("IllegalCatch")
+    public static <T> Supplier<? extends T> callableAsSupplier(Callable<? extends T> callable) {
+      return () -> {
+        try {
+          return callable.call();
+        } catch (Exception e) {
+          throw new IllegalArgumentException("Callable threw checked exception", e);
+        }
+      };
+    }
+
+    @SuppressWarnings("IllegalCatch")
+    public static <T, R> java.util.function.Function<? super T, ? extends Mono<R>> toJdkFunction(
+        io.reactivex.functions.Function<? super T, ? extends Single<R>> function) {
+      return (t) -> {
+        try {
+          return function.apply(t).as(RxJava2Adapter::singleToMono);
+        } catch (Exception e) {
+          throw new IllegalArgumentException("BiFunction threw checked exception", e);
+        }
+      };
+    }
+
+    @SuppressWarnings("IllegalCatch")
+    static <T, U, R>
+        java.util.function.BiFunction<? super T, ? super U, ? extends R> toJdkBiFunction(
+            io.reactivex.functions.BiFunction<? super T, ? super U, ? extends R> biFunction) {
+      return (t, u) -> {
+        try {
+          return biFunction.apply(t, u);
+        } catch (Exception e) {
+          throw new IllegalArgumentException("BiFunction threw checked exception", e);
         }
       };
     }

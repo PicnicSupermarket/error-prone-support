@@ -8,6 +8,8 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -130,6 +132,10 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Maybe.ambArray(Maybe.just("foo"), Maybe.just("bar"));
   }
 
+  Flowable<Integer> testMaybeConcatArray() {
+    return Maybe.concatArray(Maybe.just(1), Maybe.just(2), Maybe.empty());
+  }
+
   Mono<String> testMaybeDeferToMono() {
     return Mono.defer(() -> Maybe.just("test").as(RxJava2Adapter::maybeToMono));
   }
@@ -178,6 +184,20 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .as(RxJava2Adapter::maybeToMono)
         .flatMap(i -> Maybe.just(i * 2).as(RxJava2Adapter::maybeToMono))
         .as(RxJava2Adapter::monoToMaybe);
+  }
+
+  Maybe<Object> testMaybeFromCallable() {
+    return RxJava2Adapter.monoToMaybe(
+        Mono.fromSupplier(
+            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(
+                () -> {
+                  String s = "foo";
+                  return null;
+                })));
+  }
+
+  Maybe<Integer> testMaybeFromFuture() {
+    return RxJava2Adapter.monoToMaybe(Mono.fromFuture(new CompletableFuture<>()));
   }
 
   Maybe<Integer> testMaybeFlatMapMethodReference() {
