@@ -50,20 +50,20 @@ public final class RxJavaToReactorTemplates {
   }
 
   // How do this?
-  //  static final class FlowableAmbArray<T> {
-  //    //    static final class ambArray(Publisher[])
-  //    @BeforeTemplate
-  //    Flowable<T> before(Publisher<? extends T>... sources) {
-  //      return Flowable.ambArray(sources);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Flowable<T> after(Publisher<? extends T>... sources) {
-  //      return RxJava2Adapter.fluxToFlowable(Flux.firstWithSignal(Arrays.stream(sources)
-  //              .map(e -> RxJava2Adapter.flowableToFlux(e))
-  //              .collect(toImmutableList())));
-  //    }
-  //  }
+  static final class FlowableAmbArray<T> {
+    //    static final class ambArray(Publisher[])
+    @BeforeTemplate
+    Flowable<T> before(Publisher<? extends T>... sources) {
+      return Flowable.ambArray(sources);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Publisher<? extends T>... sources) {
+      return RxJava2Adapter.fluxToFlowable(
+          Flux.firstWithSignal(
+              sources) );
+    }
+  }
 
   // XXX: This wouldn't work for this case right?
   //     return Flowable.combineLatest(
@@ -110,19 +110,19 @@ public final class RxJavaToReactorTemplates {
   // XXX: Flowable.concatWith. -> SingleSource
   // XXX: Flowable.concatWith. -> MaybeSource
 
-  //  static final class FlowableDeferNew<T> {
-  //
-  //    @BeforeTemplate
-  //    Flowable<T> before(Callable<? extends Publisher<? extends T>> supplier) {
-  //      return Flowable.defer(supplier);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Flowable<T> after(Callable<? extends Publisher<? extends T>> supplier) {
-  //      return Flux.defer(() -> RxJava2ReactorMigrationUtil.callableAsSupplier(supplier))
-  //              .as(RxJava2Adapter::fluxToFlowable);
-  //    }
-  //  }
+  static final class FlowableDeferNew<T> {
+
+    @BeforeTemplate
+    Flowable<T> before(Callable<? extends Publisher<? extends T>> supplier) {
+      return Flowable.defer(supplier);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Callable<? extends Publisher<? extends T>> supplier) {
+      return Flux.defer(() -> RxJava2ReactorMigrationUtil.callableAsSupplier(supplier))
+          .as(RxJava2Adapter::fluxToFlowable);
+    }
+  }
 
   abstract static class FlowableDefer<T> {
     @Placeholder
@@ -676,17 +676,6 @@ public final class RxJavaToReactorTemplates {
     // XXX: Rename.
     // XXX: Introduce Refaster rules to drop this wrapper when possible.
     @SuppressWarnings("IllegalCatch")
-    public static <T> Supplier<? extends T> callableAsSupplier(Callable<? extends T> callable) {
-      return () -> {
-        try {
-          return callable.call();
-        } catch (Exception e) {
-          throw new IllegalArgumentException("Callable threw checked exception", e);
-        }
-      };
-    }
-
-    @SuppressWarnings("IllegalCatch")
     public static <T, R> java.util.function.Function<? super T, ? extends Mono<R>> toJdkFunction(
         io.reactivex.functions.Function<? super T, ? extends Single<R>> function) {
       return (t) -> {
@@ -710,6 +699,17 @@ public final class RxJavaToReactorTemplates {
         }
       };
     }
+
+
+  @SuppressWarnings("IllegalCatch")
+  public static <T> Supplier<T> callableAsSupplier(Callable<T> callable) {
+    return () -> {
+      try {
+        return callable.call();
+      } catch (Exception e) {
+        throw new IllegalArgumentException("Callable threw checked exception", e);
+      }
+    };
   }
 
   // "Coersion" (find better name):
