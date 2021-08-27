@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -29,6 +30,34 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .as(RxJava2Adapter::flowableToFlux)
         .concatWith(Flowable.just(2))
         .as(RxJava2Adapter::fluxToFlowable);
+  }
+
+  Flowable<Integer> testFlowableDefer() {
+    return RxJava2Adapter.fluxToFlowable(
+        Flux.defer(() -> Flowable.just(1).as(RxJava2Adapter::flowableToFlux)));
+  }
+
+  Flowable<Object> testFlowableEmpty() {
+    return RxJava2Adapter.fluxToFlowable(Flux.empty());
+  }
+
+  Flowable<Object> testFlowableErrorThrowable() {
+    return RxJava2Adapter.fluxToFlowable(Flux.error(new IllegalStateException()));
+  }
+
+  Flowable<Object> testFlowableErrorCallable() {
+    return RxJava2Adapter.fluxToFlowable(
+        Flux.error(
+            () -> {
+              throw new IllegalStateException();
+            }));
+  }
+
+  ImmutableList<Flowable<Integer>> testFlowableJust() {
+    return ImmutableList.of(
+        RxJava2Adapter.fluxToFlowable(Flux.just(1)),
+        RxJava2Adapter.fluxToFlowable(Flux.just(1, 2)),
+        RxJava2Adapter.fluxToFlowable(Flux.just(1, 2, 3)));
   }
 
   Flowable<Integer> testFlowableFilter() {
@@ -81,9 +110,15 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .as(RxJava2Adapter::fluxToFlowable);
   }
 
-  Maybe<String> testMaybeDeferToMono() {
-    return Maybe.just("test");
-    // XXX: Fill this in
+  Maybe<String> testMaybeAmb() {
+    // Fix this example...
+    //    return Mono.firstWithSignal(ImmutableList.of(Maybe.just(""), Maybe.just("")))
+    //        .as(RxJava2Adapter::monoToMaybe);
+    return Maybe.empty();
+  }
+
+  Mono<String> testMaybeDeferToMono() {
+    return Mono.defer(() -> Maybe.just("test").as(RxJava2Adapter::maybeToMono));
   }
 
   Maybe<String> testMaybeCastPositive() {
