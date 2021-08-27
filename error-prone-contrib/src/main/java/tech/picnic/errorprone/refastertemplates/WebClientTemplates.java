@@ -9,7 +9,8 @@ import org.springframework.web.reactive.function.client.WebClient.RequestBodySpe
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
 
 /**
- * Refaster templates related to the {@link org.springframework.web.reactive.function.client.WebClient}.
+ * Refaster templates related to the {@link
+ * org.springframework.web.reactive.function.client.WebClient}.
  */
 final class WebClientTemplates {
   private WebClientTemplates() {}
