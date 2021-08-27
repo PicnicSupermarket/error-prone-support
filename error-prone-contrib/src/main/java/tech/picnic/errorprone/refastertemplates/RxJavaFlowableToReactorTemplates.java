@@ -156,6 +156,7 @@ public final class RxJavaFlowableToReactorTemplates {
   // XXX: public final Iterable blockingLatest()
   // XXX: public final Iterable blockingMostRecent(Object)
   // XXX: public final Iterable blockingNext()
+
   // XXX: public final Object blockingSingle()
   // XXX: public final Object blockingSingle(Object)
   // XXX: public final void blockingSubscribe()
