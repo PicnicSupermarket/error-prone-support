@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -50,7 +51,10 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
   }
 
   ImmutableList<Flowable<Integer>> testFlowableJust() {
-    return ImmutableList.of(Flowable.just(1), Flowable.just(1, 2), Flowable.just(1, 2, 3));
+    return ImmutableList.of(
+        //        RxJava2Adapter.fluxToFlowable(Flux.just(1)),
+        Flowable.just(1, 2));
+    //        RxJava2Adapter.fluxToFlowable(Flux.just(1, 2, 3)));
   }
 
   Flowable<Integer> testFlowableFilter() {
@@ -84,9 +88,15 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
   }
 
   Maybe<String> testMaybeAmb() {
-    // Fix this example
-    //    return Maybe.amb(ImmutableList.of(Maybe.just(""), Maybe.just("")));
-    return Maybe.empty();
+    return Maybe.amb(ImmutableList.of(Maybe.just("foo"), Maybe.just("bar")));
+  }
+
+  Maybe<String> testMaybeAmbWith() {
+    return Maybe.just("foo").ambWith(Maybe.just("bar"));
+  }
+
+  Maybe<String> testMaybeAmbArray() {
+    return Maybe.ambArray(Maybe.just("foo"), Maybe.just("bar"));
   }
 
   Mono<String> testMaybeDeferToMono() {

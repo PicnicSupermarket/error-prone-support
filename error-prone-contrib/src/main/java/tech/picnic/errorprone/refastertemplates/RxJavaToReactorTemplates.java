@@ -1,5 +1,8 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -15,6 +18,7 @@ import io.reactivex.Single;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
@@ -43,6 +47,10 @@ public final class RxJavaToReactorTemplates {
       return flux;
     }
   }
+//
+//  static final class FlowableAmbArray<T> {
+//    static final class ambArray(Publisher[])
+//  }
 
   // XXX: This wouldn't work for this case right?
   //     return Flowable.combineLatest(
@@ -102,7 +110,7 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  static class FlowableEmpty<T> {
+  static final class FlowableEmpty<T> {
     @BeforeTemplate
     Flowable<T> before() {
       return Flowable.empty();
@@ -114,7 +122,7 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  static class FlowableErrorThrowable<T> {
+  static final class FlowableErrorThrowable<T> {
     @BeforeTemplate
     Flowable<T> before(Throwable throwable) {
       return Flowable.error(throwable);
@@ -127,7 +135,7 @@ public final class RxJavaToReactorTemplates {
   }
 
   // XXX: Use `CanBeCoercedTo`.
-  static class FlowableErrorCallable<T> {
+  static final class FlowableErrorCallable<T> {
     @BeforeTemplate
     Flowable<T> before(Callable<? extends Throwable> throwable) {
       return Flowable.error(throwable);
@@ -195,10 +203,10 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-//  static final class FlowableFromArray<T> {
-//    @BeforeTemplate
-//
-//  }
+  //  static final class FlowableFromArray<T> {
+  //    @BeforeTemplate
+  //
+  //  }
 
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
   static final class FlowableMap<I, T extends I, O> {
@@ -246,29 +254,50 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: Is this conversion correct?
-  static class MaybeAmb<T> {
+  static final class MaybeAmb<T> {
     @BeforeTemplate
-    Maybe<T> before(Iterable<? extends MaybeSource<? extends T>> iterable) {
+    Maybe<T> before(Iterable<? extends Maybe<? extends T>> iterable) {
       return Maybe.amb(iterable);
     }
 
     @AfterTemplate
-    Maybe<T> after(Iterable<? extends Mono<? extends T>> iterable) {
-      return Mono.firstWithSignal(iterable).as(RxJava2Adapter::monoToMaybe);
+    Maybe<T> after(Iterable<? extends Maybe<? extends T>> iterable) {
+      return RxJava2Adapter.monoToMaybe(
+          Mono.firstWithSignal(
+              Streams.stream(iterable)
+                  .map(RxJava2Adapter::maybeToMono)
+                  .collect(toImmutableList())));
     }
   }
 
-  // XXX: Validate.... This is not correct yet. See `maybeSource` in aftertemplate.
-  static class MaybeAmbWith<T> {
+  static final class MaybeAmbWith<T> {
     @BeforeTemplate
-    Maybe<T> before(Maybe<T> maybe, MaybeSource<? extends T> maybeSource) {
-      return maybe.ambWith(maybeSource);
+    Maybe<T> before(Maybe<T> maybe, Maybe<? extends T> otherMaybe) {
+      return maybe.ambWith(otherMaybe);
     }
 
     @AfterTemplate
-    Maybe<T> after(Maybe<T> maybe, Mono<T> maybeSource) {
-      return maybe.as(RxJava2Adapter::maybeToMono).or(maybeSource).as(RxJava2Adapter::monoToMaybe);
+    Maybe<T> after(Maybe<T> maybe, Maybe<? extends T> otherMaybe) {
+      return maybe
+          .as(RxJava2Adapter::maybeToMono)
+          .or(otherMaybe.as(RxJava2Adapter::maybeToMono))
+          .as(RxJava2Adapter::monoToMaybe);
+    }
+  }
+
+  static final class MaybeAmbArray<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<? extends T>... sources) {
+      return Maybe.ambArray(sources);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<? extends T>... sources) {
+      return RxJava2Adapter.monoToMaybe(
+              Mono.firstWithSignal(
+                      Arrays.stream(sources)
+                              .map(RxJava2Adapter::maybeToMono)
+                              .collect(toImmutableList())));
     }
   }
 
