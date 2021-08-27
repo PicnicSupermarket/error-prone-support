@@ -111,16 +111,14 @@ public final class RxJavaToReactorTemplates {
   // XXX: Flowable.concatWith. -> MaybeSource
 
   static final class FlowableDeferNew<T> {
-
     @BeforeTemplate
     Flowable<T> before(Callable<? extends Publisher<? extends T>> supplier) {
       return Flowable.defer(supplier);
     }
 
     @AfterTemplate
-    Flowable<T> after(Callable<? extends Publisher<? extends T>> supplier) {
-      return Flux.defer(() -> RxJava2ReactorMigrationUtil.callableAsSupplier(supplier))
-          .as(RxJava2Adapter::fluxToFlowable);
+    Flowable<T> after(Callable<? extends Publisher<T>> supplier) {
+      return RxJava2Adapter.fluxToFlowable(Flux.defer(RxJava2ReactorMigrationUtil.callableAsSupplier(supplier)));
     }
   }
 
