@@ -1,5 +1,15 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.Placeholder;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
+import reactor.adapter.rxjava.RxJava2Adapter;
+
 /** The Refaster templates for the migration of the RxJava Single type to Reactor */
 public final class RxJavaSingleToReactorTemplates {
 
@@ -94,8 +104,43 @@ public final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single doOnSubscribe(Consumer)
   // XXX: public final Single doOnSuccess(Consumer)
   // XXX: public final Single doOnTerminate(Action)
-  // XXX: public final Maybe filter(Predicate)
+
+  // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
+  static final class SingleFilter<S, T extends S> {
+    @BeforeTemplate
+    Maybe<T> before(Single<T> single, Predicate<S> predicate) {
+      return single.filter(predicate);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Single<T> single, java.util.function.Predicate<S> predicate) {
+      return single
+          .as(RxJava2Adapter::singleToMono)
+          .filter(predicate)
+          .as(RxJava2Adapter::monoToMaybe);
+    }
+  }
+
   // XXX: public final Single flatMap(Function)
+  // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
+  abstract static class SingleFlatMapLambda<S, T> {
+    @Placeholder
+    abstract Single<T> toSingleFunction(@MayOptionallyUse S element);
+
+    @BeforeTemplate
+    Single<T> before(Single<S> single) {
+      return single.flatMap(v -> toSingleFunction(v));
+    }
+
+    @AfterTemplate
+    Single<T> after(Single<S> single) {
+      return single
+          .as(RxJava2Adapter::singleToMono)
+          .flatMap(v -> toSingleFunction(v).as(RxJava2Adapter::singleToMono))
+          .as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
   // XXX: public final Completable flatMapCompletable(Function)
   // XXX: public final Maybe flatMapMaybe(Function)
   // XXX: public final Observable flatMapObservable(Function)
@@ -105,7 +150,20 @@ public final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single hide()
   // XXX: public final Completable ignoreElement()
   // XXX: public final Single lift(SingleOperator)
-  // XXX: public final Single map(Function)
+
+  // XXX: `Refaster.canBeCoercedTo(...)`.
+  static final class SingleMap<I, T extends I, O> {
+    @BeforeTemplate
+    Single<O> before(Single<T> single, Function<I, O> function) {
+      return single.map(function);
+    }
+
+    @AfterTemplate
+    Single<O> after(Single<T> single, java.util.function.Function<I, O> function) {
+      return single.as(RxJava2Adapter::singleToMono).map(function).as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
   // XXX: public final Single materialize()
   // XXX: public final Flowable mergeWith(SingleSource)
   // XXX: public final Single observeOn(Scheduler)

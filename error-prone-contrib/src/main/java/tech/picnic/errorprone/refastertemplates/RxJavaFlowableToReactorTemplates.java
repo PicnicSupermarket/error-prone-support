@@ -1,19 +1,76 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Repeated;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.function.Supplier;
+import org.reactivestreams.Publisher;
+import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.publisher.Flux;
+
 /** The Refaster templates for the migration of the RxJava Flowable type to Reactor */
 public final class RxJavaFlowableToReactorTemplates {
 
   private RxJavaFlowableToReactorTemplates() {}
 
   // XXX: public static Flowable amb(Iterable)
-  // XXX: public static Flowable ambArray(Publisher[])
+
+  // XXX: Write test
+  static final class FlowableAmbArray<T> {
+    @BeforeTemplate
+    Flowable<T> before(Publisher<? extends T>... sources) {
+      return Flowable.ambArray(sources);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Publisher<? extends T>... sources) {
+      return RxJava2Adapter.fluxToFlowable(Flux.firstWithSignal(sources));
+    }
+  }
+
   // XXX: public static int bufferSize()
   // XXX: public static Flowable combineLatest(Function,Publisher[])
   // XXX: public static Flowable combineLatest(Iterable,Function)
   // XXX: public static Flowable combineLatest(Iterable,Function,int)
   // XXX: public static Flowable combineLatest(Publisher[],Function)
   // XXX: public static Flowable combineLatest(Publisher[],Function,int)
-  // XXX: public static Flowable combineLatest(Publisher,Publisher,BiFunction)
+
+  // XXX: This wouldn't work for this case right?
+  //     return Flowable.combineLatest(
+  //  getEnabledConsentRequests(requiredConsentTopics, locale), // returns Flowable
+  //            Flowable.fromIterable(requiredConsentTopics), // returns Flowable
+  //          this::filterByTopic)
+  //  XXX: Add test
+  static final class FlowableCombineLatest<T1, T2, R> {
+    @BeforeTemplate
+    Flowable<R> before(
+        Publisher<? extends T1> p1,
+        Publisher<? extends T2> p2,
+        BiFunction<? super T1, ? super T2, ? extends R> combiner) {
+      return Flowable.combineLatest(p1, p2, combiner);
+    }
+
+    @AfterTemplate
+    Flowable<R> after(
+        Publisher<? extends T1> p1,
+        Publisher<? extends T2> p2,
+        BiFunction<? super T1, ? super T2, ? extends R> combiner) {
+      return RxJava2Adapter.fluxToFlowable(
+          Flux.<T1, T2, R>combineLatest(
+              p1,
+              p2,
+              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkBiFunction(combiner)));
+    }
+  }
+
   // XXX: public static Flowable combineLatest(Publisher,Publisher,Publisher,Function3)
   // XXX: public static Flowable combineLatest(Publisher,Publisher,Publisher,Publisher,Function4)
   // XXX: public static Flowable
@@ -52,10 +109,57 @@ public final class RxJavaFlowableToReactorTemplates {
   // XXX: public static Flowable concatEager(Publisher)
   // XXX: public static Flowable concatEager(Publisher,int,int)
   // XXX: public static Flowable create(FlowableOnSubscribe,BackpressureStrategy)
-  // XXX: public static Flowable defer(Callable)
-  // XXX: public static Flowable empty()
-  // XXX: public static Flowable error(Callable)
-  // XXX: public static Flowable error(Throwable)
+
+  static final class FlowableDefer<T> {
+    @BeforeTemplate
+    Flowable<T> before(Callable<? extends Publisher<? extends T>> supplier) {
+      return Flowable.defer(supplier);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Callable<? extends Publisher<T>> supplier) {
+      return RxJava2Adapter.fluxToFlowable(
+          Flux.defer(
+              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(supplier)));
+    }
+  }
+
+  static final class FlowableEmpty<T> {
+    @BeforeTemplate
+    Flowable<T> before() {
+      return Flowable.empty();
+    }
+
+    @AfterTemplate
+    Flowable<T> after() {
+      return RxJava2Adapter.fluxToFlowable(Flux.empty());
+    }
+  }
+
+  // XXX: Use `CanBeCoercedTo`.
+  static final class FlowableErrorCallable<T> {
+    @BeforeTemplate
+    Flowable<T> before(Callable<? extends Throwable> throwable) {
+      return Flowable.error(throwable);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Supplier<? extends Throwable> throwable) {
+      return RxJava2Adapter.fluxToFlowable(Flux.error(throwable));
+    }
+  }
+
+  static final class FlowableErrorThrowable<T> {
+    @BeforeTemplate
+    Flowable<T> before(Throwable throwable) {
+      return Flowable.error(throwable);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Throwable throwable) {
+      return RxJava2Adapter.fluxToFlowable(Flux.error(throwable));
+    }
+  }
   // XXX: public static Flowable fromArray(Object[])
   // XXX: public static Flowable fromCallable(Callable)
   // XXX: public static Flowable fromFuture(Future)
@@ -75,8 +179,31 @@ public final class RxJavaFlowableToReactorTemplates {
   // XXX: public static Flowable interval(long,TimeUnit,Scheduler)
   // XXX: public static Flowable intervalRange(long,long,long,long,TimeUnit)
   // XXX: public static Flowable intervalRange(long,long,long,long,TimeUnit,Scheduler)
-  // XXX: public static Flowable just(Object)
-  // XXX: public static Flowable just(Object,Object)
+
+  static final class FlowableJust<T> {
+    @BeforeTemplate
+    Flowable<T> before(T t) {
+      return Flowable.just(t);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(T t) {
+      return RxJava2Adapter.fluxToFlowable(Flux.just(t));
+    }
+  }
+
+  static final class FlowableJustTwo<T> {
+    @BeforeTemplate
+    Flowable<T> before(T t, @Repeated T arguments) {
+      return Flowable.just(t, arguments);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(T t, @Repeated T arguments) {
+      return RxJava2Adapter.fluxToFlowable(Flux.just(t, arguments));
+    }
+  }
+
   // XXX: public static Flowable just(Object,Object,Object)
   // XXX: public static Flowable just(Object,Object,Object,Object)
   // XXX: public static Flowable just(Object,Object,Object,Object,Object)
@@ -219,7 +346,22 @@ public final class RxJavaFlowableToReactorTemplates {
   // XXX: public final Flowable concatMapSingleDelayError(Function,boolean,int)
   // XXX: public final Flowable concatWith(CompletableSource)
   // XXX: public final Flowable concatWith(MaybeSource)
-  // XXX: public final Flowable concatWith(Publisher)
+
+  static final class FlowableConcatWithPublisher<T> {
+    @BeforeTemplate
+    Flowable<T> before(Flowable<T> flowable, Publisher<T> source) {
+      return flowable.concatWith(source);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Flowable<T> flowable, Publisher<T> source) {
+      return flowable
+          .as(RxJava2Adapter::flowableToFlux)
+          .concatWith(source)
+          .as(RxJava2Adapter::fluxToFlowable);
+    }
+  }
+
   // XXX: public final Flowable concatWith(SingleSource)
   // XXX: public final Single contains(Object)
   // XXX: public final Single count()
@@ -260,11 +402,54 @@ public final class RxJavaFlowableToReactorTemplates {
   // XXX: public final Maybe elementAt(long)
   // XXX: public final Single elementAt(long,Object)
   // XXX: public final Single elementAtOrError(long)
-  // XXX: public final Flowable filter(Predicate)
+
+  // XXX: `Refaster.canBeCoercedTo(...)`.
+  static final class FlowableFilter<S, T extends S> {
+    @BeforeTemplate
+    Flowable<T> before(Flowable<T> flowable, Predicate<S> predicate) {
+      return flowable.filter(predicate);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Flowable<T> flowable, java.util.function.Predicate<S> predicate) {
+      return flowable
+          .as(RxJava2Adapter::flowableToFlux)
+          .filter(predicate)
+          .as(RxJava2Adapter::fluxToFlowable);
+    }
+  }
   // XXX: public final Single first(Object)
-  // XXX: public final Maybe firstElement()
+
+  static final class FlowableFirstElement<T> {
+    @BeforeTemplate
+    Maybe<T> before(Flowable<T> flowable) {
+      return flowable.firstElement();
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Flowable<T> flowable) {
+      return flowable.as(RxJava2Adapter::flowableToFlux).next().as(RxJava2Adapter::monoToMaybe);
+    }
+  }
+
   // XXX: public final Single firstOrError()
-  // XXX: public final Flowable flatMap(Function)
+
+  // XXX: `Refaster.canBeCoercedTo(...)`.
+  static final class FlowableFlatMap<I, T extends I, O, P extends Publisher<? extends O>> {
+    @BeforeTemplate
+    Flowable<O> before(Flowable<T> flowable, Function<I, P> function) {
+      return flowable.flatMap(function);
+    }
+
+    @AfterTemplate
+    Flowable<O> after(Flowable<I> flowable, java.util.function.Function<I, P> function) {
+      return flowable
+          .as(RxJava2Adapter::flowableToFlux)
+          .flatMap(function)
+          .as(RxJava2Adapter::fluxToFlowable);
+    }
+  }
+
   // XXX: public final Flowable flatMap(Function,BiFunction)
   // XXX: public final Flowable flatMap(Function,BiFunction,boolean)
   // XXX: public final Flowable flatMap(Function,BiFunction,boolean,int)
@@ -306,7 +491,23 @@ public final class RxJavaFlowableToReactorTemplates {
   // XXX: public final Single lastOrError()
   // XXX: public final Flowable lift(FlowableOperator)
   // XXX: public final Flowable limit(long)
-  // XXX: public final Flowable map(Function)
+
+  // XXX: `Refaster.canBeCoercedTo(...)`.
+  static final class FlowableMap<I, T extends I, O> {
+    @BeforeTemplate
+    Flowable<O> before(Flowable<T> flowable, Function<I, O> function) {
+      return flowable.map(function);
+    }
+
+    @AfterTemplate
+    Flowable<O> after(Flowable<T> flowable, java.util.function.Function<I, O> function) {
+      return flowable
+          .as(RxJava2Adapter::flowableToFlux)
+          .map(function)
+          .as(RxJava2Adapter::fluxToFlowable);
+    }
+  }
+
   // XXX: public final Flowable materialize()
   // XXX: public final Flowable mergeWith(CompletableSource)
   // XXX: public final Flowable mergeWith(MaybeSource)
@@ -413,7 +614,22 @@ public final class RxJavaFlowableToReactorTemplates {
   // XXX: public final Flowable subscribeOn(Scheduler)
   // XXX: public final Flowable subscribeOn(Scheduler,boolean)
   // XXX: public final Subscriber subscribeWith(Subscriber)
-  // XXX: public final Flowable switchIfEmpty(Publisher)
+
+  static final class FlowableSwitchIfEmpty<T> {
+    @BeforeTemplate
+    Flowable<T> before(Flowable<T> flowable, Publisher<T> publisher) {
+      return flowable.switchIfEmpty(publisher);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Flowable<T> flowable, Publisher<T> publisher) {
+      return flowable
+          .as(RxJava2Adapter::flowableToFlux)
+          .switchIfEmpty(publisher)
+          .as(RxJava2Adapter::fluxToFlowable);
+    }
+  }
+
   // XXX: public final Flowable switchMap(Function)
   // XXX: public final Flowable switchMap(Function,int)
   // XXX: public final Completable switchMapCompletable(Function)
@@ -470,7 +686,22 @@ public final class RxJavaFlowableToReactorTemplates {
   // XXX: public final Single toList()
   // XXX: public final Single toList(Callable)
   // XXX: public final Single toList(int)
-  // XXX: public final Single toMap(Function)
+
+  static final class FlowableToMap<I, T extends I, O> {
+    @BeforeTemplate
+    Single<Map<O, T>> before(Flowable<T> flowable, Function<I, O> function) {
+      return flowable.toMap(function);
+    }
+
+    @AfterTemplate
+    Single<Map<O, T>> after(Flowable<T> flowable, java.util.function.Function<I, O> function) {
+      return flowable
+          .as(RxJava2Adapter::flowableToFlux)
+          .collectMap(function)
+          .as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
   // XXX: public final Single toMap(Function,Function)
   // XXX: public final Single toMap(Function,Function,Callable)
   // XXX: public final Single toMultimap(Function)
