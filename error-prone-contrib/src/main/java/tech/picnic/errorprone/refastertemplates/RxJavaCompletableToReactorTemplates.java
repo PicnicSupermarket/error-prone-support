@@ -1,11 +1,36 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import io.reactivex.Completable;
+import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.publisher.Mono;
+
 /** The Refaster templates for the migration of the RxJava Completable type to Reactor */
 public final class RxJavaCompletableToReactorTemplates {
 
   private RxJavaCompletableToReactorTemplates() {}
 
-  // XXX: public static Completable amb(Iterable)
+  // XXX: Copied over from Stephan's test, to make the test run.
+  static final class CompletableAmb {
+    @BeforeTemplate
+    Completable before(Iterable<? extends Completable> sources) {
+      return Completable.amb(sources);
+    }
+
+    @AfterTemplate
+    Completable after(Iterable<? extends Completable> sources) {
+      return Mono.firstWithSignal(
+              Streams.stream(sources)
+                  .map(RxJava2Adapter::completableToMono)
+                  .collect(toImmutableList()))
+          .as(RxJava2Adapter::monoToCompletable);
+    }
+  }
+
   // XXX: public static Completable ambArray(CompletableSource[])
   // XXX: public static Completable complete()
   // XXX: public static Completable concat(Iterable)

@@ -1,11 +1,38 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Observable;
+import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.publisher.Flux;
+
 /** The Refaster templates for the migration of the RxJava Observable type to Reactor */
 public final class RxJavaObservableToReactorTemplates {
 
   private RxJavaObservableToReactorTemplates() {}
 
-  // XXX: public static Observable amb(Iterable)
+  // XXX: is the conversion sequence correct here?
+  static final class ObservableAmb<T> {
+    @BeforeTemplate
+    Observable<T> before(Iterable<? extends Observable<T>> sources) {
+      return Observable.amb(sources);
+    }
+
+    @AfterTemplate
+    Observable<T> after(Iterable<? extends Observable<T>> sources) {
+      return RxJava2Adapter.fluxToObservable(
+          Flux.<T>firstWithSignal(
+              Streams.stream(sources)
+                  .map(e -> e.toFlowable(BackpressureStrategy.BUFFER))
+                  .map(RxJava2Adapter::flowableToFlux)
+                  .collect(toImmutableList())));
+    }
+  }
+
   // XXX: public static Observable ambArray(ObservableSource[])
   // XXX: public static int bufferSize()
   // XXX: public static Observable combineLatest(Function,int,ObservableSource[])
