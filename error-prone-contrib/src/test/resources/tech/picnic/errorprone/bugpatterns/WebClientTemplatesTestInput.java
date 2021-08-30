@@ -6,13 +6,13 @@ import com.google.common.collect.ImmutableSet;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
-final class RequestBodySpecTemplatesTest implements RefasterTemplateTestCase {
+final class WebClientTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(fromValue(""));
   }
 
-  ImmutableSet<Object> testBodyValue() {
+  ImmutableSet<?> testBodyValue() {
     return ImmutableSet.of(
         WebClient.create("foo").post().body(fromValue("bar")),
         WebTestClient.bindToServer().build().post().body(fromValue("bar")));

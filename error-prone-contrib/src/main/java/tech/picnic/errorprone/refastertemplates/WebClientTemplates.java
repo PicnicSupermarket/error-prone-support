@@ -9,13 +9,13 @@ import org.springframework.web.reactive.function.client.WebClient.RequestBodySpe
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
 
 /**
- * Refaster templates related to the {@link
- * org.springframework.web.reactive.function.client.WebClient}.
+ * Refaster templates related to expressions dealing with {@link
+ * org.springframework.web.reactive.function.client.WebClient} and related types.
  */
 final class WebClientTemplates {
   private WebClientTemplates() {}
 
-  /** Prefer using {@link RequestBodySpec#bodyValue(Object)}. */
+  /** Prefer {@link RequestBodySpec#bodyValue(Object)} over more contrived alternatives. */
   static final class BodyValue<T> {
     @BeforeTemplate
     RequestHeadersSpec<?> before(RequestBodySpec requestBodySpec, T value) {
