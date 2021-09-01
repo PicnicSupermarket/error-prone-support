@@ -22,7 +22,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /** The Refaster templates for the migration of the RxJava Maybe type to Reactor */
-public final class RxJavaMaybeToReactorTemplates {
+final class RxJavaMaybeToReactorTemplates {
 
   private RxJavaMaybeToReactorTemplates() {}
 

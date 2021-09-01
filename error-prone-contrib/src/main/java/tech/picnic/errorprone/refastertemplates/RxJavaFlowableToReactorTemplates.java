@@ -17,7 +17,7 @@ import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 
 /** The Refaster templates for the migration of the RxJava Flowable type to Reactor */
-public final class RxJavaFlowableToReactorTemplates {
+final class RxJavaFlowableToReactorTemplates {
 
   private RxJavaFlowableToReactorTemplates() {}
 
@@ -36,19 +36,14 @@ public final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: public static int bufferSize()
+  // XXX: public static int bufferSize() --> How rewrite this one? Is it valid to do so?
+  // Integer.MAX_VALUE...
   // XXX: public static Flowable combineLatest(Function,Publisher[])
   // XXX: public static Flowable combineLatest(Iterable,Function)
   // XXX: public static Flowable combineLatest(Iterable,Function,int)
   // XXX: public static Flowable combineLatest(Publisher[],Function)
   // XXX: public static Flowable combineLatest(Publisher[],Function,int)
 
-  // XXX: This wouldn't work for this case right?
-  //     return Flowable.combineLatest(
-  //  getEnabledConsentRequests(requiredConsentTopics, locale), // returns Flowable
-  //            Flowable.fromIterable(requiredConsentTopics), // returns Flowable
-  //          this::filterByTopic)
-  //  XXX: Add test
   static final class FlowableCombineLatest<T1, T2, R> {
     @BeforeTemplate
     Flowable<R> before(
@@ -160,14 +155,49 @@ public final class RxJavaFlowableToReactorTemplates {
       return RxJava2Adapter.fluxToFlowable(Flux.error(throwable));
     }
   }
-  // XXX: public static Flowable fromArray(Object[])
+
+  // XXX: Or should this be Object[] instead of T...?
+  static final class FlowableFromArray<T> {
+    @BeforeTemplate
+    Flowable<T> before(T... items) {
+      return Flowable.fromArray(items);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(T... items) {
+      return RxJava2Adapter.fluxToFlowable(Flux.fromArray(items));
+    }
+  }
   // XXX: public static Flowable fromCallable(Callable)
   // XXX: public static Flowable fromFuture(Future)
   // XXX: public static Flowable fromFuture(Future,long,TimeUnit)
   // XXX: public static Flowable fromFuture(Future,long,TimeUnit,Scheduler)
   // XXX: public static Flowable fromFuture(Future,Scheduler)
-  // XXX: public static Flowable fromIterable(Iterable)
-  // XXX: public static Flowable fromPublisher(Publisher)
+
+  static final class FlowableFromIterable<T> {
+    @BeforeTemplate
+    Flowable<T> before(Iterable<? extends T> iterable) {
+      return Flowable.fromIterable(iterable);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Iterable<? extends T> iterable) {
+      return RxJava2Adapter.fluxToFlowable(Flux.fromIterable(iterable));
+    }
+  }
+
+  static final class FlowableFromPublisher<T> {
+    @BeforeTemplate
+    Flowable<T> before(Publisher<? extends T> source) {
+      return Flowable.fromPublisher(source);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Publisher<? extends T> source) {
+      return RxJava2Adapter.fluxToFlowable(Flux.from(source));
+    }
+  }
+
   // XXX: public static Flowable generate(Callable,BiConsumer)
   // XXX: public static Flowable generate(Callable,BiConsumer,Consumer)
   // XXX: public static Flowable generate(Callable,BiFunction)
@@ -283,7 +313,6 @@ public final class RxJavaFlowableToReactorTemplates {
   // XXX: public final Iterable blockingLatest()
   // XXX: public final Iterable blockingMostRecent(Object)
   // XXX: public final Iterable blockingNext()
-
   // XXX: public final Object blockingSingle()
   // XXX: public final Object blockingSingle(Object)
   // XXX: public final void blockingSubscribe()
@@ -321,7 +350,22 @@ public final class RxJavaFlowableToReactorTemplates {
   // XXX: public final Flowable compose(FlowableTransformer)
   // XXX: public final Flowable concatMap(Function)
   // XXX: public final Flowable concatMap(Function,int)
-  // XXX: public final Completable concatMapCompletable(Function)
+  // XXX: public final Completable concatMapCompletable(Function) --> Do this one
+
+  //  static final class FlowableConcatMapCompletable<T> {
+  //    @BeforeTemplate
+  //    Completable before(Flowable<T> flowable, Function<? super T, ? extends CompletableSource>
+  // function) {
+  //      return flowable.concatMapCompletable(function);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Completable after(Flowable<T> flowable,  Function<? super T, ? extends CompletableSource>
+  // function) {
+  //      return flowable.
+  //    }
+  //  }
+
   // XXX: public final Completable concatMapCompletable(Function,int)
   // XXX: public final Completable concatMapCompletableDelayError(Function)
   // XXX: public final Completable concatMapCompletableDelayError(Function,boolean)
@@ -334,9 +378,23 @@ public final class RxJavaFlowableToReactorTemplates {
   // XXX: public final Flowable concatMapEagerDelayError(Function,int,int,boolean)
   // XXX: public final Flowable concatMapIterable(Function)
   // XXX: public final Flowable concatMapIterable(Function,int)
-  // XXX: public final Flowable concatMapMaybe(Function)
+  // XXX: public final Flowable concatMapMaybe(Function) --> Required.
+
+  //  static final class FlowableConcatMaybe<T, R> {
+  //    @BeforeTemplate
+  //    Flowable<R> before(
+  //        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> mapper) {
+  //      return flowable.concatMapMaybe(mapper);
+  //    }
+  //
+  //    Flowable<R> after(
+  //        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> mapper) {
+  //      return flowable.as(RxJava2Adapter::flowableToFlux).concat
+  //    }
+  //  }
+
   // XXX: public final Flowable concatMapMaybe(Function,int)
-  // XXX: public final Flowable concatMapMaybeDelayError(Function)
+  // XXX: public final Flowable concatMapMaybeDelayError(Function) --> This one
   // XXX: public final Flowable concatMapMaybeDelayError(Function,boolean)
   // XXX: public final Flowable concatMapMaybeDelayError(Function,boolean,int)
   // XXX: public final Flowable concatMapSingle(Function)
@@ -512,7 +570,7 @@ public final class RxJavaFlowableToReactorTemplates {
   // XXX: public final Flowable mergeWith(CompletableSource)
   // XXX: public final Flowable mergeWith(MaybeSource)
   // XXX: public final Flowable mergeWith(Publisher)
-  // XXX: public final Flowable mergeWith(SingleSource)
+  // XXX: public final Flowable mergeWith(SingleSource) --> required.
   // XXX: public final Flowable observeOn(Scheduler)
   // XXX: public final Flowable observeOn(Scheduler,boolean)
   // XXX: public final Flowable observeOn(Scheduler,boolean,int)
