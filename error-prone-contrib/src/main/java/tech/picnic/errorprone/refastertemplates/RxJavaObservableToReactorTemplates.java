@@ -11,7 +11,7 @@ import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 
 /** The Refaster templates for the migration of the RxJava Observable type to Reactor */
-public final class RxJavaObservableToReactorTemplates {
+final class RxJavaObservableToReactorTemplates {
 
   private RxJavaObservableToReactorTemplates() {}
 

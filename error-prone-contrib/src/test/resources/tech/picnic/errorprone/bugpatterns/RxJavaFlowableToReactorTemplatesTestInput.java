@@ -36,6 +36,18 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         });
   }
 
+  Flowable<Integer> testFlowableFromArray() {
+    return Flowable.fromArray(1, 2, 3);
+  }
+  
+  Flowable<Integer> testFlowableFromIterable() {
+    return Flowable.fromIterable(ImmutableList.of(1, 2, 3));
+  }
+  
+  Flowable<Integer> testFlowableFromPublisher() { 
+    return Flowable.fromPublisher(Flowable.just(1));
+  }
+
   Flowable<Integer> testFlowableFilter() {
     return Flowable.just(1).filter(i -> i > 2);
   }

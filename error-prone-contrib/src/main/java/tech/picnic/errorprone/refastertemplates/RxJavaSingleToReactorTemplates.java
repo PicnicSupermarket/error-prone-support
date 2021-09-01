@@ -11,7 +11,7 @@ import io.reactivex.functions.Predicate;
 import reactor.adapter.rxjava.RxJava2Adapter;
 
 /** The Refaster templates for the migration of the RxJava Single type to Reactor */
-public final class RxJavaSingleToReactorTemplates {
+final class RxJavaSingleToReactorTemplates {
 
   private RxJavaSingleToReactorTemplates() {}
 

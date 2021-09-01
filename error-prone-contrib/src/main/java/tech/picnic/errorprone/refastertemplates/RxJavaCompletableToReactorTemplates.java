@@ -10,7 +10,7 @@ import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 
 /** The Refaster templates for the migration of the RxJava Completable type to Reactor */
-public final class RxJavaCompletableToReactorTemplates {
+final class RxJavaCompletableToReactorTemplates {
 
   private RxJavaCompletableToReactorTemplates() {}
 
