@@ -91,7 +91,7 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public static Observable fromFuture(Future,long,TimeUnit)
   // XXX: public static Observable fromFuture(Future,long,TimeUnit,Scheduler)
   // XXX: public static Observable fromFuture(Future,Scheduler)
-  // XXX: public static Observable fromIterable(Iterable)
+  // XXX: public static Observable fromIterable(Iterable) --> Required.
   // XXX: public static Observable fromPublisher(org.reactivestreams.Publisher)
   // XXX: public static Observable generate(Callable,BiConsumer)
   // XXX: public static Observable generate(Callable,BiConsumer,Consumer)
