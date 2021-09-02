@@ -347,7 +347,7 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Observable onErrorReturnItem(Object)
   // XXX: public final Observable onExceptionResumeNext(ObservableSource)
   // XXX: public final Observable onTerminateDetach()
-  // XXX: public final ConnectableObservable publish()
+  // XXX: public final ConnectableObservable publish() --> Required.
   // XXX: public final Observable publish(Function)
   // XXX: public final Maybe reduce(BiFunction)
   // XXX: public final Single reduce(Object,BiFunction)

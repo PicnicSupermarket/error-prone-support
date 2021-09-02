@@ -102,7 +102,7 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single doOnError(Consumer)
   // XXX: public final Single doOnEvent(BiConsumer)
   // XXX: public final Single doOnSubscribe(Consumer)
-  // XXX: public final Single doOnSuccess(Consumer)
+  // XXX: public final Single doOnSuccess(Consumer) --> Required
   // XXX: public final Single doOnTerminate(Action)
 
   // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
@@ -167,7 +167,7 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single materialize()
   // XXX: public final Flowable mergeWith(SingleSource)
   // XXX: public final Single observeOn(Scheduler)
-  // XXX: public final Single onErrorResumeNext(Function)
+  // XXX: public final Single onErrorResumeNext(Function) --> Required
   // XXX: public final Single onErrorResumeNext(Single)
   // XXX: public final Single onErrorReturn(Function)
   // XXX: public final Single onErrorReturnItem(Object)
@@ -187,7 +187,7 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Disposable subscribe(Consumer)
   // XXX: public final Disposable subscribe(Consumer,Consumer)
   // XXX: public final void subscribe(SingleObserver)
-  // XXX: public final Single subscribeOn(Scheduler)
+  // XXX: public final Single subscribeOn(Scheduler) --> Required.
   // XXX: public final SingleObserver subscribeWith(SingleObserver)
   // XXX: public final Single takeUntil(CompletableSource)
   // XXX: public final Single takeUntil(Publisher)

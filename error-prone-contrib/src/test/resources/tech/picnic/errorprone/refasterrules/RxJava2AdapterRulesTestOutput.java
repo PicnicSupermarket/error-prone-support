@@ -13,6 +13,10 @@ import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class RxJava2AdapterRulesTest implements RefasterRuleCollectionTestCase {
+  ImmutableSet<Flux<Integer>> testFluxToFlowableToFlux() {
+    return ImmutableSet.of(Flux.just(1), Flux.just(2));
+  }
+
   ImmutableSet<Mono<Void>> testCompletableToMono() {
     return ImmutableSet.of(
         Completable.complete().as(RxJava2Adapter::completableToMono),

@@ -39,6 +39,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   Flowable<Integer> testFlowableFromArray() {
     return Flowable.fromArray(1, 2, 3);
   }
+
+  Flowable<Integer> testFlowableFromCallable() {
+    return Flowable.fromCallable(() -> 1);
+  }
   
   Flowable<Integer> testFlowableFromIterable() {
     return Flowable.fromIterable(ImmutableList.of(1, 2, 3));
@@ -54,6 +58,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Maybe<Integer> testFlowableFirstElement() {
     return Flowable.just(1).firstElement();
+  }
+
+  Single<Integer> testFlowableFirstOrError() {
+    return Flowable.just(1).firstOrError();
   }
 
   Flowable<Object> testFlowableFlatMap() {
@@ -81,8 +89,20 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return Flowable.just(true, true).all(Boolean::booleanValue);
   }
 
+  Single<Boolean> testFlowableAny() {
+    return Flowable.just(true, true).any(Boolean::booleanValue);
+  }
+
+  Object testFlowableBlockingFirst() {
+    return Flowable.just(1).blockingFirst();
+  }
+
   Flowable<Integer> testFlowableMap() {
     return Flowable.just(1).map(i -> i + 1);
+  }
+
+  Flowable<Integer> testFlowableMergeWith() {
+    return Flowable.just(1).mergeWith(Single.just(1));
   }
 
   Flowable<Integer> testFlowableSwitchIfEmptyPublisher() {
