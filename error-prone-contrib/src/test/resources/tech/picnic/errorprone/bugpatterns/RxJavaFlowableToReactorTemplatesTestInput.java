@@ -73,6 +73,14 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return ImmutableList.of(Flowable.just(1), Flowable.just(1, 2));
   }
 
+  Flowable<Integer> testFlowableRange() {
+    return Flowable.range(1, 10);
+  }
+
+  Single<Boolean> testFlowableAll() {
+    return Flowable.just(true, true).all(Boolean::booleanValue);
+  }
+
   Flowable<Integer> testFlowableMap() {
     return Flowable.just(1).map(i -> i + 1);
   }

@@ -100,6 +100,19 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         RxJava2Adapter.fluxToFlowable(Flux.just(1, 2)));
   }
 
+  Flowable<Integer> testFlowableRange() {
+    return RxJava2Adapter.fluxToFlowable(Flux.range(1, 10));
+  }
+
+  Single<Boolean> testFlowableAll() {
+    return Flowable.just(true, true)
+        .as(RxJava2Adapter::flowableToFlux)
+        .all(
+            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkPredicate(
+                Boolean::booleanValue))
+        .as(RxJava2Adapter::monoToSingle);
+  }
+
   Flowable<Integer> testFlowableMap() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)

@@ -162,6 +162,27 @@ public final class RxJavaToReactorTemplates {
       };
     }
 
+    /**
+     * Convert {@link io.reactivex.functions.Function} to {@link java.util.function.Function}
+     *
+     * @param predicate XXX
+     * @param <T> XXX
+     * @return XXX
+     */
+    // XXX: Rename.
+    // XXX: Introduce Refaster rules to drop this wrapper when possible.
+    @SuppressWarnings("IllegalCatch")
+    public static <T> java.util.function.Predicate<T> toJdkPredicate(
+            io.reactivex.functions.Predicate<T> predicate) {
+      return (t) -> {
+        try {
+          return predicate.test(t);
+        } catch (Exception e) {
+          throw new IllegalArgumentException("BiFunction threw checked exception", e);
+        }
+      };
+    }
+
     // "Coersion" (find better name):
     // instanceof (support this?)
     // two functional interfaces with:
