@@ -14,6 +14,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 final class RxJava2AdapterTemplatesTest implements RefasterTemplateTestCase {
+  ImmutableSet<Flux<Integer>> testFluxToFlowableToFlux() {
+    return ImmutableSet.of(
+        RxJava2Adapter.flowableToFlux(RxJava2Adapter.fluxToFlowable(Flux.just(1))),
+        RxJava2Adapter.flowableToFlux(RxJava2Adapter.fluxToFlowable(Flux.just(2))));
+  }
+
   ImmutableSet<Mono<Void>> testCompletableToMono() {
     return ImmutableSet.of(
         RxJava2Adapter.completableToMono(Completable.complete()),

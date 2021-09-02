@@ -244,7 +244,7 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe doOnError(Consumer)
   // XXX: public final Maybe doOnEvent(BiConsumer)
   // XXX: public final Maybe doOnSubscribe(Consumer)
-  // XXX: public final Maybe doOnSuccess(Consumer)
+  // XXX: public final Maybe doOnSuccess(Consumer) --> Required
   // XXX: public final Maybe doOnTerminate(Action)
   // XXX: public final Maybe filter(Predicate)
 
@@ -351,7 +351,7 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe onErrorComplete(Predicate)
   // XXX: public final Maybe onErrorResumeNext(Function)
   // XXX: public final Maybe onErrorResumeNext(MaybeSource)
-  // XXX: public final Maybe onErrorReturn(Function)
+  // XXX: public final Maybe onErrorReturn(Function) --> This one, ArticleIssueServiceImpl 484, double check please.
   // XXX: public final Maybe onErrorReturnItem(Object)
   // XXX: public final Maybe onExceptionResumeNext(MaybeSource)
   // XXX: public final Maybe onTerminateDetach()
@@ -403,10 +403,10 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe timeout(Publisher)
   // XXX: public final Maybe timeout(Publisher,MaybeSource)
   // XXX: public final Object to(Function)
-  // XXX: public final Flowable toFlowable()
+  // XXX: public final Flowable toFlowable() --> Required I guess
   // XXX: public final Observable toObservable()
-  // XXX: public final Single toSingle()
+  // XXX: public final Single toSingle() --> Required
   // XXX: public final Single toSingle(Object)
   // XXX: public final Maybe unsubscribeOn(Scheduler)
-  // XXX: public final Maybe zipWith(MaybeSource,BiFunction)
+  // XXX: public final Maybe zipWith(MaybeSource,BiFunction) --> Required.
 }

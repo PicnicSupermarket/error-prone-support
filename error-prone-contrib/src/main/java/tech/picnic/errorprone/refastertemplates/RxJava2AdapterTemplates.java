@@ -18,6 +18,19 @@ import reactor.core.publisher.Mono;
 final class RxJava2AdapterTemplates {
   private RxJava2AdapterTemplates() {}
 
+  /** Remove double conversion of ... */
+  static final class FluxToFlowableToFlux<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux) {
+      return RxJava2Adapter.flowableToFlux(RxJava2Adapter.fluxToFlowable(flux));
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux) {
+      return flux;
+    }
+  }
+
   /** Use the fluent API style when using {@link RxJava2Adapter#completableToMono}. */
   static final class CompletableToMono {
     @BeforeTemplate

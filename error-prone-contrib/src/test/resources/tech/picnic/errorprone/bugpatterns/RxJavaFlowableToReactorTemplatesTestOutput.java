@@ -52,6 +52,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return RxJava2Adapter.fluxToFlowable(Flux.fromArray(1, 2, 3));
   }
 
+  Flowable<Integer> testFlowableFromCallable() {
+    return RxJava2Adapter.monoToFlowable(Mono.fromCallable(() -> 1));
+  }
+
   Flowable<Integer> testFlowableFromIterable() {
     return RxJava2Adapter.fluxToFlowable(Flux.fromIterable(ImmutableList.of(1, 2, 3)));
   }
@@ -72,6 +76,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         .as(RxJava2Adapter::flowableToFlux)
         .next()
         .as(RxJava2Adapter::monoToMaybe);
+  }
+
+  Single<Integer> testFlowableFirstOrError() {
+    return RxJava2Adapter.monoToSingle(RxJava2Adapter.flowableToFlux(Flowable.just(1)).next());
   }
 
   Flowable<Object> testFlowableFlatMap() {
@@ -113,11 +121,28 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         .as(RxJava2Adapter::monoToSingle);
   }
 
+  Single<Boolean> testFlowableAny() {
+    return Flowable.just(true, true)
+        .as(RxJava2Adapter::flowableToFlux)
+        .any(
+            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkPredicate(
+                Boolean::booleanValue))
+        .as(RxJava2Adapter::monoToSingle);
+  }
+
+  Object testFlowableBlockingFirst() {
+    return RxJava2Adapter.flowableToFlux(Flowable.just(1)).blockFirst();
+  }
+
   Flowable<Integer> testFlowableMap() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
         .map(i -> i + 1)
         .as(RxJava2Adapter::fluxToFlowable);
+  }
+
+  Flowable<Integer> testFlowableMergeWith() {
+    return RxJava2Adapter.flowableToFlux(Flowable.just(1)).mergeWith(Single.just(1).toFlowable());
   }
 
   Flowable<Integer> testFlowableSwitchIfEmptyPublisher() {
