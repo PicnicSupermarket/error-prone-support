@@ -132,9 +132,8 @@ public final class RxJavaToReactorTemplates {
      * @return XXX
      */
     @SuppressWarnings("IllegalCatch")
-    public static <T, U, R>
-        java.util.function.BiFunction<? super T, ? super U, ? extends R> toJdkBiFunction(
-            io.reactivex.functions.BiFunction<? super T, ? super U, ? extends R> biFunction) {
+    public static <T, U, R> java.util.function.BiFunction<T, U, R> toJdkBiFunction(
+        io.reactivex.functions.BiFunction<T, U, R> biFunction) {
       return (t, u) -> {
         try {
           return biFunction.apply(t, u);
@@ -173,7 +172,7 @@ public final class RxJavaToReactorTemplates {
     // XXX: Introduce Refaster rules to drop this wrapper when possible.
     @SuppressWarnings("IllegalCatch")
     public static <T> java.util.function.Predicate<T> toJdkPredicate(
-            io.reactivex.functions.Predicate<T> predicate) {
+        io.reactivex.functions.Predicate<T> predicate) {
       return (t) -> {
         try {
           return predicate.test(t);
