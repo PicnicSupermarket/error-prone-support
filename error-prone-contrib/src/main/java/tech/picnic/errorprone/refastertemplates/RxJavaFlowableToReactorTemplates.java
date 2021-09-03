@@ -3,6 +3,8 @@ package tech.picnic.errorprone.refastertemplates;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
+import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -17,6 +19,7 @@ import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil;
 
 /** The Refaster templates for the migration of the RxJava Flowable type to Reactor */
 final class RxJavaFlowableToReactorTemplates {
@@ -62,9 +65,7 @@ final class RxJavaFlowableToReactorTemplates {
         BiFunction<? super T1, ? super T2, ? extends R> combiner) {
       return RxJava2Adapter.fluxToFlowable(
           Flux.<T1, T2, R>combineLatest(
-              p1,
-              p2,
-              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkBiFunction(combiner)));
+              p1, p2, RxJava2ReactorMigrationUtil.toJdkBiFunction(combiner)));
     }
   }
 
@@ -116,8 +117,7 @@ final class RxJavaFlowableToReactorTemplates {
     @AfterTemplate
     Flowable<T> after(Callable<? extends Publisher<T>> supplier) {
       return RxJava2Adapter.fluxToFlowable(
-          Flux.defer(
-              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(supplier)));
+          Flux.defer(RxJava2ReactorMigrationUtil.callableAsSupplier(supplier)));
     }
   }
 
@@ -338,7 +338,7 @@ final class RxJavaFlowableToReactorTemplates {
     Single<Boolean> after(Flowable<T> flowable, Predicate<? super T> predicate) {
       return flowable
           .as(RxJava2Adapter::flowableToFlux)
-          .all(RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkPredicate(predicate))
+          .all(RxJava2ReactorMigrationUtil.toJdkPredicate(predicate))
           .as(RxJava2Adapter::monoToSingle);
     }
   }
@@ -356,7 +356,7 @@ final class RxJavaFlowableToReactorTemplates {
     Single<Boolean> after(Flowable<T> flowable, Predicate<? super T> predicate) {
       return flowable
           .as(RxJava2Adapter::flowableToFlux)
-          .any(RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkPredicate(predicate))
+          .any(RxJava2ReactorMigrationUtil.toJdkPredicate(predicate))
           .as(RxJava2Adapter::monoToSingle);
     }
   }
@@ -423,19 +423,26 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable concatMap(Function,int)
   // XXX: final Completable concatMapCompletable(Function) --> Do this one
 
-  //  static final class FlowableConcatMapCompletable<T> {
-  //    @BeforeTemplate
-  //    Completable before(Flowable<T> flowable, Function<? super T, ? extends CompletableSource>
-  // function) {
-  //      return flowable.concatMapCompletable(function);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Completable after(Flowable<T> flowable,  Function<? super T, ? extends CompletableSource>
-  // function) {
-  //      return flowable.
-  //    }
-  //  }
+  static final class FlowableConcatMapCompletable<T> {
+    @BeforeTemplate
+    Completable before(
+        Flowable<T> flowable, Function<? super T, ? extends CompletableSource> function) {
+      return flowable.concatMapCompletable(function);
+    }
+
+    @AfterTemplate
+    Completable after(
+        Flowable<T> flowable, Function<? super T, ? extends CompletableSource> function) {
+      return RxJava2Adapter.monoToCompletable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .concatMap(
+                  e ->
+                      RxJava2Adapter.completableToMono(
+                          Completable.wrap(
+                              RxJava2ReactorMigrationUtil.toJdkFunction(function).apply(e))))
+              .then());
+    }
+  }
 
   // XXX: final Completable concatMapCompletable(Function,int)
   // XXX: final Completable concatMapCompletableDelayError(Function)
@@ -676,9 +683,10 @@ final class RxJavaFlowableToReactorTemplates {
     }
 
     @AfterTemplate
-    Flowable<T> after(Flowable<T> flowable, Single<T> source) {
+    Flowable<T> after(Flowable<T> flowable, SingleSource<T> source) {
       return RxJava2Adapter.fluxToFlowable(
-          RxJava2Adapter.flowableToFlux(flowable).mergeWith(source.toFlowable()));
+          RxJava2Adapter.flowableToFlux(flowable)
+              .mergeWith(RxJava2Adapter.singleToMono(Single.wrap(source))));
     }
   }
 
@@ -911,27 +919,25 @@ final class RxJavaFlowableToReactorTemplates {
 
   // XXX: final Flowable zipWith(Iterable,BiFunction) --> Required.
 
-  //  static final class FlowableZipWith<T, U, R> {
-  //    @BeforeTemplate
-  //    Flowable<R> before(
-  //        Flowable<T> flowable,
-  //        Iterable<U> iterable,
-  //        BiFunction<? super T, ? super U, ? extends R> zipper) {
-  //      return flowable.zipWith(iterable, zipper);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Flowable<R> after(
-  //        Flowable<? extends T> flowable,
-  //        Iterable<? extends U> iterable,
-  //        BiFunction<? super T, ? super U, ? extends R> zipper) {
-  //      return RxJava2Adapter.fluxToFlowable((RxJava2Adapter.flowableToFlux(flowable)
-  //              .zipWithIterable(
-  //                  iterable,
-  //
-  // RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkBiFunction(zipper))));
-  //    }
-  //  }
+  static final class FlowableZipWith<T, U, R> {
+    @BeforeTemplate
+    Flowable<R> before(
+        Flowable<T> flowable,
+        Iterable<U> iterable,
+        BiFunction<? super T, ? super U, ? extends R> zipper) {
+      return flowable.zipWith(iterable, zipper);
+    }
+
+    @AfterTemplate
+    Flowable<R> after(
+        Flowable<T> flowable,
+        Iterable<U> iterable,
+        BiFunction<? super T, ? super U, ? extends R> zipper) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .zipWithIterable(iterable, RxJava2ReactorMigrationUtil.toJdkBiFunction(zipper)));
+    }
+  }
 
   // XXX: final Flowable zipWith(Publisher,BiFunction) --> Required?
   // XXX: final Flowable zipWith(Publisher,BiFunction,boolean)
