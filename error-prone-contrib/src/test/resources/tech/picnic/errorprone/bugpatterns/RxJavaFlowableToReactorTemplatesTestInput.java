@@ -43,12 +43,12 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   Flowable<Integer> testFlowableFromCallable() {
     return Flowable.fromCallable(() -> 1);
   }
-  
+
   Flowable<Integer> testFlowableFromIterable() {
     return Flowable.fromIterable(ImmutableList.of(1, 2, 3));
   }
-  
-  Flowable<Integer> testFlowableFromPublisher() { 
+
+  Flowable<Integer> testFlowableFromPublisher() {
     return Flowable.fromPublisher(Flowable.just(1));
   }
 
@@ -83,6 +83,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Flowable<Integer> testFlowableRange() {
     return Flowable.range(1, 10);
+  }
+
+  Flowable<Integer> testFlowableZip() {
+    return Flowable.zip(Flowable.just(1), Flowable.just(2), (i1, i2) -> i1 + i2);
   }
 
   Single<Boolean> testFlowableAll() {

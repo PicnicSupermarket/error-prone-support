@@ -312,6 +312,29 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: static Flowable zip(Iterable,Function)
   // XXX: static Flowable zip(Publisher,Function)
   // XXX: static Flowable zip(Publisher,Publisher,BiFunction) --> Required
+
+  static final class FlowableZip<T, U, R> {
+    @BeforeTemplate
+    Flowable<R> before(
+        Publisher<? extends T> source1,
+        Publisher<? extends U> source2,
+        BiFunction<? super T, ? super U, ? extends R> zipper) {
+      return Flowable.zip(source1, source2, zipper);
+    }
+
+    @AfterTemplate
+    Flowable<R> after(
+        Publisher<? extends T> source1,
+        Publisher<? extends U> source2,
+        BiFunction<? super T, ? super U, ? extends R> zipper) {
+      return RxJava2Adapter.fluxToFlowable(
+          Flux.<T, U, R>zip(
+              source1,
+              source2,
+              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkBiFunction(zipper)));
+    }
+  }
+
   // XXX: static Flowable zip(Publisher,Publisher,BiFunction,boolean)
   // XXX: static Flowable zip(Publisher,Publisher,BiFunction,boolean,int)
   // XXX: static Flowable zip(Publisher,Publisher,Publisher,Function3)
@@ -676,6 +699,8 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable mergeWith(MaybeSource)
   // XXX: final Flowable mergeWith(Publisher)
 
+  // XXX: Check whethter the `toFlowable()` is correct.
+
   static final class FlowableMergeWith<T> {
     @BeforeTemplate
     Flowable<T> before(Flowable<T> flowable, SingleSource<T> source) {
@@ -938,6 +963,7 @@ final class RxJavaFlowableToReactorTemplates {
               .zipWithIterable(iterable, RxJava2ReactorMigrationUtil.toJdkBiFunction(zipper)));
     }
   }
+
 
   // XXX: final Flowable zipWith(Publisher,BiFunction) --> Required?
   // XXX: final Flowable zipWith(Publisher,BiFunction,boolean)
