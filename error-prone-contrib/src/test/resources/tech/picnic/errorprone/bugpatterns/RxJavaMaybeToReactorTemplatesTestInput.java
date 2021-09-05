@@ -27,6 +27,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.defer(() -> Maybe.just("test")).as(RxJava2Adapter::maybeToMono);
   }
 
+  Maybe<Integer> testMaybeEmpty() {
+    return Maybe.empty();
+  }
+
   Maybe<Object> testMaybeFromCallable() {
     return Maybe.fromCallable(
         () -> {

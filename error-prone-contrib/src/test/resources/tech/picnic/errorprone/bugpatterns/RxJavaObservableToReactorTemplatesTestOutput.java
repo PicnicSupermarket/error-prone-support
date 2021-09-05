@@ -19,4 +19,8 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
                 .map(RxJava2Adapter::flowableToFlux)
                 .collect(toImmutableList())));
   }
+
+  Completable<Integer> testObservableEmpty() {
+    return RxJava2Adapter.fluxToObservable(Flux.empty());
+  }
 }

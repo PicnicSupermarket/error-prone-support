@@ -83,6 +83,19 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public static Observable create(ObservableOnSubscribe)
   // XXX: public static Observable defer(Callable)
   // XXX: public static Observable empty()
+
+  static final class ObservableEmpty<T> {
+    @BeforeTemplate
+    Observable<T> before() {
+      return Observable.empty();
+    }
+
+    @AfterTemplate
+    Observable<T> after() {
+      return RxJava2Adapter.fluxToObservable(Flux.empty());
+    }
+  }
+
   // XXX: public static Observable error(Callable)
   // XXX: public static Observable error(Throwable)
   // XXX: public static Observable fromArray(Object[])
