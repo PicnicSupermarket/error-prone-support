@@ -87,6 +87,15 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public static Maybe create(MaybeOnSubscribe)
 
   // XXX: Is this correct?
+  /**
+   * Check this one:
+   * private MonoVoid verifyTagExists_migrated(OptionalString tagId) {
+   return RxJava2Adapter.completableToMono(
+   Maybe.defer(() - tagId.map(Maybe::just).orElseGet(Maybe::empty))
+   -            .flatMapSingleElement(this::getTagById)
+   -            .ignoreElement());
+   +            .flatMapSingleElement(this::getTagById).as(RxJava2Adapter::maybeToMono).
+   */
   abstract static class MaybeDefer<T> {
     @Placeholder
     abstract Maybe<T> maybeProducer();
@@ -102,7 +111,21 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: public static Maybe empty()
+  // XXX: public static Maybe empty() --> this one.
+
+  static final class MaybeEmpty<T> {
+    @BeforeTemplate
+    Maybe<T> before() {
+      return Maybe.empty();
+    }
+
+    @AfterTemplate
+    Maybe<T> after() {
+      return RxJava2Adapter.monoToMaybe(Mono.empty());
+    }
+  }
+
+
   // XXX: public static Maybe error(Callable)
   // XXX: public static Maybe error(Throwable)
   // XXX: public static Maybe fromAction(Action)

@@ -33,8 +33,8 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Mono.defer(() -> Maybe.just("test").as(RxJava2Adapter::maybeToMono));
   }
 
-  Maybe<Integer> testMaybeWrap() {
-    return Maybe.just(1);
+  Maybe<Integer> testMaybeEmpty() {
+    return RxJava2Adapter.monoToMaybe(Mono.empty());
   }
 
   Maybe<Object> testMaybeFromCallable() {
@@ -49,6 +49,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
 
   Maybe<Integer> testMaybeFromFuture() {
     return RxJava2Adapter.monoToMaybe(Mono.fromFuture(new CompletableFuture<>()));
+  }
+
+  Maybe<Integer> testMaybeWrap() {
+    return Maybe.just(1);
   }
 
   Maybe<String> testMaybeAmbWith() {

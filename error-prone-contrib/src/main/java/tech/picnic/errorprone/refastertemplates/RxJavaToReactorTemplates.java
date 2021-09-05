@@ -35,13 +35,17 @@ public final class RxJavaToReactorTemplates {
   static final class MonoToFlowableToMono<T> {
     @BeforeTemplate
     Mono<Void> before(Mono<Void> mono) {
-      return mono.as(RxJava2Adapter::monoToCompletable).as(RxJava2Adapter::completableToMono);
+      return Refaster.anyOf(
+          mono.as(RxJava2Adapter::monoToCompletable).as(RxJava2Adapter::completableToMono),
+          RxJava2Adapter.completableToMono(RxJava2Adapter.monoToCompletable(mono)));
     }
 
     @BeforeTemplate
     Mono<T> before2(Mono<T> mono) {
       return Refaster.anyOf(
+          RxJava2Adapter.maybeToMono(RxJava2Adapter.monoToMaybe(mono)),
           mono.as(RxJava2Adapter::monoToMaybe).as(RxJava2Adapter::maybeToMono),
+          RxJava2Adapter.singleToMono(RxJava2Adapter.monoToSingle(mono)),
           mono.as(RxJava2Adapter::monoToSingle).as(RxJava2Adapter::singleToMono));
     }
 
