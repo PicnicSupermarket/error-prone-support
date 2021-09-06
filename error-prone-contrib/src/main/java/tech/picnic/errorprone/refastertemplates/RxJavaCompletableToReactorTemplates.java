@@ -64,7 +64,7 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public static Completable fromFuture(Future)
   // XXX: public static Completable fromMaybe(MaybeSource)
   // XXX: public static Completable fromObservable(ObservableSource)
-  // XXX: public static Completable fromPublisher(Publisher)
+  // XXX: public static Completable fromPublisher(Publisher) --> Required
   // XXX: public static Completable fromRunnable(Runnable)
   // XXX: public static Completable fromSingle(SingleSource)
   // XXX: public static Completable merge(Iterable)

@@ -16,10 +16,12 @@ import reactor.core.publisher.Mono;
 public final class RxJavaToReactorTemplates {
   private RxJavaToReactorTemplates() {}
 
+  // XXX: Add test cases
   static final class FluxToFlowableToFlux<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, BackpressureStrategy strategy) {
       return Refaster.anyOf(
+          RxJava2Adapter.fluxToFlowable(flux).as(RxJava2Adapter::flowableToFlux),
           flux.as(RxJava2Adapter::fluxToObservable)
               .toFlowable(strategy)
               .as(RxJava2Adapter::flowableToFlux),
@@ -33,10 +35,13 @@ public final class RxJavaToReactorTemplates {
   }
 
   // XXX: What should we do with the naming here? Since it is not entirely correct now.
+  // (ObsoleteConversions?)
+  // XXX: Add test cases for the RxJava2adapter.XXX way. And the combination.
   static final class MonoToFlowableToMono<T> {
     @BeforeTemplate
     Mono<Void> before(Mono<Void> mono) {
       return Refaster.anyOf(
+          RxJava2Adapter.monoToCompletable(mono).as(RxJava2Adapter::completableToMono),
           mono.as(RxJava2Adapter::monoToCompletable).as(RxJava2Adapter::completableToMono),
           RxJava2Adapter.completableToMono(RxJava2Adapter.monoToCompletable(mono)));
     }
@@ -44,8 +49,10 @@ public final class RxJavaToReactorTemplates {
     @BeforeTemplate
     Mono<T> before2(Mono<T> mono) {
       return Refaster.anyOf(
+          RxJava2Adapter.monoToMaybe(mono).as(RxJava2Adapter::maybeToMono),
           RxJava2Adapter.maybeToMono(RxJava2Adapter.monoToMaybe(mono)),
           mono.as(RxJava2Adapter::monoToMaybe).as(RxJava2Adapter::maybeToMono),
+          RxJava2Adapter.monoToSingle(mono).as(RxJava2Adapter::singleToMono),
           RxJava2Adapter.singleToMono(RxJava2Adapter.monoToSingle(mono)),
           mono.as(RxJava2Adapter::monoToSingle).as(RxJava2Adapter::singleToMono));
     }

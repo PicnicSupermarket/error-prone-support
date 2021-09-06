@@ -122,8 +122,8 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: public static Maybe error(Callable)
-  // XXX: public static Maybe error(Throwable)
+  // XXX: public static Maybe error(Callable) --> Required
+  // XXX: public static Maybe error(Throwable) --> Required
   // XXX: public static Maybe fromAction(Action)
 
   static final class MaybeFromCallable<T> {
