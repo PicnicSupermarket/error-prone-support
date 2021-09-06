@@ -378,6 +378,8 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
+  //XXX: Remove the toJdkFunction with `CanBeCoercedTo`.
+
   // XXX: public final Single materialize()
   // XXX: public final Flowable mergeWith(MaybeSource)
   // XXX: public final Maybe observeOn(Scheduler)
