@@ -34,7 +34,7 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public static Single equals(SingleSource,SingleSource)
   // XXX: public static Single error(Callable) --> Required
   // XXX: public static Single error(Throwable) --> Required
-  // XXX: public static Single fromCallable(Callable) --> This one
+  // XXX: public static Single fromCallable(Callable) --> Required
   // XXX: public static Single fromFuture(Future)
   // XXX: public static Single fromFuture(Future,long,TimeUnit)
   // XXX: public static Single fromFuture(Future,long,TimeUnit,Scheduler)

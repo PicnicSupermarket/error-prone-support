@@ -96,10 +96,10 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
-  // XXX: public static Observable error(Callable)
-  // XXX: public static Observable error(Throwable)
+  // XXX: public static Observable error(Callable) --> Required
+  // XXX: public static Observable error(Throwable) --> Required
   // XXX: public static Observable fromArray(Object[])
-  // XXX: public static Observable fromCallable(Callable)
+  // XXX: public static Observable fromCallable(Callable) --> Required
   // XXX: public static Observable fromFuture(Future)
   // XXX: public static Observable fromFuture(Future,long,TimeUnit)
   // XXX: public static Observable fromFuture(Future,long,TimeUnit,Scheduler)
@@ -302,7 +302,7 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Maybe elementAt(long)
   // XXX: public final Single elementAt(long,Object)
   // XXX: public final Single elementAtOrError(long)
-  // XXX: public final Observable filter(Predicate)
+  // XXX: public final Observable filter(Predicate) --> This one
   // XXX: public final Single first(Object)
   // XXX: public final Maybe firstElement()
   // XXX: public final Single firstOrError()
@@ -432,7 +432,7 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final void subscribe(Observer)
   // XXX: public final Observable subscribeOn(Scheduler)
   // XXX: public final Observer subscribeWith(Observer)
-  // XXX: public final Observable switchIfEmpty(ObservableSource)
+  // XXX: public final Observable switchIfEmpty(ObservableSource) --> Required
   // XXX: public final Observable switchMap(Function)
   // XXX: public final Observable switchMap(Function,int)
   // XXX: public final Completable switchMapCompletable(Function)
@@ -458,8 +458,6 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Observable takeUntil(ObservableSource)
   // XXX: public final Observable takeUntil(Predicate)
   // XXX: public final Observable takeWhile(Predicate)
-  // XXX: public final TestObserver test()
-  // XXX: public final TestObserver test(boolean)
   // XXX: public final Observable throttleFirst(long,TimeUnit)
   // XXX: public final Observable throttleFirst(long,TimeUnit,Scheduler)
   // XXX: public final Observable throttleLast(long,TimeUnit)
@@ -535,4 +533,8 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Observable zipWith(ObservableSource,BiFunction)
   // XXX: public final Observable zipWith(ObservableSource,BiFunction,boolean)
   // XXX: public final Observable zipWith(ObservableSource,BiFunction,boolean,int)
+
+  // XXX: public final TestObserver test()
+  // XXX: public final TestObserver test(boolean)
+
 }
