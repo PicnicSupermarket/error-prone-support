@@ -585,10 +585,10 @@ final class RxJavaFlowableToReactorTemplates {
     }
 
     @AfterTemplate
-    Flowable<T> after(Flowable<T> flowable, java.util.function.Predicate<S> predicate) {
+    Flowable<T> after(Flowable<T> flowable, Predicate<S> predicate) {
       return flowable
           .as(RxJava2Adapter::flowableToFlux)
-          .filter(predicate)
+          .filter(RxJava2ReactorMigrationUtil.toJdkPredicate(predicate))
           .as(RxJava2Adapter::fluxToFlowable);
     }
   }

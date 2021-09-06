@@ -67,7 +67,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   Flowable<Integer> testFlowableFilter() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
-        .filter(i -> i > 2)
+        .filter(RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkPredicate(i -> i > 2))
         .as(RxJava2Adapter::fluxToFlowable);
   }
 
