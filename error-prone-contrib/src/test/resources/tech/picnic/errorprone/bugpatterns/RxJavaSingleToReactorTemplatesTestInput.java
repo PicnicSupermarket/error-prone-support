@@ -5,6 +5,10 @@ import io.reactivex.Single;
 
 final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTestCase {
 
+  Single<Integer> testSingleJust() {
+    return Single.just(1);
+  }
+
   Maybe<Integer> testSingleFilter() {
     return Single.just(1).filter(i -> i > 2);
   }

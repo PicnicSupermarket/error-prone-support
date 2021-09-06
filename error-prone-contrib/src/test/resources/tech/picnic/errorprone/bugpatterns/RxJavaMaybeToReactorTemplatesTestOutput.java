@@ -129,6 +129,13 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
         .as(RxJava2Adapter::monoToCompletable);
   }
 
+  Maybe<String> testMaybeMap() {
+    return Maybe.just(1, 2)
+        .as(RxJava2Adapter::maybeToMono)
+        .map(RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkFunction(String::valueOf))
+        .as(RxJava2Adapter::monoToMaybe);
+  }
+
   Single<Integer> testMaybeSwitchIfEmpty() {
     return Maybe.just(1)
         .as(RxJava2Adapter::maybeToMono)
