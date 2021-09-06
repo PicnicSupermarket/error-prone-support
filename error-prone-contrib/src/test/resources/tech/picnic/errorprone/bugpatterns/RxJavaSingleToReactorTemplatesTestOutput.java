@@ -6,6 +6,10 @@ import reactor.adapter.rxjava.RxJava2Adapter;
 
 final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCase {
 
+  Single<Integer> testSingleJust() {
+    return Mono.just(1).as(RxJava2Adapter::monoToSingle);
+  }
+
   Maybe<Integer> testSingleFilter() {
     return Single.just(1)
         .as(RxJava2Adapter::singleToMono)

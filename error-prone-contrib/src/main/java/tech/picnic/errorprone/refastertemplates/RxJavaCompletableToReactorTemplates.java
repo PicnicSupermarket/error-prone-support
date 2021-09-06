@@ -6,6 +6,7 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import io.reactivex.Completable;
+import io.reactivex.functions.Action;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 
@@ -38,10 +39,27 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public static Completable concat(Publisher,int)
   // XXX: public static Completable concatArray(CompletableSource[])
   // XXX: public static Completable create(CompletableOnSubscribe)
-  // XXX: public static Completable defer(Callable)
-  // XXX: public static Completable error(Callable)
-  // XXX: public static Completable error(Throwable)
-  // XXX: public static Completable fromAction(Action)
+  // XXX: public static Completable defer(Callable) --> Required.
+  // XXX: public static Completable error(Callable) --> Required.
+  // XXX: public static Completable error(Throwable) --> Required.
+
+  // XXX: Make the test.
+  static final class CompletableFromAction<T> {
+    @BeforeTemplate
+    Completable before(Action action) {
+      return Completable.fromAction(action);
+    }
+
+    @AfterTemplate
+    Completable after(Action action) {
+      return RxJava2Adapter.monoToCompletable(
+          Mono.fromRunnable(
+              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toRunnable(action)));
+    }
+  }
+
+
+
   // XXX: public static Completable fromCallable(Callable)
   // XXX: public static Completable fromFuture(Future)
   // XXX: public static Completable fromMaybe(MaybeSource)

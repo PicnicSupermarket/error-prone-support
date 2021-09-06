@@ -82,6 +82,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.just(1).ignoreElement();
   }
 
+  Maybe<String> testMaybeMap() {
+    return Maybe.just(1, 2).map(String::valueOf);
+  }
+
   Single<Integer> testMaybeSwitchIfEmpty() {
     return Maybe.just(1)
         .switchIfEmpty(

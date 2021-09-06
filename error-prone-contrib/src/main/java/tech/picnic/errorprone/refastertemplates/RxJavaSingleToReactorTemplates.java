@@ -9,6 +9,7 @@ import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.publisher.Mono;
 
 /** The Refaster templates for the migration of the RxJava Single type to Reactor */
 final class RxJavaSingleToReactorTemplates {
@@ -29,18 +30,31 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public static Flowable concatEager(Iterable)
   // XXX: public static Flowable concatEager(Publisher)
   // XXX: public static Single create(SingleOnSubscribe)
-  // XXX: public static Single defer(Callable)
+  // XXX: public static Single defer(Callable) --> Required
   // XXX: public static Single equals(SingleSource,SingleSource)
-  // XXX: public static Single error(Callable)
-  // XXX: public static Single error(Throwable)
-  // XXX: public static Single fromCallable(Callable)
+  // XXX: public static Single error(Callable) --> Required
+  // XXX: public static Single error(Throwable) --> Required
+  // XXX: public static Single fromCallable(Callable) --> This one
   // XXX: public static Single fromFuture(Future)
   // XXX: public static Single fromFuture(Future,long,TimeUnit)
   // XXX: public static Single fromFuture(Future,long,TimeUnit,Scheduler)
   // XXX: public static Single fromFuture(Future,Scheduler)
   // XXX: public static Single fromObservable(ObservableSource)
   // XXX: public static Single fromPublisher(Publisher)
-  // XXX: public static Single just(Object)
+
+  // XXX: Make a test
+  static final class SingleJust<T> {
+    @BeforeTemplate
+    Single<T> before(T item) {
+      return Single.just(item);
+    }
+
+    @AfterTemplate
+    Single<T> after(T item) {
+      return Mono.just(item).as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
   // XXX: public static Flowable merge(Iterable)
   // XXX: public static Flowable merge(Publisher)
   // XXX: public static Single merge(SingleSource)
@@ -59,7 +73,7 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public static Single unsafeCreate(SingleSource)
   // XXX: public static Single using(Callable,Function,Consumer)
   // XXX: public static Single using(Callable,Function,Consumer,boolean)
-  // XXX: public static Single wrap(SingleSource)
+  // XXX: public static Single wrap(SingleSource) --> Required
   // XXX: public static Single zip(Iterable,Function)
   // XXX: public static Single zip(SingleSource,SingleSource,BiFunction)
   // XXX: public static Single zip(SingleSource,SingleSource,SingleSource,Function3)

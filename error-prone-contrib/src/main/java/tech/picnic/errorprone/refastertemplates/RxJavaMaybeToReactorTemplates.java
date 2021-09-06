@@ -88,13 +88,10 @@ final class RxJavaMaybeToReactorTemplates {
 
   // XXX: Is this correct?
   /**
-   * Check this one:
-   * private MonoVoid verifyTagExists_migrated(OptionalString tagId) {
-   return RxJava2Adapter.completableToMono(
-   Maybe.defer(() - tagId.map(Maybe::just).orElseGet(Maybe::empty))
-   -            .flatMapSingleElement(this::getTagById)
-   -            .ignoreElement());
-   +            .flatMapSingleElement(this::getTagById).as(RxJava2Adapter::maybeToMono).
+   * Check this one: private MonoVoid verifyTagExists_migrated(OptionalString tagId) { return
+   * RxJava2Adapter.completableToMono( Maybe.defer(() -
+   * tagId.map(Maybe::just).orElseGet(Maybe::empty)) - .flatMapSingleElement(this::getTagById) -
+   * .ignoreElement()); + .flatMapSingleElement(this::getTagById).as(RxJava2Adapter::maybeToMono).
    */
   abstract static class MaybeDefer<T> {
     @Placeholder
@@ -124,7 +121,6 @@ final class RxJavaMaybeToReactorTemplates {
       return RxJava2Adapter.monoToMaybe(Mono.empty());
     }
   }
-
 
   // XXX: public static Maybe error(Callable)
   // XXX: public static Maybe error(Throwable)
@@ -365,7 +361,23 @@ final class RxJavaMaybeToReactorTemplates {
 
   // XXX: public final Single isEmpty()
   // XXX: public final Maybe lift(MaybeOperator)
-  // XXX: public final Maybe map(Function)
+  // XXX: public final Maybe map(Function) --> required.
+
+  static final class MaybeMap<T, R> {
+    @BeforeTemplate
+    Maybe<R> before(Maybe<T> maybe, Function<T, R> mapper) {
+      return maybe.map(mapper);
+    }
+
+    @AfterTemplate
+    Maybe<R> after(Maybe<T> maybe, Function<T, R> mapper) {
+      return maybe
+          .as(RxJava2Adapter::maybeToMono)
+          .map(RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkFunction(mapper))
+          .as(RxJava2Adapter::monoToMaybe);
+    }
+  }
+
   // XXX: public final Single materialize()
   // XXX: public final Flowable mergeWith(MaybeSource)
   // XXX: public final Maybe observeOn(Scheduler)
@@ -374,7 +386,8 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe onErrorComplete(Predicate)
   // XXX: public final Maybe onErrorResumeNext(Function)
   // XXX: public final Maybe onErrorResumeNext(MaybeSource)
-  // XXX: public final Maybe onErrorReturn(Function) --> This one, ArticleIssueServiceImpl 484, double check please.
+  // XXX: public final Maybe onErrorReturn(Function) --> This one, ArticleIssueServiceImpl 484,
+  // double check please.
   // XXX: public final Maybe onErrorReturnItem(Object)
   // XXX: public final Maybe onExceptionResumeNext(MaybeSource)
   // XXX: public final Maybe onTerminateDetach()

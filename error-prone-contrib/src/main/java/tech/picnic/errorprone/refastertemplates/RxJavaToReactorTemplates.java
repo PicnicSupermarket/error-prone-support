@@ -4,6 +4,7 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Function;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
@@ -182,6 +183,22 @@ public final class RxJavaToReactorTemplates {
           return predicate.test(t);
         } catch (Exception e) {
           throw new IllegalArgumentException("BiFunction threw checked exception", e);
+        }
+      };
+    }
+
+    /**
+     * XXX
+     * @param action XXX
+     * @return XXX
+     */
+    @SuppressWarnings("IllegalCatch")
+    public static Runnable toRunnable(Action action) {
+      return () -> {
+        try {
+          action.run();
+        } catch (Exception e) {
+          throw new IllegalArgumentException("Action threw checked exception", e);
         }
       };
     }
