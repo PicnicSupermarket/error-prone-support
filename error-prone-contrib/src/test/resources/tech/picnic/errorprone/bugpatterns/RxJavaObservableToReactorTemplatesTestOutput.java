@@ -1,26 +1,31 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
-import java.util.concurrent.TimeUnit;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 
 final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTestCase {
 
-  Completable<Integer> testObservableAmb() {
+  Observable<Integer> testObservableAmb() {
     return RxJava2Adapter.fluxToObservable(
-        Flux.<T>firstWithSignal(
-            Streams.stream(Observable.timer(100, TimeUnit.NANOSECONDS).map(i -> 1))
+        Flux.firstWithSignal(
+            Streams.stream(ImmutableList.of(Observable.just(1), Observable.just(2)))
                 .map(e -> e.toFlowable(BackpressureStrategy.BUFFER))
                 .map(RxJava2Adapter::flowableToFlux)
-                .collect(toImmutableList())));
+                .collect(ImmutableList.toImmutableList())));
   }
 
-  Completable<Integer> testObservableEmpty() {
+  Observable<Integer> testObservableEmpty() {
     return RxJava2Adapter.fluxToObservable(Flux.empty());
+  }
+
+  Completable testObservableIgnoreElements() {
+    return RxJava2Adapter.observableToFlux(Observable.just(1, 2), BackpressureStrategy.BUFFER)
+        .ignoreElements()
+        .as(RxJava2Adapter::monoToCompletable);
   }
 }

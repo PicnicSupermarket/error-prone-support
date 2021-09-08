@@ -8,6 +8,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import com.google.errorprone.refaster.annotation.Repeated;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -66,15 +67,17 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: The test is not triggering? What did I do wrong? Perhaps it should be a MaybeSource...
   static final class MaybeConcatArray<T> {
     @BeforeTemplate
-    Flowable<T> before(Maybe<? extends T>... sources) {
-      return Maybe.concatArray(sources);
+    Flowable<T> before(@Repeated Maybe<T> sources) {
+      return Maybe.concatArray(Refaster.asVarargs(sources));
     }
 
     @AfterTemplate
-    Flowable<T> after(Maybe<? extends T>... sources) {
+    Flowable<T> after(@Repeated Maybe<T> sources) {
       return RxJava2Adapter.fluxToFlowable(
           Flux.concat(
-              Arrays.stream(sources).map(RxJava2Adapter::maybeToMono).collect(toImmutableList())));
+              Arrays.stream(Refaster.asVarargs(sources))
+                  .map(RxJava2Adapter::maybeToMono)
+                  .collect(toImmutableList())));
     }
   }
 
@@ -378,7 +381,7 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  //XXX: Remove the toJdkFunction with `CanBeCoercedTo`.
+  // XXX: Remove the toJdkFunction with `CanBeCoercedTo`.
 
   // XXX: public final Single materialize()
   // XXX: public final Flowable mergeWith(MaybeSource)

@@ -6,8 +6,10 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
 
@@ -26,7 +28,11 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Flowable<Integer> testMaybeConcatArray() {
-    return Maybe.concatArray(Maybe.just(1), Maybe.just(2), Maybe.empty());
+    return RxJava2Adapter.fluxToFlowable(
+        Flux.concat(
+            Arrays.stream(Maybe.just(1), Maybe.just(2), Maybe.empty())
+                .map(RxJava2Adapter::maybeToMono)
+                .collect(ImmutableList.toImmutableList())));
   }
 
   Mono<String> testMaybeDefer() {
@@ -122,6 +128,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
         .as(RxJava2Adapter::monoToMaybe);
   }
 
+  private Maybe<Integer> exampleMethod(Integer x) {
+    return null;
+  }
+
   Completable testMaybeIgnoreElement() {
     return Maybe.just(1)
         .as(RxJava2Adapter::maybeToMono)
@@ -130,7 +140,7 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Maybe<String> testMaybeMap() {
-    return Maybe.just(1, 2)
+    return Maybe.just(1)
         .as(RxJava2Adapter::maybeToMono)
         .map(RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkFunction(String::valueOf))
         .as(RxJava2Adapter::monoToMaybe);

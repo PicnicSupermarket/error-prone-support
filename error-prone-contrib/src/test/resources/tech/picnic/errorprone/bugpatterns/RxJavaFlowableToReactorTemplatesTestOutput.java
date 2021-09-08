@@ -8,6 +8,7 @@ import io.reactivex.Single;
 import java.util.Map;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
 
 final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTestCase {
@@ -29,7 +30,9 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Flowable<Integer> testFlowableDefer() {
     return RxJava2Adapter.fluxToFlowable(
-        Flux.defer(() -> Flowable.just(1).as(RxJava2Adapter::flowableToFlux)));
+        Flux.defer(
+            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(
+                () -> Flowable.just(1))));
   }
 
   Flowable<Object> testFlowableEmpty() {
@@ -87,7 +90,6 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         .as(RxJava2Adapter::flowableToFlux)
         .flatMap(this::exampleMethod2)
         .as(RxJava2Adapter::fluxToFlowable);
-
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
         .flatMap(i -> ImmutableSet::of)
@@ -113,7 +115,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   }
 
   Flowable<Integer> testFlowableZip() {
-    return RxJava2Adapter.flowableToFlux(
+    return RxJava2Adapter.fluxToFlowable(
         Flux.zip(
             Flowable.just(1),
             Flowable.just(2),
@@ -151,7 +153,9 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   }
 
   Flowable<Integer> testFlowableMergeWith() {
-    return RxJava2Adapter.flowableToFlux(Flowable.just(1)).mergeWith(Single.just(1).toFlowable());
+    return RxJava2Adapter.fluxToFlowable(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1))
+            .mergeWith(RxJava2Adapter.singleToMono(Single.wrap(Single.just(1)))));
   }
 
   Flowable<Integer> testFlowableSwitchIfEmptyPublisher() {

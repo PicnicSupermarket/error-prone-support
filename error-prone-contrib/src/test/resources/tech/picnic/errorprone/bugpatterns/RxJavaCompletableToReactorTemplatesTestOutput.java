@@ -1,20 +1,19 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import io.reactivex.Completable;
+import java.util.Arrays;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 
 final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTestCase {
 
-  Completable<String> testCompletableAmb() {
+  Completable testCompletableAmb() {
     return Mono.firstWithSignal(
-            Streams.stream(
-                    Completable.amb(Arrays.asList(Completable.complete(), Completable.complete())))
+            Streams.stream(Arrays.asList(Completable.complete(), Completable.complete()))
                 .map(RxJava2Adapter::completableToMono)
-                .collect(toImmutableList()))
+                .collect(ImmutableList.toImmutableList()))
         .as(RxJava2Adapter::monoToCompletable);
   }
 }

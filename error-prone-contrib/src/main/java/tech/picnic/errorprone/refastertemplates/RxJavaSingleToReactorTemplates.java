@@ -4,6 +4,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
@@ -162,7 +163,22 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Flowable flattenAsFlowable(Function)
   // XXX: public final Observable flattenAsObservable(Function)
   // XXX: public final Single hide()
-  // XXX: public final Completable ignoreElement()
+
+  static final class CompletableIgnoreElement<T> {
+    @BeforeTemplate
+    Completable before(Single<T> single) {
+      return single.ignoreElement();
+    }
+
+    @AfterTemplate
+    Completable after(Single<T> single) {
+      return single
+              .as(RxJava2Adapter::singleToMono)
+              .ignoreElement()
+              .as(RxJava2Adapter::monoToCompletable);
+    }
+  }
+
   // XXX: public final Single lift(SingleOperator)
 
   // XXX: `Refaster.canBeCoercedTo(...)`.
