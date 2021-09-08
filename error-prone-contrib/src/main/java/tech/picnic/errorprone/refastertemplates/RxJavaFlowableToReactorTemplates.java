@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
@@ -161,13 +162,14 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: Or should this be Object[] instead of T...?
   static final class FlowableFromArray<T> {
     @BeforeTemplate
-    Flowable<T> before(T... items) {
-      return Flowable.fromArray(items);
+    Flowable<T> before(@Repeated T items)   {
+      return Flowable.fromArray(Refaster.asVarargs(items));
     }
 
     @AfterTemplate
-    Flowable<T> after(T... items) {
-      return RxJava2Adapter.fluxToFlowable(Flux.fromArray(items));
+    Flowable<T> after(@Repeated T items) {
+      // Here do something with T[].
+      return RxJava2Adapter.fluxToFlowable(Flux.fromArray(Refaster.asVarargs(items)));
     }
   }
 

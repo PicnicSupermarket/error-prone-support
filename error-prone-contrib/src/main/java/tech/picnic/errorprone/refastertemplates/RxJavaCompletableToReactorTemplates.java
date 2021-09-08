@@ -3,11 +3,15 @@ package tech.picnic.errorprone.refastertemplates;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.functions.Action;
 import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /** The Refaster templates for the migration of the RxJava Completable type to Reactor */
@@ -23,6 +27,7 @@ final class RxJavaCompletableToReactorTemplates {
     }
 
     @AfterTemplate
+    @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
     Completable after(Iterable<? extends Completable> sources) {
       return Mono.firstWithSignal(
               Streams.stream(sources)

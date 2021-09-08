@@ -6,6 +6,7 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
@@ -304,9 +305,9 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Single elementAtOrError(long)
   // XXX: public final Observable filter(Predicate) --> This one
   // XXX: public final Single first(Object)
-  // XXX: public final Maybe firstElement()
-  // XXX: public final Single firstOrError()
-  // XXX: public final Observable flatMap(Function)
+  // XXX: public final Maybe firstElement() --> Also this one?
+  // XXX: public final Single firstOrError() --> This one maybe?
+  // XXX: public final Observable flatMap(Function) --> Is suspect this one as well.
   // XXX: public final Observable flatMap(Function,BiFunction)
   // XXX: public final Observable flatMap(Function,BiFunction,boolean)
   // XXX: public final Observable flatMap(Function,BiFunction,boolean,int)
@@ -337,7 +338,21 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Observable groupBy(Function,Function,boolean,int)
   // XXX: public final Observable groupJoin(ObservableSource,Function,Function,BiFunction)
   // XXX: public final Observable hide()
-  // XXX: public final Completable ignoreElements()
+
+  static final class ObservableIgnoreElements<T> {
+    @BeforeTemplate
+    Completable before(Observable<T> observable) {
+      return observable.ignoreElements();
+    }
+
+    @AfterTemplate
+    Completable after(Observable<T> observable) {
+      return RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+          .ignoreElements()
+          .as(RxJava2Adapter::monoToCompletable);
+    }
+  }
+
   // XXX: public final Single isEmpty()
   // XXX: public final Observable join(ObservableSource,Function,Function,BiFunction)
   // XXX: public final Single last(Object)

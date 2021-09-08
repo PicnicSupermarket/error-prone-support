@@ -1,15 +1,20 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import com.google.common.collect.ImmutableList;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
-import java.util.concurrent.TimeUnit;
 
 final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTestCase {
 
-  Completable<Integer> testObservableAmb() {
-    return Observable.amb(Observable.timer(100, TimeUnit.NANOSECONDS).map(i -> 1));
+  Observable<Integer> testObservableAmb() {
+    return Observable.amb(ImmutableList.of(Observable.just(1), Observable.just(2)));
   }
 
-  Completable<Integer> testObservableEmpty() {
+  Observable<Integer> testObservableEmpty() {
     return Observable.empty();
+  }
+
+  Completable testObservableIgnoreElements() {
+    return Observable.just(1, 2).ignoreElements();
   }
 }

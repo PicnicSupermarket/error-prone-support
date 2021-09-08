@@ -2,8 +2,9 @@ package tech.picnic.errorprone.bugpatterns;
 
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.Completable;
 
-final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTestCase {
+final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Single<Integer> testSingleJust() {
     return Single.just(1);
@@ -15,6 +16,10 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
 
   Single<Integer> testSingleFlatMapLambda() {
     return Single.just(1).flatMap(i -> Single.just(i * 2));
+  }
+
+  Completable testCompletableIgnoreElement() {
+    return Single.just(1).ignoreElement();
   }
 
   Single<Integer> testSingleMap() {
