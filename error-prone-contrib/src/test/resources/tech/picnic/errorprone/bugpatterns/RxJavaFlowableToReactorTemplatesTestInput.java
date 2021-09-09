@@ -85,6 +85,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return Flowable.range(1, 10);
   }
 
+  Flowable<?> testFlowableRangeLong() {
+    return Flowable.rangeLong(1, 10);
+  }
+
   Flowable<Integer> testFlowableZip() {
     return Flowable.zip(Flowable.just(1), Flowable.just(2), (i1, i2) -> i1 + i2);
   }

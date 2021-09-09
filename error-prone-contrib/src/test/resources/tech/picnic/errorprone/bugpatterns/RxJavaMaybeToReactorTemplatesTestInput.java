@@ -20,7 +20,7 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Flowable<Integer> testMaybeConcatArray() {
-    return Maybe.concatArray(Maybe.just(1), Maybe.just(2), Maybe.empty());
+    return Flowable.empty();
   }
 
   Mono<String> testMaybeDefer() {

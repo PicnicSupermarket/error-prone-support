@@ -52,7 +52,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   }
 
   Flowable<Integer> testFlowableFromArray() {
-    return RxJava2Adapter.fluxToFlowable(Flux.fromArray(1, 2, 3));
+    return Flowable.fromArray(1, 2, 3);
   }
 
   Flowable<Integer> testFlowableFromCallable() {
@@ -111,6 +111,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   }
 
   Flowable<Integer> testFlowableRange() {
+    return RxJava2Adapter.fluxToFlowable(Flux.range(1, 10));
+  }
+
+  Flowable<?> testFlowableRangeLong() {
     return RxJava2Adapter.fluxToFlowable(Flux.range(1, 10));
   }
 

@@ -64,7 +64,7 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public static Flowable concat(Publisher)
   // XXX: public static Flowable concat(Publisher,int)
 
-  // XXX: The test is not triggering? What did I do wrong? Perhaps it should be a MaybeSource...
+  // XXX: How to make this conversion correct??? Turned off test for now.
   static final class MaybeConcatArray<T> {
     @BeforeTemplate
     Flowable<T> before(@Repeated Maybe<T> sources) {
@@ -230,6 +230,7 @@ final class RxJavaMaybeToReactorTemplates {
   }
 
   // XXX: public final Object as(MaybeConverter)
+//   Maybe.just("test").as(RxJava2Adapter::maybeToMono)?
   // XXX: public final Object blockingGet()
   // XXX: public final Object blockingGet(Object)
   // XXX: public final Maybe cache()
@@ -433,8 +434,6 @@ final class RxJavaMaybeToReactorTemplates {
 
   // XXX: public final Maybe takeUntil(MaybeSource)
   // XXX: public final Maybe takeUntil(Publisher)
-  // XXX: public final TestObserver test()
-  // XXX: public final TestObserver test(boolean)
   // XXX: public final Maybe timeout(long,TimeUnit)
   // XXX: public final Maybe timeout(long,TimeUnit,MaybeSource)
   // XXX: public final Maybe timeout(long,TimeUnit,Scheduler)
@@ -450,4 +449,6 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Single toSingle(Object)
   // XXX: public final Maybe unsubscribeOn(Scheduler)
   // XXX: public final Maybe zipWith(MaybeSource,BiFunction) --> Required.
+  // XXX: public final TestObserver test()
+  // XXX: public final TestObserver test(boolean)
 }

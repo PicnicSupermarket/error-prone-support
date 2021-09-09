@@ -551,5 +551,4 @@ final class RxJavaObservableToReactorTemplates {
 
   // XXX: public final TestObserver test()
   // XXX: public final TestObserver test(boolean)
-
 }
