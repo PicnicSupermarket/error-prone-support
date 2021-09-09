@@ -6,10 +6,8 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import reactor.adapter.rxjava.RxJava2Adapter;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
 
@@ -28,11 +26,7 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Flowable<Integer> testMaybeConcatArray() {
-    return RxJava2Adapter.fluxToFlowable(
-        Flux.concat(
-            Arrays.stream(Maybe.just(1), Maybe.just(2), Maybe.empty())
-                .map(RxJava2Adapter::maybeToMono)
-                .collect(ImmutableList.toImmutableList())));
+    return Flowable.empty();
   }
 
   Mono<String> testMaybeDefer() {

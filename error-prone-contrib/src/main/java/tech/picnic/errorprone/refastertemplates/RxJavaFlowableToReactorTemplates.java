@@ -1,8 +1,8 @@
 package tech.picnic.errorprone.refastertemplates;
 
-import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.Repeated;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
@@ -20,6 +20,7 @@ import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.refaster.util.IsArray;
 import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil;
 
 /** The Refaster templates for the migration of the RxJava Flowable type to Reactor */
@@ -109,6 +110,7 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: static Flowable concatEager(Publisher,int,int)
   // XXX: static Flowable create(FlowableOnSubscribe,BackpressureStrategy)
 
+  // XXX: The types of the @Before and @After template are not matching.
   static final class FlowableDefer<T> {
     @BeforeTemplate
     Flowable<T> before(Callable<? extends Publisher<? extends T>> supplier) {
@@ -159,22 +161,21 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: Or should this be Object[] instead of T...?
+  // XXX: Or should this be Object[] instead of T...? The test doesn't trigger.
   static final class FlowableFromArray<T> {
     @BeforeTemplate
-    Flowable<T> before(@Repeated T items)   {
-      return Flowable.fromArray(Refaster.asVarargs(items));
+    Flowable<T> before(@Matches(IsArray.class) T[] items) {
+      return Flowable.fromArray(items);
     }
 
     @AfterTemplate
-    Flowable<T> after(@Repeated T items) {
+    Flowable<T> after(T[] items) {
       // Here do something with T[].
-      return RxJava2Adapter.fluxToFlowable(Flux.fromArray(Refaster.asVarargs(items)));
+      return RxJava2Adapter.fluxToFlowable(Flux.fromArray(items));
     }
   }
 
   // XXX: Is this Mono correct here?
-
   static final class FlowableFromCallable<T> {
     @BeforeTemplate
     Flowable<T> before(Callable<? extends T> supplier) {
@@ -296,7 +297,18 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: static Flowable rangeLong(long,long) --> Required
+  // XXX: Not migrating the `Flowable.rangeLong` callers with actual Long as arguments.
+  static final class FlowableRangeLong {
+    @BeforeTemplate
+    Flowable<Long> before(int start, int count) {
+      return Flowable.rangeLong(start, count);
+    }
+
+    @AfterTemplate
+    Flowable<Integer> after(int start, int count) {
+      return RxJava2Adapter.fluxToFlowable(Flux.range(start, count));
+    }
+  }
 
   // XXX: static Single sequenceEqual(Publisher,Publisher)
   // XXX: static Single sequenceEqual(Publisher,Publisher,BiPredicate)
@@ -972,5 +984,4 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final TestSubscriber test()
   // XXX: final TestSubscriber test(long)
   // XXX: final TestSubscriber test(long,boolean)
-
 }

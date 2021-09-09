@@ -8,10 +8,12 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.functions.Action;
+import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 import reactor.adapter.rxjava.RxJava2Adapter;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /** The Refaster templates for the migration of the RxJava Completable type to Reactor */
@@ -44,12 +46,51 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public static Completable concat(Publisher,int)
   // XXX: public static Completable concatArray(CompletableSource[])
   // XXX: public static Completable create(CompletableOnSubscribe)
-  // XXX: public static Completable defer(Callable) --> Required.
-  // XXX: public static Completable error(Callable) --> Required.
-  // XXX: public static Completable error(Throwable) --> Required.
+
+  // XXX: The types of the @Before and @After are not matching, is this a problem?
+  static final class CompletableDefer {
+    @BeforeTemplate
+    Completable before(Callable<? extends CompletableSource> supplier) {
+      return Completable.defer(supplier);
+    }
+
+    @AfterTemplate
+    Completable after(Callable<? extends Completable> supplier) {
+      return RxJava2Adapter.monoToCompletable(
+          Mono.defer(
+              () ->
+                  RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(supplier)
+                      .get()
+                      .as(RxJava2Adapter::completableToMono)));
+    }
+  }
+
+  static final class CompletableErrorCallable {
+    @BeforeTemplate
+    Completable before(Callable<? extends Throwable> throwable) {
+      return Completable.error(throwable);
+    }
+
+    @AfterTemplate
+    Completable after(Supplier<? extends Throwable> throwable) {
+      return RxJava2Adapter.monoToCompletable(Mono.error(throwable));
+    }
+  }
+
+  static final class CompletableErrorThrowable {
+    @BeforeTemplate
+    Completable before(Throwable throwable) {
+      return Completable.error(throwable);
+    }
+
+    @AfterTemplate
+    Completable after(Throwable throwable) {
+      return RxJava2Adapter.monoToCompletable(Mono.error(throwable));
+    }
+  }
 
   // XXX: Make the test.
-  static final class CompletableFromAction<T> {
+  static final class CompletableFromAction {
     @BeforeTemplate
     Completable before(Action action) {
       return Completable.fromAction(action);
@@ -63,9 +104,19 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
-
-
   // XXX: public static Completable fromCallable(Callable)
+  static final class FlowableFromCallable<T> {
+    @BeforeTemplate
+    Flowable<T> before(Callable<? extends T> supplier) {
+      return Flowable.fromCallable(supplier);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Callable<? extends T> supplier) {
+      return RxJava2Adapter.monoToFlowable(Mono.fromCallable(supplier));
+    }
+  }
+
   // XXX: public static Completable fromFuture(Future)
   // XXX: public static Completable fromMaybe(MaybeSource)
   // XXX: public static Completable fromObservable(ObservableSource)
@@ -143,8 +194,6 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Completable subscribeOn(Scheduler)
   // XXX: public final CompletableObserver subscribeWith(CompletableObserver)
   // XXX: public final Completable takeUntil(CompletableSource)
-  // XXX: public final observers.TestObserver test()
-  // XXX: public final observers.TestObserver test(boolean)
   // XXX: public final Completable timeout(long,TimeUnit)
   // XXX: public final Completable timeout(long,TimeUnit,CompletableSource)
   // XXX: public final Completable timeout(long,TimeUnit,Scheduler)
@@ -156,4 +205,6 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Single toSingle(Callable)
   // XXX: public final Single toSingleDefault(Object)
   // XXX: public final Completable unsubscribeOn(Scheduler)
+  // XXX: public final TestObserver test()
+  // XXX: public final TestObserver test(boolean)
 }
