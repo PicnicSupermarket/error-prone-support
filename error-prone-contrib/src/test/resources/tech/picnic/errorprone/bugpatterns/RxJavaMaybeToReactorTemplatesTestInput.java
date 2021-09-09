@@ -31,6 +31,24 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.empty();
   }
 
+  Maybe<Object> testMaybeErrorThrowable() {
+    return Maybe.error(new IllegalStateException());
+  }
+
+  Maybe<Object> testMaybeErrorCallable() {
+    return Maybe.error(
+        () -> {
+          throw new IllegalStateException();
+        });
+  }
+
+  Maybe<Object> testMaybeFromAction() {
+    return Maybe.fromAction(
+        () -> {
+          String s = "foo";
+        });
+  }
+
   Maybe<Object> testMaybeFromCallable() {
     return Maybe.fromCallable(
         () -> {

@@ -9,7 +9,6 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
-import io.reactivex.Flowable;
 import io.reactivex.functions.Action;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
@@ -89,7 +88,6 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
-  // XXX: Make the test.
   static final class CompletableFromAction {
     @BeforeTemplate
     Completable before(Action action) {
@@ -104,16 +102,15 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
-  // XXX: public static Completable fromCallable(Callable)
-  static final class FlowableFromCallable<T> {
+  static final class CompletableFromCallable {
     @BeforeTemplate
-    Flowable<T> before(Callable<? extends T> supplier) {
-      return Flowable.fromCallable(supplier);
+    Completable before(Callable<?> supplier) {
+      return Completable.fromCallable(supplier);
     }
 
     @AfterTemplate
-    Flowable<T> after(Callable<? extends T> supplier) {
-      return RxJava2Adapter.monoToFlowable(Mono.fromCallable(supplier));
+    Completable after(Callable<?> supplier) {
+      return RxJava2Adapter.monoToCompletable(Mono.fromCallable(supplier));
     }
   }
 

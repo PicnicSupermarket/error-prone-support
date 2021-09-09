@@ -1,12 +1,32 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
 
 final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCase {
+
+  Single<Object> testSingleErrorThrowable() {
+    return RxJava2Adapter.monoToSingle(Mono.error(new IllegalStateException()));
+  }
+
+  Single<Object> testSingleErrorCallable() {
+    return RxJava2Adapter.monoToSingle(
+        Mono.error(
+            () -> {
+              throw new IllegalStateException();
+            }));
+  }
+
+  Single<Integer> testSingleFromCallable() {
+    return RxJava2Adapter.monoToSingle(
+        Mono.fromSupplier(
+            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(() -> 1)));
+  }
 
   Single<Integer> testSingleJust() {
     return Mono.just(1).as(RxJava2Adapter::monoToSingle);

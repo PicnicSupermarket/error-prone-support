@@ -14,10 +14,12 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Single;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Function;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -111,8 +113,6 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: public static Maybe empty() --> this one.
-
   static final class MaybeEmpty<T> {
     @BeforeTemplate
     Maybe<T> before() {
@@ -125,9 +125,45 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: public static Maybe error(Callable) --> Required
-  // XXX: public static Maybe error(Throwable) --> Required
-  // XXX: public static Maybe fromAction(Action)
+  // XXX: Use `CanBeCoercedTo`.
+  static final class MaybeErrorCallable<T> {
+    @BeforeTemplate
+    Maybe<T> before(Callable<? extends Throwable> throwable) {
+      return Maybe.error(throwable);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Supplier<? extends Throwable> throwable) {
+      return RxJava2Adapter.monoToMaybe(Mono.error(throwable));
+    }
+  }
+
+  static final class MaybeErrorThrowable<T> {
+    @BeforeTemplate
+    Maybe<T> before(Throwable throwable) {
+      return Maybe.error(throwable);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Throwable throwable) {
+      return RxJava2Adapter.monoToMaybe(Mono.error(throwable));
+    }
+  }
+
+  // XXX: Use `CanBeCoercedTo`.
+  static final class MaybeFromAction<T> {
+    @BeforeTemplate
+    Maybe<T> before(Action action) {
+      return Maybe.fromAction(action);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Action action) {
+      return RxJava2Adapter.monoToMaybe(
+          Mono.fromRunnable(
+              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toRunnable(action)));
+    }
+  }
 
   static final class MaybeFromCallable<T> {
     @BeforeTemplate
@@ -230,7 +266,7 @@ final class RxJavaMaybeToReactorTemplates {
   }
 
   // XXX: public final Object as(MaybeConverter)
-//   Maybe.just("test").as(RxJava2Adapter::maybeToMono)?
+  //   Maybe.just("test").as(RxJava2Adapter::maybeToMono)?
   // XXX: public final Object blockingGet()
   // XXX: public final Object blockingGet(Object)
   // XXX: public final Maybe cache()
