@@ -46,4 +46,12 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
         Mono.fromRunnable(
             RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toRunnable(() -> {})));
   }
+
+  Completable testCompletableFromCallable() {
+    return RxJava2Adapter.monoToCompletable(
+        Mono.fromCallable(
+            () -> {
+              return 1;
+            }));
+  }
 }

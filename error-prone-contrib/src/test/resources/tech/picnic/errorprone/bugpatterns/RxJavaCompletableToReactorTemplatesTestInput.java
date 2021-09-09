@@ -26,6 +26,13 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
   }
 
   Completable testCompletableFromAction() {
-    return Completable.fromAction(() -> { });
+    return Completable.fromAction(() -> {});
+  }
+
+  Completable testCompletableFromCallable() {
+    return Completable.fromCallable(
+        () -> {
+          return 1;
+        });
   }
 }

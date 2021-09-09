@@ -37,6 +37,27 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return RxJava2Adapter.monoToMaybe(Mono.empty());
   }
 
+  Maybe<Object> testMaybeErrorThrowable() {
+    return RxJava2Adapter.monoToMaybe(Mono.error(new IllegalStateException()));
+  }
+
+  Maybe<Object> testMaybeErrorCallable() {
+    return RxJava2Adapter.monoToMaybe(
+        Mono.error(
+            () -> {
+              throw new IllegalStateException();
+            }));
+  }
+
+  Maybe<Object> testMaybeFromAction() {
+    return RxJava2Adapter.monoToMaybe(
+        Mono.fromRunnable(
+            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toRunnable(
+                () -> {
+                  String s = "foo";
+                })));
+  }
+
   Maybe<Object> testMaybeFromCallable() {
     return RxJava2Adapter.monoToMaybe(
         Mono.fromSupplier(

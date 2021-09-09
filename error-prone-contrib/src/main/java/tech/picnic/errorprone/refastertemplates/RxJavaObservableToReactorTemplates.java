@@ -83,7 +83,6 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public static Observable concatEager(ObservableSource,int,int)
   // XXX: public static Observable create(ObservableOnSubscribe)
   // XXX: public static Observable defer(Callable)
-  // XXX: public static Observable empty()
 
   static final class ObservableEmpty<T> {
     @BeforeTemplate

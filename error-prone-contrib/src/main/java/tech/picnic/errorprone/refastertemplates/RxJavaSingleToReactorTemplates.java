@@ -9,6 +9,8 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 
@@ -33,9 +35,47 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public static Single create(SingleOnSubscribe)
   // XXX: public static Single defer(Callable) --> Required
   // XXX: public static Single equals(SingleSource,SingleSource)
-  // XXX: public static Single error(Callable) --> Required
-  // XXX: public static Single error(Throwable) --> Required
-  // XXX: public static Single fromCallable(Callable) --> Required
+
+  // XXX: Use `CanBeCoercedTo`.
+  static final class SingleErrorCallable<T> {
+    @BeforeTemplate
+    Single<T> before(Callable<? extends Throwable> throwable) {
+      return Single.error(throwable);
+    }
+
+    @AfterTemplate
+    Single<T> after(Supplier<? extends Throwable> throwable) {
+      return RxJava2Adapter.monoToSingle(Mono.error(throwable));
+    }
+  }
+
+  static final class SingleErrorThrowable<T> {
+    @BeforeTemplate
+    Single<T> before(Throwable throwable) {
+      return Single.error(throwable);
+    }
+
+    @AfterTemplate
+    Single<T> after(Throwable throwable) {
+      return RxJava2Adapter.monoToSingle(Mono.error(throwable));
+    }
+  }
+
+  // XXX: Can be coerced to.
+  static final class SingleFromCallable<T> {
+    @BeforeTemplate
+    Single<T> before(Callable<? extends T> callable) {
+      return Single.fromCallable(callable);
+    }
+
+    @AfterTemplate
+    Single<T> after(Callable<? extends T> callable) {
+      return RxJava2Adapter.monoToSingle(
+              Mono.fromSupplier(
+                      RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(callable)));
+    }
+  }
+
   // XXX: public static Single fromFuture(Future)
   // XXX: public static Single fromFuture(Future,long,TimeUnit)
   // XXX: public static Single fromFuture(Future,long,TimeUnit,Scheduler)
@@ -43,7 +83,6 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public static Single fromObservable(ObservableSource)
   // XXX: public static Single fromPublisher(Publisher)
 
-  // XXX: Make a test
   static final class SingleJust<T> {
     @BeforeTemplate
     Single<T> before(T item) {
