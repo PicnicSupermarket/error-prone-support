@@ -127,8 +127,8 @@
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.0</version.auto-service>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
-        <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.9.0</version.error-prone-orig>
+        <version.error-prone-fork>HEAD-SNAPSHOT</version.error-prone-fork>
+        <version.error-prone-orig>HEAD-SNAPSHOT</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
