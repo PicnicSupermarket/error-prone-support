@@ -5,6 +5,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Observable;

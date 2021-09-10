@@ -6,6 +6,9 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import java.util.Map;
+import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.publisher.Flux;
+import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
 
 final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -91,6 +94,15 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Flowable<Integer> testFlowableZip() {
     return Flowable.zip(Flowable.just(1), Flowable.just(2), (i1, i2) -> i1 + i2);
+  }
+
+  Flowable<Integer> testFlowableBiFunctionRemoveUtil() {
+    return RxJava2Adapter.fluxToFlowable(
+        Flux.zip(
+            Flowable.just(1),
+            Flowable.just(2),
+            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkBiFunction(
+                (i1, i2) -> i1 + i2)));
   }
 
   Single<Boolean> testFlowableAll() {

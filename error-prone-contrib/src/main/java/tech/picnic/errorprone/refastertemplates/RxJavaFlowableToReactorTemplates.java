@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refastertemplates;
 
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.Repeated;
 import io.reactivex.Completable;
@@ -346,6 +347,42 @@ final class RxJavaFlowableToReactorTemplates {
               source1,
               source2,
               RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkBiFunction(zipper)));
+    }
+  }
+
+  static final class FlowableBiFunctionRemoveUtil<T, U, R> {
+    @BeforeTemplate
+    Flowable<R> before(
+        Publisher<? extends T> source1,
+        Publisher<? extends U> source2,
+        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
+      return RxJava2Adapter.fluxToFlowable(
+          Flux.<T, U, R>zip(
+              source1,
+              source2,
+              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkBiFunction(zipper)));
+    }
+
+    @AfterTemplate
+    Flowable<R> after(
+        Publisher<? extends T> source1,
+        Publisher<? extends U> source2,
+        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
+      return RxJava2Adapter.fluxToFlowable(Flux.<T, U, R>zip(source1, source2, zipper));
+    }
+  }
+
+  static final class BiFunctionRemoveUtil<T, U, R> {
+    @BeforeTemplate
+    java.util.function.BiFunction<? super T, ? super U, ? extends R> before(
+        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
+      return RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkBiFunction(zipper);
+    }
+
+    @AfterTemplate
+    java.util.function.BiFunction<? super T, ? super U, ? extends R> after(
+        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
+      return zipper;
     }
   }
 
