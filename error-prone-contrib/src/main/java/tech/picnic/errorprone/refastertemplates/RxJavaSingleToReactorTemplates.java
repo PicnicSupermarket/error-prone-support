@@ -44,8 +44,8 @@ final class RxJavaSingleToReactorTemplates {
     }
 
     @AfterTemplate
-    Single<T> after(Supplier<? extends Throwable> throwable) {
-      return RxJava2Adapter.monoToSingle(Mono.error(throwable));
+    Single<T> after(Callable<? extends Throwable> throwable) {
+      return RxJava2Adapter.monoToSingle(Mono.error(RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(throwable)));
     }
   }
 
@@ -61,7 +61,6 @@ final class RxJavaSingleToReactorTemplates {
     }
   }
 
-  // XXX: Can be coerced to.
   static final class SingleFromCallable<T> {
     @BeforeTemplate
     Single<T> before(Callable<? extends T> callable) {
@@ -91,7 +90,7 @@ final class RxJavaSingleToReactorTemplates {
 
     @AfterTemplate
     Single<T> after(T item) {
-      return Mono.just(item).as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(Mono.just(item));
     }
   }
 
@@ -113,7 +112,19 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public static Single unsafeCreate(SingleSource)
   // XXX: public static Single using(Callable,Function,Consumer)
   // XXX: public static Single using(Callable,Function,Consumer,boolean)
-  // XXX: public static Single wrap(SingleSource) --> Required
+
+  static final class SingleWrap<T> {
+    @BeforeTemplate
+    Single<T> before(Single<T> single) {
+      return Single.wrap(single);
+    }
+
+    @AfterTemplate
+    Single<T> after(Single<T> single) {
+      return single;
+    }
+  }
+  
   // XXX: public static Single zip(Iterable,Function)
   // XXX: public static Single zip(SingleSource,SingleSource,BiFunction)
   // XXX: public static Single zip(SingleSource,SingleSource,SingleSource,Function3)
@@ -159,7 +170,7 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single doOnSuccess(Consumer) --> Required
   // XXX: public final Single doOnTerminate(Action)
 
-  // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
+  // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.  or to JdkPredicate.
   static final class SingleFilter<S, T extends S> {
     @BeforeTemplate
     Maybe<T> before(Single<T> single, Predicate<S> predicate) {

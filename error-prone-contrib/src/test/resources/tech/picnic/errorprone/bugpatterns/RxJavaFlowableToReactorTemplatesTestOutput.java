@@ -46,9 +46,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   Flowable<Object> testFlowableErrorCallable() {
     return RxJava2Adapter.fluxToFlowable(
         Flux.error(
-            () -> {
-              throw new IllegalStateException();
-            }));
+            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(
+                () -> {
+                  throw new IllegalStateException();
+                })));
   }
 
   Flowable<Integer> testFlowableFromArray() {

@@ -7,6 +7,7 @@ import io.reactivex.Single;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -38,5 +39,13 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     Mono.empty().then().as(RxJava2Adapter::monoToCompletable).as(RxJava2Adapter::completableToMono);
 
     return Mono.just(3).as(RxJava2Adapter::monoToMaybe).as(RxJava2Adapter::maybeToMono);
+  }
+
+  Mono<Integer> testMonoErrorCallableSupplierUtil() {
+    return Mono.just(1)
+        .switchIfEmpty(
+            Mono.error(
+                RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(
+                    () -> new IllegalStateException())));
   }
 }

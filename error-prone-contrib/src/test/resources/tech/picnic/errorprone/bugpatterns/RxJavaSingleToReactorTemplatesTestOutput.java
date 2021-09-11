@@ -17,9 +17,10 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   Single<Object> testSingleErrorCallable() {
     return RxJava2Adapter.monoToSingle(
         Mono.error(
-            () -> {
-              throw new IllegalStateException();
-            }));
+            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(
+                () -> {
+                  throw new IllegalStateException();
+                })));
   }
 
   Single<Integer> testSingleFromCallable() {
@@ -29,7 +30,11 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   }
 
   Single<Integer> testSingleJust() {
-    return Mono.just(1).as(RxJava2Adapter::monoToSingle);
+    return RxJava2Adapter.monoToSingle(Mono.just(1));
+  }
+
+  Single<Integer> testSingleWrap() {
+    return Single.just(1);
   }
 
   Maybe<Integer> testSingleFilter() {

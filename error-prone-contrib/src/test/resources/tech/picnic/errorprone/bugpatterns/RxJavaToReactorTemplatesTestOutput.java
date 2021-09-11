@@ -35,4 +35,8 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
     return Mono.just(3);
   }
+
+  Mono<Integer> testMonoErrorCallableSupplierUtil() {
+    return Mono.just(1).switchIfEmpty(Mono.error(() -> new IllegalStateException()));
+  }
 }

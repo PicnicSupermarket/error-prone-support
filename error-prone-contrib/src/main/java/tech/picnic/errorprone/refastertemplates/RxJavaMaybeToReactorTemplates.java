@@ -14,6 +14,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Single;
+import io.reactivex.SingleSource;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Function;
 import java.util.Arrays;
@@ -98,6 +99,23 @@ final class RxJavaMaybeToReactorTemplates {
    * tagId.map(Maybe::just).orElseGet(Maybe::empty)) - .flatMapSingleElement(this::getTagById) -
    * .ignoreElement()); + .flatMapSingleElement(this::getTagById).as(RxJava2Adapter::maybeToMono).
    */
+  /// XXX: Check this one is required for case above.
+  abstract static class MaybeDeferFirst<T> {
+    @Placeholder
+    abstract Maybe<T> maybeProducer();
+
+    @BeforeTemplate
+    Maybe<T> before() {
+      return Maybe.defer(() -> maybeProducer());
+    }
+
+    @AfterTemplate
+    Maybe<T> after() {
+      return Mono.defer(() -> maybeProducer().as(RxJava2Adapter::maybeToMono))
+          .as(RxJava2Adapter::monoToMaybe);
+    }
+  }
+
   abstract static class MaybeDefer<T> {
     @Placeholder
     abstract Maybe<T> maybeProducer();
@@ -125,7 +143,6 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: Use `CanBeCoercedTo`.
   static final class MaybeErrorCallable<T> {
     @BeforeTemplate
     Maybe<T> before(Callable<? extends Throwable> throwable) {
@@ -133,8 +150,10 @@ final class RxJavaMaybeToReactorTemplates {
     }
 
     @AfterTemplate
-    Maybe<T> after(Supplier<? extends Throwable> throwable) {
-      return RxJava2Adapter.monoToMaybe(Mono.error(throwable));
+    Maybe<T> after(Callable<? extends Throwable> throwable) {
+      return RxJava2Adapter.monoToMaybe(
+          Mono.error(
+              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(throwable)));
     }
   }
 
@@ -196,8 +215,36 @@ final class RxJavaMaybeToReactorTemplates {
 
   // XXX: public static Maybe fromFuture(Future,long,TimeUnit)
   // XXX: public static Maybe fromRunnable(Runnable)
+
+  static final class MaybeFromRunnable<T> {
+    @BeforeTemplate
+    Maybe<T> before(Runnable runnable) {
+      Maybe.fromRunnable(() -> {
+        int i = 1 + 1;
+      });
+      return Maybe.fromRunnable(runnable);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Runnable runnable) {
+      return RxJava2Adapter.monoToMaybe(Mono.fromRunnable(runnable));
+    }
+  }
+
   // XXX: public static Maybe fromSingle(SingleSource)
-  // XXX: public static Maybe just(Object)
+
+  static final class MaybeJust<T> {
+    @BeforeTemplate
+    Maybe<T> before(T item) {
+      return Maybe.just(item);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(T item) {
+      return RxJava2Adapter.monoToMaybe(Mono.just(item));
+    }
+  }
+
   // XXX: public static Flowable merge(Iterable)
   // XXX: public static Maybe merge(MaybeSource)
   // XXX: public static Flowable merge(MaybeSource,MaybeSource)
@@ -451,19 +498,34 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final void subscribe(MaybeObserver)
   // XXX: public final Maybe subscribeOn(Scheduler)
   // XXX: public final MaybeObserver subscribeWith(MaybeObserver)
-  // XXX: public final Maybe switchIfEmpty(MaybeSource)
+
+  // XXX: Make test
+  static final class MaybeSourceSwitchIfEmpty<S, T extends S> {
+    @BeforeTemplate
+    Maybe<S> before(Maybe<S> maybe, MaybeSource<T> maybeSource) {
+      return maybe.switchIfEmpty(maybeSource);
+    }
+
+    @AfterTemplate
+    Maybe<S> after(Maybe<S> maybe, MaybeSource<T> maybeSource) {
+      return maybe
+          .as(RxJava2Adapter::maybeToMono)
+          .switchIfEmpty(RxJava2Adapter.maybeToMono(Maybe.wrap(maybeSource)))
+          .as(RxJava2Adapter::monoToMaybe);
+    }
+  }
 
   static final class MaybeSwitchIfEmpty<S, T extends S> {
     @BeforeTemplate
-    Single<S> before(Maybe<S> maybe, Single<T> single) {
+    Single<S> before(Maybe<S> maybe, SingleSource<T> single) {
       return maybe.switchIfEmpty(single);
     }
 
     @AfterTemplate
-    Single<S> after(Maybe<S> maybe, Single<T> single) {
+    Single<S> after(Maybe<S> maybe, SingleSource<T> single) {
       return maybe
           .as(RxJava2Adapter::maybeToMono)
-          .switchIfEmpty(single.as(RxJava2Adapter::singleToMono))
+          .switchIfEmpty(RxJava2Adapter.singleToMono(Single.wrap(single)))
           .as(RxJava2Adapter::monoToSingle);
     }
   }

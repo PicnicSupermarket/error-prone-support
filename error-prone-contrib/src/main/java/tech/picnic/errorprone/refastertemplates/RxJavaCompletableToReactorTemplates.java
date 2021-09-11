@@ -9,6 +9,8 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
 import io.reactivex.functions.Action;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
@@ -141,6 +143,23 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Observable andThen(ObservableSource)
   // XXX: public final Flowable andThen(Publisher)
   // XXX: public final Single andThen(SingleSource)
+
+  // XXX: Verify this case
+  static final class CompletableAndThenSingle<T> {
+    @BeforeTemplate
+    Single<T> before(Completable completable, SingleSource<T> source) {
+      return completable.andThen(source);
+    }
+
+    @AfterTemplate
+    Single<T> after(Completable completable, SingleSource<T> source) {
+      return completable
+          .as(RxJava2Adapter::completableToMono)
+          .then(Single.wrap(source).as(RxJava2Adapter::singleToMono))
+          .as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
   // XXX: public final Object as(CompletableConverter)
   // XXX: public final void blockingAwait()
   // XXX: public final boolean blockingAwait(long,TimeUnit)

@@ -26,6 +26,10 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return Single.just(1);
   }
 
+  Single<Integer> testSingleWrap() {
+    return Single.wrap(Single.just(1));
+  }
+
   Maybe<Integer> testSingleFilter() {
     return Single.just(1).filter(i -> i > 2);
   }
