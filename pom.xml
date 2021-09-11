@@ -1438,13 +1438,13 @@
                 fork, some other dependencies depend on the official (i.e.,
                 non-forked) `error_prone_annotations`. Here we fix which
                 version is pulled in. -->
-                <dependencies>
-                    <dependency>
-                        <groupId>com.google.errorprone</groupId>
-                        <artifactId>error_prone_annotations</artifactId>
-                        <version>${version.error-prone-orig}</version>
-                    </dependency>
-                </dependencies>
+<!--                <dependencies>-->
+<!--                    <dependency>-->
+<!--                        <groupId>com.google.errorprone</groupId>-->
+<!--                        <artifactId>error_prone_annotations</artifactId>-->
+<!--                        <version>${version.error-prone-orig}</version>-->
+<!--                    </dependency>-->
+<!--                </dependencies>-->
             </dependencyManagement>
             <build>
                 <pluginManagement>

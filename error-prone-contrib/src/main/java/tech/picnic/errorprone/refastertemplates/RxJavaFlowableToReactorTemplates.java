@@ -137,7 +137,6 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: Use `CanBeCoercedTo`.
   static final class FlowableErrorCallable<T> {
     @BeforeTemplate
     Flowable<T> before(Callable<? extends Throwable> throwable) {
@@ -145,10 +144,13 @@ final class RxJavaFlowableToReactorTemplates {
     }
 
     @AfterTemplate
-    Flowable<T> after(Supplier<? extends Throwable> throwable) {
-      return RxJava2Adapter.fluxToFlowable(Flux.error(throwable));
+    Flowable<T> after(Callable<? extends Throwable> throwable) {
+      return RxJava2Adapter.fluxToFlowable(
+          Flux.error(RxJava2ReactorMigrationUtil.callableAsSupplier(throwable)));
     }
   }
+
+  // XXX: Thing to remove the callableAssupplier for this.
 
   static final class FlowableErrorThrowable<T> {
     @BeforeTemplate
@@ -372,6 +374,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
+  // XXX: MOVE?
   static final class BiFunctionRemoveUtil<T, U, R> {
     @BeforeTemplate
     java.util.function.BiFunction<? super T, ? super U, ? extends R> before(
@@ -729,10 +732,9 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable lift(FlowableOperator)
   // XXX: final Flowable limit(long)
 
-  // XXX: `Refaster.canBeCoercedTo(...)`.
   static final class FlowableMap<I, T extends I, O> {
     @BeforeTemplate
-    Flowable<O> before(Flowable<T> flowable, Function<I, O> function) {
+    Flowable<O> before(Flowable<T> flowable, @CanTransformToTargetType Function<I, O> function) {
       return flowable.map(function);
     }
 
@@ -750,7 +752,7 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable mergeWith(MaybeSource)
   // XXX: final Flowable mergeWith(Publisher)
 
-  // XXX: Check whethter the `toFlowable()` is correct.
+  // XXX: Check whether the `toFlowable()` is correct.
 
   static final class FlowableMergeWith<T> {
     @BeforeTemplate

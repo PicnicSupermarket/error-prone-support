@@ -61,6 +61,16 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.fromFuture(new CompletableFuture<>());
   }
 
+  Maybe<Integer> testMaybeFromRunnable() {
+    return Maybe.fromRunnable(() -> {
+      int i = 1 + 1;
+    });
+  }
+
+  Maybe<Integer> testMaybeJust() {
+    return Maybe.just(1);
+  }
+
   Maybe<Integer> testMaybeWrap() {
     return Maybe.wrap(Maybe.just(1));
   }

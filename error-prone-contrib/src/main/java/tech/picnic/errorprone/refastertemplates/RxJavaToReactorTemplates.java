@@ -3,8 +3,10 @@ package tech.picnic.errorprone.refastertemplates;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.functions.Action;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
@@ -22,6 +24,7 @@ public final class RxJavaToReactorTemplates {
     Flux<T> before(Flux<T> flux, BackpressureStrategy strategy) {
       return Refaster.anyOf(
           RxJava2Adapter.fluxToFlowable(flux).as(RxJava2Adapter::flowableToFlux),
+          RxJava2Adapter.flowableToFlux(RxJava2Adapter.fluxToFlowable(flux)),
           flux.as(RxJava2Adapter::fluxToObservable)
               .toFlowable(strategy)
               .as(RxJava2Adapter::flowableToFlux),
@@ -43,7 +46,8 @@ public final class RxJavaToReactorTemplates {
       return Refaster.anyOf(
           RxJava2Adapter.monoToCompletable(mono).as(RxJava2Adapter::completableToMono),
           mono.as(RxJava2Adapter::monoToCompletable).as(RxJava2Adapter::completableToMono),
-          RxJava2Adapter.completableToMono(RxJava2Adapter.monoToCompletable(mono)));
+          RxJava2Adapter.completableToMono(RxJava2Adapter.monoToCompletable(mono)),
+          RxJava2Adapter.completableToMono(mono.as(RxJava2Adapter::monoToCompletable)));
     }
 
     @BeforeTemplate
@@ -51,9 +55,11 @@ public final class RxJavaToReactorTemplates {
       return Refaster.anyOf(
           RxJava2Adapter.monoToMaybe(mono).as(RxJava2Adapter::maybeToMono),
           RxJava2Adapter.maybeToMono(RxJava2Adapter.monoToMaybe(mono)),
+          RxJava2Adapter.maybeToMono(mono.as(RxJava2Adapter::monoToMaybe)),
           mono.as(RxJava2Adapter::monoToMaybe).as(RxJava2Adapter::maybeToMono),
           RxJava2Adapter.monoToSingle(mono).as(RxJava2Adapter::singleToMono),
           RxJava2Adapter.singleToMono(RxJava2Adapter.monoToSingle(mono)),
+          RxJava2Adapter.singleToMono(mono.as(RxJava2Adapter::monoToSingle)),
           mono.as(RxJava2Adapter::monoToSingle).as(RxJava2Adapter::singleToMono));
     }
 
@@ -63,17 +69,45 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  static final class RemoveRedundantCast<T> {
+  // XXX: Does this make sense?
+  // This is what we want to fix: Mono.error(RxJava2ReactorMigrationUtil.callableAsSupplier(() ->
+  // new ItemNotFoundException("Banner", bannerId))));
+  static final class MonoErrorCallableSupplierUtil<T> {
     @BeforeTemplate
-    T before(T object) {
-      return (T) object;
+    Mono<T> before(Callable<? extends Throwable> callable) {
+      return Mono.error(RxJava2ReactorMigrationUtil.callableAsSupplier(callable));
     }
 
     @AfterTemplate
-    T after(T object) {
-      return object;
+    Mono<T> after(Supplier<? extends Throwable> callable) {
+      return Mono.error(callable);
     }
   }
+
+  static final class RemoveUtilCallable<T> {
+    @BeforeTemplate
+    Supplier<T> before(@CanTransformToTargetType Callable<T> callable) {
+      return RxJava2ReactorMigrationUtil.callableAsSupplier(callable);
+    }
+
+    @AfterTemplate
+    Supplier<T> before(Supplier<T> callable) {
+      return callable;
+    }
+  }
+
+  // This triggerred something in PRP what should not be changed.
+  //  static final class RemoveRedundantCast<T> {
+  //    @BeforeTemplate
+  //    T before(T object) {
+  //      return (T) object;
+  //    }
+  //
+  //    @AfterTemplate
+  //    T after(T object) {
+  //      return object;
+  //    }
+  //  }
 
   // XXX: Use `CanBeCoercedTo`
   @SuppressWarnings("NoFunctionalReturnType")
@@ -196,6 +230,7 @@ public final class RxJavaToReactorTemplates {
 
     /**
      * XXX
+     *
      * @param action XXX
      * @return XXX
      */
