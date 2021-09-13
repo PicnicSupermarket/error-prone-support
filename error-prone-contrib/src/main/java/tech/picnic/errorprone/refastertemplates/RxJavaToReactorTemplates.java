@@ -6,7 +6,6 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.functions.Action;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
@@ -74,12 +73,12 @@ public final class RxJavaToReactorTemplates {
   // new ItemNotFoundException("Banner", bannerId))));
   static final class MonoErrorCallableSupplierUtil<T> {
     @BeforeTemplate
-    Mono<T> before(Callable<? extends Throwable> callable) {
+    Mono<T> before(@CanTransformToTargetType Callable<Throwable> callable) {
       return Mono.error(RxJava2ReactorMigrationUtil.callableAsSupplier(callable));
     }
 
     @AfterTemplate
-    Mono<T> after(Supplier<? extends Throwable> callable) {
+    Mono<T> after(Supplier<Throwable> callable) {
       return Mono.error(callable);
     }
   }

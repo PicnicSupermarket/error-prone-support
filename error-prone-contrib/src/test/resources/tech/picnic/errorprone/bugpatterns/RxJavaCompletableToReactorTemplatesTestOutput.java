@@ -54,4 +54,12 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
               return 1;
             }));
   }
+
+  Completable testCompletableFromPublisher() {
+    return RxJava2Adapter.monoToCompletable(Mono.from(Flowable.just(1)));
+  }
+
+  Completable testCompletableWrap() {
+    return Completable.complete();
+  }
 }

@@ -1,10 +1,12 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.Repeated;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
@@ -16,7 +18,6 @@ import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
@@ -498,8 +499,8 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable compose(FlowableTransformer)
   // XXX: final Flowable concatMap(Function)
   // XXX: final Flowable concatMap(Function,int)
-  // XXX: final Completable concatMapCompletable(Function) --> Do this one
 
+  // XXX: Test this one
   static final class FlowableConcatMapCompletable<T> {
     @BeforeTemplate
     Completable before(
@@ -674,18 +675,18 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: `Refaster.canBeCoercedTo(...)`.
   static final class FlowableFlatMap<I, T extends I, O, P extends Publisher<? extends O>> {
     @BeforeTemplate
     Flowable<O> before(Flowable<T> flowable, Function<I, P> function) {
       return flowable.flatMap(function);
     }
 
+    @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
     @AfterTemplate
-    Flowable<O> after(Flowable<I> flowable, java.util.function.Function<I, P> function) {
+    Flowable<O> after(Flowable<I> flowable, Function<I, P> function) {
       return flowable
           .as(RxJava2Adapter::flowableToFlux)
-          .flatMap(function)
+          .flatMap(RxJava2ReactorMigrationUtil.toJdkFunction(function))
           .as(RxJava2Adapter::fluxToFlowable);
     }
   }
@@ -701,7 +702,28 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable flatMap(Function,Function,Callable)
   // XXX: final Flowable flatMap(Function,Function,Callable,int)
   // XXX: final Flowable flatMap(Function,int)
-  // XXX: final Completable flatMapCompletable(Function)
+
+  static final class FlowableFlatMapCompletable<T> {
+    @BeforeTemplate
+    Completable before(
+        Flowable<T> flowable, Function<? super T, ? extends CompletableSource> function) {
+      return flowable.flatMapCompletable(function);
+    }
+
+    @AfterTemplate
+    Completable after(
+        Flowable<T> flowable, Function<? super T, ? extends CompletableSource> function) {
+      return RxJava2Adapter.monoToCompletable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .flatMap(
+                  e ->
+                      RxJava2Adapter.completableToMono(
+                          Completable.wrap(
+                              RxJava2ReactorMigrationUtil.toJdkFunction(function).apply(e))))
+              .then());
+    }
+  }
+
   // XXX: final Completable flatMapCompletable(Function,boolean,int)
   // XXX: final Flowable flatMapIterable(Function)
   // XXX: final Flowable flatMapIterable(Function,BiFunction)

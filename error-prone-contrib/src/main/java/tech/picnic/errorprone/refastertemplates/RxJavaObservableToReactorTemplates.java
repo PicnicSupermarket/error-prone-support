@@ -5,9 +5,9 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
@@ -305,7 +305,21 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Single elementAtOrError(long)
   // XXX: public final Observable filter(Predicate) --> This one
   // XXX: public final Single first(Object)
-  // XXX: public final Maybe firstElement() --> Also this one?
+
+  // XXX: Default BUFFER is chosen here.
+  // XXX: Is next correct here?
+  static final class MaybeFirstElement<T> {
+    @BeforeTemplate
+    Maybe<T> before(Observable<T> observable) {
+      return observable.firstElement();
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Observable<T> observable) {
+      return RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER).next().as(RxJava2Adapter::monoToMaybe);
+    }
+  }
+
   // XXX: public final Single firstOrError() --> This one maybe?
   // XXX: public final Observable flatMap(Function) --> Is suspect this one as well.
   // XXX: public final Observable flatMap(Function,BiFunction)

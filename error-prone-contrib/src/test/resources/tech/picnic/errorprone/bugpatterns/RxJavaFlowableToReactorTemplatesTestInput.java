@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -65,6 +66,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Single<Integer> testFlowableFirstOrError() {
     return Flowable.just(1).firstOrError();
+  }
+
+  Completable testFlowableFlatMapCompletable() {
+    return Flowable.just(1).flatMapCompletable(integer -> Completable.complete());
   }
 
   Flowable<Object> testFlowableFlatMap() {

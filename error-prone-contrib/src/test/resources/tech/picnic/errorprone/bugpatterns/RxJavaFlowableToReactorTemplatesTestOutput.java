@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -10,6 +11,7 @@ import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
+import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil;
 
 final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -86,14 +88,27 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return RxJava2Adapter.monoToSingle(RxJava2Adapter.flowableToFlux(Flowable.just(1)).next());
   }
 
+  Completable testFlowableFlatMapCompletable() {
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1))
+            .flatMap(
+                e ->
+                    RxJava2Adapter.completableToMono(
+                        Completable.wrap(
+                            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkFunction(
+                                    integer -> Completable.complete())
+                                .apply(e))))
+            .then());
+  }
+
   Flowable<Object> testFlowableFlatMap() {
     Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
-        .flatMap(this::exampleMethod2)
+        .flatMap(RxJava2ReactorMigrationUtil.toJdkFunction(this::exampleMethod2))
         .as(RxJava2Adapter::fluxToFlowable);
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
-        .flatMap(i -> ImmutableSet::of)
+        .flatMap(RxJava2ReactorMigrationUtil.toJdkFunction(i -> ImmutableSet::of))
         .as(RxJava2Adapter::fluxToFlowable);
   }
 

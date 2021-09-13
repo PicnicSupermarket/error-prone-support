@@ -1,16 +1,19 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil;
+
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.concurrent.Callable;
-import java.util.function.Supplier;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 
@@ -36,16 +39,16 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public static Single defer(Callable) --> Required
   // XXX: public static Single equals(SingleSource,SingleSource)
 
-  // XXX: Use `CanBeCoercedTo`.
   static final class SingleErrorCallable<T> {
     @BeforeTemplate
     Single<T> before(Callable<? extends Throwable> throwable) {
       return Single.error(throwable);
     }
 
+    @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
     @AfterTemplate
     Single<T> after(Callable<? extends Throwable> throwable) {
-      return RxJava2Adapter.monoToSingle(Mono.error(RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(throwable)));
+      return RxJava2Adapter.monoToSingle(Mono.error(RxJava2ReactorMigrationUtil.callableAsSupplier(throwable)));
     }
   }
 
@@ -67,11 +70,12 @@ final class RxJavaSingleToReactorTemplates {
       return Single.fromCallable(callable);
     }
 
+    @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
     @AfterTemplate
     Single<T> after(Callable<? extends T> callable) {
       return RxJava2Adapter.monoToSingle(
               Mono.fromSupplier(
-                      RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(callable)));
+                      RxJava2ReactorMigrationUtil.callableAsSupplier(callable)));
     }
   }
 
