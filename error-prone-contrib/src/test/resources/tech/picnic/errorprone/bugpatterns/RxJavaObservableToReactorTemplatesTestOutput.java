@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
@@ -21,6 +22,13 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
 
   Observable<Integer> testObservableEmpty() {
     return RxJava2Adapter.fluxToObservable(Flux.empty());
+  }
+
+  Maybe<Integer> testMaybeFirstElement() {
+    return RxJava2Adapter.observableToFlux(
+            Observable.just(1).firstElement(), BackpressureStrategy.BUFFER)
+        .next()
+        .as(RxJava2Adapter::monoToMaybe);
   }
 
   Completable testObservableIgnoreElements() {

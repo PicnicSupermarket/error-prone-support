@@ -9,11 +9,15 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Action;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
+import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 
@@ -119,7 +123,19 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public static Completable fromFuture(Future)
   // XXX: public static Completable fromMaybe(MaybeSource)
   // XXX: public static Completable fromObservable(ObservableSource)
-  // XXX: public static Completable fromPublisher(Publisher) --> Required
+
+  static final class CompletableFromPublisher<T> {
+    @BeforeTemplate
+    Completable before(Publisher<T> source) {
+      return Completable.fromPublisher(source);
+    }
+
+    @AfterTemplate
+    Completable after(Publisher<T> source) {
+      return RxJava2Adapter.monoToCompletable(Mono.from(source));
+    }
+  }
+
   // XXX: public static Completable fromRunnable(Runnable)
   // XXX: public static Completable fromSingle(SingleSource)
   // XXX: public static Completable merge(Iterable)
@@ -136,13 +152,70 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public static Completable unsafeCreate(CompletableSource)
   // XXX: public static Completable using(Callable,Function,Consumer)
   // XXX: public static Completable using(Callable,Function,Consumer,boolean)
-  // XXX: public static Completable wrap(CompletableSource)
+
+  static final class CompletableWrap<T> {
+    @BeforeTemplate
+    Completable before(Completable source) {
+      return Completable.wrap(source);
+    }
+
+    @AfterTemplate
+    Completable after(Completable source) {
+      return source;
+    }
+  }
+
   // XXX: public final Completable ambWith(CompletableSource)
-  // XXX: public final Completable andThen(CompletableSource)
-  // XXX: public final Maybe andThen(MaybeSource)
+
+  // XXX: Add the test, is the Void correct?
+  static final class CompletableAndThenCompletable<T> {
+    @BeforeTemplate
+    Completable before(Completable completable, CompletableSource source) {
+      return completable.andThen(source);
+    }
+
+    @AfterTemplate
+    Single<Void> after(Completable completable, CompletableSource source) {
+      return RxJava2Adapter.monoToSingle(
+          completable
+              .as(RxJava2Adapter::completableToMono)
+              .then(RxJava2Adapter.completableToMono(Completable.wrap(source))));
+    }
+  }
+
+  // XXX: Add the test
+  static final class CompletableAndThenMaybe<T> {
+    @BeforeTemplate
+    Maybe<T> before(Completable completable, MaybeSource<T> source) {
+      return completable.andThen(source);
+    }
+
+    @AfterTemplate
+    Single<T> after(Completable completable, MaybeSource<T> source) {
+      return completable
+          .as(RxJava2Adapter::completableToMono)
+          .then(RxJava2Adapter.maybeToMono(Maybe.wrap(source)))
+          .as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
   // XXX: public final Observable andThen(ObservableSource)
-  // XXX: public final Flowable andThen(Publisher)
-  // XXX: public final Single andThen(SingleSource)
+
+  // XXX: Add test
+  static final class CompletableAndThenPublisher<T> {
+    @BeforeTemplate
+    Flowable<T> before(Completable completable, Publisher<T> source) {
+      return completable.andThen(source);
+    }
+
+    @AfterTemplate
+    Single<T> after(Completable completable, Publisher<T> source) {
+      return completable
+          .as(RxJava2Adapter::completableToMono)
+          .then(Mono.from(source))
+          .as(RxJava2Adapter::monoToSingle);
+    }
+  }
 
   // XXX: Verify this case
   static final class CompletableAndThenSingle<T> {

@@ -7,6 +7,7 @@ import io.reactivex.Single;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 

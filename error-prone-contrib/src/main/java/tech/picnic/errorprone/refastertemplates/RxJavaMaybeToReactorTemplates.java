@@ -1,14 +1,17 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.Repeated;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -20,7 +23,6 @@ import io.reactivex.functions.Function;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -48,12 +50,12 @@ final class RxJavaMaybeToReactorTemplates {
 
   static final class MaybeAmbArray<T> {
     @BeforeTemplate
-    Maybe<T> before(Maybe<? extends T>... sources) {
+    Maybe<T> before(Maybe<T>... sources) {
       return Maybe.ambArray(sources);
     }
 
     @AfterTemplate
-    Maybe<T> after(Maybe<? extends T>... sources) {
+    Maybe<T> after(Maybe<T>... sources) {
       return RxJava2Adapter.monoToMaybe(
           Mono.firstWithSignal(
               Arrays.stream(sources).map(RxJava2Adapter::maybeToMono).collect(toImmutableList())));
@@ -152,8 +154,7 @@ final class RxJavaMaybeToReactorTemplates {
     @AfterTemplate
     Maybe<T> after(Callable<? extends Throwable> throwable) {
       return RxJava2Adapter.monoToMaybe(
-          Mono.error(
-              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(throwable)));
+          Mono.error(RxJava2ReactorMigrationUtil.callableAsSupplier(throwable)));
     }
   }
 
@@ -179,8 +180,7 @@ final class RxJavaMaybeToReactorTemplates {
     @AfterTemplate
     Maybe<T> after(Action action) {
       return RxJava2Adapter.monoToMaybe(
-          Mono.fromRunnable(
-              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toRunnable(action)));
+          Mono.fromRunnable(RxJava2ReactorMigrationUtil.toRunnable(action)));
     }
   }
 
@@ -193,8 +193,7 @@ final class RxJavaMaybeToReactorTemplates {
     @AfterTemplate
     Maybe<T> after(Callable<? extends T> callable) {
       return RxJava2Adapter.monoToMaybe(
-          Mono.fromSupplier(
-              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(callable)));
+          Mono.fromSupplier(RxJava2ReactorMigrationUtil.callableAsSupplier(callable)));
     }
   }
 
@@ -214,14 +213,10 @@ final class RxJavaMaybeToReactorTemplates {
   }
 
   // XXX: public static Maybe fromFuture(Future,long,TimeUnit)
-  // XXX: public static Maybe fromRunnable(Runnable)
 
   static final class MaybeFromRunnable<T> {
     @BeforeTemplate
     Maybe<T> before(Runnable runnable) {
-      Maybe.fromRunnable(() -> {
-        int i = 1 + 1;
-      });
       return Maybe.fromRunnable(runnable);
     }
 
@@ -231,7 +226,18 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: public static Maybe fromSingle(SingleSource)
+  static final class MaybeFromSingle<T> {
+    @BeforeTemplate
+    Maybe<T> before(SingleSource<T> source) {
+      return Maybe.fromSingle(source);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(SingleSource<T> source) {
+      return RxJava2Adapter.monoToMaybe(
+          Mono.from(RxJava2Adapter.singleToMono(Single.wrap(source))));
+    }
+  }
 
   static final class MaybeJust<T> {
     @BeforeTemplate
@@ -363,6 +369,7 @@ final class RxJavaMaybeToReactorTemplates {
 
     @AfterTemplate
     @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
     Maybe<O> after(Maybe<T> maybe, Function<I, M> function) {
       return maybe
           .as(RxJava2Adapter::maybeToMono)
@@ -370,10 +377,7 @@ final class RxJavaMaybeToReactorTemplates {
               v ->
                   RxJava2Adapter.maybeToMono(
                       Maybe.wrap(
-                          (Maybe<O>)
-                              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkFunction(
-                                      function)
-                                  .apply(v))))
+                          (Maybe<O>) RxJava2ReactorMigrationUtil.toJdkFunction(function).apply(v))))
           .as(RxJava2Adapter::monoToMaybe);
     }
   }
@@ -411,21 +415,23 @@ final class RxJavaMaybeToReactorTemplates {
   //        .flatMapSingleElement(this::getTagById)
   //        .ignoreElement();
   //    }
-  //      static final class MaybeFlatMapSingleElement<
-  //          I, T extends I, O, S extends Single<? extends O>> { // <S, T extends S, O> {
-  //        @BeforeTemplate
-  //        Maybe<O> before(Maybe<T> maybe, Function<I, S> function) {
-  //          return maybe.flatMapSingleElement(function);
-  //        }
-  //
-  //        @AfterTemplate
-  //        Maybe<O> after(Maybe<T> maybe, Function<? extends I, S> function) {
-  //          return maybe
-  //              .as(RxJava2Adapter::maybeToMono)
-  //              .flatMap(RxJava2ReactorMigrationUtil.toJdkFunction(function))
-  //              .as(RxJava2Adapter::monoToMaybe);
-  //        }
-  //      }
+  static final class MaybeFlatMapSingleElement<T, O, S extends SingleSource<O>> { // <S, T extends S, O> {
+    @BeforeTemplate
+    Maybe<O> before(Maybe<T> maybe, Function<? super T, ? extends S> function) {
+      return maybe.flatMapSingleElement(function);
+    }
+
+    @AfterTemplate
+    Maybe<O> after(Maybe<T> maybe, Function<T, S> function) {
+      return RxJava2Adapter.monoToMaybe(
+          RxJava2Adapter.maybeToMono(maybe)
+              .flatMap(
+                  e ->
+                      RxJava2Adapter.singleToMono(
+                          Single.wrap(
+                              RxJava2ReactorMigrationUtil.toJdkFunction(function).apply(e)))));
+    }
+  }
 
   // XXX: public final Flowable flattenAsFlowable(Function)
   // XXX: public final Observable flattenAsObservable(Function)
@@ -460,7 +466,7 @@ final class RxJavaMaybeToReactorTemplates {
     Maybe<R> after(Maybe<T> maybe, Function<T, R> mapper) {
       return maybe
           .as(RxJava2Adapter::maybeToMono)
-          .map(RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkFunction(mapper))
+          .map(RxJava2ReactorMigrationUtil.toJdkFunction(mapper))
           .as(RxJava2Adapter::monoToMaybe);
     }
   }

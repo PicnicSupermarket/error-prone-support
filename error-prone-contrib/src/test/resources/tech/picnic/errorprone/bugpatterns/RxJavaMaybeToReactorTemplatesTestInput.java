@@ -67,6 +67,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     });
   }
 
+  Maybe<Integer> testMaybeFromSingle() {
+    return Maybe.fromSingle(Single.just(1));
+  }
+
   Maybe<Integer> testMaybeJust() {
     return Maybe.just(1);
   }
@@ -108,6 +112,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
 
   private Maybe<Integer> exampleMethod(Integer x) {
     return null;
+  }
+
+  Maybe<Integer> testMaybeFlatMapSingleElement() {
+    return Maybe.just(1).flatMapSingleElement(Single::just);
   }
 
   Completable testMaybeIgnoreElement() {
