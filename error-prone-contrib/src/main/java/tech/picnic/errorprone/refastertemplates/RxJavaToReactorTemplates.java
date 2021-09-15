@@ -1,14 +1,15 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static java.util.function.Function.identity;
+
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import reactor.adapter.rxjava.RxJava2Adapter;
@@ -20,6 +21,36 @@ import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 public final class RxJavaToReactorTemplates {
   private RxJavaToReactorTemplates() {}
 
+  // XXX: This one is for a specific case in the FcService... Can we solve this in a different way?
+  static final class ObservableToFlux<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Predicate<T> predicate, BackpressureStrategy strategy) {
+      return RxJava2Adapter.observableToFlux(
+          RxJava2Adapter.fluxToObservable(flux).filter(predicate), strategy);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Predicate<T> predicate, BackpressureStrategy strategy) {
+      return flux.filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate));
+    }
+  }
+
+  // XXX: This one is for a specific case in the  getActiveDcs_migrated()... Can
+  // we solve this in a different way?
+  static final class FlowableToFluxWithFilter<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Predicate<T> predicate) {
+      return RxJava2Adapter.flowableToFlux(
+          flux.filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
+              .as(RxJava2Adapter::fluxToFlowable));
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Predicate<T> predicate) {
+      return flux.filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate));
+    }
+  }
+
   // XXX: Add test cases
   static final class FluxToFlowableToFlux<T> {
     @BeforeTemplate
@@ -27,9 +58,11 @@ public final class RxJavaToReactorTemplates {
       return Refaster.anyOf(
           RxJava2Adapter.fluxToFlowable(flux).as(RxJava2Adapter::flowableToFlux),
           RxJava2Adapter.flowableToFlux(RxJava2Adapter.fluxToFlowable(flux)),
+          RxJava2Adapter.observableToFlux(flux.as(RxJava2Adapter::fluxToObservable), strategy),
           flux.as(RxJava2Adapter::fluxToObservable)
               .toFlowable(strategy)
               .as(RxJava2Adapter::flowableToFlux),
+          RxJava2Adapter.observableToFlux(RxJava2Adapter.fluxToObservable(flux), strategy),
           flux.as(RxJava2Adapter::fluxToFlowable).as(RxJava2Adapter::flowableToFlux));
     }
 
@@ -71,9 +104,18 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: Does this make sense?
-  // This is what we want to fix: Mono.error(RxJavaReactorMigrationUtil.callableAsSupplier(() ->
-  // new ItemNotFoundException("Banner", bannerId))));
+  static final class RemoveRedundantCast<T> {
+    @BeforeTemplate
+    T before(T object) {
+      return (T) object;
+    }
+
+    @AfterTemplate
+    T after(T object) {
+      return object;
+    }
+  }
+
   static final class MonoErrorCallableSupplierUtil<T> {
     @BeforeTemplate
     Mono<T> before(@CanTransformToTargetType Callable<Throwable> callable) {
@@ -98,18 +140,6 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  static final class RemoveRedundantCast<T> {
-    @BeforeTemplate
-    T before(T object) {
-      return (T) object;
-    }
-
-    @AfterTemplate
-    T after(T object) {
-      return object;
-    }
-  }
-
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryFunctionConversion<I, O> {
     @BeforeTemplate
@@ -123,148 +153,29 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: Test this
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryConsumerConversion<T> {
     @BeforeTemplate
-    java.util.function.Consumer<? super T> before(@CanTransformToTargetType Consumer<T> consumer) {
+    java.util.function.Consumer<T> before(@CanTransformToTargetType Consumer<T> consumer) {
       return RxJavaReactorMigrationUtil.toJdkConsumer(consumer);
     }
 
     @AfterTemplate
-    java.util.function.Consumer<? super T> after(java.util.function.Consumer<T> consumer) {
+    java.util.function.Consumer<T> after(java.util.function.Consumer<T> consumer) {
       return consumer;
     }
   }
 
-  // XXX: Move to a separate Maven module.
-  /** Util for the conversion of types */
-//  public static final class RxJavaReactorMigrationUtil {
-//    private RxJavaReactorMigrationUtil() {}
-//
-//    /**
-//     * Convert {@code Callable<T>} to T
-//     *
-//     * @param callable XXX
-//     * @param <T> XXX
-//     * @return XXX
-//     */
-//    // XXX: Rename.
-//    // XXX: Introduce Refaster rules to drop this wrapper when possible.
-//    @SuppressWarnings("IllegalCatch")
-//    public static <T> T getUnchecked(Callable<T> callable) {
-//      try {
-//        return callable.call();
-//      } catch (Exception e) {
-//        throw new IllegalArgumentException("Callable threw checked exception", e);
-//      }
-//    }
-//
-//    /**
-//     * Convert {@link io.reactivex.functions.Function} to {@link java.util.function.Function}
-//     *
-//     * @param function XXX
-//     * @param <T> XXX
-//     * @param <R> XXX
-//     * @return XXX
-//     */
-//    // XXX: Rename.
-//    // XXX: Introduce Refaster rules to drop this wrapper when possible.
-//    @SuppressWarnings("IllegalCatch")
-//    public static <T, R> java.util.function.Function<T, R> toJdkFunction(
-//        io.reactivex.functions.Function<T, R> function) {
-//      return (t) -> {
-//        try {
-//          return function.apply(t);
-//        } catch (Exception e) {
-//          throw new IllegalArgumentException("BiFunction threw checked exception", e);
-//        }
-//      };
-//    }
-//
-//    /**
-//     * Convert {@link io.reactivex.functions.BiFunction} to {@link java.util.function.BiFunction}
-//     *
-//     * @param biFunction XXX
-//     * @param <T> XXX
-//     * @param <U> XXX
-//     * @param <R> XXX
-//     * @return XXX
-//     */
-//    @SuppressWarnings("IllegalCatch")
-//    public static <T, U, R> java.util.function.BiFunction<T, U, R> toJdkBiFunction(
-//        io.reactivex.functions.BiFunction<T, U, R> biFunction) {
-//      return (t, u) -> {
-//        try {
-//          return biFunction.apply(t, u);
-//        } catch (Exception e) {
-//          throw new IllegalArgumentException("BiFunction threw checked exception", e);
-//        }
-//      };
-//    }
-//
-//    /**
-//     * Convert {@link io.reactivex.functions.BiFunction} to {@link java.util.function.BiFunction}
-//     *
-//     * @param callable XXX
-//     * @param <T> XXX
-//     * @return XXX
-//     */
-//    @SuppressWarnings("IllegalCatch")
-//    public static <T> Supplier<T> callableAsSupplier(Callable<T> callable) {
-//      return () -> {
-//        try {
-//          return callable.call();
-//        } catch (Exception e) {
-//          throw new IllegalArgumentException("Callable threw checked exception", e);
-//        }
-//      };
-//    }
-//
-//    /**
-//     * Convert {@link io.reactivex.functions.Function} to {@link java.util.function.Function}
-//     *
-//     * @param predicate XXX
-//     * @param <T> XXX
-//     * @return XXX
-//     */
-//    // XXX: Rename.
-//    // XXX: Introduce Refaster rules to drop this wrapper when possible.
-//    @SuppressWarnings("IllegalCatch")
-//    public static <T> java.util.function.Predicate<T> toJdkPredicate(
-//        io.reactivex.functions.Predicate<T> predicate) {
-//      return (t) -> {
-//        try {
-//          return predicate.test(t);
-//        } catch (Exception e) {
-//          throw new IllegalArgumentException("BiFunction threw checked exception", e);
-//        }
-//      };
-//    }
-//
-//    /**
-//     * XXX
-//     *
-//     * @param action XXX
-//     * @return XXX
-//     */
-//    @SuppressWarnings("IllegalCatch")
-//    public static Runnable toRunnable(Action action) {
-//      return () -> {
-//        try {
-//          action.run();
-//        } catch (Exception e) {
-//          throw new IllegalArgumentException("Action threw checked exception", e);
-//        }
-//      };
-//    }
+  @SuppressWarnings("NoFunctionalReturnType")
+  static final class UnnecessaryPredicateConversion<T> {
+    @BeforeTemplate
+    java.util.function.Predicate<T> before(@CanTransformToTargetType Predicate<T> predicate) {
+      return RxJavaReactorMigrationUtil.toJdkPredicate(predicate);
+    }
 
-    // "Coersion" (find better name):
-    // instanceof (support this?)
-    // two functional interfaces with:
-    // B.return type extends A.return type
-    // A.param 1 type extends B.param 1 type
-    // ....
-    // B throws a subset of the exceptions thrown by A
-//  }
+    @AfterTemplate
+    java.util.function.Predicate<T> after(java.util.function.Predicate<T> predicate) {
+      return predicate;
+    }
+  }
 }

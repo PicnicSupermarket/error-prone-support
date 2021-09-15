@@ -7,7 +7,6 @@ import io.reactivex.Single;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -19,10 +18,6 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .as(RxJava2Adapter::fluxToFlowable);
 
     return Flux.just(2);
-  }
-
-  Maybe<String> testRemoveRedundantCast() {
-    return Maybe.just("foo");
   }
 
   Mono<Integer> testMonoToFlowableToMono() {
@@ -37,7 +32,41 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Mono.just(3);
   }
 
+  Maybe<String> testRemoveRedundantCast() {
+    return Maybe.just("foo");
+  }
+
   Mono<Integer> testMonoErrorCallableSupplierUtil() {
     return Mono.just(1).switchIfEmpty(Mono.error(() -> new IllegalStateException()));
+  }
+
+  Maybe<Integer> testRemoveUtilCallable() {
+    return RxJava2Adapter.monoToMaybe(
+        Mono.fromSupplier(
+            () -> {
+              String s = "foo";
+              return null;
+            }));
+  }
+
+  Flowable<Object> testUnnecessaryFunctionConversion() {
+    return Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .flatMap(i -> ImmutableSet::of)
+        .as(RxJava2Adapter::fluxToFlowable);
+  }
+
+  Single<Integer> testUnnecessaryConsumerConversion() {
+    return Single.just(1)
+        .as(RxJava2Adapter::singleToMono)
+        .doOnSuccess(System.out::println)
+        .as(RxJava2Adapter::monoToSingle);
+  }
+
+  Maybe<Integer> testUnnecessaryPredicateConversion() {
+    return Single.just(1)
+        .as(RxJava2Adapter::singleToMono)
+        .filter(i -> i > 2)
+        .as(RxJava2Adapter::monoToMaybe);
   }
 }

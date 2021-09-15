@@ -23,10 +23,6 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Flux.just(2).as(RxJava2Adapter::fluxToFlowable).as(RxJava2Adapter::flowableToFlux);
   }
 
-  Maybe<String> testRemoveRedundantCast() {
-    return (Maybe<String>) Maybe.just("foo");
-  }
-
   Mono<Integer> testMonoToFlowableToMono() {
     Single.just(1)
         .as(RxJava2Adapter::singleToMono)
@@ -41,11 +37,45 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Mono.just(3).as(RxJava2Adapter::monoToMaybe).as(RxJava2Adapter::maybeToMono);
   }
 
+  Maybe<String> testRemoveRedundantCast() {
+    return (Maybe<String>) Maybe.just("foo");
+  }
+
   Mono<Integer> testMonoErrorCallableSupplierUtil() {
     return Mono.just(1)
         .switchIfEmpty(
             Mono.error(
-                RxJavaReactorMigrationUtil.callableAsSupplier(
-                    () -> new IllegalStateException())));
+                RxJavaReactorMigrationUtil.callableAsSupplier(() -> new IllegalStateException())));
+  }
+
+  Maybe<Integer> testRemoveUtilCallable() {
+    return RxJava2Adapter.monoToMaybe(
+        Mono.fromSupplier(
+            RxJavaReactorMigrationUtil.callableAsSupplier(
+                () -> {
+                  String s = "foo";
+                  return null;
+                })));
+  }
+
+  Flowable<Object> testUnnecessaryFunctionConversion() {
+    return Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .flatMap(RxJavaReactorMigrationUtil.toJdkFunction(i -> ImmutableSet::of))
+        .as(RxJava2Adapter::fluxToFlowable);
+  }
+
+  Single<Integer> testUnnecessaryConsumerConversion() {
+    return Single.just(1)
+        .as(RxJava2Adapter::singleToMono)
+        .doOnSuccess(RxJavaReactorMigrationUtil.toJdkConsumer(System.out::println))
+        .as(RxJava2Adapter::monoToSingle);
+  }
+
+  Maybe<Integer> testUnnecessaryPredicateConversion() {
+    return Single.just(1)
+        .as(RxJava2Adapter::singleToMono)
+        .filter(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 2))
+        .as(RxJava2Adapter::monoToMaybe);
   }
 }

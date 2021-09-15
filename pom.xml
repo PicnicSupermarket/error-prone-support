@@ -45,7 +45,7 @@
         <module>refaster-runner</module>
         <module>refaster-support</module>
         <module>refaster-test-support</module>
-        <module>migration-util</module>
+        <module>refaster-support</module>
     </modules>
 
     <scm>
