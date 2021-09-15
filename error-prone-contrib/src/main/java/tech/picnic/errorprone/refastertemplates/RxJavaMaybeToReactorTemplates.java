@@ -353,14 +353,13 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe doFinally(Action)
   // XXX: public final Maybe doOnComplete(Action)
   // XXX: public final Maybe doOnDispose(Action)
-  // XXX: public final Maybe doOnError(Consumer)
+  // XXX: public final Maybe doOnError(Consumer) --> Copy over from Single
   // XXX: public final Maybe doOnEvent(BiConsumer)
   // XXX: public final Maybe doOnSubscribe(Consumer)
   // XXX: public final Maybe doOnSuccess(Consumer) --> Required
   // XXX: public final Maybe doOnTerminate(Action)
-  // XXX: public final Maybe filter(Predicate)
+  // XXX: public final Maybe filter(Predicate)  --> Easy one
 
-  // See the MyUtil for additional explanation.
   static final class MaybeFlatMapFunction<I, T extends I, O, M extends MaybeSource<? extends O>> {
     @BeforeTemplate
     Maybe<O> before(Maybe<T> maybe, Function<I, M> function) {
