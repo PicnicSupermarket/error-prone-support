@@ -224,8 +224,31 @@ final class RxJavaSingleToReactorTemplates {
     }
   }
 
-  // XXX: public final Single flatMap(Function)
-  // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.
+  // XXX: Test this one
+  static final class SingleFlatMapFunction<I, T extends I, O, M extends SingleSource<? extends O>> {
+    @BeforeTemplate
+    Single<O> before(Single<T> single, Function<I, M> function) {
+      return single.flatMap(function);
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
+    Single<O> after(Single<T> single, Function<I, M> function) {
+      return single
+          .as(RxJava2Adapter::singleToMono)
+          .flatMap(
+              v ->
+                  RxJava2Adapter.singleToMono(
+                      Single.wrap(
+                          (Single<O>) RxJavaReactorMigrationUtil.toJdkFunction(function).apply(v))))
+          .as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
+  // XXX: Does this one work? See addressCompletionServiceClient.java validateAndComplete with the
+  // this::handle.
+  //  I dont think that it picks methodreferences up....
   abstract static class SingleFlatMapLambda<S, T> {
     @Placeholder
     abstract Single<T> toSingleFunction(@MayOptionallyUse S element);
@@ -309,7 +332,7 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Flowable mergeWith(SingleSource)
   // XXX: public final Single observeOn(Scheduler)
 
-  // XXX: Add test
+  // XXX: Add test. This doesn't work for method references, which is a problem.
   static final class SingleOnErrorResumeNext<T> {
     @BeforeTemplate
     Single<T> before(
@@ -378,10 +401,10 @@ final class RxJavaSingleToReactorTemplates {
   }
 
   // XXX: public final Future toFuture()
-  // XXX: public final Maybe toMaybe()
+  // XXX: public final Maybe toMaybe() --> 1 usage
   // XXX: public final Observable toObservable()
   // XXX: public final Single unsubscribeOn(Scheduler)
-  // XXX: public final Single zipWith(SingleSource,BiFunction)
+  // XXX: public final Single zipWith(SingleSource,BiFunction) --> One usage.
   // XXX: public final TestObserver test()
   // XXX: public final TestObserver test(boolean)
 }
