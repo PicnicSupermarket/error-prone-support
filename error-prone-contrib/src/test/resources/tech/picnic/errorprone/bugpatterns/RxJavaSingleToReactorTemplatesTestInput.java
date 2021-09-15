@@ -30,6 +30,14 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return Single.wrap(Single.just(1));
   }
 
+  Single<Integer> testSingleDoOnError() {
+    return Single.just(1).doOnError(System.out::println);
+  }
+
+  Single<Integer> testSingleDoOnSuccess() {
+    return Single.just(1).doOnSuccess(System.out::println);
+  }
+
   Maybe<Integer> testSingleFilter() {
     return Single.just(1).filter(i -> i > 2);
   }
@@ -44,5 +52,9 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
 
   Single<Integer> testSingleMap() {
     return Single.just(1).map(i -> i + 1);
+  }
+
+  Flowable<Integer> testFlowableToFlowable() {
+    return Single.just(1).toFlowable();
   }
 }

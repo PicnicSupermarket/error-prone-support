@@ -172,7 +172,6 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single doFinally(Action)
   // XXX: public final Single doOnDispose(Action)
 
-  // XXX: Write test
   static final class SingleDoOnError<T> {
     @BeforeTemplate
     Single<T> before(Single<T> single, Consumer<? super Throwable> consumer) {
@@ -191,7 +190,6 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single doOnEvent(BiConsumer)
   // XXX: public final Single doOnSubscribe(Consumer)
 
-  // XXX: Write test
   static final class SingleDoOnSuccess<T> {
     @BeforeTemplate
     Single<T> before(Single<T> single, Consumer<T> consumer) {
@@ -315,7 +313,6 @@ final class RxJavaSingleToReactorTemplates {
 
   // XXX: public final Single lift(SingleOperator)
 
-  // XXX: `Refaster.canBeCoercedTo(...)`.
   static final class SingleMap<I, T extends I, O> {
     @BeforeTemplate
     Single<O> before(Single<T> single, Function<I, O> function) {
@@ -323,8 +320,11 @@ final class RxJavaSingleToReactorTemplates {
     }
 
     @AfterTemplate
-    Single<O> after(Single<T> single, java.util.function.Function<I, O> function) {
-      return single.as(RxJava2Adapter::singleToMono).map(function).as(RxJava2Adapter::monoToSingle);
+    Single<O> after(Single<T> single, Function<I, O> function) {
+      return single
+          .as(RxJava2Adapter::singleToMono)
+          .map(RxJavaReactorMigrationUtil.toJdkFunction(function))
+          .as(RxJava2Adapter::monoToSingle);
     }
   }
 

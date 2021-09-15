@@ -117,7 +117,7 @@ public final class RxJavaReactorMigrationUtil {
   // XXX: Rename.
   // XXX: Introduce Refaster rules to drop this wrapper when possible.
   @SuppressWarnings("IllegalCatch")
-  public static <T> java.util.function.Consumer<? super T> toJdkConsumer(
+  public static <T> java.util.function.Consumer<T> toJdkConsumer(
       io.reactivex.functions.Consumer<T> consumer) {
     return (t) -> {
       try {

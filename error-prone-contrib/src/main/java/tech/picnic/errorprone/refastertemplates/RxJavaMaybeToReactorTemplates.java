@@ -414,6 +414,7 @@ final class RxJavaMaybeToReactorTemplates {
   //        .flatMapSingleElement(this::getTagById)
   //        .ignoreElement();
   //    }
+
   static final class MaybeFlatMapSingleElement<T, O, S extends SingleSource<O>> { // <S, T extends S, O> {
     @BeforeTemplate
     Maybe<O> before(Maybe<T> maybe, Function<? super T, ? extends S> function) {

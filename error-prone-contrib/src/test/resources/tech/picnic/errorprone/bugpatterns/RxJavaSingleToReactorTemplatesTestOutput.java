@@ -36,6 +36,20 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return Single.just(1);
   }
 
+  Single<Integer> testSingleDoOnError() {
+    return Single.just(1)
+        .as(RxJava2Adapter::singleToMono)
+        .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(System.out::println))
+        .as(RxJava2Adapter::monoToSingle);
+  }
+
+  Single<Integer> testSingleDoOnSuccess() {
+    return Single.just(1)
+        .as(RxJava2Adapter::singleToMono)
+        .doOnSuccess(RxJavaReactorMigrationUtil.toJdkConsumer(System.out::println))
+        .as(RxJava2Adapter::monoToSingle);
+  }
+
   Maybe<Integer> testSingleFilter() {
     return Single.just(1)
         .as(RxJava2Adapter::singleToMono)
@@ -60,7 +74,14 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   Single<Integer> testSingleMap() {
     return Single.just(1)
         .as(RxJava2Adapter::singleToMono)
-        .map(i -> i + 1)
+        .map(RxJavaReactorMigrationUtil.toJdkFunction(i -> i + 1))
         .as(RxJava2Adapter::monoToSingle);
+  }
+
+  Flowable<Integer> testFlowableToFlowable() {
+    return Single.just(1)
+        .as(RxJava2Adapter::singleToMono)
+        .flux()
+        .as(RxJava2Adapter::fluxToFlowable);
   }
 }
