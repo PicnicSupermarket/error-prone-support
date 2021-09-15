@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.refastertemplates;
 
-import static tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil;
-
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -9,13 +7,18 @@ import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.concurrent.Callable;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 /** The Refaster templates for the migration of the RxJava Single type to Reactor */
 final class RxJavaSingleToReactorTemplates {
@@ -48,7 +51,8 @@ final class RxJavaSingleToReactorTemplates {
     @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
     @AfterTemplate
     Single<T> after(Callable<? extends Throwable> throwable) {
-      return RxJava2Adapter.monoToSingle(Mono.error(RxJava2ReactorMigrationUtil.callableAsSupplier(throwable)));
+      return RxJava2Adapter.monoToSingle(
+          Mono.error(RxJavaReactorMigrationUtil.callableAsSupplier(throwable)));
     }
   }
 
@@ -74,8 +78,7 @@ final class RxJavaSingleToReactorTemplates {
     @AfterTemplate
     Single<T> after(Callable<? extends T> callable) {
       return RxJava2Adapter.monoToSingle(
-              Mono.fromSupplier(
-                      RxJava2ReactorMigrationUtil.callableAsSupplier(callable)));
+          Mono.fromSupplier(RxJavaReactorMigrationUtil.callableAsSupplier(callable)));
     }
   }
 
@@ -128,7 +131,7 @@ final class RxJavaSingleToReactorTemplates {
       return single;
     }
   }
-  
+
   // XXX: public static Single zip(Iterable,Function)
   // XXX: public static Single zip(SingleSource,SingleSource,BiFunction)
   // XXX: public static Single zip(SingleSource,SingleSource,SingleSource,Function3)
@@ -168,13 +171,44 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single doAfterTerminate(Action)
   // XXX: public final Single doFinally(Action)
   // XXX: public final Single doOnDispose(Action)
-  // XXX: public final Single doOnError(Consumer)
+
+  // XXX: Write test
+  static final class SingleDoOnError<T> {
+    @BeforeTemplate
+    Single<T> before(Single<T> single, Consumer<? super Throwable> consumer) {
+      return single.doOnError(consumer);
+    }
+
+    @AfterTemplate
+    Single<T> after(Single<T> single, Consumer<? super Throwable> consumer) {
+      return single
+          .as(RxJava2Adapter::singleToMono)
+          .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(consumer))
+          .as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
   // XXX: public final Single doOnEvent(BiConsumer)
   // XXX: public final Single doOnSubscribe(Consumer)
-  // XXX: public final Single doOnSuccess(Consumer) --> Required
+
+  // XXX: Write test
+  static final class SingleDoOnSuccess<T> {
+    @BeforeTemplate
+    Single<T> before(Single<T> single, Consumer<T> consumer) {
+      return single.doOnSuccess(consumer);
+    }
+
+    @AfterTemplate
+    Single<T> after(Single<T> single, Consumer<T> consumer) {
+      return single
+          .as(RxJava2Adapter::singleToMono)
+          .doOnSuccess(RxJavaReactorMigrationUtil.toJdkConsumer(consumer))
+          .as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
   // XXX: public final Single doOnTerminate(Action)
 
-  // XXX: `function` type change; look into `Refaster.canBeCoercedTo(...)`.  or to JdkPredicate.
   static final class SingleFilter<S, T extends S> {
     @BeforeTemplate
     Maybe<T> before(Single<T> single, Predicate<S> predicate) {
@@ -182,10 +216,10 @@ final class RxJavaSingleToReactorTemplates {
     }
 
     @AfterTemplate
-    Maybe<T> after(Single<T> single, java.util.function.Predicate<S> predicate) {
+    Maybe<T> after(Single<T> single, Predicate<S> predicate) {
       return single
           .as(RxJava2Adapter::singleToMono)
-          .filter(predicate)
+          .filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
           .as(RxJava2Adapter::monoToMaybe);
     }
   }
@@ -211,7 +245,30 @@ final class RxJavaSingleToReactorTemplates {
   }
 
   // XXX: public final Completable flatMapCompletable(Function)
-  // XXX: public final Maybe flatMapMaybe(Function)
+
+  // XXX: Test this one.
+  // In this case it doesnt work: flatMap(e ->
+  // RxJava2Adapter.maybeToMono(geocodingService::complete.apply(e))). (see before apply is an
+  // error)
+  static final class SingleFlatMapMaybe<T, R> {
+    @BeforeTemplate
+    Maybe<R> before(
+        Single<T> single, Function<? super T, ? extends MaybeSource<? extends R>> mapper) {
+      return single.flatMapMaybe(mapper);
+    }
+
+    @AfterTemplate
+    Maybe<R> after(
+        Single<T> single, Function<? super T, ? extends MaybeSource<? extends R>> mapper) {
+      return RxJava2Adapter.monoToMaybe(
+          RxJava2Adapter.singleToMono(single)
+              .flatMap(
+                  e ->
+                      RxJava2Adapter.maybeToMono(
+                          Maybe.wrap(RxJavaReactorMigrationUtil.toJdkFunction(mapper).apply(e)))));
+    }
+  }
+
   // XXX: public final Observable flatMapObservable(Function)
   // XXX: public final Flowable flatMapPublisher(Function)
   // XXX: public final Flowable flattenAsFlowable(Function)
@@ -227,9 +284,9 @@ final class RxJavaSingleToReactorTemplates {
     @AfterTemplate
     Completable after(Single<T> single) {
       return single
-              .as(RxJava2Adapter::singleToMono)
-              .ignoreElement()
-              .as(RxJava2Adapter::monoToCompletable);
+          .as(RxJava2Adapter::singleToMono)
+          .ignoreElement()
+          .as(RxJava2Adapter::monoToCompletable);
     }
   }
 
@@ -251,7 +308,31 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single materialize()
   // XXX: public final Flowable mergeWith(SingleSource)
   // XXX: public final Single observeOn(Scheduler)
-  // XXX: public final Single onErrorResumeNext(Function) --> Required
+
+  // XXX: Add test
+  static final class SingleOnErrorResumeNext<T> {
+    @BeforeTemplate
+    Single<T> before(
+        Single<T> single,
+        Function<? super Throwable, ? extends SingleSource<? extends T>> function) {
+      return single.onErrorResumeNext(function);
+    }
+
+    @AfterTemplate
+    Single<T> after(
+        Single<T> single,
+        Function<? super Throwable, ? extends SingleSource<? extends T>> function) {
+      return RxJava2Adapter.monoToSingle(
+          single
+              .as(RxJava2Adapter::singleToMono)
+              .onErrorResume(
+                  e ->
+                      RxJava2Adapter.singleToMono(
+                          Single.wrap(
+                              RxJavaReactorMigrationUtil.toJdkFunction(function).apply(e)))));
+    }
+  }
+
   // XXX: public final Single onErrorResumeNext(Single)
   // XXX: public final Single onErrorReturn(Function)
   // XXX: public final Single onErrorReturnItem(Object)
@@ -282,7 +363,20 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single timeout(long,TimeUnit,SingleSource)
   // XXX: public final Object to(Function)
   // XXX: public final Completable toCompletable() <-- this one is @Deprecated
-  // XXX: public final Flowable toFlowable()
+
+  // XXX: Validate this one and test it.
+  static final class FlowableToFlowable<T> {
+    @BeforeTemplate
+    Flowable<T> before(Single<T> single) {
+      return single.toFlowable();
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Single<T> single) {
+      return single.as(RxJava2Adapter::singleToMono).flux().as(RxJava2Adapter::fluxToFlowable);
+    }
+  }
+
   // XXX: public final Future toFuture()
   // XXX: public final Maybe toMaybe()
   // XXX: public final Observable toObservable()

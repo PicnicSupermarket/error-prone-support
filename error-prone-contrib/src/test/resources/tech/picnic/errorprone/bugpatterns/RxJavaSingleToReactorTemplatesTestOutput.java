@@ -6,7 +6,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
-import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil;
+import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -17,7 +17,7 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   Single<Object> testSingleErrorCallable() {
     return RxJava2Adapter.monoToSingle(
         Mono.error(
-            RxJava2ReactorMigrationUtil.callableAsSupplier(
+            RxJavaReactorMigrationUtil.callableAsSupplier(
                 () -> {
                   throw new IllegalStateException();
                 })));
@@ -25,7 +25,7 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
 
   Single<Integer> testSingleFromCallable() {
     return RxJava2Adapter.monoToSingle(
-        Mono.fromSupplier(RxJava2ReactorMigrationUtil.callableAsSupplier(() -> 1)));
+        Mono.fromSupplier(RxJavaReactorMigrationUtil.callableAsSupplier(() -> 1)));
   }
 
   Single<Integer> testSingleJust() {
@@ -39,7 +39,7 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   Maybe<Integer> testSingleFilter() {
     return Single.just(1)
         .as(RxJava2Adapter::singleToMono)
-        .filter(i -> i > 2)
+        .filter(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 2))
         .as(RxJava2Adapter::monoToMaybe);
   }
 

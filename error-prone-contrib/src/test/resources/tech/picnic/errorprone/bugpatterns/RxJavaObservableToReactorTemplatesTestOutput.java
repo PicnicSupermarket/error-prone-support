@@ -24,9 +24,16 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
     return RxJava2Adapter.fluxToObservable(Flux.empty());
   }
 
+  Observable<Integer> testObservableJust() {
+    return RxJava2Adapter.fluxToObservable(Flux.just(1));
+  }
+
+  Observable<Integer> testObservableJustTwo() {
+    return RxJava2Adapter.fluxToObservable(Flux.just(1, 2));
+  }
+
   Maybe<Integer> testMaybeFirstElement() {
-    return RxJava2Adapter.observableToFlux(
-            Observable.just(1), BackpressureStrategy.BUFFER)
+    return RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
         .next()
         .as(RxJava2Adapter::monoToMaybe);
   }

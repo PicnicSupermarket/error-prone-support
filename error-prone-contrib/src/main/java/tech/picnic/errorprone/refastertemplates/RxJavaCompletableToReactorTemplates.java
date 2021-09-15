@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 /** The Refaster templates for the migration of the RxJava Completable type to Reactor */
 final class RxJavaCompletableToReactorTemplates {
@@ -64,7 +65,7 @@ final class RxJavaCompletableToReactorTemplates {
       return RxJava2Adapter.monoToCompletable(
           Mono.defer(
               () ->
-                  RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(supplier)
+                  RxJavaReactorMigrationUtil.callableAsSupplier(supplier)
                       .get()
                       .as(RxJava2Adapter::completableToMono)));
     }
@@ -104,7 +105,7 @@ final class RxJavaCompletableToReactorTemplates {
     Completable after(Action action) {
       return RxJava2Adapter.monoToCompletable(
           Mono.fromRunnable(
-              RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toRunnable(action)));
+              RxJavaReactorMigrationUtil.toRunnable(action)));
     }
   }
 
@@ -175,8 +176,8 @@ final class RxJavaCompletableToReactorTemplates {
     }
 
     @AfterTemplate
-    Single<Void> after(Completable completable, CompletableSource source) {
-      return RxJava2Adapter.monoToSingle(
+    Completable after(Completable completable, CompletableSource source) {
+      return RxJava2Adapter.monoToCompletable(
           completable
               .as(RxJava2Adapter::completableToMono)
               .then(RxJava2Adapter.completableToMono(Completable.wrap(source))));
@@ -191,11 +192,11 @@ final class RxJavaCompletableToReactorTemplates {
     }
 
     @AfterTemplate
-    Single<T> after(Completable completable, MaybeSource<T> source) {
+    Maybe<T> after(Completable completable, MaybeSource<T> source) {
       return completable
           .as(RxJava2Adapter::completableToMono)
           .then(RxJava2Adapter.maybeToMono(Maybe.wrap(source)))
-          .as(RxJava2Adapter::monoToSingle);
+          .as(RxJava2Adapter::monoToMaybe);
     }
   }
 
@@ -209,11 +210,11 @@ final class RxJavaCompletableToReactorTemplates {
     }
 
     @AfterTemplate
-    Single<T> after(Completable completable, Publisher<T> source) {
+    Flowable<T> after(Completable completable, Publisher<T> source) {
       return completable
           .as(RxJava2Adapter::completableToMono)
           .then(Mono.from(source))
-          .as(RxJava2Adapter::monoToSingle);
+          .as(RxJava2Adapter::monoToFlowable);
     }
   }
 

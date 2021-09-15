@@ -96,7 +96,8 @@ public final class RefasterCheckTest {
   private static Stream<Arguments> templateGroupsUnderTest() {
     // XXX: Drop the filter once we have added tests for AssertJ!
     return TEMPLATES_BY_GROUP.keySet().stream()
-        .filter(not("AssertJ"::equals))
+            .filter(not("AssertJ"::equals))
+            .filter(not("Immutable"::equals))
 //        .filter("RxJavaToReactor"::equals)
         .map(Arguments::of);
   }
@@ -109,6 +110,9 @@ public final class RefasterCheckTest {
     // XXX: Drop the filter once we have added tests for AssertJ!
     return TEMPLATES_BY_GROUP.entries().stream()
         .filter(e -> !"AssertJ".equals(e.getKey()))
+        .filter(e -> !"AssertJ".contains(e.getKey()))
+        .filter(e -> !"Immutable".contains(e.getKey()))
+        .filter(e -> !"Immutable".equals(e.getKey()))
         .map(e -> arguments(e.getKey(), e.getValue()));
   }
 

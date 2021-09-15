@@ -36,6 +36,7 @@
         <module>error-prone-contrib</module>
         <module>refaster-resource-compiler</module>
         <module>refaster-support</module>
+        <module>migration-util</module>
     </modules>
 
     <scm>
