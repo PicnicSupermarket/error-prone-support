@@ -6,10 +6,12 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Flow;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
-import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
+import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -106,8 +108,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         Flux.zip(
             Flowable.just(1),
             Flowable.just(2),
-            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkBiFunction(
-                (i1, i2) -> i1 + i2)));
+            RxJavaReactorMigrationUtil.toJdkBiFunction((i1, i2) -> i1 + i2)));
   }
 
   Single<Boolean> testFlowableAll() {
@@ -130,6 +131,18 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return Flowable.just(1).mergeWith(Single.just(1));
   }
 
+  Single<Integer> testFlowableSingleDefault() {
+    return Flowable.just(1).single(2);
+  }
+
+  Maybe<Integer> testFlowableSingleElement() {
+    return Flowable.just(1).singleElement();
+  }
+
+  Single<Integer> testFlowableSingleOrError() {
+    return Flowable.just(1).singleOrError();
+  }
+
   Flowable<Integer> testFlowableSwitchIfEmptyPublisher() {
     return Flowable.just(1)
         .switchIfEmpty(
@@ -137,6 +150,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
                 () -> {
                   throw new IllegalStateException();
                 }));
+  }
+
+  Single<List<Integer>> testFlowableToList() {
+    return Flowable.just(1, 2).toList();
   }
 
   Single<Map<Boolean, Integer>> testFlowableToMap() {

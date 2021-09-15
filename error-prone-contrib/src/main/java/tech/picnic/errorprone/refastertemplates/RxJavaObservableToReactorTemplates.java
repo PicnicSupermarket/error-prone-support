@@ -7,6 +7,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import reactor.adapter.rxjava.RxJava2Adapter;
@@ -118,8 +119,31 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public static Observable interval(long,TimeUnit,Scheduler)
   // XXX: public static Observable intervalRange(long,long,long,long,TimeUnit)
   // XXX: public static Observable intervalRange(long,long,long,long,TimeUnit,Scheduler)
-  // XXX: public static Observable just(Object)
-  // XXX: public static Observable just(Object,Object)
+
+  static final class ObservableJust<T> {
+    @BeforeTemplate
+    Observable<T> before(T t) {
+      return Observable.just(t);
+    }
+
+    @AfterTemplate
+    Observable<T> after(T t) {
+      return RxJava2Adapter.fluxToObservable(Flux.just(t));
+    }
+  }
+
+  static final class ObservableJustTwo<T> {
+    @BeforeTemplate
+    Observable<T> before(T t, T t2) {
+      return Observable.just(t, t2);
+    }
+
+    @AfterTemplate
+    Observable<T> after(T t, T t2) {
+      return RxJava2Adapter.fluxToObservable(Flux.just(t, t2));
+    }
+  }
+
   // XXX: public static Observable just(Object,Object,Object)
   // XXX: public static Observable just(Object,Object,Object,Object)
   // XXX: public static Observable just(Object,Object,Object,Object,Object)

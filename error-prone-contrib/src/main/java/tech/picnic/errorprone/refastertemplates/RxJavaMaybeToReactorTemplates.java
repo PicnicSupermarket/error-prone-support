@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil;
 
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.ImportPolicy;
@@ -26,6 +25,7 @@ import java.util.concurrent.CompletableFuture;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 /** The Refaster templates for the migration of the RxJava Maybe type to Reactor */
 final class RxJavaMaybeToReactorTemplates {
@@ -154,7 +154,7 @@ final class RxJavaMaybeToReactorTemplates {
     @AfterTemplate
     Maybe<T> after(Callable<? extends Throwable> throwable) {
       return RxJava2Adapter.monoToMaybe(
-          Mono.error(RxJava2ReactorMigrationUtil.callableAsSupplier(throwable)));
+          Mono.error(RxJavaReactorMigrationUtil.callableAsSupplier(throwable)));
     }
   }
 
@@ -180,7 +180,7 @@ final class RxJavaMaybeToReactorTemplates {
     @AfterTemplate
     Maybe<T> after(Action action) {
       return RxJava2Adapter.monoToMaybe(
-          Mono.fromRunnable(RxJava2ReactorMigrationUtil.toRunnable(action)));
+          Mono.fromRunnable(RxJavaReactorMigrationUtil.toRunnable(action)));
     }
   }
 
@@ -193,7 +193,7 @@ final class RxJavaMaybeToReactorTemplates {
     @AfterTemplate
     Maybe<T> after(Callable<? extends T> callable) {
       return RxJava2Adapter.monoToMaybe(
-          Mono.fromSupplier(RxJava2ReactorMigrationUtil.callableAsSupplier(callable)));
+          Mono.fromSupplier(RxJavaReactorMigrationUtil.callableAsSupplier(callable)));
     }
   }
 
@@ -377,7 +377,7 @@ final class RxJavaMaybeToReactorTemplates {
               v ->
                   RxJava2Adapter.maybeToMono(
                       Maybe.wrap(
-                          (Maybe<O>) RxJava2ReactorMigrationUtil.toJdkFunction(function).apply(v))))
+                          (Maybe<O>) RxJavaReactorMigrationUtil.toJdkFunction(function).apply(v))))
           .as(RxJava2Adapter::monoToMaybe);
     }
   }
@@ -429,7 +429,7 @@ final class RxJavaMaybeToReactorTemplates {
                   e ->
                       RxJava2Adapter.singleToMono(
                           Single.wrap(
-                              RxJava2ReactorMigrationUtil.toJdkFunction(function).apply(e)))));
+                              RxJavaReactorMigrationUtil.toJdkFunction(function).apply(e)))));
     }
   }
 
@@ -466,7 +466,7 @@ final class RxJavaMaybeToReactorTemplates {
     Maybe<R> after(Maybe<T> maybe, Function<T, R> mapper) {
       return maybe
           .as(RxJava2Adapter::maybeToMono)
-          .map(RxJava2ReactorMigrationUtil.toJdkFunction(mapper))
+          .map(RxJavaReactorMigrationUtil.toJdkFunction(mapper))
           .as(RxJava2Adapter::monoToMaybe);
     }
   }

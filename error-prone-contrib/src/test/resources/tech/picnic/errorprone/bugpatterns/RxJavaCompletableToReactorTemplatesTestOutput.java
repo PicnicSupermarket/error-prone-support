@@ -7,7 +7,7 @@ import io.reactivex.Flowable;
 import java.util.Arrays;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
-import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
+import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -23,7 +23,7 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
     return RxJava2Adapter.monoToCompletable(
         Mono.defer(
             () ->
-                RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(
+                RxJavaReactorMigrationUtil.callableAsSupplier(
                         () -> Completable.complete())
                     .get()
                     .as(RxJava2Adapter::completableToMono)));
@@ -44,7 +44,7 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
   Completable testCompletableFromAction() {
     return RxJava2Adapter.monoToCompletable(
         Mono.fromRunnable(
-            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toRunnable(() -> {})));
+            RxJavaReactorMigrationUtil.toRunnable(() -> {})));
   }
 
   Completable testCompletableFromCallable() {

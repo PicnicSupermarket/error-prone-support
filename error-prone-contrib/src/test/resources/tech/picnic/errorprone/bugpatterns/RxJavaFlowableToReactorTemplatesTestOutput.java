@@ -6,12 +6,13 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import java.util.concurrent.Flow;
+import java.util.List;
 import java.util.Map;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates;
-import tech.picnic.errorprone.refastertemplates.RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil;
+import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -20,7 +21,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         Flux.combineLatest(
             Flowable.just(1),
             Flowable.just(2),
-            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkBiFunction(Integer::sum)));
+            RxJavaReactorMigrationUtil.toJdkBiFunction(Integer::sum)));
   }
 
   Flowable<Integer> testFlowableConcatWithPublisher() {
@@ -32,9 +33,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Flowable<Integer> testFlowableDefer() {
     return RxJava2Adapter.fluxToFlowable(
-        Flux.defer(
-            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(
-                () -> Flowable.just(1))));
+        Flux.defer(RxJavaReactorMigrationUtil.callableAsSupplier(() -> Flowable.just(1))));
   }
 
   Flowable<Object> testFlowableEmpty() {
@@ -48,7 +47,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   Flowable<Object> testFlowableErrorCallable() {
     return RxJava2Adapter.fluxToFlowable(
         Flux.error(
-            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.callableAsSupplier(
+            RxJavaReactorMigrationUtil.callableAsSupplier(
                 () -> {
                   throw new IllegalStateException();
                 })));
@@ -73,7 +72,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   Flowable<Integer> testFlowableFilter() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
-        .filter(RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkPredicate(i -> i > 2))
+        .filter(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 2))
         .as(RxJava2Adapter::fluxToFlowable);
   }
 
@@ -95,7 +94,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
                 e ->
                     RxJava2Adapter.completableToMono(
                         Completable.wrap(
-                            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkFunction(
+                            RxJavaReactorMigrationUtil.toJdkFunction(
                                     integer -> Completable.complete())
                                 .apply(e))))
             .then());
@@ -104,11 +103,11 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   Flowable<Object> testFlowableFlatMap() {
     Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
-        .flatMap(RxJava2ReactorMigrationUtil.toJdkFunction(this::exampleMethod2))
+        .flatMap(RxJavaReactorMigrationUtil.toJdkFunction(this::exampleMethod2))
         .as(RxJava2Adapter::fluxToFlowable);
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
-        .flatMap(RxJava2ReactorMigrationUtil.toJdkFunction(i -> ImmutableSet::of))
+        .flatMap(RxJavaReactorMigrationUtil.toJdkFunction(i -> ImmutableSet::of))
         .as(RxJava2Adapter::fluxToFlowable);
   }
 
@@ -139,8 +138,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         Flux.zip(
             Flowable.just(1),
             Flowable.just(2),
-            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkBiFunction(
-                (i1, i2) -> i1 + i2)));
+            RxJavaReactorMigrationUtil.toJdkBiFunction((i1, i2) -> i1 + i2)));
   }
 
   Flowable<Integer> testFlowableBiFunctionRemoveUtil() {
@@ -151,18 +149,14 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   Single<Boolean> testFlowableAll() {
     return Flowable.just(true, true)
         .as(RxJava2Adapter::flowableToFlux)
-        .all(
-            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkPredicate(
-                Boolean::booleanValue))
+        .all(RxJavaReactorMigrationUtil.toJdkPredicate(Boolean::booleanValue))
         .as(RxJava2Adapter::monoToSingle);
   }
 
   Single<Boolean> testFlowableAny() {
     return Flowable.just(true, true)
         .as(RxJava2Adapter::flowableToFlux)
-        .any(
-            RxJavaToReactorTemplates.RxJava2ReactorMigrationUtil.toJdkPredicate(
-                Boolean::booleanValue))
+        .any(RxJavaReactorMigrationUtil.toJdkPredicate(Boolean::booleanValue))
         .as(RxJava2Adapter::monoToSingle);
   }
 
@@ -183,6 +177,25 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
             .mergeWith(RxJava2Adapter.singleToMono(Single.wrap(Single.just(1)))));
   }
 
+  Single<Integer> testFlowableSingleDefault() {
+    return RxJava2Adapter.monoToSingle(
+        Flowable.just(1).as(RxJava2Adapter::flowableToFlux).single(2));
+  }
+
+  Maybe<Integer> testFlowableSingleElement() {
+    return Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .singleOrEmpty()
+        .as(RxJava2Adapter::monoToMaybe);
+  }
+
+  Single<Integer> testFlowableSingleOrError() {
+    return Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .single()
+        .as(RxJava2Adapter::monoToSingle);
+  }
+
   Flowable<Integer> testFlowableSwitchIfEmptyPublisher() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
@@ -192,6 +205,13 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
                   throw new IllegalStateException();
                 }))
         .as(RxJava2Adapter::fluxToFlowable);
+  }
+
+  Single<List<Integer>> testFlowableToList() {
+    return Flowable.just(1, 2)
+        .as(RxJava2Adapter::flowableToFlux)
+        .collectList()
+        .as(RxJava2Adapter::monoToSingle);
   }
 
   Single<Map<Boolean, Integer>> testFlowableToMap() {
