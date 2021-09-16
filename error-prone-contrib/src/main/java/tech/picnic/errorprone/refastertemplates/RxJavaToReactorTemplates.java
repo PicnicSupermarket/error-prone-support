@@ -1,12 +1,12 @@
 package tech.picnic.errorprone.refastertemplates;
 
-import static java.util.function.Function.identity;
 
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
@@ -128,6 +128,7 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
+  @SuppressWarnings("NoFunctionalReturnType")
   static final class RemoveUtilCallable<T> {
     @BeforeTemplate
     Supplier<T> before(@CanTransformToTargetType Callable<T> callable) {
@@ -143,13 +144,28 @@ public final class RxJavaToReactorTemplates {
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryFunctionConversion<I, O> {
     @BeforeTemplate
-    java.util.function.Function<I, O> before(@CanTransformToTargetType Function<I, O> function) {
+    java.util.function.Function<I, O> before(Function<I, O> function) {
       return RxJavaReactorMigrationUtil.toJdkFunction(function);
     }
 
     @AfterTemplate
     java.util.function.Function<I, O> after(java.util.function.Function<I, O> function) {
       return function;
+    }
+  }
+
+  @SuppressWarnings("NoFunctionalReturnType")
+  static final class UnnecessaryBiFunctionConversion<T, U, R> {
+    @BeforeTemplate
+    java.util.function.BiFunction<? super T, ? super U, ? extends R> before(
+            @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
+      return RxJavaReactorMigrationUtil.toJdkBiFunction(zipper);
+    }
+
+    @AfterTemplate
+    java.util.function.BiFunction<? super T, ? super U, ? extends R> after(
+            java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
+      return zipper;
     }
   }
 
@@ -166,10 +182,11 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
+  // XXX: This one is without CanBeTransformedTo...
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryPredicateConversion<T> {
     @BeforeTemplate
-    java.util.function.Predicate<T> before(@CanTransformToTargetType Predicate<T> predicate) {
+    java.util.function.Predicate<T> before(Predicate<T> predicate) {
       return RxJavaReactorMigrationUtil.toJdkPredicate(predicate);
     }
 
