@@ -370,21 +370,6 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: MOVE?
-  static final class BiFunctionRemoveUtil<T, U, R> {
-    @BeforeTemplate
-    java.util.function.BiFunction<? super T, ? super U, ? extends R> before(
-        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
-      return RxJavaReactorMigrationUtil.toJdkBiFunction(zipper);
-    }
-
-    @AfterTemplate
-    java.util.function.BiFunction<? super T, ? super U, ? extends R> after(
-        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
-      return zipper;
-    }
-  }
-
   // XXX: static Flowable zip(Publisher,Publisher,BiFunction,boolean)
   // XXX: static Flowable zip(Publisher,Publisher,BiFunction,boolean,int)
   // XXX: static Flowable zip(Publisher,Publisher,Publisher,Function3)
@@ -767,7 +752,9 @@ final class RxJavaFlowableToReactorTemplates {
 
   static final class FlowableMap<I, T extends I, O> {
     @BeforeTemplate
-    Flowable<O> before(Flowable<T> flowable, @CanTransformToTargetType Function<I, O> function) {
+    Flowable<O> before(
+        Flowable<T> flowable,
+        @CanTransformToTargetType io.reactivex.functions.Function<I, O> function) {
       return flowable.map(function);
     }
 

@@ -415,7 +415,8 @@ final class RxJavaMaybeToReactorTemplates {
   //        .ignoreElement();
   //    }
 
-  static final class MaybeFlatMapSingleElement<T, O, S extends SingleSource<O>> { // <S, T extends S, O> {
+  // XXX: This one is still not correct, see example above. Perhaps try this? <S, T extends S, O> {
+  static final class MaybeFlatMapSingleElement<T, O, S extends SingleSource<O>> {
     @BeforeTemplate
     Maybe<O> before(Maybe<T> maybe, Function<? super T, ? extends S> function) {
       return maybe.flatMapSingleElement(function);
