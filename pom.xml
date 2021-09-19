@@ -144,8 +144,8 @@
         `RefasterRuleBuilderScanner` to convert those to `.refaster` files so
         that we can pick them up. (But in case of `baseline-refaster-rules`
         perhaps we can simply incorporate all of them.) -->
-        <version.palantir-assertj-automation>0.2.1</version.palantir-assertj-automation>
-        <version.palantir-baseline>4.22.0</version.palantir-baseline>
+        <version.palantir-assertj-automation>0.3.0</version.palantir-assertj-automation>
+        <version.palantir-baseline>4.25.0</version.palantir-baseline>
         <version.surefire>2.22.2</version.surefire>
     </properties>
 
@@ -275,7 +275,7 @@
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2020.0.10</version>
+                <version>2020.0.11</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -339,7 +339,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.7.2</version>
+                <version>5.8.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -361,7 +361,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>5.3.9</version>
+                <version>5.3.10</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -411,7 +411,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.1</version>
+                    <version>3.2</version>
                     <configuration>
                         <bundledSignatures>
                             <bundledSignature>jdk-internal</bundledSignature>
@@ -839,7 +839,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.3.1</version>
                     <configuration>
                         <!-- All relevant doclint checks are performed during
                         the compilation phase; no need to recheck during
@@ -1109,7 +1109,7 @@
                         <dependency>
                             <groupId>org.pitest</groupId>
                             <artifactId>pitest-junit5-plugin</artifactId>
-                            <version>0.14</version>
+                            <version>0.15</version>
                         </dependency>
                     </dependencies>
                     <executions>
