@@ -20,7 +20,6 @@ import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
@@ -106,8 +105,7 @@ final class RxJavaCompletableToReactorTemplates {
     @AfterTemplate
     Completable after(Action action) {
       return RxJava2Adapter.monoToCompletable(
-          Mono.fromRunnable(
-              RxJavaReactorMigrationUtil.toRunnable(action)));
+          Mono.fromRunnable(RxJavaReactorMigrationUtil.toRunnable(action)));
     }
   }
 
@@ -280,12 +278,11 @@ final class RxJavaCompletableToReactorTemplates {
     Single<T> after(Single<T> single, Consumer<? super Throwable> consumer) {
 
       return single
-              .as(RxJava2Adapter::singleToMono)
-              .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(consumer))
-              .as(RxJava2Adapter::monoToSingle);
+          .as(RxJava2Adapter::singleToMono)
+          .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(consumer))
+          .as(RxJava2Adapter::monoToSingle);
     }
   }
-
 
   // XXX: public final Completable doOnTerminate(Action)
   // XXX: public final Completable hide()

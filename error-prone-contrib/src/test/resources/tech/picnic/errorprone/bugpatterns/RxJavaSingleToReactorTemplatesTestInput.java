@@ -1,9 +1,9 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import io.reactivex.Completable;
 
 final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCase {
 
