@@ -15,6 +15,8 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.amb(ImmutableList.of(Maybe.just("foo"), Maybe.just("bar")));
   }
 
+  // XXX: To be removed if template works.
+  @SuppressWarnings("MaybeJust")
   Maybe<String> testMaybeAmbArray() {
     return Maybe.ambArray(Maybe.just("foo"), Maybe.just("bar"));
   }
@@ -62,9 +64,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Maybe<Integer> testMaybeFromRunnable() {
-    return Maybe.fromRunnable(() -> {
-      int i = 1 + 1;
-    });
+    return Maybe.fromRunnable(
+        () -> {
+          int i = 1 + 1;
+        });
   }
 
   Maybe<Integer> testMaybeFromSingle() {
@@ -87,23 +90,23 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.just("string").cast(String.class);
   }
 
+  @SuppressWarnings("MaybeJust")
   Maybe<Object> testMaybeCastNegative() {
     return Maybe.just("string").cast(Object.class);
   }
 
   Maybe<Integer> testMaybeDoOnError() {
-    return Maybe.just(1).doOnError(System::out::println);
+    return Maybe.just(1).doOnError(System.out::println);
   }
 
   Maybe<Integer> testMaybeDoOnSuccess() {
-    return Maybe.just(1).doOnSuccess(System::out::println);
+    return Maybe.just(1).doOnSuccess(System.out::println);
   }
 
   Maybe<Integer> testMaybeFilter() {
     return Maybe.just(1).filter(i -> i > 1);
   }
 
-  // XXX: This should be fixed later with `Refaster.canBeCoercedTo(...)`
   Maybe<Integer> testMaybeFlatMapFunction() {
     Maybe.just(1).flatMap(this::exampleMethod);
 
@@ -126,6 +129,8 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return null;
   }
 
+  // XXX: To be removed if template works.
+  @SuppressWarnings("MaybeJust")
   Maybe<Integer> testMaybeFlatMapSingleElement() {
     return Maybe.just(1).flatMapSingleElement(Single::just);
   }

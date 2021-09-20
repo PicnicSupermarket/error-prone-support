@@ -127,7 +127,7 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  @SuppressWarnings("NoFunctionalReturnType")
+  @SuppressWarnings({"NoFunctionalReturnType", "FunctionalInterfaceClash"})
   static final class RemoveUtilCallable<T> {
     @BeforeTemplate
     Supplier<T> before(@CanTransformToTargetType Callable<T> callable) {

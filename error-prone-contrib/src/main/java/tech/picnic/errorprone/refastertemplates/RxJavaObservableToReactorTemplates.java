@@ -337,8 +337,7 @@ final class RxJavaObservableToReactorTemplates {
     }
 
     @AfterTemplate
-    Observable<T> after(
-            Observable<T> observable, Predicate<T> predicate) {
+    Observable<T> after(Observable<T> observable, Predicate<T> predicate) {
       return RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
           .filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
           .as(RxJava2Adapter::fluxToObservable);

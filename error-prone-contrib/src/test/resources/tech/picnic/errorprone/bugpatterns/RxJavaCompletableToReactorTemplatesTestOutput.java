@@ -23,8 +23,7 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
     return RxJava2Adapter.monoToCompletable(
         Mono.defer(
             () ->
-                RxJavaReactorMigrationUtil.callableAsSupplier(
-                        () -> Completable.complete())
+                RxJavaReactorMigrationUtil.callableAsSupplier(() -> Completable.complete())
                     .get()
                     .as(RxJava2Adapter::completableToMono)));
   }
@@ -43,8 +42,7 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
 
   Completable testCompletableFromAction() {
     return RxJava2Adapter.monoToCompletable(
-        Mono.fromRunnable(
-            RxJavaReactorMigrationUtil.toRunnable(() -> {})));
+        Mono.fromRunnable(RxJavaReactorMigrationUtil.toRunnable(() -> {})));
   }
 
   Completable testCompletableFromCallable() {
