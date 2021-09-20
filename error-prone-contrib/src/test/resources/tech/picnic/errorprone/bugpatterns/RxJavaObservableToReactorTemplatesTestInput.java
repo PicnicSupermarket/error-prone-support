@@ -27,6 +27,10 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
     return Observable.just(1).firstElement();
   }
 
+  Observable<Integer> testObservableFilter() {
+    return Observable.just(1).filter(i -> i > 1);
+  }
+
   Completable testObservableIgnoreElements() {
     return Observable.just(1, 2).ignoreElements();
   }

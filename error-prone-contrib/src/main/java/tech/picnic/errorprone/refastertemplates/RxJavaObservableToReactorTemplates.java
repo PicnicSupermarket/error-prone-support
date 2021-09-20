@@ -9,8 +9,10 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.functions.Predicate;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
+import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 /** The Refaster templates for the migration of the RxJava Observable type to Reactor */
 final class RxJavaObservableToReactorTemplates {
@@ -326,11 +328,26 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Maybe elementAt(long)
   // XXX: public final Single elementAt(long,Object)
   // XXX: public final Single elementAtOrError(long)
-  // XXX: public final Observable filter(Predicate) --> This one
+
+  // XXX: Default BackPressureStrategy.BUFFER is choosen.
+  static final class ObservableFilter<T> {
+    @BeforeTemplate
+    Observable<T> before(Observable<T> observable, Predicate<T> predicate) {
+      return observable.filter(predicate);
+    }
+
+    @AfterTemplate
+    Observable<T> after(
+            Observable<T> observable, Predicate<T> predicate) {
+      return RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+          .filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
+          .as(RxJava2Adapter::fluxToObservable);
+    }
+  }
+
   // XXX: public final Single first(Object)
 
   // XXX: Default BUFFER is chosen here.
-  // XXX: Is next correct here?
   static final class MaybeFirstElement<T> {
     @BeforeTemplate
     Maybe<T> before(Observable<T> observable) {
@@ -339,7 +356,9 @@ final class RxJavaObservableToReactorTemplates {
 
     @AfterTemplate
     Maybe<T> after(Observable<T> observable) {
-      return RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER).next().as(RxJava2Adapter::monoToMaybe);
+      return RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+          .next()
+          .as(RxJava2Adapter::monoToMaybe);
     }
   }
 

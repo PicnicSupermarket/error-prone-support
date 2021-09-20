@@ -91,6 +91,18 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.just("string").cast(Object.class);
   }
 
+  Maybe<Integer> testMaybeDoOnError() {
+    return Maybe.just(1).doOnError(System::out::println);
+  }
+
+  Maybe<Integer> testMaybeDoOnSuccess() {
+    return Maybe.just(1).doOnSuccess(System::out::println);
+  }
+
+  Maybe<Integer> testMaybeFilter() {
+    return Maybe.just(1).filter(i -> i > 1);
+  }
+
   // XXX: This should be fixed later with `Refaster.canBeCoercedTo(...)`
   Maybe<Integer> testMaybeFlatMapFunction() {
     Maybe.just(1).flatMap(this::exampleMethod);
