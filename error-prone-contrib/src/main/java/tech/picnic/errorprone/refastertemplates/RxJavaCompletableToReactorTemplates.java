@@ -15,10 +15,12 @@ import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
@@ -235,7 +237,20 @@ final class RxJavaCompletableToReactorTemplates {
   }
 
   // XXX: public final Object as(CompletableConverter)
-  // XXX: public final void blockingAwait()
+
+  // XXX: Test this one.
+  static final class CompletableBlockingAwait {
+    @BeforeTemplate
+    void before(Completable completable) {
+      completable.blockingAwait();
+    }
+
+    @AfterTemplate
+    void after(Completable completable) {
+      completable.as(RxJava2Adapter::completableToMono).block();
+    }
+  }
+
   // XXX: public final boolean blockingAwait(long,TimeUnit)
   // XXX: public final Throwable blockingGet()
   // XXX: public final Throwable blockingGet(long,TimeUnit)
@@ -254,6 +269,24 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Completable doOnError(Consumer)
   // XXX: public final Completable doOnEvent(Consumer)
   // XXX: public final Completable doOnSubscribe(Consumer) --> Required
+
+  static final class CompletableDoOnSubscribe<T> {
+    @BeforeTemplate
+    Single<T> before(Single<T> single, Consumer<? super Throwable> consumer) {
+      return single.doOnError(consumer);
+    }
+
+    @AfterTemplate
+    Single<T> after(Single<T> single, Consumer<? super Throwable> consumer) {
+
+      return single
+              .as(RxJava2Adapter::singleToMono)
+              .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(consumer))
+              .as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
+
   // XXX: public final Completable doOnTerminate(Action)
   // XXX: public final Completable hide()
   // XXX: public final Completable lift(CompletableOperator)

@@ -16,6 +16,7 @@ import io.reactivex.SingleSource;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -589,7 +590,22 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable delaySubscription(Publisher)
   // XXX: final Flowable dematerialize()
   // XXX: final Flowable dematerialize(Function)
-  // XXX: final Flowable distinct()
+
+  static final class FlowableDistinct<T> {
+    @BeforeTemplate
+    Flowable<T> before(Flowable<T> flowable) {
+      return flowable.distinct();
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Flowable<T> flowable) {
+      return flowable
+          .as(RxJava2Adapter::flowableToFlux)
+          .distinct()
+          .as(RxJava2Adapter::fluxToFlowable);
+    }
+  }
+
   // XXX: final Flowable distinct(Function)
   // XXX: final Flowable distinct(Function,Callable)
   // XXX: final Flowable distinctUntilChanged()
@@ -612,7 +628,6 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Single elementAt(long,Object)
   // XXX: final Single elementAtOrError(long)
 
-  // XXX: `Refaster.canBeCoercedTo(...)`.
   static final class FlowableFilter<S, T extends S> {
     @BeforeTemplate
     Flowable<T> before(Flowable<T> flowable, Predicate<S> predicate) {
@@ -908,8 +923,34 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable skipLast(long,TimeUnit,Scheduler,boolean,int)
   // XXX: final Flowable skipUntil(Publisher)
   // XXX: final Flowable skipWhile(Predicate)
-  // XXX: final Flowable sorted()
-  // XXX: final Flowable sorted(java.util.Comparator)
+
+  static final class FlowableSorted<T> {
+    @BeforeTemplate
+    Flowable<T> before(Flowable<T> flowable) {
+      return flowable.sorted();
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Flowable<T> flowable) {
+      return flowable.as(RxJava2Adapter::flowableToFlux).sort().as(RxJava2Adapter::fluxToFlowable);
+    }
+  }
+
+  static final class FlowableSortedComparator<T> {
+    @BeforeTemplate
+    Flowable<T> before(Flowable<T> flowable, Comparator<T> sortFunction) {
+      return flowable.sorted(sortFunction);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Flowable<T> flowable, Comparator<T> sortFunction) {
+      return flowable
+          .as(RxJava2Adapter::flowableToFlux)
+          .sort(sortFunction)
+          .as(RxJava2Adapter::fluxToFlowable);
+    }
+  }
+
   // XXX: final Flowable startWith(Iterable)
   // XXX: final Flowable startWith(Object)
   // XXX: final Flowable startWith(Publisher)

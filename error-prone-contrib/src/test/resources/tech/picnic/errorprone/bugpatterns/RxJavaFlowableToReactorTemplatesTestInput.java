@@ -62,6 +62,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return Flowable.just(1).filter(i -> i > 2);
   }
 
+  Flowable<Integer> testFlowableDistinct() {
+    return Flowable.just(1).distinct();
+  }
+
   Maybe<Integer> testFlowableFirstElement() {
     return Flowable.just(1).firstElement();
   }
@@ -141,6 +145,14 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Single<Integer> testFlowableSingleOrError() {
     return Flowable.just(1).singleOrError();
+  }
+
+  Flowable<Integer> testFlowableSorted() {
+    return Flowable.just(1).sorted();
+  }
+
+  Flowable<Integer> testFlowableSortedComparator() {
+    return Flowable.just(1).sorted((i1, i2) -> 0);
   }
 
   Flowable<Integer> testFlowableSwitchIfEmptyPublisher() {

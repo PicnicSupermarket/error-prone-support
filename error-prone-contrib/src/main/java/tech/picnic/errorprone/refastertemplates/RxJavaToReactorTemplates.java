@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.refastertemplates;
 
-
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -141,6 +140,7 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
+  // XXX: Temporarily disabled @CanBeTransformedTo...
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryFunctionConversion<I, O> {
     @BeforeTemplate
@@ -158,13 +158,13 @@ public final class RxJavaToReactorTemplates {
   static final class UnnecessaryBiFunctionConversion<T, U, R> {
     @BeforeTemplate
     java.util.function.BiFunction<? super T, ? super U, ? extends R> before(
-            @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
+        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
       return RxJavaReactorMigrationUtil.toJdkBiFunction(zipper);
     }
 
     @AfterTemplate
     java.util.function.BiFunction<? super T, ? super U, ? extends R> after(
-            java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
+        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
       return zipper;
     }
   }

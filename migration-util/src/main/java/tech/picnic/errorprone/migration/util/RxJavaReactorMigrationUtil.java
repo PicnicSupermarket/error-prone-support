@@ -37,7 +37,7 @@ public final class RxJavaReactorMigrationUtil {
   // XXX: Introduce Refaster rules to drop this wrapper when possible.
   @SuppressWarnings("IllegalCatch")
   public static <T, R> java.util.function.Function<T, R> toJdkFunction(
-      io.reactivex.functions.Function<T, R> function) {
+          io.reactivex.functions.Function<T, R> function) {
     return (t) -> {
       try {
         return function.apply(t);
@@ -46,6 +46,7 @@ public final class RxJavaReactorMigrationUtil {
       }
     };
   }
+
 
   /**
    * Convert {@link io.reactivex.functions.BiFunction} to {@link java.util.function.BiFunction}

@@ -18,7 +18,9 @@ import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -353,12 +355,56 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe doFinally(Action)
   // XXX: public final Maybe doOnComplete(Action)
   // XXX: public final Maybe doOnDispose(Action)
-  // XXX: public final Maybe doOnError(Consumer) --> Copy over from Single
+
+  static final class MaybeDoOnError<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe, Consumer<? super Throwable> consumer) {
+      return maybe.doOnError(consumer);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe, Consumer<? super Throwable> consumer) {
+      return maybe
+          .as(RxJava2Adapter::maybeToMono)
+          .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(consumer))
+          .as(RxJava2Adapter::monoToMaybe);
+    }
+  }
+
   // XXX: public final Maybe doOnEvent(BiConsumer)
   // XXX: public final Maybe doOnSubscribe(Consumer)
-  // XXX: public final Maybe doOnSuccess(Consumer) --> Required
+
+  static final class MaybeDoOnSuccess<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe, Consumer<T> consumer) {
+      return maybe.doOnSuccess(consumer);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe, Consumer<T> consumer) {
+      return maybe
+          .as(RxJava2Adapter::maybeToMono)
+          .doOnSuccess(RxJavaReactorMigrationUtil.toJdkConsumer(consumer))
+          .as(RxJava2Adapter::monoToMaybe);
+    }
+  }
+
   // XXX: public final Maybe doOnTerminate(Action)
-  // XXX: public final Maybe filter(Predicate)  --> Easy one
+
+  static final class MaybeFilter<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe, Predicate<T> predicate) {
+      return maybe.filter(predicate);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe, Predicate<T> predicate) {
+      return maybe
+          .as(RxJava2Adapter::maybeToMono)
+          .filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
+          .as(RxJava2Adapter::monoToMaybe);
+    }
+  }
 
   static final class MaybeFlatMapFunction<I, T extends I, O, M extends MaybeSource<? extends O>> {
     @BeforeTemplate

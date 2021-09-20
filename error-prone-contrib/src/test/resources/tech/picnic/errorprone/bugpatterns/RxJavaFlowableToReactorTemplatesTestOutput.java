@@ -76,6 +76,13 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         .as(RxJava2Adapter::fluxToFlowable);
   }
 
+  Flowable<Integer> testFlowableDistinct() {
+    return Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .distinct()
+        .as(RxJava2Adapter::fluxToFlowable);
+  }
+
   Maybe<Integer> testFlowableFirstElement() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
@@ -194,6 +201,20 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         .as(RxJava2Adapter::flowableToFlux)
         .single()
         .as(RxJava2Adapter::monoToSingle);
+  }
+
+  Flowable<Integer> testFlowableSorted() {
+    return Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .sort()
+        .as(RxJava2Adapter::fluxToFlowable);
+  }
+
+  Flowable<Integer> testFlowableSortedComparator() {
+    return Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .sort((i1, i2) -> 0)
+        .as(RxJava2Adapter::fluxToFlowable);
   }
 
   Flowable<Integer> testFlowableSwitchIfEmptyPublisher() {

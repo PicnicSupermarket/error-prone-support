@@ -8,6 +8,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
+import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -36,6 +37,12 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
     return RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
         .next()
         .as(RxJava2Adapter::monoToMaybe);
+  }
+
+  Observable<Integer> testObservableFilter() {
+    return RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
+        .filter(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 1))
+        .as(RxJava2Adapter::fluxToObservable);
   }
 
   Completable testObservableIgnoreElements() {

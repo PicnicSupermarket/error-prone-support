@@ -10,12 +10,14 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
+import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.concurrent.Callable;
+import org.checkerframework.checker.units.qual.A;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
@@ -375,7 +377,19 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Disposable subscribe(Consumer)
   // XXX: public final Disposable subscribe(Consumer,Consumer)
   // XXX: public final void subscribe(SingleObserver)
-  // XXX: public final Single subscribeOn(Scheduler) --> Required.
+  // XXX: public final Single subscribeOn(Scheduler) --> Required. How to fix the Scheduler problem?
+//  static final class SingleSubscribeOn<T> {
+//    @BeforeTemplate
+//    Single<T> before(Single<T> single, Scheduler scheduler) {
+//      return single.subscribeOn(scheduler);
+//    }
+//
+//    @AfterTemplate
+//    Single<T> after(Single<T> single, Scheduler scheduler) {
+//      return single.as(RxJava2Adapter::singleToMono).subscribeOn(scheduler);
+//    }
+//  }
+
   // XXX: public final SingleObserver subscribeWith(SingleObserver)
   // XXX: public final Single takeUntil(CompletableSource)
   // XXX: public final Single takeUntil(Publisher)
@@ -388,7 +402,7 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Completable toCompletable() <-- this one is @Deprecated
 
   // XXX: Validate this one and test it.
-  static final class FlowableToFlowable<T> {
+  static final class SingleToFlowable<T> {
     @BeforeTemplate
     Flowable<T> before(Single<T> single) {
       return single.toFlowable();
