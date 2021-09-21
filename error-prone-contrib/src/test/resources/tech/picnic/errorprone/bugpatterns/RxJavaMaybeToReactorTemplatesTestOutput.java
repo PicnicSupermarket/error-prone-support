@@ -240,6 +240,13 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     RxJava2Adapter.maybeToMono(Maybe.just(1)).as(StepVerifier::create).verifyComplete();
   }
 
+  void MaybeTestAssertValue() throws InterruptedException {
+    RxJava2Adapter.maybeToMono(Maybe.just(1))
+        .as(StepVerifier::create)
+        .expectNextMatches(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 1))
+        .verifyComplete();
+  }
+
   void testMaybeTestAssertComplete() throws InterruptedException {
     RxJava2Adapter.maybeToMono(Maybe.just(1)).as(StepVerifier::create).verifyComplete();
   }

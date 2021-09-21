@@ -168,6 +168,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     Maybe.just(1).test().await().assertResult();
   }
 
+  void MaybeTestAssertValue() throws InterruptedException {
+    Maybe.just(1).test().await().assertValue(i -> i > 1);
+  }
+
   void testMaybeTestAssertComplete() throws InterruptedException {
     Maybe.just(1).test().await().assertComplete();
   }

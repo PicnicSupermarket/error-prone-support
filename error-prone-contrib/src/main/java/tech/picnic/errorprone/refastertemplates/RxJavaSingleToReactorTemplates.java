@@ -448,6 +448,21 @@ final class RxJavaSingleToReactorTemplates {
     }
   }
 
+  static final class SingleTestAssertValue<T> {
+    @BeforeTemplate
+    void before(Single<T> single, Predicate<T> predicate) throws InterruptedException {
+      single.test().await().assertValue(predicate);
+    }
+
+    @AfterTemplate
+    void after(Single<T> single, Predicate<T> predicate) {
+      RxJava2Adapter.singleToMono(single)
+          .as(StepVerifier::create)
+          .expectNextMatches(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
+          .verifyComplete();
+    }
+  }
+
   static final class SingleTestAssertComplete<T> {
     @BeforeTemplate
     void before(Single<T> single) throws InterruptedException {

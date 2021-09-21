@@ -71,6 +71,13 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
         .verifyComplete();
   }
 
+  void testObservableTestAssertValue() throws InterruptedException {
+    RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
+        .as(StepVerifier::create)
+        .expectNextMatches(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 2))
+        .verifyComplete();
+  }
+
   void testObservableTestAssertResultValues() throws InterruptedException {
     RxJava2Adapter.observableToFlux(Observable.just(1, 2, 3), BackpressureStrategy.BUFFER)
         .as(StepVerifier::create)
