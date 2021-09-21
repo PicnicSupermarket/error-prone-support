@@ -6,8 +6,11 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.observers.BaseTestConsumer;
+import io.reactivex.observers.TestObserver;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTestCase {
@@ -49,5 +52,59 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
     return RxJava2Adapter.observableToFlux(Observable.just(1, 2), BackpressureStrategy.BUFFER)
         .ignoreElements()
         .as(RxJava2Adapter::monoToCompletable);
+  }
+
+  void testObservableTestAssertResultItem() throws InterruptedException {
+    RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
+        .as(StepVerifier::create)
+        .expectNext(1)
+        .verifyComplete();
+    RxJava2Adapter.observableToFlux(Observable.just(2), BackpressureStrategy.BUFFER)
+        .as(StepVerifier::create)
+        .expectNext(2)
+        .verifyComplete();
+  }
+
+  void testObservableTestAssertResult() throws InterruptedException {
+    RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
+        .as(StepVerifier::create)
+        .verifyComplete();
+  }
+
+  void testObservableTestAssertResultValues() throws InterruptedException {
+    RxJava2Adapter.observableToFlux(Observable.just(1, 2, 3), BackpressureStrategy.BUFFER)
+        .as(StepVerifier::create)
+        .expectNext(1, 2, 3)
+        .verifyComplete();
+    RxJava2Adapter.observableToFlux(Observable.just(4, 5, 6), BackpressureStrategy.BUFFER)
+        .as(StepVerifier::create)
+        .expectNext(4, 5, 6)
+        .verifyComplete();
+  }
+
+  void testObservableTestAssertComplete() throws InterruptedException {
+    RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
+        .as(StepVerifier::create)
+        .verifyComplete();
+  }
+
+  void testObservableTestAssertErrorClass() throws InterruptedException {
+    RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
+        .as(StepVerifier::create)
+        .expectError(InterruptedException.class)
+        .verify();
+  }
+
+  void testObservableTestAssertNoErrors() throws InterruptedException {
+    RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
+        .as(StepVerifier::create)
+        .verifyComplete();
+  }
+
+  void testObservableTestAssertValueCount() throws InterruptedException {
+    RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
+        .as(StepVerifier::create)
+        .expectNextCount(1)
+        .verifyComplete();
   }
 }

@@ -98,7 +98,8 @@ public final class RefasterCheckTest {
     return TEMPLATES_BY_GROUP.keySet().stream()
         .filter(not("AssertJ"::equals))
         .filter(not("Immutable"::equals))
-        //        .filter("RxJavaToReactor"::equals)
+        .filter(not("Reactor"::equals))
+        .filter(not("RxJava2Adapter"::equals))
         .map(Arguments::of);
   }
 

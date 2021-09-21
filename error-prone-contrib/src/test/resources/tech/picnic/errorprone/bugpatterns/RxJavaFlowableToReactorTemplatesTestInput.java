@@ -170,4 +170,34 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   Single<Map<Boolean, Integer>> testFlowableToMap() {
     return Flowable.just(1).toMap(i -> i > 1);
   }
+
+  void testFlowableTestAssertResultItem() throws InterruptedException {
+    Flowable.just(1).test().await().assertResult(1);
+    Flowable.just(2).test().await().assertValue(2);
+  }
+
+  void testFlowableTestAssertResult() throws InterruptedException {
+    Flowable.just(1).test().await().assertResult();
+  }
+
+  void testFlowableTestAssertResultValues() throws InterruptedException {
+    Flowable.just(1, 2, 3).test().await().assertResult(1, 2, 3);
+    Flowable.just(4, 5, 6).test().await().assertValues(4, 5, 6);
+  }
+
+  void testFlowableTestAssertComplete() throws InterruptedException {
+    Flowable.just(1).test().await().assertComplete();
+  }
+
+  void testFlowableTestAssertErrorClass() throws InterruptedException {
+    Flowable.just(1).test().await().assertError(InterruptedException.class);
+  }
+
+  void testFlowableTestAssertNoErrors() throws InterruptedException {
+    Flowable.just(1).test().await().assertNoErrors();
+  }
+
+  void testFlowableTestAssertValueCount() throws InterruptedException {
+    Flowable.just(1).test().await().assertValueCount(1);
+  }
 }

@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import com.google.errorprone.refaster.ImportPolicy;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
@@ -24,6 +25,7 @@ import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 import tech.picnic.errorprone.refaster.util.IsArray;
 
@@ -1108,6 +1110,7 @@ final class RxJavaFlowableToReactorTemplates {
 
   // XXX: final Flowable zipWith(Iterable,BiFunction) --> Required.
 
+  // XXX: Test this one
   static final class FlowableZipWith<T, U, R> {
     @BeforeTemplate
     Flowable<R> before(
@@ -1131,7 +1134,110 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable zipWith(Publisher,BiFunction) --> Required?
   // XXX: final Flowable zipWith(Publisher,BiFunction,boolean)
   // XXX: final Flowable zipWith(Publisher,BiFunction,boolean,int)
-  // XXX: final TestSubscriber test()
   // XXX: final TestSubscriber test(long)
+
+  static final class FlowableTestAssertResultItem<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable, T item) throws InterruptedException {
+      Refaster.anyOf(
+          flowable.test().await().assertResult(item), flowable.test().await().assertValue(item));
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable, T item) {
+      RxJava2Adapter.flowableToFlux(flowable)
+          .as(StepVerifier::create)
+          .expectNext(item)
+          .verifyComplete();
+    }
+  }
+
+  static final class FlowableTestAssertResult<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable) throws InterruptedException {
+      flowable.test().await().assertResult();
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable) {
+      RxJava2Adapter.flowableToFlux(flowable).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  static final class FlowableTestAssertResultValues<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable, @Repeated T item) throws InterruptedException {
+      Refaster.anyOf(
+          flowable.test().await().assertResult(Refaster.asVarargs(item)),
+          flowable.test().await().assertValues(Refaster.asVarargs(item)));
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable, @Repeated T item) {
+      RxJava2Adapter.flowableToFlux(flowable)
+          .as(StepVerifier::create)
+          .expectNext(item)
+          .verifyComplete();
+    }
+  }
+
+  static final class FlowableTestAssertComplete<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable) throws InterruptedException {
+      flowable.test().await().assertComplete();
+      // XXX: Add this one here? flowable.test().await().assertEmpty();
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable) {
+      RxJava2Adapter.flowableToFlux(flowable).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  static final class FlowableTestAssertErrorClass<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable, Class<? extends Throwable> errorClass)
+        throws InterruptedException {
+      flowable.test().await().assertError(errorClass);
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable, Class<? extends Throwable> errorClass) {
+      RxJava2Adapter.flowableToFlux(flowable)
+          .as(StepVerifier::create)
+          .expectError(errorClass)
+          .verify();
+    }
+  }
+
+  // XXX: .assertError(Throwable) -> (not used in PRP).
+
+  static final class FlowableTestAssertNoErrors<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable) throws InterruptedException {
+      flowable.test().await().assertNoErrors();
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable) {
+      RxJava2Adapter.flowableToFlux(flowable).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  static final class FlowableTestAssertValueCount<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable, int count) throws InterruptedException {
+      flowable.test().await().assertValueCount(count);
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable, int count) {
+      RxJava2Adapter.flowableToFlux(flowable)
+          .as(StepVerifier::create)
+          .expectNextCount(count)
+          .verifyComplete();
+    }
+  }
+
   // XXX: final TestSubscriber test(long,boolean)
 }

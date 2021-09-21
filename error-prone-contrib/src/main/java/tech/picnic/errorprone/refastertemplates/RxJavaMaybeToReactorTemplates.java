@@ -27,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 /** The Refaster templates for the migration of the RxJava Maybe type to Reactor */
@@ -600,6 +601,100 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Single toSingle(Object)
   // XXX: public final Maybe unsubscribeOn(Scheduler)
   // XXX: public final Maybe zipWith(MaybeSource,BiFunction) --> Required.
-  // XXX: public final TestObserver test()
+
+  static final class MaybeTestAssertResultItem<T> {
+    @BeforeTemplate
+    void before(Maybe<T> maybe, T item) throws InterruptedException {
+      Refaster.anyOf(
+          maybe.test().await().assertResult(item), maybe.test().await().assertValue(item));
+    }
+
+    @AfterTemplate
+    void after(Maybe<T> maybe, T item) {
+      RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).expectNext(item).verifyComplete();
+    }
+  }
+
+  static final class MaybeTestAssertResult<T> {
+    @BeforeTemplate
+    void before(Maybe<T> maybe) throws InterruptedException {
+      maybe.test().await().assertResult();
+    }
+
+    @AfterTemplate
+    void after(Maybe<T> maybe) {
+      RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  static final class MaybeTestAssertComplete<T> {
+    @BeforeTemplate
+    void before(Maybe<T> maybe) throws InterruptedException {
+      maybe.test().await().assertComplete();
+      // XXX: Add this one here? maybe.test().await().assertEmpty();
+    }
+
+    @AfterTemplate
+    void after(Maybe<T> maybe) {
+      RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  static final class MaybeTestAssertErrorClass<T> {
+    @BeforeTemplate
+    void before(Maybe<T> maybe, Class<? extends Throwable> errorClass) throws InterruptedException {
+      maybe.test().await().assertError(errorClass);
+    }
+
+    @AfterTemplate
+    void after(Maybe<T> maybe, Class<? extends Throwable> errorClass) {
+      RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).expectError(errorClass).verify();
+    }
+  }
+
+  // XXX: .assertError(Throwable) -> (not used in PRP).
+
+  static final class MaybeTestAssertNoErrors<T> {
+    @BeforeTemplate
+    void before(Maybe<T> maybe) throws InterruptedException {
+      maybe.test().await().assertNoErrors();
+    }
+
+    @AfterTemplate
+    void after(Maybe<T> maybe) {
+      RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  // XXX: The following two are combined often.
+  //  static final class MaybeTestAssertValueSet<T> {
+  //    @BeforeTemplate
+  //    void before(Maybe<T> maybe, Collection<? extends T> expected) throws InterruptedException {
+  //      maybe.test().await().assertValueSet(expected);
+  //      expected.it
+  //    }
+  //
+  //    @AfterTemplate
+  //    void after(Maybe<T> maybe, Collection<? extends T> expected) {
+  //      RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).expectNextMatches(t ->
+  // ).verifyComplete();
+  //    }
+  //  }
+
+  static final class MaybeTestAssertValueCount<T> {
+    @BeforeTemplate
+    void before(Maybe<T> maybe, int count) throws InterruptedException {
+      maybe.test().await().assertValueCount(count);
+    }
+
+    @AfterTemplate
+    void after(Maybe<T> maybe, int count) {
+      RxJava2Adapter.maybeToMono(maybe)
+          .as(StepVerifier::create)
+          .expectNextCount(count)
+          .verifyComplete();
+    }
+  }
+
   // XXX: public final TestObserver test(boolean)
 }
