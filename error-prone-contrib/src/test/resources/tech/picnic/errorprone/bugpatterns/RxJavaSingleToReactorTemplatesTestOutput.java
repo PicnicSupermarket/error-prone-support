@@ -103,6 +103,13 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     RxJava2Adapter.singleToMono(Single.just(1)).as(StepVerifier::create).verifyComplete();
   }
 
+  void testSingleTestAssertValue() throws InterruptedException {
+    RxJava2Adapter.singleToMono(Single.just(1))
+        .as(StepVerifier::create)
+        .expectNextMatches(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 1))
+        .verifyComplete();
+  }
+
   void testSingleTestAssertComplete() throws InterruptedException {
     RxJava2Adapter.singleToMono(Single.just(1)).as(StepVerifier::create).verifyComplete();
   }

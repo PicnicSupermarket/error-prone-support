@@ -1164,6 +1164,21 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
+  static final class FlowableTestAssertValue<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable, Predicate<T> predicate) throws InterruptedException {
+      flowable.test().await().assertValue(predicate);
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable, Predicate<T> predicate) {
+      RxJava2Adapter.flowableToFlux(flowable)
+              .as(StepVerifier::create)
+              .expectNextMatches(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
+              .verifyComplete();
+    }
+  }
+
   static final class FlowableTestAssertResultValues<T> {
     @BeforeTemplate
     void before(Flowable<T> flowable, @Repeated T item) throws InterruptedException {

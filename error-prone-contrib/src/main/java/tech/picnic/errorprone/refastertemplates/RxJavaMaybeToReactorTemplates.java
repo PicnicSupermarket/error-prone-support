@@ -627,6 +627,21 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
+  static final class MaybeTestAssertValue<T> {
+    @BeforeTemplate
+    void before(Maybe<T> maybe, Predicate<T> predicate) throws InterruptedException {
+      maybe.test().await().assertValue(predicate);
+    }
+
+    @AfterTemplate
+    void after(Maybe<T> maybe, Predicate<T> predicate) {
+      RxJava2Adapter.maybeToMono(maybe)
+          .as(StepVerifier::create)
+          .expectNextMatches(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
+          .verifyComplete();
+    }
+  }
+
   static final class MaybeTestAssertComplete<T> {
     @BeforeTemplate
     void before(Maybe<T> maybe) throws InterruptedException {

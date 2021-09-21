@@ -614,15 +614,16 @@ final class RxJavaObservableToReactorTemplates {
     @BeforeTemplate
     void before(Observable<T> observable, T item) throws InterruptedException {
       Refaster.anyOf(
-              observable.test().await().assertResult(item), observable.test().await().assertValue(item));
+          observable.test().await().assertResult(item),
+          observable.test().await().assertValue(item));
     }
 
     @AfterTemplate
     void after(Observable<T> observable, T item) {
       RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
-              .as(StepVerifier::create)
-              .expectNext(item)
-              .verifyComplete();
+          .as(StepVerifier::create)
+          .expectNext(item)
+          .verifyComplete();
     }
   }
 
@@ -635,7 +636,25 @@ final class RxJavaObservableToReactorTemplates {
 
     @AfterTemplate
     void after(Observable<T> observable) {
-      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER).as(StepVerifier::create).verifyComplete();
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+          .as(StepVerifier::create)
+          .verifyComplete();
+    }
+  }
+
+  // XXX: Default BackpressureStrategy.BUFFER
+  static final class ObservableTestAssertValue<T> {
+    @BeforeTemplate
+    void before(Observable<T> observable, Predicate<T> predicate) throws InterruptedException {
+      observable.test().await().assertValue(predicate);
+    }
+
+    @AfterTemplate
+    void after(Observable<T> observable, Predicate<T> predicate) {
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+          .as(StepVerifier::create)
+          .expectNextMatches(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
+          .verifyComplete();
     }
   }
 
@@ -644,16 +663,16 @@ final class RxJavaObservableToReactorTemplates {
     @BeforeTemplate
     void before(Observable<T> observable, @Repeated T item) throws InterruptedException {
       Refaster.anyOf(
-              observable.test().await().assertResult(Refaster.asVarargs(item)),
-              observable.test().await().assertValues(Refaster.asVarargs(item)));
+          observable.test().await().assertResult(Refaster.asVarargs(item)),
+          observable.test().await().assertValues(Refaster.asVarargs(item)));
     }
 
     @AfterTemplate
     void after(Observable<T> observable, @Repeated T item) {
       RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
-              .as(StepVerifier::create)
-              .expectNext(item)
-              .verifyComplete();
+          .as(StepVerifier::create)
+          .expectNext(item)
+          .verifyComplete();
     }
   }
 
@@ -667,7 +686,9 @@ final class RxJavaObservableToReactorTemplates {
 
     @AfterTemplate
     void after(Observable<T> observable) {
-      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER).as(StepVerifier::create).verifyComplete();
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+          .as(StepVerifier::create)
+          .verifyComplete();
     }
   }
 
@@ -675,16 +696,16 @@ final class RxJavaObservableToReactorTemplates {
   static final class ObservableTestAssertErrorClass<T> {
     @BeforeTemplate
     void before(Observable<T> observable, Class<? extends Throwable> errorClass)
-            throws InterruptedException {
+        throws InterruptedException {
       observable.test().await().assertError(errorClass);
     }
 
     @AfterTemplate
     void after(Observable<T> observable, Class<? extends Throwable> errorClass) {
       RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
-              .as(StepVerifier::create)
-              .expectError(errorClass)
-              .verify();
+          .as(StepVerifier::create)
+          .expectError(errorClass)
+          .verify();
     }
   }
 
@@ -699,7 +720,9 @@ final class RxJavaObservableToReactorTemplates {
 
     @AfterTemplate
     void after(Observable<T> observable) {
-      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER).as(StepVerifier::create).verifyComplete();
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+          .as(StepVerifier::create)
+          .verifyComplete();
     }
   }
 
@@ -714,7 +737,8 @@ final class RxJavaObservableToReactorTemplates {
   //
   //    @AfterTemplate
   //    void after(Observable<T> observable, Collection<? extends T> expected) {
-  //      RxJava2Adapter.observableToMono(observable).as(StepVerifier::create).expectNextMatches(t ->
+  //      RxJava2Adapter.observableToMono(observable).as(StepVerifier::create).expectNextMatches(t
+  // ->
   // ).verifyComplete();
   //    }
   //  }
@@ -729,9 +753,9 @@ final class RxJavaObservableToReactorTemplates {
     @AfterTemplate
     void after(Observable<T> observable, int count) {
       RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
-              .as(StepVerifier::create)
-              .expectNextCount(count)
-              .verifyComplete();
+          .as(StepVerifier::create)
+          .expectNextCount(count)
+          .verifyComplete();
     }
   }
 

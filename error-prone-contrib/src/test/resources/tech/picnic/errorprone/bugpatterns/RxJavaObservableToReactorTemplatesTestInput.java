@@ -46,6 +46,10 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
     Observable.just(1).test().await().assertResult();
   }
 
+  void testObservableTestAssertValue() throws InterruptedException {
+    Observable.just(1).test().await().assertValue(i -> i > 2);
+  }
+
   void testObservableTestAssertResultValues() throws InterruptedException {
     Observable.just(1, 2, 3).test().await().assertResult(1, 2, 3);
     Observable.just(4, 5, 6).test().await().assertValues(4, 5, 6);

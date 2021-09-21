@@ -180,6 +180,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     Flowable.just(1).test().await().assertResult();
   }
 
+  void testFlowableTestAssertValue() throws InterruptedException {
+    Flowable.just(1).test().await().assertValue(i -> i > 1);
+  }
+
   void testFlowableTestAssertResultValues() throws InterruptedException {
     Flowable.just(1, 2, 3).test().await().assertResult(1, 2, 3);
     Flowable.just(4, 5, 6).test().await().assertValues(4, 5, 6);
