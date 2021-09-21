@@ -4,8 +4,11 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.observers.BaseTestConsumer;
+import io.reactivex.observers.TestObserver;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCase {
@@ -78,10 +81,47 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
         .as(RxJava2Adapter::monoToSingle);
   }
 
-  Flowable<Integer> testFlowableToFlowable() {
+  Flowable<Integer> testSingleToFlowable() {
     return Single.just(1)
         .as(RxJava2Adapter::singleToMono)
         .flux()
         .as(RxJava2Adapter::fluxToFlowable);
+  }
+
+  void testSingleTestAssertResultItem() throws InterruptedException {
+    RxJava2Adapter.singleToMono(Single.just(1))
+        .as(StepVerifier::create)
+        .expectNext(1)
+        .verifyComplete();
+    RxJava2Adapter.singleToMono(Single.just(2))
+        .as(StepVerifier::create)
+        .expectNext(2)
+        .verifyComplete();
+  }
+
+  void testSingleTestAssertResult() throws InterruptedException {
+    RxJava2Adapter.singleToMono(Single.just(1)).as(StepVerifier::create).verifyComplete();
+  }
+
+  void testSingleTestAssertComplete() throws InterruptedException {
+    RxJava2Adapter.singleToMono(Single.just(1)).as(StepVerifier::create).verifyComplete();
+  }
+
+  void testSingleTestAssertErrorClass() throws InterruptedException {
+    RxJava2Adapter.singleToMono(Single.just(1))
+        .as(StepVerifier::create)
+        .expectError(InterruptedException.class)
+        .verify();
+  }
+
+  void testSingleTestAssertNoErrors() throws InterruptedException {
+    RxJava2Adapter.singleToMono(Single.just(1)).as(StepVerifier::create).verifyComplete();
+  }
+
+  void testSingleTestAssertValueCount() throws InterruptedException {
+    RxJava2Adapter.singleToMono(Single.just(1))
+        .as(StepVerifier::create)
+        .expectNextCount(1)
+        .verifyComplete();
   }
 }

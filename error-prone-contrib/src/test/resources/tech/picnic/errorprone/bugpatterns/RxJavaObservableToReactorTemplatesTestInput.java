@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableList;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
+import io.reactivex.observers.BaseTestConsumer;
 
 final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -33,5 +35,35 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
 
   Completable testObservableIgnoreElements() {
     return Observable.just(1, 2).ignoreElements();
+  }
+
+  void testObservableTestAssertResultItem() throws InterruptedException {
+    Observable.just(1).test().await().assertResult(1);
+    Observable.just(2).test().await().assertValue(2);
+  }
+
+  void testObservableTestAssertResult() throws InterruptedException {
+    Observable.just(1).test().await().assertResult();
+  }
+
+  void testObservableTestAssertResultValues() throws InterruptedException {
+    Observable.just(1, 2, 3).test().await().assertResult(1, 2, 3);
+    Observable.just(4, 5, 6).test().await().assertValues(4, 5, 6);
+  }
+
+  void testObservableTestAssertComplete() throws InterruptedException {
+    Observable.just(1).test().await().assertComplete();
+  }
+
+  void testObservableTestAssertErrorClass() throws InterruptedException {
+    Observable.just(1).test().await().assertError(InterruptedException.class);
+  }
+
+  void testObservableTestAssertNoErrors() throws InterruptedException {
+    Observable.just(1).test().await().assertNoErrors();
+  }
+
+  void testObservableTestAssertValueCount() throws InterruptedException {
+    Observable.just(1).test().await().assertValueCount(1);
   }
 }

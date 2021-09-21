@@ -3,8 +3,10 @@ package tech.picnic.errorprone.refastertemplates;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Repeated;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
@@ -12,6 +14,7 @@ import io.reactivex.Observable;
 import io.reactivex.functions.Predicate;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 /** The Refaster templates for the migration of the RxJava Observable type to Reactor */
@@ -605,5 +608,132 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Observable zipWith(ObservableSource,BiFunction,boolean,int)
 
   // XXX: public final TestObserver test()
+
+  // XXX: Default BackpressureStrategy.BUFFER
+  static final class ObservableTestAssertResultItem<T> {
+    @BeforeTemplate
+    void before(Observable<T> observable, T item) throws InterruptedException {
+      Refaster.anyOf(
+              observable.test().await().assertResult(item), observable.test().await().assertValue(item));
+    }
+
+    @AfterTemplate
+    void after(Observable<T> observable, T item) {
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+              .as(StepVerifier::create)
+              .expectNext(item)
+              .verifyComplete();
+    }
+  }
+
+  // XXX: Default BackpressureStrategy.BUFFER
+  static final class ObservableTestAssertResult<T> {
+    @BeforeTemplate
+    void before(Observable<T> observable) throws InterruptedException {
+      observable.test().await().assertResult();
+    }
+
+    @AfterTemplate
+    void after(Observable<T> observable) {
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  // XXX: Default BackpressureStrategy.BUFFER
+  static final class ObservableTestAssertResultValues<T> {
+    @BeforeTemplate
+    void before(Observable<T> observable, @Repeated T item) throws InterruptedException {
+      Refaster.anyOf(
+              observable.test().await().assertResult(Refaster.asVarargs(item)),
+              observable.test().await().assertValues(Refaster.asVarargs(item)));
+    }
+
+    @AfterTemplate
+    void after(Observable<T> observable, @Repeated T item) {
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+              .as(StepVerifier::create)
+              .expectNext(item)
+              .verifyComplete();
+    }
+  }
+
+  // XXX: Default BackpressureStrategy.BUFFER
+  static final class ObservableTestAssertComplete<T> {
+    @BeforeTemplate
+    void before(Observable<T> observable) throws InterruptedException {
+      observable.test().await().assertComplete();
+      // XXX: Add this one here? observable.test().await().assertEmpty();
+    }
+
+    @AfterTemplate
+    void after(Observable<T> observable) {
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  // XXX: Default BackpressureStrategy.BUFFER
+  static final class ObservableTestAssertErrorClass<T> {
+    @BeforeTemplate
+    void before(Observable<T> observable, Class<? extends Throwable> errorClass)
+            throws InterruptedException {
+      observable.test().await().assertError(errorClass);
+    }
+
+    @AfterTemplate
+    void after(Observable<T> observable, Class<? extends Throwable> errorClass) {
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+              .as(StepVerifier::create)
+              .expectError(errorClass)
+              .verify();
+    }
+  }
+
+  // XXX: .assertError(Throwable) -> (not used in PRP).
+
+  // XXX: Default BackpressureStrategy.BUFFER
+  static final class ObservableTestAssertNoErrors<T> {
+    @BeforeTemplate
+    void before(Observable<T> observable) throws InterruptedException {
+      observable.test().await().assertNoErrors();
+    }
+
+    @AfterTemplate
+    void after(Observable<T> observable) {
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  // XXX: The following two are combined often.
+  //  static final class ObservableTestAssertValueSet<T> {
+  //    @BeforeTemplate
+  //    void before(Observable<T> observable, Collection<? extends T> expected) throws
+  // InterruptedException {
+  //      observable.test().await().assertValueSet(expected);
+  //      expected.it
+  //    }
+  //
+  //    @AfterTemplate
+  //    void after(Observable<T> observable, Collection<? extends T> expected) {
+  //      RxJava2Adapter.observableToMono(observable).as(StepVerifier::create).expectNextMatches(t ->
+  // ).verifyComplete();
+  //    }
+  //  }
+
+  // XXX: Default BackpressureStrategy.BUFFER
+  static final class ObservableTestAssertValueCount<T> {
+    @BeforeTemplate
+    void before(Observable<T> observable, int count) throws InterruptedException {
+      observable.test().await().assertValueCount(count);
+    }
+
+    @AfterTemplate
+    void after(Observable<T> observable, int count) {
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+              .as(StepVerifier::create)
+              .expectNextCount(count)
+              .verifyComplete();
+    }
+  }
+
   // XXX: public final TestObserver test(boolean)
 }

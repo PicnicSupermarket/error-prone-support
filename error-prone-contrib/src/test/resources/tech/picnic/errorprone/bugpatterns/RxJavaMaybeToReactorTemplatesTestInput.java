@@ -5,6 +5,8 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.observers.TestObserver;
+import io.reactivex.observers.BaseTestConsumer;
 import java.util.concurrent.CompletableFuture;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
@@ -150,5 +152,35 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
                 () -> {
                   throw new IllegalStateException();
                 }));
+  }
+
+  @SuppressWarnings("MaybeJust")
+  private Maybe<Integer> getMaybe() {
+    return Maybe.just(3);
+  }
+
+  void MaybeTestAssertResultItem() throws InterruptedException {
+    Maybe.just(1).test().await().assertResult(1);
+    Maybe.just(2).test().await().assertValue(2);
+  }
+
+  void MaybeTestAssertResult() throws InterruptedException {
+    Maybe.just(1).test().await().assertResult();
+  }
+
+  void testMaybeTestAssertComplete() throws InterruptedException {
+    Maybe.just(1).test().await().assertComplete();
+  }
+
+  void testMaybeTestAssertErrorClass() throws InterruptedException {
+    Maybe.just(1).test().await().assertError(InterruptedException.class);
+  }
+
+  void testMaybeTestAssertNoErrors() throws InterruptedException {
+    Maybe.just(1).test().await().assertNoErrors();
+  }
+
+  void testMaybeTestAssertValueCount() throws InterruptedException {
+    Maybe.just(1).test().await().assertValueCount(1);
   }
 }

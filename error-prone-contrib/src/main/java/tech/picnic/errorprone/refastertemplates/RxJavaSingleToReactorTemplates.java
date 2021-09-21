@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import com.google.errorprone.refaster.ImportPolicy;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
@@ -18,6 +19,7 @@ import io.reactivex.functions.Predicate;
 import java.util.concurrent.Callable;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 /** The Refaster templates for the migration of the RxJava Single type to Reactor */
@@ -399,7 +401,6 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Object to(Function)
   // XXX: public final Completable toCompletable() <-- this one is @Deprecated
 
-  // XXX: Validate this one and test it.
   static final class SingleToFlowable<T> {
     @BeforeTemplate
     Flowable<T> before(Single<T> single) {
@@ -418,5 +419,104 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single unsubscribeOn(Scheduler)
   // XXX: public final Single zipWith(SingleSource,BiFunction) --> One usage.
   // XXX: public final TestObserver test()
+
+  static final class SingleTestAssertResultItem<T> {
+    @BeforeTemplate
+    void before(Single<T> single, T item) throws InterruptedException {
+      Refaster.anyOf(
+          single.test().await().assertResult(item), single.test().await().assertValue(item));
+    }
+
+    @AfterTemplate
+    void after(Single<T> single, T item) {
+      RxJava2Adapter.singleToMono(single)
+          .as(StepVerifier::create)
+          .expectNext(item)
+          .verifyComplete();
+    }
+  }
+
+  static final class SingleTestAssertResult<T> {
+    @BeforeTemplate
+    void before(Single<T> single) throws InterruptedException {
+      single.test().await().assertResult();
+    }
+
+    @AfterTemplate
+    void after(Single<T> single) {
+      RxJava2Adapter.singleToMono(single).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  static final class SingleTestAssertComplete<T> {
+    @BeforeTemplate
+    void before(Single<T> single) throws InterruptedException {
+      single.test().await().assertComplete();
+      // XXX: Add this one here? single.test().await().assertEmpty();
+    }
+
+    @AfterTemplate
+    void after(Single<T> single) {
+      RxJava2Adapter.singleToMono(single).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  static final class SingleTestAssertErrorClass<T> {
+    @BeforeTemplate
+    void before(Single<T> single, Class<? extends Throwable> errorClass)
+        throws InterruptedException {
+      single.test().await().assertError(errorClass);
+    }
+
+    @AfterTemplate
+    void after(Single<T> single, Class<? extends Throwable> errorClass) {
+      RxJava2Adapter.singleToMono(single).as(StepVerifier::create).expectError(errorClass).verify();
+    }
+  }
+
+  // XXX: .assertError(Throwable) -> (not used in PRP).
+
+  static final class SingleTestAssertNoErrors<T> {
+    @BeforeTemplate
+    void before(Single<T> single) throws InterruptedException {
+      single.test().await().assertNoErrors();
+    }
+
+    @AfterTemplate
+    void after(Single<T> single) {
+      RxJava2Adapter.singleToMono(single).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  // XXX: The following two are combined often.
+  //  static final class SingleTestAssertValueSet<T> {
+  //    @BeforeTemplate
+  //    void before(Single<T> single, Collection<? extends T> expected) throws InterruptedException
+  // {
+  //      single.test().await().assertValueSet(expected);
+  //      expected.it
+  //    }
+  //
+  //    @AfterTemplate
+  //    void after(Single<T> single, Collection<? extends T> expected) {
+  //      RxJava2Adapter.singleToMono(single).as(StepVerifier::create).expectNextMatches(t ->
+  // ).verifyComplete();
+  //    }
+  //  }
+
+  static final class SingleTestAssertValueCount<T> {
+    @BeforeTemplate
+    void before(Single<T> single, int count) throws InterruptedException {
+      single.test().await().assertValueCount(count);
+    }
+
+    @AfterTemplate
+    void after(Single<T> single, int count) {
+      RxJava2Adapter.singleToMono(single)
+          .as(StepVerifier::create)
+          .expectNextCount(count)
+          .verifyComplete();
+    }
+  }
   // XXX: public final TestObserver test(boolean)
 }

@@ -6,9 +6,12 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.observers.BaseTestConsumer;
+import io.reactivex.observers.TestObserver;
 import java.util.concurrent.CompletableFuture;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCase {
@@ -215,5 +218,47 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
                           throw new IllegalStateException();
                         }))))
         .as(RxJava2Adapter::monoToSingle);
+  }
+
+  @SuppressWarnings("MaybeJust")
+  private Maybe<Integer> getMaybe() {
+    return Maybe.just(3);
+  }
+
+  void MaybeTestAssertResultItem() throws InterruptedException {
+    RxJava2Adapter.maybeToMono(Maybe.just(1))
+        .as(StepVerifier::create)
+        .expectNext(1)
+        .verifyComplete();
+    RxJava2Adapter.maybeToMono(Maybe.just(2))
+        .as(StepVerifier::create)
+        .expectNext(2)
+        .verifyComplete();
+  }
+
+  void MaybeTestAssertResult() throws InterruptedException {
+    RxJava2Adapter.maybeToMono(Maybe.just(1)).as(StepVerifier::create).verifyComplete();
+  }
+
+  void testMaybeTestAssertComplete() throws InterruptedException {
+    RxJava2Adapter.maybeToMono(Maybe.just(1)).as(StepVerifier::create).verifyComplete();
+  }
+
+  void testMaybeTestAssertErrorClass() throws InterruptedException {
+    RxJava2Adapter.maybeToMono(Maybe.just(1))
+        .as(StepVerifier::create)
+        .expectError(InterruptedException.class)
+        .verify();
+  }
+
+  void testMaybeTestAssertNoErrors() throws InterruptedException {
+    RxJava2Adapter.maybeToMono(Maybe.just(1)).as(StepVerifier::create).verifyComplete();
+  }
+
+  void testMaybeTestAssertValueCount() throws InterruptedException {
+    RxJava2Adapter.maybeToMono(Maybe.just(1))
+        .as(StepVerifier::create)
+        .expectNextCount(1)
+        .verifyComplete();
   }
 }

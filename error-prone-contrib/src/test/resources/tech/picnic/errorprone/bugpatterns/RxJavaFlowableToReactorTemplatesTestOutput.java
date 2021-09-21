@@ -11,6 +11,7 @@ import java.util.Map;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTestCase {
@@ -239,5 +240,53 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         .as(RxJava2Adapter::flowableToFlux)
         .collectMap(i -> i > 1)
         .as(RxJava2Adapter::monoToSingle);
+  }
+
+  void testFlowableTestAssertResultItem() throws InterruptedException {
+    RxJava2Adapter.flowableToFlux(Flowable.just(1))
+        .as(StepVerifier::create)
+        .expectNext(1)
+        .verifyComplete();
+    RxJava2Adapter.flowableToFlux(Flowable.just(2))
+        .as(StepVerifier::create)
+        .expectNext(2)
+        .verifyComplete();
+  }
+
+  void testFlowableTestAssertResult() throws InterruptedException {
+    RxJava2Adapter.flowableToFlux(Flowable.just(1)).as(StepVerifier::create).verifyComplete();
+  }
+
+  void testFlowableTestAssertResultValues() throws InterruptedException {
+    RxJava2Adapter.flowableToFlux(Flowable.just(1, 2, 3))
+        .as(StepVerifier::create)
+        .expectNext(1, 2, 3)
+        .verifyComplete();
+    RxJava2Adapter.flowableToFlux(Flowable.just(4, 5, 6))
+        .as(StepVerifier::create)
+        .expectNext(4, 5, 6)
+        .verifyComplete();
+  }
+
+  void testFlowableTestAssertComplete() throws InterruptedException {
+    RxJava2Adapter.flowableToFlux(Flowable.just(1)).as(StepVerifier::create).verifyComplete();
+  }
+
+  void testFlowableTestAssertErrorClass() throws InterruptedException {
+    RxJava2Adapter.flowableToFlux(Flowable.just(1))
+        .as(StepVerifier::create)
+        .expectError(InterruptedException.class)
+        .verify();
+  }
+
+  void testFlowableTestAssertNoErrors() throws InterruptedException {
+    RxJava2Adapter.flowableToFlux(Flowable.just(1)).as(StepVerifier::create).verifyComplete();
+  }
+
+  void testFlowableTestAssertValueCount() throws InterruptedException {
+    RxJava2Adapter.flowableToFlux(Flowable.just(1))
+        .as(StepVerifier::create)
+        .expectNextCount(1)
+        .verifyComplete();
   }
 }
