@@ -106,7 +106,11 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   void testSingleTestAssertValue() throws InterruptedException {
     RxJava2Adapter.singleToMono(Single.just(1))
         .as(StepVerifier::create)
-        .expectNextMatches(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 1))
+        .expectNextMatches(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 2))
+        .verifyComplete();
+    RxJava2Adapter.singleToMono(Single.just(3))
+        .as(StepVerifier::create)
+        .expectNextMatches(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 4))
         .verifyComplete();
   }
 
