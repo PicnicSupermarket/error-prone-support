@@ -43,4 +43,24 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
   Completable testCompletableWrap() {
     return Completable.wrap(Completable.complete());
   }
+
+  void testCompletableTestAssertResult() throws InterruptedException {
+    Completable.complete().test().await().assertResult();
+  }
+
+  void testCompletableTestAssertComplete() throws InterruptedException {
+    Completable.complete().test().await().assertComplete();
+  }
+
+  void testCompletableTestAssertErrorClass() throws InterruptedException {
+    Completable.complete().test().await().assertError(InterruptedException.class);
+  }
+
+  void testCompletableTestAssertNoErrors() throws InterruptedException {
+    Completable.complete().test().await().assertNoErrors();
+  }
+
+  void testCompletableTestAssertValueCount() throws InterruptedException {
+    Completable.complete().test().await().assertValueCount(1);
+  }
 }

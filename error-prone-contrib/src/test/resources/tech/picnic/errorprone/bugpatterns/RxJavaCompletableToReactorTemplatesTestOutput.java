@@ -7,6 +7,7 @@ import io.reactivex.Flowable;
 import java.util.Arrays;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTestCase {
@@ -59,5 +60,37 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
 
   Completable testCompletableWrap() {
     return Completable.complete();
+  }
+
+  void testCompletableTestAssertResult() throws InterruptedException {
+    RxJava2Adapter.completableToMono(Completable.complete())
+        .as(StepVerifier::create)
+        .verifyComplete();
+  }
+
+  void testCompletableTestAssertComplete() throws InterruptedException {
+    RxJava2Adapter.completableToMono(Completable.complete())
+        .as(StepVerifier::create)
+        .verifyComplete();
+  }
+
+  void testCompletableTestAssertErrorClass() throws InterruptedException {
+    RxJava2Adapter.completableToMono(Completable.complete())
+        .as(StepVerifier::create)
+        .expectError(InterruptedException.class)
+        .verify();
+  }
+
+  void testCompletableTestAssertNoErrors() throws InterruptedException {
+    RxJava2Adapter.completableToMono(Completable.complete())
+        .as(StepVerifier::create)
+        .verifyComplete();
+  }
+
+  void testCompletableTestAssertValueCount() throws InterruptedException {
+    RxJava2Adapter.completableToMono(Completable.complete())
+        .as(StepVerifier::create)
+        .expectNextCount(1)
+        .verifyComplete();
   }
 }
