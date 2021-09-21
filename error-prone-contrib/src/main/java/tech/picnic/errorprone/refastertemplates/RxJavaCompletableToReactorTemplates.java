@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 /** The Refaster templates for the migration of the RxJava Completable type to Reactor */
@@ -154,7 +155,7 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public static Completable using(Callable,Function,Consumer)
   // XXX: public static Completable using(Callable,Function,Consumer,boolean)
 
-  static final class CompletableWrap<T> {
+  static final class CompletableWrap {
     @BeforeTemplate
     Completable before(Completable source) {
       return Completable.wrap(source);
@@ -268,19 +269,19 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Completable doOnEvent(Consumer)
   // XXX: public final Completable doOnSubscribe(Consumer) --> Required
 
-  static final class CompletableDoOnSubscribe<T> {
+  // XXX: Add test
+  static final class CompletableDoOnSubscribe {
     @BeforeTemplate
-    Single<T> before(Single<T> single, Consumer<? super Throwable> consumer) {
-      return single.doOnError(consumer);
+    Completable before(Completable completable, Consumer<? super Throwable> consumer) {
+      return completable.doOnError(consumer);
     }
 
     @AfterTemplate
-    Single<T> after(Single<T> single, Consumer<? super Throwable> consumer) {
-
-      return single
-          .as(RxJava2Adapter::singleToMono)
+    Completable after(Completable completable, Consumer<? super Throwable> consumer) {
+      return completable
+          .as(RxJava2Adapter::completableToMono)
           .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(consumer))
-          .as(RxJava2Adapter::monoToSingle);
+          .as(RxJava2Adapter::monoToCompletable);
     }
   }
 
@@ -325,6 +326,76 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Single toSingle(Callable)
   // XXX: public final Single toSingleDefault(Object)
   // XXX: public final Completable unsubscribeOn(Scheduler)
-  // XXX: public final TestObserver test()
+
+  static final class CompletableTestAssertResult {
+    @BeforeTemplate
+    void before(Completable completable) throws InterruptedException {
+      completable.test().await().assertResult();
+    }
+
+    @AfterTemplate
+    void after(Completable completable) {
+      RxJava2Adapter.completableToMono(completable).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  static final class CompletableTestAssertComplete {
+    @BeforeTemplate
+    void before(Completable completable) throws InterruptedException {
+      completable.test().await().assertComplete();
+      // XXX: Add this one here? completable.test().await().assertEmpty();
+    }
+
+    @AfterTemplate
+    void after(Completable completable) {
+      RxJava2Adapter.completableToMono(completable).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  static final class CompletableTestAssertErrorClass {
+    @BeforeTemplate
+    void before(Completable completable, Class<? extends Throwable> errorClass)
+        throws InterruptedException {
+      completable.test().await().assertError(errorClass);
+    }
+
+    @AfterTemplate
+    void after(Completable completable, Class<? extends Throwable> errorClass) {
+      RxJava2Adapter.completableToMono(completable)
+          .as(StepVerifier::create)
+          .expectError(errorClass)
+          .verify();
+    }
+  }
+
+  // XXX: .assertError(Throwable) -> (not used in PRP).
+
+  static final class CompletableTestAssertNoErrors {
+    @BeforeTemplate
+    void before(Completable completable) throws InterruptedException {
+      completable.test().await().assertNoErrors();
+    }
+
+    @AfterTemplate
+    void after(Completable completable) {
+      RxJava2Adapter.completableToMono(completable).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  static final class CompletableTestAssertValueCount {
+    @BeforeTemplate
+    void before(Completable completable, int count) throws InterruptedException {
+      completable.test().await().assertValueCount(count);
+    }
+
+    @AfterTemplate
+    void after(Completable completable, int count) {
+      RxJava2Adapter.completableToMono(completable)
+          .as(StepVerifier::create)
+          .expectNextCount(count)
+          .verifyComplete();
+    }
+  }
+
   // XXX: public final TestObserver test(boolean)
 }
