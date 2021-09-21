@@ -151,7 +151,19 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public static Single zipArray(Function,SingleSource[])
   // XXX: public final Single ambWith(SingleSource)
   // XXX: public final Object as(SingleConverter)
-  // XXX: public final Object blockingGet()
+
+  static final class SingleBlockingGet<T> {
+    @BeforeTemplate
+    Object before(Single<T> single) {
+      return single.blockingGet();
+    }
+
+    @AfterTemplate
+    Object after(Single<T> single) {
+      return RxJava2Adapter.singleToMono(single).block();
+    }
+  }
+
   // XXX: public final Single cache()
   // XXX: public final Single cast(Class)
   // XXX: public final Single compose(SingleTransformer)
@@ -415,6 +427,19 @@ final class RxJavaSingleToReactorTemplates {
 
   // XXX: public final Future toFuture()
   // XXX: public final Maybe toMaybe() --> 1 usage
+
+  static final class SingleToMaybe<T> {
+    @BeforeTemplate
+    Maybe<T> before(Single<T> single) {
+      return single.toMaybe();
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Single<T> single) {
+      return RxJava2Adapter.monoToMaybe(RxJava2Adapter.singleToMono(single));
+    }
+  }
+
   // XXX: public final Observable toObservable()
   // XXX: public final Single unsubscribeOn(Scheduler)
   // XXX: public final Single zipWith(SingleSource,BiFunction) --> One usage.
@@ -453,7 +478,9 @@ final class RxJavaSingleToReactorTemplates {
     void before(Single<T> single, Predicate<T> predicate) throws InterruptedException {
       Refaster.anyOf(
           single.test().await().assertValue(predicate),
-          single.test().await().assertValue(predicate).assertComplete());
+          single.test().await().assertValue(predicate).assertComplete(),
+          single.test().await().assertValue(predicate).assertNoErrors().assertComplete(),
+          single.test().await().assertComplete().assertValue(predicate));
     }
 
     @AfterTemplate
@@ -469,7 +496,6 @@ final class RxJavaSingleToReactorTemplates {
     @BeforeTemplate
     void before(Single<T> single) throws InterruptedException {
       single.test().await().assertComplete();
-      // XXX: Add this one here? single.test().await().assertEmpty();
     }
 
     @AfterTemplate

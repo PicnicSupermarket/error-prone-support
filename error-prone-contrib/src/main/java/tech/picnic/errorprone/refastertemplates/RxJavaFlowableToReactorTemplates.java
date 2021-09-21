@@ -36,16 +36,15 @@ final class RxJavaFlowableToReactorTemplates {
 
   // XXX: static Flowable amb(Iterable)
 
-  // XXX: Write test
   static final class FlowableAmbArray<T> {
     @BeforeTemplate
-    Flowable<T> before(Publisher<? extends T>... sources) {
+    Flowable<T> before(@Repeated Publisher<T> sources) {
       return Flowable.ambArray(sources);
     }
 
     @AfterTemplate
-    Flowable<T> after(Publisher<? extends T>... sources) {
-      return RxJava2Adapter.fluxToFlowable(Flux.firstWithSignal(sources));
+    Flowable<T> after(@Repeated Publisher<T> sources) {
+      return RxJava2Adapter.fluxToFlowable(Flux.firstWithSignal(Refaster.asVarargs(sources)));
     }
   }
 
@@ -201,6 +200,7 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: static Flowable fromFuture(Future,long,TimeUnit,Scheduler)
   // XXX: static Flowable fromFuture(Future,Scheduler)
 
+  // XXX Verify this one, consentTextAssignmentRepo.
   static final class FlowableFromIterable<T> {
     @BeforeTemplate
     Flowable<T> before(Iterable<? extends T> iterable) {
@@ -1169,7 +1169,9 @@ final class RxJavaFlowableToReactorTemplates {
     void before(Flowable<T> flowable, Predicate<T> predicate) throws InterruptedException {
       Refaster.anyOf(
           flowable.test().await().assertValue(predicate),
-          flowable.test().await().assertValue(predicate).assertComplete());
+          flowable.test().await().assertValue(predicate).assertComplete(),
+          flowable.test().await().assertValue(predicate).assertNoErrors().assertComplete(),
+          flowable.test().await().assertComplete().assertValue(predicate));
     }
 
     @AfterTemplate

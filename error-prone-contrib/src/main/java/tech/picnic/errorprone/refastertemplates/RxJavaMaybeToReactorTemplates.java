@@ -51,17 +51,20 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
+  @SuppressWarnings("unchecked")
   static final class MaybeAmbArray<T> {
     @BeforeTemplate
-    Maybe<T> before(Maybe<T>... sources) {
+    Maybe<T> before(@Repeated Maybe<T> sources) {
       return Maybe.ambArray(sources);
     }
 
     @AfterTemplate
-    Maybe<T> after(Maybe<T>... sources) {
+    Maybe<T> after(@Repeated Maybe<T> sources) {
       return RxJava2Adapter.monoToMaybe(
           Mono.firstWithSignal(
-              Arrays.stream(sources).map(RxJava2Adapter::maybeToMono).collect(toImmutableList())));
+              Arrays.stream(Refaster.asVarargs(sources))
+                  .map(RxJava2Adapter::maybeToMono)
+                  .collect(toImmutableList())));
     }
   }
 
@@ -465,7 +468,7 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: This one is still not correct, see example above. Perhaps try this? <S, T extends S, O> {
   static final class MaybeFlatMapSingleElement<T, O, S extends SingleSource<O>> {
     @BeforeTemplate
-    Maybe<O> before(Maybe<T> maybe, Function<? super T, ? extends S> function) {
+    Maybe<O> before(Maybe<T> maybe, Function<T, S> function) {
       return maybe.flatMapSingleElement(function);
     }
 
@@ -632,7 +635,9 @@ final class RxJavaMaybeToReactorTemplates {
     void before(Maybe<T> maybe, Predicate<T> predicate) throws InterruptedException {
       Refaster.anyOf(
           maybe.test().await().assertValue(predicate),
-          maybe.test().await().assertValue(predicate).assertComplete());
+          maybe.test().await().assertValue(predicate).assertComplete(),
+          maybe.test().await().assertValue(predicate).assertNoErrors().assertComplete(),
+          maybe.test().await().assertComplete().assertValue(predicate));
     }
 
     @AfterTemplate

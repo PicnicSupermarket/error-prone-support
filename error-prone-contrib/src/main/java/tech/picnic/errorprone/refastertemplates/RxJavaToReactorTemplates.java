@@ -103,6 +103,14 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
+  // XXX: Find solution to this?
+  //  static final class MaybeConversions<T> {
+  //    @BeforeTemplate
+  //    Maybe<T> before(Single<T> single) {
+  //      return RxJava2Adapter.monoToMaybe(RxJava2Adapter.singleToMono(single));
+  //    }
+  //  }
+
   static final class RemoveRedundantCast<T> {
     @BeforeTemplate
     T before(T object) {

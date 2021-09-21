@@ -6,8 +6,6 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
-import io.reactivex.observers.BaseTestConsumer;
-import io.reactivex.observers.TestObserver;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;

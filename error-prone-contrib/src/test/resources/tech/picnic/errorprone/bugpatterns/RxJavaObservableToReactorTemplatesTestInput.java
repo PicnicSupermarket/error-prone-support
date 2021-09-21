@@ -4,8 +4,6 @@ import com.google.common.collect.ImmutableList;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
-import io.reactivex.observers.TestObserver;
-import io.reactivex.observers.BaseTestConsumer;
 
 final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTestCase {
 

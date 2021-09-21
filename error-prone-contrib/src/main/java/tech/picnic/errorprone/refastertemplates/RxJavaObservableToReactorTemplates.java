@@ -648,6 +648,8 @@ final class RxJavaObservableToReactorTemplates {
     void before(Observable<T> observable, Predicate<T> predicate) throws InterruptedException {
       Refaster.anyOf(
           observable.test().await().assertValue(predicate),
+          observable.test().await().assertValue(predicate).assertNoErrors().assertComplete(),
+          observable.test().await().assertComplete().assertValue(predicate),
           observable.test().await().assertValue(predicate).assertComplete());
     }
 

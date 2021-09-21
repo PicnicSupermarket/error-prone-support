@@ -6,8 +6,7 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import io.reactivex.observers.BaseTestConsumer;
-import io.reactivex.observers.TestObserver;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
@@ -24,10 +23,12 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
                 .collect(ImmutableList.toImmutableList())));
   }
 
-  // XXX: To be removed if template works.
-  @SuppressWarnings("MaybeJust")
   Maybe<String> testMaybeAmbArray() {
-    return Maybe.ambArray(Maybe.just("foo"), Maybe.just("bar"));
+    return RxJava2Adapter.monoToMaybe(
+        Mono.firstWithSignal(
+            Arrays.stream(Maybe.just("foo"), Maybe.just("bar"))
+                .map(RxJava2Adapter::maybeToMono)
+                .collect(ImmutableList.toImmutableList())));
   }
 
   Flowable<Integer> testMaybeConcatArray() {
