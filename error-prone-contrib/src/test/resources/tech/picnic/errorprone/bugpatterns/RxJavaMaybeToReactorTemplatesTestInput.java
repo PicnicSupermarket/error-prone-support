@@ -5,8 +5,6 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import io.reactivex.observers.TestObserver;
-import io.reactivex.observers.BaseTestConsumer;
 import java.util.concurrent.CompletableFuture;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
@@ -17,8 +15,6 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.amb(ImmutableList.of(Maybe.just("foo"), Maybe.just("bar")));
   }
 
-  // XXX: To be removed if template works.
-  @SuppressWarnings("MaybeJust")
   Maybe<String> testMaybeAmbArray() {
     return Maybe.ambArray(Maybe.just("foo"), Maybe.just("bar"));
   }

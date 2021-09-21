@@ -4,8 +4,6 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import io.reactivex.observers.TestObserver;
-import io.reactivex.observers.BaseTestConsumer;
 
 final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -30,6 +28,10 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
 
   Single<Integer> testSingleWrap() {
     return Single.wrap(Single.just(1));
+  }
+
+  Integer testSingleBlockingGet() {
+    return Single.just(1).blockingGet();
   }
 
   Single<Integer> testSingleDoOnError() {

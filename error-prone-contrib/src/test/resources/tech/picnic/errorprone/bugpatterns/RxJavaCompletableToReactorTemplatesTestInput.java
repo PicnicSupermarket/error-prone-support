@@ -10,6 +10,10 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
     return Completable.amb(Arrays.asList(Completable.complete(), Completable.complete()));
   }
 
+  Completable testCompletableComplete() {
+    return Completable.complete();
+  }
+
   Completable testCompletableDefer() {
     return Completable.defer(() -> Completable.complete());
   }

@@ -20,6 +20,10 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
         .as(RxJava2Adapter::monoToCompletable);
   }
 
+  Completable testCompletableComplete() {
+    return RxJava2Adapter.monoToCompletable(Mono.empty());
+  }
+
   Completable testCompletableDefer() {
     return RxJava2Adapter.monoToCompletable(
         Mono.defer(

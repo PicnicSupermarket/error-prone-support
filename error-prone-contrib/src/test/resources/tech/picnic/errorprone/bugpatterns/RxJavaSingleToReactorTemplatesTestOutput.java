@@ -4,8 +4,6 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import io.reactivex.observers.BaseTestConsumer;
-import io.reactivex.observers.TestObserver;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -37,6 +35,10 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
 
   Single<Integer> testSingleWrap() {
     return Single.just(1);
+  }
+
+  Integer testSingleBlockingGet() {
+    return RxJava2Adapter.singleToMono(Single.just(1)).block();
   }
 
   Single<Integer> testSingleDoOnError() {

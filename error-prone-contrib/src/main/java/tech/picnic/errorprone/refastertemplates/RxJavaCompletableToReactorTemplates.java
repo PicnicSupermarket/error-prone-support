@@ -48,7 +48,19 @@ final class RxJavaCompletableToReactorTemplates {
   }
 
   // XXX: public static Completable ambArray(CompletableSource[])
-  // XXX: public static Completable complete()
+
+  static final class CompletableComplete {
+    @BeforeTemplate
+    Completable before() {
+      return Completable.complete();
+    }
+
+    @AfterTemplate
+    Completable after() {
+      return RxJava2Adapter.monoToCompletable(Mono.empty());
+    }
+  }
+
   // XXX: public static Completable concat(Iterable)
   // XXX: public static Completable concat(Publisher)
   // XXX: public static Completable concat(Publisher,int)

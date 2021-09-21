@@ -14,6 +14,10 @@ import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTestCase {
 
+  Flowable<Integer> testFlowableAmbArray() {
+    return Flowable.ambArray(Flowable.just(1), Flowable.just(2));
+  }
+
   Flowable<Integer> testFlowableCombineLatest() {
     return Flowable.combineLatest(Flowable.just(1), Flowable.just(2), Integer::sum);
   }
