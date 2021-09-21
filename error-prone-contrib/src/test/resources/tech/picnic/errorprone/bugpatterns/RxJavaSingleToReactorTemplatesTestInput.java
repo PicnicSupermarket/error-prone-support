@@ -70,7 +70,8 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   }
 
   void testSingleTestAssertValue() throws InterruptedException {
-    Single.just(1).test().await().assertValue(i -> i > 1);
+    Single.just(1).test().await().assertValue(i -> i > 2);
+    Single.just(3).test().await().assertValue(i -> i > 4).assertComplete();
   }
 
   void testSingleTestAssertComplete() throws InterruptedException {

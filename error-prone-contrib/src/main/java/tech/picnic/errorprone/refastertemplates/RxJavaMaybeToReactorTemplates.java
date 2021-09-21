@@ -630,7 +630,9 @@ final class RxJavaMaybeToReactorTemplates {
   static final class MaybeTestAssertValue<T> {
     @BeforeTemplate
     void before(Maybe<T> maybe, Predicate<T> predicate) throws InterruptedException {
-      maybe.test().await().assertValue(predicate);
+      Refaster.anyOf(
+          maybe.test().await().assertValue(predicate),
+          maybe.test().await().assertValue(predicate).assertComplete());
     }
 
     @AfterTemplate

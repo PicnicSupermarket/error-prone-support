@@ -451,7 +451,9 @@ final class RxJavaSingleToReactorTemplates {
   static final class SingleTestAssertValue<T> {
     @BeforeTemplate
     void before(Single<T> single, Predicate<T> predicate) throws InterruptedException {
-      single.test().await().assertValue(predicate);
+      Refaster.anyOf(
+          single.test().await().assertValue(predicate),
+          single.test().await().assertValue(predicate).assertComplete());
     }
 
     @AfterTemplate
