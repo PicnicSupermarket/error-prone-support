@@ -598,5 +598,19 @@ final class RxJavaSingleToReactorTemplates {
           .verifyComplete();
     }
   }
+
+  // XXX: Add test
+  static final class SingleTestAssertFailure<T> {
+    @BeforeTemplate
+    void before(Single<T> single, Class<? extends Throwable> error) throws InterruptedException {
+      single.test().await().assertFailure(error);
+    }
+
+    @AfterTemplate
+    void after(Single<T> single, Class<? extends Throwable> error) {
+      RxJava2Adapter.singleToMono(single).as(StepVerifier::create).verifyError(error);
+    }
+  }
+
   // XXX: public final TestObserver test(boolean)
 }

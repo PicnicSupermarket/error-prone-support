@@ -722,7 +722,22 @@ final class RxJavaFlowableToReactorTemplates {
   }
 
   // XXX: final Completable flatMapCompletable(Function,boolean,int)
-  // XXX: final Flowable flatMapIterable(Function)
+
+  // XXX: Test this one.
+  static final class FlowableFlatMapIterable<T, R> {
+    @BeforeTemplate
+    Flowable<R> before(Flowable<T> flowable, Function<T, Iterable<R>> mapper) {
+      return flowable.flatMapIterable(mapper);
+    }
+
+    @AfterTemplate
+    Flowable<R> after(Flowable<T> flowable, Function<T, Iterable<R>> mapper) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .flatMapIterable(RxJavaReactorMigrationUtil.toJdkFunction(mapper)));
+    }
+  }
+
   // XXX: final Flowable flatMapIterable(Function,BiFunction)
   // XXX: final Flowable flatMapIterable(Function,BiFunction,int)
   // XXX: final Flowable flatMapIterable(Function,int)
@@ -1252,6 +1267,20 @@ final class RxJavaFlowableToReactorTemplates {
           .as(StepVerifier::create)
           .expectNextCount(count)
           .verifyComplete();
+    }
+  }
+
+  // XXX: Add test
+  static final class FlowableTestAssertFailure<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable, Class<? extends Throwable> error)
+        throws InterruptedException {
+      flowable.test().await().assertFailure(error);
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable, Class<? extends Throwable> error) {
+      RxJava2Adapter.flowableToFlux(flowable).as(StepVerifier::create).verifyError(error);
     }
   }
 

@@ -409,5 +409,19 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
+  // XXX: Add test
+  static final class CompletableTestAssertFailure {
+    @BeforeTemplate
+    void before(Completable completable, Class<? extends Throwable> error)
+        throws InterruptedException {
+      completable.test().await().assertFailure(error);
+    }
+
+    @AfterTemplate
+    void after(Completable completable, Class<? extends Throwable> error) {
+      RxJava2Adapter.completableToMono(completable).as(StepVerifier::create).verifyError(error);
+    }
+  }
+
   // XXX: public final TestObserver test(boolean)
 }
