@@ -100,7 +100,9 @@ public final class RxJavaToReactorTemplates {
 
     @BeforeTemplate
     Mono<Void> before3(Mono<T> mono) {
-      return RxJava2Adapter.completableToMono(RxJava2Adapter.monoToCompletable(mono));
+      return Refaster.anyOf(
+          RxJava2Adapter.completableToMono(RxJava2Adapter.monoToCompletable(mono)),
+          RxJava2Adapter.completableToMono(mono.as(RxJava2Adapter::monoToCompletable)));
     }
 
     @AfterTemplate
@@ -209,6 +211,36 @@ public final class RxJavaToReactorTemplates {
     @AfterTemplate
     java.util.function.Predicate<T> after(java.util.function.Predicate<T> predicate) {
       return predicate;
+    }
+  }
+
+  ///////////////////////////////////
+  //////////// ASSORTED TEMPLATES
+  ///////////////////////////////////
+  static final class MonoFromNestedPublisher<T> {
+    @BeforeTemplate
+    Mono<T> before(Flux<T> flux) {
+      return Mono.from(RxJava2Adapter.fluxToFlowable(flux));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Flux<T> flux) {
+      return Mono.from(flux);
+    }
+  }
+
+  // XXX: This conversion is in the testAddAndFindBadWord of the bad-word-service.
+  // It is caused by the Flowable.then.then(Mono.from()).
+  // This is officially not correct, but it is in the test, so we can allow it?
+  static final class MonoToFlowableToFlux<T> {
+    @BeforeTemplate
+    Flux<T> before(Mono<T> mono) {
+      return RxJava2Adapter.flowableToFlux(mono.as(RxJava2Adapter::monoToFlowable));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono) {
+      return mono;
     }
   }
 }

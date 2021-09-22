@@ -719,5 +719,18 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
+  // XXX: Add test
+  static final class MaybeTestAssertFailure<T> {
+    @BeforeTemplate
+    void before(Maybe<T> maybe, Class<? extends Throwable> error) throws InterruptedException {
+      maybe.test().await().assertFailure(error);
+    }
+
+    @AfterTemplate
+    void after(Maybe<T> maybe, Class<? extends Throwable> error) {
+      RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).verifyError(error);
+    }
+  }
+
   // XXX: public final TestObserver test(boolean)
 }

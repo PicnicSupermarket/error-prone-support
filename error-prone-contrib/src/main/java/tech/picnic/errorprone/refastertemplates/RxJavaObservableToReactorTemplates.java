@@ -763,5 +763,22 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
+  // XXX: Add test
+  // XXX: Default BackpressureStrategy.BUFFER
+  static final class ObservableTestAssertFailure<T> {
+    @BeforeTemplate
+    void before(Observable<T> observable, Class<? extends Throwable> error)
+        throws InterruptedException {
+      observable.test().await().assertFailure(error);
+    }
+
+    @AfterTemplate
+    void after(Observable<T> observable, Class<? extends Throwable> error) {
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+          .as(StepVerifier::create)
+          .verifyError(error);
+    }
+  }
+
   // XXX: public final TestObserver test(boolean)
 }

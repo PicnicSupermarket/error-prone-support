@@ -86,4 +86,8 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .filter(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 2))
         .as(RxJava2Adapter::monoToMaybe);
   }
+
+  Mono<Integer> testMonoFromNestedPublisher() {
+    return Mono.from(RxJava2Adapter.fluxToFlowable(Flux.just(1)));
+  }
 }
