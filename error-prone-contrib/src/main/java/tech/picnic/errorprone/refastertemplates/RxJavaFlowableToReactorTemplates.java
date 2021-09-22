@@ -14,6 +14,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
+import io.reactivex.flowables.GroupedFlowable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
@@ -24,6 +25,7 @@ import java.util.concurrent.Callable;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.GroupedFlux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
@@ -699,24 +701,22 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable flatMap(Function,Function,Callable)
   // XXX: final Flowable flatMap(Function,Function,Callable,int)
   // XXX: final Flowable flatMap(Function,int)
-
-  static final class FlowableFlatMapCompletable<T> {
+  static final class FlowableFlatMapCompletable<T, R extends CompletableSource> {
     @BeforeTemplate
-    Completable before(
-        Flowable<T> flowable, Function<? super T, ? extends CompletableSource> function) {
+    Completable before(Flowable<T> flowable, Function<T, R> function) {
       return flowable.flatMapCompletable(function);
     }
 
     @AfterTemplate
-    Completable after(
-        Flowable<T> flowable, Function<? super T, ? extends CompletableSource> function) {
+    Completable after(Flowable<T> flowable, Function<T, R> function) {
       return RxJava2Adapter.monoToCompletable(
           RxJava2Adapter.flowableToFlux(flowable)
               .flatMap(
                   e ->
                       RxJava2Adapter.completableToMono(
                           Completable.wrap(
-                              RxJavaReactorMigrationUtil.toJdkFunction(function).apply(e))))
+                              RxJavaReactorMigrationUtil.toJdkFunction((Function<T, R>) function)
+                                  .apply(e))))
               .then());
     }
   }
@@ -735,21 +735,20 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Disposable forEachWhile(Predicate,Consumer)
   // XXX: final Disposable forEachWhile(Predicate,Consumer,Action)
 
-  // XXX: Test this, and improve this, the GroupedType is not working...
-  //  static final class FlowableGroupBy<K, V, T> {
-  //    @BeforeTemplate
-  //    Flowable<GroupedFlowable<K, T>> before(Flowable<T> flowable, Function<T, K> keySelector) {
-  //      return flowable.groupBy(keySelector);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Flowable<GroupedFlowable<K, T>> after(Flowable<T> flowable, Function<T, K> keySelector) {
-  //      return RxJava2Adapter.fluxToFlowable(
-  //          flowable
-  //              .as(RxJava2Adapter::flowableToFlux)
-  //              .groupBy(RxJavaReactorMigrationUtil.toJdkFunction(keySelector)));
-  //    }
-  //  }
+  // XXX: Test this, and improve this, the GroupedType is not working... Hacked the GroupedFlux.
+  static final class FlowableGroupBy<K, V, T> {
+    @BeforeTemplate
+    Flowable<GroupedFlowable<K, T>> before(Flowable<T> flowable, Function<T, K> keySelector) {
+      return flowable.groupBy(keySelector);
+    }
+
+    @AfterTemplate
+    Flowable<GroupedFlux<K, T>> after(Flowable<T> flowable, Function<T, K> keySelector) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .groupBy(RxJavaReactorMigrationUtil.toJdkFunction(keySelector)));
+    }
+  }
 
   // XXX: final Flowable groupBy(Function,boolean)
   // XXX: final Flowable groupBy(Function,Function)
@@ -769,17 +768,15 @@ final class RxJavaFlowableToReactorTemplates {
 
   static final class FlowableMap<I, T extends I, O> {
     @BeforeTemplate
-    Flowable<O> before(
-        Flowable<T> flowable,
-        @CanTransformToTargetType io.reactivex.functions.Function<I, O> function) {
+    Flowable<O> before(Flowable<T> flowable, Function<I, O> function) {
       return flowable.map(function);
     }
 
     @AfterTemplate
-    Flowable<O> after(Flowable<T> flowable, java.util.function.Function<I, O> function) {
+    Flowable<O> after(Flowable<T> flowable, Function<I, O> function) {
       return flowable
           .as(RxJava2Adapter::flowableToFlux)
-          .map(function)
+          .map(RxJavaReactorMigrationUtil.toJdkFunction(function))
           .as(RxJava2Adapter::fluxToFlowable);
     }
   }

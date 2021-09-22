@@ -16,7 +16,9 @@ import io.reactivex.SingleSource;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import io.reactivex.schedulers.Schedulers;
 import java.util.concurrent.Callable;
+import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -306,6 +308,22 @@ final class RxJavaSingleToReactorTemplates {
 
   // XXX: public final Observable flatMapObservable(Function)
   // XXX: public final Flowable flatMapPublisher(Function)
+
+  // XXX: Test this.
+  static final class SingleFlatMapPublisher<T, R> {
+    @BeforeTemplate
+    Flowable<R> before(Single<T> single, Function<T, Publisher<? extends R>> mapper) {
+      return single.flatMapPublisher(mapper);
+    }
+
+    @AfterTemplate
+    Flowable<R> after(Single<T> single, Function<T, Publisher<? extends R>> mapper) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.singleToMono(single)
+              .flatMapMany(RxJavaReactorMigrationUtil.toJdkFunction(mapper)));
+    }
+  }
+
   // XXX: public final Flowable flattenAsFlowable(Function)
   // XXX: public final Observable flattenAsObservable(Function)
   // XXX: public final Single hide()
@@ -383,24 +401,43 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single retry(long)
   // XXX: public final Single retry(long,Predicate)
   // XXX: public final Single retry(Predicate)
-  // XXX: public final Single retryWhen(Function)
+
+  //   XXX: public final Single retryWhen(Function)
+  //  static final class SingleRetryWhen<T, R> {
+  //    @BeforeTemplate
+  //    Single<T> before(Single<T> single, Function<Flowable<Throwable>, Publisher<R>> handler) {
+  //      return single.retryWhen(handler);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Single<T> after(Single<T> single, Function<Flux<Long>, Publisher<R>> handler) {
+  //      return
+  //          RxJava2Adapter.singleToMono(single)
+  //              .retryWhen(RxJavaReactorMigrationUtil.toJdkFunction(handler)));
+  //    }
+  //  }
+
   // XXX: public final Disposable subscribe()
   // XXX: public final Disposable subscribe(BiConsumer)
   // XXX: public final Disposable subscribe(Consumer)
   // XXX: public final Disposable subscribe(Consumer,Consumer)
   // XXX: public final void subscribe(SingleObserver)
   // XXX: public final Single subscribeOn(Scheduler) --> Required. How to fix the Scheduler problem?
-  //  static final class SingleSubscribeOn<T> {
-  //    @BeforeTemplate
-  //    Single<T> before(Single<T> single, Scheduler scheduler) {
-  //      return single.subscribeOn(scheduler);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Single<T> after(Single<T> single, Scheduler scheduler) {
-  //      return single.as(RxJava2Adapter::singleToMono).subscribeOn(scheduler);
-  //    }
-  //  }
+
+  // XXX: Not accounting for the Schedulers.computation()
+  static final class SingleSubscribeOn<T> {
+    @BeforeTemplate
+    Single<T> before(Single<T> single) {
+      return single.subscribeOn(Schedulers.io());
+    }
+
+    @AfterTemplate
+    Single<T> after(Single<T> single) {
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.singleToMono(single)
+              .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic()));
+    }
+  }
 
   // XXX: public final SingleObserver subscribeWith(SingleObserver)
   // XXX: public final Single takeUntil(CompletableSource)
@@ -421,7 +458,7 @@ final class RxJavaSingleToReactorTemplates {
 
     @AfterTemplate
     Flowable<T> after(Single<T> single) {
-      return single.as(RxJava2Adapter::singleToMono).flux().as(RxJava2Adapter::fluxToFlowable);
+      return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.singleToMono(single).flux());
     }
   }
 

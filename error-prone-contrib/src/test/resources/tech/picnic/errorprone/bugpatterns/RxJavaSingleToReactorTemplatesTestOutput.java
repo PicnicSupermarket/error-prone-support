@@ -84,10 +84,7 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   }
 
   Flowable<Integer> testSingleToFlowable() {
-    return Single.just(1)
-        .as(RxJava2Adapter::singleToMono)
-        .flux()
-        .as(RxJava2Adapter::fluxToFlowable);
+    return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.singleToMono(Single.just(1)).flux());
   }
 
   void testSingleTestAssertResultItem() throws InterruptedException {
