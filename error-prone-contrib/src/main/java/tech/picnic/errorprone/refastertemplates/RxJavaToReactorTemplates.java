@@ -57,6 +57,7 @@ public final class RxJavaToReactorTemplates {
       return Refaster.anyOf(
           RxJava2Adapter.fluxToFlowable(flux).as(RxJava2Adapter::flowableToFlux),
           RxJava2Adapter.flowableToFlux(RxJava2Adapter.fluxToFlowable(flux)),
+          RxJava2Adapter.flowableToFlux(flux.as(RxJava2Adapter::fluxToFlowable)),
           RxJava2Adapter.observableToFlux(flux.as(RxJava2Adapter::fluxToObservable), strategy),
           flux.as(RxJava2Adapter::fluxToObservable)
               .toFlowable(strategy)
@@ -97,6 +98,11 @@ public final class RxJavaToReactorTemplates {
           mono.as(RxJava2Adapter::monoToSingle).as(RxJava2Adapter::singleToMono));
     }
 
+    @BeforeTemplate
+    Mono<Void> before3(Mono<T> mono) {
+      return RxJava2Adapter.completableToMono(RxJava2Adapter.monoToCompletable(mono));
+    }
+
     @AfterTemplate
     Mono<T> after(Mono<T> mono) {
       return mono;
@@ -111,17 +117,17 @@ public final class RxJavaToReactorTemplates {
   //    }
   //  }
 
-  static final class RemoveRedundantCast<T> {
-    @BeforeTemplate
-    T before(T object) {
-      return (T) object;
-    }
-
-    @AfterTemplate
-    T after(T object) {
-      return object;
-    }
-  }
+  //  static final class RemoveRedundantCast<T> {
+  //    @BeforeTemplate
+  //    T before(T object) {
+  //      return (T) object;
+  //    }
+  //
+  //    @AfterTemplate
+  //    T after(T object) {
+  //      return object;
+  //    }
+  //  }
 
   static final class MonoErrorCallableSupplierUtil<T> {
     @BeforeTemplate
@@ -153,7 +159,9 @@ public final class RxJavaToReactorTemplates {
   static final class UnnecessaryFunctionConversion<I, O> {
     @BeforeTemplate
     java.util.function.Function<I, O> before(Function<I, O> function) {
-      return RxJavaReactorMigrationUtil.toJdkFunction(function);
+      return Refaster.anyOf(
+          RxJavaReactorMigrationUtil.toJdkFunction((Function<I, O>) function),
+          RxJavaReactorMigrationUtil.toJdkFunction(function));
     }
 
     @AfterTemplate

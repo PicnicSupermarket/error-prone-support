@@ -15,6 +15,7 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.amb(ImmutableList.of(Maybe.just("foo"), Maybe.just("bar")));
   }
 
+  // XXX: Template turned off for now.
   Maybe<String> testMaybeAmbArray() {
     return Maybe.ambArray(Maybe.just("foo"), Maybe.just("bar"));
   }

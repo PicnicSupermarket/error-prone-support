@@ -52,21 +52,22 @@ final class RxJavaMaybeToReactorTemplates {
   }
 
   @SuppressWarnings("unchecked")
-  static final class MaybeAmbArray<T> {
-    @BeforeTemplate
-    Maybe<T> before(@Repeated Maybe<T> sources) {
-      return Maybe.ambArray(sources);
-    }
-
-    @AfterTemplate
-    Maybe<T> after(@Repeated Maybe<T> sources) {
-      return RxJava2Adapter.monoToMaybe(
-          Mono.firstWithSignal(
-              Arrays.stream(Refaster.asVarargs(sources))
-                  .map(RxJava2Adapter::maybeToMono)
-                  .collect(toImmutableList())));
-    }
-  }
+  // XXX: Refaster rule is almost good, but is not in PRP, so skipping for now.
+  //  static final class MaybeAmbArray<T> {
+  //    @BeforeTemplate
+  //    Maybe<T> before(@Repeated Maybe<T> sources) {
+  //      return Maybe.ambArray(sources);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Maybe<T> after(@Repeated Maybe<T> sources) {
+  //      return RxJava2Adapter.monoToMaybe(
+  //          Mono.firstWithSignal(
+  //              Arrays.stream(Refaster.asVarargs(sources))
+  //                  .map(RxJava2Adapter::maybeToMono)
+  //                  .collect(toImmutableList())));
+  //    }
+  //  }
 
   // XXX: public static Flowable concat(Iterable)
   // XXX: public static Flowable concat(MaybeSource,MaybeSource)
