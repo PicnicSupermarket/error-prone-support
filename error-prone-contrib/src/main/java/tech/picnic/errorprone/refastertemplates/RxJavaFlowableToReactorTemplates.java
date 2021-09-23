@@ -727,55 +727,87 @@ final class RxJavaFlowableToReactorTemplates {
               .then());
     }
   }
+  //  .flatMap(gf -> RxJava2Adapter.fluxToFlowable(buildConsentRequest_migrated(gf, locale)))
+  Completable testRandomness() {
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1))
+            .flatMap(
+                e ->
+                    RxJava2Adapter.completableToMono(
+                        Completable.wrap(
+                            RxJavaReactorMigrationUtil.toJdkFunction(
+                                    integer -> RxJava2Adapter.monoToCompletable(Mono.empty()))
+                                .apply(e))))
+            .then());
+  }
 
-//  // XXX: Delete this/move it.
-//  static final class XXXv1<I, O> {
-//    @BeforeTemplate
-//    Function<I, O> before(Function<I, O> function) {
-//      return i -> function.apply(i);
-//    }
-//
-//    @BeforeTemplate
-//    Function<I, O> before2(Function<I, O> function) {
-//      return function::apply;
-//    }
-//
-//    @AfterTemplate
-//    Function<I, O> after(Function<I, O> function) {
-//      return function;
-//    }
-//  }
-//
-//  // XXX: Delete this/move it.
-//  static final class XXXv2<I, O> {
-//    @BeforeTemplate
-//    // Or: @LambdaExprOrMethodReferenceReceiverEnsuresType
-//    Function<I, O> before(Function<I, O> function) {
-//      return Refaster.<Function<I, O>>receiverEnsuresType(i -> function.apply(i));
-//    }
-//
-//    @BeforeTemplate
-//    Function<I, O> before2(Function<I, O> function) {
-//      return function::apply;
-//    }
-//
-//    @AfterTemplate
-//    Function<I, O> after(Function<I, O> function) {
-//      return function;
-//    }
-//  }
+  static final class Randomness<T, R extends Publisher> {
+    @BeforeTemplate
+    java.util.function.Function<T, R> before(java.util.function.Function<T, R> function) {
+      return e ->
+          RxJava2Adapter.completableToMono(
+              Completable.wrap(RxJavaReactorMigrationUtil.toJdkFunction().apply(e)));
+    }
+
+    @AfterTemplate
+    Completable after(Flowable<T> flowable, java.util.function.Function<T, R> function) {
+      return RxJava2Adapter.monoToCompletable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .flatMap(e -> RxJava2Adapter.completableToMono(Completable.wrap(function.apply(e))))
+              .then());
+    }
+  }
+
+  //  // XXX: Delete this/move it.
+  //  static final class XXXv1<I, O> {
+  //    @BeforeTemplate
+  //    Function<I, O> before(Function<I, O> function) {
+  //      return i -> function.apply(i);
+  //    }
+  //
+  //    @BeforeTemplate
+  //    Function<I, O> before2(Function<I, O> function) {
+  //      return function::apply;
+  //    }
+  //
+  //    @AfterTemplate
+  //    Function<I, O> after(Function<I, O> function) {
+  //      return function;
+  //    }
+  //  }
+  //
+  //  // XXX: Delete this/move it.
+  //  static final class XXXv2<I, O> {
+  //    @BeforeTemplate
+  //    // Or: @LambdaExprOrMethodReferenceReceiverEnsuresType
+  //    Function<I, O> before(Function<I, O> function) {
+  //      return Refaster.<Function<I, O>>receiverEnsuresType(i -> function.apply(i));
+  //    }
+  //
+  //    @BeforeTemplate
+  //    Function<I, O> before2(Function<I, O> function) {
+  //      return function::apply;
+  //    }
+  //
+  //    @AfterTemplate
+  //    Function<I, O> after(Function<I, O> function) {
+  //      return function;
+  //    }
+  //  }
 
   // XXX: final Completable flatMapCompletable(Function,boolean,int)
 
   // XXX: Test this one. Doesnt pick up one in bad-word-service.
   static final class FlowableFlatMapIterable<T, R> {
     @BeforeTemplate
-    Flowable<R> before(Flowable<T> flowable, Function<T, Iterable<R>> mapper) {
+    Flowable<R> before(
+        Flowable<T> flowable, Function<? super T, ? extends Iterable<? extends R>> mapper) {
       return flowable.flatMapIterable(mapper);
     }
 
     @AfterTemplate
-    Flowable<R> after(Flowable<T> flowable, Function<T, Iterable<R>> mapper) {
+    Flowable<R> after(
+        Flowable<T> flowable, Function<? super T, ? extends Iterable<? extends R>> mapper) {
       return RxJava2Adapter.fluxToFlowable(
           RxJava2Adapter.flowableToFlux(flowable)
               .flatMapIterable(RxJavaReactorMigrationUtil.toJdkFunction(mapper)));
@@ -786,9 +818,8 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable flatMapIterable(Function,BiFunction,int)
   // XXX: final Flowable flatMapIterable(Function,int)
 
-  //  static final
+  // XXX: final Flowable flatMapMaybe(Function) --> This one.
 
-  // XXX: final Flowable flatMapMaybe(Function)
   // XXX: final Flowable flatMapMaybe(Function,boolean,int)
   // XXX: final Flowable flatMapSingle(Function)
   // XXX: final Flowable flatMapSingle(Function,boolean,int)
