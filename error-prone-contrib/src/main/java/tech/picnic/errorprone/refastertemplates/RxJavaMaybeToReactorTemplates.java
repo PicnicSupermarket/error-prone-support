@@ -12,6 +12,7 @@ import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
@@ -453,7 +454,28 @@ final class RxJavaMaybeToReactorTemplates {
 
   // XXX: public final Maybe flatMap(Function,BiFunction)
   // XXX: public final Maybe flatMap(Function,Function,Callable)
-  // XXX: public final Completable flatMapCompletable(Function)
+
+  // XXX: Test this one
+  static final class MaybeFlatMapCompletable<T, R extends CompletableSource> {
+    @BeforeTemplate
+    Completable before(Maybe<T> maybe, Function<T, R> function) {
+      return maybe.flatMapCompletable(function);
+    }
+
+    @AfterTemplate
+    Completable after(Maybe<T> maybe, Function<T, R> function) {
+      return RxJava2Adapter.monoToCompletable(
+          RxJava2Adapter.maybeToMono(maybe)
+              .flatMap(
+                  e ->
+                      RxJava2Adapter.completableToMono(
+                          Completable.wrap(
+                              RxJavaReactorMigrationUtil.toJdkFunction((Function<T, R>) function)
+                                  .apply(e))))
+              .then());
+    }
+  }
+
   // XXX: public final Observable flatMapObservable(Function)
   // XXX: public final Flowable flatMapPublisher(Function)
   // XXX: public final Single flatMapSingle(Function)
@@ -599,9 +621,34 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe timeout(Publisher)
   // XXX: public final Maybe timeout(Publisher,MaybeSource)
   // XXX: public final Object to(Function)
-  // XXX: public final Flowable toFlowable() --> Required I guess
+
+  static final class MaybeToFlowable<T> {
+    @BeforeTemplate
+    Flowable<T> before(Maybe<T> maybe) {
+      return maybe.toFlowable();
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Maybe<T> maybe) {
+      return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.maybeToMono(maybe).flux());
+    }
+  }
+
   // XXX: public final Observable toObservable()
-  // XXX: public final Single toSingle() --> Required
+
+  // XXX: This one should be improved, it is not correct yet.
+  static final class MaybeToSingle<T> {
+    @BeforeTemplate
+    Single<T> before(Maybe<T> maybe) {
+      return maybe.toSingle();
+    }
+
+    @AfterTemplate
+    Single<T> after(Maybe<T> maybe) {
+      return RxJava2Adapter.monoToSingle(RxJava2Adapter.maybeToMono(maybe));
+    }
+  }
+
   // XXX: public final Single toSingle(Object)
   // XXX: public final Maybe unsubscribeOn(Scheduler)
   // XXX: public final Maybe zipWith(MaybeSource,BiFunction) --> Required.

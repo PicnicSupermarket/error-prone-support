@@ -218,6 +218,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
         .as(RxJava2Adapter::monoToSingle);
   }
 
+  Flowable<Integer> testMaybeToFlowable() {
+    return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.maybeToMono(Maybe.just(1)).flux());
+  }
+
   @SuppressWarnings("MaybeJust")
   private Maybe<Integer> getMaybe() {
     return Maybe.just(3);

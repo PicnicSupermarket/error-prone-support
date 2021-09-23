@@ -151,6 +151,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
                 }));
   }
 
+  Flowable<Integer> testMaybeToFlowable() {
+    return Maybe.just(1).toFlowable();
+  }
+
   @SuppressWarnings("MaybeJust")
   private Maybe<Integer> getMaybe() {
     return Maybe.just(3);

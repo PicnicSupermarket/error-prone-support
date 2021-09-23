@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>error-prone-support</artifactId>
         <groupId>tech.picnic.error-prone-support</groupId>
+        <artifactId>error-prone-support</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
@@ -17,16 +17,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-            <version>3.4.8</version>
-        </dependency>
-        <dependency>
-            <groupId>io.projectreactor.addons</groupId>
-            <artifactId>reactor-adapter</artifactId>
-            <version>3.4.3</version>
-        </dependency>
         <dependency>
             <groupId>io.reactivex.rxjava2</groupId>
             <artifactId>rxjava</artifactId>
