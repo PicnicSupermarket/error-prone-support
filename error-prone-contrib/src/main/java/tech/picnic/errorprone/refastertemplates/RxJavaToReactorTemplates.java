@@ -5,6 +5,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -197,6 +198,18 @@ public final class RxJavaToReactorTemplates {
     @AfterTemplate
     java.util.function.Consumer<T> after(java.util.function.Consumer<T> consumer) {
       return consumer;
+    }
+  }
+
+  static final class UnnecessaryRunnableConversion<T> {
+    @BeforeTemplate
+    Runnable before(@CanTransformToTargetType Action action) {
+      return RxJavaReactorMigrationUtil.toRunnable(action);
+    }
+
+    @AfterTemplate
+    Runnable after(Runnable action) {
+      return action;
     }
   }
 

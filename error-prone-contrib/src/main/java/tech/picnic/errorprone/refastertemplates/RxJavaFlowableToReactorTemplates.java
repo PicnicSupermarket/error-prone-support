@@ -12,6 +12,7 @@ import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.flowables.GroupedFlowable;
@@ -519,37 +520,43 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable concatMapEagerDelayError(Function,int,int,boolean)
   // XXX: final Flowable concatMapIterable(Function)
   // XXX: final Flowable concatMapIterable(Function,int)
-  // XXX: final Flowable concatMapMaybe(Function) --> Required.
 
-  //  static final class FlowableConcatMaybe<T, R> {
-  //    @BeforeTemplate
-  //    Flowable<R> before(
-  //        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> mapper) {
-  //      return flowable.concatMapMaybe(mapper);
-  //    }
-  //
-  //    Flowable<R> after(
-  //        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> mapper) {
-  //      return flowable.as(RxJava2Adapter::flowableToFlux).concat
-  //    }
-  //  }
+  // XXX: Test this one.
+  static final class FlowableConcatMaybe<T, R> {
+    @BeforeTemplate
+    Flowable<R> before(Flowable<T> flowable, Function<T, ? extends MaybeSource<R>> mapper) {
+      return flowable.concatMapMaybe(mapper);
+    }
+
+    @AfterTemplate
+    Flowable<R> after(Flowable<T> flowable, Function<T, ? extends MaybeSource<R>> mapper) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .concatMap(
+                  e ->
+                      Maybe.wrap(RxJavaReactorMigrationUtil.toJdkFunction(mapper).apply(e))
+                          .toFlowable()));
+    }
+  }
 
   // XXX: final Flowable concatMapMaybe(Function,int)
-  // XXX: final Flowable concatMapMaybeDelayError(Function) --> This one
 
-  //  static final class FlowableConcatMapMaybeDelayError<T, R> {
-  //    @BeforeTemplate
-  //    Flowable<R> before(Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends
-  // R>> mapper) {
-  //      return flowable.concatMapMaybeDelayError(mapper);
-  //    }
-  //    @AfterTemplate
-  //    Flowable<R> after(Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends
-  // R>> mapper) {
-  //      return
-  // flowable.as(RxJava2Adapter::flowableToFlux).concat.concatMapMaybeDelayError(mapper);
-  //    }
-  //  }
+  static final class FlowableConcatMapMaybeDelayError<T, R> {
+    @BeforeTemplate
+    Flowable<R> before(Flowable<T> flowable, Function<T, MaybeSource<R>> mapper) {
+      return flowable.concatMapMaybeDelayError(mapper);
+    }
+
+    @AfterTemplate
+    Flowable<R> after(Flowable<T> flowable, Function<T, MaybeSource<R>> mapper) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .concatMapDelayError(
+                  e ->
+                      Maybe.wrap(RxJavaReactorMigrationUtil.toJdkFunction(mapper).apply(e))
+                          .toFlowable()));
+    }
+  }
 
   // XXX: final Flowable concatMapMaybeDelayError(Function,boolean)
   // XXX: final Flowable concatMapMaybeDelayError(Function,boolean,int)
@@ -646,6 +653,7 @@ final class RxJavaFlowableToReactorTemplates {
           .as(RxJava2Adapter::fluxToFlowable);
     }
   }
+
   // XXX: final Single first(Object)
 
   static final class FlowableFirstElement<T> {
@@ -723,7 +731,7 @@ final class RxJavaFlowableToReactorTemplates {
 
   // XXX: final Completable flatMapCompletable(Function,boolean,int)
 
-  // XXX: Test this one.
+  // XXX: Test this one. Doesnt pick up one in bad-word-service.
   static final class FlowableFlatMapIterable<T, R> {
     @BeforeTemplate
     Flowable<R> before(Flowable<T> flowable, Function<T, Iterable<R>> mapper) {
@@ -741,6 +749,9 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable flatMapIterable(Function,BiFunction)
   // XXX: final Flowable flatMapIterable(Function,BiFunction,int)
   // XXX: final Flowable flatMapIterable(Function,int)
+
+  //  static final
+
   // XXX: final Flowable flatMapMaybe(Function)
   // XXX: final Flowable flatMapMaybe(Function,boolean,int)
   // XXX: final Flowable flatMapSingle(Function)
@@ -887,6 +898,7 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable serialize()
   // XXX: final Flowable share()
   // XXX: final Single single(Object) --> I think so.
+
   static final class FlowableSingleDefault<T> {
     @BeforeTemplate
     Single<T> before(Flowable<T> flowable, T item) {
