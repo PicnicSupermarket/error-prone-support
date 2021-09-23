@@ -729,26 +729,13 @@ final class RxJavaFlowableToReactorTemplates {
               .then());
     }
   }
-  //  .flatMap(gf -> RxJava2Adapter.fluxToFlowable(buildConsentRequest_migrated(gf, locale)))
-  Completable testRandomness() {
-    return RxJava2Adapter.monoToCompletable(
-        RxJava2Adapter.flowableToFlux(Flowable.just(1))
-            .flatMap(
-                e ->
-                    RxJava2Adapter.completableToMono(
-                        Completable.wrap(
-                            RxJavaReactorMigrationUtil.toJdkFunction(
-                                    integer -> RxJava2Adapter.monoToCompletable(Mono.empty()))
-                                .apply(e))))
-            .then());
-  }
 
   abstract static class Randomness<T> {
     @Placeholder
-    abstract Mono<Void> placeholder(@MayOptionallyUse T input);
+    abstract Mono<?> placeholder(@MayOptionallyUse T input);
 
     @BeforeTemplate
-    java.util.function.Function<T, Mono<Void>> before() {
+    java.util.function.Function<T, Publisher<? extends Void>> before() {
       return e ->
           RxJava2Adapter.completableToMono(
               Completable.wrap(
@@ -758,7 +745,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
 
     @AfterTemplate
-    java.util.function.Function<T, Mono<Void>> after() {
+    java.util.function.Function<T, Mono<?>> after() {
       return v -> placeholder(v);
     }
   }

@@ -128,8 +128,6 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return null;
   }
 
-  // XXX: To be removed if template works.
-  @SuppressWarnings("MaybeJust")
   Maybe<Integer> testMaybeFlatMapSingleElement() {
     return Maybe.just(1).flatMapSingleElement(Single::just);
   }

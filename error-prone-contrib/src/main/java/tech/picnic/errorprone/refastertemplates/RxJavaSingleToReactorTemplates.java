@@ -8,6 +8,7 @@ import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
@@ -282,6 +283,45 @@ final class RxJavaSingleToReactorTemplates {
   }
 
   // XXX: public final Completable flatMapCompletable(Function)
+  // XXX: TESTTTT
+  static final class SingleFlatMapCompletable<T, R extends CompletableSource> {
+    @BeforeTemplate
+    Completable before(Single<T> single, Function<? super T, R> function) {
+      return single.flatMapCompletable(function);
+    }
+
+    @AfterTemplate
+    Completable after(Single<T> single, Function<? super T, R> function) {
+      return RxJava2Adapter.monoToCompletable(
+          RxJava2Adapter.singleToMono(single)
+              .flatMap(
+                  e ->
+                      RxJava2Adapter.completableToMono(
+                          Completable.wrap(
+                              RxJavaReactorMigrationUtil.toJdkFunction(function).apply(e))))
+              .then());
+    }
+  }
+
+  abstract static class SingleRandomness<T> {
+    @Placeholder
+    abstract Mono<?> placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<? super T, ? extends Mono<? extends Void>> before() {
+      return e ->
+          RxJava2Adapter.completableToMono(
+              Completable.wrap(
+                  RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                          v -> RxJava2Adapter.monoToCompletable(placeholder(v)))
+                      .apply(e)));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<? super T, ? extends Mono<?>> after() {
+      return v -> placeholder(v);
+    }
+  }
 
   // XXX: Test this one.
   // In this case it doesnt work: flatMap(e ->

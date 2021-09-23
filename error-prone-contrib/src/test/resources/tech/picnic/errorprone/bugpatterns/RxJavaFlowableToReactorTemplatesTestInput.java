@@ -14,18 +14,6 @@ import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTestCase {
-  Completable testRandomness() {
-    return RxJava2Adapter.monoToCompletable(
-        RxJava2Adapter.flowableToFlux(Flowable.just(1))
-            .flatMap(
-                e ->
-                    RxJava2Adapter.completableToMono(
-                        Completable.wrap(
-                            RxJavaReactorMigrationUtil.<Integer, Completable>toJdkFunction(
-                                    v -> RxJava2Adapter.monoToCompletable(Mono.empty()))
-                                .apply(e))))
-            .then());
-  }
 
   Flowable<Integer> testFlowableAmbArray() {
     return Flowable.ambArray(Flowable.just(1), Flowable.just(2));
@@ -92,6 +80,19 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Completable testFlowableFlatMapCompletable() {
     return Flowable.just(1).flatMapCompletable(integer -> Completable.complete());
+  }
+
+  Completable testRandomness() {
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1))
+            .flatMap(
+                e ->
+                    RxJava2Adapter.completableToMono(
+                        Completable.wrap(
+                            RxJavaReactorMigrationUtil.<Integer, Completable>toJdkFunction(
+                                    v -> RxJava2Adapter.monoToCompletable(Mono.empty()))
+                                .apply(e))))
+            .then());
   }
 
   Flowable<Object> testFlowableFlatMap() {
