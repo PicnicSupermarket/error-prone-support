@@ -489,14 +489,16 @@ final class RxJavaMaybeToReactorTemplates {
   //    }
 
   // XXX: This one is still not correct, see example above. Perhaps try this? <S, T extends S, O> {
-  static final class MaybeFlatMapSingleElement<T, O, S extends SingleSource<O>> {
+  static final class MaybeFlatMapSingleElement<T, O> {
     @BeforeTemplate
-    Maybe<O> before(Maybe<T> maybe, Function<T, S> function) {
+    Maybe<O> before(
+        Maybe<T> maybe, Function<? super T, ? extends SingleSource<? extends O>> function) {
       return maybe.flatMapSingleElement(function);
     }
 
     @AfterTemplate
-    Maybe<O> after(Maybe<T> maybe, Function<T, S> function) {
+    Maybe<O> after(
+        Maybe<T> maybe, Function<? super T, ? extends SingleSource<? extends O>> function) {
       return RxJava2Adapter.monoToMaybe(
           RxJava2Adapter.maybeToMono(maybe)
               .flatMap(
@@ -645,7 +647,7 @@ final class RxJavaMaybeToReactorTemplates {
 
     @AfterTemplate
     Single<T> after(Maybe<T> maybe) {
-      return RxJava2Adapter.monoToSingle(RxJava2Adapter.maybeToMono(maybe));
+      return RxJava2Adapter.monoToSingle(RxJava2Adapter.maybeToMono(maybe).single());
     }
   }
 

@@ -41,6 +41,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>migration-util</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>refaster-resource-compiler</artifactId>
             <!-- This dependency is declared only as a hint to Maven that
             compilation depends on it; see the `maven-compiler-plugin`'s
@@ -190,12 +196,6 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>tech.picnic.error-prone-support</groupId>
-            <artifactId>migration-util</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
