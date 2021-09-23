@@ -26,7 +26,6 @@ import java.util.concurrent.Callable;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.GroupedFlux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
@@ -729,6 +728,43 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
+//  // XXX: Delete this/move it.
+//  static final class XXXv1<I, O> {
+//    @BeforeTemplate
+//    Function<I, O> before(Function<I, O> function) {
+//      return i -> function.apply(i);
+//    }
+//
+//    @BeforeTemplate
+//    Function<I, O> before2(Function<I, O> function) {
+//      return function::apply;
+//    }
+//
+//    @AfterTemplate
+//    Function<I, O> after(Function<I, O> function) {
+//      return function;
+//    }
+//  }
+//
+//  // XXX: Delete this/move it.
+//  static final class XXXv2<I, O> {
+//    @BeforeTemplate
+//    // Or: @LambdaExprOrMethodReferenceReceiverEnsuresType
+//    Function<I, O> before(Function<I, O> function) {
+//      return Refaster.<Function<I, O>>receiverEnsuresType(i -> function.apply(i));
+//    }
+//
+//    @BeforeTemplate
+//    Function<I, O> before2(Function<I, O> function) {
+//      return function::apply;
+//    }
+//
+//    @AfterTemplate
+//    Function<I, O> after(Function<I, O> function) {
+//      return function;
+//    }
+//  }
+
   // XXX: final Completable flatMapCompletable(Function,boolean,int)
 
   // XXX: Test this one. Doesnt pick up one in bad-word-service.
@@ -761,18 +797,18 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Disposable forEachWhile(Predicate,Consumer)
   // XXX: final Disposable forEachWhile(Predicate,Consumer,Action)
 
-  // XXX: Test this, and improve this, the GroupedType is not working... Hacked the GroupedFlux.
-  static final class FlowableGroupBy<K, V, T> {
+  static final class FlowableGroupBy<K, V> {
     @BeforeTemplate
-    Flowable<GroupedFlowable<K, T>> before(Flowable<T> flowable, Function<T, K> keySelector) {
+    Flowable<GroupedFlowable<K, V>> before(Flowable<V> flowable, Function<V, K> keySelector) {
       return flowable.groupBy(keySelector);
     }
 
     @AfterTemplate
-    Flowable<GroupedFlux<K, T>> after(Flowable<T> flowable, Function<T, K> keySelector) {
+    Flowable<GroupedFlowable<K, V>> after(Flowable<V> flowable, Function<V, K> keySelector) {
       return RxJava2Adapter.fluxToFlowable(
           RxJava2Adapter.flowableToFlux(flowable)
-              .groupBy(RxJavaReactorMigrationUtil.toJdkFunction(keySelector)));
+              .groupBy(RxJavaReactorMigrationUtil.toJdkFunction(keySelector))
+              .map(RxJavaReactorMigrationUtil::groupedFluxToGroupedFlowable));
     }
   }
 
