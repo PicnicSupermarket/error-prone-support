@@ -10,9 +10,22 @@ import java.util.List;
 import java.util.Map;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTestCase {
+  Completable testRandomness() {
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1))
+            .flatMap(
+                e ->
+                    RxJava2Adapter.completableToMono(
+                        Completable.wrap(
+                            RxJavaReactorMigrationUtil.<Integer, Completable>toJdkFunction(
+                                    v -> RxJava2Adapter.monoToCompletable(Mono.empty()))
+                                .apply(e))))
+            .then());
+  }
 
   Flowable<Integer> testFlowableAmbArray() {
     return Flowable.ambArray(Flowable.just(1), Flowable.just(2));

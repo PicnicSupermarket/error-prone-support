@@ -6,6 +6,8 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import com.google.errorprone.refaster.annotation.Matches;
+import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
@@ -741,20 +743,23 @@ final class RxJavaFlowableToReactorTemplates {
             .then());
   }
 
-  static final class Randomness<T, R extends Publisher> {
+  abstract static class Randomness<T> {
+    @Placeholder
+    abstract Mono<Void> placeholder(@MayOptionallyUse T input);
+
     @BeforeTemplate
-    java.util.function.Function<T, R> before(java.util.function.Function<T, R> function) {
+    java.util.function.Function<T, Mono<Void>> before() {
       return e ->
           RxJava2Adapter.completableToMono(
-              Completable.wrap(RxJavaReactorMigrationUtil.toJdkFunction().apply(e)));
+              Completable.wrap(
+                  RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                          v -> RxJava2Adapter.monoToCompletable(placeholder(v)))
+                      .apply(e)));
     }
 
     @AfterTemplate
-    Completable after(Flowable<T> flowable, java.util.function.Function<T, R> function) {
-      return RxJava2Adapter.monoToCompletable(
-          RxJava2Adapter.flowableToFlux(flowable)
-              .flatMap(e -> RxJava2Adapter.completableToMono(Completable.wrap(function.apply(e))))
-              .then());
+    java.util.function.Function<T, Mono<Void>> after() {
+      return v -> placeholder(v);
     }
   }
 
