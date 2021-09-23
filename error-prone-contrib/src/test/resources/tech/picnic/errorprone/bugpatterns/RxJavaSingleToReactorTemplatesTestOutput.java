@@ -69,6 +69,26 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
         .as(RxJava2Adapter::monoToSingle);
   }
 
+  Completable testSingleFlatMapCompletable() {
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.singleToMono(Single.just(1))
+            .flatMap(
+                e ->
+                    RxJava2Adapter.completableToMono(
+                        Completable.wrap(
+                            RxJavaReactorMigrationUtil.toJdkFunction(
+                                    integer -> Completable.complete())
+                                .apply(e))))
+            .then());
+  }
+
+  Completable testSingleRandomness() {
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.singleToMono(RxJava2Adapter.monoToSingle(Mono.just(1)))
+            .flatMap(v -> Mono.empty())
+            .then());
+  }
+
   Completable testCompletableIgnoreElement() {
     return Single.just(1)
         .as(RxJava2Adapter::singleToMono)

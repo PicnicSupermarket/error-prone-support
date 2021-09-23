@@ -4,6 +4,9 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -48,6 +51,23 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
 
   Single<Integer> testSingleFlatMapLambda() {
     return Single.just(1).flatMap(i -> Single.just(i * 2));
+  }
+
+  Completable testSingleFlatMapCompletable() {
+    return Single.just(1).flatMapCompletable(integer -> Completable.complete());
+  }
+
+  Completable testSingleRandomness() {
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.singleToMono(Single.just(1))
+            .flatMap(
+                e ->
+                    RxJava2Adapter.completableToMono(
+                        Completable.wrap(
+                            RxJavaReactorMigrationUtil.<Integer, Completable>toJdkFunction(
+                                    v -> RxJava2Adapter.monoToCompletable(Mono.empty()))
+                                .apply(e))))
+            .then());
   }
 
   Completable testCompletableIgnoreElement() {
