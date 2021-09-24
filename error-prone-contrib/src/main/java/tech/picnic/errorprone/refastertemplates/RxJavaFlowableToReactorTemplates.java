@@ -752,6 +752,27 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
+  // This one works, for one extra case, improve naming and watch the other case.
+  abstract static class FlowableUnwrapLambdaa<T> {
+    @Placeholder
+    abstract CompletableSource placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<T, Publisher<? extends Void>> before() {
+      return e ->
+          RxJava2Adapter.completableToMono(
+              Completable.wrap(
+                  RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
+                          (Function<T, CompletableSource>) v -> placeholder(v))
+                      .apply(e)));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<T, Mono<? extends Void>> after() {
+      return v -> RxJava2Adapter.completableToMono(Completable.wrap(placeholder(v)));
+    }
+  }
+
   //  // XXX: Delete this/move it.
   //  static final class XXXv1<I, O> {
   //    @BeforeTemplate

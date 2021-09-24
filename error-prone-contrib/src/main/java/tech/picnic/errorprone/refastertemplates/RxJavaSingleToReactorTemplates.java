@@ -314,7 +314,7 @@ final class RxJavaSingleToReactorTemplates {
               Completable.wrap(
                   RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
                           (Function<T, CompletableSource>)
-                              v -> RxJava2Adapter.monoToCompletable(placeholder(v)))
+                              v -> (placeholder(v).as(RxJava2Adapter::monoToCompletable)))
                       .apply(e)));
     }
 
