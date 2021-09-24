@@ -114,7 +114,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
             .then());
   }
 
-  Completable testRandomness() {
+  Completable testFlowableUnwrapLambda() {
     return RxJava2Adapter.monoToCompletable(
         RxJava2Adapter.flowableToFlux(RxJava2Adapter.fluxToFlowable(Flux.just(1)))
             .flatMap(v -> Mono.empty())

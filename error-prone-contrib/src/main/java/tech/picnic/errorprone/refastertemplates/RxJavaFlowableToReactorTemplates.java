@@ -710,6 +710,7 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable flatMap(Function,Function,Callable)
   // XXX: final Flowable flatMap(Function,Function,Callable,int)
   // XXX: final Flowable flatMap(Function,int)
+
   static final class FlowableFlatMapCompletable<T, R extends CompletableSource> {
     @BeforeTemplate
     Completable before(Flowable<T> flowable, Function<T, R> function) {
@@ -730,7 +731,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  abstract static class Randomness<T> {
+  abstract static class FlowableUnwrapLambda<T> {
     @Placeholder
     abstract Mono<?> placeholder(@MayOptionallyUse T input);
 
@@ -739,8 +740,9 @@ final class RxJavaFlowableToReactorTemplates {
       return e ->
           RxJava2Adapter.completableToMono(
               Completable.wrap(
-                  RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
-                          v -> RxJava2Adapter.monoToCompletable(placeholder(v)))
+                  RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
+                          (Function<T, CompletableSource>)
+                              v -> RxJava2Adapter.monoToCompletable(placeholder(v)))
                       .apply(e)));
     }
 

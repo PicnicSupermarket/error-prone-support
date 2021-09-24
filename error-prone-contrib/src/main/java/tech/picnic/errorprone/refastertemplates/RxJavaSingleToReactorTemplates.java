@@ -263,7 +263,7 @@ final class RxJavaSingleToReactorTemplates {
 
   // XXX: Does this one work? See addressCompletionServiceClient.java validateAndComplete with the
   // this::handle.
-  //  I dont think that it picks methodreferences up....
+  //  I dont think that it picks up on method references....
   abstract static class SingleFlatMapLambda<S, T> {
     @Placeholder
     abstract Single<T> toSingleFunction(@MayOptionallyUse S element);
@@ -282,8 +282,6 @@ final class RxJavaSingleToReactorTemplates {
     }
   }
 
-  // XXX: public final Completable flatMapCompletable(Function)
-  // XXX: TESTTTT
   static final class SingleFlatMapCompletable<T, R extends CompletableSource> {
     @BeforeTemplate
     Completable before(Single<T> single, Function<? super T, R> function) {
@@ -291,6 +289,7 @@ final class RxJavaSingleToReactorTemplates {
     }
 
     @AfterTemplate
+    @SuppressWarnings("unchecked")
     Completable after(Single<T> single, Function<? super T, R> function) {
       return RxJava2Adapter.monoToCompletable(
           RxJava2Adapter.singleToMono(single)
@@ -298,12 +297,13 @@ final class RxJavaSingleToReactorTemplates {
                   e ->
                       RxJava2Adapter.completableToMono(
                           Completable.wrap(
-                              RxJavaReactorMigrationUtil.toJdkFunction(function).apply(e))))
+                              RxJavaReactorMigrationUtil.toJdkFunction((Function<T, R>) function)
+                                  .apply(e))))
               .then());
     }
   }
 
-  abstract static class SingleRandomness<T> {
+  abstract static class SingleRemoveLambdaWithCast<T> {
     @Placeholder
     abstract Mono<?> placeholder(@MayOptionallyUse T input);
 
@@ -312,8 +312,9 @@ final class RxJavaSingleToReactorTemplates {
       return e ->
           RxJava2Adapter.completableToMono(
               Completable.wrap(
-                  RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
-                          v -> RxJava2Adapter.monoToCompletable(placeholder(v)))
+                  RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
+                          (Function<T, CompletableSource>)
+                              v -> RxJava2Adapter.monoToCompletable(placeholder(v)))
                       .apply(e)));
     }
 
