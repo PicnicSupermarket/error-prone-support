@@ -39,6 +39,7 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractBooleanAssert;
+import org.assertj.core.api.AbstractCollectionAssert;
 import org.assertj.core.api.AbstractComparableAssert;
 import org.assertj.core.api.AbstractDoubleAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
@@ -529,7 +530,7 @@ final class AssertJTemplates {
 
   static final class AssertThatSetsAreEqual<S, T extends S> {
     @BeforeTemplate
-    IterableAssert<S> before(Set<S> set1, Set<T> set2) {
+    AbstractCollectionAssert<?, ?, S, ?> before(Set<S> set1, Set<T> set2) {
       return Refaster.anyOf(
           assertThat(set1).isEqualTo(set2),
           assertThat(set1).containsExactlyInAnyOrderElementsOf(set2));
@@ -537,7 +538,7 @@ final class AssertJTemplates {
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    IterableAssert<S> after(Set<S> set1, Set<T> set2) {
+    AbstractCollectionAssert<?, ?, S, ?> after(Set<S> set1, Set<T> set2) {
       return assertThat(set1).hasSameElementsAs(set2);
     }
   }
@@ -548,13 +549,13 @@ final class AssertJTemplates {
 
   static final class AssertThatMultisetsAreEqual<S, T extends S> {
     @BeforeTemplate
-    IterableAssert<S> before(Multiset<S> multiset1, Multiset<T> multiset2) {
+    AbstractCollectionAssert<?, ?, S, ?> before(Multiset<S> multiset1, Multiset<T> multiset2) {
       return assertThat(multiset1).isEqualTo(multiset2);
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
-    IterableAssert<S> after(Multiset<S> multiset1, Multiset<T> multiset2) {
+    AbstractCollectionAssert<?, ?, S, ?> after(Multiset<S> multiset1, Multiset<T> multiset2) {
       return assertThat(multiset1).containsExactlyInAnyOrderElementsOf(multiset2);
     }
   }
@@ -934,7 +935,7 @@ final class AssertJTemplates {
     }
 
     @BeforeTemplate
-    IterableAssert<T> before2(
+    AbstractCollectionAssert<?, ?, T, ?> before2(
         Stream<S> stream, Collector<S, ?, ? extends Multiset<T>> collector, Iterable<U> iterable) {
       return assertThat(stream.collect(collector)).containsExactlyInAnyOrderElementsOf(iterable);
     }
@@ -955,7 +956,7 @@ final class AssertJTemplates {
     }
 
     @BeforeTemplate
-    IterableAssert<T> before2(
+    AbstractCollectionAssert<?, ?, T, ?> before2(
         Stream<S> stream, Collector<S, ?, ? extends Multiset<T>> collector, U[] array) {
       return assertThat(stream.collect(collector)).containsExactlyInAnyOrder(array);
     }
@@ -979,7 +980,7 @@ final class AssertJTemplates {
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsExactlyInAnyOrder" /* Varargs converted to array. */)
-    IterableAssert<T> before2(
+    AbstractCollectionAssert<?, ?, T, ?> before2(
         Stream<S> stream, Collector<S, ?, ? extends Multiset<T>> collector, @Repeated U elements) {
       return assertThat(stream.collect(collector))
           .containsExactlyInAnyOrder(Refaster.asVarargs(elements));
