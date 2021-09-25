@@ -379,7 +379,7 @@ final class RxJavaSingleToReactorTemplates {
     Completable after(Single<T> single) {
       return single
           .as(RxJava2Adapter::singleToMono)
-          .ignoreElement()
+          .then()
           .as(RxJava2Adapter::monoToCompletable);
     }
   }
