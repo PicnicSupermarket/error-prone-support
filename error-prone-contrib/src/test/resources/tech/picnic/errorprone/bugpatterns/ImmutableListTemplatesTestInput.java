@@ -59,10 +59,6 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
         Stream.of(2).collect(collectingAndThen(toList(), ImmutableList::copyOf)));
   }
 
-  ImmutableList<Integer> testImmutableListAsList() {
-    return ImmutableList.of(1, 2, 3).asList();
-  }
-
   ImmutableSet<ImmutableList<Integer>> testImmutableListSortedCopyOf() {
     return ImmutableSet.of(
         ImmutableList.sortedCopyOf(naturalOrder(), ImmutableSet.of(1)),

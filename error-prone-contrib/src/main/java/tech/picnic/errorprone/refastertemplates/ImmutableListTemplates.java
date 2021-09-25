@@ -128,19 +128,6 @@ final class ImmutableListTemplates {
     }
   }
 
-  /** Don't call {@link ImmutableList#asList()}; it is a no-op. */
-  static final class ImmutableListAsList<T> {
-    @BeforeTemplate
-    ImmutableList<T> before(ImmutableList<T> list) {
-      return list.asList();
-    }
-
-    @AfterTemplate
-    ImmutableList<T> after(ImmutableList<T> list) {
-      return list;
-    }
-  }
-
   /** Prefer {@link ImmutableList#sortedCopyOf(Iterable)} over more contrived alternatives. */
   static final class ImmutableListSortedCopyOf<T extends Comparable<? super T>> {
     @BeforeTemplate

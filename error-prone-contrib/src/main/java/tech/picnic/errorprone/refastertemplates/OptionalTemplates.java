@@ -91,19 +91,6 @@ final class OptionalTemplates {
     }
   }
 
-  /** Prefer {@link Optional#stream()} over the Guava alternative. */
-  static final class OptionalToStream<T> {
-    @BeforeTemplate
-    Stream<T> before(Optional<T> optional) {
-      return Streams.stream(optional);
-    }
-
-    @AfterTemplate
-    Stream<T> after(Optional<T> optional) {
-      return optional.stream();
-    }
-  }
-
   /**
    * Don't use the ternary operator to extract the first element of a possibly-empty {@link
    * Iterator} as an {@link Optional}.

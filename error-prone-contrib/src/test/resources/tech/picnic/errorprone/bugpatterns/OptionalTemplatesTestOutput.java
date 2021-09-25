@@ -34,10 +34,6 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
     return Optional::orElseThrow;
   }
 
-  Stream<Object> testOptionalToStream() {
-    return Stream.concat(Optional.empty().stream(), Optional.of("foo").stream());
-  }
-
   ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
     return ImmutableSet.of(
         stream(ImmutableSet.of("foo").iterator()).findFirst(),
