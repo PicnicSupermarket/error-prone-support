@@ -126,6 +126,7 @@
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.0</version.auto-service>
+        <version.auto-value>1.8.2</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.9.0</version.error-prone-orig>
@@ -205,8 +206,13 @@
             </dependency>
             <dependency>
                 <groupId>com.google.auto.value</groupId>
+                <artifactId>auto-value</artifactId>
+                <version>${version.auto-value}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value-annotations</artifactId>
-                <version>1.8.2</version>
+                <version>${version.auto-value}</version>
             </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
@@ -339,7 +345,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.8.0</version>
+                <version>5.8.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -743,7 +749,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M3</version>
+                    <version>3.0.0</version>
                     <configuration>
                         <fail>false</fail>
                         <rules>
@@ -780,7 +786,7 @@
                         <dependency>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>extra-enforcer-rules</artifactId>
-                            <version>1.3</version>
+                            <version>1.4</version>
                         </dependency>
                     </dependencies>
                     <executions>
