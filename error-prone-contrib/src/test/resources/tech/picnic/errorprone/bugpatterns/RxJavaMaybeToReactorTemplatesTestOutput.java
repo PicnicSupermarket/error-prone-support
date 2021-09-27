@@ -6,6 +6,8 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.functions.Function;
 import java.util.concurrent.CompletableFuture;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
@@ -192,7 +194,9 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
                 e ->
                     RxJava2Adapter.singleToMono(
                         Single.wrap(
-                            RxJavaReactorMigrationUtil.toJdkFunction(Single::just).apply(e)))));
+                            RxJavaReactorMigrationUtil.toJdkFunction(
+                                    (Function<Integer, SingleSource<Integer>>) x -> Single.just(x))
+                                .apply(e)))));
   }
 
   Completable testMaybeIgnoreElement() {

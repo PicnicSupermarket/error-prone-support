@@ -129,7 +129,7 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Maybe<Integer> testMaybeFlatMapSingleElement() {
-    return Maybe.just(1).flatMapSingleElement(Single::just);
+    return Maybe.just(1).flatMapSingleElement(x -> Single.just(x));
   }
 
   Completable testMaybeIgnoreElement() {

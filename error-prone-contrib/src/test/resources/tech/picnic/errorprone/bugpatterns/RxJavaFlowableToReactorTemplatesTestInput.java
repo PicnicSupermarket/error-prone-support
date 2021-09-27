@@ -81,7 +81,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   }
 
   Completable testFlowableFlatMapCompletable() {
-    return Flowable.just(1).flatMapCompletable(integer -> Completable.complete());
+    return Flowable.just(1).flatMapCompletable(integer2 -> Completable.complete());
   }
 
   Completable testFlowableUnwrapLambda() {
@@ -91,7 +91,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
                 e ->
                     RxJava2Adapter.completableToMono(
                         Completable.wrap(
-                            RxJavaReactorMigrationUtil.<Integer, Completable>toJdkFunction(
+                            RxJavaReactorMigrationUtil.<Integer, CompletableSource>toJdkFunction(
                                     (Function<Integer, CompletableSource>)
                                         v -> RxJava2Adapter.monoToCompletable(Mono.empty()))
                                 .apply(e))))

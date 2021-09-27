@@ -540,7 +540,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: final Flowable concatMapMaybe(Function,int)
+  // XXX: final Flowable concat q MapMaybe(Function,int)
 
   static final class FlowableConcatMapMaybeDelayError<T, R> {
     @BeforeTemplate
@@ -725,7 +725,8 @@ final class RxJavaFlowableToReactorTemplates {
                   e ->
                       RxJava2Adapter.completableToMono(
                           Completable.wrap(
-                              RxJavaReactorMigrationUtil.toJdkFunction((Function<T, R>) function)
+                              RxJavaReactorMigrationUtil.toJdkFunction(
+                                      (Function<T, Completable>) function)
                                   .apply(e))))
               .then());
     }
