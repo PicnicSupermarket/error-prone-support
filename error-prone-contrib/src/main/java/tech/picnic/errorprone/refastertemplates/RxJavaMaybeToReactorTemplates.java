@@ -505,7 +505,9 @@ final class RxJavaMaybeToReactorTemplates {
                   e ->
                       RxJava2Adapter.singleToMono(
                           Single.wrap(
-                              RxJavaReactorMigrationUtil.toJdkFunction(function).apply(e)))));
+                              RxJavaReactorMigrationUtil.toJdkFunction(
+                                      (Function<T, SingleSource<O>>) function)
+                                  .apply(e)))));
     }
   }
 

@@ -3,7 +3,6 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.reactivex.Completable;
-import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -108,8 +107,8 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
                     RxJava2Adapter.completableToMono(
                         Completable.wrap(
                             RxJavaReactorMigrationUtil.toJdkFunction(
-                                    (Function<Integer, CompletableSource>)
-                                        integer -> Completable.complete())
+                                    (Function<Integer, Completable>)
+                                        integer2 -> Completable.complete())
                                 .apply(e))))
             .then());
   }

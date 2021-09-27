@@ -44,7 +44,23 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public static Flowable concatEager(Iterable)
   // XXX: public static Flowable concatEager(Publisher)
   // XXX: public static Single create(SingleOnSubscribe)
-  // XXX: public static Single defer(Callable) --> Required
+
+  abstract static class SingleDeferFirst<T> {
+    @Placeholder
+    abstract Single<? extends T> singleProducer();
+
+    @BeforeTemplate
+    Single<T> before() {
+      return Single.defer(() -> singleProducer());
+    }
+
+    @AfterTemplate
+    Single<? extends T> after() {
+      return Mono.defer(() -> singleProducer().as(RxJava2Adapter::singleToMono))
+          .as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
   // XXX: public static Single equals(SingleSource,SingleSource)
 
   static final class SingleErrorCallable<T> {
@@ -308,12 +324,41 @@ final class RxJavaSingleToReactorTemplates {
     abstract Mono<?> placeholder(@MayOptionallyUse T input);
 
     @BeforeTemplate
-    java.util.function.Function<? super T, ? extends Mono<? extends Void>> before() {
+    java.util.function.Function<? super T, ? extends Publisher<? extends Void>> before() {
+      return Refaster.anyOf(
+          e ->
+              RxJava2Adapter.completableToMono(
+                  Completable.wrap(
+                      RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                              (Function<T, Completable>)
+                                  v -> (placeholder(v).as(RxJava2Adapter::monoToCompletable)))
+                          .apply(e))),
+          e ->
+              RxJava2Adapter.completableToMono(
+                  Completable.wrap(
+                      RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                              (Function<T, Completable>)
+                                  v -> RxJava2Adapter.monoToCompletable(placeholder(v)))
+                          .apply(e))));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<? super T, ? extends Mono<?>> after() {
+      return v -> placeholder(v);
+    }
+  }
+
+  abstract static class SingleRemoveLambdaWithCasttt<T> {
+    @Placeholder
+    abstract Mono<?> placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<? super T, ? extends Publisher<? extends Void>> before() {
       return e ->
           RxJava2Adapter.completableToMono(
               Completable.wrap(
-                  RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
-                          (Function<T, CompletableSource>)
+                  RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                          (Function<T, Completable>)
                               v -> (placeholder(v).as(RxJava2Adapter::monoToCompletable)))
                       .apply(e)));
     }
@@ -443,27 +488,15 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single retry(long,Predicate)
   // XXX: public final Single retry(Predicate)
 
+  // Can be skipped because of:
+  //  https://picnic.atlassian.net/browse/PRP-12237
   //   XXX: public final Single retryWhen(Function)
-  //  static final class SingleRetryWhen<T, R> {
-  //    @BeforeTemplate
-  //    Single<T> before(Single<T> single, Function<Flowable<Throwable>, Publisher<R>> handler) {
-  //      return single.retryWhen(handler);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Single<T> after(Single<T> single, Function<Flux<Long>, Publisher<R>> handler) {
-  //      return
-  //          RxJava2Adapter.singleToMono(single)
-  //              .retryWhen(RxJavaReactorMigrationUtil.toJdkFunction(handler)));
-  //    }
-  //  }
 
   // XXX: public final Disposable subscribe()
   // XXX: public final Disposable subscribe(BiConsumer)
   // XXX: public final Disposable subscribe(Consumer)
   // XXX: public final Disposable subscribe(Consumer,Consumer)
   // XXX: public final void subscribe(SingleObserver)
-  // XXX: public final Single subscribeOn(Scheduler) --> Required. How to fix the Scheduler problem?
 
   // XXX: Not accounting for the Schedulers.computation()
   static final class SingleSubscribeOn<T> {

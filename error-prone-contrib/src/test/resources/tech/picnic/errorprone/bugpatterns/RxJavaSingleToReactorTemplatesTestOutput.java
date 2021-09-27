@@ -1,9 +1,11 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.functions.Function;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -13,6 +15,11 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
 
   Single<Object> testSingleErrorThrowable() {
     return RxJava2Adapter.monoToSingle(Mono.error(new IllegalStateException()));
+  }
+
+  Single<Integer> testSingleDefer() {
+    return Mono.defer(() -> Single.just(1).as(RxJava2Adapter::singleToMono))
+        .as(RxJava2Adapter::monoToSingle);
   }
 
   Single<Object> testSingleErrorCallable() {
@@ -77,7 +84,8 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
                     RxJava2Adapter.completableToMono(
                         Completable.wrap(
                             RxJavaReactorMigrationUtil.toJdkFunction(
-                                    integer -> Completable.complete())
+                                    (Function<Integer, CompletableSource>)
+                                        integer -> Completable.complete())
                                 .apply(e))))
             .then());
   }
@@ -85,7 +93,7 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   Completable testSingleRandomness() {
     return RxJava2Adapter.monoToCompletable(
         RxJava2Adapter.singleToMono(RxJava2Adapter.monoToSingle(Mono.just(1)))
-            .flatMap(v -> Mono.empty())
+            .flatMap(v -> Mono.justOrEmpty(null))
             .then());
   }
 

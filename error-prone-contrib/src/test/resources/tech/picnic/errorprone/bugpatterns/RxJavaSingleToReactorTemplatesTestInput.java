@@ -4,6 +4,7 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.functions.Function;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
@@ -12,6 +13,10 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
 
   Single<Object> testSingleErrorThrowable() {
     return Single.error(new IllegalStateException());
+  }
+
+  Single<Integer> testSingleDefer() {
+    return Single.defer(() -> Single.just(1));
   }
 
   Single<Object> testSingleErrorCallable() {
@@ -65,7 +70,10 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
                     RxJava2Adapter.completableToMono(
                         Completable.wrap(
                             RxJavaReactorMigrationUtil.<Integer, Completable>toJdkFunction(
-                                    v -> RxJava2Adapter.monoToCompletable(Mono.empty()))
+                                    (Function<Integer, Completable>)
+                                        v ->
+                                            RxJava2Adapter.monoToCompletable(
+                                                Mono.justOrEmpty(null)))
                                 .apply(e))))
             .then());
   }
