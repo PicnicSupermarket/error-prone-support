@@ -21,6 +21,7 @@ import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import java.util.concurrent.Callable;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
@@ -279,6 +280,27 @@ final class RxJavaSingleToReactorTemplates {
     }
   }
 
+  // XXX: Test this one.
+  abstract static class SingleFlatMapUnwrapLambda<T, R> {
+    @Placeholder
+    abstract Mono<? extends R> placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<T, ? extends Mono<? extends R>> before() {
+      return v ->
+          RxJava2Adapter.singleToMono(
+              (Single<? extends R>)
+                  RxJavaReactorMigrationUtil.toJdkFunction(
+                          ident -> RxJava2Adapter.monoToSingle(placeholder(v)))
+                      .apply(v));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<T, ? extends Mono<? extends R>> after() {
+      return v -> placeholder(v);
+    }
+  }
+
   // XXX: Does this one work? See addressCompletionServiceClient.java validateAndComplete with the
   // this::handle.
   //  I dont think that it picks up on method references....
@@ -413,6 +435,26 @@ final class RxJavaSingleToReactorTemplates {
     }
   }
 
+  // XXX: Test this one.
+  abstract static class SingleFlatMapMaybeUnwrapLambda<T, R> {
+    @Placeholder
+    abstract Mono<? extends R> placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<T, ? extends Mono<? extends R>> before() {
+      return e ->
+          RxJava2Adapter.maybeToMono(
+              RxJavaReactorMigrationUtil.toJdkFunction(
+                      ident -> RxJava2Adapter.monoToMaybe(placeholder(e)))
+                  .apply(e));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<T, ? extends Mono<? extends R>> after() {
+      return v -> placeholder(v);
+    }
+  }
+
   // XXX: public final Observable flatMapObservable(Function)
   // XXX: public final Flowable flatMapPublisher(Function)
 
@@ -489,6 +531,26 @@ final class RxJavaSingleToReactorTemplates {
                       RxJava2Adapter.singleToMono(
                           Single.wrap(
                               RxJavaReactorMigrationUtil.toJdkFunction(function).apply(e)))));
+    }
+  }
+
+  // XXX: Test this one. (works on PRP example validateAndComplete_migrated())
+  abstract static class SingleOnResumeUnwrapLambda<T, R> {
+    @Placeholder
+    abstract Mono<? extends R> placeholder(@MayOptionallyUse Throwable input);
+
+    @BeforeTemplate
+    java.util.function.Function<? extends Throwable, ? extends Mono<? extends R>> before() {
+      return e ->
+          RxJava2Adapter.singleToMono(
+              RxJavaReactorMigrationUtil.toJdkFunction(
+                      ident -> RxJava2Adapter.monoToSingle(placeholder(e)))
+                  .apply(e));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<Throwable, ? extends Mono<? extends R>> after() {
+      return v -> placeholder(v);
     }
   }
 
