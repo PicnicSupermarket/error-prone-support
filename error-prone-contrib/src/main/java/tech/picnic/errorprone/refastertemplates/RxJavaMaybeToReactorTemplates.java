@@ -799,6 +799,22 @@ final class RxJavaMaybeToReactorTemplates {
   }
 
   // XXX: Add test
+  static final class MaybeTestAssertNoValues<T> {
+    @BeforeTemplate
+    void before(Maybe<T> maybe) throws InterruptedException {
+      maybe.test().await().assertNoValues();
+    }
+
+    @AfterTemplate
+    void after(Maybe<T> maybe) {
+      RxJava2Adapter.maybeToMono(maybe)
+          .as(StepVerifier::create)
+          .expectNextCount(0)
+          .verifyComplete();
+    }
+  }
+
+  // XXX: Add test
   // XXX: This introduces AssertJ dependency
   static final class MaybeTestAssertFailureAndMessage<T> {
     @BeforeTemplate

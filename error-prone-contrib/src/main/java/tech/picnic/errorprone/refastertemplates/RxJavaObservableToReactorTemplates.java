@@ -4,10 +4,12 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
@@ -783,6 +785,25 @@ final class RxJavaObservableToReactorTemplates {
   }
 
   // XXX: Add test
+  // XXX: Default BackpressureStrategy.BUFFER
+  static final class ObservableTestAssertNoValues<T> {
+    @BeforeTemplate
+    void before(Observable<T> observable) throws InterruptedException {
+      Refaster.anyOf(
+          observable.test().await().assertNoValues(),
+          observable.test().await().assertNoValues().assertComplete());
+    }
+
+    @AfterTemplate
+    void after(Observable<T> observable) {
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+          .as(StepVerifier::create)
+          .expectNextCount(0)
+          .verifyComplete();
+    }
+  }
+
+  // XXX: Add test
   // XXX: This introduces AssertJ dependency
   static final class ObservableTestAssertFailureAndMessage<T> {
     @BeforeTemplate
@@ -792,6 +813,7 @@ final class RxJavaObservableToReactorTemplates {
     }
 
     @AfterTemplate
+    @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
     void after(Observable<T> observable, Class<? extends Throwable> error, String message) {
       RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
           .as(StepVerifier::create)

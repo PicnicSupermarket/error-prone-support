@@ -1387,6 +1387,24 @@ final class RxJavaFlowableToReactorTemplates {
   }
 
   // XXX: Add test
+  static final class FlowableTestAssertNoValues<T> {
+    @BeforeTemplate
+    void before(Single<T> single) throws InterruptedException {
+      Refaster.anyOf(
+              single.test().await().assertNoValues(),
+              single.test().await().assertNoValues().assertComplete());
+    }
+
+    @AfterTemplate
+    void after(Single<T> single) {
+      RxJava2Adapter.singleToMono(single)
+              .as(StepVerifier::create)
+              .expectNextCount(0)
+              .verifyComplete();
+    }
+  }
+
+  // XXX: Add test
   // XXX: This introduces AssertJ dependency
   static final class FlowableTestAssertFailureAndMessage<T> {
     @BeforeTemplate

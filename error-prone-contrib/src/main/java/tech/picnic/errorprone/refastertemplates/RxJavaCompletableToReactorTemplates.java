@@ -21,6 +21,7 @@ import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
@@ -182,7 +183,6 @@ final class RxJavaCompletableToReactorTemplates {
 
   // XXX: public final Completable ambWith(CompletableSource)
 
-  // XXX: Add the test, is the Void correct?
   static final class CompletableAndThenCompletable<T> {
     @BeforeTemplate
     Completable before(Completable completable, CompletableSource source) {
@@ -192,8 +192,7 @@ final class RxJavaCompletableToReactorTemplates {
     @AfterTemplate
     Completable after(Completable completable, CompletableSource source) {
       return RxJava2Adapter.monoToCompletable(
-          completable
-              .as(RxJava2Adapter::completableToMono)
+          RxJava2Adapter.completableToMono(completable)
               .then(RxJava2Adapter.completableToMono(Completable.wrap(source))));
     }
   }
@@ -227,8 +226,8 @@ final class RxJavaCompletableToReactorTemplates {
     Flowable<T> after(Completable completable, Publisher<T> source) {
       return completable
           .as(RxJava2Adapter::completableToMono)
-          .then(Mono.from(source))
-          .as(RxJava2Adapter::monoToFlowable);
+          .thenMany(source)
+          .as(RxJava2Adapter::fluxToFlowable);
     }
   }
 
@@ -241,10 +240,9 @@ final class RxJavaCompletableToReactorTemplates {
 
     @AfterTemplate
     Single<T> after(Completable completable, SingleSource<T> source) {
-      return completable
-          .as(RxJava2Adapter::completableToMono)
-          .then(Single.wrap(source).as(RxJava2Adapter::singleToMono))
-          .as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.completableToMono(completable)
+              .then(RxJava2Adapter.singleToMono(Single.wrap(source))));
     }
   }
 
@@ -421,6 +419,22 @@ final class RxJavaCompletableToReactorTemplates {
     @AfterTemplate
     void after(Completable completable, Class<? extends Throwable> error) {
       RxJava2Adapter.completableToMono(completable).as(StepVerifier::create).verifyError(error);
+    }
+  }
+
+  // XXX: Add test
+  static final class CompletableTestAssertNoValues {
+    @BeforeTemplate
+    void before(Completable completable) throws InterruptedException {
+      completable.test().await().assertNoValues();
+    }
+
+    @AfterTemplate
+    void after(Completable completable) {
+      RxJava2Adapter.completableToMono(completable)
+          .as(StepVerifier::create)
+          .expectNextCount(0)
+          .verifyComplete();
     }
   }
 

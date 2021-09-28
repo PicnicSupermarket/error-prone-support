@@ -443,7 +443,7 @@ final class RxJavaSingleToReactorTemplates {
 
     @AfterTemplate
     Completable after(Single<T> single) {
-      return single.as(RxJava2Adapter::singleToMono).then().as(RxJava2Adapter::monoToCompletable);
+      return RxJava2Adapter.monoToCompletable(RxJava2Adapter.singleToMono(single).then());
     }
   }
 
@@ -706,6 +706,24 @@ final class RxJavaSingleToReactorTemplates {
     @AfterTemplate
     void after(Single<T> single, Class<? extends Throwable> error) {
       RxJava2Adapter.singleToMono(single).as(StepVerifier::create).verifyError(error);
+    }
+  }
+
+  // XXX: Add test
+  static final class SingleTestAssertNoValues<T> {
+    @BeforeTemplate
+    void before(Single<T> single) throws InterruptedException {
+      Refaster.anyOf(
+          single.test().await().assertNoValues(),
+          single.test().await().assertNoValues().assertComplete());
+    }
+
+    @AfterTemplate
+    void after(Single<T> single) {
+      RxJava2Adapter.singleToMono(single)
+          .as(StepVerifier::create)
+          .expectNextCount(0)
+          .verifyComplete();
     }
   }
 
