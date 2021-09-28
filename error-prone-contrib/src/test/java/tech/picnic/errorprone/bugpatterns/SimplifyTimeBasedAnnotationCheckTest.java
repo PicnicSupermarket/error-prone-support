@@ -37,7 +37,7 @@ public final class SimplifyTimeBasedAnnotationCheckTest {
             "import org.junit.jupiter.api.Timeout;",
             "",
             "interface A {",
-            "  @Timeout(60) A simple();",
+            "  @Timeout(value = 60) A simple();",
             "}")
         .addOutputLines(
             "out/A.java",

@@ -78,33 +78,18 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
     return simplifyUnit(value, timeUnit)
         .map(
             simplification ->
+                // handle the @Annotation(value) case separately by synthesizing it completely.
                 SuggestedFixes.updateAnnotationArgumentValues(
                         annotation,
                         getTimeUnitArgumentName(annotation),
                         ImmutableList.of(simplification.getUnit().name()))
-                    .merge(
-                        valueFix(
+                    .merge(SuggestedFixes.updateAnnotationArgumentValues(
                             annotation,
                             getValueArgumentName(annotation),
-                            simplification.getValue()))
+                            ImmutableList.of(simplification.getValue().toString())))
                     .addStaticImport(
                         TimeUnit.class.getName() + '.' + simplification.getUnit().name())
                     .build());
-  }
-
-  private static SuggestedFix valueFix(
-      AnnotationTree annotation, String parameterName, Number value) {
-    if (!parameterName.equals("value")) {
-      return SuggestedFixes.updateAnnotationArgumentValues(
-              annotation, getValueArgumentName(annotation), ImmutableList.of(value.toString()))
-          .build();
-    }
-
-    // XXX: Fix this. Maybe synthesize the entire annotation in case of "value" and arguments.size()
-    // == 1.
-    return SuggestedFix.builder()
-        .replace(annotation.getArguments().get(0), parameterName + " = " + value)
-        .build();
   }
 
   private static Number getValue(
