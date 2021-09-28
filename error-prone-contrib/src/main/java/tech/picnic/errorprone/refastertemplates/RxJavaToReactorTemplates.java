@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
-import com.google.errorprone.matchers.IsMethodReference;
+import com.google.errorprone.matchers.IsMethodReferenceOrLambdaHasReturnStatement;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -9,7 +9,6 @@ import com.google.errorprone.refaster.annotation.NotMatches;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
@@ -173,7 +172,8 @@ public final class RxJavaToReactorTemplates {
   static final class UnnecessaryFunctionConversion<I, O> {
     @BeforeTemplate
     java.util.function.Function<I, O> before(
-        @NotMatches(IsMethodReference.class) @CanTransformToTargetType Function<I, O> function) {
+        @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class) @CanTransformToTargetType
+            Function<I, O> function) {
       return Refaster.anyOf(
           RxJavaReactorMigrationUtil.toJdkFunction((Function<I, O>) function),
           RxJavaReactorMigrationUtil.toJdkFunction(function));
@@ -268,41 +268,25 @@ public final class RxJavaToReactorTemplates {
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono) {
-      return mono;
+    Flux<T> after(Mono<T> mono) {
+      return mono.flux();
     }
   }
 
-  // XXX It doesn't trigger: DeliveryRepository#handleDeliveryUpdateFailure_migrated ?
-  static final class CompletableIgnoreElementAndThen<T> {
-    @BeforeTemplate
-    Single<T> before(Single<T> single, SingleSource<T> single2) {
-      return single.ignoreElement().andThen(single2);
-    }
-
-    @AfterTemplate
-    Single<T> after(Single<T> single, SingleSource<T> single2) {
-      return single
-          .as(RxJava2Adapter::singleToMono)
-          .ignoreElement()
-          .<T>then(Single.<T>wrap(single2).as(RxJava2Adapter::singleToMono))
-          .as(RxJava2Adapter::monoToSingle);
-    }
-  }
-
-  static final class CompletableIgnoreElementAndThenPublisher<T> {
-    @BeforeTemplate
-    Flowable<T> before(Single<T> single, Publisher<T> publisher) {
-      return single.ignoreElement().andThen(publisher);
-    }
-
-    @AfterTemplate
-    Single<T> after(Single<T> single, Publisher<T> publisher) {
-      return single
-          .as(RxJava2Adapter::singleToMono)
-          .then()
-          .then(Mono.from(publisher))
-          .as(RxJava2Adapter::monoToSingle);
-    }
-  }
+  // XXX: Try with turning this one off.
+//  static final class CompletableIgnoreElementAndThenPublisher<T> {
+//    @BeforeTemplate
+//    Flowable<T> before(Single<T> single, Publisher<T> publisher) {
+//      return single.ignoreElement().andThen(publisher);
+//    }
+//
+//    @AfterTemplate
+//    Single<T> after(Single<T> single, Publisher<T> publisher) {
+//      return single
+//          .as(RxJava2Adapter::singleToMono)
+//          .then()
+//          .then(Mono.from(publisher))
+//          .as(RxJava2Adapter::monoToSingle);
+//    }
+//  }
 }
