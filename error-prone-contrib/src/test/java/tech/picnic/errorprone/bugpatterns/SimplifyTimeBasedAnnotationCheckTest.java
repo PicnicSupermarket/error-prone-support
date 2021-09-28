@@ -20,6 +20,7 @@ public final class SimplifyTimeBasedAnnotationCheckTest {
             "import org.junit.jupiter.api.Timeout;",
             "",
             "interface A {",
+            "  @Timeout(6) A noSimplification();",
             "  // BUG: Diagnostic contains:",
             "  @Timeout(60) A simple();",
             "  // BUG: Diagnostic contains:",
@@ -40,10 +41,12 @@ public final class SimplifyTimeBasedAnnotationCheckTest {
             "}")
         .addOutputLines(
             "out/A.java",
+            "import static java.util.concurrent.TimeUnit.MINUTES;",
+            "",
             "import org.junit.jupiter.api.Timeout;",
             "",
             "interface A {",
-            "  @Timeout(1, unit = TimeUnit.MINUTES) A simple();",
+            "  @Timeout(value = 1, unit = MINUTES) A simple();",
             "}")
         .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
   }

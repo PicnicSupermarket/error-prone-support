@@ -14,6 +14,8 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
 import com.google.errorprone.fixes.Fix;
+import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
@@ -54,7 +56,7 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
     }
 
     return trySimplification(annotationTree, arguments)
-        .map(SimplifyTimeBasedAnnotationCheck::describeMatch)
+        .map(fix -> describeMatch(annotationTree, fix))
         .orElse(Description.NO_MATCH);
   }
 
@@ -73,8 +75,36 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
     Number value = getValue(annotation, indexedArguments);
     TimeUnit timeUnit = getTimeUnit(annotation, indexedArguments);
 
-    Optional<Simplification> simplification = simplifyUnit(value, timeUnit);
-    return Optional.empty();
+    return simplifyUnit(value, timeUnit)
+        .map(
+            simplification ->
+                SuggestedFixes.updateAnnotationArgumentValues(
+                        annotation,
+                        getTimeUnitArgumentName(annotation),
+                        ImmutableList.of(simplification.getUnit().name()))
+                    .merge(
+                        valueFix(
+                            annotation,
+                            getValueArgumentName(annotation),
+                            simplification.getValue()))
+                    .addStaticImport(
+                        TimeUnit.class.getName() + '.' + simplification.getUnit().name())
+                    .build());
+  }
+
+  private static SuggestedFix valueFix(
+      AnnotationTree annotation, String parameterName, Number value) {
+    if (!parameterName.equals("value")) {
+      return SuggestedFixes.updateAnnotationArgumentValues(
+              annotation, getValueArgumentName(annotation), ImmutableList.of(value.toString()))
+          .build();
+    }
+
+    // XXX: Fix this. Maybe synthesize the entire annotation in case of "value" and arguments.size()
+    // == 1.
+    return SuggestedFix.builder()
+        .replace(annotation.getArguments().get(0), parameterName + " = " + value)
+        .build();
   }
 
   private static Number getValue(
@@ -118,10 +148,6 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
             Iterables.getOnlyElement(
                 scope.getSymbols(symbol -> symbol.getQualifiedName().contentEquals(argument)));
     return (VarSymbol) argumentSymbol.getDefaultValue().getValue();
-  }
-
-  private static Description describeMatch(Fix fix) {
-    return Description.NO_MATCH;
   }
 
   private static AnnotationAttributeMatcher getMatcher() {
