@@ -7,6 +7,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
@@ -90,17 +91,24 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
             .then());
   }
 
-  Completable testSingleRandomness() {
+  Completable testSingleRemoveLambdaWithCast() {
     return RxJava2Adapter.monoToCompletable(
         RxJava2Adapter.singleToMono(RxJava2Adapter.monoToSingle(Mono.just(1)))
             .flatMap(v -> Mono.justOrEmpty(null))
             .then());
   }
 
+  Mono<Void> testSingleRemoveLambdaWithCompletable() {
+    return Flux.just(1, 2)
+        .collectList()
+        .flatMap(u -> RxJava2Adapter.completableToMono(Completable.complete()))
+        .then();
+  }
+
   Completable testCompletableIgnoreElement() {
     return Single.just(1)
         .as(RxJava2Adapter::singleToMono)
-        .ignoreElement()
+        .then()
         .as(RxJava2Adapter::monoToCompletable);
   }
 

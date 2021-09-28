@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
@@ -407,6 +408,7 @@ final class RxJavaObservableToReactorTemplates {
     Completable after(Observable<T> observable) {
       return RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
           .ignoreElements()
+          .then()
           .as(RxJava2Adapter::monoToCompletable);
     }
   }
@@ -777,6 +779,25 @@ final class RxJavaObservableToReactorTemplates {
       RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
           .as(StepVerifier::create)
           .verifyError(error);
+    }
+  }
+
+  // XXX: Add test
+  // XXX: This introduces AssertJ dependency
+  static final class ObservableTestAssertFailureAndMessage<T> {
+    @BeforeTemplate
+    void before(Observable<T> observable, Class<? extends Throwable> error, String message)
+        throws InterruptedException {
+      observable.test().await().assertFailureAndMessage(error, message);
+    }
+
+    @AfterTemplate
+    void after(Observable<T> observable, Class<? extends Throwable> error, String message) {
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+          .as(StepVerifier::create)
+          .expectErrorSatisfies(
+              t -> assertThat(t).isInstanceOf(error).hasMessageContaining(message))
+          .verify();
     }
   }
 

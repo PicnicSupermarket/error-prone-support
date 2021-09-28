@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.ImportPolicy;
@@ -420,6 +421,24 @@ final class RxJavaCompletableToReactorTemplates {
     @AfterTemplate
     void after(Completable completable, Class<? extends Throwable> error) {
       RxJava2Adapter.completableToMono(completable).as(StepVerifier::create).verifyError(error);
+    }
+  }
+
+  // XXX: Add test
+  static final class CompletableTestAssertFailureAndMessage {
+    @BeforeTemplate
+    void before(Completable completable, Class<? extends Throwable> error, String message)
+        throws InterruptedException {
+      completable.test().await().assertFailureAndMessage(error, message);
+    }
+
+    @AfterTemplate
+    void after(Completable completable, Class<? extends Throwable> error, String message) {
+      RxJava2Adapter.completableToMono(completable)
+          .as(StepVerifier::create)
+          .expectErrorSatisfies(
+              t -> assertThat(t).isInstanceOf(error).hasMessageContaining(message))
+          .verify();
     }
   }
 

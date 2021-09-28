@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -348,24 +350,43 @@ final class RxJavaSingleToReactorTemplates {
     }
   }
 
-  abstract static class SingleRemoveLambdaWithCasttt<T> {
-    @Placeholder
-    abstract Mono<?> placeholder(@MayOptionallyUse T input);
-
+  abstract static class SingleRemoveLambdaWithCompletable<T> {
     @BeforeTemplate
-    java.util.function.Function<? super T, ? extends Publisher<? extends Void>> before() {
+    java.util.function.Function<? super T, ? extends Mono<? extends Void>> before(
+        Completable completable) {
       return e ->
           RxJava2Adapter.completableToMono(
               Completable.wrap(
-                  RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
-                          (Function<T, Completable>)
-                              v -> (placeholder(v).as(RxJava2Adapter::monoToCompletable)))
+                  RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
+                          (Function<T, CompletableSource>) v -> completable)
                       .apply(e)));
     }
 
     @AfterTemplate
-    java.util.function.Function<? super T, ? extends Mono<?>> after() {
-      return v -> placeholder(v);
+    java.util.function.Function<? super T, ? extends Mono<? extends Void>> after(
+        Completable completable) {
+      return v -> RxJava2Adapter.completableToMono(completable);
+    }
+  }
+
+  // XXX: Verify if this template still flags other cases.
+  abstract static class SingleRemoveLambdaWithCompletableExtra<T> {
+    @Placeholder
+    abstract Completable placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<? super T, ? extends Mono<? extends Void>> before() {
+      return e ->
+          RxJava2Adapter.completableToMono(
+              Completable.wrap(
+                  RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
+                          (Function<T, CompletableSource>) v -> placeholder(v))
+                      .apply(e)));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<? super T, ? extends Mono<? extends Void>> after() {
+      return v -> RxJava2Adapter.completableToMono(placeholder(v));
     }
   }
 
@@ -422,10 +443,7 @@ final class RxJavaSingleToReactorTemplates {
 
     @AfterTemplate
     Completable after(Single<T> single) {
-      return single
-          .as(RxJava2Adapter::singleToMono)
-          .then()
-          .as(RxJava2Adapter::monoToCompletable);
+      return single.as(RxJava2Adapter::singleToMono).then().as(RxJava2Adapter::monoToCompletable);
     }
   }
 
@@ -560,7 +578,12 @@ final class RxJavaSingleToReactorTemplates {
     @BeforeTemplate
     void before(Single<T> single, T item) throws InterruptedException {
       Refaster.anyOf(
-          single.test().await().assertResult(item), single.test().await().assertValue(item));
+          single.test().await().assertResult(item),
+          single.test().assertResult(item),
+          single.test().assertResult(item).assertComplete(),
+          single.test().await().assertValue(item),
+          single.test().assertValue(item),
+          single.test().await().assertValue(item).assertComplete());
     }
 
     @AfterTemplate
@@ -683,6 +706,25 @@ final class RxJavaSingleToReactorTemplates {
     @AfterTemplate
     void after(Single<T> single, Class<? extends Throwable> error) {
       RxJava2Adapter.singleToMono(single).as(StepVerifier::create).verifyError(error);
+    }
+  }
+
+  // XXX: Add test
+  // XXX: This introduces AssertJ dependency
+  static final class SingleTestAssertFailureAndMessage<T> {
+    @BeforeTemplate
+    void before(Single<T> single, Class<? extends Throwable> error, String message)
+        throws InterruptedException {
+      single.test().await().assertFailureAndMessage(error, message);
+    }
+
+    @AfterTemplate
+    void after(Single<T> single, Class<? extends Throwable> error, String message) {
+      RxJava2Adapter.singleToMono(single)
+          .as(StepVerifier::create)
+          .expectErrorSatisfies(
+              t -> assertThat(t).isInstanceOf(error).hasMessageContaining(message))
+          .verify();
     }
   }
 

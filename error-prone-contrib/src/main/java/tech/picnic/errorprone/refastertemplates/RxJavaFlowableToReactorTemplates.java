@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -1247,7 +1249,12 @@ final class RxJavaFlowableToReactorTemplates {
     @BeforeTemplate
     void before(Flowable<T> flowable, T item) throws InterruptedException {
       Refaster.anyOf(
-          flowable.test().await().assertResult(item), flowable.test().await().assertValue(item));
+          flowable.test().assertResult(item),
+          flowable.test().await().assertResult(item),
+          flowable.test().await().assertResult(item).assertComplete(),
+          flowable.test().assertValue(item),
+          flowable.test().await().assertValue(item),
+          flowable.test().await().assertValue(item).assertComplete());
     }
 
     @AfterTemplate
@@ -1376,6 +1383,25 @@ final class RxJavaFlowableToReactorTemplates {
     @AfterTemplate
     void after(Flowable<T> flowable, Class<? extends Throwable> error) {
       RxJava2Adapter.flowableToFlux(flowable).as(StepVerifier::create).verifyError(error);
+    }
+  }
+
+  // XXX: Add test
+  // XXX: This introduces AssertJ dependency
+  static final class FlowableTestAssertFailureAndMessage<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable, Class<? extends Throwable> error, String message)
+        throws InterruptedException {
+      flowable.test().await().assertFailureAndMessage(error, message);
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable, Class<? extends Throwable> error, String message) {
+      RxJava2Adapter.flowableToFlux(flowable)
+          .as(StepVerifier::create)
+          .expectErrorSatisfies(
+              t -> assertThat(t).isInstanceOf(error).hasMessageContaining(message))
+          .verify();
     }
   }
 

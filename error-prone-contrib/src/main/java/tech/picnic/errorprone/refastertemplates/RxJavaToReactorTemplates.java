@@ -1,10 +1,15 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import com.google.errorprone.matchers.IsMethodReference;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
@@ -12,6 +17,7 @@ import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
+import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -112,14 +118,20 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: Find solution to this?
-  //  static final class MaybeConversions<T> {
-  //    @BeforeTemplate
-  //    Maybe<T> before(Single<T> single) {
-  //      return RxJava2Adapter.monoToMaybe(RxJava2Adapter.singleToMono(single));
-  //    }
-  //  }
+  // XXX: Make test
+  static final class MonoToFlowableToFlux<T> {
+    @BeforeTemplate
+    Flux<T> before(Mono<T> mono) {
+      return mono.as(RxJava2Adapter::monoToFlowable).as(RxJava2Adapter::flowableToFlux);
+    }
 
+    @AfterTemplate
+    Flux<T> after(Mono<T> mono) {
+      return mono.flux();
+    }
+  }
+
+  // XXX: Temporarily disabled @CanBeTransformedTo...
   //  static final class RemoveRedundantCast<T> {
   //    @BeforeTemplate
   //    T before(T object) {
@@ -134,12 +146,12 @@ public final class RxJavaToReactorTemplates {
 
   static final class MonoErrorCallableSupplierUtil<T> {
     @BeforeTemplate
-    Mono<T> before(@CanTransformToTargetType Callable<Throwable> callable) {
+    Mono<T> before(@CanTransformToTargetType Callable<? extends Throwable> callable) {
       return Mono.error(RxJavaReactorMigrationUtil.callableAsSupplier(callable));
     }
 
     @AfterTemplate
-    Mono<T> after(Supplier<Throwable> callable) {
+    Mono<T> after(Supplier<? extends Throwable> callable) {
       return Mono.error(callable);
     }
   }
@@ -157,16 +169,20 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: Temporarily disabled @CanBeTransformedTo...
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryFunctionConversion<I, O> {
     @BeforeTemplate
-    java.util.function.Function<I, O> before(Function<I, O> function) {
+    java.util.function.Function<I, O> before(
+        @NotMatches(IsMethodReference.class) @CanTransformToTargetType Function<I, O> function) {
       return Refaster.anyOf(
           RxJavaReactorMigrationUtil.toJdkFunction((Function<I, O>) function),
           RxJavaReactorMigrationUtil.toJdkFunction(function));
     }
 
+    // XXX: Redundant cast to cover the case in which `function` is a method reference on which
+    // `.apply` is invoked.
+    // XXX: This happens e.g. in lambda expressions, but we can't seem to match those with Refaster,
+    // preventing simplification. Investigate.
     @AfterTemplate
     java.util.function.Function<I, O> after(java.util.function.Function<I, O> function) {
       return function;
@@ -245,7 +261,7 @@ public final class RxJavaToReactorTemplates {
   // XXX: This conversion is in the testAddAndFindBadWord of the bad-word-service.
   // It is caused by the Flowable.then.then(Mono.from()).
   // This is officially not correct, but it is in the test, so we can allow it?
-  static final class MonoToFlowableToFlux<T> {
+  static final class MonoFromToFlowableToFlux<T> {
     @BeforeTemplate
     Flux<T> before(Mono<T> mono) {
       return RxJava2Adapter.flowableToFlux(mono.as(RxJava2Adapter::monoToFlowable));
@@ -254,6 +270,39 @@ public final class RxJavaToReactorTemplates {
     @AfterTemplate
     Mono<T> after(Mono<T> mono) {
       return mono;
+    }
+  }
+
+  // XXX It doesn't trigger: DeliveryRepository#handleDeliveryUpdateFailure_migrated ?
+  static final class CompletableIgnoreElementAndThen<T> {
+    @BeforeTemplate
+    Single<T> before(Single<T> single, SingleSource<T> single2) {
+      return single.ignoreElement().andThen(single2);
+    }
+
+    @AfterTemplate
+    Single<T> after(Single<T> single, SingleSource<T> single2) {
+      return single
+          .as(RxJava2Adapter::singleToMono)
+          .ignoreElement()
+          .<T>then(Single.<T>wrap(single2).as(RxJava2Adapter::singleToMono))
+          .as(RxJava2Adapter::monoToSingle);
+    }
+  }
+
+  static final class CompletableIgnoreElementAndThenPublisher<T> {
+    @BeforeTemplate
+    Flowable<T> before(Single<T> single, Publisher<T> publisher) {
+      return single.ignoreElement().andThen(publisher);
+    }
+
+    @AfterTemplate
+    Single<T> after(Single<T> single, Publisher<T> publisher) {
+      return single
+          .as(RxJava2Adapter::singleToMono)
+          .then()
+          .then(Mono.from(publisher))
+          .as(RxJava2Adapter::monoToSingle);
     }
   }
 }
