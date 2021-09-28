@@ -58,10 +58,10 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
                 })));
   }
 
-  Flowable<Object> testUnnecessaryFunctionConversion() {
+  Flowable<String> testUnnecessaryFunctionConversion() {
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
-        .flatMap(RxJavaReactorMigrationUtil.toJdkFunction(i -> ImmutableSet::of))
+        .map(RxJavaReactorMigrationUtil.toJdkFunction(e -> String.valueOf(e)))
         .as(RxJava2Adapter::fluxToFlowable);
   }
 
@@ -89,5 +89,13 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Mono<Integer> testMonoFromNestedPublisher() {
     return Mono.from(RxJava2Adapter.fluxToFlowable(Flux.just(1)));
+  }
+
+  Single<Integer> testCompletableIgnoreElementAndThen() {
+    return Single.fromCallable(() -> 1)
+        .filter(count -> count > 0)
+        .switchIfEmpty(Single.just(1))
+        .ignoreElement()
+        .andThen(Single.error(IllegalAccessError::new));
   }
 }

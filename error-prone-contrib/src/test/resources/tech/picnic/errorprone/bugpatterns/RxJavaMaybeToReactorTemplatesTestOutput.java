@@ -202,7 +202,7 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   Completable testMaybeIgnoreElement() {
     return Maybe.just(1)
         .as(RxJava2Adapter::maybeToMono)
-        .ignoreElement()
+        .then()
         .as(RxJava2Adapter::monoToCompletable);
   }
 

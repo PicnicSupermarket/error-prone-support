@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.ImportPolicy;
@@ -511,6 +512,23 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
+  // XXX: Discuss with Stephan. Still not useful for methodreferences.
+  //  abstract class MaybeUnwrapSingleElement<T, O> {
+  //    @BeforeTemplate
+  //    Maybe<O> after(
+  //        Maybe<T> maybe, Function<? super T, ? extends SingleSource<? extends O>> function) {
+  //      return RxJava2Adapter.monoToMaybe(
+  //          RxJava2Adapter.maybeToMono(maybe)
+  //              .flatMap(
+  //                  e ->
+  //                      RxJava2Adapter.singleToMono(
+  //                          Single.wrap(
+  //                              RxJavaReactorMigrationUtil.toJdkFunction(
+  //                                      (Function<T, SingleSource<O>>) function)
+  //                                  .apply(e)))));
+  //    }
+  //  }
+
   // XXX: public final Flowable flattenAsFlowable(Function)
   // XXX: public final Observable flattenAsObservable(Function)
   // XXX: public final Maybe hide()
@@ -523,10 +541,7 @@ final class RxJavaMaybeToReactorTemplates {
 
     @AfterTemplate
     Completable after(Maybe<T> maybe) {
-      return maybe
-          .as(RxJava2Adapter::maybeToMono)
-          .ignoreElement()
-          .as(RxJava2Adapter::monoToCompletable);
+      return maybe.as(RxJava2Adapter::maybeToMono).then().as(RxJava2Adapter::monoToCompletable);
     }
   }
 
@@ -780,6 +795,25 @@ final class RxJavaMaybeToReactorTemplates {
     @AfterTemplate
     void after(Maybe<T> maybe, Class<? extends Throwable> error) {
       RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).verifyError(error);
+    }
+  }
+
+  // XXX: Add test
+  // XXX: This introduces AssertJ dependency
+  static final class MaybeTestAssertFailureAndMessage<T> {
+    @BeforeTemplate
+    void before(Maybe<T> maybe, Class<? extends Throwable> error, String message)
+        throws InterruptedException {
+      maybe.test().await().assertFailureAndMessage(error, message);
+    }
+
+    @AfterTemplate
+    void after(Maybe<T> maybe, Class<? extends Throwable> error, String message) {
+      RxJava2Adapter.maybeToMono(maybe)
+          .as(StepVerifier::create)
+          .expectErrorSatisfies(
+              t -> assertThat(t).isInstanceOf(error).hasMessageContaining(message))
+          .verify();
     }
   }
 

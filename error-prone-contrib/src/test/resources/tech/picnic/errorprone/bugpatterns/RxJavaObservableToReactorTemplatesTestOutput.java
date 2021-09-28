@@ -49,6 +49,7 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
   Completable testObservableIgnoreElements() {
     return RxJava2Adapter.observableToFlux(Observable.just(1, 2), BackpressureStrategy.BUFFER)
         .ignoreElements()
+        .then()
         .as(RxJava2Adapter::monoToCompletable);
   }
 
