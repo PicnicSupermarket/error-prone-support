@@ -14,7 +14,6 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
 import com.google.errorprone.fixes.Fix;
-import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
@@ -40,7 +39,6 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
     implements AnnotationTreeMatcher {
   private static ImmutableListMultimap<String, String> ANNOTATION_ATTRIBUTES =
       ImmutableListMultimap.<String, String>builder()
-          // How to handle @AliasFor?
           .putAll("org.junit.jupiter.api.Timeout", "value", "unit")
           .build();
 
@@ -83,7 +81,8 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
                         annotation,
                         getTimeUnitArgumentName(annotation),
                         ImmutableList.of(simplification.getUnit().name()))
-                    .merge(SuggestedFixes.updateAnnotationArgumentValues(
+                    .merge(
+                        SuggestedFixes.updateAnnotationArgumentValues(
                             annotation,
                             getValueArgumentName(annotation),
                             ImmutableList.of(simplification.getValue().toString())))
@@ -143,54 +142,79 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
     return AnnotationAttributeMatcher.create(Optional.of(toMatch), ImmutableList.of());
   }
 
-  private static Optional<Simplification> simplifyUnit(Number value, TimeUnit unit) {
-    // floating point numbers are incorrect by default
-    // let's pick a type that fits both int and long, and later work back to the original type
-    // going to the original type is always safe: we only simplify (read: smaller), so we never
-    // overflow
-    long originalValue = value.longValue();
-    TimeUnit originalUnit = unit;
-    ImmutableList<TimeUnit> ceiling = topDownCeiling(unit);
-    return ceiling.stream()
-        .flatMap(
-            u -> {
-              long converted = u.convert(originalValue, unit);
-              // check if we lost any precision, by simply converting back and seeing if we get the
-              // original value
-              return originalValue == originalUnit.convert(converted, u)
-                  ? Stream.of(new Simplification(converted, u))
-                  : Stream.empty();
-            })
-        .findFirst()
-        .map(simplification -> simplification.ensureOriginalNumberType(value.getClass()));
+  private static Optional<TimeSimplifier.Simplification> simplifyUnit(Number value, TimeUnit unit) {
+    checkArgument(
+        value instanceof Integer || value instanceof Long,
+        "Only time expressed as a long or integer can be simplified");
+    return TimeSimplifier.simplify(value.longValue(), unit)
+        .map(simplification -> simplification.ensureNumberIsOfType(value.getClass()));
   }
 
-  private static ImmutableList<TimeUnit> topDownCeiling(TimeUnit unit) {
-    return Arrays.stream(TimeUnit.values())
-        .filter(u -> u.compareTo(unit) > 0)
-        .collect(toImmutableList())
-        .reverse();
-  }
-
-  private static final class Simplification {
-    private final Number value;
-    private final TimeUnit unit;
-
-    public Simplification(Number value, TimeUnit unit) {
-      this.value = value;
-      this.unit = unit;
+  private static final class TimeSimplifier {
+    /**
+     * Returns a {@link Simplification} (iff possible) that describes how the {@code originalValue}
+     * and {@code originalUnit} can be simplified using a larger {@link TimeUnit}.
+     */
+    static Optional<Simplification> simplify(long originalValue, TimeUnit originalUnit) {
+      ImmutableList<TimeUnit> ceiling = descendingLargerUnits(originalUnit);
+      return ceiling.stream()
+          .flatMap(unit -> trySimplify(originalValue, originalUnit, unit))
+          .findFirst();
     }
 
-    public Number getValue() {
-      return value;
+    private static Stream<Simplification> trySimplify(
+        long originalValue, TimeUnit originalUnit, TimeUnit unit) {
+      long converted = unit.convert(originalValue, originalUnit);
+      // Check if we lose any precision by checking if we can convert back.
+      return originalValue == originalUnit.convert(converted, unit)
+          ? Stream.of(new Simplification(converted, unit))
+          : Stream.empty();
     }
 
-    public TimeUnit getUnit() {
-      return unit;
+    /**
+     * Returns all time units that represent a larger amount of time than {@code unit} in descending
+     * order.
+     */
+    private static ImmutableList<TimeUnit> descendingLargerUnits(TimeUnit unit) {
+      return Arrays.stream(TimeUnit.values())
+          .filter(u -> u.compareTo(unit) > 0)
+          .collect(toImmutableList())
+          .reverse();
     }
 
-    public Simplification ensureOriginalNumberType(Class<? extends Number> original) {
-      return original.equals(value.getClass()) ? this : new Simplification(value.intValue(), unit);
+    private static final class Simplification {
+      private final Number value;
+      private final TimeUnit unit;
+
+      public Simplification(int value, TimeUnit unit) {
+        this.value = value;
+        this.unit = unit;
+      }
+
+      public Simplification(long value, TimeUnit unit) {
+        this.value = value;
+        this.unit = unit;
+      }
+
+      public Number getValue() {
+        return value;
+      }
+
+      public TimeUnit getUnit() {
+        return unit;
+      }
+
+      /**
+       * Ensures that {@link #getValue()} returns a {@link Number} of the same type as {@code
+       * original}. Since a {@link Simplification} can only have smaller or values equal to the
+       * original value, this cannot result in an overflow if we need to go from a long to an
+       * integer.
+       */
+      public Simplification ensureNumberIsOfType(Class<? extends Number> original) {
+        return original.equals(value.getClass())
+            ? this
+            : new Simplification(value.intValue(), unit);
+      }
     }
   }
 }
