@@ -33,6 +33,10 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+/**
+ * A {@link BugChecker} which flags methods annotated with annotations described by {@link
+ * AnnotationDescriptor} that can be written more concisely.
+ */
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "SimplifyTimeAnnotation",
@@ -41,6 +45,7 @@ import java.util.stream.Stream;
     severity = BugPattern.SeverityLevel.WARNING,
     tags = BugPattern.StandardTags.SIMPLIFICATION)
 public final class SimplifyTimeAnnotationCheck extends BugChecker implements AnnotationTreeMatcher {
+  private static final long serialVersionUID = 1L;
   private static final AnnotationAttributeMatcher ARGUMENT_SELECTOR = getMatcher();
 
   @Override
@@ -99,7 +104,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
 
     // The annotation is of the form `@Annotation(v)` or `@Annotation(value = v)`. For the former we
     // must synthesize the entire annotation, but this is OK for the latter, too.
-    if (indexedAttributes.size() == 1 && indexedAttributes.containsKey("value")) {
+    if (indexedAttributes.size() == 1 && simplifications.containsKey("value")) {
       TimeSimplifier.Simplification simplification = simplifications.get("value");
       return Optional.of(
           getImplicitValueAttributeFix(
@@ -137,15 +142,15 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
 
   private static Fix getImplicitValueAttributeFix(
       AnnotationTree annotation, Number newValue, String timeUnitField, TimeUnit newTimeUnit) {
+    @SuppressWarnings("TreeToString")
+    String synthesizedAnnotation =
+        annotation
+            .toString()
+            .replaceFirst(
+                "\\(.+\\)",
+                String.format("(value=%s, %s=%s)", newValue, timeUnitField, newTimeUnit.name()));
     return SuggestedFix.builder()
-        .replace(
-            annotation,
-            annotation
-                .toString()
-                .replaceFirst(
-                    "\\(.+\\)",
-                    String.format(
-                        "(value=%s, %s=%s)", newValue, timeUnitField, newTimeUnit.name())))
+        .replace(annotation, synthesizedAnnotation)
         .addStaticImport(TimeUnit.class.getName() + '.' + newTimeUnit.name())
         .build();
   }
@@ -301,7 +306,9 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
      * order.
      */
     private static ImmutableSortedSet<TimeUnit> descendingLargerUnits(TimeUnit unit) {
-      return ImmutableSortedSet.copyOf(TimeUnit.values()).tailSet(unit, false).descendingSet();
+      return ImmutableSortedSet.copyOf(TimeUnit.values())
+          .tailSet(unit, /* inclusive= */ false)
+          .descendingSet();
     }
 
     /** Represents a simplification in terms of the new value and new unit. */
