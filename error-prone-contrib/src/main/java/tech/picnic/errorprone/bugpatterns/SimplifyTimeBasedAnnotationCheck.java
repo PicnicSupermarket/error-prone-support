@@ -2,11 +2,13 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.errorprone.BugPattern;
@@ -14,6 +16,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
 import com.google.errorprone.fixes.Fix;
+import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
@@ -24,6 +27,7 @@ import com.sun.tools.javac.code.Scope;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -37,11 +41,6 @@ import java.util.stream.Stream;
     tags = BugPattern.StandardTags.SIMPLIFICATION)
 public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
     implements AnnotationTreeMatcher {
-  private static ImmutableListMultimap<String, String> ANNOTATION_ATTRIBUTES =
-      ImmutableListMultimap.<String, String>builder()
-          .putAll("org.junit.jupiter.api.Timeout", "value", "unit")
-          .build();
-
   private static final AnnotationAttributeMatcher ARGUMENT_SELECTOR = getMatcher();
 
   @Override
@@ -62,6 +61,8 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
       AnnotationTree annotation, ImmutableList<ExpressionTree> arguments) {
     checkArgument(!arguments.isEmpty());
 
+    SimplifiableAnnotation simplifiableAnnotation =
+        SimplifiableAnnotation.from(getAnnotationFqcn(annotation));
     ImmutableMap<String, ExpressionTree> indexedArguments =
         Maps.uniqueIndex(
             arguments,
@@ -69,59 +70,84 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
                 ASTHelpers.getSymbol(((AssignmentTree) expr).getVariable())
                     .getSimpleName()
                     .toString());
+    TimeUnit timeUnit =
+        getTimeUnit(annotation, simplifiableAnnotation.getTimeUnitField(), indexedArguments);
 
-    Number value = getValue(annotation, indexedArguments);
-    TimeUnit timeUnit = getTimeUnit(annotation, indexedArguments);
+    ImmutableMap<String, Number> fieldValues =
+        simplifiableAnnotation.getTimeFields().stream()
+            .map(field -> Maps.immutableEntry(field, getValue(field, indexedArguments)))
+            .filter(entry -> entry.getValue().isPresent())
+            .collect(toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().orElseThrow()));
 
-    return simplifyUnit(value, timeUnit)
+    Map<String, TimeSimplifier.Simplification> simplifications =
+        Maps.transformValues(
+            Maps.filterValues(
+                Maps.transformEntries(fieldValues, (field, value) -> simplifyUnit(value, timeUnit)),
+                Optional::isPresent),
+            Optional::orElseThrow);
+
+    // Some could not be simplified, and since the unit is shared, the others can't either.
+    if (simplifications.size() != fieldValues.size()) {
+      return Optional.empty();
+    }
+
+    // Since each might have a different simplification possible, check the common unit.
+    // Since we only get simplifications iff it's possible, and we check that all can be simplified,
+    // we don't need to check if this equals `timeUnit`.
+    TimeUnit commonUnit =
+        findCommonUnit(
+            ImmutableSet.copyOf(
+                Maps.transformValues(simplifications, TimeSimplifier.Simplification::getUnit)
+                    .values()));
+
+    // handle the @Annotation(value) case separately by synthesizing it completely.
+    return simplifications.entrySet().stream()
         .map(
             simplification ->
-                // handle the @Annotation(value) case separately by synthesizing it completely.
                 SuggestedFixes.updateAnnotationArgumentValues(
                         annotation,
-                        getTimeUnitArgumentName(annotation),
-                        ImmutableList.of(simplification.getUnit().name()))
+                        simplifiableAnnotation.getTimeUnitField(),
+                        ImmutableList.of(commonUnit.name()))
                     .merge(
                         SuggestedFixes.updateAnnotationArgumentValues(
                             annotation,
-                            getValueArgumentName(annotation),
-                            ImmutableList.of(simplification.getValue().toString())))
-                    .addStaticImport(
-                        TimeUnit.class.getName() + '.' + simplification.getUnit().name())
-                    .build());
+                            simplification.getKey(),
+                            ImmutableList.of(inCommonUnit(simplification.getValue(), commonUnit)))))
+        .reduce(SuggestedFix.Builder::merge)
+        .map(builder -> builder.addStaticImport(TimeUnit.class.getName() + '.' + commonUnit.name()))
+        .map(SuggestedFix.Builder::build);
   }
 
-  private static Number getValue(
-      AnnotationTree annotationTree, ImmutableMap<String, ExpressionTree> indexedArguments) {
-    String valueName = getValueArgumentName(annotationTree);
-    return (Number)
-        ASTHelpers.constValue(((AssignmentTree) indexedArguments.get(valueName)).getExpression());
+  private static String inCommonUnit(
+      TimeSimplifier.Simplification simplification, TimeUnit commonUnit) {
+    return String.valueOf(
+        commonUnit.convert(simplification.getValue().longValue(), simplification.getUnit()));
   }
 
-  private static String getValueArgumentName(AnnotationTree annotationTree) {
-    return getArgumentName(annotationTree, 0);
+  private static String getAnnotationFqcn(AnnotationTree annotation) {
+    return ASTHelpers.getSymbol(annotation).getQualifiedName().toString();
   }
 
-  private static String getTimeUnitArgumentName(AnnotationTree annotationTree) {
-    return getArgumentName(annotationTree, 1);
-  }
-
-  private static String getArgumentName(AnnotationTree annotationTree, int index) {
-    return ANNOTATION_ATTRIBUTES
-        .get(ASTHelpers.getSymbol(annotationTree).getQualifiedName().toString())
-        .get(index);
+  private static Optional<Number> getValue(
+      String field, ImmutableMap<String, ExpressionTree> indexedArguments) {
+    return Optional.ofNullable(indexedArguments.get(field))
+        .filter(AssignmentTree.class::isInstance)
+        .map(AssignmentTree.class::cast)
+        .map(AssignmentTree::getExpression)
+        .map(expr -> ASTHelpers.constValue(expr, Number.class));
   }
 
   private static TimeUnit getTimeUnit(
-      AnnotationTree annotation, ImmutableMap<String, ExpressionTree> indexedArguments) {
-    String argument = getTimeUnitArgumentName(annotation);
+      AnnotationTree annotation,
+      String field,
+      ImmutableMap<String, ExpressionTree> indexedArguments) {
     VarSymbol symbol =
-        Optional.ofNullable(indexedArguments.get(argument))
+        Optional.ofNullable(indexedArguments.get(field))
             .map(
                 argumentTree ->
                     (VarSymbol)
                         ASTHelpers.getSymbol(((AssignmentTree) argumentTree).getExpression()))
-            .orElseGet(() -> getDefaultTimeUnit(annotation, argument));
+            .orElseGet(() -> getDefaultTimeUnit(annotation, field));
     return TimeUnit.valueOf(symbol.getQualifiedName().toString());
   }
 
@@ -136,8 +162,11 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
 
   private static AnnotationAttributeMatcher getMatcher() {
     ImmutableList<String> toMatch =
-        ANNOTATION_ATTRIBUTES.entries().stream()
-            .map(entry -> entry.getKey() + '#' + entry.getValue())
+        Arrays.stream(SimplifiableAnnotation.values())
+            .flatMap(
+                annotation ->
+                    annotation.getTimeFields().stream()
+                        .map(field -> annotation.getFqcn() + '#' + field))
             .collect(toImmutableList());
     return AnnotationAttributeMatcher.create(Optional.of(toMatch), ImmutableList.of());
   }
@@ -148,6 +177,53 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
         "Only time expressed as a long or integer can be simplified");
     return TimeSimplifier.simplify(value.longValue(), unit)
         .map(simplification -> simplification.ensureNumberIsOfType(value.getClass()));
+  }
+
+  private static TimeUnit findCommonUnit(ImmutableSet<TimeUnit> units) {
+    return ImmutableSortedSet.copyOf(units).first();
+  }
+
+  // XXX: Support "banned" fields which prevent simplifications altogether.
+  private enum SimplifiableAnnotation {
+    JUNIT_TIMEOUT("org.junit.jupiter.api.Timeout", ImmutableSet.of("value"), "unit"),
+    SPRING_SCHEDULED(
+        "org.springframework.scheduling.annotation.Scheduled",
+        ImmutableSet.of("fixedDelay", "fixedRate", "initialDelay"),
+        "timeUnit");
+
+    private final String fqcn;
+    private final ImmutableSet<String> timeFields;
+    private final String timeUnitField;
+
+    SimplifiableAnnotation(String fqcn, ImmutableSet<String> timeFields, String timeUnitField) {
+      this.fqcn = fqcn;
+      this.timeFields = timeFields;
+      this.timeUnitField = timeUnitField;
+    }
+
+    public static SimplifiableAnnotation from(String fqcn) {
+      return Arrays.stream(values())
+          .filter(annotation -> annotation.fqcn.equals(fqcn))
+          .findFirst()
+          .orElseThrow(
+              () ->
+                  new IllegalArgumentException(
+                      String.format(
+                          "Unknown enum constant: %s.%s",
+                          SimplifiableAnnotation.class.getName(), fqcn)));
+    }
+
+    public String getFqcn() {
+      return fqcn;
+    }
+
+    public ImmutableSet<String> getTimeFields() {
+      return timeFields;
+    }
+
+    public String getTimeUnitField() {
+      return timeUnitField;
+    }
   }
 
   private static final class TimeSimplifier {

@@ -35,18 +35,23 @@ public final class SimplifyTimeBasedAnnotationCheckTest {
         .addInputLines(
             "in/A.java",
             "import org.junit.jupiter.api.Timeout;",
+            "import org.springframework.scheduling.annotation.Scheduled;",
             "",
             "interface A {",
             "  @Timeout(value = 60) A simple();",
+            "  @Scheduled(fixedDelay = 6_000) A scheduledFixedDelay();",
             "}")
         .addOutputLines(
             "out/A.java",
             "import static java.util.concurrent.TimeUnit.MINUTES;",
+            "import static java.util.concurrent.TimeUnit.SECONDS;",
             "",
             "import org.junit.jupiter.api.Timeout;",
+            "import org.springframework.scheduling.annotation.Scheduled;",
             "",
             "interface A {",
-            "  @Timeout(value = 1, unit = MINUTES) A simple();",
+            "  @Timeout(unit = MINUTES, value = 1) A simple();",
+            "  @Scheduled(timeUnit = SECONDS, fixedDelay = 6) A scheduledFixedDelay();",
             "}")
         .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
   }
