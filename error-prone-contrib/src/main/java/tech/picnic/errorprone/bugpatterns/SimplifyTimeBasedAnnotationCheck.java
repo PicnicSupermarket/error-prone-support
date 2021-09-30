@@ -91,6 +91,17 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
       return Optional.empty();
     }
 
+    // We need to synthesize the annotation entirely.
+    if (indexedArguments.size() == 1 && indexedArguments.containsKey("value")) {
+      TimeSimplifier.Simplification simplification = simplifications.get("value");
+      return Optional.of(
+          getImplicitValueAttributeFix(
+              annotation,
+              simplification.getValue(),
+              simplifiableAnnotation.getTimeUnitField(),
+              simplification.getUnit()));
+    }
+
     // Since each might have a different simplification possible, check the common unit.
     // Since we only get simplifications iff it's possible, and we check that all can be simplified,
     // we don't need to check if this equals `timeUnit`.
@@ -100,28 +111,44 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
                 Maps.transformValues(simplifications, TimeSimplifier.Simplification::getUnit)
                     .values()));
 
-    // handle the @Annotation(value) case separately by synthesizing it completely.
+    return getExplicitAttributesFix(
+        annotation, simplifications, simplifiableAnnotation.getTimeUnitField(), commonUnit);
+  }
+
+  private static Fix getImplicitValueAttributeFix(
+      AnnotationTree annotation, Number newValue, String timeUnitField, TimeUnit newTimeUnit) {
+    return SuggestedFix.builder()
+        .replace(
+            annotation,
+            annotation
+                .toString()
+                .replaceFirst(
+                    "\\(.+\\)",
+                    String.format(
+                        "(value=%s, %s=%s)", newValue, timeUnitField, newTimeUnit.name())))
+        .addStaticImport(TimeUnit.class.getName() + '.' + newTimeUnit.name())
+        .build();
+  }
+
+  private static Optional<Fix> getExplicitAttributesFix(
+      AnnotationTree annotation,
+      Map<String, TimeSimplifier.Simplification> simplifications,
+      String timeUnitField,
+      TimeUnit newUnit) {
     return simplifications.entrySet().stream()
         .map(
             simplification ->
                 SuggestedFixes.updateAnnotationArgumentValues(
-                        annotation,
-                        simplifiableAnnotation.getTimeUnitField(),
-                        ImmutableList.of(commonUnit.name()))
+                        annotation, timeUnitField, ImmutableList.of(newUnit.name()))
                     .merge(
                         SuggestedFixes.updateAnnotationArgumentValues(
                             annotation,
                             simplification.getKey(),
-                            ImmutableList.of(inCommonUnit(simplification.getValue(), commonUnit)))))
+                            ImmutableList.of(
+                                String.valueOf(simplification.getValue().toUnit(newUnit))))))
         .reduce(SuggestedFix.Builder::merge)
-        .map(builder -> builder.addStaticImport(TimeUnit.class.getName() + '.' + commonUnit.name()))
+        .map(builder -> builder.addStaticImport(TimeUnit.class.getName() + '.' + newUnit.name()))
         .map(SuggestedFix.Builder::build);
-  }
-
-  private static String inCommonUnit(
-      TimeSimplifier.Simplification simplification, TimeUnit commonUnit) {
-    return String.valueOf(
-        commonUnit.convert(simplification.getValue().longValue(), simplification.getUnit()));
   }
 
   private static String getAnnotationFqcn(AnnotationTree annotation) {
@@ -290,6 +317,10 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
         return original.equals(value.getClass())
             ? this
             : new Simplification(value.intValue(), unit);
+      }
+
+      public long toUnit(TimeUnit unit) {
+        return unit.convert(value.longValue(), this.unit);
       }
     }
   }
