@@ -67,52 +67,55 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
       return Optional.empty();
     }
 
-    ImmutableMap<String, ExpressionTree> indexedArguments =
+    ImmutableMap<String, ExpressionTree> indexedAttributes =
         Maps.uniqueIndex(
             arguments,
             expr ->
                 ASTHelpers.getSymbol(((AssignmentTree) expr).getVariable())
                     .getSimpleName()
                     .toString());
-    TimeUnit timeUnit =
-        getTimeUnit(annotation, annotationDescriptor.timeUnitField, indexedArguments);
 
-    ImmutableMap<String, Number> fieldValues =
+    TimeUnit currentTimeUnit =
+        getTimeUnit(annotation, annotationDescriptor.timeUnitField, indexedAttributes);
+
+    ImmutableMap<String, Number> timeValues =
         annotationDescriptor.timeFields.stream()
-            .map(field -> Maps.immutableEntry(field, getValue(field, indexedArguments)))
+            .map(field -> Maps.immutableEntry(field, getValue(field, indexedAttributes)))
             .filter(entry -> entry.getValue().isPresent())
             .collect(toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().orElseThrow()));
 
     Map<String, TimeSimplifier.Simplification> simplifications =
         Maps.transformValues(
             Maps.filterValues(
-                Maps.transformEntries(fieldValues, (field, value) -> simplifyUnit(value, timeUnit)),
+                Maps.transformEntries(
+                    timeValues, (field, value) -> trySimplify(value, currentTimeUnit)),
                 Optional::isPresent),
             Optional::orElseThrow);
 
     // Some could not be simplified, and since the unit is shared, the others can't either.
-    if (simplifications.size() != fieldValues.size()) {
+    if (simplifications.size() != timeValues.size()) {
       return Optional.empty();
     }
 
-    // We need to synthesize the annotation entirely.
-    if (indexedArguments.size() == 1 && indexedArguments.containsKey("value")) {
+    // The annotation is of the form `@Annotation(v)` or `@Annotation(value = v)`. For the former we
+    // must synthesize the entire annotation, but this is OK for the latter, too.
+    if (indexedAttributes.size() == 1 && indexedAttributes.containsKey("value")) {
       TimeSimplifier.Simplification simplification = simplifications.get("value");
       return Optional.of(
           getImplicitValueAttributeFix(
               annotation,
-              simplification.getValue(),
+              simplification.value,
               annotationDescriptor.timeUnitField,
-              simplification.getUnit()));
+              simplification.unit));
     }
 
     // Since each might have a different simplification possible, check the common unit.
     // Since we only get simplifications iff it's possible, and we check that all can be simplified,
-    // we don't need to check if this equals `timeUnit`.
+    // we don't need to check if this equals `currentTimeUnit`.
     TimeUnit commonUnit =
         findCommonUnit(
             ImmutableSet.copyOf(
-                Maps.transformValues(simplifications, TimeSimplifier.Simplification::getUnit)
+                Maps.transformValues(simplifications, simplification -> simplification.unit)
                     .values()));
 
     return getExplicitAttributesFix(
@@ -154,15 +157,15 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
       TimeUnit newUnit) {
     return simplifications.entrySet().stream()
         .map(
-            simplification ->
+            simplificationEntry ->
                 SuggestedFixes.updateAnnotationArgumentValues(
                         annotation, timeUnitField, ImmutableList.of(newUnit.name()))
                     .merge(
                         SuggestedFixes.updateAnnotationArgumentValues(
                             annotation,
-                            simplification.getKey(),
+                            simplificationEntry.getKey(),
                             ImmutableList.of(
-                                String.valueOf(simplification.getValue().toUnit(newUnit))))))
+                                String.valueOf(simplificationEntry.getValue().toUnit(newUnit))))))
         .reduce(SuggestedFix.Builder::merge)
         .map(builder -> builder.addStaticImport(TimeUnit.class.getName() + '.' + newUnit.name()))
         .map(SuggestedFix.Builder::build);
@@ -214,7 +217,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
     return AnnotationAttributeMatcher.create(Optional.of(toMatch), ImmutableList.of());
   }
 
-  private static Optional<TimeSimplifier.Simplification> simplifyUnit(Number value, TimeUnit unit) {
+  private static Optional<TimeSimplifier.Simplification> trySimplify(Number value, TimeUnit unit) {
     checkArgument(
         value instanceof Integer || value instanceof Long,
         "Only time expressed as a long or integer can be simplified");
@@ -271,6 +274,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
     }
   }
 
+  /** Utility class to help simplify time expressions. */
   private static final class TimeSimplifier {
     /**
      * Returns a {@link Simplification} (iff possible) that describes how the {@code originalValue}
@@ -318,19 +322,10 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
         this.unit = unit;
       }
 
-      public Number getValue() {
-        return value;
-      }
-
-      public TimeUnit getUnit() {
-        return unit;
-      }
-
       /**
-       * Ensures that {@link #getValue()} returns a {@link Number} of the same type as {@code
-       * original}. Since a {@link Simplification} can only have smaller or values equal to the
-       * original value, this cannot result in an overflow if we need to go from a long to an
-       * integer.
+       * Ensures that {@link #value} returns a {@link Number} of the same type as {@code original}.
+       * Since a {@link Simplification} can only have smaller or values equal to the original value,
+       * this cannot result in an overflow if we need to go from a long to an integer.
        */
       public Simplification ensureNumberIsOfType(Class<? extends Number> original) {
         return original.equals(value.getClass())
