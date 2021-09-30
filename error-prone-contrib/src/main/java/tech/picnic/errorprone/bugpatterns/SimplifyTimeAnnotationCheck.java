@@ -281,7 +281,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
      * and {@code originalUnit} can be simplified using a larger {@link TimeUnit}.
      */
     static Optional<Simplification> simplify(long originalValue, TimeUnit originalUnit) {
-      ImmutableList<TimeUnit> ceiling = descendingLargerUnits(originalUnit);
+      ImmutableSortedSet<TimeUnit> ceiling = descendingLargerUnits(originalUnit);
       return ceiling.stream()
           .flatMap(unit -> trySimplify(originalValue, originalUnit, unit))
           .findFirst();
@@ -300,11 +300,8 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
      * Returns all time units that represent a larger amount of time than {@code unit} in descending
      * order.
      */
-    private static ImmutableList<TimeUnit> descendingLargerUnits(TimeUnit unit) {
-      return Arrays.stream(TimeUnit.values())
-          .filter(u -> u.compareTo(unit) > 0)
-          .collect(toImmutableList())
-          .reverse();
+    private static ImmutableSortedSet<TimeUnit> descendingLargerUnits(TimeUnit unit) {
+      return ImmutableSortedSet.copyOf(TimeUnit.values()).tailSet(unit, false).descendingSet();
     }
 
     /** Represents a simplification in terms of the new value and new unit. */
