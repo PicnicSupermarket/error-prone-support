@@ -4,12 +4,11 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class SimplifyTimeBasedAnnotationCheckTest {
+public final class SimplifyTimeAnnotationCheckTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(SimplifyTimeBasedAnnotationCheck.class, getClass());
+      CompilationTestHelper.newInstance(SimplifyTimeAnnotationCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(
-          SimplifyTimeBasedAnnotationCheck.class, getClass());
+      BugCheckerRefactoringTestHelper.newInstance(SimplifyTimeAnnotationCheck.class, getClass());
 
   @Test
   void identification() {
@@ -25,6 +24,21 @@ public final class SimplifyTimeBasedAnnotationCheckTest {
             "  @Timeout(60) A simple();",
             "  // BUG: Diagnostic contains:",
             "  @Timeout(value = 60 * 1000, unit = TimeUnit.MILLISECONDS) A explicitUnit();",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void identificationBannedField() {
+    compilationTestHelper
+        .addSourceLines(
+            "A.java",
+            "import org.springframework.scheduling.annotation.Scheduled;",
+            "",
+            "interface A {",
+            "  // BUG: Diagnostic contains:",
+            "  @Scheduled(fixedDelay = 6_000) A scheduledFixedDelay();",
+            "  @Scheduled(fixedDelay = 6_000, fixedRateString = \"\") A bannedAttribute();",
             "}")
         .doTest();
   }

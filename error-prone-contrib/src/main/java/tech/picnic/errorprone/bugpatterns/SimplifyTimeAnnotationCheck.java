@@ -23,6 +23,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Scope;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
@@ -34,13 +35,12 @@ import java.util.stream.Stream;
 
 @AutoService(BugChecker.class)
 @BugPattern(
-    name = "SimplifyTimeBasedAnnotation",
+    name = "SimplifyTimeAnnotation",
     summary = "Simplifies annotations which express an amount of time using TimeUnit",
     linkType = BugPattern.LinkType.NONE,
     severity = BugPattern.SeverityLevel.WARNING,
     tags = BugPattern.StandardTags.SIMPLIFICATION)
-public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
-    implements AnnotationTreeMatcher {
+public final class SimplifyTimeAnnotationCheck extends BugChecker implements AnnotationTreeMatcher {
   private static final AnnotationAttributeMatcher ARGUMENT_SELECTOR = getMatcher();
 
   @Override
@@ -61,8 +61,12 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
       AnnotationTree annotation, ImmutableList<ExpressionTree> arguments) {
     checkArgument(!arguments.isEmpty());
 
-    SimplifiableAnnotation simplifiableAnnotation =
-        SimplifiableAnnotation.from(getAnnotationFqcn(annotation));
+    AnnotationDescriptor annotationDescriptor =
+        AnnotationDescriptor.from(getAnnotationFqcn(annotation));
+    if (containsAnyAttributeOf(annotation, annotationDescriptor.bannedFields)) {
+      return Optional.empty();
+    }
+
     ImmutableMap<String, ExpressionTree> indexedArguments =
         Maps.uniqueIndex(
             arguments,
@@ -71,10 +75,10 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
                     .getSimpleName()
                     .toString());
     TimeUnit timeUnit =
-        getTimeUnit(annotation, simplifiableAnnotation.getTimeUnitField(), indexedArguments);
+        getTimeUnit(annotation, annotationDescriptor.timeUnitField, indexedArguments);
 
     ImmutableMap<String, Number> fieldValues =
-        simplifiableAnnotation.getTimeFields().stream()
+        annotationDescriptor.timeFields.stream()
             .map(field -> Maps.immutableEntry(field, getValue(field, indexedArguments)))
             .filter(entry -> entry.getValue().isPresent())
             .collect(toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().orElseThrow()));
@@ -98,7 +102,7 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
           getImplicitValueAttributeFix(
               annotation,
               simplification.getValue(),
-              simplifiableAnnotation.getTimeUnitField(),
+              annotationDescriptor.timeUnitField,
               simplification.getUnit()));
     }
 
@@ -112,7 +116,20 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
                     .values()));
 
     return getExplicitAttributesFix(
-        annotation, simplifications, simplifiableAnnotation.getTimeUnitField(), commonUnit);
+        annotation, simplifications, annotationDescriptor.timeUnitField, commonUnit);
+  }
+
+  private static boolean containsAnyAttributeOf(
+      AnnotationTree annotation, ImmutableSet<String> attributes) {
+    return annotation.getArguments().stream()
+        .map(
+            expr ->
+                expr.getKind() == Tree.Kind.ASSIGNMENT
+                    ? ASTHelpers.getSymbol(((AssignmentTree) expr).getVariable())
+                        .getSimpleName()
+                        .toString()
+                    : "value")
+        .anyMatch(attributes::contains);
   }
 
   private static Fix getImplicitValueAttributeFix(
@@ -189,11 +206,10 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
 
   private static AnnotationAttributeMatcher getMatcher() {
     ImmutableList<String> toMatch =
-        Arrays.stream(SimplifiableAnnotation.values())
+        Arrays.stream(AnnotationDescriptor.values())
             .flatMap(
                 annotation ->
-                    annotation.getTimeFields().stream()
-                        .map(field -> annotation.getFqcn() + '#' + field))
+                    annotation.timeFields.stream().map(field -> annotation.fqcn + '#' + field))
             .collect(toImmutableList());
     return AnnotationAttributeMatcher.create(Optional.of(toMatch), ImmutableList.of());
   }
@@ -210,25 +226,39 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
     return ImmutableSortedSet.copyOf(units).first();
   }
 
-  // XXX: Support "banned" fields which prevent simplifications altogether.
-  private enum SimplifiableAnnotation {
+  private enum AnnotationDescriptor {
     JUNIT_TIMEOUT("org.junit.jupiter.api.Timeout", ImmutableSet.of("value"), "unit"),
     SPRING_SCHEDULED(
         "org.springframework.scheduling.annotation.Scheduled",
         ImmutableSet.of("fixedDelay", "fixedRate", "initialDelay"),
-        "timeUnit");
+        "timeUnit",
+        ImmutableSet.of("fixedDelayString", "fixedRateString", "initialDelayString"));
 
+    /** The fully-qualified class name of the annotation to simplify. */
     private final String fqcn;
+    /** The attributes containing a value of time. */
     private final ImmutableSet<String> timeFields;
+    /** The attribute containing the time unit. */
     private final String timeUnitField;
+    /** The set of attributes that cause the check to backoff. */
+    private final ImmutableSet<String> bannedFields;
 
-    SimplifiableAnnotation(String fqcn, ImmutableSet<String> timeFields, String timeUnitField) {
+    AnnotationDescriptor(String fqcn, ImmutableSet<String> timeFields, String timeUnitField) {
+      this(fqcn, timeFields, timeUnitField, ImmutableSet.of());
+    }
+
+    AnnotationDescriptor(
+        String fqcn,
+        ImmutableSet<String> timeFields,
+        String timeUnitField,
+        ImmutableSet<String> bannedFields) {
       this.fqcn = fqcn;
       this.timeFields = timeFields;
       this.timeUnitField = timeUnitField;
+      this.bannedFields = bannedFields;
     }
 
-    public static SimplifiableAnnotation from(String fqcn) {
+    public static AnnotationDescriptor from(String fqcn) {
       return Arrays.stream(values())
           .filter(annotation -> annotation.fqcn.equals(fqcn))
           .findFirst()
@@ -237,19 +267,7 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
                   new IllegalArgumentException(
                       String.format(
                           "Unknown enum constant: %s.%s",
-                          SimplifiableAnnotation.class.getName(), fqcn)));
-    }
-
-    public String getFqcn() {
-      return fqcn;
-    }
-
-    public ImmutableSet<String> getTimeFields() {
-      return timeFields;
-    }
-
-    public String getTimeUnitField() {
-      return timeUnitField;
+                          AnnotationDescriptor.class.getName(), fqcn)));
     }
   }
 
@@ -285,6 +303,7 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
           .reverse();
     }
 
+    /** Represents a simplification in terms of the new value and new unit. */
     private static final class Simplification {
       private final Number value;
       private final TimeUnit unit;
@@ -319,6 +338,10 @@ public final class SimplifyTimeBasedAnnotationCheck extends BugChecker
             : new Simplification(value.intValue(), unit);
       }
 
+      /**
+       * Converts the value with the unit represented by this simplification to an equivalent value
+       * in the given {@code unit}.
+       */
       public long toUnit(TimeUnit unit) {
         return unit.convert(value.longValue(), this.unit);
       }
