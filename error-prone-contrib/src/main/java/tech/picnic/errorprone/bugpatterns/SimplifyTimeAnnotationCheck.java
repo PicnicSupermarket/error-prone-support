@@ -12,6 +12,9 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.errorprone.BugPattern;
+import com.google.errorprone.BugPattern.LinkType;
+import com.google.errorprone.BugPattern.SeverityLevel;
+import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
@@ -41,15 +44,15 @@ import java.util.stream.Stream;
 @BugPattern(
     name = "SimplifyTimeAnnotation",
     summary = "Simplifies annotations which express an amount of time using TimeUnit",
-    linkType = BugPattern.LinkType.NONE,
-    severity = BugPattern.SeverityLevel.WARNING,
-    tags = BugPattern.StandardTags.SIMPLIFICATION)
+    linkType = LinkType.NONE,
+    severity = SeverityLevel.WARNING,
+    tags = StandardTags.SIMPLIFICATION)
 public final class SimplifyTimeAnnotationCheck extends BugChecker implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final AnnotationAttributeMatcher ARGUMENT_SELECTOR = getMatcher();
 
   @Override
-  public Description matchAnnotation(AnnotationTree annotationTree, VisitorState visitorState) {
+  public Description matchAnnotation(AnnotationTree annotationTree, VisitorState state) {
     ImmutableList<ExpressionTree> arguments =
         ARGUMENT_SELECTOR.extractMatchingArguments(annotationTree).collect(toImmutableList());
 
@@ -57,13 +60,13 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
       return Description.NO_MATCH;
     }
 
-    return trySimplification(annotationTree, arguments)
+    return trySimplification(annotationTree, arguments, state)
         .map(fix -> describeMatch(annotationTree, fix))
         .orElse(Description.NO_MATCH);
   }
 
   private static Optional<Fix> trySimplification(
-      AnnotationTree annotation, ImmutableList<ExpressionTree> arguments) {
+      AnnotationTree annotation, ImmutableList<ExpressionTree> arguments, VisitorState state) {
     checkArgument(!arguments.isEmpty());
 
     AnnotationDescriptor annotationDescriptor =
@@ -111,7 +114,8 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
               annotation,
               simplification.value,
               annotationDescriptor.timeUnitField,
-              simplification.unit));
+              simplification.timeUnit,
+              state));
     }
 
     // Since each might have a different simplification possible, check the common unit.
@@ -120,7 +124,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
     TimeUnit commonUnit =
         findCommonUnit(
             ImmutableSet.copyOf(
-                Maps.transformValues(simplifications, simplification -> simplification.unit)
+                Maps.transformValues(simplifications, simplification -> simplification.timeUnit)
                     .values()));
 
     return getExplicitAttributesFix(
@@ -141,11 +145,13 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
   }
 
   private static Fix getImplicitValueAttributeFix(
-      AnnotationTree annotation, long newValue, String timeUnitField, TimeUnit newTimeUnit) {
-    @SuppressWarnings("TreeToString")
+      AnnotationTree annotation,
+      long newValue,
+      String timeUnitField,
+      TimeUnit newTimeUnit,
+      VisitorState state) {
     String synthesizedAnnotation =
-        annotation
-            .toString()
+        Util.treeToString(annotation, state)
             .replaceFirst(
                 "\\(.+\\)",
                 String.format("(value=%s, %s=%s)", newValue, timeUnitField, newTimeUnit.name()));
@@ -225,7 +231,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
   private static Optional<TimeSimplifier.Simplification> trySimplify(Number value, TimeUnit unit) {
     checkArgument(
         value instanceof Integer || value instanceof Long,
-        "Only time expressed as a long or integer can be simplified");
+        "Only time expressed as an integer or long can be simplified");
     return TimeSimplifier.simplify(value.longValue(), unit);
   }
 
@@ -313,11 +319,11 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
     /** Represents a simplification in terms of the new value and new unit. */
     private static final class Simplification {
       private final long value;
-      private final TimeUnit unit;
+      private final TimeUnit timeUnit;
 
-      public Simplification(long value, TimeUnit unit) {
+      Simplification(long value, TimeUnit timeUnit) {
         this.value = value;
-        this.unit = unit;
+        this.timeUnit = timeUnit;
       }
 
       /**
@@ -325,7 +331,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
        * in the given {@code unit}.
        */
       public long toUnit(TimeUnit unit) {
-        return unit.convert(value, this.unit);
+        return unit.convert(value, timeUnit);
       }
     }
   }
