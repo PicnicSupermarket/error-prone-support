@@ -73,7 +73,7 @@ public final class SimplifyTimeAnnotationCheckTest {
             "  @Scheduled(timeUnit = SECONDS, fixedDelay = 60, initialDelay = 6, fixedRate = 7) A scheduledCommonUnit();",
             "  @Scheduled(fixedDelay = 5, initialDelay = 6_000, fixedRate = 7_000) A scheduledNoSimplification();",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -95,7 +95,7 @@ public final class SimplifyTimeAnnotationCheckTest {
             "interface A {",
             "  @Timeout(value = 1, unit = MINUTES) A simple();",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -110,6 +110,6 @@ public final class SimplifyTimeAnnotationCheckTest {
             "interface A {",
             "  @org.junit.jupiter.api.Timeout(value = 1, unit = MINUTES) A simple();",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest();
   }
 }
