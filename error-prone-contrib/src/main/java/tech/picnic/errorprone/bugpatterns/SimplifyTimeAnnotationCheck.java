@@ -141,7 +141,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
   }
 
   private static Fix getImplicitValueAttributeFix(
-      AnnotationTree annotation, Number newValue, String timeUnitField, TimeUnit newTimeUnit) {
+      AnnotationTree annotation, long newValue, String timeUnitField, TimeUnit newTimeUnit) {
     @SuppressWarnings("TreeToString")
     String synthesizedAnnotation =
         annotation
@@ -226,8 +226,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
     checkArgument(
         value instanceof Integer || value instanceof Long,
         "Only time expressed as a long or integer can be simplified");
-    return TimeSimplifier.simplify(value.longValue(), unit)
-        .map(simplification -> simplification.ensureNumberIsOfType(value.getClass()));
+    return TimeSimplifier.simplify(value.longValue(), unit);
   }
 
   private static TimeUnit findCommonUnit(ImmutableSet<TimeUnit> units) {
@@ -313,13 +312,8 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
 
     /** Represents a simplification in terms of the new value and new unit. */
     private static final class Simplification {
-      private final Number value;
+      private final long value;
       private final TimeUnit unit;
-
-      public Simplification(int value, TimeUnit unit) {
-        this.value = value;
-        this.unit = unit;
-      }
 
       public Simplification(long value, TimeUnit unit) {
         this.value = value;
@@ -327,22 +321,11 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
       }
 
       /**
-       * Ensures that {@link #value} returns a {@link Number} of the same type as {@code original}.
-       * Since a {@link Simplification} can only have smaller or values equal to the original value,
-       * this cannot result in an overflow if we need to go from a long to an integer.
-       */
-      public Simplification ensureNumberIsOfType(Class<? extends Number> original) {
-        return original.equals(value.getClass())
-            ? this
-            : new Simplification(value.intValue(), unit);
-      }
-
-      /**
        * Converts the value with the unit represented by this simplification to an equivalent value
        * in the given {@code unit}.
        */
       public long toUnit(TimeUnit unit) {
-        return unit.convert(value.longValue(), this.unit);
+        return unit.convert(value, this.unit);
       }
     }
   }
