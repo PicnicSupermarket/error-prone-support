@@ -96,7 +96,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   }
 
   Single<Integer> testFlowableFirstOrError() {
-    return RxJava2Adapter.monoToSingle(RxJava2Adapter.flowableToFlux(Flowable.just(1)).next());
+    return RxJava2Adapter.monoToSingle(RxJava2Adapter.flowableToFlux(Flowable.just(1)).next().single());
   }
 
   Completable testFlowableFlatMapCompletable() {

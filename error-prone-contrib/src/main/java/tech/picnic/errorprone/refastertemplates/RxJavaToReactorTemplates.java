@@ -207,17 +207,17 @@ public final class RxJavaToReactorTemplates {
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryConsumerConversion<T> {
     @BeforeTemplate
-    java.util.function.Consumer<T> before(@CanTransformToTargetType Consumer<T> consumer) {
+    java.util.function.Consumer<? extends T> before(@CanTransformToTargetType Consumer<? extends T> consumer) {
       return RxJavaReactorMigrationUtil.toJdkConsumer(consumer);
     }
 
     @AfterTemplate
-    java.util.function.Consumer<T> after(java.util.function.Consumer<T> consumer) {
+    java.util.function.Consumer<? extends T> after(java.util.function.Consumer<? extends T> consumer) {
       return consumer;
     }
   }
 
-  static final class UnnecessaryRunnableConversion<T> {
+  static final class UnnecessaryRunnableConversion {
     @BeforeTemplate
     Runnable before(@CanTransformToTargetType Action action) {
       return RxJavaReactorMigrationUtil.toRunnable(action);
@@ -229,16 +229,15 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: This one is without CanBeTransformedTo...
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryPredicateConversion<T> {
     @BeforeTemplate
-    java.util.function.Predicate<T> before(Predicate<T> predicate) {
+    java.util.function.Predicate<? extends T> before(@CanTransformToTargetType Predicate<? extends T> predicate) {
       return RxJavaReactorMigrationUtil.toJdkPredicate(predicate);
     }
 
     @AfterTemplate
-    java.util.function.Predicate<T> after(java.util.function.Predicate<T> predicate) {
+    java.util.function.Predicate<? extends T> after(java.util.function.Predicate<? extends T> predicate) {
       return predicate;
     }
   }

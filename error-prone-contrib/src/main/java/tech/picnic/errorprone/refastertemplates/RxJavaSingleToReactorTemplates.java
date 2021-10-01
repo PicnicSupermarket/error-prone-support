@@ -280,7 +280,7 @@ final class RxJavaSingleToReactorTemplates {
     }
   }
 
-  // XXX: Test this one.
+  // XXX: Write a test.
   abstract static class SingleFlatMapUnwrapLambda<T, R> {
     @Placeholder
     abstract Mono<? extends R> placeholder(@MayOptionallyUse T input);
@@ -530,7 +530,12 @@ final class RxJavaSingleToReactorTemplates {
                   e ->
                       RxJava2Adapter.singleToMono(
                           Single.wrap(
-                              RxJavaReactorMigrationUtil.toJdkFunction(function).apply(e)))));
+                              RxJavaReactorMigrationUtil.toJdkFunction(
+                                      (Function<
+                                              ? super Throwable,
+                                              ? extends SingleSource<? extends T>>)
+                                          function)
+                                  .apply(e)))));
     }
   }
 
