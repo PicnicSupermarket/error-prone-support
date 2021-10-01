@@ -681,7 +681,7 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Single<T> after(Flowable<T> flowable) {
-      return RxJava2Adapter.monoToSingle(RxJava2Adapter.flowableToFlux(flowable).next());
+      return RxJava2Adapter.monoToSingle(RxJava2Adapter.flowableToFlux(flowable).next().single());
     }
   }
 
