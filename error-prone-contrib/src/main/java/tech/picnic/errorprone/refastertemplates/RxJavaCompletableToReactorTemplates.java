@@ -183,7 +183,7 @@ final class RxJavaCompletableToReactorTemplates {
 
   // XXX: public final Completable ambWith(CompletableSource)
 
-  static final class CompletableAndThenCompletable<T> {
+  static final class CompletableAndThenCompletable {
     @BeforeTemplate
     Completable before(Completable completable, CompletableSource source) {
       return completable.andThen(source);
@@ -274,7 +274,7 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Completable delaySubscription(long,TimeUnit,Scheduler)
   // XXX: public final Completable doAfterTerminate(Action)
   // XXX: public final Completable doFinally(Action)
-  // XXX: public final Completable doOnComplete(Action) --> Required
+  // XXX: public final Completable doOnComplete(Action)
   // XXX: public final Completable doOnDispose(Action)
   // XXX: public final Completable doOnError(Consumer)
   // XXX: public final Completable doOnEvent(Consumer)

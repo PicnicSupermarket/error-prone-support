@@ -57,6 +57,17 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return Single.just(1).filter(i -> i > 2);
   }
 
+  public Mono<String> testUnwrapLambdaSingle() {
+    return Mono.just("1")
+        .flatMap(
+            v ->
+                RxJava2Adapter.singleToMono(
+                    (Single<String>)
+                        RxJavaReactorMigrationUtil.toJdkFunction(
+                                (String ident) -> RxJava2Adapter.monoToSingle(Mono.just(ident)))
+                            .apply(v)));
+  }
+
   Single<Integer> testSingleFlatMapLambda() {
     return Single.just(1).flatMap(i -> Single.just(i * 2));
   }
@@ -95,6 +106,10 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
         .then();
   }
 
+  Flowable<Integer> testSingleFlatMapPublisher() {
+    return Single.just(1).flatMapPublisher(i -> Flowable::just);
+  }
+  
   Completable testCompletableIgnoreElement() {
     return Single.just(1).ignoreElement();
   }

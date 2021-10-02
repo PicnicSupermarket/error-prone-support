@@ -271,21 +271,4 @@ public final class RxJavaToReactorTemplates {
       return mono.flux();
     }
   }
-
-  // XXX: Try with turning this one off.
-//  static final class CompletableIgnoreElementAndThenPublisher<T> {
-//    @BeforeTemplate
-//    Flowable<T> before(Single<T> single, Publisher<T> publisher) {
-//      return single.ignoreElement().andThen(publisher);
-//    }
-//
-//    @AfterTemplate
-//    Single<T> after(Single<T> single, Publisher<T> publisher) {
-//      return single
-//          .as(RxJava2Adapter::singleToMono)
-//          .then()
-//          .then(Mono.from(publisher))
-//          .as(RxJava2Adapter::monoToSingle);
-//    }
-//  }
 }

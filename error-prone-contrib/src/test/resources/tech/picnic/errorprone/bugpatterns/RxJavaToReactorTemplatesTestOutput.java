@@ -7,6 +7,7 @@ import io.reactivex.Single;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -77,15 +78,5 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Mono<Integer> testMonoFromNestedPublisher() {
     return Mono.from(Flux.just(1));
-  }
-
-  Single<Integer> testCompletableIgnoreElementAndThen() {
-    return Single.fromCallable(() -> 1)
-        .filter(count -> count > 0)
-        .switchIfEmpty(Single.just(1))
-        .as(RxJava2Adapter::singleToMono)
-        .ignoreElement()
-        .then(Single.wrap(Single.error(IllegalAccessError::new)).as(RxJava2Adapter::singleToMono))
-        .as(RxJava2Adapter::monoToSingle);
   }
 }

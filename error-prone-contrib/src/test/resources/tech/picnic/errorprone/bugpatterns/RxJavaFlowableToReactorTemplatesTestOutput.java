@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -96,7 +97,8 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   }
 
   Single<Integer> testFlowableFirstOrError() {
-    return RxJava2Adapter.monoToSingle(RxJava2Adapter.flowableToFlux(Flowable.just(1)).next().single());
+    return RxJava2Adapter.monoToSingle(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1)).next().single());
   }
 
   Completable testFlowableFlatMapCompletable() {
@@ -182,6 +184,48 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Object testFlowableBlockingFirst() {
     return RxJava2Adapter.flowableToFlux(Flowable.just(1)).blockFirst();
+  }
+
+  Flowable<Integer> testFlowableConcatMap() {
+    return RxJava2Adapter.fluxToFlowable(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1))
+            .concatMap(RxJavaReactorMigrationUtil.toJdkFunction(e -> Flowable::just)));
+  }
+
+  Completable testFlowableConcatMapCompletable() {
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1))
+            .concatMap(
+                e ->
+                    RxJava2Adapter.completableToMono(
+                        Completable.wrap(
+                            RxJavaReactorMigrationUtil.toJdkFunction(c -> Completable.complete())
+                                .apply(e))))
+            .then());
+  }
+
+  Flowable<Integer> testFlowableConcatMapMaybe() {
+    return RxJava2Adapter.fluxToFlowable(Flux.just(1))
+        .concatMapMaybe(integer -> Maybe.just(integer));
+  }
+
+  Flowable<Integer> testFlowableConcatMapMaybeDelayError() {
+    return RxJava2Adapter.fluxToFlowable(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1))
+            .concatMapDelayError(
+                e ->
+                    Maybe.wrap(RxJavaReactorMigrationUtil.toJdkFunction(Maybe::just).apply(e))
+                        .toFlowable()));
+  }
+
+  Flowable<Integer> testFlatMapMaybe() {
+    return RxJava2Adapter.fluxToFlowable(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1))
+            .flatMap(
+                e ->
+                    RxJava2Adapter.maybeToMono(
+                        Maybe.wrap(
+                            RxJavaReactorMigrationUtil.toJdkFunction(Maybe::just).apply(e)))));
   }
 
   Flowable<Integer> testFlowableMap() {

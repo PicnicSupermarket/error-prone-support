@@ -147,6 +147,26 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return Flowable.just(1).blockingFirst();
   }
 
+  Flowable<Integer> testFlowableConcatMap() {
+    return Flowable.just(1).concatMap(e -> Flowable::just);
+  }
+
+  Completable testFlowableConcatMapCompletable() {
+    return Flowable.just(1).concatMapCompletable(c -> Completable.complete());
+  }
+
+  Flowable<Integer> testFlowableConcatMapMaybe() {
+    return Flowable.just(1).concatMapMaybe(integer -> Maybe.just(integer));
+  }
+
+  Flowable<Integer> testFlowableConcatMapMaybeDelayError() {
+    return Flowable.just(1).concatMapMaybeDelayError(Maybe::just);
+  }
+
+  Flowable<Integer> testFlatMapMaybe() {
+    return Flowable.just(1).flatMapMaybe(Maybe::just);
+  }
+
   Flowable<Integer> testFlowableMap() {
     return Flowable.just(1).map(i -> i + 1);
   }
