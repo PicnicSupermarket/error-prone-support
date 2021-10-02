@@ -486,10 +486,25 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Single collect(Callable,BiConsumer)
   // XXX: final Single collectInto(Object,BiConsumer)
   // XXX: final Flowable compose(FlowableTransformer)
-  // XXX: final Flowable concatMap(Function)
+
+  static final class FlowableConcatMap<T, R> {
+    @BeforeTemplate
+    Flowable<R> before(
+        Flowable<T> flowable, Function<? super T, ? extends Publisher<? extends R>> function) {
+      return flowable.concatMap(function);
+    }
+
+    @AfterTemplate
+    Flowable<R> after(
+        Flowable<T> flowable, Function<? super T, ? extends Publisher<? extends R>> function) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .concatMap(RxJavaReactorMigrationUtil.toJdkFunction(function)));
+    }
+  }
+
   // XXX: final Flowable concatMap(Function,int)
 
-  // XXX: Test this one
   static final class FlowableConcatMapCompletable<T> {
     @BeforeTemplate
     Completable before(
@@ -524,8 +539,7 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable concatMapIterable(Function)
   // XXX: final Flowable concatMapIterable(Function,int)
 
-  // XXX: Test this one.
-  static final class FlowableConcatMaybe<T, R> {
+  static final class FlowableConcatMapMaybe<T, R> {
     @BeforeTemplate
     Flowable<R> before(Flowable<T> flowable, Function<T, ? extends MaybeSource<R>> mapper) {
       return flowable.concatMapMaybe(mapper);
@@ -542,16 +556,18 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: final Flowable concat q MapMaybe(Function,int)
+  // XXX: final Flowable concatMapMaybe(Function,int)
 
   static final class FlowableConcatMapMaybeDelayError<T, R> {
     @BeforeTemplate
-    Flowable<R> before(Flowable<T> flowable, Function<T, MaybeSource<R>> mapper) {
+    Flowable<R> before(
+        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> mapper) {
       return flowable.concatMapMaybeDelayError(mapper);
     }
 
     @AfterTemplate
-    Flowable<R> after(Flowable<T> flowable, Function<T, MaybeSource<R>> mapper) {
+    Flowable<R> after(
+        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> mapper) {
       return RxJava2Adapter.fluxToFlowable(
           RxJava2Adapter.flowableToFlux(flowable)
               .concatMapDelayError(
@@ -836,7 +852,25 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable flatMapIterable(Function,BiFunction,int)
   // XXX: final Flowable flatMapIterable(Function,int)
 
-  // XXX: final Flowable flatMapMaybe(Function) --> This one.
+  static final class FlatMapMaybe<T, R> {
+    @BeforeTemplate
+    Flowable<R> before(
+        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function) {
+      return flowable.flatMapMaybe(function);
+    }
+
+    @AfterTemplate
+    Flowable<R> after(
+        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .flatMap(
+                  e ->
+                      RxJava2Adapter.maybeToMono(
+                          Maybe.wrap(
+                              RxJavaReactorMigrationUtil.toJdkFunction(function).apply(e)))));
+    }
+  }
 
   // XXX: final Flowable flatMapMaybe(Function,boolean,int)
   // XXX: final Flowable flatMapSingle(Function)
@@ -1391,16 +1425,16 @@ final class RxJavaFlowableToReactorTemplates {
     @BeforeTemplate
     void before(Single<T> single) throws InterruptedException {
       Refaster.anyOf(
-              single.test().await().assertNoValues(),
-              single.test().await().assertNoValues().assertComplete());
+          single.test().await().assertNoValues(),
+          single.test().await().assertNoValues().assertComplete());
     }
 
     @AfterTemplate
     void after(Single<T> single) {
       RxJava2Adapter.singleToMono(single)
-              .as(StepVerifier::create)
-              .expectNextCount(0)
-              .verifyComplete();
+          .as(StepVerifier::create)
+          .expectNextCount(0)
+          .verifyComplete();
     }
   }
 

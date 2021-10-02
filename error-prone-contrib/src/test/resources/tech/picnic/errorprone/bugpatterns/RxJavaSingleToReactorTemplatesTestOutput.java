@@ -105,11 +105,14 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
         .then();
   }
 
+  Flowable<Integer> testSingleFlatMapPublisher() {
+    return RxJava2Adapter.fluxToFlowable(
+        RxJava2Adapter.singleToMono(Single.just(1))
+            .flatMapMany(RxJavaReactorMigrationUtil.toJdkFunction(i -> Flowable::just)));
+  }
+
   Completable testCompletableIgnoreElement() {
-    return Single.just(1)
-        .as(RxJava2Adapter::singleToMono)
-        .then()
-        .as(RxJava2Adapter::monoToCompletable);
+    return RxJava2Adapter.monoToCompletable(RxJava2Adapter.singleToMono(Single.just(1)).then());
   }
 
   Single<Integer> testSingleMap() {

@@ -21,7 +21,6 @@ import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import java.util.concurrent.Callable;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
@@ -280,6 +279,28 @@ final class RxJavaSingleToReactorTemplates {
     }
   }
 
+  // This one doesnt work yet...
+  abstract static class SingleFlatMapUnwrapLambda222<T, R extends T> {
+    @Placeholder
+    abstract Mono<? extends R> placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<? super T, ? extends Mono<? extends R>> before() {
+      return v ->
+              RxJava2Adapter.singleToMono(
+                      (Single<? extends R>)
+                              RxJavaReactorMigrationUtil.toJdkFunction(
+                                              (T ident) -> RxJava2Adapter.monoToSingle(placeholder(ident)))
+                                      .apply(v));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<? super T, ? extends Mono<? extends R>> after() {
+      return v -> placeholder(v);
+    }
+  }
+
+
   // XXX: Write a test.
   abstract static class SingleFlatMapUnwrapLambda<T, R> {
     @Placeholder
@@ -291,7 +312,7 @@ final class RxJavaSingleToReactorTemplates {
           RxJava2Adapter.singleToMono(
               (Single<? extends R>)
                   RxJavaReactorMigrationUtil.toJdkFunction(
-                          ident -> RxJava2Adapter.monoToSingle(placeholder(v)))
+                          (T ident) -> RxJava2Adapter.monoToSingle(placeholder(ident)))
                       .apply(v));
     }
 
@@ -310,7 +331,8 @@ final class RxJavaSingleToReactorTemplates {
 
     @BeforeTemplate
     Single<T> before(Single<S> single) {
-      return single.flatMap(v -> toSingleFunction(v));
+      return Refaster.anyOf(
+          single.flatMap(v -> toSingleFunction(v)), single.flatMap((S v) -> toSingleFunction(v)));
     }
 
     @AfterTemplate
@@ -456,17 +478,15 @@ final class RxJavaSingleToReactorTemplates {
   }
 
   // XXX: public final Observable flatMapObservable(Function)
-  // XXX: public final Flowable flatMapPublisher(Function)
 
-  // XXX: Test this.
   static final class SingleFlatMapPublisher<T, R> {
     @BeforeTemplate
-    Flowable<R> before(Single<T> single, Function<T, Publisher<? extends R>> mapper) {
+    Flowable<R> before(Single<T> single, Function<? super T, ? extends Publisher<? extends R>> mapper) {
       return single.flatMapPublisher(mapper);
     }
 
     @AfterTemplate
-    Flowable<R> after(Single<T> single, Function<T, Publisher<? extends R>> mapper) {
+    Flowable<R> after(Single<T> single, Function<? super T, ? extends Publisher<? extends R>> mapper) {
       return RxJava2Adapter.fluxToFlowable(
           RxJava2Adapter.singleToMono(single)
               .flatMapMany(RxJavaReactorMigrationUtil.toJdkFunction(mapper)));

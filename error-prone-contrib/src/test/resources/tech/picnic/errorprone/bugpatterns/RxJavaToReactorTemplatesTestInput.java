@@ -90,12 +90,4 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
   Mono<Integer> testMonoFromNestedPublisher() {
     return Mono.from(RxJava2Adapter.fluxToFlowable(Flux.just(1)));
   }
-
-  Single<Integer> testCompletableIgnoreElementAndThen() {
-    return Single.fromCallable(() -> 1)
-        .filter(count -> count > 0)
-        .switchIfEmpty(Single.just(1))
-        .ignoreElement()
-        .andThen(Single.error(IllegalAccessError::new));
-  }
 }
