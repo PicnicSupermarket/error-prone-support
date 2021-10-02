@@ -287,11 +287,11 @@ final class RxJavaSingleToReactorTemplates {
     @BeforeTemplate
     java.util.function.Function<? super T, ? extends Mono<? extends R>> before() {
       return v ->
-              RxJava2Adapter.singleToMono(
-                      (Single<? extends R>)
-                              RxJavaReactorMigrationUtil.toJdkFunction(
-                                              (T ident) -> RxJava2Adapter.monoToSingle(placeholder(ident)))
-                                      .apply(v));
+          RxJava2Adapter.singleToMono(
+              (Single<? extends R>)
+                  RxJavaReactorMigrationUtil.toJdkFunction(
+                          (T ident) -> RxJava2Adapter.monoToSingle(placeholder(ident)))
+                      .apply(v));
     }
 
     @AfterTemplate
@@ -299,7 +299,6 @@ final class RxJavaSingleToReactorTemplates {
       return v -> placeholder(v);
     }
   }
-
 
   // XXX: Write a test.
   abstract static class SingleFlatMapUnwrapLambda<T, R> {
@@ -481,12 +480,14 @@ final class RxJavaSingleToReactorTemplates {
 
   static final class SingleFlatMapPublisher<T, R> {
     @BeforeTemplate
-    Flowable<R> before(Single<T> single, Function<? super T, ? extends Publisher<? extends R>> mapper) {
+    Flowable<R> before(
+        Single<T> single, Function<? super T, ? extends Publisher<? extends R>> mapper) {
       return single.flatMapPublisher(mapper);
     }
 
     @AfterTemplate
-    Flowable<R> after(Single<T> single, Function<? super T, ? extends Publisher<? extends R>> mapper) {
+    Flowable<R> after(
+        Single<T> single, Function<? super T, ? extends Publisher<? extends R>> mapper) {
       return RxJava2Adapter.fluxToFlowable(
           RxJava2Adapter.singleToMono(single)
               .flatMapMany(RxJavaReactorMigrationUtil.toJdkFunction(mapper)));
