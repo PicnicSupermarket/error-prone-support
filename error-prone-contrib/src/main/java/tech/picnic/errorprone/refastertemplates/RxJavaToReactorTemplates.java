@@ -7,8 +7,6 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
@@ -16,7 +14,6 @@ import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
-import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -207,12 +204,14 @@ public final class RxJavaToReactorTemplates {
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryConsumerConversion<T> {
     @BeforeTemplate
-    java.util.function.Consumer<? extends T> before(@CanTransformToTargetType Consumer<? extends T> consumer) {
+    java.util.function.Consumer<? extends T> before(
+        @CanTransformToTargetType Consumer<? extends T> consumer) {
       return RxJavaReactorMigrationUtil.toJdkConsumer(consumer);
     }
 
     @AfterTemplate
-    java.util.function.Consumer<? extends T> after(java.util.function.Consumer<? extends T> consumer) {
+    java.util.function.Consumer<? extends T> after(
+        java.util.function.Consumer<? extends T> consumer) {
       return consumer;
     }
   }
@@ -232,12 +231,14 @@ public final class RxJavaToReactorTemplates {
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryPredicateConversion<T> {
     @BeforeTemplate
-    java.util.function.Predicate<? extends T> before(@CanTransformToTargetType Predicate<? extends T> predicate) {
+    java.util.function.Predicate<? extends T> before(
+        @CanTransformToTargetType Predicate<? extends T> predicate) {
       return RxJavaReactorMigrationUtil.toJdkPredicate(predicate);
     }
 
     @AfterTemplate
-    java.util.function.Predicate<? extends T> after(java.util.function.Predicate<? extends T> predicate) {
+    java.util.function.Predicate<? extends T> after(
+        java.util.function.Predicate<? extends T> predicate) {
       return predicate;
     }
   }

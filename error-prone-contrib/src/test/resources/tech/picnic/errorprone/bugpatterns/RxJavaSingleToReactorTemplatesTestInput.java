@@ -109,7 +109,7 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   Flowable<Integer> testSingleFlatMapPublisher() {
     return Single.just(1).flatMapPublisher(i -> Flowable::just);
   }
-  
+
   Completable testCompletableIgnoreElement() {
     return Single.just(1).ignoreElement();
   }
