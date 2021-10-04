@@ -163,7 +163,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return Flowable.just(1).concatMapMaybeDelayError(Maybe::just);
   }
 
-  Flowable<Integer> testFlatMapMaybe() {
+  Flowable<Integer> testFlowableFlatMapMaybe() {
     return Flowable.just(1).flatMapMaybe(Maybe::just);
   }
 
@@ -173,6 +173,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Flowable<Integer> testFlowableMergeWith() {
     return Flowable.just(1).mergeWith(Single.just(1));
+  }
+
+  Flowable<Integer> testFlowableOnErrorResumeNext() {
+    return Flowable.just(1).onErrorResumeNext((Throwable throwable) -> Flux.just(1));
   }
 
   Single<Integer> testFlowableSingleDefault() {

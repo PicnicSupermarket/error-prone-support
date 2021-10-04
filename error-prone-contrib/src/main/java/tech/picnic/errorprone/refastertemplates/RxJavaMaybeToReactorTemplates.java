@@ -17,6 +17,7 @@ import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Action;
@@ -512,23 +513,6 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: Discuss with Stephan. Still not useful for methodreferences.
-  //  abstract class MaybeUnwrapSingleElement<T, O> {
-  //    @BeforeTemplate
-  //    Maybe<O> after(
-  //        Maybe<T> maybe, Function<? super T, ? extends SingleSource<? extends O>> function) {
-  //      return RxJava2Adapter.monoToMaybe(
-  //          RxJava2Adapter.maybeToMono(maybe)
-  //              .flatMap(
-  //                  e ->
-  //                      RxJava2Adapter.singleToMono(
-  //                          Single.wrap(
-  //                              RxJavaReactorMigrationUtil.toJdkFunction(
-  //                                      (Function<T, SingleSource<O>>) function)
-  //                                  .apply(e)))));
-  //    }
-  //  }
-
   // XXX: public final Flowable flattenAsFlowable(Function)
   // XXX: public final Observable flattenAsObservable(Function)
   // XXX: public final Maybe hide()
@@ -653,7 +637,17 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: public final Observable toObservable()
+  static final class MaybeToObservable<T> {
+    @BeforeTemplate
+    Observable<T> before(Maybe<T> maybe) {
+      return maybe.toObservable();
+    }
+
+    @AfterTemplate
+    Observable<T> after(Maybe<T> maybe) {
+      return RxJava2Adapter.fluxToObservable(RxJava2Adapter.maybeToMono(maybe).flux());
+    }
+  }
 
   // XXX: This one should be improved, it is not correct yet.
   static final class MaybeToSingle<T> {
@@ -754,21 +748,6 @@ final class RxJavaMaybeToReactorTemplates {
       RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).verifyComplete();
     }
   }
-
-  // XXX: The following two are combined often.
-  //  static final class MaybeTestAssertValueSet<T> {
-  //    @BeforeTemplate
-  //    void before(Maybe<T> maybe, Collection<? extends T> expected) throws InterruptedException {
-  //      maybe.test().await().assertValueSet(expected);
-  //      expected.it
-  //    }
-  //
-  //    @AfterTemplate
-  //    void after(Maybe<T> maybe, Collection<? extends T> expected) {
-  //      RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).expectNextMatches(t ->
-  // ).verifyComplete();
-  //    }
-  //  }
 
   static final class MaybeTestAssertValueCount<T> {
     @BeforeTemplate

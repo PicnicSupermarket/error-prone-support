@@ -15,8 +15,10 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.functions.Predicate;
+import java.util.concurrent.Callable;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
@@ -105,15 +107,27 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
-  // XXX: public static Observable error(Callable) --> Required
-  // XXX: public static Observable error(Throwable) --> Required
+  // XXX: public static Observable error(Callable)
+  // XXX: public static Observable error(Throwable)
   // XXX: public static Observable fromArray(Object[])
-  // XXX: public static Observable fromCallable(Callable) --> Required
+
+  static final class ObservableFromCallable<T> {
+    @BeforeTemplate
+    Observable<? extends T> before(Callable<? extends T> callable) {
+      return Observable.fromCallable(callable);
+    }
+
+    @AfterTemplate
+    Observable<? extends T> after(Callable<? extends T>  callable) {
+      return RxJava2Adapter.fluxToObservable(Mono.fromSupplier(RxJavaReactorMigrationUtil.callableAsSupplier(callable)).flux());
+    }
+  }
+
   // XXX: public static Observable fromFuture(Future)
   // XXX: public static Observable fromFuture(Future,long,TimeUnit)
   // XXX: public static Observable fromFuture(Future,long,TimeUnit,Scheduler)
   // XXX: public static Observable fromFuture(Future,Scheduler)
-  // XXX: public static Observable fromIterable(Iterable) --> Required.
+  // XXX: public static Observable fromIterable(Iterable)
   // XXX: public static Observable fromPublisher(org.reactivestreams.Publisher)
   // XXX: public static Observable generate(Callable,BiConsumer)
   // XXX: public static Observable generate(Callable,BiConsumer,Consumer)
@@ -367,8 +381,8 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
-  // XXX: public final Single firstOrError() --> This one maybe?
-  // XXX: public final Observable flatMap(Function) --> Is suspect this one as well.
+  // XXX: public final Single firstOrError()
+  // XXX: public final Observable flatMap(Function)
   // XXX: public final Observable flatMap(Function,BiFunction)
   // XXX: public final Observable flatMap(Function,BiFunction,boolean)
   // XXX: public final Observable flatMap(Function,BiFunction,boolean,int)
@@ -384,7 +398,7 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Completable flatMapCompletable(Function,boolean)
   // XXX: public final Observable flatMapIterable(Function)
   // XXX: public final Observable flatMapIterable(Function,BiFunction)
-  // XXX: public final Observable flatMapMaybe(Function)
+  // XXX: public final Observable flatMapMaybe(Function) <-- this one?
   // XXX: public final Observable flatMapMaybe(Function,boolean)
   // XXX: public final Observable flatMapSingle(Function)
   // XXX: public final Observable flatMapSingle(Function,boolean)
@@ -437,7 +451,7 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Observable onErrorReturnItem(Object)
   // XXX: public final Observable onExceptionResumeNext(ObservableSource)
   // XXX: public final Observable onTerminateDetach()
-  // XXX: public final ConnectableObservable publish() --> Required.
+  // XXX: public final ConnectableObservable publish()
   // XXX: public final Observable publish(Function)
   // XXX: public final Maybe reduce(BiFunction)
   // XXX: public final Single reduce(Object,BiFunction)
@@ -733,23 +747,6 @@ final class RxJavaObservableToReactorTemplates {
           .verifyComplete();
     }
   }
-
-  // XXX: The following two are combined often.
-  //  static final class ObservableTestAssertValueSet<T> {
-  //    @BeforeTemplate
-  //    void before(Observable<T> observable, Collection<? extends T> expected) throws
-  // InterruptedException {
-  //      observable.test().await().assertValueSet(expected);
-  //      expected.it
-  //    }
-  //
-  //    @AfterTemplate
-  //    void after(Observable<T> observable, Collection<? extends T> expected) {
-  //      RxJava2Adapter.observableToMono(observable).as(StepVerifier::create).expectNextMatches(t
-  // ->
-  // ).verifyComplete();
-  //    }
-  //  }
 
   // XXX: Default BackpressureStrategy.BUFFER
   static final class ObservableTestAssertValueCount<T> {

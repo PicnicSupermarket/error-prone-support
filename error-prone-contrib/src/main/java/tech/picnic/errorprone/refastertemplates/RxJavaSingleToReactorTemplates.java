@@ -433,10 +433,7 @@ final class RxJavaSingleToReactorTemplates {
     }
   }
 
-  // XXX: Test this one.
-  // In this case it doesnt work: flatMap(e ->
-  // RxJava2Adapter.maybeToMono(geocodingService::complete.apply(e))). (see before apply is an
-  // error)
+  // XXX: Test this one
   static final class SingleFlatMapMaybe<T, R> {
     @BeforeTemplate
     Maybe<R> before(
@@ -452,29 +449,32 @@ final class RxJavaSingleToReactorTemplates {
               .flatMap(
                   e ->
                       RxJava2Adapter.maybeToMono(
-                          Maybe.wrap(RxJavaReactorMigrationUtil.toJdkFunction(mapper).apply(e)))));
+                          Maybe.wrap(
+                              RxJavaReactorMigrationUtil.toJdkFunction(
+                                      (Function<T, MaybeSource<R>>) mapper)
+                                  .apply(e)))));
     }
   }
 
-  // XXX: Test this one.
-  abstract static class SingleFlatMapMaybeUnwrapLambda<T, R> {
-    @Placeholder
-    abstract Mono<? extends R> placeholder(@MayOptionallyUse T input);
-
-    @BeforeTemplate
-    java.util.function.Function<T, ? extends Mono<? extends R>> before() {
-      return e ->
-          RxJava2Adapter.maybeToMono(
-              RxJavaReactorMigrationUtil.toJdkFunction(
-                      ident -> RxJava2Adapter.monoToMaybe(placeholder(e)))
-                  .apply(e));
-    }
-
-    @AfterTemplate
-    java.util.function.Function<T, ? extends Mono<? extends R>> after() {
-      return v -> placeholder(v);
-    }
-  }
+  // XXX: Test this one. (Disabled, created a better one (?) in RxJavaUnwrapTemplates.
+//  abstract static class SingleFlatMapMaybeUnwrapLambda<T, R> {
+//    @Placeholder
+//    abstract Mono<? extends R> placeholder(@MayOptionallyUse T input);
+//
+//    @BeforeTemplate
+//    java.util.function.Function<T, ? extends Mono<? extends R>> before() {
+//      return e ->
+//          RxJava2Adapter.maybeToMono(
+//              RxJavaReactorMigrationUtil.toJdkFunction(
+//                      ident -> RxJava2Adapter.monoToMaybe(placeholder(e)))
+//                  .apply(e));
+//    }
+//
+//    @AfterTemplate
+//    java.util.function.Function<T, ? extends Mono<? extends R>> after() {
+//      return v -> placeholder(v);
+//    }
+//  }
 
   // XXX: public final Observable flatMapObservable(Function)
 

@@ -217,7 +217,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
                         .toFlowable()));
   }
 
-  Flowable<Integer> testFlatMapMaybe() {
+  Flowable<Integer> testFlowableFlatMapMaybe() {
     return RxJava2Adapter.fluxToFlowable(
         RxJava2Adapter.flowableToFlux(Flowable.just(1))
             .flatMap(
