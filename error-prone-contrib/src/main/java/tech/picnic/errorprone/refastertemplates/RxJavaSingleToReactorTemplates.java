@@ -16,6 +16,7 @@ import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
@@ -279,6 +280,7 @@ final class RxJavaSingleToReactorTemplates {
     }
   }
 
+  // XXX: remove this one?
   // This one doesnt work yet...
   abstract static class SingleFlatMapUnwrapLambda222<T, R extends T> {
     @Placeholder
@@ -457,24 +459,24 @@ final class RxJavaSingleToReactorTemplates {
   }
 
   // XXX: Test this one. (Disabled, created a better one (?) in RxJavaUnwrapTemplates.
-//  abstract static class SingleFlatMapMaybeUnwrapLambda<T, R> {
-//    @Placeholder
-//    abstract Mono<? extends R> placeholder(@MayOptionallyUse T input);
-//
-//    @BeforeTemplate
-//    java.util.function.Function<T, ? extends Mono<? extends R>> before() {
-//      return e ->
-//          RxJava2Adapter.maybeToMono(
-//              RxJavaReactorMigrationUtil.toJdkFunction(
-//                      ident -> RxJava2Adapter.monoToMaybe(placeholder(e)))
-//                  .apply(e));
-//    }
-//
-//    @AfterTemplate
-//    java.util.function.Function<T, ? extends Mono<? extends R>> after() {
-//      return v -> placeholder(v);
-//    }
-//  }
+  //  abstract static class SingleFlatMapMaybeUnwrapLambda<T, R> {
+  //    @Placeholder
+  //    abstract Mono<? extends R> placeholder(@MayOptionallyUse T input);
+  //
+  //    @BeforeTemplate
+  //    java.util.function.Function<T, ? extends Mono<? extends R>> before() {
+  //      return e ->
+  //          RxJava2Adapter.maybeToMono(
+  //              RxJavaReactorMigrationUtil.toJdkFunction(
+  //                      ident -> RxJava2Adapter.monoToMaybe(placeholder(e)))
+  //                  .apply(e));
+  //    }
+  //
+  //    @AfterTemplate
+  //    java.util.function.Function<T, ? extends Mono<? extends R>> after() {
+  //      return v -> placeholder(v);
+  //    }
+  //  }
 
   // XXX: public final Observable flatMapObservable(Function)
 
@@ -548,35 +550,12 @@ final class RxJavaSingleToReactorTemplates {
           single
               .as(RxJava2Adapter::singleToMono)
               .onErrorResume(
-                  e ->
+                  err ->
                       RxJava2Adapter.singleToMono(
                           Single.wrap(
                               RxJavaReactorMigrationUtil.toJdkFunction(
-                                      (Function<
-                                              ? super Throwable,
-                                              ? extends SingleSource<? extends T>>)
-                                          function)
-                                  .apply(e)))));
-    }
-  }
-
-  // XXX: Test this one. (works on PRP example validateAndComplete_migrated())
-  abstract static class SingleOnResumeUnwrapLambda<T, R> {
-    @Placeholder
-    abstract Mono<? extends R> placeholder(@MayOptionallyUse Throwable input);
-
-    @BeforeTemplate
-    java.util.function.Function<? extends Throwable, ? extends Mono<? extends R>> before() {
-      return e ->
-          RxJava2Adapter.singleToMono(
-              RxJavaReactorMigrationUtil.toJdkFunction(
-                      ident -> RxJava2Adapter.monoToSingle(placeholder(e)))
-                  .apply(e));
-    }
-
-    @AfterTemplate
-    java.util.function.Function<Throwable, ? extends Mono<? extends R>> after() {
-      return v -> placeholder(v);
+                                      (Function<Throwable, Single<T>>) function)
+                                  .apply(err)))));
     }
   }
 
@@ -628,7 +607,7 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single timeout(long,TimeUnit,Scheduler,SingleSource)
   // XXX: public final Single timeout(long,TimeUnit,SingleSource)
   // XXX: public final Object to(Function)
-  // XXX: public final Completable toCompletable() <-- this one is @Deprecated
+  // XXX: public final Completable toCompletable()
 
   static final class SingleToFlowable<T> {
     @BeforeTemplate
@@ -643,7 +622,6 @@ final class RxJavaSingleToReactorTemplates {
   }
 
   // XXX: public final Future toFuture()
-  // XXX: public final Maybe toMaybe() --> 1 usage
 
   static final class SingleToMaybe<T> {
     @BeforeTemplate
@@ -659,7 +637,29 @@ final class RxJavaSingleToReactorTemplates {
 
   // XXX: public final Observable toObservable()
   // XXX: public final Single unsubscribeOn(Scheduler)
-  // XXX: public final Single zipWith(SingleSource,BiFunction) --> One usage.
+
+  static final class SingleZipWith<T, R, U> {
+    @BeforeTemplate
+    Single<R> before(
+        Single<T> single,
+        SingleSource<U> source,
+        BiFunction<? super T, ? super U, ? extends R> biFunction) {
+      return single.zipWith(source, biFunction);
+    }
+
+    @AfterTemplate
+    Single<R> after(
+        Single<T> single,
+        SingleSource<U> source,
+        BiFunction<? super T, ? super U, ? extends R> biFunction) {
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.singleToMono(single)
+              .zipWith(
+                  RxJava2Adapter.singleToMono(Single.wrap(source)),
+                  RxJavaReactorMigrationUtil.toJdkBiFunction(biFunction)));
+    }
+  }
+
   // XXX: public final TestObserver test()
 
   static final class SingleTestAssertResultItem<T> {

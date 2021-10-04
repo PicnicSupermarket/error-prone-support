@@ -122,6 +122,10 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return Single.just(1).toFlowable();
   }
 
+  Single<Integer> testSingleZipWith() {
+    return Single.just(1).zipWith(Single.just(2), (integer, integer2) -> integer + integer2);
+  }
+
   void testSingleTestAssertResultItem() throws InterruptedException {
     Single.just(1).test().await().assertResult(1);
     Single.just(2).test().await().assertValue(2);
