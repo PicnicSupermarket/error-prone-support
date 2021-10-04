@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import org.junit.After;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
@@ -561,18 +562,21 @@ final class RxJavaFlowableToReactorTemplates {
   static final class FlowableConcatMapMaybeDelayError<T, R> {
     @BeforeTemplate
     Flowable<R> before(
-        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> mapper) {
-      return flowable.concatMapMaybeDelayError(mapper);
+        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function) {
+      return flowable.concatMapMaybeDelayError(function);
     }
 
     @AfterTemplate
     Flowable<R> after(
-        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> mapper) {
+        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function) {
       return RxJava2Adapter.fluxToFlowable(
           RxJava2Adapter.flowableToFlux(flowable)
               .concatMapDelayError(
                   e ->
-                      Maybe.wrap(RxJavaReactorMigrationUtil.toJdkFunction(mapper).apply(e))
+                      Maybe.wrap(
+                              RxJavaReactorMigrationUtil.toJdkFunction(
+                                      (Function<T, MaybeSource<R>>) function)
+                                  .apply(e))
                           .toFlowable()));
     }
   }
@@ -731,12 +735,13 @@ final class RxJavaFlowableToReactorTemplates {
 
   static final class FlowableFlatMapCompletable<T, R extends CompletableSource> {
     @BeforeTemplate
-    Completable before(Flowable<T> flowable, Function<T, R> function) {
+    Completable before(
+        Flowable<T> flowable, Function<? super T, ? extends CompletableSource> function) {
       return flowable.flatMapCompletable(function);
     }
 
     @AfterTemplate
-    Completable after(Flowable<T> flowable, Function<T, R> function) {
+    Completable after(Flowable<T> flowable, Function<? super T, ? extends R> function) {
       return RxJava2Adapter.monoToCompletable(
           RxJava2Adapter.flowableToFlux(flowable)
               .flatMap(
@@ -750,10 +755,11 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  abstract static class FlowableUnwrapLambda<T> {
+  abstract static class FlowableFlatMapCompletableUnwrapLambda<T> {
     @Placeholder
     abstract Mono<?> placeholder(@MayOptionallyUse T input);
 
+    // XXX: Perhaps: `? extends Publisher.....`
     @BeforeTemplate
     java.util.function.Function<T, Publisher<? extends Void>> before() {
       return e ->
@@ -792,46 +798,8 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  //  // XXX: Delete this/move it.
-  //  static final class XXXv1<I, O> {
-  //    @BeforeTemplate
-  //    Function<I, O> before(Function<I, O> function) {
-  //      return i -> function.apply(i);
-  //    }
-  //
-  //    @BeforeTemplate
-  //    Function<I, O> before2(Function<I, O> function) {
-  //      return function::apply;
-  //    }
-  //
-  //    @AfterTemplate
-  //    Function<I, O> after(Function<I, O> function) {
-  //      return function;
-  //    }
-  //  }
-  //
-  //  // XXX: Delete this/move it.
-  //  static final class XXXv2<I, O> {
-  //    @BeforeTemplate
-  //    // Or: @LambdaExprOrMethodReferenceReceiverEnsuresType
-  //    Function<I, O> before(Function<I, O> function) {
-  //      return Refaster.<Function<I, O>>receiverEnsuresType(i -> function.apply(i));
-  //    }
-  //
-  //    @BeforeTemplate
-  //    Function<I, O> before2(Function<I, O> function) {
-  //      return function::apply;
-  //    }
-  //
-  //    @AfterTemplate
-  //    Function<I, O> after(Function<I, O> function) {
-  //      return function;
-  //    }
-  //  }
-
   // XXX: final Completable flatMapCompletable(Function,boolean,int)
 
-  // XXX: Test this one. Doesnt pick up one in bad-word-service.
   static final class FlowableFlatMapIterable<T, R> {
     @BeforeTemplate
     Flowable<R> before(
@@ -852,7 +820,7 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable flatMapIterable(Function,BiFunction,int)
   // XXX: final Flowable flatMapIterable(Function,int)
 
-  static final class FlatMapMaybe<T, R> {
+  static final class FlowableFlatMapMaybe<T, R> {
     @BeforeTemplate
     Flowable<R> before(
         Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function) {
@@ -868,7 +836,9 @@ final class RxJavaFlowableToReactorTemplates {
                   e ->
                       RxJava2Adapter.maybeToMono(
                           Maybe.wrap(
-                              RxJavaReactorMigrationUtil.toJdkFunction(function).apply(e)))));
+                              RxJavaReactorMigrationUtil.toJdkFunction(
+                                      (Function<T, MaybeSource<R>>) function)
+                                  .apply(e)))));
     }
   }
 
@@ -962,6 +932,30 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable onBackpressureLatest()
   // XXX: final Flowable onErrorResumeNext(Function) -> Required
   // XXX: final Flowable onErrorResumeNext(Publisher) -> Required? check consentTextServiceImpl
+
+  //  @BeforeTemplate
+  //    Flowable<T> before(Flowable<T> flowable, Publisher<? extends T> publisher) {
+  //      return flowable.onErrorResumeNext(publisher);
+  //    }
+
+  static final class FlowableOnErrorResumeNext<T> {
+    @BeforeTemplate
+    Flowable<T> before(
+        Flowable<T> flowable,
+        Function<? super Throwable, ? extends Publisher<? extends T>> function) {
+      return flowable.onErrorResumeNext(function);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(
+        Flowable<T> flowable,
+        Function<? super Throwable, ? extends Publisher<? extends T>> function) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .onErrorResume(RxJavaReactorMigrationUtil.toJdkFunction(function)));
+    }
+  }
+
   // XXX: final Flowable onErrorReturn(Function) --> Required, ibanBlacklistServiceClient 60
   // XXX: final Flowable onErrorReturnItem(Object)
   // XXX: final Flowable onExceptionResumeNext(Publisher)
