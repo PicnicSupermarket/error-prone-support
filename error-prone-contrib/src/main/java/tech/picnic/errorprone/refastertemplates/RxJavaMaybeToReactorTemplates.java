@@ -16,6 +16,7 @@ import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.MaybeOnSubscribe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -104,14 +105,19 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public static Flowable concatEager(Publisher)
   // XXX: public static Maybe create(MaybeOnSubscribe)
 
-  // XXX: Is this correct?
-  /**
-   * Check this one: private MonoVoid verifyTagExists_migrated(OptionalString tagId) { return
-   * RxJava2Adapter.completableToMono( Maybe.defer(() -
-   * tagId.map(Maybe::just).orElseGet(Maybe::empty)) - .flatMapSingleElement(this::getTagById) -
-   * .ignoreElement()); + .flatMapSingleElement(this::getTagById).as(RxJava2Adapter::maybeToMono).
-   */
-  /// XXX: Check this one is required for case above.
+  //  static final class MaybeCreate<T> {
+  //    @BeforeTemplate
+  //    Maybe<T> before(MaybeOnSubscribe<T> onSubscribe) {
+  //      return Maybe.create(onSubscribe);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Maybe<T> after(MaybeOnSubscribe<T> onSubscribe) {
+  //      return Mono.create(() -> RxJava2Adapter.maybeToMono(onSubscribe));
+  //    }
+  //  }
+
+  /// XXX: CTest this one.
   abstract static class MaybeDeferFirst<T> {
     @Placeholder
     abstract Maybe<T> maybeProducer();
