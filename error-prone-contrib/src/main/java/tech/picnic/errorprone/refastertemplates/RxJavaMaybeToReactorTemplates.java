@@ -103,21 +103,9 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public static Flowable concatDelayError(Publisher)
   // XXX: public static Flowable concatEager(Iterable)
   // XXX: public static Flowable concatEager(Publisher)
-  // XXX: public static Maybe create(MaybeOnSubscribe)
+  // XXX: public static Maybe create(MaybeOnSubscribe) --> Out of scope.
 
-  //  static final class MaybeCreate<T> {
-  //    @BeforeTemplate
-  //    Maybe<T> before(MaybeOnSubscribe<T> onSubscribe) {
-  //      return Maybe.create(onSubscribe);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Maybe<T> after(MaybeOnSubscribe<T> onSubscribe) {
-  //      return Mono.create(() -> RxJava2Adapter.maybeToMono(onSubscribe));
-  //    }
-  //  }
-
-  /// XXX: CTest this one.
+  /// XXX: Test this one.
   abstract static class MaybeDeferFirst<T> {
     @Placeholder
     abstract Maybe<T> maybeProducer();
@@ -336,7 +324,19 @@ final class RxJavaMaybeToReactorTemplates {
 
   // XXX: public final Object as(MaybeConverter)
   //   Maybe.just("test").as(RxJava2Adapter::maybeToMono)?
-  // XXX: public final Object blockingGet()
+
+  static final class MaybeBlockingGet<T> {
+    @BeforeTemplate
+    Object before(Maybe<T> maybe) {
+      return maybe.blockingGet();
+    }
+
+    @AfterTemplate
+    Object after(Maybe<T> maybe) {
+      return RxJava2Adapter.maybeToMono(maybe).block();
+    }
+  }
+
   // XXX: public final Object blockingGet(Object)
   // XXX: public final Maybe cache()
 
@@ -357,7 +357,19 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Flowable concatWith(MaybeSource)
   // XXX: public final Single contains(Object)
   // XXX: public final Single count()
-  // XXX: public final Maybe defaultIfEmpty(Object)
+
+  static final class MaybeDefaultIfEmpty<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe, T item) {
+      return maybe.defaultIfEmpty(item);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe, T item) {
+      return RxJava2Adapter.monoToMaybe(RxJava2Adapter.maybeToMono(maybe).defaultIfEmpty(item));
+    }
+  }
+
   // XXX: public final Maybe delay(long,TimeUnit)
   // XXX: public final Maybe delay(long,TimeUnit,Scheduler)
   // XXX: public final Maybe delay(Publisher)
@@ -535,7 +547,19 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: public final Single isEmpty()
+  // XXX: Test this one.
+  static final class MaybeIsEmpty<T> {
+    @BeforeTemplate
+    Single<Boolean> before(Maybe<T> maybe) {
+      return maybe.isEmpty();
+    }
+
+    @AfterTemplate
+    Single<Boolean> after(Maybe<T> maybe) {
+      return RxJava2Adapter.monoToSingle(RxJava2Adapter.maybeToMono(maybe).hasElement());
+    }
+  }
+
   // XXX: public final Maybe lift(MaybeOperator)
   // XXX: public final Maybe map(Function) --> required.
 

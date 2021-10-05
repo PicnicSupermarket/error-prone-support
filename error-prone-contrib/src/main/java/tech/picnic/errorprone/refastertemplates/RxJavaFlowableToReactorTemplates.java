@@ -1,7 +1,9 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableMultiset;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -23,6 +25,7 @@ import io.reactivex.flowables.GroupedFlowable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -841,6 +844,25 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
+  static final class FlowableFlatMapMaybeSecond<
+      S, T extends S, R, P extends R, Q extends MaybeSource<P>> {
+    @BeforeTemplate
+    Flowable<R> before(Flowable<T> flowable, Function<S, Q> function) {
+      return flowable.flatMapMaybe(function);
+    }
+
+    @AfterTemplate
+    Flowable<R> after(Flowable<T> flowable, Function<S, Q> function) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .flatMap(
+                  e ->
+                      RxJava2Adapter.maybeToMono(
+                          Maybe.wrap(
+                              RxJavaReactorMigrationUtil.<S, Q>toJdkFunction(function).apply(e)))));
+    }
+  }
+
   // XXX: final Flowable flatMapMaybe(Function,boolean,int)
   // XXX: final Flowable flatMapSingle(Function)
   // XXX: final Flowable flatMapSingle(Function,boolean,int)
@@ -1340,17 +1362,69 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  //  static final class FlowableAssertValueSet<T> {
-  //    @BeforeTemplate
-  //    void before(Flowable<T> flowable, Collection<? extends T> set) throws InterruptedException {
-  //      flowable.test().await().assertValueSet(set);
-  //    }
-  //
-  //    @AfterTemplate
-  //    void after(Flowable<T> flowable, Collection<? extends T> set) throws InterruptedException {
-  //      RxJava2Adapter.flowableToFlux(flowable).as(StepVerifier::create).expectNext(set);
-  //    }
-  //  }
+  // XXX: Strictly speaking not equivalent because of the poor API design for `assertValueSet`.
+  static final class FlowableAssertValueSet<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable, Collection<? extends T> set) throws InterruptedException {
+      Refaster.anyOf(
+          flowable.test().await().assertValueSet(set),
+          flowable.test().await().assertNoErrors().assertValueSet(set).assertComplete(),
+          flowable.test().await().assertValueSet(set).assertNoErrors().assertComplete());
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable, Collection<? extends T> set) throws InterruptedException {
+      RxJava2Adapter.flowableToFlux(flowable)
+          .collect(toImmutableMultiset())
+          .as(StepVerifier::create)
+          .expectNext(ImmutableMultiset.copyOf(set))
+          .verifyComplete();
+    }
+  }
+
+  // XXX: Test this one.
+  static final class FlowableAssertValueSetWithValueCount<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable, Collection<? extends T> set, Integer count)
+        throws InterruptedException {
+      Refaster.anyOf(
+          flowable.test().await().assertValueCount(count).assertValueSet(set),
+          flowable
+              .test()
+              .assertComplete()
+              .assertNoErrors()
+              .assertValueCount(count)
+              .assertValueSet(set),
+          flowable
+              .test()
+              .await()
+              .assertComplete()
+              .assertNoErrors()
+              .assertValueCount(count)
+              .assertValueSet(set),
+          flowable.test().await().assertNoErrors().assertValueSet(set).assertComplete(),
+          flowable.test().await().assertValueCount(count).assertValueSet(set).assertComplete(),
+          flowable
+              .test()
+              .await()
+              .assertValueCount(count)
+              .assertValueSet(set)
+              .assertNoErrors()
+              .assertComplete(),
+          flowable.test().await().assertValueSet(set).assertNoErrors().assertComplete());
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable, Collection<? extends T> set, Integer count)
+        throws InterruptedException {
+      RxJava2Adapter.flowableToFlux(flowable)
+          .collect(toImmutableMultiset())
+          .as(StepVerifier::create)
+          .expectNextCount(count)
+          .expectNext(ImmutableMultiset.copyOf(set))
+          .verifyComplete();
+    }
+  }
 
   static final class FlowableTestAssertResultValues<T> {
     @BeforeTemplate

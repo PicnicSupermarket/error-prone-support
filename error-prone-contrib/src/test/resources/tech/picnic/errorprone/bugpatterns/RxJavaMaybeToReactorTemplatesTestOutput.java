@@ -113,6 +113,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
         .as(RxJava2Adapter::monoToMaybe);
   }
 
+  Integer testMaybeBlockingGet() {
+    return RxJava2Adapter.maybeToMono(Maybe.just(1)).block();
+  }
+
   Maybe<String> testMaybeCastPositive() {
     return Maybe.just("string");
   }
@@ -120,6 +124,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   @SuppressWarnings("MaybeJust")
   Maybe<Object> testMaybeCastNegative() {
     return Maybe.just("string").cast(Object.class);
+  }
+
+  Maybe<Integer> testMaybeDefaultIfEmpty() {
+    return RxJava2Adapter.monoToMaybe(RxJava2Adapter.maybeToMono(Maybe.just(1)).defaultIfEmpty(0));
   }
 
   Maybe<Integer> testMaybeDoOnError() {
@@ -211,6 +219,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
         .as(RxJava2Adapter::maybeToMono)
         .then()
         .as(RxJava2Adapter::monoToCompletable);
+  }
+
+  Single<Boolean> testMaybeIsEmpty() {
+    return RxJava2Adapter.monoToSingle(RxJava2Adapter.maybeToMono(Maybe.just(1)).hasElement());
   }
 
   Maybe<String> testMaybeMap() {
