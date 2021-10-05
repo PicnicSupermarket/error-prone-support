@@ -144,6 +144,10 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.singleToMono(Single.just(1)).flux());
   }
 
+  Maybe<Integer> testSingleToMaybe() {
+    return RxJava2Adapter.monoToMaybe(RxJava2Adapter.singleToMono(Single.just(1)));
+  }
+
   Single<Integer> testSingleZipWith() {
     return RxJava2Adapter.monoToSingle(
         RxJava2Adapter.singleToMono(Single.just(1))
@@ -186,8 +190,7 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   void testSingleTestAssertErrorClass() throws InterruptedException {
     RxJava2Adapter.singleToMono(Single.just(1))
         .as(StepVerifier::create)
-        .expectError(InterruptedException.class)
-        .verify();
+        .verifyError(InterruptedException.class);
   }
 
   void testSingleTestAssertNoErrors() throws InterruptedException {

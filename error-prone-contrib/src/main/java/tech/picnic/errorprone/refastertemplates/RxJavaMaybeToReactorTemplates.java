@@ -566,6 +566,23 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe onErrorResumeNext(MaybeSource)
   // XXX: public final Maybe onErrorReturn(Function) --> This one, ArticleIssueServiceImpl 484,
   // double check please.
+
+  abstract static class MaybeOnErrorReturn<T, R> {
+    @Placeholder
+    abstract T placeholder(@MayOptionallyUse Throwable throwable);
+
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe) {
+      return maybe.onErrorReturn(t -> placeholder(t));
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe) {
+      return RxJava2Adapter.monoToMaybe(
+          RxJava2Adapter.maybeToMono(maybe).onErrorResume(t -> Mono.just(placeholder(t))));
+    }
+  }
+
   // XXX: public final Maybe onErrorReturnItem(Object)
   // XXX: public final Maybe onExceptionResumeNext(MaybeSource)
   // XXX: public final Maybe onTerminateDetach()
@@ -759,7 +776,7 @@ final class RxJavaMaybeToReactorTemplates {
 
     @AfterTemplate
     void after(Maybe<T> maybe, Class<? extends Throwable> errorClass) {
-      RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).expectError(errorClass).verify();
+      RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).verifyError(errorClass);
     }
   }
 
@@ -814,10 +831,7 @@ final class RxJavaMaybeToReactorTemplates {
 
     @AfterTemplate
     void after(Maybe<T> maybe) {
-      RxJava2Adapter.maybeToMono(maybe)
-          .as(StepVerifier::create)
-          .expectNextCount(0)
-          .verifyComplete();
+      RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).verifyComplete();
     }
   }
 
