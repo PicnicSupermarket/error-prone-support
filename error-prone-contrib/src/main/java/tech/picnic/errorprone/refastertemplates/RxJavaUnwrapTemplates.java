@@ -5,13 +5,12 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
-import io.reactivex.Flowable;
+import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Function;
-import java.util.Map;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
@@ -185,6 +184,34 @@ public final class RxJavaUnwrapTemplates {
     @AfterTemplate
     java.util.function.Function<? super T, ? extends Publisher<? extends R>> before() {
       return e -> placeholder(e);
+    }
+  }
+
+  abstract static class FlowableFlatMapCompletableUnwrapLambda<T> {
+    @Placeholder
+    abstract Mono<?> placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<T, ? extends Publisher<? extends Void>> before() {
+      return Refaster.anyOf(
+          e ->
+              RxJava2Adapter.completableToMono(
+                  Completable.wrap(
+                      RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                              (Function<T, Completable>)
+                                  (T ident) -> RxJava2Adapter.monoToCompletable(placeholder(ident)))
+                          .apply(e))),
+          e ->
+              RxJava2Adapter.completableToMono(
+                  RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                          (Function<T, Completable>)
+                              (T ident) -> RxJava2Adapter.monoToCompletable(placeholder(ident)))
+                      .apply(e)));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<T, Mono<?>> after() {
+      return v -> placeholder(v);
     }
   }
 }

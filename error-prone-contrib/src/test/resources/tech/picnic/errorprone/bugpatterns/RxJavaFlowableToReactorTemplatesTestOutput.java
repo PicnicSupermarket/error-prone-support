@@ -3,8 +3,10 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import java.util.List;
@@ -16,6 +18,11 @@ import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTestCase {
+
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(CompletableSource.class, MaybeSource.class);
+  }
 
   Flowable<Integer> testFlowableAmbArray() {
     return RxJava2Adapter.fluxToFlowable(Flux.firstWithSignal(Flowable.just(1), Flowable.just(2)));
@@ -213,7 +220,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         RxJava2Adapter.flowableToFlux(Flowable.just(1))
             .concatMapDelayError(
                 e ->
-                    Maybe.wrap(RxJavaReactorMigrationUtil.toJdkFunction(Maybe::just).apply(e))
+                    Maybe.wrap(
+                            RxJavaReactorMigrationUtil.toJdkFunction(
+                                    (Function<Integer, MaybeSource<Integer>>) Maybe::just)
+                                .apply(e))
                         .toFlowable()));
   }
 
@@ -224,7 +234,9 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
                 e ->
                     RxJava2Adapter.maybeToMono(
                         Maybe.wrap(
-                            RxJavaReactorMigrationUtil.toJdkFunction(Maybe::just).apply(e)))));
+                            RxJavaReactorMigrationUtil.toJdkFunction(
+                                    (Function<Integer, MaybeSource<Integer>>) Maybe::just)
+                                .apply(e)))));
   }
 
   Flowable<Integer> testFlowableMap() {
@@ -238,6 +250,13 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return RxJava2Adapter.fluxToFlowable(
         RxJava2Adapter.flowableToFlux(Flowable.just(1))
             .mergeWith(RxJava2Adapter.singleToMono(Single.wrap(Single.just(1)))));
+  }
+
+  Flowable<Integer> testFlowableOnErrorResumeNext() {
+    return RxJava2Adapter.fluxToFlowable(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1))
+            .onErrorResume(
+                RxJavaReactorMigrationUtil.toJdkFunction((Throwable throwable) -> Flux.just(1))));
   }
 
   Single<Integer> testFlowableSingleDefault() {

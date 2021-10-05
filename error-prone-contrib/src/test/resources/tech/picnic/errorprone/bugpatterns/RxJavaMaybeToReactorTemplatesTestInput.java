@@ -1,15 +1,22 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.util.concurrent.CompletableFuture;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 
 final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCase {
+
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(Observable.class);
+  }
 
   Maybe<String> testMaybeAmb() {
     return Maybe.amb(ImmutableList.of(Maybe.just("foo"), Maybe.just("bar")));
@@ -153,7 +160,7 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.just(1).toFlowable();
   }
 
-  Completable<Integer> testMaybeToObservable() {
+  Observable<Integer> testMaybeToObservable() {
     return Maybe.just(1).toObservable();
   }
 

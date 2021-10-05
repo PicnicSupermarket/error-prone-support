@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.ImportPolicy;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
@@ -366,7 +367,9 @@ final class RxJavaCompletableToReactorTemplates {
     @BeforeTemplate
     void before(Completable completable, Class<? extends Throwable> errorClass)
         throws InterruptedException {
-      completable.test().await().assertError(errorClass);
+      Refaster.anyOf(
+          completable.test().await().assertError(errorClass),
+          completable.test().assertError(errorClass));
     }
 
     @AfterTemplate

@@ -1,10 +1,12 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Function;
@@ -15,6 +17,11 @@ import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCase {
+
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(Observable.class);
+  }
 
   Maybe<String> testMaybeAmb() {
     return RxJava2Adapter.monoToMaybe(
@@ -228,6 +235,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
 
   Flowable<Integer> testMaybeToFlowable() {
     return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.maybeToMono(Maybe.just(1)).flux());
+  }
+
+  Observable<Integer> testMaybeToObservable() {
+    return RxJava2Adapter.fluxToObservable(RxJava2Adapter.maybeToMono(Maybe.just(1)).flux());
   }
 
   @SuppressWarnings("MaybeJust")

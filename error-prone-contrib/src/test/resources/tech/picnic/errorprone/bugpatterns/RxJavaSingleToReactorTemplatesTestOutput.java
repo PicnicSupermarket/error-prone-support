@@ -1,11 +1,13 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import com.google.common.collect.ImmutableSet;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
+import java.util.List;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -13,6 +15,11 @@ import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCase {
+
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(List.class);
+  }
 
   Single<Object> testSingleErrorThrowable() {
     return RxJava2Adapter.monoToSingle(Mono.error(new IllegalStateException()));
@@ -70,6 +77,17 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
         .as(RxJava2Adapter::monoToMaybe);
   }
 
+  public Mono<String> testUnwrapLambdaSingle() {
+    return Mono.just("1")
+        .flatMap(
+            v ->
+                RxJava2Adapter.singleToMono(
+                    (Single<String>)
+                        RxJavaReactorMigrationUtil.toJdkFunction(
+                                (String ident) -> RxJava2Adapter.monoToSingle(Mono.just(ident)))
+                            .apply(v)));
+  }
+
   Single<Integer> testSingleFlatMapLambda() {
     return Single.just(1)
         .as(RxJava2Adapter::singleToMono)
@@ -124,6 +142,15 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
 
   Flowable<Integer> testSingleToFlowable() {
     return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.singleToMono(Single.just(1)).flux());
+  }
+
+  Single<Integer> testSingleZipWith() {
+    return RxJava2Adapter.monoToSingle(
+        RxJava2Adapter.singleToMono(Single.just(1))
+            .zipWith(
+                RxJava2Adapter.singleToMono(Single.wrap(Single.just(2))),
+                RxJavaReactorMigrationUtil.toJdkBiFunction(
+                    (integer, integer2) -> integer + integer2)));
   }
 
   void testSingleTestAssertResultItem() throws InterruptedException {

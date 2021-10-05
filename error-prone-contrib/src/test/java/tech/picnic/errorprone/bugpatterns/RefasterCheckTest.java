@@ -71,6 +71,7 @@ public final class RefasterCheckTest {
           "RxJavaObservableToReactor",
           "RxJavaSingleToReactor",
           "RxJavaToReactor",
+          "RxJavaUnwrap",
           "Stream",
           "String",
           "TestNGToAssertJ",

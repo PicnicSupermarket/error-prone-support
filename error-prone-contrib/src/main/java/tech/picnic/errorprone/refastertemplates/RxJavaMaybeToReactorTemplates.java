@@ -16,12 +16,12 @@ import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
-import io.reactivex.MaybeOnSubscribe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Action;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
@@ -670,7 +670,29 @@ final class RxJavaMaybeToReactorTemplates {
 
   // XXX: public final Single toSingle(Object)
   // XXX: public final Maybe unsubscribeOn(Scheduler)
-  // XXX: public final Maybe zipWith(MaybeSource,BiFunction) --> Required.
+
+  // XXX: Test this one.
+  static final class MaybeZipWith<T, R, U> {
+    @BeforeTemplate
+    Maybe<R> before(
+        Maybe<T> maybe,
+        MaybeSource<U> source,
+        BiFunction<? super T, ? super U, ? extends R> biFunction) {
+      return maybe.zipWith(source, biFunction);
+    }
+
+    @AfterTemplate
+    Maybe<R> after(
+        Maybe<T> maybe,
+        MaybeSource<U> source,
+        BiFunction<? super T, ? super U, ? extends R> biFunction) {
+      return RxJava2Adapter.monoToMaybe(
+          RxJava2Adapter.maybeToMono(maybe)
+              .zipWith(
+                  RxJava2Adapter.maybeToMono(Maybe.wrap(source)),
+                  RxJavaReactorMigrationUtil.toJdkBiFunction(biFunction)));
+    }
+  }
 
   static final class MaybeTestAssertResultItem<T> {
     @BeforeTemplate
@@ -787,7 +809,7 @@ final class RxJavaMaybeToReactorTemplates {
   static final class MaybeTestAssertNoValues<T> {
     @BeforeTemplate
     void before(Maybe<T> maybe) throws InterruptedException {
-      maybe.test().await().assertNoValues();
+      Refaster.anyOf(maybe.test().await().assertNoValues(), maybe.test().assertNoValues());
     }
 
     @AfterTemplate

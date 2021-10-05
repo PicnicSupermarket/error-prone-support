@@ -11,6 +11,11 @@ import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(RxJavaReactorMigrationUtil.class);
+  }
+
   Flux<Integer> testFluxToFlowableToFlux() {
     Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
