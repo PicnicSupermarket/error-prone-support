@@ -118,8 +118,9 @@ final class RxJavaObservableToReactorTemplates {
     }
 
     @AfterTemplate
-    Observable<? extends T> after(Callable<? extends T>  callable) {
-      return RxJava2Adapter.fluxToObservable(Mono.fromSupplier(RxJavaReactorMigrationUtil.callableAsSupplier(callable)).flux());
+    Observable<? extends T> after(Callable<? extends T> callable) {
+      return RxJava2Adapter.fluxToObservable(
+          Mono.fromSupplier(RxJavaReactorMigrationUtil.callableAsSupplier(callable)).flux());
     }
   }
 

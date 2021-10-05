@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import com.google.common.collect.ImmutableSet;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
@@ -13,6 +14,11 @@ import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCase {
+
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(List.class);
+  }
 
   Single<Object> testSingleErrorThrowable() {
     return Single.error(new IllegalStateException());

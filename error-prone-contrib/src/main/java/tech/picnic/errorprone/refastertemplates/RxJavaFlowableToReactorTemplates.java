@@ -27,7 +27,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import org.junit.After;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
@@ -872,7 +871,23 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable groupBy(Function,Function,boolean,int,Function)
   // XXX: final Flowable groupJoin(Publisher,Function,Function,BiFunction)
   // XXX: final Flowable hide()
-  // XXX: final Completable ignoreElements()
+
+  // XXX: Add test
+  static final class FlowableIgnoreElements<T> {
+    @BeforeTemplate
+    Completable before(Flowable<T> flowable) {
+      return flowable.ignoreElements();
+    }
+
+    @AfterTemplate
+    Completable after(Flowable<T> flowable) {
+      return RxJava2Adapter.flowableToFlux(flowable)
+          .ignoreElements()
+          .then()
+          .as(RxJava2Adapter::monoToCompletable);
+    }
+  }
+
   // XXX: final Single isEmpty()
   // XXX: final Flowable join(Publisher,Function,Function,BiFunction)
   // XXX: final Single last(Object)
@@ -1325,6 +1340,18 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
+  //  static final class FlowableAssertValueSet<T> {
+  //    @BeforeTemplate
+  //    void before(Flowable<T> flowable, Collection<? extends T> set) throws InterruptedException {
+  //      flowable.test().await().assertValueSet(set);
+  //    }
+  //
+  //    @AfterTemplate
+  //    void after(Flowable<T> flowable, Collection<? extends T> set) throws InterruptedException {
+  //      RxJava2Adapter.flowableToFlux(flowable).as(StepVerifier::create).expectNext(set);
+  //    }
+  //  }
+
   static final class FlowableTestAssertResultValues<T> {
     @BeforeTemplate
     void before(Flowable<T> flowable, @Repeated T item) throws InterruptedException {
@@ -1417,15 +1444,15 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: Add test
   static final class FlowableTestAssertNoValues<T> {
     @BeforeTemplate
-    void before(Single<T> single) throws InterruptedException {
+    void before(Flowable<T> flowable) throws InterruptedException {
       Refaster.anyOf(
-          single.test().await().assertNoValues(),
-          single.test().await().assertNoValues().assertComplete());
+          flowable.test().await().assertNoValues(),
+          flowable.test().await().assertNoValues().assertComplete());
     }
 
     @AfterTemplate
-    void after(Single<T> single) {
-      RxJava2Adapter.singleToMono(single)
+    void after(Flowable<T> flowable) {
+      RxJava2Adapter.flowableToFlux(flowable)
           .as(StepVerifier::create)
           .expectNextCount(0)
           .verifyComplete();

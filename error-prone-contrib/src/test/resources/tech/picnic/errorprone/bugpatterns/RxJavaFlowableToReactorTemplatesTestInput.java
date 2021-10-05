@@ -6,6 +6,7 @@ import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import java.util.List;
@@ -16,6 +17,11 @@ import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTestCase {
+
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(CompletableSource.class, MaybeSource.class);
+  }
 
   Flowable<Integer> testFlowableAmbArray() {
     return Flowable.ambArray(Flowable.just(1), Flowable.just(2));

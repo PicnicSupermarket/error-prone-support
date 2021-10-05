@@ -106,7 +106,8 @@ public final class RxJavaToReactorTemplates {
     Mono<Void> before3(Mono<T> mono) {
       return Refaster.anyOf(
           RxJava2Adapter.completableToMono(RxJava2Adapter.monoToCompletable(mono)),
-          RxJava2Adapter.completableToMono(mono.as(RxJava2Adapter::monoToCompletable)));
+          RxJava2Adapter.completableToMono(mono.as(RxJava2Adapter::monoToCompletable)),
+          RxJava2Adapter.monoToCompletable(mono).as(RxJava2Adapter::completableToMono));
     }
 
     @AfterTemplate
@@ -272,5 +273,14 @@ public final class RxJavaToReactorTemplates {
     Flux<T> after(Mono<T> mono) {
       return mono.flux();
     }
+  }
+
+  ////
+  Mono<Void> test() {
+    return Mono.fromRunnable(() -> System.out.println(""))
+        .then(
+            RxJava2Adapter.flowableToFlux(Flowable.just(1))
+                .flatMap(ident -> Flowable.just(ident))
+                .then());
   }
 }
