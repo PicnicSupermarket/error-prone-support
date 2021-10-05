@@ -8,6 +8,7 @@ import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
@@ -16,11 +17,13 @@ import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -262,7 +265,20 @@ final class RxJavaCompletableToReactorTemplates {
   }
 
   // XXX: public final boolean blockingAwait(long,TimeUnit)
-  // XXX: public final Throwable blockingGet()
+
+  // XXX: Strictly speaking not correct, should return `Throwable`.
+  static final class CompletableBlockingGet {
+    @BeforeTemplate
+    Object before(Completable completable) {
+      return completable.blockingGet();
+    }
+
+    @AfterTemplate
+    Object after(Completable completable) {
+      return RxJava2Adapter.completableToMono(completable).block();
+    }
+  }
+
   // XXX: public final Throwable blockingGet(long,TimeUnit)
   // XXX: public final Completable cache()
   // XXX: public final Completable compose(CompletableTransformer)
@@ -280,8 +296,26 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Completable doOnEvent(Consumer)
   // XXX: public final Completable doOnSubscribe(Consumer) --> Required
 
+  // XXX Doesnt work yet....
+  abstract static class CompletableDoOnSubscribe<T> {
+    @Placeholder
+    abstract T placeholder();
+
+    @BeforeTemplate
+    Completable before(Completable completable) {
+      return completable.doOnSubscribe((Disposable d) -> placeholder());
+    }
+
+    @AfterTemplate
+    Completable after(Completable completable) {
+      return RxJava2Adapter.monoToCompletable(
+          RxJava2Adapter.completableToMono(completable)
+              .doOnSubscribe((Subscription s) -> placeholder()));
+    }
+  }
+
   // XXX: Add test
-  static final class CompletableDoOnSubscribe {
+  static final class CompletableDoOnError {
     @BeforeTemplate
     Completable before(Completable completable, Consumer<? super Throwable> consumer) {
       return completable.doOnError(consumer);

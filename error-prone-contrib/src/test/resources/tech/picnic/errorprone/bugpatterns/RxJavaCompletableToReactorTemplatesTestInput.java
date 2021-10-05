@@ -55,6 +55,10 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
     return Completable.wrap(Completable.complete());
   }
 
+  Completable testCompletableDoOnSubscribe() {
+    return Completable.complete().doOnSubscribe((Disposable d) -> System.out.println(""));
+  }
+
   Flowable<Void> testCompletableToFlowable() {
     return Completable.complete().toFlowable();
   }

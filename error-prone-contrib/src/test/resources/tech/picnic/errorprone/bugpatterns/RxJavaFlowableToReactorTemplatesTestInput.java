@@ -9,6 +9,7 @@ import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
+import io.reactivex.internal.functions.Functions;
 import java.util.List;
 import java.util.Map;
 import reactor.adapter.rxjava.RxJava2Adapter;
@@ -171,6 +172,11 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Flowable<Integer> testFlowableFlatMapMaybe() {
     return Flowable.just(1).flatMapMaybe(Maybe::just);
+  }
+
+  Flowable<Integer> testFlowableFlatMapMaybeSecond() {
+    return Flowable.zip(Flowable.just(1), Flowable.just(2), (i1, i2) -> Maybe.just(i1 + i2))
+        .flatMapMaybe(Functions.identity());
   }
 
   Flowable<Integer> testFlowableMap() {

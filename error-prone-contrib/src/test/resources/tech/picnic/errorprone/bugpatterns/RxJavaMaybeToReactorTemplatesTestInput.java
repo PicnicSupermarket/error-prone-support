@@ -92,6 +92,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.just("foo").ambWith(Maybe.just("bar"));
   }
 
+  Integer testMaybeBlockingGet() {
+    return Maybe.just(1).blockingGet();
+  }
+
   Maybe<String> testMaybeCastPositive() {
     return Maybe.just("string").cast(String.class);
   }
@@ -99,6 +103,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   @SuppressWarnings("MaybeJust")
   Maybe<Object> testMaybeCastNegative() {
     return Maybe.just("string").cast(Object.class);
+  }
+
+  Maybe<Integer> testMaybeDefaultIfEmpty() {
+    return Maybe.just(1).defaultIfEmpty(0);
   }
 
   Maybe<Integer> testMaybeDoOnError() {
@@ -141,6 +149,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
 
   Completable testMaybeIgnoreElement() {
     return Maybe.just(1).ignoreElement();
+  }
+
+  Single<Boolean> testMaybeIsEmpty() {
+    return Maybe.just(1).isEmpty();
   }
 
   Maybe<String> testMaybeMap() {
