@@ -101,8 +101,7 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
   void testObservableTestAssertErrorClass() throws InterruptedException {
     RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
         .as(StepVerifier::create)
-        .expectError(InterruptedException.class)
-        .verify();
+        .verifyError(InterruptedException.class);
   }
 
   void testObservableTestAssertNoErrors() throws InterruptedException {

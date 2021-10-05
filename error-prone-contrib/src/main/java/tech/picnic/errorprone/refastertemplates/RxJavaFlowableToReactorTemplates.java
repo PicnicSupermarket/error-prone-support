@@ -1391,10 +1391,7 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     void after(Flowable<T> flowable, Class<? extends Throwable> errorClass) {
-      RxJava2Adapter.flowableToFlux(flowable)
-          .as(StepVerifier::create)
-          .expectError(errorClass)
-          .verify();
+      RxJava2Adapter.flowableToFlux(flowable).as(StepVerifier::create).verifyError(errorClass);
     }
   }
 
@@ -1452,10 +1449,7 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     void after(Flowable<T> flowable) {
-      RxJava2Adapter.flowableToFlux(flowable)
-          .as(StepVerifier::create)
-          .expectNextCount(0)
-          .verifyComplete();
+      RxJava2Adapter.flowableToFlux(flowable).as(StepVerifier::create).verifyComplete();
     }
   }
 

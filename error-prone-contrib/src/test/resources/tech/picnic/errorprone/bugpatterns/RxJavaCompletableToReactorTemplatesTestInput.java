@@ -1,10 +1,17 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import com.google.common.collect.ImmutableSet;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import java.util.Arrays;
 
 final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTestCase {
+
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(Maybe.class);
+  }
 
   Completable testCompletableAmb() {
     return Completable.amb(Arrays.asList(Completable.complete(), Completable.complete()));
@@ -46,6 +53,14 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
 
   Completable testCompletableWrap() {
     return Completable.wrap(Completable.complete());
+  }
+
+  Flowable<Void> testCompletableToFlowable() {
+    return Completable.complete().toFlowable();
+  }
+
+  Maybe<Void> testCompletableToMaybe() {
+    return Completable.complete().toMaybe();
   }
 
   void testCompletableTestAssertResult() throws InterruptedException {

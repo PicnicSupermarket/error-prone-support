@@ -220,6 +220,12 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
         .as(RxJava2Adapter::monoToMaybe);
   }
 
+  Maybe<Integer> testMaybeOnErrorReturn() {
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.maybeToMono(Maybe.just(1))
+            .onErrorResume(t -> Mono.just(Integer.valueOf(1))));
+  }
+
   Single<Integer> testMaybeSwitchIfEmpty() {
     return Maybe.just(1)
         .as(RxJava2Adapter::maybeToMono)
@@ -279,8 +285,7 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   void testMaybeTestAssertErrorClass() throws InterruptedException {
     RxJava2Adapter.maybeToMono(Maybe.just(1))
         .as(StepVerifier::create)
-        .expectError(InterruptedException.class)
-        .verify();
+        .verifyError(InterruptedException.class);
   }
 
   void testMaybeTestAssertNoErrors() throws InterruptedException {

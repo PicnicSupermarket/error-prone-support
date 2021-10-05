@@ -1,9 +1,11 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import java.util.Arrays;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
@@ -11,6 +13,11 @@ import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTestCase {
+
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(Maybe.class);
+  }
 
   Completable testCompletableAmb() {
     return Mono.firstWithSignal(
@@ -66,6 +73,15 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
     return Completable.complete();
   }
 
+  Flowable<Void> testCompletableToFlowable() {
+    return RxJava2Adapter.fluxToFlowable(
+        RxJava2Adapter.completableToMono(Completable.complete()).flux());
+  }
+
+  Maybe<Void> testCompletableToMaybe() {
+    return RxJava2Adapter.monoToMaybe(RxJava2Adapter.completableToMono(Completable.complete()));
+  }
+
   void testCompletableTestAssertResult() throws InterruptedException {
     RxJava2Adapter.completableToMono(Completable.complete())
         .as(StepVerifier::create)
@@ -81,8 +97,7 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
   void testCompletableTestAssertErrorClass() throws InterruptedException {
     RxJava2Adapter.completableToMono(Completable.complete())
         .as(StepVerifier::create)
-        .expectError(InterruptedException.class)
-        .verify();
+        .verifyError(InterruptedException.class);
   }
 
   void testCompletableTestAssertNoErrors() throws InterruptedException {

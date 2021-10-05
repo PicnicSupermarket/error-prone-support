@@ -727,8 +727,7 @@ final class RxJavaObservableToReactorTemplates {
     void after(Observable<T> observable, Class<? extends Throwable> errorClass) {
       RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
           .as(StepVerifier::create)
-          .expectError(errorClass)
-          .verify();
+          .verifyError(errorClass);
     }
   }
 
@@ -796,7 +795,6 @@ final class RxJavaObservableToReactorTemplates {
     void after(Observable<T> observable) {
       RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
           .as(StepVerifier::create)
-          .expectNextCount(0)
           .verifyComplete();
     }
   }

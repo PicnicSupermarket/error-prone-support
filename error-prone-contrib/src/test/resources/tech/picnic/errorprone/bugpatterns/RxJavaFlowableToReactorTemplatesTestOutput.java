@@ -361,8 +361,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   void testFlowableTestAssertErrorClass() throws InterruptedException {
     RxJava2Adapter.flowableToFlux(Flowable.just(1))
         .as(StepVerifier::create)
-        .expectError(InterruptedException.class)
-        .verify();
+        .verifyError(InterruptedException.class);
   }
 
   void testFlowableTestAssertNoErrors() throws InterruptedException {

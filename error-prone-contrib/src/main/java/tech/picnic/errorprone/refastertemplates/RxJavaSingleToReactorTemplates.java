@@ -735,7 +735,7 @@ final class RxJavaSingleToReactorTemplates {
 
     @AfterTemplate
     void after(Single<T> single, Class<? extends Throwable> errorClass) {
-      RxJava2Adapter.singleToMono(single).as(StepVerifier::create).expectError(errorClass).verify();
+      RxJava2Adapter.singleToMono(single).as(StepVerifier::create).verifyError(errorClass);
     }
   }
 
@@ -808,10 +808,7 @@ final class RxJavaSingleToReactorTemplates {
 
     @AfterTemplate
     void after(Single<T> single) {
-      RxJava2Adapter.singleToMono(single)
-          .as(StepVerifier::create)
-          .expectNextCount(0)
-          .verifyComplete();
+      RxJava2Adapter.singleToMono(single).as(StepVerifier::create).verifyComplete();
     }
   }
 

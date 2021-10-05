@@ -331,8 +331,31 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Completable timeout(long,TimeUnit,Scheduler)
   // XXX: public final Completable timeout(long,TimeUnit,Scheduler,CompletableSource)
   // XXX: public final Object to(Function)
-  // XXX: public final Flowable toFlowable()
-  // XXX: public final Maybe toMaybe()
+
+  static final class CompletableToFlowable<T> {
+    @BeforeTemplate
+    Flowable<Void> before(Completable completable) {
+      return completable.toFlowable();
+    }
+
+    @AfterTemplate
+    Flowable<Void> after(Completable completable) {
+      return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.completableToMono(completable).flux());
+    }
+  }
+
+  static final class CompletableToMaybe<T> {
+    @BeforeTemplate
+    Maybe<Void> before(Completable completable) {
+      return completable.toMaybe();
+    }
+
+    @AfterTemplate
+    Maybe<Void> after(Completable completable) {
+      return RxJava2Adapter.monoToMaybe(RxJava2Adapter.completableToMono(completable));
+    }
+  }
+
   // XXX: public final Observable toObservable()
   // XXX: public final Single toSingle(Callable)
   // XXX: public final Single toSingleDefault(Object)
@@ -376,8 +399,7 @@ final class RxJavaCompletableToReactorTemplates {
     void after(Completable completable, Class<? extends Throwable> errorClass) {
       RxJava2Adapter.completableToMono(completable)
           .as(StepVerifier::create)
-          .expectError(errorClass)
-          .verify();
+          .verifyError(errorClass);
     }
   }
 
@@ -433,10 +455,7 @@ final class RxJavaCompletableToReactorTemplates {
 
     @AfterTemplate
     void after(Completable completable) {
-      RxJava2Adapter.completableToMono(completable)
-          .as(StepVerifier::create)
-          .expectNextCount(0)
-          .verifyComplete();
+      RxJava2Adapter.completableToMono(completable).as(StepVerifier::create).verifyComplete();
     }
   }
 

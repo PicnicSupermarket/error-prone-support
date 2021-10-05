@@ -128,6 +128,10 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return Single.just(1).toFlowable();
   }
 
+  Maybe<Integer> testSingleToMaybe() {
+    return Single.just(1).toMaybe();
+  }
+
   Single<Integer> testSingleZipWith() {
     return Single.just(1).zipWith(Single.just(2), (integer, integer2) -> integer + integer2);
   }

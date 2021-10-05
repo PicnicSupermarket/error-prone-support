@@ -7,7 +7,6 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
@@ -275,12 +274,15 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  ////
-  Mono<Void> test() {
-    return Mono.fromRunnable(() -> System.out.println(""))
-        .then(
-            RxJava2Adapter.flowableToFlux(Flowable.just(1))
-                .flatMap(ident -> Flowable.just(ident))
-                .then());
+  static final class MonoThenThen<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Mono<T> other) {
+      return mono.then().then(other);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Mono<T> other) {
+      return mono.then(other);
+    }
   }
 }
