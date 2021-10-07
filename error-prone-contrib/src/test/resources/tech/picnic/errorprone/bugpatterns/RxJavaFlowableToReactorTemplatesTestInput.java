@@ -122,6 +122,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return ImmutableList.of(Flowable.just(1), Flowable.just(1, 2));
   }
 
+  Flowable<Integer> testFlowableMergePublisherPublisher() {
+    return Flowable.merge(Flowable.just(1), Flowable.just(2));
+  }
+
   Flowable<Integer> testFlowableRange() {
     return Flowable.range(1, 10);
   }

@@ -1,9 +1,11 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -286,6 +288,19 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: static Flowable merge(Publisher)
   // XXX: static Flowable merge(Publisher,int)
   // XXX: static Flowable merge(Publisher,Publisher)
+
+  static final class FlowableMergePublisherPublisher<T> {
+    @BeforeTemplate
+    Flowable<T> before(Publisher<? extends T> source1, Publisher<? extends T> source2) {
+      return Flowable.merge(source1, source2);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Publisher<? extends T> source1, Publisher<? extends T> source2) {
+      return RxJava2Adapter.fluxToFlowable(Flux.merge(source1, source2));
+    }
+  }
+
   // XXX: static Flowable merge(Publisher,Publisher,Publisher)
   // XXX: static Flowable merge(Publisher,Publisher,Publisher,Publisher)
   // XXX: static Flowable mergeArray(int,int,Publisher[])
@@ -1114,12 +1129,12 @@ final class RxJavaFlowableToReactorTemplates {
 
   static final class FlowableSortedComparator<T> {
     @BeforeTemplate
-    Flowable<T> before(Flowable<T> flowable, Comparator<T> sortFunction) {
+    Flowable<T> before(Flowable<T> flowable, Comparator<? super T> sortFunction) {
       return flowable.sorted(sortFunction);
     }
 
     @AfterTemplate
-    Flowable<T> after(Flowable<T> flowable, Comparator<T> sortFunction) {
+    Flowable<T> after(Flowable<T> flowable, Comparator<? super T> sortFunction) {
       return flowable
           .as(RxJava2Adapter::flowableToFlux)
           .sort(sortFunction)
@@ -1382,6 +1397,27 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
+  // XXX: Introduced this more specific one because the `Collection` did not see the ImmutableSet
+  // variants.
+  static final class FlowableAssertValueImmutableSet<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable, ImmutableSet<? extends T> set) throws InterruptedException {
+      Refaster.anyOf(
+          flowable.test().await().assertValueSet(set),
+          flowable.test().await().assertNoErrors().assertValueSet(set).assertComplete(),
+          flowable.test().await().assertValueSet(set).assertNoErrors().assertComplete());
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable, ImmutableSet<? extends T> set) throws InterruptedException {
+      RxJava2Adapter.flowableToFlux(flowable)
+          .collect(toImmutableSet())
+          .as(StepVerifier::create)
+          .expectNext(ImmutableSet.copyOf(set))
+          .verifyComplete();
+    }
+  }
+
   // XXX: Test this one.
   static final class FlowableAssertValueSetWithValueCount<T> {
     @BeforeTemplate
@@ -1402,8 +1438,8 @@ final class RxJavaFlowableToReactorTemplates {
               .assertNoErrors()
               .assertValueCount(count)
               .assertValueSet(set),
-          flowable.test().await().assertNoErrors().assertValueSet(set).assertComplete(),
-          flowable.test().await().assertValueCount(count).assertValueSet(set).assertComplete(),
+          //          flowable.test().await().assertNoErrors().assertValueSet(set).assertComplete(),
+          flowable.test().assertValueCount(count).assertValueSet(set).assertComplete(),
           flowable
               .test()
               .await()
@@ -1411,7 +1447,13 @@ final class RxJavaFlowableToReactorTemplates {
               .assertValueSet(set)
               .assertNoErrors()
               .assertComplete(),
-          flowable.test().await().assertValueSet(set).assertNoErrors().assertComplete());
+          flowable
+              .test()
+              .await()
+              .assertValueSet(set)
+              .assertNoErrors()
+              .assertValueCount(count)
+              .assertComplete());
     }
 
     @AfterTemplate

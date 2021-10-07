@@ -267,17 +267,17 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final boolean blockingAwait(long,TimeUnit)
 
   // XXX: Strictly speaking not correct, should return `Throwable`.
-  static final class CompletableBlockingGet {
-    @BeforeTemplate
-    Object before(Completable completable) {
-      return completable.blockingGet();
-    }
-
-    @AfterTemplate
-    Object after(Completable completable) {
-      return RxJava2Adapter.completableToMono(completable).block();
-    }
-  }
+  //  static final class CompletableBlockingGet {
+  //    @BeforeTemplate
+  //    Throwable before(Completable completable) {
+  //      return completable.blockingGet();
+  //    }
+  //
+  //    @AfterTemplate
+  //    Throwable after(Completable completable) {
+  //      return Exceptions.propagate(RxJava2Adapter.completableToMono(completable).single());
+  //    }
+  //  }
 
   // XXX: public final Throwable blockingGet(long,TimeUnit)
   // XXX: public final Completable cache()
