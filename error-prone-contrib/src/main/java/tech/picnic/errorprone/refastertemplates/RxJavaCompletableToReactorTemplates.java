@@ -398,7 +398,7 @@ final class RxJavaCompletableToReactorTemplates {
   static final class CompletableTestAssertResult {
     @BeforeTemplate
     void before(Completable completable) throws InterruptedException {
-      completable.test().await().assertResult();
+      Refaster.anyOf(completable.test().await().assertResult(), completable.test().await());
     }
 
     @AfterTemplate

@@ -667,10 +667,12 @@ final class RxJavaSingleToReactorTemplates {
     @BeforeTemplate
     void before(Single<T> single, T item) throws InterruptedException {
       Refaster.anyOf(
-          single.test().await().assertResult(item),
           single.test().assertResult(item),
-          single.test().assertResult(item).assertComplete(),
+          single.test().await().assertResult(item),
+          single.test().await().assertComplete().assertResult(item),
+          single.test().await().assertResult(item).assertComplete(),
           single.test().await().assertValue(item),
+          single.test().await().assertComplete().assertValue(item),
           single.test().assertValue(item),
           single.test().await().assertValue(item).assertComplete());
     }
