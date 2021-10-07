@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -679,6 +680,22 @@ final class RxJavaSingleToReactorTemplates {
       RxJava2Adapter.singleToMono(single)
           .as(StepVerifier::create)
           .expectNext(item)
+          .verifyComplete();
+    }
+  }
+
+  static final class SingleAssertValueSet<T> {
+    @BeforeTemplate
+    void before(Single<T> single, ImmutableSet<? extends T> set) throws InterruptedException {
+      single.test().await().assertNoErrors().assertValueSet(set).assertComplete();
+    }
+
+    @AfterTemplate
+    void after(Single<T> single, ImmutableSet<? extends T> set) throws InterruptedException {
+      RxJava2Adapter.singleToMono(single)
+          .map(ImmutableSet::of)
+          .as(StepVerifier::create)
+          .expectNext(ImmutableSet.copyOf(set))
           .verifyComplete();
     }
   }

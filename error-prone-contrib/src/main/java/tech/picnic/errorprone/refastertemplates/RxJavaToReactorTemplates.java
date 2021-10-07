@@ -1,11 +1,9 @@
 package tech.picnic.errorprone.refastertemplates;
 
-import com.google.errorprone.matchers.IsMethodReferenceOrLambdaHasReturnStatement;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
-import com.google.errorprone.refaster.annotation.NotMatches;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
@@ -166,14 +164,15 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
+  // XXX: @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class)  add this temporarily and
+  // remove at end of migration.
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryFunctionConversion<I, O> {
     @BeforeTemplate
-    java.util.function.Function<I, O> before(
-        @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class) @CanTransformToTargetType
-            Function<I, O> function) {
+    java.util.function.Function<I, O> before(@CanTransformToTargetType Function<I, O> function) {
       return Refaster.anyOf(
-          RxJavaReactorMigrationUtil.toJdkFunction((Function<I, O>) function),
+          //          RxJavaReactorMigrationUtil.toJdkFunction((Function<I, O>) function), --> This
+          // one gets us in non-compilable state.
           RxJavaReactorMigrationUtil.toJdkFunction(function));
     }
 
