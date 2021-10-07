@@ -740,8 +740,13 @@ final class RxJavaMaybeToReactorTemplates {
     void before(Maybe<T> maybe, T item) throws InterruptedException {
       Refaster.anyOf(
           maybe.test().await().assertResult(item),
+          maybe.test().await().assertResult(item).assertComplete(),
+          maybe.test().await().assertComplete().assertResult(item),
           maybe.test().await().assertValue(item),
-          maybe.test().await().assertValue(item).assertComplete());
+          maybe.test().await().assertValue(item).assertComplete(),
+          maybe.test().await().assertComplete().assertValue(item),
+          // XXX: Move this to correct method
+          maybe.test().await().assertValues(item));
     }
 
     @AfterTemplate

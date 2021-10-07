@@ -651,6 +651,7 @@ final class RxJavaObservableToReactorTemplates {
     @BeforeTemplate
     void before(Observable<T> observable) throws InterruptedException {
       observable.test().await().assertResult();
+      observable.test().await();
     }
 
     @AfterTemplate
