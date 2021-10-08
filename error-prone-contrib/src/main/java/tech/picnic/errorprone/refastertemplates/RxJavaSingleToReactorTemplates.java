@@ -772,22 +772,6 @@ final class RxJavaSingleToReactorTemplates {
     }
   }
 
-  // XXX: The following two are combined often.
-  //  static final class SingleTestAssertValueSet<T> {
-  //    @BeforeTemplate
-  //    void before(Single<T> single, Collection<? extends T> expected) throws InterruptedException
-  // {
-  //      single.test().await().assertValueSet(expected);
-  //      expected.it
-  //    }
-  //
-  //    @AfterTemplate
-  //    void after(Single<T> single, Collection<? extends T> expected) {
-  //      RxJava2Adapter.singleToMono(single).as(StepVerifier::create).expectNextMatches(t ->
-  // ).verifyComplete();
-  //    }
-  //  }
-
   static final class SingleTestAssertValueCount<T> {
     @BeforeTemplate
     void before(Single<T> single, int count) throws InterruptedException {
