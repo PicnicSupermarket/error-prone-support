@@ -165,8 +165,6 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: Thing to remove the callableAssupplier for this.
-
   static final class FlowableErrorThrowable<T> {
     @BeforeTemplate
     Flowable<T> before(Throwable throwable) {
@@ -179,10 +177,28 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
+  // XXX: Add test
+  static final class FlowableFromArraySingleElement<T> {
+    @BeforeTemplate
+    Flowable<T> before(T item) {
+      return Flowable.fromArray(item);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(T item) {
+      return RxJava2Adapter.fluxToFlowable(Flux.just(item));
+    }
+  }
+
   // XXX: Or should this be Object[] instead of T...? The test doesn't trigger.
   static final class FlowableFromArray<T> {
     @BeforeTemplate
     Flowable<T> before(@Matches(IsArray.class) T[] items) {
+      return Flowable.fromArray(items);
+    }
+
+    @BeforeTemplate
+    Flowable<T> before2(@Matches(IsArray.class) T... items) {
       return Flowable.fromArray(items);
     }
 
