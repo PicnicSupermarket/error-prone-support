@@ -37,19 +37,20 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 /**
- * A {@link BugChecker} which flags methods annotated with annotations described by {@link
- * AnnotationDescriptor} that can be written more concisely.
+ * A {@link BugChecker} which flags annotations with time attributes that can be written more
+ * concisely.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "SimplifyTimeAnnotation",
-    summary = "Simplifies annotations which express an amount of time using TimeUnit",
+    summary = "Simplifies annotations which express an amount of time using a `TimeUnit`",
     linkType = LinkType.NONE,
     severity = SeverityLevel.WARNING,
     tags = StandardTags.SIMPLIFICATION)
 public final class SimplifyTimeAnnotationCheck extends BugChecker implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final AnnotationAttributeMatcher ARGUMENT_SELECTOR = getMatcher();
+  private static final AnnotationAttributeMatcher ARGUMENT_SELECTOR =
+      createAnnotationAttributeMatcher();
 
   @Override
   public Description matchAnnotation(AnnotationTree annotationTree, VisitorState state) {
@@ -218,7 +219,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
     return (VarSymbol) argumentSymbol.getDefaultValue().getValue();
   }
 
-  private static AnnotationAttributeMatcher getMatcher() {
+  private static AnnotationAttributeMatcher createAnnotationAttributeMatcher() {
     ImmutableList<String> toMatch =
         Arrays.stream(AnnotationDescriptor.values())
             .flatMap(
@@ -253,7 +254,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
     private final ImmutableSet<String> timeFields;
     /** The attribute containing the time unit. */
     private final String timeUnitField;
-    /** The set of attributes that cause the check to backoff. */
+    /** The set of attributes that cause the check to back off. */
     private final ImmutableSet<String> bannedFields;
 
     AnnotationDescriptor(String fqcn, ImmutableSet<String> timeFields, String timeUnitField) {
@@ -286,13 +287,15 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
 
   /** Utility class to help simplify time expressions. */
   private static final class TimeSimplifier {
+    private static final ImmutableSortedSet<TimeUnit> TIME_UNITS =
+        ImmutableSortedSet.copyOf(TimeUnit.values());
+
     /**
      * Returns a {@link Simplification} (iff possible) that describes how the {@code originalValue}
      * and {@code originalUnit} can be simplified using a larger {@link TimeUnit}.
      */
     static Optional<Simplification> simplify(long originalValue, TimeUnit originalUnit) {
-      ImmutableSortedSet<TimeUnit> ceiling = descendingLargerUnits(originalUnit);
-      return ceiling.stream()
+      return descendingLargerUnits(originalUnit).stream()
           .flatMap(unit -> trySimplify(originalValue, originalUnit, unit))
           .findFirst();
     }
@@ -300,20 +303,18 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
     private static Stream<Simplification> trySimplify(
         long originalValue, TimeUnit originalUnit, TimeUnit unit) {
       long converted = unit.convert(originalValue, originalUnit);
-      // Check if we lose any precision by checking if we can convert back.
+      // Check whether we lose any precision by checking whether we can convert back.
       return originalValue == originalUnit.convert(converted, unit)
           ? Stream.of(new Simplification(converted, unit))
           : Stream.empty();
     }
 
     /**
-     * Returns all time units that represent a larger amount of time than {@code unit} in descending
-     * order.
+     * Returns all time units that represent a larger amount of time than {@code unit}, in
+     * descending order.
      */
     private static ImmutableSortedSet<TimeUnit> descendingLargerUnits(TimeUnit unit) {
-      return ImmutableSortedSet.copyOf(TimeUnit.values())
-          .tailSet(unit, /* inclusive= */ false)
-          .descendingSet();
+      return TIME_UNITS.tailSet(unit, /* inclusive= */ false).descendingSet();
     }
 
     /** Represents a simplification in terms of the new value and new unit. */

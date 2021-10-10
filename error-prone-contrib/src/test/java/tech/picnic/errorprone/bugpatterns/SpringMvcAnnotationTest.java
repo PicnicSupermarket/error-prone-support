@@ -50,7 +50,7 @@ final class SpringMvcAnnotationTest {
             "  @RequestMapping(method = {DELETE})",
             "  A delete();",
             "  // BUG: Diagnostic contains:",
-            "  @RequestMapping(method = {PATCH})",
+            "  @RequestMapping(method = {org.springframework.web.bind.annotation.RequestMethod.PATCH})",
             "  A patch();",
             "",
             "  @RequestMapping(method = HEAD)",
