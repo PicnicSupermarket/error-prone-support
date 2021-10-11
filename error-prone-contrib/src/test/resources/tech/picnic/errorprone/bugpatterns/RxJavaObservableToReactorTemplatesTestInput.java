@@ -23,6 +23,10 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
     return Observable.just(1, 2);
   }
 
+  Observable<Integer> testObservableJustThree() {
+    return Observable.just(1, 2, 3);
+  }
+
   Maybe<Integer> testMaybeFirstElement() {
     return Observable.just(1).firstElement();
   }

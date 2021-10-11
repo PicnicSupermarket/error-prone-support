@@ -190,7 +190,21 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single cache()
   // XXX: public final Single cast(Class)
   // XXX: public final Single compose(SingleTransformer)
-  // XXX: public final Flowable concatWith(SingleSource)
+
+  static final class SingleConcatWith<T> {
+    @BeforeTemplate
+    Flowable<T> before(Single<T> single, SingleSource<? extends T> source) {
+      return single.concatWith(source);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Single<T> single, SingleSource<? extends T> source) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.singleToMono(single)
+              .concatWith(RxJava2Adapter.singleToMono(Single.wrap(source))));
+    }
+  }
+
   // XXX: public final Single contains(Object)
   // XXX: public final Single contains(Object,BiPredicate)
   // XXX: public final Single delay(long,TimeUnit)
@@ -534,31 +548,67 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Flowable mergeWith(SingleSource)
   // XXX: public final Single observeOn(Scheduler)
 
-  // XXX: Add test. This doesn't work for method references, which is a problem.
-  static final class SingleOnErrorResumeNext<T> {
+  // XXX Keep the original for safety, first verify that others work!
+  //  static final class SingleOnErrorResumeNext<T> {
+  //    @BeforeTemplate
+  //    Single<T> before(
+  //            Single<T> single,
+  //            Function<? super Throwable, ? extends SingleSource<? extends T>> function) {
+  //      return single.onErrorResumeNext(function);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Single<T> after(
+  //            Single<T> single,
+  //            Function<? super Throwable, ? extends SingleSource<? extends T>> function) {
+  //      return RxJava2Adapter.monoToSingle(
+  //              single
+  //                      .as(RxJava2Adapter::singleToMono)
+  //                      .onErrorResume(
+  //                              err ->
+  //                                      RxJava2Adapter.singleToMono(
+  //                                              Single.wrap(
+  //                                                      RxJavaReactorMigrationUtil.toJdkFunction(
+  //                                                                      (Function<Throwable,
+  // Single<T>>) function)
+  //                                                              .apply(err)))));
+  //    }
+  //  }
+  static final class SingleOnErrorResumeNext<S, T extends S, R, P extends Throwable, Q extends Single<T>> {
     @BeforeTemplate
-    Single<T> before(
-        Single<T> single,
-        Function<? super Throwable, ? extends SingleSource<? extends T>> function) {
+    Single<T> before(Single<T> single, Function<? super Throwable, Q> function) {
       return single.onErrorResumeNext(function);
     }
 
     @AfterTemplate
-    Single<T> after(
-        Single<T> single,
-        Function<? super Throwable, ? extends SingleSource<? extends T>> function) {
+    Single<T> after(Single<T> single, Function<Throwable, Single<T>> function) {
       return RxJava2Adapter.monoToSingle(
           single
               .as(RxJava2Adapter::singleToMono)
               .onErrorResume(
                   err ->
                       RxJava2Adapter.singleToMono(
-                          Single.wrap(
-                              RxJavaReactorMigrationUtil.toJdkFunction(
-                                      (Function<Throwable, Single<T>>) function)
-                                  .apply(err)))));
+                          (Q) RxJavaReactorMigrationUtil.<Throwable, Single<T>>toJdkFunction(function).apply(err))));
     }
-  }
+  } // Why doesn't it add the <Throwable, Single<T>>???????
+  //  static final class FlowableFlatMapMaybeSecond<
+  //      S, T extends S, R, P extends R, Q extends Maybe<P>> {
+  //    @BeforeTemplate
+  //    Flowable<R> before(Flowable<T> flowable, Function<S, Q> function) {
+  //      return flowable.flatMapMaybe(function);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Flowable<R> after(Flowable<T> flowable, Function<S, Q> function) {
+  //      return RxJava2Adapter.fluxToFlowable(
+  //          RxJava2Adapter.flowableToFlux(flowable)
+  //              .flatMap(
+  //                  e ->
+  //                      RxJava2Adapter.maybeToMono(
+  //                          (Q) RxJavaReactorMigrationUtil.<S,
+  // Q>toJdkFunction(function).apply(e))));
+  //    }
+  //  }
 
   // XXX: public final Single onErrorResumeNext(Single)
   // XXX: public final Single onErrorReturn(Function)

@@ -20,6 +20,7 @@ import io.reactivex.SingleSource;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Predicate;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
@@ -155,7 +156,18 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
-  // XXX: public static Completable fromRunnable(Runnable)
+  static final class CompletableFromRunnable {
+    @BeforeTemplate
+    Completable before(Runnable runnable) {
+      return Completable.fromRunnable(runnable);
+    }
+
+    @AfterTemplate
+    Completable after(Runnable runnable) {
+      return RxJava2Adapter.monoToCompletable(Mono.fromRunnable(runnable));
+    }
+  }
+
   // XXX: public static Completable fromSingle(SingleSource)
   // XXX: public static Completable merge(Iterable)
   // XXX: public static Completable merge(Publisher)
@@ -266,18 +278,23 @@ final class RxJavaCompletableToReactorTemplates {
 
   // XXX: public final boolean blockingAwait(long,TimeUnit)
 
-  // XXX: Strictly speaking not correct, should return `Throwable`.
-  //  static final class CompletableBlockingGet {
-  //    @BeforeTemplate
-  //    Throwable before(Completable completable) {
-  //      return completable.blockingGet();
-  //    }
+  //   XXX: Strictly speaking not correct, should return `Throwable`.
+  //    static final class CompletableBlockingGet {
+  //      @BeforeTemplate
+  //      Throwable before(Completable completable) {
+  //        return completable.blockingGet();
+  //      }
   //
-  //    @AfterTemplate
-  //    Throwable after(Completable completable) {
-  //      return Exceptions.propagate(RxJava2Adapter.completableToMono(completable).single());
+  //      @AfterTemplate
+  //      Throwable after(Completable completable) {
+  //        try{
+  //           RxJava2Adapter.completableToMono(completable).single();
+  //          } catch(Exception e) {
+  //
+  //        }
+  //
+  //      }
   //    }
-  //  }
 
   // XXX: public final Throwable blockingGet(long,TimeUnit)
   // XXX: public final Completable cache()
@@ -336,7 +353,31 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Single materialize()
   // XXX: public final Completable mergeWith(CompletableSource)
   // XXX: public final Completable observeOn(Scheduler)
-  // XXX: public final Completable onErrorComplete()
+
+  // XXX: Verify whether this is correct.
+  static final class CompletableOnErrorComplete {
+    Completable before(Completable completable) {
+      return completable.onErrorComplete();
+    }
+
+    Completable after(Completable completable) {
+      return RxJava2Adapter.monoToCompletable(
+          RxJava2Adapter.completableToMono(completable).onErrorStop());
+    }
+  }
+
+  // XXX: Verify whether this is correct.
+  //  static final class CompletableOnErrorCompletePredicate<T> {
+  //    Completable before(Completable completable, Predicate<? super Throwable> predicate) {
+  //      return completable.onErrorComplete(predicate);
+  //    }
+  //
+  //    Completable after(Completable completable) {
+  //      return RxJava2Adapter.monoToCompletable(
+  //              RxJava2Adapter.completableToMono(completable).filter());
+  //    }
+  //  }
+
   // XXX: public final Completable onErrorComplete(Predicate)
   // XXX: public final Completable onErrorResumeNext(Function)
   // XXX: public final Completable onTerminateDetach()
@@ -398,7 +439,10 @@ final class RxJavaCompletableToReactorTemplates {
   static final class CompletableTestAssertResult {
     @BeforeTemplate
     void before(Completable completable) throws InterruptedException {
-      Refaster.anyOf(completable.test().await().assertResult(), completable.test().await());
+      Refaster.anyOf(
+          completable.test().await().assertResult(),
+          completable.test().assertResult(),
+          completable.test().await());
     }
 
     @AfterTemplate

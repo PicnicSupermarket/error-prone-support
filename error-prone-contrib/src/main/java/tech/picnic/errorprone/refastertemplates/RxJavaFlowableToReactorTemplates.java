@@ -21,6 +21,7 @@ import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.flowables.GroupedFlowable;
@@ -32,8 +33,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -288,9 +291,42 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: static Flowable just(Object,Object,Object)
-  // XXX: static Flowable just(Object,Object,Object,Object)
-  // XXX: static Flowable just(Object,Object,Object,Object,Object)
+  static final class FlowableJustThree<T> {
+    @BeforeTemplate
+    Flowable<T> before(T t1, T t2, T t3) {
+      return Flowable.just(t1, t2, t3);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(T t1, T t2, T t3) {
+      return RxJava2Adapter.fluxToFlowable(Flux.just(t1, t2, t3));
+    }
+  }
+
+  static final class FlowableJustFour<T> {
+    @BeforeTemplate
+    Flowable<T> before(T t1, T t2, T t3, T t4) {
+      return Flowable.just(t1, t2, t3, t4);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(T t1, T t2, T t3, T t4) {
+      return RxJava2Adapter.fluxToFlowable(Flux.just(t1, t2, t3, t4));
+    }
+  }
+
+  static final class FlowableJustFive<T> {
+    @BeforeTemplate
+    Flowable<T> before(T t1, T t2, T t3, T t4, T t5) {
+      return Flowable.just(t1, t2, t3, t4, t5);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(T t1, T t2, T t3, T t4, T t5) {
+      return RxJava2Adapter.fluxToFlowable(Flux.just(t1, t2, t3, t4, t5));
+    }
+  }
+
   // XXX: static Flowable just(Object,Object,Object,Object,Object,Object)
   // XXX: static Flowable just(Object,Object,Object,Object,Object,Object,Object)
   // XXX: static Flowable just(Object,Object,Object,Object,Object,Object,Object,Object)
@@ -876,7 +912,7 @@ final class RxJavaFlowableToReactorTemplates {
   }
 
   static final class FlowableFlatMapMaybeSecond<
-      S, T extends S, R, P extends R, Q extends MaybeSource<P>> {
+      S, T extends S, R, P extends R, Q extends Maybe<P>> {
     @BeforeTemplate
     Flowable<R> before(Flowable<T> flowable, Function<S, Q> function) {
       return flowable.flatMapMaybe(function);
@@ -889,8 +925,7 @@ final class RxJavaFlowableToReactorTemplates {
               .flatMap(
                   e ->
                       RxJava2Adapter.maybeToMono(
-                          Maybe.wrap(
-                              RxJavaReactorMigrationUtil.<S, Q>toJdkFunction(function).apply(e)))));
+                          (Q) RxJavaReactorMigrationUtil.<S, Q>toJdkFunction(function).apply(e))));
     }
   }
 
@@ -999,12 +1034,6 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable onBackpressureDrop(Consumer)
   // XXX: final Flowable onBackpressureLatest()
   // XXX: final Flowable onErrorResumeNext(Function) -> Required
-  // XXX: final Flowable onErrorResumeNext(Publisher) -> Required? check consentTextServiceImpl
-
-  //  @BeforeTemplate
-  //    Flowable<T> before(Flowable<T> flowable, Publisher<? extends T> publisher) {
-  //      return flowable.onErrorResumeNext(publisher);
-  //    }
 
   static final class FlowableOnErrorResumeNext<T> {
     @BeforeTemplate
@@ -1281,7 +1310,17 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Single toMultimap(Function,Function)
   // XXX: final Single toMultimap(Function,Function,Callable)
   // XXX: final Single toMultimap(Function,Function,Callable,Function)
-  // XXX: final Observable toObservable()
+
+  static final class FlowableToObservable<T> {
+    Observable<T> before(Flowable<T> flowable) {
+      return flowable.toObservable();
+    }
+
+    Observable<T> after(Flowable<T> flowable) {
+      return RxJava2Adapter.fluxToObservable(RxJava2Adapter.flowableToFlux(flowable));
+    }
+  }
+
   // XXX: final Single toSortedList()
   // XXX: final Single toSortedList(int)
   // XXX: final Single toSortedList(java.util.Comparator)
@@ -1348,9 +1387,13 @@ final class RxJavaFlowableToReactorTemplates {
           flowable.test().assertResult(item),
           flowable.test().await().assertResult(item),
           flowable.test().await().assertResult(item).assertComplete(),
+          flowable.test().await().assertNoErrors().assertResult(item).assertComplete(),
+          flowable.test().await().assertNoErrors().assertResult(item),
           flowable.test().assertValue(item),
           flowable.test().await().assertValue(item),
-          flowable.test().await().assertValue(item).assertComplete());
+          flowable.test().await().assertNoErrors().assertValue(item),
+          flowable.test().await().assertValue(item).assertComplete(),
+          flowable.test().await().assertNoErrors().assertValue(item).assertComplete());
     }
 
     @AfterTemplate
@@ -1362,15 +1405,53 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
+  static final class FlowableTestAssertResultItems<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable, @Repeated T... results) throws InterruptedException {
+      Refaster.anyOf(
+          flowable.test().await().assertResult(results), flowable.test().assertResult(results));
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable, @Repeated T... results) {
+      RxJava2Adapter.flowableToFlux(flowable)
+          .as(StepVerifier::create)
+          .expectNext(results)
+          .verifyComplete();
+    }
+  }
+
   static final class FlowableTestAssertResult<T> {
     @BeforeTemplate
     void before(Flowable<T> flowable) throws InterruptedException {
-      flowable.test().await().assertResult();
+      Refaster.anyOf(flowable.test().await().assertResult(), flowable.test().assertResult());
     }
 
     @AfterTemplate
     void after(Flowable<T> flowable) {
       RxJava2Adapter.flowableToFlux(flowable).as(StepVerifier::create).verifyComplete();
+    }
+  }
+
+  // XXX: Requires investigation
+  static final class FlowableTestAwaitDoneAssertResultItem<T> {
+    @BeforeTemplate
+    void before(Flowable<T> flowable, long time, TimeUnit timeUnit, T item)
+        throws InterruptedException {
+      flowable.test().awaitDone(time, timeUnit).assertResult(item);
+    }
+
+    @AfterTemplate
+    void after(Flowable<T> flowable, long time, TimeUnit timeUnit, T item)
+        throws InterruptedException {
+      try {
+        RxJava2Adapter.flowableToFlux(flowable)
+            .as(StepVerifier::create)
+            .expectNext(item)
+            .wait(time);
+      } catch (InterruptedException e) {
+        Exceptions.propagate(e);
+      }
     }
   }
 

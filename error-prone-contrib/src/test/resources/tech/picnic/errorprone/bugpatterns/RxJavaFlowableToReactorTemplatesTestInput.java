@@ -7,6 +7,7 @@ import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.internal.functions.Functions;
@@ -21,7 +22,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(CompletableSource.class, MaybeSource.class);
+    return ImmutableSet.of(CompletableSource.class, MaybeSource.class, Functions.class);
   }
 
   Flowable<Integer> testFlowableAmbArray() {
@@ -119,7 +120,12 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   }
 
   ImmutableList<Flowable<Integer>> testFlowableJust() {
-    return ImmutableList.of(Flowable.just(1), Flowable.just(1, 2));
+    return ImmutableList.of(
+        Flowable.just(1),
+        Flowable.just(1, 2),
+        Flowable.just(1, 2, 3),
+        Flowable.just(1, 2, 3, 4),
+        Flowable.just(1, 2, 3, 4, 5));
   }
 
   Flowable<Integer> testFlowableMergePublisherPublisher() {
@@ -230,6 +236,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Single<Map<Boolean, Integer>> testFlowableToMap() {
     return Flowable.just(1).toMap(i -> i > 1);
+  }
+
+  Observable<Integer> testFlowableToObservable() {
+    return Flowable.just(1).toObservable();
   }
 
   void testFlowableTestAssertResultItem() throws InterruptedException {

@@ -9,6 +9,7 @@ import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
+import io.reactivex.internal.functions.Functions;
 import java.util.List;
 import java.util.Map;
 import reactor.adapter.rxjava.RxJava2Adapter;
@@ -21,7 +22,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(CompletableSource.class, MaybeSource.class);
+    return ImmutableSet.of(CompletableSource.class, MaybeSource.class, Functions.class);
   }
 
   Flowable<Integer> testFlowableAmbArray() {
@@ -63,10 +64,6 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
                 () -> {
                   throw new IllegalStateException();
                 })));
-  }
-
-  Flowable<Integer> testFlowableFromArraySingleElement() {
-    return Flowable.fromArray(1);
   }
 
   Flowable<Integer> testFlowableFromArray() {
@@ -154,7 +151,14 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
   ImmutableList<Flowable<Integer>> testFlowableJust() {
     return ImmutableList.of(
         RxJava2Adapter.fluxToFlowable(Flux.just(1)),
-        RxJava2Adapter.fluxToFlowable(Flux.just(1, 2)));
+        RxJava2Adapter.fluxToFlowable(Flux.just(1, 2)),
+        RxJava2Adapter.fluxToFlowable(Flux.just(1, 2, 3)),
+        RxJava2Adapter.fluxToFlowable(Flux.just(1, 2, 3, 4)),
+        RxJava2Adapter.fluxToFlowable(Flux.just(1, 2, 3, 4, 5)));
+  }
+
+  Flowable<Integer> testFlowableMergePublisherPublisher() {
+    return RxJava2Adapter.fluxToFlowable(Flux.merge(Flowable.just(1), Flowable.just(2)));
   }
 
   Flowable<Integer> testFlowableRange() {
@@ -331,6 +335,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
         .as(RxJava2Adapter::flowableToFlux)
         .collectMap(i -> i > 1)
         .as(RxJava2Adapter::monoToSingle);
+  }
+
+  Observable<Integer> testFlowableToObservable() {
+    return RxJava2Adapter.fluxToFlowable(Flux.just(1)).toObservable();
   }
 
   void testFlowableTestAssertResultItem() throws InterruptedException {
