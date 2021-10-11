@@ -34,6 +34,10 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
     return RxJava2Adapter.fluxToObservable(Flux.just(1, 2));
   }
 
+  Observable<Integer> testObservableJustThree() {
+    return RxJava2Adapter.fluxToObservable(Flux.just(1, 2, 3));
+  }
+
   Maybe<Integer> testMaybeFirstElement() {
     return RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
         .next()
@@ -67,6 +71,7 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
   void testObservableTestAssertResult() throws InterruptedException {
     RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
         .as(StepVerifier::create)
+        .expectNext()
         .verifyComplete();
   }
 

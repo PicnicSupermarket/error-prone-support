@@ -56,6 +56,12 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return RxJava2Adapter.singleToMono(Single.just(1)).block();
   }
 
+  Flowable<Integer> testSingleConcatWith() {
+    return RxJava2Adapter.fluxToFlowable(
+        RxJava2Adapter.singleToMono(Single.just(1))
+            .concatWith(RxJava2Adapter.singleToMono(Single.wrap(Single.just(2)))));
+  }
+
   Single<Integer> testSingleDoOnError() {
     return Single.just(1)
         .as(RxJava2Adapter::singleToMono)

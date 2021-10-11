@@ -69,9 +69,17 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
     return RxJava2Adapter.monoToCompletable(Mono.from(Flowable.just(1)));
   }
 
+  Completable testCompletableFromRunnable() {
+    return RxJava2Adapter.monoToCompletable(Mono.fromRunnable(() -> {}));
+  }
+
   Completable testCompletableWrap() {
     return Completable.complete();
   }
+
+  //  Completable testCompletableDoOnSubscribe() {
+  //    return Completable.complete().doOnSubscribe((Disposable d) -> System.out.println(""));
+  //  }
 
   Flowable<Void> testCompletableToFlowable() {
     return RxJava2Adapter.fluxToFlowable(

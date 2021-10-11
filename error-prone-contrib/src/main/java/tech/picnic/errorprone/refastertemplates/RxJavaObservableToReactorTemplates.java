@@ -166,7 +166,18 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
-  // XXX: public static Observable just(Object,Object,Object)
+  static final class ObservableJustThree<T> {
+    @BeforeTemplate
+    Observable<T> before(T t, T t2, T t3) {
+      return Observable.just(t, t2, t3);
+    }
+
+    @AfterTemplate
+    Observable<T> after(T t, T t2, T t3) {
+      return RxJava2Adapter.fluxToObservable(Flux.just(t, t2, t3));
+    }
+  }
+
   // XXX: public static Observable just(Object,Object,Object,Object)
   // XXX: public static Observable just(Object,Object,Object,Object,Object)
   // XXX: public static Observable just(Object,Object,Object,Object,Object,Object)
@@ -650,8 +661,7 @@ final class RxJavaObservableToReactorTemplates {
   static final class ObservableTestAssertResult<T> {
     @BeforeTemplate
     void before(Observable<T> observable) throws InterruptedException {
-      observable.test().await().assertResult();
-      observable.test().await();
+      Refaster.anyOf(observable.test().await().assertResult(), observable.test().await());
     }
 
     @AfterTemplate
