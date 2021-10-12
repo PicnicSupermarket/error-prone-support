@@ -28,6 +28,7 @@ import io.reactivex.flowables.GroupedFlowable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -1387,12 +1388,14 @@ final class RxJavaFlowableToReactorTemplates {
           flowable.test().assertResult(item),
           flowable.test().await().assertResult(item),
           flowable.test().await().assertResult(item).assertComplete(),
+          flowable.test().await().assertComplete().assertResult(item),
           flowable.test().await().assertNoErrors().assertResult(item).assertComplete(),
           flowable.test().await().assertNoErrors().assertResult(item),
           flowable.test().assertValue(item),
           flowable.test().await().assertValue(item),
           flowable.test().await().assertNoErrors().assertValue(item),
           flowable.test().await().assertValue(item).assertComplete(),
+          flowable.test().await().assertComplete().assertValue(item),
           flowable.test().await().assertNoErrors().assertValue(item).assertComplete());
     }
 
@@ -1441,17 +1444,14 @@ final class RxJavaFlowableToReactorTemplates {
       flowable.test().awaitDone(time, timeUnit).assertResult(item);
     }
 
+    // XXX: Do something with: `Duration.of(time, timeUnit.toChronoUnit());`.
+    // Since there is no Reactor equivalent, this is not behavior preserving.
     @AfterTemplate
-    void after(Flowable<T> flowable, long time, TimeUnit timeUnit, T item)
-        throws InterruptedException {
-      try {
-        RxJava2Adapter.flowableToFlux(flowable)
-            .as(StepVerifier::create)
-            .expectNext(item)
-            .wait(time);
-      } catch (InterruptedException e) {
-        Exceptions.propagate(e);
-      }
+    void after(Flowable<T> flowable, long time, TimeUnit timeUnit, T item) {
+      RxJava2Adapter.flowableToFlux(flowable)
+          .as(StepVerifier::create)
+          .expectNext(item)
+          .verifyComplete();
     }
   }
 
@@ -1585,7 +1585,10 @@ final class RxJavaFlowableToReactorTemplates {
   static final class FlowableTestAssertComplete<T> {
     @BeforeTemplate
     void before(Flowable<T> flowable) throws InterruptedException {
-      flowable.test().await().assertComplete();
+      Refaster.anyOf(
+          flowable.test().await().assertComplete(),
+          flowable.test().assertComplete(),
+          flowable.test().await());
       // XXX: Add this one here? flowable.test().await().assertEmpty();
     }
 

@@ -12,6 +12,7 @@ import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.functions.Predicate;
@@ -588,7 +589,19 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Observable timestamp(TimeUnit)
   // XXX: public final Observable timestamp(TimeUnit,Scheduler)
   // XXX: public final Object to(Function)
-  // XXX: public final Flowable toFlowable(BackpressureStrategy)
+
+  static final class CompletableToFlowable<T> {
+    @BeforeTemplate
+    Flowable<T> before(Observable<T> observable, BackpressureStrategy strategy) {
+      return observable.toFlowable(strategy);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Observable<T> observable, BackpressureStrategy strategy) {
+      return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.observableToFlux(observable, strategy));
+    }
+  }
+
   // XXX: public final Future toFuture()
   // XXX: public final Single toList()
   // XXX: public final Single toList(Callable)
@@ -669,6 +682,21 @@ final class RxJavaObservableToReactorTemplates {
       RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
           .as(StepVerifier::create)
           .verifyComplete();
+    }
+  }
+
+  static final class ObservableTestAssertResultTwoItems<T> {
+    @BeforeTemplate
+    void before(Observable<T> observable, T t1, T t2) throws InterruptedException {
+      observable.test().await().assertResult(t1, t2);
+    }
+
+    @AfterTemplate
+    void after(Observable<T> observable, T t1, T t2) {
+      RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+              .as(StepVerifier::create)
+              .expectNext(t1, t2)
+              .verifyComplete();
     }
   }
 

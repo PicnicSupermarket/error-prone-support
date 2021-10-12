@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableList;
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
@@ -37,6 +38,10 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
 
   Completable testObservableIgnoreElements() {
     return Observable.just(1, 2).ignoreElements();
+  }
+
+  Flowable<Integer> testCompletableToFlowable() {
+    return Observable.just(1).toFlowable(BackpressureStrategy.BUFFER);
   }
 
   void testObservableTestAssertResultItem() throws InterruptedException {
