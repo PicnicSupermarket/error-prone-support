@@ -366,17 +366,19 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
-  // XXX: Verify whether this is correct.
-  //  static final class CompletableOnErrorCompletePredicate<T> {
-  //    Completable before(Completable completable, Predicate<? super Throwable> predicate) {
-  //      return completable.onErrorComplete(predicate);
-  //    }
-  //
-  //    Completable after(Completable completable) {
-  //      return RxJava2Adapter.monoToCompletable(
-  //              RxJava2Adapter.completableToMono(completable).filter());
-  //    }
-  //  }
+  // XXX: Add test case.
+  static final class CompletableOnErrorCompletePredicate {
+    Completable before(Completable completable, Predicate<? super Throwable> predicate) {
+      return completable.onErrorComplete(predicate);
+    }
+
+    Completable after(Completable completable, Predicate<? super Throwable> predicate) {
+      return RxJava2Adapter.monoToCompletable(
+          RxJava2Adapter.completableToMono(completable)
+              .onErrorResume(
+                  RxJavaReactorMigrationUtil.toJdkPredicate(predicate), t -> Mono.empty()));
+    }
+  }
 
   // XXX: public final Completable onErrorComplete(Predicate)
   // XXX: public final Completable onErrorResumeNext(Function)
@@ -454,7 +456,8 @@ final class RxJavaCompletableToReactorTemplates {
   static final class CompletableTestAssertComplete {
     @BeforeTemplate
     void before(Completable completable) throws InterruptedException {
-      completable.test().await().assertComplete();
+      Refaster.anyOf(
+          completable.test().await().assertComplete(), completable.test().assertComplete());
       // XXX: Add this one here? completable.test().await().assertEmpty();
     }
 
