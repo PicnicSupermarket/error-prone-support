@@ -239,10 +239,8 @@ final class RxJavaCompletableToReactorTemplates {
 
     @AfterTemplate
     Flowable<T> after(Completable completable, Publisher<T> source) {
-      return completable
-          .as(RxJava2Adapter::completableToMono)
-          .thenMany(source)
-          .as(RxJava2Adapter::fluxToFlowable);
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.completableToMono(completable).thenMany(source));
     }
   }
 
