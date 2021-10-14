@@ -421,6 +421,7 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
+  // XXX: Requires investigation. Should not be Void...
   static final class CompletableToMaybe<T> {
     @BeforeTemplate
     Maybe<Void> before(Completable completable) {
