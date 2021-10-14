@@ -426,24 +426,23 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  static final class MaybeFlatMapFunction<I, T extends I, O, M extends MaybeSource<? extends O>> {
+  static final class MaybeFlatMapFunction<
+      I, T extends I, O, X extends O, M extends MaybeSource<X>> {
     @BeforeTemplate
-    Maybe<O> before(Maybe<T> maybe, Function<I, ? extends MaybeSource<? extends O>> function) {
+    Maybe<O> before(Maybe<T> maybe, Function<? super T, ? extends MaybeSource<? extends O>> function) {
       return maybe.flatMap(function);
     }
 
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
-    Maybe<O> after(Maybe<T> maybe, Function<I, ? extends MaybeSource<? extends O>> function) {
+    Maybe<O> after(Maybe<T> maybe, Function<I, M> function) {
       return RxJava2Adapter.monoToMaybe(
           RxJava2Adapter.maybeToMono(maybe)
               .flatMap(
                   v ->
                       RxJava2Adapter.maybeToMono(
                           Maybe.wrap(
-                              RxJavaReactorMigrationUtil.<I, MaybeSource<? extends O>>toJdkFunction(
-                                              (Function<I, MaybeSource<? extends O>>) function)
-                                  .apply(v)))));
+                              RxJavaReactorMigrationUtil.<I, M>toJdkFunction(function).apply(v)))));
     }
   }
   //  static final class MaybeFlatMapFunction<
