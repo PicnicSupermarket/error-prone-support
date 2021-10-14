@@ -431,25 +431,6 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  static final class FlowableBiFunctionRemoveUtil<T, U, R> {
-    @BeforeTemplate
-    Flowable<R> before(
-        Publisher<? extends T> source1,
-        Publisher<? extends U> source2,
-        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
-      return RxJava2Adapter.fluxToFlowable(
-          Flux.<T, U, R>zip(source1, source2, RxJavaReactorMigrationUtil.toJdkBiFunction(zipper)));
-    }
-
-    @AfterTemplate
-    Flowable<R> after(
-        Publisher<? extends T> source1,
-        Publisher<? extends U> source2,
-        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
-      return RxJava2Adapter.fluxToFlowable(Flux.<T, U, R>zip(source1, source2, zipper));
-    }
-  }
-
   // XXX: static Flowable zip(Publisher,Publisher,BiFunction,boolean)
   // XXX: static Flowable zip(Publisher,Publisher,BiFunction,boolean,int)
   // XXX: static Flowable zip(Publisher,Publisher,Publisher,Function3)
