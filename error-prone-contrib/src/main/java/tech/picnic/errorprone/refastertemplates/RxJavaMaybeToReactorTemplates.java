@@ -442,14 +442,15 @@ final class RxJavaMaybeToReactorTemplates {
     @SuppressWarnings("unchecked")
     @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
     Maybe<O> after(Maybe<T> maybe, Function<I, M> function) {
-      return maybe
-          .as(RxJava2Adapter::maybeToMono)
-          .flatMap(
-              v ->
-                  RxJava2Adapter.maybeToMono(
-                      Maybe.wrap(
-                          (Maybe<O>) RxJavaReactorMigrationUtil.toJdkFunction(function).apply(v))))
-          .as(RxJava2Adapter::monoToMaybe);
+      return RxJava2Adapter.monoToMaybe(
+          RxJava2Adapter.maybeToMono(maybe)
+              .flatMap(
+                  v ->
+                      RxJava2Adapter.maybeToMono(
+                          Maybe.wrap(
+                              RxJavaReactorMigrationUtil.<I, M>toJdkFunction(
+                                      function)
+                                  .apply(v)))));
     }
   }
 
@@ -487,11 +488,11 @@ final class RxJavaMaybeToReactorTemplates {
       return RxJava2Adapter.monoToCompletable(
           RxJava2Adapter.maybeToMono(maybe)
               .flatMap(
-                  e ->
+                  y ->
                       RxJava2Adapter.completableToMono(
                           Completable.wrap(
                               RxJavaReactorMigrationUtil.toJdkFunction((Function<T, R>) function)
-                                  .apply(e))))
+                                  .apply(y))))
               .then());
     }
   }

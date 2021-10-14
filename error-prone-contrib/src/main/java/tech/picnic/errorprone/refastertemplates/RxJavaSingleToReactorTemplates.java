@@ -60,8 +60,8 @@ final class RxJavaSingleToReactorTemplates {
 
     @AfterTemplate
     Single<? extends T> after() {
-      return Mono.defer(() -> singleProducer().as(RxJava2Adapter::singleToMono))
-          .as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(
+          Mono.defer(() -> singleProducer().as(RxJava2Adapter::singleToMono)));
     }
   }
 
@@ -231,10 +231,9 @@ final class RxJavaSingleToReactorTemplates {
 
     @AfterTemplate
     Single<T> after(Single<T> single, Consumer<? super Throwable> consumer) {
-      return single
-          .as(RxJava2Adapter::singleToMono)
-          .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(consumer))
-          .as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.singleToMono(single)
+              .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(consumer)));
     }
   }
 
@@ -249,10 +248,9 @@ final class RxJavaSingleToReactorTemplates {
 
     @AfterTemplate
     Single<T> after(Single<T> single, Consumer<T> consumer) {
-      return single
-          .as(RxJava2Adapter::singleToMono)
-          .doOnSuccess(RxJavaReactorMigrationUtil.toJdkConsumer(consumer))
-          .as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.singleToMono(single)
+              .doOnSuccess(RxJavaReactorMigrationUtil.toJdkConsumer(consumer)));
     }
   }
 
@@ -266,10 +264,9 @@ final class RxJavaSingleToReactorTemplates {
 
     @AfterTemplate
     Maybe<T> after(Single<T> single, Predicate<S> predicate) {
-      return single
-          .as(RxJava2Adapter::singleToMono)
-          .filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
-          .as(RxJava2Adapter::monoToMaybe);
+      return RxJava2Adapter.monoToMaybe(
+          RxJava2Adapter.singleToMono(single)
+              .filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate)));
     }
   }
 
@@ -284,14 +281,16 @@ final class RxJavaSingleToReactorTemplates {
     @SuppressWarnings("unchecked")
     @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
     Single<O> after(Single<T> single, Function<I, M> function) {
-      return single
-          .as(RxJava2Adapter::singleToMono)
-          .flatMap(
-              v ->
-                  RxJava2Adapter.singleToMono(
-                      Single.wrap(
-                          (Single<O>) RxJavaReactorMigrationUtil.toJdkFunction(function).apply(v))))
-          .as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.singleToMono(single)
+              .flatMap(
+                  v ->
+                      RxJava2Adapter.singleToMono(
+                          Single.wrap(
+                              (Single<O>)
+                                  RxJavaReactorMigrationUtil.toJdkFunction(
+                                          (Function<I, Single<O>>) function)
+                                      .apply(v)))));
     }
   }
 
@@ -353,10 +352,9 @@ final class RxJavaSingleToReactorTemplates {
 
     @AfterTemplate
     Single<T> after(Single<S> single) {
-      return single
-          .as(RxJava2Adapter::singleToMono)
-          .flatMap(v -> toSingleFunction(v).as(RxJava2Adapter::singleToMono))
-          .as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.singleToMono(single)
+              .flatMap(v -> toSingleFunction(v).as(RxJava2Adapter::singleToMono)));
     }
   }
 
@@ -372,11 +370,11 @@ final class RxJavaSingleToReactorTemplates {
       return RxJava2Adapter.monoToCompletable(
           RxJava2Adapter.singleToMono(single)
               .flatMap(
-                  e ->
+                  y ->
                       RxJava2Adapter.completableToMono(
                           Completable.wrap(
                               RxJavaReactorMigrationUtil.toJdkFunction((Function<T, R>) function)
-                                  .apply(e))))
+                                  .apply(y))))
               .then());
     }
   }
@@ -537,10 +535,9 @@ final class RxJavaSingleToReactorTemplates {
 
     @AfterTemplate
     Single<O> after(Single<T> single, Function<I, O> function) {
-      return single
-          .as(RxJava2Adapter::singleToMono)
-          .map(RxJavaReactorMigrationUtil.toJdkFunction(function))
-          .as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.singleToMono(single)
+              .map(RxJavaReactorMigrationUtil.toJdkFunction(function)));
     }
   }
 
@@ -574,7 +571,8 @@ final class RxJavaSingleToReactorTemplates {
   //                                                              .apply(err)))));
   //    }
   //  }
-  static final class SingleOnErrorResumeNext<S, T extends S, R, P extends Throwable, Q extends Single<T>> {
+  static final class SingleOnErrorResumeNext<
+      S, T extends S, R, P extends Throwable, Q extends Single<T>> {
     @BeforeTemplate
     Single<T> before(Single<T> single, Function<? super Throwable, Q> function) {
       return single.onErrorResumeNext(function);
@@ -588,7 +586,10 @@ final class RxJavaSingleToReactorTemplates {
               .onErrorResume(
                   err ->
                       RxJava2Adapter.singleToMono(
-                          (Q) RxJavaReactorMigrationUtil.<Throwable, Single<T>>toJdkFunction(function).apply(err))));
+                          (Q)
+                              RxJavaReactorMigrationUtil.<Throwable, Single<T>>toJdkFunction(
+                                      function)
+                                  .apply(err))));
     }
   } // Why doesn't it add the <Throwable, Single<T>>???????
   //  static final class FlowableFlatMapMaybeSecond<

@@ -796,12 +796,12 @@ final class RxJavaFlowableToReactorTemplates {
       return RxJava2Adapter.monoToCompletable(
           RxJava2Adapter.flowableToFlux(flowable)
               .flatMap(
-                  e ->
+                  y ->
                       RxJava2Adapter.completableToMono(
                           Completable.wrap(
                               RxJavaReactorMigrationUtil.toJdkFunction(
                                       (Function<T, Completable>) function)
-                                  .apply(e))))
+                                  .apply(y))))
               .then());
     }
   }
