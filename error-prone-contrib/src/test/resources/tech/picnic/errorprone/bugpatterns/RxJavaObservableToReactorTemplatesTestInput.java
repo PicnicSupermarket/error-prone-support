@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.common.collect.ImmutableList;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 

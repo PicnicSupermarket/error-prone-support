@@ -121,6 +121,7 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.just(1).filter(i -> i > 1);
   }
 
+  @SuppressWarnings("MaybeJust")
   Maybe<Integer> testMaybeFlatMapFunction() {
     Maybe.just(1).flatMap(this::exampleMethod);
 

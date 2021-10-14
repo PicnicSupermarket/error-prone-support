@@ -42,6 +42,7 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Mono.just(3).as(RxJava2Adapter::monoToMaybe).as(RxJava2Adapter::maybeToMono);
   }
 
+  // This one doesnt work
   Maybe<String> testRemoveRedundantCast() {
     return (Maybe<String>) Maybe.just("foo");
   }

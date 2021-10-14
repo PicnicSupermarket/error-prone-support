@@ -144,14 +144,6 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return Flowable.zip(Flowable.just(1), Flowable.just(2), (i1, i2) -> i1 + i2);
   }
 
-  Flowable<Integer> testFlowableBiFunctionRemoveUtil() {
-    return RxJava2Adapter.fluxToFlowable(
-        Flux.zip(
-            Flowable.just(1),
-            Flowable.just(2),
-            RxJavaReactorMigrationUtil.toJdkBiFunction((i1, i2) -> i1 + i2)));
-  }
-
   Single<Boolean> testFlowableAll() {
     return Flowable.just(true, true).all(Boolean::booleanValue);
   }

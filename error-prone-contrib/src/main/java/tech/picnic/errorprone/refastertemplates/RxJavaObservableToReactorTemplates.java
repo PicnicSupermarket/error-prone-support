@@ -371,9 +371,9 @@ final class RxJavaObservableToReactorTemplates {
 
     @AfterTemplate
     Observable<T> after(Observable<T> observable, Predicate<T> predicate) {
-      return RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
-          .filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
-          .as(RxJava2Adapter::fluxToObservable);
+      return RxJava2Adapter.fluxToObservable(
+          RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+              .filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate)));
     }
   }
 
@@ -388,9 +388,8 @@ final class RxJavaObservableToReactorTemplates {
 
     @AfterTemplate
     Maybe<T> after(Observable<T> observable) {
-      return RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
-          .next()
-          .as(RxJava2Adapter::monoToMaybe);
+      return RxJava2Adapter.monoToMaybe(
+          RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER).next());
     }
   }
 
@@ -435,10 +434,10 @@ final class RxJavaObservableToReactorTemplates {
 
     @AfterTemplate
     Completable after(Observable<T> observable) {
-      return RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
-          .ignoreElements()
-          .then()
-          .as(RxJava2Adapter::monoToCompletable);
+      return RxJava2Adapter.monoToCompletable(
+          RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+              .ignoreElements()
+              .then());
     }
   }
 
@@ -694,9 +693,9 @@ final class RxJavaObservableToReactorTemplates {
     @AfterTemplate
     void after(Observable<T> observable, T t1, T t2) {
       RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
-              .as(StepVerifier::create)
-              .expectNext(t1, t2)
-              .verifyComplete();
+          .as(StepVerifier::create)
+          .expectNext(t1, t2)
+          .verifyComplete();
     }
   }
 

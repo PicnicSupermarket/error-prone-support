@@ -455,10 +455,9 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Single<Boolean> after(Flowable<T> flowable, Predicate<? super T> predicate) {
-      return flowable
-          .as(RxJava2Adapter::flowableToFlux)
-          .all(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
-          .as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .all(RxJavaReactorMigrationUtil.toJdkPredicate(predicate)));
     }
   }
   // XXX: final Flowable ambWith(Publisher)
@@ -473,10 +472,9 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Single<Boolean> after(Flowable<T> flowable, Predicate<? super T> predicate) {
-      return flowable
-          .as(RxJava2Adapter::flowableToFlux)
-          .any(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
-          .as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .any(RxJavaReactorMigrationUtil.toJdkPredicate(predicate)));
     }
   }
 
@@ -650,10 +648,8 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Flowable<T> after(Flowable<T> flowable, Publisher<T> source) {
-      return flowable
-          .as(RxJava2Adapter::flowableToFlux)
-          .concatWith(source)
-          .as(RxJava2Adapter::fluxToFlowable);
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable).concatWith(source));
     }
   }
 
@@ -684,10 +680,7 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Flowable<T> after(Flowable<T> flowable) {
-      return flowable
-          .as(RxJava2Adapter::flowableToFlux)
-          .distinct()
-          .as(RxJava2Adapter::fluxToFlowable);
+      return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.flowableToFlux(flowable).distinct());
     }
   }
 
@@ -721,10 +714,9 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Flowable<T> after(Flowable<T> flowable, Predicate<S> predicate) {
-      return flowable
-          .as(RxJava2Adapter::flowableToFlux)
-          .filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
-          .as(RxJava2Adapter::fluxToFlowable);
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate)));
     }
   }
 
@@ -738,7 +730,7 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Maybe<T> after(Flowable<T> flowable) {
-      return flowable.as(RxJava2Adapter::flowableToFlux).next().as(RxJava2Adapter::monoToMaybe);
+      return RxJava2Adapter.monoToMaybe(RxJava2Adapter.flowableToFlux(flowable).next());
     }
   }
 
@@ -765,10 +757,9 @@ final class RxJavaFlowableToReactorTemplates {
     @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
     @AfterTemplate
     Flowable<O> after(Flowable<I> flowable, Function<I, P> function) {
-      return flowable
-          .as(RxJava2Adapter::flowableToFlux)
-          .flatMap(RxJavaReactorMigrationUtil.toJdkFunction(function))
-          .as(RxJava2Adapter::fluxToFlowable);
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .flatMap(RxJavaReactorMigrationUtil.toJdkFunction(function)));
     }
   }
 
@@ -893,8 +884,9 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
+  // This one is now tested and good!
   static final class FlowableFlatMapMaybeSecond<
-      S, T extends S, R, P extends R, Q extends Maybe<P>> {
+      S, T extends S, R, P extends R, Q extends MaybeSource<P>> {
     @BeforeTemplate
     Flowable<R> before(Flowable<T> flowable, Function<S, Q> function) {
       return flowable.flatMapMaybe(function);
@@ -907,7 +899,8 @@ final class RxJavaFlowableToReactorTemplates {
               .flatMap(
                   e ->
                       RxJava2Adapter.maybeToMono(
-                          (Q) RxJavaReactorMigrationUtil.<S, Q>toJdkFunction(function).apply(e))));
+                          Maybe.wrap(
+                              RxJavaReactorMigrationUtil.<S, Q>toJdkFunction(function).apply(e)))));
     }
   }
 
@@ -951,10 +944,8 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Completable after(Flowable<T> flowable) {
-      return RxJava2Adapter.flowableToFlux(flowable)
-          .ignoreElements()
-          .then()
-          .as(RxJava2Adapter::monoToCompletable);
+      return RxJava2Adapter.monoToCompletable(
+          RxJava2Adapter.flowableToFlux(flowable).ignoreElements().then());
     }
   }
 
@@ -974,10 +965,9 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Flowable<O> after(Flowable<T> flowable, Function<I, O> function) {
-      return flowable
-          .as(RxJava2Adapter::flowableToFlux)
-          .map(RxJavaReactorMigrationUtil.toJdkFunction(function))
-          .as(RxJava2Adapter::fluxToFlowable);
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .map(RxJavaReactorMigrationUtil.toJdkFunction(function)));
     }
   }
 
@@ -1099,7 +1089,7 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Single<T> after(Flowable<T> flowable, T item) {
-      return RxJava2Adapter.monoToSingle(flowable.as(RxJava2Adapter::flowableToFlux).single(item));
+      return RxJava2Adapter.monoToSingle(RxJava2Adapter.flowableToFlux(flowable).single(item));
     }
   }
 
@@ -1111,10 +1101,7 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Maybe<T> after(Flowable<T> flowable) {
-      return flowable
-          .as(RxJava2Adapter::flowableToFlux)
-          .singleOrEmpty()
-          .as(RxJava2Adapter::monoToMaybe);
+      return RxJava2Adapter.monoToMaybe(RxJava2Adapter.flowableToFlux(flowable).singleOrEmpty());
     }
   }
 
@@ -1126,7 +1113,7 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Single<T> after(Flowable<T> flowable) {
-      return flowable.as(RxJava2Adapter::flowableToFlux).single().as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(RxJava2Adapter.flowableToFlux(flowable).single());
     }
   }
 
@@ -1150,7 +1137,7 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Flowable<T> after(Flowable<T> flowable) {
-      return flowable.as(RxJava2Adapter::flowableToFlux).sort().as(RxJava2Adapter::fluxToFlowable);
+      return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.flowableToFlux(flowable).sort());
     }
   }
 
@@ -1162,10 +1149,8 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Flowable<T> after(Flowable<T> flowable, Comparator<? super T> sortFunction) {
-      return flowable
-          .as(RxJava2Adapter::flowableToFlux)
-          .sort(sortFunction)
-          .as(RxJava2Adapter::fluxToFlowable);
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable).sort(sortFunction));
     }
   }
 
@@ -1192,10 +1177,8 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Flowable<T> after(Flowable<T> flowable, Publisher<T> publisher) {
-      return flowable
-          .as(RxJava2Adapter::flowableToFlux)
-          .switchIfEmpty(publisher)
-          .as(RxJava2Adapter::fluxToFlowable);
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable).switchIfEmpty(publisher));
     }
   }
 
@@ -1261,10 +1244,7 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Single<List<T>> after(Flowable<T> flowable) {
-      return flowable
-          .as(RxJava2Adapter::flowableToFlux)
-          .collectList()
-          .as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(RxJava2Adapter.flowableToFlux(flowable).collectList());
     }
   }
 
@@ -1279,10 +1259,8 @@ final class RxJavaFlowableToReactorTemplates {
 
     @AfterTemplate
     Single<Map<O, T>> after(Flowable<T> flowable, java.util.function.Function<I, O> function) {
-      return flowable
-          .as(RxJava2Adapter::flowableToFlux)
-          .collectMap(function)
-          .as(RxJava2Adapter::monoToSingle);
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.flowableToFlux(flowable).collectMap(function));
     }
   }
 

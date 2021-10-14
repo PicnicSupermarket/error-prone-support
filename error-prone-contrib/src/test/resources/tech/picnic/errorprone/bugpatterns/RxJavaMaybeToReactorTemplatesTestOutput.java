@@ -107,10 +107,9 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Maybe<String> testMaybeAmbWith() {
-    return Maybe.just("foo")
-        .as(RxJava2Adapter::maybeToMono)
-        .or(Maybe.just("bar").as(RxJava2Adapter::maybeToMono))
-        .as(RxJava2Adapter::monoToMaybe);
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.maybeToMono(Maybe.just("foo"))
+            .or(RxJava2Adapter.maybeToMono(Maybe.just("bar"))));
   }
 
   Integer testMaybeBlockingGet() {
@@ -131,47 +130,42 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Maybe<Integer> testMaybeDoOnError() {
-    return Maybe.just(1)
-        .as(RxJava2Adapter::maybeToMono)
-        .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(System.out::println))
-        .as(RxJava2Adapter::monoToMaybe);
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.maybeToMono(Maybe.just(1))
+            .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(System.out::println)));
   }
 
   Maybe<Integer> testMaybeDoOnSuccess() {
-    return Maybe.just(1)
-        .as(RxJava2Adapter::maybeToMono)
-        .doOnSuccess(RxJavaReactorMigrationUtil.toJdkConsumer(System.out::println))
-        .as(RxJava2Adapter::monoToMaybe);
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.maybeToMono(Maybe.just(1))
+            .doOnSuccess(RxJavaReactorMigrationUtil.toJdkConsumer(System.out::println)));
   }
 
   Maybe<Integer> testMaybeFilter() {
-    return Maybe.just(1)
-        .as(RxJava2Adapter::maybeToMono)
-        .filter(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 1))
-        .as(RxJava2Adapter::monoToMaybe);
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.maybeToMono(Maybe.just(1))
+            .filter(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 1)));
   }
 
+  @SuppressWarnings("MaybeJust")
   Maybe<Integer> testMaybeFlatMapFunction() {
-    Maybe.just(1)
-        .as(RxJava2Adapter::maybeToMono)
-        .flatMap(
-            v ->
-                RxJava2Adapter.maybeToMono(
-                    Maybe.wrap(
-                        (Maybe<Integer>)
+    RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.maybeToMono(Maybe.just(1))
+            .flatMap(
+                v ->
+                    RxJava2Adapter.maybeToMono(
+                        Maybe.wrap(
                             RxJavaReactorMigrationUtil.toJdkFunction(this::exampleMethod)
-                                .apply(v))))
-        .as(RxJava2Adapter::monoToMaybe);
+                                .apply(v)))));
 
-    return Maybe.just(1)
-        .as(RxJava2Adapter::maybeToMono)
-        .flatMap(
-            v ->
-                RxJava2Adapter.maybeToMono(
-                    Maybe.wrap(
-                        (Maybe<Integer>)
-                            RxJavaReactorMigrationUtil.toJdkFunction(exampleFunction()).apply(v))))
-        .as(RxJava2Adapter::monoToMaybe);
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.maybeToMono(Maybe.just(1))
+            .flatMap(
+                v ->
+                    RxJava2Adapter.maybeToMono(
+                        Maybe.wrap(
+                            RxJavaReactorMigrationUtil.toJdkFunction(exampleFunction())
+                                .apply(v)))));
   }
 
   private io.reactivex.functions.Function<Integer, Maybe<Integer>> exampleFunction() {
@@ -179,23 +173,21 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Maybe<Integer> testMaybeFlatMapLambda() {
-    return Maybe.just(1)
-        .as(RxJava2Adapter::maybeToMono)
-        .flatMap(i -> Maybe.just(i * 2).as(RxJava2Adapter::maybeToMono))
-        .as(RxJava2Adapter::monoToMaybe);
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.maybeToMono(Maybe.just(1))
+            .flatMap(z -> Maybe.just(z * 2).as(RxJava2Adapter::maybeToMono)));
   }
 
   Maybe<Integer> testMaybeFlatMapMethodReference() {
-    return Maybe.just(1)
-        .as(RxJava2Adapter::maybeToMono)
-        .flatMap(
-            v ->
-                RxJava2Adapter.maybeToMono(
-                    Maybe.wrap(
-                        (Maybe<Integer>)
-                            RxJavaReactorMigrationUtil.toJdkFunction(this::exampleMethod)
-                                .apply(v))))
-        .as(RxJava2Adapter::monoToMaybe);
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.maybeToMono(Maybe.just(1))
+            .flatMap(
+                v ->
+                    RxJava2Adapter.maybeToMono(
+                        Maybe.wrap(
+                            (Maybe<Integer>)
+                                RxJavaReactorMigrationUtil.toJdkFunction(this::exampleMethod)
+                                    .apply(v)))));
   }
 
   private Maybe<Integer> exampleMethod(Integer x) {
@@ -215,10 +207,7 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Completable testMaybeIgnoreElement() {
-    return Maybe.just(1)
-        .as(RxJava2Adapter::maybeToMono)
-        .then()
-        .as(RxJava2Adapter::monoToCompletable);
+    return RxJava2Adapter.monoToCompletable(RxJava2Adapter.maybeToMono(Maybe.just(1)).then());
   }
 
   Single<Boolean> testMaybeIsEmpty() {
@@ -226,10 +215,9 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Maybe<String> testMaybeMap() {
-    return Maybe.just(1)
-        .as(RxJava2Adapter::maybeToMono)
-        .map(RxJavaReactorMigrationUtil.toJdkFunction(String::valueOf))
-        .as(RxJava2Adapter::monoToMaybe);
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.maybeToMono(Maybe.just(1))
+            .map(RxJavaReactorMigrationUtil.toJdkFunction(String::valueOf)));
   }
 
   Maybe<Integer> testMaybeOnErrorReturn() {
@@ -239,16 +227,15 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Single<Integer> testMaybeSwitchIfEmpty() {
-    return Maybe.just(1)
-        .as(RxJava2Adapter::maybeToMono)
-        .switchIfEmpty(
-            RxJava2Adapter.singleToMono(
-                Single.wrap(
-                    Single.<Integer>error(
-                        () -> {
-                          throw new IllegalStateException();
-                        }))))
-        .as(RxJava2Adapter::monoToSingle);
+    return RxJava2Adapter.monoToSingle(
+        RxJava2Adapter.maybeToMono(Maybe.just(1))
+            .switchIfEmpty(
+                RxJava2Adapter.singleToMono(
+                    Single.wrap(
+                        Single.<Integer>error(
+                            () -> {
+                              throw new IllegalStateException();
+                            })))));
   }
 
   Flowable<Integer> testMaybeToFlowable() {
