@@ -26,8 +26,8 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   }
 
   Single<Integer> testSingleDefer() {
-    return Mono.defer(() -> Single.just(1).as(RxJava2Adapter::singleToMono))
-        .as(RxJava2Adapter::monoToSingle);
+    return RxJava2Adapter.monoToSingle(
+        Mono.defer(() -> Single.just(1).as(RxJava2Adapter::singleToMono)));
   }
 
   Single<Object> testSingleErrorCallable() {
@@ -63,24 +63,21 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   }
 
   Single<Integer> testSingleDoOnError() {
-    return Single.just(1)
-        .as(RxJava2Adapter::singleToMono)
-        .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(System.out::println))
-        .as(RxJava2Adapter::monoToSingle);
+    return RxJava2Adapter.monoToSingle(
+        RxJava2Adapter.singleToMono(Single.just(1))
+            .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(System.out::println)));
   }
 
   Single<Integer> testSingleDoOnSuccess() {
-    return Single.just(1)
-        .as(RxJava2Adapter::singleToMono)
-        .doOnSuccess(RxJavaReactorMigrationUtil.toJdkConsumer(System.out::println))
-        .as(RxJava2Adapter::monoToSingle);
+    return RxJava2Adapter.monoToSingle(
+        RxJava2Adapter.singleToMono(Single.just(1))
+            .doOnSuccess(RxJavaReactorMigrationUtil.toJdkConsumer(System.out::println)));
   }
 
   Maybe<Integer> testSingleFilter() {
-    return Single.just(1)
-        .as(RxJava2Adapter::singleToMono)
-        .filter(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 2))
-        .as(RxJava2Adapter::monoToMaybe);
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.singleToMono(Single.just(1))
+            .filter(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 2)));
   }
 
   public Mono<String> testUnwrapLambdaSingle() {
@@ -95,23 +92,22 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   }
 
   Single<Integer> testSingleFlatMapLambda() {
-    return Single.just(1)
-        .as(RxJava2Adapter::singleToMono)
-        .flatMap(i -> Single.just(i * 2).as(RxJava2Adapter::singleToMono))
-        .as(RxJava2Adapter::monoToSingle);
+    return RxJava2Adapter.monoToSingle(
+        RxJava2Adapter.singleToMono(Single.just(1))
+            .flatMap(i -> Single.just(i * 2).as(RxJava2Adapter::singleToMono)));
   }
 
   Completable testSingleFlatMapCompletable() {
     return RxJava2Adapter.monoToCompletable(
         RxJava2Adapter.singleToMono(Single.just(1))
             .flatMap(
-                e ->
+                y ->
                     RxJava2Adapter.completableToMono(
                         Completable.wrap(
                             RxJavaReactorMigrationUtil.toJdkFunction(
                                     (Function<Integer, CompletableSource>)
                                         integer -> Completable.complete())
-                                .apply(e))))
+                                .apply(y))))
             .then());
   }
 
@@ -140,10 +136,9 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   }
 
   Single<Integer> testSingleMap() {
-    return Single.just(1)
-        .as(RxJava2Adapter::singleToMono)
-        .map(RxJavaReactorMigrationUtil.toJdkFunction(i -> i + 1))
-        .as(RxJava2Adapter::monoToSingle);
+    return RxJava2Adapter.monoToSingle(
+        RxJava2Adapter.singleToMono(Single.just(1))
+            .map(RxJavaReactorMigrationUtil.toJdkFunction(i -> i + 1)));
   }
 
   Flowable<Integer> testSingleToFlowable() {

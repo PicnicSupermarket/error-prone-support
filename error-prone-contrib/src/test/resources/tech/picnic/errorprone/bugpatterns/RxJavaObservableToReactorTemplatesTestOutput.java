@@ -39,22 +39,26 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
   }
 
   Maybe<Integer> testMaybeFirstElement() {
-    return RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
-        .next()
-        .as(RxJava2Adapter::monoToMaybe);
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER).next());
   }
 
   Observable<Integer> testObservableFilter() {
-    return RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
-        .filter(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 1))
-        .as(RxJava2Adapter::fluxToObservable);
+    return RxJava2Adapter.fluxToObservable(
+        RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
+            .filter(RxJavaReactorMigrationUtil.toJdkPredicate(i -> i > 1)));
   }
 
   Completable testObservableIgnoreElements() {
-    return RxJava2Adapter.observableToFlux(Observable.just(1, 2), BackpressureStrategy.BUFFER)
-        .ignoreElements()
-        .then()
-        .as(RxJava2Adapter::monoToCompletable);
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.observableToFlux(Observable.just(1, 2), BackpressureStrategy.BUFFER)
+            .ignoreElements()
+            .then());
+  }
+
+  Flowable<Integer> testCompletableToFlowable() {
+    return RxJava2Adapter.fluxToFlowable(
+        RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER));
   }
 
   void testObservableTestAssertResultItem() throws InterruptedException {
@@ -71,7 +75,6 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
   void testObservableTestAssertResult() throws InterruptedException {
     RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
         .as(StepVerifier::create)
-        .expectNext()
         .verifyComplete();
   }
 

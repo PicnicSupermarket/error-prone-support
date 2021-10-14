@@ -312,22 +312,22 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Completable doOnSubscribe(Consumer) --> Required
 
   // XXX Doesnt work yet....
-  abstract static class CompletableDoOnSubscribe<T> {
-    @Placeholder
-    abstract T placeholder();
-
-    @BeforeTemplate
-    Completable before(Completable completable) {
-      return completable.doOnSubscribe((Disposable d) -> placeholder());
-    }
-
-    @AfterTemplate
-    Completable after(Completable completable) {
-      return RxJava2Adapter.monoToCompletable(
-          RxJava2Adapter.completableToMono(completable)
-              .doOnSubscribe((Subscription s) -> placeholder()));
-    }
-  }
+  //  abstract static class CompletableDoOnSubscribe<T> {
+  //    @Placeholder
+  //    abstract T placeholder();
+  //
+  //    @BeforeTemplate
+  //    Completable before(Completable completable) {
+  //      return completable.doOnSubscribe((Disposable d) -> placeholder());
+  //    }
+  //
+  //    @AfterTemplate
+  //    Completable after(Completable completable) {
+  //      return RxJava2Adapter.monoToCompletable(
+  //          RxJava2Adapter.completableToMono(completable)
+  //              .doOnSubscribe((Subscription s) -> placeholder()));
+  //    }
+  //  }
 
   // XXX: Add test
   static final class CompletableDoOnError {
