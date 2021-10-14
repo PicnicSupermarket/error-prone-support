@@ -185,9 +185,8 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
                 v ->
                     RxJava2Adapter.maybeToMono(
                         Maybe.wrap(
-                            (Maybe<Integer>)
-                                RxJavaReactorMigrationUtil.toJdkFunction(this::exampleMethod)
-                                    .apply(v)))));
+                            RxJavaReactorMigrationUtil.toJdkFunction(this::exampleMethod)
+                                .apply(v)))));
   }
 
   private Maybe<Integer> exampleMethod(Integer x) {
