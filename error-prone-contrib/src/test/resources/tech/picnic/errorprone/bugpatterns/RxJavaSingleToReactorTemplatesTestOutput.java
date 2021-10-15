@@ -27,7 +27,7 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
 
   Single<Integer> testSingleDefer() {
     return RxJava2Adapter.monoToSingle(
-        Mono.defer(() -> Single.just(1).as(RxJava2Adapter::singleToMono)));
+        Mono.defer(() -> RxJava2Adapter.singleToMono(Single.just(1))));
   }
 
   Single<Object> testSingleErrorCallable() {
@@ -94,7 +94,7 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
   Single<Integer> testSingleFlatMapLambda() {
     return RxJava2Adapter.monoToSingle(
         RxJava2Adapter.singleToMono(Single.just(1))
-            .flatMap(i -> Single.just(i * 2).as(RxJava2Adapter::singleToMono)));
+            .flatMap(i -> RxJava2Adapter.singleToMono(Single.just(i * 2))));
   }
 
   Completable testSingleFlatMapCompletable() {

@@ -118,7 +118,7 @@ final class RxJavaMaybeToReactorTemplates {
     @AfterTemplate
     Maybe<T> after() {
       return RxJava2Adapter.monoToMaybe(
-          Mono.defer(() -> maybeProducer().as(RxJava2Adapter::maybeToMono)));
+          Mono.defer(() -> RxJava2Adapter.maybeToMono(maybeProducer())));
     }
   }
 
@@ -133,7 +133,7 @@ final class RxJavaMaybeToReactorTemplates {
 
     @AfterTemplate
     Mono<T> after() {
-      return Mono.defer(() -> maybeProducer().as(RxJava2Adapter::maybeToMono));
+      return Mono.defer(() -> RxJava2Adapter.maybeToMono(maybeProducer()));
     }
   }
 
@@ -429,7 +429,8 @@ final class RxJavaMaybeToReactorTemplates {
   static final class MaybeFlatMapFunction<
       I, T extends I, O, X extends O, M extends MaybeSource<X>> {
     @BeforeTemplate
-    Maybe<O> before(Maybe<T> maybe, Function<? super T, ? extends MaybeSource<? extends O>> function) {
+    Maybe<O> before(
+        Maybe<T> maybe, Function<? super T, ? extends MaybeSource<? extends O>> function) {
       return maybe.flatMap(function);
     }
 

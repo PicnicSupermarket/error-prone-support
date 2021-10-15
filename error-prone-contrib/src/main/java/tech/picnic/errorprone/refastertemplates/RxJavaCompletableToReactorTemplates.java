@@ -45,11 +45,11 @@ final class RxJavaCompletableToReactorTemplates {
     @AfterTemplate
     @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
     Completable after(Iterable<? extends Completable> sources) {
-      return Mono.firstWithSignal(
+      return RxJava2Adapter.monoToCompletable(
+          Mono.firstWithSignal(
               Streams.stream(sources)
                   .map(RxJava2Adapter::completableToMono)
-                  .collect(toImmutableList()))
-          .as(RxJava2Adapter::monoToCompletable);
+                  .collect(toImmutableList())));
     }
   }
 

@@ -20,11 +20,11 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
   }
 
   Completable testCompletableAmb() {
-    return Mono.firstWithSignal(
+    return RxJava2Adapter.monoToCompletable(
+        Mono.firstWithSignal(
             Streams.stream(Arrays.asList(Completable.complete(), Completable.complete()))
                 .map(RxJava2Adapter::completableToMono)
-                .collect(ImmutableList.toImmutableList()))
-        .as(RxJava2Adapter::monoToCompletable);
+                .collect(ImmutableList.toImmutableList())));
   }
 
   Completable testCompletableComplete() {
