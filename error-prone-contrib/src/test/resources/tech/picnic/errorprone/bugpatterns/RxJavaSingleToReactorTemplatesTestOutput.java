@@ -104,9 +104,8 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
                 y ->
                     RxJava2Adapter.completableToMono(
                         Completable.wrap(
-                            RxJavaReactorMigrationUtil.toJdkFunction(
-                                    (Function<Integer, CompletableSource>)
-                                        integer -> Completable.complete())
+                            RxJavaReactorMigrationUtil.<Integer, CompletableSource>toJdkFunction(
+                                    integer -> Completable.complete())
                                 .apply(y))))
             .then());
   }

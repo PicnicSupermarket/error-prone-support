@@ -85,9 +85,8 @@ final class RxJavaCompletableToReactorTemplates {
       return RxJava2Adapter.monoToCompletable(
           Mono.defer(
               () ->
-                  RxJavaReactorMigrationUtil.callableAsSupplier(supplier)
-                      .get()
-                      .as(RxJava2Adapter::completableToMono)));
+                  RxJava2Adapter.completableToMono(
+                      RxJavaReactorMigrationUtil.callableAsSupplier(supplier).get())));
     }
   }
 
@@ -221,10 +220,9 @@ final class RxJavaCompletableToReactorTemplates {
 
     @AfterTemplate
     Maybe<T> after(Completable completable, MaybeSource<T> source) {
-      return completable
-          .as(RxJava2Adapter::completableToMono)
-          .then(RxJava2Adapter.maybeToMono(Maybe.wrap(source)))
-          .as(RxJava2Adapter::monoToMaybe);
+      return RxJava2Adapter.monoToMaybe(
+          RxJava2Adapter.completableToMono(completable)
+              .then(RxJava2Adapter.maybeToMono(Maybe.wrap(source))));
     }
   }
 
@@ -270,7 +268,7 @@ final class RxJavaCompletableToReactorTemplates {
 
     @AfterTemplate
     void after(Completable completable) {
-      completable.as(RxJava2Adapter::completableToMono).block();
+      RxJava2Adapter.completableToMono(completable).block();
     }
   }
 
@@ -338,10 +336,9 @@ final class RxJavaCompletableToReactorTemplates {
 
     @AfterTemplate
     Completable after(Completable completable, Consumer<? super Throwable> consumer) {
-      return completable
-          .as(RxJava2Adapter::completableToMono)
-          .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(consumer))
-          .as(RxJava2Adapter::monoToCompletable);
+      return RxJava2Adapter.monoToCompletable(
+          RxJava2Adapter.completableToMono(completable)
+              .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(consumer)));
     }
   }
 

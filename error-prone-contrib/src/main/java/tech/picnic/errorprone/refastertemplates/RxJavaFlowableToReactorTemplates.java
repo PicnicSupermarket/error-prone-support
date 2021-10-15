@@ -800,15 +800,14 @@ final class RxJavaFlowableToReactorTemplates {
     }
 
     @AfterTemplate
-    Completable after(Flowable<T> flowable, Function<? super T, ? extends R> function) {
+    Completable after(Flowable<T> flowable, Function<T, R> function) {
       return RxJava2Adapter.monoToCompletable(
           RxJava2Adapter.flowableToFlux(flowable)
               .flatMap(
                   y ->
                       RxJava2Adapter.completableToMono(
                           Completable.wrap(
-                              RxJavaReactorMigrationUtil.toJdkFunction(
-                                      (Function<T, Completable>) function)
+                              RxJavaReactorMigrationUtil.<T, R>toJdkFunction(function)
                                   .apply(y))))
               .then());
     }

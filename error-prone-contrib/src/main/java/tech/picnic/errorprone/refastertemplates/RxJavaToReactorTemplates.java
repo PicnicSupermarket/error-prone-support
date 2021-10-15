@@ -141,128 +141,128 @@ public final class RxJavaToReactorTemplates {
   //    }
   //  }
 
-  static final class MonoErrorCallableSupplierUtil<T> {
-    @BeforeTemplate
-    Mono<T> before(@CanTransformToTargetType Callable<? extends Throwable> callable) {
-      return Mono.error(RxJavaReactorMigrationUtil.callableAsSupplier(callable));
-    }
-
-    @AfterTemplate
-    Mono<T> after(Supplier<? extends Throwable> callable) {
-      return Mono.error(callable);
-    }
-  }
-
-  @SuppressWarnings({"NoFunctionalReturnType", "FunctionalInterfaceClash"})
-  static final class RemoveUtilCallable<T> {
-    @BeforeTemplate
-    Supplier<T> before(@CanTransformToTargetType Callable<T> callable) {
-      return RxJavaReactorMigrationUtil.callableAsSupplier(callable);
-    }
-
-    @AfterTemplate
-    Supplier<T> before(Supplier<T> callable) {
-      return callable;
-    }
-  }
-
-  // XXX: @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class)  add this temporarily
-  //   and  remove at end of migration.
-  @SuppressWarnings("NoFunctionalReturnType")
-  static final class UnnecessaryFunctionConversion<I, O> {
-    @BeforeTemplate
-    java.util.function.Function<I, O> before(@CanTransformToTargetType Function<I, O> function) {
-      return Refaster.anyOf(
-          //          RxJavaReactorMigrationUtil.toJdkFunction((Function<I, O>) function), --> This
-          // one gets us in non-compilable state.
-          RxJavaReactorMigrationUtil.toJdkFunction(function));
-    }
-
-    // XXX: Redundant cast to cover the case in which `function` is a method reference on which
-    // `.apply` is invoked.
-    // XXX: This happens e.g. in lambda expressions, but we can't seem to match those with
-    //   Refaster preventing simplification. Investigate.
-    @AfterTemplate
-    java.util.function.Function<I, O> after(java.util.function.Function<I, O> function) {
-      return function;
-    }
-  }
-
-  @SuppressWarnings("NoFunctionalReturnType")
-  static final class UnnecessaryBiFunctionConversion<T, U, R> {
-    @BeforeTemplate
-    java.util.function.BiFunction<? super T, ? super U, ? extends R> before(
-        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
-      return RxJavaReactorMigrationUtil.toJdkBiFunction(zipper);
-    }
-
-    @AfterTemplate
-    java.util.function.BiFunction<? super T, ? super U, ? extends R> after(
-        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
-      return zipper;
-    }
-  }
-
-  @SuppressWarnings("NoFunctionalReturnType")
-  static final class UnnecessaryConsumerConversion<T> {
-    @BeforeTemplate
-    java.util.function.Consumer<? extends T> before(
-        @CanTransformToTargetType Consumer<? extends T> consumer) {
-      return RxJavaReactorMigrationUtil.toJdkConsumer(consumer);
-    }
-
-    @AfterTemplate
-    java.util.function.Consumer<? extends T> after(
-        java.util.function.Consumer<? extends T> consumer) {
-      return consumer;
-    }
-  }
-
-  static final class UnnecessaryRunnableConversion {
-    @BeforeTemplate
-    Runnable before(@CanTransformToTargetType Action action) {
-      return RxJavaReactorMigrationUtil.toRunnable(action);
-    }
-
-    @AfterTemplate
-    Runnable after(Runnable action) {
-      return action;
-    }
-  }
-
-  @SuppressWarnings("NoFunctionalReturnType")
-  static final class UnnecessaryPredicateConversion<T> {
-    @BeforeTemplate
-    java.util.function.Predicate<? extends T> before(
-        @CanTransformToTargetType Predicate<? extends T> predicate) {
-      return RxJavaReactorMigrationUtil.toJdkPredicate(predicate);
-    }
-
-    @AfterTemplate
-    java.util.function.Predicate<? extends T> after(
-        java.util.function.Predicate<? extends T> predicate) {
-      return predicate;
-    }
-  }
-
-  static final class FlowableBiFunctionRemoveUtil<T, U, R> {
-    @BeforeTemplate
-    Flowable<R> before(
-        Publisher<? extends T> source1,
-        Publisher<? extends U> source2,
-        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
-      return RxJava2Adapter.fluxToFlowable(
-          Flux.<T, U, R>zip(source1, source2, RxJavaReactorMigrationUtil.toJdkBiFunction(zipper)));
-    }
-
-    @AfterTemplate
-    Flowable<R> after(
-        Publisher<? extends T> source1,
-        Publisher<? extends U> source2,
-        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
-      return RxJava2Adapter.fluxToFlowable(Flux.<T, U, R>zip(source1, source2, zipper));
-    }
-  }
+//  static final class MonoErrorCallableSupplierUtil<T> {
+//    @BeforeTemplate
+//    Mono<T> before(@CanTransformToTargetType Callable<? extends Throwable> callable) {
+//      return Mono.error(RxJavaReactorMigrationUtil.callableAsSupplier(callable));
+//    }
+//
+//    @AfterTemplate
+//    Mono<T> after(Supplier<? extends Throwable> callable) {
+//      return Mono.error(callable);
+//    }
+//  }
+//
+//  @SuppressWarnings({"NoFunctionalReturnType", "FunctionalInterfaceClash"})
+//  static final class RemoveUtilCallable<T> {
+//    @BeforeTemplate
+//    Supplier<T> before(@CanTransformToTargetType Callable<T> callable) {
+//      return RxJavaReactorMigrationUtil.callableAsSupplier(callable);
+//    }
+//
+//    @AfterTemplate
+//    Supplier<T> before(Supplier<T> callable) {
+//      return callable;
+//    }
+//  }
+//
+//  // XXX: @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class)  add this temporarily
+//  //   and  remove at end of migration.
+//  @SuppressWarnings("NoFunctionalReturnType")
+//  static final class UnnecessaryFunctionConversion<I, O> {
+//    @BeforeTemplate
+//    java.util.function.Function<I, O> before(@CanTransformToTargetType Function<I, O> function) {
+//      return Refaster.anyOf(
+//          //          RxJavaReactorMigrationUtil.toJdkFunction((Function<I, O>) function), --> This
+//          // one gets us in non-compilable state.
+//          RxJavaReactorMigrationUtil.toJdkFunction(function));
+//    }
+//
+//    // XXX: Redundant cast to cover the case in which `function` is a method reference on which
+//    // `.apply` is invoked.
+//    // XXX: This happens e.g. in lambda expressions, but we can't seem to match those with
+//    //   Refaster preventing simplification. Investigate.
+//    @AfterTemplate
+//    java.util.function.Function<I, O> after(java.util.function.Function<I, O> function) {
+//      return function;
+//    }
+//  }
+//
+//  @SuppressWarnings("NoFunctionalReturnType")
+//  static final class UnnecessaryBiFunctionConversion<T, U, R> {
+//    @BeforeTemplate
+//    java.util.function.BiFunction<? super T, ? super U, ? extends R> before(
+//        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
+//      return RxJavaReactorMigrationUtil.toJdkBiFunction(zipper);
+//    }
+//
+//    @AfterTemplate
+//    java.util.function.BiFunction<? super T, ? super U, ? extends R> after(
+//        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
+//      return zipper;
+//    }
+//  }
+//
+//  @SuppressWarnings("NoFunctionalReturnType")
+//  static final class UnnecessaryConsumerConversion<T> {
+//    @BeforeTemplate
+//    java.util.function.Consumer<? extends T> before(
+//        @CanTransformToTargetType Consumer<? extends T> consumer) {
+//      return RxJavaReactorMigrationUtil.toJdkConsumer(consumer);
+//    }
+//
+//    @AfterTemplate
+//    java.util.function.Consumer<? extends T> after(
+//        java.util.function.Consumer<? extends T> consumer) {
+//      return consumer;
+//    }
+//  }
+//
+//  static final class UnnecessaryRunnableConversion {
+//    @BeforeTemplate
+//    Runnable before(@CanTransformToTargetType Action action) {
+//      return RxJavaReactorMigrationUtil.toRunnable(action);
+//    }
+//
+//    @AfterTemplate
+//    Runnable after(Runnable action) {
+//      return action;
+//    }
+//  }
+//
+//  @SuppressWarnings("NoFunctionalReturnType")
+//  static final class UnnecessaryPredicateConversion<T> {
+//    @BeforeTemplate
+//    java.util.function.Predicate<? extends T> before(
+//        @CanTransformToTargetType Predicate<? extends T> predicate) {
+//      return RxJavaReactorMigrationUtil.toJdkPredicate(predicate);
+//    }
+//
+//    @AfterTemplate
+//    java.util.function.Predicate<? extends T> after(
+//        java.util.function.Predicate<? extends T> predicate) {
+//      return predicate;
+//    }
+//  }
+//
+//  static final class FlowableBiFunctionRemoveUtil<T, U, R> {
+//    @BeforeTemplate
+//    Flowable<R> before(
+//        Publisher<? extends T> source1,
+//        Publisher<? extends U> source2,
+//        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
+//      return RxJava2Adapter.fluxToFlowable(
+//          Flux.<T, U, R>zip(source1, source2, RxJavaReactorMigrationUtil.toJdkBiFunction(zipper)));
+//    }
+//
+//    @AfterTemplate
+//    Flowable<R> after(
+//        Publisher<? extends T> source1,
+//        Publisher<? extends U> source2,
+//        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
+//      return RxJava2Adapter.fluxToFlowable(Flux.<T, U, R>zip(source1, source2, zipper));
+//    }
+//  }
 
   ///////////////////////////////////
   //////////// ASSORTED TEMPLATES

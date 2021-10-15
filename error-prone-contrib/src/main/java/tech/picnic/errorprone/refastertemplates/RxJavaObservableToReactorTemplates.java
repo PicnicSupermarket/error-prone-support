@@ -14,9 +14,14 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.Single;
+import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.concurrent.Callable;
+import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -395,6 +400,30 @@ final class RxJavaObservableToReactorTemplates {
 
   // XXX: public final Single firstOrError()
   // XXX: public final Observable flatMap(Function)
+
+  // XXX: Test this one.
+  // XXX: Default BUFFER is chosen here.
+  static final class ObservableFlatMap<I, T extends I, O, P extends ObservableSource<O>> {
+    @BeforeTemplate
+    Observable<O> before(
+        Observable<T> observable,
+        Function<? super T, ? extends ObservableSource<? extends O>> function) {
+      return observable.flatMap(function);
+    }
+
+    @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
+    @AfterTemplate
+    Observable<O> after(Observable<T> observable, Function<I, P> function) {
+      return RxJava2Adapter.fluxToObservable(
+          RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+              .flatMap(
+                  z ->
+                      RxJava2Adapter.observableToFlux(
+                          Observable.wrap(
+                              RxJavaReactorMigrationUtil.<I, P>toJdkFunction(function).apply(z)), BackpressureStrategy.BUFFER)));
+    }
+  }
+
   // XXX: public final Observable flatMap(Function,BiFunction)
   // XXX: public final Observable flatMap(Function,BiFunction,boolean)
   // XXX: public final Observable flatMap(Function,BiFunction,boolean,int)
