@@ -10,7 +10,6 @@ import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
@@ -28,7 +27,6 @@ import io.reactivex.flowables.GroupedFlowable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -37,7 +35,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -608,24 +605,44 @@ final class RxJavaFlowableToReactorTemplates {
 
   // XXX: final Flowable concatMapMaybe(Function,int)
 
-  static final class FlowableConcatMapMaybeDelayError<T, R> {
+  // XXX: Better one below?
+  //  static final class FlowableConcatMapMaybeDelayError<T, R> {
+  //    @BeforeTemplate
+  //    Flowable<R> before(
+  //        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function)
+  // {
+  //      return flowable.concatMapMaybeDelayError(function);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Flowable<R> after(
+  //        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function)
+  // {
+  //      return RxJava2Adapter.fluxToFlowable(
+  //          RxJava2Adapter.flowableToFlux(flowable)
+  //              .concatMapDelayError(
+  //                  e ->
+  //                      Maybe.wrap(
+  //                              RxJavaReactorMigrationUtil.toJdkFunction(
+  //                                      (Function<T, MaybeSource<R>>) function)
+  //                                  .apply(e))
+  //                          .toFlowable()));
+  //    }
+  //  }
+  static final class FlowableConcatMapMaybeDelayError<T, R, O extends R, M extends MaybeSource<O>> {
     @BeforeTemplate
-    Flowable<R> before(
-        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function) {
+    Flowable<O> before(
+        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends O>> function) {
       return flowable.concatMapMaybeDelayError(function);
     }
 
     @AfterTemplate
-    Flowable<R> after(
-        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function) {
+    Flowable<O> after(Flowable<T> flowable, Function<T, M> function) {
       return RxJava2Adapter.fluxToFlowable(
           RxJava2Adapter.flowableToFlux(flowable)
               .concatMapDelayError(
                   e ->
-                      Maybe.wrap(
-                              RxJavaReactorMigrationUtil.toJdkFunction(
-                                      (Function<T, MaybeSource<R>>) function)
-                                  .apply(e))
+                      Maybe.wrap(RxJavaReactorMigrationUtil.<T, M>toJdkFunction(function).apply(e))
                           .toFlowable()));
     }
   }
@@ -862,45 +879,50 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable flatMapIterable(Function,BiFunction,int)
   // XXX: final Flowable flatMapIterable(Function,int)
 
-  static final class FlowableFlatMapMaybe<T, R> {
-    @BeforeTemplate
-    Flowable<R> before(
-        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function) {
-      return flowable.flatMapMaybe(function);
-    }
-
-    @AfterTemplate
-    Flowable<R> after(
-        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function) {
-      return RxJava2Adapter.fluxToFlowable(
-          RxJava2Adapter.flowableToFlux(flowable)
-              .flatMap(
-                  e ->
-                      RxJava2Adapter.maybeToMono(
-                          Maybe.wrap(
-                              RxJavaReactorMigrationUtil.toJdkFunction(
-                                      (Function<T, MaybeSource<R>>) function)
-                                  .apply(e)))));
-    }
-  }
+  // XXX : Below is a better version.
+  //  static final class FlowableFlatMapMaybe<T, R> {
+  //    @BeforeTemplate
+  //    Flowable<R> before(
+  //        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function)
+  // {
+  //      return flowable.flatMapMaybe(function);
+  //    }
+  //
+  //    @AfterTemplate
+  //    Flowable<R> after(
+  //        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function)
+  // {
+  //      return RxJava2Adapter.fluxToFlowable(
+  //          RxJava2Adapter.flowableToFlux(flowable)
+  //              .flatMap(
+  //                  e ->
+  //                      RxJava2Adapter.maybeToMono(
+  //                          Maybe.wrap(
+  //                              RxJavaReactorMigrationUtil.toJdkFunction(
+  //                                      (Function<T, MaybeSource<R>>) function)
+  //                                  .apply(e)))));
+  //    }
+  //  }
 
   // This one is now tested and good!
+  // XXX: Perhaps improved by improving the before template with ? extends and such.
   static final class FlowableFlatMapMaybeSecond<
-      S, T extends S, R, P extends R, Q extends MaybeSource<P>> {
+      S, T extends S, R, P extends R, M extends MaybeSource<P>> {
     @BeforeTemplate
-    Flowable<R> before(Flowable<T> flowable, Function<S, Q> function) {
+    Flowable<R> before(
+        Flowable<T> flowable, Function<? super S, ? extends MaybeSource<? extends R>> function) {
       return flowable.flatMapMaybe(function);
     }
 
     @AfterTemplate
-    Flowable<R> after(Flowable<T> flowable, Function<S, Q> function) {
+    Flowable<R> after(Flowable<T> flowable, Function<S, M> function) {
       return RxJava2Adapter.fluxToFlowable(
           RxJava2Adapter.flowableToFlux(flowable)
               .flatMap(
                   e ->
                       RxJava2Adapter.maybeToMono(
                           Maybe.wrap(
-                              RxJavaReactorMigrationUtil.<S, Q>toJdkFunction(function).apply(e)))));
+                              RxJavaReactorMigrationUtil.<S, M>toJdkFunction(function).apply(e)))));
     }
   }
 

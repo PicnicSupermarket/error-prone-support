@@ -212,8 +212,8 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
             .concatMapDelayError(
                 e ->
                     Maybe.wrap(
-                            RxJavaReactorMigrationUtil.toJdkFunction(
-                                    (Function<Integer, MaybeSource<Integer>>) Maybe::just)
+                            RxJavaReactorMigrationUtil.<Integer, MaybeSource<Integer>>toJdkFunction(
+                                    Maybe::just)
                                 .apply(e))
                         .toFlowable()));
   }

@@ -61,7 +61,7 @@ final class RxJavaSingleToReactorTemplates {
     @AfterTemplate
     Single<? extends T> after() {
       return RxJava2Adapter.monoToSingle(
-          Mono.defer(() -> singleProducer().as(RxJava2Adapter::singleToMono)));
+          Mono.defer(() -> RxJava2Adapter.singleToMono(singleProducer())));
     }
   }
 
@@ -354,7 +354,7 @@ final class RxJavaSingleToReactorTemplates {
     Single<T> after(Single<S> single) {
       return RxJava2Adapter.monoToSingle(
           RxJava2Adapter.singleToMono(single)
-              .flatMap(v -> toSingleFunction(v).as(RxJava2Adapter::singleToMono)));
+              .flatMap(v -> RxJava2Adapter.singleToMono(toSingleFunction(v))));
     }
   }
 
@@ -581,8 +581,7 @@ final class RxJavaSingleToReactorTemplates {
     @AfterTemplate
     Single<T> after(Single<T> single, Function<Throwable, Single<T>> function) {
       return RxJava2Adapter.monoToSingle(
-          single
-              .as(RxJava2Adapter::singleToMono)
+          RxJava2Adapter.singleToMono(single)
               .onErrorResume(
                   err ->
                       RxJava2Adapter.singleToMono(
