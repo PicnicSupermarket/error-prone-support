@@ -45,12 +45,18 @@ public final class RxJavaUnwrapTemplates {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
     java.util.function.Function<? super T, ? extends Mono<? extends O>> before() {
-      return v ->
-          RxJava2Adapter.maybeToMono(
-              (Maybe<O>)
-                  RxJavaReactorMigrationUtil.toJdkFunction(
-                          (T ident) -> RxJava2Adapter.monoToMaybe(placeholder(ident)))
-                      .apply(v));
+      return Refaster.anyOf(
+          v ->
+              RxJava2Adapter.maybeToMono(
+                  (Maybe<O>)
+                      RxJavaReactorMigrationUtil.toJdkFunction(
+                              (T ident) -> RxJava2Adapter.monoToMaybe(placeholder(ident)))
+                          .apply(v)),
+          v ->
+              RxJava2Adapter.maybeToMono(
+                      RxJavaReactorMigrationUtil.toJdkFunction(
+                              (T ident) -> RxJava2Adapter.monoToMaybe(placeholder(ident)))
+                          .apply(v)));
     }
 
     @AfterTemplate
@@ -65,13 +71,20 @@ public final class RxJavaUnwrapTemplates {
 
     @BeforeTemplate
     java.util.function.Function<T, ? extends Mono<? extends R>> before() {
-      return e ->
-          RxJava2Adapter.singleToMono(
-              Single.wrap(
-                  RxJavaReactorMigrationUtil.toJdkFunction(
-                          (Function<T, SingleSource<R>>)
+      return Refaster.anyOf(
+          e ->
+              RxJava2Adapter.singleToMono(
+                  Single.wrap(
+                      RxJavaReactorMigrationUtil.toJdkFunction(
+                              (Function<T, SingleSource<R>>)
+                                  (T ident) -> RxJava2Adapter.monoToSingle(placeholder(ident)))
+                          .apply(e))),
+          e ->
+              RxJava2Adapter.singleToMono(
+                  Single.wrap(
+                      RxJavaReactorMigrationUtil.<T, SingleSource<R>>toJdkFunction(
                               (T ident) -> RxJava2Adapter.monoToSingle(placeholder(ident)))
-                      .apply(e)));
+                          .apply(e))));
     }
 
     @AfterTemplate
@@ -100,6 +113,12 @@ public final class RxJavaUnwrapTemplates {
                       RxJavaReactorMigrationUtil.toJdkFunction(
                               (Function<T, MaybeSource<R>>)
                                   ident -> RxJava2Adapter.monoToMaybe(placeholder(ident)))
+                          .apply(e))),
+          e ->
+              RxJava2Adapter.maybeToMono(
+                  Maybe.wrap(
+                      RxJavaReactorMigrationUtil.<T, MaybeSource<R>>toJdkFunction(
+                              ident -> RxJava2Adapter.monoToMaybe(placeholder(ident)))
                           .apply(e))));
     }
 
@@ -131,12 +150,11 @@ public final class RxJavaUnwrapTemplates {
                                   placeholder(e))
                           .apply(e))),
           e ->
-              (Mono<? extends R>)
-                  RxJava2Adapter.singleToMono(
-                      Single.wrap(
-                          RxJavaReactorMigrationUtil.toJdkFunction(
-                                  (Function<Throwable, ? extends Single<?>>) placeholder(e))
-                              .apply(e))));
+              RxJava2Adapter.singleToMono(
+                  Single.wrap(
+                      RxJavaReactorMigrationUtil.<Throwable, SingleSource<R>>toJdkFunction(
+                              (Function<Throwable, SingleSource<R>>) placeholder(e))
+                          .apply(e))));
     }
 
     @AfterTemplate
@@ -145,40 +163,26 @@ public final class RxJavaUnwrapTemplates {
     }
   }
 
-  //  abstract static class SingleOnResumeUnwrapLambdaWithSingleMethod<T, R> {
-  //    @Placeholder
-  //    abstract Function<Throwable, Single<T>> placeholder();
-  //
-  //    @BeforeTemplate
-  //    java.util.function.Function<? extends Throwable, ? extends Mono<? extends R>> before() {
-  //      return e ->
-  //          (Mono<? extends R>)
-  //              RxJava2Adapter.singleToMono(
-  //                  Single.wrap(
-  //                      RxJavaReactorMigrationUtil.toJdkFunction(
-  //                              (Function<Throwable, ? extends Single<?>>) placeholder())
-  //                          .apply(e)));
-  //    }
-  //
-  //    @AfterTemplate
-  //    java.util.function.Function<Throwable, ? extends Mono<? extends R>> after() {
-  //      return v -> placeholder());
-  //    }
-  //  }
-
   abstract static class FlowableConcatMapMaybeDelayErrorUnwrapLambda<T, R> {
     @Placeholder
     abstract Mono<R> placeholder(@MayOptionallyUse T input);
 
     @BeforeTemplate
     java.util.function.Function<? super T, ? extends Publisher<? extends R>> after() {
-      return e ->
-          Maybe.wrap(
-                  RxJavaReactorMigrationUtil.toJdkFunction(
-                          (Function<T, MaybeSource<R>>)
+      return Refaster.anyOf(
+          e ->
+              Maybe.wrap(
+                      RxJavaReactorMigrationUtil.toJdkFunction(
+                              (Function<T, MaybeSource<R>>)
+                                  ident -> RxJava2Adapter.monoToMaybe(placeholder(ident)))
+                          .apply(e))
+                  .toFlowable(),
+          e ->
+              Maybe.wrap(
+                      RxJavaReactorMigrationUtil.<T, MaybeSource<R>>toJdkFunction(
                               ident -> RxJava2Adapter.monoToMaybe(placeholder(ident)))
-                      .apply(e))
-              .toFlowable();
+                          .apply(e))
+                  .toFlowable());
     }
 
     @AfterTemplate
@@ -206,6 +210,17 @@ public final class RxJavaUnwrapTemplates {
                   RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
                           (Function<T, Completable>)
                               (T ident) -> RxJava2Adapter.monoToCompletable(placeholder(ident)))
+                      .apply(e)),
+          e ->
+              RxJava2Adapter.completableToMono(
+                  Completable.wrap(
+                      RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                              (T ident) -> RxJava2Adapter.monoToCompletable(placeholder(ident)))
+                          .apply(e))),
+          e ->
+              RxJava2Adapter.completableToMono(
+                  RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                          (T ident) -> RxJava2Adapter.monoToCompletable(placeholder(ident)))
                       .apply(e)));
     }
 
