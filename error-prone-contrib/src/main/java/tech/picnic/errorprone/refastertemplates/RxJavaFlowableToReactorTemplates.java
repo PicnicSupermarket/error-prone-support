@@ -804,11 +804,11 @@ final class RxJavaFlowableToReactorTemplates {
       return RxJava2Adapter.monoToCompletable(
           RxJava2Adapter.flowableToFlux(flowable)
               .flatMap(
-                  y ->
+                  x ->
                       RxJava2Adapter.completableToMono(
                           Completable.wrap(
                               RxJavaReactorMigrationUtil.<T, R>toJdkFunction(function)
-                                  .apply(y))))
+                                  .apply(x))))
               .then());
     }
   }
