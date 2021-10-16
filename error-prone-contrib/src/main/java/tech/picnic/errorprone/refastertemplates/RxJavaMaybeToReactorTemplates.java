@@ -446,26 +446,6 @@ final class RxJavaMaybeToReactorTemplates {
                               RxJavaReactorMigrationUtil.<I, M>toJdkFunction(function).apply(v)))));
     }
   }
-  //  static final class MaybeFlatMapFunction<
-  //      I, T extends I, O, X extends O, M extends MaybeSource<X>> {
-  //    @BeforeTemplate
-  //    Maybe<O> before(Maybe<T> maybe, Function<? super I, ? extends M> function) {
-  //      return maybe.flatMap(function);
-  //    }
-  //
-  //    @AfterTemplate
-  //    @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
-  //    Maybe<O> after(Maybe<T> maybe, Function<I, M> function) {
-  //      return RxJava2Adapter.monoToMaybe(
-  //          RxJava2Adapter.maybeToMono(maybe)
-  //              .flatMap(
-  //                  v ->
-  //                      RxJava2Adapter.maybeToMono(
-  //                          Maybe.wrap(
-  //                              RxJavaReactorMigrationUtil.<I,
-  // M>toJdkFunction(function).apply(v)))));
-  //    }
-  //  }
 
   // XXX: There is no link to an original public method for this, but it is important.
   abstract static class MaybeFlatMapLambda<S, T> {

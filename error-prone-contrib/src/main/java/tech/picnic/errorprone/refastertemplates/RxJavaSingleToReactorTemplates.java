@@ -367,10 +367,10 @@ final class RxJavaSingleToReactorTemplates {
       return RxJava2Adapter.monoToCompletable(
           RxJava2Adapter.singleToMono(single)
               .flatMap(
-                  y ->
+                  z ->
                       RxJava2Adapter.completableToMono(
                           Completable.wrap(
-                              RxJavaReactorMigrationUtil.<T, R>toJdkFunction(function).apply(y))))
+                              RxJavaReactorMigrationUtil.<T, R>toJdkFunction(function).apply(z))))
               .then());
     }
   }
