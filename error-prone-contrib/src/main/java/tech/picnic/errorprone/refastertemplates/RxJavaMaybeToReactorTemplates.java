@@ -20,6 +20,7 @@ import io.reactivex.MaybeSource;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
@@ -28,6 +29,7 @@ import io.reactivex.functions.Predicate;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -490,8 +492,43 @@ final class RxJavaMaybeToReactorTemplates {
   }
 
   // XXX: public final Observable flatMapObservable(Function)
-  // XXX: public final Flowable flatMapPublisher(Function)
-  // XXX: public final Single flatMapSingle(Function)
+
+  static final class MaybeFlatMapPublisher<T, O extends T, R extends Publisher<O>> {
+    @BeforeTemplate
+    Flowable<O> before(
+        Maybe<T> maybe, Function<? super T, ? extends Publisher<? extends O>> function) {
+      return maybe.flatMapPublisher(function);
+    }
+
+    @AfterTemplate
+    Flowable<O> after(Maybe<T> maybe, Function<T, R> function) {
+      return RxJava2Adapter.monoToFlowable(
+          RxJava2Adapter.maybeToMono(maybe)
+              .flatMap(
+                  y ->
+                      Mono.from(
+                          RxJavaReactorMigrationUtil.<T, R>toJdkFunction(function).apply(y))));
+    }
+  }
+
+  static final class MaybeFlatMapSingle<T, O extends T, R extends SingleSource<O>> {
+    @BeforeTemplate
+    Single<O> before(
+        Maybe<T> maybe, Function<? super T, ? extends SingleSource<? extends O>> function) {
+      return maybe.flatMapSingle(function);
+    }
+
+    @AfterTemplate
+    Single<O> after(Maybe<T> maybe, Function<T, R> function) {
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.maybeToMono(maybe)
+              .flatMap(
+                  y ->
+                      RxJava2Adapter.singleToMono(
+                          Single.wrap(
+                              RxJavaReactorMigrationUtil.<T, R>toJdkFunction(function).apply(y)))));
+    }
+  }
 
   // XXX: public final Maybe flatMapSingleElement(Function)
   //  The following template is required to rewrite this code from platform:
@@ -610,10 +647,71 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe retry(Predicate)
   // XXX: public final Maybe retryUntil(BooleanSupplier)
   // XXX: public final Maybe retryWhen(Function)
-  // XXX: public final Disposable subscribe()
-  // XXX: public final Disposable subscribe(Consumer)
-  // XXX: public final Disposable subscribe(Consumer,Consumer)
-  // XXX: public final Disposable subscribe(Consumer,Consumer,Action)
+
+  // XXX: Test this.
+  static final class MaybeSubscribe<T> {
+    @BeforeTemplate
+    Disposable before(Maybe<T> maybe) {
+      return maybe.subscribe();
+    }
+
+    @AfterTemplate
+    reactor.core.Disposable after(Maybe<T> maybe) {
+      return RxJava2Adapter.maybeToMono(maybe).subscribe();
+    }
+  }
+
+  // XXX: Test this.
+  static final class MaybeSubscribeConsumer<T> {
+    @BeforeTemplate
+    Disposable before(Maybe<T> maybe, Consumer<? super T> consumer) {
+      return maybe.subscribe(consumer);
+    }
+
+    @AfterTemplate
+    reactor.core.Disposable after(Maybe<T> maybe, Consumer<? super T> consumer) {
+      return RxJava2Adapter.maybeToMono(maybe)
+              .subscribe(RxJavaReactorMigrationUtil.toJdkConsumer(consumer));
+    }
+  }
+
+  // XXX: Test this.
+  static final class MaybeSubscribeTwoConsumers<T> {
+    @BeforeTemplate
+    Disposable before(
+            Maybe<T> maybe, Consumer<? super T> consumer1, Consumer<? super Throwable> consumer2) {
+      return maybe.subscribe(consumer1, consumer2);
+    }
+
+    @AfterTemplate
+    reactor.core.Disposable after(
+            Maybe<T> maybe, Consumer<? super T> consumer1, Consumer<? super Throwable> consumer2) {
+      return RxJava2Adapter.maybeToMono(maybe)
+              .subscribe(
+                      RxJavaReactorMigrationUtil.toJdkConsumer(consumer1),
+                      RxJavaReactorMigrationUtil.toJdkConsumer(consumer2));
+    }
+  }
+
+  // XXX: Test this.
+  static final class MaybeSubscribeTwoConsumersWithAction<T> {
+    @BeforeTemplate
+    Disposable before(
+            Maybe<T> maybe, Consumer<? super T> consumer1, Consumer<? super Throwable> consumer2, Action action) {
+      return maybe.subscribe(consumer1, consumer2, action);
+    }
+
+    @AfterTemplate
+    reactor.core.Disposable after(
+            Maybe<T> maybe, Consumer<? super T> consumer1, Consumer<? super Throwable> consumer2, Action action) {
+      return RxJava2Adapter.maybeToMono(maybe)
+              .subscribe(
+                      RxJavaReactorMigrationUtil.toJdkConsumer(consumer1),
+                      RxJavaReactorMigrationUtil.toJdkConsumer(consumer2),
+                      RxJavaReactorMigrationUtil.toRunnable(action));
+    }
+  }
+
   // XXX: public final void subscribe(MaybeObserver)
   // XXX: public final Maybe subscribeOn(Scheduler)
   // XXX: public final MaybeObserver subscribeWith(MaybeObserver)

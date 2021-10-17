@@ -1,9 +1,11 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import com.google.errorprone.matchers.IsMethodReferenceOrLambdaHasReturnStatement;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.functions.Action;
@@ -168,40 +170,42 @@ public final class RxJavaToReactorTemplates {
 
   // XXX: @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class)  add this temporarily
   //   and  remove at end of migration.
-  @SuppressWarnings("NoFunctionalReturnType")
-  static final class UnnecessaryFunctionConversion<I, O> {
-    @BeforeTemplate
-    java.util.function.Function<I, O> before(@CanTransformToTargetType Function<I, O> function) {
-      return Refaster.anyOf(
-          //          RxJavaReactorMigrationUtil.toJdkFunction((Function<I, O>) function), --> This
-          // one gets us in non-compilable state.
-          RxJavaReactorMigrationUtil.toJdkFunction(function));
-    }
-
-    // XXX: Redundant cast to cover the case in which `function` is a method reference on which
-    // `.apply` is invoked.
-    // XXX: This happens e.g. in lambda expressions, but we can't seem to match those with
-    //   Refaster preventing simplification. Investigate.
-    @AfterTemplate
-    java.util.function.Function<I, O> after(java.util.function.Function<I, O> function) {
-      return function;
-    }
-  }
-
-  @SuppressWarnings("NoFunctionalReturnType")
-  static final class UnnecessaryBiFunctionConversion<T, U, R> {
-    @BeforeTemplate
-    java.util.function.BiFunction<? super T, ? super U, ? extends R> before(
-        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
-      return RxJavaReactorMigrationUtil.toJdkBiFunction(zipper);
-    }
-
-    @AfterTemplate
-    java.util.function.BiFunction<? super T, ? super U, ? extends R> after(
-        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
-      return zipper;
-    }
-  }
+//  @SuppressWarnings("NoFunctionalReturnType")
+//  static final class UnnecessaryFunctionConversion<I, O> {
+//    @BeforeTemplate
+//    java.util.function.Function<I, O> before(
+//        @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class) @CanTransformToTargetType
+//            Function<I, O> function) {
+//      return Refaster.anyOf(
+//          //          RxJavaReactorMigrationUtil.toJdkFunction((Function<I, O>) function), -->
+//          //   This one gets us in non-compilable state.
+//          RxJavaReactorMigrationUtil.toJdkFunction(function));
+//    }
+//
+//    // XXX: Redundant cast to cover the case in which `function` is a method reference on which
+//    // `.apply` is invoked.
+//    // XXX: This happens e.g. in lambda expressions, but we can't seem to match those with
+//    //   Refaster preventing simplification. Investigate.
+//    @AfterTemplate
+//    java.util.function.Function<I, O> after(java.util.function.Function<I, O> function) {
+//      return function;
+//    }
+//  }
+//
+//  @SuppressWarnings("NoFunctionalReturnType")
+//  static final class UnnecessaryBiFunctionConversion<T, U, R> {
+//    @BeforeTemplate
+//    java.util.function.BiFunction<? super T, ? super U, ? extends R> before(
+//        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
+//      return RxJavaReactorMigrationUtil.toJdkBiFunction(zipper);
+//    }
+//
+//    @AfterTemplate
+//    java.util.function.BiFunction<? super T, ? super U, ? extends R> after(
+//        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
+//      return zipper;
+//    }
+//  }
 
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryConsumerConversion<T> {
