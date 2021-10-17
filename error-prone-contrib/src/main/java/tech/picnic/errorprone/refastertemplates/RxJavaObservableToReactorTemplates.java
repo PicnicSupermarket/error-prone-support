@@ -17,7 +17,6 @@ import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.concurrent.Callable;
@@ -135,7 +134,19 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public static Observable fromFuture(Future,long,TimeUnit,Scheduler)
   // XXX: public static Observable fromFuture(Future,Scheduler)
   // XXX: public static Observable fromIterable(Iterable)
-  // XXX: public static Observable fromPublisher(org.reactivestreams.Publisher)
+
+  static final class ObservableFromPublisher<T> {
+    @BeforeTemplate
+    Observable<T> before(Publisher<? extends T> source) {
+      return Observable.fromPublisher(source);
+    }
+
+    @AfterTemplate
+    Observable<T> after(Publisher<? extends T> source) {
+      return RxJava2Adapter.fluxToObservable(Flux.from(source));
+    }
+  }
+
   // XXX: public static Observable generate(Callable,BiConsumer)
   // XXX: public static Observable generate(Callable,BiConsumer,Consumer)
   // XXX: public static Observable generate(Callable,BiFunction)
@@ -420,7 +431,8 @@ final class RxJavaObservableToReactorTemplates {
                   z ->
                       RxJava2Adapter.observableToFlux(
                           Observable.wrap(
-                              RxJavaReactorMigrationUtil.<I, P>toJdkFunction(function).apply(z)), BackpressureStrategy.BUFFER)));
+                              RxJavaReactorMigrationUtil.<I, P>toJdkFunction(function).apply(z)),
+                          BackpressureStrategy.BUFFER)));
     }
   }
 
@@ -437,10 +449,37 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Observable flatMap(Function,int)
   // XXX: public final Completable flatMapCompletable(Function)
   // XXX: public final Completable flatMapCompletable(Function,boolean)
-  // XXX: public final Observable flatMapIterable(Function)
+
+  static final class ObservableFromIterable<T> {
+    @BeforeTemplate
+    Observable<T> before(Iterable<? extends T> iterable) {
+      return Observable.fromIterable(iterable);
+    }
+
+    @AfterTemplate
+    Observable<T> after(Iterable<? extends T> iterable) {
+      return RxJava2Adapter.fluxToObservable(Flux.fromIterable(iterable));
+    }
+  }
+
   // XXX: public final Observable flatMapIterable(Function,BiFunction)
-  // XXX: public final Observable flatMapMaybe(Function) <-- this one?
-  // XXX: public final Observable flatMapMaybe(Function,boolean)
+
+  static final class ObservableFlatMapMaybe<T, R, O extends R, M extends MaybeSource<O>> {
+    Observable<O> before(
+        Observable<T> observable, Function<? super T, ? extends MaybeSource<? extends O>> mapper) {
+      return observable.flatMapMaybe(mapper);
+    }
+
+    Observable<O> after(Observable<T> observable, Function<T, M> mapper) {
+      return RxJava2Adapter.fluxToObservable(
+          RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+              .flatMap(
+                  t ->
+                      RxJava2Adapter.maybeToMono(
+                          Maybe.wrap(
+                              RxJavaReactorMigrationUtil.<T, M>toJdkFunction(mapper).apply(t)))));
+    }
+  } // XXX: public final Observable flatMapMaybe(Function,boolean)
   // XXX: public final Observable flatMapSingle(Function)
   // XXX: public final Observable flatMapSingle(Function,boolean)
   // XXX: public final Disposable forEach(Consumer)

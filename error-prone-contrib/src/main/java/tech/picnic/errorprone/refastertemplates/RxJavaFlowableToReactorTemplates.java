@@ -23,8 +23,11 @@ import io.reactivex.MaybeSource;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.flowables.GroupedFlowable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.util.Collection;
@@ -767,7 +770,7 @@ final class RxJavaFlowableToReactorTemplates {
 
   static final class FlowableFlatMap<I, T extends I, O, P extends Publisher<? extends O>> {
     @BeforeTemplate
-    Flowable<O> before(Flowable<T> flowable, Function<I, P> function) {
+    Flowable<O> before(Flowable<T> flowable, Function<? super I, ? extends Publisher<? extends O>> function) {
       return flowable.flatMap(function);
     }
 
@@ -791,6 +794,20 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable flatMap(Function,Function,Callable)
   // XXX: final Flowable flatMap(Function,Function,Callable,int)
   // XXX: final Flowable flatMap(Function,int)
+  static final class FlowableFlatMapInt<I, T extends I, O, P extends Publisher<? extends O>> {
+    @BeforeTemplate
+    Flowable<O> before(Flowable<T> flowable, Function<? super I, ? extends Publisher<? extends O>> function, Integer i) {
+      return flowable.flatMap(function, i);
+    }
+
+    @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
+    @AfterTemplate
+    Flowable<O> after(Flowable<I> flowable, Function<I, P> function, Integer i) {
+      return RxJava2Adapter.fluxToFlowable(
+              RxJava2Adapter.flowableToFlux(flowable)
+                      .flatMap(RxJavaReactorMigrationUtil.toJdkFunction(function), i));
+    }
+  }
 
   static final class FlowableFlatMapCompletable<T, R extends CompletableSource> {
     @BeforeTemplate
@@ -807,8 +824,7 @@ final class RxJavaFlowableToReactorTemplates {
                   x ->
                       RxJava2Adapter.completableToMono(
                           Completable.wrap(
-                              RxJavaReactorMigrationUtil.<T, R>toJdkFunction(function)
-                                  .apply(x))))
+                              RxJavaReactorMigrationUtil.<T, R>toJdkFunction(function).apply(x))))
               .then());
     }
   }
@@ -926,7 +942,24 @@ final class RxJavaFlowableToReactorTemplates {
   }
 
   // XXX: final Flowable flatMapMaybe(Function,boolean,int)
-  // XXX: final Flowable flatMapSingle(Function)
+  static final class FlowableFlatMapSingle<S, T extends S, R, P extends R, M extends Single<P>> {
+    @BeforeTemplate
+    Flowable<R> before(
+        Flowable<T> flowable, Function<? super S, ? extends SingleSource<? extends R>> function) {
+      return flowable.flatMapSingle(function);
+    }
+
+    @AfterTemplate
+    Flowable<R> after(Flowable<T> flowable, Function<S, M> function) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .flatMap(
+                  e ->
+                      RxJava2Adapter.singleToMono(
+                          RxJavaReactorMigrationUtil.<S, M>toJdkFunction(function).apply(e))));
+    }
+  }
+
   // XXX: final Flowable flatMapSingle(Function,boolean,int)
   // XXX: final Disposable forEach(Consumer)
   // XXX: final Disposable forEachWhile(Predicate)
@@ -1179,10 +1212,81 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable startWith(Object)
   // XXX: final Flowable startWith(Publisher)
   // XXX: final Flowable startWithArray(Object[])
-  // XXX: final Disposable subscribe()
-  // XXX: final Disposable subscribe(Consumer)
-  // XXX: final Disposable subscribe(Consumer,Consumer)
-  // XXX: final Disposable subscribe(Consumer,Consumer,Action)
+
+  // XXX: Test this.
+  static final class FlowableSubscribe<T> {
+    @BeforeTemplate
+    Disposable before(Flowable<T> flowable) {
+      return flowable.subscribe();
+    }
+
+    @AfterTemplate
+    reactor.core.Disposable after(Flowable<T> flowable) {
+      return RxJava2Adapter.flowableToFlux(flowable).subscribe();
+    }
+  }
+
+  // XXX: Test this.
+  static final class FlowableSubscribeConsumer<T> {
+    @BeforeTemplate
+    Disposable before(Flowable<T> flowable, Consumer<? super T> consumer) {
+      return flowable.subscribe(consumer);
+    }
+
+    @AfterTemplate
+    reactor.core.Disposable after(Flowable<T> flowable, Consumer<? super T> consumer) {
+      return RxJava2Adapter.flowableToFlux(flowable)
+          .subscribe(RxJavaReactorMigrationUtil.toJdkConsumer(consumer));
+    }
+  }
+
+  // XXX: Test this.
+  static final class FlowableSubscribeTwoConsumers<T> {
+    @BeforeTemplate
+    Disposable before(
+        Flowable<T> flowable,
+        Consumer<? super T> consumer1,
+        Consumer<? super Throwable> consumer2) {
+      return flowable.subscribe(consumer1, consumer2);
+    }
+
+    @AfterTemplate
+    reactor.core.Disposable after(
+        Flowable<T> flowable,
+        Consumer<? super T> consumer1,
+        Consumer<? super Throwable> consumer2) {
+      return RxJava2Adapter.flowableToFlux(flowable)
+          .subscribe(
+              RxJavaReactorMigrationUtil.toJdkConsumer(consumer1),
+              RxJavaReactorMigrationUtil.toJdkConsumer(consumer2));
+    }
+  }
+
+  // XXX: Test this.
+  static final class FlowableSubscribeTwoConsumersWithAction<T> {
+    @BeforeTemplate
+    Disposable before(
+        Flowable<T> flowable,
+        Consumer<? super T> consumer1,
+        Consumer<? super Throwable> consumer2,
+        Action action) {
+      return flowable.subscribe(consumer1, consumer2, action);
+    }
+
+    @AfterTemplate
+    reactor.core.Disposable after(
+        Flowable<T> flowable,
+        Consumer<? super T> consumer1,
+        Consumer<? super Throwable> consumer2,
+        Action action) {
+      return RxJava2Adapter.flowableToFlux(flowable)
+          .subscribe(
+              RxJavaReactorMigrationUtil.toJdkConsumer(consumer1),
+              RxJavaReactorMigrationUtil.toJdkConsumer(consumer2),
+              RxJavaReactorMigrationUtil.toRunnable(action));
+    }
+  }
+
   // XXX: final Disposable subscribe(Consumer,Consumer,Action,Consumer)
   // XXX: final void subscribe(FlowableSubscriber)
   // XXX: final void subscribe(Subscriber)

@@ -17,14 +17,17 @@ import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 import java.util.concurrent.Callable;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
@@ -112,7 +115,19 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public static Single fromFuture(Future,long,TimeUnit,Scheduler)
   // XXX: public static Single fromFuture(Future,Scheduler)
   // XXX: public static Single fromObservable(ObservableSource)
-  // XXX: public static Single fromPublisher(Publisher)
+
+  static final class SingleFromPublisher<T> {
+    @BeforeTemplate
+    Single<T> before(Publisher<? extends T> source) {
+      return Single.fromPublisher(source);
+    }
+
+    @AfterTemplate
+    Single<T> after(Publisher<? extends T> source) {
+      return RxJava2Adapter.monoToSingle(Mono.from(source));
+    }
+  }
+
 
   static final class SingleJust<T> {
     @BeforeTemplate
@@ -535,7 +550,7 @@ final class RxJavaSingleToReactorTemplates {
 
   static final class SingleMap<I, T extends I, O> {
     @BeforeTemplate
-    Single<O> before(Single<T> single, Function<I, O> function) {
+    Single<O> before(Single<T> single, Function<? super I, ? extends O> function) {
       return single.map(function);
     }
 
@@ -581,18 +596,18 @@ final class RxJavaSingleToReactorTemplates {
   static final class SingleOnErrorResumeNext<
       S, T extends S, R, P extends Throwable, Q extends Single<T>> {
     @BeforeTemplate
-    Single<T> before(Single<T> single, Function<? super Throwable, Q> function) {
+    Single<T> before(Single<T> single, Function<? super Throwable, ? extends SingleSource<? extends T>> function) {
       return single.onErrorResumeNext(function);
     }
 
     @AfterTemplate
-    Single<T> after(Single<T> single, Function<Throwable, Single<T>> function) {
+    Single<T> after(Single<T> single, Function<Throwable, Q> function) {
       return RxJava2Adapter.monoToSingle(
           RxJava2Adapter.singleToMono(single)
               .onErrorResume(
                   err ->
                       RxJava2Adapter.singleToMono(
-                          RxJavaReactorMigrationUtil.<Throwable, Single<T>>toJdkFunction(function)
+                          RxJavaReactorMigrationUtil.<Throwable, Q>toJdkFunction(function)
                               .apply(err))));
     }
   } // Why doesn't it add the <Throwable, Single<T>>???????
@@ -628,15 +643,55 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single retry(long)
   // XXX: public final Single retry(long,Predicate)
   // XXX: public final Single retry(Predicate)
+  // XXX: public final Single retryWhen(Function)
 
-  // Can be skipped because of:
-  //  https://picnic.atlassian.net/browse/PRP-12237
-  //   XXX: public final Single retryWhen(Function)
+  // XXX: Test this.
+  static final class SingleSubscribe<T> {
+    @BeforeTemplate
+    Disposable before(Single<T> single) {
+      return single.subscribe();
+    }
 
-  // XXX: public final Disposable subscribe()
+    @AfterTemplate
+    reactor.core.Disposable after(Single<T> single) {
+      return RxJava2Adapter.singleToMono(single).subscribe();
+    }
+  }
+
   // XXX: public final Disposable subscribe(BiConsumer)
-  // XXX: public final Disposable subscribe(Consumer)
-  // XXX: public final Disposable subscribe(Consumer,Consumer)
+
+  // XXX: Test this.
+  static final class SingleSubscribeConsumer<T> {
+    @BeforeTemplate
+    Disposable before(Single<T> single, Consumer<? super T> consumer) {
+      return single.subscribe(consumer);
+    }
+
+    @AfterTemplate
+    reactor.core.Disposable after(Single<T> single, Consumer<? super T> consumer) {
+      return RxJava2Adapter.singleToMono(single)
+          .subscribe(RxJavaReactorMigrationUtil.toJdkConsumer(consumer));
+    }
+  }
+
+  // XXX: Test this.
+  static final class SingleSubscribeTwoConsumers<T> {
+    @BeforeTemplate
+    Disposable before(
+        Single<T> single, Consumer<? super T> consumer1, Consumer<? super Throwable> consumer2) {
+      return single.subscribe(consumer1, consumer2);
+    }
+
+    @AfterTemplate
+    reactor.core.Disposable after(
+        Single<T> single, Consumer<? super T> consumer1, Consumer<? super Throwable> consumer2) {
+      return RxJava2Adapter.singleToMono(single)
+          .subscribe(
+              RxJavaReactorMigrationUtil.toJdkConsumer(consumer1),
+              RxJavaReactorMigrationUtil.toJdkConsumer(consumer2));
+    }
+  }
+
   // XXX: public final void subscribe(SingleObserver)
 
   // XXX: Not accounting for the Schedulers.computation()
