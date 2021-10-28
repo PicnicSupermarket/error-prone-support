@@ -220,6 +220,32 @@ final class ReactorTemplates {
     }
   }
 
+  /** Use the fluent API style when using {@link StepVerifier#create} for {@link Mono}. */
+  static final class StepVerifierCreateMono<T> {
+    @BeforeTemplate
+    StepVerifier.FirstStep<? extends T> before(Mono<T> mono) {
+      return StepVerifier.create(mono);
+    }
+
+    @AfterTemplate
+    StepVerifier.FirstStep<? extends T> after(Flux<T> mono) {
+      return mono.as(StepVerifier::create);
+    }
+  }
+
+  /** Use the fluent API style when using {@link StepVerifier#create} for {@link Flux}. */
+  static final class StepVerifierCreateFlux<T> {
+    @BeforeTemplate
+    StepVerifier.FirstStep<? extends T> before(Flux<T> flux) {
+      return StepVerifier.create(flux);
+    }
+
+    @AfterTemplate
+    StepVerifier.FirstStep<? extends T> after(Flux<T> flux) {
+      return flux.as(StepVerifier::create);
+    }
+  }
+
   /** Don't unnecessarily call {@link StepVerifier.Step#expectNext(Object[])}. */
   static final class StepVerifierStepExpectNextEmpty<T> {
     @BeforeTemplate
