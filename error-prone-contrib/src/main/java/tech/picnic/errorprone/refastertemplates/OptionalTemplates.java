@@ -14,6 +14,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 /** Refaster templates related to expressions dealing with {@link Optional}s. */
 final class OptionalTemplates {
@@ -24,7 +25,7 @@ final class OptionalTemplates {
     // parentheses around the null check, but that's currently not the case. Try to fix that.
     @BeforeTemplate
     @SuppressWarnings("TernaryOperatorOptionalNegativeFiltering" /* Special case. */)
-    Optional<T> before(T object) {
+    Optional<T> before(@Nullable T object) {
       return object == null ? Optional.empty() : Optional.of(object);
     }
 

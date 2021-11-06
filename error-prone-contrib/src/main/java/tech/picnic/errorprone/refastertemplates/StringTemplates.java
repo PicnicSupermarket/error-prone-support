@@ -14,6 +14,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 /** Refaster templates related to expressions dealing with {@link String}s. */
 // XXX: Should we prefer `s -> !s.isEmpty()` or `not(String::isEmpty)`?
@@ -37,7 +38,7 @@ final class StringTemplates {
   /** Prefer {@link Strings#isNullOrEmpty(String)} over the more verbose alternative. */
   static final class StringIsNullOrEmpty {
     @BeforeTemplate
-    boolean before(String str) {
+    boolean before(@Nullable String str) {
       return str == null || str.isEmpty();
     }
 
