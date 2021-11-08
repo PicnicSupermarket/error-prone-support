@@ -80,6 +80,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           "org.mockito.Answers",
           "org.mockito.ArgumentMatchers",
           "org.mockito.Mockito",
+          "org.springframework.boot.test.context.SpringBootTest.WebEnvironment",
           "org.springframework.format.annotation.DateTimeFormat.ISO",
           "org.springframework.http.HttpHeaders",
           "org.springframework.http.HttpMethod",

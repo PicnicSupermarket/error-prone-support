@@ -372,6 +372,11 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-test</artifactId>
+                <version>2.5.6</version>
+            </dependency>
+            <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>7.4.0</version>
@@ -990,6 +995,7 @@
                             <licenseMerge>
                                 <!-- -->
                                 BSD-3-Clause
+                                | BSD License 3
                                 | 3-Clause BSD License
                                 | BSD 3-clause
                                 | Eclipse Distribution License (New BSD License)
