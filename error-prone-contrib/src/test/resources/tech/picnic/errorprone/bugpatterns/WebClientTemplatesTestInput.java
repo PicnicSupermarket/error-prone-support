@@ -14,7 +14,12 @@ import reactor.core.publisher.Mono;
 final class WebClientTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(fromValue(""));
+    return ImmutableSet.of(
+        fromValue(""),
+        identity(),
+        Flux.class,
+        ImmutableList.class,
+        ParameterizedTypeReference.class);
   }
 
   ImmutableSet<?> testBodyValue() {
