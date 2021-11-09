@@ -161,6 +161,32 @@ final class ReactorTemplates {
     }
   }
 
+  /** Don't use {@link Flux#concat(Publisher)} with only a single {@link Mono}. */
+  abstract static class FluxConcatOfOneMono<T> {
+    @BeforeTemplate
+    Flux<T> before(Mono<T> mono) {
+      return Flux.concat(mono);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Mono<T> mono) {
+      return mono.flux();
+    }
+  }
+
+  /** Don't use {@link Flux#concat(Publisher)} with only a single {@link Flux}. */
+  abstract static class FluxConcatOfOneFlux<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux) {
+      return Flux.concat(flux);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux) {
+      return flux;
+    }
+  }
+
   /**
    * Prefer a collection using {@link MoreCollectors#toOptional()} over more contrived alternatives.
    */
