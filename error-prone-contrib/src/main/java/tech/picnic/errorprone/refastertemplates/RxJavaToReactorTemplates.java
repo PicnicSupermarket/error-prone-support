@@ -1,11 +1,9 @@
 package tech.picnic.errorprone.refastertemplates;
 
-import com.google.errorprone.matchers.IsMethodReferenceOrLambdaHasReturnStatement;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
-import com.google.errorprone.refaster.annotation.NotMatches;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.functions.Action;
@@ -25,37 +23,6 @@ import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 public final class RxJavaToReactorTemplates {
   private RxJavaToReactorTemplates() {}
 
-  // XXX: This one is for a specific case in the FcService... Can we solve this in a different way?
-  static final class ObservableToFlux<T> {
-    @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Predicate<T> predicate, BackpressureStrategy strategy) {
-      return RxJava2Adapter.observableToFlux(
-          RxJava2Adapter.fluxToObservable(flux).filter(predicate), strategy);
-    }
-
-    @AfterTemplate
-    Flux<T> after(Flux<T> flux, Predicate<T> predicate, BackpressureStrategy strategy) {
-      return flux.filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate));
-    }
-  }
-
-  // XXX: This one is for a specific case in the  getActiveDcs_migrated()... Can
-  // we solve this in a different way?
-  static final class FlowableToFluxWithFilter<T> {
-    @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Predicate<T> predicate) {
-      return RxJava2Adapter.flowableToFlux(
-          flux.filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
-              .as(RxJava2Adapter::fluxToFlowable));
-    }
-
-    @AfterTemplate
-    Flux<T> after(Flux<T> flux, Predicate<T> predicate) {
-      return flux.filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate));
-    }
-  }
-
-  // XXX: Add test cases
   static final class FluxToFlowableToFlux<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, BackpressureStrategy strategy) {
@@ -77,9 +44,6 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: What should we do with the naming here? Since it is not entirely correct now.
-  // (ObsoleteConversions?)
-  // XXX: Add test cases for the RxJava2adapter.XXX way. And the combination.
   static final class MonoToFlowableToMono<T> {
     @BeforeTemplate
     Mono<Void> before(Mono<Void> mono) {
@@ -117,7 +81,7 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: Make test
+  // XXX: Add test cases
   static final class MonoToFlowableToFlux<T> {
     @BeforeTemplate
     Flux<T> before(Mono<T> mono) {
@@ -129,19 +93,6 @@ public final class RxJavaToReactorTemplates {
       return mono.flux();
     }
   }
-
-  // XXX: Temporarily disabled @CanBeTransformedTo...
-  //  static final class RemoveRedundantCast<T> {
-  //    @BeforeTemplate
-  //    T before(T object) {
-  //      return (T) object;
-  //    }
-  //
-  //    @AfterTemplate
-  //    T after(T object) {
-  //      return object;
-  //    }
-  //  }
 
   static final class MonoErrorCallableSupplierUtil<T> {
     @BeforeTemplate
@@ -168,44 +119,33 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class)  add this temporarily
-  //   and  remove at end of migration.
-//  @SuppressWarnings("NoFunctionalReturnType")
-//  static final class UnnecessaryFunctionConversion<I, O> {
-//    @BeforeTemplate
-//    java.util.function.Function<I, O> before(
-//        @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class) @CanTransformToTargetType
-//            Function<I, O> function) {
-//      return Refaster.anyOf(
-//          //          RxJavaReactorMigrationUtil.toJdkFunction((Function<I, O>) function), -->
-//          //   This one gets us in non-compilable state.
-//          RxJavaReactorMigrationUtil.toJdkFunction(function));
-//    }
-//
-//    // XXX: Redundant cast to cover the case in which `function` is a method reference on which
-//    // `.apply` is invoked.
-//    // XXX: This happens e.g. in lambda expressions, but we can't seem to match those with
-//    //   Refaster preventing simplification. Investigate.
-//    @AfterTemplate
-//    java.util.function.Function<I, O> after(java.util.function.Function<I, O> function) {
-//      return function;
-//    }
-//  }
-//
-//  @SuppressWarnings("NoFunctionalReturnType")
-//  static final class UnnecessaryBiFunctionConversion<T, U, R> {
-//    @BeforeTemplate
-//    java.util.function.BiFunction<? super T, ? super U, ? extends R> before(
-//        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
-//      return RxJavaReactorMigrationUtil.toJdkBiFunction(zipper);
-//    }
-//
-//    @AfterTemplate
-//    java.util.function.BiFunction<? super T, ? super U, ? extends R> after(
-//        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
-//      return zipper;
-//    }
-//  }
+  @SuppressWarnings("NoFunctionalReturnType")
+  static final class UnnecessaryFunctionConversion<I, O> {
+    @BeforeTemplate
+    java.util.function.Function<I, O> before(@CanTransformToTargetType Function<I, O> function) {
+      return RxJavaReactorMigrationUtil.toJdkFunction(function);
+    }
+
+    @AfterTemplate
+    java.util.function.Function<I, O> after(java.util.function.Function<I, O> function) {
+      return function;
+    }
+  }
+
+  @SuppressWarnings("NoFunctionalReturnType")
+  static final class UnnecessaryBiFunctionConversion<T, U, R> {
+    @BeforeTemplate
+    java.util.function.BiFunction<? super T, ? super U, ? extends R> before(
+        @CanTransformToTargetType BiFunction<? super T, ? super U, ? extends R> zipper) {
+      return RxJavaReactorMigrationUtil.toJdkBiFunction(zipper);
+    }
+
+    @AfterTemplate
+    java.util.function.BiFunction<? super T, ? super U, ? extends R> after(
+        java.util.function.BiFunction<? super T, ? super U, ? extends R> zipper) {
+      return zipper;
+    }
+  }
 
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryConsumerConversion<T> {
@@ -268,9 +208,10 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  ///////////////////////////////////
-  //////////// ASSORTED TEMPLATES
-  ///////////////////////////////////
+  ///////////////////////////////////////////
+  //////////// ASSORTED TEMPLATES ///////////
+  ///////////////////////////////////////////
+
   static final class MonoFromNestedPublisher<T> {
     @BeforeTemplate
     Mono<T> before(Flux<T> flux) {
@@ -283,9 +224,33 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  // XXX: This conversion is in the testAddAndFindBadWord of the bad-word-service.
-  // It is caused by the Flowable.then.then(Mono.from()).
-  // This is officially not correct, but it is in the test, so we can allow it?
+  static final class FlowableToFluxWithFilter<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Predicate<T> predicate) {
+      return RxJava2Adapter.flowableToFlux(
+          flux.filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate))
+              .as(RxJava2Adapter::fluxToFlowable));
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Predicate<T> predicate) {
+      return flux.filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate));
+    }
+  }
+
+  static final class ObservableToFlux<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Predicate<T> predicate, BackpressureStrategy strategy) {
+      return RxJava2Adapter.observableToFlux(
+          RxJava2Adapter.fluxToObservable(flux).filter(predicate), strategy);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Predicate<T> predicate, BackpressureStrategy strategy) {
+      return flux.filter(RxJavaReactorMigrationUtil.toJdkPredicate(predicate));
+    }
+  }
+
   static final class MonoFromToFlowableToFlux<T> {
     @BeforeTemplate
     Flux<T> before(Mono<T> mono) {
@@ -309,4 +274,17 @@ public final class RxJavaToReactorTemplates {
       return mono.then(other);
     }
   }
+
+  // XXX: Find out how we can use this in the future.
+  //  static final class RemoveRedundantCast<T> {
+  //    @BeforeTemplate
+  //    T before(T object) {
+  //      return (T) object;
+  //    }
+  //
+  //    @AfterTemplate
+  //    T after(T object) {
+  //      return object;
+  //    }
+  //  }
 }

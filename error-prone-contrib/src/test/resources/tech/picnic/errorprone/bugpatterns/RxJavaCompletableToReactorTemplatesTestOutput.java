@@ -6,7 +6,9 @@ import com.google.common.collect.Streams;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 import java.util.Arrays;
+import org.assertj.core.api.Assertions;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -35,9 +37,9 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
     return RxJava2Adapter.monoToCompletable(
         Mono.defer(
             () ->
-                RxJavaReactorMigrationUtil.callableAsSupplier(() -> Completable.complete())
-                    .get()
-                    .as(RxJava2Adapter::completableToMono)));
+                RxJava2Adapter.completableToMono(
+                    RxJavaReactorMigrationUtil.callableAsSupplier(() -> Completable.complete())
+                        .get())));
   }
 
   Completable testCompletableErrorThrowable() {
@@ -77,9 +79,46 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
     return Completable.complete();
   }
 
-  //  Completable testCompletableDoOnSubscribe() {
-  //    return Completable.complete().doOnSubscribe((Disposable d) -> System.out.println(""));
-  //  }
+  Completable testCompletableAndThenCompletable() {
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.completableToMono(Completable.complete())
+            .then(RxJava2Adapter.completableToMono(Completable.wrap(Completable.complete()))));
+  }
+
+  Maybe<Integer> testCompletableAndThenMaybe() {
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.completableToMono(Completable.complete())
+            .then(RxJava2Adapter.maybeToMono(Maybe.wrap(Maybe.just(1)))));
+  }
+
+  Flowable<Integer> testCompletableAndThenPublisher() {
+    return RxJava2Adapter.fluxToFlowable(
+        RxJava2Adapter.completableToMono(Completable.complete()).thenMany(Flowable.just(1)));
+  }
+
+  Single<Integer> testCompletableAndThenSingle() {
+    return RxJava2Adapter.monoToSingle(
+        RxJava2Adapter.completableToMono(Completable.complete())
+            .then(RxJava2Adapter.singleToMono(Single.wrap(Single.just(1)))));
+  }
+
+  void testCompletableBlockingAwait() {
+    RxJava2Adapter.completableToMono(Completable.complete()).block();
+  }
+
+  Completable testCompletableDoOnError() {
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.completableToMono(Completable.complete())
+            .doOnError(RxJavaReactorMigrationUtil.toJdkConsumer(System.out::println)));
+  }
+
+  Completable testCompletableOnErrorComplete() {
+    return RxJava2Adapter.monoToCompletable(Mono.empty()).onErrorComplete();
+  }
+
+  Completable testCompletableOnErrorCompletePredicate() {
+    return RxJava2Adapter.monoToCompletable(Mono.empty()).onErrorComplete(throwable -> true);
+  }
 
   Flowable<Void> testCompletableToFlowable() {
     return RxJava2Adapter.fluxToFlowable(
@@ -119,5 +158,28 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
         .as(StepVerifier::create)
         .expectNextCount(1)
         .verifyComplete();
+  }
+
+  void testCompletableTestAssertFailure() throws InterruptedException {
+    RxJava2Adapter.completableToMono(Completable.complete())
+        .as(StepVerifier::create)
+        .verifyError(IllegalArgumentException.class);
+  }
+
+  void testCompletableTestAssertNoValues() throws InterruptedException {
+    RxJava2Adapter.completableToMono(Completable.complete())
+        .as(StepVerifier::create)
+        .verifyComplete();
+  }
+
+  void testCompletableTestAssertFailureAndMessage() throws InterruptedException {
+    RxJava2Adapter.completableToMono(Completable.complete())
+        .as(StepVerifier::create)
+        .expectErrorSatisfies(
+            t ->
+                Assertions.assertThat(t)
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("foo"))
+        .verify();
   }
 }

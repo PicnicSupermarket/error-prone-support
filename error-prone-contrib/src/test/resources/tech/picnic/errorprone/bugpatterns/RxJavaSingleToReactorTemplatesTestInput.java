@@ -2,14 +2,11 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableSet;
 import io.reactivex.Completable;
-import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
 import java.util.List;
 import reactor.adapter.rxjava.RxJava2Adapter;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
@@ -84,36 +81,6 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
 
   Completable testSingleFlatMapCompletable() {
     return Single.just(1).flatMapCompletable(integer -> Completable.complete());
-  }
-
-  Completable testSingleRemoveLambdaWithCast() {
-    return RxJava2Adapter.monoToCompletable(
-        RxJava2Adapter.singleToMono(Single.just(1))
-            .flatMap(
-                e ->
-                    RxJava2Adapter.completableToMono(
-                        Completable.wrap(
-                            RxJavaReactorMigrationUtil.<Integer, Completable>toJdkFunction(
-                                    (Function<Integer, Completable>)
-                                        v ->
-                                            RxJava2Adapter.monoToCompletable(
-                                                Mono.justOrEmpty(null)))
-                                .apply(e))))
-            .then());
-  }
-
-  Mono<Void> testSingleRemoveLambdaWithCompletable() {
-    return Flux.just(1, 2)
-        .collectList()
-        .flatMap(
-            e ->
-                RxJava2Adapter.completableToMono(
-                    Completable.wrap(
-                        RxJavaReactorMigrationUtil.toJdkFunction(
-                                (Function<List<Integer>, CompletableSource>)
-                                    u -> Completable.complete())
-                            .apply(e))))
-        .then();
   }
 
   Flowable<Integer> testSingleFlatMapPublisher() {

@@ -8,7 +8,6 @@ import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
@@ -17,14 +16,12 @@ import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscription;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -35,7 +32,6 @@ final class RxJavaCompletableToReactorTemplates {
 
   private RxJavaCompletableToReactorTemplates() {}
 
-  // XXX: Copied over from Stephan's test, to make the test run.
   static final class CompletableAmb {
     @BeforeTemplate
     Completable before(Iterable<? extends Completable> sources) {
@@ -73,7 +69,7 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public static Completable concatArray(CompletableSource[])
   // XXX: public static Completable create(CompletableOnSubscribe)
 
-  // XXX: The types of the @Before and @After are not matching, is this a problem?
+  // XXX: The types of the @Before and @After are not matching
   static final class CompletableDefer {
     @BeforeTemplate
     Completable before(Callable<? extends CompletableSource> supplier) {
@@ -211,7 +207,6 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
-  // XXX: Add the test
   static final class CompletableAndThenMaybe<T> {
     @BeforeTemplate
     Maybe<T> before(Completable completable, MaybeSource<T> source) {
@@ -228,7 +223,6 @@ final class RxJavaCompletableToReactorTemplates {
 
   // XXX: public final Observable andThen(ObservableSource)
 
-  // XXX: Add test
   static final class CompletableAndThenPublisher<T> {
     @BeforeTemplate
     Flowable<T> before(Completable completable, Publisher<T> source) {
@@ -242,7 +236,6 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
-  // XXX: Verify this case
   static final class CompletableAndThenSingle<T> {
     @BeforeTemplate
     Single<T> before(Completable completable, SingleSource<T> source) {
@@ -259,7 +252,6 @@ final class RxJavaCompletableToReactorTemplates {
 
   // XXX: public final Object as(CompletableConverter)
 
-  // XXX: Test this one.
   static final class CompletableBlockingAwait {
     @BeforeTemplate
     void before(Completable completable) {
@@ -273,25 +265,7 @@ final class RxJavaCompletableToReactorTemplates {
   }
 
   // XXX: public final boolean blockingAwait(long,TimeUnit)
-
-  //   XXX: Strictly speaking not correct, should return `Throwable`.
-  //    static final class CompletableBlockingGet {
-  //      @BeforeTemplate
-  //      Throwable before(Completable completable) {
-  //        return completable.blockingGet();
-  //      }
-  //
-  //      @AfterTemplate
-  //      Throwable after(Completable completable) {
-  //        try{
-  //           RxJava2Adapter.completableToMono(completable).single();
-  //          } catch(Exception e) {
-  //
-  //        }
-  //
-  //      }
-  //    }
-
+  // XXX: public final Throwable blockingGet()
   // XXX: public final Throwable blockingGet(long,TimeUnit)
   // XXX: public final Completable cache()
   // XXX: public final Completable compose(CompletableTransformer)
@@ -307,27 +281,8 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Completable doOnDispose(Action)
   // XXX: public final Completable doOnError(Consumer)
   // XXX: public final Completable doOnEvent(Consumer)
-  // XXX: public final Completable doOnSubscribe(Consumer) --> Required
+  // XXX: public final Completable doOnSubscribe(Consumer)
 
-  // XXX Doesnt work yet....
-  //  abstract static class CompletableDoOnSubscribe<T> {
-  //    @Placeholder
-  //    abstract T placeholder();
-  //
-  //    @BeforeTemplate
-  //    Completable before(Completable completable) {
-  //      return completable.doOnSubscribe((Disposable d) -> placeholder());
-  //    }
-  //
-  //    @AfterTemplate
-  //    Completable after(Completable completable) {
-  //      return RxJava2Adapter.monoToCompletable(
-  //          RxJava2Adapter.completableToMono(completable)
-  //              .doOnSubscribe((Subscription s) -> placeholder()));
-  //    }
-  //  }
-
-  // XXX: Add test
   static final class CompletableDoOnError {
     @BeforeTemplate
     Completable before(Completable completable, Consumer<? super Throwable> consumer) {
@@ -349,7 +304,7 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Completable mergeWith(CompletableSource)
   // XXX: public final Completable observeOn(Scheduler)
 
-  // XXX: Verify whether this is correct.
+  // XXX: Verify whether this is the correct equivalent.
   static final class CompletableOnErrorComplete {
     Completable before(Completable completable) {
       return completable.onErrorComplete();
@@ -361,7 +316,6 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
-  // XXX: Add test case.
   static final class CompletableOnErrorCompletePredicate {
     Completable before(Completable completable, Predicate<? super Throwable> predicate) {
       return completable.onErrorComplete(predicate);
@@ -404,7 +358,7 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Completable timeout(long,TimeUnit,Scheduler,CompletableSource)
   // XXX: public final Object to(Function)
 
-  static final class CompletableToFlowable<T> {
+  static final class CompletableToFlowable {
     @BeforeTemplate
     Flowable<Void> before(Completable completable) {
       return completable.toFlowable();
@@ -417,7 +371,7 @@ final class RxJavaCompletableToReactorTemplates {
   }
 
   // XXX: Requires investigation. Should not be Void...
-  static final class CompletableToMaybe<T> {
+  static final class CompletableToMaybe {
     @BeforeTemplate
     Maybe<Void> before(Completable completable) {
       return completable.toMaybe();
@@ -454,7 +408,6 @@ final class RxJavaCompletableToReactorTemplates {
     void before(Completable completable) throws InterruptedException {
       Refaster.anyOf(
           completable.test().await().assertComplete(), completable.test().assertComplete());
-      // XXX: Add this one here? completable.test().await().assertEmpty();
     }
 
     @AfterTemplate
@@ -479,8 +432,6 @@ final class RxJavaCompletableToReactorTemplates {
           .verifyError(errorClass);
     }
   }
-
-  // XXX: .assertError(Throwable) -> (not used in PRP).
 
   static final class CompletableTestAssertNoErrors {
     @BeforeTemplate
@@ -509,7 +460,6 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
-  // XXX: Add test
   static final class CompletableTestAssertFailure {
     @BeforeTemplate
     void before(Completable completable, Class<? extends Throwable> error)
@@ -523,7 +473,6 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
-  // XXX: Add test
   static final class CompletableTestAssertNoValues {
     @BeforeTemplate
     void before(Completable completable) throws InterruptedException {
@@ -536,7 +485,6 @@ final class RxJavaCompletableToReactorTemplates {
     }
   }
 
-  // XXX: Add test
   static final class CompletableTestAssertFailureAndMessage {
     @BeforeTemplate
     void before(Completable completable, Class<? extends Throwable> error, String message)

@@ -11,8 +11,6 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
-import com.google.errorprone.refaster.annotation.MayOptionallyUse;
-import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.Completable;
@@ -63,8 +61,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: static int bufferSize() --> How rewrite this one? Is it valid to do so?
-  // Integer.MAX_VALUE...
+  // XXX: static int bufferSize()
   // XXX: static Flowable combineLatest(Function,Publisher[])
   // XXX: static Flowable combineLatest(Iterable,Function)
   // XXX: static Flowable combineLatest(Iterable,Function,int)
@@ -213,7 +210,6 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: Is this Mono correct here?
   static final class FlowableFromCallable<T> {
     @BeforeTemplate
     Flowable<T> before(Callable<? extends T> supplier) {
@@ -231,7 +227,6 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: static Flowable fromFuture(Future,long,TimeUnit,Scheduler)
   // XXX: static Flowable fromFuture(Future,Scheduler)
 
-  // XXX Verify this one, consentTextAssignmentRepo.
   static final class FlowableFromIterable<T> {
     @BeforeTemplate
     Flowable<T> before(Iterable<? extends T> iterable) {
@@ -382,7 +377,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: Not migrating the `Flowable.rangeLong` callers with actual Long as arguments.
+  // XXX: Not migrating the `Flowable.rangeLong` callers with actual `long` arguments.
   static final class FlowableRangeLong {
     @BeforeTemplate
     Flowable<Long> before(int start, int count) {
@@ -460,9 +455,8 @@ final class RxJavaFlowableToReactorTemplates {
               .all(RxJavaReactorMigrationUtil.toJdkPredicate(predicate)));
     }
   }
-  // XXX: final Flowable ambWith(Publisher)
 
-  // XXX: Write cleanup for RxJavaReactorMigrationUtil.toJdkPredicate.
+  // XXX: final Flowable ambWith(Publisher)
 
   static final class FlowableAny<T> {
     @BeforeTemplate
@@ -494,7 +488,7 @@ final class RxJavaFlowableToReactorTemplates {
 
   // XXX: final Object blockingFirst(Object)
   // XXX: final void blockingForEach(Consumer)
-  // XXX: final Iterable blockingIterable() -> Required.
+  // XXX: final Iterable blockingIterable()
   // XXX: final Iterable blockingIterable(int)
   // XXX: final Object blockingLast()
   // XXX: final Object blockingLast(Object)
@@ -608,30 +602,6 @@ final class RxJavaFlowableToReactorTemplates {
 
   // XXX: final Flowable concatMapMaybe(Function,int)
 
-  // XXX: Better one below?
-  //  static final class FlowableConcatMapMaybeDelayError<T, R> {
-  //    @BeforeTemplate
-  //    Flowable<R> before(
-  //        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function)
-  // {
-  //      return flowable.concatMapMaybeDelayError(function);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Flowable<R> after(
-  //        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function)
-  // {
-  //      return RxJava2Adapter.fluxToFlowable(
-  //          RxJava2Adapter.flowableToFlux(flowable)
-  //              .concatMapDelayError(
-  //                  e ->
-  //                      Maybe.wrap(
-  //                              RxJavaReactorMigrationUtil.toJdkFunction(
-  //                                      (Function<T, MaybeSource<R>>) function)
-  //                                  .apply(e))
-  //                          .toFlowable()));
-  //    }
-  //  }
   static final class FlowableConcatMapMaybeDelayError<T, R, O extends R, M extends MaybeSource<O>> {
     @BeforeTemplate
     Flowable<O> before(
@@ -770,7 +740,8 @@ final class RxJavaFlowableToReactorTemplates {
 
   static final class FlowableFlatMap<I, T extends I, O, P extends Publisher<? extends O>> {
     @BeforeTemplate
-    Flowable<O> before(Flowable<T> flowable, Function<? super I, ? extends Publisher<? extends O>> function) {
+    Flowable<O> before(
+        Flowable<T> flowable, Function<? super I, ? extends Publisher<? extends O>> function) {
       return flowable.flatMap(function);
     }
 
@@ -794,18 +765,22 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable flatMap(Function,Function,Callable)
   // XXX: final Flowable flatMap(Function,Function,Callable,int)
   // XXX: final Flowable flatMap(Function,int)
+
   static final class FlowableFlatMapInt<I, T extends I, O, P extends Publisher<? extends O>> {
     @BeforeTemplate
-    Flowable<O> before(Flowable<T> flowable, Function<? super I, ? extends Publisher<? extends O>> function, Integer i) {
+    Flowable<O> before(
+        Flowable<T> flowable,
+        Function<? super I, ? extends Publisher<? extends O>> function,
+        int i) {
       return flowable.flatMap(function, i);
     }
 
     @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
     @AfterTemplate
-    Flowable<O> after(Flowable<I> flowable, Function<I, P> function, Integer i) {
+    Flowable<O> after(Flowable<I> flowable, Function<I, P> function, int i) {
       return RxJava2Adapter.fluxToFlowable(
-              RxJava2Adapter.flowableToFlux(flowable)
-                      .flatMap(RxJavaReactorMigrationUtil.toJdkFunction(function), i));
+          RxJava2Adapter.flowableToFlux(flowable)
+              .flatMap(RxJavaReactorMigrationUtil.toJdkFunction(function), i));
     }
   }
 
@@ -826,49 +801,6 @@ final class RxJavaFlowableToReactorTemplates {
                           Completable.wrap(
                               RxJavaReactorMigrationUtil.<T, R>toJdkFunction(function).apply(x))))
               .then());
-    }
-  }
-
-  abstract static class FlowableFlatMapCompletableUnwrapLambda<T> {
-    @Placeholder
-    abstract Mono<?> placeholder(@MayOptionallyUse T input);
-
-    // XXX: Perhaps: `? extends Publisher.....`
-    @BeforeTemplate
-    java.util.function.Function<T, Publisher<? extends Void>> before() {
-      return e ->
-          RxJava2Adapter.completableToMono(
-              Completable.wrap(
-                  RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
-                          (Function<T, CompletableSource>)
-                              v -> RxJava2Adapter.monoToCompletable(placeholder(v)))
-                      .apply(e)));
-    }
-
-    @AfterTemplate
-    java.util.function.Function<T, Mono<?>> after() {
-      return v -> placeholder(v);
-    }
-  }
-
-  // This one works, for one extra case, improve naming and watch the other case.
-  abstract static class FlowableUnwrapLambdaa<T> {
-    @Placeholder
-    abstract CompletableSource placeholder(@MayOptionallyUse T input);
-
-    @BeforeTemplate
-    java.util.function.Function<T, Publisher<? extends Void>> before() {
-      return e ->
-          RxJava2Adapter.completableToMono(
-              Completable.wrap(
-                  RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
-                          (Function<T, CompletableSource>) v -> placeholder(v))
-                      .apply(e)));
-    }
-
-    @AfterTemplate
-    java.util.function.Function<T, Mono<? extends Void>> after() {
-      return v -> RxJava2Adapter.completableToMono(Completable.wrap(placeholder(v)));
     }
   }
 
@@ -894,34 +826,7 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable flatMapIterable(Function,BiFunction,int)
   // XXX: final Flowable flatMapIterable(Function,int)
 
-  // XXX : Below is a better version.
-  //  static final class FlowableFlatMapMaybe<T, R> {
-  //    @BeforeTemplate
-  //    Flowable<R> before(
-  //        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function)
-  // {
-  //      return flowable.flatMapMaybe(function);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Flowable<R> after(
-  //        Flowable<T> flowable, Function<? super T, ? extends MaybeSource<? extends R>> function)
-  // {
-  //      return RxJava2Adapter.fluxToFlowable(
-  //          RxJava2Adapter.flowableToFlux(flowable)
-  //              .flatMap(
-  //                  e ->
-  //                      RxJava2Adapter.maybeToMono(
-  //                          Maybe.wrap(
-  //                              RxJavaReactorMigrationUtil.toJdkFunction(
-  //                                      (Function<T, MaybeSource<R>>) function)
-  //                                  .apply(e)))));
-  //    }
-  //  }
-
-  // This one is now tested and good!
-  // XXX: Perhaps improved by improving the before template with ? extends and such.
-  static final class FlowableFlatMapMaybeSecond<
+  static final class FlowableFlatMapMaybe<
       S, T extends S, R, P extends R, M extends MaybeSource<P>> {
     @BeforeTemplate
     Flowable<R> before(
@@ -942,6 +847,7 @@ final class RxJavaFlowableToReactorTemplates {
   }
 
   // XXX: final Flowable flatMapMaybe(Function,boolean,int)
+
   static final class FlowableFlatMapSingle<S, T extends S, R, P extends R, M extends Single<P>> {
     @BeforeTemplate
     Flowable<R> before(
@@ -1079,7 +985,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: final Flowable onErrorReturn(Function) --> Required, ibanBlacklistServiceClient 60
+  // XXX: final Flowable onErrorReturn(Function)
   // XXX: final Flowable onErrorReturnItem(Object)
   // XXX: final Flowable onExceptionResumeNext(Publisher)
   // XXX: final Flowable onTerminateDetach()
@@ -1133,7 +1039,7 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable scanWith(Callable,BiFunction)
   // XXX: final Flowable serialize()
   // XXX: final Flowable share()
-  // XXX: final Single single(Object) --> I think so.
+  // XXX: final Single single(Object)
 
   static final class FlowableSingleDefault<T> {
     @BeforeTemplate
@@ -1213,7 +1119,7 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable startWith(Publisher)
   // XXX: final Flowable startWithArray(Object[])
 
-  // XXX: Test this.
+  // XXX: Add test
   static final class FlowableSubscribe<T> {
     @BeforeTemplate
     Disposable before(Flowable<T> flowable) {
@@ -1226,7 +1132,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: Test this.
+  // XXX: Add test
   static final class FlowableSubscribeConsumer<T> {
     @BeforeTemplate
     Disposable before(Flowable<T> flowable, Consumer<? super T> consumer) {
@@ -1240,7 +1146,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: Test this.
+  // XXX: Add test
   static final class FlowableSubscribeTwoConsumers<T> {
     @BeforeTemplate
     Disposable before(
@@ -1262,7 +1168,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: Test this.
+  // XXX: Add test
   static final class FlowableSubscribeTwoConsumersWithAction<T> {
     @BeforeTemplate
     Disposable before(
@@ -1436,10 +1342,9 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable withLatestFrom(Publisher,Publisher,Function3)
   // XXX: final Flowable withLatestFrom(Publisher,Publisher,Publisher,Function4)
   // XXX: final Flowable withLatestFrom(Publisher,Publisher,Publisher,Publisher,Function5)
+  // XXX: final Flowable zipWith(Iterable,BiFunction)
 
-  // XXX: final Flowable zipWith(Iterable,BiFunction) --> Required.
-
-  // XXX: Test this one
+  // XXX: Add test
   static final class FlowableZipWith<T, U, R> {
     @BeforeTemplate
     Flowable<R> before(
@@ -1460,11 +1365,12 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: final Flowable zipWith(Publisher,BiFunction) --> Required?
+  // XXX: final Flowable zipWith(Publisher,BiFunction)
   // XXX: final Flowable zipWith(Publisher,BiFunction,boolean)
   // XXX: final Flowable zipWith(Publisher,BiFunction,boolean,int)
   // XXX: final TestSubscriber test(long)
 
+  @SuppressWarnings("unchecked")
   static final class FlowableTestAssertResultItem<T> {
     @BeforeTemplate
     void before(Flowable<T> flowable, T item) throws InterruptedException {
@@ -1508,6 +1414,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
+  @SuppressWarnings("unchecked")
   static final class FlowableTestAssertResult<T> {
     @BeforeTemplate
     void before(Flowable<T> flowable) throws InterruptedException {
@@ -1521,14 +1428,14 @@ final class RxJavaFlowableToReactorTemplates {
   }
 
   // XXX: Requires investigation
+  @SuppressWarnings("unchecked")
   static final class FlowableTestAwaitDoneAssertResultItem<T> {
     @BeforeTemplate
-    void before(Flowable<T> flowable, long time, TimeUnit timeUnit, T item)
-        throws InterruptedException {
+    void before(Flowable<T> flowable, long time, TimeUnit timeUnit, T item) {
       flowable.test().awaitDone(time, timeUnit).assertResult(item);
     }
 
-    // XXX: Do something with: `Duration.of(time, timeUnit.toChronoUnit());`.
+    // XXX: Can be improved with: `Duration.of(time, timeUnit.toChronoUnit());`.
     // Since there is no Reactor equivalent, this is not behavior preserving.
     @AfterTemplate
     void after(Flowable<T> flowable, long time, TimeUnit timeUnit, T item) {
@@ -1569,7 +1476,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
 
     @AfterTemplate
-    void after(Flowable<T> flowable, Collection<? extends T> set) throws InterruptedException {
+    void after(Flowable<T> flowable, Collection<? extends T> set) {
       RxJava2Adapter.flowableToFlux(flowable)
           .collect(toImmutableMultiset())
           .as(StepVerifier::create)
@@ -1590,7 +1497,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
 
     @AfterTemplate
-    void after(Flowable<T> flowable, ImmutableSet<? extends T> set) throws InterruptedException {
+    void after(Flowable<T> flowable, ImmutableSet<? extends T> set) {
       RxJava2Adapter.flowableToFlux(flowable)
           .collect(toImmutableSet())
           .as(StepVerifier::create)
@@ -1599,7 +1506,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: Test this one.
+  // XXX: Add test
   static final class FlowableAssertValueSetWithValueCount<T> {
     @BeforeTemplate
     void before(Flowable<T> flowable, Collection<? extends T> set, Integer count)
@@ -1619,7 +1526,6 @@ final class RxJavaFlowableToReactorTemplates {
               .assertNoErrors()
               .assertValueCount(count)
               .assertValueSet(set),
-          //          flowable.test().await().assertNoErrors().assertValueSet(set).assertComplete(),
           flowable.test().assertValueCount(count).assertValueSet(set).assertComplete(),
           flowable
               .test()
@@ -1638,8 +1544,7 @@ final class RxJavaFlowableToReactorTemplates {
     }
 
     @AfterTemplate
-    void after(Flowable<T> flowable, Collection<? extends T> set, Integer count)
-        throws InterruptedException {
+    void after(Flowable<T> flowable, Collection<? extends T> set, Integer count) {
       RxJava2Adapter.flowableToFlux(flowable)
           .collect(toImmutableMultiset())
           .as(StepVerifier::create)
@@ -1673,7 +1578,6 @@ final class RxJavaFlowableToReactorTemplates {
           flowable.test().await().assertComplete(),
           flowable.test().assertComplete(),
           flowable.test().await());
-      // XXX: Add this one here? flowable.test().await().assertEmpty();
     }
 
     @AfterTemplate
@@ -1694,8 +1598,6 @@ final class RxJavaFlowableToReactorTemplates {
       RxJava2Adapter.flowableToFlux(flowable).as(StepVerifier::create).verifyError(errorClass);
     }
   }
-
-  // XXX: .assertError(Throwable) -> (not used in PRP).
 
   static final class FlowableTestAssertNoErrors<T> {
     @BeforeTemplate
@@ -1725,6 +1627,7 @@ final class RxJavaFlowableToReactorTemplates {
   }
 
   // XXX: Add test
+  @SuppressWarnings("unchecked")
   static final class FlowableTestAssertFailure<T> {
     @BeforeTemplate
     void before(Flowable<T> flowable, Class<? extends Throwable> error)
@@ -1755,6 +1658,7 @@ final class RxJavaFlowableToReactorTemplates {
 
   // XXX: Add test
   // XXX: This introduces AssertJ dependency
+  @SuppressWarnings("unchecked")
   static final class FlowableTestAssertFailureAndMessage<T> {
     @BeforeTemplate
     void before(Flowable<T> flowable, Class<? extends Throwable> error, String message)

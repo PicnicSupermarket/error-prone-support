@@ -6,6 +6,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Single;
@@ -19,6 +20,8 @@ import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 public final class RxJavaUnwrapTemplates {
   private RxJavaUnwrapTemplates() {}
 
+  // XXX: Add test
+  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class FlowableConcatMapCompletableUnwrapLambda<T> {
     @Placeholder
     abstract Mono<?> placeholder(@MayOptionallyUse T input);
@@ -38,6 +41,8 @@ public final class RxJavaUnwrapTemplates {
     }
   }
 
+  // XXX: Add test
+  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class MaybeFlatMapUnwrapLambda<I, T extends I, O> {
     @Placeholder
     abstract Mono<? extends O> placeholder(@MayOptionallyUse T input);
@@ -54,9 +59,9 @@ public final class RxJavaUnwrapTemplates {
                           .apply(v)),
           v ->
               RxJava2Adapter.maybeToMono(
-                      RxJavaReactorMigrationUtil.toJdkFunction(
-                              (T ident) -> RxJava2Adapter.monoToMaybe(placeholder(ident)))
-                          .apply(v)));
+                  RxJavaReactorMigrationUtil.toJdkFunction(
+                          (T ident) -> RxJava2Adapter.monoToMaybe(placeholder(ident)))
+                      .apply(v)));
     }
 
     @AfterTemplate
@@ -65,6 +70,8 @@ public final class RxJavaUnwrapTemplates {
     }
   }
 
+  // XXX: Add test
+  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class MaybeFlatMapSingleElementUnwrapLambda<T, R> {
     @Placeholder
     abstract Mono<R> placeholder(@MayOptionallyUse T input);
@@ -93,6 +100,8 @@ public final class RxJavaUnwrapTemplates {
     }
   }
 
+  // XXX: Add test
+  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class SingleFlatMapMaybeUnwrapLambda<T, R> {
     @Placeholder
     abstract Mono<R> placeholder(@MayOptionallyUse T input);
@@ -128,8 +137,8 @@ public final class RxJavaUnwrapTemplates {
     }
   }
 
-  // XXX: Test this one. (works on PRP example validateAndComplete_migrated())
-  // XXX: Test the second one, see: getAddressDeliveryStatus in UserProfileApiController.
+  // XXX: Add test
+  @SuppressWarnings({"NoFunctionalReturnType", "unchecked"})
   abstract static class SingleOnResumeUnwrapLambda<T, R> {
     @Placeholder
     abstract Mono<? extends R> placeholder(@MayOptionallyUse Throwable input);
@@ -163,6 +172,8 @@ public final class RxJavaUnwrapTemplates {
     }
   }
 
+  // XXX: Add test
+  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class FlowableConcatMapMaybeDelayErrorUnwrapLambda<T, R> {
     @Placeholder
     abstract Mono<R> placeholder(@MayOptionallyUse T input);
@@ -191,6 +202,8 @@ public final class RxJavaUnwrapTemplates {
     }
   }
 
+  // XXX: Add test
+  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class FlowableFlatMapCompletableUnwrapLambda<T> {
     @Placeholder
     abstract Mono<?> placeholder(@MayOptionallyUse T input);
@@ -227,6 +240,165 @@ public final class RxJavaUnwrapTemplates {
     @AfterTemplate
     java.util.function.Function<T, Mono<?>> after() {
       return v -> placeholder(v);
+    }
+  }
+
+  // XXX: Improve naming and add test case
+  @SuppressWarnings("NoFunctionalReturnType")
+  abstract static class FlowableUnwrapLambda<T> {
+    @Placeholder
+    abstract Completable placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<T, Publisher<? extends Void>> before() {
+      return Refaster.anyOf(
+          e ->
+              RxJava2Adapter.completableToMono(
+                  Completable.wrap(
+                      RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
+                              (Function<T, CompletableSource>) v -> placeholder(v))
+                          .apply(e))),
+          e ->
+              RxJava2Adapter.completableToMono(
+                  Completable.wrap(
+                      RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
+                              v -> placeholder(v))
+                          .apply(e))));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<T, Mono<? extends Void>> after() {
+      return v -> RxJava2Adapter.completableToMono(Completable.wrap(placeholder(v)));
+    }
+  }
+
+  @SuppressWarnings("NoFunctionalReturnType")
+  abstract static class FlowableFlatMapUnwrapLambda<T> {
+    @Placeholder
+    abstract CompletableSource placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<T, ? extends Publisher<? extends Void>> before() {
+      return e ->
+          RxJava2Adapter.completableToMono(
+              Completable.wrap(
+                  RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
+                          (Function<T, CompletableSource>) v -> placeholder(v))
+                      .apply(e)));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<T, Mono<? extends Void>> after() {
+      return v -> RxJava2Adapter.completableToMono(Completable.wrap(placeholder(v)));
+    }
+  }
+
+  // XXX: Add test
+  @SuppressWarnings("NoFunctionalReturnType")
+  abstract static class SingleFlatMapUnwrapLambda<T, R> {
+    @Placeholder
+    abstract Mono<? extends R> placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<T, ? extends Mono<? extends R>> before() {
+      return v ->
+          RxJava2Adapter.singleToMono(
+              (Single<? extends R>)
+                  RxJavaReactorMigrationUtil.toJdkFunction(
+                          (T ident) -> RxJava2Adapter.monoToSingle(placeholder(ident)))
+                      .apply(v));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<T, ? extends Mono<? extends R>> after() {
+      return v -> placeholder(v);
+    }
+  }
+
+  // XXX: Add test
+  @SuppressWarnings("NoFunctionalReturnType")
+  abstract static class SingleRemoveLambdaWithCast<T> {
+    @Placeholder
+    abstract Mono<?> placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<? super T, ? extends Publisher<? extends Void>> before() {
+      return Refaster.anyOf(
+          e ->
+              RxJava2Adapter.completableToMono(
+                  Completable.wrap(
+                      RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                              (Function<T, Completable>)
+                                  v -> placeholder(v).as(RxJava2Adapter::monoToCompletable))
+                          .apply(e))),
+          e ->
+              RxJava2Adapter.completableToMono(
+                  Completable.wrap(
+                      RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                              (Function<T, Completable>)
+                                  v -> RxJava2Adapter.monoToCompletable(placeholder(v)))
+                          .apply(e))),
+          e ->
+              RxJava2Adapter.completableToMono(
+                  Completable.wrap(
+                      RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                              v -> RxJava2Adapter.monoToCompletable(placeholder(v)))
+                          .apply(e))));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<? super T, ? extends Mono<?>> after() {
+      return v -> placeholder(v);
+    }
+  }
+
+  // XXX: Add test
+  @SuppressWarnings("NoFunctionalReturnType")
+  abstract static class SingleRemoveLambdaWithCompletable<T> {
+    @BeforeTemplate
+    java.util.function.Function<? super T, ? extends Mono<? extends Void>> before(
+        Completable completable) {
+      return Refaster.anyOf(
+          e ->
+              RxJava2Adapter.completableToMono(
+                  Completable.wrap(
+                      RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
+                              (Function<T, CompletableSource>) v -> completable)
+                          .apply(e))),
+          e ->
+              RxJava2Adapter.completableToMono(
+                  Completable.wrap(
+                      RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
+                              v -> completable)
+                          .apply(e))));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<? super T, ? extends Mono<? extends Void>> after(
+        Completable completable) {
+      return v -> RxJava2Adapter.completableToMono(completable);
+    }
+  }
+
+  // XXX: Verify if this template still flags other cases than the one above.
+  @SuppressWarnings("NoFunctionalReturnType")
+  abstract static class SingleRemoveLambdaWithCompletableExtra<T> {
+    @Placeholder
+    abstract Completable placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<? super T, ? extends Mono<? extends Void>> before() {
+      return e ->
+          RxJava2Adapter.completableToMono(
+              Completable.wrap(
+                  RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
+                          (Function<T, CompletableSource>) v -> placeholder(v))
+                      .apply(e)));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<? super T, ? extends Mono<? extends Void>> after() {
+      return v -> RxJava2Adapter.completableToMono(placeholder(v));
     }
   }
 }
