@@ -228,7 +228,7 @@ final class ReactorTemplates {
     }
 
     @AfterTemplate
-    StepVerifier.FirstStep<? extends T> after(Flux<T> mono) {
+    StepVerifier.FirstStep<? extends T> after(Mono<T> mono) {
       return mono.as(StepVerifier::create);
     }
   }
