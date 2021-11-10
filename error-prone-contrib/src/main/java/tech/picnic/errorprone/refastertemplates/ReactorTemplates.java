@@ -162,7 +162,7 @@ final class ReactorTemplates {
   }
 
   /** Don't use {@link Flux#concat(Publisher)} with only a single {@link Mono}. */
-  abstract static class FluxConcatOfOneMono<T> {
+  static final class FluxConcatMono<T> {
     @BeforeTemplate
     Flux<T> before(Mono<T> mono) {
       return Flux.concat(mono);
@@ -175,7 +175,7 @@ final class ReactorTemplates {
   }
 
   /** Don't use {@link Flux#concat(Publisher)} with only a single {@link Flux}. */
-  abstract static class FluxConcatOfOneFlux<T> {
+  static final class FluxConcatFlux<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux) {
       return Flux.concat(flux);
