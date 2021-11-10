@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.util.concurrent.CompletableFuture;
@@ -128,7 +129,7 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.just(1).flatMap(exampleFunction());
   }
 
-  private io.reactivex.functions.Function<Integer, Maybe<Integer>> exampleFunction() {
+  private io.reactivex.functions.Function<Integer, MaybeSource<Integer>> exampleFunction() {
     return null;
   }
 

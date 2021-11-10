@@ -32,7 +32,6 @@ final class RxJavaObservableToReactorTemplates {
 
   private RxJavaObservableToReactorTemplates() {}
 
-  // XXX: is the conversion sequence correct here?
   static final class ObservableAmb<T> {
     @BeforeTemplate
     Observable<T> before(Iterable<? extends Observable<T>> sources) {
@@ -378,7 +377,7 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Single elementAt(long,Object)
   // XXX: public final Single elementAtOrError(long)
 
-  // XXX: Default BackPressureStrategy.BUFFER is choosen.
+  // XXX: Default BackPressureStrategy.BUFFER is set.
   static final class ObservableFilter<T> {
     @BeforeTemplate
     Observable<T> before(Observable<T> observable, Predicate<T> predicate) {
@@ -412,8 +411,8 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Single firstOrError()
   // XXX: public final Observable flatMap(Function)
 
-  // XXX: Test this one.
-  // XXX: Default BUFFER is chosen here.
+  // XXX: Add test
+  // XXX: Default BUFFER is set here.
   static final class ObservableFlatMap<I, T extends I, O, P extends ObservableSource<O>> {
     @BeforeTemplate
     Observable<O> before(
@@ -603,7 +602,7 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final void subscribe(Observer)
   // XXX: public final Observable subscribeOn(Scheduler)
   // XXX: public final Observer subscribeWith(Observer)
-  // XXX: public final Observable switchIfEmpty(ObservableSource) --> Required
+  // XXX: public final Observable switchIfEmpty(ObservableSource)
   // XXX: public final Observable switchMap(Function)
   // XXX: public final Observable switchMap(Function,int)
   // XXX: public final Completable switchMapCompletable(Function)
@@ -717,9 +716,7 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Observable zipWith(ObservableSource,BiFunction,boolean)
   // XXX: public final Observable zipWith(ObservableSource,BiFunction,boolean,int)
 
-  // XXX: public final TestObserver test()
-
-  // XXX: Default BackpressureStrategy.BUFFER
+  // XXX: Default BackpressureStrategy.BUFFER is set
   static final class ObservableTestAssertResultItem<T> {
     @BeforeTemplate
     void before(Observable<T> observable, T item) throws InterruptedException {
@@ -737,7 +734,8 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
-  // XXX: Default BackpressureStrategy.BUFFER
+  // XXX: Default BackpressureStrategy.BUFFER is set
+  @SuppressWarnings("unchecked")
   static final class ObservableTestAssertResult<T> {
     @BeforeTemplate
     void before(Observable<T> observable) throws InterruptedException {
@@ -752,6 +750,7 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
+  @SuppressWarnings("unchecked")
   static final class ObservableTestAssertResultTwoItems<T> {
     @BeforeTemplate
     void before(Observable<T> observable, T t1, T t2) throws InterruptedException {
@@ -767,7 +766,7 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
-  // XXX: Default BackpressureStrategy.BUFFER
+  // XXX: Default BackpressureStrategy.BUFFER is set
   static final class ObservableTestAssertValue<T> {
     @BeforeTemplate
     void before(Observable<T> observable, Predicate<T> predicate) throws InterruptedException {
@@ -787,7 +786,7 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
-  // XXX: Default BackpressureStrategy.BUFFER
+  // XXX: Default BackpressureStrategy.BUFFER is set
   static final class ObservableTestAssertResultValues<T> {
     @BeforeTemplate
     void before(Observable<T> observable, @Repeated T item) throws InterruptedException {
@@ -805,12 +804,11 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
-  // XXX: Default BackpressureStrategy.BUFFER
+  // XXX: Default BackpressureStrategy.BUFFER is set
   static final class ObservableTestAssertComplete<T> {
     @BeforeTemplate
     void before(Observable<T> observable) throws InterruptedException {
       observable.test().await().assertComplete();
-      // XXX: Add this one here? observable.test().await().assertEmpty();
     }
 
     @AfterTemplate
@@ -821,7 +819,7 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
-  // XXX: Default BackpressureStrategy.BUFFER
+  // XXX: Default BackpressureStrategy.BUFFER is set
   static final class ObservableTestAssertErrorClass<T> {
     @BeforeTemplate
     void before(Observable<T> observable, Class<? extends Throwable> errorClass)
@@ -837,9 +835,7 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
-  // XXX: .assertError(Throwable) -> (not used in PRP).
-
-  // XXX: Default BackpressureStrategy.BUFFER
+  // XXX: Default BackpressureStrategy.BUFFER is set
   static final class ObservableTestAssertNoErrors<T> {
     @BeforeTemplate
     void before(Observable<T> observable) throws InterruptedException {
@@ -854,7 +850,7 @@ final class RxJavaObservableToReactorTemplates {
     }
   }
 
-  // XXX: Default BackpressureStrategy.BUFFER
+  // XXX: Default BackpressureStrategy.BUFFER is set
   static final class ObservableTestAssertValueCount<T> {
     @BeforeTemplate
     void before(Observable<T> observable, int count) throws InterruptedException {
@@ -871,7 +867,8 @@ final class RxJavaObservableToReactorTemplates {
   }
 
   // XXX: Add test
-  // XXX: Default BackpressureStrategy.BUFFER
+  // XXX: Default BackpressureStrategy.BUFFER is set
+  @SuppressWarnings("unchecked")
   static final class ObservableTestAssertFailure<T> {
     @BeforeTemplate
     void before(Observable<T> observable, Class<? extends Throwable> error)
@@ -888,7 +885,7 @@ final class RxJavaObservableToReactorTemplates {
   }
 
   // XXX: Add test
-  // XXX: Default BackpressureStrategy.BUFFER
+  // XXX: Default BackpressureStrategy.BUFFER is set
   static final class ObservableTestAssertNoValues<T> {
     @BeforeTemplate
     void before(Observable<T> observable) throws InterruptedException {
@@ -907,6 +904,7 @@ final class RxJavaObservableToReactorTemplates {
 
   // XXX: Add test
   // XXX: This introduces AssertJ dependency
+  @SuppressWarnings("unchecked")
   static final class ObservableTestAssertFailureAndMessage<T> {
     @BeforeTemplate
     void before(Observable<T> observable, Class<? extends Throwable> error, String message)

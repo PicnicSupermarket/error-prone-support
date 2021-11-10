@@ -7,6 +7,7 @@ import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.internal.functions.Functions;
@@ -31,7 +32,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Flowable<Integer> testFlowableCombineLatest() {
     return RxJava2Adapter.fluxToFlowable(
-        Flux.combineLatest(
+        Flux.<Integer, Integer, Integer>combineLatest(
             Flowable.just(1),
             Flowable.just(2),
             RxJavaReactorMigrationUtil.toJdkBiFunction(Integer::sum)));
@@ -104,6 +105,19 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return RxJava2Adapter.monoToCompletable(
         RxJava2Adapter.flowableToFlux(Flowable.just(1))
             .flatMap(
+                x ->
+                    RxJava2Adapter.completableToMono(
+                        Completable.wrap(
+                            RxJavaReactorMigrationUtil.<Integer, CompletableSource>toJdkFunction(
+                                    integer2 -> Completable.complete())
+                                .apply(x))))
+            .then());
+  }
+
+  Completable testFlowableFlatMapCompletableUnwrap() {
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.flowableToFlux(RxJava2Adapter.fluxToFlowable(Flux.just(1)))
+            .flatMap(
                 y ->
                     RxJava2Adapter.completableToMono(
                         Completable.wrap(
@@ -111,13 +125,6 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
                                     (Function<Integer, Completable>)
                                         integer2 -> Completable.complete())
                                 .apply(y))))
-            .then());
-  }
-
-  Completable testFlowableUnwrapLambda() {
-    return RxJava2Adapter.monoToCompletable(
-        RxJava2Adapter.flowableToFlux(RxJava2Adapter.fluxToFlowable(Flux.just(1)))
-            .flatMap(v -> Mono.empty())
             .then());
   }
 
@@ -161,7 +168,7 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Flowable<Integer> testFlowableZip() {
     return RxJava2Adapter.fluxToFlowable(
-        Flux.zip(
+        Flux.<Integer, Integer, Integer>zip(
             Flowable.just(1),
             Flowable.just(2),
             RxJavaReactorMigrationUtil.toJdkBiFunction((i1, i2) -> i1 + i2)));
@@ -218,28 +225,29 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
                         .toFlowable()));
   }
 
-  Flowable<Integer> testFlowableFlatMapMaybe() {
-    return RxJava2Adapter.fluxToFlowable(
-        RxJava2Adapter.flowableToFlux(Flowable.just(1))
-            .flatMap(
-                e ->
-                    RxJava2Adapter.maybeToMono(
-                        Maybe.wrap(
-                            RxJavaReactorMigrationUtil.toJdkFunction(
-                                    (Function<Integer, MaybeSource<Integer>>) Maybe::just)
-                                .apply(e)))));
-  }
-
-  Flowable<Integer> testFlowableFlatMapMaybeSecond() {
-    return RxJava2Adapter.fluxToFlowable(
-        RxJava2Adapter.flowableToFlux(
-                Flowable.zip(Flowable.just(1), Flowable.just(2), (i1, i2) -> Maybe.just(i1 + i2)))
-            .flatMap(
-                e ->
-                    RxJava2Adapter.maybeToMono(
-                        Maybe.wrap(
-                            RxJavaReactorMigrationUtil.toJdkFunction(Functions.identity())
-                                .apply(e)))));
+  ImmutableSet<Flowable<Integer>> testFlowableFlatMapMaybe() {
+    return ImmutableSet.of(
+        RxJava2Adapter.fluxToFlowable(
+            RxJava2Adapter.flowableToFlux(Flowable.just(1))
+                .flatMap(
+                    e ->
+                        RxJava2Adapter.maybeToMono(
+                            Maybe.wrap(
+                                RxJavaReactorMigrationUtil
+                                    .<Integer, MaybeSource<Integer>>toJdkFunction(Maybe::just)
+                                    .apply(e))))),
+        RxJava2Adapter.fluxToFlowable(
+            RxJava2Adapter.flowableToFlux(
+                    Flowable.zip(
+                        Flowable.just(1), Flowable.just(2), (i1, i2) -> Maybe.just(i1 + i2)))
+                .flatMap(
+                    e ->
+                        RxJava2Adapter.maybeToMono(
+                            Maybe.wrap(
+                                RxJavaReactorMigrationUtil
+                                    .<MaybeSource<Integer>, MaybeSource<Integer>>toJdkFunction(
+                                        Functions.identity())
+                                    .apply(e))))));
   }
 
   Flowable<Integer> testFlowableMap() {

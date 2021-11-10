@@ -38,7 +38,6 @@ import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 /** The Refaster templates for the migration of the RxJava Maybe type to Reactor */
 final class RxJavaMaybeToReactorTemplates {
-
   private RxJavaMaybeToReactorTemplates() {}
 
   static final class MaybeAmb<T> {
@@ -57,24 +56,7 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  // XXX: Refaster rule is almost good, but is not in PRP, so skipping for now.
-  //  static final class MaybeAmbArray<T> {
-  //    @BeforeTemplate
-  //    Maybe<T> before(@Repeated Maybe<T> sources) {
-  //      return Maybe.ambArray(sources);
-  //    }
-  //
-  //    @AfterTemplate
-  //    Maybe<T> after(@Repeated Maybe<T> sources) {
-  //      return RxJava2Adapter.monoToMaybe(
-  //          Mono.firstWithSignal(
-  //              Arrays.stream(Refaster.asVarargs(sources))
-  //                  .map(RxJava2Adapter::maybeToMono)
-  //                  .collect(toImmutableList())));
-  //    }
-  //  }
-
+  // XXX: public static Maybe ambArray(MaybeSource... sources)
   // XXX: public static Flowable concat(Iterable)
   // XXX: public static Flowable concat(MaybeSource,MaybeSource)
   // XXX: public static Flowable concat(MaybeSource,MaybeSource,MaybeSource)
@@ -82,7 +64,7 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public static Flowable concat(Publisher)
   // XXX: public static Flowable concat(Publisher,int)
 
-  // XXX: How to make this conversion correct??? Turned off test for now.
+  // XXX: How to make this conversion correct? Turned off test for now.
   static final class MaybeConcatArray<T> {
     @BeforeTemplate
     Flowable<T> before(@Repeated Maybe<T> sources) {
@@ -105,9 +87,9 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public static Flowable concatDelayError(Publisher)
   // XXX: public static Flowable concatEager(Iterable)
   // XXX: public static Flowable concatEager(Publisher)
-  // XXX: public static Maybe create(MaybeOnSubscribe) --> Out of scope.
+  // XXX: public static Maybe create(MaybeOnSubscribe)
 
-  /// XXX: Test this one.
+  /// XXX: Add test
   abstract static class MaybeDeferFirst<T> {
     @Placeholder
     abstract Maybe<T> maybeProducer();
@@ -322,7 +304,6 @@ final class RxJavaMaybeToReactorTemplates {
   }
 
   // XXX: public final Object as(MaybeConverter)
-  //   Maybe.just("test").as(RxJava2Adapter::maybeToMono)?
 
   static final class MaybeBlockingGet<T> {
     @BeforeTemplate
@@ -470,7 +451,7 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe flatMap(Function,BiFunction)
   // XXX: public final Maybe flatMap(Function,Function,Callable)
 
-  // XXX: Test this one
+  // XXX: Add test
   static final class MaybeFlatMapCompletable<T, R extends CompletableSource> {
     @BeforeTemplate
     Completable before(Maybe<T> maybe, Function<T, R> function) {
@@ -530,15 +511,8 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: public final Maybe flatMapSingleElement(Function)
-  //  The following template is required to rewrite this code from platform:
-  //    private Completable verifyTagExists(Optional<String> tagId) {
-  //    return Maybe.defer(() -> tagId.map(Maybe::just).orElseGet(Maybe::empty))
-  //        .flatMapSingleElement(this::getTagById)
-  //        .ignoreElement();
-  //    }
-
-  // XXX: This one is still not correct, see example above. Perhaps try this? <S, T extends S, O> {
+  // XXX: Improve the @AfterTemplate to not have a cast
+  @SuppressWarnings("unchecked")
   static final class MaybeFlatMapSingleElement<T, O> {
     @BeforeTemplate
     Maybe<O> before(
@@ -577,7 +551,7 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: Test this one.
+  // XXX: Add test
   static final class MaybeIsEmpty<T> {
     @BeforeTemplate
     Single<Boolean> before(Maybe<T> maybe) {
@@ -591,7 +565,7 @@ final class RxJavaMaybeToReactorTemplates {
   }
 
   // XXX: public final Maybe lift(MaybeOperator)
-  // XXX: public final Maybe map(Function) --> required.
+  // XXX: public final Maybe map(Function)
 
   static final class MaybeMap<T, R> {
     @BeforeTemplate
@@ -614,8 +588,7 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe onErrorComplete(Predicate)
   // XXX: public final Maybe onErrorResumeNext(Function)
   // XXX: public final Maybe onErrorResumeNext(MaybeSource)
-  // XXX: public final Maybe onErrorReturn(Function) --> This one, ArticleIssueServiceImpl 484,
-  // double check please.
+  // XXX: public final Maybe onErrorReturn(Function)
 
   abstract static class MaybeOnErrorReturn<T, R> {
     @Placeholder
@@ -648,7 +621,7 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe retryUntil(BooleanSupplier)
   // XXX: public final Maybe retryWhen(Function)
 
-  // XXX: Test this.
+  // XXX: Add test
   static final class MaybeSubscribe<T> {
     @BeforeTemplate
     Disposable before(Maybe<T> maybe) {
@@ -661,7 +634,7 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: Test this.
+  // XXX: Add test
   static final class MaybeSubscribeConsumer<T> {
     @BeforeTemplate
     Disposable before(Maybe<T> maybe, Consumer<? super T> consumer) {
@@ -671,44 +644,50 @@ final class RxJavaMaybeToReactorTemplates {
     @AfterTemplate
     reactor.core.Disposable after(Maybe<T> maybe, Consumer<? super T> consumer) {
       return RxJava2Adapter.maybeToMono(maybe)
-              .subscribe(RxJavaReactorMigrationUtil.toJdkConsumer(consumer));
+          .subscribe(RxJavaReactorMigrationUtil.toJdkConsumer(consumer));
     }
   }
 
-  // XXX: Test this.
+  // XXX: Add test
   static final class MaybeSubscribeTwoConsumers<T> {
     @BeforeTemplate
     Disposable before(
-            Maybe<T> maybe, Consumer<? super T> consumer1, Consumer<? super Throwable> consumer2) {
+        Maybe<T> maybe, Consumer<? super T> consumer1, Consumer<? super Throwable> consumer2) {
       return maybe.subscribe(consumer1, consumer2);
     }
 
     @AfterTemplate
     reactor.core.Disposable after(
-            Maybe<T> maybe, Consumer<? super T> consumer1, Consumer<? super Throwable> consumer2) {
+        Maybe<T> maybe, Consumer<? super T> consumer1, Consumer<? super Throwable> consumer2) {
       return RxJava2Adapter.maybeToMono(maybe)
-              .subscribe(
-                      RxJavaReactorMigrationUtil.toJdkConsumer(consumer1),
-                      RxJavaReactorMigrationUtil.toJdkConsumer(consumer2));
+          .subscribe(
+              RxJavaReactorMigrationUtil.toJdkConsumer(consumer1),
+              RxJavaReactorMigrationUtil.toJdkConsumer(consumer2));
     }
   }
 
-  // XXX: Test this.
+  // XXX: Add test
   static final class MaybeSubscribeTwoConsumersWithAction<T> {
     @BeforeTemplate
     Disposable before(
-            Maybe<T> maybe, Consumer<? super T> consumer1, Consumer<? super Throwable> consumer2, Action action) {
+        Maybe<T> maybe,
+        Consumer<? super T> consumer1,
+        Consumer<? super Throwable> consumer2,
+        Action action) {
       return maybe.subscribe(consumer1, consumer2, action);
     }
 
     @AfterTemplate
     reactor.core.Disposable after(
-            Maybe<T> maybe, Consumer<? super T> consumer1, Consumer<? super Throwable> consumer2, Action action) {
+        Maybe<T> maybe,
+        Consumer<? super T> consumer1,
+        Consumer<? super Throwable> consumer2,
+        Action action) {
       return RxJava2Adapter.maybeToMono(maybe)
-              .subscribe(
-                      RxJavaReactorMigrationUtil.toJdkConsumer(consumer1),
-                      RxJavaReactorMigrationUtil.toJdkConsumer(consumer2),
-                      RxJavaReactorMigrationUtil.toRunnable(action));
+          .subscribe(
+              RxJavaReactorMigrationUtil.toJdkConsumer(consumer1),
+              RxJavaReactorMigrationUtil.toJdkConsumer(consumer2),
+              RxJavaReactorMigrationUtil.toRunnable(action));
     }
   }
 
@@ -716,7 +695,7 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe subscribeOn(Scheduler)
   // XXX: public final MaybeObserver subscribeWith(MaybeObserver)
 
-  // XXX: Make test
+  // XXX: Add test
   static final class MaybeSourceSwitchIfEmpty<S, T extends S> {
     @BeforeTemplate
     Maybe<S> before(Maybe<S> maybe, MaybeSource<T> maybeSource) {
@@ -781,7 +760,7 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: This one should be improved, it is not correct yet.
+  // XXX: Add test
   static final class MaybeToSingle<T> {
     @BeforeTemplate
     Single<T> before(Maybe<T> maybe) {
@@ -797,7 +776,7 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Single toSingle(Object)
   // XXX: public final Maybe unsubscribeOn(Scheduler)
 
-  // XXX: Test this one.
+  // XXX: Add test
   static final class MaybeZipWith<T, R, U> {
     @BeforeTemplate
     Maybe<R> before(
@@ -820,6 +799,7 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
+  @SuppressWarnings("unchecked")
   static final class MaybeTestAssertResultItem<T> {
     @BeforeTemplate
     void before(Maybe<T> maybe, T item) throws InterruptedException {
@@ -840,6 +820,7 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
+  @SuppressWarnings("unchecked")
   static final class MaybeTestAssertResult<T> {
     @BeforeTemplate
     void before(Maybe<T> maybe) throws InterruptedException {
@@ -875,7 +856,6 @@ final class RxJavaMaybeToReactorTemplates {
     @BeforeTemplate
     void before(Maybe<T> maybe) throws InterruptedException {
       maybe.test().await().assertComplete();
-      // XXX: Add this one here? maybe.test().await().assertEmpty();
     }
 
     @AfterTemplate
@@ -895,8 +875,6 @@ final class RxJavaMaybeToReactorTemplates {
       RxJava2Adapter.maybeToMono(maybe).as(StepVerifier::create).verifyError(errorClass);
     }
   }
-
-  // XXX: .assertError(Throwable) -> (not used in PRP).
 
   static final class MaybeTestAssertNoErrors<T> {
     @BeforeTemplate
@@ -926,6 +904,7 @@ final class RxJavaMaybeToReactorTemplates {
   }
 
   // XXX: Add test
+  @SuppressWarnings("unchecked")
   static final class MaybeTestAssertFailure<T> {
     @BeforeTemplate
     void before(Maybe<T> maybe, Class<? extends Throwable> error) throws InterruptedException {
@@ -958,6 +937,7 @@ final class RxJavaMaybeToReactorTemplates {
 
   // XXX: Add test
   // XXX: This introduces AssertJ dependency
+  @SuppressWarnings("unchecked")
   static final class MaybeTestAssertFailureAndMessage<T> {
     @BeforeTemplate
     void before(Maybe<T> maybe, Class<? extends Throwable> error, String message)

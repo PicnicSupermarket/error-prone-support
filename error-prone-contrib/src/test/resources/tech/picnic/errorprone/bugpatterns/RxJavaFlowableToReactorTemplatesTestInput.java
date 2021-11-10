@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
 final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTestCase {
@@ -106,20 +105,6 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
             .then());
   }
 
-  Completable testFlowableUnwrapLambda() {
-    return RxJava2Adapter.monoToCompletable(
-        RxJava2Adapter.flowableToFlux(Flowable.just(1))
-            .flatMap(
-                e ->
-                    RxJava2Adapter.completableToMono(
-                        Completable.wrap(
-                            RxJavaReactorMigrationUtil.<Integer, CompletableSource>toJdkFunction(
-                                    (Function<Integer, CompletableSource>)
-                                        v -> RxJava2Adapter.monoToCompletable(Mono.empty()))
-                                .apply(e))))
-            .then());
-  }
-
   Flowable<Object> testFlowableFlatMap() {
     Flowable.just(1).flatMap(this::exampleMethod2);
     return Flowable.just(1).flatMap(i -> ImmutableSet::of);
@@ -186,13 +171,11 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return Flowable.just(1).concatMapMaybeDelayError(Maybe::just);
   }
 
-  Flowable<Integer> testFlowableFlatMapMaybe() {
-    return Flowable.just(1).flatMapMaybe(Maybe::just);
-  }
-
-  Flowable<Integer> testFlowableFlatMapMaybeSecond() {
-    return Flowable.zip(Flowable.just(1), Flowable.just(2), (i1, i2) -> Maybe.just(i1 + i2))
-        .flatMapMaybe(Functions.identity());
+  ImmutableSet<Flowable<Integer>> testFlowableFlatMapMaybe() {
+    return ImmutableSet.of(
+        Flowable.just(1).flatMapMaybe(Maybe::just),
+        Flowable.zip(Flowable.just(1), Flowable.just(2), (i1, i2) -> Maybe.just(i1 + i2))
+            .flatMapMaybe(Functions.identity()));
   }
 
   Flowable<Integer> testFlowableMap() {

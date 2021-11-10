@@ -6,6 +6,7 @@ import com.google.common.collect.Streams;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
@@ -155,7 +156,8 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
                 v ->
                     RxJava2Adapter.maybeToMono(
                         Maybe.wrap(
-                            RxJavaReactorMigrationUtil.toJdkFunction(this::exampleMethod)
+                            RxJavaReactorMigrationUtil.<Integer, MaybeSource<Integer>>toJdkFunction(
+                                    this::exampleMethod)
                                 .apply(v)))));
 
     return RxJava2Adapter.monoToMaybe(
@@ -164,11 +166,12 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
                 v ->
                     RxJava2Adapter.maybeToMono(
                         Maybe.wrap(
-                            RxJavaReactorMigrationUtil.toJdkFunction(exampleFunction())
+                            RxJavaReactorMigrationUtil.<Integer, MaybeSource<Integer>>toJdkFunction(
+                                    exampleFunction())
                                 .apply(v)))));
   }
 
-  private io.reactivex.functions.Function<Integer, Maybe<Integer>> exampleFunction() {
+  private io.reactivex.functions.Function<Integer, MaybeSource<Integer>> exampleFunction() {
     return null;
   }
 
@@ -185,7 +188,8 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
                 v ->
                     RxJava2Adapter.maybeToMono(
                         Maybe.wrap(
-                            RxJavaReactorMigrationUtil.toJdkFunction(this::exampleMethod)
+                            RxJavaReactorMigrationUtil.<Integer, MaybeSource<Integer>>toJdkFunction(
+                                    this::exampleMethod)
                                 .apply(v)))));
   }
 

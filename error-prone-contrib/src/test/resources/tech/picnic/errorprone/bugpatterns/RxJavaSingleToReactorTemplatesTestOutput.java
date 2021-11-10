@@ -6,10 +6,8 @@ import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
 import java.util.List;
 import reactor.adapter.rxjava.RxJava2Adapter;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
@@ -101,27 +99,13 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return RxJava2Adapter.monoToCompletable(
         RxJava2Adapter.singleToMono(Single.just(1))
             .flatMap(
-                y ->
+                z ->
                     RxJava2Adapter.completableToMono(
                         Completable.wrap(
                             RxJavaReactorMigrationUtil.<Integer, CompletableSource>toJdkFunction(
                                     integer -> Completable.complete())
-                                .apply(y))))
+                                .apply(z))))
             .then());
-  }
-
-  Completable testSingleRemoveLambdaWithCast() {
-    return RxJava2Adapter.monoToCompletable(
-        RxJava2Adapter.singleToMono(RxJava2Adapter.monoToSingle(Mono.just(1)))
-            .flatMap(v -> Mono.justOrEmpty(null))
-            .then());
-  }
-
-  Mono<Void> testSingleRemoveLambdaWithCompletable() {
-    return Flux.just(1, 2)
-        .collectList()
-        .flatMap(u -> RxJava2Adapter.completableToMono(Completable.complete()))
-        .then();
   }
 
   Flowable<Integer> testSingleFlatMapPublisher() {

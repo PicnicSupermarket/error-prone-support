@@ -65,7 +65,8 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Flowable<Integer> testUnnecessaryBiFunctionConversion() {
     return RxJava2Adapter.fluxToFlowable(
-        Flux.zip(Flowable.just(1), Flowable.just(2), (i1, i2) -> i1 + i2));
+        Flux.<Integer, Integer, Integer>zip(
+            Flowable.just(1), Flowable.just(2), (i1, i2) -> i1 + i2));
   }
 
   Single<Integer> testUnnecessaryConsumerConversion() {
