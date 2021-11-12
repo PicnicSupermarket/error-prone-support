@@ -40,6 +40,10 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return Single.just(1);
   }
 
+  Single<Object> testSingleNever() {
+    return Single.never();
+  }
+
   Single<Integer> testSingleWrap() {
     return Single.wrap(Single.just(1));
   }
