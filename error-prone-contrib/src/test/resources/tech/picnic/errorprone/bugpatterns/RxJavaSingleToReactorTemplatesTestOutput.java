@@ -46,6 +46,10 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return RxJava2Adapter.monoToSingle(Mono.just(1));
   }
 
+  Single<Object> testSingleNever() {
+    return RxJava2Adapter.monoToSingle(Mono.never());
+  }
+
   Single<Integer> testSingleWrap() {
     return Single.just(1);
   }
