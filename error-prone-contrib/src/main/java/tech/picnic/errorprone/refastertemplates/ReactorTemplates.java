@@ -161,8 +161,8 @@ final class ReactorTemplates {
     }
   }
 
-  /** Don't use {@link Flux#concat(Publisher)} with only a single {@link Mono}. */
-  static final class FluxConcatMono<T> {
+  /** Prefer {@link Mono#flux()}} over more contrived alternatives. */
+  static final class MonoFlux<T> {
     @BeforeTemplate
     Flux<T> before(Mono<T> mono) {
       return Flux.concat(mono);
@@ -174,8 +174,8 @@ final class ReactorTemplates {
     }
   }
 
-  /** Don't use {@link Flux#concat(Publisher)} with only a single {@link Flux}. */
-  static final class FluxConcatFlux<T> {
+  /** Don't unnecessarily invoke {@link Flux#concat(Publisher)}. */
+  static final class FluxIdentity<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux) {
       return Flux.concat(flux);
