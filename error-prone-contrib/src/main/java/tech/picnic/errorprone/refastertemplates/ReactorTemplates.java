@@ -161,6 +161,32 @@ final class ReactorTemplates {
     }
   }
 
+  /** Prefer {@link Mono#flux()}} over more contrived alternatives. */
+  static final class MonoFlux<T> {
+    @BeforeTemplate
+    Flux<T> before(Mono<T> mono) {
+      return Flux.concat(mono);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Mono<T> mono) {
+      return mono.flux();
+    }
+  }
+
+  /** Don't unnecessarily invoke {@link Flux#concat(Publisher)}. */
+  static final class FluxIdentity<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux) {
+      return Flux.concat(flux);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux) {
+      return flux;
+    }
+  }
+
   /**
    * Prefer a collection using {@link MoreCollectors#toOptional()} over more contrived alternatives.
    */
