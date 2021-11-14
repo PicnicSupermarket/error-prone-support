@@ -67,6 +67,14 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(PublisherProbe.of(Mono.empty()), PublisherProbe.of(Flux.empty()));
   }
 
+  StepVerifier.FirstStep<Integer> testStepVerifierFromMono() {
+    return StepVerifier.create(Mono.just(1));
+  }
+
+  StepVerifier.FirstStep<Integer> testStepVerifierFromFlux() {
+    return StepVerifier.create(Flux.just(1));
+  }
+
   StepVerifier.Step<Integer> testStepVerifierStepExpectNextEmpty() {
     return StepVerifier.create(Mono.just(0)).expectNext();
   }

@@ -220,6 +220,32 @@ final class ReactorTemplates {
     }
   }
 
+  /** Prefer {@link Mono#as(Function)} when creating a {@link StepVerifier}. */
+  static final class StepVerifierFromMono<T> {
+    @BeforeTemplate
+    StepVerifier.FirstStep<? extends T> before(Mono<T> mono) {
+      return StepVerifier.create(mono);
+    }
+
+    @AfterTemplate
+    StepVerifier.FirstStep<? extends T> after(Mono<T> mono) {
+      return mono.as(StepVerifier::create);
+    }
+  }
+
+  /** Prefer {@link Flux#as(Function)} when creating a {@link StepVerifier}. */
+  static final class StepVerifierFromFlux<T> {
+    @BeforeTemplate
+    StepVerifier.FirstStep<? extends T> before(Flux<T> flux) {
+      return StepVerifier.create(flux);
+    }
+
+    @AfterTemplate
+    StepVerifier.FirstStep<? extends T> after(Flux<T> flux) {
+      return flux.as(StepVerifier::create);
+    }
+  }
+
   /** Don't unnecessarily call {@link StepVerifier.Step#expectNext(Object[])}. */
   static final class StepVerifierStepExpectNextEmpty<T> {
     @BeforeTemplate
