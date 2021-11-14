@@ -72,8 +72,8 @@ public final class StaticImportCheckTest {
             "    Object o2 = UTF_8;",
             "",
             "    // BUG: Diagnostic contains:",
-            "    WebEnvironment randomPort1 = WebEnvironment.RANDOM_PORT;",
-            "    WebEnvironment randomPort2 = RANDOM_PORT;",
+            "    Object e1 = WebEnvironment.RANDOM_PORT;",
+            "    Object e2 = RANDOM_PORT;",
             "",
             "    Optional.empty();",
             "  }",
@@ -124,7 +124,7 @@ public final class StaticImportCheckTest {
             "      @DateTimeFormat(iso = ISO.TIME) String time) {}",
             "",
             "   @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)",
-            "   final class Foo {}",
+            "   final class Test {}",
             "}")
         .addOutputLines(
             "out/A.java",
@@ -171,7 +171,7 @@ public final class StaticImportCheckTest {
             "      @DateTimeFormat(iso = TIME) String time) {}",
             "",
             "   @SpringBootTest(webEnvironment = RANDOM_PORT)",
-            "   final class Foo {}",
+            "   final class Test {}",
             "}")
         .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
   }
