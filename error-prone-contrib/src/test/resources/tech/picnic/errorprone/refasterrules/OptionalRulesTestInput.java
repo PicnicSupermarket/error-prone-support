@@ -120,10 +120,12 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Optional.of("foo").or(() -> Optional.empty()),
         Optional.of("bar").or(Optional::empty),
-        Optional.of("baz").stream().findFirst(),
-        Optional.of("qux").stream().findAny(),
-        Optional.of("quux").stream().min(String::compareTo),
-        Optional.of("quuz").stream().max(String::compareTo));
+        Optional.of("baz").map(Optional::of).orElseGet(() -> Optional.empty()),
+        Optional.of("qux").map(Optional::of).orElseGet(Optional::empty),
+        Optional.of("quux").stream().findFirst(),
+        Optional.of("quuz").stream().findAny(),
+        Optional.of("corge").stream().min(String::compareTo),
+        Optional.of("grault").stream().max(String::compareTo));
   }
 
   ImmutableSet<Optional<String>> testOptionalFilter() {
@@ -136,9 +138,7 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.of(1).stream().map(String::valueOf).findAny();
   }
 
-  ImmutableSet<Stream<String>> testOptionalStream() {
-    return ImmutableSet.of(
-        Optional.of("foo").map(Stream::of).orElse(Stream.empty()),
-        Optional.of("bar").map(Stream::of).orElseGet(Stream::empty));
+  Stream<String> testOptionalStream() {
+    return Optional.of("foo").map(Stream::of).orElseGet(Stream::empty);
   }
 }

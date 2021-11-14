@@ -386,9 +386,13 @@ final class OptionalRules {
    */
   static final class OptionalIdentity<T> {
     @BeforeTemplate
+    @SuppressWarnings("NestedOptionals" /* Auto-fix for the `NestedOptionals` check. */)
     Optional<T> before(Optional<T> optional, Comparator<? super T> comparator) {
       return Refaster.anyOf(
           optional.or(Refaster.anyOf(() -> Optional.empty(), Optional::empty)),
+          optional
+              .map(Optional::of)
+              .orElseGet(Refaster.anyOf(() -> Optional.empty(), Optional::empty)),
           optional.stream().findFirst(),
           optional.stream().findAny(),
           optional.stream().min(comparator),
@@ -442,9 +446,7 @@ final class OptionalRules {
   static final class OptionalStream<T> {
     @BeforeTemplate
     Stream<T> before(Optional<T> optional) {
-      return Refaster.anyOf(
-          optional.map(Stream::of).orElse(Stream.empty()),
-          optional.map(Stream::of).orElseGet(Stream::empty));
+      return optional.map(Stream::of).orElseGet(Stream::empty);
     }
 
     @AfterTemplate
