@@ -153,12 +153,12 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public static Single never()
   static final class SingleNever {
     @BeforeTemplate
-    Single<Object> before() {
+    <T> Single<T> before() {
       return Single.never();
     }
 
     @AfterTemplate
-    Single<Object> after() {
+    <T> Single<T> after() {
       return RxJava2Adapter.monoToSingle(Mono.never());
     }
   }
