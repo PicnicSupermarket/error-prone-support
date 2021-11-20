@@ -41,6 +41,7 @@ abstract class AbstractMatcherTestChecker extends BugChecker implements Compilat
           TreePath path = new TreePath(getCurrentPath(), tree);
           ExpressionTree expressionTree = (ExpressionTree) tree;
           if (!isMethodSelect(expressionTree, path)
+              && state.getSourceForNode(expressionTree) != null
               && delegate.matches(expressionTree, state.withPath(path))) {
             state.reportMatch(describeMatch(tree));
           }
