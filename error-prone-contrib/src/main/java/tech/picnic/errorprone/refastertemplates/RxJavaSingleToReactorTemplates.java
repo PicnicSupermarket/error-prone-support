@@ -150,15 +150,15 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public static Flowable mergeDelayError(SingleSource,SingleSource,SingleSource)
   // XXX: public static Flowable
   // mergeDelayError(SingleSource,SingleSource,SingleSource,SingleSource)
-  // XXX: public static Single never()
-  static final class SingleNever {
+
+  static final class SingleNever<T> {
     @BeforeTemplate
-    Single<Object> before() {
+    Single<T> before() {
       return Single.never();
     }
 
     @AfterTemplate
-    Single<Object> after() {
+    Single<T> after() {
       return RxJava2Adapter.monoToSingle(Mono.never());
     }
   }
