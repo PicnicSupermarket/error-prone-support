@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.sun.source.tree.Tree.Kind.MEMBER_SELECT;
 import static com.sun.source.tree.Tree.Kind.METHOD_INVOCATION;
+import static com.sun.source.tree.Tree.Kind.PACKAGE;
 import static java.util.Objects.requireNonNull;
 
 import com.google.auto.service.AutoService;
@@ -184,7 +185,8 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
   private static boolean isExempted(VisitorState state) {
     Tree currentTree = state.getPath().getLeaf();
     Tree parentTree = state.getPath().getParentPath().getLeaf();
-    if (currentTree.getKind() != MEMBER_SELECT && parentTree.getKind() != METHOD_INVOCATION) {
+    if ((currentTree.getKind() != MEMBER_SELECT && parentTree.getKind() != METHOD_INVOCATION)
+        || parentTree.getKind() == PACKAGE) {
       return false;
     }
 
