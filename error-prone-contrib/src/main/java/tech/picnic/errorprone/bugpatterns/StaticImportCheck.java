@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.sun.source.tree.Tree.Kind.MEMBER_SELECT;
+import static com.sun.source.tree.Tree.Kind.METHOD_INVOCATION;
 import static java.util.Objects.requireNonNull;
 
 import com.google.auto.service.AutoService;
@@ -19,14 +21,18 @@ import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
+import com.sun.tools.javac.code.Symbol;
 import java.util.Optional;
 
-/** A {@link BugChecker} which flags methods that can and should be statically imported. */
+/**
+ * A {@link BugChecker} which flags methods and constants that can and should be statically
+ * imported.
+ */
 // XXX: Tricky cases:
-// - `org.springframework.http.MediaType` (do except for `ALL`?)
 // - `org.springframework.http.HttpStatus` (not always an improvement, and `valueOf` must
 //    certainly be excluded)
 // - `com.google.common.collect.Tables`
@@ -42,7 +48,7 @@ import java.util.Optional;
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "StaticImport",
-    summary = "Method should be statically imported",
+    summary = "Method or constant should be statically imported",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
     tags = StandardTags.SIMPLIFICATION)
@@ -84,6 +90,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           "org.springframework.format.annotation.DateTimeFormat.ISO",
           "org.springframework.http.HttpHeaders",
           "org.springframework.http.HttpMethod",
+          "org.springframework.http.MediaType",
           "org.testng.Assert",
           "reactor.function.TupleUtils");
 
@@ -123,9 +130,28 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           .putAll("com.google.common.collect.Comparators", "emptiesFirst", "emptiesLast")
           .build();
 
+  @VisibleForTesting
+  static final ImmutableSetMultimap<String, String> STATIC_IMPORT_EXEMPTION_METHODS =
+      ImmutableSetMultimap.<String, String>builder()
+          .put("com.mongodb.client.model.Filters", "empty")
+          .put("org.springframework.http.MediaType", "ALL")
+          .build();
+
+  private static final ImmutableSet<String> BAD_STATIC_IDENTIFIERS =
+      ImmutableSet.of(
+          "builder",
+          "create",
+          "copyOf",
+          "from",
+          "getDefaultInstance",
+          "INSTANCE",
+          "newBuilder",
+          "of",
+          "valueOf");
+
   @Override
   public Description matchMemberSelect(MemberSelectTree tree, VisitorState state) {
-    if (!isCandidate(state)) {
+    if (!isCandidate(state) || isExempted(state)) {
       return Description.NO_MATCH;
     }
 
@@ -153,6 +179,24 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
       default:
         return true;
     }
+  }
+
+  private static boolean isExempted(VisitorState state) {
+    Tree currentTree = state.getPath().getLeaf();
+    Tree parentTree = state.getPath().getParentPath().getLeaf();
+    if (currentTree.getKind() != MEMBER_SELECT && parentTree.getKind() != METHOD_INVOCATION) {
+      return false;
+    }
+
+    Symbol symbol =
+        currentTree.getKind() == MEMBER_SELECT
+            ? ASTHelpers.getSymbol(currentTree)
+            : ASTHelpers.getSymbol(parentTree);
+
+    String methodName = symbol.name.toString();
+    return STATIC_IMPORT_EXEMPTION_METHODS.get(symbol.owner.toString()).stream()
+            .anyMatch(methodName::equals)
+        || BAD_STATIC_IDENTIFIERS.contains(methodName);
   }
 
   private static Optional<String> getCandidateSimpleName(StaticImportInfo importInfo) {
