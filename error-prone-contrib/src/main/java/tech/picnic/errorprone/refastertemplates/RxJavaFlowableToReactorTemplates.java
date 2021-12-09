@@ -489,6 +489,19 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Object blockingFirst(Object)
   // XXX: final void blockingForEach(Consumer)
   // XXX: final Iterable blockingIterable()
+
+  static final class FlowableBlockingIterable<T> {
+    @BeforeTemplate
+    Iterable<T> before(Flowable<T> flowable) {
+      return flowable.blockingIterable();
+    }
+
+    @AfterTemplate
+    Iterable<T> after(Flowable<T> flowable) {
+      return RxJava2Adapter.flowableToFlux(flowable).toIterable();
+    }
+  }
+
   // XXX: final Iterable blockingIterable(int)
   // XXX: final Object blockingLast()
   // XXX: final Object blockingLast(Object)

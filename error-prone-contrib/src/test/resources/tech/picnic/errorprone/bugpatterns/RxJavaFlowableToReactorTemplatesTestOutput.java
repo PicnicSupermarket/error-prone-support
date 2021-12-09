@@ -190,6 +190,10 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
     return RxJava2Adapter.flowableToFlux(Flowable.just(1)).blockFirst();
   }
 
+  Iterable<Integer> testFlowableBlockingIterable() {
+    return RxJava2Adapter.flowableToFlux(Flowable.just(1)).toIterable();
+  }
+
   Flowable<Integer> testFlowableConcatMap() {
     return RxJava2Adapter.fluxToFlowable(
         RxJava2Adapter.flowableToFlux(Flowable.just(1))
