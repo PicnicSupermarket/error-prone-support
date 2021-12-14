@@ -76,6 +76,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           "com.mongodb.client.model.Sorts",
           "com.mongodb.client.model.Updates",
           "java.nio.charset.StandardCharsets",
+          "java.util.Collections",
           "java.util.Comparator",
           "java.util.Map.Entry",
           "java.util.regex.Pattern",
