@@ -6,7 +6,9 @@ import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -130,6 +132,14 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
 
   Flowable<Integer> testSingleToFlowable() {
     return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.singleToMono(Single.just(1)).flux());
+  }
+
+  Single<Integer> testSingleTimeOut() {
+    return RxJava2Adapter.monoToSingle(
+        RxJava2Adapter.singleToMono(Single.just(1))
+            .timeout(
+                Duration.of(100, TimeUnit.MILLISECONDS.toChronoUnit()),
+                RxJava2Adapter.singleToMono(Single.just(2))));
   }
 
   Maybe<Integer> testSingleToMaybe() {

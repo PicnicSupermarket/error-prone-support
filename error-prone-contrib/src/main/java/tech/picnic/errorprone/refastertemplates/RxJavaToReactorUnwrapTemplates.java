@@ -17,8 +17,8 @@ import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
-public final class RxJavaUnwrapTemplates {
-  private RxJavaUnwrapTemplates() {}
+public final class RxJavaToReactorUnwrapTemplates {
+  private RxJavaToReactorUnwrapTemplates() {}
 
   // XXX: Add test
   @SuppressWarnings("NoFunctionalReturnType")
@@ -209,7 +209,7 @@ public final class RxJavaUnwrapTemplates {
     abstract Mono<?> placeholder(@MayOptionallyUse T input);
 
     @BeforeTemplate
-    java.util.function.Function<T, ? extends Publisher<? extends Void>> before() {
+    java.util.function.Function<? super T, ? extends Publisher<? extends Void>> before() {
       return Refaster.anyOf(
           e ->
               RxJava2Adapter.completableToMono(
@@ -228,6 +228,12 @@ public final class RxJavaUnwrapTemplates {
               RxJava2Adapter.completableToMono(
                   Completable.wrap(
                       RxJavaReactorMigrationUtil.<T, Completable>toJdkFunction(
+                              (T ident) -> RxJava2Adapter.monoToCompletable(placeholder(ident)))
+                          .apply(e))),
+          e ->
+              RxJava2Adapter.completableToMono(
+                  Completable.wrap(
+                      RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
                               (T ident) -> RxJava2Adapter.monoToCompletable(placeholder(ident)))
                           .apply(e))),
           e ->
@@ -290,6 +296,27 @@ public final class RxJavaUnwrapTemplates {
     @AfterTemplate
     java.util.function.Function<T, Mono<? extends Void>> after() {
       return v -> RxJava2Adapter.completableToMono(Completable.wrap(placeholder(v)));
+    }
+  }
+
+  @SuppressWarnings("NoFunctionalReturnType")
+  abstract static class UnwrapCompletableExtendsMono<T, R> {
+    @Placeholder
+    abstract Mono<? extends R> placeholder(@MayOptionallyUse T input);
+
+    @BeforeTemplate
+    java.util.function.Function<? super T, ? extends Mono<? extends Void>> before() {
+      return e ->
+          RxJava2Adapter.completableToMono(
+              Completable.wrap(
+                  RxJavaReactorMigrationUtil.<T, CompletableSource>toJdkFunction(
+                          (T ident) -> RxJava2Adapter.monoToCompletable(placeholder(ident)))
+                      .apply(e)));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<T, Mono<? extends R>> after() {
+      return v -> placeholder(v);
     }
   }
 

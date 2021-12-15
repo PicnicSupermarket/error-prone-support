@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
-final class RxJavaUnwrapTemplatesTest implements RefasterTemplateTestCase {
+final class RxJavaToReactorUnwrapTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
@@ -63,5 +63,22 @@ final class RxJavaUnwrapTemplatesTest implements RefasterTemplateTestCase {
         .then();
   }
 
+  Mono<Void> testUnwrapCompletableExtendsMono() {
+    return Mono.just(1)
+        .flatMap(
+            e ->
+                RxJava2Adapter.completableToMono(
+                    Completable.wrap(
+                        RxJavaReactorMigrationUtil.<Integer, CompletableSource>toJdkFunction(
+                                (Integer ident) ->
+                                    RxJava2Adapter.monoToCompletable(
+                                        produceMessage_migrated(ident)))
+                            .apply(e))))
+        .then();
+  }
+
+  private Mono<Void> produceMessage_migrated(Integer integer) {
+    return Mono.empty();
+  }
   // Many tests for the `RxJavaUnwrapTemplates` class are not written due to time constraints.
 }

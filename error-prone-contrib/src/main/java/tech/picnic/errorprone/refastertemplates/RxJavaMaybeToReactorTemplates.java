@@ -26,9 +26,11 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
@@ -560,7 +562,8 @@ final class RxJavaMaybeToReactorTemplates {
 
     @AfterTemplate
     Single<Boolean> after(Maybe<T> maybe) {
-      return RxJava2Adapter.monoToSingle(RxJava2Adapter.maybeToMono(maybe).hasElement());
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.maybeToMono(maybe).hasElement().map(hasElement -> !hasElement));
     }
   }
 
@@ -587,10 +590,45 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe onErrorComplete()
   // XXX: public final Maybe onErrorComplete(Predicate)
   // XXX: public final Maybe onErrorResumeNext(Function)
-  // XXX: public final Maybe onErrorResumeNext(MaybeSource)
+
+  // XXX: Add test
+  static final class MaybeOnErrorResumeNextFunction<
+      S, T extends S, R, P extends Throwable, Q extends Maybe<T>> {
+    @BeforeTemplate
+    Maybe<T> before(
+        Maybe<T> maybe, Function<? super Throwable, ? extends MaybeSource<? extends T>> function) {
+      return maybe.onErrorResumeNext(function);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe, Function<Throwable, Q> function) {
+      return RxJava2Adapter.monoToMaybe(
+          RxJava2Adapter.maybeToMono(maybe)
+              .onErrorResume(
+                  err ->
+                      RxJava2Adapter.maybeToMono(
+                          RxJavaReactorMigrationUtil.<Throwable, Q>toJdkFunction(function)
+                              .apply(err))));
+    }
+  }
+
+  // XXX: Add test and is this correct?
+  static final class MaybeOnErrorResumeNextMaybeSource<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe, MaybeSource<? extends T> next) {
+      return maybe.onErrorResumeNext(next);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe, MaybeSource<T> next) {
+      return RxJava2Adapter.monoToMaybe(
+          RxJava2Adapter.maybeToMono(maybe)
+              .onErrorResume(t -> RxJava2Adapter.maybeToMono(Maybe.wrap(next))));
+    }
+  }
   // XXX: public final Maybe onErrorReturn(Function)
 
-  abstract static class MaybeOnErrorReturn<T, R> {
+  abstract static class MaybeOnErrorReturn<T> {
     @Placeholder
     abstract T placeholder(@MayOptionallyUse Throwable throwable);
 
@@ -727,7 +765,23 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe takeUntil(MaybeSource)
   // XXX: public final Maybe takeUntil(Publisher)
   // XXX: public final Maybe timeout(long,TimeUnit)
-  // XXX: public final Maybe timeout(long,TimeUnit,MaybeSource)
+
+  static final class MaybeTimeOut<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe, long timeout, TimeUnit unit, MaybeSource<? extends T> other) {
+      return maybe.timeout(timeout, unit, other);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe, long timeout, TimeUnit unit, MaybeSource<? extends T> other) {
+      return RxJava2Adapter.monoToMaybe(
+          RxJava2Adapter.maybeToMono(maybe)
+              .timeout(
+                  Duration.of(timeout, unit.toChronoUnit()),
+                  RxJava2Adapter.maybeToMono(Maybe.wrap(other))));
+    }
+  }
+
   // XXX: public final Maybe timeout(long,TimeUnit,Scheduler)
   // XXX: public final Maybe timeout(long,TimeUnit,Scheduler,MaybeSource)
   // XXX: public final Maybe timeout(MaybeSource)

@@ -65,6 +65,11 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
   }
 
   Flowable<String> testUnnecessaryFunctionConversion() {
+    Flowable.just(1)
+        .as(RxJava2Adapter::flowableToFlux)
+        .map(RxJavaReactorMigrationUtil.<Integer, String>toJdkFunction(String::valueOf))
+        .as(RxJava2Adapter::fluxToFlowable);
+
     return Flowable.just(1)
         .as(RxJava2Adapter::flowableToFlux)
         .map(RxJavaReactorMigrationUtil.toJdkFunction(e -> String.valueOf(e)))

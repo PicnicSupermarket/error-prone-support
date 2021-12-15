@@ -23,7 +23,9 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
+import java.time.Duration;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
@@ -449,6 +451,24 @@ final class RxJavaSingleToReactorTemplates {
 
   // XXX: public final Single onErrorResumeNext(Single)
   // XXX: public final Single onErrorReturn(Function)
+
+  // XXX: Add test -> Works in PRP.
+  abstract static class SingleOnErrorReturn<T, S extends T> {
+    @Placeholder
+    abstract S placeholder(@MayOptionallyUse Throwable throwable);
+
+    @BeforeTemplate
+    Single<T> before(Single<T> single) {
+      return single.onErrorReturn(t -> placeholder(t));
+    }
+
+    @AfterTemplate
+    Single<T> after(Single<T> single) {
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.singleToMono(single).onErrorResume(t -> Mono.just(placeholder(t))));
+    }
+  }
+
   // XXX: public final Single onErrorReturnItem(Object)
   // XXX: public final Single onTerminateDetach()
   // XXX: public final Flowable repeat()
@@ -533,6 +553,24 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single timeout(long,TimeUnit)
   // XXX: public final Single timeout(long,TimeUnit,Scheduler)
   // XXX: public final Single timeout(long,TimeUnit,Scheduler,SingleSource)
+
+  static final class SingleTimeOut<T> {
+    @BeforeTemplate
+    Single<T> before(
+        Single<T> single, long timeout, TimeUnit unit, SingleSource<? extends T> other) {
+      return single.timeout(timeout, unit, other);
+    }
+
+    @AfterTemplate
+    Single<T> after(
+        Single<T> single, long timeout, TimeUnit unit, SingleSource<? extends T> other) {
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.singleToMono(single)
+              .timeout(
+                  Duration.of(timeout, unit.toChronoUnit()),
+                  RxJava2Adapter.singleToMono(Single.wrap(other))));
+    }
+  }
   // XXX: public final Single timeout(long,TimeUnit,SingleSource)
   // XXX: public final Object to(Function)
   // XXX: public final Completable toCompletable()

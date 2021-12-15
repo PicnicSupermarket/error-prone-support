@@ -122,12 +122,15 @@ public final class RxJavaToReactorTemplates {
   @SuppressWarnings("NoFunctionalReturnType")
   static final class UnnecessaryFunctionConversion<I, O> {
     @BeforeTemplate
-    java.util.function.Function<I, O> before(@CanTransformToTargetType Function<I, O> function) {
+    java.util.function.Function<? extends I, ? extends O> before(
+        // @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class)
+        @CanTransformToTargetType Function<? extends I, ? extends O> function) {
       return RxJavaReactorMigrationUtil.toJdkFunction(function);
     }
 
     @AfterTemplate
-    java.util.function.Function<I, O> after(java.util.function.Function<I, O> function) {
+    java.util.function.Function<? extends I, ? extends O> after(
+        java.util.function.Function<? extends I, ? extends O> function) {
       return function;
     }
   }
