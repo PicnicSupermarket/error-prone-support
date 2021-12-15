@@ -1,9 +1,13 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.common.collect.ImmutableList.*;
+
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.functions.Action;
@@ -11,6 +15,7 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
@@ -266,7 +271,8 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  static final class MonoThenThen<T> {
+  /** Remove unnecessary {@code Mono#then} */
+  static final class MonoThen<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono, Mono<T> other) {
       return mono.then().then(other);
@@ -275,6 +281,69 @@ public final class RxJavaToReactorTemplates {
     @AfterTemplate
     Mono<T> after(Mono<T> mono, Mono<T> other) {
       return mono.then(other);
+    }
+  }
+
+  /** Remove unnecessary {@code Flux#ignoreElements} */
+  static final class FluxThen<T> {
+    @BeforeTemplate
+    Mono<Void> before(Flux<T> flux) {
+      return flux.ignoreElements().then();
+    }
+
+    @AfterTemplate
+    Mono<Void> after(Flux<T> flux) {
+      return flux.then();
+    }
+  }
+
+  static final class MonoCollectToImmutableList<T> {
+    @BeforeTemplate
+    Mono<List<T>> before(Flux<T> flux) {
+      return flux.collectList();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    Mono<List<T>> after(Flux<T> flux) {
+      return flux.collect(toImmutableList());
+    }
+  }
+
+  static final class MonoDefaultIfEmpty<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, T item) {
+      return mono.switchIfEmpty(Mono.just(item));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, T item) {
+      return mono.defaultIfEmpty(item);
+    }
+  }
+
+  static final class FluxDefaultIfEmpty<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, T item) {
+      return flux.switchIfEmpty(Flux.just(item));
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, T item) {
+      return flux.defaultIfEmpty(item);
+    }
+  }
+
+  /** Remove unnecessary {@code Mono#then} */
+  static final class MonoVoid {
+    @BeforeTemplate
+    Mono<Void> before(Mono<Void> mono) {
+      return mono.then();
+    }
+
+    @AfterTemplate
+    Mono<Void> after(Mono<Void> mono) {
+      return mono;
     }
   }
 
