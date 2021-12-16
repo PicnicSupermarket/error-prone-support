@@ -214,7 +214,8 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
   }
 
   Single<Boolean> testMaybeIsEmpty() {
-    return RxJava2Adapter.monoToSingle(RxJava2Adapter.maybeToMono(Maybe.just(1)).hasElement());
+    return RxJava2Adapter.monoToSingle(
+        RxJava2Adapter.maybeToMono(Maybe.just(1)).hasElement().map(hasElement -> !hasElement));
   }
 
   Maybe<String> testMaybeMap() {

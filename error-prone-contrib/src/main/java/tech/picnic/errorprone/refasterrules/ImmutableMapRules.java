@@ -188,6 +188,8 @@ final class ImmutableMapRules {
   /**
    * Prefer creating an immutable copy of the result of {@link Maps#transformValues(Map,
    * com.google.common.base.Function)} over more contrived alternatives.
+   *
+   * <p>Additionally, this way it is easier to see that only values are being transformed.
    */
   abstract static class TransformMapValuesToImmutableMap<K, V1, V2> {
     @Placeholder(allowsIdentity = true)

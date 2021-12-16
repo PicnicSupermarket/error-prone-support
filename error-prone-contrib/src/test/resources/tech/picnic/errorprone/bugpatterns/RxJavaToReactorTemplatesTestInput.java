@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import java.util.List;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -102,7 +103,27 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Mono.from(RxJava2Adapter.fluxToFlowable(Flux.just(1)));
   }
 
-  Mono<Integer> testMonoThenThen() {
+  Mono<Integer> testMonoThen() {
     return Mono.just(1).then().then(Mono.just(2));
+  }
+
+  Mono<Void> testFluxThen() {
+    return Flux.just(1).ignoreElements().then();
+  }
+
+  Mono<List<Integer>> testMonoCollectToImmutableList() {
+    return Flux.just(1).collectList();
+  }
+
+  Mono<Integer> testMonoDefaultIfEmpty() {
+    return Mono.just(1).switchIfEmpty(Mono.just(2));
+  }
+
+  Flux<Integer> testFluxDefaultIfEmpty() {
+    return Flux.just(1).switchIfEmpty(Flux.just(2));
+  }
+
+  Mono<Void> testMonoVoid() {
+    return Mono.when(Flux.just(1)).then();
   }
 }

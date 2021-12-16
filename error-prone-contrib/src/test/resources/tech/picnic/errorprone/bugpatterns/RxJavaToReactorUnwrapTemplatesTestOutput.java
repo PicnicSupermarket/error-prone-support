@@ -41,5 +41,13 @@ final class RxJavaToReactorUnwrapTemplatesTest implements RefasterTemplateTestCa
         .then();
   }
 
+  Mono<Void> testUnwrapCompletableExtendsMono() {
+    return Mono.just(1).flatMap(v -> produceMessage_migrated(v)).then();
+  }
+
+  private Mono<Void> produceMessage_migrated(Integer integer) {
+    return Mono.empty();
+  }
+
   // Many tests for the `RxJavaUnwrapTemplates` class are not written due to time constraints.
 }

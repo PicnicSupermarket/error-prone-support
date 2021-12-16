@@ -138,8 +138,8 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return RxJava2Adapter.monoToSingle(
         RxJava2Adapter.singleToMono(Single.just(1))
             .timeout(
-                Duration.of(100, TimeUnit.MILLISECONDS.toChronoUnit()),
-                RxJava2Adapter.singleToMono(Single.just(2))));
+                Duration.of(1000, TimeUnit.MILLISECONDS.toChronoUnit()),
+                RxJava2Adapter.singleToMono(Single.wrap(Single.just(2)))));
   }
 
   Maybe<Integer> testSingleToMaybe() {
