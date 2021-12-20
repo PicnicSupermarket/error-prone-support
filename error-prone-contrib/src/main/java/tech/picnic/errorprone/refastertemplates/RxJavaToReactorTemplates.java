@@ -347,6 +347,19 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
+  /** Remove unnecessary {@code Flux#next} */
+  static final class FluxSingle<T> {
+    @BeforeTemplate
+    Mono<T> before(Flux<T> flux) {
+      return flux.next().single();
+    }
+
+    @AfterTemplate
+    Mono<T> after(Flux<T> flux) {
+      return flux.single();
+    }
+  }
+
   // XXX: Find out how we can use this in the future.
   //  static final class RemoveRedundantCast<T> {
   //    @BeforeTemplate
