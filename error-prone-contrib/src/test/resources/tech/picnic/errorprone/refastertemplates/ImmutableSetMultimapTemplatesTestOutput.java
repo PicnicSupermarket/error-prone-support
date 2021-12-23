@@ -47,17 +47,17 @@ final class ImmutableSetMultimapTemplatesTest implements RefasterTemplateTestCas
         ImmutableSetMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
   }
 
-  ImmutableSetMultimap<Integer, String> testStreamOfMapEntriesToImmutableSetMultimap() {
+  ImmutableSetMultimap<Integer, String> testStreamCollectToImmutableSetMultimap() {
     return Stream.of(1, 2, 3).collect(toImmutableSetMultimap(n -> n, n -> n.toString()));
   }
 
-  ImmutableSetMultimap<String, Integer> testTransformMultimapValuesToImmutableSetMultimap() {
+  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapCopyOfMultimapsTransformValues() {
     return ImmutableSetMultimap.copyOf(
         Multimaps.transformValues(ImmutableSetMultimap.of("foo", 1L), e -> Math.toIntExact(e)));
   }
 
   ImmutableSet<ImmutableSetMultimap<String, Integer>>
-      testTransformMultimapValuesToImmutableSetMultimap2() {
+      testImmutableSetMultimapCopyOfMultimapsTransformValuesTransformation() {
     return ImmutableSet.of(
         ImmutableSetMultimap.copyOf(
             Multimaps.transformValues(ImmutableSetMultimap.of("foo", 1L), Math::toIntExact)),

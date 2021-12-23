@@ -68,13 +68,13 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
         Multimaps.index(ImmutableList.of(3).iterator(), n -> n.intValue()));
   }
 
-  ImmutableListMultimap<String, Integer> testTransformMultimapValuesToImmutableListMultimap() {
+  ImmutableListMultimap<String, Integer> testImmutableListMultimapCopyOfMultimapsTransformValues() {
     return ImmutableListMultimap.copyOf(
         Multimaps.transformValues(ImmutableListMultimap.of("foo", 1L), v -> Math.toIntExact(v)));
   }
 
   ImmutableSet<ImmutableListMultimap<String, Integer>>
-      testTransformMultimapValuesToImmutableListMultimap2() {
+      testImmutableListMultimapCopyOfMultimapsTransformValuesTransformation() {
     return ImmutableSet.of(
         ImmutableListMultimap.copyOf(
             Multimaps.transformValues(ImmutableSetMultimap.of("foo", 1L), Math::toIntExact)),

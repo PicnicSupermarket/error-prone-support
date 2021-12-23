@@ -121,7 +121,7 @@ final class ImmutableSetMultimapTemplates {
    * Don't map a a stream's elements to map entries, only to subsequently collect them into an
    * {@link ImmutableSetMultimap}. The collection can be performed directly.
    */
-  abstract static class StreamOfMapEntriesToImmutableSetMultimap<E, K, V> {
+  abstract static class StreamCollectToImmutableSetMultimap<E, K, V> {
     @Placeholder(allowsIdentity = true)
     abstract K keyFunction(@MayOptionallyUse E element);
 
@@ -148,7 +148,7 @@ final class ImmutableSetMultimapTemplates {
    * Prefer creating an immutable copy of the result of {@link Multimaps#transformValues(Multimap,
    * com.google.common.base.Function)} over creating and directly collecting a stream.
    */
-  abstract static class TransformMultimapValuesToImmutableSetMultimap<K, V1, V2> {
+  abstract static class ImmutableSetMultimapCopyOfMultimapsTransformValues<K, V1, V2> {
     @Placeholder(allowsIdentity = true)
     abstract V2 valueTransformation(@MayOptionallyUse V1 value);
 
@@ -170,7 +170,7 @@ final class ImmutableSetMultimapTemplates {
    * Prefer creating an immutable copy of the result of {@link Multimaps#transformValues(Multimap,
    * com.google.common.base.Function)} over creating and directly collecting a stream.
    */
-  static final class TransformMultimapValuesToImmutableSetMultimap2<K, V1, V2> {
+  static final class ImmutableSetMultimapCopyOfMultimapsTransformValuesTransformation<K, V1, V2> {
     // XXX: Drop the `Refaster.anyOf` if we decide to rewrite one to the other.
     @BeforeTemplate
     ImmutableSetMultimap<K, V2> before(

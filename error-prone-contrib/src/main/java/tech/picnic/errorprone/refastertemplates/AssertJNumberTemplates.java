@@ -18,7 +18,7 @@ import org.assertj.core.api.NumberAssert;
 final class AssertJNumberTemplates {
   private AssertJNumberTemplates() {}
 
-  static final class NumberIsPositive {
+  static final class NumberAssertIsPositive {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
       return Refaster.anyOf(
@@ -69,7 +69,7 @@ final class AssertJNumberTemplates {
     }
   }
 
-  static final class NumberIsNotPositive {
+  static final class NumberAssertIsNotPositive {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
       return Refaster.anyOf(
@@ -120,7 +120,7 @@ final class AssertJNumberTemplates {
     }
   }
 
-  static final class NumberIsNegative {
+  static final class NumberAssertIsNegative {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
       return Refaster.anyOf(
@@ -171,7 +171,7 @@ final class AssertJNumberTemplates {
     }
   }
 
-  static final class NumberIsNotNegative {
+  static final class NumberAssertIsNotNegative {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
       return Refaster.anyOf(

@@ -198,23 +198,7 @@ final class IntStreamTemplates {
     }
   }
 
-  /** Prefer {@link IntStream#noneMatch(IntPredicate)} over more contrived alternatives. */
-  static final class IntStreamNoneMatch {
-    @BeforeTemplate
-    boolean before(IntStream stream, IntPredicate predicate) {
-      return Refaster.anyOf(
-          !stream.anyMatch(predicate),
-          stream.allMatch(predicate.negate()),
-          stream.filter(predicate).findAny().isEmpty());
-    }
-
-    @AfterTemplate
-    boolean after(IntStream stream, IntPredicate predicate) {
-      return stream.noneMatch(predicate);
-    }
-  }
-
-  abstract static class IntStreamNoneMatch2 {
+  abstract static class IntStreamNoneMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse int element);
 
@@ -226,6 +210,22 @@ final class IntStreamTemplates {
     @AfterTemplate
     boolean after(IntStream stream) {
       return stream.noneMatch(e -> test(e));
+    }
+  }
+
+  /** Prefer {@link IntStream#noneMatch(IntPredicate)} over more contrived alternatives. */
+  static final class IntStreamNoneMatchPredicate {
+    @BeforeTemplate
+    boolean before(IntStream stream, IntPredicate predicate) {
+      return Refaster.anyOf(
+          !stream.anyMatch(predicate),
+          stream.allMatch(predicate.negate()),
+          stream.filter(predicate).findAny().isEmpty());
+    }
+
+    @AfterTemplate
+    boolean after(IntStream stream, IntPredicate predicate) {
+      return stream.noneMatch(predicate);
     }
   }
 
@@ -243,19 +243,7 @@ final class IntStreamTemplates {
     }
   }
 
-  static final class IntStreamAllMatch {
-    @BeforeTemplate
-    boolean before(IntStream stream, IntPredicate predicate) {
-      return stream.noneMatch(predicate.negate());
-    }
-
-    @AfterTemplate
-    boolean after(IntStream stream, IntPredicate predicate) {
-      return stream.allMatch(predicate);
-    }
-  }
-
-  abstract static class IntStreamAllMatch2 {
+  abstract static class IntStreamAllMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse int element);
 
@@ -267,6 +255,18 @@ final class IntStreamTemplates {
     @AfterTemplate
     boolean after(IntStream stream) {
       return stream.allMatch(e -> test(e));
+    }
+  }
+
+  static final class IntStreamAllMatchPredicate {
+    @BeforeTemplate
+    boolean before(IntStream stream, IntPredicate predicate) {
+      return stream.noneMatch(predicate.negate());
+    }
+
+    @AfterTemplate
+    boolean after(IntStream stream, IntPredicate predicate) {
+      return stream.allMatch(predicate);
     }
   }
 }

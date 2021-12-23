@@ -66,12 +66,12 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
     return Lists.newArrayList(ImmutableList.of("foo"));
   }
 
-  Stream<Integer> testImmutableCollectionStream() {
-    return ImmutableSet.of(1).asList().stream();
-  }
-
   ImmutableList<Integer> testImmutableCollectionAsList() {
     return ImmutableList.copyOf(ImmutableSet.of(1));
+  }
+
+  Stream<Integer> testImmutableCollectionStream() {
+    return ImmutableSet.of(1).asList().stream();
   }
 
   boolean testImmutableCollectionContains() {
