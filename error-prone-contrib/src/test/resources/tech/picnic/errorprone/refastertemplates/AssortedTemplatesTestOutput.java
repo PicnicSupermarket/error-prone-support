@@ -21,7 +21,23 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.annotations.Template;
+import tech.picnic.errorprone.annotations.TemplateCollection;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.CheckIndex;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.CreateEnumMap;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.DisjointCollections;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.DisjointSets;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.IterableIsEmpty;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.IteratorGetNextOrDefault;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.LogicalImplication;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.MapGetOrNull;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.MapKeyStream;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.MapValueStream;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.SplitToStream;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.StreamToImmutableEnumSet;
+import tech.picnic.errorprone.refastertemplates.AssortedTemplates.UnboundedSingleElementStream;
 
+@TemplateCollection(AssortedTemplates.class)
 final class AssortedTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
@@ -36,22 +52,27 @@ final class AssortedTemplatesTest implements RefasterTemplateTestCase {
         toImmutableSet());
   }
 
+  @Template(CheckIndex.class)
   int testCheckIndex() {
     return Objects.checkIndex(0, 1);
   }
 
+  @Template(CreateEnumMap.class)
   Map<RoundingMode, String> testCreateEnumMap() {
     return new EnumMap<>(RoundingMode.class);
   }
 
+  @Template(MapGetOrNull.class)
   String testMapGetOrNull() {
     return ImmutableMap.of(1, "foo").get("bar");
   }
 
+  @Template(StreamToImmutableEnumSet.class)
   ImmutableSet<BoundType> testStreamToImmutableEnumSet() {
     return Stream.of(BoundType.OPEN).collect(toImmutableEnumSet());
   }
 
+  @Template(IteratorGetNextOrDefault.class)
   ImmutableSet<String> testIteratorGetNextOrDefault() {
     return ImmutableSet.of(
         Iterators.getNext(ImmutableList.of("a").iterator(), "foo"),
@@ -60,6 +81,7 @@ final class AssortedTemplatesTest implements RefasterTemplateTestCase {
   }
 
   // XXX: Only the first statement is rewritten. Make smarter.
+  @Template(LogicalImplication.class)
   ImmutableSet<Boolean> testLogicalImplication() {
     return ImmutableSet.of(
         toString().isEmpty() || true,
@@ -68,16 +90,19 @@ final class AssortedTemplatesTest implements RefasterTemplateTestCase {
         3 >= 4 || (3 < 4 && true));
   }
 
+  @Template(UnboundedSingleElementStream.class)
   Stream<String> testUnboundedSingleElementStream() {
     return Stream.generate(() -> "foo");
   }
 
+  @Template(DisjointSets.class)
   ImmutableSet<Boolean> testDisjointSets() {
     return ImmutableSet.of(
         Collections.disjoint(ImmutableSet.of(1), ImmutableSet.of(2)),
         Collections.disjoint(ImmutableSet.of(3), ImmutableSet.of(4)));
   }
 
+  @Template(DisjointCollections.class)
   ImmutableSet<Boolean> testDisjointCollections() {
     return ImmutableSet.of(
         Collections.disjoint(ImmutableList.of(1), ImmutableList.of(2)),
@@ -86,18 +111,22 @@ final class AssortedTemplatesTest implements RefasterTemplateTestCase {
         Collections.disjoint(ImmutableList.of(7), ImmutableList.of(8)));
   }
 
+  @Template(IterableIsEmpty.class)
   boolean testIterableIsEmpty() {
     return Iterables.isEmpty(ImmutableList.of());
   }
 
+  @Template(MapKeyStream.class)
   Stream<String> testMapKeyStream() {
     return ImmutableMap.of("foo", 1).keySet().stream();
   }
 
+  @Template(MapValueStream.class)
   Stream<Integer> testMapValueStream() {
     return ImmutableMap.of("foo", 1).values().stream();
   }
 
+  @Template(SplitToStream.class)
   ImmutableSet<Stream<String>> testSplitToStream() {
     return ImmutableSet.of(
         Splitter.on(':').splitToStream("foo"),

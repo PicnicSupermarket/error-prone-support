@@ -13,31 +13,45 @@ import com.google.common.collect.Streams;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.annotations.Template;
+import tech.picnic.errorprone.annotations.TemplateCollection;
+import tech.picnic.errorprone.refastertemplates.ImmutableSortedMultisetTemplates.EmptyImmutableSortedMultiset;
+import tech.picnic.errorprone.refastertemplates.ImmutableSortedMultisetTemplates.ImmutableSortedMultisetBuilder;
+import tech.picnic.errorprone.refastertemplates.ImmutableSortedMultisetTemplates.ImmutableSortedMultisetNaturalOrderBuilder;
+import tech.picnic.errorprone.refastertemplates.ImmutableSortedMultisetTemplates.ImmutableSortedMultisetReverseOrderBuilder;
+import tech.picnic.errorprone.refastertemplates.ImmutableSortedMultisetTemplates.IterableToImmutableSortedMultiset;
+import tech.picnic.errorprone.refastertemplates.ImmutableSortedMultisetTemplates.StreamToImmutableSortedMultiset;
 
+@TemplateCollection(ImmutableSortedMultisetTemplates.class)
 final class ImmutableSortedMultisetTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Arrays.class, Streams.class, collectingAndThen(null, null), toList());
   }
 
+  @Template(ImmutableSortedMultisetBuilder.class)
   ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetBuilder() {
     return new ImmutableSortedMultiset.Builder<>(Comparator.comparingInt(String::length));
   }
 
+  @Template(ImmutableSortedMultisetNaturalOrderBuilder.class)
   ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetNaturalOrderBuilder() {
     return ImmutableSortedMultiset.orderedBy(Comparator.<String>naturalOrder());
   }
 
+  @Template(ImmutableSortedMultisetReverseOrderBuilder.class)
   ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetReverseOrderBuilder() {
     return ImmutableSortedMultiset.orderedBy(Comparator.<String>reverseOrder());
   }
 
+  @Template(EmptyImmutableSortedMultiset.class)
   ImmutableMultiset<ImmutableSortedMultiset<Integer>> testEmptyImmutableSortedMultiset() {
     return ImmutableMultiset.of(
         ImmutableSortedMultiset.<Integer>naturalOrder().build(),
         Stream.<Integer>empty().collect(toImmutableSortedMultiset(naturalOrder())));
   }
 
+  @Template(IterableToImmutableSortedMultiset.class)
   ImmutableMultiset<ImmutableSortedMultiset<Integer>> testIterableToImmutableSortedMultiset() {
     return ImmutableMultiset.of(
         ImmutableSortedMultiset.copyOf(naturalOrder(), ImmutableList.of(1)),
@@ -58,6 +72,7 @@ final class ImmutableSortedMultisetTemplatesTest implements RefasterTemplateTest
         Arrays.stream(new Integer[] {10}).collect(toImmutableSortedMultiset(naturalOrder())));
   }
 
+  @Template(StreamToImmutableSortedMultiset.class)
   ImmutableSet<ImmutableSortedMultiset<Integer>> testStreamToImmutableSortedMultiset() {
     return ImmutableSet.of(
         ImmutableSortedMultiset.copyOf(Stream.of(1).iterator()),

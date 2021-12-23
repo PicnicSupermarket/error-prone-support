@@ -16,7 +16,20 @@ import com.google.common.collect.Streams;
 import com.google.common.collect.TreeMultimap;
 import java.util.Map;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.annotations.Template;
+import tech.picnic.errorprone.annotations.TemplateCollection;
+import tech.picnic.errorprone.refastertemplates.ImmutableListMultimapTemplates.EmptyImmutableListMultimap;
+import tech.picnic.errorprone.refastertemplates.ImmutableListMultimapTemplates.EntryToImmutableListMultimap;
+import tech.picnic.errorprone.refastertemplates.ImmutableListMultimapTemplates.ImmutableListMultimapBuilder;
+import tech.picnic.errorprone.refastertemplates.ImmutableListMultimapTemplates.ImmutableListMultimapCopyOfImmutableListMultimap;
+import tech.picnic.errorprone.refastertemplates.ImmutableListMultimapTemplates.ImmutableListMultimapCopyOfMultimapsTransformValues;
+import tech.picnic.errorprone.refastertemplates.ImmutableListMultimapTemplates.ImmutableListMultimapCopyOfMultimapsTransformValuesTransformation;
+import tech.picnic.errorprone.refastertemplates.ImmutableListMultimapTemplates.IndexIterableToImmutableListMultimap;
+import tech.picnic.errorprone.refastertemplates.ImmutableListMultimapTemplates.IterableToImmutableListMultimap;
+import tech.picnic.errorprone.refastertemplates.ImmutableListMultimapTemplates.PairToImmutableListMultimap;
+import tech.picnic.errorprone.refastertemplates.ImmutableListMultimapTemplates.StreamOfMapEntriesToImmutableListMultimap;
 
+@TemplateCollection(ImmutableListMultimapTemplates.class)
 final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
@@ -24,6 +37,7 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
         Streams.class, flatteningToImmutableListMultimap(null, null), identity());
   }
 
+  @Template(ImmutableListMultimapBuilder.class)
   ImmutableSet<ImmutableMultimap.Builder<String, Integer>> testImmutableListMultimapBuilder() {
     return ImmutableSet.of(
         new ImmutableListMultimap.Builder<>(),
@@ -31,17 +45,20 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
         ImmutableMultimap.builder());
   }
 
+  @Template(EmptyImmutableListMultimap.class)
   ImmutableSet<ImmutableMultimap<String, Integer>> testEmptyImmutableListMultimap() {
     return ImmutableSet.of(
         ImmutableListMultimap.<String, Integer>builder().build(), ImmutableMultimap.of());
   }
 
+  @Template(PairToImmutableListMultimap.class)
   ImmutableSet<ImmutableMultimap<String, Integer>> testPairToImmutableListMultimap() {
     return ImmutableSet.of(
         ImmutableListMultimap.<String, Integer>builder().put("foo", 1).build(),
         ImmutableMultimap.of("bar", 2));
   }
 
+  @Template(EntryToImmutableListMultimap.class)
   ImmutableList<ImmutableMultimap<String, Integer>> testEntryToImmutableListMultimap() {
     return ImmutableList.of(
         ImmutableListMultimap.<String, Integer>builder().put(Map.entry("foo", 1)).build(),
@@ -49,6 +66,7 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
             .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
+  @Template(IterableToImmutableListMultimap.class)
   ImmutableList<ImmutableMultimap<String, Integer>> testIterableToImmutableListMultimap() {
     return ImmutableList.of(
         ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1).entries()),
@@ -67,12 +85,14 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
         ImmutableMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
   }
 
+  @Template(StreamOfMapEntriesToImmutableListMultimap.class)
   ImmutableListMultimap<Integer, String> testStreamOfMapEntriesToImmutableListMultimap() {
     return Stream.of(1, 2, 3)
         .map(n -> Map.entry(n, n.toString()))
         .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
+  @Template(IndexIterableToImmutableListMultimap.class)
   ImmutableSet<ImmutableListMultimap<Integer, Integer>> testIndexIterableToImmutableListMultimap() {
     return ImmutableSet.of(
         ImmutableList.of(1).stream().collect(toImmutableListMultimap(n -> n * 2, identity())),
@@ -82,11 +102,13 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
             .collect(toImmutableListMultimap(n -> n.intValue(), identity())));
   }
 
+  @Template(ImmutableListMultimapCopyOfMultimapsTransformValues.class)
   ImmutableListMultimap<String, Integer> testImmutableListMultimapCopyOfMultimapsTransformValues() {
     return ImmutableListMultimap.of("foo", 1L).entries().stream()
         .collect(toImmutableListMultimap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue())));
   }
 
+  @Template(ImmutableListMultimapCopyOfMultimapsTransformValuesTransformation.class)
   ImmutableSet<ImmutableListMultimap<String, Integer>>
       testImmutableListMultimapCopyOfMultimapsTransformValuesTransformation() {
     return ImmutableSet.of(
@@ -114,6 +136,7 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
                     Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))));
   }
 
+  @Template(ImmutableListMultimapCopyOfImmutableListMultimap.class)
   ImmutableListMultimap<String, Integer> testImmutableListMultimapCopyOfImmutableListMultimap() {
     return ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1));
   }
