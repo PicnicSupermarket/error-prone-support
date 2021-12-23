@@ -6,8 +6,16 @@ import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.assertj.core.api.NumberAssert;
+import tech.picnic.errorprone.annotations.Template;
+import tech.picnic.errorprone.annotations.TemplateCollection;
+import tech.picnic.errorprone.refastertemplates.AssertJNumberTemplates.NumberAssertIsNegative;
+import tech.picnic.errorprone.refastertemplates.AssertJNumberTemplates.NumberAssertIsNotNegative;
+import tech.picnic.errorprone.refastertemplates.AssertJNumberTemplates.NumberAssertIsNotPositive;
+import tech.picnic.errorprone.refastertemplates.AssertJNumberTemplates.NumberAssertIsPositive;
 
+@TemplateCollection(AssertJNumberTemplates.class)
 final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
+  @Template(NumberAssertIsPositive.class)
   ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsPositive() {
     return ImmutableSet.of(
         assertThat((byte) 0).isPositive(),
@@ -25,6 +33,7 @@ final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigDecimal.ZERO).isPositive());
   }
 
+  @Template(NumberAssertIsNotPositive.class)
   ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsNotPositive() {
     return ImmutableSet.of(
         assertThat((byte) 0).isNotPositive(),
@@ -42,6 +51,7 @@ final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigDecimal.ZERO).isNotPositive());
   }
 
+  @Template(NumberAssertIsNegative.class)
   ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsNegative() {
     return ImmutableSet.of(
         assertThat((byte) 0).isNegative(),
@@ -59,6 +69,7 @@ final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigDecimal.ZERO).isNegative());
   }
 
+  @Template(NumberAssertIsNotNegative.class)
   ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsNotNegative() {
     return ImmutableSet.of(
         assertThat((byte) 0).isNotNegative(),

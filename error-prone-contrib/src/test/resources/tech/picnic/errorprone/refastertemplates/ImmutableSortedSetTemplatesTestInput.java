@@ -12,31 +12,45 @@ import com.google.common.collect.Streams;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.annotations.Template;
+import tech.picnic.errorprone.annotations.TemplateCollection;
+import tech.picnic.errorprone.refastertemplates.ImmutableSortedSetTemplates.EmptyImmutableSortedSet;
+import tech.picnic.errorprone.refastertemplates.ImmutableSortedSetTemplates.ImmutableSortedSetBuilder;
+import tech.picnic.errorprone.refastertemplates.ImmutableSortedSetTemplates.ImmutableSortedSetNaturalOrderBuilder;
+import tech.picnic.errorprone.refastertemplates.ImmutableSortedSetTemplates.ImmutableSortedSetReverseOrderBuilder;
+import tech.picnic.errorprone.refastertemplates.ImmutableSortedSetTemplates.IterableToImmutableSortedSet;
+import tech.picnic.errorprone.refastertemplates.ImmutableSortedSetTemplates.StreamToImmutableSortedSet;
 
+@TemplateCollection(ImmutableSortedSetTemplates.class)
 final class ImmutableSortedSetTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Arrays.class, Streams.class, collectingAndThen(null, null), toList());
   }
 
+  @Template(ImmutableSortedSetBuilder.class)
   ImmutableSortedSet.Builder<String> testImmutableSortedSetBuilder() {
     return new ImmutableSortedSet.Builder<>(Comparator.comparingInt(String::length));
   }
 
+  @Template(ImmutableSortedSetNaturalOrderBuilder.class)
   ImmutableSortedSet.Builder<String> testImmutableSortedSetNaturalOrderBuilder() {
     return ImmutableSortedSet.orderedBy(Comparator.<String>naturalOrder());
   }
 
+  @Template(ImmutableSortedSetReverseOrderBuilder.class)
   ImmutableSortedSet.Builder<String> testImmutableSortedSetReverseOrderBuilder() {
     return ImmutableSortedSet.orderedBy(Comparator.<String>reverseOrder());
   }
 
+  @Template(EmptyImmutableSortedSet.class)
   ImmutableSet<ImmutableSortedSet<Integer>> testEmptyImmutableSortedSet() {
     return ImmutableSet.of(
         ImmutableSortedSet.<Integer>naturalOrder().build(),
         Stream.<Integer>empty().collect(toImmutableSortedSet(naturalOrder())));
   }
 
+  @Template(IterableToImmutableSortedSet.class)
   ImmutableSet<ImmutableSortedSet<Integer>> testIterableToImmutableSortedSet() {
     // XXX: The first subexpression is not rewritten (`naturalOrder()` isn't dropped). WHY!?
     return ImmutableSet.of(
@@ -53,6 +67,7 @@ final class ImmutableSortedSetTemplatesTest implements RefasterTemplateTestCase 
         Arrays.stream(new Integer[] {10}).collect(toImmutableSortedSet(naturalOrder())));
   }
 
+  @Template(StreamToImmutableSortedSet.class)
   ImmutableSet<ImmutableSortedSet<Integer>> testStreamToImmutableSortedSet() {
     return ImmutableSet.of(
         ImmutableSortedSet.copyOf(Stream.of(1).iterator()),

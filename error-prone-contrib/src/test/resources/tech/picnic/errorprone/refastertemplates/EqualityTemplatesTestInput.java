@@ -5,13 +5,22 @@ import com.google.common.collect.ImmutableSet;
 import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.annotations.Template;
+import tech.picnic.errorprone.annotations.TemplateCollection;
+import tech.picnic.errorprone.refastertemplates.EqualityTemplates.DoubleNegation;
+import tech.picnic.errorprone.refastertemplates.EqualityTemplates.EqualsPredicate;
+import tech.picnic.errorprone.refastertemplates.EqualityTemplates.IndirectDoubleNegation;
+import tech.picnic.errorprone.refastertemplates.EqualityTemplates.Negation;
+import tech.picnic.errorprone.refastertemplates.EqualityTemplates.PrimitiveOrReferenceEquality;
 
+@TemplateCollection(EqualityTemplates.class)
 final class EqualityTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Objects.class);
   }
 
+  @Template(PrimitiveOrReferenceEquality.class)
   ImmutableSet<Boolean> testPrimitiveOrReferenceEquality() {
     return ImmutableSet.of(
         RoundingMode.UP.equals(RoundingMode.DOWN),
@@ -20,16 +29,19 @@ final class EqualityTemplatesTest implements RefasterTemplateTestCase {
         !Objects.equals(RoundingMode.UP, RoundingMode.DOWN));
   }
 
+  @Template(EqualsPredicate.class)
   boolean testEqualsPredicate() {
     // XXX: When boxing is involved this rule seems to break. Example:
     // Stream.of(1).anyMatch(e -> Integer.MIN_VALUE.equals(e));
     return Stream.of("foo").anyMatch(s -> "bar".equals(s));
   }
 
+  @Template(DoubleNegation.class)
   boolean testDoubleNegation() {
     return !!true;
   }
 
+  @Template(Negation.class)
   ImmutableSet<Boolean> testNegation() {
     return ImmutableSet.of(
         true ? !false : false,
@@ -43,6 +55,7 @@ final class EqualityTemplatesTest implements RefasterTemplateTestCase {
         !(BoundType.OPEN == BoundType.CLOSED));
   }
 
+  @Template(IndirectDoubleNegation.class)
   ImmutableSet<Boolean> testIndirectDoubleNegation() {
     return ImmutableSet.of(
         true ? false : !false,

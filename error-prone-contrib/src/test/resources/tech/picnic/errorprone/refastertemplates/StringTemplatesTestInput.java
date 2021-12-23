@@ -12,7 +12,17 @@ import com.google.common.collect.Streams;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.annotations.Template;
+import tech.picnic.errorprone.annotations.TemplateCollection;
+import tech.picnic.errorprone.refastertemplates.StringTemplates.FilterEmptyString;
+import tech.picnic.errorprone.refastertemplates.StringTemplates.JoinStrings;
+import tech.picnic.errorprone.refastertemplates.StringTemplates.OptionalNonEmptyString;
+import tech.picnic.errorprone.refastertemplates.StringTemplates.StringIsEmpty;
+import tech.picnic.errorprone.refastertemplates.StringTemplates.StringIsNullOrEmpty;
+import tech.picnic.errorprone.refastertemplates.StringTemplates.SubstringRemainder;
+import tech.picnic.errorprone.refastertemplates.StringTemplates.Utf8EncodedLength;
 
+@TemplateCollection(StringTemplates.class)
 final class StringTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
@@ -20,6 +30,7 @@ final class StringTemplatesTest implements RefasterTemplateTestCase {
         Arrays.class, Joiner.class, Stream.class, Streams.class, joining(), UTF_8);
   }
 
+  @Template(StringIsEmpty.class)
   ImmutableSet<Boolean> testStringIsEmpty() {
     return ImmutableSet.of(
         "foo".length() == 0,
@@ -30,12 +41,14 @@ final class StringTemplatesTest implements RefasterTemplateTestCase {
         "baz".length() >= 1);
   }
 
+  @Template(StringIsNullOrEmpty.class)
   ImmutableSet<Boolean> testStringIsNullOrEmpty() {
     return ImmutableSet.of(
         getClass().getName() == null || getClass().getName().isEmpty(),
         getClass().getName() != null && !getClass().getName().isEmpty());
   }
 
+  @Template(OptionalNonEmptyString.class)
   ImmutableSet<Optional<String>> testOptionalNonEmptyString() {
     return ImmutableSet.of(
         Strings.isNullOrEmpty(toString()) ? Optional.empty() : Optional.of(toString()),
@@ -44,10 +57,12 @@ final class StringTemplatesTest implements RefasterTemplateTestCase {
         !Strings.isNullOrEmpty(toString()) ? Optional.ofNullable(toString()) : Optional.empty());
   }
 
+  @Template(FilterEmptyString.class)
   Optional<String> testFilterEmptyString() {
     return Optional.of("foo").map(Strings::emptyToNull);
   }
 
+  @Template(JoinStrings.class)
   ImmutableSet<String> testJoinStrings() {
     return ImmutableSet.of(
         Joiner.on("a").join(new String[] {"foo", "bar"}),
@@ -58,10 +73,12 @@ final class StringTemplatesTest implements RefasterTemplateTestCase {
         ImmutableList.of("foo", "bar").stream().collect(joining("f")));
   }
 
+  @Template(SubstringRemainder.class)
   String testSubstringRemainder() {
     return "foo".substring(1, "foo".length());
   }
 
+  @Template(Utf8EncodedLength.class)
   int testUtf8EncodedLength() {
     return "foo".getBytes(UTF_8).length;
   }

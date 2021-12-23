@@ -17,7 +17,49 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import java.util.ArrayList;
 import java.util.Collections;
+import tech.picnic.errorprone.annotations.Template;
+import tech.picnic.errorprone.annotations.TemplateCollection;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqual;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualArrayIterationOrder;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualArrayIterationOrderWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualArraysIrrespectiveOfOrder;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualArraysIrrespectiveOfOrderWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualDoublesWithDelta;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualDoublesWithDeltaWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualFloatsWithDelta;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualFloatsWithDeltaWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualIterableIterationOrder;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualIterableIterationOrderWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualIteratorIterationOrder;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualIteratorIterationOrderWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualSets;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualSetsWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertEqualWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertFalse;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertFalseWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertNotNull;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertNotNullWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertNotSame;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertNotSameWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertNull;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertNullWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertSame;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertSameWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertThrows;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertThrowsWithType;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertTrue;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertTrueWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertUnequal;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertUnequalDoublesWithDelta;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertUnequalDoublesWithDeltaWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertUnequalFloatsWithDelta;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertUnequalFloatsWithDeltaWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.AssertUnequalWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.Fail;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.FailWithMessage;
+import tech.picnic.errorprone.refastertemplates.TestNGToAssertJTemplates.FailWithMessageAndThrowable;
 
+@TemplateCollection(TestNGToAssertJTemplates.class)
 final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
@@ -34,66 +76,82 @@ final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
         (Runnable) () -> assertTrue(true));
   }
 
+  @Template(Fail.class)
   void testFail() {
     org.testng.Assert.fail();
   }
 
+  @Template(FailWithMessage.class)
   void testFailWithMessage() {
     org.testng.Assert.fail("foo");
   }
 
+  @Template(FailWithMessageAndThrowable.class)
   void testFailWithMessageAndThrowable() {
     org.testng.Assert.fail("foo", new IllegalStateException());
   }
 
+  @Template(AssertTrue.class)
   void testAssertTrue() {
     assertTrue(true);
   }
 
+  @Template(AssertTrueWithMessage.class)
   void testAssertTrueWithMessage() {
     assertTrue(true, "foo");
   }
 
+  @Template(AssertFalse.class)
   void testAssertFalse() {
     assertFalse(true);
   }
 
+  @Template(AssertFalseWithMessage.class)
   void testAssertFalseWithMessage() {
     assertFalse(true, "message");
   }
 
+  @Template(AssertNull.class)
   void testAssertNull() {
     assertNull(new Object());
   }
 
+  @Template(AssertNullWithMessage.class)
   void testAssertNullWithMessage() {
     assertNull(new Object(), "foo");
   }
 
+  @Template(AssertNotNull.class)
   void testAssertNotNull() {
     assertNotNull(new Object());
   }
 
+  @Template(AssertNotNullWithMessage.class)
   void testAssertNotNullWithMessage() {
     assertNotNull(new Object(), "foo");
   }
 
+  @Template(AssertSame.class)
   void testAssertSame() {
     assertSame(new Object(), new Object());
   }
 
+  @Template(AssertSameWithMessage.class)
   void testAssertSameWithMessage() {
     assertSame(new Object(), new Object(), "foo");
   }
 
+  @Template(AssertNotSame.class)
   void testAssertNotSame() {
     assertNotSame(new Object(), new Object());
   }
 
+  @Template(AssertNotSameWithMessage.class)
   void testAssertNotSameWithMessage() {
     assertNotSame(new Object(), new Object(), "foo");
   }
 
+  @Template(AssertEqual.class)
   void testAssertEqual() {
     assertEquals(true, true);
     assertEquals((byte) 0, (byte) 0);
@@ -109,6 +167,7 @@ final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
     assertEquals(ImmutableMap.of(), ImmutableMap.of());
   }
 
+  @Template(AssertEqualWithMessage.class)
   void testAssertEqualWithMessage() {
     assertEquals(true, true, "foo");
     assertEquals((byte) 0, (byte) 0, "bar");
@@ -123,22 +182,27 @@ final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
     assertEquals(ImmutableMap.of(), ImmutableMap.of(), "plugh");
   }
 
+  @Template(AssertEqualFloatsWithDelta.class)
   void testAssertEqualFloatsWithDelta() {
     assertEquals(0.0F, 0.0F, 0.0F);
   }
 
+  @Template(AssertEqualFloatsWithDeltaWithMessage.class)
   void testAssertEqualFloatsWithDeltaWithMessage() {
     assertEquals(0.0F, 0.0F, 0.0F, "foo");
   }
 
+  @Template(AssertEqualDoublesWithDelta.class)
   void testAssertEqualDoublesWithDelta() {
     assertEquals(0.0, 0.0, 0.0);
   }
 
+  @Template(AssertEqualDoublesWithDeltaWithMessage.class)
   void testAssertEqualDoublesWithDeltaWithMessage() {
     assertEquals(0.0, 0.0, 0.0, "foo");
   }
 
+  @Template(AssertEqualArrayIterationOrder.class)
   void testAssertEqualArrayIterationOrder() {
     assertEquals(new boolean[0], new boolean[0]);
     assertEquals(new byte[0], new byte[0]);
@@ -151,6 +215,7 @@ final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
     assertEquals(new Object[0], new Object[0]);
   }
 
+  @Template(AssertEqualArrayIterationOrderWithMessage.class)
   void testAssertEqualArrayIterationOrderWithMessage() {
     assertEquals(new boolean[0], new boolean[0], "foo");
     assertEquals(new byte[0], new byte[0], "bar");
@@ -163,20 +228,24 @@ final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
     assertEquals(new Object[0], new Object[0], "garply");
   }
 
+  @Template(AssertEqualArraysIrrespectiveOfOrder.class)
   void testAssertEqualArraysIrrespectiveOfOrder() {
     assertEqualsNoOrder(new Object[0], new Object[0]);
   }
 
+  @Template(AssertEqualArraysIrrespectiveOfOrderWithMessage.class)
   void testAssertEqualArraysIrrespectiveOfOrderWithMessage() {
     assertEqualsNoOrder(new Object[0], new Object[0], "foo");
   }
 
+  @Template(AssertEqualIteratorIterationOrder.class)
   void testAssertEqualIteratorIterationOrder() {
     assertEquals(
         Iterators.unmodifiableIterator(new ArrayList<>().iterator()),
         Iterators.unmodifiableIterator(new ArrayList<>().iterator()));
   }
 
+  @Template(AssertEqualIteratorIterationOrderWithMessage.class)
   void testAssertEqualIteratorIterationOrderWithMessage() {
     assertEquals(
         Iterators.unmodifiableIterator(new ArrayList<>().iterator()),
@@ -184,6 +253,7 @@ final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
         "foo");
   }
 
+  @Template(AssertEqualIterableIterationOrder.class)
   void testAssertEqualIterableIterationOrder() {
     assertEquals(
         Iterables.unmodifiableIterable(new ArrayList<>()),
@@ -193,6 +263,7 @@ final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
         Collections.synchronizedCollection(new ArrayList<>()));
   }
 
+  @Template(AssertEqualIterableIterationOrderWithMessage.class)
   void testAssertEqualIterableIterationOrderWithMessage() {
     assertEquals(
         Iterables.unmodifiableIterable(new ArrayList<>()),
@@ -204,14 +275,17 @@ final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
         "bar");
   }
 
+  @Template(AssertEqualSets.class)
   void testAssertEqualSets() {
     assertEquals(ImmutableSet.of(), ImmutableSet.of());
   }
 
+  @Template(AssertEqualSetsWithMessage.class)
   void testAssertEqualSetsWithMessage() {
     assertEquals(ImmutableSet.of(), ImmutableSet.of(), "foo");
   }
 
+  @Template(AssertUnequal.class)
   void testAssertUnequal() {
     assertNotEquals(true, true);
     assertNotEquals((byte) 0, (byte) 0);
@@ -227,6 +301,7 @@ final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
     assertNotEquals(ImmutableMap.of(), ImmutableMap.of());
   }
 
+  @Template(AssertUnequalWithMessage.class)
   void testAssertUnequalWithMessage() {
     assertNotEquals(true, true, "foo");
     assertNotEquals((byte) 0, (byte) 0, "bar");
@@ -242,26 +317,32 @@ final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
     assertNotEquals(ImmutableMap.of(), ImmutableMap.of(), "plugh");
   }
 
+  @Template(AssertUnequalFloatsWithDelta.class)
   void testAssertUnequalFloatsWithDelta() {
     assertNotEquals(0.0F, 0.0F, 0.0F);
   }
 
+  @Template(AssertUnequalFloatsWithDeltaWithMessage.class)
   void testAssertUnequalFloatsWithDeltaWithMessage() {
     assertNotEquals(0.0F, 0.0F, 0.0F, "foo");
   }
 
+  @Template(AssertUnequalDoublesWithDelta.class)
   void testAssertUnequalDoublesWithDelta() {
     assertNotEquals(0.0, 0.0, 0.0);
   }
 
+  @Template(AssertUnequalDoublesWithDeltaWithMessage.class)
   void testAssertUnequalDoublesWithDeltaWithMessage() {
     assertNotEquals(0.0, 0.0, 0.0, "foo");
   }
 
+  @Template(AssertThrows.class)
   void testAssertThrows() {
     assertThrows(() -> {});
   }
 
+  @Template(AssertThrowsWithType.class)
   void testAssertThrowsWithType() {
     assertThrows(IllegalStateException.class, () -> {});
   }
