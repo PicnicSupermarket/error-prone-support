@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import org.assertj.core.api.NumberAssert;
 
 final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
-  ImmutableSet<NumberAssert<?, ?>> testAbstractIntegerAssertIsPositive() {
+  ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsPositive() {
     return ImmutableSet.of(
         assertThat((byte) 0).isPositive(),
         assertThat((byte) 0).isPositive(),
@@ -25,7 +25,7 @@ final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigDecimal.ZERO).isPositive());
   }
 
-  ImmutableSet<NumberAssert<?, ?>> testAbstractIntegerAssertIsNotPositive() {
+  ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsNotPositive() {
     return ImmutableSet.of(
         assertThat((byte) 0).isNotPositive(),
         assertThat((byte) 0).isNotPositive(),
@@ -42,7 +42,7 @@ final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigDecimal.ZERO).isNotPositive());
   }
 
-  ImmutableSet<NumberAssert<?, ?>> testAbstractIntegerAssertIsNegative() {
+  ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsNegative() {
     return ImmutableSet.of(
         assertThat((byte) 0).isNegative(),
         assertThat((byte) 0).isNegative(),
@@ -59,7 +59,7 @@ final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigDecimal.ZERO).isNegative());
   }
 
-  ImmutableSet<NumberAssert<?, ?>> testAbstractIntegerAssertIsNotNegative() {
+  ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsNotNegative() {
     return ImmutableSet.of(
         assertThat((byte) 0).isNotNegative(),
         assertThat((byte) 0).isNotNegative(),

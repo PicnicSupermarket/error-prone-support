@@ -67,7 +67,10 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   private static final String REFASTER_TEMPLATE_SUFFIX = ".refaster";
   private static final String INCLUDED_TEMPLATES_PATTERN_FLAG = "Refaster:NamePattern";
 
-  /** Test */
+  /**
+   * Retrieve all code transformers by calling {@link
+   * Suppliers#memoize(com.google.common.base.Supplier)}.
+   */
   public static final Supplier<ImmutableListMultimap<String, CodeTransformer>>
       ALL_CODE_TRANSFORMERS = Suppliers.memoize(RefasterCheck::loadAllCodeTransformers);
 
@@ -179,9 +182,10 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   }
 
   /**
-   * Test
+   * Use the classpath to find all resources that are {@link CodeTransformer}s. Next, map the {@link
+   * CodeTransformer}s based on the template name.
    *
-   * @return X
+   * @return all {@link CodeTransformer}s by template name.
    */
   public static ImmutableListMultimap<String, CodeTransformer> loadAllCodeTransformers() {
     ImmutableListMultimap.Builder<String, CodeTransformer> transformers =

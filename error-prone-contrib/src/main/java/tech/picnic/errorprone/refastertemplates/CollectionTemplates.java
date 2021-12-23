@@ -187,7 +187,7 @@ final class CollectionTemplates {
    * Don't call {@link ImmutableCollection#asList()} if the result is going to be streamed; stream
    * directly.
    */
-  static final class ImmutableCollectionAsListToStream<T> {
+  static final class ImmutableCollectionStream<T> {
     @BeforeTemplate
     Stream<T> before(ImmutableCollection<T> collection) {
       return collection.asList().stream();

@@ -198,23 +198,7 @@ final class LongStreamTemplates {
     }
   }
 
-  /** Prefer {@link LongStream#noneMatch(LongPredicate)} over more contrived alternatives. */
-  static final class LongStreamNoneMatch {
-    @BeforeTemplate
-    boolean before(LongStream stream, LongPredicate predicate) {
-      return Refaster.anyOf(
-          !stream.anyMatch(predicate),
-          stream.allMatch(predicate.negate()),
-          stream.filter(predicate).findAny().isEmpty());
-    }
-
-    @AfterTemplate
-    boolean after(LongStream stream, LongPredicate predicate) {
-      return stream.noneMatch(predicate);
-    }
-  }
-
-  abstract static class LongStreamNoneMatch2 {
+  abstract static class LongStreamNoneMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse long element);
 
@@ -226,6 +210,22 @@ final class LongStreamTemplates {
     @AfterTemplate
     boolean after(LongStream stream) {
       return stream.noneMatch(e -> test(e));
+    }
+  }
+
+  /** Prefer {@link LongStream#noneMatch(LongPredicate)} over more contrived alternatives. */
+  static final class LongStreamNoneMatchPredicate {
+    @BeforeTemplate
+    boolean before(LongStream stream, LongPredicate predicate) {
+      return Refaster.anyOf(
+          !stream.anyMatch(predicate),
+          stream.allMatch(predicate.negate()),
+          stream.filter(predicate).findAny().isEmpty());
+    }
+
+    @AfterTemplate
+    boolean after(LongStream stream, LongPredicate predicate) {
+      return stream.noneMatch(predicate);
     }
   }
 
@@ -243,19 +243,7 @@ final class LongStreamTemplates {
     }
   }
 
-  static final class LongStreamAllMatch {
-    @BeforeTemplate
-    boolean before(LongStream stream, LongPredicate predicate) {
-      return stream.noneMatch(predicate.negate());
-    }
-
-    @AfterTemplate
-    boolean after(LongStream stream, LongPredicate predicate) {
-      return stream.allMatch(predicate);
-    }
-  }
-
-  abstract static class LongStreamAllMatch2 {
+  abstract static class LongStreamAllMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse long element);
 
@@ -267,6 +255,18 @@ final class LongStreamTemplates {
     @AfterTemplate
     boolean after(LongStream stream) {
       return stream.allMatch(e -> test(e));
+    }
+  }
+
+  static final class LongStreamAllMatchPredicate {
+    @BeforeTemplate
+    boolean before(LongStream stream, LongPredicate predicate) {
+      return stream.noneMatch(predicate.negate());
+    }
+
+    @AfterTemplate
+    boolean after(LongStream stream, LongPredicate predicate) {
+      return stream.allMatch(predicate);
     }
   }
 }

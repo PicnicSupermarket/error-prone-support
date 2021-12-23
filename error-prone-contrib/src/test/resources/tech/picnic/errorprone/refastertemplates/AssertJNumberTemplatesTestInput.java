@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import org.assertj.core.api.NumberAssert;
 
 final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
-  ImmutableSet<NumberAssert<?, ?>> testAbstractIntegerAssertIsPositive() {
+  ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsPositive() {
     return ImmutableSet.of(
         assertThat((byte) 0).isGreaterThan((byte) 0),
         assertThat((byte) 0).isGreaterThanOrEqualTo((byte) 1),
@@ -25,7 +25,7 @@ final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigDecimal.ZERO).isGreaterThan(BigDecimal.ZERO));
   }
 
-  ImmutableSet<NumberAssert<?, ?>> testAbstractIntegerAssertIsNotPositive() {
+  ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsNotPositive() {
     return ImmutableSet.of(
         assertThat((byte) 0).isLessThanOrEqualTo((byte) 0),
         assertThat((byte) 0).isLessThan((byte) 1),
@@ -42,7 +42,7 @@ final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigDecimal.ZERO).isLessThanOrEqualTo(BigDecimal.ZERO));
   }
 
-  ImmutableSet<NumberAssert<?, ?>> testAbstractIntegerAssertIsNegative() {
+  ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsNegative() {
     return ImmutableSet.of(
         assertThat((byte) 0).isLessThan((byte) 0),
         assertThat((byte) 0).isLessThanOrEqualTo((byte) -1),
@@ -59,7 +59,7 @@ final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigDecimal.ZERO).isLessThan(BigDecimal.ZERO));
   }
 
-  ImmutableSet<NumberAssert<?, ?>> testAbstractIntegerAssertIsNotNegative() {
+  ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsNotNegative() {
     return ImmutableSet.of(
         assertThat((byte) 0).isGreaterThanOrEqualTo((byte) 0),
         assertThat((byte) 0).isGreaterThan((byte) -1),

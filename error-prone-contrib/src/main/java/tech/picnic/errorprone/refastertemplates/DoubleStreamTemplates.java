@@ -185,23 +185,7 @@ final class DoubleStreamTemplates {
     }
   }
 
-  /** Prefer {@link DoubleStream#noneMatch(DoublePredicate)} over more contrived alternatives. */
-  static final class DoubleStreamNoneMatch {
-    @BeforeTemplate
-    boolean before(DoubleStream stream, DoublePredicate predicate) {
-      return Refaster.anyOf(
-          !stream.anyMatch(predicate),
-          stream.allMatch(predicate.negate()),
-          stream.filter(predicate).findAny().isEmpty());
-    }
-
-    @AfterTemplate
-    boolean after(DoubleStream stream, DoublePredicate predicate) {
-      return stream.noneMatch(predicate);
-    }
-  }
-
-  abstract static class DoubleStreamNoneMatch2 {
+  abstract static class DoubleStreamNoneMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse double element);
 
@@ -213,6 +197,22 @@ final class DoubleStreamTemplates {
     @AfterTemplate
     boolean after(DoubleStream stream) {
       return stream.noneMatch(e -> test(e));
+    }
+  }
+
+  /** Prefer {@link DoubleStream#noneMatch(DoublePredicate)} over more contrived alternatives. */
+  static final class DoubleStreamNoneMatchPredicate {
+    @BeforeTemplate
+    boolean before(DoubleStream stream, DoublePredicate predicate) {
+      return Refaster.anyOf(
+          !stream.anyMatch(predicate),
+          stream.allMatch(predicate.negate()),
+          stream.filter(predicate).findAny().isEmpty());
+    }
+
+    @AfterTemplate
+    boolean after(DoubleStream stream, DoublePredicate predicate) {
+      return stream.noneMatch(predicate);
     }
   }
 
@@ -230,19 +230,7 @@ final class DoubleStreamTemplates {
     }
   }
 
-  static final class DoubleStreamAllMatch {
-    @BeforeTemplate
-    boolean before(DoubleStream stream, DoublePredicate predicate) {
-      return stream.noneMatch(predicate.negate());
-    }
-
-    @AfterTemplate
-    boolean after(DoubleStream stream, DoublePredicate predicate) {
-      return stream.allMatch(predicate);
-    }
-  }
-
-  abstract static class DoubleStreamAllMatch2 {
+  abstract static class DoubleStreamAllMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse double element);
 
@@ -254,6 +242,18 @@ final class DoubleStreamTemplates {
     @AfterTemplate
     boolean after(DoubleStream stream) {
       return stream.allMatch(e -> test(e));
+    }
+  }
+
+  static final class DoubleStreamAllMatchPredicate {
+    @BeforeTemplate
+    boolean before(DoubleStream stream, DoublePredicate predicate) {
+      return stream.noneMatch(predicate.negate());
+    }
+
+    @AfterTemplate
+    boolean after(DoubleStream stream, DoublePredicate predicate) {
+      return stream.allMatch(predicate);
     }
   }
 }

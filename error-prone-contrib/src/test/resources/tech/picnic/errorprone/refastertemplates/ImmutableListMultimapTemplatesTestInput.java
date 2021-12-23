@@ -82,13 +82,13 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
             .collect(toImmutableListMultimap(n -> n.intValue(), identity())));
   }
 
-  ImmutableListMultimap<String, Integer> testTransformMultimapValuesToImmutableListMultimap() {
+  ImmutableListMultimap<String, Integer> testImmutableListMultimapCopyOfMultimapsTransformValues() {
     return ImmutableListMultimap.of("foo", 1L).entries().stream()
         .collect(toImmutableListMultimap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue())));
   }
 
   ImmutableSet<ImmutableListMultimap<String, Integer>>
-      testTransformMultimapValuesToImmutableListMultimap2() {
+      testImmutableListMultimapCopyOfMultimapsTransformValuesTransformation() {
     return ImmutableSet.of(
         ImmutableSetMultimap.of("foo", 1L).asMap().entrySet().stream()
             .collect(
