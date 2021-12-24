@@ -37,7 +37,7 @@ final class ImmutableListTemplates {
 
     @AfterTemplate
     ImmutableList.Builder<T> after() {
-      return ImmutableList.builder();
+      return ImmutableList.<T>builder();
     }
   }
 
