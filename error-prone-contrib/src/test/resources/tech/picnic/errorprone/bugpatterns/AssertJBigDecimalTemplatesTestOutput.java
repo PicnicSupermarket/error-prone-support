@@ -26,24 +26,15 @@ final class AssertJBigDecimalTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigDecimal.ZERO).isNotEqualTo(BigDecimal.ONE));
   }
 
-  ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsZero() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO).isEqualTo(0),
-        assertThat(BigDecimal.ZERO).isEqualTo(0),
-        assertThat(BigDecimal.ZERO).isEqualTo(0));
+  AbstractBigDecimalAssert<?> testAbstractBigDecimalAssertIsZero() {
+    return assertThat(BigDecimal.ZERO).isZero();
   }
 
-  ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsNotZero() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO).isNotEqualTo(0),
-        assertThat(BigDecimal.ZERO).isNotEqualTo(0),
-        assertThat(BigDecimal.ZERO).isNotEqualTo(0));
+  AbstractBigDecimalAssert<?> testAbstractBigDecimalAssertIsNotZero() {
+    return assertThat(BigDecimal.ZERO).isNotZero();
   }
 
-  ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsOne() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO).isEqualTo(1),
-        assertThat(BigDecimal.ZERO).isEqualTo(1),
-        assertThat(BigDecimal.ZERO).isEqualTo(1));
+  AbstractBigDecimalAssert<?> testAbstractBigDecimalAssertIsOne() {
+    return assertThat(BigDecimal.ZERO).isOne();
   }
 }
