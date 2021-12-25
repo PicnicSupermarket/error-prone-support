@@ -7,6 +7,7 @@ import static com.google.errorprone.matchers.Matchers.isType;
 import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
@@ -22,6 +23,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Symbol;
+import java.util.Objects;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
 
@@ -59,6 +61,13 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
               isType("org.junit.jupiter.api.AfterEach"),
               isType("org.junit.jupiter.api.BeforeAll"),
               isType("org.junit.jupiter.api.BeforeEach")));
+  private static final ImmutableMap<String, String> REPLACEMENTS =
+      ImmutableMap.<String, String>builder()
+          .put("org.junit.jupiter.api.AfterAll", "afterAll")
+          .put("org.junit.jupiter.api.AfterEach", "tearDown")
+          .put("org.junit.jupiter.api.BeforeAll", "beforeAll")
+          .put("org.junit.jupiter.api.BeforeEach", "setUp")
+          .build();
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
@@ -83,7 +92,30 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
       tryCanonicalizeMethodName(tree, state).ifPresent(builder::merge);
     }
 
+    if (SETUP_OR_TEARDOWN_METHOD.matches(tree, state)) {
+      tryCanonicalizeSetupOrTeardownMethod(tree, state).ifPresent(builder::merge);
+    }
+
     return builder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, builder.build());
+  }
+
+  private static Optional<SuggestedFix> tryCanonicalizeSetupOrTeardownMethod(
+      MethodTree tree, VisitorState state) {
+    Symbol.MethodSymbol symbol = ASTHelpers.getSymbol(tree);
+
+    return symbol.getAnnotationMirrors().stream()
+        .map(compound -> compound.getAnnotationType().toString())
+        .filter(REPLACEMENTS::containsKey)
+        .filter(
+            e ->
+                !symbol
+                    .getSimpleName()
+                    .toString()
+                    .startsWith(
+                        Objects.requireNonNull(
+                            REPLACEMENTS.get(e)))) // , tree.getName().toString()))
+        .findFirst()
+        .map(e -> SuggestedFixes.renameMethod(tree, REPLACEMENTS.get(e), state));
   }
 
   private static Optional<SuggestedFix> tryCanonicalizeMethodName(
