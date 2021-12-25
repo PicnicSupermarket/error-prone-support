@@ -26,24 +26,15 @@ final class AssertJBigDecimalTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigDecimal.ZERO).isNotCloseTo(BigDecimal.ONE, withPercentage(0)));
   }
 
-  ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsZero() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO).isZero(),
-        assertThat(BigDecimal.ZERO).isEqualTo(0L),
-        assertThat(BigDecimal.ZERO).isEqualTo(BigDecimal.ZERO));
+  AbstractBigDecimalAssert<?> testAbstractBigDecimalAssertIsZero() {
+    return assertThat(BigDecimal.ZERO).isEqualTo(BigDecimal.ZERO);
   }
 
-  ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsNotZero() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO).isNotZero(),
-        assertThat(BigDecimal.ZERO).isNotEqualTo(0L),
-        assertThat(BigDecimal.ZERO).isNotEqualTo(BigDecimal.ZERO));
+  AbstractBigDecimalAssert<?> testAbstractBigDecimalAssertIsNotZero() {
+    return assertThat(BigDecimal.ZERO).isNotEqualTo(BigDecimal.ZERO);
   }
 
-  ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsOne() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO).isOne(),
-        assertThat(BigDecimal.ZERO).isEqualTo(1L),
-        assertThat(BigDecimal.ZERO).isEqualTo(BigDecimal.ONE));
+  AbstractBigDecimalAssert<?> testAbstractBigDecimalAssertIsOne() {
+    return assertThat(BigDecimal.ZERO).isEqualTo(BigDecimal.ONE);
   }
 }
