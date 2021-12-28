@@ -7,6 +7,7 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import java.io.IOException;
 import java.util.Arrays;
 import org.assertj.core.api.Assertions;
 import reactor.adapter.rxjava.RxJava2Adapter;
@@ -113,11 +114,20 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
   }
 
   Completable testCompletableOnErrorComplete() {
-    return RxJava2Adapter.monoToCompletable(Mono.empty()).onErrorComplete();
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.completableToMono(Completable.complete()).onErrorStop());
   }
 
   Completable testCompletableOnErrorCompletePredicate() {
-    return RxJava2Adapter.monoToCompletable(Mono.empty()).onErrorComplete(throwable -> true);
+    RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.completableToMono(Completable.complete())
+            .onErrorResume(
+                RxJavaReactorMigrationUtil.toJdkPredicate(t -> t instanceof IOException),
+                t -> Mono.empty()));
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.completableToMono(Completable.complete())
+            .onErrorResume(
+                RxJavaReactorMigrationUtil.toJdkPredicate(throwable -> true), t -> Mono.empty()));
   }
 
   Flowable<Void> testCompletableToFlowable() {

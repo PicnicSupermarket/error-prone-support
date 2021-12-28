@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
-import static com.google.common.collect.ImmutableList.*;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
@@ -114,7 +114,9 @@ public final class RxJavaToReactorTemplates {
   @SuppressWarnings({"NoFunctionalReturnType", "FunctionalInterfaceClash"})
   static final class RemoveUtilCallable<T> {
     @BeforeTemplate
-    Supplier<T> before(@CanTransformToTargetType Callable<T> callable) {
+    Supplier<T> before(
+        //        @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class)
+        @CanTransformToTargetType Callable<T> callable) {
       return RxJavaReactorMigrationUtil.callableAsSupplier(callable);
     }
 
@@ -128,7 +130,7 @@ public final class RxJavaToReactorTemplates {
   static final class UnnecessaryFunctionConversion<I, O> {
     @BeforeTemplate
     java.util.function.Function<? extends I, ? extends O> before(
-        // @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class)
+        //        @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class)
         @CanTransformToTargetType Function<? extends I, ? extends O> function) {
       return RxJavaReactorMigrationUtil.toJdkFunction(function);
     }
@@ -272,14 +274,14 @@ public final class RxJavaToReactorTemplates {
   }
 
   /** Remove unnecessary {@code Mono#then} */
-  static final class MonoThen<T> {
+  static final class MonoThen<T, S> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono, Mono<T> other) {
+    Mono<S> before(Mono<T> mono, Mono<S> other) {
       return mono.then().then(other);
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono, Mono<T> other) {
+    Mono<S> after(Mono<T> mono, Mono<S> other) {
       return mono.then(other);
     }
   }
@@ -347,18 +349,18 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
-  /** Remove unnecessary {@code Flux#next} */
-  static final class FluxSingle<T> {
-    @BeforeTemplate
-    Mono<T> before(Flux<T> flux) {
-      return flux.next().single();
-    }
-
-    @AfterTemplate
-    Mono<T> after(Flux<T> flux) {
-      return flux.single();
-    }
-  }
+  //  /** Remove unnecessary {@code Flux#next}. This is not *strictly* behavior preserving. */
+  //  static final class FluxSingle<T> {
+  //    @BeforeTemplate
+  //    Mono<T> before(Flux<T> flux) {
+  //      return flux.next().single();
+  //    }
+  //
+  //    @AfterTemplate
+  //    Mono<T> after(Flux<T> flux) {
+  //      return flux.single();
+  //    }
+  //  }
 
   // XXX: Find out how we can use this in the future.
   //  static final class RemoveRedundantCast<T> {

@@ -306,10 +306,12 @@ final class RxJavaCompletableToReactorTemplates {
 
   // XXX: Verify whether this is the correct equivalent.
   static final class CompletableOnErrorComplete {
+    @BeforeTemplate
     Completable before(Completable completable) {
       return completable.onErrorComplete();
     }
 
+    @AfterTemplate
     Completable after(Completable completable) {
       return RxJava2Adapter.monoToCompletable(
           RxJava2Adapter.completableToMono(completable).onErrorStop());
@@ -317,10 +319,12 @@ final class RxJavaCompletableToReactorTemplates {
   }
 
   static final class CompletableOnErrorCompletePredicate {
+    @BeforeTemplate
     Completable before(Completable completable, Predicate<? super Throwable> predicate) {
       return completable.onErrorComplete(predicate);
     }
 
+    @AfterTemplate
     Completable after(Completable completable, Predicate<? super Throwable> predicate) {
       return RxJava2Adapter.monoToCompletable(
           RxJava2Adapter.completableToMono(completable)
