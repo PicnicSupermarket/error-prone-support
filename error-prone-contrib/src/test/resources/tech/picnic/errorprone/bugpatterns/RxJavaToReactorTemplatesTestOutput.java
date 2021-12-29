@@ -118,4 +118,9 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
   Mono<Void> testMonoVoid() {
     return Mono.when(Flux.just(1));
   }
+
+  Flux<Object> testFlatMapFluxFromArray() {
+    Flux<String[]> test = null;
+    return test.flatMap(Flux::fromArray);
+  }
 }

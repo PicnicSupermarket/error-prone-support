@@ -349,6 +349,19 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
+  static final class FlatMapFluxFromArray<T> {
+    @BeforeTemplate
+    Flux<Object> before(Flux<T[]> flux) {
+      return flux.flatMap(Flowable::fromArray);
+    }
+
+    @UseImportPolicy(ImportPolicy.IMPORT_CLASS_DIRECTLY)
+    @AfterTemplate
+    Flux<Object> after(Flux<T[]> flux) {
+      return flux.flatMap(Flux::fromArray);
+    }
+  }
+
   //  /** Remove unnecessary {@code Flux#next}. This is not *strictly* behavior preserving. */
   //  static final class FluxSingle<T> {
   //    @BeforeTemplate

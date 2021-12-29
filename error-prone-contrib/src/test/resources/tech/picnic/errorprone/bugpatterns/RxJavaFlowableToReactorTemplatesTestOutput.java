@@ -305,6 +305,14 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
                     })));
   }
 
+  void testFlowableSubscribeTwoConsumersWithAction() {
+    RxJava2Adapter.flowableToFlux(Flowable.just(1))
+        .subscribe(
+            RxJavaReactorMigrationUtil.toJdkConsumer(i -> {}),
+            RxJavaReactorMigrationUtil.toJdkConsumer(i -> {}),
+            RxJavaReactorMigrationUtil.toRunnable(() -> {}));
+  }
+
   Single<List<Integer>> testFlowableToList() {
     return RxJava2Adapter.monoToSingle(
         RxJava2Adapter.flowableToFlux(Flowable.just(1, 2)).collectList());
@@ -317,6 +325,14 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
 
   Observable<Integer> testFlowableToObservable() {
     return RxJava2Adapter.fluxToFlowable(Flux.just(1)).toObservable();
+  }
+
+  Flowable<Integer> testFlowableZipWith() {
+    return RxJava2Adapter.fluxToFlowable(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1))
+            .zipWithIterable(
+                ImmutableList.of(1, 2),
+                RxJavaReactorMigrationUtil.toJdkBiFunction((a, b) -> a + b)));
   }
 
   void testFlowableTestAssertResultItem() throws InterruptedException {

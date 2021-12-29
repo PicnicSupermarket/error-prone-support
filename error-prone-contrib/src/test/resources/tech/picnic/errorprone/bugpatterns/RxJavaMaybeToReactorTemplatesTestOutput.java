@@ -11,7 +11,9 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Function;
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -197,6 +199,18 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return null;
   }
 
+  Single<Integer> testMaybeFlatMapPublisher() {
+    return RxJava2Adapter.monoToSingle(
+        RxJava2Adapter.maybeToMono(Maybe.just(1))
+            .flatMap(
+                y ->
+                    RxJava2Adapter.singleToMono(
+                        Single.wrap(
+                            RxJavaReactorMigrationUtil
+                                .<Integer, SingleSource<Integer>>toJdkFunction(e -> Single.just(1))
+                                .apply(y)))));
+  }
+
   Maybe<Integer> testMaybeFlatMapSingleElement() {
     return RxJava2Adapter.monoToMaybe(
         RxJava2Adapter.maybeToMono(Maybe.just(1))
@@ -230,6 +244,42 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
             .onErrorResume(t -> Mono.just(Integer.valueOf(1))));
   }
 
+  void testMaybeSubscribe() {
+    RxJava2Adapter.maybeToMono(Maybe.just(1)).subscribe();
+  }
+
+  void testMaybeSubscribeConsumer() {
+    RxJava2Adapter.maybeToMono(Maybe.just(1))
+        .subscribe(RxJavaReactorMigrationUtil.toJdkConsumer(i -> {}));
+  }
+
+  void testMaybeSubscribeTwoConsumers() {
+    RxJava2Adapter.maybeToMono(Maybe.just(1))
+        .subscribe(
+            RxJavaReactorMigrationUtil.toJdkConsumer(i -> {}),
+            RxJavaReactorMigrationUtil.toJdkConsumer(i -> {}));
+  }
+
+  void testMaybeSubscribeTwoConsumersWithAction() {
+    RxJava2Adapter.maybeToMono(Maybe.just(1))
+        .subscribe(
+            RxJavaReactorMigrationUtil.toJdkConsumer(i -> {}),
+            RxJavaReactorMigrationUtil.toJdkConsumer(i -> {}),
+            RxJavaReactorMigrationUtil.toRunnable(() -> {}));
+  }
+
+  Maybe<Integer> testMaybeSourceSwitchIfEmpty() {
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.maybeToMono(Maybe.just(1))
+            .switchIfEmpty(
+                RxJava2Adapter.maybeToMono(
+                    Maybe.wrap(
+                        Maybe.<Integer>error(
+                            () -> {
+                              throw new IllegalStateException();
+                            })))));
+  }
+
   Single<Integer> testMaybeSwitchIfEmpty() {
     return RxJava2Adapter.monoToSingle(
         RxJava2Adapter.maybeToMono(Maybe.just(1))
@@ -240,6 +290,14 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
                             () -> {
                               throw new IllegalStateException();
                             })))));
+  }
+
+  Maybe<Object> testMaybeTimeOut() {
+    return RxJava2Adapter.monoToMaybe(
+        RxJava2Adapter.maybeToMono(Maybe.empty())
+            .timeout(
+                Duration.of(100, TimeUnit.MILLISECONDS.toChronoUnit()),
+                RxJava2Adapter.maybeToMono(Maybe.wrap(Maybe.just(2)))));
   }
 
   Flowable<Integer> testMaybeToFlowable() {

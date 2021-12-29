@@ -9,6 +9,7 @@ import io.reactivex.MaybeSource;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 
@@ -145,6 +146,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return null;
   }
 
+  Single<Integer> testMaybeFlatMapPublisher() {
+    return Maybe.just(1).flatMapSingle(e -> Single.just(1));
+  }
+
   Maybe<Integer> testMaybeFlatMapSingleElement() {
     return Maybe.just(1).flatMapSingleElement(x -> Single.just(x));
   }
@@ -165,6 +170,31 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
     return Maybe.just(1).onErrorReturn(t -> Integer.valueOf(1));
   }
 
+  void testMaybeSubscribe() {
+    Maybe.just(1).subscribe();
+  }
+
+  void testMaybeSubscribeConsumer() {
+    Maybe.just(1).subscribe(i -> {});
+  }
+
+  void testMaybeSubscribeTwoConsumers() {
+    Maybe.just(1).subscribe(i -> {}, i -> {});
+  }
+
+  void testMaybeSubscribeTwoConsumersWithAction() {
+    Maybe.just(1).subscribe(i -> {}, i -> {}, () -> {});
+  }
+
+  Maybe<Integer> testMaybeSourceSwitchIfEmpty() {
+    return Maybe.just(1)
+        .switchIfEmpty(
+            Maybe.<Integer>error(
+                () -> {
+                  throw new IllegalStateException();
+                }));
+  }
+
   Single<Integer> testMaybeSwitchIfEmpty() {
     return Maybe.just(1)
         .switchIfEmpty(
@@ -172,6 +202,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
                 () -> {
                   throw new IllegalStateException();
                 }));
+  }
+
+  Maybe<Object> testMaybeTimeOut() {
+    return Maybe.empty().timeout(100, TimeUnit.MILLISECONDS, Maybe.just(2));
   }
 
   Flowable<Integer> testMaybeToFlowable() {

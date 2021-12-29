@@ -1181,7 +1181,6 @@ final class RxJavaFlowableToReactorTemplates {
     }
   }
 
-  // XXX: Add test
   static final class FlowableSubscribeTwoConsumersWithAction<T> {
     @BeforeTemplate
     Disposable before(
@@ -1357,7 +1356,6 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable withLatestFrom(Publisher,Publisher,Publisher,Publisher,Function5)
   // XXX: final Flowable zipWith(Iterable,BiFunction)
 
-  // XXX: Add test
   static final class FlowableZipWith<T, U, R> {
     @BeforeTemplate
     Flowable<R> before(

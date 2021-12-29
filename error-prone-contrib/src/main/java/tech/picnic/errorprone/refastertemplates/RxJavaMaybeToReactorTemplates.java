@@ -553,7 +553,6 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: Add test
   static final class MaybeIsEmpty<T> {
     @BeforeTemplate
     Single<Boolean> before(Maybe<T> maybe) {
@@ -659,7 +658,6 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe retryUntil(BooleanSupplier)
   // XXX: public final Maybe retryWhen(Function)
 
-  // XXX: Add test
   static final class MaybeSubscribe<T> {
     @BeforeTemplate
     Disposable before(Maybe<T> maybe) {
@@ -672,7 +670,6 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: Add test
   static final class MaybeSubscribeConsumer<T> {
     @BeforeTemplate
     Disposable before(Maybe<T> maybe, Consumer<? super T> consumer) {
@@ -686,7 +683,6 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: Add test
   static final class MaybeSubscribeTwoConsumers<T> {
     @BeforeTemplate
     Disposable before(
@@ -704,7 +700,6 @@ final class RxJavaMaybeToReactorTemplates {
     }
   }
 
-  // XXX: Add test
   static final class MaybeSubscribeTwoConsumersWithAction<T> {
     @BeforeTemplate
     Disposable before(
@@ -733,7 +728,6 @@ final class RxJavaMaybeToReactorTemplates {
   // XXX: public final Maybe subscribeOn(Scheduler)
   // XXX: public final MaybeObserver subscribeWith(MaybeObserver)
 
-  // XXX: Add test
   static final class MaybeSourceSwitchIfEmpty<S, T extends S> {
     @BeforeTemplate
     Maybe<S> before(Maybe<S> maybe, MaybeSource<T> maybeSource) {
