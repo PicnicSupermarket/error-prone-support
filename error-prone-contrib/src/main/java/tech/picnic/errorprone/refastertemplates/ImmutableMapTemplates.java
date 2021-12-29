@@ -10,7 +10,9 @@ import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
@@ -20,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.util.IsIdentity;
 
 /** Refaster templates related to expressions dealing with {@link ImmutableMap}s. */
 final class ImmutableMapTemplates {
@@ -94,32 +97,35 @@ final class ImmutableMapTemplates {
    * Prefer {@link Maps#toMap(Iterable, com.google.common.base.Function)} over more contrived
    * alternatives.
    */
-  // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
   static final class IterableToImmutableMap<K, V> {
     @BeforeTemplate
     ImmutableMap<K, V> before(
-        Iterator<K> iterable, Function<? super K, ? extends V> valueFunction) {
+        Iterator<K> iterable,
+        @NotMatches(IsIdentity.class) Function<? super K, ? extends V> valueFunction) {
       return Streams.stream(iterable)
           .collect(toImmutableMap(Refaster.anyOf(identity(), k -> k), valueFunction));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
-        Iterable<K> iterable, Function<? super K, ? extends V> valueFunction) {
+        Iterable<K> iterable,
+        @NotMatches(IsIdentity.class) Function<? super K, ? extends V> valueFunction) {
       return Streams.stream(iterable)
           .collect(toImmutableMap(Refaster.anyOf(identity(), k -> k), valueFunction));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
-        Collection<K> iterable, Function<? super K, ? extends V> valueFunction) {
+        Collection<K> iterable,
+        @NotMatches(IsIdentity.class) Function<? super K, ? extends V> valueFunction) {
       return iterable.stream()
           .collect(toImmutableMap(Refaster.anyOf(identity(), k -> k), valueFunction));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
-        Set<K> iterable, com.google.common.base.Function<? super K, V> valueFunction) {
+        Set<K> iterable,
+        @NotMatches(IsIdentity.class) com.google.common.base.Function<? super K, V> valueFunction) {
       return ImmutableMap.copyOf(Maps.asMap(iterable, valueFunction));
     }
 
@@ -127,6 +133,49 @@ final class ImmutableMapTemplates {
     ImmutableMap<K, V> after(
         Iterable<K> iterable, com.google.common.base.Function<? super K, V> valueFunction) {
       return Maps.toMap(iterable, valueFunction);
+    }
+  }
+
+  /**
+   * Prefer {@link Maps#toMap(Iterable, com.google.common.base.Function)} over more contrived
+   * alternatives and rewrite {@link Function#identity()} to {@code k -> k}.
+   */
+  static final class IterableToImmutableMapIdentity<K, V> {
+    @BeforeTemplate
+    ImmutableMap<K, V> before(
+        Iterator<K> iterable,
+        @Matches(IsIdentity.class) Function<? super K, ? extends V> valueFunction) {
+      return Streams.stream(iterable)
+          .collect(toImmutableMap(Refaster.anyOf(identity(), k -> k), valueFunction));
+    }
+
+    @BeforeTemplate
+    ImmutableMap<K, V> before(
+        Iterable<K> iterable,
+        @Matches(IsIdentity.class) Function<? super K, ? extends V> valueFunction) {
+      return Streams.stream(iterable)
+          .collect(toImmutableMap(Refaster.anyOf(identity(), k -> k), valueFunction));
+    }
+
+    @BeforeTemplate
+    ImmutableMap<K, V> before(
+        Collection<K> iterable,
+        @Matches(IsIdentity.class) Function<? super K, ? extends V> valueFunction) {
+      return iterable.stream()
+          .collect(toImmutableMap(Refaster.anyOf(identity(), k -> k), valueFunction));
+    }
+
+    @BeforeTemplate
+    ImmutableMap<K, V> before(
+        Set<K> iterable,
+        @Matches(IsIdentity.class) com.google.common.base.Function<? super K, V> valueFunction) {
+      return ImmutableMap.copyOf(Maps.asMap(iterable, valueFunction));
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, K> after(
+        Iterable<K> iterable, com.google.common.base.Function<? super K, V> valueFunction) {
+      return Maps.toMap(iterable, k -> k);
     }
   }
 
@@ -188,23 +237,27 @@ final class ImmutableMapTemplates {
    * Prefer {@link Maps#uniqueIndex(Iterable, com.google.common.base.Function)} over the
    * stream-based alternative.
    */
-  // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
   static final class IndexIterableToImmutableMap<K, V> {
     @BeforeTemplate
-    ImmutableMap<K, V> before(Iterator<V> iterable, Function<? super V, ? extends K> keyFunction) {
-      return Streams.stream(iterable)
-          .collect(toImmutableMap(keyFunction, Refaster.anyOf(identity(), v -> v)));
-    }
-
-    @BeforeTemplate
-    ImmutableMap<K, V> before(Iterable<V> iterable, Function<? super V, ? extends K> keyFunction) {
+    ImmutableMap<K, V> before(
+        Iterator<V> iterable,
+        @NotMatches(IsIdentity.class) Function<? super V, ? extends K> keyFunction) {
       return Streams.stream(iterable)
           .collect(toImmutableMap(keyFunction, Refaster.anyOf(identity(), v -> v)));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
-        Collection<V> iterable, Function<? super V, ? extends K> keyFunction) {
+        Iterable<V> iterable,
+        @NotMatches(IsIdentity.class) Function<? super V, ? extends K> keyFunction) {
+      return Streams.stream(iterable)
+          .collect(toImmutableMap(keyFunction, Refaster.anyOf(identity(), v -> v)));
+    }
+
+    @BeforeTemplate
+    ImmutableMap<K, V> before(
+        Collection<V> iterable,
+        @NotMatches(IsIdentity.class) Function<? super V, ? extends K> keyFunction) {
       return iterable.stream()
           .collect(toImmutableMap(keyFunction, Refaster.anyOf(identity(), v -> v)));
     }
@@ -213,6 +266,42 @@ final class ImmutableMapTemplates {
     ImmutableMap<K, V> after(
         Iterable<V> iterable, com.google.common.base.Function<? super V, K> keyFunction) {
       return Maps.uniqueIndex(iterable, keyFunction);
+    }
+  }
+
+  /**
+   * Prefer {@link Maps#uniqueIndex(Iterable, com.google.common.base.Function)} over the
+   * stream-based alternatives and rewrite {@link Function#identity()} to {@code k -> k}.
+   */
+  static final class IndexIterableToImmutableMapIdentity<K, V> {
+    @BeforeTemplate
+    ImmutableMap<K, V> before(
+        Iterator<V> iterable,
+        @Matches(IsIdentity.class) Function<? super V, ? extends K> keyFunction) {
+      return Streams.stream(iterable)
+          .collect(toImmutableMap(keyFunction, Refaster.anyOf(identity(), v -> v)));
+    }
+
+    @BeforeTemplate
+    ImmutableMap<K, V> before(
+        Iterable<V> iterable,
+        @Matches(IsIdentity.class) Function<? super V, ? extends K> keyFunction) {
+      return Streams.stream(iterable)
+          .collect(toImmutableMap(keyFunction, Refaster.anyOf(identity(), v -> v)));
+    }
+
+    @BeforeTemplate
+    ImmutableMap<K, V> before(
+        Collection<V> iterable,
+        @Matches(IsIdentity.class) Function<? super V, ? extends K> keyFunction) {
+      return iterable.stream()
+          .collect(toImmutableMap(keyFunction, Refaster.anyOf(identity(), v -> v)));
+    }
+
+    @AfterTemplate
+    ImmutableMap<V, V> after(
+        Iterable<V> iterable, com.google.common.base.Function<? super V, K> keyFunction) {
+      return Maps.uniqueIndex(iterable, v -> v);
     }
   }
 

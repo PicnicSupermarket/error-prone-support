@@ -37,12 +37,19 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
         ImmutableMap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()));
   }
 
+  @SuppressWarnings({"IterableToImmutableMapIdentity", "IndexIterableToImmutableMapIdentity"})
   ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToImmutableMap() {
     return ImmutableSet.of(
         Maps.toMap(ImmutableList.of(1), n -> n * 2),
         Maps.toMap(ImmutableList.of(2)::iterator, Integer::valueOf),
         Maps.toMap(ImmutableList.of(3).iterator(), n -> n.intValue()),
-        Maps.toMap(ImmutableSet.of(4), Integer::valueOf));
+        Maps.toMap(ImmutableSet.of(4), Integer::valueOf),
+        ImmutableList.of(1).stream().collect(toImmutableMap(identity(), identity())));
+  }
+
+  ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToImmutableMapIdentity() {
+    return ImmutableSet.of(
+        Maps.toMap(ImmutableList.of(1), k -> k), Maps.toMap(ImmutableList.of(2)::iterator, n -> n));
   }
 
   ImmutableSet<ImmutableMap<String, Integer>> testEntryIterableToImmutableMap() {
@@ -63,6 +70,14 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
         Maps.uniqueIndex(ImmutableList.of(1), n -> n * 2),
         Maps.uniqueIndex(ImmutableList.of(2)::iterator, Integer::valueOf),
         Maps.uniqueIndex(ImmutableList.of(3).iterator(), n -> n.intValue()));
+  }
+
+  @SuppressWarnings("IterableToImmutableMapIdentity")
+  ImmutableSet<ImmutableMap<Integer, Integer>> testIndexIterableToImmutableMapIdentity() {
+    return ImmutableSet.of(
+        Maps.uniqueIndex(ImmutableList.of(1), v -> v),
+        Maps.uniqueIndex(ImmutableList.of(2)::iterator, v -> v),
+        Maps.uniqueIndex(ImmutableList.of(3).iterator(), v -> v));
   }
 
   ImmutableSet<ImmutableMap<String, Integer>> testTransformMapValuesToImmutableMap() {

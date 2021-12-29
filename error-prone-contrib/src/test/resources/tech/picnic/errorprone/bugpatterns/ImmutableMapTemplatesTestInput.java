@@ -40,6 +40,7 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
             .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
+  @SuppressWarnings({"IterableToImmutableMapIdentity", "IndexIterableToImmutableMapIdentity"})
   ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToImmutableMap() {
     return ImmutableSet.of(
         ImmutableList.of(1).stream().collect(toImmutableMap(identity(), n -> n * 2)),
@@ -47,7 +48,14 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
             .collect(toImmutableMap(n -> n, Integer::valueOf)),
         Streams.stream(ImmutableList.of(3).iterator())
             .collect(toImmutableMap(identity(), n -> n.intValue())),
-        ImmutableMap.copyOf(Maps.asMap(ImmutableSet.of(4), Integer::valueOf)));
+        ImmutableMap.copyOf(Maps.asMap(ImmutableSet.of(4), Integer::valueOf)),
+        ImmutableList.of(1).stream().collect(toImmutableMap(identity(), identity())));
+  }
+
+  ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToImmutableMapIdentity() {
+    return ImmutableSet.of(
+        ImmutableList.of(1).stream().collect(toImmutableMap(identity(), identity())),
+        Streams.stream(ImmutableList.of(2)::iterator).collect(toImmutableMap(n -> n, identity())));
   }
 
   ImmutableSet<ImmutableMap<String, Integer>> testEntryIterableToImmutableMap() {
@@ -76,6 +84,16 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
             .collect(toImmutableMap(Integer::valueOf, n -> n)),
         Streams.stream(ImmutableList.of(3).iterator())
             .collect(toImmutableMap(n -> n.intValue(), identity())));
+  }
+
+  @SuppressWarnings("IterableToImmutableMapIdentity")
+  ImmutableSet<ImmutableMap<Integer, Integer>> testIndexIterableToImmutableMapIdentity() {
+    return ImmutableSet.of(
+        ImmutableList.of(1).stream().collect(toImmutableMap(identity(), identity())),
+        Streams.stream(ImmutableList.of(2)::iterator)
+            .collect(toImmutableMap(identity(), identity())),
+        Streams.stream(ImmutableList.of(3).iterator())
+            .collect(toImmutableMap(identity(), identity())));
   }
 
   ImmutableSet<ImmutableMap<String, Integer>> testTransformMapValuesToImmutableMap() {
