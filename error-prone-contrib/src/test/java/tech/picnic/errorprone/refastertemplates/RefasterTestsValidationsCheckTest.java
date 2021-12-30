@@ -41,7 +41,7 @@ public final class RefasterTestsValidationsCheckTest {
 
   static final ImmutableSet<String> TEMPLATE_GROUPS =
       ImmutableSet.of(
-          // "AssertJ", --> This isn't a template, discuss with Stephan why that is in here.
+          // "AssertJ", --> This template doesn't have a test yet.
           "AssertJBigDecimal",
           "AssertJBigInteger",
           "AssertJBoolean",
