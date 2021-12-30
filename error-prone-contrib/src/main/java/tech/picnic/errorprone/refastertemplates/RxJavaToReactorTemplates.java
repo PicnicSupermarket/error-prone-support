@@ -17,6 +17,7 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
@@ -376,8 +377,21 @@ final class RxJavaToReactorTemplates {
     }
 
     @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     Mono<ImmutableSet<T>> after(Flux<T> flux) {
       return flux.collect(toImmutableSet());
+    }
+  }
+
+  static final class MonoBlock<T> {
+    @BeforeTemplate
+    T before(Mono<T> mono, Duration timeout) {
+      return mono.timeout(timeout).block();
+    }
+
+    @AfterTemplate
+    T after(Mono<T> mono, Duration timeout) {
+      return mono.block(timeout);
     }
   }
 

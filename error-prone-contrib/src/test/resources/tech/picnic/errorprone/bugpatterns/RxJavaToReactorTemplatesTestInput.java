@@ -1,9 +1,12 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 import com.google.common.collect.ImmutableSet;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import java.time.Duration;
 import java.util.List;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
@@ -130,5 +133,13 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
   Flux<Object> testFlatMapFluxFromArray() {
     Flux<String[]> test = null;
     return test.flatMap(Flowable::fromArray);
+  }
+
+  Mono<ImmutableSet<Integer>> testFluxToImmutableSet() {
+    return Flux.just(1).collect(toImmutableList()).map(ImmutableSet::copyOf);
+  }
+
+  Integer testMonoBlock() {
+    return Mono.just(1).timeout(Duration.ofMillis(1)).block();
   }
 }

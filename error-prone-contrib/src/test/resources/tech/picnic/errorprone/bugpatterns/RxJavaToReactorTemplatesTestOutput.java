@@ -123,4 +123,12 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     Flux<String[]> test = null;
     return test.flatMap(Flux::fromArray);
   }
+
+  Mono<ImmutableSet<Integer>> testFluxToImmutableSet() {
+    return Flux.just(1).collect(toImmutableSet());
+  }
+
+  Integer testMonoBlock() {
+    return Mono.just(1).block(Duration.ofMillis(1));
+  }
 }
