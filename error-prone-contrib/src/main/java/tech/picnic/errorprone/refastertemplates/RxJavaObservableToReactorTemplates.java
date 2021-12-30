@@ -27,9 +27,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
-/** The Refaster templates for the migration of the RxJava Observable type to Reactor */
+/** The Refaster templates for the migration of the RxJava {@link Observable} to Reactor. */
 final class RxJavaObservableToReactorTemplates {
-
   private RxJavaObservableToReactorTemplates() {}
 
   static final class ObservableAmb<T> {
@@ -717,6 +716,7 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Observable zipWith(ObservableSource,BiFunction,boolean,int)
 
   // XXX: Default BackpressureStrategy.BUFFER is set
+  @SuppressWarnings("unchecked")
   static final class ObservableTestAssertResultItem<T> {
     @BeforeTemplate
     void before(Observable<T> observable, T item) throws InterruptedException {

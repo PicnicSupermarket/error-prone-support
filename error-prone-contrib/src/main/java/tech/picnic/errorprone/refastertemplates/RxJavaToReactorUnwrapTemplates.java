@@ -17,11 +17,12 @@ import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
-public final class RxJavaToReactorUnwrapTemplates {
+/** Templates to clean up nested lambdas. */
+@SuppressWarnings({"Convert2MethodRef", "NoFunctionalReturnType"})
+final class RxJavaToReactorUnwrapTemplates {
   private RxJavaToReactorUnwrapTemplates() {}
 
   // XXX: Add test
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class FlowableConcatMapCompletableUnwrapLambda<T> {
     @Placeholder
     abstract Mono<?> placeholder(@MayOptionallyUse T input);
@@ -42,7 +43,6 @@ public final class RxJavaToReactorUnwrapTemplates {
   }
 
   // XXX: Add test
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class MaybeFlatMapUnwrapLambda<I, T extends I, O> {
     @Placeholder
     abstract Mono<? extends O> placeholder(@MayOptionallyUse T input);
@@ -71,7 +71,6 @@ public final class RxJavaToReactorUnwrapTemplates {
   }
 
   // XXX: Add test
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class MaybeFlatMapSingleElementUnwrapLambda<T, R> {
     @Placeholder
     abstract Mono<R> placeholder(@MayOptionallyUse T input);
@@ -101,7 +100,6 @@ public final class RxJavaToReactorUnwrapTemplates {
   }
 
   // XXX: Add test
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class SingleFlatMapMaybeUnwrapLambda<T, R> {
     @Placeholder
     abstract Mono<R> placeholder(@MayOptionallyUse T input);
@@ -138,7 +136,7 @@ public final class RxJavaToReactorUnwrapTemplates {
   }
 
   // XXX: Add test
-  @SuppressWarnings({"NoFunctionalReturnType", "unchecked"})
+  @SuppressWarnings("unchecked")
   abstract static class SingleOnResumeUnwrapLambda<T, R> {
     @Placeholder
     abstract Mono<? extends R> placeholder(@MayOptionallyUse Throwable input);
@@ -173,7 +171,6 @@ public final class RxJavaToReactorUnwrapTemplates {
   }
 
   // XXX: Add test
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class FlowableConcatMapMaybeDelayErrorUnwrapLambda<T, R> {
     @Placeholder
     abstract Mono<R> placeholder(@MayOptionallyUse T input);
@@ -203,7 +200,6 @@ public final class RxJavaToReactorUnwrapTemplates {
   }
 
   // XXX: Add test
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class FlowableFlatMapCompletableUnwrapLambda<T> {
     @Placeholder
     abstract Mono<?> placeholder(@MayOptionallyUse T input);
@@ -250,7 +246,6 @@ public final class RxJavaToReactorUnwrapTemplates {
   }
 
   // XXX: Improve naming and add test case
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class FlowableUnwrapLambda<T> {
     @Placeholder
     abstract Completable placeholder(@MayOptionallyUse T input);
@@ -278,7 +273,6 @@ public final class RxJavaToReactorUnwrapTemplates {
     }
   }
 
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class FlowableFlatMapUnwrapLambda<T> {
     @Placeholder
     abstract CompletableSource placeholder(@MayOptionallyUse T input);
@@ -299,7 +293,6 @@ public final class RxJavaToReactorUnwrapTemplates {
     }
   }
 
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class UnwrapCompletableExtendsMono<T, R> {
     @Placeholder
     abstract Mono<? extends R> placeholder(@MayOptionallyUse T input);
@@ -321,7 +314,6 @@ public final class RxJavaToReactorUnwrapTemplates {
   }
 
   // XXX: Add test
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class SingleFlatMapUnwrapLambda<T, R> {
     @Placeholder
     abstract Mono<? extends R> placeholder(@MayOptionallyUse T input);
@@ -343,7 +335,6 @@ public final class RxJavaToReactorUnwrapTemplates {
   }
 
   // XXX: Add test
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class SingleRemoveLambdaWithCast<T> {
     @Placeholder
     abstract Mono<?> placeholder(@MayOptionallyUse T input);
@@ -380,7 +371,6 @@ public final class RxJavaToReactorUnwrapTemplates {
   }
 
   // XXX: Add test
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class SingleRemoveLambdaWithCompletable<T> {
     @BeforeTemplate
     java.util.function.Function<? super T, ? extends Mono<? extends Void>> before(
@@ -408,7 +398,6 @@ public final class RxJavaToReactorUnwrapTemplates {
   }
 
   // XXX: Verify if this template still flags other cases than the one above.
-  @SuppressWarnings("NoFunctionalReturnType")
   abstract static class SingleRemoveLambdaWithCompletableExtra<T> {
     @Placeholder
     abstract Completable placeholder(@MayOptionallyUse T input);

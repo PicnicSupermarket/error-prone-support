@@ -27,9 +27,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
-/** The Refaster templates for the migration of the RxJava Completable type to Reactor */
+/** The Refaster templates for the migration of the RxJava {@link Completable} to Reactor. */
 final class RxJavaCompletableToReactorTemplates {
-
   private RxJavaCompletableToReactorTemplates() {}
 
   static final class CompletableAmb {

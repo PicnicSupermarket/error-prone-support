@@ -42,13 +42,13 @@ import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 import tech.picnic.errorprone.refaster.util.IsArray;
 
-/** The Refaster templates for the migration of the RxJava Flowable type to Reactor */
+/** The Refaster templates for the migration of the RxJava {@link Flowable} to Reactor. */
 final class RxJavaFlowableToReactorTemplates {
-
   private RxJavaFlowableToReactorTemplates() {}
 
   // XXX: static Flowable amb(Iterable)
 
+  @SuppressWarnings("unchecked")
   static final class FlowableAmbArray<T> {
     @BeforeTemplate
     Flowable<T> before(@Repeated Publisher<T> sources) {

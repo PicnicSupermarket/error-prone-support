@@ -6,6 +6,7 @@ import io.reactivex.internal.fuseable.ConditionalSubscriber;
 import io.reactivex.internal.fuseable.QueueSubscription;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
+import javax.annotation.Nonnull;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.CoreSubscriber;
@@ -14,6 +15,10 @@ import reactor.core.Fuseable;
 import reactor.core.publisher.GroupedFlux;
 import reactor.core.publisher.Operators;
 
+/**
+ * This util helps bridge the gap between RxJava and Reactor. The methods are used to safely rewrite
+ * RxJava code to Reactor.
+ */
 public final class RxJavaReactorMigrationUtil {
   private RxJavaReactorMigrationUtil() {}
 
@@ -25,7 +30,6 @@ public final class RxJavaReactorMigrationUtil {
    * @return XXX
    */
   // XXX: Rename.
-  // XXX: Introduce Refaster rules to drop this wrapper when possible.
   @SuppressWarnings("IllegalCatch")
   public static <T> T getUnchecked(Callable<T> callable) {
     try {
@@ -44,7 +48,6 @@ public final class RxJavaReactorMigrationUtil {
    * @return XXX
    */
   // XXX: Rename.
-  // XXX: Introduce Refaster rules to drop this wrapper when possible.
   @SuppressWarnings("IllegalCatch")
   public static <T, R> java.util.function.Function<T, R> toJdkFunction(
       io.reactivex.functions.Function<T, R> function) {
@@ -104,7 +107,6 @@ public final class RxJavaReactorMigrationUtil {
    * @return XXX
    */
   // XXX: Rename.
-  // XXX: Introduce Refaster rules to drop this wrapper when possible.
   @SuppressWarnings("IllegalCatch")
   public static <T> java.util.function.Predicate<T> toJdkPredicate(
       io.reactivex.functions.Predicate<T> predicate) {
@@ -125,7 +127,6 @@ public final class RxJavaReactorMigrationUtil {
    * @return XXX
    */
   // XXX: Rename.
-  // XXX: Introduce Refaster rules to drop this wrapper when possible.
   @SuppressWarnings("IllegalCatch")
   public static <T> java.util.function.Consumer<T> toJdkConsumer(
       io.reactivex.functions.Consumer<T> consumer) {
@@ -139,10 +140,10 @@ public final class RxJavaReactorMigrationUtil {
   }
 
   /**
-   * XXX
+   * Convert an {@link Action} to a {@link Runnable}.
    *
-   * @param action XXX
-   * @return XXX
+   * @param action the {@link Action} to convert.
+   * @return a {@link Runnable}
    */
   @SuppressWarnings("IllegalCatch")
   public static Runnable toRunnable(Action action) {
@@ -163,6 +164,14 @@ public final class RxJavaReactorMigrationUtil {
   // ....
   // B throws a subset of the exceptions thrown by A
 
+  /**
+   * Utility used to migrate from {@link GroupedFlowable} to {@link GroupedFlux}.
+   *
+   * @param source the {@link GroupedFlux} to convert
+   * @param <K> XXX
+   * @param <V> XXX
+   * @return the GroupedFlowable
+   */
   public static <K, V> GroupedFlowable<K, V> groupedFluxToGroupedFlowable(
       GroupedFlux<K, V> source) {
     return new GroupedFluxAsGroupedFlowable<>(source);
@@ -178,6 +187,7 @@ public final class RxJavaReactorMigrationUtil {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void subscribeActual(Subscriber<? super V> s) {
       if (s instanceof ConditionalSubscriber) {
         source.subscribe(
@@ -191,7 +201,7 @@ public final class RxJavaReactorMigrationUtil {
         implements CoreSubscriber<T>, QueueSubscription<T> {
       private final Subscriber<? super T> actual;
 
-      private Subscription s;
+      private Subscription subscription;
       private Fuseable.QueueSubscription<T> qs;
 
       FluxAsFlowableSubscriber(Subscriber<? super T> actual) {
@@ -200,9 +210,9 @@ public final class RxJavaReactorMigrationUtil {
 
       @Override
       @SuppressWarnings("unchecked")
-      public void onSubscribe(Subscription s) {
-        if (Operators.validate(this.s, s)) {
-          this.s = s;
+      public void onSubscribe(@Nonnull Subscription s) {
+        if (Operators.validate(this.subscription, s)) {
+          this.subscription = s;
           if (s instanceof Fuseable.QueueSubscription) {
             this.qs = (Fuseable.QueueSubscription<T>) s;
           }
@@ -228,12 +238,12 @@ public final class RxJavaReactorMigrationUtil {
 
       @Override
       public void request(long n) {
-        s.request(n);
+        subscription.request(n);
       }
 
       @Override
       public void cancel() {
-        s.cancel();
+        subscription.cancel();
       }
 
       @Override
@@ -260,12 +270,12 @@ public final class RxJavaReactorMigrationUtil {
       }
 
       @Override
-      public boolean offer(T value) {
+      public boolean offer(@Nonnull T value) {
         throw new UnsupportedOperationException("Should not be called");
       }
 
       @Override
-      public boolean offer(T v1, T v2) {
+      public boolean offer(@Nonnull T v1, @Nonnull T v2) {
         throw new UnsupportedOperationException("Should not be called");
       }
     }
@@ -274,7 +284,7 @@ public final class RxJavaReactorMigrationUtil {
         implements Fuseable.ConditionalSubscriber<T>, QueueSubscription<T> {
       private final ConditionalSubscriber<? super T> actual;
 
-      private Subscription s;
+      private Subscription subscription;
       private QueueSubscription<T> qs;
 
       FluxAsFlowableConditionalSubscriber(ConditionalSubscriber<? super T> actual) {
@@ -283,10 +293,10 @@ public final class RxJavaReactorMigrationUtil {
 
       @Override
       @SuppressWarnings("unchecked")
-      public void onSubscribe(Subscription s) {
-        if (Operators.validate(this.s, s)) {
-          this.s = s;
-          if (s instanceof io.reactivex.internal.fuseable.QueueSubscription) {
+      public void onSubscribe(@Nonnull Subscription s) {
+        if (Operators.validate(this.subscription, s)) {
+          this.subscription = s;
+          if (s instanceof QueueSubscription) {
             this.qs = (QueueSubscription<T>) s;
           }
 
@@ -300,7 +310,7 @@ public final class RxJavaReactorMigrationUtil {
       }
 
       @Override
-      public boolean tryOnNext(T t) {
+      public boolean tryOnNext(@Nonnull T t) {
         return actual.tryOnNext(t);
       }
 
@@ -316,19 +326,20 @@ public final class RxJavaReactorMigrationUtil {
 
       @Override
       public void request(long n) {
-        s.request(n);
+        subscription.request(n);
       }
 
       @Override
       public void cancel() {
-        s.cancel();
+        subscription.cancel();
       }
 
       @Override
+      @SuppressWarnings("IllegalCatch")
       public T poll() {
         try {
           return qs.poll();
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
           throw Exceptions.bubble(ex);
         }
       }
@@ -352,12 +363,12 @@ public final class RxJavaReactorMigrationUtil {
       }
 
       @Override
-      public boolean offer(T v1) {
+      public boolean offer(@Nonnull T v1) {
         throw new UnsupportedOperationException("Should not be called!");
       }
 
       @Override
-      public boolean offer(T v1, T v2) {
+      public boolean offer(@Nonnull T v1, @Nonnull T v2) {
         throw new UnsupportedOperationException("Should not be called!");
       }
     }

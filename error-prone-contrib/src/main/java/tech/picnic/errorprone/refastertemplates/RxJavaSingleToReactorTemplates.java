@@ -32,9 +32,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
-/** The Refaster templates for the migration of the RxJava Single type to Reactor */
+/** The Refaster templates for the migration of the RxJava {@link Single} to Reactor. */
 final class RxJavaSingleToReactorTemplates {
-
   private RxJavaSingleToReactorTemplates() {}
 
   // XXX: public static Single amb(Iterable)
@@ -57,6 +56,7 @@ final class RxJavaSingleToReactorTemplates {
     abstract Single<? extends T> singleProducer();
 
     @BeforeTemplate
+    @SuppressWarnings("Convert2MethodRef")
     Single<T> before() {
       return Single.defer(() -> singleProducer());
     }
@@ -781,6 +781,7 @@ final class RxJavaSingleToReactorTemplates {
 
   // XXX: Add test
   // XXX: This introduces AssertJ dependency
+  @SuppressWarnings("unchecked")
   static final class SingleTestAssertFailureAndMessage<T> {
     @BeforeTemplate
     void before(Single<T> single, Class<? extends Throwable> error, String message)

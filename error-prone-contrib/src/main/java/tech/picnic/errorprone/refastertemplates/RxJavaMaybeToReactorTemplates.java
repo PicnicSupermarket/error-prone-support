@@ -38,7 +38,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
-/** The Refaster templates for the migration of the RxJava Maybe type to Reactor */
+/** The Refaster templates for the migration of the RxJava {@link Maybe} to Reactor. */
 final class RxJavaMaybeToReactorTemplates {
   private RxJavaMaybeToReactorTemplates() {}
 

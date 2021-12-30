@@ -1,7 +1,9 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.auto.common.MoreStreams.toImmutableSet;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -24,10 +26,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
 
-/** Assorted Refaster templates for the migration of RxJava to Reactor */
-public final class RxJavaToReactorTemplates {
+/** Assorted Refaster templates for the migration of RxJava to Reactor. */
+final class RxJavaToReactorTemplates {
   private RxJavaToReactorTemplates() {}
 
+  @SuppressWarnings("NullableProblems")
   static final class FluxToFlowableToFlux<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, BackpressureStrategy strategy) {
@@ -49,6 +52,7 @@ public final class RxJavaToReactorTemplates {
     }
   }
 
+  @SuppressWarnings("NullableProblems")
   static final class MonoToFlowableToMono<T> {
     @BeforeTemplate
     Mono<Void> before(Mono<Void> mono) {
@@ -89,6 +93,7 @@ public final class RxJavaToReactorTemplates {
   // XXX: Add test cases
   static final class MonoToFlowableToFlux<T> {
     @BeforeTemplate
+    @SuppressWarnings("NullableProblems")
     Flux<T> before(Mono<T> mono) {
       return mono.as(RxJava2Adapter::monoToFlowable).as(RxJava2Adapter::flowableToFlux);
     }
@@ -351,6 +356,7 @@ public final class RxJavaToReactorTemplates {
 
   static final class FlatMapFluxFromArray<T> {
     @BeforeTemplate
+    @SuppressWarnings("unchecked")
     Flux<Object> before(Flux<T[]> flux) {
       return flux.flatMap(Flowable::fromArray);
     }
@@ -359,6 +365,19 @@ public final class RxJavaToReactorTemplates {
     @AfterTemplate
     Flux<Object> after(Flux<T[]> flux) {
       return flux.flatMap(Flux::fromArray);
+    }
+  }
+
+  // XXX: Move this to correct class later on.
+  static final class FluxToImmutableSet<T> {
+    @BeforeTemplate
+    Mono<ImmutableSet<T>> before(Flux<T> flux) {
+      return flux.collect(toImmutableList()).map(ImmutableSet::copyOf);
+    }
+
+    @AfterTemplate
+    Mono<ImmutableSet<T>> after(Flux<T> flux) {
+      return flux.collect(toImmutableSet());
     }
   }
 
