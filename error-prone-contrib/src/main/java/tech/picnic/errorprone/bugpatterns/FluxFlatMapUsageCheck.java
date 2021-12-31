@@ -26,8 +26,8 @@ import reactor.core.publisher.Flux;
     summary =
         "`Flux#flatMap` is not allowed, please use `Flux#concatMap` or specify an argument for the concurrency.",
     explanation =
-        "The problem with `Flux#flatMap` is that it is not clear that it provides unbounded parallelism and is"
-            + " not guaranteed to be sequential. Therefore, we disallow the use of the non-overloaded `Flux#flatMap`.",
+        "`Flux#flatMap` provides unbounded parallelism and is not guaranteed to be sequential. "
+            + "Therefore, we disallow the use of the non-overloaded `Flux#flatMap`.",
     linkType = LinkType.NONE,
     severity = SeverityLevel.ERROR,
     tags = StandardTags.LIKELY_ERROR)
@@ -36,9 +36,9 @@ public final class FluxFlatMapUsageCheck extends BugChecker implements MemberSel
   private static final String NAME_CONCURRENCY_ARGUMENT = "MAX_CONCURRENCY";
   private static final Matcher<ExpressionTree> FLUX_FLATMAP =
       instanceMethod()
-          .onExactClass("reactor.core.publisher.Flux")
+          .onDescendantOf("reactor.core.publisher.Flux")
           .named("flatMap")
-          .withParameters("java.util.function.Function");
+          .withParameters(Function.class.getName());
 
   @Override
   public Description matchMemberSelect(MemberSelectTree tree, VisitorState state) {
