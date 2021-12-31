@@ -46,6 +46,10 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(Flux.just(1), Flux.just(2));
   }
 
+  ImmutableSet<Flux<Integer>> testFluxConcatMap() {
+    return ImmutableSet.of(Flux.just(1).concatMap(Mono::just), Flux.just(2).concatMap(Mono::just));
+  }
+
   Flux<String> testMonoFlatMapToFlux() {
     return Mono.just("foo").flatMap(s -> Mono.just(s + s)).flux();
   }

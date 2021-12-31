@@ -18,20 +18,32 @@ final class FluxFlatMapUsageCheckTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
+            "import java.util.function.BiFunction;",
+            "import java.util.function.Function;",
+            "import reactor.core.publisher.Mono;",
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
-            "  void positive() {",
-            "      // BUG: Diagnostic contains:",
-            "      Flux.just(1).flatMap(Flux::just);",
-            "  }",
+            "  void m() {",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.just(1).flatMap(Flux::just);",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.just(1).<String>flatMap(i -> Flux.just(String.valueOf(i)));",
             "",
-            "  void negative() {",
             "    Flux.just(1).concatMap(Flux::just);",
             "    Flux.just(1).flatMap(Flux::just, 1);",
             "    Flux.just(1).flatMap(Flux::just, 1, 1);",
             "    Flux.just(1).flatMap(Flux::just, throwable -> Flux.empty(), Flux::empty);",
+            "",
+            "    // BUG: Diagnostic contains:",
+            "    this.<String, Flux<String>>sink(Flux::flatMap);",
+            "    // BUG: Diagnostic contains:",
+            "    this.<Integer, Flux<Integer>>sink(Flux::<Integer>flatMap);",
+            "",
+            "    this.<String, Mono<String>>sink(Mono::flatMap);",
             "  }",
+            "",
+            "  private <T, P> void sink(BiFunction<P, Function<T, P>, P> fun) {}",
             "}")
         .doTest();
   }
@@ -45,8 +57,8 @@ final class FluxFlatMapUsageCheckTest {
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
-            "  void positive() {",
-            "      Flux.just(1).flatMap(Flux::just);",
+            "  void m() {",
+            "    Flux.just(1).flatMap(Flux::just);",
             "  }",
             "}")
         .addOutputLines(
@@ -54,8 +66,8 @@ final class FluxFlatMapUsageCheckTest {
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
-            "  void positive() {",
-            "      Flux.just(1).concatMap(Flux::just);",
+            "  void m() {",
+            "    Flux.just(1).concatMap(Flux::just);",
             "  }",
             "}")
         .doTest();
@@ -70,10 +82,10 @@ final class FluxFlatMapUsageCheckTest {
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
-            "  private static final int MAX_CONCURRENCY = 10;",
+            "  private static final int MAX_CONCURRENCY = 8;",
             "",
-            "  void positive() {",
-            "      Flux.just(1).flatMap(Flux::just);",
+            "  void m() {",
+            "    Flux.just(1).flatMap(Flux::just);",
             "  }",
             "}")
         .addOutputLines(
@@ -81,10 +93,10 @@ final class FluxFlatMapUsageCheckTest {
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
-            "  private static final int MAX_CONCURRENCY = 10;",
+            "  private static final int MAX_CONCURRENCY = 8;",
             "",
-            "  void positive() {",
-            "      Flux.just(1).flatMap(Flux::just, MAX_CONCURRENCY);",
+            "  void m() {",
+            "    Flux.just(1).flatMap(Flux::just, MAX_CONCURRENCY);",
             "  }",
             "}")
         .doTest();
