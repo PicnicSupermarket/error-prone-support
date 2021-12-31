@@ -66,9 +66,8 @@ public final class FluxFlatMapUsageCheck extends BugChecker implements MemberSel
   private static String getReplacementWithConcurrencyArgument(
       Tree parentExpression, VisitorState state) {
     String parentString = Util.treeToString(parentExpression, state);
-    return parentString.substring(0, parentString.lastIndexOf(')'))
-        + ", "
-        + NAME_CONCURRENCY_ARGUMENT
-        + ")";
+    return String.format(
+        "%s, %s)",
+        parentString.substring(0, parentString.lastIndexOf(')')), NAME_CONCURRENCY_ARGUMENT);
   }
 }
