@@ -162,7 +162,7 @@ final class ImmutableSetMultimapTemplates {
     @AfterTemplate
     ImmutableSetMultimap<K, V2> after(Multimap<K, V1> multimap) {
       return ImmutableSetMultimap.copyOf(
-          Multimaps.transformValues(multimap, v -> valueTransformation(v)));
+          Multimaps.transformValues(multimap, e -> valueTransformation(e)));
     }
   }
 

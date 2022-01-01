@@ -53,7 +53,7 @@ final class ImmutableSetMultimapTemplatesTest implements RefasterTemplateTestCas
 
   ImmutableSetMultimap<String, Integer> testTransformMultimapValuesToImmutableSetMultimap() {
     return ImmutableSetMultimap.copyOf(
-        Multimaps.transformValues(ImmutableSetMultimap.of("foo", 1L), v -> Math.toIntExact(v)));
+        Multimaps.transformValues(ImmutableSetMultimap.of("foo", 1L), e -> Math.toIntExact(e)));
   }
 
   ImmutableSet<ImmutableSetMultimap<String, Integer>>
