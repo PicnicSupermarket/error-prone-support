@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -14,17 +15,20 @@ public final class StaticImportCheckTest {
 
   @Test
   void candidateMethodsAreNotRedundant() {
-    assertThat(StaticImportCheck.STATIC_IMPORT_CANDIDATE_METHODS.keySet())
-        .doesNotContainAnyElementsOf(StaticImportCheck.STATIC_IMPORT_CANDIDATE_CLASSES);
+    assertThat(StaticImportCheck.STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
+        .doesNotContainAnyElementsOf(StaticImportCheck.STATIC_IMPORT_CANDIDATE_TYPES);
   }
 
   @Test
-  void exemptionsAreListedAsCandidates() {
-    assertThat(StaticImportCheck.STATIC_IMPORT_EXEMPTION_METHODS.keySet())
-        .allMatch(
-            e ->
-                StaticImportCheck.STATIC_IMPORT_CANDIDATE_CLASSES.contains(e)
-                    || StaticImportCheck.STATIC_IMPORT_CANDIDATE_METHODS.containsKey(e));
+  void exemptedMembersAreNotVacuous() {
+    assertThat(StaticImportCheck.STATIC_IMPORT_EXEMPTED_MEMBERS.keySet())
+        .isSubsetOf(StaticImportCheck.STATIC_IMPORT_CANDIDATE_TYPES);
+  }
+
+  @Test
+  void exemptedMembersAreNotRedundant() {
+    assertThat(StaticImportCheck.STATIC_IMPORT_EXEMPTED_MEMBERS.values())
+        .doesNotContainAnyElementsOf(StaticImportCheck.STATIC_IMPORT_EXEMPTED_IDENTIFIERS);
   }
 
   @Test
@@ -86,9 +90,9 @@ public final class StaticImportCheckTest {
             "    Object e2 = RANDOM_PORT;",
             "",
             "    // Not flagged because `MediaType.ALL` is exempted.",
-            "    MediaType type1 = MediaType.ALL;",
+            "    MediaType t1 = MediaType.ALL;",
             "    // BUG: Diagnostic contains:",
-            "    MediaType type2 = MediaType.APPLICATION_JSON;",
+            "    MediaType t2 = MediaType.APPLICATION_JSON;",
             "",
             "    Optional.empty();",
             "  }",
@@ -134,10 +138,11 @@ public final class StaticImportCheckTest {
             "",
             "    Object o = StandardCharsets.UTF_8;",
             "",
-            "    ImmutableSet.of(MediaType.TEXT_HTML,",
-            "      MediaType.APPLICATION_XHTML_XML,",
-            "      MediaType.valueOf(\"image/webp\"),",
-            "      MediaType.ALL);",
+            "    ImmutableSet.of(",
+            "        MediaType.ALL,",
+            "        MediaType.APPLICATION_XHTML_XML,",
+            "        MediaType.TEXT_HTML,",
+            "        MediaType.valueOf(\"image/webp\"));",
             "  }",
             "",
             "  void m2(",
@@ -197,10 +202,11 @@ public final class StaticImportCheckTest {
             "",
             "    Object o = UTF_8;",
             "",
-            "    ImmutableSet.of(TEXT_HTML,",
-            "      APPLICATION_XHTML_XML,",
-            "      MediaType.valueOf(\"image/webp\"),",
-            "      MediaType.ALL);",
+            "    ImmutableSet.of(",
+            "        MediaType.ALL,",
+            "        APPLICATION_XHTML_XML,",
+            "        TEXT_HTML,",
+            "        MediaType.valueOf(\"image/webp\"));",
             "  }",
             "",
             "  void m2(",
@@ -216,7 +222,7 @@ public final class StaticImportCheckTest {
             "   @SpringBootTest(webEnvironment = RANDOM_PORT)",
             "   final class Test {}",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
@@ -233,6 +239,6 @@ public final class StaticImportCheckTest {
             "  }",
             "}")
         .expectUnchanged()
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 }
