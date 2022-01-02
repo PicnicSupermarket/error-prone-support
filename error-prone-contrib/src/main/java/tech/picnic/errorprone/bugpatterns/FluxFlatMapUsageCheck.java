@@ -28,12 +28,12 @@ import reactor.core.publisher.Flux;
  * Flux#flatMapSequential(Function)}.
  *
  * <p>{@link Flux#flatMap(Function)} and {@link Flux#flatMapSequential(Function)} eagerly perform up
- * to {@link reactor.util.concurrent.Queues#SMALL_BUFFER_SIZE} subscriptions, interleaving the
- * results as they are emitted. In most cases {@link Flux#concatMap(Function)} should be preferred,
- * as it produces consistent results and avoids potentially saturating the thread pool on which
- * subscription happens. If {@code concatMap}'s single-subscription semantics are undesirable one
- * should invoke a {@code flatMap} or {@code flatMapSequential} overload with an explicit
- * concurrency level.
+ * to {@link reactor.util.concurrent.Queues#SMALL_BUFFER_SIZE} subscriptions. Additionally, the
+ * former interleaves values as they are emitted, yielding nondeterministic results. In most cases
+ * {@link Flux#concatMap(Function)} should be preferred, as it produces consistent results and
+ * avoids potentially saturating the thread pool on which subscription happens. If {@code
+ * concatMap}'s single-subscription semantics are undesirable one should invoke a {@code flatMap} or
+ * {@code flatMapSequential} overload with an explicit concurrency level.
  *
  * <p>NB: The rarely-used overload {@link Flux#flatMap(Function, Function, Supplier)} is not flagged
  * by this check because there is no clear alternative to point to.
@@ -42,7 +42,8 @@ import reactor.core.publisher.Flux;
 @BugPattern(
     name = "FluxFlatMapUsage",
     summary =
-        "`Flux#flatMap` and `Flux#flatMapSequential` have subtle semantics; please use `Flux#concatMap` or explicitly specify the desired amount of concurrency",
+        "`Flux#flatMap` and `Flux#flatMapSequential` have subtle semantics; "
+            + "please use `Flux#concatMap` or explicitly specify the desired amount of concurrency",
     linkType = LinkType.NONE,
     severity = SeverityLevel.ERROR,
     tags = StandardTags.LIKELY_ERROR)
