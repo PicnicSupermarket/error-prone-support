@@ -29,16 +29,30 @@ final class FluxFlatMapUsageCheckTest {
             "    Flux.just(1).flatMap(Flux::just);",
             "    // BUG: Diagnostic contains:",
             "    Flux.just(1).<String>flatMap(i -> Flux.just(String.valueOf(i)));",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.just(1).flatMapSequential(Flux::just);",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.just(1).<String>flatMapSequential(i -> Flux.just(String.valueOf(i)));",
             "",
+            "    Mono.just(1).flatMap(Mono::just);",
             "    Flux.just(1).concatMap(Flux::just);",
+            "",
             "    Flux.just(1).flatMap(Flux::just, 1);",
             "    Flux.just(1).flatMap(Flux::just, 1, 1);",
             "    Flux.just(1).flatMap(Flux::just, throwable -> Flux.empty(), Flux::empty);",
+            "",
+            "    Flux.just(1).flatMapSequential(Flux::just, 1);",
+            "    Flux.just(1).flatMapSequential(Flux::just, 1, 1);",
             "",
             "    // BUG: Diagnostic contains:",
             "    this.<String, Flux<String>>sink(Flux::flatMap);",
             "    // BUG: Diagnostic contains:",
             "    this.<Integer, Flux<Integer>>sink(Flux::<Integer>flatMap);",
+            "",
+            "    // BUG: Diagnostic contains:",
+            "    this.<String, Flux<String>>sink(Flux::flatMapSequential);",
+            "    // BUG: Diagnostic contains:",
+            "    this.<Integer, Flux<Integer>>sink(Flux::<Integer>flatMapSequential);",
             "",
             "    this.<String, Mono<String>>sink(Mono::flatMap);",
             "  }",
@@ -59,6 +73,7 @@ final class FluxFlatMapUsageCheckTest {
             "class A {",
             "  void m() {",
             "    Flux.just(1).flatMap(Flux::just);",
+            "    Flux.just(1).flatMapSequential(Flux::just);",
             "  }",
             "}")
         .addOutputLines(
@@ -67,6 +82,7 @@ final class FluxFlatMapUsageCheckTest {
             "",
             "class A {",
             "  void m() {",
+            "    Flux.just(1).concatMap(Flux::just);",
             "    Flux.just(1).concatMap(Flux::just);",
             "  }",
             "}")
@@ -86,6 +102,7 @@ final class FluxFlatMapUsageCheckTest {
             "",
             "  void m() {",
             "    Flux.just(1).flatMap(Flux::just);",
+            "    Flux.just(1).flatMapSequential(Flux::just);",
             "  }",
             "}")
         .addOutputLines(
@@ -97,6 +114,7 @@ final class FluxFlatMapUsageCheckTest {
             "",
             "  void m() {",
             "    Flux.just(1).flatMap(Flux::just, MAX_CONCURRENCY);",
+            "    Flux.just(1).flatMapSequential(Flux::just, MAX_CONCURRENCY);",
             "  }",
             "}")
         .doTest();

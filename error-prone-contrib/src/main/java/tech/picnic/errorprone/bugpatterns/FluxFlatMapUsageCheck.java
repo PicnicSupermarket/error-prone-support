@@ -24,14 +24,16 @@ import java.util.function.Supplier;
 import reactor.core.publisher.Flux;
 
 /**
- * A {@link BugChecker} which flags usages of {@link Flux#flatMap(Function)}.
+ * A {@link BugChecker} which flags usages of {@link Flux#flatMap(Function)} and {@link
+ * Flux#flatMapSequential(Function)}.
  *
- * <p>{@link Flux#flatMap(Function)} eagerly performs up to {@link
- * reactor.util.concurrent.Queues#SMALL_BUFFER_SIZE} subscriptions, interleaving the results as they
- * are emitted. In most cases {@link Flux#concatMap(Function)} should be preferred, as it produces
- * consistent results and avoids potentially saturating the thread pool on which subscription
- * happens. If {@code concatMap}'s single-subscription semantics are undesirable one should invoke a
- * {@code flatMap} or {@code flatMapSequential} overload with an explicit concurrency level.
+ * <p>{@link Flux#flatMap(Function)} and {@link Flux#flatMapSequential(Function)} eagerly perform up
+ * to {@link reactor.util.concurrent.Queues#SMALL_BUFFER_SIZE} subscriptions, interleaving the
+ * results as they are emitted. In most cases {@link Flux#concatMap(Function)} should be preferred,
+ * as it produces consistent results and avoids potentially saturating the thread pool on which
+ * subscription happens. If {@code concatMap}'s single-subscription semantics are undesirable one
+ * should invoke a {@code flatMap} or {@code flatMapSequential} overload with an explicit
+ * concurrency level.
  *
  * <p>NB: The rarely-used overload {@link Flux#flatMap(Function, Function, Supplier)} is not flagged
  * by this check because there is no clear alternative to point to.
@@ -40,7 +42,7 @@ import reactor.core.publisher.Flux;
 @BugPattern(
     name = "FluxFlatMapUsage",
     summary =
-        "`Flux#flatMap` has subtle semantics; please use `Flux#concatMap` or explicitly specify the desired amount of concurrency",
+        "`Flux#flatMap` and `Flux#flatMapSequential` have subtle semantics; please use `Flux#concatMap` or explicitly specify the desired amount of concurrency",
     linkType = LinkType.NONE,
     severity = SeverityLevel.ERROR,
     tags = StandardTags.LIKELY_ERROR)
@@ -51,7 +53,7 @@ public final class FluxFlatMapUsageCheck extends BugChecker
   private static final Matcher<ExpressionTree> FLUX_FLATMAP =
       instanceMethod()
           .onDescendantOf("reactor.core.publisher.Flux")
-          .named("flatMap")
+          .namedAnyOf("flatMap", "flatMapSequential")
           .withParameters(Function.class.getName());
 
   @Override
