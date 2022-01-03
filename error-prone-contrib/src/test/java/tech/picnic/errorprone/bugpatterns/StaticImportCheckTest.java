@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -14,8 +15,20 @@ public final class StaticImportCheckTest {
 
   @Test
   void candidateMethodsAreNotRedundant() {
-    assertThat(StaticImportCheck.STATIC_IMPORT_CANDIDATE_METHODS.keySet())
-        .doesNotContainAnyElementsOf(StaticImportCheck.STATIC_IMPORT_CANDIDATE_CLASSES);
+    assertThat(StaticImportCheck.STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
+        .doesNotContainAnyElementsOf(StaticImportCheck.STATIC_IMPORT_CANDIDATE_TYPES);
+  }
+
+  @Test
+  void exemptedMembersAreNotVacuous() {
+    assertThat(StaticImportCheck.STATIC_IMPORT_EXEMPTED_MEMBERS.keySet())
+        .isSubsetOf(StaticImportCheck.STATIC_IMPORT_CANDIDATE_TYPES);
+  }
+
+  @Test
+  void exemptedMembersAreNotRedundant() {
+    assertThat(StaticImportCheck.STATIC_IMPORT_EXEMPTED_MEMBERS.values())
+        .doesNotContainAnyElementsOf(StaticImportCheck.STATIC_IMPORT_EXEMPTED_IDENTIFIERS);
   }
 
   @Test
@@ -38,6 +51,7 @@ public final class StaticImportCheckTest {
             "import java.util.function.Predicate;",
             "import org.springframework.boot.test.context.SpringBootTest;",
             "import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;",
+            "import org.springframework.http.MediaType;",
             "",
             "class A {",
             "  void m() {",
@@ -75,6 +89,11 @@ public final class StaticImportCheckTest {
             "    Object e1 = WebEnvironment.RANDOM_PORT;",
             "    Object e2 = RANDOM_PORT;",
             "",
+            "    // Not flagged because `MediaType.ALL` is exempted.",
+            "    MediaType t1 = MediaType.ALL;",
+            "    // BUG: Diagnostic contains:",
+            "    MediaType t2 = MediaType.APPLICATION_JSON;",
+            "",
             "    Optional.empty();",
             "  }",
             "",
@@ -100,6 +119,7 @@ public final class StaticImportCheckTest {
             "import org.springframework.format.annotation.DateTimeFormat.ISO;",
             "import org.springframework.boot.test.context.SpringBootTest;",
             "import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;",
+            "import org.springframework.http.MediaType;",
             "",
             "class A {",
             "  void m1() {",
@@ -117,6 +137,12 @@ public final class StaticImportCheckTest {
             "    Objects.requireNonNull(\"bar\");",
             "",
             "    Object o = StandardCharsets.UTF_8;",
+            "",
+            "    ImmutableSet.of(",
+            "        MediaType.ALL,",
+            "        MediaType.APPLICATION_XHTML_XML,",
+            "        MediaType.TEXT_HTML,",
+            "        MediaType.valueOf(\"image/webp\"));",
             "  }",
             "",
             "  void m2(",
@@ -144,6 +170,8 @@ public final class StaticImportCheckTest {
             "import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;",
             "import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME;",
             "import static org.springframework.format.annotation.DateTimeFormat.ISO.TIME;",
+            "import static org.springframework.http.MediaType.APPLICATION_XHTML_XML;",
+            "import static org.springframework.http.MediaType.TEXT_HTML;",
             "",
             "import com.google.common.base.Predicates;",
             "import com.google.common.collect.ImmutableMap;",
@@ -155,6 +183,7 @@ public final class StaticImportCheckTest {
             "import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;",
             "import org.springframework.format.annotation.DateTimeFormat;",
             "import org.springframework.format.annotation.DateTimeFormat.ISO;",
+            "import org.springframework.http.MediaType;",
             "",
             "class A {",
             "  void m1() {",
@@ -172,6 +201,12 @@ public final class StaticImportCheckTest {
             "    requireNonNull(\"bar\");",
             "",
             "    Object o = UTF_8;",
+            "",
+            "    ImmutableSet.of(",
+            "        MediaType.ALL,",
+            "        APPLICATION_XHTML_XML,",
+            "        TEXT_HTML,",
+            "        MediaType.valueOf(\"image/webp\"));",
             "  }",
             "",
             "  void m2(",
@@ -187,6 +222,6 @@ public final class StaticImportCheckTest {
             "   @SpringBootTest(webEnvironment = RANDOM_PORT)",
             "   final class Test {}",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 }

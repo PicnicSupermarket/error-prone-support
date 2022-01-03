@@ -19,14 +19,18 @@ import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
+import com.sun.tools.javac.code.Type;
 import java.util.Optional;
 
-/** A {@link BugChecker} which flags methods that can and should be statically imported. */
+/**
+ * A {@link BugChecker} which flags methods and constants that can and should be statically
+ * imported.
+ */
 // XXX: Tricky cases:
-// - `org.springframework.http.MediaType` (do except for `ALL`?)
 // - `org.springframework.http.HttpStatus` (not always an improvement, and `valueOf` must
 //    certainly be excluded)
 // - `com.google.common.collect.Tables`
@@ -42,15 +46,19 @@ import java.util.Optional;
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "StaticImport",
-    summary = "Method should be statically imported",
+    summary = "Identifier should be statically imported",
     linkType = LinkType.NONE,
     severity = SeverityLevel.SUGGESTION,
     tags = StandardTags.SIMPLIFICATION)
 public final class StaticImportCheck extends BugChecker implements MemberSelectTreeMatcher {
   private static final long serialVersionUID = 1L;
 
+  /**
+   * Types whose members should be statically imported, unless exempted by {@link
+   * #STATIC_IMPORT_EXEMPTED_MEMBERS} or {@link #STATIC_IMPORT_EXEMPTED_IDENTIFIERS}.
+   */
   @VisibleForTesting
-  static final ImmutableSet<String> STATIC_IMPORT_CANDIDATE_CLASSES =
+  static final ImmutableSet<String> STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of(
           "com.google.common.base.Preconditions",
           "com.google.common.base.Predicates",
@@ -84,11 +92,13 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           "org.springframework.format.annotation.DateTimeFormat.ISO",
           "org.springframework.http.HttpHeaders",
           "org.springframework.http.HttpMethod",
+          "org.springframework.http.MediaType",
           "org.testng.Assert",
           "reactor.function.TupleUtils");
 
+  /** Type members that should be statically imported. */
   @VisibleForTesting
-  static final ImmutableSetMultimap<String, String> STATIC_IMPORT_CANDIDATE_METHODS =
+  static final ImmutableSetMultimap<String, String> STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
           .putAll(
               "com.google.common.collect.ImmutableListMultimap",
@@ -123,9 +133,41 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           .putAll("com.google.common.collect.Comparators", "emptiesFirst", "emptiesLast")
           .build();
 
+  /**
+   * Type members that should never be statically imported.
+   *
+   * <p>Identifiers listed by {@link #STATIC_IMPORT_EXEMPTED_IDENTIFIERS} should be omitted from
+   * this collection.
+   */
+  @VisibleForTesting
+  static final ImmutableSetMultimap<String, String> STATIC_IMPORT_EXEMPTED_MEMBERS =
+      ImmutableSetMultimap.<String, String>builder()
+          .put("com.mongodb.client.model.Filters", "empty")
+          .put("org.springframework.http.MediaType", "ALL")
+          .build();
+
+  /**
+   * Identifiers that should never be statically imported.
+   *
+   * <p>This should be a superset of the identifiers flagged by {@link
+   * com.google.errorprone.bugpatterns.BadImport}.
+   */
+  @VisibleForTesting
+  static final ImmutableSet<String> STATIC_IMPORT_EXEMPTED_IDENTIFIERS =
+      ImmutableSet.of(
+          "builder",
+          "create",
+          "copyOf",
+          "from",
+          "getDefaultInstance",
+          "INSTANCE",
+          "newBuilder",
+          "of",
+          "valueOf");
+
   @Override
   public Description matchMemberSelect(MemberSelectTree tree, VisitorState state) {
-    if (!isCandidate(state)) {
+    if (!isCandidateContext(state) || !isCandidate(tree)) {
       return Description.NO_MATCH;
     }
 
@@ -140,7 +182,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
         .orElse(Description.NO_MATCH);
   }
 
-  private static boolean isCandidate(VisitorState state) {
+  private static boolean isCandidateContext(VisitorState state) {
     Tree parentTree =
         requireNonNull(state.getPath().getParentPath(), "MemberSelectTree lacks enclosing node")
             .getLeaf();
@@ -155,6 +197,17 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
     }
   }
 
+  private static boolean isCandidate(MemberSelectTree tree) {
+    String identifier = tree.getIdentifier().toString();
+    if (STATIC_IMPORT_EXEMPTED_IDENTIFIERS.contains(identifier)) {
+      return false;
+    }
+
+    Type type = ASTHelpers.getType(tree.getExpression());
+    return type != null
+        && !STATIC_IMPORT_EXEMPTED_MEMBERS.containsEntry(type.toString(), identifier);
+  }
+
   private static Optional<String> getCandidateSimpleName(StaticImportInfo importInfo) {
     String canonicalName = importInfo.canonicalName();
     return importInfo
@@ -162,8 +215,8 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
         .toJavaUtil()
         .filter(
             name ->
-                STATIC_IMPORT_CANDIDATE_CLASSES.contains(canonicalName)
-                    || STATIC_IMPORT_CANDIDATE_METHODS.containsEntry(canonicalName, name));
+                STATIC_IMPORT_CANDIDATE_TYPES.contains(canonicalName)
+                    || STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(canonicalName, name));
   }
 
   private static Optional<Fix> tryStaticImport(
