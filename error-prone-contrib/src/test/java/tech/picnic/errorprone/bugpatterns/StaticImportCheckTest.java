@@ -224,21 +224,4 @@ public final class StaticImportCheckTest {
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
-
-  @Test
-  void exemptions() {
-    refactoringTestHelper
-        .addInputLines(
-            "in/A.java",
-            "import org.springframework.http.MediaType;",
-            "",
-            "class A { ",
-            "  void exemptions() {",
-            "    MediaType mediaType1 = MediaType.ALL;",
-            "    MediaType mediaType2 = MediaType.valueOf(\"\");",
-            "  }",
-            "}")
-        .expectUnchanged()
-        .doTest(TestMode.TEXT_MATCH);
-  }
 }
