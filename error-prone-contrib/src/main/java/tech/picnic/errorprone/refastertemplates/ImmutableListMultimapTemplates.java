@@ -272,17 +272,4 @@ final class ImmutableListMultimapTemplates {
       return ImmutableListMultimap.copyOf(Multimaps.transformValues(multimap, transformation));
     }
   }
-
-  /** Don't unnecessarily copy an {@link ImmutableListMultimap}. */
-  static final class ImmutableListMultimapCopyOfImmutableListMultimap<K, V> {
-    @BeforeTemplate
-    ImmutableListMultimap<K, V> before(ImmutableListMultimap<K, V> multimap) {
-      return ImmutableListMultimap.copyOf(multimap);
-    }
-
-    @AfterTemplate
-    ImmutableListMultimap<K, V> after(ImmutableListMultimap<K, V> multimap) {
-      return multimap;
-    }
-  }
 }

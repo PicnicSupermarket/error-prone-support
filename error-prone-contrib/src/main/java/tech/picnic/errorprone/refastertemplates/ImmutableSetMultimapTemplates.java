@@ -215,17 +215,4 @@ final class ImmutableSetMultimapTemplates {
       return ImmutableSetMultimap.copyOf(Multimaps.transformValues(multimap, transformation));
     }
   }
-
-  /** Don't unnecessarily copy an {@link ImmutableSetMultimap}. */
-  static final class ImmutableSetMultimapCopyOfImmutableSetMultimap<K, V> {
-    @BeforeTemplate
-    ImmutableSetMultimap<K, V> before(ImmutableSetMultimap<K, V> multimap) {
-      return ImmutableSetMultimap.copyOf(multimap);
-    }
-
-    @AfterTemplate
-    ImmutableSetMultimap<K, V> after(ImmutableSetMultimap<K, V> multimap) {
-      return multimap;
-    }
-  }
 }

@@ -91,8 +91,4 @@ final class ImmutableSetMultimapTemplatesTest implements RefasterTemplateTestCas
                 flatteningToImmutableSetMultimap(
                     Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))));
   }
-
-  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapCopyOfImmutableSetMultimap() {
-    return ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("foo", 1));
-  }
 }

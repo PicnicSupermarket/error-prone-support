@@ -126,19 +126,6 @@ final class ImmutableSetTemplates {
     }
   }
 
-  /** Don't unnecessarily copy an {@link ImmutableSet}. */
-  static final class ImmutableSetCopyOfImmutableSet<T> {
-    @BeforeTemplate
-    ImmutableSet<T> before(ImmutableSet<T> set) {
-      return ImmutableSet.copyOf(set);
-    }
-
-    @AfterTemplate
-    ImmutableSet<T> after(ImmutableSet<T> set) {
-      return set;
-    }
-  }
-
   /** Prefer {@link SetView#immutableCopy()} over the more verbose alternative. */
   static final class ImmutableSetCopyOfSetView<T> {
     @BeforeTemplate

@@ -89,8 +89,4 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
         ImmutableListMultimap.copyOf(
             Multimaps.transformValues(TreeMultimap.<String, Long>create(), Math::toIntExact)));
   }
-
-  ImmutableListMultimap<String, Integer> testImmutableListMultimapCopyOfImmutableListMultimap() {
-    return ImmutableListMultimap.of("foo", 1);
-  }
 }
