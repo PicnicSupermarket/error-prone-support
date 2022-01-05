@@ -30,8 +30,6 @@ final class ImmutableMapRules {
   private ImmutableMapRules() {}
 
   /** Prefer {@link ImmutableMap#builder()} over the associated constructor. */
-  // XXX: This drops generic type information, sometimes leading to non-compilable code. See
-  // https://github.com/google/error-prone/pull/2706.
   static final class ImmutableMapBuilder<K, V> {
     @BeforeTemplate
     ImmutableMap.Builder<K, V> before() {
@@ -40,7 +38,7 @@ final class ImmutableMapRules {
 
     @AfterTemplate
     ImmutableMap.Builder<K, V> after() {
-      return ImmutableMap.builder();
+      return ImmutableMap.<K, V>builder();
     }
   }
 
