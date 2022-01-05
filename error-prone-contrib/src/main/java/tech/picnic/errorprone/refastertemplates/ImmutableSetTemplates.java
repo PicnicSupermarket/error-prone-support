@@ -35,7 +35,7 @@ final class ImmutableSetTemplates {
 
     @AfterTemplate
     ImmutableSet.Builder<T> after() {
-      return ImmutableSet.builder();
+      return ImmutableSet.<T>builder();
     }
   }
 

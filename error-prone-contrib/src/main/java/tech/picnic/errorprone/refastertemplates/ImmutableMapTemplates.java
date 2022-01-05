@@ -39,7 +39,7 @@ final class ImmutableMapTemplates {
 
     @AfterTemplate
     ImmutableMap.Builder<K, V> after() {
-      return ImmutableMap.builder();
+      return ImmutableMap.<K, V>builder();
     }
   }
 

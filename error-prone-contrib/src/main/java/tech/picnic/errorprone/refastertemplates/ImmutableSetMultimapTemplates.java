@@ -37,7 +37,7 @@ final class ImmutableSetMultimapTemplates {
 
     @AfterTemplate
     ImmutableSetMultimap.Builder<K, V> after() {
-      return ImmutableSetMultimap.builder();
+      return ImmutableSetMultimap.<K, V>builder();
     }
   }
 
