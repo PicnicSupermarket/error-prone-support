@@ -1,7 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
-import static com.google.auto.common.MoreStreams.toImmutableSet;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.refaster.ImportPolicy;
@@ -279,7 +279,7 @@ final class RxJavaToReactorTemplates {
     }
   }
 
-  /** Remove unnecessary {@code Mono#then} */
+  /** Remove unnecessary {@code Mono#then}. */
   static final class MonoThen<T, S> {
     @BeforeTemplate
     Mono<S> before(Mono<T> mono, Mono<S> other) {
@@ -289,6 +289,19 @@ final class RxJavaToReactorTemplates {
     @AfterTemplate
     Mono<S> after(Mono<T> mono, Mono<S> other) {
       return mono.then(other);
+    }
+  }
+
+  /** Prefer {@link Mono#thenMany(Publisher)} without first calling {@code Mono#then}. */
+  static final class MonoThenMany<T> {
+    @BeforeTemplate
+    Flux<T> before(Mono<T> mono, Publisher<T> publisher) {
+      return mono.then().thenMany(publisher);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Mono<T> mono, Publisher<T> publisher) {
+      return mono.thenMany(publisher);
     }
   }
 

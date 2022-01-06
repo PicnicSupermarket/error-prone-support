@@ -99,6 +99,10 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
     return Mono.just(1).then(Mono.just(2));
   }
 
+  Flux<Integer> testMonoThenMany() {
+    return Mono.just(1).thenMany(Flux.just(1));
+  }
+
   Mono<Void> testFluxThen() {
     return Flux.just(1).then();
   }
