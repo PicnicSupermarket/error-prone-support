@@ -276,10 +276,6 @@ Refaster's expressiveness:
   to be lost. In such a case don't statically import the method, so that the
   generic type information can be retained. (There may be cases where generic
   type information should even be _added_. Find an example.)
-- Upon application of a template Refaster can throw a _No binding for
-  Key{identifier=someAfterTemplateParam}_ exception. When this happens the
-  template is invalid. Instead perform this check at compile time, such that
-  such malformed templates cannot be defined in the first place.
 - Provide a way to express "match if (not) annotated (with _X_)". See #1 for a
   motivating example.
 - Provide a way to place match constraints on compile time constants. For
