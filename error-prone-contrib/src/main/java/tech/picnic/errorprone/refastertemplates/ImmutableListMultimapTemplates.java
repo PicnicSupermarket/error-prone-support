@@ -205,7 +205,7 @@ final class ImmutableListMultimapTemplates {
    * Prefer creating an immutable copy of the result of {@link Multimaps#transformValues(Multimap,
    * com.google.common.base.Function)} over creating and directly collecting a stream.
    */
-  abstract static class TransformMultimapValuesToImmutableListMultimap<K, V1, V2> {
+  abstract static class ImmutableListMultimapCopyOfMultimapsTransformValues<K, V1, V2> {
     @Placeholder(allowsIdentity = true)
     abstract V2 valueTransformation(@MayOptionallyUse V1 value);
 
@@ -227,7 +227,7 @@ final class ImmutableListMultimapTemplates {
    * Prefer creating an immutable copy of the result of {@link Multimaps#transformValues(Multimap,
    * com.google.common.base.Function)} over creating and directly collecting a stream.
    */
-  static final class TransformMultimapValuesToImmutableListMultimap2<K, V1, V2> {
+  static final class ImmutableListMultimapCopyOfMultimapsTransformValuesTransformation<K, V1, V2> {
     // XXX: Drop the `Refaster.anyOf` if we decide to rewrite one to the other.
     @BeforeTemplate
     ImmutableListMultimap<K, V2> before(

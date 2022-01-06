@@ -100,7 +100,7 @@ final class StreamTemplatesTest implements RefasterTemplateTestCase {
         Stream.of("foo").max(naturalOrder()), Stream.of("bar").max(naturalOrder()));
   }
 
-  ImmutableSet<Boolean> testStreamNoneMatch() {
+  ImmutableSet<Boolean> testStreamNoneMatchPredicate() {
     Predicate<String> pred = String::isBlank;
     return ImmutableSet.of(
         Stream.of("foo").noneMatch(s -> s.length() > 1),
@@ -109,7 +109,7 @@ final class StreamTemplatesTest implements RefasterTemplateTestCase {
         Stream.of("qux").noneMatch(String::isEmpty));
   }
 
-  ImmutableSet<Boolean> testStreamNoneMatch2() {
+  ImmutableSet<Boolean> testStreamNoneMatch() {
     return ImmutableSet.of(
         Stream.of("foo").noneMatch(s -> s.isBlank()), Stream.of(Boolean.TRUE).noneMatch(b -> b));
   }
@@ -119,13 +119,13 @@ final class StreamTemplatesTest implements RefasterTemplateTestCase {
         Stream.of("foo").anyMatch(s -> s.length() > 1), Stream.of("bar").anyMatch(String::isEmpty));
   }
 
-  ImmutableSet<Boolean> testStreamAllMatch() {
+  ImmutableSet<Boolean> testStreamAllMatchPredicate() {
     Predicate<String> pred = String::isBlank;
     return ImmutableSet.of(
         Stream.of("foo").allMatch(String::isBlank), Stream.of("bar").allMatch(pred));
   }
 
-  boolean testStreamAllMatch2() {
+  boolean testStreamAllMatch() {
     return Stream.of("foo").allMatch(s -> s.isBlank());
   }
 }

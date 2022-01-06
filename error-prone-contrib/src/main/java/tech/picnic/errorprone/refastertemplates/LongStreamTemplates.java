@@ -199,7 +199,7 @@ final class LongStreamTemplates {
   }
 
   /** Prefer {@link LongStream#noneMatch(LongPredicate)} over more contrived alternatives. */
-  static final class LongStreamNoneMatch {
+  static final class LongStreamNoneMatchLongPredicate {
     @BeforeTemplate
     boolean before(LongStream stream, LongPredicate predicate) {
       return Refaster.anyOf(
@@ -214,7 +214,7 @@ final class LongStreamTemplates {
     }
   }
 
-  abstract static class LongStreamNoneMatch2 {
+  abstract static class LongStreamNoneMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse long element);
 
@@ -243,7 +243,7 @@ final class LongStreamTemplates {
     }
   }
 
-  static final class LongStreamAllMatch {
+  static final class LongStreamAllMatchLongPredicate {
     @BeforeTemplate
     boolean before(LongStream stream, LongPredicate predicate) {
       return stream.noneMatch(predicate.negate());
@@ -255,7 +255,7 @@ final class LongStreamTemplates {
     }
   }
 
-  abstract static class LongStreamAllMatch2 {
+  abstract static class LongStreamAllMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse long element);
 

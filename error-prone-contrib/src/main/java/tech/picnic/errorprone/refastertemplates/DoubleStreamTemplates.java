@@ -186,7 +186,7 @@ final class DoubleStreamTemplates {
   }
 
   /** Prefer {@link DoubleStream#noneMatch(DoublePredicate)} over more contrived alternatives. */
-  static final class DoubleStreamNoneMatch {
+  static final class DoubleStreamNoneMatchDoublePredicate {
     @BeforeTemplate
     boolean before(DoubleStream stream, DoublePredicate predicate) {
       return Refaster.anyOf(
@@ -201,7 +201,7 @@ final class DoubleStreamTemplates {
     }
   }
 
-  abstract static class DoubleStreamNoneMatch2 {
+  abstract static class DoubleStreamNoneMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse double element);
 
@@ -230,7 +230,7 @@ final class DoubleStreamTemplates {
     }
   }
 
-  static final class DoubleStreamAllMatch {
+  static final class DoubleStreamAllMatchDoublePredicate {
     @BeforeTemplate
     boolean before(DoubleStream stream, DoublePredicate predicate) {
       return stream.noneMatch(predicate.negate());
@@ -242,7 +242,7 @@ final class DoubleStreamTemplates {
     }
   }
 
-  abstract static class DoubleStreamAllMatch2 {
+  abstract static class DoubleStreamAllMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse double element);
 
