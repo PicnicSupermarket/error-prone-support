@@ -177,9 +177,7 @@ final class AssortedTemplates {
     @BeforeTemplate
     boolean before(Collection<T> collection1, Collection<T> collection2) {
       return Refaster.anyOf(
-          Collections.disjoint(ImmutableSet.copyOf(collection1), collection2),
           Collections.disjoint(new HashSet<>(collection1), collection2),
-          Collections.disjoint(collection1, ImmutableSet.copyOf(collection2)),
           Collections.disjoint(collection1, new HashSet<>(collection2)));
     }
 

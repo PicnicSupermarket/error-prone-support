@@ -113,8 +113,4 @@ final class ImmutableListMultimapTemplatesTest implements RefasterTemplateTestCa
                 flatteningToImmutableListMultimap(
                     Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))));
   }
-
-  ImmutableListMultimap<String, Integer> testImmutableListMultimapCopyOfImmutableListMultimap() {
-    return ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1));
-  }
 }

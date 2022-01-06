@@ -63,10 +63,6 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return Mono.just("foo").flux();
   }
 
-  Flux<String> testFluxIdentity() {
-    return Flux.just("foo");
-  }
-
   ImmutableSet<Mono<Optional<String>>> testMonoCollectToOptional() {
     return ImmutableSet.of(
         Mono.just("foo").flux().collect(toOptional()),

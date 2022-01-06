@@ -101,17 +101,4 @@ final class ImmutableMultisetTemplates {
       return stream.collect(toImmutableMultiset());
     }
   }
-
-  /** Don't unnecessarily copy an {@link ImmutableMultiset}. */
-  static final class ImmutableMultisetCopyOfImmutableMultiset<T> {
-    @BeforeTemplate
-    ImmutableMultiset<T> before(ImmutableMultiset<T> multiset) {
-      return ImmutableMultiset.copyOf(multiset);
-    }
-
-    @AfterTemplate
-    ImmutableMultiset<T> after(ImmutableMultiset<T> multiset) {
-      return multiset;
-    }
-  }
 }
