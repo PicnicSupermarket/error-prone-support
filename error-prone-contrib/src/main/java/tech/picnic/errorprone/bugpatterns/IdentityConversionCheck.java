@@ -43,6 +43,7 @@ public final class IdentityConversionCheck extends BugChecker
                   "com.google.common.collect.ImmutableMap",
                   "com.google.common.collect.ImmutableMultimap",
                   "com.google.common.collect.ImmutableMultiset",
+                  "com.google.common.collect.ImmutableRangeMap",
                   "com.google.common.collect.ImmutableRangeSet",
                   "com.google.common.collect.ImmutableSet",
                   "com.google.common.collect.ImmutableSetMultimap",
