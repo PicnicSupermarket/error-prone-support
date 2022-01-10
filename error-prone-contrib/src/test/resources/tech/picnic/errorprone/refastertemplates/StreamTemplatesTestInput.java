@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class StreamTemplatesTest implements RefasterTemplateTestCase {
   @Override

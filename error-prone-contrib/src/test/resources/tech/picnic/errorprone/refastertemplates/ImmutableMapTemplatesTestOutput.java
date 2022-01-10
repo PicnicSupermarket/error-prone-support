@@ -12,6 +12,7 @@ import com.google.common.collect.Streams;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
   @Override

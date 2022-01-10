@@ -6,6 +6,7 @@ import java.util.OptionalInt;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class IntStreamTemplatesTest implements RefasterTemplateTestCase {
   @Override

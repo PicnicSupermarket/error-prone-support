@@ -6,6 +6,7 @@ import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.AbstractShortAssert;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJShortTemplatesTest implements RefasterTemplateTestCase {
   @Override

@@ -6,6 +6,7 @@ import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.AbstractDoubleAssert;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
   @Override

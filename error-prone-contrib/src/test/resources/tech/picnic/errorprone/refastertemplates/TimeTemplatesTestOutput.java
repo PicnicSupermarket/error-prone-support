@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class TimeTemplatesTest implements RefasterTemplateTestCase {
   @Override

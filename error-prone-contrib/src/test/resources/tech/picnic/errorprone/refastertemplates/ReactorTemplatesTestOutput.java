@@ -12,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class ReactorTemplatesTest implements RefasterTemplateTestCase {
   @Override

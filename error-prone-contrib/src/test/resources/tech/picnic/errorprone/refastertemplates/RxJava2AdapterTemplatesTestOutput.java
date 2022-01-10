@@ -12,6 +12,7 @@ import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class RxJava2AdapterTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<Mono<Void>> testCompletableToMono() {
