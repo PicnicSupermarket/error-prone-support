@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.Map;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class MapEntryTemplatesTest implements RefasterTemplateTestCase {
   @Override

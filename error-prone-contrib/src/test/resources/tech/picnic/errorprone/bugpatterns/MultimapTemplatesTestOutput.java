@@ -6,6 +6,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.util.Collection;
 import java.util.Set;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class MultimapTemplatesTest implements RefasterTemplateTestCase {
   @Override

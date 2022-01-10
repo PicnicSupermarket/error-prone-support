@@ -35,7 +35,9 @@
     <modules>
         <module>error-prone-contrib</module>
         <module>refaster-resource-compiler</module>
+        <module>refaster-runner</module>
         <module>refaster-support</module>
+        <module>refaster-test-support</module>
     </modules>
 
     <scm>
@@ -185,6 +187,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>refaster-support</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>refaster-test-support</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

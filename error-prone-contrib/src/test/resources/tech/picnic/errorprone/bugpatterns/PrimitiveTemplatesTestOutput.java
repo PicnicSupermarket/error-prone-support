@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class PrimitiveTemplatesTest implements RefasterTemplateTestCase {
   @Override

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import org.assertj.core.api.EnumerableAssert;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJEnumableTemplatesTest implements RefasterTemplateTestCase {
   @Override

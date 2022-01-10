@@ -33,4 +33,16 @@ final class WebClientTemplates {
       return requestBodySpec.bodyValue(value);
     }
   }
+
+  static final class StringIsEmpty {
+    @BeforeTemplate
+    boolean equalsEmptyString(String string) {
+      return string.equals("");
+    }
+
+    @AfterTemplate
+    boolean optimizedMethod(String string) {
+      return string.isEmpty();
+    }
+  }
 }

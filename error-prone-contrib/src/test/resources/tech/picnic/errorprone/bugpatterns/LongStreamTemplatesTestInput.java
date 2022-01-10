@@ -6,6 +6,7 @@ import java.util.OptionalLong;
 import java.util.function.LongPredicate;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class LongStreamTemplatesTest implements RefasterTemplateTestCase {
   @Override

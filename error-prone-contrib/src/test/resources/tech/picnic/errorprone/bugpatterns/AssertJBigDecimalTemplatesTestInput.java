@@ -7,6 +7,7 @@ import static org.assertj.core.data.Percentage.withPercentage;
 import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
 import org.assertj.core.api.AbstractBigDecimalAssert;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJBigDecimalTemplatesTest implements RefasterTemplateTestCase {
   @Override

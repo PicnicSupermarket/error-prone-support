@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class ComparatorTemplatesTest implements RefasterTemplateTestCase {
   @Override

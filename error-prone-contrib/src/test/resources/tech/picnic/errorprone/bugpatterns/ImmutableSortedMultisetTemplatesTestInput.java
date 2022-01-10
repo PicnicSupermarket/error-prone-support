@@ -13,6 +13,7 @@ import com.google.common.collect.Streams;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class ImmutableSortedMultisetTemplatesTest implements RefasterTemplateTestCase {
   @Override

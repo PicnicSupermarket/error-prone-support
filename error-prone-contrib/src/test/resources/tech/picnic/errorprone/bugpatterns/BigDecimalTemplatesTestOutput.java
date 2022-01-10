@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class BigDecimalTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<BigDecimal> testBigDecimalZero() {

@@ -4,6 +4,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import com.google.common.collect.ImmutableSet;
 import org.junit.jupiter.params.provider.Arguments;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class JUnitTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<Arguments> testArgumentsEnumeration() {

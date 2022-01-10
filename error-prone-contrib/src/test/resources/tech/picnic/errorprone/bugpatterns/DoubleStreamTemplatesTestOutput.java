@@ -6,6 +6,7 @@ import java.util.OptionalDouble;
 import java.util.function.DoublePredicate;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class DoubleStreamTemplatesTest implements RefasterTemplateTestCase {
   @Override
