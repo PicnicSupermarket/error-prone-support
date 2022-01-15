@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
 import java.util.Optional;
@@ -48,6 +49,10 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<Flux<Integer>> testFluxConcatMap() {
     return ImmutableSet.of(
         Flux.just(1).flatMap(Mono::just, 1), Flux.just(2).flatMapSequential(Mono::just, 1));
+  }
+
+  Flux<Integer> testFluxConcatMapIterable() {
+    return Flux.just(1, 2).flatMapIterable(ImmutableList::of);
   }
 
   Flux<String> testMonoFlatMapToFlux() {

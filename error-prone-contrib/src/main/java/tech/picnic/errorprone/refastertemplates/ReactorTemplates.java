@@ -21,6 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
+import tech.picnic.errorprone.bugpatterns.FluxFlatMapUsageCheck;
 
 /** Refaster templates related to Reactor expressions and statements. */
 final class ReactorTemplates {
@@ -152,6 +153,25 @@ final class ReactorTemplates {
     @AfterTemplate
     Flux<S> after(Flux<T> flux, Function<? super T, ? extends Publisher<? extends S>> function) {
       return flux.concatMap(function);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#concatMapIterable(Function)} over {@link Flux#concatMapIterable(Function)}
+   * to be consistent with {@link FluxFlatMapUsageCheck}.
+   *
+   * <p>NB: Both implementations emit values in a deterministic order and there is no difference
+   * with eager or lazy inner subscriptions. This means that both implementations are *equivalent*.
+   */
+  static final class FluxConcatMapIterable<T, S> {
+    @BeforeTemplate
+    Flux<S> before(Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function) {
+      return flux.flatMapIterable(function);
+    }
+
+    @AfterTemplate
+    Flux<S> after(Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function) {
+      return flux.concatMapIterable(function);
     }
   }
 
