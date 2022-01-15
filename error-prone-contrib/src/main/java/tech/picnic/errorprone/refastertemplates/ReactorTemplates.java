@@ -21,7 +21,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
-import tech.picnic.errorprone.bugpatterns.FluxFlatMapUsageCheck;
 
 /** Refaster templates related to Reactor expressions and statements. */
 final class ReactorTemplates {
@@ -157,11 +156,8 @@ final class ReactorTemplates {
   }
 
   /**
-   * Prefer {@link Flux#concatMapIterable(Function)} over {@link Flux#concatMapIterable(Function)}
-   * to be consistent with {@link FluxFlatMapUsageCheck}.
-   *
-   * <p>NB: Both implementations emit values in a deterministic order and there is no difference
-   * with eager or lazy inner subscriptions. This means that both implementations are *equivalent*.
+   * Prefer {@link Flux#concatMapIterable(Function)} over {@link Flux#concatMapIterable(Function)},
+   * as the former has equivalent semantics but a clearer name.
    */
   static final class FluxConcatMapIterable<T, S> {
     @BeforeTemplate
