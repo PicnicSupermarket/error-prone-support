@@ -177,4 +177,94 @@ public final class JUnitMethodDeclarationCheckTest {
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
+
+  @Test
+  void methodAlreadyExistsInClass() {
+    refactoringTestHelper
+        .addInputLines(
+            "A.java",
+            "import org.junit.jupiter.api.Test;",
+            "",
+            "class A {",
+            "  @Test void testFoo() {}",
+            "  void foo() {}",
+            "",
+            "  @Test void testBar() {}",
+            "  private void bar() {}",
+            "",
+            "  @Test void testFooDifferent() {}",
+            "  @Test void testBarDifferent() {}",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "import org.junit.jupiter.api.Test;",
+            "",
+            "class A {",
+            "  @Test void testFoo() {}",
+            "  void foo() {}",
+            "",
+            "  @Test void testBar() {}",
+            "  private void bar() {}",
+            "",
+            "  @Test void fooDifferent() {}",
+            "  @Test void barDifferent() {}",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void methodAlreadyInStaticImports() {
+    refactoringTestHelper
+        .addInputLines(
+            "A.java",
+            "import static com.google.common.collect.ImmutableSet.toImmutableSet;",
+            "import static org.junit.jupiter.params.provider.Arguments.arguments;",
+            "",
+            "import org.junit.jupiter.api.Test;",
+            "import com.google.common.collect.ImmutableSet;",
+            "",
+            "class A {",
+            "  @Test",
+            "  void testArguments() {",
+            "    arguments(1, 2, 3);",
+            "  }",
+            "",
+            "  @Test",
+            "  void testToImmutableSet() {",
+            "    ImmutableSet.of(1).stream().filter(i -> i > 1).collect(toImmutableSet());",
+            "  }",
+            "",
+            "  @Test",
+            "  void testArgumentsDifferentName() {}",
+            "",
+            "  @Test",
+            "  void testToImmutableSetDifferentName() {}",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "import static com.google.common.collect.ImmutableSet.toImmutableSet;",
+            "import static org.junit.jupiter.params.provider.Arguments.arguments;",
+            "",
+            "import org.junit.jupiter.api.Test;",
+            "import com.google.common.collect.ImmutableSet;",
+            "",
+            "class A {",
+            "  @Test",
+            "  void testArguments() {",
+            "    arguments(1, 2, 3);",
+            "  }",
+            "",
+            "  @Test",
+            "  void testToImmutableSet() {",
+            "    ImmutableSet.of(1).stream().filter(i -> i > 1).collect(toImmutableSet());",
+            "  }",
+            "",
+            "  @Test",
+            "  void argumentsDifferentName() {}",
+            "",
+            "  @Test",
+            "  void toImmutableSetDifferentName() {}",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
 }
