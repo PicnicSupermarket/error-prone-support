@@ -142,6 +142,35 @@ final class ReactorTemplates {
     }
   }
 
+  /** Prefer {@link Flux#concatMap(Function)} over more contrived alternatives. */
+  static final class FluxConcatMap<T, S> {
+    @BeforeTemplate
+    Flux<S> before(Flux<T> flux, Function<? super T, ? extends Publisher<? extends S>> function) {
+      return Refaster.anyOf(flux.flatMap(function, 1), flux.flatMapSequential(function, 1));
+    }
+
+    @AfterTemplate
+    Flux<S> after(Flux<T> flux, Function<? super T, ? extends Publisher<? extends S>> function) {
+      return flux.concatMap(function);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#concatMapIterable(Function)} over {@link Flux#concatMapIterable(Function)},
+   * as the former has equivalent semantics but a clearer name.
+   */
+  static final class FluxConcatMapIterable<T, S> {
+    @BeforeTemplate
+    Flux<S> before(Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function) {
+      return flux.flatMapIterable(function);
+    }
+
+    @AfterTemplate
+    Flux<S> after(Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function) {
+      return flux.concatMapIterable(function);
+    }
+  }
+
   /**
    * Don't use {@link Mono#flatMapMany(Function)} to implicitly convert a {@link Mono} to a {@link
    * Flux}.
