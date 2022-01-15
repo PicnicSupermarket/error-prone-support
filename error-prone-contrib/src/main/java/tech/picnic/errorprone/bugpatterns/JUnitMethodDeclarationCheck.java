@@ -23,10 +23,16 @@ import com.google.errorprone.matchers.MultiMatcher;
 import com.google.errorprone.predicates.TypePredicate;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
+import java.util.Objects;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 
 /** A {@link BugChecker} which flags non-canonical JUnit method declarations. */
 // XXX: Consider introducing a class-level check which enforces that test classes:
@@ -81,24 +87,83 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
         .ifPresent(builder::merge);
 
     if (isTestMethod) {
-      // XXX: In theory this rename could clash with an existing method or static import. In that
-      // case we should emit a warning without a suggested replacement.
-      tryCanonicalizeMethodName(tree, state).ifPresent(builder::merge);
-    }
+      String newMethodName = tryCanonicalizeMethodName(tree).orElse("");
 
+      if (newMethodName.isEmpty()) {
+        return describeMatchesIfPresent(tree, builder);
+      }
+
+      boolean reportedNameClash = reportDescriptionForPossibleNameClash(tree, newMethodName, state);
+      if (!reportedNameClash) {
+        builder.merge(SuggestedFixes.renameMethod(tree, newMethodName, state));
+      }
+    }
+    return describeMatchesIfPresent(tree, builder);
+  }
+
+  private Description describeMatchesIfPresent(MethodTree tree, SuggestedFix.Builder builder) {
     return builder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, builder.build());
   }
 
-  private static Optional<SuggestedFix> tryCanonicalizeMethodName(
-      MethodTree tree, VisitorState state) {
+  private boolean reportDescriptionForPossibleNameClash(
+      MethodTree tree, String methodName, VisitorState state) {
+    if (isMethodNameInClass(methodName, state)) {
+      state.reportMatch(
+          buildDescription(tree)
+              .setMessage(
+                  String.format("A method with name %s already exists in the class.", methodName))
+              .build());
+      return true;
+    }
+
+    if (isMethodNameStaticallyImported(methodName, state)) {
+      state.reportMatch(
+          buildDescription(tree)
+              .setMessage(
+                  String.format(
+                      "A method with name %s is already statically imported.", methodName))
+              .build());
+      return true;
+    }
+
+    return false;
+  }
+
+  private static boolean isMethodNameInClass(String methodName, VisitorState state) {
+    return state.findEnclosing(ClassTree.class).getMembers().stream()
+        .filter(member -> !ASTHelpers.isGeneratedConstructor((MethodTree) member))
+        .map(MethodTree.class::cast)
+        .map(MethodTree::getName)
+        .map(Name::toString)
+        .anyMatch(n -> n.equals(methodName));
+  }
+
+  private static boolean isMethodNameStaticallyImported(String methodName, VisitorState state) {
+    CompilationUnitTree compilationUnit = state.getPath().getCompilationUnit();
+
+    return compilationUnit.getImports().stream()
+        .filter(Objects::nonNull)
+        .map(ImportTree.class::cast)
+        .filter(ImportTree::isStatic)
+        .map(ImportTree::getQualifiedIdentifier)
+        .map(tree -> getStaticImportIdentifier(tree, state))
+        .anyMatch(methodName::contentEquals);
+  }
+
+  private static CharSequence getStaticImportIdentifier(Tree tree, VisitorState state) {
+    String source = Util.treeToString(tree, state);
+    int lastDot = source.lastIndexOf('.');
+    return lastDot < 0 ? source : source.subSequence(lastDot + 1, source.length());
+  }
+
+  private static Optional<String> tryCanonicalizeMethodName(MethodTree tree) {
     return Optional.ofNullable(ASTHelpers.getSymbol(tree))
         .map(sym -> sym.getQualifiedName().toString())
         .filter(name -> name.startsWith(TEST_PREFIX))
         .map(name -> name.substring(TEST_PREFIX.length()))
         .filter(not(String::isEmpty))
         .map(name -> Character.toLowerCase(name.charAt(0)) + name.substring(1))
-        .filter(name -> !Character.isDigit(name.charAt(0)))
-        .map(name -> SuggestedFixes.renameMethod(tree, name, state));
+        .filter(name -> !Character.isDigit(name.charAt(0)));
   }
 
   // XXX: Move to a `MoreMatchers` utility class.
