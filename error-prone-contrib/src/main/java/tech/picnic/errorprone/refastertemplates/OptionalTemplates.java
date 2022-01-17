@@ -5,7 +5,9 @@ import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Iterator;
@@ -15,6 +17,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import tech.picnic.errorprone.refaster.util.IsNonNull;
 
 /** Refaster templates related to expressions dealing with {@link Optional}s. */
 final class OptionalTemplates {
@@ -109,7 +112,10 @@ final class OptionalTemplates {
     }
   }
 
-  /** Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator. */
+  /**
+   * Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator while matching
+   * non-null expressions.
+   */
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
   // Maybe our RefasterCheck should test `compilesWithFix`?
@@ -118,18 +124,42 @@ final class OptionalTemplates {
     abstract boolean test(T value);
 
     @BeforeTemplate
-    Optional<T> before(T input) {
+    Optional<T> before(@Matches(IsNonNull.class) T input) {
       return test(input) ? Optional.of(input) : Optional.empty();
     }
 
     @AfterTemplate
     Optional<T> after(T input) {
-      return Refaster.emitCommentBefore(
-          "Or Optional.ofNullable (can't auto-infer).", Optional.of(input).filter(v -> test(v)));
+      return Optional.of(input).filter(v -> test(v));
     }
   }
 
-  /** Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator. */
+  /**
+   * Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator and only match
+   * nullable expressions.
+   */
+  // XXX: This rule may introduce a compilation error: the `test` expression may reference a
+  // non-effectively final variable, which is not allowed in the replacement lambda expression.
+  // Maybe our RefasterCheck should test `compilesWithFix`?
+  abstract static class OptionalOfNullableFilterPositive<T> {
+    @Placeholder
+    abstract boolean test(T value);
+
+    @BeforeTemplate
+    Optional<T> before(@NotMatches(IsNonNull.class) T input) {
+      return test(input) ? Optional.of(input) : Optional.empty();
+    }
+
+    @AfterTemplate
+    Optional<T> after(@Nullable T input) {
+      return Optional.ofNullable(input).filter(v -> test(v));
+    }
+  }
+
+  /**
+   * Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator and only matching
+   * non-null expressions.
+   */
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
   // Maybe our RefasterCheck should test `compilesWithFix`?
@@ -138,14 +168,35 @@ final class OptionalTemplates {
     abstract boolean test(T value);
 
     @BeforeTemplate
-    Optional<T> before(T input) {
+    Optional<T> before(@Matches(IsNonNull.class) T input) {
       return test(input) ? Optional.empty() : Optional.of(input);
     }
 
     @AfterTemplate
     Optional<T> after(T input) {
-      return Refaster.emitCommentBefore(
-          "Or Optional.ofNullable (can't auto-infer).", Optional.of(input).filter(v -> !test(v)));
+      return Optional.of(input).filter(v -> !test(v));
+    }
+  }
+
+  /**
+   * Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator and only matching
+   * nullable expressions.
+   */
+  // XXX: This rule may introduce a compilation error: the `test` expression may reference a
+  // non-effectively final variable, which is not allowed in the replacement lambda expression.
+  // Maybe our RefasterCheck should test `compilesWithFix`?
+  abstract static class OptionalOfNullableFilterNegative<T> {
+    @Placeholder
+    abstract boolean test(T value);
+
+    @BeforeTemplate
+    Optional<T> before(@Matches(IsNonNull.class) T input) {
+      return test(input) ? Optional.empty() : Optional.of(input);
+    }
+
+    @AfterTemplate
+    Optional<T> after(@Nullable T input) {
+      return Optional.ofNullable(input).filter(v -> !test(v));
     }
   }
 

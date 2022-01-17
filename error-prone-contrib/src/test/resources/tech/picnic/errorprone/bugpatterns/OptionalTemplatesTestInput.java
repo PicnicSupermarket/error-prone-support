@@ -5,6 +5,7 @@ import com.google.common.collect.Streams;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 final class OptionalTemplatesTest implements RefasterTemplateTestCase {
   @Override
@@ -48,6 +49,14 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(
         "foo".length() > 5 ? Optional.of("foo") : Optional.empty(),
         !"bar".contains("baz") ? Optional.of("bar") : Optional.empty());
+  }
+
+  ImmutableSet<Optional<String>> testOptionalOfNullableFilterPositive(
+      @Nullable String nullableString) {
+    nullableString = null;
+    return ImmutableSet.of(
+        "foo".length() > 5 ? Optional.of(nullableString) : Optional.empty(),
+        !"bar".contains("baz") ? Optional.of(nullableString) : Optional.empty());
   }
 
   ImmutableSet<Optional<String>> testTernaryOperatorOptionalNegativeFiltering() {
