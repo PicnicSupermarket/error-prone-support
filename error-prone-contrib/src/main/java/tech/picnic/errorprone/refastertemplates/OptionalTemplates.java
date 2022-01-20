@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import tech.picnic.errorprone.refaster.util.IsNonNull;
+import tech.picnic.errorprone.refaster.util.IsNullable;
 
 /** Refaster templates related to expressions dealing with {@link Optional}s. */
 final class OptionalTemplates {
@@ -121,10 +121,10 @@ final class OptionalTemplates {
   // Maybe our RefasterCheck should test `compilesWithFix`?
   abstract static class TernaryOperatorOptionalPositiveFiltering<T> {
     @Placeholder
-    abstract boolean test(T value);
+    abstract boolean test(@MayOptionallyUse T value);
 
     @BeforeTemplate
-    Optional<T> before(@Matches(IsNonNull.class) T input) {
+    Optional<T> before(@NotMatches(IsNullable.class) T input) {
       return test(input) ? Optional.of(input) : Optional.empty();
     }
 
@@ -143,16 +143,16 @@ final class OptionalTemplates {
   // Maybe our RefasterCheck should test `compilesWithFix`?
   abstract static class OptionalOfNullableFilterPositive<T> {
     @Placeholder
-    abstract boolean test(T value);
+    abstract boolean test();
 
     @BeforeTemplate
-    Optional<T> before(@NotMatches(IsNonNull.class) T input) {
-      return test(input) ? Optional.of(input) : Optional.empty();
+    Optional<T> before(@Matches(IsNullable.class) T input) {
+      return test() ? Optional.of(input) : Optional.empty();
     }
 
     @AfterTemplate
     Optional<T> after(@Nullable T input) {
-      return Optional.ofNullable(input).filter(v -> test(v));
+      return Optional.ofNullable(input).filter(v -> test());
     }
   }
 
@@ -165,10 +165,10 @@ final class OptionalTemplates {
   // Maybe our RefasterCheck should test `compilesWithFix`?
   abstract static class TernaryOperatorOptionalNegativeFiltering<T> {
     @Placeholder
-    abstract boolean test(T value);
+    abstract boolean test(@MayOptionallyUse T value);
 
     @BeforeTemplate
-    Optional<T> before(@Matches(IsNonNull.class) T input) {
+    Optional<T> before(@NotMatches(IsNullable.class) T input) {
       return test(input) ? Optional.empty() : Optional.of(input);
     }
 
@@ -187,10 +187,10 @@ final class OptionalTemplates {
   // Maybe our RefasterCheck should test `compilesWithFix`?
   abstract static class OptionalOfNullableFilterNegative<T> {
     @Placeholder
-    abstract boolean test(T value);
+    abstract boolean test(@MayOptionallyUse T value);
 
     @BeforeTemplate
-    Optional<T> before(@Matches(IsNonNull.class) T input) {
+    Optional<T> before(@Matches(IsNullable.class) T input) {
       return test(input) ? Optional.empty() : Optional.of(input);
     }
 

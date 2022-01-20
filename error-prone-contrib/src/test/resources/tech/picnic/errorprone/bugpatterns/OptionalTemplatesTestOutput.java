@@ -7,6 +7,7 @@ import com.google.common.collect.Streams;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 final class OptionalTemplatesTest implements RefasterTemplateTestCase {
   @Override

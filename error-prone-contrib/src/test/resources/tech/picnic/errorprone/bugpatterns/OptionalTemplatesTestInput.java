@@ -52,17 +52,23 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
   }
 
   ImmutableSet<Optional<String>> testOptionalOfNullableFilterPositive(
-      @Nullable String nullableString) {
-    nullableString = null;
+          @Nullable String nullableString) {
     return ImmutableSet.of(
-        "foo".length() > 5 ? Optional.of(nullableString) : Optional.empty(),
-        !"bar".contains("baz") ? Optional.of(nullableString) : Optional.empty());
+            "foo".length() > 5 ? Optional.of(nullableString) : Optional.empty(),
+            !"bar".contains("baz") ? Optional.of(nullableString) : Optional.empty());
   }
 
   ImmutableSet<Optional<String>> testTernaryOperatorOptionalNegativeFiltering() {
     return ImmutableSet.of(
         "foo".length() > 5 ? Optional.empty() : Optional.of("foo"),
         !"bar".contains("baz") ? Optional.empty() : Optional.of("bar"));
+  }
+
+  ImmutableSet<Optional<String>> testOptionalOfNullableFilterNegative(
+      @Nullable String nullableString) {
+    return ImmutableSet.of(
+        "foo".length() > 5 ? Optional.empty() : Optional.of(nullableString),
+        !"bar".contains("baz") ? Optional.empty() : Optional.of(nullableString));
   }
 
   ImmutableSet<Boolean> testMapOptionalToBoolean() {
