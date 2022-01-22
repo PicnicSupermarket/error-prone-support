@@ -2,6 +2,9 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableRangeSet.toImmutableRangeSet;
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.Objects.requireNonNullElseGet;
 import static java.util.function.Predicate.not;
 
@@ -19,9 +22,6 @@ import com.google.common.collect.TreeRangeSet;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ResourceInfo;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.ErrorProneFlags;
@@ -60,9 +60,9 @@ import java.util.stream.Stream;
 @BugPattern(
     name = "Refaster",
     summary = "Write idiomatic code when possible",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.SIMPLIFICATION)
+    linkType = NONE,
+    severity = SUGGESTION,
+    tags = SIMPLIFICATION)
 public final class RefasterCheck extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String REFASTER_TEMPLATE_SUFFIX = ".refaster";
