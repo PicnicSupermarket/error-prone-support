@@ -87,15 +87,16 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
         .ifPresent(builder::merge);
 
     if (isTestMethod) {
-      String newMethodName = tryCanonicalizeMethodName(tree).orElse("");
+      Optional<String> newMethodName = tryCanonicalizeMethodName(tree);
 
       if (newMethodName.isEmpty()) {
         return describeMatchesIfPresent(tree, builder);
       }
 
-      boolean reportedNameClash = reportDescriptionForPossibleNameClash(tree, newMethodName, state);
+      boolean reportedNameClash =
+          reportDescriptionForPossibleNameClash(tree, newMethodName.orElseThrow(), state);
       if (!reportedNameClash) {
-        builder.merge(SuggestedFixes.renameMethod(tree, newMethodName, state));
+        builder.merge(SuggestedFixes.renameMethod(tree, newMethodName.orElseThrow(), state));
       }
     }
     return describeMatchesIfPresent(tree, builder);
@@ -131,11 +132,12 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
 
   private static boolean isMethodNameInClass(String methodName, VisitorState state) {
     return state.findEnclosing(ClassTree.class).getMembers().stream()
-        .filter(member -> !ASTHelpers.isGeneratedConstructor((MethodTree) member))
+        .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
+        .filter(member -> !ASTHelpers.isGeneratedConstructor(member))
         .map(MethodTree::getName)
         .map(Name::toString)
-        .anyMatch(n -> n.equals(methodName));
+        .anyMatch(methodName::equals);
   }
 
   private static boolean isMethodNameStaticallyImported(String methodName, VisitorState state) {
@@ -143,7 +145,6 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
 
     return compilationUnit.getImports().stream()
         .filter(Objects::nonNull)
-        .map(ImportTree.class::cast)
         .filter(ImportTree::isStatic)
         .map(ImportTree::getQualifiedIdentifier)
         .map(tree -> getStaticImportIdentifier(tree, state))
