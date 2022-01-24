@@ -365,6 +365,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     ObjectEnumerableAssert<?, S> after(Set<S> set, T element) {
       return assertThat(set).containsExactly(element);
     }
