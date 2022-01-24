@@ -1,5 +1,8 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.ALL;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.allOf;
@@ -11,6 +14,8 @@ import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.methodHasParameters;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -20,17 +25,17 @@ import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.MethodTree;
 
 /**
- * A {@link BugChecker} which flags {@code @RequestParam} parameters that have an invalid type.
+ * A {@link BugChecker} which flags {@code RequestParam} parameters that have an invalid type.
  *
- * <p>Types considered invalid are {@code ImmutableMap} and subtypes of {@code ImmutableCollection}.
+ * <p>Types considered invalid are {@link ImmutableMap} and subtypes of {@link ImmutableCollection}.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "RequestParamAnnotationCheck",
     summary = "Make sure all `@RequestParam` method parameters are valid",
-    linkType = BugPattern.LinkType.NONE,
-    severity = BugPattern.SeverityLevel.ERROR,
-    tags = BugPattern.StandardTags.LIKELY_ERROR)
+    linkType = NONE,
+    severity = ERROR,
+    tags = LIKELY_ERROR)
 public final class RequestParamAnnotationCheck extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String ANN_PACKAGE_PREFIX = "org.springframework.web.bind.annotation.";
@@ -48,13 +53,13 @@ public final class RequestParamAnnotationCheck extends BugChecker implements Met
                   isType(ANN_PACKAGE_PREFIX + "RequestMapping"))),
           methodHasParameters(
               AT_LEAST_ONE,
-              annotations(AT_LEAST_ONE, anyOf(isType(ANN_PACKAGE_PREFIX + "RequestParam")))));
+              annotations(AT_LEAST_ONE, isType(ANN_PACKAGE_PREFIX + "RequestParam"))));
 
   private static final Matcher<MethodTree> HAS_INVALID_REQUEST_PARAM_TYPE =
       methodHasParameters(
           AT_LEAST_ONE,
           allOf(
-              annotations(ALL, anyOf(isType(ANN_PACKAGE_PREFIX + "RequestParam"))),
+              annotations(ALL, isType(ANN_PACKAGE_PREFIX + "RequestParam")),
               anyOf(
                   isSubtypeOf("com.google.common.collect.ImmutableCollection"),
                   isSameType("com.google.common.collect.ImmutableMap"))));
@@ -64,7 +69,9 @@ public final class RequestParamAnnotationCheck extends BugChecker implements Met
     return HAS_REQUEST_MAPPING_ANNOTATION.matches(tree, state)
             && HAS_INVALID_REQUEST_PARAM_TYPE.matches(tree, state)
         ? buildDescription(tree)
-            .setMessage("At least one defined Request Parameters has an invalid type.")
+            .setMessage(
+                "At least one defined Request Parameter has an invalid type. "
+                    + "`ImmutableMap`, `ImmutableCollection` and subtypes are not allowed.")
             .build()
         : Description.NO_MATCH;
   }
