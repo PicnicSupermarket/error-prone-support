@@ -145,7 +145,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
       ImmutableSetMultimap.<String, String>builder()
           .put("com.mongodb.client.model.Filters", "empty")
           .put("org.springframework.http.MediaType", "ALL")
-          .putAll("java.util.regex.Pattern", "compile", "quote")
+          .putAll("java.util.regex.Pattern", "compile", "matches", "quote")
           .build();
 
   /**
