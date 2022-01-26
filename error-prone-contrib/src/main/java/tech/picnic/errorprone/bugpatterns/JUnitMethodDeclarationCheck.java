@@ -153,8 +153,7 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
 
   private static CharSequence getStaticImportIdentifier(Tree tree, VisitorState state) {
     String source = Util.treeToString(tree, state);
-    int lastDot = source.lastIndexOf('.');
-    return lastDot < 0 ? source : source.subSequence(lastDot + 1, source.length());
+    return source.subSequence(source.lastIndexOf('.') + 1, source.length());
   }
 
   private static Optional<String> tryCanonicalizeMethodName(MethodTree tree) {
