@@ -7,7 +7,6 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
-import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Iterator;
@@ -17,6 +16,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import tech.picnic.errorprone.refaster.util.IsNonNull;
 import tech.picnic.errorprone.refaster.util.IsNullable;
 
 /** Refaster templates related to expressions dealing with {@link Optional}s. */
@@ -124,7 +124,7 @@ final class OptionalTemplates {
     abstract boolean test(@MayOptionallyUse T value);
 
     @BeforeTemplate
-    Optional<T> before(@NotMatches(IsNullable.class) T input) {
+    Optional<T> before(@Matches(IsNonNull.class) T input) {
       return test(input) ? Optional.of(input) : Optional.empty();
     }
 
@@ -143,16 +143,16 @@ final class OptionalTemplates {
   // Maybe our RefasterCheck should test `compilesWithFix`?
   abstract static class OptionalOfNullableFilterPositive<T> {
     @Placeholder
-    abstract boolean test();
+    abstract boolean test(@Nullable @MayOptionallyUse T value);
 
     @BeforeTemplate
     Optional<T> before(@Matches(IsNullable.class) T input) {
-      return test() ? Optional.of(input) : Optional.empty();
+      return test(input) ? Optional.of(input) : Optional.empty();
     }
 
     @AfterTemplate
     Optional<T> after(@Nullable T input) {
-      return Optional.ofNullable(input).filter(v -> test());
+      return Optional.ofNullable(input).filter(v -> test(input));
     }
   }
 
@@ -160,15 +160,15 @@ final class OptionalTemplates {
    * Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator and only matching
    * non-null expressions.
    */
-  // XXX: This rule may introduce a compilation error: the `test` expression may reference a
-  // non-effectively final variable, which is not allowed in the replacement lambda expression.
-  // Maybe our RefasterCheck should test `compilesWithFix`?
+  //  // XXX: This rule may introduce a compilation error: the `test` expression may reference a
+  //  // non-effectively final variable, which is not allowed in the replacement lambda expression.
+  //  // Maybe our RefasterCheck should test `compilesWithFix`?
   abstract static class TernaryOperatorOptionalNegativeFiltering<T> {
     @Placeholder
     abstract boolean test(@MayOptionallyUse T value);
 
     @BeforeTemplate
-    Optional<T> before(@NotMatches(IsNullable.class) T input) {
+    Optional<T> before(@Matches(IsNonNull.class) T input) {
       return test(input) ? Optional.empty() : Optional.of(input);
     }
 
@@ -187,10 +187,10 @@ final class OptionalTemplates {
   // Maybe our RefasterCheck should test `compilesWithFix`?
   abstract static class OptionalOfNullableFilterNegative<T> {
     @Placeholder
-    abstract boolean test(@MayOptionallyUse T value);
+    abstract boolean test(@MayOptionallyUse @Nullable T value);
 
     @BeforeTemplate
-    Optional<T> before(@Matches(IsNullable.class) T input) {
+    Optional<T> before(@Matches(IsNullable.class) @Nullable T input) {
       return test(input) ? Optional.empty() : Optional.of(input);
     }
 

@@ -9,6 +9,7 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.VariableTree;
 import org.junit.jupiter.api.Test;
 
 final class IsNullableTest {
@@ -49,18 +50,33 @@ final class IsNullableTest {
             "    foo(id(nullableObj));",
             "    foo(id(nonnullObj));",
             "  }",
+            "  private void m(@Nullable String nullableString) {",
+            "    // BUG: Diagnostic contains:",
+            "    String s = nullableString;",
+            "  }",
             "}")
         .doTest();
   }
 
   /** A {@link BugChecker} which simply delegates to {@link IsNullable}. */
   @BugPattern(name = "TestChecker", summary = "Flags non-null expressions", severity = ERROR)
-  public static final class TestChecker extends BugChecker implements MethodInvocationTreeMatcher {
+  public static final class TestChecker extends BugChecker
+      implements BugChecker.VariableTreeMatcher, MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
 
     @Override
     public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
       return new IsNullable().matches(tree, state) ? describeMatch(tree) : Description.NO_MATCH;
+    }
+
+    @Override
+    public Description matchVariable(VariableTree tree, VisitorState state) {
+      if (tree.getInitializer() == null) {
+        return Description.NO_MATCH;
+      }
+      return new IsNullable().matches(tree.getInitializer(), state)
+          ? describeMatch(tree)
+          : Description.NO_MATCH;
     }
   }
 }

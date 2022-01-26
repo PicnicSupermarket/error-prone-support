@@ -5,7 +5,8 @@ import com.google.common.collect.Streams;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class OptionalTemplatesTest implements RefasterTemplateTestCase {
   @Override
@@ -51,11 +52,14 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
         !"bar".contains("baz") ? Optional.of("bar") : Optional.empty());
   }
 
+  @Nullable String nullableObj;
+  @NonNull Object nonnullObj;
+
   ImmutableSet<Optional<String>> testOptionalOfNullableFilterPositive(
-          @Nullable String nullableString) {
+      @Nullable String nullableString) {
     return ImmutableSet.of(
-            "foo".length() > 5 ? Optional.of(nullableString) : Optional.empty(),
-            !"bar".contains("baz") ? Optional.of(nullableString) : Optional.empty());
+        nullableObj.length() > 5 ? Optional.of(nullableObj) : Optional.empty(),
+        !nullableObj.contains("baz") ? Optional.of(nullableObj) : Optional.empty());
   }
 
   ImmutableSet<Optional<String>> testTernaryOperatorOptionalNegativeFiltering() {
@@ -67,8 +71,8 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<Optional<String>> testOptionalOfNullableFilterNegative(
       @Nullable String nullableString) {
     return ImmutableSet.of(
-        "foo".length() > 5 ? Optional.empty() : Optional.of(nullableString),
-        !"bar".contains("baz") ? Optional.empty() : Optional.of(nullableString));
+        nullableString.length() > 5 ? Optional.empty() : Optional.of(nullableString),
+        !nullableString.contains("baz") ? Optional.empty() : Optional.of(nullableString));
   }
 
   ImmutableSet<Boolean> testMapOptionalToBoolean() {
