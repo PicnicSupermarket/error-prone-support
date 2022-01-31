@@ -55,7 +55,7 @@ final class ImmutableMapTemplates {
 
   /**
    * Prefer {@link ImmutableMap#of(Object, Object)} over more contrived alternatives and
-   * alternatives that don't communicate the immutability of the resulting map at the type level..
+   * alternatives that don't communicate the immutability of the resulting map at the type level.
    */
   // XXX: One can define variants for more than one key-value pair, but at some point the builder
   // actually produces nicer code. So it's not clear we should add Refaster templates for those
