@@ -21,4 +21,12 @@ final class AssertJStringTemplatesTest implements RefasterTemplateTestCase {
   AbstractAssert<?, ?> testAssertThatStringIsNotEmpty() {
     return assertThat("foo").isNotEmpty();
   }
+
+  AbstractAssert<?, ?> testAssertThatMatches() {
+    return assertThat("foo").matches(".*");
+  }
+
+  AbstractAssert<?, ?> testAssertThatDoesNotMatch() {
+    return assertThat("foo").doesNotMatch(".*");
+  }
 }
