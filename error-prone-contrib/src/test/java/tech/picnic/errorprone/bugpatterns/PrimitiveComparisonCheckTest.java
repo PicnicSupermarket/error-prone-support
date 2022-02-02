@@ -426,8 +426,6 @@ public final class PrimitiveComparisonCheckTest {
         .doTest();
   }
 
-  // XXX: If the explicit `<A, BoxedPrimitive>` generic type information was necessary, then this
-  // replacement drops too much information.
   @Test
   void replacementWithPrimitiveVariants() {
     refactoringTestHelper
@@ -459,13 +457,13 @@ public final class PrimitiveComparisonCheckTest {
             "import java.util.Comparator;",
             "",
             "interface A extends Comparable<A> {",
-            "  Comparator<A> bCmp = Comparator.comparingInt(o -> (byte) 0);",
-            "  Comparator<A> cCmp = Comparator.comparingInt(o -> (char) 0);",
-            "  Comparator<A> sCmp = Comparator.comparingInt(o -> (short) 0);",
-            "  Comparator<A> iCmp = Comparator.comparingInt(o -> 0);",
-            "  Comparator<A> lCmp = Comparator.comparingLong(o -> 0L);",
-            "  Comparator<A> fCmp = Comparator.comparingDouble(o -> 0.0f);",
-            "  Comparator<A> dCmp = Comparator.comparingDouble(o -> 0.0);",
+            "  Comparator<A> bCmp = Comparator.<A>comparingInt(o -> (byte) 0);",
+            "  Comparator<A> cCmp = Comparator.<A>comparingInt(o -> (char) 0);",
+            "  Comparator<A> sCmp = Comparator.<A>comparingInt(o -> (short) 0);",
+            "  Comparator<A> iCmp = Comparator.<A>comparingInt(o -> 0);",
+            "  Comparator<A> lCmp = Comparator.<A>comparingLong(o -> 0L);",
+            "  Comparator<A> fCmp = Comparator.<A>comparingDouble(o -> 0.0f);",
+            "  Comparator<A> dCmp = Comparator.<A>comparingDouble(o -> 0.0);",
             "",
             "  default void m() {",
             "    bCmp.thenComparingInt(o -> (byte) 0);",
@@ -480,8 +478,6 @@ public final class PrimitiveComparisonCheckTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
-  // XXX: If the explicit `<A>` generic type information was necessary, then this replacement drops
-  // too much information.
   @Test
   void replacementWithBoxedVariants() {
     refactoringTestHelper
@@ -513,13 +509,13 @@ public final class PrimitiveComparisonCheckTest {
             "import java.util.Comparator;",
             "",
             "interface A extends Comparable<A> {",
-            "  Comparator<A> bCmp = Comparator.comparing(o -> Byte.valueOf((byte) 0));",
-            "  Comparator<A> cCmp = Comparator.comparing(o -> Character.valueOf((char) 0));",
-            "  Comparator<A> sCmp = Comparator.comparing(o -> Short.valueOf((short) 0));",
-            "  Comparator<A> iCmp = Comparator.comparing(o -> Integer.valueOf(0));",
-            "  Comparator<A> lCmp = Comparator.comparing(o -> Long.valueOf(0));",
-            "  Comparator<A> fCmp = Comparator.comparing(o -> Float.valueOf(0));",
-            "  Comparator<A> dCmp = Comparator.comparing(o -> Double.valueOf(0));",
+            "  Comparator<A> bCmp = Comparator.<A, Byte>comparing(o -> Byte.valueOf((byte) 0));",
+            "  Comparator<A> cCmp = Comparator.<A, Character>comparing(o -> Character.valueOf((char) 0));",
+            "  Comparator<A> sCmp = Comparator.<A, Short>comparing(o -> Short.valueOf((short) 0));",
+            "  Comparator<A> iCmp = Comparator.<A, Integer>comparing(o -> Integer.valueOf(0));",
+            "  Comparator<A> lCmp = Comparator.<A, Long>comparing(o -> Long.valueOf(0));",
+            "  Comparator<A> fCmp = Comparator.<A, Float>comparing(o -> Float.valueOf(0));",
+            "  Comparator<A> dCmp = Comparator.<A, Double>comparing(o -> Double.valueOf(0));",
             "",
             "  default void m() {",
             "    bCmp.thenComparing(o -> Byte.valueOf((byte) 0));",
