@@ -37,7 +37,6 @@ import java.util.function.Function;
  */
 // XXX: Add more documentation. Explain how this is useful in the face of refactoring to more
 // specific types.
-// XXX: Change this checker's name?
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "PrimitiveComparison",
@@ -77,23 +76,44 @@ public final class PrimitiveComparisonCheck extends BugChecker
     }
 
     return getPotentiallyBoxedReturnType(tree.getArguments().get(0))
-        .flatMap(cmpType -> tryFix(tree, state, cmpType, isStatic))
+        .flatMap(cmpType -> tryMakeMethodCallMorePrecise(tree, cmpType, isStatic, state))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 
-  private static Optional<Fix> tryFix(
-      MethodInvocationTree tree, VisitorState state, Type cmpType, boolean isStatic) {
+  private static Optional<Fix> tryMakeMethodCallMorePrecise(
+      MethodInvocationTree tree, Type cmpType, boolean isStatic, VisitorState state) {
     return Optional.ofNullable(ASTHelpers.getSymbol(tree))
         .map(methodSymbol -> methodSymbol.getSimpleName().toString())
         .flatMap(
             actualMethodName ->
-                Optional.of(getPreferredMethod(state, cmpType, isStatic))
+                Optional.of(getPreferredMethod(cmpType, isStatic, state))
                     .filter(not(actualMethodName::equals)))
+        .map(
+            preferredMethodName ->
+                prefixWithTypeArgumentsIfNeeded(preferredMethodName, tree, cmpType, state))
         .map(preferredMethodName -> suggestFix(tree, preferredMethodName, state));
   }
 
-  private static String getPreferredMethod(VisitorState state, Type cmpType, boolean isStatic) {
+  private static String prefixWithTypeArgumentsIfNeeded(
+      String preferredMethodName, MethodInvocationTree tree, Type cmpType, VisitorState state) {
+    int typeArguments = tree.getTypeArguments().size();
+    boolean methodNameIsComparing = preferredMethodName.equals("comparing");
+
+    if (typeArguments == 0 || (typeArguments == 1 && !methodNameIsComparing)) {
+      return preferredMethodName;
+    }
+
+    String optionalSecondTypeArgument =
+        methodNameIsComparing ? ", " + cmpType.tsym.getSimpleName() : "";
+    return String.format(
+        "<%s%s>%s",
+        Util.treeToString(tree.getTypeArguments().get(0), state),
+        optionalSecondTypeArgument,
+        preferredMethodName);
+  }
+
+  private static String getPreferredMethod(Type cmpType, boolean isStatic, VisitorState state) {
     Types types = state.getTypes();
     Symtab symtab = state.getSymtab();
 
@@ -128,9 +148,6 @@ public final class PrimitiveComparisonCheck extends BugChecker
     }
   }
 
-  // XXX: We drop explicitly specified generic type information. In case the number of type
-  // arguments before and after doesn't match, that's for the better. But if we e.g. replace
-  // `comparingLong` with `comparingInt`, then we should retain it.
   private static Fix suggestFix(
       MethodInvocationTree tree, String preferredMethodName, VisitorState state) {
     ExpressionTree expr = tree.getMethodSelect();
