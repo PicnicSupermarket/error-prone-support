@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -134,5 +135,9 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Integer testMonoBlock() {
     return Mono.just(1).block(Duration.ofMillis(1));
+  }
+
+  ImmutableList<Integer> testFluxCollectBlock() {
+    return Flux.just(1).collect(toImmutableList()).block();
   }
 }

@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refastertemplates;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
@@ -405,6 +406,18 @@ final class RxJavaToReactorTemplates {
     @AfterTemplate
     T after(Mono<T> mono, Duration timeout) {
       return mono.block(timeout);
+    }
+  }
+
+  static final class FluxCollectBlock<T> {
+    @BeforeTemplate
+    ImmutableList<T> before(Flux<T> flux) {
+      return ImmutableList.copyOf(flux.toIterable());
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after(Flux<T> flux) {
+      return flux.collect(toImmutableList()).block();
     }
   }
 
