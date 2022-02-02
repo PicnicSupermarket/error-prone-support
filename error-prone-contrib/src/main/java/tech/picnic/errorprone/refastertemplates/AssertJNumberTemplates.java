@@ -1,8 +1,12 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.assertj.core.api.AbstractBigDecimalAssert;
@@ -219,6 +223,62 @@ final class AssertJNumberTemplates {
     @AfterTemplate
     NumberAssert<?, ?> after(NumberAssert<?, ?> numberAssert) {
       return numberAssert.isNotNegative();
+    }
+  }
+
+  static final class AssertThatIsOdd {
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before(byte number) {
+      return assertThat(number % 2).isEqualTo(1);
+    }
+
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before(int number) {
+      return assertThat(number % 2).isEqualTo(1);
+    }
+
+    @BeforeTemplate
+    AbstractLongAssert<?> before(long number) {
+      return assertThat(number % 2).isEqualTo(1);
+    }
+
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before(short number) {
+      return assertThat(number % 2).isEqualTo(1);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    NumberAssert<?, ?> after(Integer number) {
+      return assertThat(number).isOdd();
+    }
+  }
+
+  static final class AssertThatIsEven {
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before(byte number) {
+      return assertThat(number % 2).isEqualTo(0);
+    }
+
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before(int number) {
+      return assertThat(number % 2).isEqualTo(0);
+    }
+
+    @BeforeTemplate
+    AbstractLongAssert<?> before(long number) {
+      return assertThat(number % 2).isEqualTo(0);
+    }
+
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before(short number) {
+      return assertThat(number % 2).isEqualTo(0);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    NumberAssert<?, ?> after(Integer number) {
+      return assertThat(number).isEven();
     }
   }
 }

@@ -75,4 +75,20 @@ final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigInteger.ZERO).isNotNegative(),
         assertThat(BigDecimal.ZERO).isNotNegative());
   }
+
+  ImmutableSet<NumberAssert<?, ?>> testAssertThatIsOdd() {
+    return ImmutableSet.of(
+        assertThat((byte) 1).isOdd(),
+        assertThat((Integer) 1).isOdd(),
+        assertThat((long) 1).isOdd(),
+        assertThat((short) 1).isOdd());
+  }
+
+  ImmutableSet<NumberAssert<?, ?>> testAssertThatIsEven() {
+    return ImmutableSet.of(
+        assertThat((byte) 1).isEven(),
+        assertThat((Integer) 1).isEven(),
+        assertThat((long) 1).isEven(),
+        assertThat((short) 1).isEven());
+  }
 }
