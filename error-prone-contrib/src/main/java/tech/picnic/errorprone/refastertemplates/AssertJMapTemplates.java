@@ -21,7 +21,7 @@ final class AssertJMapTemplates {
     }
   }
 
-  static final class AbstractMapAssertContainsEntry<K, V> {
+  static final class AbstractMapAssertContainsOnly<K, V> {
     @BeforeTemplate
     AbstractMapAssert<?, ?, K, V> before(AbstractMapAssert<?, ?, K, V> mapAssert, K key, V value) {
       return mapAssert.containsExactlyInAnyOrderEntriesOf(ImmutableMap.of(key, value));
@@ -29,7 +29,7 @@ final class AssertJMapTemplates {
 
     @AfterTemplate
     AbstractMapAssert<?, ?, K, V> after(AbstractMapAssert<?, ?, K, V> mapAssert, K key, V value) {
-      return mapAssert.containsExactly(Map.entry(key, value));
+      return mapAssert.containsOnly(Map.entry(key, value));
     }
   }
 }

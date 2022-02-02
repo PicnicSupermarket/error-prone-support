@@ -10,7 +10,7 @@ final class AssertJMapTemplatesTest implements RefasterTemplateTestCase {
     return assertThat(ImmutableMap.of(1, 2, 3, 4)).isEqualTo(ImmutableMap.of(1, 2, 3, 4));
   }
 
-  AbstractMapAssert<?, ?, Integer, Integer> testAbstractMapAssertContainsEntry() {
+  AbstractMapAssert<?, ?, Integer, Integer> testAbstractMapAssertContainsOnly() {
     return assertThat(ImmutableMap.of(1, 2))
         .containsExactlyInAnyOrderEntriesOf(ImmutableMap.of(1, 2));
   }
