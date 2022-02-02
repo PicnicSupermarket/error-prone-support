@@ -59,7 +59,7 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
       @Nullable String nullableString) {
     return ImmutableSet.of(
         nullableObj.length() > 5 ? Optional.of(nullableObj) : Optional.empty(),
-        !nullableObj.contains("baz") ? Optional.of(nullableObj) : Optional.empty());
+        !nullableString.contains("baz") ? Optional.of(nullableString) : Optional.empty());
   }
 
   ImmutableSet<Optional<String>> testTernaryOperatorOptionalNegativeFiltering() {
