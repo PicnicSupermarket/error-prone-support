@@ -61,4 +61,30 @@ final class AssertJStringTemplates {
       return assertThat(string).isNotEmpty();
     }
   }
+
+  static final class AssertThatMatches {
+    @BeforeTemplate
+    AbstractAssert<?, ?> before(String string, String regex) {
+      return assertThat(string.matches(regex)).isTrue();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    AbstractAssert<?, ?> after(String string, String regex) {
+      return assertThat(string).matches(regex);
+    }
+  }
+
+  static final class AssertThatDoesNotMatch {
+    @BeforeTemplate
+    AbstractAssert<?, ?> before(String string, String regex) {
+      return assertThat(string.matches(regex)).isFalse();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    AbstractAssert<?, ?> after(String string, String regex) {
+      return assertThat(string).doesNotMatch(regex);
+    }
+  }
 }
