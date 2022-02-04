@@ -14,43 +14,43 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(Streams.class);
   }
 
-  ImmutableSet<Optional<String>> testOptionalOfNullable() {
-    return ImmutableSet.of(
-        toString() == null ? Optional.empty() : Optional.of(toString()),
-        toString() != null ? Optional.of(toString()) : Optional.empty());
-  }
-
-  ImmutableSet<Boolean> testOptionalIsEmpty() {
-    return ImmutableSet.of(!Optional.empty().isPresent(), !Optional.of("foo").isPresent());
-  }
-
-  ImmutableSet<Boolean> testOptionalIsPresent() {
-    return ImmutableSet.of(!Optional.empty().isEmpty(), !Optional.of("foo").isEmpty());
-  }
-
-  String testOptionalOrElseThrow() {
-    return Optional.of("foo").get();
-  }
-
-  Function<Optional<Integer>, Integer> testOptionalOrElseThrowMethodReference() {
-    return Optional::get;
-  }
-
-  ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
-    return ImmutableSet.of(
-        ImmutableSet.of("foo").iterator().hasNext()
-            ? Optional.of(ImmutableSet.of("foo").iterator().next())
-            : Optional.empty(),
-        !ImmutableSet.of("foo").iterator().hasNext()
-            ? Optional.empty()
-            : Optional.of(ImmutableSet.of("foo").iterator().next()));
-  }
-
-  ImmutableSet<Optional<String>> testTernaryOperatorOptionalPositiveFiltering() {
-    return ImmutableSet.of(
-        "foo".length() > 5 ? Optional.of("foo") : Optional.empty(),
-        !"bar".contains("baz") ? Optional.of("bar") : Optional.empty());
-  }
+//  ImmutableSet<Optional<String>> testOptionalOfNullable() {
+//    return ImmutableSet.of(
+//        toString() == null ? Optional.empty() : Optional.of(toString()),
+//        toString() != null ? Optional.of(toString()) : Optional.empty());
+//  }
+//
+//  ImmutableSet<Boolean> testOptionalIsEmpty() {
+//    return ImmutableSet.of(!Optional.empty().isPresent(), !Optional.of("foo").isPresent());
+//  }
+//
+//  ImmutableSet<Boolean> testOptionalIsPresent() {
+//    return ImmutableSet.of(!Optional.empty().isEmpty(), !Optional.of("foo").isEmpty());
+//  }
+//
+//  String testOptionalOrElseThrow() {
+//    return Optional.of("foo").get();
+//  }
+//
+//  Function<Optional<Integer>, Integer> testOptionalOrElseThrowMethodReference() {
+//    return Optional::get;
+//  }
+//
+//  ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
+//    return ImmutableSet.of(
+//        ImmutableSet.of("foo").iterator().hasNext()
+//            ? Optional.of(ImmutableSet.of("foo").iterator().next())
+//            : Optional.empty(),
+//        !ImmutableSet.of("foo").iterator().hasNext()
+//            ? Optional.empty()
+//            : Optional.of(ImmutableSet.of("foo").iterator().next()));
+//  }
+//
+//  ImmutableSet<Optional<String>> testTernaryOperatorOptionalPositiveFiltering() {
+//    return ImmutableSet.of(
+//        "foo".length() > 5 ? Optional.of("foo") : Optional.empty(),
+//        !"bar".contains("baz") ? Optional.of("bar") : Optional.empty());
+//  }
 
   @Nullable String nullableObj;
   @NonNull Object nonnullObj;
@@ -62,10 +62,10 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
         !nullableString.contains("baz") ? Optional.of(nullableString) : Optional.empty());
   }
 
-  ImmutableSet<Optional<String>> testTernaryOperatorOptionalNegativeFiltering() {
+  ImmutableSet<Optional<String>> testTernaryOperatorOptionalNegativeFiltering(String testy) {
     return ImmutableSet.of(
-        "foo".length() > 5 ? Optional.empty() : Optional.of("foo"),
-        !"bar".contains("baz") ? Optional.empty() : Optional.of("bar"));
+            testy.length() > 5 ? Optional.empty() : Optional.of(testy),
+        !testy.contains("baz") ? Optional.empty() : Optional.of(testy));
   }
 
   ImmutableSet<Optional<String>> testOptionalOfNullableFilterNegative(

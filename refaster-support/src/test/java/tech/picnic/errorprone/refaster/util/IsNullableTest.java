@@ -25,6 +25,11 @@ final class IsNullableTest {
             "import org.checkerframework.checker.nullness.qual.Nullable;",
             "import org.checkerframework.checker.nullness.qual.NonNull;",
             "public class IdentityTest {",
+            "  private void m(@Nullable String nullableString) {",
+            "    // BUG: Diagnostic contains:",
+            "    String s = nullableString;",
+            "    int i = nullableString.length();",
+            "  }",
             "",
             "  public static <T> T foo(T t) {",
             "    return t;",
@@ -49,10 +54,6 @@ final class IsNullableTest {
             "    // BUG: Diagnostic contains:",
             "    foo(id(nullableObj));",
             "    foo(id(nonnullObj));",
-            "  }",
-            "  private void m(@Nullable String nullableString) {",
-            "    // BUG: Diagnostic contains:",
-            "    String s = nullableString;",
             "  }",
             "}")
         .doTest();
