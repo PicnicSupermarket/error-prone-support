@@ -119,6 +119,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           .put("com.google.common.collect.ImmutableTable", "toImmutableTable")
           .put("com.google.common.collect.Sets", "toImmutableEnumSet")
           .put("com.google.common.base.Functions", "identity")
+          .put("java.time.ZoneOffset", "UTC")
           .put("java.util.function.Function", "identity")
           .put("java.util.function.Predicate", "not")
           .put("org.junit.jupiter.params.provider.Arguments", "arguments")

@@ -34,6 +34,10 @@ final class TimeTemplatesTest implements RefasterTemplateTestCase {
         ZoneOffset.UTC);
   }
 
+  OffsetDateTime testInstantAtOffset() {
+    return Instant.EPOCH.atOffset(ZoneOffset.UTC);
+  }
+
   Clock testUtcClock() {
     return Clock.systemUTC();
   }
