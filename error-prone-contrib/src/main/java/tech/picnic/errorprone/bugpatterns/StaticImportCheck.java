@@ -76,7 +76,6 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           "com.mongodb.client.model.Sorts",
           "com.mongodb.client.model.Updates",
           "java.nio.charset.StandardCharsets",
-          "java.util.Collections",
           "java.util.Comparator",
           "java.util.Map.Entry",
           "java.util.regex.Pattern",
@@ -126,6 +125,26 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           .put("com.google.common.collect.Sets", "toImmutableEnumSet")
           .put("com.google.common.base.Functions", "identity")
           .put("java.time.ZoneOffset", "UTC")
+          .putAll(
+              "java.util.Collections",
+              "disjoint",
+              "emptyList",
+              "emptyMap",
+              "emptySet",
+              "reverse",
+              "singleton",
+              "singletonList",
+              "singletonMap",
+              "synchronizedCollection",
+              "synchronizedList",
+              "synchronizedMap",
+              "synchronizedNavigableMap",
+              "synchronizedSet",
+              "unmodifiableCollection",
+              "unmodifiableList",
+              "unmodifiableMap",
+              "unmodifiableNavigableSet",
+              "unmodifiableSet")
           .put("java.util.function.Function", "identity")
           .put("java.util.function.Predicate", "not")
           .put("java.util.UUID", "randomUUID")
