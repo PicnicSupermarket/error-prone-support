@@ -47,9 +47,6 @@ public final class IdentityConversionCheck extends BugChecker
                   "com.google.common.collect.ImmutableRangeSet",
                   "com.google.common.collect.ImmutableSet",
                   "com.google.common.collect.ImmutableSetMultimap",
-                  "com.google.common.collect.ImmutableSortedMap",
-                  "com.google.common.collect.ImmutableSortedMultiset",
-                  "com.google.common.collect.ImmutableSortedSet",
                   "com.google.common.collect.ImmutableTable")
               .named("copyOf"),
           staticMethod()
