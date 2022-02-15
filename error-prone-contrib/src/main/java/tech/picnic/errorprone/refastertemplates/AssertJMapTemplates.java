@@ -9,7 +9,7 @@ import org.assertj.core.api.AbstractMapAssert;
 final class AssertJMapTemplates {
   private AssertJMapTemplates() {}
 
-  static final class AbstractMapAssertContainsExactlyEntriesOf<K, V> {
+  static final class AbstractMapAssertContainsExactlyInAnyOrderEntriesOf<K, V> {
     @BeforeTemplate
     AbstractMapAssert<?, ?, K, V> before(AbstractMapAssert<?, ?, K, V> mapAssert, Map<K, V> map) {
       return mapAssert.isEqualTo(map);
@@ -21,7 +21,7 @@ final class AssertJMapTemplates {
     }
   }
 
-  static final class AbstractMapAssertContainsOnly<K, V> {
+  static final class AbstractMapAssertContainsExactlyEntriesOf<K, V> {
     @BeforeTemplate
     AbstractMapAssert<?, ?, K, V> before(AbstractMapAssert<?, ?, K, V> mapAssert, K key, V value) {
       return mapAssert.containsExactlyInAnyOrderEntriesOf(ImmutableMap.of(key, value));
@@ -29,7 +29,7 @@ final class AssertJMapTemplates {
 
     @AfterTemplate
     AbstractMapAssert<?, ?, K, V> after(AbstractMapAssert<?, ?, K, V> mapAssert, K key, V value) {
-      return mapAssert.containsOnly(Map.entry(key, value));
+      return mapAssert.containsExactlyEntriesOf(ImmutableMap.of(key, value));
     }
   }
 }
