@@ -7,6 +7,7 @@ import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.joining;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
@@ -30,6 +31,7 @@ import com.sun.tools.javac.tree.JCTree.JCMemberReference;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * A {@link BugChecker} which flags {@code Comparator#comparing*} invocations that can be replaced
@@ -91,11 +93,11 @@ public final class PrimitiveComparisonCheck extends BugChecker
                     .filter(not(actualMethodName::equals)))
         .map(
             preferredMethodName ->
-                prefixWithTypeArgumentsIfNeeded(preferredMethodName, tree, cmpType, state))
+                mayPrefixWithTypeArguments(preferredMethodName, tree, cmpType, state))
         .map(preferredMethodName -> suggestFix(tree, preferredMethodName, state));
   }
 
-  private static String prefixWithTypeArgumentsIfNeeded(
+  private static String mayPrefixWithTypeArguments(
       String preferredMethodName, MethodInvocationTree tree, Type cmpType, VisitorState state) {
     int typeArguments = tree.getTypeArguments().size();
     boolean methodNameIsComparing = preferredMethodName.equals("comparing");
@@ -104,13 +106,13 @@ public final class PrimitiveComparisonCheck extends BugChecker
       return preferredMethodName;
     }
 
-    String optionalSecondTypeArgument =
-        methodNameIsComparing ? ", " + cmpType.tsym.getSimpleName() : "";
-    return String.format(
-        "<%s%s>%s",
-        Util.treeToString(tree.getTypeArguments().get(0), state),
-        optionalSecondTypeArgument,
-        preferredMethodName);
+    String typeArgument =
+        Stream.concat(
+                Stream.of(Util.treeToString(tree.getTypeArguments().get(0), state)),
+                Stream.of(cmpType.tsym.getSimpleName()).filter(u -> methodNameIsComparing))
+            .collect(joining(","));
+
+    return String.format("<%s>%s", typeArgument, preferredMethodName);
   }
 
   private static String getPreferredMethod(Type cmpType, boolean isStatic, VisitorState state) {
