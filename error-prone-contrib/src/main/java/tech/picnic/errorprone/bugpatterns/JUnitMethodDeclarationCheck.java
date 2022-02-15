@@ -87,22 +87,11 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
         .ifPresent(builder::merge);
 
     if (isTestMethod) {
-      Optional<String> newMethodName = tryCanonicalizeMethodName(tree);
-
-      if (newMethodName.isEmpty()) {
-        return describeMatchesIfPresent(tree, builder);
-      }
-
-      boolean reportedNameClash =
-          reportDescriptionForPossibleNameClash(tree, newMethodName.orElseThrow(), state);
-      if (!reportedNameClash) {
-        builder.merge(SuggestedFixes.renameMethod(tree, newMethodName.orElseThrow(), state));
-      }
+      tryCanonicalizeMethodName(tree)
+          .filter(methodName -> !reportDescriptionForPossibleNameClash(tree, methodName, state))
+          .ifPresent(
+              methodName -> builder.merge(SuggestedFixes.renameMethod(tree, methodName, state)));
     }
-    return describeMatchesIfPresent(tree, builder);
-  }
-
-  private Description describeMatchesIfPresent(MethodTree tree, SuggestedFix.Builder builder) {
     return builder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, builder.build());
   }
 
@@ -134,7 +123,7 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
     return state.findEnclosing(ClassTree.class).getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
-        .filter(member -> !ASTHelpers.isGeneratedConstructor(member))
+        .filter(not(ASTHelpers::isGeneratedConstructor))
         .map(MethodTree::getName)
         .map(Name::toString)
         .anyMatch(methodName::equals);
