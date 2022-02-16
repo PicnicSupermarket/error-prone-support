@@ -7,6 +7,7 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.assertj.core.api.AbstractBigDecimalAssert;
 
 // XXX: If we add a rule which drops unnecessary `L` suffixes from literal longs, then the `0L`/`1L`
@@ -84,6 +85,50 @@ final class AssertJBigDecimalTemplates {
     @AfterTemplate
     AbstractBigDecimalAssert<?> after(AbstractBigDecimalAssert<?> bigDecimalAssert) {
       return bigDecimalAssert.isEqualTo(1);
+    }
+  }
+
+  static final class AbstractBigDecimalAssertIsEqualToBigDecimal {
+    @BeforeTemplate
+    AbstractBigDecimalAssert<?> before(
+        AbstractBigDecimalAssert<?> abstractBigDecimalAssert, BigInteger bigDecimal) {
+      return abstractBigDecimalAssert.isEqualTo(new BigDecimal(bigDecimal));
+    }
+
+    @BeforeTemplate
+    AbstractBigDecimalAssert<?> before(
+        AbstractBigDecimalAssert<?> abstractBigDecimalAssert, char[] bigDecimal) {
+      return abstractBigDecimalAssert.isEqualTo(new BigDecimal(bigDecimal));
+    }
+
+    @BeforeTemplate
+    AbstractBigDecimalAssert<?> before(
+        AbstractBigDecimalAssert<?> abstractBigDecimalAssert, double bigDecimal) {
+      return abstractBigDecimalAssert.isEqualTo(new BigDecimal(bigDecimal));
+    }
+
+    @BeforeTemplate
+    AbstractBigDecimalAssert<?> before(
+        AbstractBigDecimalAssert<?> abstractBigDecimalAssert, int bigDecimal) {
+      return abstractBigDecimalAssert.isEqualTo(new BigDecimal(bigDecimal));
+    }
+
+    @BeforeTemplate
+    AbstractBigDecimalAssert<?> before(
+        AbstractBigDecimalAssert<?> abstractBigDecimalAssert, long bigDecimal) {
+      return abstractBigDecimalAssert.isEqualTo(new BigDecimal(bigDecimal));
+    }
+
+    @BeforeTemplate
+    AbstractBigDecimalAssert<?> before(
+        AbstractBigDecimalAssert<?> abstractBigDecimalAssert, String bigDecimal) {
+      return abstractBigDecimalAssert.isEqualTo(new BigDecimal(bigDecimal));
+    }
+
+    @AfterTemplate
+    AbstractBigDecimalAssert<?> after(
+        AbstractBigDecimalAssert<?> abstractBigDecimalAssert, Object bigDecimal) {
+      return abstractBigDecimalAssert.isEqualTo(bigDecimal);
     }
   }
 }

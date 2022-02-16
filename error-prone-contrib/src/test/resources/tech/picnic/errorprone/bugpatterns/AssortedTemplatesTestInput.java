@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 final class AssortedTemplatesTest implements RefasterTemplateTestCase {
@@ -82,6 +83,10 @@ final class AssortedTemplatesTest implements RefasterTemplateTestCase {
         Collections.disjoint(new HashSet<>(ImmutableList.of(3)), ImmutableList.of(4)),
         Collections.disjoint(ImmutableList.of(5), ImmutableSet.copyOf(ImmutableList.of(6))),
         Collections.disjoint(ImmutableList.of(7), new HashSet<>(ImmutableList.of(8))));
+  }
+
+  Set<String> testImmutableSetOf() {
+    return Collections.singleton("foo");
   }
 
   boolean testIterableIsEmpty() {

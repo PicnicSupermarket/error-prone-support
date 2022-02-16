@@ -189,6 +189,18 @@ final class AssortedTemplates {
     }
   }
 
+  static final class ImmutableSetOf<T> {
+    @BeforeTemplate
+    Set<T> before(T element) {
+      return Collections.singleton(element);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T element) {
+      return ImmutableSet.of(element);
+    }
+  }
+
   /** Prefer {@link Iterables#isEmpty(Iterable)} over more contrived alternatives. */
   static final class IterableIsEmpty<T> {
     @BeforeTemplate

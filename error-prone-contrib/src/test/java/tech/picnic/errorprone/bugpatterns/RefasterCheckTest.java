@@ -36,6 +36,7 @@ public final class RefasterCheckTest {
           "AssertJNumber",
           "AssertJMap",
           "AssertJObject",
+          "AssertJObjectEnumerable",
           "AssertJOptional",
           "AssertJShort",
           "AssertJString",

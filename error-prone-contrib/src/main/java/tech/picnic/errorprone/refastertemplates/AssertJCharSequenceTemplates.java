@@ -12,6 +12,19 @@ import org.assertj.core.api.AbstractAssert;
 final class AssertJCharSequenceTemplates {
   private AssertJCharSequenceTemplates() {}
 
+  static final class AbstractCharSequenceAssertContains {
+    @BeforeTemplate
+    void before(String string, CharSequence charSequence) {
+      assertThat(string.contains(charSequence)).isTrue();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    void after(String string, CharSequence charSequence) {
+      assertThat(string).contains(charSequence);
+    }
+  }
+
   static final class AssertThatCharSequenceIsEmpty {
     @BeforeTemplate
     void before(CharSequence charSequence) {

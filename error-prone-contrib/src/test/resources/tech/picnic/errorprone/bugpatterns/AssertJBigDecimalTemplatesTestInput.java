@@ -6,6 +6,7 @@ import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.assertj.core.api.AbstractBigDecimalAssert;
 
 final class AssertJBigDecimalTemplatesTest implements RefasterTemplateTestCase {
@@ -45,5 +46,15 @@ final class AssertJBigDecimalTemplatesTest implements RefasterTemplateTestCase {
         assertThat(BigDecimal.ZERO).isOne(),
         assertThat(BigDecimal.ZERO).isEqualTo(1L),
         assertThat(BigDecimal.ZERO).isEqualTo(BigDecimal.ONE));
+  }
+
+  ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsEqualToBigDecimal() {
+    return ImmutableSet.of(
+        assertThat(BigDecimal.ZERO).isEqualTo(new BigDecimal(BigInteger.ONE)),
+        assertThat(BigDecimal.ZERO).isEqualTo(new BigDecimal(new char[] {'1'})),
+        assertThat(BigDecimal.ZERO).isEqualTo(new BigDecimal(1D)),
+        assertThat(BigDecimal.ZERO).isEqualTo(new BigDecimal(1)),
+        assertThat(BigDecimal.ZERO).isEqualTo(new BigDecimal(1L)),
+        assertThat(BigDecimal.ZERO).isEqualTo(new BigDecimal("1")));
   }
 }
