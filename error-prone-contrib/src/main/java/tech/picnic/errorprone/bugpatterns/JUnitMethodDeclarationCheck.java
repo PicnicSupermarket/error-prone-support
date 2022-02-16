@@ -8,6 +8,7 @@ import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static java.util.function.Predicate.not;
+import static tech.picnic.errorprone.bugpatterns.JavaKeywords.isJavaKeyword;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
@@ -88,35 +89,41 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
 
     if (isTestMethod) {
       tryCanonicalizeMethodName(tree)
-          .filter(methodName -> !reportDescriptionForPossibleNameClash(tree, methodName, state))
+          .filter(methodName -> isValidMethodName(tree, methodName, state))
           .ifPresent(
               methodName -> builder.merge(SuggestedFixes.renameMethod(tree, methodName, state)));
     }
     return builder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, builder.build());
   }
 
-  private boolean reportDescriptionForPossibleNameClash(
-      MethodTree tree, String methodName, VisitorState state) {
+  private boolean isValidMethodName(MethodTree tree, String methodName, VisitorState state) {
     if (isMethodNameInClass(methodName, state)) {
-      state.reportMatch(
-          buildDescription(tree)
-              .setMessage(
-                  String.format("A method with name %s already exists in the class.", methodName))
-              .build());
-      return true;
+      reportIncorrectMethodName(
+          methodName, tree, "A method with name %s already exists in the class.", state);
+      return false;
     }
 
     if (isMethodNameStaticallyImported(methodName, state)) {
-      state.reportMatch(
-          buildDescription(tree)
-              .setMessage(
-                  String.format(
-                      "A method with name %s is already statically imported.", methodName))
-              .build());
-      return true;
+      reportIncorrectMethodName(
+          methodName, tree, "A method with name %s is already statically imported.", state);
+      return false;
     }
 
-    return false;
+    if (isJavaKeyword(methodName)) {
+      reportIncorrectMethodName(
+          methodName,
+          tree,
+          "Method name `%s` is not possible because it is a Java keyword.",
+          state);
+      return false;
+    }
+    return true;
+  }
+
+  private void reportIncorrectMethodName(
+      String methodName, MethodTree tree, String message, VisitorState state) {
+    state.reportMatch(
+        buildDescription(tree).setMessage(String.format(message, methodName)).build());
   }
 
   private static boolean isMethodNameInClass(String methodName, VisitorState state) {

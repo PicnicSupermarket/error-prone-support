@@ -267,4 +267,44 @@ public final class JUnitMethodDeclarationCheckTest {
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
+
+  @Test
+  void methodHasJavaKeyword() {
+    refactoringTestHelper
+        .addInputLines(
+            "A.java",
+            "import org.junit.jupiter.api.Test;",
+            "",
+            "class A {",
+            "  @Test",
+            "  void testClass() {}",
+            "",
+            "  @Test",
+            "  void testClazz() {}",
+            "",
+            "  @Test",
+            "  void testThrow() {}",
+            "",
+            "  @Test",
+            "  void testThrowww() {}",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "import org.junit.jupiter.api.Test;",
+            "",
+            "class A {",
+            "  @Test",
+            "  void testClass() {}",
+            "",
+            "  @Test",
+            "  void clazz() {}",
+            "",
+            "  @Test",
+            "  void testThrow() {}",
+            "",
+            "  @Test",
+            "  void throwww() {}",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
 }
