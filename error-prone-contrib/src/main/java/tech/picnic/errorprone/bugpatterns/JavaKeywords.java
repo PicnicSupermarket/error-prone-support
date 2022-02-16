@@ -12,6 +12,8 @@ final class JavaKeywords {
    * <p>See: the <a
    * href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html">Oracle
    * Documentation</a> on Java Keywords.
+   *
+   * <p>In addition, `sealed` is added for Java 17. See: <a href="openjdk.net/jeps/409">JEP-409</a>.
    */
   private static final ImmutableSet<String> JAVA_KEYWORDS =
       ImmutableSet.of(
@@ -50,6 +52,7 @@ final class JavaKeywords {
           "protected",
           "public",
           "return",
+          "sealed",
           "short",
           "static",
           "strictfp",
