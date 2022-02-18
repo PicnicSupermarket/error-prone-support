@@ -117,6 +117,10 @@ final class TimeTemplatesTest implements RefasterTemplateTestCase {
         Duration.ZERO);
   }
 
+  Duration testDurationOfMillis() {
+    return Duration.ofMillis(1);
+  }
+
   Duration testDurationBetweenInstants() {
     return Duration.between(Instant.MIN, Instant.MAX);
   }

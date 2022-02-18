@@ -17,6 +17,7 @@ import java.time.ZoneOffset;
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
 import java.time.chrono.ChronoZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 
 /** Refaster templates related to expressions dealing with time. */
@@ -310,8 +311,20 @@ final class TimeTemplates {
     }
   }
 
+  static final class DurationOfMillis {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.MILLIS);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofMillis(amount);
+    }
+  }
+
   /**
-   * Don't unnecessarily convert two and from milliseconds. (This way nanosecond precision is
+   * Don't unnecessarily convert to and from milliseconds. (This way nanosecond precision is
    * retained.)
    *
    * <p><strong>Warning:</strong> this rewrite rule increases precision!
@@ -329,7 +342,7 @@ final class TimeTemplates {
   }
 
   /**
-   * Don't unnecessarily convert two and from milliseconds. (This way nanosecond precision is
+   * Don't unnecessarily convert to and from milliseconds. (This way nanosecond precision is
    * retained.)
    *
    * <p><strong>Warning:</strong> this rewrite rule increases precision!

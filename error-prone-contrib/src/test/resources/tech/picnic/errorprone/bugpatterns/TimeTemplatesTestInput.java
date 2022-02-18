@@ -128,6 +128,10 @@ final class TimeTemplatesTest implements RefasterTemplateTestCase {
         Duration.of(0, ChronoUnit.MILLIS));
   }
 
+  Duration testDurationOfMillis() {
+    return Duration.of(1, ChronoUnit.MILLIS);
+  }
+
   Duration testDurationBetweenInstants() {
     return Duration.ofMillis(Instant.MAX.toEpochMilli() - Instant.MIN.toEpochMilli());
   }
