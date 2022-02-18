@@ -141,6 +141,10 @@ final class TimeTemplatesTest implements RefasterTemplateTestCase {
     return Duration.ofDays(1);
   }
 
+  Duration testDurationOfDaysStaticImport() {
+    return Duration.ofDays(1);
+  }
+
   Duration testDurationBetweenInstants() {
     return Duration.between(Instant.MIN, Instant.MAX);
   }

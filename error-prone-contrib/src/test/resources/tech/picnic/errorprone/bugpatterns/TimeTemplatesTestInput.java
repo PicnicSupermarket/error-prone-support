@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
 import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.time.Duration;
@@ -150,6 +152,10 @@ final class TimeTemplatesTest implements RefasterTemplateTestCase {
 
   Duration testDurationOfDays() {
     return Duration.of(1, ChronoUnit.DAYS);
+  }
+
+  Duration testDurationOfDaysStaticImport() {
+    return Duration.of(1, DAYS);
   }
 
   Duration testDurationBetweenInstants() {
