@@ -6,20 +6,16 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
 final class CollectionTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Collections.class, Iterables.class, Lists.class);
+    return ImmutableSet.of(Iterables.class, Lists.class);
   }
 
   ImmutableSet<Boolean> testCollectionIsEmpty() {
@@ -187,29 +183,5 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
         !new LinkedList<String>().isEmpty()
             ? Optional.ofNullable(new LinkedList<String>().remove())
             : Optional.empty());
-  }
-
-  Set<?> testImmutableSetOf() {
-    return Collections.emptySet();
-  }
-
-  Set<String> testImmutableSetOfTyped() {
-    return Collections.emptySet();
-  }
-
-  List<?> testImmutableListOf() {
-    return Collections.emptyList();
-  }
-
-  List<String> testImmutableListOfTyped() {
-    return Collections.emptyList();
-  }
-
-  Map<?, ?> testImmutableMapOf() {
-    return Collections.emptyMap();
-  }
-
-  Map<String, String> testImmutableMapOfTyped() {
-    return Collections.emptyMap();
   }
 }

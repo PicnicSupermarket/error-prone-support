@@ -242,6 +242,31 @@ final class ImmutableMapTemplates {
     }
   }
 
+  /** Don't unnecessarily copy an {@link ImmutableMap}. */
+  static final class ImmutableMapCopyOfImmutableMap<K, V> {
+    @BeforeTemplate
+    ImmutableMap<K, V> before(ImmutableMap<K, V> map) {
+      return ImmutableMap.copyOf(map);
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after(ImmutableMap<K, V> map) {
+      return map;
+    }
+  }
+
+  static final class ImmutableMapOf<K, V> {
+    @BeforeTemplate
+    Map<K, V> before() {
+      return Collections.emptyMap();
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after() {
+      return ImmutableMap.of();
+    }
+  }
+
   // XXX: Add a template for this:
   // Maps.transformValues(streamOfEntries.collect(groupBy(fun)), ImmutableMap::copyOf)
   // ->

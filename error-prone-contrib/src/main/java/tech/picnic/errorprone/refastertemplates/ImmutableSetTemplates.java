@@ -138,4 +138,16 @@ final class ImmutableSetTemplates {
       return set.immutableCopy();
     }
   }
+
+  static final class ImmutableSetOf<T> {
+    @BeforeTemplate
+    Set<T> before() {
+      return Collections.emptySet();
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after() {
+      return ImmutableSet.of();
+    }
+  }
 }

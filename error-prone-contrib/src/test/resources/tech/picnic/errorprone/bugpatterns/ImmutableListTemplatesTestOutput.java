@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -20,6 +21,7 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         Arrays.class,
+        Collection.class,
         Collections.class,
         Comparator.class,
         Streams.class,
@@ -73,5 +75,17 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableList<Integer> testStreamToDistinctImmutableList() {
     return Stream.of(1).collect(toImmutableSet()).asList();
+  }
+
+  List<?> testImmutableListOf() {
+    return ImmutableList.of();
+  }
+
+  List<String> testImmutableListOfTyped() {
+    return ImmutableList.of();
+  }
+
+  ImmutableSet<Collection<String>> testImmutableList1() {
+    return ImmutableSet.of(ImmutableList.of("1"));
   }
 }

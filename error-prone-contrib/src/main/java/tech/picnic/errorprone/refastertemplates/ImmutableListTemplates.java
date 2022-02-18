@@ -7,6 +7,7 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
@@ -184,6 +185,30 @@ final class ImmutableListTemplates {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ImmutableList<T> after(Stream<T> stream) {
       return stream.collect(toImmutableSet()).asList();
+    }
+  }
+
+  static final class ImmutableListOf<T> {
+    @BeforeTemplate
+    List<T> before() {
+      return Collections.emptyList();
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after() {
+      return ImmutableList.of();
+    }
+  }
+
+  static final class ImmutableListOf1<T> {
+    @BeforeTemplate
+    List<T> before(T item) {
+      return List.of(item);
+    }
+
+    @AfterTemplate
+    ImmutableCollection<T> after(T item) {
+      return ImmutableList.of(item);
     }
   }
 }
