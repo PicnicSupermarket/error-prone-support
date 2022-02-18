@@ -2,6 +2,8 @@ package tech.picnic.errorprone.refastertemplates;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.errorprone.refaster.Refaster;
@@ -10,11 +12,14 @@ import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
@@ -402,4 +407,40 @@ final class CollectionTemplates {
 
   // XXX: collection.stream().noneMatch(e -> e.equals(other))
   // ^ This is !collection.contains(other). Do we already rewrite variations on this?
+
+  static final class ImmutableSetOf<T> {
+    @BeforeTemplate
+    Set<T> before() {
+      return Collections.emptySet();
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after() {
+      return ImmutableSet.of();
+    }
+  }
+
+  static final class ImmutableListOf<T> {
+    @BeforeTemplate
+    List<T> before() {
+      return Collections.emptyList();
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after() {
+      return ImmutableList.of();
+    }
+  }
+
+  static final class ImmutableMapOf<K, V> {
+    @BeforeTemplate
+    Map<K, V> before() {
+      return Collections.emptyMap();
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after() {
+      return ImmutableMap.of();
+    }
+  }
 }

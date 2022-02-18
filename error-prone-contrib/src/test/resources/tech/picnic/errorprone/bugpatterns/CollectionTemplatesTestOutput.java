@@ -1,21 +1,26 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
 final class CollectionTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Iterables.class, Lists.class);
+    return ImmutableSet.of(Collections.class, Iterables.class, Lists.class);
   }
 
   ImmutableSet<Boolean> testCollectionIsEmpty() {
@@ -133,5 +138,29 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
         Optional.ofNullable(new LinkedList<String>().poll()),
         Optional.ofNullable(new LinkedList<String>().poll()),
         Optional.ofNullable(new LinkedList<String>().poll()));
+  }
+
+  Set<?> testImmutableSetOf() {
+    return ImmutableSet.of();
+  }
+
+  Set<String> testImmutableSetOfTyped() {
+    return ImmutableSet.of();
+  }
+
+  List<?> testImmutableListOf() {
+    return ImmutableList.of();
+  }
+
+  List<String> testImmutableListOfTyped() {
+    return ImmutableList.of();
+  }
+
+  Map<?, ?> testImmutableMapOf() {
+    return ImmutableMap.of();
+  }
+
+  Map<String, String> testImmutableMapOfTyped() {
+    return ImmutableMap.of();
   }
 }
