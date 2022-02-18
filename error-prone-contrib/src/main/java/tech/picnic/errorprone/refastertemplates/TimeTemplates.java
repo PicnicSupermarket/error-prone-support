@@ -311,6 +311,18 @@ final class TimeTemplates {
     }
   }
 
+  static final class DurationOfNanos {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.NANOS);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofNanos(amount);
+    }
+  }
+
   static final class DurationOfMillis {
     @BeforeTemplate
     Duration before(long amount) {
@@ -320,6 +332,54 @@ final class TimeTemplates {
     @AfterTemplate
     Duration after(long amount) {
       return Duration.ofMillis(amount);
+    }
+  }
+
+  static final class DurationOfSeconds {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.SECONDS);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofSeconds(amount);
+    }
+  }
+
+  static final class DurationOfMinutes {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.MINUTES);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofMinutes(amount);
+    }
+  }
+
+  static final class DurationOfHours {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.HOURS);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofHours(amount);
+    }
+  }
+
+  static final class DurationOfDays {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.DAYS);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofDays(amount);
     }
   }
 
