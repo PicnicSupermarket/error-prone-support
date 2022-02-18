@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 
@@ -11,6 +12,7 @@ import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
+import com.google.errorprone.bugpatterns.TypesWithUndefinedEquality;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
@@ -20,6 +22,7 @@ import com.google.errorprone.util.ASTHelpers.TargetType;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
+import java.util.Arrays;
 import java.util.List;
 
 /** A {@link BugChecker} that flags redundant identity conversions. */
@@ -74,18 +77,30 @@ public final class IdentityConversionCheck extends BugChecker
     ExpressionTree sourceTree = arguments.get(0);
     Type sourceType = ASTHelpers.getType(sourceTree);
     TargetType targetType = ASTHelpers.targetType(state);
-    if (sourceType == null
-        || targetType == null
-        || !state.getTypes().isSubtype(sourceType, targetType.type())) {
-      return Description.NO_MATCH;
-    }
+    checkState(
+        sourceType != null && targetType != null,
+        "sourceType `%s` or targetType `%s` is null.",
+        sourceType,
+        targetType);
 
-    return buildDescription(tree)
-        .setMessage(
-            "This method invocation appears redundant; remove it or suppress this warning and "
-                + "add an comment explaining its purpose")
-        .addFix(SuggestedFix.replace(tree, state.getSourceForNode(sourceTree)))
-        .addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()))
-        .build();
+    if (state.getTypes().isSameType(sourceType, ASTHelpers.getType(tree))
+        || isSubtypeWithDefinedEquality(sourceType, targetType, state)) {
+      return buildDescription(tree)
+          .setMessage(
+              "This method invocation appears redundant; remove it or suppress this warning and "
+                  + "add an comment explaining its purpose")
+          .addFix(SuggestedFix.replace(tree, state.getSourceForNode(sourceTree)))
+          .addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()))
+          .build();
+    }
+    return Description.NO_MATCH;
+  }
+
+  private static boolean isSubtypeWithDefinedEquality(
+      Type sourceType, TargetType targetType, VisitorState state) {
+    return state.getTypes().isSubtype(sourceType, targetType.type())
+        && Arrays.stream(TypesWithUndefinedEquality.values())
+            .noneMatch(
+                b -> b.matchesType(sourceType, state) || b.matchesType(targetType.type(), state));
   }
 }
