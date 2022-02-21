@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
 import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.time.Duration;
@@ -17,7 +19,7 @@ import java.time.temporal.ChronoUnit;
 final class TimeTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(ChronoUnit.class);
+    return ImmutableSet.of(ChronoUnit.class, DAYS);
   }
 
   Instant testClockInstant() {
