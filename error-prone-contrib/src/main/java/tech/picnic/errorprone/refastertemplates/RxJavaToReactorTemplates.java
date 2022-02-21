@@ -16,7 +16,6 @@ import io.reactivex.Flowable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import java.time.Duration;
 import java.util.List;
@@ -57,16 +56,7 @@ final class RxJavaToReactorTemplates {
   @SuppressWarnings("NullableProblems")
   static final class MonoToFlowableToMono<T> {
     @BeforeTemplate
-    Mono<Void> before(Mono<Void> mono) {
-      return Refaster.anyOf(
-          RxJava2Adapter.monoToCompletable(mono).as(RxJava2Adapter::completableToMono),
-          mono.as(RxJava2Adapter::monoToCompletable).as(RxJava2Adapter::completableToMono),
-          RxJava2Adapter.completableToMono(RxJava2Adapter.monoToCompletable(mono)),
-          RxJava2Adapter.completableToMono(mono.as(RxJava2Adapter::monoToCompletable)));
-    }
-
-    @BeforeTemplate
-    Mono<T> before2(Mono<T> mono) {
+    Mono<T> before(Mono<T> mono) {
       return Refaster.anyOf(
           RxJava2Adapter.monoToMaybe(mono).as(RxJava2Adapter::maybeToMono),
           RxJava2Adapter.maybeToMono(RxJava2Adapter.monoToMaybe(mono)),
@@ -78,8 +68,25 @@ final class RxJavaToReactorTemplates {
           mono.as(RxJava2Adapter::monoToSingle).as(RxJava2Adapter::singleToMono));
     }
 
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono) {
+      return mono;
+    }
+  }
+
+  @SuppressWarnings("NullableProblems")
+  static final class MonoToFlowableToMonoThen<T> {
     @BeforeTemplate
-    Mono<Void> before3(Mono<T> mono) {
+    Mono<Void> before(Mono<Void> mono) {
+      return Refaster.anyOf(
+          RxJava2Adapter.monoToCompletable(mono).as(RxJava2Adapter::completableToMono),
+          mono.as(RxJava2Adapter::monoToCompletable).as(RxJava2Adapter::completableToMono),
+          RxJava2Adapter.completableToMono(RxJava2Adapter.monoToCompletable(mono)),
+          RxJava2Adapter.completableToMono(mono.as(RxJava2Adapter::monoToCompletable)));
+    }
+
+    @BeforeTemplate
+    Mono<Void> before2(Mono<T> mono) {
       return Refaster.anyOf(
           RxJava2Adapter.completableToMono(RxJava2Adapter.monoToCompletable(mono)),
           RxJava2Adapter.completableToMono(mono.as(RxJava2Adapter::monoToCompletable)),
@@ -87,8 +94,8 @@ final class RxJavaToReactorTemplates {
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono) {
-      return mono;
+    Mono<Void> after(Mono<T> mono) {
+      return mono.then();
     }
   }
 
@@ -138,7 +145,8 @@ final class RxJavaToReactorTemplates {
     @BeforeTemplate
     java.util.function.Function<? extends I, ? extends O> before(
         //        @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class)
-        @CanTransformToTargetType Function<? extends I, ? extends O> function) {
+        @CanTransformToTargetType
+            io.reactivex.functions.Function<? extends I, ? extends O> function) {
       return RxJavaReactorMigrationUtil.toJdkFunction(function);
     }
 
