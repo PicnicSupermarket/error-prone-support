@@ -150,4 +150,64 @@ final class ImmutableSetTemplates {
       return ImmutableSet.of();
     }
   }
+
+  static final class ImmutableSetOfItems1<T> {
+    @BeforeTemplate
+    Set<T> before(T e1) {
+      return Set.of(e1);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1) {
+      return ImmutableSet.of(e1);
+    }
+  }
+
+  static final class ImmutableSetOfItems2<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2) {
+      return Set.of(e1, e2);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2) {
+      return ImmutableSet.of(e1, e2);
+    }
+  }
+
+  static final class ImmutableSetOfItems3<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2, T e3) {
+      return Set.of(e1, e2, e3);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2, T e3) {
+      return ImmutableSet.of(e1, e2, e3);
+    }
+  }
+
+  static final class ImmutableSetOfItems4<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2, T e3, T e4) {
+      return Set.of(e1, e2, e3, e4);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2, T e3, T e4) {
+      return ImmutableSet.of(e1, e2, e3, e4);
+    }
+  }
+
+  static final class ImmutableSetOfItems5<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2, T e3, T e4, T e5) {
+      return Set.of(e1, e2, e3, e4, e5);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5) {
+      return ImmutableSet.of(e1, e2, e3, e4, e5);
+    }
+  }
 }

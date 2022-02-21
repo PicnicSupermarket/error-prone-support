@@ -211,4 +211,52 @@ final class ImmutableListTemplates {
       return ImmutableList.of(item);
     }
   }
+
+  static final class ImmutableListOf2<T> {
+    @BeforeTemplate
+    List<T> before(T item, T item2) {
+      return List.of(item, item2);
+    }
+
+    @AfterTemplate
+    ImmutableCollection<T> after(T item, T item2) {
+      return ImmutableList.of(item, item2);
+    }
+  }
+
+  static final class ImmutableListOf3<T> {
+    @BeforeTemplate
+    List<T> before(T i1, T i2, T i3) {
+      return List.of(i1, i2, i3);
+    }
+
+    @AfterTemplate
+    ImmutableCollection<T> after(T i1, T i2, T i3) {
+      return ImmutableList.of(i1, i2, i3);
+    }
+  }
+
+  static final class ImmutableListOf4<T> {
+    @BeforeTemplate
+    List<T> before(T i1, T i2, T i3, T i4) {
+      return List.of(i1, i2, i3, i4);
+    }
+
+    @AfterTemplate
+    ImmutableCollection<T> after(T i1, T i2, T i3, T i4) {
+      return ImmutableList.of(i1, i2, i3, i4);
+    }
+  }
+
+  static final class ImmutableListOf5<T> {
+    @BeforeTemplate
+    List<T> before(T i1, T i2, T i3, T i4, T i5) {
+      return List.of(i1, i2, i3, i4, i5);
+    }
+
+    @AfterTemplate
+    ImmutableCollection<T> after(T i1, T i2, T i3, T i4, T i5) {
+      return ImmutableList.of(i1, i2, i3, i4, i5);
+    }
+  }
 }

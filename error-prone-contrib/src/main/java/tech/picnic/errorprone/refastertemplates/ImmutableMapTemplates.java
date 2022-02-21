@@ -267,6 +267,65 @@ final class ImmutableMapTemplates {
     }
   }
 
+  static final class ImmutableMapOf1<K, V> {
+    @BeforeTemplate
+    Map<K, V> before(K k1, V v1) {
+      return Map.of(k1, v1);
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after(K k1, V v1) {
+      return ImmutableMap.of(k1, v1);
+    }
+  }
+
+  static final class ImmutableMapOf2<K, V> {
+    @BeforeTemplate
+    Map<K, V> before(K k1, V v1, K k2, V v2) {
+      return Map.of(k1, v1, k2, v2);
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after(K k1, V v1, K k2, V v2) {
+      return ImmutableMap.of(k1, v1, k2, v2);
+    }
+  }
+
+  static final class ImmutableMapOf3<K, V> {
+    @BeforeTemplate
+    Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3) {
+      return Map.of(k1, v1, k2, v2, k3, v3);
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after(K k1, V v1, K k2, V v2, K k3, V v3) {
+      return ImmutableMap.of(k1, v1, k2, v2, k3, v3);
+    }
+  }
+
+  static final class ImmutableMapOf4<K, V> {
+    @BeforeTemplate
+    Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+      return Map.of(k1, v1, k2, v2, k3, v3, k4, v4);
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+      return ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4);
+    }
+  }
+
+  static final class ImmutableMapOf5<K, V> {
+    @BeforeTemplate
+    Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+      return Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+      return ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
+    }
+  }
   // XXX: Add a template for this:
   // Maps.transformValues(streamOfEntries.collect(groupBy(fun)), ImmutableMap::copyOf)
   // ->

@@ -402,5 +402,4 @@ final class CollectionTemplates {
 
   // XXX: collection.stream().noneMatch(e -> e.equals(other))
   // ^ This is !collection.contains(other). Do we already rewrite variations on this?
-
 }
