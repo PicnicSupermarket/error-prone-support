@@ -128,28 +128,14 @@ final class TimeTemplatesTest implements RefasterTemplateTestCase {
         Duration.of(0, ChronoUnit.MILLIS));
   }
 
-  Duration testDurationOfDays() {
-    return Duration.of(1, ChronoUnit.DAYS);
-  }
-
-  Duration testDurationOfHours() {
-    return Duration.of(1, ChronoUnit.HOURS);
-  }
-
-  Duration testDurationOfMillis() {
-    return Duration.of(1, ChronoUnit.MILLIS);
-  }
-
-  Duration testDurationOfMinutes() {
-    return Duration.of(1, ChronoUnit.MINUTES);
-  }
-
-  Duration testDurationOfNanos() {
-    return Duration.of(1, ChronoUnit.NANOS);
-  }
-
-  Duration testDurationOfSeconds() {
-    return Duration.of(1, ChronoUnit.SECONDS);
+  ImmutableSet<Duration> testDurationOf() {
+    return ImmutableSet.of(
+        Duration.of(1, ChronoUnit.DAYS),
+        Duration.of(1, ChronoUnit.HOURS),
+        Duration.of(1, ChronoUnit.MILLIS),
+        Duration.of(1, ChronoUnit.MINUTES),
+        Duration.of(1, ChronoUnit.NANOS),
+        Duration.of(1, ChronoUnit.SECONDS));
   }
 
   Duration testDurationBetweenInstants() {
