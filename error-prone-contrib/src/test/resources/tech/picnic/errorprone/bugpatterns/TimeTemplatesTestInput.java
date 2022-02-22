@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static java.time.temporal.ChronoUnit.DAYS;
-
 import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.time.Duration;
@@ -19,7 +17,7 @@ import java.time.temporal.ChronoUnit;
 final class TimeTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(ChronoUnit.class, DAYS);
+    return ImmutableSet.of(ChronoUnit.class);
   }
 
   Instant testClockInstant() {
@@ -130,32 +128,28 @@ final class TimeTemplatesTest implements RefasterTemplateTestCase {
         Duration.of(0, ChronoUnit.MILLIS));
   }
 
-  Duration testDurationOfNanos() {
-    return Duration.of(1, ChronoUnit.NANOS);
-  }
-
-  Duration testDurationOfMillis() {
-    return Duration.of(1, ChronoUnit.MILLIS);
-  }
-
-  Duration testDurationOfSeconds() {
-    return Duration.of(1, ChronoUnit.SECONDS);
-  }
-
-  Duration testDurationOfMinutes() {
-    return Duration.of(1, ChronoUnit.MINUTES);
+  Duration testDurationOfDays() {
+    return Duration.of(1, ChronoUnit.DAYS);
   }
 
   Duration testDurationOfHours() {
     return Duration.of(1, ChronoUnit.HOURS);
   }
 
-  Duration testDurationOfDays() {
-    return Duration.of(1, ChronoUnit.DAYS);
+  Duration testDurationOfMillis() {
+    return Duration.of(1, ChronoUnit.MILLIS);
   }
 
-  Duration testDurationOfDaysStaticImport() {
-    return Duration.of(1, DAYS);
+  Duration testDurationOfMinutes() {
+    return Duration.of(1, ChronoUnit.MINUTES);
+  }
+
+  Duration testDurationOfNanos() {
+    return Duration.of(1, ChronoUnit.NANOS);
+  }
+
+  Duration testDurationOfSeconds() {
+    return Duration.of(1, ChronoUnit.SECONDS);
   }
 
   Duration testDurationBetweenInstants() {

@@ -311,54 +311,20 @@ final class TimeTemplates {
     }
   }
 
-  static final class DurationOfNanos {
+  /** Prefer {@link Duration#ofDays(long)} over alternative representations. */
+  static final class DurationOfDays {
     @BeforeTemplate
     Duration before(long amount) {
-      return Duration.of(amount, ChronoUnit.NANOS);
+      return Duration.of(amount, ChronoUnit.DAYS);
     }
 
     @AfterTemplate
     Duration after(long amount) {
-      return Duration.ofNanos(amount);
+      return Duration.ofDays(amount);
     }
   }
 
-  static final class DurationOfMillis {
-    @BeforeTemplate
-    Duration before(long amount) {
-      return Duration.of(amount, ChronoUnit.MILLIS);
-    }
-
-    @AfterTemplate
-    Duration after(long amount) {
-      return Duration.ofMillis(amount);
-    }
-  }
-
-  static final class DurationOfSeconds {
-    @BeforeTemplate
-    Duration before(long amount) {
-      return Duration.of(amount, ChronoUnit.SECONDS);
-    }
-
-    @AfterTemplate
-    Duration after(long amount) {
-      return Duration.ofSeconds(amount);
-    }
-  }
-
-  static final class DurationOfMinutes {
-    @BeforeTemplate
-    Duration before(long amount) {
-      return Duration.of(amount, ChronoUnit.MINUTES);
-    }
-
-    @AfterTemplate
-    Duration after(long amount) {
-      return Duration.ofMinutes(amount);
-    }
-  }
-
+  /** Prefer {@link Duration#ofHours(long)} over alternative representations. */
   static final class DurationOfHours {
     @BeforeTemplate
     Duration before(long amount) {
@@ -371,15 +337,55 @@ final class TimeTemplates {
     }
   }
 
-  static final class DurationOfDays {
+  /** Prefer {@link Duration#ofMillis(long)} over alternative representations. */
+  static final class DurationOfMillis {
     @BeforeTemplate
     Duration before(long amount) {
-      return Duration.of(amount, ChronoUnit.DAYS);
+      return Duration.of(amount, ChronoUnit.MILLIS);
     }
 
     @AfterTemplate
     Duration after(long amount) {
-      return Duration.ofDays(amount);
+      return Duration.ofMillis(amount);
+    }
+  }
+
+  /** Prefer {@link Duration#ofMinutes(long)} over alternative representations. */
+  static final class DurationOfMinutes {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.MINUTES);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofMinutes(amount);
+    }
+  }
+
+  /** Prefer {@link Duration#ofNanos(long)} over alternative representations. */
+  static final class DurationOfNanos {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.NANOS);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofNanos(amount);
+    }
+  }
+
+  /** Prefer {@link Duration#ofSeconds(long)} over alternative representations. */
+  static final class DurationOfSeconds {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.SECONDS);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofSeconds(amount);
     }
   }
 
