@@ -9,6 +9,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -150,5 +151,15 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableList<Integer> testFluxCollectBlock() {
     return ImmutableList.copyOf(Flux.just(1).toIterable());
+  }
+
+  ImmutableSet<Flux<String>> testConcatMapIterable() {
+    return ImmutableSet.of(
+        Flux.just(ImmutableList.of("1")).flatMap(Flux::fromIterable),
+        Flux.just(ImmutableList.of("2")).concatMap(Flux::fromIterable));
+  }
+
+  Mono<Map<Integer, Integer>> testCollectToImmutableMap() {
+    return Flux.just(1).collectMap(i -> i);
   }
 }

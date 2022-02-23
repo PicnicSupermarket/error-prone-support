@@ -1,7 +1,9 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.util.function.Function.identity;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -19,7 +21,9 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
@@ -417,6 +421,12 @@ final class RxJavaToReactorTemplates {
     }
   }
 
+  ImmutableSet<Flux<String>> testConcatMapIterable() {
+    return ImmutableSet.of(
+        Flux.just(ImmutableList.of("1")).flatMap(Flux::fromIterable),
+        Flux.just(ImmutableList.of("2")).concatMap(Flux::fromIterable));
+  }
+
   static final class FluxCollectBlock<T> {
     @BeforeTemplate
     ImmutableList<T> before(Flux<T> flux) {
@@ -424,8 +434,35 @@ final class RxJavaToReactorTemplates {
     }
 
     @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     ImmutableList<T> after(Flux<T> flux) {
       return flux.collect(toImmutableList()).block();
+    }
+  }
+
+  static final class ConcatMapIterable<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<? extends Iterable<? extends T>> flux) {
+      return Refaster.anyOf(flux.flatMap(Flux::fromIterable), flux.concatMap(Flux::fromIterable));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    Flux<T> after(Flux<? extends Iterable<? extends T>> flux) {
+      return flux.concatMapIterable(identity());
+    }
+  }
+
+  static final class CollectToImmutableMap<K, V> {
+    @BeforeTemplate
+    Mono<Map<K, V>> before(Flux<V> flux, Function<? super V, ? extends K> keyExtractor) {
+      return flux.collectMap(keyExtractor);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    Mono<Map<K, V>> after(Flux<V> flux, Function<? super V, ? extends K> keyExtractor) {
+      return flux.collect(toImmutableMap(keyExtractor, identity()));
     }
   }
 

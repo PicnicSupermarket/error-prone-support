@@ -1,13 +1,18 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.util.function.Function.identity;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,7 +42,7 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
         .filter(i -> i > 2)
         .as(RxJava2Adapter::monoToSingle);
 
-    Mono.empty().then();
+    Mono.empty().then().then();
 
     return Mono.just(3);
   }
@@ -139,5 +144,15 @@ final class RxJavaToReactorTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableList<Integer> testFluxCollectBlock() {
     return Flux.just(1).collect(toImmutableList()).block();
+  }
+
+  ImmutableSet<Flux<String>> testConcatMapIterable() {
+    return ImmutableSet.of(
+        Flux.just(ImmutableList.of("1")).concatMapIterable(identity()),
+        Flux.just(ImmutableList.of("2")).concatMapIterable(identity()));
+  }
+
+  Mono<Map<Integer, Integer>> testCollectToImmutableMap() {
+    return Flux.just(1).collect(toImmutableMap(i -> i, identity()));
   }
 }
