@@ -7,7 +7,6 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
@@ -188,6 +187,10 @@ final class ImmutableListTemplates {
     }
   }
 
+  /**
+   * Prefer {@link ImmutableList#of(Object)} over alternatives that don't communicate the
+   * immutability of the resulting list at the type level.
+   */
   static final class ImmutableListOf<T> {
     @BeforeTemplate
     List<T> before() {
@@ -200,6 +203,10 @@ final class ImmutableListTemplates {
     }
   }
 
+  /**
+   * Prefer {@link ImmutableList#of(Object)} over alternatives that don't communicate the
+   * immutability of the resulting list at the type level.
+   */
   static final class ImmutableListOf1<T> {
     @BeforeTemplate
     List<T> before(T item) {
@@ -207,56 +214,72 @@ final class ImmutableListTemplates {
     }
 
     @AfterTemplate
-    ImmutableCollection<T> after(T item) {
+    ImmutableList<T> after(T item) {
       return ImmutableList.of(item);
     }
   }
 
+  /**
+   * Prefer {@link ImmutableList#of(Object, Object)} over alternatives that don't communicate the
+   * immutability of the resulting list at the type level.
+   */
   static final class ImmutableListOf2<T> {
     @BeforeTemplate
-    List<T> before(T item, T item2) {
-      return List.of(item, item2);
+    List<T> before(T e1, T e2) {
+      return List.of(e1, e2);
     }
 
     @AfterTemplate
-    ImmutableCollection<T> after(T item, T item2) {
-      return ImmutableList.of(item, item2);
+    ImmutableList<T> after(T e1, T e2) {
+      return ImmutableList.of(e1, e2);
     }
   }
 
+  /**
+   * Prefer {@link ImmutableList#of(Object, Object, Object)} over alternatives that don't
+   * communicate the immutability of the resulting list at the type level.
+   */
   static final class ImmutableListOf3<T> {
     @BeforeTemplate
-    List<T> before(T i1, T i2, T i3) {
-      return List.of(i1, i2, i3);
+    List<T> before(T e1, T e2, T e3) {
+      return List.of(e1, e2, e3);
     }
 
     @AfterTemplate
-    ImmutableCollection<T> after(T i1, T i2, T i3) {
-      return ImmutableList.of(i1, i2, i3);
+    ImmutableList<T> after(T e1, T e2, T e3) {
+      return ImmutableList.of(e1, e2, e3);
     }
   }
 
+  /**
+   * Prefer {@link ImmutableList#of(Object, Object, Object, Object)} over alternatives that don't
+   * communicate the immutability of the resulting list at the type level.
+   */
   static final class ImmutableListOf4<T> {
     @BeforeTemplate
-    List<T> before(T i1, T i2, T i3, T i4) {
-      return List.of(i1, i2, i3, i4);
+    List<T> before(T e1, T e2, T e3, T e4) {
+      return List.of(e1, e2, e3, e4);
     }
 
     @AfterTemplate
-    ImmutableCollection<T> after(T i1, T i2, T i3, T i4) {
-      return ImmutableList.of(i1, i2, i3, i4);
+    ImmutableList<T> after(T e1, T e2, T e3, T e4) {
+      return ImmutableList.of(e1, e2, e3, e4);
     }
   }
 
+  /**
+   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object)} over alternatives that
+   * don't communicate the immutability of the resulting list at the type level.
+   */
   static final class ImmutableListOf5<T> {
     @BeforeTemplate
-    List<T> before(T i1, T i2, T i3, T i4, T i5) {
-      return List.of(i1, i2, i3, i4, i5);
+    List<T> before(T e1, T e2, T e3, T e4, T e5) {
+      return List.of(e1, e2, e3, e4, e5);
     }
 
     @AfterTemplate
-    ImmutableCollection<T> after(T i1, T i2, T i3, T i4, T i5) {
-      return ImmutableList.of(i1, i2, i3, i4, i5);
+    ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5) {
+      return ImmutableList.of(e1, e2, e3, e4, e5);
     }
   }
 }

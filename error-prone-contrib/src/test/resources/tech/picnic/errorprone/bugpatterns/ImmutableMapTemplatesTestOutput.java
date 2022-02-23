@@ -77,13 +77,27 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableMap.of();
   }
 
-  ImmutableSet<Map<?, ?>> testImmutableMapOfN() {
-    return ImmutableSet.of(
-        ImmutableMap.of(),
-        ImmutableMap.of("k1", "v1"),
-        ImmutableMap.of("k1", "v1", "k2", "v2"),
-        ImmutableMap.of("k1", "v1", "k2", "v2", "k3", "v3"),
-        ImmutableMap.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4"),
-        ImmutableMap.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4", "k5", "v5"));
+  Map<?, ?> testImmutableMapOf() {
+    return ImmutableMap.of();
+  }
+
+  Map<String, String> testImmutableMapOf1() {
+    return ImmutableMap.of("k1", "v1");
+  }
+
+  Map<String, String> testImmutableMapOf2() {
+    return ImmutableMap.of("k1", "v1", "k2", "v2");
+  }
+
+  Map<String, String> testImmutableMapOf3() {
+    return ImmutableMap.of("k1", "v1", "k2", "v2", "k3", "v3");
+  }
+
+  Map<String, String> testImmutableMapOf4() {
+    return ImmutableMap.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4");
+  }
+
+  Map<String, String> testImmutableMapOf5() {
+    return ImmutableMap.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4", "k5", "v5");
   }
 }

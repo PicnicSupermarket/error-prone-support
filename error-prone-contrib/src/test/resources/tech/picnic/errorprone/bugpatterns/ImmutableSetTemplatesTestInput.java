@@ -10,7 +10,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -72,23 +71,23 @@ final class ImmutableSetTemplatesTest implements RefasterTemplateTestCase {
     return Collections.emptySet();
   }
 
-  Collection<String> testImmutableSetOfItems1() {
+  Set<String> testImmutableSetOfItems1() {
     return Set.of("1");
   }
 
-  Collection<String> testImmutableSetOfItems2() {
+  Set<String> testImmutableSetOfItems2() {
     return Set.of("1", "2");
   }
 
-  Collection<String> testImmutableSetOfItems3() {
+  Set<String> testImmutableSetOfItems3() {
     return Set.of("1", "2", "3");
   }
 
-  Collection<String> testImmutableSetOfItems4() {
+  Set<String> testImmutableSetOfItems4() {
     return Set.of("1", "2", "3", "4");
   }
 
-  Collection<String> testImmutableSetOfItems5() {
+  Set<String> testImmutableSetOfItems5() {
     return Set.of("1", "2", "3", "4", "5");
   }
 }

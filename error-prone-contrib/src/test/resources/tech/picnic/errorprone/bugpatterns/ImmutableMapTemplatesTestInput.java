@@ -91,13 +91,27 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
     return Collections.emptyMap();
   }
 
-  ImmutableSet<Map<?, ?>> testImmutableMapOfN() {
-    return ImmutableSet.of(
-        Collections.emptyMap(),
-        Map.of("k1", "v1"),
-        Map.of("k1", "v1", "k2", "v2"),
-        Map.of("k1", "v1", "k2", "v2", "k3", "v3"),
-        Map.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4"),
-        Map.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4", "k5", "v5"));
+  Map<?, ?> testImmutableMapOf() {
+    return Collections.emptyMap();
+  }
+
+  Map<String, String> testImmutableMapOf1() {
+    return Map.of("k1", "v1");
+  }
+
+  Map<String, String> testImmutableMapOf2() {
+    return Map.of("k1", "v1", "k2", "v2");
+  }
+
+  Map<String, String> testImmutableMapOf3() {
+    return Map.of("k1", "v1", "k2", "v2", "k3", "v3");
+  }
+
+  Map<String, String> testImmutableMapOf4() {
+    return Map.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4");
+  }
+
+  Map<String, String> testImmutableMapOf5() {
+    return Map.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4", "k5", "v5");
   }
 }

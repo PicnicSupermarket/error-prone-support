@@ -255,6 +255,10 @@ final class ImmutableMapTemplates {
     }
   }
 
+  /**
+   * Prefer {@link ImmutableMap#of()} over alternatives that don't communicate the immutability of
+   * the resulting list at the type level.
+   */
   static final class ImmutableMapOf<K, V> {
     @BeforeTemplate
     Map<K, V> before() {
@@ -267,6 +271,10 @@ final class ImmutableMapTemplates {
     }
   }
 
+  /**
+   * Prefer {@link ImmutableMap#of(Object, Object)} over alternatives that don't communicate the
+   * immutability of the resulting list at the type level.
+   */
   static final class ImmutableMapOf1<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1) {
@@ -279,6 +287,10 @@ final class ImmutableMapTemplates {
     }
   }
 
+  /**
+   * Prefer {@link ImmutableMap#of(Object, Object, Object, Object)} over alternatives that don't
+   * communicate the immutability of the resulting list at the type level.
+   */
   static final class ImmutableMapOf2<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2) {
@@ -291,6 +303,10 @@ final class ImmutableMapTemplates {
     }
   }
 
+  /**
+   * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object)} over
+   * alternatives that don't communicate the immutability of the resulting list at the type level.
+   */
   static final class ImmutableMapOf3<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3) {
@@ -303,6 +319,11 @@ final class ImmutableMapTemplates {
     }
   }
 
+  /**
+   * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object, Object, Object)}
+   * over alternatives that don't communicate the immutability of the resulting list at the type
+   * level.
+   */
   static final class ImmutableMapOf4<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
@@ -315,6 +336,11 @@ final class ImmutableMapTemplates {
     }
   }
 
+  /**
+   * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object, Object, Object,
+   * Object, Object)} over alternatives that don't communicate the immutability of the resulting
+   * list at the type level.
+   */
   static final class ImmutableMapOf5<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
@@ -326,6 +352,7 @@ final class ImmutableMapTemplates {
       return ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
     }
   }
+
   // XXX: Add a template for this:
   // Maps.transformValues(streamOfEntries.collect(groupBy(fun)), ImmutableMap::copyOf)
   // ->
