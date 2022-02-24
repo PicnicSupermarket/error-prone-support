@@ -71,23 +71,23 @@ final class ImmutableSetTemplatesTest implements RefasterTemplateTestCase {
     return Collections.emptySet();
   }
 
-  Set<String> testImmutableSetOfItems1() {
+  Set<String> testImmutableSetOf1() {
     return Set.of("1");
   }
 
-  Set<String> testImmutableSetOfItems2() {
+  Set<String> testImmutableSetOf2() {
     return Set.of("1", "2");
   }
 
-  Set<String> testImmutableSetOfItems3() {
+  Set<String> testImmutableSetOf3() {
     return Set.of("1", "2", "3");
   }
 
-  Set<String> testImmutableSetOfItems4() {
+  Set<String> testImmutableSetOf4() {
     return Set.of("1", "2", "3", "4");
   }
 
-  Set<String> testImmutableSetOfItems5() {
+  Set<String> testImmutableSetOf5() {
     return Set.of("1", "2", "3", "4", "5");
   }
 }
