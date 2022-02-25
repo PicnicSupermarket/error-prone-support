@@ -77,7 +77,7 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
     return Stream.of(1).collect(toImmutableSet()).asList();
   }
 
-  List<?> testImmutableListOf() {
+  List<Object> testImmutableListOf() {
     return ImmutableList.of();
   }
 
