@@ -209,13 +209,13 @@ final class ImmutableListTemplates {
    */
   static final class ImmutableListOf1<T> {
     @BeforeTemplate
-    List<T> before(T item) {
-      return List.of(item);
+    List<T> before(T e1) {
+      return List.of(e1);
     }
 
     @AfterTemplate
-    ImmutableList<T> after(T item) {
-      return ImmutableList.of(item);
+    ImmutableList<T> after(T e1) {
+      return ImmutableList.of(e1);
     }
   }
 

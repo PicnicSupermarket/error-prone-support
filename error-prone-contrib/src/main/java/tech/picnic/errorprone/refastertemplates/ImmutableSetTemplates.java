@@ -159,7 +159,7 @@ final class ImmutableSetTemplates {
    * Prefer {@link ImmutableSet#of(Object)} over alternatives that don't communicate the
    * immutability of the resulting list at the type level.
    */
-  static final class ImmutableSetOfItems1<T> {
+  static final class ImmutableSetOf1<T> {
     @BeforeTemplate
     Set<T> before(T e1) {
       return Set.of(e1);
@@ -175,7 +175,7 @@ final class ImmutableSetTemplates {
    * Prefer {@link ImmutableSet#of(Object, Object)} over alternatives that don't communicate the
    * immutability of the resulting list at the type level.
    */
-  static final class ImmutableSetOfItems2<T> {
+  static final class ImmutableSetOf2<T> {
     @BeforeTemplate
     Set<T> before(T e1, T e2) {
       return Set.of(e1, e2);
@@ -191,7 +191,7 @@ final class ImmutableSetTemplates {
    * Prefer {@link ImmutableSet#of(Object, Object, Object)} over alternatives that don't communicate
    * the immutability of the resulting list at the type level.
    */
-  static final class ImmutableSetOfItems3<T> {
+  static final class ImmutableSetOf3<T> {
     @BeforeTemplate
     Set<T> before(T e1, T e2, T e3) {
       return Set.of(e1, e2, e3);
@@ -207,7 +207,7 @@ final class ImmutableSetTemplates {
    * Prefer {@link ImmutableSet#of(Object, Object, Object, Object)} over alternatives that don't
    * communicate the immutability of the resulting list at the type level.
    */
-  static final class ImmutableSetOfItems4<T> {
+  static final class ImmutableSetOf4<T> {
     @BeforeTemplate
     Set<T> before(T e1, T e2, T e3, T e4) {
       return Set.of(e1, e2, e3, e4);
@@ -223,7 +223,7 @@ final class ImmutableSetTemplates {
    * Prefer {@link ImmutableSet#of(Object, Object, Object, Object, Object)} over alternatives that
    * don't communicate the immutability of the resulting list at the type level.
    */
-  static final class ImmutableSetOfItems5<T> {
+  static final class ImmutableSetOf5<T> {
     @BeforeTemplate
     Set<T> before(T e1, T e2, T e3, T e4, T e5) {
       return Set.of(e1, e2, e3, e4, e5);
