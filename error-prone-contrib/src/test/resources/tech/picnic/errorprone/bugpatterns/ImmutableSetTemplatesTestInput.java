@@ -67,10 +67,6 @@ final class ImmutableSetTemplatesTest implements RefasterTemplateTestCase {
     return Collections.emptySet();
   }
 
-  Set<String> testImmutableSetOfTyped() {
-    return Collections.emptySet();
-  }
-
   Set<String> testImmutableSetOf1() {
     return Set.of("1");
   }

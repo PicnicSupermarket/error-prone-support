@@ -87,10 +87,6 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
             k -> Math.toIntExact(ImmutableMap.of("bar", 2L).get(k))));
   }
 
-  Map<String, String> testImmutableMapOfTyped() {
-    return Collections.emptyMap();
-  }
-
   Map<?, ?> testImmutableMapOf() {
     return Collections.emptyMap();
   }
