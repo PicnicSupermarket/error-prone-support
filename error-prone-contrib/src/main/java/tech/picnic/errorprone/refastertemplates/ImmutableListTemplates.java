@@ -194,7 +194,7 @@ final class ImmutableListTemplates {
   static final class ImmutableListOf<T> {
     @BeforeTemplate
     List<T> before() {
-      return Collections.emptyList();
+      return List.of();
     }
 
     @AfterTemplate

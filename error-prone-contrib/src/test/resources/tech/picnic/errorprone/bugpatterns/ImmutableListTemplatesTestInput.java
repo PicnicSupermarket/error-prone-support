@@ -81,7 +81,7 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
   }
 
   List<Object> testImmutableListOf() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   List<String> testImmutableListOf1() {
