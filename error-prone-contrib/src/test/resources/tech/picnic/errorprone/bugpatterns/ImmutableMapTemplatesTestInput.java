@@ -88,7 +88,7 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
   }
 
   Map<Object, Object> testImmutableMapOf() {
-    return Collections.emptyMap();
+    return Map.of();
   }
 
   Map<String, String> testImmutableMapOf1() {
