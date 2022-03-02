@@ -84,23 +84,23 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
     return List.of();
   }
 
-  List<String> testImmutableListOf1() {
-    return List.of("1");
+  List<Integer> testImmutableListOf1() {
+    return List.of(1);
   }
 
-  List<String> testImmutableListOf2() {
-    return List.of("1", "2");
+  List<Integer> testImmutableListOf2() {
+    return List.of(1, 2);
   }
 
-  List<String> testImmutableListOf3() {
-    return List.of("1", "2", "3");
+  List<Integer> testImmutableListOf3() {
+    return List.of(1, 2, 3);
   }
 
-  List<String> testImmutableListOf4() {
-    return List.of("1", "2", "3", "4");
+  List<Integer> testImmutableListOf4() {
+    return List.of(1, 2, 3, 4);
   }
 
-  List<String> testImmutableListOf5() {
-    return List.of("1", "2", "3", "4", "5");
+  List<Integer> testImmutableListOf5() {
+    return List.of(1, 2, 3, 4, 5);
   }
 }
