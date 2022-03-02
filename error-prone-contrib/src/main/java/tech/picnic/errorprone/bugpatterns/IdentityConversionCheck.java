@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static com.google.errorprone.suppliers.Suppliers.typeFromString;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -22,6 +23,7 @@ import com.google.errorprone.util.ASTHelpers.TargetType;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Types;
 import java.util.Arrays;
 import java.util.List;
 
@@ -84,7 +86,7 @@ public final class IdentityConversionCheck extends BugChecker
         targetType);
 
     if (state.getTypes().isSameType(sourceType, ASTHelpers.getType(tree))
-        || isSubtypeWithDefinedEquality(sourceType, targetType, state)) {
+        || isSubtypeWithDefinedEquality(sourceType, targetType.type(), state)) {
       return buildDescription(tree)
           .setMessage(
               "This method invocation appears redundant; remove it or suppress this warning and "
@@ -97,10 +99,13 @@ public final class IdentityConversionCheck extends BugChecker
   }
 
   private static boolean isSubtypeWithDefinedEquality(
-      Type sourceType, TargetType targetType, VisitorState state) {
-    return state.getTypes().isSubtype(sourceType, targetType.type())
+      Type sourceType, Type targetType, VisitorState state) {
+    Type objectType = typeFromString("java.lang.Object").get(state);
+    Types types = state.getTypes();
+    return types.isSubtype(sourceType, targetType)
+        && !types.isSameType(sourceType, objectType)
+        && !types.isSameType(targetType, objectType)
         && Arrays.stream(TypesWithUndefinedEquality.values())
-            .noneMatch(
-                b -> b.matchesType(sourceType, state) || b.matchesType(targetType.type(), state));
+            .noneMatch(b -> b.matchesType(sourceType, state) || b.matchesType(targetType, state));
   }
 }
