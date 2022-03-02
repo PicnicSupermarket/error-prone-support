@@ -187,6 +187,19 @@ final class ReactorTemplates {
     }
   }
 
+  /** Don't unnecessarily call {@link Mono#flux()}. */
+  static final class MonoFlatMapIterable<T, R> {
+    @BeforeTemplate
+    Flux<R> before(Mono<T> mono, Function<? super T, ? extends Iterable<? extends R>> mapper) {
+      return mono.flux().concatMapIterable(mapper);
+    }
+
+    @AfterTemplate
+    Flux<R> after(Mono<T> mono, Function<? super T, ? extends Iterable<? extends R>> mapper) {
+      return mono.flatMapIterable(mapper);
+    }
+  }
+
   /**
    * Don't use {@link Mono#flatMapMany(Function)} to implicitly convert a {@link Mono} to a {@link
    * Flux}.
