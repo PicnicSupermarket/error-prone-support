@@ -14,14 +14,14 @@ import org.assertj.core.api.BigDecimalAssert;
  * Refaster templates that improve {@link BigDecimal} asserts written in AssertJ.
  *
  * <p>A few {@link BigDecimal} assertions are not rewritten. This is because the {@link BigDecimal}
- * also uses scale to determine whether two values are equal. As a result, we cannot rewrite the
- * following assertions:
+ * also uses scale to determine whether two values are equal. As a result, we cannot perform the
+ * following rewrites:
  *
  * <ul>
- *   <li>{@link BigDecimalAssert#isEqualTo(Object)} (for values 0L, 1L, BigDecimal.ZERO, and
- *       BigDecimal.ONE)
- *   <li>{@link BigDecimalAssert#isNotEqualTo(Object)} (for values 0L, 1L, BigDecimal.ZERO, and
- *       BigDecimal.ONE)
+ *   <li>From {@link BigDecimalAssert#isEqualTo(Object)} (for values 0L, 1L, BigDecimal.ZERO, and
+ *       BigDecimal.ONE) to replace the parameter with either 0 or 1.
+ *   <li>From {@link BigDecimalAssert#isNotEqualTo(Object)} (for values 0L, 1L, BigDecimal.ZERO, and
+ *       BigDecimal.ONE) to replace the parameter with either 0 or 1.
  * </ul>
  */
 final class AssertJBigDecimalTemplates {
