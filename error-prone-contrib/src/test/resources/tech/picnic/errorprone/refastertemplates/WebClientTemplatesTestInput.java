@@ -19,9 +19,8 @@ final class WebClientTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(fromValue(""), GET, HEAD, OPTIONS, PATCH, POST, PUT);
   }
 
-  ImmutableSet<?> testBodyVallue() {
+  ImmutableSet<?> testBodyValue() {
     return ImmutableSet.of(
-        WebClient.create().post().body(fromValue("bar")),
         WebClient.create().post().body(fromValue("bar")),
         WebTestClient.bindToServer().build().post().body(fromValue("bar")));
   }
