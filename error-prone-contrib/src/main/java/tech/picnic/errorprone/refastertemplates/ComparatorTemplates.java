@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingDouble;
 import static java.util.Comparator.comparingInt;
@@ -11,7 +12,6 @@ import static java.util.function.Function.identity;
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -38,7 +38,7 @@ final class ComparatorTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<T> after() {
       return naturalOrder();
     }
@@ -52,7 +52,7 @@ final class ComparatorTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<T> after() {
       return reverseOrder();
     }
@@ -66,7 +66,7 @@ final class ComparatorTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<T> after(Comparator<T> cmp) {
       return cmp;
     }
@@ -93,7 +93,7 @@ final class ComparatorTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<S> after(Comparator<S> cmp, Function<? super S, ? extends T> function) {
       return cmp.thenComparing(function, reverseOrder());
     }
@@ -180,7 +180,7 @@ final class ComparatorTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<T> after(Comparator<T> cmp) {
       return cmp.thenComparing(naturalOrder());
     }

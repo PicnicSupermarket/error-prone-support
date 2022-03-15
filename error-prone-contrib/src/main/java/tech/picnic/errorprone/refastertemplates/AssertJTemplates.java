@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -12,7 +13,6 @@ import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -137,7 +137,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     OptionalDoubleAssert after(OptionalDouble optional, double expected) {
       return assertThat(optional).hasValue(expected);
     }
@@ -156,7 +156,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     OptionalIntAssert after(OptionalInt optional, int expected) {
       return assertThat(optional).hasValue(expected);
     }
@@ -175,7 +175,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     OptionalLongAssert after(OptionalLong optional, long expected) {
       return assertThat(optional).hasValue(expected);
     }
@@ -365,7 +365,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ObjectEnumerableAssert<?, S> after(Set<S> set, T element) {
       return assertThat(set).containsExactly(element);
     }
@@ -430,7 +430,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Collection<E> iterable) {
       assertThat(iterable).isEmpty();
     }
@@ -454,7 +454,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     IterableAssert<E> after(Iterable<E> iterable) {
       return assertThat(iterable).isNotEmpty();
     }
@@ -472,7 +472,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     IterableAssert<E> after(Iterable<E> iterable, int length) {
       return assertThat(iterable).hasSize(length);
     }
@@ -485,7 +485,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     IterableAssert<S> after(Iterable<S> iterable, T element) {
       return assertThat(iterable).containsExactly(element);
     }
@@ -502,7 +502,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     IterableAssert<S> after(Iterable<S> iterable, T element) {
       return assertThat(iterable).containsExactly(element);
     }
@@ -519,7 +519,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(List<S> list1, List<T> list2) {
       return assertThat(list1).containsExactlyElementsOf(list2);
     }
@@ -538,7 +538,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractCollectionAssert<?, ?, S, ?> after(Set<S> set1, Set<T> set2) {
       return assertThat(set1).hasSameElementsAs(set2);
     }
@@ -555,7 +555,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractCollectionAssert<?, ?, S, ?> after(Multiset<S> multiset1, Multiset<T> multiset2) {
       return assertThat(multiset1).containsExactlyInAnyOrderElementsOf(multiset2);
     }
@@ -633,7 +633,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Map<K, V> map) {
       assertThat(map).isEmpty();
     }
@@ -670,7 +670,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     MapAssert<K, V> after(Map<K, V> map) {
       return assertThat(map).isNotEmpty();
     }
@@ -685,7 +685,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     MapAssert<K, V> after(Map<K, V> map, int length) {
       return assertThat(map).hasSize(length);
     }
@@ -699,7 +699,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     MapAssert<K, V> after(Map<K, V> map1, Map<K, V> map2) {
       return assertThat(map1).hasSameSizeAs(map2);
     }
@@ -713,7 +713,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     MapAssert<K, V> after(Map<K, V> map, K key) {
       return assertThat(map).containsKey(key);
     }
@@ -726,7 +726,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     MapAssert<K, V> after(Map<K, V> map, K key) {
       return assertThat(map).doesNotContainKey(key);
     }
@@ -739,7 +739,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     MapAssert<K, V> after(Map<K, V> map, K key, V value) {
       return assertThat(map).containsEntry(key, value);
     }
@@ -764,7 +764,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
       return assertThat(stream).containsAnyElementsOf(iterable);
     }
@@ -785,7 +785,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, U[] array) {
       return assertThat(stream).containsAnyOf(array);
     }
@@ -809,7 +809,7 @@ final class AssertJTemplates {
 
     @AfterTemplate
     @SuppressWarnings("ObjectEnumerableContainsOneElement" /* Not a true singleton. */)
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
       return assertThat(stream).containsAnyOf(elements);
     }
@@ -830,7 +830,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
       return assertThat(stream).containsAll(iterable);
     }
@@ -851,7 +851,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, U[] array) {
       return assertThat(stream).contains(array);
     }
@@ -874,7 +874,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
       return assertThat(stream).contains(elements);
     }
@@ -889,7 +889,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
       return assertThat(stream).containsExactlyElementsOf(iterable);
     }
@@ -904,7 +904,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, U[] array) {
       return assertThat(stream).containsExactly(array);
     }
@@ -920,7 +920,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
       return assertThat(stream).containsExactly(elements);
     }
@@ -942,7 +942,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
       return assertThat(stream).containsExactlyInAnyOrderElementsOf(iterable);
     }
@@ -963,7 +963,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, U[] array) {
       return assertThat(stream).containsExactlyInAnyOrder(array);
     }
@@ -989,7 +989,7 @@ final class AssertJTemplates {
 
     @AfterTemplate
     @SuppressWarnings("ObjectEnumerableContainsExactlyOneElement" /* Not a true singleton. */)
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
       return assertThat(stream).containsExactlyInAnyOrder(elements);
     }
@@ -1010,7 +1010,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
       return assertThat(stream).containsSequence(iterable);
     }
@@ -1027,7 +1027,7 @@ final class AssertJTemplates {
 
     @AfterTemplate
     @SuppressWarnings("ObjectEnumerableContainsOneElement" /* Not a true singleton. */)
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
       return assertThat(stream).containsSequence(elements);
     }
@@ -1048,7 +1048,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
       return assertThat(stream).containsSubsequence(iterable);
     }
@@ -1066,7 +1066,7 @@ final class AssertJTemplates {
 
     @AfterTemplate
     @SuppressWarnings("ObjectEnumerableContainsOneElement" /* Not a true singleton. */)
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
       return assertThat(stream).containsSubsequence(elements);
     }
@@ -1087,7 +1087,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
       return assertThat(stream).doesNotContainAnyElementsOf(iterable);
     }
@@ -1108,7 +1108,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, U[] array) {
       return assertThat(stream).doesNotContain(array);
     }
@@ -1131,7 +1131,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
       return assertThat(stream).doesNotContain(elements);
     }
@@ -1152,7 +1152,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
       return assertThat(stream).doesNotContainSequence(iterable);
     }
@@ -1170,7 +1170,7 @@ final class AssertJTemplates {
 
     @AfterTemplate
     @SuppressWarnings("ObjectEnumerableDoesNotContainOneElement" /* Not a true singleton. */)
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
       return assertThat(stream).doesNotContainSequence(elements);
     }
@@ -1191,7 +1191,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
       return assertThat(stream).hasSameElementsAs(iterable);
     }
@@ -1212,7 +1212,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, U[] array) {
       return assertThat(stream).containsOnly(array);
     }
@@ -1235,7 +1235,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
       return assertThat(stream).containsOnly(elements);
     }
@@ -1268,7 +1268,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, U[] iterable) {
       return assertThat(stream).isSubsetOf(iterable);
     }
@@ -1291,7 +1291,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
       return assertThat(stream).isSubsetOf(elements);
     }
@@ -1310,7 +1310,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Stream<S> stream) {
       assertThat(stream).isEmpty();
     }
@@ -1329,7 +1329,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Stream<S> stream) {
       assertThat(stream).isNotEmpty();
     }
@@ -1342,7 +1342,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Stream<T> stream, int size) {
       assertThat(stream).hasSize(size);
     }
@@ -1359,7 +1359,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Predicate<T> predicate, T object) {
       assertThat(predicate).accepts(object);
     }
@@ -1372,7 +1372,7 @@ final class AssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Predicate<T> predicate, T object) {
       assertThat(predicate).rejects(object);
     }
@@ -2213,7 +2213,7 @@ final class AssertJTemplates {
   //        }
   //
   //        @AfterTemplate
-  //        @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+  //        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
   //        IterableAssert<E> after(Iterable<E> iterable, E expected) {
   //            return assertThat(iterable).containsExactly(expected);
   //        }

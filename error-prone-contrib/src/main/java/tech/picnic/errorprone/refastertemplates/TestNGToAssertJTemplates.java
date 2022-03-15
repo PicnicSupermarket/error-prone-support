@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
@@ -17,7 +18,6 @@ import static org.testng.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.DoNotCall;
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
@@ -96,7 +96,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(String message) {
       fail(message);
     }
@@ -110,7 +110,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(String message, Throwable throwable) {
       fail(message, throwable);
     }
@@ -123,7 +123,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(boolean condition) {
       assertThat(condition).isTrue();
     }
@@ -136,7 +136,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(boolean condition, String message) {
       assertThat(condition).withFailMessage(message).isTrue();
     }
@@ -149,7 +149,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(boolean condition) {
       assertThat(condition).isFalse();
     }
@@ -162,7 +162,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(boolean condition, String message) {
       assertThat(condition).withFailMessage(message).isFalse();
     }
@@ -175,7 +175,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object object) {
       assertThat(object).isNull();
     }
@@ -188,7 +188,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object object, String message) {
       assertThat(object).withFailMessage(message).isNull();
     }
@@ -201,7 +201,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object object) {
       assertThat(object).isNotNull();
     }
@@ -214,7 +214,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object object, String message) {
       assertThat(object).withFailMessage(message).isNotNull();
     }
@@ -227,7 +227,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object actual, Object expected) {
       assertThat(actual).isSameAs(expected);
     }
@@ -240,7 +240,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object actual, Object expected, String message) {
       assertThat(actual).withFailMessage(message).isSameAs(expected);
     }
@@ -253,7 +253,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object actual, Object expected) {
       assertThat(actual).isNotSameAs(expected);
     }
@@ -266,7 +266,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object actual, Object expected, String message) {
       assertThat(actual).withFailMessage(message).isNotSameAs(expected);
     }
@@ -329,7 +329,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object actual, Object expected) {
       assertThat(actual).isEqualTo(expected);
     }
@@ -392,7 +392,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object actual, Object expected, String message) {
       assertThat(actual).withFailMessage(message).isEqualTo(expected);
     }
@@ -405,7 +405,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(float actual, float expected, float delta) {
       assertThat(actual).isCloseTo(expected, offset(delta));
     }
@@ -418,7 +418,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(float actual, float expected, float delta, String message) {
       assertThat(actual).withFailMessage(message).isCloseTo(expected, offset(delta));
     }
@@ -431,7 +431,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(double actual, double expected, double delta) {
       assertThat(actual).isCloseTo(expected, offset(delta));
     }
@@ -444,7 +444,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(double actual, double expected, double delta, String message) {
       assertThat(actual).withFailMessage(message).isCloseTo(expected, offset(delta));
     }
@@ -497,7 +497,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object[] actual, Object[] expected) {
       assertThat(actual).containsExactly(expected);
     }
@@ -550,7 +550,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object[] actual, Object[] expected, String message) {
       assertThat(actual).withFailMessage(message).containsExactly(expected);
     }
@@ -563,7 +563,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object[] actual, Object[] expected) {
       assertThat(actual).containsExactlyInAnyOrder(expected);
     }
@@ -576,7 +576,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object[] actual, Object[] expected, String message) {
       assertThat(actual).withFailMessage(message).containsExactlyInAnyOrder(expected);
     }
@@ -589,7 +589,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     <S, T extends S> void after(Iterator<S> actual, Iterator<T> expected) {
       // XXX: This is not `null`-safe.
       // XXX: The `ImmutableList.copyOf` should actually *not* be imported statically.
@@ -604,7 +604,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     <S, T extends S> void after(Iterator<S> actual, Iterator<T> expected, String message) {
       // XXX: This is not `null`-safe.
       // XXX: The `ImmutableList.copyOf` should actually *not* be imported statically.
@@ -629,7 +629,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     <S, T extends S> void after(Iterable<S> actual, Iterable<T> expected) {
       assertThat(actual).containsExactlyElementsOf(expected);
     }
@@ -647,7 +647,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     <S, T extends S> void after(Iterable<S> actual, Iterable<T> expected, String message) {
       assertThat(actual).withFailMessage(message).containsExactlyElementsOf(expected);
     }
@@ -660,7 +660,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     <S, T extends S> void after(Set<S> actual, Set<T> expected) {
       assertThat(actual).hasSameElementsAs(expected);
     }
@@ -673,7 +673,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     <S, T extends S> void after(Set<S> actual, Set<T> expected, String message) {
       assertThat(actual).withFailMessage(message).hasSameElementsAs(expected);
     }
@@ -741,7 +741,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object actual, Object expected) {
       assertThat(actual).isNotEqualTo(expected);
     }
@@ -809,7 +809,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object actual, Object expected, String message) {
       assertThat(actual).withFailMessage(message).isNotEqualTo(expected);
     }
@@ -822,7 +822,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(float actual, float expected, float delta) {
       assertThat(actual).isNotCloseTo(expected, offset(delta));
     }
@@ -835,7 +835,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(float actual, float expected, float delta, String message) {
       assertThat(actual).withFailMessage(message).isNotCloseTo(expected, offset(delta));
     }
@@ -848,7 +848,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(double actual, double expected, double delta) {
       assertThat(actual).isNotCloseTo(expected, offset(delta));
     }
@@ -861,7 +861,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(double actual, double expected, double delta, String message) {
       assertThat(actual).withFailMessage(message).isNotCloseTo(expected, offset(delta));
     }
@@ -874,7 +874,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(ThrowingCallable runnable) {
       assertThatThrownBy(runnable);
     }
@@ -887,7 +887,7 @@ final class TestNGToAssertJTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(ThrowingCallable runnable, Class<T> clazz) {
       assertThatThrownBy(runnable).isInstanceOf(clazz);
     }
