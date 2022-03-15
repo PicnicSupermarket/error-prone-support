@@ -67,6 +67,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           "com.google.errorprone.BugPattern.LinkType",
           "com.google.errorprone.BugPattern.SeverityLevel",
           "com.google.errorprone.BugPattern.StandardTags",
+          "com.google.errorprone.refaster.ImportPolicy",
           "com.mongodb.client.model.Accumulators",
           "com.mongodb.client.model.Aggregates",
           "com.mongodb.client.model.Filters",
