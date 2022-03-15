@@ -1,11 +1,12 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.joining;
 
 import com.google.common.collect.Streams;
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -18,11 +19,26 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link Stream}s. */
 final class StreamTemplates {
   private StreamTemplates() {}
+
+  /** Prefer joining without delimiter using a more efficient implementation. */
+  static final class CollectorJoiningWithoutDelimiter {
+    @BeforeTemplate
+    Collector<CharSequence, ?, String> before() {
+      return joining("");
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Collector<CharSequence, ?, String> after() {
+      return joining();
+    }
+  }
 
   /** Prefer {@link Stream#empty()} over less clear alternatives. */
   static final class EmptyStream<T> {
@@ -216,7 +232,7 @@ final class StreamTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Optional<T> after(Stream<T> stream) {
       return stream.min(naturalOrder());
     }
@@ -242,7 +258,7 @@ final class StreamTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Optional<T> after(Stream<T> stream) {
       return stream.max(naturalOrder());
     }
