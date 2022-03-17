@@ -47,6 +47,7 @@ public final class StaticImportCheckTest {
             "import com.google.common.collect.ImmutableMultiset;",
             "import com.google.common.collect.ImmutableSet;",
             "import com.google.errorprone.refaster.ImportPolicy;",
+            "import com.google.errorprone.refaster.annotation.AfterTemplate;",
             "import com.google.errorprone.refaster.annotation.UseImportPolicy;",
             "import java.nio.charset.StandardCharsets;",
             "import java.util.Optional;",
@@ -101,6 +102,9 @@ public final class StaticImportCheckTest {
             "",
             "  // BUG: Diagnostic contains:",
             "  @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)",
+            "  @AfterTemplate",
+            "  void m2() {}",
+            "",
             "  void toImmutableMultiset() {}",
             "}")
         .doTest();
@@ -119,6 +123,7 @@ public final class StaticImportCheckTest {
             "import com.google.errorprone.BugPattern;",
             "import com.google.errorprone.BugPattern.SeverityLevel;",
             "import com.google.errorprone.refaster.ImportPolicy;",
+            "import com.google.errorprone.refaster.annotation.AfterTemplate;",
             "import com.google.errorprone.refaster.annotation.UseImportPolicy;",
             "import java.nio.charset.StandardCharsets;",
             "import java.util.Objects;",
@@ -131,7 +136,6 @@ public final class StaticImportCheckTest {
             "import org.springframework.http.MediaType;",
             "",
             "class A {",
-            "  @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)",
             "  void m1() {",
             "    ImmutableMap.toImmutableMap(v -> v, v -> v);",
             "    ImmutableMap.<String, String, String>toImmutableMap(v -> v, v -> v);",
@@ -177,6 +181,10 @@ public final class StaticImportCheckTest {
             "    severity = SeverityLevel.SUGGESTION,",
             "    tags = BugPattern.StandardTags.SIMPLIFICATION)",
             "  static final class TestBugPattern {}",
+            "",
+            "  @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)",
+            "  @AfterTemplate",
+            "  void m4() {}",
             "}")
         .addOutputLines(
             "out/A.java",
@@ -203,6 +211,7 @@ public final class StaticImportCheckTest {
             "import com.google.errorprone.BugPattern;",
             "import com.google.errorprone.BugPattern.SeverityLevel;",
             "import com.google.errorprone.refaster.ImportPolicy;",
+            "import com.google.errorprone.refaster.annotation.AfterTemplate;",
             "import com.google.errorprone.refaster.annotation.UseImportPolicy;",
             "import java.nio.charset.StandardCharsets;",
             "import java.util.Objects;",
@@ -215,7 +224,6 @@ public final class StaticImportCheckTest {
             "import org.springframework.http.MediaType;",
             "",
             "class A {",
-            "  @UseImportPolicy(STATIC_IMPORT_ALWAYS)",
             "  void m1() {",
             "    toImmutableMap(v -> v, v -> v);",
             "    ImmutableMap.<String, String, String>toImmutableMap(v -> v, v -> v);",
@@ -261,6 +269,10 @@ public final class StaticImportCheckTest {
             "    severity = SUGGESTION,",
             "    tags = SIMPLIFICATION)",
             "  static final class TestBugPattern {}",
+            "",
+            "  @UseImportPolicy(STATIC_IMPORT_ALWAYS)",
+            "  @AfterTemplate",
+            "  void m4() {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
