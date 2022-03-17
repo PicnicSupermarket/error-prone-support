@@ -20,14 +20,18 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link Stream}s. */
 final class StreamTemplates {
   private StreamTemplates() {}
 
-  /** Prefer joining without delimiter using a more efficient implementation. */
-  static final class CollectorJoiningWithoutDelimiter {
+  /**
+   * Prefer {@link Collectors#joining()} over {@link Collectors#joining(CharSequence)} with an empty
+   * String as delimiter.
+   */
+  static final class Joining {
     @BeforeTemplate
     Collector<CharSequence, ?, String> before() {
       return joining("");

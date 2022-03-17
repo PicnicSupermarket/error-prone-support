@@ -15,10 +15,10 @@ import java.util.stream.Stream;
 final class StreamTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Objects.class, Streams.class, not(null), reverseOrder(), joining());
+    return ImmutableSet.of(Objects.class, Streams.class, not(null), reverseOrder());
   }
 
-  String testCollectorJoiningWithoutDelimiter() {
+  String testJoining() {
     return Stream.of("foo").collect(joining(""));
   }
 
