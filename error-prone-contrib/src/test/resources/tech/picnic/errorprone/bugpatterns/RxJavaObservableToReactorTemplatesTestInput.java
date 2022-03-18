@@ -6,6 +6,7 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import java.util.concurrent.TimeUnit;
 
 final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -41,7 +42,11 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
     return Observable.just(1, 2).ignoreElements();
   }
 
-  Flowable<Integer> testCompletableToFlowable() {
+  Observable<Integer> testObservableTimeoutLongTimeUnit() {
+    return Observable.just(1).timeout(1000, TimeUnit.MILLISECONDS);
+  }
+
+  Flowable<Integer> testObservableToFlowable() {
     return Observable.just(1).toFlowable(BackpressureStrategy.BUFFER);
   }
 

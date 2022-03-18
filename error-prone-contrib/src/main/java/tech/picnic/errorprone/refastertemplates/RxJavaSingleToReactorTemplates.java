@@ -550,11 +550,24 @@ final class RxJavaSingleToReactorTemplates {
   // XXX: public final Single takeUntil(CompletableSource)
   // XXX: public final Single takeUntil(Publisher)
   // XXX: public final Single takeUntil(SingleSource)
-  // XXX: public final Single timeout(long,TimeUnit)
+
+  static final class SingleTimeoutLongTimeUnit<T> {
+    @BeforeTemplate
+    Single<T> before(Single<T> single, long timeout, TimeUnit unit) {
+      return single.timeout(timeout, unit);
+    }
+
+    @AfterTemplate
+    Single<T> after(Single<T> single, long timeout, TimeUnit unit) {
+      return RxJava2Adapter.monoToSingle(
+          RxJava2Adapter.singleToMono(single).timeout(Duration.of(timeout, unit.toChronoUnit())));
+    }
+  }
+
   // XXX: public final Single timeout(long,TimeUnit,Scheduler)
   // XXX: public final Single timeout(long,TimeUnit,Scheduler,SingleSource)
 
-  static final class SingleTimeOut<T> {
+  static final class SingleTimeoutLongTimeUnitSingleSource<T> {
     @BeforeTemplate
     Single<T> before(
         Single<T> single, long timeout, TimeUnit unit, SingleSource<? extends T> other) {

@@ -134,7 +134,13 @@ final class RxJavaSingleToReactorTemplatesTest implements RefasterTemplateTestCa
     return RxJava2Adapter.fluxToFlowable(RxJava2Adapter.singleToMono(Single.just(1)).flux());
   }
 
-  Single<Integer> testSingleTimeOut() {
+  Single<Integer> testSingleTimeoutLongTimeUnit() {
+    return RxJava2Adapter.monoToSingle(
+        RxJava2Adapter.singleToMono(Single.just(1))
+            .timeout(Duration.of(1000, TimeUnit.MILLISECONDS.toChronoUnit())));
+  }
+
+  Single<Integer> testSingleTimeoutLongTimeUnitSingleSource() {
     return RxJava2Adapter.monoToSingle(
         RxJava2Adapter.singleToMono(Single.just(1))
             .timeout(

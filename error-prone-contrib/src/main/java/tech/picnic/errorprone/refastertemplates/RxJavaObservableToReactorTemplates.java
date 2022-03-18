@@ -19,7 +19,9 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import java.time.Duration;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
@@ -643,7 +645,22 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Observable timeInterval(TimeUnit,Scheduler)
   // XXX: public final Observable timeout(Function)
   // XXX: public final Observable timeout(Function,ObservableSource)
-  // XXX: public final Observable timeout(long,TimeUnit)
+
+  // Default BackpressureStrategy.BUFFER is set
+  static final class ObservableTimeoutLongTimeUnit<T> {
+    @BeforeTemplate
+    Observable<T> before(Observable<T> observable, long timeout, TimeUnit unit) {
+      return observable.timeout(timeout, unit);
+    }
+
+    @AfterTemplate
+    Observable<T> after(Observable<T> observable, long timeout, TimeUnit unit) {
+      return RxJava2Adapter.fluxToObservable(
+          RxJava2Adapter.observableToFlux(observable, BackpressureStrategy.BUFFER)
+              .timeout(Duration.of(timeout, unit.toChronoUnit())));
+    }
+  }
+
   // XXX: public final Observable timeout(long,TimeUnit,ObservableSource)
   // XXX: public final Observable timeout(long,TimeUnit,Scheduler)
   // XXX: public final Observable timeout(long,TimeUnit,Scheduler,ObservableSource)
@@ -655,7 +672,7 @@ final class RxJavaObservableToReactorTemplates {
   // XXX: public final Observable timestamp(TimeUnit,Scheduler)
   // XXX: public final Object to(Function)
 
-  static final class CompletableToFlowable<T> {
+  static final class ObservableToFlowable<T> {
     @BeforeTemplate
     Flowable<T> before(Observable<T> observable, BackpressureStrategy strategy) {
       return observable.toFlowable(strategy);

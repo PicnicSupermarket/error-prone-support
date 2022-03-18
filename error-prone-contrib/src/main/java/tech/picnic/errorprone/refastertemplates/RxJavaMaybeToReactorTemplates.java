@@ -758,7 +758,19 @@ final class RxJavaMaybeToReactorTemplates {
 
   // XXX: public final Maybe takeUntil(MaybeSource)
   // XXX: public final Maybe takeUntil(Publisher)
-  // XXX: public final Maybe timeout(long,TimeUnit)
+
+  static final class MaybeTimeoutLongTimeUnit<T> {
+    @BeforeTemplate
+    Maybe<T> before(Maybe<T> maybe, long timeout, TimeUnit unit) {
+      return maybe.timeout(timeout, unit);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Maybe<T> maybe, long timeout, TimeUnit unit) {
+      return RxJava2Adapter.monoToMaybe(
+          RxJava2Adapter.maybeToMono(maybe).timeout(Duration.of(timeout, unit.toChronoUnit())));
+    }
+  }
 
   static final class MaybeTimeOut<T> {
     @BeforeTemplate

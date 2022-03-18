@@ -171,6 +171,27 @@ final class RxJavaToReactorUnwrapTemplates {
   }
 
   // XXX: Add test
+  @SuppressWarnings("unchecked")
+  abstract static class SingleOnResumeUnwrapLambdaSpecialCase<T, R> {
+    @Placeholder
+    abstract Mono<R> placeholder(@MayOptionallyUse Throwable input);
+
+    @BeforeTemplate
+    java.util.function.Function<? extends Throwable, ? extends Mono<? extends R>> before() {
+      return e ->
+          RxJava2Adapter.singleToMono(
+              RxJavaReactorMigrationUtil.<Throwable, Single<R>>toJdkFunction(
+                      t -> RxJava2Adapter.monoToSingle(placeholder(t)))
+                  .apply(e));
+    }
+
+    @AfterTemplate
+    java.util.function.Function<Throwable, ? extends Mono<? extends R>> after() {
+      return v -> placeholder(v);
+    }
+  }
+
+  // XXX: Add test
   abstract static class FlowableConcatMapMaybeDelayErrorUnwrapLambda<T, R> {
     @Placeholder
     abstract Mono<R> placeholder(@MayOptionallyUse T input);

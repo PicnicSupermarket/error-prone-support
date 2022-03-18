@@ -7,6 +7,8 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -57,7 +59,13 @@ final class RxJavaObservableToReactorTemplatesTest implements RefasterTemplateTe
             .then());
   }
 
-  Flowable<Integer> testCompletableToFlowable() {
+  Observable<Integer> testObservableTimeoutLongTimeUnit() {
+    return RxJava2Adapter.fluxToObservable(
+        RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER)
+            .timeout(Duration.of(1000, TimeUnit.MILLISECONDS.toChronoUnit())));
+  }
+
+  Flowable<Integer> testObservableToFlowable() {
     return RxJava2Adapter.fluxToFlowable(
         RxJava2Adapter.observableToFlux(Observable.just(1), BackpressureStrategy.BUFFER));
   }

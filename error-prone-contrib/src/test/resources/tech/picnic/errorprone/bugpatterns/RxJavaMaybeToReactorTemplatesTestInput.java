@@ -204,6 +204,10 @@ final class RxJavaMaybeToReactorTemplatesTest implements RefasterTemplateTestCas
                 }));
   }
 
+  Maybe<Integer> testMaybeTimeoutLongTimeUnit() {
+    return Maybe.just(1).timeout(1000, TimeUnit.MILLISECONDS);
+  }
+
   Maybe<Object> testMaybeTimeOut() {
     return Maybe.empty().timeout(100, TimeUnit.MILLISECONDS, Maybe.just(2));
   }

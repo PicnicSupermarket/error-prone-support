@@ -28,6 +28,7 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -1266,7 +1267,20 @@ final class RxJavaFlowableToReactorTemplates {
   // XXX: final Flowable timeInterval(TimeUnit,Scheduler)
   // XXX: final Flowable timeout(Function)
   // XXX: final Flowable timeout(Function,Flowable)
-  // XXX: final Flowable timeout(long,TimeUnit)
+
+  static final class FlowableTimeoutLongTimeUnit<T> {
+    @BeforeTemplate
+    Flowable<T> before(Flowable<T> flowable, long timeout, TimeUnit unit) {
+      return flowable.timeout(timeout, unit);
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Flowable<T> flowable, long timeout, TimeUnit unit) {
+      return RxJava2Adapter.fluxToFlowable(
+          RxJava2Adapter.flowableToFlux(flowable)
+              .timeout(Duration.of(timeout, unit.toChronoUnit())));
+    }
+  }
   // XXX: final Flowable timeout(long,TimeUnit,Publisher)
   // XXX: final Flowable timeout(long,TimeUnit,Scheduler)
   // XXX: final Flowable timeout(long,TimeUnit,Scheduler,Publisher)

@@ -7,6 +7,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTestCase {
 
@@ -92,6 +93,10 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
   Completable testCompletableOnErrorCompletePredicate() {
     Completable.complete().onErrorComplete(t -> t instanceof IOException);
     return Completable.complete().onErrorComplete(throwable -> true);
+  }
+
+  Completable testCompletableTimeoutLongTimeUnit() {
+    return Completable.complete().timeout(1000, TimeUnit.MILLISECONDS);
   }
 
   Flowable<Void> testCompletableToFlowable() {

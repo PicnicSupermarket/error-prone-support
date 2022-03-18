@@ -19,7 +19,9 @@ import io.reactivex.SingleSource;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
+import java.time.Duration;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
@@ -355,7 +357,21 @@ final class RxJavaCompletableToReactorTemplates {
   // XXX: public final Completable subscribeOn(Scheduler)
   // XXX: public final CompletableObserver subscribeWith(CompletableObserver)
   // XXX: public final Completable takeUntil(CompletableSource)
-  // XXX: public final Completable timeout(long,TimeUnit)
+
+  static final class CompletableTimeoutLongTimeUnit {
+    @BeforeTemplate
+    Completable before(Completable completable, long timeout, TimeUnit unit) {
+      return completable.timeout(timeout, unit);
+    }
+
+    @AfterTemplate
+    Completable after(Completable completable, long timeout, TimeUnit unit) {
+      return RxJava2Adapter.monoToCompletable(
+          RxJava2Adapter.completableToMono(completable)
+              .timeout(Duration.of(timeout, unit.toChronoUnit())));
+    }
+  }
+
   // XXX: public final Completable timeout(long,TimeUnit,CompletableSource)
   // XXX: public final Completable timeout(long,TimeUnit,Scheduler)
   // XXX: public final Completable timeout(long,TimeUnit,Scheduler,CompletableSource)

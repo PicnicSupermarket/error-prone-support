@@ -8,7 +8,9 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
@@ -128,6 +130,12 @@ final class RxJavaCompletableReactorTemplatesTest implements RefasterTemplateTes
         RxJava2Adapter.completableToMono(Completable.complete())
             .onErrorResume(
                 RxJavaReactorMigrationUtil.toJdkPredicate(throwable -> true), t -> Mono.empty()));
+  }
+
+  Completable testCompletableTimeoutLongTimeUnit() {
+    return RxJava2Adapter.monoToCompletable(
+        RxJava2Adapter.completableToMono(Completable.complete())
+            .timeout(Duration.of(1000, TimeUnit.MILLISECONDS.toChronoUnit())));
   }
 
   Flowable<Void> testCompletableToFlowable() {

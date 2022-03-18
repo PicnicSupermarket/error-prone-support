@@ -11,8 +11,10 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.internal.functions.Functions;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -311,6 +313,12 @@ final class RxJavaFlowableToReactorTemplatesTest implements RefasterTemplateTest
             RxJavaReactorMigrationUtil.toJdkConsumer(i -> {}),
             RxJavaReactorMigrationUtil.toJdkConsumer(i -> {}),
             RxJavaReactorMigrationUtil.toRunnable(() -> {}));
+  }
+
+  Flowable<Integer> testFlowableTimeoutLongTimeUnit() {
+    return RxJava2Adapter.fluxToFlowable(
+        RxJava2Adapter.flowableToFlux(Flowable.just(1))
+            .timeout(Duration.of(1000, TimeUnit.MILLISECONDS.toChronoUnit())));
   }
 
   Single<List<Integer>> testFlowableToList() {
