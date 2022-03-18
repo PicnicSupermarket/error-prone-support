@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.suppliers.Suppliers.typeFromString;
@@ -79,11 +78,9 @@ public final class IdentityConversionCheck extends BugChecker
     ExpressionTree sourceTree = arguments.get(0);
     Type sourceType = ASTHelpers.getType(sourceTree);
     TargetType targetType = ASTHelpers.targetType(state);
-    checkState(
-        sourceType != null && targetType != null,
-        "sourceType `%s` or targetType `%s` is null.",
-        sourceType,
-        targetType);
+    if (sourceType == null || targetType == null) {
+      return Description.NO_MATCH;
+    }
 
     if (state.getTypes().isSameType(sourceType, ASTHelpers.getType(tree))
         || isSubtypeWithDefinedEquality(sourceType, targetType.type(), state)) {
