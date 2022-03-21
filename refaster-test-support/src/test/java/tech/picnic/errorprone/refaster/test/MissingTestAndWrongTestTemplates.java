@@ -3,6 +3,10 @@ package tech.picnic.errorprone.refaster.test;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 
+/**
+ * Refaster template collection to validate that a missing test and misplaced tests are both
+ * reported.
+ */
 final class MissingTestAndWrongTestTemplates {
   private MissingTestAndWrongTestTemplates() {}
 

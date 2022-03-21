@@ -44,7 +44,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-runner</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>

@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refaster.test;
 
+/** Code to test the Refaster templates from `MatchInWrongMethodTemplates`. */
 final class MatchInWrongMethodTemplatesTest implements RefasterTemplateTestCase {
   boolean testWrongName() {
     "foo".isEmpty();
@@ -7,8 +8,8 @@ final class MatchInWrongMethodTemplatesTest implements RefasterTemplateTestCase 
     return "baz".isEmpty();
   }
 }
-/* The following matches occurred in method `testWrongName` (position: [131,233]):
-- Template `StringIsEmpty` matched on position: [161..177)
-- Template `StringIsEmpty` matched on position: [183..199)
-- Template `StringIsEmpty` matched on position: [212..228)
+/* The following matches unexpectedly occurred in method `testWrongName`:
+- Template `StringIsEmpty` matches on line 6, while it should match in a method named `testStringIsEmpty`.
+- Template `StringIsEmpty` matches on line 7, while it should match in a method named `testStringIsEmpty`.
+- Template `StringIsEmpty` matches on line 8, while it should match in a method named `testStringIsEmpty`.
 */
