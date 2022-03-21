@@ -29,6 +29,7 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.LineMap;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.EndPosTable;
@@ -125,15 +126,16 @@ public final class RefasterCollectionTestUtil {
           VisitorState.createForCustomFindingCollection(new SubContext(state.context), matches::add)
               .withPath(state.getPath()));
 
+      JCCompilationUnit compilationUnit = (JCCompilationUnit) tree;
       ImmutableRangeMap<Integer, String> matchesRangeMap =
-          buildRangeMapForMatches(matches, ((JCCompilationUnit) tree).endPositions);
+          buildRangeMapForMatches(matches, compilationUnit.endPositions);
 
       ImmutableSet<String> templatesWithoutMatch = getTemplateNamesWithoutMatch(matches);
       if (!templatesWithoutMatch.isEmpty()) {
         appendCommentToCompilationUnit(
             String.format(
-                "Did not encounter test in %s for the following template(s)",
-                ASTHelpers.getFileName(tree)),
+                "Did not encounter a test in `%s` for the following template(s)",
+                getNameFromFQCN(compilationUnit.sourcefile.getName().replace(".java", ""))),
             templatesWithoutMatch.stream().collect(LIST_COLLECTOR),
             state);
       }
@@ -197,6 +199,7 @@ public final class RefasterCollectionTestUtil {
         String methodName = tree.getName().toString().replace("test", "");
         int startPosition = ASTHelpers.getStartPosition(tree);
         int endPosition = state.getEndPosition(tree);
+        LineMap lineMap = state.getPath().getCompilationUnit().getLineMap();
 
         ImmutableRangeMap<Integer, String> matchesInCurrentMethod =
             matchesRangeMap.subRangeMap(Range.open(startPosition, endPosition));
@@ -205,10 +208,15 @@ public final class RefasterCollectionTestUtil {
         if (!correctTemplatesMatchedInMethod) {
           appendCommentToCompilationUnit(
               String.format(
-                  "The following matches occurred in method `%s` (position: [%s,%s])",
-                  tree.getName(), startPosition, endPosition),
+                  "The following matches unexpectedly occurred in method `%s`", tree.getName()),
               matchesRangeMap.asMapOfRanges().entrySet().stream()
-                  .map(e -> "Template `" + e.getValue() + "` matched on position: " + e.getKey())
+                  .map(
+                      e ->
+                          String.format(
+                              "Template `%s` matches on line %s, while it should match in a method named `test%s`.",
+                              e.getValue(),
+                              lineMap.getLineNumber(e.getKey().lowerEndpoint()),
+                              e.getValue()))
                   .collect(LIST_COLLECTOR),
               state);
         }

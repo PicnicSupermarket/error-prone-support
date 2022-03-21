@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refaster.test;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 
+/** Refaster template collection to validate the reporting of missing test methods. */
 final class TemplateWithoutTestTemplates {
   private TemplateWithoutTestTemplates() {}
 
