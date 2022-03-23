@@ -11,6 +11,7 @@ final class RefasterCollectionTestUtilTest {
         MatchInWrongMethodTemplates.class,
         MethodNameWithNumberTemplates.class,
         MissingTestAndWrongTestTemplates.class,
+        PartialTemplateMatchTemplates.class,
         TemplateWithoutTestTemplates.class
       })
   void verifyRefasterTemplateCollections(Class<?> clazz) {

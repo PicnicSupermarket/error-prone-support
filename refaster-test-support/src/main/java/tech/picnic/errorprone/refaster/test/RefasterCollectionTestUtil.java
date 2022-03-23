@@ -31,6 +31,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.LineMap;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
@@ -39,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collector;
+import java.util.stream.Stream;
 import javax.tools.JavaFileObject;
 import tech.picnic.errorprone.refaster.runner.CodeTransformers;
 import tech.picnic.errorprone.refaster.runner.RefasterCheck;
@@ -63,23 +64,26 @@ public final class RefasterCollectionTestUtil {
    */
   public static void validateTemplateCollection(Class<?> clazz) {
     String className = clazz.getSimpleName();
-    JavaFileObject input = FileObjects.forResource(clazz, className + "TestInput.java");
-    JavaFileObject output = FileObjects.forResource(clazz, className + "TestOutput.java");
-    String inputFileContent;
-    String outputFileContent;
-    try {
-      inputFileContent = input.getCharContent(false).toString();
-      outputFileContent = output.getCharContent(false).toString();
-    } catch (IOException e) {
-      throw new IllegalStateException(
-          "Can't retrieve content from input or output file for class " + clazz.getName(), e);
-    }
+
     BugCheckerRefactoringTestHelper.newInstance(
             RefasterTestBugChecker.class, RefasterCollectionTestUtil.class)
         .setArgs(ImmutableList.of("-XepOpt:RefasterTestChecker:TemplateCollection=" + className))
-        .addInputLines(clazz.getName() + "TestInput.java", inputFileContent)
-        .addOutputLines(clazz.getName() + "TestOutput.java", outputFileContent)
+        .addInputLines(
+            clazz.getName() + "TestInput.java",
+            getContentOfResource(clazz, className + "TestInput.java"))
+        .addOutputLines(
+            clazz.getName() + "TestOutput.java",
+            getContentOfResource(clazz, className + "TestOutput.java"))
         .doTest(TEXT_MATCH);
+  }
+
+  private static String getContentOfResource(Class<?> clazz, String resource) {
+    JavaFileObject object = FileObjects.forResource(clazz, resource);
+    try {
+      return object.getCharContent(false).toString();
+    } catch (IOException e) {
+      throw new IllegalStateException("Can't retrieve content for file " + resource, e);
+    }
   }
 
   /**
@@ -93,8 +97,6 @@ public final class RefasterCollectionTestUtil {
   public static final class RefasterTestBugChecker extends BugChecker
       implements CompilationUnitTreeMatcher {
     private static final long serialVersionUID = 1L;
-    private static final Collector<CharSequence, ?, String> LIST_COLLECTOR =
-        joining("\n- ", "\n- ", "\n");
 
     private final ImmutableSet<String> templateNamesFromClassPath;
     private final RefasterCheck delegate;
@@ -130,13 +132,14 @@ public final class RefasterCollectionTestUtil {
       ImmutableRangeMap<Integer, String> matchesRangeMap =
           buildRangeMapForMatches(matches, compilationUnit.endPositions);
 
-      ImmutableSet<String> templatesWithoutMatch = getTemplateNamesWithoutMatch(matches);
+      ImmutableSet<String> templatesWithoutMatch = getTemplateNamesWithoutMatch(matchesRangeMap);
       if (!templatesWithoutMatch.isEmpty()) {
         appendCommentToCompilationUnit(
+            compilationUnit,
             String.format(
                 "Did not encounter a test in `%s` for the following template(s)",
                 getNameFromFQCN(compilationUnit.sourcefile.getName().replace(".java", ""))),
-            templatesWithoutMatch.stream().collect(LIST_COLLECTOR),
+            templatesWithoutMatch.stream(),
             state);
       }
 
@@ -148,21 +151,21 @@ public final class RefasterCollectionTestUtil {
       return Description.NO_MATCH;
     }
 
-    private ImmutableSet<String> getTemplateNamesWithoutMatch(List<Description> matches) {
-      ImmutableSet<String> templateNamesOfMatches =
-          matches.stream()
-              .map(description -> description.checkName)
-              .map(RefasterTestBugChecker::getNameFromFQCN)
-              .collect(toImmutableSet());
-
-      return Sets.difference(templateNamesFromClassPath, templateNamesOfMatches).immutableCopy();
+    private ImmutableSet<String> getTemplateNamesWithoutMatch(
+        ImmutableRangeMap<Integer, String> matchesRangeMap) {
+      return Sets.difference(
+              templateNamesFromClassPath,
+              ImmutableSet.copyOf(matchesRangeMap.asMapOfRanges().values()))
+          .immutableCopy();
     }
 
-    private void appendCommentToCompilationUnit(String message, String list, VisitorState state) {
-      String comment = String.format("\n/* %s:%s*/", message, list);
-      CompilationUnitTree compilationUnit = state.getPath().getCompilationUnit();
+    private void appendCommentToCompilationUnit(
+        Tree tree, String message, Stream<String> conflicts, VisitorState state) {
+      String comment =
+          String.format("\n/* %s:\n- %s\n*/", message, conflicts.collect(joining("\n- ")));
       state.reportMatch(
-          describeMatch(compilationUnit, SuggestedFix.postfixWith(compilationUnit, comment)));
+          describeMatch(
+              state.getPath().getCompilationUnit(), SuggestedFix.postfixWith(tree, comment)));
     }
 
     private static ImmutableRangeMap<Integer, String> buildRangeMapForMatches(
@@ -207,17 +210,18 @@ public final class RefasterCollectionTestUtil {
             matchesInCurrentMethod.asMapOfRanges().values().stream().allMatch(methodName::equals);
         if (!correctTemplatesMatchedInMethod) {
           appendCommentToCompilationUnit(
+              tree,
               String.format(
                   "The following matches unexpectedly occurred in method `%s`", tree.getName()),
               matchesRangeMap.asMapOfRanges().entrySet().stream()
+                  .filter(e -> !e.getValue().equals(methodName))
                   .map(
                       e ->
                           String.format(
                               "Template `%s` matches on line %s, while it should match in a method named `test%s`.",
                               e.getValue(),
                               lineMap.getLineNumber(e.getKey().lowerEndpoint()),
-                              e.getValue()))
-                  .collect(LIST_COLLECTOR),
+                              e.getValue())),
               state);
         }
         return super.visitMethod(tree, state);
