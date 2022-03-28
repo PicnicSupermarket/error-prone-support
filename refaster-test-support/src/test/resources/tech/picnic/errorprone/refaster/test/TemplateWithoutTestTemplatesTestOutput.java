@@ -6,7 +6,8 @@ final class TemplateWithoutTestTemplatesTest implements RefasterTemplateTestCase
     return "foo".isEmpty();
   }
 }
-/* Did not encounter a test in `TemplateWithoutTestTemplatesTestInput` for the following template(s):
-- AnotherTemplateWithoutTest
-- TemplateWithoutTest
-*/
+/*
+ *  Did not encounter a test in `TemplateWithoutTestTemplatesTestInput` for the following template(s):
+ *  - AnotherTemplateWithoutTest
+ *  - TemplateWithoutTest
+ */

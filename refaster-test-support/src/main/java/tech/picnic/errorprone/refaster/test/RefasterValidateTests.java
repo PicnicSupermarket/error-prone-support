@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.refaster.runner.RefasterCheck.INCLUDED_TEMPLATES_PATTERN_FLAG;
 
 import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableRangeMap;
@@ -27,6 +28,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.LineMap;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
@@ -34,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collector;
+import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.runner.CodeTransformers;
 import tech.picnic.errorprone.refaster.runner.RefasterCheck;
 
@@ -50,8 +52,6 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
   private static final long serialVersionUID = 1L;
   private static final Supplier<ImmutableListMultimap<String, CodeTransformer>>
       ALL_CODE_TRANSFORMERS = Suppliers.memoize(CodeTransformers::loadAllCodeTransformers);
-  private static final Collector<CharSequence, ?, String> LIST_COLLECTOR =
-      joining("\n- ", "\n- ", "\n");
 
   private final ImmutableSet<String> templateNamesFromClassPath;
   private final RefasterCheck delegate;
@@ -87,13 +87,15 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
     ImmutableRangeMap<Integer, String> matchesRangeMap =
         buildRangeMapForMatches(matches, compilationUnit.endPositions);
 
-    ImmutableSet<String> templatesWithoutMatch = getTemplateNamesWithoutMatch(matches);
+    ImmutableSet<String> templatesWithoutMatch =
+        getTemplateNamesWithoutMatch(matchesRangeMap.asMapOfRanges().values());
     if (!templatesWithoutMatch.isEmpty()) {
-      appendCommentToCompilationUnit(
+      addCommentToTreeInOutputFile(
+          tree,
           String.format(
               "Did not encounter a test in `%s` for the following template(s)",
               getNameFromFQCN(compilationUnit.sourcefile.getName().replace(".java", ""))),
-          templatesWithoutMatch.stream().collect(LIST_COLLECTOR),
+          templatesWithoutMatch.stream(),
           state);
     }
 
@@ -104,21 +106,21 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
     return Description.NO_MATCH;
   }
 
-  private ImmutableSet<String> getTemplateNamesWithoutMatch(List<Description> matches) {
-    ImmutableSet<String> templateNamesOfMatches =
-        matches.stream()
-            .map(description -> description.checkName)
-            .map(RefasterValidateTests::getNameFromFQCN)
-            .collect(toImmutableSet());
-
-    return Sets.difference(templateNamesFromClassPath, templateNamesOfMatches).immutableCopy();
+  private ImmutableSet<String> getTemplateNamesWithoutMatch(
+      ImmutableCollection<String> templateNamesOfMatches) {
+    return Sets.difference(templateNamesFromClassPath, ImmutableSet.copyOf(templateNamesOfMatches))
+        .immutableCopy();
   }
 
-  private void appendCommentToCompilationUnit(String message, String list, VisitorState state) {
-    String comment = String.format("\n/* %s:%s*/", message, list);
-    CompilationUnitTree compilationUnit = state.getPath().getCompilationUnit();
-    state.reportMatch(
-        describeMatch(compilationUnit, SuggestedFix.postfixWith(compilationUnit, comment)));
+  private void addCommentToTreeInOutputFile(
+      Tree tree, String message, Stream<String> violations, VisitorState state) {
+    String listOfViolations = violations.collect(joining("\n*  - ", "\n*  - ", "\n"));
+    String comment = String.format("/*\n*  %s:%s*/\n", message, listOfViolations);
+    SuggestedFix fixWithComment =
+        tree instanceof MethodTree
+            ? SuggestedFix.prefixWith(tree, comment)
+            : SuggestedFix.postfixWith(tree, "\n" + comment);
+    state.reportMatch(describeMatch(tree, fixWithComment));
   }
 
   private static ImmutableRangeMap<Integer, String> buildRangeMapForMatches(
@@ -162,18 +164,19 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
       boolean correctTemplatesMatchedInMethod =
           matchesInCurrentMethod.asMapOfRanges().values().stream().allMatch(methodName::equals);
       if (!correctTemplatesMatchedInMethod) {
-        appendCommentToCompilationUnit(
+        addCommentToTreeInOutputFile(
+            tree,
             String.format(
                 "The following matches unexpectedly occurred in method `%s`", tree.getName()),
             matchesRangeMap.asMapOfRanges().entrySet().stream()
+                .filter(e -> !e.getValue().equals(methodName))
                 .map(
                     e ->
                         String.format(
                             "Template `%s` matches on line %s, while it should match in a method named `test%s`.",
                             e.getValue(),
                             lineMap.getLineNumber(e.getKey().lowerEndpoint()),
-                            e.getValue()))
-                .collect(LIST_COLLECTOR),
+                            e.getValue())),
             state);
       }
       return super.visitMethod(tree, state);
