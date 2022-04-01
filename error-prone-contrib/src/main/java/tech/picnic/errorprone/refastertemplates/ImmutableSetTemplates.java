@@ -149,6 +149,11 @@ final class ImmutableSetTemplates {
       return Set.of();
     }
 
+    @BeforeTemplate
+    Set<T> before2() {
+      return Collections.emptySet();
+    }
+
     @AfterTemplate
     ImmutableSet<T> after() {
       return ImmutableSet.of();

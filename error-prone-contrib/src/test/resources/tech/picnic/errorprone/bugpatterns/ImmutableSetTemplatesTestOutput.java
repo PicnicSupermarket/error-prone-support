@@ -62,8 +62,8 @@ final class ImmutableSetTemplatesTest implements RefasterTemplateTestCase {
     return Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)).immutableCopy();
   }
 
-  Set<Object> testImmutableSetOf() {
-    return ImmutableSet.of();
+  ImmutableSet<Set<Object>> testImmutableSetOf() {
+    return ImmutableSet.of(ImmutableSet.of(), ImmutableSet.of());
   }
 
   Set<Integer> testImmutableSetOf1() {

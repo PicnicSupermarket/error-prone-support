@@ -265,6 +265,11 @@ final class ImmutableMapTemplates {
       return Map.of();
     }
 
+    @BeforeTemplate
+    Map<K, V> before2() {
+      return Collections.emptyMap();
+    }
+
     @AfterTemplate
     ImmutableMap<K, V> after() {
       return ImmutableMap.of();
