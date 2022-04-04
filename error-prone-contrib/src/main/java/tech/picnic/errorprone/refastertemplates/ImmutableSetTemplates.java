@@ -146,12 +146,12 @@ final class ImmutableSetTemplates {
   static final class ImmutableSetOf<T> {
     @BeforeTemplate
     Set<T> before() {
-      return Set.of();
+      return Collections.emptySet();
     }
 
     @BeforeTemplate
     Set<T> before2() {
-      return Collections.emptySet();
+      return Set.of();
     }
 
     @AfterTemplate

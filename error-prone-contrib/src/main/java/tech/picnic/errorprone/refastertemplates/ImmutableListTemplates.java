@@ -194,12 +194,12 @@ final class ImmutableListTemplates {
   static final class ImmutableListOf<T> {
     @BeforeTemplate
     List<T> before() {
-      return List.of();
+      return Collections.emptyList();
     }
 
     @BeforeTemplate
     List<T> before2() {
-      return Collections.emptyList();
+      return List.of();
     }
 
     @AfterTemplate
