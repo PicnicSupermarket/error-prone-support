@@ -33,8 +33,8 @@ To adopt this setup, the following requirements have to be met:
   file is added for every template collection.
 - For each Refaster template in the collection, the input and output file must contain a method. The name of the method
   is equal to the name of the Refaster template prefixed with `test` (e.g. `test<RefasterTemplateClassName>`).
-- The method contains at least one expression that matches the `@BeforeTemplate` one specific Refaster template. As a
-  result, the output file contains the same method with an updated expression, matching the content of
+- The method contains at least one expression that matches the `@BeforeTemplate` of one specific Refaster template. As 
+  a result, the output file contains the same method with an updated expression, matching the content of
   the `@AfterTemplate`. Additionally, incorrect matches of _other_ Refaster templates in the method are flagged.
 
 As a result from these tests, unexpected output will be shown in the console.
@@ -44,7 +44,7 @@ An example of a folder structure for such a setup is as follows:
 ```
 main/java/ 
       tech.picnic.errorprone.refastertemplates
-      └── ExampleTemplates.java  -- Contains multiple Refaster templates
+      └── ExampleTemplates.java  -- Contains multiple Refaster templates.
           └── Example1Template
           └── Example2Template
 
