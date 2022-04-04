@@ -26,19 +26,20 @@ To adopt this setup, the following requirements have to be met:
 
 - Create a class with a (parameterized) test method that calls
   the `RefasterCollectionTestUtil#validateTemplateCollection` and passes the collection(s) to validate. The Refaster
-  template collection must match the naming convention `<TemplateCollectionClassName>Templates.java`.
-- An input file matching the naming convention `<TemplateCollectionClassName>TemplatesTestInput.java` is added for every
+  template collection must match the naming convention `<TemplateCollectionName>Templates.java`.
+- An input file matching the naming convention `<TemplateCollectionName>TemplatesTestInput.java` is added for every
   template collection.
-- An output file matching the naming convention `<TemplateCollectionClassName>TemplatesTestOutput.java`
+- An output file matching the naming convention `<TemplateCollectionName>TemplatesTestOutput.java`
   file is added for every template collection.
-- For each Refaster template in the collection, the input and output file contain a method. The name of the method is
-  equal to the name of the Refaster template prefixed with `test` (e.g. `test<RefasterTemplateClassName>`).
-- The method contains at least one expression that matches the `@BeforeTemplate`. As a result, the output file contains
-  the same method with an updated expression, matching the content of the `@AfterTemplate`.
+- For each Refaster template in the collection, the input and output file must contain a method. The name of the method
+  is equal to the name of the Refaster template prefixed with `test` (e.g. `test<RefasterTemplateClassName>`).
+- The method contains at least one expression that matches the `@BeforeTemplate` one specific Refaster template. As a
+  result, the output file contains the same method with an updated expression, matching the content of
+  the `@AfterTemplate`. Additionally, incorrect matches of _other_ Refaster templates in the method are flagged.
 
 As a result from these tests, unexpected output will be shown in the console.
 
-An example of a folder structure for such a setup:
+An example of a folder structure for such a setup is as follows:
 
 ```
 main/java/ 
@@ -53,6 +54,8 @@ test/
         └── RefasterCollectionTest.java -- Here the test invokes `RefasterCollectionTestUtil#validateTemplateCollection`.
   resources/
     └── tech.picnic.errorprone.refastertemplates
-        └── ExampleTemplatesTestInput.java -- Contains a class named `ExampleTemplatesTest`
-        └── ExampleTemplatesTestOutput.java -- Contains a class named `ExampleTemplatesTest`
+        └── ExampleTemplatesTestInput.java -- Contains a class named `ExampleTemplatesTest` and 
+                                              two methods named `testExample1Template` and `testExample2Template`.
+        └── ExampleTemplatesTestOutput.java -- Contains a class named `ExampleTemplatesTest` and 
+                                               two methods named `testExample1Template` and `testExample2Template`.
 ```
