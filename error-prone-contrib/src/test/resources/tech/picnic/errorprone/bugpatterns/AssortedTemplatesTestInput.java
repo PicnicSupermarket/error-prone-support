@@ -78,8 +78,10 @@ final class AssortedTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableSet<Boolean> testDisjointCollections() {
     return ImmutableSet.of(
-        Collections.disjoint(new HashSet<>(ImmutableList.of(1)), ImmutableList.of(2)),
-        Collections.disjoint(ImmutableList.of(3), new HashSet<>(ImmutableList.of(4))));
+        Collections.disjoint(ImmutableSet.copyOf(ImmutableList.of(1)), ImmutableList.of(2)),
+        Collections.disjoint(new HashSet<>(ImmutableList.of(3)), ImmutableList.of(4)),
+        Collections.disjoint(ImmutableList.of(5), ImmutableSet.copyOf(ImmutableList.of(6))),
+        Collections.disjoint(ImmutableList.of(7), new HashSet<>(ImmutableList.of(8))));
   }
 
   boolean testIterableIsEmpty() {

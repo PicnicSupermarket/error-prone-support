@@ -2,7 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
-import static com.google.errorprone.suppliers.Suppliers.typeFromString;
+import static com.google.errorprone.suppliers.Suppliers.OBJECT_TYPE;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -97,11 +97,9 @@ public final class IdentityConversionCheck extends BugChecker
 
   private static boolean isSubtypeWithDefinedEquality(
       Type sourceType, Type targetType, VisitorState state) {
-    Type objectType = typeFromString("java.lang.Object").get(state);
     Types types = state.getTypes();
-    return types.isSubtype(sourceType, targetType)
-        && !types.isSameType(sourceType, objectType)
-        && !types.isSameType(targetType, objectType)
+    return !types.isSameType(targetType, OBJECT_TYPE.get(state))
+        && types.isSubtype(sourceType, targetType)
         && Arrays.stream(TypesWithUndefinedEquality.values())
             .noneMatch(b -> b.matchesType(sourceType, state) || b.matchesType(targetType, state));
   }
