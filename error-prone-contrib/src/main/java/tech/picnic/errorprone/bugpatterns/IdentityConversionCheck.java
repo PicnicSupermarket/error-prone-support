@@ -1,10 +1,12 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.suppliers.Suppliers.OBJECT_TYPE;
 
 import com.google.auto.service.AutoService;
+import com.google.common.primitives.Primitives;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
 import com.google.errorprone.BugPattern.SeverityLevel;
@@ -55,13 +57,11 @@ public final class IdentityConversionCheck extends BugChecker
               .named("copyOf"),
           staticMethod()
               .onClassAny(
-                  Byte.class.getName(),
-                  Character.class.getName(),
-                  Double.class.getName(),
-                  Float.class.getName(),
-                  Integer.class.getName(),
-                  String.class.getName())
+                  Primitives.allWrapperTypes().stream()
+                      .map(Class::getName)
+                      .collect(toImmutableSet()))
               .named("valueOf"),
+          staticMethod().onClass(String.class.getName()).named("valueOf"),
           staticMethod().onClass("reactor.adapter.rxjava.RxJava2Adapter"),
           staticMethod()
               .onClass("reactor.core.publisher.Flux")
@@ -77,29 +77,31 @@ public final class IdentityConversionCheck extends BugChecker
 
     ExpressionTree sourceTree = arguments.get(0);
     Type sourceType = ASTHelpers.getType(sourceTree);
+    Type resultType = ASTHelpers.getType(tree);
     TargetType targetType = ASTHelpers.targetType(state);
-    if (sourceType == null || targetType == null) {
+    if (sourceType == null || resultType == null || targetType == null) {
       return Description.NO_MATCH;
     }
 
-    if (state.getTypes().isSameType(sourceType, ASTHelpers.getType(tree))
-        || isSubtypeWithDefinedEquality(sourceType, targetType.type(), state)) {
-      return buildDescription(tree)
-          .setMessage(
-              "This method invocation appears redundant; remove it or suppress this warning and "
-                  + "add an comment explaining its purpose")
-          .addFix(SuggestedFix.replace(tree, state.getSourceForNode(sourceTree)))
-          .addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()))
-          .build();
+    if (!state.getTypes().isSameType(sourceType, resultType)
+        && !isConvertibleWithWellDefinedEquality(sourceType, targetType.type(), state)) {
+      return Description.NO_MATCH;
     }
-    return Description.NO_MATCH;
+
+    return buildDescription(tree)
+        .setMessage(
+            "This method invocation appears redundant; remove it or suppress this warning and "
+                + "add a comment explaining its purpose")
+        .addFix(SuggestedFix.replace(tree, Util.treeToString(sourceTree, state)))
+        .addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()))
+        .build();
   }
 
-  private static boolean isSubtypeWithDefinedEquality(
+  private static boolean isConvertibleWithWellDefinedEquality(
       Type sourceType, Type targetType, VisitorState state) {
     Types types = state.getTypes();
     return !types.isSameType(targetType, OBJECT_TYPE.get(state))
-        && types.isSubtype(sourceType, targetType)
+        && types.isConvertible(sourceType, targetType)
         && Arrays.stream(TypesWithUndefinedEquality.values())
             .noneMatch(b -> b.matchesType(sourceType, state) || b.matchesType(targetType, state));
   }
