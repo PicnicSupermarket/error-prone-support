@@ -16,19 +16,13 @@ final class AssertJByteTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<AbstractByteAssert<?>> testAbstractByteAssertIsEqualTo() {
     return ImmutableSet.of(
         assertThat((byte) 0).isCloseTo((byte) 1, offset((byte) 0)),
-        assertThat((byte) 0).isCloseTo(Byte.valueOf((byte) 1), offset((byte) 0)),
-        assertThat((byte) 0).isCloseTo((byte) 1, withPercentage(0)),
-        assertThat((byte) 0).isCloseTo(Byte.valueOf((byte) 1), withPercentage(0)),
-        assertThat((byte) 0).isEqualTo(Byte.valueOf((byte) 1)));
+        assertThat((byte) 0).isCloseTo((byte) 1, withPercentage(0)));
   }
 
   ImmutableSet<AbstractByteAssert<?>> testAbstractByteAssertIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat((byte) 0).isNotCloseTo((byte) 1, offset((byte) 0)),
-        assertThat((byte) 0).isNotCloseTo(Byte.valueOf((byte) 1), offset((byte) 0)),
-        assertThat((byte) 0).isNotCloseTo((byte) 1, withPercentage(0)),
-        assertThat((byte) 0).isNotCloseTo(Byte.valueOf((byte) 1), withPercentage(0)),
-        assertThat((byte) 0).isNotEqualTo(Byte.valueOf((byte) 1)));
+        assertThat((byte) 0).isNotCloseTo((byte) 1, withPercentage(0)));
   }
 
   AbstractByteAssert<?> testAbstractByteAssertIsZero() {

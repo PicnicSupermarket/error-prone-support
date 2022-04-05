@@ -36,11 +36,7 @@ final class AssertJDoubleTemplates {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert, double n) {
       return Refaster.anyOf(
-          doubleAssert.isCloseTo(n, offset(0.0)),
-          doubleAssert.isCloseTo(Double.valueOf(n), offset(0.0)),
-          doubleAssert.isCloseTo(n, withPercentage(0.0)),
-          doubleAssert.isCloseTo(Double.valueOf(n), withPercentage(0.0)),
-          doubleAssert.isEqualTo(Double.valueOf(n)));
+          doubleAssert.isCloseTo(n, offset(0.0)), doubleAssert.isCloseTo(n, withPercentage(0.0)));
     }
 
     @AfterTemplate
@@ -54,10 +50,7 @@ final class AssertJDoubleTemplates {
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert, double n) {
       return Refaster.anyOf(
           doubleAssert.isNotCloseTo(n, offset(0.0)),
-          doubleAssert.isNotCloseTo(Double.valueOf(n), offset(0.0)),
-          doubleAssert.isNotCloseTo(n, withPercentage(0.0)),
-          doubleAssert.isNotCloseTo(Double.valueOf(n), withPercentage(0.0)),
-          doubleAssert.isNotEqualTo(Double.valueOf(n)));
+          doubleAssert.isNotCloseTo(n, withPercentage(0.0)));
     }
 
     @AfterTemplate
