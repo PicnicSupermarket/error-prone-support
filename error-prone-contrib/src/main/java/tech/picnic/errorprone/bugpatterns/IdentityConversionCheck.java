@@ -1,6 +1,9 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.suppliers.Suppliers.OBJECT_TYPE;
@@ -8,9 +11,6 @@ import static com.google.errorprone.suppliers.Suppliers.OBJECT_TYPE;
 import com.google.auto.service.AutoService;
 import com.google.common.primitives.Primitives;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
@@ -29,13 +29,15 @@ import java.util.Arrays;
 import java.util.List;
 
 /** A {@link BugChecker} that flags redundant identity conversions. */
+// XXX: Consider detecting cases where a suggested fix may lead to calling a different overload,
+// as this may change semantics.
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "IdentityConversion",
     summary = "Avoid or clarify identity conversions",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.WARNING,
-    tags = StandardTags.SIMPLIFICATION)
+    linkType = NONE,
+    severity = WARNING,
+    tags = SIMPLIFICATION)
 public final class IdentityConversionCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
