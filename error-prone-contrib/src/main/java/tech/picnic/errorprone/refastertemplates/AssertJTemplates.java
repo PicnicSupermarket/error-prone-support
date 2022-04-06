@@ -442,6 +442,7 @@ final class AssertJTemplates {
       return Refaster.anyOf(
           assertThat(iterable.iterator().hasNext()).isTrue(),
           assertThat(Iterables.size(iterable)).isNotEqualTo(0),
+          assertThat(Iterables.size(iterable)).isNotEqualTo(0L),
           assertThat(Iterables.size(iterable)).isPositive());
     }
 
@@ -450,6 +451,7 @@ final class AssertJTemplates {
       return Refaster.anyOf(
           assertThat(iterable.isEmpty()).isFalse(),
           assertThat(iterable.size()).isNotEqualTo(0),
+          assertThat(iterable.size()).isNotEqualTo(0L),
           assertThat(iterable.size()).isPositive());
     }
 
@@ -665,6 +667,7 @@ final class AssertJTemplates {
       return Refaster.anyOf(
           assertThat(map.isEmpty()).isFalse(),
           assertThat(map.size()).isNotEqualTo(0),
+          assertThat(map.size()).isNotEqualTo(0L),
           assertThat(map.size()).isPositive(),
           assertThat(Refaster.anyOf(map.keySet(), map.values())).isNotEmpty());
     }
