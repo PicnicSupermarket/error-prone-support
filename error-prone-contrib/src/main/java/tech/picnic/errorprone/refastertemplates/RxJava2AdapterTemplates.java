@@ -41,11 +41,9 @@ final class RxJava2AdapterTemplates {
     @BeforeTemplate
     Publisher<T> before(Flowable<T> flowable) {
       return Refaster.anyOf(
-          Flux.from(flowable),
           flowable.compose(Flux::from),
           flowable.to(Flux::from),
           flowable.as(Flux::from),
-          RxJava2Adapter.flowableToFlux(flowable),
           flowable.compose(RxJava2Adapter::flowableToFlux),
           flowable.to(RxJava2Adapter::flowableToFlux));
     }
@@ -67,7 +65,6 @@ final class RxJava2AdapterTemplates {
           Flowable.fromPublisher(flux),
           flux.transform(Flowable::fromPublisher),
           flux.as(Flowable::fromPublisher),
-          RxJava2Adapter.fluxToFlowable(flux),
           flux.transform(RxJava2Adapter::fluxToFlowable));
     }
 
@@ -140,7 +137,6 @@ final class RxJava2AdapterTemplates {
           Flowable.fromPublisher(mono),
           mono.transform(Flowable::fromPublisher),
           mono.as(Flowable::fromPublisher),
-          RxJava2Adapter.monoToFlowable(mono),
           mono.transform(RxJava2Adapter::monoToFlowable));
     }
 

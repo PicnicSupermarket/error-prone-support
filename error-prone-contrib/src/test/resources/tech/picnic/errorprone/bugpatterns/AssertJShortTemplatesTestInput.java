@@ -16,19 +16,13 @@ final class AssertJShortTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<AbstractShortAssert<?>> testAbstractShortAssertIsEqualTo() {
     return ImmutableSet.of(
         assertThat((short) 0).isCloseTo((short) 1, offset((short) 0)),
-        assertThat((short) 0).isCloseTo(Short.valueOf((short) 1), offset((short) 0)),
-        assertThat((short) 0).isCloseTo((short) 1, withPercentage(0)),
-        assertThat((short) 0).isCloseTo(Short.valueOf((short) 1), withPercentage(0)),
-        assertThat((short) 0).isEqualTo(Short.valueOf((short) 1)));
+        assertThat((short) 0).isCloseTo((short) 1, withPercentage(0)));
   }
 
   ImmutableSet<AbstractShortAssert<?>> testAbstractShortAssertIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat((short) 0).isNotCloseTo((short) 1, offset((short) 0)),
-        assertThat((short) 0).isNotCloseTo(Short.valueOf((short) 1), offset((short) 0)),
-        assertThat((short) 0).isNotCloseTo((short) 1, withPercentage(0)),
-        assertThat((short) 0).isNotCloseTo(Short.valueOf((short) 1), withPercentage(0)),
-        assertThat((short) 0).isNotEqualTo(Short.valueOf((short) 1)));
+        assertThat((short) 0).isNotCloseTo((short) 1, withPercentage(0)));
   }
 
   AbstractShortAssert<?> testAbstractShortAssertIsZero() {

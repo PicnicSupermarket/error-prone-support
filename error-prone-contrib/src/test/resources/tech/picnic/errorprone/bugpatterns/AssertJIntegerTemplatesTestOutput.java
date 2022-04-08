@@ -14,21 +14,11 @@ final class AssertJIntegerTemplatesTest implements RefasterTemplateTestCase {
   }
 
   ImmutableSet<AbstractIntegerAssert<?>> testAbstractIntegerAssertIsEqualTo() {
-    return ImmutableSet.of(
-        assertThat(0).isEqualTo(1),
-        assertThat(0).isEqualTo(1),
-        assertThat(0).isEqualTo(1),
-        assertThat(0).isEqualTo(1),
-        assertThat(0).isEqualTo(1));
+    return ImmutableSet.of(assertThat(0).isEqualTo(1), assertThat(0).isEqualTo(1));
   }
 
   ImmutableSet<AbstractIntegerAssert<?>> testAbstractIntegerAssertIsNotEqualTo() {
-    return ImmutableSet.of(
-        assertThat(0).isNotEqualTo(1),
-        assertThat(0).isNotEqualTo(1),
-        assertThat(0).isNotEqualTo(1),
-        assertThat(0).isNotEqualTo(1),
-        assertThat(0).isNotEqualTo(1));
+    return ImmutableSet.of(assertThat(0).isNotEqualTo(1), assertThat(0).isNotEqualTo(1));
   }
 
   AbstractIntegerAssert<?> testAbstractIntegerAssertIsZero() {

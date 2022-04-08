@@ -15,11 +15,7 @@ final class AssertJShortTemplates {
     @BeforeTemplate
     AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert, short n) {
       return Refaster.anyOf(
-          shortAssert.isCloseTo(n, offset((short) 0)),
-          shortAssert.isCloseTo(Short.valueOf(n), offset((short) 0)),
-          shortAssert.isCloseTo(n, withPercentage(0)),
-          shortAssert.isCloseTo(Short.valueOf(n), withPercentage(0)),
-          shortAssert.isEqualTo(Short.valueOf(n)));
+          shortAssert.isCloseTo(n, offset((short) 0)), shortAssert.isCloseTo(n, withPercentage(0)));
     }
 
     @AfterTemplate
@@ -33,10 +29,7 @@ final class AssertJShortTemplates {
     AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert, short n) {
       return Refaster.anyOf(
           shortAssert.isNotCloseTo(n, offset((short) 0)),
-          shortAssert.isNotCloseTo(Short.valueOf(n), offset((short) 0)),
-          shortAssert.isNotCloseTo(n, withPercentage(0)),
-          shortAssert.isNotCloseTo(Short.valueOf(n), withPercentage(0)),
-          shortAssert.isNotEqualTo(Short.valueOf(n)));
+          shortAssert.isNotCloseTo(n, withPercentage(0)));
     }
 
     @AfterTemplate

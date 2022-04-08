@@ -29,9 +29,7 @@ final class RxJava2AdapterTemplatesTest implements RefasterTemplateTestCase {
             Flowable.just(2).as(RxJava2Adapter::flowableToFlux),
             Flowable.just(3).as(RxJava2Adapter::flowableToFlux),
             Flowable.just(4).as(RxJava2Adapter::flowableToFlux),
-            Flowable.just(5).as(RxJava2Adapter::flowableToFlux),
-            Flowable.just(6).as(RxJava2Adapter::flowableToFlux),
-            Flowable.just(7).as(RxJava2Adapter::flowableToFlux)));
+            Flowable.just(5).as(RxJava2Adapter::flowableToFlux)));
   }
 
   ImmutableSet<Publisher<String>> testFluxToFlowable() {
@@ -39,8 +37,7 @@ final class RxJava2AdapterTemplatesTest implements RefasterTemplateTestCase {
         Flux.just("foo").as(RxJava2Adapter::fluxToFlowable),
         Flux.just("bar").as(RxJava2Adapter::fluxToFlowable),
         Flux.just("baz").as(RxJava2Adapter::fluxToFlowable),
-        Flux.just("qux").as(RxJava2Adapter::fluxToFlowable),
-        Flux.just("quux").as(RxJava2Adapter::fluxToFlowable));
+        Flux.just("qux").as(RxJava2Adapter::fluxToFlowable));
   }
 
   ImmutableSet<Observable<Integer>> testFluxToObservable() {
@@ -68,8 +65,7 @@ final class RxJava2AdapterTemplatesTest implements RefasterTemplateTestCase {
         Mono.just(1).as(RxJava2Adapter::monoToFlowable),
         Mono.just(2).as(RxJava2Adapter::monoToFlowable),
         Mono.just(3).as(RxJava2Adapter::monoToFlowable),
-        Mono.just(4).as(RxJava2Adapter::monoToFlowable),
-        Mono.just(5).as(RxJava2Adapter::monoToFlowable));
+        Mono.just(4).as(RxJava2Adapter::monoToFlowable));
   }
 
   Maybe<String> testMonoToMaybe() {

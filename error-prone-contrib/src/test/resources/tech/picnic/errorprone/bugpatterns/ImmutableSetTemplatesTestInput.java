@@ -59,10 +59,6 @@ final class ImmutableSetTemplatesTest implements RefasterTemplateTestCase {
         Stream.of(4).collect(collectingAndThen(toSet(), ImmutableSet::copyOf)));
   }
 
-  ImmutableSet<Integer> testImmutableSetCopyOfImmutableSet() {
-    return ImmutableSet.copyOf(ImmutableSet.of(1, 2));
-  }
-
   ImmutableSet<Integer> testImmutableSetCopyOfSetView() {
     return ImmutableSet.copyOf(Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)));
   }

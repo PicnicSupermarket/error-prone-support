@@ -15,20 +15,13 @@ final class AssertJLongTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableSet<AbstractLongAssert<?>> testAbstractLongAssertIsEqualTo() {
     return ImmutableSet.of(
-        assertThat(0L).isCloseTo(1, offset(0L)),
-        assertThat(0L).isCloseTo(Long.valueOf(1), offset(0L)),
-        assertThat(0L).isCloseTo(1, withPercentage(0)),
-        assertThat(0L).isCloseTo(Long.valueOf(1), withPercentage(0)),
-        assertThat(0L).isEqualTo(Long.valueOf(1)));
+        assertThat(0L).isCloseTo(1, offset(0L)), assertThat(0L).isCloseTo(1, withPercentage(0)));
   }
 
   ImmutableSet<AbstractLongAssert<?>> testAbstractLongAssertIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat(0L).isNotCloseTo(1, offset(0L)),
-        assertThat(0L).isNotCloseTo(Long.valueOf(1), offset(0L)),
-        assertThat(0L).isNotCloseTo(1, withPercentage(0)),
-        assertThat(0L).isNotCloseTo(Long.valueOf(1), withPercentage(0)),
-        assertThat(0L).isNotEqualTo(Long.valueOf(1)));
+        assertThat(0L).isNotCloseTo(1, withPercentage(0)));
   }
 
   AbstractLongAssert<?> testAbstractLongAssertIsZero() {

@@ -21,20 +21,13 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableSet<AbstractDoubleAssert<?>> testAbstractDoubleAssertIsEqualTo() {
     return ImmutableSet.of(
-        assertThat(0.0).isCloseTo(1, offset(0.0)),
-        assertThat(0.0).isCloseTo(Double.valueOf(1), offset(0.0)),
-        assertThat(0.0).isCloseTo(1, withPercentage(0)),
-        assertThat(0.0).isCloseTo(Double.valueOf(1), withPercentage(0)),
-        assertThat(0.0).isEqualTo(Double.valueOf(1)));
+        assertThat(0.0).isCloseTo(1, offset(0.0)), assertThat(0.0).isCloseTo(1, withPercentage(0)));
   }
 
   ImmutableSet<AbstractDoubleAssert<?>> testAbstractDoubleAssertIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat(0.0).isNotCloseTo(1, offset(0.0)),
-        assertThat(0.0).isNotCloseTo(Double.valueOf(1), offset(0.0)),
-        assertThat(0.0).isNotCloseTo(1, withPercentage(0)),
-        assertThat(0.0).isNotCloseTo(Double.valueOf(1), withPercentage(0)),
-        assertThat(0.0).isNotEqualTo(Double.valueOf(1)));
+        assertThat(0.0).isNotCloseTo(1, withPercentage(0)));
   }
 
   AbstractDoubleAssert<?> testAbstractDoubleAssertIsZero() {

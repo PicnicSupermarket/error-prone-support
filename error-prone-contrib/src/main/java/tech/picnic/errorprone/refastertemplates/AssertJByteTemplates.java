@@ -15,11 +15,7 @@ final class AssertJByteTemplates {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> byteAssert, byte n) {
       return Refaster.anyOf(
-          byteAssert.isCloseTo(n, offset((byte) 0)),
-          byteAssert.isCloseTo(Byte.valueOf(n), offset((byte) 0)),
-          byteAssert.isCloseTo(n, withPercentage(0)),
-          byteAssert.isCloseTo(Byte.valueOf(n), withPercentage(0)),
-          byteAssert.isEqualTo(Byte.valueOf(n)));
+          byteAssert.isCloseTo(n, offset((byte) 0)), byteAssert.isCloseTo(n, withPercentage(0)));
     }
 
     @AfterTemplate
@@ -33,10 +29,7 @@ final class AssertJByteTemplates {
     AbstractByteAssert<?> before(AbstractByteAssert<?> byteAssert, byte n) {
       return Refaster.anyOf(
           byteAssert.isNotCloseTo(n, offset((byte) 0)),
-          byteAssert.isNotCloseTo(Byte.valueOf(n), offset((byte) 0)),
-          byteAssert.isNotCloseTo(n, withPercentage(0)),
-          byteAssert.isNotCloseTo(Byte.valueOf(n), withPercentage(0)),
-          byteAssert.isNotEqualTo(Byte.valueOf(n)));
+          byteAssert.isNotCloseTo(n, withPercentage(0)));
     }
 
     @AfterTemplate

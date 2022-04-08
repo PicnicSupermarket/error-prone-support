@@ -15,11 +15,7 @@ final class AssertJLongTemplates {
     @BeforeTemplate
     AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert, long n) {
       return Refaster.anyOf(
-          longAssert.isCloseTo(n, offset(0L)),
-          longAssert.isCloseTo(Long.valueOf(n), offset(0L)),
-          longAssert.isCloseTo(n, withPercentage(0)),
-          longAssert.isCloseTo(Long.valueOf(n), withPercentage(0)),
-          longAssert.isEqualTo(Long.valueOf(n)));
+          longAssert.isCloseTo(n, offset(0L)), longAssert.isCloseTo(n, withPercentage(0)));
     }
 
     @AfterTemplate
@@ -32,11 +28,7 @@ final class AssertJLongTemplates {
     @BeforeTemplate
     AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert, long n) {
       return Refaster.anyOf(
-          longAssert.isNotCloseTo(n, offset(0L)),
-          longAssert.isNotCloseTo(Long.valueOf(n), offset(0L)),
-          longAssert.isNotCloseTo(n, withPercentage(0)),
-          longAssert.isNotCloseTo(Long.valueOf(n), withPercentage(0)),
-          longAssert.isNotEqualTo(Long.valueOf(n)));
+          longAssert.isNotCloseTo(n, offset(0L)), longAssert.isNotCloseTo(n, withPercentage(0)));
     }
 
     @AfterTemplate

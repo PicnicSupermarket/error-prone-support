@@ -15,11 +15,7 @@ final class AssertJIntegerTemplates {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int n) {
       return Refaster.anyOf(
-          intAssert.isCloseTo(n, offset(0)),
-          intAssert.isCloseTo(Integer.valueOf(n), offset(0)),
-          intAssert.isCloseTo(n, withPercentage(0)),
-          intAssert.isCloseTo(Integer.valueOf(n), withPercentage(0)),
-          intAssert.isEqualTo(Integer.valueOf(n)));
+          intAssert.isCloseTo(n, offset(0)), intAssert.isCloseTo(n, withPercentage(0)));
     }
 
     @AfterTemplate
@@ -32,11 +28,7 @@ final class AssertJIntegerTemplates {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int n) {
       return Refaster.anyOf(
-          intAssert.isNotCloseTo(n, offset(0)),
-          intAssert.isNotCloseTo(Integer.valueOf(n), offset(0)),
-          intAssert.isNotCloseTo(n, withPercentage(0)),
-          intAssert.isNotCloseTo(Integer.valueOf(n), withPercentage(0)),
-          intAssert.isNotEqualTo(Integer.valueOf(n)));
+          intAssert.isNotCloseTo(n, offset(0)), intAssert.isNotCloseTo(n, withPercentage(0)));
     }
 
     @AfterTemplate

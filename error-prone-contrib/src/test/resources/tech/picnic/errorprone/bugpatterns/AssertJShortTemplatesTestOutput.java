@@ -15,18 +15,11 @@ final class AssertJShortTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableSet<AbstractShortAssert<?>> testAbstractShortAssertIsEqualTo() {
     return ImmutableSet.of(
-        assertThat((short) 0).isEqualTo((short) 1),
-        assertThat((short) 0).isEqualTo((short) 1),
-        assertThat((short) 0).isEqualTo((short) 1),
-        assertThat((short) 0).isEqualTo((short) 1),
-        assertThat((short) 0).isEqualTo((short) 1));
+        assertThat((short) 0).isEqualTo((short) 1), assertThat((short) 0).isEqualTo((short) 1));
   }
 
   ImmutableSet<AbstractShortAssert<?>> testAbstractShortAssertIsNotEqualTo() {
     return ImmutableSet.of(
-        assertThat((short) 0).isNotEqualTo((short) 1),
-        assertThat((short) 0).isNotEqualTo((short) 1),
-        assertThat((short) 0).isNotEqualTo((short) 1),
         assertThat((short) 0).isNotEqualTo((short) 1),
         assertThat((short) 0).isNotEqualTo((short) 1));
   }

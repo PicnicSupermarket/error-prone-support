@@ -21,20 +21,13 @@ final class AssertJFloatTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableSet<AbstractFloatAssert<?>> testAbstractFloatAssertIsEqualTo() {
     return ImmutableSet.of(
-        assertThat(0F).isCloseTo(1, offset(0F)),
-        assertThat(0F).isCloseTo(Float.valueOf(1), offset(0F)),
-        assertThat(0F).isCloseTo(1, withPercentage(0)),
-        assertThat(0F).isCloseTo(Float.valueOf(1), withPercentage(0)),
-        assertThat(0F).isEqualTo(Float.valueOf(1)));
+        assertThat(0F).isCloseTo(1, offset(0F)), assertThat(0F).isCloseTo(1, withPercentage(0)));
   }
 
   ImmutableSet<AbstractFloatAssert<?>> testAbstractFloatAssertIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat(0F).isNotCloseTo(1, offset(0F)),
-        assertThat(0F).isNotCloseTo(Float.valueOf(1), offset(0F)),
-        assertThat(0F).isNotCloseTo(1, withPercentage(0)),
-        assertThat(0F).isNotCloseTo(Float.valueOf(1), withPercentage(0)),
-        assertThat(0F).isNotEqualTo(Float.valueOf(1)));
+        assertThat(0F).isNotCloseTo(1, withPercentage(0)));
   }
 
   AbstractFloatAssert<?> testAbstractFloatAssertIsZero() {
