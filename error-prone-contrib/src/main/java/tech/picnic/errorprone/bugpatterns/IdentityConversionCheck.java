@@ -29,8 +29,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /** A {@link BugChecker} that flags redundant identity conversions. */
-// XXX: Consider detecting cases where a suggested fix may lead to calling a different overload,
-// as this may change semantics.
+// XXX: Consider detecting cases where a flagged expression is passed to a method, and where removal
+// of the identify conversion would cause a different method overload to be selected. Depending on
+// the target method such a modification may change the code's semantics or performance.
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "IdentityConversion",
