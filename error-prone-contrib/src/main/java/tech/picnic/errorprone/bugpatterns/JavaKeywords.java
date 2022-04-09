@@ -1,22 +1,19 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
-@SuppressWarnings("DeclarationOrder" /* The private constructor should come first. */)
 final class JavaKeywords {
-  private JavaKeywords() {}
-
   /**
-   * List of all Java Language Keywords.
+   * List of all reserved keywords in the Java language.
    *
-   * <p>See: the <a
-   * href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html">Oracle
-   * Documentation</a> on Java Keywords.
-   *
-   * <p>In addition, `sealed` is added for Java 17. See: <a href="openjdk.net/jeps/409">JEP-409</a>.
+   * @see <a href="https://docs.oracle.com/javase/specs/jls/se17/html/jls-3.html#jls-3.9">JDK 17 JLS
+   *     section 3.9: Keywords</a>
    */
-  private static final ImmutableSet<String> JAVA_KEYWORDS =
+  private static final ImmutableSet<String> RESERVED_KEYWORDS =
       ImmutableSet.of(
+          "_",
+          "abstract",
           "assert",
           "boolean",
           "break",
@@ -52,7 +49,6 @@ final class JavaKeywords {
           "protected",
           "public",
           "return",
-          "sealed",
           "short",
           "static",
           "strictfp",
@@ -69,12 +65,48 @@ final class JavaKeywords {
           "while");
 
   /**
-   * Check whether the String is a Java Language Keyword.
+   * List of all contextual keywords in the Java language.
    *
-   * @param possibleKeyword a possible Java keyword
-   * @return whether the String is a Java keyword
+   * @see <a href="https://docs.oracle.com/javase/specs/jls/se17/html/jls-3.html#jls-3.9">JDK 17 JLS
+   *     section 3.9: Keywords</a>
    */
-  public static boolean isJavaKeyword(String possibleKeyword) {
-    return JAVA_KEYWORDS.contains(possibleKeyword);
+  private static final ImmutableSet<String> CONTEXTUAL_KEYWORDS =
+      ImmutableSet.of(
+          "exports",
+          "module",
+          "non-sealed",
+          "open",
+          "opens",
+          "permits",
+          "provides",
+          "record",
+          "requires",
+          "sealed",
+          "to",
+          "transitive",
+          "uses",
+          "var",
+          "with",
+          "yield");
+
+  /** List of all keywords in the Java language. */
+  private static final ImmutableSet<String> ALL_KEYWORDS =
+      Sets.union(RESERVED_KEYWORDS, CONTEXTUAL_KEYWORDS).immutableCopy();
+
+  private JavaKeywords() {}
+
+  /** Tells whether the given string is a reserved keyword in the Java language. */
+  public static boolean isReservedKeyword(String str) {
+    return RESERVED_KEYWORDS.contains(str);
+  }
+
+  /** Tells whether the given string is a contextual keyword in the Java language. */
+  public static boolean isContextualKeyword(String str) {
+    return CONTEXTUAL_KEYWORDS.contains(str);
+  }
+
+  /** Tells whether the given string is a reserved or contextual keyword in the Java language. */
+  public static boolean isKeyword(String str) {
+    return ALL_KEYWORDS.contains(str);
   }
 }

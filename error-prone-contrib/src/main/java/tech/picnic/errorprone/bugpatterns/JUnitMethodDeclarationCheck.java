@@ -8,7 +8,7 @@ import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static java.util.function.Predicate.not;
-import static tech.picnic.errorprone.bugpatterns.JavaKeywords.isJavaKeyword;
+import static tech.picnic.errorprone.bugpatterns.JavaKeywords.isReservedKeyword;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
@@ -109,7 +109,7 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
       return false;
     }
 
-    if (isJavaKeyword(methodName)) {
+    if (isReservedKeyword(methodName)) {
       reportIncorrectMethodName(
           methodName,
           tree,
