@@ -78,12 +78,12 @@ public final class PrimitiveComparisonCheck extends BugChecker
     }
 
     return getPotentiallyBoxedReturnType(tree.getArguments().get(0))
-        .flatMap(cmpType -> tryMakeMethodCallMorePrecise(tree, cmpType, isStatic, state))
+        .flatMap(cmpType -> attemptMethodInvocationReplacement(tree, cmpType, isStatic, state))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 
-  private static Optional<Fix> tryMakeMethodCallMorePrecise(
+  private static Optional<Fix> attemptMethodInvocationReplacement(
       MethodInvocationTree tree, Type cmpType, boolean isStatic, VisitorState state) {
     return Optional.ofNullable(ASTHelpers.getSymbol(tree))
         .map(methodSymbol -> methodSymbol.getSimpleName().toString())
@@ -93,26 +93,35 @@ public final class PrimitiveComparisonCheck extends BugChecker
                     .filter(not(actualMethodName::equals)))
         .map(
             preferredMethodName ->
-                mayPrefixWithTypeArguments(preferredMethodName, tree, cmpType, state))
+                prefixTypeArgumentsIfRelevant(preferredMethodName, tree, cmpType, state))
         .map(preferredMethodName -> suggestFix(tree, preferredMethodName, state));
   }
 
-  private static String mayPrefixWithTypeArguments(
+  /**
+   * Prefixes the given method name with generic type parameters if it replaces a {@code
+   * Comparator#comparing{,Double,Long,Int}} method which also has generic type parameters.
+   *
+   * <p>Such type parameters are retained as they are likely required.
+   *
+   * <p>Note that any type parameter to {@code Comparator#thenComparing} is likely redundant, and in
+   * any case becomes obsolete once that method is replaced with {@code
+   * Comparator#thenComparing{Double,Long,Int}}. Conversion in the opposite direction does not
+   * require the introduction of a generic type parameter.
+   */
+  private static String prefixTypeArgumentsIfRelevant(
       String preferredMethodName, MethodInvocationTree tree, Type cmpType, VisitorState state) {
-    int typeArgumentsCount = tree.getTypeArguments().size();
-    boolean methodNameIsComparing = "comparing".equals(preferredMethodName);
-
-    if (typeArgumentsCount == 0 || (typeArgumentsCount == 1 && !methodNameIsComparing)) {
+    if (tree.getTypeArguments().isEmpty() || preferredMethodName.startsWith("then")) {
       return preferredMethodName;
     }
 
-    String typeArgument =
+    String typeArguments =
         Stream.concat(
                 Stream.of(Util.treeToString(tree.getTypeArguments().get(0), state)),
-                Stream.of(cmpType.tsym.getSimpleName()).filter(u -> methodNameIsComparing))
-            .collect(joining(","));
+                Stream.of(cmpType.tsym.getSimpleName())
+                    .filter(u -> "comparing".equals(preferredMethodName)))
+            .collect(joining(", ", "<", ">"));
 
-    return String.format("<%s>%s", typeArgument, preferredMethodName);
+    return typeArguments + preferredMethodName;
   }
 
   private static String getPreferredMethod(Type cmpType, boolean isStatic, VisitorState state) {
