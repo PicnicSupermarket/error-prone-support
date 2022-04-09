@@ -99,10 +99,10 @@ public final class PrimitiveComparisonCheck extends BugChecker
 
   private static String mayPrefixWithTypeArguments(
       String preferredMethodName, MethodInvocationTree tree, Type cmpType, VisitorState state) {
-    int typeArguments = tree.getTypeArguments().size();
-    boolean methodNameIsComparing = preferredMethodName.equals("comparing");
+    int typeArgumentsCount = tree.getTypeArguments().size();
+    boolean methodNameIsComparing = "comparing".equals(preferredMethodName);
 
-    if (typeArguments == 0 || (typeArguments == 1 && !methodNameIsComparing)) {
+    if (typeArgumentsCount == 0 || (typeArgumentsCount == 1 && !methodNameIsComparing)) {
       return preferredMethodName;
     }
 
