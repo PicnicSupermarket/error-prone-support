@@ -7,6 +7,7 @@ import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -29,7 +30,7 @@ final class StreamTemplates {
 
   /**
    * Prefer {@link Collectors#joining()} over {@link Collectors#joining(CharSequence)} with an empty
-   * String as delimiter.
+   * delimiter string.
    */
   static final class Joining {
     @BeforeTemplate
@@ -236,7 +237,7 @@ final class StreamTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     Optional<T> after(Stream<T> stream) {
       return stream.min(naturalOrder());
     }
@@ -262,7 +263,7 @@ final class StreamTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     Optional<T> after(Stream<T> stream) {
       return stream.max(naturalOrder());
     }
