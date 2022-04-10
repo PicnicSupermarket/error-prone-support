@@ -14,27 +14,15 @@ final class AssertJBigDecimalTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(offset(0), withPercentage(0));
   }
 
-  ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsEqualTo() {
+  ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsEqualByComparingTo() {
     return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO).isEqualTo(BigDecimal.ONE),
-        assertThat(BigDecimal.ZERO).isEqualTo(BigDecimal.ONE));
+        assertThat(BigDecimal.ZERO).isEqualByComparingTo(BigDecimal.ONE),
+        assertThat(BigDecimal.ZERO).isEqualByComparingTo(BigDecimal.ONE));
   }
 
-  ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsNotEqualTo() {
+  ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsNotEqualByComparingTo() {
     return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO).isNotEqualTo(BigDecimal.ONE),
-        assertThat(BigDecimal.ZERO).isNotEqualTo(BigDecimal.ONE));
-  }
-
-  AbstractBigDecimalAssert<?> testAbstractBigDecimalAssertIsZero() {
-    return assertThat(BigDecimal.ZERO).isZero();
-  }
-
-  AbstractBigDecimalAssert<?> testAbstractBigDecimalAssertIsNotZero() {
-    return assertThat(BigDecimal.ZERO).isNotZero();
-  }
-
-  AbstractBigDecimalAssert<?> testAbstractBigDecimalAssertIsOne() {
-    return assertThat(BigDecimal.ZERO).isOne();
+        assertThat(BigDecimal.ZERO).isNotEqualByComparingTo(BigDecimal.ONE),
+        assertThat(BigDecimal.ZERO).isNotEqualByComparingTo(BigDecimal.ONE));
   }
 }
