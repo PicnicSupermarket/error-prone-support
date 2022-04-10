@@ -615,7 +615,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatIsEmpty<K, V> {
+  static final class AssertThatMapIsEmpty<K, V> {
     @BeforeTemplate
     void before(Map<K, V> map) {
       Refaster.anyOf(
@@ -656,7 +656,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatIsNotEmpty<K, V> {
+  static final class AssertThatMapIsNotEmpty<K, V> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Map<K, V> map) {
       return Refaster.anyOf(
