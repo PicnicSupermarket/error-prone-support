@@ -17,6 +17,7 @@ import java.time.ZoneOffset;
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
 import java.time.chrono.ChronoZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 
 /** Refaster templates related to expressions dealing with time. */
@@ -310,8 +311,86 @@ final class TimeTemplates {
     }
   }
 
+  /** Prefer {@link Duration#ofDays(long)} over alternative representations. */
+  static final class DurationOfDays {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.DAYS);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofDays(amount);
+    }
+  }
+
+  /** Prefer {@link Duration#ofHours(long)} over alternative representations. */
+  static final class DurationOfHours {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.HOURS);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofHours(amount);
+    }
+  }
+
+  /** Prefer {@link Duration#ofMillis(long)} over alternative representations. */
+  static final class DurationOfMillis {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.MILLIS);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofMillis(amount);
+    }
+  }
+
+  /** Prefer {@link Duration#ofMinutes(long)} over alternative representations. */
+  static final class DurationOfMinutes {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.MINUTES);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofMinutes(amount);
+    }
+  }
+
+  /** Prefer {@link Duration#ofNanos(long)} over alternative representations. */
+  static final class DurationOfNanos {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.NANOS);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofNanos(amount);
+    }
+  }
+
+  /** Prefer {@link Duration#ofSeconds(long)} over alternative representations. */
+  static final class DurationOfSeconds {
+    @BeforeTemplate
+    Duration before(long amount) {
+      return Duration.of(amount, ChronoUnit.SECONDS);
+    }
+
+    @AfterTemplate
+    Duration after(long amount) {
+      return Duration.ofSeconds(amount);
+    }
+  }
+
   /**
-   * Don't unnecessarily convert two and from milliseconds. (This way nanosecond precision is
+   * Don't unnecessarily convert to and from milliseconds. (This way nanosecond precision is
    * retained.)
    *
    * <p><strong>Warning:</strong> this rewrite rule increases precision!
@@ -329,7 +408,7 @@ final class TimeTemplates {
   }
 
   /**
-   * Don't unnecessarily convert two and from milliseconds. (This way nanosecond precision is
+   * Don't unnecessarily convert to and from milliseconds. (This way nanosecond precision is
    * retained.)
    *
    * <p><strong>Warning:</strong> this rewrite rule increases precision!

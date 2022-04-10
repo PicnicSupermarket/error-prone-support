@@ -117,6 +117,30 @@ final class TimeTemplatesTest implements RefasterTemplateTestCase {
         Duration.ZERO);
   }
 
+  Duration testDurationOfDays() {
+    return Duration.ofDays(1);
+  }
+
+  Duration testDurationOfHours() {
+    return Duration.ofHours(1);
+  }
+
+  Duration testDurationOfMillis() {
+    return Duration.ofMillis(1);
+  }
+
+  Duration testDurationOfMinutes() {
+    return Duration.ofMinutes(1);
+  }
+
+  Duration testDurationOfNanos() {
+    return Duration.ofNanos(1);
+  }
+
+  Duration testDurationOfSeconds() {
+    return Duration.ofSeconds(1);
+  }
+
   Duration testDurationBetweenInstants() {
     return Duration.between(Instant.MIN, Instant.MAX);
   }
