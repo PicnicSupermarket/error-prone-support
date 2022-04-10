@@ -242,19 +242,6 @@ final class ImmutableMapTemplates {
     }
   }
 
-  /** Don't unnecessarily copy an {@link ImmutableMap}. */
-  static final class ImmutableMapCopyOfImmutableMap<K, V> {
-    @BeforeTemplate
-    ImmutableMap<K, V> before(ImmutableMap<K, V> map) {
-      return ImmutableMap.copyOf(map);
-    }
-
-    @AfterTemplate
-    ImmutableMap<K, V> after(ImmutableMap<K, V> map) {
-      return map;
-    }
-  }
-
   /**
    * Prefer {@link ImmutableMap#of()} over alternatives that don't communicate the immutability of
    * the resulting list at the type level.
