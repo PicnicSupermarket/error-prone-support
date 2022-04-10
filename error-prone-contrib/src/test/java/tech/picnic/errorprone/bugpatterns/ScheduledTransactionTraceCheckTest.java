@@ -47,8 +47,8 @@ public final class ScheduledTransactionTraceCheckTest {
 
   // XXX: Enable this test for all JREs once https://github.com/google/error-prone/pull/2820 is
   // merged and released.
-  @DisabledForJreRange(min = JRE.JAVA_12)
   @Test
+  @DisabledForJreRange(min = JRE.JAVA_12)
   void replacement() {
     refactoringTestHelper
         .addInputLines(

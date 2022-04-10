@@ -161,12 +161,12 @@ public final class StaticImportCheckTest {
             "  final class Test {}",
             "",
             "  @BugPattern(",
-            "    name = \"TestBugChecker\",",
+            "    name = \"TestBugPattern\",",
             "    summary = \"\",",
             "    linkType = BugPattern.LinkType.NONE,",
             "    severity = SeverityLevel.SUGGESTION,",
             "    tags = BugPattern.StandardTags.SIMPLIFICATION)",
-            "  static class TestBugChecker {}",
+            "  static final class TestBugPattern {}",
             "}")
         .addOutputLines(
             "out/A.java",
@@ -238,12 +238,12 @@ public final class StaticImportCheckTest {
             "  final class Test {}",
             "",
             "  @BugPattern(",
-            "    name = \"TestBugChecker\",",
+            "    name = \"TestBugPattern\",",
             "    summary = \"\",",
             "    linkType = NONE,",
             "    severity = SUGGESTION,",
             "    tags = SIMPLIFICATION)",
-            "  static class TestBugChecker {}",
+            "  static final class TestBugPattern {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
