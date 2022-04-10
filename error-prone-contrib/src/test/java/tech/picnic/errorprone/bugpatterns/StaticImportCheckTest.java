@@ -47,7 +47,6 @@ public final class StaticImportCheckTest {
             "import com.google.common.collect.ImmutableMultiset;",
             "import com.google.common.collect.ImmutableSet;",
             "import com.google.errorprone.refaster.ImportPolicy;",
-            "import com.google.errorprone.refaster.annotation.AfterTemplate;",
             "import com.google.errorprone.refaster.annotation.UseImportPolicy;",
             "import java.nio.charset.StandardCharsets;",
             "import java.util.Optional;",
@@ -102,8 +101,7 @@ public final class StaticImportCheckTest {
             "",
             "  // BUG: Diagnostic contains:",
             "  @UseImportPolicy(ImportPolicy.IMPORT_TOP_LEVEL)",
-            "  @AfterTemplate",
-            "  void m2() {}",
+            "  void refasterAfterTemplate() {}",
             "",
             "  void toImmutableMultiset() {}",
             "}")
