@@ -40,41 +40,6 @@ final class ImmutableMapTemplates {
     }
   }
 
-  /** Prefer {@link ImmutableMap#of()} over more contrived alternatives. */
-  static final class EmptyImmutableMap<K, V> {
-    @BeforeTemplate
-    ImmutableMap<K, V> before() {
-      return ImmutableMap.<K, V>builder().build();
-    }
-
-    @AfterTemplate
-    ImmutableMap<K, V> after() {
-      return ImmutableMap.of();
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableMap#of(Object, Object)} over more contrived alternatives and
-   * alternatives that don't communicate the immutability of the resulting map at the type level.
-   */
-  // XXX: One can define variants for more than one key-value pair, but at some point the builder
-  // actually produces nicer code. So it's not clear we should add Refaster templates for those
-  // variants.
-  // XXX: Note that the `singletonMap` rewrite rule is incorrect for nullable elements.
-  static final class PairToImmutableMap<K, V> {
-    @BeforeTemplate
-    Map<K, V> before(K key, V value) {
-      return Refaster.anyOf(
-          ImmutableMap.<K, V>builder().put(key, value).build(),
-          Collections.singletonMap(key, value));
-    }
-
-    @AfterTemplate
-    ImmutableMap<K, V> after(K key, V value) {
-      return ImmutableMap.of(key, value);
-    }
-  }
-
   /** Prefer {@link ImmutableMap#of(Object, Object)} over more contrived alternatives. */
   static final class EntryToImmutableMap<K, V> {
     @BeforeTemplate
@@ -243,18 +208,13 @@ final class ImmutableMapTemplates {
   }
 
   /**
-   * Prefer {@link ImmutableMap#of()} over alternatives that don't communicate the immutability of
-   * the resulting list at the type level.
+   * Prefer {@link ImmutableMap#of()} over more contrived alternatives or alternatives that don't
+   * communicate the immutability of the resulting map at the type level.
    */
   static final class ImmutableMapOf<K, V> {
     @BeforeTemplate
     Map<K, V> before() {
-      return Collections.emptyMap();
-    }
-
-    @BeforeTemplate
-    Map<K, V> before2() {
-      return Map.of();
+      return Refaster.anyOf(ImmutableMap.<K, V>builder().build(), Collections.emptyMap(), Map.of());
     }
 
     @AfterTemplate
@@ -264,13 +224,18 @@ final class ImmutableMapTemplates {
   }
 
   /**
-   * Prefer {@link ImmutableMap#of(Object, Object)} over alternatives that don't communicate the
-   * immutability of the resulting list at the type level.
+   * Prefer {@link ImmutableMap#of(Object, Object)} over more contrived alternatives or alternatives
+   * that don't communicate the immutability of the resulting map at the type level.
    */
+  // XXX: Note that the replacement of `Collections#singletonMap` is incorrect for nullable
+  // elements.
   static final class ImmutableMapOf1<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1) {
-      return Map.of(k1, v1);
+      return Refaster.anyOf(
+          ImmutableMap.<K, V>builder().put(k1, v1).build(),
+          Collections.singletonMap(k1, v1),
+          Map.of(k1, v1));
     }
 
     @AfterTemplate
@@ -281,8 +246,9 @@ final class ImmutableMapTemplates {
 
   /**
    * Prefer {@link ImmutableMap#of(Object, Object, Object, Object)} over alternatives that don't
-   * communicate the immutability of the resulting list at the type level.
+   * communicate the immutability of the resulting map at the type level.
    */
+  // XXX: Also rewrite the `ImmutableMap.builder()` variant?
   static final class ImmutableMapOf2<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2) {
@@ -297,8 +263,9 @@ final class ImmutableMapTemplates {
 
   /**
    * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object)} over
-   * alternatives that don't communicate the immutability of the resulting list at the type level.
+   * alternatives that don't communicate the immutability of the resulting map at the type level.
    */
+  // XXX: Also rewrite the `ImmutableMap.builder()` variant?
   static final class ImmutableMapOf3<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3) {
@@ -313,9 +280,10 @@ final class ImmutableMapTemplates {
 
   /**
    * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object, Object, Object)}
-   * over alternatives that don't communicate the immutability of the resulting list at the type
+   * over alternatives that don't communicate the immutability of the resulting map at the type
    * level.
    */
+  // XXX: Also rewrite the `ImmutableMap.builder()` variant?
   static final class ImmutableMapOf4<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
@@ -330,9 +298,10 @@ final class ImmutableMapTemplates {
 
   /**
    * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object, Object, Object,
-   * Object, Object)} over alternatives that don't communicate the immutability of the resulting
-   * list at the type level.
+   * Object, Object)} over alternatives that don't communicate the immutability of the resulting map
+   * at the type level.
    */
+  // XXX: Also rewrite the `ImmutableMap.builder()` variant?
   static final class ImmutableMapOf5<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {

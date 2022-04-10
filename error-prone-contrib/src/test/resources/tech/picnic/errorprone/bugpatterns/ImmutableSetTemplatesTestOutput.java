@@ -30,14 +30,6 @@ final class ImmutableSetTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.builder();
   }
 
-  ImmutableSet<ImmutableSet<Integer>> testEmptyImmutableSet() {
-    return ImmutableSet.of(ImmutableSet.of(), ImmutableSet.of());
-  }
-
-  Set<String> testSingletonImmutableSet() {
-    return ImmutableSet.of("foo");
-  }
-
   ImmutableSet<ImmutableSet<Integer>> testIterableToImmutableSet() {
     return ImmutableSet.of(
         ImmutableSet.copyOf(ImmutableList.of(1)),
@@ -62,12 +54,13 @@ final class ImmutableSetTemplatesTest implements RefasterTemplateTestCase {
     return Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)).immutableCopy();
   }
 
-  ImmutableSet<Set<Object>> testImmutableSetOf() {
-    return ImmutableSet.of(ImmutableSet.of(), ImmutableSet.of());
+  ImmutableSet<Set<Integer>> testImmutableSetOf() {
+    return ImmutableSet.of(
+        ImmutableSet.of(), ImmutableSet.of(), ImmutableSet.of(), ImmutableSet.of());
   }
 
-  Set<Integer> testImmutableSetOf1() {
-    return ImmutableSet.of(1);
+  ImmutableSet<Set<Integer>> testImmutableSetOf1() {
+    return ImmutableSet.of(ImmutableSet.of(1), ImmutableSet.of(1), ImmutableSet.of(1));
   }
 
   Set<Integer> testImmutableSetOf2() {

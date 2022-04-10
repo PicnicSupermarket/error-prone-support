@@ -41,37 +41,6 @@ final class ImmutableListTemplates {
     }
   }
 
-  /** Prefer {@link ImmutableList#of()} over more contrived alternatives. */
-  static final class EmptyImmutableList<T> {
-    @BeforeTemplate
-    ImmutableList<T> before() {
-      return Refaster.anyOf(
-          ImmutableList.<T>builder().build(), Stream.<T>empty().collect(toImmutableList()));
-    }
-
-    @AfterTemplate
-    ImmutableList<T> after() {
-      return ImmutableList.of();
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableList#of(Object)} over alternatives that don't communicate the
-   * immutability of the resulting list at the type level.
-   */
-  // XXX: Note that this rewrite rule is incorrect for nullable elements.
-  static final class SingletonImmutableList<T> {
-    @BeforeTemplate
-    List<T> before(T element) {
-      return Collections.singletonList(element);
-    }
-
-    @AfterTemplate
-    ImmutableList<T> after(T element) {
-      return ImmutableList.of(element);
-    }
-  }
-
   /**
    * Prefer {@link ImmutableList#copyOf(Iterable)} and variants over more contrived alternatives.
    */
@@ -188,18 +157,19 @@ final class ImmutableListTemplates {
   }
 
   /**
-   * Prefer {@link ImmutableList#of()} over alternatives that don't communicate the immutability of
-   * the resulting list at the type level.
+   * Prefer {@link ImmutableList#of()} over more contrived alternatives or alternatives that don't
+   * communicate the immutability of the resulting list at the type level.
    */
+  // XXX: The `Stream` variant may be too contrived to warrant inclusion. Review its usage if/when
+  // this and similar Refaster templates are replaced with an Error Prone check.
   static final class ImmutableListOf<T> {
     @BeforeTemplate
     List<T> before() {
-      return Collections.emptyList();
-    }
-
-    @BeforeTemplate
-    List<T> before2() {
-      return List.of();
+      return Refaster.anyOf(
+          ImmutableList.<T>builder().build(),
+          Stream.<T>empty().collect(toImmutableList()),
+          Collections.emptyList(),
+          List.of());
     }
 
     @AfterTemplate
@@ -209,13 +179,16 @@ final class ImmutableListTemplates {
   }
 
   /**
-   * Prefer {@link ImmutableList#of(Object)} over alternatives that don't communicate the
-   * immutability of the resulting list at the type level.
+   * Prefer {@link ImmutableList#of(Object)} over more contrived alternatives or alternatives that
+   * don't communicate the immutability of the resulting list at the type level.
    */
+  // XXX: Note that the replacement of `Collections#singletonList` is incorrect for nullable
+  // elements.
   static final class ImmutableListOf1<T> {
     @BeforeTemplate
     List<T> before(T e1) {
-      return List.of(e1);
+      return Refaster.anyOf(
+          ImmutableList.<T>builder().add(e1).build(), Collections.singletonList(e1), List.of(e1));
     }
 
     @AfterTemplate
@@ -228,6 +201,8 @@ final class ImmutableListTemplates {
    * Prefer {@link ImmutableList#of(Object, Object)} over alternatives that don't communicate the
    * immutability of the resulting list at the type level.
    */
+  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // `ImmutableList.builder()` usages.
   static final class ImmutableListOf2<T> {
     @BeforeTemplate
     List<T> before(T e1, T e2) {
@@ -244,6 +219,8 @@ final class ImmutableListTemplates {
    * Prefer {@link ImmutableList#of(Object, Object, Object)} over alternatives that don't
    * communicate the immutability of the resulting list at the type level.
    */
+  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // `ImmutableList.builder()` usages.
   static final class ImmutableListOf3<T> {
     @BeforeTemplate
     List<T> before(T e1, T e2, T e3) {
@@ -260,6 +237,8 @@ final class ImmutableListTemplates {
    * Prefer {@link ImmutableList#of(Object, Object, Object, Object)} over alternatives that don't
    * communicate the immutability of the resulting list at the type level.
    */
+  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // `ImmutableList.builder()` usages.
   static final class ImmutableListOf4<T> {
     @BeforeTemplate
     List<T> before(T e1, T e2, T e3, T e4) {
@@ -276,6 +255,8 @@ final class ImmutableListTemplates {
    * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object)} over alternatives that
    * don't communicate the immutability of the resulting list at the type level.
    */
+  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // `ImmutableList.builder()` usages.
   static final class ImmutableListOf5<T> {
     @BeforeTemplate
     List<T> before(T e1, T e2, T e3, T e4, T e5) {
