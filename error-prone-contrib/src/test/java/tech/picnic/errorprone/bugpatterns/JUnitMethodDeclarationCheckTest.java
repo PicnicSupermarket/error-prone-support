@@ -16,6 +16,8 @@ public final class JUnitMethodDeclarationCheckTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
+            "import static org.junit.jupiter.params.provider.Arguments.arguments;",
+            "",
             "import org.junit.jupiter.api.AfterAll;",
             "import org.junit.jupiter.api.AfterEach;",
             "import org.junit.jupiter.api.BeforeAll;",
@@ -81,6 +83,14 @@ public final class JUnitMethodDeclarationCheckTest {
             "  protected void testNonTestMethod3() {}",
             "  private void testNonTestMethod4() {}",
             "  @Test void test5() {}",
+            "",
+            "  // BUG: Diagnostic contains: (but note that a method named `overload` already exists in this class)",
+            "  @Test void testOverload() {}",
+            "  void overload() {}",
+            "  // BUG: Diagnostic contains: (but note that `arguments` is already statically imported)",
+            "  @Test void testArguments() {}",
+            "  // BUG: Diagnostic contains: (but note that `public` is a reserved keyword)",
+            "  @Test void testPublic() {}",
             "}")
         .addSourceLines(
             "B.java",
@@ -122,6 +132,11 @@ public final class JUnitMethodDeclarationCheckTest {
             "  @Override public void testNonTestMethod2() {}",
             "  @Override protected void testNonTestMethod3() {}",
             "  @Override @Test void test5() {}",
+            "",
+            "  @Override @Test void testOverload() {}",
+            "  @Override void overload() {}",
+            "  @Override @Test void testArguments() {}",
+            "  @Override @Test void testPublic() {}",
             "}")
         .doTest();
   }
@@ -131,6 +146,8 @@ public final class JUnitMethodDeclarationCheckTest {
     refactoringTestHelper
         .addInputLines(
             "in/A.java",
+            "import static org.junit.jupiter.params.provider.Arguments.arguments;",
+            "",
             "import org.junit.jupiter.api.AfterAll;",
             "import org.junit.jupiter.api.AfterEach;",
             "import org.junit.jupiter.api.BeforeAll;",
@@ -151,9 +168,16 @@ public final class JUnitMethodDeclarationCheckTest {
             "  @Test public void baz() {}",
             "  @RepeatedTest(2) private void qux() {}",
             "  @ParameterizedTest protected void quux() {}",
+            "",
+            "  @Test public void testOverload() {}",
+            "  void overload() {}",
+            "  @Test protected void testArguments() {}",
+            "  @Test private void testClass() {}",
             "}")
         .addOutputLines(
             "out/A.java",
+            "import static org.junit.jupiter.params.provider.Arguments.arguments;",
+            "",
             "import org.junit.jupiter.api.AfterAll;",
             "import org.junit.jupiter.api.AfterEach;",
             "import org.junit.jupiter.api.BeforeAll;",
@@ -174,136 +198,11 @@ public final class JUnitMethodDeclarationCheckTest {
             "  @Test void baz() {}",
             "  @RepeatedTest(2) void qux() {}",
             "  @ParameterizedTest void quux() {}",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
-  }
-
-  @Test
-  void methodAlreadyExistsInClass() {
-    refactoringTestHelper
-        .addInputLines(
-            "A.java",
-            "import org.junit.jupiter.api.Test;",
             "",
-            "class A {",
-            "  @Test void testFoo() {}",
-            "  void foo() {}",
-            "",
-            "  @Test void testBar() {}",
-            "  private void bar() {}",
-            "",
-            "  @Test void testFooDifferent() {}",
-            "  @Test void testBarDifferent() {}",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "import org.junit.jupiter.api.Test;",
-            "",
-            "class A {",
-            "  @Test void testFoo() {}",
-            "  void foo() {}",
-            "",
-            "  @Test void testBar() {}",
-            "  private void bar() {}",
-            "",
-            "  @Test void fooDifferent() {}",
-            "  @Test void barDifferent() {}",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
-  }
-
-  @Test
-  void methodAlreadyInStaticImports() {
-    refactoringTestHelper
-        .addInputLines(
-            "A.java",
-            "import static com.google.common.collect.ImmutableSet.toImmutableSet;",
-            "import static org.junit.jupiter.params.provider.Arguments.arguments;",
-            "",
-            "import org.junit.jupiter.api.Test;",
-            "import com.google.common.collect.ImmutableSet;",
-            "",
-            "class A {",
-            "  @Test",
-            "  void testArguments() {",
-            "    arguments(1, 2, 3);",
-            "  }",
-            "",
-            "  @Test",
-            "  void testToImmutableSet() {",
-            "    ImmutableSet.of(1).stream().filter(i -> i > 1).collect(toImmutableSet());",
-            "  }",
-            "",
-            "  @Test",
-            "  void testArgumentsDifferentName() {}",
-            "",
-            "  @Test",
-            "  void testToImmutableSetDifferentName() {}",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "import static com.google.common.collect.ImmutableSet.toImmutableSet;",
-            "import static org.junit.jupiter.params.provider.Arguments.arguments;",
-            "",
-            "import org.junit.jupiter.api.Test;",
-            "import com.google.common.collect.ImmutableSet;",
-            "",
-            "class A {",
-            "  @Test",
-            "  void testArguments() {",
-            "    arguments(1, 2, 3);",
-            "  }",
-            "",
-            "  @Test",
-            "  void testToImmutableSet() {",
-            "    ImmutableSet.of(1).stream().filter(i -> i > 1).collect(toImmutableSet());",
-            "  }",
-            "",
-            "  @Test",
-            "  void argumentsDifferentName() {}",
-            "",
-            "  @Test",
-            "  void toImmutableSetDifferentName() {}",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
-  }
-
-  @Test
-  void methodHasJavaKeyword() {
-    refactoringTestHelper
-        .addInputLines(
-            "A.java",
-            "import org.junit.jupiter.api.Test;",
-            "",
-            "class A {",
-            "  @Test",
-            "  void testClass() {}",
-            "",
-            "  @Test",
-            "  void testClazz() {}",
-            "",
-            "  @Test",
-            "  void testThrow() {}",
-            "",
-            "  @Test",
-            "  void testThrowww() {}",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "import org.junit.jupiter.api.Test;",
-            "",
-            "class A {",
-            "  @Test",
-            "  void testClass() {}",
-            "",
-            "  @Test",
-            "  void clazz() {}",
-            "",
-            "  @Test",
-            "  void testThrow() {}",
-            "",
-            "  @Test",
-            "  void throwww() {}",
+            "  @Test void testOverload() {}",
+            "  void overload() {}",
+            "  @Test void testArguments() {}",
+            "  @Test void testClass() {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
