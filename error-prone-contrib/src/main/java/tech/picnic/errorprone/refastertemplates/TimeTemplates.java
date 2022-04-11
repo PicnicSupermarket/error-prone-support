@@ -60,6 +60,19 @@ final class TimeTemplates {
     }
   }
 
+  /** Prefer {@link Instant#atOffset(ZoneOffset)} over the more verbose alternative. */
+  static final class InstantAtOffset {
+    @BeforeTemplate
+    OffsetDateTime before(Instant instant, ZoneOffset zoneOffset) {
+      return OffsetDateTime.ofInstant(instant, zoneOffset);
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(Instant instant, ZoneOffset zoneOffset) {
+      return instant.atOffset(zoneOffset);
+    }
+  }
+
   /** Use {@link Clock#systemUTC()} when possible. */
   static final class UtcClock {
     @BeforeTemplate
