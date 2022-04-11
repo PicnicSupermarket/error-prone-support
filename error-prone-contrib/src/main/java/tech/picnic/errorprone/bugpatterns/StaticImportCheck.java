@@ -126,6 +126,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           .put("java.time.ZoneOffset", "UTC")
           .put("java.util.function.Function", "identity")
           .put("java.util.function.Predicate", "not")
+          .put("java.util.UUID", "randomUUID")
           .put("org.junit.jupiter.params.provider.Arguments", "arguments")
           .putAll(
               "java.util.Objects",
