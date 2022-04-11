@@ -8,13 +8,22 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.math.BigDecimal;
 import org.assertj.core.api.AbstractBigDecimalAssert;
+import org.assertj.core.api.BigDecimalAssert;
 
-// XXX: If we add a rule which drops unnecessary `L` suffixes from literal longs, then the `0L`/`1L`
-// cases below can go.
+/**
+ * Refaster templates related to AssertJ assertions over {@link BigDecimal}s.
+ *
+ * <p>Note that, contrary to collections of Refaster templates for other {@link
+ * org.assertj.core.api.NumberAssert} subtypes, these templates do not rewrite to/from {@link
+ * BigDecimalAssert#isEqualTo(Object)} and {@link BigDecimalAssert#isNotEqualTo(Object)}. This is
+ * because {@link BigDecimal#equals(Object)} considers not only the numeric value of compared
+ * instances, but also their scale. As a result various seemingly straightforward transformations
+ * would actually subtly change the assertion's semantics.
+ */
 final class AssertJBigDecimalTemplates {
   private AssertJBigDecimalTemplates() {}
 
-  static final class AbstractBigDecimalAssertIsEqualTo {
+  static final class AbstractBigDecimalAssertIsEqualByComparingTo {
     @BeforeTemplate
     AbstractBigDecimalAssert<?> before(AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal n) {
       return Refaster.anyOf(
@@ -24,11 +33,11 @@ final class AssertJBigDecimalTemplates {
 
     @AfterTemplate
     AbstractBigDecimalAssert<?> after(AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal n) {
-      return bigDecimalAssert.isEqualTo(n);
+      return bigDecimalAssert.isEqualByComparingTo(n);
     }
   }
 
-  static final class AbstractBigDecimalAssertIsNotEqualTo {
+  static final class AbstractBigDecimalAssertIsNotEqualByComparingTo {
     @BeforeTemplate
     AbstractBigDecimalAssert<?> before(AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal n) {
       return Refaster.anyOf(
@@ -38,52 +47,7 @@ final class AssertJBigDecimalTemplates {
 
     @AfterTemplate
     AbstractBigDecimalAssert<?> after(AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal n) {
-      return bigDecimalAssert.isNotEqualTo(n);
-    }
-  }
-
-  static final class AbstractBigDecimalAssertIsZero {
-    @BeforeTemplate
-    AbstractBigDecimalAssert<?> before(AbstractBigDecimalAssert<?> bigDecimalAssert) {
-      return Refaster.anyOf(
-          bigDecimalAssert.isZero(),
-          bigDecimalAssert.isEqualTo(0L),
-          bigDecimalAssert.isEqualTo(BigDecimal.ZERO));
-    }
-
-    @AfterTemplate
-    AbstractBigDecimalAssert<?> after(AbstractBigDecimalAssert<?> bigDecimalAssert) {
-      return bigDecimalAssert.isEqualTo(0);
-    }
-  }
-
-  static final class AbstractBigDecimalAssertIsNotZero {
-    @BeforeTemplate
-    AbstractBigDecimalAssert<?> before(AbstractBigDecimalAssert<?> bigDecimalAssert) {
-      return Refaster.anyOf(
-          bigDecimalAssert.isNotZero(),
-          bigDecimalAssert.isNotEqualTo(0L),
-          bigDecimalAssert.isNotEqualTo(BigDecimal.ZERO));
-    }
-
-    @AfterTemplate
-    AbstractBigDecimalAssert<?> after(AbstractBigDecimalAssert<?> bigDecimalAssert) {
-      return bigDecimalAssert.isNotEqualTo(0);
-    }
-  }
-
-  static final class AbstractBigDecimalAssertIsOne {
-    @BeforeTemplate
-    AbstractBigDecimalAssert<?> before(AbstractBigDecimalAssert<?> bigDecimalAssert) {
-      return Refaster.anyOf(
-          bigDecimalAssert.isOne(),
-          bigDecimalAssert.isEqualTo(1L),
-          bigDecimalAssert.isEqualTo(BigDecimal.ONE));
-    }
-
-    @AfterTemplate
-    AbstractBigDecimalAssert<?> after(AbstractBigDecimalAssert<?> bigDecimalAssert) {
-      return bigDecimalAssert.isEqualTo(1);
+      return bigDecimalAssert.isNotEqualByComparingTo(n);
     }
   }
 }
