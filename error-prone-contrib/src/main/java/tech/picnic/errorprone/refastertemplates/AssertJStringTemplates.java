@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.errorprone.refaster.ImportPolicy;
@@ -59,6 +60,32 @@ final class AssertJStringTemplates {
     @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     AbstractAssert<?, ?> after(String string) {
       return assertThat(string).isNotEmpty();
+    }
+  }
+
+  static final class AssertThatMatches {
+    @BeforeTemplate
+    AbstractAssert<?, ?> before(String string, String regex) {
+      return assertThat(string.matches(regex)).isTrue();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractAssert<?, ?> after(String string, String regex) {
+      return assertThat(string).matches(regex);
+    }
+  }
+
+  static final class AssertThatDoesNotMatch {
+    @BeforeTemplate
+    AbstractAssert<?, ?> before(String string, String regex) {
+      return assertThat(string.matches(regex)).isFalse();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractAssert<?, ?> after(String string, String regex) {
+      return assertThat(string).doesNotMatch(regex);
     }
   }
 }

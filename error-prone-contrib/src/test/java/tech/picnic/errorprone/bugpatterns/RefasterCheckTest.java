@@ -34,6 +34,7 @@ public final class RefasterCheckTest {
           "AssertJInteger",
           "AssertJLong",
           "AssertJNumber",
+          "AssertJMap",
           "AssertJObject",
           "AssertJOptional",
           "AssertJShort",
