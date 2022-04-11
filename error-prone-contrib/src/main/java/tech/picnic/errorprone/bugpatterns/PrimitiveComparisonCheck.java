@@ -7,6 +7,7 @@ import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.joining;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
@@ -30,6 +31,7 @@ import com.sun.tools.javac.tree.JCTree.JCMemberReference;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * A {@link BugChecker} which flags {@code Comparator#comparing*} invocations that can be replaced
@@ -37,7 +39,6 @@ import java.util.function.Function;
  */
 // XXX: Add more documentation. Explain how this is useful in the face of refactoring to more
 // specific types.
-// XXX: Change this checker's name?
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "PrimitiveComparison",
@@ -77,23 +78,53 @@ public final class PrimitiveComparisonCheck extends BugChecker
     }
 
     return getPotentiallyBoxedReturnType(tree.getArguments().get(0))
-        .flatMap(cmpType -> tryFix(tree, state, cmpType, isStatic))
+        .flatMap(cmpType -> attemptMethodInvocationReplacement(tree, cmpType, isStatic, state))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 
-  private static Optional<Fix> tryFix(
-      MethodInvocationTree tree, VisitorState state, Type cmpType, boolean isStatic) {
+  private static Optional<Fix> attemptMethodInvocationReplacement(
+      MethodInvocationTree tree, Type cmpType, boolean isStatic, VisitorState state) {
     return Optional.ofNullable(ASTHelpers.getSymbol(tree))
         .map(methodSymbol -> methodSymbol.getSimpleName().toString())
         .flatMap(
             actualMethodName ->
-                Optional.of(getPreferredMethod(state, cmpType, isStatic))
+                Optional.of(getPreferredMethod(cmpType, isStatic, state))
                     .filter(not(actualMethodName::equals)))
+        .map(
+            preferredMethodName ->
+                prefixTypeArgumentsIfRelevant(preferredMethodName, tree, cmpType, state))
         .map(preferredMethodName -> suggestFix(tree, preferredMethodName, state));
   }
 
-  private static String getPreferredMethod(VisitorState state, Type cmpType, boolean isStatic) {
+  /**
+   * Prefixes the given method name with generic type parameters if it replaces a {@code
+   * Comparator#comparing{,Double,Long,Int}} method which also has generic type parameters.
+   *
+   * <p>Such type parameters are retained as they are likely required.
+   *
+   * <p>Note that any type parameter to {@code Comparator#thenComparing} is likely redundant, and in
+   * any case becomes obsolete once that method is replaced with {@code
+   * Comparator#thenComparing{Double,Long,Int}}. Conversion in the opposite direction does not
+   * require the introduction of a generic type parameter.
+   */
+  private static String prefixTypeArgumentsIfRelevant(
+      String preferredMethodName, MethodInvocationTree tree, Type cmpType, VisitorState state) {
+    if (tree.getTypeArguments().isEmpty() || preferredMethodName.startsWith("then")) {
+      return preferredMethodName;
+    }
+
+    String typeArguments =
+        Stream.concat(
+                Stream.of(Util.treeToString(tree.getTypeArguments().get(0), state)),
+                Stream.of(cmpType.tsym.getSimpleName())
+                    .filter(u -> "comparing".equals(preferredMethodName)))
+            .collect(joining(", ", "<", ">"));
+
+    return typeArguments + preferredMethodName;
+  }
+
+  private static String getPreferredMethod(Type cmpType, boolean isStatic, VisitorState state) {
     Types types = state.getTypes();
     Symtab symtab = state.getSymtab();
 
@@ -128,9 +159,6 @@ public final class PrimitiveComparisonCheck extends BugChecker
     }
   }
 
-  // XXX: We drop explicitly specified generic type information. In case the number of type
-  // arguments before and after doesn't match, that's for the better. But if we e.g. replace
-  // `comparingLong` with `comparingInt`, then we should retain it.
   private static Fix suggestFix(
       MethodInvocationTree tree, String preferredMethodName, VisitorState state) {
     ExpressionTree expr = tree.getMethodSelect();
