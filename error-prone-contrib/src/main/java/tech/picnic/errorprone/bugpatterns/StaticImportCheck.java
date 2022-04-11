@@ -77,6 +77,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           "java.nio.charset.StandardCharsets",
           "java.util.Comparator",
           "java.util.Map.Entry",
+          "java.util.regex.Pattern",
           "java.util.stream.Collectors",
           "org.assertj.core.api.Assertions",
           "org.assertj.core.api.InstanceOfAssertFactories",
@@ -146,6 +147,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
   static final ImmutableSetMultimap<String, String> STATIC_IMPORT_EXEMPTED_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
           .put("com.mongodb.client.model.Filters", "empty")
+          .putAll("java.util.regex.Pattern", "compile", "matches", "quote")
           .put("org.springframework.http.MediaType", "ALL")
           .build();
 
