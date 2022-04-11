@@ -1,6 +1,9 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.base.Verify.verify;
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 
@@ -9,9 +12,6 @@ import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
@@ -35,9 +35,9 @@ import java.util.Optional;
     name = "SpringMvcAnnotation",
     summary =
         "Prefer the conciseness of `@{Get,Put,Post,Delete,Patch}Mapping` over `@RequestMapping`",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.SIMPLIFICATION)
+    linkType = NONE,
+    severity = SUGGESTION,
+    tags = SIMPLIFICATION)
 public final class SpringMvcAnnotationCheck extends BugChecker implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String ANN_PACKAGE_PREFIX = "org.springframework.web.bind.annotation.";

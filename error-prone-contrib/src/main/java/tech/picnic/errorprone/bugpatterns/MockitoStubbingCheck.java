@@ -1,13 +1,13 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
@@ -26,9 +26,9 @@ import java.util.List;
 @BugPattern(
     name = "MockitoStubbing",
     summary = "Don't unnecessarily use Mockito's `eq(...)`",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.SIMPLIFICATION)
+    linkType = NONE,
+    severity = SUGGESTION,
+    tags = SIMPLIFICATION)
 public final class MockitoStubbingCheck extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> MOCKITO_EQ_METHOD =

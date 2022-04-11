@@ -1,11 +1,12 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
@@ -30,9 +31,9 @@ import java.util.regex.Pattern;
 @BugPattern(
     name = "CanonicalAnnotationSyntax",
     summary = "Omit redundant syntax from annotation declarations",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.SIMPLIFICATION)
+    linkType = NONE,
+    severity = SUGGESTION,
+    tags = SIMPLIFICATION)
 public final class CanonicalAnnotationSyntaxCheck extends BugChecker
     implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;

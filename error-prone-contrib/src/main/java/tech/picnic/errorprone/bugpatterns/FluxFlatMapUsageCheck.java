@@ -1,13 +1,13 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MemberReferenceTreeMatcher;
@@ -44,9 +44,9 @@ import reactor.core.publisher.Flux;
     summary =
         "`Flux#flatMap` and `Flux#flatMapSequential` have subtle semantics; "
             + "please use `Flux#concatMap` or explicitly specify the desired amount of concurrency",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.ERROR,
-    tags = StandardTags.LIKELY_ERROR)
+    linkType = NONE,
+    severity = ERROR,
+    tags = LIKELY_ERROR)
 public final class FluxFlatMapUsageCheck extends BugChecker
     implements MethodInvocationTreeMatcher, MemberReferenceTreeMatcher {
   private static final long serialVersionUID = 1L;

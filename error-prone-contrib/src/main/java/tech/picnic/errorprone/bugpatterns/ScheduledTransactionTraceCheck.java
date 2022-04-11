@@ -1,5 +1,8 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
@@ -10,9 +13,6 @@ import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
@@ -34,9 +34,9 @@ import com.sun.source.tree.Tree;
 @BugPattern(
     name = "ScheduledTransactionTrace",
     summary = "Scheduled operation must start a new New Relic transaction",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.ERROR,
-    tags = StandardTags.LIKELY_ERROR)
+    linkType = NONE,
+    severity = ERROR,
+    tags = LIKELY_ERROR)
 public final class ScheduledTransactionTraceCheck extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String TRACE_ANNOTATION_FQCN = "com.newrelic.api.agent.Trace";

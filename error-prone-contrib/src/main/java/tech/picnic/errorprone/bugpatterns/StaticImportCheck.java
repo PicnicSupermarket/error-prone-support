@@ -1,5 +1,8 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.Objects.requireNonNull;
 
 import com.google.auto.service.AutoService;
@@ -7,9 +10,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MemberSelectTreeMatcher;
@@ -47,9 +47,9 @@ import java.util.Optional;
 @BugPattern(
     name = "StaticImport",
     summary = "Identifier should be statically imported",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.SIMPLIFICATION)
+    linkType = NONE,
+    severity = SUGGESTION,
+    tags = SIMPLIFICATION)
 public final class StaticImportCheck extends BugChecker implements MemberSelectTreeMatcher {
   private static final long serialVersionUID = 1L;
 
@@ -64,6 +64,9 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           "com.google.common.base.Predicates",
           "com.google.common.base.Verify",
           "com.google.common.collect.MoreCollectors",
+          "com.google.errorprone.BugPattern.LinkType",
+          "com.google.errorprone.BugPattern.SeverityLevel",
+          "com.google.errorprone.BugPattern.StandardTags",
           "com.mongodb.client.model.Accumulators",
           "com.mongodb.client.model.Aggregates",
           "com.mongodb.client.model.Filters",

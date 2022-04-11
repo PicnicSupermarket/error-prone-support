@@ -1,5 +1,8 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
@@ -9,9 +12,6 @@ import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -48,9 +48,9 @@ import java.util.stream.Stream;
 @BugPattern(
     name = "LexicographicalAnnotationAttributeListing",
     summary = "Where possible, sort annotation array attributes lexicographically",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.STYLE)
+    linkType = NONE,
+    severity = SUGGESTION,
+    tags = STYLE)
 public final class LexicographicalAnnotationAttributeListingCheck extends BugChecker
     implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;

@@ -1,14 +1,14 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.LambdaExpressionTreeMatcher;
@@ -53,9 +53,9 @@ import javax.lang.model.element.Name;
 @BugPattern(
     name = "MethodReferenceUsage",
     summary = "Prefer method references over lambda expressions",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.STYLE)
+    linkType = NONE,
+    severity = SUGGESTION,
+    tags = STYLE)
 public final class MethodReferenceUsageCheck extends BugChecker
     implements LambdaExpressionTreeMatcher {
   private static final long serialVersionUID = 1L;

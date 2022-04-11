@@ -1,5 +1,8 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
@@ -35,9 +38,9 @@ import javax.lang.model.element.Modifier;
 @BugPattern(
     name = "JUnitMethodDeclaration",
     summary = "JUnit method declaration can likely be improved",
-    linkType = BugPattern.LinkType.NONE,
-    severity = BugPattern.SeverityLevel.SUGGESTION,
-    tags = BugPattern.StandardTags.SIMPLIFICATION)
+    linkType = NONE,
+    severity = SUGGESTION,
+    tags = SIMPLIFICATION)
 public final class JUnitMethodDeclarationCheck extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String TEST_PREFIX = "test";

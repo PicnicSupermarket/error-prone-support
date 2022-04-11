@@ -1,5 +1,8 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyMethod;
 import static com.google.errorprone.matchers.Matchers.anyOf;
@@ -10,9 +13,6 @@ import static java.util.stream.Collectors.joining;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
@@ -50,9 +50,9 @@ import java.util.Optional;
 @BugPattern(
     name = "FormatStringConcatenation",
     summary = "Defer string concatenation to the invoked method",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.WARNING,
-    tags = StandardTags.SIMPLIFICATION)
+    linkType = NONE,
+    severity = WARNING,
+    tags = SIMPLIFICATION)
 public final class FormatStringConcatenationCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;

@@ -1,10 +1,10 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -19,7 +19,7 @@ public final class MethodMatcherFactoryTest {
   /** A {@link BugChecker} which flags method invocations matched by {@link #TEST_MATCHER}. */
   @BugPattern(
       name = "MatchedMethodsFlagger",
-      severity = SeverityLevel.SUGGESTION,
+      severity = SUGGESTION,
       summary = "Flags methods matched by the test matcher.")
   public static final class MatchedMethodsFlagger extends BugChecker
       implements MethodInvocationTreeMatcher {

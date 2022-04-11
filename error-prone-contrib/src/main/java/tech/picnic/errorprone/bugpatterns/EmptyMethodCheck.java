@@ -1,5 +1,8 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
@@ -7,9 +10,6 @@ import static com.google.errorprone.matchers.Matchers.isType;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
@@ -28,9 +28,9 @@ import java.util.Optional;
 @BugPattern(
     name = "EmptyMethod",
     summary = "Empty method can likely be deleted",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.SUGGESTION,
-    tags = StandardTags.SIMPLIFICATION)
+    linkType = NONE,
+    severity = SUGGESTION,
+    tags = SIMPLIFICATION)
 public final class EmptyMethodCheck extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> PERMITTED_ANNOTATION =
