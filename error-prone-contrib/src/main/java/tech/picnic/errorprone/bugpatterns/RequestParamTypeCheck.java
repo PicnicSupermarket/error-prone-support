@@ -24,12 +24,12 @@ import com.sun.source.tree.VariableTree;
 /** A {@link BugChecker} which flags {@code @RequestParam} parameters with an unsupported type. */
 @AutoService(BugChecker.class)
 @BugPattern(
-    name = "RequestParamAnnotation",
+    name = "RequestParamType",
     summary = "`@RequestParam` does not support `ImmutableCollection` and `ImmutableMap` subtypes",
     linkType = NONE,
     severity = ERROR,
     tags = LIKELY_ERROR)
-public final class RequestParamAnnotationCheck extends BugChecker implements VariableTreeMatcher {
+public final class RequestParamTypeCheck extends BugChecker implements VariableTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<VariableTree> HAS_UNSUPPORTED_REQUEST_PARAM =
       allOf(

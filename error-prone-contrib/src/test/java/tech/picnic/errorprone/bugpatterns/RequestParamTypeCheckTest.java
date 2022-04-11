@@ -3,9 +3,9 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class RequestParamAnnotationCheckTest {
+final class RequestParamTypeCheckTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(RequestParamAnnotationCheck.class, getClass());
+      CompilationTestHelper.newInstance(RequestParamTypeCheck.class, getClass());
 
   @Test
   void identification() {
