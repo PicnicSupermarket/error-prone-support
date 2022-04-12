@@ -1,8 +1,8 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -21,7 +21,7 @@ final class AssertJObjectTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ObjectAssert<S> after(S object) {
       return assertThat(object).isInstanceOf(Refaster.<T>clazz());
     }
@@ -34,7 +34,7 @@ final class AssertJObjectTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ObjectAssert<S> after(S object) {
       return assertThat(object).isNotInstanceOf(Refaster.<T>clazz());
     }
@@ -47,7 +47,7 @@ final class AssertJObjectTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ObjectAssert<S> after(S object1, T object2) {
       return assertThat(object1).isEqualTo(object2);
     }
@@ -60,7 +60,7 @@ final class AssertJObjectTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ObjectAssert<S> after(S object1, T object2) {
       return assertThat(object1).isNotEqualTo(object2);
     }
@@ -73,7 +73,7 @@ final class AssertJObjectTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ObjectAssert<T> after(T object, String str) {
       return assertThat(object).hasToString(str);
     }

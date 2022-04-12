@@ -46,6 +46,8 @@ public final class StaticImportCheckTest {
             "import com.google.common.collect.ImmutableMap;",
             "import com.google.common.collect.ImmutableMultiset;",
             "import com.google.common.collect.ImmutableSet;",
+            "import com.google.errorprone.refaster.ImportPolicy;",
+            "import com.google.errorprone.refaster.annotation.UseImportPolicy;",
             "import java.nio.charset.StandardCharsets;",
             "import java.time.ZoneOffset;",
             "import java.util.Optional;",
@@ -105,6 +107,10 @@ public final class StaticImportCheckTest {
             "    ZoneOffset zo1 = ZoneOffset.UTC;",
             "    ZoneOffset zo2 = ZoneOffset.MIN;",
             "  }",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  @UseImportPolicy(ImportPolicy.IMPORT_TOP_LEVEL)",
+            "  void refasterAfterTemplate() {}",
             "",
             "  void toImmutableMultiset() {}",
             "}")
@@ -169,9 +175,6 @@ public final class StaticImportCheckTest {
             "      @DateTimeFormat(iso = ISO.DATE_TIME) String dateTime,",
             "      @DateTimeFormat(iso = ISO.TIME) String time) {}",
             "",
-            "  @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)",
-            "  final class Test {}",
-            "",
             "  @BugPattern(",
             "    name = \"TestBugPattern\",",
             "    summary = \"\",",
@@ -179,6 +182,9 @@ public final class StaticImportCheckTest {
             "    severity = SeverityLevel.SUGGESTION,",
             "    tags = BugPattern.StandardTags.SIMPLIFICATION)",
             "  static final class TestBugPattern {}",
+            "",
+            "   @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)",
+            "   final class Test {}",
             "}")
         .addOutputLines(
             "out/A.java",
@@ -250,9 +256,6 @@ public final class StaticImportCheckTest {
             "      @DateTimeFormat(iso = DATE_TIME) String dateTime,",
             "      @DateTimeFormat(iso = TIME) String time) {}",
             "",
-            "  @SpringBootTest(webEnvironment = RANDOM_PORT)",
-            "  final class Test {}",
-            "",
             "  @BugPattern(",
             "    name = \"TestBugPattern\",",
             "    summary = \"\",",
@@ -260,6 +263,9 @@ public final class StaticImportCheckTest {
             "    severity = SUGGESTION,",
             "    tags = SIMPLIFICATION)",
             "  static final class TestBugPattern {}",
+            "",
+            "   @SpringBootTest(webEnvironment = RANDOM_PORT)",
+            "   final class Test {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }

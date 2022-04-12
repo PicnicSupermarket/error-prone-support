@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refastertemplates;
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Sets.toImmutableEnumSet;
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Objects.checkIndex;
 
 import com.google.common.base.Splitter;
@@ -11,7 +12,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -92,7 +92,7 @@ final class AssortedTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ImmutableSet<T> after(Stream<T> stream) {
       return stream.collect(toImmutableEnumSet());
     }

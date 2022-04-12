@@ -1,11 +1,11 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.not;
 
 import com.google.common.collect.Streams;
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -216,7 +216,7 @@ final class StreamTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Optional<T> after(Stream<T> stream) {
       return stream.min(naturalOrder());
     }
@@ -242,7 +242,7 @@ final class StreamTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Optional<T> after(Stream<T> stream) {
       return stream.max(naturalOrder());
     }

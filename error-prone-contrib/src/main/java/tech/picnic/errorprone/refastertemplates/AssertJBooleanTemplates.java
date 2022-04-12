@@ -1,8 +1,8 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -59,7 +59,7 @@ final class AssertJBooleanTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractBooleanAssert<?> after(boolean b) {
       return assertThat(b).isTrue();
     }
@@ -88,7 +88,7 @@ final class AssertJBooleanTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractBooleanAssert<?> after(boolean b) {
       return assertThat(b).isFalse();
     }

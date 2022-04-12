@@ -1,9 +1,9 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Objects.requireNonNullElse;
 
 import com.google.common.base.MoreObjects;
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
@@ -24,7 +24,7 @@ final class NullTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     T after(T first, T second) {
       return requireNonNullElse(first, second);
     }

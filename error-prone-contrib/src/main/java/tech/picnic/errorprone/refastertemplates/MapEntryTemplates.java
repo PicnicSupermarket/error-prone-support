@@ -1,12 +1,12 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.Map.Entry.comparingByValue;
 
 import com.google.common.collect.Maps;
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -51,7 +51,7 @@ final class MapEntryTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<Map.Entry<K, V>> after() {
       return comparingByKey();
     }
@@ -65,7 +65,7 @@ final class MapEntryTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<Map.Entry<K, V>> after(Comparator<? super K> cmp) {
       return comparingByKey(cmp);
     }
@@ -80,7 +80,7 @@ final class MapEntryTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<Map.Entry<K, V>> after() {
       return comparingByValue();
     }
@@ -94,7 +94,7 @@ final class MapEntryTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<Map.Entry<K, V>> after(Comparator<? super V> cmp) {
       return comparingByValue(cmp);
     }

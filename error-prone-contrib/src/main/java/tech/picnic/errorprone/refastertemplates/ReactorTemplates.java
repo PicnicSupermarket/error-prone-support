@@ -1,9 +1,9 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.MoreCollectors.toOptional;
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 
 import com.google.common.collect.MoreCollectors;
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -217,7 +217,7 @@ final class ReactorTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Mono<Optional<T>> after(Mono<T> mono) {
       return mono.flux().collect(toOptional());
     }

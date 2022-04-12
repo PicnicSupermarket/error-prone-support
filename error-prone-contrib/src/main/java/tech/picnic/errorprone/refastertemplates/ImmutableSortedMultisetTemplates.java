@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSortedMultiset;
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
@@ -8,7 +9,6 @@ import static java.util.stream.Collectors.toList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.Streams;
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -140,7 +140,7 @@ final class ImmutableSortedMultisetTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ImmutableSortedMultiset<T> after(Stream<T> stream) {
       return stream.collect(toImmutableSortedMultiset(naturalOrder()));
     }

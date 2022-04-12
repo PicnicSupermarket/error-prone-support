@@ -1,8 +1,8 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -26,7 +26,7 @@ final class AssertJOptionalTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractObjectAssert<?, T> after(Optional<T> optional) {
       return assertThat(optional).get();
     }
@@ -53,7 +53,7 @@ final class AssertJOptionalTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     OptionalAssert<T> after(Optional<T> optional) {
       return assertThat(optional).isPresent();
     }
@@ -80,7 +80,7 @@ final class AssertJOptionalTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     OptionalAssert<T> after(Optional<T> optional) {
       return assertThat(optional).isEmpty();
     }
@@ -122,7 +122,7 @@ final class AssertJOptionalTemplates {
     }
 
     @AfterTemplate
-    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractObjectAssert<?, T> after(Optional<T> optional, Predicate<? super T> predicate) {
       return assertThat(optional).get().matches(predicate);
     }
