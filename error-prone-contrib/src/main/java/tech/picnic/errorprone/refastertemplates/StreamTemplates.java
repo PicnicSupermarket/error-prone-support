@@ -4,6 +4,7 @@ import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.joining;
 
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
@@ -18,11 +19,30 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** Refaster templates related to expressions dealing with {@link Stream}s. */
 final class StreamTemplates {
   private StreamTemplates() {}
+
+  /**
+   * Prefer {@link Collectors#joining()} over {@link Collectors#joining(CharSequence)} with an empty
+   * delimiter string.
+   */
+  static final class Joining {
+    @BeforeTemplate
+    Collector<CharSequence, ?, String> before() {
+      return joining("");
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Collector<CharSequence, ?, String> after() {
+      return joining();
+    }
+  }
 
   /** Prefer {@link Stream#empty()} over less clear alternatives. */
   static final class EmptyStream<T> {

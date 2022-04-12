@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.joining;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
@@ -15,6 +16,10 @@ final class StreamTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Objects.class, Streams.class, not(null), reverseOrder());
+  }
+
+  String testJoining() {
+    return Stream.of("foo").collect(joining(""));
   }
 
   Stream<String> testEmptyStream() {
