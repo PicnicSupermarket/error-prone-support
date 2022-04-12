@@ -39,37 +39,6 @@ final class ImmutableSetTemplates {
     }
   }
 
-  /** Prefer {@link ImmutableSet#of()} over more contrived alternatives. */
-  static final class EmptyImmutableSet<T> {
-    @BeforeTemplate
-    ImmutableSet<T> before() {
-      return Refaster.anyOf(
-          ImmutableSet.<T>builder().build(), Stream.<T>empty().collect(toImmutableSet()));
-    }
-
-    @AfterTemplate
-    ImmutableSet<T> after() {
-      return ImmutableSet.of();
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableSet#of(Object)} over alternatives that don't communicate the
-   * immutability of the resulting set at the type level.
-   */
-  // XXX: Note that this rewrite rule is incorrect for nullable elements.
-  static final class SingletonImmutableSet<T> {
-    @BeforeTemplate
-    Set<T> before(T element) {
-      return Collections.singleton(element);
-    }
-
-    @AfterTemplate
-    ImmutableSet<T> after(T element) {
-      return ImmutableSet.of(element);
-    }
-  }
-
   /** Prefer {@link ImmutableSet#copyOf(Iterable)} and variants over more contrived alternatives. */
   static final class IterableToImmutableSet<T> {
     @BeforeTemplate
@@ -136,6 +105,118 @@ final class ImmutableSetTemplates {
     @AfterTemplate
     ImmutableSet<T> after(SetView<T> set) {
       return set.immutableCopy();
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#of()} over more contrived alternatives or alternatives that don't
+   * communicate the immutability of the resulting set at the type level.
+   */
+  // XXX: The `Stream` variant may be too contrived to warrant inclusion. Review its usage if/when
+  // this and similar Refaster templates are replaced with an Error Prone check.
+  static final class ImmutableSetOf<T> {
+    @BeforeTemplate
+    Set<T> before() {
+      return Refaster.anyOf(
+          ImmutableSet.<T>builder().build(),
+          Stream.<T>empty().collect(toImmutableSet()),
+          Collections.emptySet(),
+          Set.of());
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after() {
+      return ImmutableSet.of();
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#of(Object)} over more contrived alternatives or alternatives that
+   * don't communicate the immutability of the resulting set at the type level.
+   */
+  // XXX: Note that the replacement of `Collections#singleton` is incorrect for nullable elements.
+  static final class ImmutableSetOf1<T> {
+    @BeforeTemplate
+    Set<T> before(T e1) {
+      return Refaster.anyOf(
+          ImmutableSet.<T>builder().add(e1).build(), Collections.singleton(e1), Set.of(e1));
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1) {
+      return ImmutableSet.of(e1);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#of(Object, Object)} over alternatives that don't communicate the
+   * immutability of the resulting set at the type level.
+   */
+  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // `ImmutableSet.builder()` usages.
+  static final class ImmutableSetOf2<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2) {
+      return Set.of(e1, e2);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2) {
+      return ImmutableSet.of(e1, e2);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#of(Object, Object, Object)} over alternatives that don't communicate
+   * the immutability of the resulting set at the type level.
+   */
+  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // `ImmutableSet.builder()` usages.
+  static final class ImmutableSetOf3<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2, T e3) {
+      return Set.of(e1, e2, e3);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2, T e3) {
+      return ImmutableSet.of(e1, e2, e3);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object)} over alternatives that don't
+   * communicate the immutability of the resulting set at the type level.
+   */
+  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // `ImmutableSet.builder()` usages.
+  static final class ImmutableSetOf4<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2, T e3, T e4) {
+      return Set.of(e1, e2, e3, e4);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2, T e3, T e4) {
+      return ImmutableSet.of(e1, e2, e3, e4);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object, Object)} over alternatives that
+   * don't communicate the immutability of the resulting set at the type level.
+   */
+  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // `ImmutableSet.builder()` usages.
+  static final class ImmutableSetOf5<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2, T e3, T e4, T e5) {
+      return Set.of(e1, e2, e3, e4, e5);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5) {
+      return ImmutableSet.of(e1, e2, e3, e4, e5);
     }
   }
 }

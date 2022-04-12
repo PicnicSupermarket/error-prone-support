@@ -32,14 +32,6 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableList.builder();
   }
 
-  ImmutableSet<ImmutableList<Integer>> testEmptyImmutableList() {
-    return ImmutableSet.of(ImmutableList.of(), ImmutableList.of());
-  }
-
-  List<String> testSingletonImmutableList() {
-    return ImmutableList.of("foo");
-  }
-
   ImmutableSet<ImmutableList<Integer>> testIterableToImmutableList() {
     return ImmutableSet.of(
         ImmutableList.copyOf(ImmutableList.of(1)),
@@ -73,5 +65,30 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableList<Integer> testStreamToDistinctImmutableList() {
     return Stream.of(1).collect(toImmutableSet()).asList();
+  }
+
+  ImmutableSet<List<Integer>> testImmutableListOf() {
+    return ImmutableSet.of(
+        ImmutableList.of(), ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
+  }
+
+  ImmutableSet<List<Integer>> testImmutableListOf1() {
+    return ImmutableSet.of(ImmutableList.of(1), ImmutableList.of(1));
+  }
+
+  List<Integer> testImmutableListOf2() {
+    return ImmutableList.of(1, 2);
+  }
+
+  List<Integer> testImmutableListOf3() {
+    return ImmutableList.of(1, 2, 3);
+  }
+
+  List<Integer> testImmutableListOf4() {
+    return ImmutableList.of(1, 2, 3, 4);
+  }
+
+  List<Integer> testImmutableListOf5() {
+    return ImmutableList.of(1, 2, 3, 4, 5);
   }
 }

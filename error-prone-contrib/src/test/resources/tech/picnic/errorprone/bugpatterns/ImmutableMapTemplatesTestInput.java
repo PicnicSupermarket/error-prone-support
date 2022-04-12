@@ -23,16 +23,6 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
     return new ImmutableMap.Builder<>();
   }
 
-  ImmutableMap<String, Integer> testEmptyImmutableMap() {
-    return ImmutableMap.<String, Integer>builder().build();
-  }
-
-  ImmutableSet<Map<String, Integer>> testPairToImmutableMap() {
-    return ImmutableSet.of(
-        ImmutableMap.<String, Integer>builder().put("foo", 1).build(),
-        Collections.singletonMap("bar", 2));
-  }
-
   ImmutableSet<ImmutableMap<String, Integer>> testEntryToImmutableMap() {
     return ImmutableSet.of(
         ImmutableMap.<String, Integer>builder().put(Map.entry("foo", 1)).build(),
@@ -85,5 +75,35 @@ final class ImmutableMapTemplatesTest implements RefasterTemplateTestCase {
         Maps.toMap(
             ImmutableMap.of("bar", 2L).keySet(),
             k -> Math.toIntExact(ImmutableMap.of("bar", 2L).get(k))));
+  }
+
+  ImmutableSet<Map<String, String>> testImmutableMapOf() {
+    return ImmutableSet.of(
+        ImmutableMap.<String, String>builder().build(),
+        Collections.<String, String>emptyMap(),
+        Map.<String, String>of());
+  }
+
+  ImmutableSet<Map<String, String>> testImmutableMapOf1() {
+    return ImmutableSet.of(
+        ImmutableMap.<String, String>builder().put("k1", "v1").build(),
+        Collections.singletonMap("k1", "v1"),
+        Map.of("k1", "v1"));
+  }
+
+  Map<String, String> testImmutableMapOf2() {
+    return Map.of("k1", "v1", "k2", "v2");
+  }
+
+  Map<String, String> testImmutableMapOf3() {
+    return Map.of("k1", "v1", "k2", "v2", "k3", "v3");
+  }
+
+  Map<String, String> testImmutableMapOf4() {
+    return Map.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4");
+  }
+
+  Map<String, String> testImmutableMapOf5() {
+    return Map.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4", "k5", "v5");
   }
 }
