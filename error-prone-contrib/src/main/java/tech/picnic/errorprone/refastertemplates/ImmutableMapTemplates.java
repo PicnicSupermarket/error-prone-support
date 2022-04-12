@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.function.Function.identity;
 
@@ -214,7 +215,7 @@ final class ImmutableMapTemplates {
   static final class ImmutableMapOf<K, V> {
     @BeforeTemplate
     Map<K, V> before() {
-      return Refaster.anyOf(ImmutableMap.<K, V>builder().build(), Collections.emptyMap(), Map.of());
+      return Refaster.anyOf(ImmutableMap.<K, V>builder().build(), emptyMap(), Map.of());
     }
 
     @AfterTemplate
@@ -233,9 +234,7 @@ final class ImmutableMapTemplates {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1) {
       return Refaster.anyOf(
-          ImmutableMap.<K, V>builder().put(k1, v1).build(),
-          Collections.singletonMap(k1, v1),
-          Map.of(k1, v1));
+          ImmutableMap.<K, V>builder().put(k1, v1).build(), singletonMap(k1, v1), Map.of(k1, v1));
     }
 
     @AfterTemplate

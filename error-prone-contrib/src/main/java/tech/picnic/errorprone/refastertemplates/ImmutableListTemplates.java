@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refastertemplates;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -168,7 +169,7 @@ final class ImmutableListTemplates {
       return Refaster.anyOf(
           ImmutableList.<T>builder().build(),
           Stream.<T>empty().collect(toImmutableList()),
-          Collections.emptyList(),
+          emptyList(),
           List.of());
     }
 
@@ -188,7 +189,7 @@ final class ImmutableListTemplates {
     @BeforeTemplate
     List<T> before(T e1) {
       return Refaster.anyOf(
-          ImmutableList.<T>builder().add(e1).build(), Collections.singletonList(e1), List.of(e1));
+          ImmutableList.<T>builder().add(e1).build(), singletonList(e1), List.of(e1));
     }
 
     @AfterTemplate
