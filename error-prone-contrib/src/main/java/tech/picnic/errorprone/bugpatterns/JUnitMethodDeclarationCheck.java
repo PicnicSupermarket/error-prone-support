@@ -8,6 +8,7 @@ import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static java.util.function.Predicate.not;
+import static tech.picnic.errorprone.bugpatterns.JavaKeywords.isReservedKeyword;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
@@ -23,10 +24,14 @@ import com.google.errorprone.matchers.MultiMatcher;
 import com.google.errorprone.predicates.TypePredicate;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 
 /** A {@link BugChecker} which flags non-canonical JUnit method declarations. */
 // XXX: Consider introducing a class-level check which enforces that test classes:
@@ -76,29 +81,101 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
       return Description.NO_MATCH;
     }
 
-    SuggestedFix.Builder builder = SuggestedFix.builder();
+    SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
     SuggestedFixes.removeModifiers(tree.getModifiers(), state, ILLEGAL_MODIFIERS)
-        .ifPresent(builder::merge);
+        .ifPresent(fixBuilder::merge);
 
     if (isTestMethod) {
-      // XXX: In theory this rename could clash with an existing method or static import. In that
-      // case we should emit a warning without a suggested replacement.
-      tryCanonicalizeMethodName(tree, state).ifPresent(builder::merge);
+      suggestTestMethodRenameIfApplicable(tree, fixBuilder, state);
     }
 
-    return builder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, builder.build());
+    return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
   }
 
-  private static Optional<SuggestedFix> tryCanonicalizeMethodName(
-      MethodTree tree, VisitorState state) {
+  private void suggestTestMethodRenameIfApplicable(
+      MethodTree tree, SuggestedFix.Builder fixBuilder, VisitorState state) {
+    tryCanonicalizeMethodName(tree)
+        .ifPresent(
+            newName ->
+                findMethodRenameBlocker(newName, state)
+                    .ifPresentOrElse(
+                        blocker -> reportMethodRenameBlocker(tree, blocker, state),
+                        () -> fixBuilder.merge(SuggestedFixes.renameMethod(tree, newName, state))));
+  }
+
+  private void reportMethodRenameBlocker(MethodTree tree, String reason, VisitorState state) {
+    state.reportMatch(
+        buildDescription(tree)
+            .setMessage(
+                String.format(
+                    "This method's name should not redundantly start with `%s` (but note that %s)",
+                    TEST_PREFIX, reason))
+            .build());
+  }
+
+  /**
+   * If applicable, returns a human-readable argument against assigning the given name to an
+   * existing method.
+   *
+   * <p>This method implements imperfect heuristics. Things it currently does not consider include
+   * the following:
+   *
+   * <ul>
+   *   <li>Whether the rename would merely introduce a method overload, rather than clashing with an
+   *       existing method declaration.
+   *   <li>Whether the rename would cause a method in a superclass to be overridden.
+   *   <li>Whether the rename would in fact clash with a static import. (It could be that a static
+   *       import of the same name is only referenced from lexical scopes in which the method under
+   *       consideration cannot be referenced directly.)
+   * </ul>
+   */
+  private static Optional<String> findMethodRenameBlocker(String methodName, VisitorState state) {
+    if (isMethodInEnclosingClass(methodName, state)) {
+      return Optional.of(
+          String.format("a method named `%s` already exists in this class", methodName));
+    }
+
+    if (isSimpleNameStaticallyImported(methodName, state)) {
+      return Optional.of(String.format("`%s` is already statically imported", methodName));
+    }
+
+    if (isReservedKeyword(methodName)) {
+      return Optional.of(String.format("`%s` is a reserved keyword", methodName));
+    }
+
+    return Optional.empty();
+  }
+
+  private static boolean isMethodInEnclosingClass(String methodName, VisitorState state) {
+    return state.findEnclosing(ClassTree.class).getMembers().stream()
+        .filter(MethodTree.class::isInstance)
+        .map(MethodTree.class::cast)
+        .map(MethodTree::getName)
+        .map(Name::toString)
+        .anyMatch(methodName::equals);
+  }
+
+  private static boolean isSimpleNameStaticallyImported(String simpleName, VisitorState state) {
+    return state.getPath().getCompilationUnit().getImports().stream()
+        .filter(ImportTree::isStatic)
+        .map(ImportTree::getQualifiedIdentifier)
+        .map(tree -> getStaticImportSimpleName(tree, state))
+        .anyMatch(simpleName::contentEquals);
+  }
+
+  private static CharSequence getStaticImportSimpleName(Tree tree, VisitorState state) {
+    String source = Util.treeToString(tree, state);
+    return source.subSequence(source.lastIndexOf('.') + 1, source.length());
+  }
+
+  private static Optional<String> tryCanonicalizeMethodName(MethodTree tree) {
     return Optional.ofNullable(ASTHelpers.getSymbol(tree))
         .map(sym -> sym.getQualifiedName().toString())
         .filter(name -> name.startsWith(TEST_PREFIX))
         .map(name -> name.substring(TEST_PREFIX.length()))
         .filter(not(String::isEmpty))
         .map(name -> Character.toLowerCase(name.charAt(0)) + name.substring(1))
-        .filter(name -> !Character.isDigit(name.charAt(0)))
-        .map(name -> SuggestedFixes.renameMethod(tree, name, state));
+        .filter(name -> !Character.isDigit(name.charAt(0)));
   }
 
   // XXX: Move to a `MoreMatchers` utility class.
