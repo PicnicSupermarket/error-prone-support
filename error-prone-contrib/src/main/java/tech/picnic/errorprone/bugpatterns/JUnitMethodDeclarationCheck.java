@@ -150,7 +150,6 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
     return state.findEnclosing(ClassTree.class).getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
-        .filter(not(ASTHelpers::isGeneratedConstructor))
         .map(MethodTree::getName)
         .map(Name::toString)
         .anyMatch(methodName::equals);
