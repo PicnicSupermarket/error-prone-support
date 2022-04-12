@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static java.time.ZoneOffset.UTC;
+
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
@@ -50,13 +52,13 @@ final class TimeTemplates {
           ZoneId.of("UTC"),
           ZoneId.of("+0"),
           ZoneId.of("-0"),
-          ZoneOffset.UTC.normalized(),
-          ZoneId.from(ZoneOffset.UTC));
+          UTC.normalized(),
+          ZoneId.from(UTC));
     }
 
     @AfterTemplate
     ZoneOffset after() {
-      return ZoneOffset.UTC;
+      return UTC;
     }
   }
 
@@ -78,7 +80,7 @@ final class TimeTemplates {
     @BeforeTemplate
     @SuppressWarnings("TimeZoneUsage")
     Clock before() {
-      return Clock.system(ZoneOffset.UTC);
+      return Clock.system(UTC);
     }
 
     @AfterTemplate

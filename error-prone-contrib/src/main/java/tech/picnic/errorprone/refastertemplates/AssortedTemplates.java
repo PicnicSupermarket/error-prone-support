@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Sets.toImmutableEnumSet;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Collections.disjoint;
 import static java.util.Objects.checkIndex;
 
 import com.google.common.base.Splitter;
@@ -162,7 +163,7 @@ final class AssortedTemplates {
 
     @AfterTemplate
     boolean after(Set<T> set1, Set<T> set2) {
-      return Collections.disjoint(set1, set2);
+      return disjoint(set1, set2);
     }
   }
 
@@ -177,15 +178,15 @@ final class AssortedTemplates {
     @BeforeTemplate
     boolean before(Collection<T> collection1, Collection<T> collection2) {
       return Refaster.anyOf(
-          Collections.disjoint(ImmutableSet.copyOf(collection1), collection2),
-          Collections.disjoint(new HashSet<>(collection1), collection2),
-          Collections.disjoint(collection1, ImmutableSet.copyOf(collection2)),
-          Collections.disjoint(collection1, new HashSet<>(collection2)));
+          disjoint(ImmutableSet.copyOf(collection1), collection2),
+          disjoint(new HashSet<>(collection1), collection2),
+          disjoint(collection1, ImmutableSet.copyOf(collection2)),
+          disjoint(collection1, new HashSet<>(collection2)));
     }
 
     @AfterTemplate
     boolean after(Collection<T> collection1, Collection<T> collection2) {
-      return Collections.disjoint(collection1, collection2);
+      return disjoint(collection1, collection2);
     }
   }
 

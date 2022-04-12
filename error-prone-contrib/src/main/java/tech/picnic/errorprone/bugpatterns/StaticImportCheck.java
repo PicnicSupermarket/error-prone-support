@@ -76,6 +76,7 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
           "com.mongodb.client.model.Sorts",
           "com.mongodb.client.model.Updates",
           "java.nio.charset.StandardCharsets",
+          "java.util.Collections",
           "java.util.Comparator",
           "java.util.Map.Entry",
           "java.util.regex.Pattern",
@@ -146,10 +147,25 @@ public final class StaticImportCheck extends BugChecker implements MemberSelectT
    * <p>Identifiers listed by {@link #STATIC_IMPORT_EXEMPTED_IDENTIFIERS} should be omitted from
    * this collection.
    */
+  // XXX: Perhaps the set of exempted `java.util.Collections` methods is too strict. For now any
+  // method name that could be considered "too vague" or could conceivably mean something else in a
+  // specific context is left out.
   @VisibleForTesting
   static final ImmutableSetMultimap<String, String> STATIC_IMPORT_EXEMPTED_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
           .put("com.mongodb.client.model.Filters", "empty")
+          .putAll(
+              "java.util.Collections",
+              "addAll",
+              "copy",
+              "fill",
+              "list",
+              "max",
+              "min",
+              "nCopies",
+              "rotate",
+              "sort",
+              "swap")
           .putAll("java.util.regex.Pattern", "compile", "matches", "quote")
           .put("org.springframework.http.MediaType", "ALL")
           .build();

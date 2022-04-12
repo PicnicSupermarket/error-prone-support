@@ -2,6 +2,8 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -15,7 +17,6 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -120,7 +121,7 @@ final class ImmutableSetTemplates {
       return Refaster.anyOf(
           ImmutableSet.<T>builder().build(),
           Stream.<T>empty().collect(toImmutableSet()),
-          Collections.emptySet(),
+          emptySet(),
           Set.of());
     }
 
@@ -138,8 +139,7 @@ final class ImmutableSetTemplates {
   static final class ImmutableSetOf1<T> {
     @BeforeTemplate
     Set<T> before(T e1) {
-      return Refaster.anyOf(
-          ImmutableSet.<T>builder().add(e1).build(), Collections.singleton(e1), Set.of(e1));
+      return Refaster.anyOf(ImmutableSet.<T>builder().add(e1).build(), singleton(e1), Set.of(e1));
     }
 
     @AfterTemplate
