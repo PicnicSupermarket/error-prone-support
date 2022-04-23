@@ -728,12 +728,6 @@
                         </compilerArgs>
                         <parameters>true</parameters>
                         <release>${version.jdk}</release>
-                        <!-- Even though `-release X` implies `-source X` and
-                        `-target X`, we need to configure these properties
-                        explicitily, for otherwise the plugin's default value
-                        of `1.6` is passed on. -->
-                        <source>${version.jdk}</source>
-                        <target>${version.jdk}</target>
                         <!-- Erroneously inverted logic... for details, see
                         https://issues.apache.org/jira/browse/MCOMPILER-209. -->
                         <useIncrementalCompilation>false</useIncrementalCompilation>
