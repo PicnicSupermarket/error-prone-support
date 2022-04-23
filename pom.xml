@@ -133,6 +133,7 @@
         <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
+        <version.hamcrest>2.2</version.hamcrest>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
         <version.mockito>4.0.0</version.mockito>
@@ -344,8 +345,18 @@
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest</artifactId>
+                <version>${version.hamcrest}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-core</artifactId>
+                <version>${version.hamcrest}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
                 <artifactId>hamcrest-library</artifactId>
-                <version>2.2</version>
+                <version>${version.hamcrest}</version>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
@@ -1002,6 +1013,7 @@
                                 BSD-3-Clause
                                 | 3-Clause BSD License
                                 | BSD 3-clause
+                                | BSD License 3
                                 | Eclipse Distribution License (New BSD License)
                                 | New BSD License
                             </licenseMerge>
