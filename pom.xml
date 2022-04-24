@@ -146,7 +146,7 @@
         `RefasterRuleBuilderScanner` to convert those to `.refaster` files so
         that we can pick them up. (But in case of `baseline-refaster-rules`
         perhaps we can simply incorporate all of them.) -->
-        <version.palantir-assertj-automation>0.3.0</version.palantir-assertj-automation>
+        <version.palantir-assertj-automation>0.6.0</version.palantir-assertj-automation>
         <version.palantir-baseline>4.42.0</version.palantir-baseline>
         <version.surefire>2.22.2</version.surefire>
     </properties>
