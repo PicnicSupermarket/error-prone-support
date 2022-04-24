@@ -753,10 +753,16 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <ignoreDirect>false</ignoreDirect>
                         <ignoreNonCompile>true</ignoreNonCompile>
+                        <!-- XXX: Drop/review this configuration once
+                        https://issues.apache.org/jira/browse/MDEP-791 is
+                        resolved. -->
+                        <ignoredNonTestScopedDependencies>
+                            <ignoredNonTestScopedDependency>*</ignoredNonTestScopedDependency>
+                        </ignoredNonTestScopedDependencies>
                     </configuration>
                 </plugin>
                 <plugin>
