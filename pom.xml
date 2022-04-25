@@ -135,7 +135,7 @@
         <version.auto-value>1.9</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-3</version.error-prone-fork>
-        <version.error-prone-orig>2.10.0</version.error-prone-orig>
+        <version.error-prone-orig>2.13.1</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
