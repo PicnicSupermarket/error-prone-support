@@ -75,7 +75,7 @@ public final class ScheduledTransactionTraceCheck extends BugChecker implements 
     return describeMatch(
         traceAnnotation,
         SuggestedFixes.updateAnnotationArgumentValues(
-                traceAnnotation, "dispatcher", ImmutableList.of("true"))
+                traceAnnotation, state, "dispatcher", ImmutableList.of("true"))
             .build());
   }
 

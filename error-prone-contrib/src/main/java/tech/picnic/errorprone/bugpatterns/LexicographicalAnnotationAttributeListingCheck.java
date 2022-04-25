@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 /**
  * A {@link BugChecker} which flags annotation array listings which aren't sorted lexicographically.
@@ -171,18 +172,21 @@ public final class LexicographicalAnnotationAttributeListingCheck extends BugChe
     ImmutableList.Builder<ImmutableList<String>> nodes = ImmutableList.builder();
 
     new TreeScanner<Void, Void>() {
+      @Nullable
       @Override
       public Void visitIdentifier(IdentifierTree node, Void ctx) {
         nodes.add(tokenize(node));
         return super.visitIdentifier(node, ctx);
       }
 
+      @Nullable
       @Override
       public Void visitLiteral(LiteralTree node, Void ctx) {
         nodes.add(tokenize(node));
         return super.visitLiteral(node, ctx);
       }
 
+      @Nullable
       @Override
       public Void visitPrimitiveType(PrimitiveTypeTree node, Void ctx) {
         nodes.add(tokenize(node));

@@ -166,11 +166,12 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
         flags
             .get(INCLUDED_TEMPLATES_PATTERN_FLAG)
             .map(Pattern::compile)
-            .map(nameFilter -> filterCodeTransformers(allTransformers, nameFilter))
+            .<ImmutableCollection<CodeTransformer>>map(
+                nameFilter -> filterCodeTransformers(allTransformers, nameFilter))
             .orElseGet(allTransformers::values));
   }
 
-  private static ImmutableCollection<CodeTransformer> filterCodeTransformers(
+  private static ImmutableList<CodeTransformer> filterCodeTransformers(
       ImmutableListMultimap<String, CodeTransformer> transformers, Pattern nameFilter) {
     return transformers.entries().stream()
         .filter(e -> nameFilter.matcher(e.getKey()).matches())

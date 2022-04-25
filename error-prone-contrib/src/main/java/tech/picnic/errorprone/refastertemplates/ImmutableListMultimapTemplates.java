@@ -92,7 +92,7 @@ final class ImmutableListMultimapTemplates {
    */
   static final class EntryToImmutableListMultimap<K, V> {
     @BeforeTemplate
-    ImmutableMultimap<K, V> before(Map.Entry<? extends K, ? extends V> entry) {
+    ImmutableListMultimap<K, V> before(Map.Entry<? extends K, ? extends V> entry) {
       return Refaster.anyOf(
           ImmutableListMultimap.<K, V>builder().put(entry).build(),
           Stream.of(entry)

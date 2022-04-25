@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
@@ -89,14 +88,14 @@ final class ImmutableSortedSetTemplates {
   // `reverseOrder`.) Worth the hassle?
   static final class IterableToImmutableSortedSet<T extends Comparable<? super T>> {
     @BeforeTemplate
-    ImmutableSet<T> before(T[] iterable) {
+    ImmutableSortedSet<T> before(T[] iterable) {
       return Refaster.anyOf(
           ImmutableSortedSet.<T>naturalOrder().add(iterable).build(),
           Arrays.stream(iterable).collect(toImmutableSortedSet(naturalOrder())));
     }
 
     @BeforeTemplate
-    ImmutableSet<T> before(Iterator<T> iterable) {
+    ImmutableSortedSet<T> before(Iterator<T> iterable) {
       return Refaster.anyOf(
           ImmutableSortedSet.copyOf(naturalOrder(), iterable),
           ImmutableSortedSet.<T>naturalOrder().addAll(iterable).build(),
@@ -104,7 +103,7 @@ final class ImmutableSortedSetTemplates {
     }
 
     @BeforeTemplate
-    ImmutableSet<T> before(Iterable<T> iterable) {
+    ImmutableSortedSet<T> before(Iterable<T> iterable) {
       return Refaster.anyOf(
           ImmutableSortedSet.copyOf(naturalOrder(), iterable),
           ImmutableSortedSet.<T>naturalOrder().addAll(iterable).build(),

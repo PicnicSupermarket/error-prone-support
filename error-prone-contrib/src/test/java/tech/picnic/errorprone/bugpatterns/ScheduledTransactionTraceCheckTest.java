@@ -4,8 +4,6 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledForJreRange;
-import org.junit.jupiter.api.condition.JRE;
 
 final class ScheduledTransactionTraceCheckTest {
   private final CompilationTestHelper compilationTestHelper =
@@ -45,10 +43,7 @@ final class ScheduledTransactionTraceCheckTest {
         .doTest();
   }
 
-  // XXX: Enable this test for all JREs once https://github.com/google/error-prone/pull/2820 is
-  // merged and released.
   @Test
-  @DisabledForJreRange(min = JRE.JAVA_12)
   void replacement() {
     refactoringTestHelper
         .addInputLines(

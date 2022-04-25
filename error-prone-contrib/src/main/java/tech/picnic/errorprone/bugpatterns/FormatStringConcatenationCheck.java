@@ -31,6 +31,7 @@ import com.sun.source.util.SimpleTreeVisitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 /**
  * A {@link BugChecker} which flags string concatenations that produce a format string; in such
@@ -210,6 +211,7 @@ public final class FormatStringConcatenationCheck extends BugChecker
       this.formatSpecifier = formatSpecifier;
     }
 
+    @Nullable
     @Override
     public Void visitBinary(BinaryTree tree, VisitorState state) {
       if (tree.getKind() == Kind.PLUS && isStringTyped(tree, state)) {
@@ -222,11 +224,13 @@ public final class FormatStringConcatenationCheck extends BugChecker
       return null;
     }
 
+    @Nullable
     @Override
     public Void visitParenthesized(ParenthesizedTree tree, VisitorState state) {
       return tree.getExpression().accept(this, state);
     }
 
+    @Nullable
     @Override
     protected Void defaultAction(Tree tree, VisitorState state) {
       appendExpression(tree);
