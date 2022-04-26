@@ -1087,12 +1087,6 @@
                     <version>2.4.0</version>
                     <configuration>
                         <exclusionPatterns>
-                            <!-- The plugin suggests replacing Guava's
-                            immutable collection factory methods with
-                            `java.util.{List,Map,Set}.{copyOf,of}`, but those
-                            methods don't allow one to convey immutability at
-                            the type system level. -->
-                            <exclusionPattern>com/google/common/collect/Immutable(List|Map|Set)\.(copyOf|of):.*</exclusionPattern>
                             <!-- The plugin suggests replacing usages of
                             Guava's `Iterables` class with
                             `java.util.stream.Stream` equivalents, but the
