@@ -25,6 +25,12 @@
 
     <developers>
         <developer>
+            <name>Rick Ossendrijver</name>
+            <email>rick.ossendrijver@teampicnic.com</email>
+            <organization>Picnic Technologies BV</organization>
+            <timezone>Europe/Amsterdam</timezone>
+        </developer>
+        <developer>
             <name>Stephan Schroevers</name>
             <email>stephan.schroevers@teampicnic.com</email>
             <organization>Picnic Technologies BV</organization>
@@ -564,7 +570,7 @@
                                     </module>
                                     <module name="EmptyStatement" />
                                     <module name="FinalClass" />
-                                    <module name="HiddenFieldCheck">
+                                    <module name="HiddenField">
                                         <property name="ignoreConstructorParameter" value="true" />
                                         <property name="ignoreSetter" value="true" />
                                         <property name="setterCanReturnItsClass" value="true" />
