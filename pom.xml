@@ -108,9 +108,9 @@
             from showing up in the dock and capturing window focus. -->
             -Djava.awt.headless=true
         </argLine>
-        <!-- Our build system (Travis CI) provides a monotonically increasing
-        build number. When building locally, this number is obviously absent.
-        So we provide a default value. -->
+        <!-- Our build system provides a monotonically increasing build number.
+        When building locally, this number is obviously absent. So we provide a
+        default value. -->
         <build.number>LOCAL</build.number>
         <!-- Properties using which additional Error Prone flags can be
         specified. Used by the `patch` and `self-check` profiles. -->
