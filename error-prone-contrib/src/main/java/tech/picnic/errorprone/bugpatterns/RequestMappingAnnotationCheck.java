@@ -69,7 +69,8 @@ public final class RequestMappingAnnotationCheck extends BugChecker implements M
                   isSameType("javax.servlet.http.HttpServletRequest"),
                   isSameType("javax.servlet.http.HttpServletResponse"),
                   isSameType("org.springframework.http.HttpMethod"),
-                  isSubtypeOf("org.springframework.web.context.request.WebRequest"))));
+                  isSubtypeOf("org.springframework.web.context.request.WebRequest"),
+                  isSubtypeOf("org.springframework.web.server.ServerWebExchange"))));
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {

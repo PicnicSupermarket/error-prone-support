@@ -3,7 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class RequestMappingAnnotationCheckTest {
+final class RequestMappingAnnotationCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(RequestMappingAnnotationCheck.class, getClass());
 
@@ -28,6 +28,7 @@ public final class RequestMappingAnnotationCheckTest {
             "import org.springframework.web.bind.annotation.RequestMethod;",
             "import org.springframework.web.bind.annotation.RequestParam;",
             "import org.springframework.web.context.request.WebRequest;",
+            "import org.springframework.web.server.ServerWebExchange;",
             "",
             "interface A {",
             "  A noMapping();",
@@ -42,6 +43,7 @@ public final class RequestMappingAnnotationCheckTest {
             "  @RequestMapping A properHttpServletResponse(HttpServletResponse response);",
             "  @RequestMapping A properHttpMethod(HttpMethod method);",
             "  @RequestMapping A properWebRequest(WebRequest request);",
+            "  @RequestMapping A properServerWebExchange(ServerWebExchange exchange);",
             "",
             "  // BUG: Diagnostic contains:",
             "  @DeleteMapping A delete(String param);",
