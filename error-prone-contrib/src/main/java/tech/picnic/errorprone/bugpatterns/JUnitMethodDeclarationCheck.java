@@ -29,6 +29,7 @@ import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
@@ -78,6 +79,11 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
 
     boolean isTestMethod = TEST_METHOD.matches(tree, state);
     if (!isTestMethod && !SETUP_OR_TEARDOWN_METHOD.matches(tree, state)) {
+      return Description.NO_MATCH;
+    }
+
+    var parentLeaf = ((JCClassDecl) state.getPath().getParentPath().getLeaf());
+    if (parentLeaf.getModifiers().getFlags().contains(Modifier.ABSTRACT)) {
       return Description.NO_MATCH;
     }
 
