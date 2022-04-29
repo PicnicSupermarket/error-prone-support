@@ -3,7 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class RequestMappingAnnotationCheckTest {
+final class RequestMappingAnnotationCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(RequestMappingAnnotationCheck.class, getClass());
 
@@ -13,6 +13,9 @@ public final class RequestMappingAnnotationCheckTest {
         .addSourceLines(
             "A.java",
             "import java.io.InputStream;",
+            "import java.time.ZoneId;",
+            "import java.util.Locale;",
+            "import java.util.TimeZone;",
             "import javax.servlet.http.HttpServletRequest;",
             "import javax.servlet.http.HttpServletResponse;",
             "import org.springframework.http.HttpMethod;",
@@ -27,7 +30,11 @@ public final class RequestMappingAnnotationCheckTest {
             "import org.springframework.web.bind.annotation.RequestMapping;",
             "import org.springframework.web.bind.annotation.RequestMethod;",
             "import org.springframework.web.bind.annotation.RequestParam;",
+            "import org.springframework.web.context.request.NativeWebRequest;",
             "import org.springframework.web.context.request.WebRequest;",
+            "import org.springframework.web.server.ServerWebExchange;",
+            "import org.springframework.web.util.UriBuilder;",
+            "import org.springframework.web.util.UriComponentsBuilder;",
             "",
             "interface A {",
             "  A noMapping();",
@@ -38,10 +45,17 @@ public final class RequestMappingAnnotationCheckTest {
             "  @PostMapping A properRequestHeader(@RequestHeader String header);",
             "  @PutMapping A properRequestParam(@RequestParam String param);",
             "  @RequestMapping A properInputStream(InputStream input);",
+            "  @RequestMapping A properZoneId(ZoneId zoneId);",
+            "  @RequestMapping A properLocale(Locale locale);",
+            "  @RequestMapping A properTimeZone(TimeZone timeZone);",
             "  @RequestMapping A properHttpServletRequest(HttpServletRequest request);",
             "  @RequestMapping A properHttpServletResponse(HttpServletResponse response);",
             "  @RequestMapping A properHttpMethod(HttpMethod method);",
+            "  @RequestMapping A properNativeWebRequest(NativeWebRequest request);",
             "  @RequestMapping A properWebRequest(WebRequest request);",
+            "  @RequestMapping A properServerWebExchange(ServerWebExchange exchange);",
+            "  @RequestMapping A properServerUriBuilder(UriBuilder builder);",
+            "  @RequestMapping A properServerUriComponentsBuilder(UriComponentsBuilder builder);",
             "",
             "  // BUG: Diagnostic contains:",
             "  @DeleteMapping A delete(String param);",

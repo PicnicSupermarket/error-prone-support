@@ -8,7 +8,6 @@ import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAS
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isSameType;
-import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.methodHasParameters;
 import static com.google.errorprone.matchers.Matchers.not;
@@ -51,8 +50,11 @@ public final class RequestMappingAnnotationCheck extends BugChecker implements M
               isType(ANN_PACKAGE_PREFIX + "PostMapping"),
               isType(ANN_PACKAGE_PREFIX + "PutMapping"),
               isType(ANN_PACKAGE_PREFIX + "RequestMapping")));
-  // XXX: Add other parameters as necessary. See
-  // https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc-ann-arguments.
+  // XXX: Add other parameters as necessary. Also consider whether it makes sense to have WebMVC-
+  // and WebFlux-specific logic. See
+  // https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-arguments
+  // and
+  // https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html#webflux-ann-arguments.
   private static final Matcher<MethodTree> LACKS_PARAMETER_ANNOTATION =
       not(
           methodHasParameters(
@@ -66,10 +68,17 @@ public final class RequestMappingAnnotationCheck extends BugChecker implements M
                           isType(ANN_PACKAGE_PREFIX + "RequestHeader"),
                           isType(ANN_PACKAGE_PREFIX + "RequestParam"))),
                   isSameType("java.io.InputStream"),
+                  isSameType("java.time.ZoneId"),
+                  isSameType("java.util.Locale"),
+                  isSameType("java.util.TimeZone"),
                   isSameType("javax.servlet.http.HttpServletRequest"),
                   isSameType("javax.servlet.http.HttpServletResponse"),
                   isSameType("org.springframework.http.HttpMethod"),
-                  isSubtypeOf("org.springframework.web.context.request.WebRequest"))));
+                  isSameType("org.springframework.web.context.request.NativeWebRequest"),
+                  isSameType("org.springframework.web.context.request.WebRequest"),
+                  isSameType("org.springframework.web.server.ServerWebExchange"),
+                  isSameType("org.springframework.web.util.UriBuilder"),
+                  isSameType("org.springframework.web.util.UriComponentsBuilder"))));
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
