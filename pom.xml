@@ -25,6 +25,12 @@
 
     <developers>
         <developer>
+            <name>Rick Ossendrijver</name>
+            <email>rick.ossendrijver@teampicnic.com</email>
+            <organization>Picnic Technologies BV</organization>
+            <timezone>Europe/Amsterdam</timezone>
+        </developer>
+        <developer>
             <name>Stephan Schroevers</name>
             <email>stephan.schroevers@teampicnic.com</email>
             <organization>Picnic Technologies BV</organization>
@@ -87,7 +93,7 @@
             <!-- The test JVMs are short-running. By disabling certain
             expensive JIT optimizations we actually speed up most tests. -->
             -XX:TieredStopAtLevel=1
-            <!-- We cap memory usage. This is especially relevant on Travis CI,
+            <!-- We cap memory usage. This is primarily relevant for build agents,
             but locally this should also be more than enough. -->
             -Xmx512m
             <!-- This argument cannot be set through Surefire's
@@ -108,9 +114,9 @@
             from showing up in the dock and capturing window focus. -->
             -Djava.awt.headless=true
         </argLine>
-        <!-- Our build system (Travis CI) provides a monotonically increasing
-        build number. When building locally, this number is obviously absent.
-        So we provide a default value. -->
+        <!-- Our build system provides a monotonically increasing build number.
+        When building locally, this number is obviously absent. So we provide a
+        default value. -->
         <build.number>LOCAL</build.number>
         <!-- Properties using which additional Error Prone flags can be
         specified. Used by the `patch` and `self-check` profiles. -->
@@ -367,8 +373,10 @@
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
+                <artifactId>mockito-bom</artifactId>
                 <version>${version.mockito}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.reactivestreams</groupId>
@@ -449,7 +457,7 @@
                             <bundledSignature>jdk-system-out</bundledSignature>
                             <!-- Other bundles are available but currently not
                             enabled:
-                            - commons-io-unsafe-*: while we may indirectly rely
+                            - commons-io-unsafe: while we may indirectly rely
                               on Apache Commons IO, we avoid direct
                               dependencies.
                             - jdk-deprecated: we compile with `-Xlint:all`,
@@ -562,7 +570,7 @@
                                     </module>
                                     <module name="EmptyStatement" />
                                     <module name="FinalClass" />
-                                    <module name="HiddenFieldCheck">
+                                    <module name="HiddenField">
                                         <property name="ignoreConstructorParameter" value="true" />
                                         <property name="ignoreSetter" value="true" />
                                         <property name="setterCanReturnItsClass" value="true" />
@@ -609,6 +617,10 @@
                                             custom helper method. -->
                                         </property>
                                         <property name="illegalPkgs" value="org.immutables.value.internal" />
+                                        <property name="illegalPkgs" value="org.jongo.marshall.jackson.oid">
+                                            <!-- Instead, please use Jackson's
+                                            `@JsonProperty` annotation. -->
+                                        </property>
                                         <property name="illegalPkgs" value="org.mutabilitydetector.internal" />
                                         <property name="illegalPkgs" value="org.testcontainers.shaded" />
                                         <property name="illegalPkgs" value="org.testng.internal" />
@@ -683,7 +695,9 @@
                                     <module name="RedundantModifier" />
                                     <module name="SimplifyBooleanExpression" />
                                     <module name="SimplifyBooleanReturn" />
-                                    <module name="SuppressWarningsHolder" />
+                                    <module name="SuppressWarningsHolder">
+                                        <property name="aliasList" value="com.puppycrawl.tools.checkstyle.checks.coding.UnusedLocalVariableCheck=unused" />
+                                    </module>
                                     <module name="TrailingComment" />
                                     <module name="UnnecessarySemicolonAfterTypeMemberDeclaration" />
                                     <module name="UnnecessarySemicolonInEnumeration" />
@@ -700,6 +714,16 @@
                         </checkstyleRules>
                         <failOnViolation>false</failOnViolation>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <!-- The plugin's "excludes" property accepts an Ant
+                        pattern, but does not match against the full path. So
+                        rather than explicitly excluding generated sources, we
+                        have to explicitly include "original" sources. -->
+                        <sourceDirectories>
+                            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                        </sourceDirectories>
+                        <testSourceDirectories>
+                            <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+                        </testSourceDirectories>
                     </configuration>
                     <dependencies>
                         <dependency>
@@ -854,6 +878,8 @@
                                 <Implementation-Title>${project.name}</Implementation-Title>
                                 <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
                                 <Implementation-Version>${project.version}.${build.number}.${build.revision}</Implementation-Version>
+                                <Rookout-Repository>${project.scm.url}</Rookout-Repository>
+                                <Rookout-Revision>${build.revision}</Rookout-Revision>
                             </manifestEntries>
                         </archive>
                     </configuration>
@@ -1608,6 +1634,54 @@
                             <artifactId>fmt-maven-plugin</artifactId>
                             <configuration>
                                 <skip>true</skip>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>sonar</id>
+            <properties>
+                <maven.test.failure.ignore>true</maven.test.failure.ignore>
+            </properties>
+        </profile>
+        <profile>
+            <id>third-party-license-tsv-export</id>
+            <activation>
+                <file>
+                    <exists>${path.third-party-licenses-template}</exists>
+                </file>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>license-maven-plugin</artifactId>
+                            <configuration>
+                                <fileTemplate>${path.third-party-licenses-template}</fileTemplate>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>version-number-rules</id>
+            <activation>
+                <file>
+                    <exists>${path.version-number-rules}</exists>
+                </file>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>versions-maven-plugin</artifactId>
+                            <configuration>
+                                <rulesUri>file://${path.version-number-rules}</rulesUri>
                             </configuration>
                         </plugin>
                     </plugins>
