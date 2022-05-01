@@ -30,11 +30,21 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>${groupId.error-prone}</groupId>
+            <artifactId>error_prone_core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-compiler</artifactId>
             <!-- This dependency is declared only as a hint to Maven that
             compilation depends on it; see the `maven-compiler-plugin`'s
             `annotationProcessorPaths` configuration below. -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto</groupId>
+            <artifactId>auto-common</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

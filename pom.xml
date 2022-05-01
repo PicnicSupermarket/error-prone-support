@@ -622,6 +622,10 @@
                                     </module>
                                     <module name="IllegalIdentifierName" />
                                     <module name="IllegalImport">
+                                        <property name="illegalClasses" value="com.google.auto.common.MoreStreams">
+                                            <!-- Instead, please use Guava's
+                                            `java.util.stream.Collector`s. -->
+                                        </property>
                                         <property name="illegalClasses" value="com.mongodb.lang.Nullable">
                                             <!-- Instead, please use
                                             `javax.annotation.Nullable`. -->
