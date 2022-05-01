@@ -35,6 +35,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <artifactId>error_prone_core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-compiler</artifactId>
             <!-- This dependency is declared only as a hint to Maven that
@@ -46,6 +50,11 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-support</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto</groupId>
+            <artifactId>auto-common</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>
