@@ -82,8 +82,10 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
       return Description.NO_MATCH;
     }
 
-    var parentLeaf = ((JCClassDecl) state.getPath().getParentPath().getLeaf());
-    if (parentLeaf.getModifiers().getFlags().contains(Modifier.ABSTRACT)) {
+    JCClassDecl enclosingClass = ASTHelpers.findEnclosingNode(state.getPath(), JCClassDecl.class);
+
+    if (enclosingClass != null
+        && enclosingClass.getModifiers().getFlags().contains(Modifier.ABSTRACT)) {
       return Description.NO_MATCH;
     }
 
