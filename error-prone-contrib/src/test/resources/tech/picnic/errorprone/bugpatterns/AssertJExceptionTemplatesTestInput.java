@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import org.assertj.core.api.AbstractObjectAssert;
 
 final class AssertJExceptionTemplatesTest implements RefasterTemplateTestCase {
-
   AbstractObjectAssert<?, ?> assertThatIllegalArgumentExceptionIsThrown() {
     return assertThatIllegalArgumentException().isThrownBy(() -> {});
   }
