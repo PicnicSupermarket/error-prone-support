@@ -11,7 +11,6 @@ import java.io.IOException;
 import org.assertj.core.api.AbstractObjectAssert;
 
 final class AssertJExceptionTemplatesTest implements RefasterTemplateTestCase {
-
   AbstractObjectAssert<?, ?> assertThatIllegalArgumentExceptionIsThrown() {
     return assertThatThrownBy(() -> {}).isInstanceOf(IllegalArgumentException.class);
   }
