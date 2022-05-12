@@ -55,7 +55,7 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
       ImmutableSet.of(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC);
   private static final MultiMatcher<MethodTree, AnnotationTree> OVERRIDE_METHOD =
       annotations(AT_LEAST_ONE, isType("java.lang.Override"));
-  private static final Matcher<MethodTree> ENCLOSING_ABSTRACT_CLASS =
+  private static final Matcher<Tree> ENCLOSING_ABSTRACT_CLASS =
       enclosingClass(hasModifier(Modifier.ABSTRACT));
   private static final MultiMatcher<MethodTree, AnnotationTree> TEST_METHOD =
       annotations(
