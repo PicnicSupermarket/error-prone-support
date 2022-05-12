@@ -5,7 +5,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class JUnitMethodDeclarationCheckTest {
+final class JUnitMethodDeclarationCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(JUnitMethodDeclarationCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
@@ -138,25 +138,14 @@ public final class JUnitMethodDeclarationCheckTest {
             "  @Override @Test void testArguments() {}",
             "  @Override @Test void testPublic() {}",
             "}")
-        .doTest();
-  }
-
-  @Test
-  void identificationDoesNotMatchAbstractClass() {
-    compilationTestHelper
         .addSourceLines(
-            "A.java",
-            "import static org.junit.jupiter.params.provider.Arguments.arguments;",
-            "",
-            "import org.junit.jupiter.api.AfterAll;",
-            "import org.junit.jupiter.api.AfterEach;",
+            "C.java",
             "import org.junit.jupiter.api.BeforeAll;",
-            "import org.junit.jupiter.api.BeforeEach;",
             "import org.junit.jupiter.api.Test;",
-            "import org.junit.jupiter.params.ParameterizedTest;",
             "",
-            "abstract class A {",
-            "  @BeforeAll public void setUp1() {}",
+            "abstract class C {",
+            "  @BeforeAll public void setUp() {}",
+            "  @Test void testMethod() {}",
             "}")
         .doTest();
   }

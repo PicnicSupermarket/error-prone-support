@@ -6,6 +6,8 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.enclosingClass;
+import static com.google.errorprone.matchers.Matchers.hasModifier;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static java.util.function.Predicate.not;
 import static tech.picnic.errorprone.bugpatterns.JavaKeywords.isReservedKeyword;
@@ -29,7 +31,6 @@ import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
@@ -54,6 +55,8 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
       ImmutableSet.of(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC);
   private static final MultiMatcher<MethodTree, AnnotationTree> OVERRIDE_METHOD =
       annotations(AT_LEAST_ONE, isType("java.lang.Override"));
+  private static final Matcher<MethodTree> ENCLOSING_ABSTRACT_CLASS =
+      enclosingClass(hasModifier(Modifier.ABSTRACT));
   private static final MultiMatcher<MethodTree, AnnotationTree> TEST_METHOD =
       annotations(
           AT_LEAST_ONE,
@@ -71,21 +74,12 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    // XXX: Perhaps we should also skip analysis of non-`private` non-`final` methods in abstract
-    // classes?
-    if (OVERRIDE_METHOD.matches(tree, state)) {
+    if (OVERRIDE_METHOD.matches(tree, state) || ENCLOSING_ABSTRACT_CLASS.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
     boolean isTestMethod = TEST_METHOD.matches(tree, state);
     if (!isTestMethod && !SETUP_OR_TEARDOWN_METHOD.matches(tree, state)) {
-      return Description.NO_MATCH;
-    }
-
-    JCClassDecl enclosingClass = ASTHelpers.findEnclosingNode(state.getPath(), JCClassDecl.class);
-
-    if (enclosingClass != null
-        && enclosingClass.getModifiers().getFlags().contains(Modifier.ABSTRACT)) {
       return Description.NO_MATCH;
     }
 
