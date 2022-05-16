@@ -39,6 +39,7 @@ public final class RefasterCheckTest {
           "AssertJOptional",
           "AssertJShort",
           "AssertJString",
+          "AssertJThrowable",
           "AssertJThrowingCallable",
           "Assorted",
           "BigDecimal",
