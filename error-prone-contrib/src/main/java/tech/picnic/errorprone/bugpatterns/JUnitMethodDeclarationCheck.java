@@ -59,7 +59,8 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
       anyOf(
           annotations(AT_LEAST_ONE, isType("java.lang.Override")),
           allOf(
-              Matchers.not(anyOf(hasModifier(Modifier.FINAL), hasModifier(Modifier.PRIVATE))),
+              Matchers.not(hasModifier(Modifier.FINAL)),
+              Matchers.not(hasModifier(Modifier.PRIVATE)),
               enclosingClass(hasModifier(Modifier.ABSTRACT))));
   private static final MultiMatcher<MethodTree, AnnotationTree> TEST_METHOD =
       annotations(
