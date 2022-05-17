@@ -5,11 +5,11 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
 import org.assertj.core.api.ThrowableAssertAlternative;
 
-final class AssertJThrowableTemplates {
+final class AssertJExceptionTemplates {
 
-  private AssertJThrowableTemplates() {}
+  private AssertJExceptionTemplates() {}
 
-  static final class AssertWithMessageStringFormatTemplate {
+  static final class ThrowableAssertAlternativeWithMessageArgs {
 
     @BeforeTemplate
     ThrowableAssertAlternative<?> before(
