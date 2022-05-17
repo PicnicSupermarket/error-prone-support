@@ -5,7 +5,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class JUnitMethodDeclarationCheckTest {
+final class JUnitMethodDeclarationCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(JUnitMethodDeclarationCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
@@ -137,6 +137,21 @@ public final class JUnitMethodDeclarationCheckTest {
             "  @Override void overload() {}",
             "  @Override @Test void testArguments() {}",
             "  @Override @Test void testPublic() {}",
+            "}")
+        .addSourceLines(
+            "C.java",
+            "import org.junit.jupiter.api.AfterAll;",
+            "import org.junit.jupiter.api.BeforeAll;",
+            "import org.junit.jupiter.api.Test;",
+            "",
+            "abstract class C {",
+            "  @BeforeAll public void setUp() {}",
+            "  @Test void testMethod1() {}",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  @AfterAll private void tearDown() {}",
+            "  // BUG: Diagnostic contains:",
+            "  @Test final void testMethod2() {}",
             "}")
         .doTest();
   }

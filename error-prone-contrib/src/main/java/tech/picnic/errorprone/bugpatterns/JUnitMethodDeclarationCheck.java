@@ -4,8 +4,11 @@ import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
+import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.enclosingClass;
+import static com.google.errorprone.matchers.Matchers.hasModifier;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static java.util.function.Predicate.not;
 import static tech.picnic.errorprone.bugpatterns.JavaKeywords.isReservedKeyword;
@@ -20,6 +23,7 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.matchers.MultiMatcher;
 import com.google.errorprone.predicates.TypePredicate;
 import com.google.errorprone.util.ASTHelpers;
@@ -51,8 +55,13 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
   private static final String TEST_PREFIX = "test";
   private static final ImmutableSet<Modifier> ILLEGAL_MODIFIERS =
       ImmutableSet.of(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC);
-  private static final MultiMatcher<MethodTree, AnnotationTree> OVERRIDE_METHOD =
-      annotations(AT_LEAST_ONE, isType("java.lang.Override"));
+  private static final Matcher<MethodTree> HAS_UNMODIFIABLE_SIGNATURE =
+      anyOf(
+          annotations(AT_LEAST_ONE, isType("java.lang.Override")),
+          allOf(
+              Matchers.not(hasModifier(Modifier.FINAL)),
+              Matchers.not(hasModifier(Modifier.PRIVATE)),
+              enclosingClass(hasModifier(Modifier.ABSTRACT))));
   private static final MultiMatcher<MethodTree, AnnotationTree> TEST_METHOD =
       annotations(
           AT_LEAST_ONE,
@@ -70,9 +79,7 @@ public final class JUnitMethodDeclarationCheck extends BugChecker implements Met
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    // XXX: Perhaps we should also skip analysis of non-`private` non-`final` methods in abstract
-    // classes?
-    if (OVERRIDE_METHOD.matches(tree, state)) {
+    if (HAS_UNMODIFIABLE_SIGNATURE.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
