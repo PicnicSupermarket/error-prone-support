@@ -1,18 +1,30 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import com.google.common.collect.ImmutableSet;
+import org.assertj.core.api.AbstractThrowableAssert;
+import org.assertj.core.api.ThrowableAssertAlternative;
 
-final class AssertJExceptionTemplatesTestInput implements RefasterTemplateTestCase {
-    void testThrowableAssertAlternativeWithMessageArgs() {
-        assertThatIllegalArgumentException()
-                .isThrownBy(() -> {})
-                .withMessage(String.format("foo"));
+import static org.assertj.core.api.Assertions.*;
+
+final class AssertJExceptionTemplatesTest implements RefasterTemplateTestCase {
+    ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>> testThrowableAssertAlternativeHasMessageArgs() {
+        return ImmutableSet.of(
+                assertThatThrownBy(() -> {})
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessage(String.format("foo %s", "bar")),
+                assertThatThrownBy(() -> {})
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessage(String.format("foo %s %f", "bar", 1))
+        );
     }
 
-    void testThrowableAssertAlternativeWithMessageArgsOptionalArgs() {
-        assertThatIllegalArgumentException()
-                .isThrownBy(() -> {})
-                .withMessage(String.format("foo %s %f", "bar", 1));
+    ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>> testThrowableAssertAlternativeWithFailMessageArgs() {
+        return ImmutableSet.of(
+                assertThatThrownBy(() -> {})
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .withFailMessage(String.format("foo %s", "bar")),
+                assertThatThrownBy(() -> {})
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .withFailMessage(String.format("foo %s %f", "bar", 1)));
     }
 }
