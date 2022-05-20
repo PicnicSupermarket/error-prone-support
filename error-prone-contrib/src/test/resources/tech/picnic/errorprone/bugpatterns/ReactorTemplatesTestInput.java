@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
@@ -101,6 +103,10 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Duration testStepVerifierLastStepVerifyErrorClass() {
     return StepVerifier.create(Mono.empty()).expectError(IllegalArgumentException.class).verify();
+  }
+
+  Duration testStepVerifierLastStepVerifyErrorAssert() {
+    return StepVerifier.create(Mono.empty()).verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(Throwable.class));
   }
 
   Duration testStepVerifierLastStepVerifyErrorMatches() {

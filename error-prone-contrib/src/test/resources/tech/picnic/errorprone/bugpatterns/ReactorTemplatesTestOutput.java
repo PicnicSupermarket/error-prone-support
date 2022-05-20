@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.MoreCollectors.toOptional;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -101,6 +102,10 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Duration testStepVerifierLastStepVerifyErrorClass() {
     return StepVerifier.create(Mono.empty()).verifyError(IllegalArgumentException.class);
+  }
+
+  Duration testStepVerifierLastStepVerifyErrorAssert() {
+    return StepVerifier.create(Mono.empty()).verifyError(Throwable.class);
   }
 
   Duration testStepVerifierLastStepVerifyErrorMatches() {
