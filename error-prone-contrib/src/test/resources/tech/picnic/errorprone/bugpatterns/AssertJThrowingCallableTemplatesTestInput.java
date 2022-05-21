@@ -97,24 +97,24 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
   }
 
   ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>>
-      testThrowableAssertAlternativeHasMessageArgs() {
+      testAbstractThrowableAssertHasMessage() {
     return ImmutableSet.of(
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage(String.format("foo %s", "bar")),
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage(String.format("foo %s %f", "bar", 1)));
+            .hasMessage(String.format("foo %s %s", "bar", 1)));
   }
 
   ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>>
-      testThrowableAssertAlternativeWithFailMessageArgs() {
+      testAbstractThrowableAssertWithFailMessage() {
     return ImmutableSet.of(
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
             .withFailMessage(String.format("foo %s", "bar")),
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
-            .withFailMessage(String.format("foo %s %f", "bar", 1)));
+            .withFailMessage(String.format("foo %s %s", "bar", 1)));
   }
 }

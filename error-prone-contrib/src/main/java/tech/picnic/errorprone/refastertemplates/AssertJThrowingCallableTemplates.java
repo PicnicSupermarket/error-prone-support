@@ -321,7 +321,9 @@ final class AssertJThrowingCallableTemplates {
     }
   }
 
-  static final class ThrowableAssertAlternativeHasMessageArgs {
+  // XXX: Drop this template in favour of a generic Error Prone check which flags
+  // `String.format(...)` arguments to a wide range of format methods.
+  static final class AbstractThrowableAssertHasMessage {
     @BeforeTemplate
     AbstractThrowableAssert<?, ? extends Throwable> before(
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
@@ -339,21 +341,23 @@ final class AssertJThrowingCallableTemplates {
     }
   }
 
-  static final class ThrowableAssertAlternativeWithFailMessageArgs {
+  // XXX: Drop this template in favour of a generic Error Prone check which flags
+  // `String.format(...)` arguments to a wide range of format methods.
+  static final class AbstractThrowableAssertWithFailMessage {
     @BeforeTemplate
     AbstractThrowableAssert<?, ? extends Throwable> before(
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
         String message,
-        @Repeated Object parameters) {
-      return abstractThrowableAssert.withFailMessage(String.format(message, parameters));
+        @Repeated Object args) {
+      return abstractThrowableAssert.withFailMessage(String.format(message, args));
     }
 
     @AfterTemplate
     AbstractThrowableAssert<?, ? extends Throwable> after(
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
         String message,
-        @Repeated Object parameters) {
-      return abstractThrowableAssert.withFailMessage(message, parameters);
+        @Repeated Object args) {
+      return abstractThrowableAssert.withFailMessage(message, args);
     }
   }
 }
