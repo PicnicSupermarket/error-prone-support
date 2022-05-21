@@ -6,6 +6,8 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static java.util.Collections.newSetFromMap;
+import static java.util.Objects.requireNonNullElseGet;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toCollection;
 
@@ -41,8 +43,11 @@ import com.google.errorprone.refaster.UClassIdent;
 import com.google.errorprone.refaster.UExpression;
 import com.google.errorprone.refaster.UStatement;
 import com.google.errorprone.refaster.UStaticIdent;
+import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.CompoundAssignmentTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MemberSelectTree;
@@ -58,6 +63,7 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -92,7 +98,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   static final Supplier<ImmutableListMultimap<String, CodeTransformer>> ALL_CODE_TRANSFORMERS =
       Suppliers.memoize(RefasterCheck::loadAllCodeTransformers);
 
-  private final Node<RefasterRule<?, ?>> refasterTemplatesTree;
+  private final Node<RefasterRule<?, ?>> refasterRules;
 
   /** Instantiates the default {@link RefasterCheck}. */
   public RefasterCheck() {
@@ -105,18 +111,13 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
    * @param flags Any provided command line flags.
    */
   public RefasterCheck(ErrorProneFlags flags) {
-    List<RefasterRule<?, ?>> refasterRules = getRefasterRules(flags);
-    refasterTemplatesTree =
-        Node.createRefasterTemplateTree(refasterRules, RefasterCheck::extractTemplateIdentifiers);
+    refasterRules = Node.create(getRefasterRules(flags), RefasterCheck::extractTemplateIdentifiers);
   }
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
-    ImmutableSortedSet<String> sourceIdentifiers = extractSourceIdentifiers(tree);
-
-    HashSet<RefasterRule<?, ?>> candidateRules = new HashSet<>();
-    refasterTemplatesTree.collectCandidateTemplates(
-        sourceIdentifiers.asList(), candidateRules::add);
+    // XXX: Inline this variable.
+    Set<RefasterRule<?, ?>> candidateRules = getCandidateRefasterRules(tree);
 
     // XXX: Remove these debug lines
     // String removeThis =
@@ -124,11 +125,12 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
     // System.out.printf("\nTemplates for %s: \n%s\n", tree.getSourceFile().getName(), removeThis);
 
     /* First, collect all matches. */
+    SubContext context = new SubContext(state.context);
     List<Description> matches = new ArrayList<>();
     for (RefasterRule<?, ?> rule : candidateRules) {
       try {
-        rule.apply(state.getPath(), new SubContext(state.context), matches::add);
-      } catch (LinkageError le) {
+        rule.apply(state.getPath(), context, matches::add);
+      } catch (LinkageError e) {
         // XXX: This `try/catch` block handles the issue described and resolved in
         // https://github.com/google/error-prone/pull/2456. Drop this block once that change is
         // released.
@@ -142,6 +144,15 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
 
     /* Any matches were already reported by the code above, directly to the `VisitorState`. */
     return Description.NO_MATCH;
+  }
+
+  // XXX: Here and below: drop redundant `Refaster` from method names?
+  private Set<RefasterRule<?, ?>> getCandidateRefasterRules(CompilationUnitTree tree) {
+    Set<RefasterRule<?, ?>> candidateRules = newSetFromMap(new IdentityHashMap<>());
+    refasterRules.collectCandidateTemplates(
+        extractSourceIdentifiers(tree).asList(), candidateRules::add);
+
+    return candidateRules;
   }
 
   private static List<RefasterRule<?, ?>> getRefasterRules(ErrorProneFlags flags) {
@@ -166,6 +177,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
     }
   }
 
+  // XXX: Decompose `RefasterRule`s such that each has exactly one `@BeforeTemplate`.
   private static ImmutableSet<ImmutableSortedSet<String>> extractTemplateIdentifiers(
       RefasterRule<?, ?> refasterRule) {
     ImmutableSet.Builder<ImmutableSortedSet<String>> results = ImmutableSet.builder();
@@ -224,22 +236,6 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
       }
 
       @Override
-      public Void visitOther(Tree node, List<Set<String>> identifierCombinations) {
-        if (node instanceof UAnyOf) {
-          List<Set<String>> base = copy(identifierCombinations);
-          identifierCombinations.clear();
-
-          for (UExpression expr : ((UAnyOf) node).expressions()) {
-            List<Set<String>> branch = copy(base);
-            scan(expr, branch);
-            identifierCombinations.addAll(branch);
-          }
-        }
-
-        return null;
-      }
-
-      @Override
       public Void visitMemberReference(
           MemberReferenceTree node, List<Set<String>> identifierCombinations) {
         super.visitMemberReference(node, identifierCombinations);
@@ -258,17 +254,48 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
       }
 
       @Override
-      public Void visitBinary(BinaryTree node, List<Set<String>> identifierCombinations) {
-        super.visitBinary(node, identifierCombinations);
-        String operator = Util.treeKindToString(node.getKind());
-        identifierCombinations.forEach(ids -> ids.add(operator));
-        return null;
+      public Void visitAssignment(AssignmentTree node, List<Set<String>> identifierCombinations) {
+        registerOperator(node, identifierCombinations);
+        return super.visitAssignment(node, identifierCombinations);
+      }
+
+      @Override
+      public Void visitCompoundAssignment(
+          CompoundAssignmentTree node, List<Set<String>> identifierCombinations) {
+        registerOperator(node, identifierCombinations);
+        return super.visitCompoundAssignment(node, identifierCombinations);
       }
 
       @Override
       public Void visitUnary(UnaryTree node, List<Set<String>> identifierCombinations) {
-        super.visitUnary(node, identifierCombinations);
+        registerOperator(node, identifierCombinations);
+        return super.visitUnary(node, identifierCombinations);
+      }
+
+      @Override
+      public Void visitBinary(BinaryTree node, List<Set<String>> identifierCombinations) {
+        registerOperator(node, identifierCombinations);
+        return super.visitBinary(node, identifierCombinations);
+      }
+
+      // XXX: Rename!
+      private void registerOperator(ExpressionTree node, List<Set<String>> identifierCombinations) {
         identifierCombinations.forEach(ids -> ids.add(Util.treeKindToString(node.getKind())));
+      }
+
+      @Override
+      public Void visitOther(Tree node, List<Set<String>> identifierCombinations) {
+        if (node instanceof UAnyOf) {
+          List<Set<String>> base = copy(identifierCombinations);
+          identifierCombinations.clear();
+
+          for (UExpression expr : ((UAnyOf) node).expressions()) {
+            List<Set<String>> branch = copy(base);
+            scan(expr, branch);
+            identifierCombinations.addAll(branch);
+          }
+        }
+
         return null;
       }
 
@@ -311,17 +338,32 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
       }
 
       @Override
-      public Void visitBinary(BinaryTree node, Set<String> identifiers) {
-        super.visitBinary(node, identifiers);
-        identifiers.add(Util.treeKindToString(node.getKind()));
-        return null;
+      public Void visitAssignment(AssignmentTree node, Set<String> identifiers) {
+        registerOperator(node, identifiers);
+        return super.visitAssignment(node, identifiers);
+      }
+
+      @Override
+      public Void visitCompoundAssignment(CompoundAssignmentTree node, Set<String> identifiers) {
+        registerOperator(node, identifiers);
+        return super.visitCompoundAssignment(node, identifiers);
       }
 
       @Override
       public Void visitUnary(UnaryTree node, Set<String> identifiers) {
-        super.visitUnary(node, identifiers);
+        registerOperator(node, identifiers);
+        return super.visitUnary(node, identifiers);
+      }
+
+      @Override
+      public Void visitBinary(BinaryTree node, Set<String> identifiers) {
+        registerOperator(node, identifiers);
+        return super.visitBinary(node, identifiers);
+      }
+
+      // XXX: Rename!
+      private void registerOperator(ExpressionTree node, Set<String> identifiers) {
         identifiers.add(Util.treeKindToString(node.getKind()));
-        return null;
       }
     }.scan(tree, identifiers);
 

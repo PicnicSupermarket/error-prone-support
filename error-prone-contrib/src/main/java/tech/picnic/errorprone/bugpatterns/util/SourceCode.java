@@ -26,25 +26,29 @@ public final class SourceCode {
   }
 
   /**
-   * Returns a string representation of the given {@link Tree.Kind}.
+   * Returns a unique string representation of the given {@link Tree.Kind}.
    *
-   * @return A string representation of the operator or else throws an exception.
+   * @return A string representation of the operator, if known
+   * @throws IllegalArgumentException If the given input is not supported.
    */
-  // XXX: List needs to be extended, as it currently only supports `BinaryTree`s and `UnaryTree`s.
+  // XXX: Extend list to cover remaining cases; at least for any `Kind` that may appear in a
+  // Refaster template.
   static String treeKindToString(Tree.Kind kind) {
     switch (kind) {
+      case ASSIGNMENT:
+        return "=";
       case POSTFIX_INCREMENT:
+        return "x++";
       case PREFIX_INCREMENT:
-        return "++";
+        return "++x";
       case POSTFIX_DECREMENT:
+        return "x--";
       case PREFIX_DECREMENT:
-        return "--";
+        return "--x";
       case UNARY_PLUS:
-      case PLUS:
-        return "+";
+        return "+x";
       case UNARY_MINUS:
-      case MINUS:
-        return "-";
+        return "-x";
       case BITWISE_COMPLEMENT:
         return "~";
       case LOGICAL_COMPLEMENT:
@@ -55,6 +59,10 @@ public final class SourceCode {
         return "/";
       case REMAINDER:
         return "%";
+      case PLUS:
+        return "+";
+      case MINUS:
+        return "-";
       case LEFT_SHIFT:
         return "<<";
       case RIGHT_SHIFT:
@@ -83,6 +91,28 @@ public final class SourceCode {
         return "&&";
       case CONDITIONAL_OR:
         return "||";
+      case MULTIPLY_ASSIGNMENT:
+        return "*=";
+      case DIVIDE_ASSIGNMENT:
+        return "/=";
+      case REMAINDER_ASSIGNMENT:
+        return "%=";
+      case PLUS_ASSIGNMENT:
+        return "+=";
+      case MINUS_ASSIGNMENT:
+        return "-=";
+      case LEFT_SHIFT_ASSIGNMENT:
+        return "<<=";
+      case RIGHT_SHIFT_ASSIGNMENT:
+        return ">>=";
+      case UNSIGNED_RIGHT_SHIFT_ASSIGNMENT:
+        return ">>>=";
+      case AND_ASSIGNMENT:
+        return "&=";
+      case XOR_ASSIGNMENT:
+        return "^=";
+      case OR_ASSIGNMENT:
+        return "|=";
       default:
         throw new IllegalStateException("Cannot convert Tree.Kind to a String: " + kind);
     }
