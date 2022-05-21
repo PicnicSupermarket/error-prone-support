@@ -17,15 +17,16 @@ import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 
 /**
- * Refaster templates related to AssertJ assertions over methods producing {@link Throwable}s.
+ * Refaster templates related to AssertJ assertions over expressions that may throw a {@link
+ * Throwable} subtype.
  *
- * <p>To unify the way we assert throwables in unit tests, we have chosen to use the form {@link
- * org.assertj.core.api.Assertions#assertThatThrownBy}. Note that many more combinations can be made
- * with exception-specific assertions than covered here. The templates below replace those
- * combinations that were encountered the most.
+ * <p>For reasons of consistency we prefer {@link
+ * org.assertj.core.api.Assertions#assertThatThrownBy} over static methods for specific exception
+ * types. Note that only the most common assertion expressions are rewritten here; covering all
+ * cases would require the implementation an Error Prone check instead.
  */
-final class AssertJExceptionTemplates {
-  private AssertJExceptionTemplates() {}
+final class AssertJThrowingCallableTemplates {
+  private AssertJThrowingCallableTemplates() {}
 
   static final class AssertThatThrownByIllegalArgumentException {
     @BeforeTemplate
@@ -40,7 +41,7 @@ final class AssertJExceptionTemplates {
     }
   }
 
-  static final class AssertThatThrownByIllegalArgumentExceptionWithMessage {
+  static final class AssertThatThrownByIllegalArgumentExceptionHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalArgumentException" /* Matches strictly more specific expressions. */)
@@ -57,7 +58,7 @@ final class AssertJExceptionTemplates {
     }
   }
 
-  static final class AssertThatThrownByIllegalArgumentExceptionWithMessageStartingWith {
+  static final class AssertThatThrownByIllegalArgumentExceptionHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalArgumentException" /* Matches strictly more specific expressions. */)
@@ -76,7 +77,7 @@ final class AssertJExceptionTemplates {
     }
   }
 
-  static final class AssertThatThrownByIllegalArgumentExceptionWithMessageContaining {
+  static final class AssertThatThrownByIllegalArgumentExceptionHasMessageContaining {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalArgumentException" /* Matches strictly more specific expressions. */)
@@ -95,7 +96,7 @@ final class AssertJExceptionTemplates {
     }
   }
 
-  static final class AssertThatThrownByIllegalArgumentExceptionWithMessageNotContainingAny {
+  static final class AssertThatThrownByIllegalArgumentExceptionHasMessageNotContainingAny {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalArgumentException" /* Matches strictly more specific expressions. */)
@@ -129,7 +130,7 @@ final class AssertJExceptionTemplates {
     }
   }
 
-  static final class AssertThatThrownByIllegalStateExceptionWithMessage {
+  static final class AssertThatThrownByIllegalStateExceptionHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalStateException" /* Matches strictly more specific expressions. */)
@@ -146,7 +147,7 @@ final class AssertJExceptionTemplates {
     }
   }
 
-  static final class AssertThatThrownByIllegalStateExceptionWithMessageStartingWith {
+  static final class AssertThatThrownByIllegalStateExceptionHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalStateException" /* Matches strictly more specific expressions. */)
@@ -165,7 +166,7 @@ final class AssertJExceptionTemplates {
     }
   }
 
-  static final class AssertThatThrownByIllegalStateExceptionWithMessageContaining {
+  static final class AssertThatThrownByIllegalStateExceptionHasMessageContaining {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalStateException" /* Matches strictly more specific expressions. */)
@@ -184,7 +185,7 @@ final class AssertJExceptionTemplates {
     }
   }
 
-  static final class AssertThatThrownByIllegalStateExceptionWithMessageNotContaining {
+  static final class AssertThatThrownByIllegalStateExceptionHasMessageNotContaining {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalStateException" /* Matches strictly more specific expressions. */)
@@ -203,7 +204,7 @@ final class AssertJExceptionTemplates {
     }
   }
 
-  static final class AssertThatThrownByNPE {
+  static final class AssertThatThrownByNullPointerException {
     @BeforeTemplate
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable) {
       return assertThatNullPointerException().isThrownBy(throwingCallable);
@@ -216,9 +217,10 @@ final class AssertJExceptionTemplates {
     }
   }
 
-  static final class AssertThatThrownByNPEWithMessage {
+  static final class AssertThatThrownByNullPointerExceptionHasMessage {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatThrownByNPE" /* Matches strictly more specific expressions. */)
+    @SuppressWarnings(
+        "AssertThatThrownByNullPointerException" /* Matches strictly more specific expressions. */)
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatNullPointerException().isThrownBy(throwingCallable).withMessage(message);
     }
@@ -232,9 +234,10 @@ final class AssertJExceptionTemplates {
     }
   }
 
-  static final class AssertThatThrownByNPEWithMessageStartingWith {
+  static final class AssertThatThrownByNullPointerExceptionHasMessageStartingWith {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatThrownByNPE" /* Matches strictly more specific expressions. */)
+    @SuppressWarnings(
+        "AssertThatThrownByNullPointerException" /* Matches strictly more specific expressions. */)
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatNullPointerException()
           .isThrownBy(throwingCallable)
@@ -278,7 +281,7 @@ final class AssertJExceptionTemplates {
     }
   }
 
-  static final class AssertThatThrownByWithMessage {
+  static final class AssertThatThrownByHasMessage {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownBy" /* Matches strictly more specific expressions. */)
     AbstractObjectAssert<?, ?> before(
