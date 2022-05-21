@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import org.assertj.core.api.AbstractObjectAssert;
+import org.assertj.core.api.AbstractThrowableAssert;
 
 final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTestCase {
   @Override
@@ -110,5 +111,27 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
     return assertThatThrownBy(() -> {})
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("foo");
+  }
+
+  ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>>
+      testThrowableAssertAlternativeHasMessageArgs() {
+    return ImmutableSet.of(
+        assertThatThrownBy(() -> {})
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("foo %s", "bar"),
+        assertThatThrownBy(() -> {})
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("foo %s %f", "bar", 1));
+  }
+
+  ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>>
+      testThrowableAssertAlternativeWithFailMessageArgs() {
+    return ImmutableSet.of(
+        assertThatThrownBy(() -> {})
+            .isInstanceOf(IllegalArgumentException.class)
+            .withFailMessage("foo %s", "bar"),
+        assertThatThrownBy(() -> {})
+            .isInstanceOf(IllegalArgumentException.class)
+            .withFailMessage("foo %s %f", "bar", 1));
   }
 }

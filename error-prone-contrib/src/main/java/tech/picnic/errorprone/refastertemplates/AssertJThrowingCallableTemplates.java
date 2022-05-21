@@ -14,6 +14,7 @@ import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.io.IOException;
 import org.assertj.core.api.AbstractObjectAssert;
+import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 
 /**
@@ -317,6 +318,42 @@ final class AssertJThrowingCallableTemplates {
         ThrowingCallable throwingCallable,
         String message) {
       return assertThatThrownBy(throwingCallable).isInstanceOf(exceptionType).hasMessage(message);
+    }
+  }
+
+  static final class ThrowableAssertAlternativeHasMessageArgs {
+    @BeforeTemplate
+    AbstractThrowableAssert<?, ? extends Throwable> before(
+        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        String message,
+        @Repeated Object parameters) {
+      return abstractThrowableAssert.hasMessage(String.format(message, parameters));
+    }
+
+    @AfterTemplate
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        String message,
+        @Repeated Object parameters) {
+      return abstractThrowableAssert.hasMessage(message, parameters);
+    }
+  }
+
+  static final class ThrowableAssertAlternativeWithFailMessageArgs {
+    @BeforeTemplate
+    AbstractThrowableAssert<?, ? extends Throwable> before(
+        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        String message,
+        @Repeated Object parameters) {
+      return abstractThrowableAssert.withFailMessage(String.format(message, parameters));
+    }
+
+    @AfterTemplate
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        String message,
+        @Repeated Object parameters) {
+      return abstractThrowableAssert.withFailMessage(message, parameters);
     }
   }
 }
