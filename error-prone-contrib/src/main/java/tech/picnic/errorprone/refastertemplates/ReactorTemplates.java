@@ -317,24 +317,13 @@ final class ReactorTemplates {
     }
   }
 
-  /** Prefer {@link StepVerifier.LastStep#verifyError()} over type check verification */
-  static final class StepVerifierLastStepVerifyErrorAssert {
-    @BeforeTemplate
-    Duration before(StepVerifier.LastStep step) {
-      return step.verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(Throwable.class));
-    }
-
-    @AfterTemplate
-    Duration after(StepVerifier.LastStep step) {
-      return step.verifyError(Throwable.class);
-    }
-  }
-
   /** Prefer {@link StepVerifier.LastStep#verifyError(Class)} over more verbose alternatives. */
   static final class StepVerifierLastStepVerifyErrorClass<T extends Throwable> {
     @BeforeTemplate
     Duration before(StepVerifier.LastStep step, Class<T> clazz) {
-      return step.expectError(clazz).verify();
+      return Refaster.anyOf(
+          step.expectError(clazz).verify(),
+          step.verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(clazz)));
     }
 
     @AfterTemplate

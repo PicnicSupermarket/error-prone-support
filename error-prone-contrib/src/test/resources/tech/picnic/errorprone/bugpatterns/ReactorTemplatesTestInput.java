@@ -13,6 +13,11 @@ import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 
 final class ReactorTemplatesTest implements RefasterTemplateTestCase {
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(assertThat(0));
+  }
+
   ImmutableSet<Mono<Integer>> testMonoFromOptional() {
     return ImmutableSet.of(
         Mono.fromCallable(() -> Optional.of(1).orElse(null)),
@@ -101,12 +106,11 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return StepVerifier.create(Mono.empty()).expectError().verify();
   }
 
-  Duration testStepVerifierLastStepVerifyErrorClass() {
-    return StepVerifier.create(Mono.empty()).expectError(IllegalArgumentException.class).verify();
-  }
-
-  Duration testStepVerifierLastStepVerifyErrorAssert() {
-    return StepVerifier.create(Mono.empty()).verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(Throwable.class));
+  ImmutableSet<Duration> testStepVerifierLastStepVerifyErrorClass() {
+    return ImmutableSet.of(
+        StepVerifier.create(Mono.empty()).expectError(IllegalArgumentException.class).verify(),
+        StepVerifier.create(Mono.empty())
+            .verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(IllegalStateException.class)));
   }
 
   Duration testStepVerifierLastStepVerifyErrorMatches() {
