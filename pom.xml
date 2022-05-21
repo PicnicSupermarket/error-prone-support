@@ -449,6 +449,9 @@
                     <artifactId>fmt-maven-plugin</artifactId>
                     <version>2.19</version>
                     <configuration>
+                        <additionalSourceDirectories>
+                            <additionalSourceDirectory>${basedir}/src/test/resources</additionalSourceDirectory>
+                        </additionalSourceDirectories>
                         <forkMode>never</forkMode>
                         <failOnError>false</failOnError>
                     </configuration>
