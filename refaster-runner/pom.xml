@@ -11,7 +11,7 @@
     <artifactId>refaster-runner</artifactId>
 
     <name>Picnic :: Error Prone Support :: Refaster Runner</name>
-    <description>Applies Refaster templates found on the classpath.</description>
+    <description>Exposes Refaster templates found on the classpath through a regular Error Prone check.</description>
 
     <dependencies>
         <dependency>
