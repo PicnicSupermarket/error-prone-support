@@ -139,7 +139,6 @@
         <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
-        <version.hamcrest>2.2</version.hamcrest>
         <version.jdk>11</version.jdk>
         <version.maven>3.6.3</version.maven>
         <version.mockito>4.5.1</version.mockito>
@@ -350,21 +349,6 @@
                 <version>3.22.0</version>
             </dependency>
             <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest</artifactId>
-                <version>${version.hamcrest}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-core</artifactId>
-                <version>${version.hamcrest}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-library</artifactId>
-                <version>${version.hamcrest}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
                 <version>5.8.2</version>
@@ -377,11 +361,6 @@
                 <version>${version.mockito}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.reactivestreams</groupId>
-                <artifactId>reactive-streams</artifactId>
-                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
