@@ -40,6 +40,7 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
         stream(ImmutableSet.of("foo").iterator()).findFirst());
   }
 
+  @SuppressWarnings("TernaryOperatorOptionalNegativeFiltering" /* Special case. */)
   ImmutableSet<Optional<String>> testTernaryOperatorOptionalPositiveFiltering() {
     return ImmutableSet.of(
         /* Or Optional.ofNullable (can't auto-infer). */ Optional.of("foo")

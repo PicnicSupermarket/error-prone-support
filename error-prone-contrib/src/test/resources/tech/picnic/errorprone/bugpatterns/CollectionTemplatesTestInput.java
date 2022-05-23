@@ -126,7 +126,6 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableSet<Optional<String>> testOptionalFirstQueueElement() {
     return ImmutableSet.of(
-        new LinkedList<String>().stream().findAny(),
         new LinkedList<String>().isEmpty()
             ? Optional.empty()
             : Optional.of(new LinkedList<String>().peek()),

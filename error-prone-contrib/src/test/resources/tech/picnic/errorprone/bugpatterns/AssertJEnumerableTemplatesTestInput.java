@@ -12,15 +12,9 @@ final class AssertJEnumableTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(Iterables.class);
   }
 
-  void testEnumerableAssertIsEmpty1() {
+  void testEnumerableAssertIsEmpty() {
     assertThat(ImmutableSet.of()).hasSize(0);
-  }
-
-  void testEnumerableAssertIsEmpty2() {
     assertThat(ImmutableSet.of()).hasSizeLessThanOrEqualTo(0);
-  }
-
-  void testEnumerableAssertIsEmpty3() {
     assertThat(ImmutableSet.of()).hasSizeLessThan(1);
   }
 

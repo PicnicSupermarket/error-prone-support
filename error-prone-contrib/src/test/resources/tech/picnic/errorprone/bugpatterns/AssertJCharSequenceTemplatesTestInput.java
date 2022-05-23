@@ -6,11 +6,8 @@ import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.AbstractAssert;
 
 final class AssertJCharSequenceTemplatesTest implements RefasterTemplateTestCase {
-  void testAssertThatCharSequenceIsEmpty1() {
+  void testAssertThatCharSequenceIsEmpty() {
     assertThat("foo".length()).isEqualTo(0L);
-  }
-
-  void testAssertThatCharSequenceIsEmpty2() {
     assertThat("foo".length()).isNotPositive();
   }
 

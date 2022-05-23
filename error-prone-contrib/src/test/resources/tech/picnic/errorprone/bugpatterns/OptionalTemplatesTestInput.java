@@ -44,6 +44,7 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
             : Optional.of(ImmutableSet.of("foo").iterator().next()));
   }
 
+  @SuppressWarnings("TernaryOperatorOptionalNegativeFiltering" /* Special case. */)
   ImmutableSet<Optional<String>> testTernaryOperatorOptionalPositiveFiltering() {
     return ImmutableSet.of(
         "foo".length() > 5 ? Optional.of("foo") : Optional.empty(),
