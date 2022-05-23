@@ -40,6 +40,8 @@
 
     <modules>
         <module>error-prone-contrib</module>
+        <!-- XXX: Drop? -->
+        <module>plexus-compiler-javac-caching</module>
         <module>refaster-compiler</module>
         <module>refaster-support</module>
     </modules>
@@ -347,6 +349,33 @@
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
                 <version>3.22.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-compiler-api</artifactId>
+                <version>2.12.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-compiler-javac</artifactId>
+                <!-- XXX: Dedup. -->
+                <version>2.12.0</version>
+            </dependency>
+            <!--<dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-component-annotations</artifactId>
+                <version>2.1.1</version>
+            </dependency>-->
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-container-default</artifactId>
+                <!-- XXX: dedup? -->
+                <version>2.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
@@ -749,7 +778,16 @@
                         <!-- Erroneously inverted logic... for details, see
                         https://issues.apache.org/jira/browse/MCOMPILER-209. -->
                         <useIncrementalCompilation>false</useIncrementalCompilation>
+                        <!--<compilerId>javac-with-caching</compilerId>-->
+                        <compilerId>javac-with-caching</compilerId>
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>plexus-compiler-javac-caching</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1086,6 +1124,21 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
                     <version>2.11.0</version>
+                </plugin>
+                <!-- XXX: Drop if unused! -->
+                <plugin>
+                    <groupId>org.codehaus.plexus</groupId>
+                    <artifactId>plexus-component-metadata</artifactId>
+                    <!-- XXX: Dedup -->
+                    <version>2.1.1</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>generate-metadata</goal>
+                                <goal>merge-metadata</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.gaul</groupId>
