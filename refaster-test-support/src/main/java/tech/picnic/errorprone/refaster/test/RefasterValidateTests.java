@@ -1,7 +1,8 @@
 package tech.picnic.errorprone.refaster.test;
 
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.refaster.runner.RefasterCheck.INCLUDED_TEMPLATES_PATTERN_FLAG;
 
@@ -69,10 +70,9 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
                 ImmutableMap.of(INCLUDED_TEMPLATES_PATTERN_FLAG, templateCollection + ".*")));
     templateNamesFromClassPath =
         ALL_CODE_TRANSFORMERS.get().keySet().stream()
-            .filter(k -> k.contains(templateCollection))
+            .filter(k -> k.startsWith(templateCollection))
             .map(k -> k.replace(templateCollection + "$", ""))
-            .sorted()
-            .collect(toImmutableSet());
+            .collect(toImmutableSortedSet(naturalOrder()));
   }
 
   @Override
@@ -168,7 +168,7 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
             tree,
             String.format(
                 "The following matches unexpectedly occurred in method `%s`", tree.getName()),
-            matchesRangeMap.asMapOfRanges().entrySet().stream()
+            matchesInCurrentMethod.asMapOfRanges().entrySet().stream()
                 .filter(e -> !e.getValue().equals(methodName))
                 .map(
                     e ->

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableMap;
 import org.assertj.core.api.AbstractMapAssert;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJMapTemplatesTest implements RefasterTemplateTestCase {
   AbstractMapAssert<?, ?, Integer, Integer>
