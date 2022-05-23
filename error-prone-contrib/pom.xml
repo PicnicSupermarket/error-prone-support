@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>refaster-resource-compiler</artifactId>
+            <artifactId>refaster-compiler</artifactId>
             <!-- This dependency is declared only as a hint to Maven that
             compilation depends on it; see the `maven-compiler-plugin`'s
             `annotationProcessorPaths` configuration below. -->
@@ -207,7 +207,7 @@
                         <annotationProcessorPaths combine.children="append">
                             <path>
                                 <groupId>${project.groupId}</groupId>
-                                <artifactId>refaster-resource-compiler</artifactId>
+                                <artifactId>refaster-compiler</artifactId>
                                 <version>${project.version}</version>
                             </path>
                             <path>
@@ -217,7 +217,7 @@
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs combine.children="append">
-                            <arg>-Xplugin:RefasterRuleResourceCompiler</arg>
+                            <arg>-Xplugin:RefasterRuleCompiler</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>

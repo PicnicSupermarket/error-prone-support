@@ -8,9 +8,9 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>refaster-resource-compiler</artifactId>
+    <artifactId>refaster-compiler</artifactId>
 
-    <name>Picnic :: Error Prone Support :: Refaster Resource Compiler</name>
+    <name>Picnic :: Error Prone Support :: Refaster Compiler</name>
     <description>Java Compiler Plugin which identifies and compiles Refaster templates, storing them as resource files on the classpath.</description>
 
     <dependencies>
