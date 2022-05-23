@@ -43,9 +43,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.plexus.compiler.javac.caching.CachingJavacCompiler;
 
 /**
  * A {@link BugChecker} which flags code which can be simplified using Refaster templates located on
@@ -89,6 +91,16 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
+    System.out.println("XXXX :" + CachingJavacCompiler.class.toString());
+    ConcurrentMap<String, Integer> cache = state.context.get(ConcurrentMap.class);
+    System.err.printf("XXX %s%n", cache);
+    if (cache != null) {
+      cache.compute("x", (a, b) -> b == null ? 1 : b + 1);
+    } else {
+      // We're not using the hacked compiler
+      System.err.printf("XXX NOP!%n");
+    }
+
     /* First, collect all matches. */
     List<Description> matches = new ArrayList<>();
     try {

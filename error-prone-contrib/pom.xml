@@ -39,6 +39,11 @@
             <artifactId>error_prone_test_helpers</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- XXX: dubious. -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>plexus-compiler-javac-caching</artifactId>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-compiler</artifactId>

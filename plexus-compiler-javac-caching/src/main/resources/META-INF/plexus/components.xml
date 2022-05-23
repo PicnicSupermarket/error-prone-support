@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component-set>
-  <components>
-    <component>
-      <role>org.codehaus.plexus.compiler.Compiler</role>
-      <role-hint>javac-with-caching</role-hint>
-      <implementation>org.codehaus.plexus.compiler.javac.JavacCompiler</implementation>
-      <description />
-      <isolated-realm>false</isolated-realm>
-      <requirements>
-        <requirement>
-          <role>org.codehaus.plexus.compiler.javac.InProcessCompiler</role>
-           <role-hint>javac-with-caching</role-hint>
-          <field-name>inProcessCompiler</field-name>
-        </requirement>
-      </requirements>
-    </component>
-    <component>
-      <role>org.codehaus.plexus.compiler.javac.InProcessCompiler</role>
-      <role-hint>javac-with-caching</role-hint>
-      <implementation>tech.picnic.errorprone.plexus.compiler.javac.caching.CachingJavacCompiler</implementation>
-      <description />
-      <isolated-realm>false</isolated-realm>
-    </component>
-  </components>
+    <components>
+        <component>
+            <role>org.codehaus.plexus.compiler.Compiler</role>
+            <role-hint>javac-with-caching</role-hint>
+            <implementation>org.codehaus.plexus.compiler.javac.JavacCompiler</implementation>
+            <description/>
+            <isolated-realm>false</isolated-realm>
+            <requirements>
+                <requirement>
+                    <role>org.codehaus.plexus.compiler.javac.InProcessCompiler</role>
+                    <role-hint>javac-with-caching</role-hint>
+                    <field-name>inProcessCompiler</field-name>
+                </requirement>
+            </requirements>
+        </component>
+        <component>
+            <role>org.codehaus.plexus.compiler.javac.InProcessCompiler</role>
+            <role-hint>javac-with-caching</role-hint>
+            <implementation>tech.picnic.errorprone.plexus.compiler.javac.caching.CachingJavacCompiler</implementation>
+            <description/>
+            <isolated-realm>false</isolated-realm>
+        </component>
+    </components>
 </component-set>
