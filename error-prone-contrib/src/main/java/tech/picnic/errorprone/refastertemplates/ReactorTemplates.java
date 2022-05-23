@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.MoreCollectors;
 import com.google.errorprone.refaster.Refaster;
@@ -320,7 +321,9 @@ final class ReactorTemplates {
   static final class StepVerifierLastStepVerifyErrorClass<T extends Throwable> {
     @BeforeTemplate
     Duration before(StepVerifier.LastStep step, Class<T> clazz) {
-      return step.expectError(clazz).verify();
+      return Refaster.anyOf(
+          step.expectError(clazz).verify(),
+          step.verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(clazz)));
     }
 
     @AfterTemplate

@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.MoreCollectors.toOptional;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -13,6 +14,11 @@ import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 
 final class ReactorTemplatesTest implements RefasterTemplateTestCase {
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(assertThat(0));
+  }
+
   ImmutableSet<Mono<Integer>> testMonoFromOptional() {
     return ImmutableSet.of(
         Mono.defer(() -> Mono.justOrEmpty(Optional.of(1))),
@@ -99,8 +105,10 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return StepVerifier.create(Mono.empty()).verifyError();
   }
 
-  Duration testStepVerifierLastStepVerifyErrorClass() {
-    return StepVerifier.create(Mono.empty()).verifyError(IllegalArgumentException.class);
+  ImmutableSet<Duration> testStepVerifierLastStepVerifyErrorClass() {
+    return ImmutableSet.of(
+        StepVerifier.create(Mono.empty()).verifyError(IllegalArgumentException.class),
+        StepVerifier.create(Mono.empty()).verifyError(IllegalStateException.class));
   }
 
   Duration testStepVerifierLastStepVerifyErrorMatches() {
