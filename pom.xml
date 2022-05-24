@@ -678,7 +678,6 @@
                                     <module name="JavadocBlockTagLocation" />
                                     <module name="LocalVariableName">
                                         <property name="format" value="^[a-z]+[a-zA-Z0-9]*$"/>
-                                        <property name="allowOneCharVarInForLoop" value="true"/>
                                     </module>
                                     <module name="MatchXpath">
                                         <property name="query" value="//BLOCK_COMMENT_BEGIN[./COMMENT_CONTENT[contains(@text, '@author')]]" />
