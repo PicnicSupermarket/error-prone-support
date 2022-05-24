@@ -23,7 +23,7 @@ import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
  * <p>For reasons of consistency we prefer {@link
  * org.assertj.core.api.Assertions#assertThatThrownBy} over static methods for specific exception
  * types. Note that only the most common assertion expressions are rewritten here; covering all
- * cases would require the implementation an Error Prone check instead.
+ * cases would require the implementation of an Error Prone check instead.
  */
 final class AssertJThrowingCallableTemplates {
   private AssertJThrowingCallableTemplates() {}
