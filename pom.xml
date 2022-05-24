@@ -676,9 +676,7 @@
                                     <module name="InnerAssignment" />
                                     <module name="InvalidJavadocPosition" />
                                     <module name="JavadocBlockTagLocation" />
-                                    <module name="LocalVariableName">
-                                        <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
-                                    </module>
+                                    <module name="LocalVariableName" />
                                     <module name="MatchXpath">
                                         <property name="query" value="//BLOCK_COMMENT_BEGIN[./COMMENT_CONTENT[contains(@text, '@author')]]" />
                                         <message key="matchxpath.match" value="Avoid the `@author` Javadoc tag; Git history suffices." />
