@@ -96,6 +96,12 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
     return assertThatThrownBy(() -> {}).isInstanceOf(IOException.class);
   }
 
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionHasMessage() {
+    return assertThatThrownBy(() -> {})
+            .isInstanceOf(IOException.class)
+            .hasMessage("foo");
+  }
+
   AbstractObjectAssert<?, ?> testAssertThatThrownBy() {
     return assertThatThrownBy(() -> {}).isInstanceOf(IllegalArgumentException.class);
   }

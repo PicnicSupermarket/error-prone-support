@@ -266,6 +266,23 @@ final class AssertJThrowingCallableTemplates {
     }
   }
 
+  static final class AssertThatThrownByIOExceptionHasMessage {
+    @SuppressWarnings(
+        "AssertThatThrownByIOException" /* Matches strictly more specific expressions. */)
+    @BeforeTemplate
+    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+      return assertThatIOException().isThrownBy(throwingCallable).withMessage(message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
+      return assertThatThrownBy(throwingCallable)
+          .isInstanceOf(IOException.class)
+          .hasMessage(message);
+    }
+  }
+
   static final class AssertThatThrownBy {
     @BeforeTemplate
     AbstractObjectAssert<?, ?> before(
