@@ -31,6 +31,7 @@ import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
 import com.google.errorprone.fixes.Replacement;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.util.TreePath;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import java.io.IOException;
@@ -47,6 +48,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import javax.naming.Context;
 import tech.picnic.errorprone.plexus.compiler.javac.caching.CachingJavacCompiler;
 
 /**
@@ -73,7 +75,8 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   static final Supplier<ImmutableListMultimap<String, CodeTransformer>> ALL_CODE_TRANSFORMERS =
       Suppliers.memoize(RefasterCheck::loadAllCodeTransformers);
 
-  private final CodeTransformer codeTransformer;
+  private final ErrorProneFlags errorProneFlags;
+  private final Supplier<CodeTransformer> codeTransformer;
 
   /** Instantiates the default {@link RefasterCheck}. */
   public RefasterCheck() {
@@ -86,25 +89,37 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
    * @param flags Any provided command line flags.
    */
   public RefasterCheck(ErrorProneFlags flags) {
-    codeTransformer = createCompositeCodeTransformer(flags);
+    errorProneFlags = flags;
+    codeTransformer = Suppliers.memoize(() -> createCompositeCodeTransformer(flags));
   }
+
+  // XXX: Need to somehow convert `Description` to handle classloading issue.
+  //  private BiFunction<TreePath, Context, List<Description>>
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
+    // XXX Use the `codeTransformer` field only if `cache` is empty. In that case, populate the
+    // cache.
+    // XXX: Current code is wrong: doesn't respect flags.
     System.out.println("XXXX :" + CachingJavacCompiler.class.toString());
-    ConcurrentMap<String, Integer> cache = state.context.get(ConcurrentMap.class);
+    System.out.println("XXXX Path :" + TreePath.class.hashCode());
+    System.out.println("XXXX Context:" + Context.class.hashCode());
+    ConcurrentMap<String, Object> cache = state.context.get(ConcurrentMap.class);
     System.err.printf("XXX %s%n", cache);
+    CodeTransformer transformer;
     if (cache != null) {
-      cache.compute("x", (a, b) -> b == null ? 1 : b + 1);
+      cache.compute("x", (a, b) -> b instanceof Integer ? ((Integer) b) + 1 : 1);
+      transformer = (CodeTransformer) cache.computeIfAbsent("c", k -> codeTransformer.get());
     } else {
       // We're not using the hacked compiler
       System.err.printf("XXX NOP!%n");
+      transformer = codeTransformer.get();
     }
 
     /* First, collect all matches. */
     List<Description> matches = new ArrayList<>();
     try {
-      codeTransformer.apply(state.getPath(), new SubContext(state.context), matches::add);
+      transformer.apply(state.getPath(), new SubContext(state.context), matches::add);
     } catch (LinkageError e) {
       // XXX: This `try/catch` block handles the issue described and resolved in
       // https://github.com/google/error-prone/pull/2456. Drop this block once that change is

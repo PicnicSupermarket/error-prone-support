@@ -61,6 +61,8 @@ public final class CachingJavacCompiler extends JavaxToolsCompiler {
       System.out.println("XXXX I'm invoked!");
       Context context = new Context();
       // XXX: Explain.
+      // XXX: This hack should be hidden in a utility class, exposed by a separate Maven module (to
+      // be used both here and within RefasterCheck).
       context.put(ConcurrentMap.class, cache);
       return delegate.getTask(
           out, fileManager, diagnosticListener, options, classes, compilationUnits, context);
