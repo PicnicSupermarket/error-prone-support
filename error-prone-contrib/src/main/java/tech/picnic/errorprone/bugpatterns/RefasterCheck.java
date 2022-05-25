@@ -5,7 +5,6 @@ import static com.google.common.collect.ImmutableRangeSet.toImmutableRangeSet;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
-import static java.util.Objects.requireNonNullElseGet;
 import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
@@ -196,10 +195,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
 
   private static ImmutableSet<ResourceInfo> getClassPathResources() {
     try {
-      return ClassPath.from(
-              requireNonNullElseGet(
-                  RefasterCheck.class.getClassLoader(), ClassLoader::getSystemClassLoader))
-          .getResources();
+      return ClassPath.from(ClassLoader.getSystemClassLoader()).getResources();
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to scan classpath for resources", e);
     }
