@@ -8,7 +8,6 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
@@ -67,9 +66,9 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   private static final String REFASTER_TEMPLATE_SUFFIX = ".refaster";
   private static final String INCLUDED_TEMPLATES_PATTERN_FLAG = "Refaster:NamePattern";
 
-  @VisibleForTesting
-  static final Supplier<ImmutableListMultimap<String, CodeTransformer>> ALL_CODE_TRANSFORMERS =
-      Suppliers.memoize(RefasterCheck::loadAllCodeTransformers);
+  /** All code transformers loaded by {@link RefasterCheck}. */
+  public static final Supplier<ImmutableListMultimap<String, CodeTransformer>>
+      ALL_CODE_TRANSFORMERS = Suppliers.memoize(RefasterCheck::loadAllCodeTransformers);
 
   private final CodeTransformer codeTransformer;
 
