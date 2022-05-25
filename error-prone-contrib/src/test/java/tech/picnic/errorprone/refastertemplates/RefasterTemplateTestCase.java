@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.refastertemplates;
 
 import com.google.common.collect.ImmutableSet;
 
