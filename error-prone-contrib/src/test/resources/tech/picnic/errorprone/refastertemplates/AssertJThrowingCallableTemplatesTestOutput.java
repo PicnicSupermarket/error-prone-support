@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.refastertemplates;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIOException;
@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
 
@@ -23,77 +24,91 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalArgumentException() {
-    return assertThatIllegalArgumentException().isThrownBy(() -> {});
+    return assertThatThrownBy(() -> {}).isInstanceOf(IllegalArgumentException.class);
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalArgumentExceptionHasMessage() {
-    return assertThatIllegalArgumentException().isThrownBy(() -> {}).withMessage("foo");
+    return assertThatThrownBy(() -> {})
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("foo");
   }
 
   AbstractObjectAssert<?, ?>
       testAssertThatThrownByIllegalArgumentExceptionHasMessageStartingWith() {
-    return assertThatIllegalArgumentException().isThrownBy(() -> {}).withMessageStartingWith("foo");
+    return assertThatThrownBy(() -> {})
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageStartingWith("foo");
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalArgumentExceptionHasMessageContaining() {
-    return assertThatIllegalArgumentException().isThrownBy(() -> {}).withMessageContaining("foo");
+    return assertThatThrownBy(() -> {})
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("foo");
   }
 
   AbstractObjectAssert<?, ?>
       testAssertThatThrownByIllegalArgumentExceptionHasMessageNotContainingAny() {
-    return assertThatIllegalArgumentException()
-        .isThrownBy(() -> {})
-        .withMessageNotContainingAny("foo", "bar");
+    return assertThatThrownBy(() -> {})
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageNotContainingAny("foo", "bar");
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateException() {
-    return assertThatIllegalStateException().isThrownBy(() -> {});
+    return assertThatThrownBy(() -> {}).isInstanceOf(IllegalStateException.class);
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionHasMessage() {
-    return assertThatIllegalStateException().isThrownBy(() -> {}).withMessage("foo");
+    return assertThatThrownBy(() -> {}).isInstanceOf(IllegalStateException.class).hasMessage("foo");
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionHasMessageStartingWith() {
-    return assertThatIllegalStateException().isThrownBy(() -> {}).withMessageStartingWith("foo");
+    return assertThatThrownBy(() -> {})
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageStartingWith("foo");
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionHasMessageContaining() {
-    return assertThatIllegalStateException().isThrownBy(() -> {}).withMessageContaining("foo");
+    return assertThatThrownBy(() -> {})
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("foo");
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionHasMessageNotContaining() {
-    return assertThatIllegalStateException().isThrownBy(() -> {}).withMessageNotContaining("foo");
+    return assertThatThrownBy(() -> {})
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageNotContaining("foo");
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerException() {
-    return assertThatNullPointerException().isThrownBy(() -> {});
+    return assertThatThrownBy(() -> {}).isInstanceOf(NullPointerException.class);
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionHasMessage() {
-    return assertThatNullPointerException().isThrownBy(() -> {}).withMessage("foo");
+    return assertThatThrownBy(() -> {}).isInstanceOf(NullPointerException.class).hasMessage("foo");
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionHasMessageStartingWith() {
-    return assertThatNullPointerException().isThrownBy(() -> {}).withMessageStartingWith("foo");
+    return assertThatThrownBy(() -> {})
+        .isInstanceOf(NullPointerException.class)
+        .hasMessageStartingWith("foo");
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByIOException() {
-    return assertThatIOException().isThrownBy(() -> {});
+    return assertThatThrownBy(() -> {}).isInstanceOf(IOException.class);
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionHasMessage() {
-    return assertThatIOException().isThrownBy(() -> {}).withMessage("foo");
+    return assertThatThrownBy(() -> {}).isInstanceOf(IOException.class).hasMessage("foo");
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownBy() {
-    return assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {});
+    return assertThatThrownBy(() -> {}).isInstanceOf(IllegalArgumentException.class);
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByHasMessage() {
-    return assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> {})
-        .withMessage("foo");
+    return assertThatThrownBy(() -> {})
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("foo");
   }
 
   ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>>
@@ -101,10 +116,10 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
     return ImmutableSet.of(
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage(String.format("foo %s", "bar")),
+            .hasMessage("foo %s", "bar"),
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage(String.format("foo %s %s", "bar", 1)));
+            .hasMessage("foo %s %s", "bar", 1));
   }
 
   ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>>
@@ -112,9 +127,9 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
     return ImmutableSet.of(
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
-            .withFailMessage(String.format("foo %s", "bar")),
+            .withFailMessage("foo %s", "bar"),
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
-            .withFailMessage(String.format("foo %s %s", "bar", 1)));
+            .withFailMessage("foo %s %s", "bar", 1));
   }
 }
