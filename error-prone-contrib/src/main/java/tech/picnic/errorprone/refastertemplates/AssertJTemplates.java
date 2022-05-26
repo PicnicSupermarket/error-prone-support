@@ -97,7 +97,6 @@ import tech.picnic.errorprone.refaster.util.IsArray;
 // XXX: Right now we use and import `Offset.offset` and `Percentage.withPercentage`. Use the AssertJ
 // methods instead. (Also in the TestNG migration.)
 //      ^ Also for `Tuple`!
-// XXX: Use `assertThatIllegalArgumentException` and variants.
 // XXX: `assertThatCode(x).isInstanceOf(clazz)` -> `assertThatThrownBy(x).isInstanceOf(clazz)`
 // (etc.)
 // XXX: Look into using Assertions#contentOf(URL url, Charset charset) instead of our own test
