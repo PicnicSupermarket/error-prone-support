@@ -1,4 +1,7 @@
-/** A {@code javac} plugin which compiles Refaster templates once their Java code is compiled. */
+/**
+ * A Java compiler plugin which identifies and compiles Refaster templates, storing them as resource
+ * files on the classpath.
+ */
 @com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 package tech.picnic.errorprone.refaster.plugin;
