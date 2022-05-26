@@ -111,6 +111,7 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
         Optional.ofNullable(new LinkedList<String>().peek()),
         Optional.ofNullable(new LinkedList<String>().peek()),
         Optional.ofNullable(new LinkedList<String>().peek()),
+        Optional.ofNullable(new LinkedList<String>().peek()),
         Optional.ofNullable(new LinkedList<String>().peek()));
   }
 
