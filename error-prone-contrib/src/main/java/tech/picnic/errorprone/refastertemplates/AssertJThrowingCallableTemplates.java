@@ -14,6 +14,7 @@ import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.io.IOException;
 import org.assertj.core.api.AbstractObjectAssert;
+import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 
 /**
@@ -317,6 +318,46 @@ final class AssertJThrowingCallableTemplates {
         ThrowingCallable throwingCallable,
         String message) {
       return assertThatThrownBy(throwingCallable).isInstanceOf(exceptionType).hasMessage(message);
+    }
+  }
+
+  // XXX: Drop this template in favour of a generic Error Prone check which flags
+  // `String.format(...)` arguments to a wide range of format methods.
+  static final class AbstractThrowableAssertHasMessage {
+    @BeforeTemplate
+    AbstractThrowableAssert<?, ? extends Throwable> before(
+        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        String message,
+        @Repeated Object parameters) {
+      return abstractThrowableAssert.hasMessage(String.format(message, parameters));
+    }
+
+    @AfterTemplate
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        String message,
+        @Repeated Object parameters) {
+      return abstractThrowableAssert.hasMessage(message, parameters);
+    }
+  }
+
+  // XXX: Drop this template in favour of a generic Error Prone check which flags
+  // `String.format(...)` arguments to a wide range of format methods.
+  static final class AbstractThrowableAssertWithFailMessage {
+    @BeforeTemplate
+    AbstractThrowableAssert<?, ? extends Throwable> before(
+        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        String message,
+        @Repeated Object args) {
+      return abstractThrowableAssert.withFailMessage(String.format(message, args));
+    }
+
+    @AfterTemplate
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        String message,
+        @Repeated Object args) {
+      return abstractThrowableAssert.withFailMessage(message, args);
     }
   }
 }
