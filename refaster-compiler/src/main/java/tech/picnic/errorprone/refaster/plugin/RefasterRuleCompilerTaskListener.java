@@ -40,10 +40,10 @@ import javax.tools.StandardLocation;
  *
  * <p>This {@link TaskListener} thus supports compilation of multiple Refaster rules.
  */
-final class RefasterRuleResourceCompilerTaskListener implements TaskListener {
+final class RefasterRuleCompilerTaskListener implements TaskListener {
   private final Context context;
 
-  RefasterRuleResourceCompilerTaskListener(Context context) {
+  RefasterRuleCompilerTaskListener(Context context) {
     this.context = context;
   }
 
@@ -108,7 +108,7 @@ final class RefasterRuleResourceCompilerTaskListener implements TaskListener {
             .orElse("");
     CharSequence className =
         Optional.ofNullable(ASTHelpers.getSymbol(tree))
-            .map(RefasterRuleResourceCompilerTaskListener::toSimpleFlatName)
+            .map(RefasterRuleCompilerTaskListener::toSimpleFlatName)
             .orElseGet(tree::getSimpleName);
     String relativeName = className + ".refaster";
 

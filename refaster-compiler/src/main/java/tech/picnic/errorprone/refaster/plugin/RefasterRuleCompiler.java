@@ -11,7 +11,7 @@ import com.sun.tools.javac.api.BasicJavacTask;
  * contains a Refaster template.
  */
 @AutoService(Plugin.class)
-public final class RefasterRuleResourceCompiler implements Plugin {
+public final class RefasterRuleCompiler implements Plugin {
   @Override
   public String getName() {
     return getClass().getSimpleName();
@@ -20,6 +20,6 @@ public final class RefasterRuleResourceCompiler implements Plugin {
   @Override
   public void init(JavacTask javacTask, String... args) {
     javacTask.addTaskListener(
-        new RefasterRuleResourceCompilerTaskListener(((BasicJavacTask) javacTask).getContext()));
+        new RefasterRuleCompilerTaskListener(((BasicJavacTask) javacTask).getContext()));
   }
 }

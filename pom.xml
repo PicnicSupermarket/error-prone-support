@@ -40,7 +40,7 @@
 
     <modules>
         <module>error-prone-contrib</module>
-        <module>refaster-resource-compiler</module>
+        <module>refaster-compiler</module>
         <module>refaster-support</module>
     </modules>
 
@@ -185,7 +185,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>refaster-resource-compiler</artifactId>
+                <artifactId>refaster-compiler</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
