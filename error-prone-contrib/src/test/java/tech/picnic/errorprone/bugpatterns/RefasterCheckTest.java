@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refastertemplates;
+package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static java.util.function.Function.identity;
@@ -18,11 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import tech.picnic.errorprone.bugpatterns.RefasterCheck;
 
-// XXX: This test class is located in a different package than the associated main class. This is
-// necessary for this class to be able to load the Refaster templates using
-// `BugCheckerRefactoringTestHelper`.
 final class RefasterCheckTest {
   /** The names of all Refaster template groups defined in this module. */
   private static final ImmutableSet<String> TEMPLATE_GROUPS =
