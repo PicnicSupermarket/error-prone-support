@@ -19,6 +19,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import tech.picnic.errorprone.bugpatterns.RefasterCheck;
 
+// XXX: This test class is located in a different package than the associated main class. This is
+// necessary for this class to be able to load the Refaster templates using
+// `BugCheckerRefactoringTestHelper`.
 public final class RefasterCheckTest {
   /** The names of all Refaster template groups defined in this module. */
   private static final ImmutableSet<String> TEMPLATE_GROUPS =
