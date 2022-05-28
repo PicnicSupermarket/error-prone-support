@@ -66,7 +66,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   private static final String REFASTER_TEMPLATE_SUFFIX = ".refaster";
   private static final String INCLUDED_TEMPLATES_PATTERN_FLAG = "Refaster:NamePattern";
 
-  /** All code transformers loaded by {@link RefasterCheck}. */
+  /** All code transformers found on the classpath, loaded lazily. */
   public static final Supplier<ImmutableListMultimap<String, CodeTransformer>>
       ALL_CODE_TRANSFORMERS = Suppliers.memoize(RefasterCheck::loadAllCodeTransformers);
 
