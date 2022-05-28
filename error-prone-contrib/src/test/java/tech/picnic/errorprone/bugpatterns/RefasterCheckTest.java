@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refastertemplates;
+package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static java.util.function.Function.identity;
@@ -17,11 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import tech.picnic.errorprone.bugpatterns.RefasterCheck;
 
-// XXX: This test class is located in a different package than the associated main class. This is
-// necessary for this class to be able to load the Refaster templates using
-// `BugCheckerRefactoringTestHelper`.
 public final class RefasterCheckTest {
   /** The names of all Refaster template groups defined in this module. */
   private static final ImmutableSet<String> TEMPLATE_GROUPS =
@@ -172,7 +168,24 @@ public final class RefasterCheckTest {
 
   private BugCheckerRefactoringTestHelper createRestrictedRefactoringTestHelper(
       String namePattern) {
-    return BugCheckerRefactoringTestHelper.newInstance(RefasterCheck.class, getClass())
+    return BugCheckerRefactoringTestHelper.newInstance(
+            RefasterCheck.class, getRefasterTemplateCollectionClass())
         .setArgs("-XepOpt:Refaster:NamePattern=" + namePattern);
+  }
+
+  /**
+   * Returns an arbitrary Refaster template collection class inside the {@code
+   * tech.picnic.errorprone.refastertemplates} package, enabling {@link
+   * BugCheckerRefactoringTestHelper} to load test resources from said package.
+   */
+  private Class<?> getRefasterTemplateCollectionClass() {
+    try {
+      return Class.forName(
+          "tech.picnic.errorprone.refastertemplates.AssortedTemplates",
+          false,
+          getClass().getClassLoader());
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException("Failed to load Refaster template collection class", e);
+    }
   }
 }
