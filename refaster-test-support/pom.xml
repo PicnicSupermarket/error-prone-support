@@ -11,7 +11,7 @@
     <artifactId>refaster-test-support</artifactId>
 
     <name>Picnic :: Error Prone Support :: Refaster Test Support</name>
-    <description>Utilities to support with the validation of Refaster templates tests.</description>
+    <description>Opinionated utilities for the testing of Refaster templates.</description>
 
     <dependencies>
         <dependency>

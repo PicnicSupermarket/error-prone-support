@@ -14,8 +14,10 @@ final class MethodNameWithNumberTemplatesTest implements RefasterTemplateTestCas
     return "foo".isEmpty();
   }
 
+  /* ERROR: Method names should start with `test`. */
   private void foo() {}
 
+  /* ERROR: Method names should start with `test`. */
   public String bar() {
     return "";
   }

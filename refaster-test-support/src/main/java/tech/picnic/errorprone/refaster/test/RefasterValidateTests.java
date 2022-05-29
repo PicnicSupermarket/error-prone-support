@@ -1,13 +1,13 @@
 package tech.picnic.errorprone.refaster.test;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.util.Comparator.naturalOrder;
-import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.refaster.runner.RefasterCheck.INCLUDED_TEMPLATES_PATTERN_FLAG;
 
-import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableRangeMap;
@@ -16,7 +16,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.SubContext;
 import com.google.errorprone.VisitorState;
@@ -33,46 +32,69 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
+import com.sun.tools.javac.util.Position;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
+import java.util.regex.Pattern;
 import tech.picnic.errorprone.refaster.runner.CodeTransformers;
 import tech.picnic.errorprone.refaster.runner.RefasterCheck;
 
 /**
- * A {@link BugChecker} that tests the Refaster templates of a given template collection and
- * validates its tests.
+ * A {@link BugChecker} that applies a Refaster template collection by delegating to {@link
+ * RefasterCheck} and subsequently validates that each template modifies exactly one distinct
+ * method, as indicate by each method's name.
  */
+// XXX: Rename to `RefasterTemplateCollectionValidator`. Be sure to update all references to
+// `RefasterValidateTests`.
 @BugPattern(
     name = "RefasterValidateTests",
-    summary = "Validate a Refaster template collection and its tests",
+    summary = "Exercises a Refaster template collection",
     severity = ERROR)
 public final class RefasterValidateTests extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Supplier<ImmutableListMultimap<String, CodeTransformer>>
-      ALL_CODE_TRANSFORMERS = Suppliers.memoize(CodeTransformers::loadAllCodeTransformers);
+  private static final String TEMPLATE_COLLECTION_FLAG = "RefasterValidateTests:TemplateCollection";
+  private static final String TEST_METHOD_NAME_PREFIX = "test";
 
-  private final ImmutableSet<String> templateNamesFromClassPath;
+  private final ImmutableSet<String> templatesUnderTest;
   private final RefasterCheck delegate;
 
   /**
-   * Instantiates a customized {@link RefasterValidateTests}.
+   * Instantiates a {@link RefasterValidateTests} instance.
    *
    * @param flags Any provided command line flags.
    */
   public RefasterValidateTests(ErrorProneFlags flags) {
-    String templateCollection = flags.get("RefasterValidateTests:TemplateCollection").orElseThrow();
-    delegate =
-        new RefasterCheck(
-            ErrorProneFlags.fromMap(
-                ImmutableMap.of(INCLUDED_TEMPLATES_PATTERN_FLAG, templateCollection + ".*")));
-    templateNamesFromClassPath =
-        ALL_CODE_TRANSFORMERS.get().keySet().stream()
-            .filter(k -> k.startsWith(templateCollection))
-            .map(k -> k.replace(templateCollection + "$", ""))
-            .collect(toImmutableSortedSet(naturalOrder()));
+    String templateCollectionUnderTest = getTemplateCollectionUnderTest(flags);
+    delegate = createRefasterCheck(templateCollectionUnderTest);
+    templatesUnderTest = getTemplatesUnderTest(templateCollectionUnderTest);
+  }
+
+  private static String getTemplateCollectionUnderTest(ErrorProneFlags flags) {
+    return flags
+        .get(TEMPLATE_COLLECTION_FLAG)
+        .orElseThrow(
+            () ->
+                new IllegalStateException(
+                    String.format(
+                        "Error Prone flag `%s` must be specified", TEMPLATE_COLLECTION_FLAG)));
+  }
+
+  private static RefasterCheck createRefasterCheck(String templateCollectionUnderTest) {
+    return new RefasterCheck(
+        ErrorProneFlags.fromMap(
+            ImmutableMap.of(
+                INCLUDED_TEMPLATES_PATTERN_FLAG,
+                Pattern.quote(templateCollectionUnderTest) + ".*")));
+  }
+
+  private static ImmutableSet<String> getTemplatesUnderTest(String templateCollectionUnderTest) {
+    return CodeTransformers.getAllCodeTransformers().keySet().stream()
+        .filter(k -> k.startsWith(templateCollectionUnderTest))
+        .map(k -> k.replace(templateCollectionUnderTest + '$', ""))
+        .collect(toImmutableSortedSet(naturalOrder()));
   }
 
   @Override
@@ -83,39 +105,65 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
         VisitorState.createForCustomFindingCollection(new SubContext(state.context), matches::add)
             .withPath(state.getPath()));
 
-    JCCompilationUnit compilationUnit = (JCCompilationUnit) tree;
-    ImmutableRangeMap<Integer, String> matchesRangeMap =
-        buildRangeMapForMatches(matches, compilationUnit.endPositions);
-
-    ImmutableSet<String> templatesWithoutMatch =
-        getTemplateNamesWithoutMatch(matchesRangeMap.asMapOfRanges().values());
-    if (!templatesWithoutMatch.isEmpty()) {
-      addCommentToTreeInOutputFile(
-          tree,
-          String.format(
-              "Did not encounter a test in `%s` for the following template(s)",
-              getNameFromFQCN(compilationUnit.sourcefile.getName().replace(".java", ""))),
-          templatesWithoutMatch.stream(),
-          state);
-    }
-
-    ValidateMatchesInMethodsScanner scanner = new ValidateMatchesInMethodsScanner(matchesRangeMap);
-    scanner.scan(tree.getTypeDecls(), state);
+    ImmutableRangeMap<Integer, String> indexedMatches =
+        indexTemplateMatches(matches, ((JCCompilationUnit) tree).endPositions);
 
     matches.forEach(state::reportMatch);
+    reportMissingMatches(tree, state, indexedMatches);
+    reportUnexpectedMatches(tree, state, indexedMatches);
+
     return Description.NO_MATCH;
   }
 
-  private ImmutableSet<String> getTemplateNamesWithoutMatch(
-      ImmutableCollection<String> templateNamesOfMatches) {
-    return Sets.difference(templateNamesFromClassPath, ImmutableSet.copyOf(templateNamesOfMatches))
-        .immutableCopy();
+  private static ImmutableRangeMap<Integer, String> indexTemplateMatches(
+      List<Description> matches, EndPosTable endPositions) {
+    ImmutableRangeMap.Builder<Integer, String> templateMatches = ImmutableRangeMap.builder();
+
+    for (Description description : matches) {
+      Set<Replacement> replacements =
+          Iterables.getOnlyElement(description.fixes).getReplacements(endPositions);
+      for (Replacement replacement : replacements) {
+        templateMatches.put(
+            replacement.range(), getSubstringAfterLastChar('.', description.checkName));
+      }
+    }
+
+    return templateMatches.build();
   }
 
-  private void addCommentToTreeInOutputFile(
-      Tree tree, String message, Stream<String> violations, VisitorState state) {
-    String listOfViolations = violations.collect(joining("\n*  - ", "\n*  - ", "\n"));
-    String comment = String.format("/*\n*  %s:%s*/\n", message, listOfViolations);
+  private void reportMissingMatches(
+      CompilationUnitTree tree,
+      VisitorState state,
+      ImmutableRangeMap<Integer, String> indexedMatches) {
+    ImmutableSet<String> templatesWithoutMatch =
+        Sets.difference(
+                templatesUnderTest, ImmutableSet.copyOf(indexedMatches.asMapOfRanges().values()))
+            .immutableCopy();
+    if (!templatesWithoutMatch.isEmpty()) {
+      String sourceFile = ((JCCompilationUnit) tree).sourcefile.getName();
+      reportViolations(
+          tree,
+          String.format(
+              "Did not encounter a test in `%s` for the following template(s)",
+              getSubstringAfterLastChar('/', sourceFile)),
+          templatesWithoutMatch,
+          state);
+    }
+  }
+
+  private void reportUnexpectedMatches(
+      CompilationUnitTree tree,
+      VisitorState state,
+      ImmutableRangeMap<Integer, String> indexedMatches) {
+    UnexpectedMatchReporter unexpectedMatchReporter = new UnexpectedMatchReporter(indexedMatches);
+    unexpectedMatchReporter.scan(tree.getTypeDecls(), state);
+  }
+
+  private void reportViolations(
+      Tree tree, String message, ImmutableSet<String> violations, VisitorState state) {
+    String violationEnumeration = String.join("\n*  - ", violations);
+    String comment =
+        String.format("/*\n*  ERROR: %s:\n*  - %s\n*/\n", message, violationEnumeration);
     SuggestedFix fixWithComment =
         tree instanceof MethodTree
             ? SuggestedFix.prefixWith(tree, comment)
@@ -123,63 +171,95 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
     state.reportMatch(describeMatch(tree, fixWithComment));
   }
 
-  private static ImmutableRangeMap<Integer, String> buildRangeMapForMatches(
-      List<Description> matches, EndPosTable endPositions) {
-    ImmutableRangeMap.Builder<Integer, String> rangeMap = ImmutableRangeMap.builder();
-
-    for (Description description : matches) {
-      Set<Replacement> replacements =
-          Iterables.getOnlyElement(description.fixes).getReplacements(endPositions);
-      Replacement replacement = Iterables.getOnlyElement(replacements);
-
-      rangeMap.put(replacement.range(), getNameFromFQCN(description.checkName));
-    }
-    return rangeMap.build();
+  private static String getSubstringAfterLastChar(char delimiter, String value) {
+    int index = value.lastIndexOf(delimiter);
+    checkState(index >= 0, "String '%s' does not contain character '%s'", value, delimiter);
+    return value.substring(index + 1);
   }
 
-  private static String getNameFromFQCN(String fqcn) {
-    return fqcn.substring(fqcn.lastIndexOf('.') + 1);
-  }
+  private class UnexpectedMatchReporter extends TreeScanner<Void, VisitorState> {
+    private final ImmutableRangeMap<Integer, String> indexedMatches;
 
-  private class ValidateMatchesInMethodsScanner extends TreeScanner<Void, VisitorState> {
-    private final ImmutableRangeMap<Integer, String> matchesRangeMap;
-
-    ValidateMatchesInMethodsScanner(ImmutableRangeMap<Integer, String> matchesRangeMap) {
-      this.matchesRangeMap = matchesRangeMap;
+    UnexpectedMatchReporter(ImmutableRangeMap<Integer, String> indexedMatches) {
+      this.indexedMatches = indexedMatches;
     }
 
     @Override
     public Void visitMethod(MethodTree tree, VisitorState state) {
-      if (ASTHelpers.isGeneratedConstructor(tree)) {
-        return super.visitMethod(tree, state);
+      if (!ASTHelpers.isGeneratedConstructor(tree)) {
+        getTemplateUnderTest(tree, state)
+            .ifPresent(
+                templateUnderTest -> reportUnexpectedMatches(tree, state, templateUnderTest));
       }
 
-      String methodName = tree.getName().toString().replace("test", "");
-      int startPosition = ASTHelpers.getStartPosition(tree);
-      int endPosition = state.getEndPosition(tree);
-      LineMap lineMap = state.getPath().getCompilationUnit().getLineMap();
+      return super.visitMethod(tree, state);
+    }
 
-      ImmutableRangeMap<Integer, String> matchesInCurrentMethod =
-          matchesRangeMap.subRangeMap(Range.open(startPosition, endPosition));
-      boolean correctTemplatesMatchedInMethod =
-          matchesInCurrentMethod.asMapOfRanges().values().stream().allMatch(methodName::equals);
-      if (!correctTemplatesMatchedInMethod) {
-        addCommentToTreeInOutputFile(
+    private void reportUnexpectedMatches(
+        MethodTree tree, VisitorState state, String templateUnderTest) {
+      // XXX: Validate that `getMatchesInTree(tree, state)` returns a non-empty result (strictly
+      // speaking one of the values should match `templateUnderTest`, but we can skip that check).
+
+      ImmutableListMultimap<Long, String> unexpectedMatchesByLineNumber =
+          getUnexpectedMatchesByLineNumber(getMatchesInTree(tree, state), templateUnderTest, state);
+
+      if (!unexpectedMatchesByLineNumber.isEmpty()) {
+        reportViolations(
             tree,
             String.format(
                 "The following matches unexpectedly occurred in method `%s`", tree.getName()),
-            matchesInCurrentMethod.asMapOfRanges().entrySet().stream()
-                .filter(e -> !e.getValue().equals(methodName))
+            unexpectedMatchesByLineNumber.entries().stream()
                 .map(
                     e ->
                         String.format(
                             "Template `%s` matches on line %s, while it should match in a method named `test%s`.",
-                            e.getValue(),
-                            lineMap.getLineNumber(e.getKey().lowerEndpoint()),
-                            e.getValue())),
+                            e.getValue(), e.getKey(), e.getValue()))
+                .collect(toImmutableSet()),
             state);
       }
-      return super.visitMethod(tree, state);
+    }
+
+    private Optional<String> getTemplateUnderTest(MethodTree tree, VisitorState state) {
+      String methodName = tree.getName().toString();
+      if (methodName.startsWith(TEST_METHOD_NAME_PREFIX)) {
+        return Optional.of(methodName.substring(TEST_METHOD_NAME_PREFIX.length()));
+      }
+
+      /*
+       * Unless this method is `RefasterTemplateTestCase#elidedTypesAndStaticImports`, it's
+       * misnamed.
+       */
+      if (!"elidedTypesAndStaticImports".equals(methodName)) {
+        state.reportMatch(
+            describeMatch(
+                tree,
+                SuggestedFix.prefixWith(
+                    tree, "/* ERROR: Method names should start with `test`. */\n")));
+      }
+
+      return Optional.empty();
+    }
+
+    private ImmutableRangeMap<Integer, String> getMatchesInTree(
+        MethodTree tree, VisitorState state) {
+      int startPosition = ASTHelpers.getStartPosition(tree);
+      int endPosition = state.getEndPosition(tree);
+
+      checkState(
+          startPosition != Position.NOPOS && endPosition != Position.NOPOS,
+          "Cannot determine location of method in source code");
+
+      return indexedMatches.subRangeMap(Range.open(startPosition, endPosition));
+    }
+
+    private ImmutableListMultimap<Long, String> getUnexpectedMatchesByLineNumber(
+        ImmutableRangeMap<Integer, String> matches, String templateUnderTest, VisitorState state) {
+      LineMap lineMap = state.getPath().getCompilationUnit().getLineMap();
+      return matches.asMapOfRanges().entrySet().stream()
+          .filter(e -> !e.getValue().equals(templateUnderTest))
+          .collect(
+              toImmutableListMultimap(
+                  e -> lineMap.getLineNumber(e.getKey().lowerEndpoint()), Map.Entry::getValue));
     }
   }
 }

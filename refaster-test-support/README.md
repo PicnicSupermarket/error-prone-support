@@ -1,24 +1,28 @@
 # Refaster test support
 
-This package provides utilities to validate Refaster template collections.
+This module provides utilities to validate Refaster template collections.
 
 ## What does this module do?
 
-These utilities allow for validating the rewrites performed by Refaster
-templates, or absence thereof. Each collection of Refaster templates is applied
-to an input file and the result of that should match the provided output file.
+These utilities allow validating the rewrites (or their absence) performed by
+Refaster templates. Each collection of Refaster templates defined in the same
+top-level class is applied to an input file, and the resulting rewrites should
+match the associated output file.
 
-This extension ensures that each Refaster template has a test and has a match at
-the expected place. If a test is missing, an error is reported in the test's
-console. This way, the developer has some guidance on how to write tests and
-assurance that every template is tested.
+This extension ensures that each Refaster template is tested, making sure that
+it matches and transforms code as intended. If a Refaster template is not
+covered by a test, if it influences unrelated test code code, or if the
+associated test doesn't follow certain established standards, then this
+irregularity will be reported, and the associated template collection test will
+fail. This way developers receive guidance on how to write Refaster template
+tests and assurance that every template is properly tested.
 
 ## How to test a collection of Refaster templates?
 
 In summary, to test Refaster templates using the `RefasterCollectionTestUtil`,
 one should create an input and output file. The Refaster templates from the
-collection are applied on the input file and should exactly match the content of
-the provided output file.
+collection are applied on the input file and should exactly match the content
+of the provided output file.
 
 To test Refaster templates, one can create a (parameterized) test for every
 class containing the Refaster templates to invoke the
@@ -29,8 +33,8 @@ the result to exactly match the contents of a provided output file.
 
 To adopt this setup, the following requirements have to be met:
 
-- Create a class with a (parameterized) test method that calls
-  the `RefasterCollectionTestUtil#validateTemplateCollection` and passes the
+- Create a class with a (parameterized) test method that calls the
+  `RefasterCollectionTestUtil#validateTemplateCollection` and passes the
   collection(s) to validate. The Refaster template collection must match the
   naming convention `<TemplateCollectionName>Templates.java`.
 - An input file matching the naming convention
@@ -42,11 +46,11 @@ To adopt this setup, the following requirements have to be met:
 - For each Refaster template in the collection, the input and output file must
   contain a method. The name of the method is equal to the name of the Refaster
   template prefixed with `test` (e.g. `test<RefasterTemplateClassName>`).
-- The method contains at least one expression that matches the `@BeforeTemplate`
-  of one specific Refaster template. As a result, the output file contains the
-  same method with an updated expression, matching the content of the
-  `@AfterTemplate`. Additionally, incorrect matches of _other_ Refaster
-  templates in the method are flagged.
+- The method contains at least one expression that matches the
+  `@BeforeTemplate` of one specific Refaster template. As a result, the output
+  file contains the same method with an updated expression, matching the
+  content of the `@AfterTemplate`. Additionally, incorrect matches of _other_
+  Refaster templates in the method are flagged.
 
 As a result from these tests, unexpected output will be shown in the console.
 

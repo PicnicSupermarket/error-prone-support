@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refaster.runner;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
@@ -11,18 +12,32 @@ import java.io.ObjectInputStream;
 import java.io.UncheckedIOException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /** Scans the classpath for `.refaster` files and loads them as {@link CodeTransformer}s. */
 public final class CodeTransformers {
   private static final String REFASTER_TEMPLATE_SUFFIX = ".refaster";
+  private static final Supplier<ImmutableListMultimap<String, CodeTransformer>>
+      ALL_CODE_TRANSFORMERS = Suppliers.memoize(CodeTransformers::loadAllCodeTransformers);
 
   private CodeTransformers() {}
 
   /**
-   * Use the classpath to find Refaster templates and return a map of the names with {@link
-   * CodeTransformer}s.
+   * Returns all Refaster {@link CodeTransformer}s found on the classpath.
    *
-   * @return A mapping from Refaster template names to {@link CodeTransformer}s.
+   * <p>This method returns a cached view; all invocations exception the first are very cheap.
+   *
+   * @return A mapping from Refaster template names to associated {@link CodeTransformer}s.
+   */
+  public static ImmutableListMultimap<String, CodeTransformer> getAllCodeTransformers() {
+    return ALL_CODE_TRANSFORMERS.get();
+  }
+
+  /**
+   * Scans the classpath to for compiled Refaster templates and returns the associated deserialized
+   * {@link CodeTransformer}s, indexed by their name.
+   *
+   * @return A mapping from Refaster template names to associated {@link CodeTransformer}s.
    */
   public static ImmutableListMultimap<String, CodeTransformer> loadAllCodeTransformers() {
     ImmutableListMultimap.Builder<String, CodeTransformer> transformers =

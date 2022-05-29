@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Interface implemented by classes that exercise Refaster templates. These classes come in {@code
  * *Input.java} and {@code *Output.java} pairs, demonstrating the expected result of applying the
- * associated Refaster templates. These classes are <em>resources</em>.
+ * associated Refaster templates. These classes are <em>resources</em> on the test classpath.
  */
 public interface RefasterTemplateTestCase {
   /**
@@ -15,7 +15,9 @@ public interface RefasterTemplateTestCase {
    * types and statically imported methods, such that any imports present in the input file are also
    * present in the output file.
    *
-   * @return The classes and methods needed to get a properly formatted file.
+   * @return Any values that are the result of expressions defined to ensure that all {@code
+   *     *Input.java} import statements are also present in the associated {@code *Output.java}
+   *     file.
    */
   default ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of();

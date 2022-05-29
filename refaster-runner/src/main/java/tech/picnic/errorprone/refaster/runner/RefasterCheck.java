@@ -8,7 +8,6 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
-import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -34,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -58,9 +56,6 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   public static final String INCLUDED_TEMPLATES_PATTERN_FLAG = "Refaster:NamePattern";
 
   private static final long serialVersionUID = 1L;
-
-  static final Supplier<ImmutableListMultimap<String, CodeTransformer>> ALL_CODE_TRANSFORMERS =
-      Suppliers.memoize(CodeTransformers::loadAllCodeTransformers);
 
   private final CodeTransformer codeTransformer;
 
@@ -153,7 +148,8 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   }
 
   private static CodeTransformer createCompositeCodeTransformer(ErrorProneFlags flags) {
-    ImmutableListMultimap<String, CodeTransformer> allTransformers = ALL_CODE_TRANSFORMERS.get();
+    ImmutableListMultimap<String, CodeTransformer> allTransformers =
+        CodeTransformers.getAllCodeTransformers();
     return CompositeCodeTransformer.compose(
         flags
             .get(INCLUDED_TEMPLATES_PATTERN_FLAG)

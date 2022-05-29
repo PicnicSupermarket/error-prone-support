@@ -7,7 +7,7 @@ final class TemplateWithoutTestTemplatesTest implements RefasterTemplateTestCase
   }
 }
 /*
- *  Did not encounter a test in `TemplateWithoutTestTemplatesTestInput` for the following template(s):
+ *  ERROR: Did not encounter a test in `TemplateWithoutTestTemplatesTestInput.java` for the following template(s):
  *  - AnotherTemplateWithoutTest
  *  - TemplateWithoutTest
  */
