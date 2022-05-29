@@ -182,7 +182,7 @@ public final class RefasterCheckTest {
     try {
       return Class.forName(
           "tech.picnic.errorprone.refastertemplates.AssortedTemplates",
-          false,
+          /* initialize= */ false,
           getClass().getClassLoader());
     } catch (ClassNotFoundException e) {
       throw new IllegalStateException("Failed to load Refaster template collection class", e);
