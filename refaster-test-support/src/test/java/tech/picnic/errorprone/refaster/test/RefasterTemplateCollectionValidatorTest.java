@@ -17,8 +17,8 @@ final class RefasterTemplateCollectionValidatorTest {
   @ParameterizedTest
   @ValueSource(
       classes = {
+        DummyTemplates.class,
         MatchInWrongMethodTemplates.class,
-        MethodNameWithNumberTemplates.class,
         MissingTestAndWrongTestTemplates.class,
         PartialTestMatchTemplates.class,
         TemplateWithoutTestTemplates.class
