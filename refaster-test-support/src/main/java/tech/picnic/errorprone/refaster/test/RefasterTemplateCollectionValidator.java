@@ -4,10 +4,12 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
+import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.util.Comparator.naturalOrder;
 import static tech.picnic.errorprone.refaster.runner.RefasterCheck.INCLUDED_TEMPLATES_PATTERN_FLAG;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableRangeMap;
@@ -15,6 +17,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
+import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.SubContext;
@@ -45,28 +48,28 @@ import tech.picnic.errorprone.refaster.runner.RefasterCheck;
 /**
  * A {@link BugChecker} that applies a Refaster template collection by delegating to {@link
  * RefasterCheck} and subsequently validates that each template modifies exactly one distinct
- * method, as indicate by each method's name.
+ * method, as indicated by each method's name.
  */
-// XXX: Rename to `RefasterTemplateCollectionValidator`. Be sure to update all references to
-// `RefasterValidateTests`.
 @BugPattern(
-    name = "RefasterValidateTests",
+    name = "RefasterTemplateCollectionValidator",
     summary = "Exercises a Refaster template collection",
     severity = ERROR)
-public final class RefasterValidateTests extends BugChecker implements CompilationUnitTreeMatcher {
+public final class RefasterTemplateCollectionValidator extends BugChecker
+    implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final String TEMPLATE_COLLECTION_FLAG = "RefasterValidateTests:TemplateCollection";
+  private static final String TEMPLATE_COLLECTION_FLAG =
+      "RefasterTemplateCollectionValidator:TemplateCollection";
   private static final String TEST_METHOD_NAME_PREFIX = "test";
 
   private final ImmutableSet<String> templatesUnderTest;
   private final RefasterCheck delegate;
 
   /**
-   * Instantiates a {@link RefasterValidateTests} instance.
+   * Instantiates a {@link RefasterTemplateCollectionValidator} instance.
    *
    * @param flags Any provided command line flags.
    */
-  public RefasterValidateTests(ErrorProneFlags flags) {
+  public RefasterTemplateCollectionValidator(ErrorProneFlags flags) {
     String templateCollectionUnderTest = getTemplateCollectionUnderTest(flags);
     delegate = createRefasterCheck(templateCollectionUnderTest);
     templatesUnderTest = getTemplatesUnderTest(templateCollectionUnderTest);
@@ -95,6 +98,27 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
         .filter(k -> k.startsWith(templateCollectionUnderTest))
         .map(k -> k.replace(templateCollectionUnderTest + '$', ""))
         .collect(toImmutableSortedSet(naturalOrder()));
+  }
+
+  /**
+   * Verifies that all Refaster templates in the given collection class are covered by precisely one
+   * test method, defined explicitly for the purpose of exercising that template.
+   *
+   * <p>Note that a passing test does not guarantee full coverage: this test does not ascertain that
+   * all {@link com.google.errorprone.refaster.Refaster#anyOf} branches are tested. Likewise for
+   * {@link com.google.errorprone.refaster.annotation.BeforeTemplate} methods in case there are
+   * multiple.
+   *
+   * @param clazz The Refaster template collection under test.
+   */
+  public static void validate(Class<?> clazz) {
+    String className = clazz.getSimpleName();
+
+    BugCheckerRefactoringTestHelper.newInstance(RefasterTemplateCollectionValidator.class, clazz)
+        .setArgs(ImmutableList.of("-XepOpt:" + TEMPLATE_COLLECTION_FLAG + "=" + className))
+        .addInput(className + "TestInput.java")
+        .addOutput(className + "TestOutput.java")
+        .doTest(TEXT_MATCH);
   }
 
   @Override

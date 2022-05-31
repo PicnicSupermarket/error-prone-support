@@ -19,24 +19,24 @@ tests and assurance that every template is properly tested.
 
 ## How to test a collection of Refaster templates?
 
-In summary, to test Refaster templates using the `RefasterCollectionTestUtil`,
-one should create an input and output file. The Refaster templates from the
-collection are applied on the input file and should exactly match the content
-of the provided output file.
+In summary, to test Refaster templates using the
+`RefasterTemplateCollectionValidator`, one should create an input and output
+file. The Refaster templates from the collection are applied on the input file
+and should exactly match the content of the provided output file.
 
 To test Refaster templates, one can create a (parameterized) test for every
 class containing the Refaster templates to invoke the
-`RefasterCollectionTestUtil`. A class that contains one or more Refaster
-templates is called a Refaster template collection. This test utility applies
-the Refaster templates in the collection to a provided input file, and expects
-the result to exactly match the contents of a provided output file.
+`RefasterTemplateCollectionValidator`. A class that contains one or more 
+Refaster templates is called a Refaster template collection. This test utility
+applies the Refaster templates in the collection to a provided input file, and
+expects the result to exactly match the contents of a provided output file.
 
 To adopt this setup, the following requirements have to be met:
 
 - Create a class with a (parameterized) test method that calls the
-  `RefasterCollectionTestUtil#validateTemplateCollection` and passes the
-  collection(s) to validate. The Refaster template collection must match the
-  naming convention `<TemplateCollectionName>Templates.java`.
+  `RefasterTemplateCollectionValidator#validate` and passes the collection(s)
+  to validate. The Refaster template collection must match the naming 
+  convention `<TemplateCollectionName>Templates.java`.
 - An input file matching the naming convention
   `<TemplateCollectionName>TemplatesTestInput.java` is added for every template
   collection.
@@ -69,7 +69,7 @@ test/
     └── tech.picnic.errorprone.refastertemplates
         └── RefasterCollectionTest.java
                -- Here the test invokes
-               -- `RefasterCollectionTestUtil#validateTemplateCollection`.
+               -- `RefasterTemplateCollectionValidator#validate`.
   resources/
     └── tech.picnic.errorprone.refastertemplates
         └── ExampleTemplatesTestInput.java
