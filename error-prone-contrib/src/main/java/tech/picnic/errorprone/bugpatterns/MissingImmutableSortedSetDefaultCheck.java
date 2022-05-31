@@ -4,17 +4,22 @@ import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
+import static com.google.errorprone.matchers.Matchers.hasAnyAnnotation;
+import static com.google.errorprone.matchers.Matchers.isSameType;
+import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
+import static com.google.errorprone.matchers.Matchers.isType;
+import static com.google.errorprone.matchers.Matchers.methodReturns;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
-import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
 import org.immutables.value.Value;
 
 /**
@@ -27,7 +32,7 @@ import org.immutables.value.Value;
 @BugPattern(
     name = "MissingImmutableSortedSetDefault",
     summary =
-        "Properties of type `ImmutableSortedSet` within an @Value.Immutable or @Value.Modifiable class "
+        "Methods returning an `ImmutableSortedSet` within an @Value.Immutable or @Value.Modifiable class "
             + "should provide a default value or specify the comparator.",
     linkType = NONE,
     severity = ERROR,
@@ -35,35 +40,35 @@ import org.immutables.value.Value;
 public final class MissingImmutableSortedSetDefaultCheck extends BugChecker
     implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final String VALUE_NATURAL_ORDER_ANNOTATION =
-      "org.immutables.value.Value.NaturalOrder";
-  private static final Matcher<Tree> HAS_NATURAL_ORDER =
-      hasAnnotation(VALUE_NATURAL_ORDER_ANNOTATION);
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    // is not within immutable or modifiable class -> no match
-    if (tree.getClass().isAnnotationPresent(org.immutables.value.Value.Immutable.class)
-        || tree.getClass().isAnnotationPresent(Value.Modifiable.class)) {
+    // has no return type ImmutableSortedSet -> no match
+    if (!methodReturns(isSameType(ImmutableSortedSet.class)).matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
     // has implementation -> no match
-    if (tree.getDefaultValue() != null) {
+    if (tree.getBody() != null && !tree.getBody().getStatements().isEmpty()) {
+      return Description.NO_MATCH;
+    }
+
+    // is not within immutable or modifiable class -> no match
+    if (!ASTHelpers.hasAnnotation(tree, org.immutables.value.Value.Immutable.class, state)
+        && !ASTHelpers.hasAnnotation(tree, Value.Modifiable.class, state)) {
       return Description.NO_MATCH;
     }
 
     // is annotated with @Value.NaturalOrder -> no match
-    if (HAS_NATURAL_ORDER.matches(tree, state)) {
+    if (hasAnnotation(Value.NaturalOrder.class).matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
-    // The ImmutableSortedSet has no empty default -> add the `@Value.NaturalOrder` annotation.
-    return describeMatch(
-        tree,
-        SuggestedFix.builder()
-            .addStaticImport(VALUE_NATURAL_ORDER_ANNOTATION)
-            .prefixWith(tree, "@Value.NaturalOrder ")
-            .build());
+    // The ImmutableSortedSet has no empty default -> add the `@Value.NaturalOrder` annotation or
+    // provide a default implementation.
+    return buildDescription(tree)
+        .addFix(SuggestedFix.builder().prefixWith(tree, "@Value.NaturalOrder ").build())
+        .addFix(SuggestedFix.postfixWith(tree, "return ImmutableSortedSet.of();"))
+        .build();
   }
 }
