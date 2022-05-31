@@ -110,7 +110,6 @@ final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
     assertThat(0.0).isEqualTo(0.0);
     assertThat(new Object()).isEqualTo(new Object());
     assertThat("actual").isEqualTo("expected");
-    assertThat(ImmutableSet.of()).hasSameElementsAs(ImmutableSet.of());
     assertThat(ImmutableMap.of()).isEqualTo(ImmutableMap.of());
   }
 

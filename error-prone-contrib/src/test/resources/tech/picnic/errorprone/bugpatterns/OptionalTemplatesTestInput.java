@@ -44,16 +44,12 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
             : Optional.of(ImmutableSet.of("foo").iterator().next()));
   }
 
-  ImmutableSet<Optional<String>> testTernaryOperatorOptionalPositiveFiltering() {
-    return ImmutableSet.of(
-        "foo".length() > 5 ? Optional.of("foo") : Optional.empty(),
-        !"bar".contains("baz") ? Optional.of("bar") : Optional.empty());
+  Optional<String> testTernaryOperatorOptionalPositiveFiltering() {
+    return "foo".length() > 5 ? Optional.of("foo") : Optional.empty();
   }
 
-  ImmutableSet<Optional<String>> testTernaryOperatorOptionalNegativeFiltering() {
-    return ImmutableSet.of(
-        "foo".length() > 5 ? Optional.empty() : Optional.of("foo"),
-        !"bar".contains("baz") ? Optional.empty() : Optional.of("bar"));
+  Optional<String> testTernaryOperatorOptionalNegativeFiltering() {
+    return "foo".length() > 5 ? Optional.empty() : Optional.of("foo");
   }
 
   ImmutableSet<Boolean> testMapOptionalToBoolean() {
