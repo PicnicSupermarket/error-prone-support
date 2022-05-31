@@ -6,8 +6,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 
 /**
- * Utility to test Refaster templates and validate that the tests use meet all requirements for
- * template collection tests.
+ * Utility to test Refaster templates and validate that the tests meet all requirements for template
+ * collection tests.
  */
 // XXX: Consider dropping this class in favour of a static
 // `RefasterTemplateCollectionValidator#validate` method.

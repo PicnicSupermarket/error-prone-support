@@ -109,8 +109,8 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
         indexTemplateMatches(matches, ((JCCompilationUnit) tree).endPositions);
 
     matches.forEach(state::reportMatch);
-    reportMissingMatches(tree, state, indexedMatches);
-    reportUnexpectedMatches(tree, state, indexedMatches);
+    reportMissingMatches(tree, indexedMatches, state);
+    reportUnexpectedMatches(tree, indexedMatches, state);
 
     return Description.NO_MATCH;
   }
@@ -133,8 +133,8 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
 
   private void reportMissingMatches(
       CompilationUnitTree tree,
-      VisitorState state,
-      ImmutableRangeMap<Integer, String> indexedMatches) {
+      ImmutableRangeMap<Integer, String> indexedMatches,
+      VisitorState state) {
     ImmutableSet<String> templatesWithoutMatch =
         Sets.difference(
                 templatesUnderTest, ImmutableSet.copyOf(indexedMatches.asMapOfRanges().values()))
@@ -153,8 +153,8 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
 
   private void reportUnexpectedMatches(
       CompilationUnitTree tree,
-      VisitorState state,
-      ImmutableRangeMap<Integer, String> indexedMatches) {
+      ImmutableRangeMap<Integer, String> indexedMatches,
+      VisitorState state) {
     UnexpectedMatchReporter unexpectedMatchReporter = new UnexpectedMatchReporter(indexedMatches);
     unexpectedMatchReporter.scan(tree.getTypeDecls(), state);
   }
@@ -189,14 +189,14 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
       if (!ASTHelpers.isGeneratedConstructor(tree)) {
         getTemplateUnderTest(tree, state)
             .ifPresent(
-                templateUnderTest -> reportUnexpectedMatches(tree, state, templateUnderTest));
+                templateUnderTest -> reportUnexpectedMatches(tree, templateUnderTest, state));
       }
 
       return super.visitMethod(tree, state);
     }
 
     private void reportUnexpectedMatches(
-        MethodTree tree, VisitorState state, String templateUnderTest) {
+        MethodTree tree, String templateUnderTest, VisitorState state) {
       // XXX: Validate that `getMatchesInTree(tree, state)` returns a non-empty result (strictly
       // speaking one of the values should match `templateUnderTest`, but we can skip that check).
 
@@ -249,7 +249,7 @@ public final class RefasterValidateTests extends BugChecker implements Compilati
           startPosition != Position.NOPOS && endPosition != Position.NOPOS,
           "Cannot determine location of method in source code");
 
-      return indexedMatches.subRangeMap(Range.open(startPosition, endPosition));
+      return indexedMatches.subRangeMap(Range.closedOpen(startPosition, endPosition));
     }
 
     private ImmutableListMultimap<Long, String> getUnexpectedMatchesByLineNumber(

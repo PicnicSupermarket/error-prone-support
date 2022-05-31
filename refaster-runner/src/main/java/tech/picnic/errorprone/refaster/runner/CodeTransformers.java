@@ -25,7 +25,7 @@ public final class CodeTransformers {
   /**
    * Returns all Refaster {@link CodeTransformer}s found on the classpath.
    *
-   * <p>This method returns a cached view; all invocations exception the first are very cheap.
+   * <p>This method returns a cached view; all invocations except the first are very cheap.
    *
    * @return A mapping from Refaster template names to associated {@link CodeTransformer}s.
    */
@@ -34,7 +34,7 @@ public final class CodeTransformers {
   }
 
   /**
-   * Scans the classpath to for compiled Refaster templates and returns the associated deserialized
+   * Scans the classpath for compiled Refaster templates and returns the associated deserialized
    * {@link CodeTransformer}s, indexed by their name.
    *
    * @return A mapping from Refaster template names to associated {@link CodeTransformer}s.
