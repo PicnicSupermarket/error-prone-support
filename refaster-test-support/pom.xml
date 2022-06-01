@@ -31,19 +31,21 @@
         </dependency>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
+            <artifactId>error_prone_core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_test_helpers</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>refaster-compiler</artifactId>
-            <!-- This dependency is declared only as a hint to Maven that
-            compilation depends on it; see the `maven-compiler-plugin`'s
-            `annotationProcessorPaths` configuration below. -->
-            <scope>provided</scope>
+            <artifactId>refaster-runner</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>refaster-runner</artifactId>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service-annotations</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>

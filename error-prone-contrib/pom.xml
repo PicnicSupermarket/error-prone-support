@@ -41,19 +41,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>refaster-compiler</artifactId>
-            <!-- This dependency is declared only as a hint to Maven that
-            compilation depends on it; see the `maven-compiler-plugin`'s
-            `annotationProcessorPaths` configuration below. -->
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>refaster-runner</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>refaster-support</artifactId>
             <scope>provided</scope>
         </dependency>

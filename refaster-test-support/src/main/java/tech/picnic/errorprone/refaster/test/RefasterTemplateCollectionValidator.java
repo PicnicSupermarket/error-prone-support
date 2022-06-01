@@ -105,8 +105,8 @@ public final class RefasterTemplateCollectionValidator extends BugChecker
    * test method, defined explicitly for the purpose of exercising that template.
    *
    * <p>Note that a passing test does not guarantee full coverage: this test does not ascertain that
-   * all {@link com.google.errorprone.refaster.Refaster#anyOf} branches are tested. Likewise for
-   * {@link com.google.errorprone.refaster.annotation.BeforeTemplate} methods in case there are
+   * all {@code com.google.errorprone.refaster.Refaster#anyOf} branches are tested. Likewise for
+   * {@code com.google.errorprone.refaster.annotation.BeforeTemplate} methods in case there are
    * multiple.
    *
    * @param clazz The Refaster template collection under test.
