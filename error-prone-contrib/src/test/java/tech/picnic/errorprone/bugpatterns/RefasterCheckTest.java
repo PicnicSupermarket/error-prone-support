@@ -168,7 +168,24 @@ public final class RefasterCheckTest {
 
   private BugCheckerRefactoringTestHelper createRestrictedRefactoringTestHelper(
       String namePattern) {
-    return BugCheckerRefactoringTestHelper.newInstance(RefasterCheck.class, getClass())
+    return BugCheckerRefactoringTestHelper.newInstance(
+            RefasterCheck.class, getRefasterTemplateCollectionClass())
         .setArgs("-XepOpt:Refaster:NamePattern=" + namePattern);
+  }
+
+  /**
+   * Returns an arbitrary Refaster template collection class inside the {@code
+   * tech.picnic.errorprone.refastertemplates} package, enabling {@link
+   * BugCheckerRefactoringTestHelper} to load test resources from said package.
+   */
+  private Class<?> getRefasterTemplateCollectionClass() {
+    try {
+      return Class.forName(
+          "tech.picnic.errorprone.refastertemplates.AssortedTemplates",
+          /* initialize= */ false,
+          getClass().getClassLoader());
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException("Failed to load Refaster template collection class", e);
+    }
   }
 }
