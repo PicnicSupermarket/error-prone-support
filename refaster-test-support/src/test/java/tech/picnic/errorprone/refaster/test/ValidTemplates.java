@@ -11,12 +11,11 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 /**
- * Refaster template collection containing arbitrary examples to validate that violations are
- * reported correctly.
+ * Refaster template collection with arbitrary valid examples to validate that having no violations
+ * works as expected.
  */
-// XXX: Rename class and update Javadoc.
-final class DummyTemplates {
-  private DummyTemplates() {}
+final class ValidTemplates {
+  private ValidTemplates() {}
 
   static final class StringIsEmpty2 {
     @BeforeTemplate
@@ -43,7 +42,7 @@ final class DummyTemplates {
     }
   }
 
-  abstract class SetAddElement<E> {
+  abstract static class BlockTemplateSetAddElement<E> {
     @Placeholder
     abstract void doAfterAdd(E element);
 

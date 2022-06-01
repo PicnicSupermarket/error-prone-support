@@ -61,16 +61,18 @@ final class RefasterTemplatesTest {
           TimeTemplates.class,
           WebClientTemplates.class);
 
-  private static Stream<Arguments> templateCollectionsTestCases() {
+  // XXX: Create a JUnit extension to automatically discover the template collections in a given
+  // context to make sure the list is exhaustive.
+  private static Stream<Arguments> validateTemplateCollectionsTestCases() {
     // XXX: Drop the filter once we have added tests for AssertJ!
     return TEMPLATE_COLLECTIONS.stream()
-        .filter(c -> c != AssertJTemplates.class)
+        .filter(tc -> tc != AssertJTemplates.class)
         .map(Arguments::arguments);
   }
 
   @ParameterizedTest
-  @MethodSource("templateCollectionsTestCases")
-  void validateTemplateCollectionTests(Class<?> clazz) {
+  @MethodSource("validateTemplateCollectionsTestCases")
+  void validateTemplateCollections(Class<?> clazz) {
     RefasterTemplateCollectionValidator.validate(clazz);
   }
 }
