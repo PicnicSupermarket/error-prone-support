@@ -39,7 +39,7 @@ public final class CodeTransformers {
    *
    * @return A mapping from Refaster template names to associated {@link CodeTransformer}s.
    */
-  public static ImmutableListMultimap<String, CodeTransformer> loadAllCodeTransformers() {
+  private static ImmutableListMultimap<String, CodeTransformer> loadAllCodeTransformers() {
     ImmutableListMultimap.Builder<String, CodeTransformer> transformers =
         ImmutableListMultimap.builder();
 

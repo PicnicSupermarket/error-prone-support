@@ -44,6 +44,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-runner</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
