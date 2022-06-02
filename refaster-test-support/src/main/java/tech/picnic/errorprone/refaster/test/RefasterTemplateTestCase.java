@@ -16,8 +16,8 @@ public interface RefasterTemplateTestCase {
    * present in the output file.
    *
    * @return Any values that are the result of expressions defined to ensure that all {@code
-   *     *Input.java} import statements are also present in the associated {@code *Output.java}
-   *     file.
+   *     *Input.java} import statements are also required to be present in the associated {@code
+   *     *Output.java} file.
    */
   default ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of();
