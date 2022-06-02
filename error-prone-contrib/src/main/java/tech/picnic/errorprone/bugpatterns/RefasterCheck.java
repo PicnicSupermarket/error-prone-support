@@ -7,7 +7,6 @@ import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.Collections.newSetFromMap;
-import static java.util.Objects.requireNonNullElseGet;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toCollection;
 
