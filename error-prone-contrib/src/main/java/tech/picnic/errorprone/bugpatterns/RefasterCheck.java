@@ -116,7 +116,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     // XXX: Inline this variable.
-    Set<RefasterRule<?, ?>> candidateRules = getCandidateRefasterRules(tree);
+    Set<RefasterRule<?, ?>> candidateRules = getCandidateRules(tree);
 
     // XXX: Remove these debug lines
     // String removeThis =
@@ -146,7 +146,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   }
 
   // XXX: Here and below: drop redundant `Refaster` from method names?
-  private Set<RefasterRule<?, ?>> getCandidateRefasterRules(CompilationUnitTree tree) {
+  private Set<RefasterRule<?, ?>> getCandidateRules(CompilationUnitTree tree) {
     Set<RefasterRule<?, ?>> candidateRules = newSetFromMap(new IdentityHashMap<>());
     refasterRules.collectCandidateTemplates(
         extractSourceIdentifiers(tree).asList(), candidateRules::add);

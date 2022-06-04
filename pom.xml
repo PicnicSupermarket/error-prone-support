@@ -42,6 +42,7 @@
         <module>error-prone-contrib</module>
         <module>refaster-compiler</module>
         <module>refaster-runner</module>
+        <module>refaster-rule-selector</module>
         <module>refaster-support</module>
         <module>refaster-test-support</module>
     </modules>
