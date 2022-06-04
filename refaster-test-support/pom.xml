@@ -17,7 +17,6 @@
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_annotation</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
@@ -27,7 +26,6 @@
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_check_api</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
@@ -60,7 +58,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

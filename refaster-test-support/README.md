@@ -21,12 +21,12 @@ tests and assurance that every template is properly tested.
 
 In summary, to test Refaster templates using the
 `RefasterTemplateCollectionValidator`, one should create an input and output
-file. The Refaster templates from the collection are applied on the input file
-and should exactly match the content of the provided output file.
+file. The Refaster templates from the collection are applied to the input file
+and should exactly match the contents of the provided output file.
 
 To test Refaster templates, one can create a (parameterized) test for every
 class containing the Refaster templates to invoke the
-`RefasterTemplateCollectionValidator`. A class that contains one or more 
+`RefasterTemplateCollectionValidator`. A class that contains one or more
 Refaster templates is called a Refaster template collection. This test utility
 applies the Refaster templates in the collection to a provided input file, and
 expects the result to exactly match the contents of a provided output file.
@@ -35,7 +35,7 @@ To adopt this setup, the following requirements have to be met:
 
 - Create a class with a (parameterized) test method that calls the
   `RefasterTemplateCollectionValidator#validate` and passes the collection(s)
-  to validate. The Refaster template collection must match the naming 
+  to validate. The Refaster template collection must match the naming
   convention `<TemplateCollectionName>Templates.java`.
 - An input file matching the naming convention
   `<TemplateCollectionName>TemplatesTestInput.java` is added for every template
@@ -81,4 +81,3 @@ test/
                -- two methods named `testExample1Template` and
                -- `testExample2Template`.
 ```
-
