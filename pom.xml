@@ -134,9 +134,9 @@
         <version.auto-service>1.0.1</version.auto-service>
         <version.auto-value>1.9</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
-        <version.error-prone-fork>v${version.error-prone-orig}-picnic-3</version.error-prone-fork>
-        <version.error-prone-orig>2.13.1</version.error-prone-orig>
-        <version.error-prone-slf4j>0.1.11</version.error-prone-slf4j>
+        <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
+        <version.error-prone-orig>2.14.0</version.error-prone-orig>
+        <version.error-prone-slf4j>0.1.12</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
@@ -347,6 +347,11 @@
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
                 <version>3.23.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-core</artifactId>
+                <version>2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
@@ -1506,6 +1511,9 @@
                                     See https://github.com/google/error-prone/issues/2679. -->
                                     -Xep:VoidMissingNullable:OFF
                                     -XepOpt:CheckReturnValue:CheckAllConstructors=true
+                                    <!-- XXX: Enable once there are fewer
+                                    false-positives.
+                                    -XepOpt:CheckReturnValue:CheckAllMethods=true -->
                                     -XepOpt:InlineMe:SkipInliningsWithComments=false
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
                                     -XepOpt:NullAway:AssertsEnabled=true
