@@ -13,6 +13,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import org.junit.ComparisonFailure;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -139,8 +140,7 @@ public final class RefasterCheckTest {
     assertThatCode(() -> verifyRefactoring(group, namePattern(group, template)))
         .withFailMessage(
             "Template %s does not affect the tests for group %s; is it tested?", template, group)
-        .isInstanceOf(AssertionError.class)
-        .hasMessageFindingMatch("^(diff|expected):");
+        .isInstanceOf(ComparisonFailure.class);
   }
 
   private static ImmutableSetMultimap<String, String> indexTemplateNamesByGroup(
