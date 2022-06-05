@@ -15,6 +15,12 @@ script:
   # this project and any Error Prone checks available only from other artifact
   # repositories.
   - ./mvnw clean install
+  # XXX: This extra build step should not be necessary. (Note that contrary to
+  # the statement above, we now run the build _thrice_). This extra step is
+  # here to recompile the Refaster templates against the Picnic Error Prone
+  # fork, because at this moment vanilla Refaster and Picnic's Refaster
+  # modifications are not (de)serialization compatible.
+  - ./mvnw clean install -Perror-prone-fork -DskipTests -Dverification.skip -s settings.xml
   - ./mvnw clean install -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
   # XXX: Enable SonarCloud once we "go public".
   # ./mvnw jacoco:prepare-agent surefire:test jacoco:report sonar:sonar
