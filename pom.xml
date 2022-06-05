@@ -87,6 +87,7 @@
             -XX:SoftRefLRUPolicyMSPerMB=10
             -XX:+UseParallelGC
             --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
+            --add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED
@@ -94,7 +95,6 @@
             --add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
-            --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
             --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED
             <!-- The test JVMs are short-running. By disabling certain
             expensive JIT optimizations we actually speed up most tests. -->
@@ -251,11 +251,6 @@
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>jsr305</artifactId>
                 <version>3.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.errorprone</groupId>
-                <artifactId>javac</artifactId>
-                <version>9+181-r4173-1</version>
             </dependency>
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
@@ -846,13 +841,19 @@
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs>
+                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
                             <arg>-Xmaxerrs</arg>
                             <arg>10000</arg>
                             <arg>-Xmaxwarns</arg>
                             <arg>10000</arg>
                         </compilerArgs>
                         <parameters>true</parameters>
-                        <release>${version.jdk}</release>
+                        <source>${version.jdk}</source>
+                        <target>${version.jdk}</target>
                         <!-- Erroneously inverted logic... for details, see
                         https://issues.apache.org/jira/browse/MCOMPILER-209. -->
                         <useIncrementalCompilation>false</useIncrementalCompilation>
@@ -1711,41 +1712,6 @@
                             <artifactId>versions-maven-plugin</artifactId>
                             <configuration>
                                 <rulesUri>file://${path.version-number-rules}</rulesUri>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-        <profile>
-            <!-- Some code in this project interfaces directly with the Java
-            compiler. The following `add-exports` arguments are not necessary
-            for the code to compile because `com.google.errorprone:javac` is on
-            the classpath. In fact, enabling this profile when building with
-            Maven on the command line will cause a build failure, because these
-            flags are incompatible with the `release` flag. This profile exists
-            solely to be enabled within an IDE: without them IntelliJ IDEA
-            reports compilation errors. -->
-            <id>add-exports</id>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <compilerArgs combine.children="append">
-                                    <arg>--add-exports</arg>
-                                    <arg>jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
-                                    <arg>--add-exports</arg>
-                                    <arg>jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
-                                    <arg>--add-exports</arg>
-                                    <arg>jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-                                    <arg>--add-exports</arg>
-                                    <arg>jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
-                                    <arg>--add-exports</arg>
-                                    <arg>jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
-                                </compilerArgs>
                             </configuration>
                         </plugin>
                     </plugins>

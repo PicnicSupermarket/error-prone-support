@@ -33,9 +33,16 @@ Two other goals that one may find relevant:
   `target/pit-reports/index.html` files. For more information check the [PIT
   Maven plugin][pitest-maven].
 
-When loading the project in IntelliJ IDEA (and perhaps other IDEs) errors about
-the inaccessibility of `com.sun.tools.javac.*` classes may be reported. If this
-happens, configure your IDE to enable the `add-exports` profile.
+When running the project's tests in IntelliJ IDEA, you might see the following
+error:
+```
+java: exporting a package from system module jdk.compiler is not allowed with --release
+```
+
+If this happens, go to _Settings -> Build, Execution, Deployment -> Compiler ->
+Java Compiler_ and deselect the option _Use '--release' option for
+cross-compilation (Java 9 and later)_. See [IDEA-288052][idea-288052] for
+details.
 
 ### Contribution guidelines
 
@@ -335,8 +342,9 @@ Refaster's expressiveness:
 [forbidden-apis]: https://github.com/policeman-tools/forbidden-apis
 [fossa]: https://fossa.io
 [google-java-format]: https://github.com/google/google-java-format
+[idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
 [maven]: https://maven.apache.org
 [modernizer-maven-plugin]: https://github.com/gaul/modernizer-maven-plugin
-[sonarcloud]: https://sonarcloud.io
 [pitest]: https://pitest.org
 [pitest-maven]: https://pitest.org/quickstart/maven
+[sonarcloud]: https://sonarcloud.io
