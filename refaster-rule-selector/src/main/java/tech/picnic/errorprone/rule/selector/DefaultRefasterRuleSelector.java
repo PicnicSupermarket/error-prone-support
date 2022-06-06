@@ -1,19 +1,29 @@
 package tech.picnic.errorprone.rule.selector;
 
+import com.google.auto.service.AutoService;
 import com.google.errorprone.refaster.RefasterRule;
 import com.sun.source.tree.CompilationUnitTree;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import tech.picnic.errorprone.rule.selector.RefasterRuleSelectorFactory.RefasterRuleSelector;
 
+/** XXX: Write this */
+@AutoService(RefasterRuleSelector.class)
 public final class DefaultRefasterRuleSelector implements RefasterRuleSelector {
-   private final Set<RefasterRule<?,?>> refasterRules;
+  private final List<RefasterRule<?, ?>> refasterRules;
 
-   public DefaultRefasterRuleSelector(Set<RefasterRule<?, ?>> refasterRules) {
-      this.refasterRules = refasterRules;
-   }
+  /**
+   * XXX: Write this.
+   *
+   * @param refasterRules XXX: Write this
+   */
+  public DefaultRefasterRuleSelector(List<RefasterRule<?, ?>> refasterRules) {
+    this.refasterRules = refasterRules;
+  }
 
-   @Override
-   public Set<RefasterRule<?, ?>> selectCandidateRules(CompilationUnitTree tree) {
-      return refasterRules;
-   }
+  @Override
+  public Set<RefasterRule<?, ?>> selectCandidateRules(CompilationUnitTree tree) {
+    return new HashSet<>(refasterRules);
+  }
 }

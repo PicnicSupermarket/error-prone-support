@@ -2,13 +2,10 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableRangeSet.toImmutableRangeSet;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
-import static java.util.Collections.newSetFromMap;
 import static java.util.function.Predicate.not;
-import static java.util.stream.Collectors.toCollection;
 
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
@@ -18,7 +15,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableRangeSet;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
@@ -34,25 +31,9 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
 import com.google.errorprone.fixes.Replacement;
 import com.google.errorprone.matchers.Description;
-import com.google.errorprone.refaster.BlockTemplate;
-import com.google.errorprone.refaster.ExpressionTemplate;
 import com.google.errorprone.refaster.RefasterRule;
-import com.google.errorprone.refaster.UAnyOf;
-import com.google.errorprone.refaster.UClassIdent;
-import com.google.errorprone.refaster.UExpression;
-import com.google.errorprone.refaster.UStatement;
-import com.google.errorprone.refaster.UStaticIdent;
-import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.CompoundAssignmentTree;
-import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.MemberReferenceTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.UnaryTree;
-import com.sun.source.util.TreeScanner;
+import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import java.io.IOException;
@@ -60,18 +41,20 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.rule.selector.RefasterRuleSelectorFactory;
+import tech.picnic.errorprone.rule.selector.RefasterRuleSelectorFactory.RefasterRuleSelector;
 
 /**
  * A {@link BugChecker} which flags code which can be simplified using Refaster templates located on
@@ -97,7 +80,8 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
   static final Supplier<ImmutableListMultimap<String, CodeTransformer>> ALL_CODE_TRANSFORMERS =
       Suppliers.memoize(RefasterCheck::loadAllCodeTransformers);
 
-  private final Node<RefasterRule<?, ?>> refasterRules;
+  private final List<RefasterRule<?, ?>> refasterRules;
+  //  private final Node<RefasterRule<?, ?>> refasterRules;
 
   /** Instantiates the default {@link RefasterCheck}. */
   public RefasterCheck() {
@@ -110,20 +94,39 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
    * @param flags Any provided command line flags.
    */
   public RefasterCheck(ErrorProneFlags flags) {
-    refasterRules = Node.create(getRefasterRules(flags), RefasterCheck::extractTemplateIdentifiers);
+    refasterRules = getRefasterRules(flags);
   }
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
+    RefasterRuleSelectorFactory refasterRuleSelectorFactory =
+        loadRefasterRuleSelectorFactory(state);
+    RefasterRuleSelector refasterRuleSelector =
+        refasterRuleSelectorFactory.createRefasterRuleSelector(refasterRules);
+    Set<RefasterRule<?, ?>> candidateRules = refasterRuleSelector.selectCandidateRules(tree);
+
+
+    //    DefaultRefasterRuleSelector refasterRuleSelector =
+    //        (DefaultRefasterRuleSelector)
+    // ruleSelectorFactories.get(0).createRefasterRuleSelector(refasterRules);
+    //    SmartRefasterRuleSelector smartRefasterRuleSelector =
+    //        (SmartRefasterRuleSelector)
+    // ruleSelectorFactories.get(1).createRefasterRuleSelector(refasterRules);
+    //
+    //    Set<RefasterRule<?, ?>> refasterRules1 = ((RefasterRuleSelector)
+    // refasterRuleSelector).selectCandidateRules(tree);
+    //    Set<RefasterRule<?, ?>> refasterRules2 = ((RefasterRuleSelector)
+    // smartRefasterRuleSelector).selectCandidateRules(tree);
+
     // XXX: Inline this variable.
-    Set<RefasterRule<?, ?>> candidateRules = getCandidateRules(tree);
+    //    Set<RefasterRule<?, ?>> candidateRules = new HashSet<>(); // new getCandidateRules(tree);
 
     // XXX: Remove these debug lines
     // String removeThis =
-    // candidateRules.stream().map(Object::toString).collect(joining(","));
+    // candidateRules.stream().map(Object::toString).ruleSelectorFactories(joining(","));
     // System.out.printf("\nTemplates for %s: \n%s\n", tree.getSourceFile().getName(), removeThis);
 
-    /* First, collect all matches. */
+    /* First, ruleSelectorFactories all matches. */
     SubContext context = new SubContext(state.context);
     List<Description> matches = new ArrayList<>();
     for (RefasterRule<?, ?> rule : candidateRules) {
@@ -145,14 +148,27 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
     return Description.NO_MATCH;
   }
 
-  // XXX: Here and below: drop redundant `Refaster` from method names?
-  private Set<RefasterRule<?, ?>> getCandidateRules(CompilationUnitTree tree) {
-    Set<RefasterRule<?, ?>> candidateRules = newSetFromMap(new IdentityHashMap<>());
-    refasterRules.collectCandidateTemplates(
-        extractSourceIdentifiers(tree).asList(), candidateRules::add);
+  private static RefasterRuleSelectorFactory loadRefasterRuleSelectorFactory(VisitorState state) {
+    JavacProcessingEnvironment processingEnvironment =
+        JavacProcessingEnvironment.instance(state.context);
+    ClassLoader loader = processingEnvironment.getProcessorClassLoader();
+    Iterable<RefasterRuleSelectorFactory> ruleSelectorFactory =
+        ServiceLoader.load(RefasterRuleSelectorFactory.class, loader);
 
-    return candidateRules;
+    return Arrays.stream(Iterables.toArray(ruleSelectorFactory, RefasterRuleSelectorFactory.class))
+        .filter(RefasterRuleSelectorFactory::isClassPathCompatible)
+        .min(Comparator.comparingInt(RefasterRuleSelectorFactory::priority))
+        .orElseThrow();
   }
+
+  //  // XXX: Here and below: drop redundant `Refaster` from method names?
+  //  private Set<RefasterRule<?, ?>> getCandidateRules(CompilationUnitTree tree) {
+  //    Set<RefasterRule<?, ?>> candidateRules = newSetFrom`Map(new IdentityHashMap<>());
+  //    refasterRules.collectCandidateTemplates(
+  //        extractSourceIdentifiers(tree).asList(), candidateRules::add);
+  //
+  //    return candidateRules;
+  //  }
 
   private static List<RefasterRule<?, ?>> getRefasterRules(ErrorProneFlags flags) {
     CodeTransformer compositeCodeTransformer = createCompositeCodeTransformer(flags);
@@ -176,198 +192,181 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
     }
   }
 
-  // XXX: Decompose `RefasterRule`s such that each has exactly one `@BeforeTemplate`.
-  private static ImmutableSet<ImmutableSortedSet<String>> extractTemplateIdentifiers(
-      RefasterRule<?, ?> refasterRule) {
-    ImmutableSet.Builder<ImmutableSortedSet<String>> results = ImmutableSet.builder();
-
-    for (Object template : refasterRule.beforeTemplates()) {
-      if (template instanceof ExpressionTemplate) {
-        UExpression expr = ((ExpressionTemplate) template).expression();
-        results.addAll(extractTemplateIdentifiers(ImmutableList.of(expr)));
-      } else if (template instanceof BlockTemplate) {
-        ImmutableList<UStatement> statements = ((BlockTemplate) template).templateStatements();
-        results.addAll(extractTemplateIdentifiers(statements));
-      } else {
-        throw new IllegalStateException(
-            String.format("Unexpected template type '%s'", template.getClass()));
-      }
-    }
-
-    return results.build();
-  }
-
-  // XXX: Consider interning the strings (once a benchmark is in place).
-  private static ImmutableSet<ImmutableSortedSet<String>> extractTemplateIdentifiers(
-      ImmutableList<? extends Tree> trees) {
-    List<Set<String>> identifierCombinations = new ArrayList<>();
-    identifierCombinations.add(new HashSet<>());
-
-    // XXX: Make the scanner static, then make also its helper methods static.
-    new TreeScanner<Void, List<Set<String>>>() {
-      @Override
-      public Void visitIdentifier(IdentifierTree node, List<Set<String>> identifierCombinations) {
-        // XXX: Also include the package name if not `java.lang`; it must be present.
-        if (node instanceof UClassIdent) {
-          for (Set<String> ids : identifierCombinations) {
-            ids.add(getSimpleName(((UClassIdent) node).getTopLevelClass()));
-            ids.add(getIdentifier(node));
-          }
-        } else if (node instanceof UStaticIdent) {
-          UClassIdent subNode = ((UStaticIdent) node).classIdent();
-          for (Set<String> ids : identifierCombinations) {
-            ids.add(getSimpleName(subNode.getTopLevelClass()));
-            ids.add(getIdentifier(subNode));
-            ids.add(node.getName().toString());
-          }
-        }
-
-        return null;
-      }
-
-      private String getIdentifier(IdentifierTree tree) {
-        return getSimpleName(tree.getName().toString());
-      }
-
-      private String getSimpleName(String fcqn) {
-        int index = fcqn.lastIndexOf('.');
-        return index < 0 ? fcqn : fcqn.substring(index + 1);
-      }
-
-      @Override
-      public Void visitMemberReference(
-          MemberReferenceTree node, List<Set<String>> identifierCombinations) {
-        super.visitMemberReference(node, identifierCombinations);
-        String id = node.getName().toString();
-        identifierCombinations.forEach(ids -> ids.add(id));
-        return null;
-      }
-
-      @Override
-      public Void visitMemberSelect(
-          MemberSelectTree node, List<Set<String>> identifierCombinations) {
-        super.visitMemberSelect(node, identifierCombinations);
-        String id = node.getIdentifier().toString();
-        identifierCombinations.forEach(ids -> ids.add(id));
-        return null;
-      }
-
-      @Override
-      public Void visitAssignment(AssignmentTree node, List<Set<String>> identifierCombinations) {
-        registerOperator(node, identifierCombinations);
-        return super.visitAssignment(node, identifierCombinations);
-      }
-
-      @Override
-      public Void visitCompoundAssignment(
-          CompoundAssignmentTree node, List<Set<String>> identifierCombinations) {
-        registerOperator(node, identifierCombinations);
-        return super.visitCompoundAssignment(node, identifierCombinations);
-      }
-
-      @Override
-      public Void visitUnary(UnaryTree node, List<Set<String>> identifierCombinations) {
-        registerOperator(node, identifierCombinations);
-        return super.visitUnary(node, identifierCombinations);
-      }
-
-      @Override
-      public Void visitBinary(BinaryTree node, List<Set<String>> identifierCombinations) {
-        registerOperator(node, identifierCombinations);
-        return super.visitBinary(node, identifierCombinations);
-      }
-
-      // XXX: Rename!
-      private void registerOperator(ExpressionTree node, List<Set<String>> identifierCombinations) {
-        identifierCombinations.forEach(ids -> ids.add(Util.treeKindToString(node.getKind())));
-      }
-
-      @Override
-      public Void visitOther(Tree node, List<Set<String>> identifierCombinations) {
-        if (node instanceof UAnyOf) {
-          List<Set<String>> base = copy(identifierCombinations);
-          identifierCombinations.clear();
-
-          for (UExpression expr : ((UAnyOf) node).expressions()) {
-            List<Set<String>> branch = copy(base);
-            scan(expr, branch);
-            identifierCombinations.addAll(branch);
-          }
-        }
-
-        return null;
-      }
-
-      private List<Set<String>> copy(List<Set<String>> identifierCombinations) {
-        return identifierCombinations.stream()
-            .map(HashSet::new)
-            .collect(toCollection(ArrayList::new));
-      }
-    }.scan(trees, identifierCombinations);
-
-    return identifierCombinations.stream()
-        .map(ImmutableSortedSet::copyOf)
-        .collect(toImmutableSet());
-  }
-
-  // XXX: Consider interning!
-  private static ImmutableSortedSet<String> extractSourceIdentifiers(Tree tree) {
-    Set<String> identifiers = new HashSet<>();
-
-    // XXX: Make the scanner static.
-    new TreeScanner<Void, Set<String>>() {
-      @Override
-      public Void visitIdentifier(IdentifierTree node, Set<String> identifiers) {
-        identifiers.add(node.getName().toString());
-        return null;
-      }
-
-      @Override
-      public Void visitMemberReference(MemberReferenceTree node, Set<String> identifiers) {
-        super.visitMemberReference(node, identifiers);
-        identifiers.add(node.getName().toString());
-        return null;
-      }
-
-      @Override
-      public Void visitMemberSelect(MemberSelectTree node, Set<String> identifiers) {
-        super.visitMemberSelect(node, identifiers);
-        identifiers.add(node.getIdentifier().toString());
-        return null;
-      }
-
-      @Override
-      public Void visitAssignment(AssignmentTree node, Set<String> identifiers) {
-        registerOperator(node, identifiers);
-        return super.visitAssignment(node, identifiers);
-      }
-
-      @Override
-      public Void visitCompoundAssignment(CompoundAssignmentTree node, Set<String> identifiers) {
-        registerOperator(node, identifiers);
-        return super.visitCompoundAssignment(node, identifiers);
-      }
-
-      @Override
-      public Void visitUnary(UnaryTree node, Set<String> identifiers) {
-        registerOperator(node, identifiers);
-        return super.visitUnary(node, identifiers);
-      }
-
-      @Override
-      public Void visitBinary(BinaryTree node, Set<String> identifiers) {
-        registerOperator(node, identifiers);
-        return super.visitBinary(node, identifiers);
-      }
-
-      // XXX: Rename!
-      private void registerOperator(ExpressionTree node, Set<String> identifiers) {
-        identifiers.add(Util.treeKindToString(node.getKind()));
-      }
-    }.scan(tree, identifiers);
-
-    return ImmutableSortedSet.copyOf(identifiers);
-  }
+  //  // XXX: Consider interning the strings (once a benchmark is in place).
+  //  private static ImmutableSet<ImmutableSortedSet<String>> extractTemplateIdentifiers(
+  //      ImmutableList<? extends Tree> trees) {
+  //    List<Set<String>> identifierCombinations = new ArrayList<>();
+  //    identifierCombinations.add(new HashSet<>());
+  //
+  //    // XXX: Make the scanner static, then make also its helper methods static.
+  //    new TreeScanner<Void, List<Set<String>>>() {
+  //      @Override
+  //      public Void visitIdentifier(IdentifierTree node, List<Set<String>> identifierCombinations)
+  // {
+  //        // XXX: Also include the package name if not `java.lang`; it must be present.
+  //        if (node instanceof UClassIdent) {
+  //          for (Set<String> ids : identifierCombinations) {
+  //            ids.add(getSimpleName(((UClassIdent) node).getTopLevelClass()));
+  //            ids.add(getIdentifier(node));
+  //          }
+  //        } else if (node instanceof UStaticIdent) {
+  //          UClassIdent subNode = ((UStaticIdent) node).classIdent();
+  //          for (Set<String> ids : identifierCombinations) {
+  //            ids.add(getSimpleName(subNode.getTopLevelClass()));
+  //            ids.add(getIdentifier(subNode));
+  //            ids.add(node.getName().toString());
+  //          }
+  //        }
+  //
+  //        return null;
+  //      }
+  //
+  //      private String getIdentifier(IdentifierTree tree) {
+  //        return getSimpleName(tree.getName().toString());
+  //      }
+  //
+  //      private String getSimpleName(String fcqn) {
+  //        int index = fcqn.lastIndexOf('.');
+  //        return index < 0 ? fcqn : fcqn.substring(index + 1);
+  //      }
+  //
+  //      @Override
+  //      public Void visitMemberReference(
+  //          MemberReferenceTree node, List<Set<String>> identifierCombinations) {
+  //        super.visitMemberReference(node, identifierCombinations);
+  //        String id = node.getName().toString();
+  //        identifierCombinations.forEach(ids -> ids.add(id));
+  //        return null;
+  //      }
+  //
+  //      @Override
+  //      public Void visitMemberSelect(
+  //          MemberSelectTree node, List<Set<String>> identifierCombinations) {
+  //        super.visitMemberSelect(node, identifierCombinations);
+  //        String id = node.getIdentifier().toString();
+  //        identifierCombinations.forEach(ids -> ids.add(id));
+  //        return null;
+  //      }
+  //
+  //      @Override
+  //      public Void visitAssignment(AssignmentTree node, List<Set<String>> identifierCombinations)
+  // {
+  //        registerOperator(node, identifierCombinations);
+  //        return super.visitAssignment(node, identifierCombinations);
+  //      }
+  //
+  //      @Override
+  //      public Void visitCompoundAssignment(
+  //          CompoundAssignmentTree node, List<Set<String>> identifierCombinations) {
+  //        registerOperator(node, identifierCombinations);
+  //        return super.visitCompoundAssignment(node, identifierCombinations);
+  //      }
+  //
+  //      @Override
+  //      public Void visitUnary(UnaryTree node, List<Set<String>> identifierCombinations) {
+  //        registerOperator(node, identifierCombinations);
+  //        return super.visitUnary(node, identifierCombinations);
+  //      }
+  //
+  //      @Override
+  //      public Void visitBinary(BinaryTree node, List<Set<String>> identifierCombinations) {
+  //        registerOperator(node, identifierCombinations);
+  //        return super.visitBinary(node, identifierCombinations);
+  //      }
+  //
+  //      // XXX: Rename!
+  //      private void registerOperator(ExpressionTree node, List<Set<String>>
+  // identifierCombinations) {
+  //        identifierCombinations.forEach(ids -> ids.add(Util.treeKindToString(node.getKind())));
+  //      }
+  //
+  //      @Override
+  //      public Void visitOther(Tree node, List<Set<String>> identifierCombinations) {
+  //        if (node instanceof UAnyOf) {
+  //          List<Set<String>> base = copy(identifierCombinations);
+  //          identifierCombinations.clear();
+  //
+  //          for (UExpression expr : ((UAnyOf) node).expressions()) {
+  //            List<Set<String>> branch = copy(base);
+  //            scan(expr, branch);
+  //            identifierCombinations.addAll(branch);
+  //          }
+  //        }
+  //
+  //        return null;
+  //      }
+  //
+  //      private List<Set<String>> copy(List<Set<String>> identifierCombinations) {
+  //        return identifierCombinations.stream()
+  //            .map(HashSet::new)
+  //            .collect(toCollection(ArrayList::new));
+  //      }
+  //    }.scan(trees, identifierCombinations);
+  //
+  //    return identifierCombinations.stream()
+  //        .map(ImmutableSortedSet::copyOf)
+  //        .collect(toImmutableSet());
+  //  }
+  //
+  //  // XXX: Consider interning!
+  //  private static ImmutableSortedSet<String> extractSourceIdentifiers(Tree tree) {
+  //    Set<String> identifiers = new HashSet<>();
+  //
+  //    // XXX: Make the scanner static.
+  //    new TreeScanner<Void, Set<String>>() {
+  //      @Override
+  //      public Void visitIdentifier(IdentifierTree node, Set<String> identifiers) {
+  //        identifiers.add(node.getName().toString());
+  //        return null;
+  //      }
+  //
+  //      @Override
+  //      public Void visitMemberReference(MemberReferenceTree node, Set<String> identifiers) {
+  //        super.visitMemberReference(node, identifiers);
+  //        identifiers.add(node.getName().toString());
+  //        return null;
+  //      }
+  //
+  //      @Override
+  //      public Void visitMemberSelect(MemberSelectTree node, Set<String> identifiers) {
+  //        super.visitMemberSelect(node, identifiers);
+  //        identifiers.add(node.getIdentifier().toString());
+  //        return null;
+  //      }
+  //
+  //      @Override
+  //      public Void visitAssignment(AssignmentTree node, Set<String> identifiers) {
+  //        registerOperator(node, identifiers);
+  //        return super.visitAssignment(node, identifiers);
+  //      }
+  //
+  //      @Override
+  //      public Void visitCompoundAssignment(CompoundAssignmentTree node, Set<String> identifiers)
+  // {
+  //        registerOperator(node, identifiers);
+  //        return super.visitCompoundAssignment(node, identifiers);
+  //      }
+  //
+  //      @Override
+  //      public Void visitUnary(UnaryTree node, Set<String> identifiers) {
+  //        registerOperator(node, identifiers);
+  //        return super.visitUnary(node, identifiers);
+  //      }
+  //
+  //      @Override
+  //      public Void visitBinary(BinaryTree node, Set<String> identifiers) {
+  //        registerOperator(node, identifiers);
+  //        return super.visitBinary(node, identifiers);
+  //      }
+  //
+  //      // XXX: Rename!
+  //      private void registerOperator(ExpressionTree node, Set<String> identifiers) {
+  //        identifiers.add(Util.treeKindToString(node.getKind()));
+  //      }
+  //    }.scan(tree, identifiers);
+  //
+  //    return ImmutableSortedSet.copyOf(identifiers);
+  //  }
 
   /**
    * Reports a subset of the given matches, such that no two reported matches suggest a replacement

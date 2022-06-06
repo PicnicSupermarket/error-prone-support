@@ -1,11 +1,12 @@
 package tech.picnic.errorprone.rule.selector;
 
+import com.google.auto.service.AutoService;
 import com.google.errorprone.refaster.RefasterRule;
-import com.sun.source.tree.CompilationUnitTree;
-import java.util.Set;
-import tech.picnic.errorprone.rule.selector.RefasterRuleSelectorFactory.RefasterRuleSelector;
+import java.util.List;
 
-public class DefaultRefasterRuleSelectorFactory implements RefasterRuleSelectorFactory {
+/** XXX: Write this */
+@AutoService(RefasterRuleSelectorFactory.class)
+public final class DefaultRefasterRuleSelectorFactory implements RefasterRuleSelectorFactory {
   @Override
   public int priority() {
     return 1;
@@ -18,7 +19,7 @@ public class DefaultRefasterRuleSelectorFactory implements RefasterRuleSelectorF
   }
 
   @Override
-  public RefasterRuleSelector createRefasterRuleSelector(Set<RefasterRule<?, ?>> refasterRules) {
+  public RefasterRuleSelector createRefasterRuleSelector(List<RefasterRule<?, ?>> refasterRules) {
     return new DefaultRefasterRuleSelector(refasterRules);
   }
 }

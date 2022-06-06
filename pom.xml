@@ -205,6 +205,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>refaster-rule-selector</artifactId>
+                <version>${project.version}</version>
+	    </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>refaster-support</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1293,7 +1298,7 @@
         <profile>
             <id>error-prone-fork</id>
             <properties>
-                <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>
+<!--                <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>-->
                 <version.error-prone>${version.error-prone-fork}</version.error-prone>
             </properties>
             <dependencyManagement>
