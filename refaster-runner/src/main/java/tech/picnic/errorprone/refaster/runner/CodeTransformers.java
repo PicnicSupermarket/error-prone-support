@@ -84,6 +84,10 @@ public final class CodeTransformers {
       /* For some reason we can't load the resource. Skip it. */
       // XXX: Should we log this?
       return Optional.empty();
+    } catch (ClassCastException e) {
+      /* This resource does not appear to be compatible with the current classpath. */
+      // XXX: Should we log this?
+      return Optional.empty();
     } catch (IOException | ClassNotFoundException e) {
       throw new IllegalStateException("Can't load `CodeTransformer` from " + resource, e);
     }
