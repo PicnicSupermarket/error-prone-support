@@ -2,23 +2,23 @@ package tech.picnic.errorprone.refaster.test;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /** Code to test the Refaster templates from {@link ValidTemplates}. */
 final class ValidTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Collections.class, Strings.class);
+    return ImmutableSet.of(Objects.class, Strings.class);
   }
 
   boolean testStringIsEmpty2() {
-    return "foo".equals("");
+    return "foo".toCharArray().length == 0;
   }
 
   boolean testStaticImportStringLength() {
-    return "foo" == null || "foo".isEmpty();
+    return Objects.isNull("foo") || "foo".isEmpty();
   }
 
   void testBlockTemplateSetAddElement() {

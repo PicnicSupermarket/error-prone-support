@@ -9,7 +9,7 @@ final class PartialTestMatchTemplates {
   static final class StringEquals {
     @BeforeTemplate
     boolean before(String string) {
-      return string.length() == 0;
+      return string.toCharArray().length == 0;
     }
 
     @AfterTemplate

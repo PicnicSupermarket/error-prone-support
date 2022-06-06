@@ -7,6 +7,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 
@@ -20,7 +21,7 @@ final class ValidTemplates {
   static final class StringIsEmpty2 {
     @BeforeTemplate
     boolean before(String string) {
-      return string.equals("");
+      return string.toCharArray().length == 0;
     }
 
     @AfterTemplate
@@ -32,7 +33,7 @@ final class ValidTemplates {
   static final class StaticImportStringLength {
     @BeforeTemplate
     boolean before(@Nullable String string) {
-      return string == null || string.isEmpty();
+      return Objects.isNull(string) || string.isEmpty();
     }
 
     @AfterTemplate

@@ -11,12 +11,12 @@ final class FooTemplates {
   static final class SimpleTemplate {
     @BeforeTemplate
     boolean before(String string) {
-      return string.length() == 1;
+      return string.toCharArray().length == 0;
     }
 
     @AfterTemplate
     boolean after(String string) {
-      return string.length() > 0;
+      return string.isEmpty();
     }
   }
 }

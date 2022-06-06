@@ -73,8 +73,8 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
     codeTransformer = createCompositeCodeTransformer(flags);
   }
 
-  @Override
   @CanIgnoreReturnValue
+  @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     /* First, collect all matches. */
     List<Description> matches = new ArrayList<>();
