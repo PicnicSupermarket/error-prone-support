@@ -268,9 +268,9 @@ final class AssertJThrowingCallableTemplates {
   }
 
   static final class AssertThatThrownByIOExceptionHasMessage {
+    @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIOException" /* Matches strictly more specific expressions. */)
-    @BeforeTemplate
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatIOException().isThrownBy(throwingCallable).withMessage(message);
     }
