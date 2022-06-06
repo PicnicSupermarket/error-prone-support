@@ -195,7 +195,7 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
 
   private static ImmutableSet<ResourceInfo> getClassPathResources() {
     try {
-      return ClassPath.from(ClassLoader.getSystemClassLoader()).getResources();
+      return ClassPath.from(RefasterCheck.class.getClassLoader()).getResources();
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to scan classpath for resources", e);
     }
