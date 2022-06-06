@@ -1355,6 +1355,11 @@
                                     <artifactId>error-prone-contrib</artifactId>
                                     <version>${project.version}</version>
                                 </path>
+                                <path>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>refaster-runner</artifactId>
+                                    <version>${project.version}</version>
+                                </path>
                             </annotationProcessorPaths>
                         </configuration>
                     </plugin>

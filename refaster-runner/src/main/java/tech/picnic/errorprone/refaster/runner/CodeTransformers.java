@@ -56,7 +56,7 @@ public final class CodeTransformers {
 
   private static ImmutableSet<ResourceInfo> getClassPathResources() {
     try {
-      return ClassPath.from(ClassLoader.getSystemClassLoader()).getResources();
+      return ClassPath.from(CodeTransformers.class.getClassLoader()).getResources();
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to scan classpath for resources", e);
     }
