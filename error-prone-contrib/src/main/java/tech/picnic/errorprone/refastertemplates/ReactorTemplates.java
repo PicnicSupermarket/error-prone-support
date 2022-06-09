@@ -157,8 +157,8 @@ final class ReactorTemplates {
   }
 
   /**
-   * Prefer {@link Flux#concatMapIterable(Function)} over {@link Flux#concatMapIterable(Function)},
-   * as the former has equivalent semantics but a clearer name.
+   * Prefer {@link Flux#concatMapIterable(Function)} over {@link Flux#flatMapIterable(Function)}, as
+   * the former has equivalent semantics but a clearer name.
    */
   static final class FluxConcatMapIterable<T, S> {
     @BeforeTemplate
