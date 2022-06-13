@@ -393,4 +393,36 @@ final class ReactorTemplates {
       return step.verifyTimeout(duration);
     }
   }
+
+  /**
+   * Prefer {@link Flux#cast(Class)} over {@link Flux#map(Function)} with {@link Class#cast(Object)}
+   */
+  static final class FluxCast<T, S> {
+
+    @BeforeTemplate
+    Flux<S> before(Flux<T> flux) {
+      return flux.map(Refaster.<S>clazz()::cast);
+    }
+
+    @AfterTemplate
+    Flux<S> after(Flux<T> flux) {
+      return flux.cast(Refaster.<S>clazz());
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#cast(Class)} over {@link Mono#map(Function)} with {@link Class#cast(Object)}
+   */
+  static final class MonoCast<T, S> {
+
+    @BeforeTemplate
+    Mono<S> before(Mono<T> mono) {
+      return mono.map(Refaster.<S>clazz()::cast);
+    }
+
+    @AfterTemplate
+    Mono<S> after(Mono<T> mono) {
+      return mono.cast(Refaster.<S>clazz());
+    }
+  }
 }
