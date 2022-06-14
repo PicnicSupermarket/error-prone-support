@@ -20,7 +20,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addSourceLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Immutable",
@@ -104,7 +103,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addInputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Immutable",
@@ -123,7 +121,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addOutputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Immutable",
@@ -149,7 +146,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addInputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Modifiable",
@@ -168,7 +164,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addOutputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Modifiable",
@@ -194,7 +189,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addInputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Immutable",
@@ -213,7 +207,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addOutputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Immutable",
@@ -239,7 +232,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addInputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Modifiable",
@@ -258,7 +250,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addOutputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Modifiable",
@@ -285,7 +276,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addInputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Modifiable",
@@ -304,7 +294,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addOutputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Modifiable",
@@ -332,7 +321,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addInputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Immutable",
@@ -351,7 +339,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addOutputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Immutable",
@@ -378,7 +365,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addInputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "abstract class E {",
@@ -396,7 +382,6 @@ final class MissingImmutableSortedSetDefaultCheckTest {
         .addOutputLines(
             "A.java",
             "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "abstract class E {",
