@@ -29,21 +29,6 @@ final class WebClientTemplatesTest implements RefasterTemplateTestCase {
         WebClient.create("foo").get(), WebTestClient.bindToServer().build().get());
   }
 
-  ImmutableSet<?> testPostMethod() {
-    return ImmutableSet.of(
-        WebClient.create("foo").post(), WebTestClient.bindToServer().build().post());
-  }
-
-  ImmutableSet<?> testPutMethod() {
-    return ImmutableSet.of(
-        WebClient.create("foo").put(), WebTestClient.bindToServer().build().put());
-  }
-
-  ImmutableSet<?> testPatchMethod() {
-    return ImmutableSet.of(
-        WebClient.create("foo").patch(), WebTestClient.bindToServer().build().patch());
-  }
-
   ImmutableSet<?> testHeadMethod() {
     return ImmutableSet.of(
         WebClient.create("foo").head(), WebTestClient.bindToServer().build().head());
@@ -52,6 +37,21 @@ final class WebClientTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<?> testOptionsMethod() {
     return ImmutableSet.of(
         WebClient.create("foo").options(), WebTestClient.bindToServer().build().options());
+  }
+
+  ImmutableSet<?> testPatchMethod() {
+    return ImmutableSet.of(
+        WebClient.create("foo").patch(), WebTestClient.bindToServer().build().patch());
+  }
+
+  ImmutableSet<?> testPostMethod() {
+    return ImmutableSet.of(
+        WebClient.create("foo").post(), WebTestClient.bindToServer().build().post());
+  }
+
+  ImmutableSet<?> testPutMethod() {
+    return ImmutableSet.of(
+        WebClient.create("foo").put(), WebTestClient.bindToServer().build().put());
   }
 
   ImmutableSet<?> testRequestHeadersUriSpecUri() {
