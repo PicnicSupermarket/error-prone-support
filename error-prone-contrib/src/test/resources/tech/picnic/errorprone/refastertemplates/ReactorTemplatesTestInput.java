@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Supplier;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -133,10 +132,10 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
   }
 
   Flux<String> testFluxCast() {
-    return Flux.just(UUID.randomUUID()).map(String.class::cast);
+    return Flux.just(1).map(String.class::cast);
   }
 
   Mono<String> testMonoCast() {
-    return Mono.just(UUID.randomUUID()).map(String.class::cast);
+    return Mono.just(1).map(String.class::cast);
   }
 }
