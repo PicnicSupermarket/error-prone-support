@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.RequestBodySpec;
+import org.springframework.web.reactive.function.client.WebClient.RequestBodyUriSpec;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
 
@@ -48,10 +49,9 @@ final class WebClientTemplates {
 
   /**
    * Prefer {@link WebClient#get()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#GET}
+   * HttpMethod#GET}.
    */
   static final class GetMethod {
-
     @BeforeTemplate
     RequestHeadersSpec<?> before(WebClient webClient) {
       return webClient.method(GET);
@@ -69,77 +69,10 @@ final class WebClientTemplates {
   }
 
   /**
-   * Prefer {@link WebClient#post()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#POST}
-   */
-  static final class PostMethod {
-
-    @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
-      return webClient.method(POST);
-    }
-
-    @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before2(WebTestClient webClient) {
-      return webClient.method(POST);
-    }
-
-    @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
-      return webClient.post();
-    }
-  }
-
-  /**
-   * Prefer {@link WebClient#put()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#PUT}
-   */
-  static final class PutMethod {
-
-    @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
-      return webClient.method(PUT);
-    }
-
-    @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before2(WebTestClient webClient) {
-      return webClient.method(PUT);
-    }
-
-    @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
-      return webClient.put();
-    }
-  }
-
-  /**
-   * Prefer {@link WebClient#patch()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#PATCH}
-   */
-  static final class PatchMethod {
-
-    @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
-      return webClient.method(PATCH);
-    }
-
-    @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before2(WebTestClient webClient) {
-      return webClient.method(PATCH);
-    }
-
-    @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
-      return webClient.patch();
-    }
-  }
-
-  /**
    * Prefer {@link WebClient#head()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#HEAD}
+   * HttpMethod#HEAD}.
    */
   static final class HeadMethod {
-
     @BeforeTemplate
     RequestHeadersSpec<?> before(WebClient webClient) {
       return webClient.method(HEAD);
@@ -158,10 +91,9 @@ final class WebClientTemplates {
 
   /**
    * Prefer {@link WebClient#options()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#OPTIONS}
+   * HttpMethod#OPTIONS}.
    */
   static final class OptionsMethod {
-
     @BeforeTemplate
     RequestHeadersSpec<?> before(WebClient webClient) {
       return webClient.method(OPTIONS);
@@ -175,6 +107,69 @@ final class WebClientTemplates {
     @AfterTemplate
     RequestHeadersSpec<?> after(WebClient webClient) {
       return webClient.options();
+    }
+  }
+
+  /**
+   * Prefer {@link WebClient#patch()} over {@link WebClient#method(HttpMethod)} with {@link
+   * HttpMethod#PATCH}.
+   */
+  static final class PatchMethod {
+    @BeforeTemplate
+    RequestBodyUriSpec before(WebClient webClient) {
+      return webClient.method(PATCH);
+    }
+
+    @BeforeTemplate
+    WebTestClient.RequestBodyUriSpec before2(WebTestClient webClient) {
+      return webClient.method(PATCH);
+    }
+
+    @AfterTemplate
+    RequestBodyUriSpec after(WebClient webClient) {
+      return webClient.patch();
+    }
+  }
+
+  /**
+   * Prefer {@link WebClient#post()} over {@link WebClient#method(HttpMethod)} with {@link
+   * HttpMethod#POST}.
+   */
+  static final class PostMethod {
+    @BeforeTemplate
+    RequestBodyUriSpec before(WebClient webClient) {
+      return webClient.method(POST);
+    }
+
+    @BeforeTemplate
+    WebTestClient.RequestBodyUriSpec before2(WebTestClient webClient) {
+      return webClient.method(POST);
+    }
+
+    @AfterTemplate
+    RequestBodyUriSpec after(WebClient webClient) {
+      return webClient.post();
+    }
+  }
+
+  /**
+   * Prefer {@link WebClient#put()} over {@link WebClient#method(HttpMethod)} with {@link
+   * HttpMethod#PUT}.
+   */
+  static final class PutMethod {
+    @BeforeTemplate
+    RequestBodyUriSpec before(WebClient webClient) {
+      return webClient.method(PUT);
+    }
+
+    @BeforeTemplate
+    WebTestClient.RequestBodyUriSpec before2(WebTestClient webClient) {
+      return webClient.method(PUT);
+    }
+
+    @AfterTemplate
+    RequestBodyUriSpec after(WebClient webClient) {
+      return webClient.put();
     }
   }
 
