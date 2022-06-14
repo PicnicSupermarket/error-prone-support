@@ -13,7 +13,8 @@ public final class MissingImmutableSortedSetDefaultCheckTest {
           .expectErrorMessage(
               "X",
               containsPattern(
-                  "Methods returning an `ImmutableSortedSet` within an @Value.Immutable or @Value.Modifiable class should provide a default value or specify the comparator."));
+                  "Methods returning an `ImmutableSortedSet` within an @Value.Immutable or @Value.Modifiable class " +
+                          "should provide a default value or specify the comparator."));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(
           MissingImmutableSortedSetDefaultCheck.class, getClass());

@@ -3,12 +3,12 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
+import static com.google.errorprone.matchers.Matchers.allOf;
+import static com.google.errorprone.matchers.Matchers.enclosingClass;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
-import static com.google.errorprone.matchers.Matchers.hasAnyAnnotation;
 import static com.google.errorprone.matchers.Matchers.isSameType;
-import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
-import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.methodReturns;
+import static com.google.errorprone.matchers.Matchers.not;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSortedSet;
@@ -18,7 +18,6 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
-import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MethodTree;
 import org.immutables.value.Value;
 
@@ -54,8 +53,11 @@ public final class MissingImmutableSortedSetDefaultCheck extends BugChecker
     }
 
     // is not within immutable or modifiable class -> no match
-    if (!ASTHelpers.hasAnnotation(tree, org.immutables.value.Value.Immutable.class, state)
-        && !ASTHelpers.hasAnnotation(tree, Value.Modifiable.class, state)) {
+    if (enclosingClass(
+            allOf(
+                not(hasAnnotation(org.immutables.value.Value.Immutable.class)),
+                not(hasAnnotation(org.immutables.value.Value.Modifiable.class))))
+        .matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
