@@ -18,6 +18,7 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MethodTree;
 import org.immutables.value.Value;
 
@@ -72,6 +73,8 @@ public final class MissingImmutableSortedSetDefaultCheck extends BugChecker
         .addFix(SuggestedFix.builder().prefixWith(tree, "@Value.NaturalOrder ").build())
         .addFix(
             SuggestedFix.builder()
+                .replace(
+                    ASTHelpers.getStartPosition(tree), ASTHelpers.getStartPosition(tree) + 8, "")
                 .replace(
                     state.getEndPosition(tree) - 1,
                     state.getEndPosition(tree),
