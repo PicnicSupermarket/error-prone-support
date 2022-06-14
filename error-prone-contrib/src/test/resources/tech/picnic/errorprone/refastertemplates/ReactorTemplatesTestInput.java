@@ -76,6 +76,16 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
         Mono.just("bar").map(Optional::of).switchIfEmpty(Mono.just(Optional.empty())));
   }
 
+  ImmutableSet<Mono<String>> testMonoCast() {
+    return ImmutableSet.of(
+        Mono.just(1).map(String.class::cast), Mono.just(1.1f).map(String.class::cast));
+  }
+
+  ImmutableSet<Flux<String>> testFluxCast() {
+    return ImmutableSet.of(
+        Flux.just(1).map(String.class::cast), Flux.just(1.1f).map(String.class::cast));
+  }
+
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
     return ImmutableSet.of(PublisherProbe.of(Mono.empty()), PublisherProbe.of(Flux.empty()));
   }
@@ -129,13 +139,5 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Duration testStepVerifierLastStepVerifyTimeout() {
     return StepVerifier.create(Mono.empty()).expectTimeout(Duration.ZERO).verify();
-  }
-
-  Flux<String> testFluxCast() {
-    return Flux.just(1).map(String.class::cast);
-  }
-
-  Mono<String> testMonoCast() {
-    return Mono.just(1).map(String.class::cast);
   }
 }
