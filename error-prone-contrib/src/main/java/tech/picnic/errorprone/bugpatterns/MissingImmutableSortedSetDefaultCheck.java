@@ -43,7 +43,7 @@ public final class MissingImmutableSortedSetDefaultCheck extends BugChecker
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
     // has no return type ImmutableSortedSet -> no match
-    if (!methodReturns(isSameType(ImmutableSortedSet.class)).matches(tree, state)) {
+    if (not(methodReturns(isSameType(ImmutableSortedSet.class))).matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
@@ -70,7 +70,13 @@ public final class MissingImmutableSortedSetDefaultCheck extends BugChecker
     // provide a default implementation.
     return buildDescription(tree)
         .addFix(SuggestedFix.builder().prefixWith(tree, "@Value.NaturalOrder ").build())
-        .addFix(SuggestedFix.postfixWith(tree, "return ImmutableSortedSet.of();"))
+        .addFix(
+            SuggestedFix.builder()
+                .replace(
+                    state.getEndPosition(tree) - 1,
+                    state.getEndPosition(tree),
+                    "{ return ImmutableSortedSet.of(); }")
+                .build())
         .build();
   }
 }
