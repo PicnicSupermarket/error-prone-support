@@ -12,9 +12,7 @@
       "matchPackagePatterns": [
         "^com\\.palantir\\.baseline:baseline-error-prone$"
       ],
-      "extends": [
-        "schedule:monthly"
-      ]
+      "schedule": "* * 1 * *"
     }
   ],
   "reviewers": [
