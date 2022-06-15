@@ -18,7 +18,6 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
-import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import org.immutables.value.Value.Immutable;
@@ -63,16 +62,11 @@ public final class MissingImmutableSortedSetDefaultCheck extends BugChecker
     // The ImmutableSortedSet has no empty default -> add the `@Value.NaturalOrder` annotation or
     // provide a default implementation.
     return buildDescription(tree)
+        .setMessage(
+            "Methods returning an `ImmutableSortedSet` within an @Value.Immutable or @Value.Modifiable class "
+                + "should include additional deserialization information for absent sets. "
+                + "Alternatively, specify a default implementation.")
         .addFix(SuggestedFix.builder().prefixWith(tree, "@Value.NaturalOrder ").build())
-        .addFix(
-            SuggestedFix.builder()
-                .replace(
-                    ASTHelpers.getStartPosition(tree), ASTHelpers.getStartPosition(tree) + 8, "")
-                .replace(
-                    state.getEndPosition(tree) - 1,
-                    state.getEndPosition(tree),
-                    "{ return ImmutableSortedSet.of(); }")
-                .build())
         .build();
   }
 }

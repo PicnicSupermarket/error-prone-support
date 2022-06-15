@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.SECOND;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -98,7 +96,7 @@ final class MissingImmutableSortedSetDefaultCheckTest {
   }
 
   @Test
-  void replacementInImmutableInterface() {
+  void replacementInImmutable() {
     refactoringTestHelper
         .addInputLines(
             "A.java",
@@ -106,17 +104,13 @@ final class MissingImmutableSortedSetDefaultCheckTest {
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Immutable",
-            "interface A {",
-            "  ImmutableSortedSet<String> sortedSet();",
-            "  default ImmutableSortedSet<String> defaultSortedSet() {",
-            "    return ImmutableSortedSet.of();",
+            "abstract class A {",
+            "  abstract ImmutableSortedSet<String> sortedSet();",
+            "",
+            "  @Value.Immutable",
+            "  interface B {",
+            "    ImmutableSortedSet<String> sortedSet();",
             "  }",
-            "  @Value.Default",
-            "  default ImmutableSortedSet<String> defaultSortedSet2() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.NaturalOrder",
-            "  ImmutableSortedSet<String> defaultSortedSet3();",
             "}")
         .addOutputLines(
             "A.java",
@@ -124,24 +118,21 @@ final class MissingImmutableSortedSetDefaultCheckTest {
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Immutable",
-            "interface A {",
+            "abstract class A {",
             "  @Value.NaturalOrder",
-            "  ImmutableSortedSet<String> sortedSet();",
-            "  default ImmutableSortedSet<String> defaultSortedSet() {",
-            "    return ImmutableSortedSet.of();",
+            "  abstract ImmutableSortedSet<String> sortedSet();",
+            "",
+            "  @Value.Immutable",
+            "  interface B {",
+            "    @Value.NaturalOrder",
+            "    ImmutableSortedSet<String> sortedSet();",
             "  }",
-            "  @Value.Default",
-            "  default ImmutableSortedSet<String> defaultSortedSet2() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.NaturalOrder",
-            "  ImmutableSortedSet<String> defaultSortedSet3();",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
-  void replacementInModifiableInterface() {
+  void replacementInModifiable() {
     refactoringTestHelper
         .addInputLines(
             "A.java",
@@ -149,17 +140,13 @@ final class MissingImmutableSortedSetDefaultCheckTest {
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Modifiable",
-            "interface B {",
-            "  ImmutableSortedSet<String> sortedSet();",
-            "  default ImmutableSortedSet<String> defaultSortedSet() {",
-            "    return ImmutableSortedSet.of();",
+            "abstract class A {",
+            "  abstract ImmutableSortedSet<String> sortedSet();",
+            "",
+            "  @Value.Modifiable",
+            "  interface B {",
+            "    ImmutableSortedSet<String> sortedSet();",
             "  }",
-            "  @Value.Default",
-            "  default ImmutableSortedSet<String> defaultSortedSet2() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.NaturalOrder",
-            "  ImmutableSortedSet<String> defaultSortedSet3();",
             "}")
         .addOutputLines(
             "A.java",
@@ -167,194 +154,15 @@ final class MissingImmutableSortedSetDefaultCheckTest {
             "import com.google.common.collect.ImmutableSortedSet;",
             "",
             "@Value.Modifiable",
-            "interface B {",
-            "  @Value.NaturalOrder",
-            "  ImmutableSortedSet<String> sortedSet();",
-            "  default ImmutableSortedSet<String> defaultSortedSet() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.Default",
-            "  default ImmutableSortedSet<String> defaultSortedSet2() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.NaturalOrder",
-            "  ImmutableSortedSet<String> defaultSortedSet3();",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
-  }
-
-  @Test
-  void replacementInImmutableAbstractClass() {
-    refactoringTestHelper
-        .addInputLines(
-            "A.java",
-            "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSortedSet;",
-            "",
-            "@Value.Immutable",
-            "abstract class C {",
-            "  abstract ImmutableSortedSet<String> sortedSet();",
-            "  ImmutableSortedSet<String> defaultSortedSet() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.Default",
-            "  ImmutableSortedSet<String> defaultSortedSet2() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.NaturalOrder",
-            "  abstract ImmutableSortedSet<String> defaultSortedSet3();",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSortedSet;",
-            "",
-            "@Value.Immutable",
-            "abstract class C {",
+            "abstract class A {",
             "  @Value.NaturalOrder",
             "  abstract ImmutableSortedSet<String> sortedSet();",
-            "  ImmutableSortedSet<String> defaultSortedSet() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.Default",
-            "  ImmutableSortedSet<String> defaultSortedSet2() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.NaturalOrder",
-            "  abstract ImmutableSortedSet<String> defaultSortedSet3();",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
-  }
-
-  @Test
-  void replacementInModifiableAbstractClass() {
-    refactoringTestHelper
-        .addInputLines(
-            "A.java",
-            "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSortedSet;",
             "",
-            "@Value.Modifiable",
-            "abstract class D {",
-            "  abstract ImmutableSortedSet<String> sortedSet();",
-            "  ImmutableSortedSet<String> defaultSortedSet() {",
-            "    return ImmutableSortedSet.of();",
+            "  @Value.Modifiable",
+            "  interface B {",
+            "    @Value.NaturalOrder",
+            "    ImmutableSortedSet<String> sortedSet();",
             "  }",
-            "  @Value.Default",
-            "  ImmutableSortedSet<String> defaultSortedSet2() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.NaturalOrder",
-            "  abstract ImmutableSortedSet<String> defaultSortedSet3();",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSortedSet;",
-            "",
-            "@Value.Modifiable",
-            "abstract class D {",
-            "  @Value.NaturalOrder",
-            "  abstract ImmutableSortedSet<String> sortedSet();",
-            "  ImmutableSortedSet<String> defaultSortedSet() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.Default",
-            "  ImmutableSortedSet<String> defaultSortedSet2() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.NaturalOrder",
-            "  abstract ImmutableSortedSet<String> defaultSortedSet3();",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
-  }
-
-  @Test
-  void secondaryReplacementInModifiableInterface() {
-    refactoringTestHelper
-        .setFixChooser(SECOND)
-        .addInputLines(
-            "A.java",
-            "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSortedSet;",
-            "",
-            "@Value.Modifiable",
-            "interface B {",
-            "  ImmutableSortedSet<String> sortedSet();",
-            "  default ImmutableSortedSet<String> defaultSortedSet() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.Default",
-            "  default ImmutableSortedSet<String> defaultSortedSet2() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.NaturalOrder",
-            "  ImmutableSortedSet<String> defaultSortedSet3();",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSortedSet;",
-            "",
-            "@Value.Modifiable",
-            "interface B {",
-            "  default ImmutableSortedSet<String> sortedSet() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  default ImmutableSortedSet<String> defaultSortedSet() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.Default",
-            "  default ImmutableSortedSet<String> defaultSortedSet2() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.NaturalOrder",
-            "  ImmutableSortedSet<String> defaultSortedSet3();",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
-  }
-
-  @Test
-  void secondaryReplacementInImmutableAbstractClass() {
-    refactoringTestHelper
-        .setFixChooser(SECOND)
-        .addInputLines(
-            "A.java",
-            "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSortedSet;",
-            "",
-            "@Value.Immutable",
-            "abstract class C {",
-            "  abstract ImmutableSortedSet<String> sortedSet();",
-            "  ImmutableSortedSet<String> defaultSortedSet() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.Default",
-            "  ImmutableSortedSet<String> defaultSortedSet2() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.NaturalOrder",
-            "  abstract ImmutableSortedSet<String> defaultSortedSet3();",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "import org.immutables.value.Value;",
-            "import com.google.common.collect.ImmutableSortedSet;",
-            "",
-            "@Value.Immutable",
-            "abstract class C {",
-            "  ImmutableSortedSet<String> sortedSet() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  ImmutableSortedSet<String> defaultSortedSet() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.Default",
-            "  ImmutableSortedSet<String> defaultSortedSet2() {",
-            "    return ImmutableSortedSet.of();",
-            "  }",
-            "  @Value.NaturalOrder",
-            "  abstract ImmutableSortedSet<String> defaultSortedSet3();",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
