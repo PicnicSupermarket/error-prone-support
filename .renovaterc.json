@@ -1,0 +1,22 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "^org\\.springframework:spring-framework-bom$",
+        "^org\\.springframework\\.boot:spring-boot[a-z-]*$"
+      ],
+      "separateMinorPatch": true
+    },
+    {
+      "matchPackagePatterns": [
+        "^com\\.palantir\\.baseline:baseline-error-prone$"
+      ],
+      "schedule": "* * 1 * *"
+    }
+  ],
+  "reviewers": [
+    "rickie",
+    "Stephan202"
+  ]
+}
