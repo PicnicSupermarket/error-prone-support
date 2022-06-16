@@ -27,8 +27,6 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import java.util.stream.Collector;
-import java.util.stream.Stream;
-import reactor.core.publisher.Flux;
 
 /**
  * A {@link BugChecker} which flags {@link Collector} usages that don't clearly express
@@ -56,7 +54,8 @@ public final class CollectorMutabilityCheck extends BugChecker
                   // `METHOD_INVOCATION`, so we can safely cast it manually.
                   (tree, state) ->
                       instanceMethod()
-                          .onDescendantOfAny(Flux.class.getName(), Stream.class.getName())
+                          .onDescendantOfAny(
+                              "reactor.core.publisher.Flux", "java.util.stream.Stream")
                           .named("collect")
                           .matches((MethodInvocationTree) tree, state))),
           anyOf(
