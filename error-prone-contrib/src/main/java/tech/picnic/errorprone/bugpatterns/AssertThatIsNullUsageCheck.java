@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.sun.source.tree.Tree.Kind.NULL_LITERAL;
 
 import com.google.auto.service.AutoService;
@@ -13,6 +14,7 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.matchers.method.MethodMatchers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
@@ -32,16 +34,15 @@ public final class AssertThatIsNullUsageCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
 
-  private final Matcher<ExpressionTree> ASSERT_IS_EQUAL =
-      MethodMatchers.instanceMethod()
-          .onDescendantOf("org.assertj.core.api.Assert")
-          .named("isEqualTo");
+  private static final Matcher<MethodInvocationTree> ASSERT_IS_EQUAL =
+      Matchers.allOf(
+          instanceMethod().onDescendantOf("org.assertj.core.api.Assert").named("isEqualTo"),
+          Matchers.argumentCount(1),
+          Matchers.argument(0, Matchers.nullLiteral()));
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!ASSERT_IS_EQUAL.matches(tree, state)
-        || tree.getArguments().size() != 1
-        || tree.getArguments().get(0).getKind() != NULL_LITERAL) {
+    if (!ASSERT_IS_EQUAL.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
