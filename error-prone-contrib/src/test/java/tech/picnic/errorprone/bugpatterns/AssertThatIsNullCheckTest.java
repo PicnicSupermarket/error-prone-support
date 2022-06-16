@@ -4,7 +4,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class AssertThatIsNullCheckTest {
+final class AssertThatIsNullCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(AssertThatIsNullCheck.class, getClass());
 
