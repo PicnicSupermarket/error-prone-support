@@ -363,6 +363,11 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>org.reactivestreams</groupId>
+                <artifactId>reactive-streams</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>1.7.36</version>
@@ -999,6 +1004,7 @@
                             <includedLicense>GPL-2.0-with-classpath-exception</includedLicense>
                             <includedLicense>LGPL-3.0+</includedLicense>
                             <includedLicense>MIT</includedLicense>
+                            <includedLicense>MIT-0</includedLicense>
                             <includedLicense>Public Domain</includedLicense>
                         </includedLicenses>
                         <licenseMerges>
