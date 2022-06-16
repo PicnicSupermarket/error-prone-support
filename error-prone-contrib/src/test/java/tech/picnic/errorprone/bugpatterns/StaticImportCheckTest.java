@@ -7,7 +7,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class StaticImportCheckTest {
+final class StaticImportCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(StaticImportCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =

@@ -5,7 +5,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class PrimitiveComparisonCheckTest {
+final class PrimitiveComparisonCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(PrimitiveComparisonCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =

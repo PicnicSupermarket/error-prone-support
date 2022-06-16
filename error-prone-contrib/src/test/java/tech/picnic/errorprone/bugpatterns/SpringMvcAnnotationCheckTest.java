@@ -5,7 +5,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class SpringMvcAnnotationCheckTest {
+final class SpringMvcAnnotationCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(SpringMvcAnnotationCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =

@@ -7,7 +7,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class LexicographicalAnnotationListingCheckTest {
+final class LexicographicalAnnotationListingCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(LexicographicalAnnotationListingCheck.class, getClass())
           .expectErrorMessage(
