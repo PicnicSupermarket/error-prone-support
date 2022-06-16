@@ -51,7 +51,7 @@ final class WebClientTemplates {
    * Prefer {@link WebClient#get()} over {@link WebClient#method(HttpMethod)} with {@link
    * HttpMethod#GET}.
    */
-  static final class GetMethod {
+  static final class WebClientGet {
     @BeforeTemplate
     RequestHeadersSpec<?> before(WebClient webClient) {
       return webClient.method(GET);
@@ -72,7 +72,7 @@ final class WebClientTemplates {
    * Prefer {@link WebClient#head()} over {@link WebClient#method(HttpMethod)} with {@link
    * HttpMethod#HEAD}.
    */
-  static final class HeadMethod {
+  static final class WebClientHead {
     @BeforeTemplate
     RequestHeadersSpec<?> before(WebClient webClient) {
       return webClient.method(HEAD);
@@ -93,7 +93,7 @@ final class WebClientTemplates {
    * Prefer {@link WebClient#options()} over {@link WebClient#method(HttpMethod)} with {@link
    * HttpMethod#OPTIONS}.
    */
-  static final class OptionsMethod {
+  static final class WebClientOptions {
     @BeforeTemplate
     RequestHeadersSpec<?> before(WebClient webClient) {
       return webClient.method(OPTIONS);
@@ -114,7 +114,7 @@ final class WebClientTemplates {
    * Prefer {@link WebClient#patch()} over {@link WebClient#method(HttpMethod)} with {@link
    * HttpMethod#PATCH}.
    */
-  static final class PatchMethod {
+  static final class WebClientPatch {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(PATCH);
@@ -135,7 +135,7 @@ final class WebClientTemplates {
    * Prefer {@link WebClient#post()} over {@link WebClient#method(HttpMethod)} with {@link
    * HttpMethod#POST}.
    */
-  static final class PostMethod {
+  static final class WebClientPost {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(POST);
@@ -156,7 +156,7 @@ final class WebClientTemplates {
    * Prefer {@link WebClient#put()} over {@link WebClient#method(HttpMethod)} with {@link
    * HttpMethod#PUT}.
    */
-  static final class PutMethod {
+  static final class WebClientPut {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(PUT);

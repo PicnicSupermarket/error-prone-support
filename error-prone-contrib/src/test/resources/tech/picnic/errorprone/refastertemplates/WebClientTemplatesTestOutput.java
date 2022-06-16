@@ -15,7 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 final class WebClientTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(fromValue(""), GET, POST, PUT, PATCH, HEAD, OPTIONS);
+    return ImmutableSet.of(fromValue(""), GET, HEAD, OPTIONS, PATCH, POST, PUT);
   }
 
   ImmutableSet<?> testBodyValue() {
