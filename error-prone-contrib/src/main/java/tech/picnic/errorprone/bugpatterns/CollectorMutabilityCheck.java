@@ -3,6 +3,12 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
+import static com.google.errorprone.matchers.Matchers.allOf;
+import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.argumentCount;
+import static com.google.errorprone.matchers.Matchers.kindIs;
+import static com.google.errorprone.matchers.Matchers.methodInvocation;
+import static com.google.errorprone.matchers.Matchers.parentNode;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 
@@ -15,16 +21,19 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
-import java.util.function.Function;
 import java.util.stream.Collector;
+import java.util.stream.Stream;
+import reactor.core.publisher.Flux;
 
 /**
- * A {@link BugChecker} which flags {@link Collector} usage that doesn't emphasize (im)mutability.
+ * A {@link BugChecker} which flags {@link Collector} usages that don't clearly express
+ * (im)mutability.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -37,50 +46,47 @@ public final class CollectorMutabilityCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
 
-  private static final Matcher<ExpressionTree> COLLECTOR =
-      staticMethod().onClass("java.util.stream.Collectors").namedAnyOf("toList", "toSet", "toMap");
-
-  private static final Matcher<ExpressionTree> COLLECTOR_USAGE =
-      instanceMethod()
-          .onDescendantOfAny("reactor.core.publisher.Flux", "java.util.stream.Stream")
-          .namedAnyOf("collect")
-          .withParameters(Collector.class.getName());
+  private static final Matcher<MethodInvocationTree> MATCHER =
+      Matchers.allOf(
+          parentNode(
+              allOf(
+                  kindIs(Tree.Kind.METHOD_INVOCATION),
+                  // `Matchers#parentNode()` requires as `Matcher<? extends Tree>` as parameter
+                  // `Matchers#methodInvocation` provides a `Matcher<ExpressionTree>`,
+                  // which cannot be casted safely. However, we assert the parent node is a
+                  // `METHOD_INVOCATION`, so we can safely cast it manually.
+                  (tree, state) ->
+                      methodInvocation(
+                              instanceMethod()
+                                  .onDescendantOfAny(Flux.class.getName(), Stream.class.getName())
+                                  .named("collect"))
+                          .matches((MethodInvocationTree) tree, state))),
+          anyOf(
+              methodInvocation(
+                  staticMethod()
+                      .onClass("java.util.stream.Collectors")
+                      .namedAnyOf("toList", "toSet")),
+              allOf(
+                  staticMethod().onClass("java.util.stream.Collectors").named("toMap"),
+                  argumentCount(2))));
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!COLLECTOR.matches(tree, state)) {
+
+    if (!MATCHER.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
     Symbol collector = ASTHelpers.getSymbol(tree);
-    if (collector == null
-        || state.getPath().getParentPath().getLeaf().getKind() != Tree.Kind.METHOD_INVOCATION) {
+    if (collector == null) {
       return Description.NO_MATCH;
     }
 
-    MethodInvocationTree parent = (MethodInvocationTree) state.getPath().getParentPath().getLeaf();
-    if (!COLLECTOR_USAGE.matches(parent, state)) {
-      return Description.NO_MATCH;
-    }
-
-    // filter out toMap with more than 4 arguments, as these already emphasize the (im)mutability
-    if (collector.name.contentEquals("toMap") && tree.getArguments().size() == 4) {
-      return Description.NO_MATCH;
-    }
-
-    return createDescription(tree, state, collector);
+    return createDescription(tree, collector, state);
   }
 
-  /**
-   * Build a {@link Description} for the provided {@link java.util.stream.Collectors} method.
-   *
-   * @param tree the method invocation tree
-   * @param state the visitor state
-   * @param collector the collector method symbol
-   * @return a description appropriate for the specific collectors method
-   */
   private Description createDescription(
-      MethodInvocationTree tree, VisitorState state, Symbol collector) {
+      MethodInvocationTree tree, Symbol collector, VisitorState state) {
     switch (collector.name.toString()) {
       case "toList":
         return buildSimpleDescription(tree, state, "toImmutableList", "ArrayList");
@@ -93,17 +99,6 @@ public final class CollectorMutabilityCheck extends BugChecker
     }
   }
 
-  /**
-   * Build a {@link Description} for a simple collector method with suggested fixes to provide
-   * emphasis on (im)mutability.
-   *
-   * @param tree the method invocation tree of the collector method
-   * @param state the visitor state
-   * @param immutable the name of the immutable collector method to use instead
-   * @param mutable the name of the mutable collection class to use
-   * @return a description with two suggested fixes on how to provide more emphasis on
-   *     (im)mutability
-   */
   private Description buildSimpleDescription(
       MethodInvocationTree tree, VisitorState state, String immutable, String mutable) {
     return buildDescription(tree)
@@ -117,14 +112,6 @@ public final class CollectorMutabilityCheck extends BugChecker
         .build();
   }
 
-  /**
-   * Build a {@link Description} for a {@link java.util.stream.Collectors#toMap(Function, Function)}
-   * method with two suggested fixes to provide more emphasis on (im)mutability
-   *
-   * @param tree the method invocation tree
-   * @param state the visitor state
-   * @return a description with two suggested fixes to provide more emphasis on (im)mutability
-   */
   private Description buildMapDescription(MethodInvocationTree tree, VisitorState state) {
     ExpressionTree keyMapper = tree.getArguments().get(0);
     ExpressionTree valueMapper = tree.getArguments().get(1);

@@ -1,12 +1,13 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.SECOND;
+
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class CollectorMutabilityCheckTest {
-
+final class CollectorMutabilityCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(CollectorMutabilityCheck.class, getClass());
 
@@ -30,24 +31,25 @@ public final class CollectorMutabilityCheckTest {
             "",
             "class A {",
             "  void m() {",
-            "    // BUG: Diagnostic contains: emphasize (im)mutability",
+            "    // BUG: Diagnostic contains:",
             "    Flux.just(1).collect(toList());",
-            "    // BUG: Diagnostic contains: emphasize (im)mutability",
+            "    // BUG: Diagnostic contains:",
             "    Flux.just(\"foo\").collect(toMap(String::getBytes, String::length));",
             "    Flux.just(\"foo\").collect(toImmutableMap(String::getBytes, String::length));",
             "    Flux.just(\"foo\").collect(toMap(String::getBytes, String::length, (a, b) -> a, HashMap::new));",
             "    Flux.just(1).collect(toImmutableList());",
-            "    // BUG: Diagnostic contains: emphasize (im)mutability",
+            "    // BUG: Diagnostic contains:",
             "    Flux.just(1).collect(toSet());",
             "    Flux.just(1).collect(toImmutableSet());",
-            "    // BUG: Diagnostic contains: emphasize (im)mutability",
+            "",
+            "    // BUG: Diagnostic contains:",
             "    Stream.of(1).collect(toList());",
             "    Stream.of(1).collect(toImmutableList());",
-            "    // BUG: Diagnostic contains: emphasize (im)mutability",
+            "    // BUG: Diagnostic contains:",
             "    Stream.of(\"foo\").collect(toMap(String::getBytes, String::length));",
             "    Stream.of(\"foo\").collect(toImmutableMap(String::getBytes, String::length));",
             "    Stream.of(\"foo\").collect(toMap(String::getBytes, String::length, (a, b) -> a, HashMap::new));",
-            "    // BUG: Diagnostic contains: emphasize (im)mutability",
+            "    // BUG: Diagnostic contains:",
             "    Stream.of(1).collect(toSet());",
             "    Stream.of(1).collect(toImmutableSet());",
             "  }",
@@ -66,6 +68,7 @@ public final class CollectorMutabilityCheckTest {
             "import static com.google.common.collect.ImmutableList.toImmutableList;",
             "import static com.google.common.collect.ImmutableSet.toImmutableSet;",
             "import static com.google.common.collect.ImmutableMap.toImmutableMap;",
+            "",
             "import reactor.core.publisher.Flux;",
             "import java.util.stream.Stream;",
             "",
@@ -74,6 +77,7 @@ public final class CollectorMutabilityCheckTest {
             "    Flux.just(1).collect(toList());",
             "    Flux.just(\"foo\").collect(toMap(String::getBytes, String::length));",
             "    Flux.just(1).collect(toSet());",
+            "",
             "    Stream.of(1).collect(toList());",
             "    Stream.of(\"foo\").collect(toMap(String::getBytes, String::length));",
             "    Stream.of(1).collect(toSet());",
@@ -87,6 +91,7 @@ public final class CollectorMutabilityCheckTest {
             "import static com.google.common.collect.ImmutableList.toImmutableList;",
             "import static com.google.common.collect.ImmutableSet.toImmutableSet;",
             "import static com.google.common.collect.ImmutableMap.toImmutableMap;",
+            "",
             "import reactor.core.publisher.Flux;",
             "import java.util.stream.Stream;",
             "",
@@ -95,23 +100,25 @@ public final class CollectorMutabilityCheckTest {
             "    Flux.just(1).collect(toImmutableList());",
             "    Flux.just(\"foo\").collect(toImmutableMap(String::getBytes, String::length));",
             "    Flux.just(1).collect(toImmutableSet());",
+            "",
             "    Stream.of(1).collect(toImmutableList());",
             "    Stream.of(\"foo\").collect(toImmutableMap(String::getBytes, String::length));",
             "    Stream.of(1).collect(toImmutableSet());",
             "  }",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
   void replacementSecondSuggestedFix() {
     refactoringTestHelper
-        .setFixChooser(FixChoosers.SECOND)
+        .setFixChooser(SECOND)
         .addInputLines(
             "A.java",
             "import static java.util.stream.Collectors.toList;",
             "import static java.util.stream.Collectors.toMap;",
             "import static java.util.stream.Collectors.toSet;",
+            "",
             "import java.util.stream.Stream;",
             "import reactor.core.publisher.Flux;",
             "class A {",
@@ -119,6 +126,7 @@ public final class CollectorMutabilityCheckTest {
             "   Flux.just(1).collect(toList());",
             "   Flux.just(\"foo\").collect(toMap(String::getBytes, String::length));",
             "   Flux.just(1).collect(toSet());",
+            "",
             "   Stream.of(1).collect(toList());",
             "   Stream.of(\"foo\").collect(toMap(String::getBytes, String::length));",
             "   Stream.of(1).collect(toSet());",
@@ -130,6 +138,7 @@ public final class CollectorMutabilityCheckTest {
             "import static java.util.stream.Collectors.toList;",
             "import static java.util.stream.Collectors.toMap;",
             "import static java.util.stream.Collectors.toSet;",
+            "",
             "import java.util.ArrayList;",
             "import java.util.HashMap;",
             "import java.util.HashSet;",
@@ -140,11 +149,12 @@ public final class CollectorMutabilityCheckTest {
             "   Flux.just(1).collect(toCollection(ArrayList::new));",
             "   Flux.just(\"foo\").collect(toMap(String::getBytes, String::length, (a, b) -> a, HashMap::new));",
             "   Flux.just(1).collect(toCollection(HashSet::new));",
+            "",
             "   Stream.of(1).collect(toCollection(ArrayList::new));",
             "   Stream.of(\"foo\").collect(toMap(String::getBytes, String::length, (a, b) -> a, HashMap::new));",
             "   Stream.of(1).collect(toCollection(HashSet::new));",
             " }",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 }
