@@ -4,14 +4,13 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class AssertThatIsNullCheckTest {
+final class AssertThatIsNullUsageCheckTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(AssertThatIsNullCheck.class, getClass());
+      CompilationTestHelper.newInstance(AssertThatIsNullUsageCheck.class, getClass());
 
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(AssertThatIsNullCheck.class, getClass());
+      BugCheckerRefactoringTestHelper.newInstance(AssertThatIsNullUsageCheck.class, getClass());
 
-  // XXX: Methods always start with lowercase. I thought we had a Checkstyle thing for this.
   @Test
   void identification() {
     compilationTestHelper
@@ -29,7 +28,13 @@ final class AssertThatIsNullCheckTest {
             "    assertThat(\"value\").isEqualTo(null);",
             "    // BUG: Diagnostic contains: assertThat(...).isNull()",
             "    assertThat(nullValue).isEqualTo(null);",
+            "    isEqualTo(\"foo\");",
+            "    isEqualTo(null);",
             "  }",
+            "",
+            " private boolean isEqualTo (Object value) {",
+            "     return value.equals(\"bar\");",
+            " }",
             "} ")
         .doTest();
   }
@@ -49,7 +54,13 @@ final class AssertThatIsNullCheckTest {
             "    assertThat(12).isEqualTo(12);",
             "    assertThat(\"value\").isEqualTo(null);",
             "    assertThat(nullValue).isEqualTo(null);",
+            "    isEqualTo(\"foo\");",
+            "    isEqualTo(null);",
             "  }",
+            "",
+            " private boolean isEqualTo (Object value) {",
+            "     return value.equals(\"bar\");",
+            " }",
             "} ")
         .addOutputLines(
             "A.java",
@@ -63,7 +74,13 @@ final class AssertThatIsNullCheckTest {
             "    assertThat(12).isEqualTo(12);",
             "    assertThat(\"value\").isNull();",
             "    assertThat(nullValue).isNull();",
+            "    isEqualTo(\"foo\");",
+            "    isEqualTo(null);",
             "  }",
+            "",
+            " private boolean isEqualTo (Object value) {",
+            "     return value.equals(\"bar\");",
+            " }",
             "} ")
         .doTest();
   }

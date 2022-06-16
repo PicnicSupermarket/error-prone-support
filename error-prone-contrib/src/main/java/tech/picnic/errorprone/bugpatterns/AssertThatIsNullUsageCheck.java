@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.sun.source.tree.Tree.Kind.NULL_LITERAL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -11,32 +12,36 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
-import com.google.errorprone.util.ASTHelpers;
+import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.matchers.method.MethodMatchers;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.Tree;
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
-import org.assertj.core.api.AbstractAssert;
 
 /**
- * A {@link BugChecker} which flags {@code asserThat(someValue).isEqualTo(null)} and suggests {@link
- * AbstractAssert#isNull()}.
+ * A {@link BugChecker} which flags {@code asserThat(someValue).isEqualTo(null)} for further
+ * simplification
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    name = "AssertThatIsNull",
-    summary = "asserThat(...).isEqualTo(null) should be assertThat(...).isNull()",
+    name = "AssertThatIsNullUsage",
+    summary = "`asserThat(...).isEqualTo(null)` should be `assertThat(...).isNull()`",
     linkType = NONE,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
-public final class AssertThatIsNullCheck extends BugChecker implements MethodInvocationTreeMatcher {
+public final class AssertThatIsNullUsageCheck extends BugChecker
+    implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
+
+  private final Matcher<ExpressionTree> ASSERT_IS_EQUAL =
+      MethodMatchers.instanceMethod()
+          .onDescendantOf("org.assertj.core.api.Assert")
+          .named("isEqualTo");
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    MethodSymbol symbol = ASTHelpers.getSymbol(tree);
-    if (symbol == null
+    if (!ASSERT_IS_EQUAL.matches(tree, state)
         || tree.getArguments().size() != 1
-        || tree.getArguments().get(0).getKind() != Tree.Kind.NULL_LITERAL) {
+        || tree.getArguments().get(0).getKind() != NULL_LITERAL) {
       return Description.NO_MATCH;
     }
 
