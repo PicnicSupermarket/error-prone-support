@@ -52,20 +52,16 @@ public final class CollectorMutabilityCheck extends BugChecker
               allOf(
                   kindIs(Tree.Kind.METHOD_INVOCATION),
                   // `Matchers#parentNode()` requires as `Matcher<? extends Tree>` as parameter
-                  // `Matchers#methodInvocation` provides a `Matcher<ExpressionTree>`,
+                  // `Matchers#instanceMethod` provides a `Matcher<ExpressionTree>`,
                   // which cannot be casted safely. However, we assert the parent node is a
                   // `METHOD_INVOCATION`, so we can safely cast it manually.
                   (tree, state) ->
-                      methodInvocation(
-                              instanceMethod()
-                                  .onDescendantOfAny(Flux.class.getName(), Stream.class.getName())
-                                  .named("collect"))
+                      instanceMethod()
+                          .onDescendantOfAny(Flux.class.getName(), Stream.class.getName())
+                          .named("collect")
                           .matches((MethodInvocationTree) tree, state))),
           anyOf(
-              methodInvocation(
-                  staticMethod()
-                      .onClass("java.util.stream.Collectors")
-                      .namedAnyOf("toList", "toSet")),
+              staticMethod().onClass("java.util.stream.Collectors").namedAnyOf("toList", "toSet"),
               allOf(
                   staticMethod().onClass("java.util.stream.Collectors").named("toMap"),
                   argumentCount(2))));
