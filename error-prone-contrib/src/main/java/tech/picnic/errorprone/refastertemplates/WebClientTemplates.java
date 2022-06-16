@@ -38,9 +38,11 @@ final class WebClientTemplates {
     }
   }
 
-  /** Prefer {@link RequestHeadersUriSpec#uri(String, Object...)} over {@link UriBuilder} pattern */
-  abstract static class UriBuilderInline {
-
+  /**
+   * Don't unnecessarily use a {@link UriBuilder} in {@link RequestHeadersUriSpec#uri(String,
+   * Object...)}.
+   */
+  abstract static class RequestHeadersUriSpecUri {
     @BeforeTemplate
     RequestHeadersSpec<?> before(
         RequestHeadersUriSpec<?> requestHeadersUriSpec, String path, @Repeated Object args) {
