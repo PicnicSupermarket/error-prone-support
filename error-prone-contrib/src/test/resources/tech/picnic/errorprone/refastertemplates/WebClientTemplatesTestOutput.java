@@ -20,38 +20,34 @@ final class WebClientTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableSet<?> testBodyValue() {
     return ImmutableSet.of(
-        WebClient.create("foo").post().bodyValue("bar"),
+        WebClient.create().post().bodyValue("bar"),
         WebTestClient.bindToServer().build().post().bodyValue("bar"));
   }
 
-  ImmutableSet<?> testGetMethod() {
-    return ImmutableSet.of(
-        WebClient.create("foo").get(), WebTestClient.bindToServer().build().get());
+  ImmutableSet<?> testWebClientGet() {
+    return ImmutableSet.of(WebClient.create().get(), WebTestClient.bindToServer().build().get());
   }
 
-  ImmutableSet<?> testHeadMethod() {
-    return ImmutableSet.of(
-        WebClient.create("foo").head(), WebTestClient.bindToServer().build().head());
+  ImmutableSet<?> testWebClientHead() {
+    return ImmutableSet.of(WebClient.create().head(), WebTestClient.bindToServer().build().head());
   }
 
-  ImmutableSet<?> testOptionsMethod() {
+  ImmutableSet<?> testWebClientOptions() {
     return ImmutableSet.of(
-        WebClient.create("foo").options(), WebTestClient.bindToServer().build().options());
+        WebClient.create().options(), WebTestClient.bindToServer().build().options());
   }
 
-  ImmutableSet<?> testPatchMethod() {
+  ImmutableSet<?> testWebClientPatch() {
     return ImmutableSet.of(
-        WebClient.create("foo").patch(), WebTestClient.bindToServer().build().patch());
+        WebClient.create().patch(), WebTestClient.bindToServer().build().patch());
   }
 
-  ImmutableSet<?> testPostMethod() {
-    return ImmutableSet.of(
-        WebClient.create("foo").post(), WebTestClient.bindToServer().build().post());
+  ImmutableSet<?> testWebClientPost() {
+    return ImmutableSet.of(WebClient.create().post(), WebTestClient.bindToServer().build().post());
   }
 
-  ImmutableSet<?> testPutMethod() {
-    return ImmutableSet.of(
-        WebClient.create("foo").put(), WebTestClient.bindToServer().build().put());
+  ImmutableSet<?> testWebClientPut() {
+    return ImmutableSet.of(WebClient.create().put(), WebTestClient.bindToServer().build().put());
   }
 
   ImmutableSet<?> testRequestHeadersUriSpecUri() {
