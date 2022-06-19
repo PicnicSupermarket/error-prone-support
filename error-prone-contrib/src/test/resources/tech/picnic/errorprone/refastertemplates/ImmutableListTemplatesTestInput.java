@@ -3,7 +3,6 @@ package tech.picnic.errorprone.refastertemplates;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -23,8 +22,7 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
         Comparator.class,
         Streams.class,
         collectingAndThen(null, null),
-        naturalOrder(),
-        toList());
+        naturalOrder());
   }
 
   ImmutableList.Builder<String> testImmutableListBuilder() {
@@ -43,10 +41,8 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
         Arrays.stream(new Integer[] {8}).collect(toImmutableList()));
   }
 
-  ImmutableSet<ImmutableList<Integer>> testStreamToImmutableList() {
-    return ImmutableSet.of(
-        ImmutableList.copyOf(Stream.of(1).iterator()),
-        Stream.of(2).collect(collectingAndThen(toList(), ImmutableList::copyOf)));
+  ImmutableList<Integer> testStreamToImmutableList() {
+    return ImmutableList.copyOf(Stream.of(1).iterator());
   }
 
   ImmutableSet<ImmutableList<Integer>> testImmutableListSortedCopyOf() {

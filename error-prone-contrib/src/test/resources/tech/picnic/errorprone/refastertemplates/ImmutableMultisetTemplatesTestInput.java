@@ -2,7 +2,6 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
 import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
@@ -14,7 +13,7 @@ import java.util.stream.Stream;
 final class ImmutableMultisetTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Arrays.class, Streams.class, collectingAndThen(null, null), toList());
+    return ImmutableSet.of(Arrays.class, Streams.class, collectingAndThen(null, null));
   }
 
   ImmutableMultiset.Builder<String> testImmutableMultisetBuilder() {
@@ -39,9 +38,7 @@ final class ImmutableMultisetTemplatesTest implements RefasterTemplateTestCase {
         Arrays.stream(new Integer[] {8}).collect(toImmutableMultiset()));
   }
 
-  ImmutableSet<ImmutableMultiset<Integer>> testStreamToImmutableMultiset() {
-    return ImmutableSet.of(
-        ImmutableMultiset.copyOf(Stream.of(1).iterator()),
-        Stream.of(2).collect(collectingAndThen(toList(), ImmutableMultiset::copyOf)));
+  ImmutableMultiset<Integer> testStreamToImmutableMultiset() {
+    return ImmutableMultiset.copyOf(Stream.of(1).iterator());
   }
 }

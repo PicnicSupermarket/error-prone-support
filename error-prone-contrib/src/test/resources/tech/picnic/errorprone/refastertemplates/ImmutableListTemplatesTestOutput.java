@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -24,8 +23,7 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
         Comparator.class,
         Streams.class,
         collectingAndThen(null, null),
-        naturalOrder(),
-        toList());
+        naturalOrder());
   }
 
   ImmutableList.Builder<String> testImmutableListBuilder() {
@@ -44,9 +42,8 @@ final class ImmutableListTemplatesTest implements RefasterTemplateTestCase {
         ImmutableList.copyOf(new Integer[] {8}));
   }
 
-  ImmutableSet<ImmutableList<Integer>> testStreamToImmutableList() {
-    return ImmutableSet.of(
-        Stream.of(1).collect(toImmutableList()), Stream.of(2).collect(toImmutableList()));
+  ImmutableList<Integer> testStreamToImmutableList() {
+    return Stream.of(1).collect(toImmutableList());
   }
 
   ImmutableSet<ImmutableList<Integer>> testImmutableListSortedCopyOf() {

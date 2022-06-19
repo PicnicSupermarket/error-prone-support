@@ -3,7 +3,6 @@ package tech.picnic.errorprone.refastertemplates;
 import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSortedMultiset;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
@@ -17,7 +16,7 @@ import java.util.stream.Stream;
 final class ImmutableSortedMultisetTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Arrays.class, Streams.class, collectingAndThen(null, null), toList());
+    return ImmutableSet.of(Arrays.class, Streams.class, collectingAndThen(null, null));
   }
 
   ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetBuilder() {
@@ -58,9 +57,7 @@ final class ImmutableSortedMultisetTemplatesTest implements RefasterTemplateTest
         Arrays.stream(new Integer[] {10}).collect(toImmutableSortedMultiset(naturalOrder())));
   }
 
-  ImmutableSet<ImmutableSortedMultiset<Integer>> testStreamToImmutableSortedMultiset() {
-    return ImmutableSet.of(
-        ImmutableSortedMultiset.copyOf(Stream.of(1).iterator()),
-        Stream.of(2).collect(collectingAndThen(toList(), ImmutableSortedMultiset::copyOf)));
+  ImmutableSortedMultiset<Integer> testStreamToImmutableSortedMultiset() {
+    return ImmutableSortedMultiset.copyOf(Stream.of(1).iterator());
   }
 }

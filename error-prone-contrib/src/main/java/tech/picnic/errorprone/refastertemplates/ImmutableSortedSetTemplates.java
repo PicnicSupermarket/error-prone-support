@@ -3,8 +3,6 @@ package tech.picnic.errorprone.refastertemplates;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
@@ -134,9 +132,7 @@ final class ImmutableSortedSetTemplates {
   static final class StreamToImmutableSortedSet<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedSet<T> before(Stream<T> stream) {
-      return Refaster.anyOf(
-          ImmutableSortedSet.copyOf(stream.iterator()),
-          stream.collect(collectingAndThen(toList(), ImmutableSortedSet::copyOf)));
+      return ImmutableSortedSet.copyOf(stream.iterator());
     }
 
     @AfterTemplate

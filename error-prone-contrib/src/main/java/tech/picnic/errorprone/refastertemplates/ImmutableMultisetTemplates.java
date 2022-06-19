@@ -2,8 +2,6 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Streams;
@@ -90,9 +88,7 @@ final class ImmutableMultisetTemplates {
   static final class StreamToImmutableMultiset<T> {
     @BeforeTemplate
     ImmutableMultiset<T> before(Stream<T> stream) {
-      return Refaster.anyOf(
-          ImmutableMultiset.copyOf(stream.iterator()),
-          stream.collect(collectingAndThen(toList(), ImmutableMultiset::copyOf)));
+      return ImmutableMultiset.copyOf(stream.iterator());
     }
 
     @AfterTemplate
