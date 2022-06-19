@@ -292,7 +292,7 @@
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2020.0.19</version>
+                <version>2020.0.20</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -361,6 +361,11 @@
                 <version>${version.mockito}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.reactivestreams</groupId>
+                <artifactId>reactive-streams</artifactId>
+                <version>1.0.4</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -1000,6 +1005,7 @@
                             <includedLicense>GPL-2.0-with-classpath-exception</includedLicense>
                             <includedLicense>LGPL-3.0+</includedLicense>
                             <includedLicense>MIT</includedLicense>
+                            <includedLicense>MIT-0</includedLicense>
                             <includedLicense>Public Domain</includedLicense>
                         </includedLicenses>
                         <licenseMerges>
