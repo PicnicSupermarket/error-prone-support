@@ -6,11 +6,11 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
+import java.util.function.Function;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.WebClient.RequestBodySpec;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
-import org.springframework.web.util.UriBuilder;
 
 /**
  * Refaster templates related to expressions dealing with {@link
@@ -38,31 +38,32 @@ final class WebClientTemplates {
     }
   }
 
-  /**
-   * Don't unnecessarily use a {@link UriBuilder} in {@link RequestHeadersUriSpec#uri(String,
-   * Object...)}.
-   */
+  /** Don't unnecessarily use {@link RequestHeadersUriSpec#uri(Function)}. */
   abstract static class RequestHeadersUriSpecUri {
     @BeforeTemplate
     RequestHeadersSpec<?> before(
-        RequestHeadersUriSpec<?> requestHeadersUriSpec, String path, @Repeated Object args) {
+        RequestHeadersUriSpec<?> requestHeadersUriSpec,
+        String path,
+        @Repeated Object uriVariables) {
       return requestHeadersUriSpec.uri(
-          uriBuilder -> uriBuilder.path(path).build(Refaster.asVarargs(args)));
+          uriBuilder -> uriBuilder.path(path).build(Refaster.asVarargs(uriVariables)));
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before2(
+    WebTestClient.RequestHeadersSpec<?> before(
         WebTestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec,
         String path,
-        @Repeated Object args) {
+        @Repeated Object uriVariables) {
       return requestHeadersUriSpec.uri(
-          uriBuilder -> uriBuilder.path(path).build(Refaster.asVarargs(args)));
+          uriBuilder -> uriBuilder.path(path).build(Refaster.asVarargs(uriVariables)));
     }
 
     @AfterTemplate
     RequestHeadersSpec<?> after(
-        RequestHeadersUriSpec<?> requestHeadersUriSpec, String path, @Repeated Object args) {
-      return requestHeadersUriSpec.uri(path, Refaster.asVarargs(args));
+        RequestHeadersUriSpec<?> requestHeadersUriSpec,
+        String path,
+        @Repeated Object uriVariables) {
+      return requestHeadersUriSpec.uri(path, Refaster.asVarargs(uriVariables));
     }
   }
 }
