@@ -36,7 +36,7 @@ final class WebClientTemplates {
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before2(
+    WebTestClient.RequestHeadersSpec<?> before(
         WebTestClient.RequestBodySpec requestBodySpec, T value) {
       return requestBodySpec.body(fromValue(value));
     }
@@ -58,7 +58,7 @@ final class WebClientTemplates {
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before2(WebTestClient webClient) {
+    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
       return webClient.method(GET);
     }
 
@@ -79,7 +79,7 @@ final class WebClientTemplates {
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before2(WebTestClient webClient) {
+    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
       return webClient.method(HEAD);
     }
 
@@ -100,7 +100,7 @@ final class WebClientTemplates {
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before2(WebTestClient webClient) {
+    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
       return webClient.method(OPTIONS);
     }
 
@@ -121,7 +121,7 @@ final class WebClientTemplates {
     }
 
     @BeforeTemplate
-    WebTestClient.RequestBodyUriSpec before2(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(PATCH);
     }
 
@@ -142,7 +142,7 @@ final class WebClientTemplates {
     }
 
     @BeforeTemplate
-    WebTestClient.RequestBodyUriSpec before2(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(POST);
     }
 
@@ -163,7 +163,7 @@ final class WebClientTemplates {
     }
 
     @BeforeTemplate
-    WebTestClient.RequestBodyUriSpec before2(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(PUT);
     }
 
