@@ -266,7 +266,7 @@
             <dependency>
                 <groupId>com.newrelic.agent.java</groupId>
                 <artifactId>newrelic-api</artifactId>
-                <version>7.7.0</version>
+                <version>7.8.0</version>
             </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
