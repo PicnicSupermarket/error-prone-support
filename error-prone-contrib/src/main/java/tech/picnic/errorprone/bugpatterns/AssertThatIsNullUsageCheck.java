@@ -16,10 +16,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.Matchers;
 import com.sun.source.tree.MethodInvocationTree;
 
-/**
- * A {@link BugChecker} which flags {@code asserThat(someValue).isEqualTo(null)} for further
- * simplification
- */
+/** A {@link BugChecker} which flags {@code Assert.isEqualTo(null)} for further simplification */
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "AssertThatIsNullUsage",

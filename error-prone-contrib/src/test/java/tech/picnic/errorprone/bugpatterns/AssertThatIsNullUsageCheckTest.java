@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 final class AssertThatIsNullUsageCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(AssertThatIsNullUsageCheck.class, getClass());
-
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(AssertThatIsNullUsageCheck.class, getClass());
 
@@ -25,10 +24,10 @@ final class AssertThatIsNullUsageCheckTest {
             "    String nullValue = null;",
             "    assertThat(12).isEqualTo(12);",
             "    // BUG: Diagnostic contains: assertThat(...).isNull()",
-            "    assertThat(\"value\").isEqualTo(null);",
+            "    assertThat(\"foo\").isEqualTo(null);",
             "    // BUG: Diagnostic contains: assertThat(...).isNull()",
             "    assertThat(nullValue).isEqualTo(null);",
-            "    isEqualTo(\"foo\");",
+            "    isEqualTo(\"bar\");",
             "    isEqualTo(null);",
             "  }",
             "",
@@ -52,9 +51,9 @@ final class AssertThatIsNullUsageCheckTest {
             "  public void testAssertThat() {",
             "    String nullValue = null;",
             "    assertThat(12).isEqualTo(12);",
-            "    assertThat(\"value\").isEqualTo(null);",
+            "    assertThat(\"foo\").isEqualTo(null);",
             "    assertThat(nullValue).isEqualTo(null);",
-            "    isEqualTo(\"foo\");",
+            "    isEqualTo(\"bar\");",
             "    isEqualTo(null);",
             "  }",
             "",
@@ -72,9 +71,9 @@ final class AssertThatIsNullUsageCheckTest {
             "  public void testAssertThat() {",
             "    String nullValue = null;",
             "    assertThat(12).isEqualTo(12);",
-            "    assertThat(\"value\").isNull();",
+            "    assertThat(\"foo\").isNull();",
             "    assertThat(nullValue).isNull();",
-            "    isEqualTo(\"foo\");",
+            "    isEqualTo(\"bar\");",
             "    isEqualTo(null);",
             "  }",
             "",
