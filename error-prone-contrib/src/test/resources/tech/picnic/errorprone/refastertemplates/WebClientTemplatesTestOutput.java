@@ -17,4 +17,12 @@ final class WebClientTemplatesTest implements RefasterTemplateTestCase {
         WebClient.create("foo").post().bodyValue("bar"),
         WebTestClient.bindToServer().build().post().bodyValue("bar"));
   }
+
+  ImmutableSet<?> testRequestHeadersUriSpecUri() {
+    return ImmutableSet.of(
+        WebClient.create("foo").get().uri("/bar"),
+        WebClient.create("bar").post().uri("/bar/{baz}", "quux"),
+        WebTestClient.bindToServer().build().get().uri("/baz"),
+        WebTestClient.bindToServer().build().post().uri("/qux/{quux}/{quuz}", "corge", "grault"));
+  }
 }
