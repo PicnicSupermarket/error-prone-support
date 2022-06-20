@@ -1,9 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -17,13 +14,7 @@ import java.util.stream.Stream;
 final class ImmutableSetTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(
-        Arrays.class,
-        Collections.class,
-        Streams.class,
-        collectingAndThen(null, null),
-        toList(),
-        toSet());
+    return ImmutableSet.of(Arrays.class, Collections.class, Streams.class);
   }
 
   ImmutableSet.Builder<String> testImmutableSetBuilder() {
@@ -45,9 +36,7 @@ final class ImmutableSetTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<ImmutableSet<Integer>> testStreamToImmutableSet() {
     return ImmutableSet.of(
         ImmutableSet.copyOf(Stream.of(1).iterator()),
-        Stream.of(2).distinct().collect(toImmutableSet()),
-        Stream.of(3).collect(collectingAndThen(toList(), ImmutableSet::copyOf)),
-        Stream.of(4).collect(collectingAndThen(toSet(), ImmutableSet::copyOf)));
+        Stream.of(2).distinct().collect(toImmutableSet()));
   }
 
   ImmutableSet<Integer> testImmutableSetCopyOfSetView() {
