@@ -375,6 +375,45 @@ final class ReactorRules {
     }
   }
 
+  /**
+   * Don't unnecessarily use {@link Mono#flatMap(Function)} followed by {@link Mono#just(Object)}.
+   * Instead, use {@link Mono#map(Function)} in order to avoid an inner subscription.
+   */
+  abstract static class MonoFlatMapJust<T, S> {
+    @Placeholder(allowsIdentity = true)
+    abstract S valueTransformation(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Mono<S> before(Mono<T> mono) {
+      return mono.flatMap(x -> Mono.just(valueTransformation(x)));
+    }
+
+    @AfterTemplate
+    Mono<S> after(Mono<T> mono) {
+      return mono.map(x -> valueTransformation(x));
+    }
+  }
+
+  /**
+   * Don't unnecessarily use {@link Mono#flatMap(Function)} followed by {@link
+   * Mono#justOrEmpty(Object)}. Instead, use {@link Mono#mapNotNull(Function)} in order to avoid an
+   * inner subscription.
+   */
+  abstract static class MonoFlatMapJustOrEmpty<T, S> {
+    @Placeholder(allowsIdentity = true)
+    abstract S valueTransformation(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Mono<S> before(Mono<T> mono) {
+      return mono.flatMap(x -> Mono.justOrEmpty(valueTransformation(x)));
+    }
+
+    @AfterTemplate
+    Mono<S> after(Mono<T> mono) {
+      return mono.mapNotNull(x -> valueTransformation(x));
+    }
+  }
+
   /** Prefer {@link Mono#flux()}} over more contrived alternatives. */
   static final class MonoFlux<T> {
     @BeforeTemplate
