@@ -496,6 +496,16 @@
                             Error Prone or automatically corrected through
                             application of google-java-format. -->
                             <module name="Checker">
+                                <module name="RegexpMultiline">
+                                    <property name="format" value="\{\s*[\r]?\n\s*[\r]?\n" />
+                                    <property name="message" value="A blank line at the start of a block should be removed." />
+                                    <property name="fileExtensions" value="java" />
+                                </module>
+                                <module name="RegexpMultiline">
+                                    <property name="format" value="[\r]?\n\s*[\r]?\n\s*\}" />
+                                    <property name="message" value="A blank line at the end of a block should be removed." />
+                                    <property name="fileExtensions" value="java" />
+                                </module>
                                 <module name="SuppressWarningsFilter" />
                                 <module name="TreeWalker">
                                     <module name="AbbreviationAsWordInName" />
