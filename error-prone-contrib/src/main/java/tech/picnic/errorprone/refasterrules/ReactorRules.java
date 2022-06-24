@@ -362,55 +362,54 @@ final class ReactorRules {
    */
   abstract static class MonoFlatMapToFlux<T, S> {
     @Placeholder(allowsIdentity = true)
-    abstract Mono<S> valueTransformation(@MayOptionallyUse T value);
+    abstract Mono<S> transformation(@MayOptionallyUse T value);
 
     @BeforeTemplate
     Flux<S> before(Mono<T> mono) {
-      return mono.flatMapMany(v -> valueTransformation(v));
+      return mono.flatMapMany(v -> transformation(v));
     }
 
     @AfterTemplate
     Flux<S> after(Mono<T> mono) {
-      return mono.flatMap(v -> valueTransformation(v)).flux();
+      return mono.flatMap(v -> transformation(v)).flux();
     }
   }
 
   /**
-   * Don't unnecessarily use {@link Mono#flatMap(Function)} followed by {@link Mono#just(Object)}.
-   * Instead, use {@link Mono#map(Function)} in order to avoid an inner subscription.
+   * Prefer {@link Mono#map(Function)} over alternatives that unnecessarily require an inner
+   * subscription.
    */
-  abstract static class MonoFlatMapJust<T, S> {
+  abstract static class MonoMap<T, S> {
     @Placeholder(allowsIdentity = true)
-    abstract S valueTransformation(@MayOptionallyUse T value);
+    abstract S transformation(@MayOptionallyUse T value);
 
     @BeforeTemplate
     Mono<S> before(Mono<T> mono) {
-      return mono.flatMap(x -> Mono.just(valueTransformation(x)));
+      return mono.flatMap(x -> Mono.just(transformation(x)));
     }
 
     @AfterTemplate
     Mono<S> after(Mono<T> mono) {
-      return mono.map(x -> valueTransformation(x));
+      return mono.map(x -> transformation(x));
     }
   }
 
   /**
-   * Don't unnecessarily use {@link Mono#flatMap(Function)} followed by {@link
-   * Mono#justOrEmpty(Object)}. Instead, use {@link Mono#mapNotNull(Function)} in order to avoid an
-   * inner subscription.
+   * Prefer {@link Mono#mapNotNull(Function)} over alternatives that unnecessarily require an inner
+   * subscription.
    */
-  abstract static class MonoFlatMapJustOrEmpty<T, S> {
+  abstract static class MonoMapNotNull<T, S> {
     @Placeholder(allowsIdentity = true)
-    abstract S valueTransformation(@MayOptionallyUse T value);
+    abstract S transformation(@MayOptionallyUse T value);
 
     @BeforeTemplate
     Mono<S> before(Mono<T> mono) {
-      return mono.flatMap(x -> Mono.justOrEmpty(valueTransformation(x)));
+      return mono.flatMap(x -> Mono.justOrEmpty(transformation(x)));
     }
 
     @AfterTemplate
     Mono<S> after(Mono<T> mono) {
-      return mono.mapNotNull(x -> valueTransformation(x));
+      return mono.mapNotNull(x -> transformation(x));
     }
   }
 
