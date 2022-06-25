@@ -3,43 +3,49 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.matchers.Matchers.allOf;
+import static com.google.errorprone.matchers.Matchers.argument;
+import static com.google.errorprone.matchers.Matchers.argumentCount;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
+import static com.google.errorprone.matchers.Matchers.nullLiteral;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
+import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
-import com.google.errorprone.matchers.Matchers;
 import com.sun.source.tree.MethodInvocationTree;
 
-/** A {@link BugChecker} which flags {@code Assert.isEqualTo(null)} for further simplification */
+/** A {@link BugChecker} which flags AssertJ {@code isEqualTo(null)} checks for simplification. */
 @AutoService(BugChecker.class)
 @BugPattern(
-    name = "AssertThatIsNullUsage",
-    summary = "`asserThat(...).isEqualTo(null)` should be `assertThat(...).isNull()`",
+    name = "AssertJIsNull",
+    summary = "Prefer `.isNull()` over `.isEqualTo(null)`",
     linkType = NONE,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
-public final class AssertThatIsNullUsageCheck extends BugChecker
-    implements MethodInvocationTreeMatcher {
+public final class AssertJIsNullCheck extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-
-  private static final Matcher<MethodInvocationTree> ASSERT_IS_EQUAL =
-      Matchers.allOf(
+  private static final Matcher<MethodInvocationTree> ASSERT_IS_EQUAL_TO_NULL =
+      allOf(
           instanceMethod().onDescendantOf("org.assertj.core.api.Assert").named("isEqualTo"),
-          Matchers.argumentCount(1),
-          Matchers.argument(0, Matchers.nullLiteral()));
+          argumentCount(1),
+          argument(0, nullLiteral()));
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!ASSERT_IS_EQUAL.matches(tree, state)) {
+    if (!ASSERT_IS_EQUAL_TO_NULL.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
-    return describeMatch(tree, SuggestedFixes.renameMethodInvocation(tree, "isNull()", state));
+    SuggestedFix.Builder fix =
+        SuggestedFix.builder().merge(SuggestedFixes.renameMethodInvocation(tree, "isNull", state));
+    tree.getArguments().forEach(arg -> fix.merge(SuggestedFix.delete(arg)));
+
+    return describeMatch(tree, fix.build());
   }
 }
