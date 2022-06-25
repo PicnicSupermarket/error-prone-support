@@ -40,7 +40,7 @@ import javax.lang.model.element.Name;
 /** A {@link BugChecker} which flags non-canonical JUnit method declarations. */
 // XXX: Consider introducing a class-level check which enforces that test classes:
 // 1. Are named `*Test` or `Abstract*TestCase`.
-// 2. If not `abstract`, don't have public methods and subclasses.
+// 2. If not `abstract`, are package-private and don't have public methods and subclasses.
 // 3. Only have private fields.
 // XXX: If implemented, the current logic could flag only `private` JUnit methods.
 @AutoService(BugChecker.class)
