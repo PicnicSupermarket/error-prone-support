@@ -494,17 +494,19 @@
                         <checkstyleRules>
                             <!-- We only enable rules that are not enforced by
                             Error Prone or automatically corrected through
-                            application of google-java-format. -->
+                            application of google-java-format (GJF). -->
                             <module name="Checker">
                                 <module name="RegexpMultiline">
+                                    <!-- GJF drops trailing horizontal
+                                    whitespace and blank lines preceding a
+                                    closing curly brace, but it does not remove
+                                    a blank line following an opening curly
+                                    brace. Here we disallow that specific case.
+                                    (The regular expression assumes that the
+                                    code has already been formatted using GJF.) -->
                                     <property name="fileExtensions" value="java" />
-                                    <property name="format" value="\{\s*\r?\n\s*\r?\n" />
+                                    <property name="format" value="\{\r?\n\r?\n" />
                                     <property name="message" value="Avoid blank lines at the start of a block." />
-                                </module>
-                                <module name="RegexpMultiline">
-                                    <property name="fileExtensions" value="java" />
-                                    <property name="format" value="\r?\n\s*\r?\n\s*\}" />
-                                    <property name="message" value="Avoid blank lines at the end of a block." />
                                 </module>
                                 <module name="SuppressWarningsFilter" />
                                 <module name="TreeWalker">
