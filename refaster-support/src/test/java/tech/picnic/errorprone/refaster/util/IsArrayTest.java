@@ -17,7 +17,6 @@ final class IsArrayTest {
     CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "package test.foo;",
             "class A {",
             "  Object negative1() {",
             "    return alwaysNull();",
