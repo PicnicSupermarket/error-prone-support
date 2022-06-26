@@ -721,6 +721,10 @@
                         </sourceDirectories>
                         <testSourceDirectories>
                             <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+                            <!-- Refaster input and output test files represent
+                            valid Java code, exposed as resources on the test
+                            classpath. -->
+                            <testSourceDirectory>${basedir}/src/test/resources</testSourceDirectory>
                         </testSourceDirectories>
                     </configuration>
                     <dependencies>

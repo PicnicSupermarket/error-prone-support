@@ -7,11 +7,11 @@ import org.assertj.core.api.AbstractBooleanAssert;
 
 final class AssertJBooleanTemplatesTest implements RefasterTemplateTestCase {
   AbstractBooleanAssert<?> testAbstractBooleanAssertIsEqualTo() {
-    return assertThat(true).isEqualTo(false);
+    return assertThat(true).isEqualTo(Boolean.FALSE);
   }
 
   AbstractBooleanAssert<?> testAbstractBooleanAssertIsNotEqualTo() {
-    return assertThat(true).isNotEqualTo(false);
+    return assertThat(true).isNotEqualTo(Boolean.FALSE);
   }
 
   ImmutableSet<AbstractBooleanAssert<?>> testAbstractBooleanAssertIsTrue() {
@@ -23,7 +23,7 @@ final class AssertJBooleanTemplatesTest implements RefasterTemplateTestCase {
   }
 
   AbstractBooleanAssert<?> testAssertThatBooleanIsTrue() {
-    return assertThat(true).isTrue();
+    return assertThat(Boolean.TRUE).isTrue();
   }
 
   ImmutableSet<AbstractBooleanAssert<?>> testAbstractBooleanAssertIsFalse() {
@@ -35,6 +35,6 @@ final class AssertJBooleanTemplatesTest implements RefasterTemplateTestCase {
   }
 
   AbstractBooleanAssert<?> testAssertThatBooleanIsFalse() {
-    return assertThat(true).isFalse();
+    return assertThat(Boolean.TRUE).isFalse();
   }
 }

@@ -62,10 +62,10 @@ final class AssortedTemplatesTest implements RefasterTemplateTestCase {
   // XXX: Only the first statement is rewritten. Make smarter.
   ImmutableSet<Boolean> testLogicalImplication() {
     return ImmutableSet.of(
-        toString().isEmpty() || true,
-        !toString().isEmpty() || (toString().isEmpty() && true),
-        3 < 4 || (3 >= 4 && true),
-        3 >= 4 || (3 < 4 && true));
+        toString().isEmpty() || Boolean.TRUE,
+        !toString().isEmpty() || (toString().isEmpty() && Boolean.TRUE),
+        3 < 4 || (3 >= 4 && Boolean.TRUE),
+        3 >= 4 || (3 < 4 && Boolean.TRUE));
   }
 
   Stream<String> testUnboundedSingleElementStream() {
