@@ -5,7 +5,7 @@ import static com.google.common.base.Predicates.containsPattern;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class MissingRefasterAnnotationCheckTest {
+final class MissingRefasterAnnotationCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(MissingRefasterAnnotationCheck.class, getClass())
           .expectErrorMessage(

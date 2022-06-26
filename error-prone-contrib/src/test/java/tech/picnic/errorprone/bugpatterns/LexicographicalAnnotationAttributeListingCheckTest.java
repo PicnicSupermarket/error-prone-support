@@ -6,7 +6,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class LexicographicalAnnotationAttributeListingCheckTest {
+final class LexicographicalAnnotationAttributeListingCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(
           LexicographicalAnnotationAttributeListingCheck.class, getClass());

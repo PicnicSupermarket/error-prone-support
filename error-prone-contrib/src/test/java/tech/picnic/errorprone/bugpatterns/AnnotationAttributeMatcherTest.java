@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-public final class AnnotationAttributeMatcherTest {
+final class AnnotationAttributeMatcherTest {
   @Test
   void withoutListings() {
     AnnotationAttributeMatcher matcher =

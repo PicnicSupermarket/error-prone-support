@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
-public final class ScheduledTransactionTraceCheckTest {
+final class ScheduledTransactionTraceCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(ScheduledTransactionTraceCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =

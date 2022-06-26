@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 // XXX: The tests below show that `String.valueOf((String) null)` may be simplified, but
 // `String.valueOf(null)` may not. That is because the latter matches `String#valueOf(char[])`. We
 // could special-case `null` arguments, but that doesn't seem worth the trouble.
-public final class RedundantStringConversionCheckTest {
+final class RedundantStringConversionCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(RedundantStringConversionCheck.class, getClass());
   private final CompilationTestHelper customizedCompilationTestHelper =

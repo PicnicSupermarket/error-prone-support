@@ -5,7 +5,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class CanonicalAnnotationSyntaxCheckTest {
+final class CanonicalAnnotationSyntaxCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(CanonicalAnnotationSyntaxCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =

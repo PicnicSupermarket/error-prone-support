@@ -5,7 +5,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class MethodReferenceUsageCheckTest {
+final class MethodReferenceUsageCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(MethodReferenceUsageCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =

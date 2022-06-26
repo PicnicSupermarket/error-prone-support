@@ -5,7 +5,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-public final class EmptyMethodCheckTest {
+final class EmptyMethodCheckTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(EmptyMethodCheck.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
