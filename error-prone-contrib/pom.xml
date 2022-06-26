@@ -145,7 +145,8 @@
         </dependency>
         <dependency>
             <groupId>org.immutables</groupId>
-            <artifactId>value</artifactId>
+            <artifactId>value-annotations</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

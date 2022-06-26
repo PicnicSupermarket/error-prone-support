@@ -20,9 +20,6 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
-import org.immutables.value.Value.Immutable;
-import org.immutables.value.Value.Modifiable;
-import org.immutables.value.Value.NaturalOrder;
 
 /**
  * A {@link BugChecker} which flags methods with return type {@link
@@ -43,7 +40,10 @@ public final class MissingImmutableSortedSetDefaultCheck extends BugChecker
     implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> ENCLOSING_IS_MODIFIABLE_OR_IMMUTABLES =
-      enclosingClass(anyOf(hasAnnotation(Immutable.class), hasAnnotation(Modifiable.class)));
+      enclosingClass(
+          anyOf(
+              hasAnnotation("org.immutables.value.Value.Immutable"),
+              hasAnnotation("org.immutables.value.Value.Modifiable")));
   private static final Matcher<MethodTree> RETURNS_IMMUTABLE_SORTED_SET =
       methodReturns(isSameType(ImmutableSortedSet.class));
 
@@ -51,7 +51,7 @@ public final class MissingImmutableSortedSetDefaultCheck extends BugChecker
   public Description matchMethod(MethodTree tree, VisitorState state) {
     if (!RETURNS_IMMUTABLE_SORTED_SET.matches(tree, state)
         || !ENCLOSING_IS_MODIFIABLE_OR_IMMUTABLES.matches(tree, state)
-        || hasAnnotation(NaturalOrder.class).matches(tree, state)) {
+        || hasAnnotation("org.immutables.value.Value.NaturalOrder").matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
