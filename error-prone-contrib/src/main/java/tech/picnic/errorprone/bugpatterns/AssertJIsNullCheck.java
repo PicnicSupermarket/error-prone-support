@@ -21,11 +21,10 @@ import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.MethodInvocationTree;
 
 /**
- * A {@link BugChecker} which flags AssertJ {@code isEqualTo(null)} checks for simplification. <br>
- * This cannot be done using a refaster template, as refaster is unable to match the abstraction
- * layers in AssertJ
+ * A {@link BugChecker} which flags AssertJ {@code isEqualTo(null)} checks for simplification.
  *
- * <p>Example: <code>assertThat("foo").isEqualTo(null)</code> will not be matched by refaster.
+ * <p>This cannot be done by using only Refaster templates, as Refaster is not able to match *all*
+ * {@code AbstractAssert} subtypes correctly.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
