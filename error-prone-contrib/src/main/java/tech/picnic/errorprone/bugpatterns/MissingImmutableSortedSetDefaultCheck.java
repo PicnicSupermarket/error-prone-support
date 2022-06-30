@@ -23,34 +23,37 @@ import com.sun.source.tree.Tree;
 
 /**
  * A {@link BugChecker} which flags methods with return type {@link
- * com.google.common.collect.ImmutableSortedSet} within an {@code @Value.Immutable} or
- * {@code @Value.Modifiable} class that lack either a default implementation or
- * {@code @Value.NaturalOrder}.
+ * com.google.common.collect.ImmutableSortedSet} within a class or interface annotated with
+ * {@code @Value.Immutable} or {@code @Value.Modifiable} and lacks either a default implementation
+ * or {@code @Value.NaturalOrder} annotation.
+ *
+ * <p>Such methods without {@code @Value.NaturalOrder} or default implementation would result in
+ * deserialization problems in case of absent sets.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
     name = "MissingImmutableSortedSetDefault",
     summary =
-        "Methods returning an `ImmutableSortedSet` within an @Value.Immutable or @Value.Modifiable class "
-            + "should provide a default value or specify the comparator.",
+        "Methods returning an `ImmutableSortedSet` within a `@Value.Immutable` or `@Value.Modifiable` class "
+            + "or interface should provide a default value or specify a comparator",
     linkType = NONE,
     severity = ERROR,
     tags = LIKELY_ERROR)
 public final class MissingImmutableSortedSetDefaultCheck extends BugChecker
     implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<Tree> ENCLOSING_IS_MODIFIABLE_OR_IMMUTABLES =
+  private static final Matcher<MethodTree> RETURNS_IMMUTABLE_SORTED_SET =
+      methodReturns(isSameType(ImmutableSortedSet.class));
+  private static final Matcher<Tree> ENCLOSING_IS_IMMUTABLE_OR_MODIFIABLE =
       enclosingClass(
           anyOf(
               hasAnnotation("org.immutables.value.Value.Immutable"),
               hasAnnotation("org.immutables.value.Value.Modifiable")));
-  private static final Matcher<MethodTree> RETURNS_IMMUTABLE_SORTED_SET =
-      methodReturns(isSameType(ImmutableSortedSet.class));
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
     if (!RETURNS_IMMUTABLE_SORTED_SET.matches(tree, state)
-        || !ENCLOSING_IS_MODIFIABLE_OR_IMMUTABLES.matches(tree, state)
+        || !ENCLOSING_IS_IMMUTABLE_OR_MODIFIABLE.matches(tree, state)
         || hasAnnotation("org.immutables.value.Value.NaturalOrder").matches(tree, state)) {
       return Description.NO_MATCH;
     }
@@ -59,14 +62,15 @@ public final class MissingImmutableSortedSetDefaultCheck extends BugChecker
       return Description.NO_MATCH;
     }
 
-    // The ImmutableSortedSet has no empty default -> add the `@Value.NaturalOrder` annotation or
-    // provide a default implementation.
     return buildDescription(tree)
         .setMessage(
-            "Methods returning an `ImmutableSortedSet` within an @Value.Immutable or @Value.Modifiable class "
-                + "should include additional deserialization information for absent sets. "
-                + "Alternatively, specify a default implementation.")
-        .addFix(SuggestedFix.builder().prefixWith(tree, "@Value.NaturalOrder ").build())
+            "Methods returning an `ImmutableSortedSet` within a `@Value.Immutable` or `@Value.Modifiable` class or "
+                + "interface should be annotated with `@Value.NaturalOrder` or specify a default implementation")
+        .addFix(
+            SuggestedFix.builder()
+                .addImport("org.immutables.value.Value")
+                .prefixWith(tree, "@Value.NaturalOrder ")
+                .build())
         .build();
   }
 }
