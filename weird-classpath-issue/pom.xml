@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>tech.picnic.error-prone-support</groupId>
+    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>weird-classpath-issue</artifactId>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <name>Try some stuff</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+            <artifactId>error_prone_annotation</artifactId>
+            <version>v2.10.0-picnic-3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+            <artifactId>error_prone_annotations</artifactId>
+            <version>v2.10.0-picnic-3</version>
+        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>com.google.auto.service</groupId>-->
+        <!--            <artifactId>auto-service-annotations</artifactId>-->
+        <!--            <version>1.0.1</version>-->
+        <!--        </dependency>-->
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <!-- <version>3.9.0</version>-->
+                    <configuration>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>com.google.auto.service</groupId>
+                                <artifactId>auto-service</artifactId>
+                                <version>1.0.1</version>
+                            </path>
+                        </annotationProcessorPaths>
+                        <parameters>true</parameters>
+                        <release>11</release>
+                        <!-- Even though `-release X` implies `-source X` and-->
+                        <!-- `-target X`, we need to configure these properties-->
+                        <!-- explicitily, for otherwise the plugin's default value-->
+                        <!-- of `1.6` is passed on. &ndash;&gt;-->
+                        <source>11</source>
+                        <target>11</target>
+                        <!-- &lt;!&ndash; Erroneously inverted logic... for details, see-->
+                        <!-- https://issues.apache.org/jira/browse/MCOMPILER-209. &ndash;&gt;-->
+                        <useIncrementalCompilation>false</useIncrementalCompilation>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>error-prone</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <annotationProcessorPaths combine.children="append">
+                                <path>
+                                    <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+                                    <artifactId>error_prone_annotations</artifactId>
+                                    <version>v2.10.0-picnic-3</version>
+                                </path>
+                                <!--                                <path>-->
+                                <!--                                    <groupId>com.github.PicnicSupermarket.error-prone</groupId>-->
+                                <!--                                    <artifactId>error_prone_core</artifactId>-->
+                                <!--                                    <version>v2.10.0-picnic-1</version>-->
+                                <!--                                </path>-->
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
