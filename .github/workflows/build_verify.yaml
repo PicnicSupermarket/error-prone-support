@@ -1,0 +1,47 @@
+name: Build and verify Error Prone Support
+
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+
+# We run the build twice: once against the original Error Prone release,
+# using only Error Prone checks available on Maven Central, and once against
+# the Picnic Error Prone fork, additionally enabling all checks defined in
+# this project and any Error Prone checks available only from other artifact
+# repositories.
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        jdk: [ 11, 17 ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.jdk }}
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Verify with Maven
+        run: mvn verify -strict-checksums --errors --show-version --batch-mode --update-snapshots --file pom.xml
+
+      - name: Run full Maven build
+        run: mvn clean install
+
+      - name: Run self-check Error Prone Support using the fork
+        run: mvn clean install -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
+
+      - name: Run Surefire and JaCoCo reporting
+        run: mvn jacoco:prepare-agent surefire:test jacoco:report
+
+# XXX: Enable Codecov once we "go public".
+# XXX: Enable SonarCloud once we "go public".
+# XXX: Enable JaCoCo reporting.
