@@ -17,23 +17,8 @@
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
-            <version>1.0.1</version>
+            <version>1.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
-            <artifactId>error_prone_annotation</artifactId>
-            <version>v2.10.0-picnic-3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
-            <artifactId>error_prone_annotations</artifactId>
-            <version>v2.10.0-picnic-3</version>
-        </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>com.google.auto.service</groupId>-->
-        <!--            <artifactId>auto-service-annotations</artifactId>-->
-        <!--            <version>1.0.1</version>-->
-        <!--        </dependency>-->
     </dependencies>
 
     <build>
@@ -49,7 +34,7 @@
                             <path>
                                 <groupId>com.google.auto.service</groupId>
                                 <artifactId>auto-service</artifactId>
-                                <version>1.0.1</version>
+                                <version>1.0</version>
                             </path>
                         </annotationProcessorPaths>
                         <parameters>true</parameters>
@@ -71,7 +56,7 @@
 
     <profiles>
         <profile>
-            <id>error-prone</id>
+            <id>guava</id>
             <build>
                 <plugins>
                     <plugin>
@@ -80,15 +65,20 @@
                         <configuration>
                             <annotationProcessorPaths combine.children="append">
                                 <path>
-                                    <groupId>com.github.PicnicSupermarket.error-prone</groupId>
-                                    <artifactId>error_prone_annotations</artifactId>
-                                    <version>v2.10.0-picnic-3</version>
+                                    <groupId>com.google.guava</groupId>
+                                    <artifactId>guava</artifactId>
+                                    <version>31.0.1-jre</version>
                                 </path>
-                                <!--                                <path>-->
-                                <!--                                    <groupId>com.github.PicnicSupermarket.error-prone</groupId>-->
-                                <!--                                    <artifactId>error_prone_core</artifactId>-->
-                                <!--                                    <version>v2.10.0-picnic-1</version>-->
-                                <!--                                </path>-->
+                                <!-- <path>-->
+                                <!--     <groupId>com.github.PicnicSupermarket.error-prone</groupId>-->
+                                <!--     <artifactId>error_prone_annotations</artifactId>-->
+                                <!--     <version>v2.10.0-picnic-3</version>-->
+                                <!-- </path>-->
+                                <!-- <path>-->
+                                <!--     <groupId>com.github.PicnicSupermarket.error-prone</groupId>-->
+                                <!--     <artifactId>error_prone_core</artifactId>-->
+                                <!--     <version>v2.10.0-picnic-1</version>-->
+                                <!-- </path>-->
                             </annotationProcessorPaths>
                         </configuration>
                     </plugin>
