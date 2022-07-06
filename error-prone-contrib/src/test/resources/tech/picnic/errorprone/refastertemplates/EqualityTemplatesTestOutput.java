@@ -27,13 +27,13 @@ final class EqualityTemplatesTest implements RefasterTemplateTestCase {
   }
 
   boolean testDoubleNegation() {
-    return true;
+    return Boolean.TRUE;
   }
 
   ImmutableSet<Boolean> testNegation() {
     return ImmutableSet.of(
-        true != false,
-        true != false,
+        Boolean.TRUE != Boolean.FALSE,
+        Boolean.TRUE != Boolean.FALSE,
         (byte) 3 != (byte) 4,
         (short) 3 != (short) 4,
         3 != 4,
@@ -45,8 +45,8 @@ final class EqualityTemplatesTest implements RefasterTemplateTestCase {
 
   ImmutableSet<Boolean> testIndirectDoubleNegation() {
     return ImmutableSet.of(
-        true == false,
-        true == false,
+        Boolean.TRUE == Boolean.FALSE,
+        Boolean.TRUE == Boolean.FALSE,
         (byte) 3 == (byte) 4,
         (short) 3 == (short) 4,
         3 == 4,
