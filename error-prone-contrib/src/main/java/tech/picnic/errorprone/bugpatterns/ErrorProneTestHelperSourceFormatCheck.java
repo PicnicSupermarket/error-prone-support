@@ -84,7 +84,7 @@ public final class ErrorProneTestHelperSourceFormatCheck extends BugChecker
     int startPos = ASTHelpers.getStartPosition(sourceLines.get(0));
     int endPos = state.getEndPosition(sourceLines.get(sourceLines.size() - 1));
 
-    /* Attempt to format the source code only if it fully consists of constant expression. */
+    /* Attempt to format the source code only if it fully consists of constant expressions. */
     return getConstantSourceCode(sourceLines)
         .map(source -> flagFormattingIssues(startPos, endPos, source, isOutputSource, state))
         .orElse(Description.NO_MATCH);
