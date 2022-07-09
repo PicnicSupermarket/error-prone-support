@@ -167,9 +167,9 @@ final class OptionalTemplates {
   }
 
   /**
-   * Prefer {@link Optional#map} over a {@link Optional#flatMap} that wraps a method invocation
-   * capable of returning {@code null} in an {@link Optional}. The former already transforms {@code
-   * null} to {@link Optional#empty()}.
+   * Prefer {@link Optional#map} over a {@link Optional#flatMap} which wraps the result of a
+   * transformation in an {@link Optional}; the former operation transforms {@code null} to {@link
+   * Optional#empty()}.
    */
   abstract static class MapToNullable<T, S> {
     @Placeholder
