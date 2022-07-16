@@ -1,4 +1,4 @@
-name: Java CI
+name: Error Prone Support build & verify
 
 on: [ push ]
 
@@ -8,20 +8,22 @@ jobs:
     strategy:
       matrix:
         jdk: [ 11, 17 ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.jdk }}
+          distribution: 'temurin'
+          cache: maven
+      - name: Build & verify with Maven
+        run: mvn verify -strict-checksums --errors --show-version --batch-mode --update-snapshots --file pom.xml
 
-  steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: ${{ matrix.jdk }}
-        distribution: 'temurin'
-        cache: maven
-    - name: Build & verify with Maven
-      run: mvn verify -strict-checksums --errors --show-version --batch-mode --update-snapshots --file pom.xml
+      - name: Full Maven build
+        run: mvn clean install
 
-    - name: Full Maven build
-      run: mvn clean install
+      - name: Self-check
+        run: mvn clean install -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
 
-    - name: Self-check
-      run: mvn clean install -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
+#      - name: Run Surefire and Jacoco?
+#        run: mvn jacoco:prepare-agent surefire:test jacoco:report
