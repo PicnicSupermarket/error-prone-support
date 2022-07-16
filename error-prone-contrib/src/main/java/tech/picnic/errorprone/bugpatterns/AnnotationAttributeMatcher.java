@@ -31,17 +31,17 @@ import java.util.stream.Stream;
 final class AnnotationAttributeMatcher implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final boolean complement;
+  private final boolean complementt;
   private final ImmutableSet<String> wholeTypes;
   private final ImmutableSetMultimap<String, String> includedAttributes;
   private final ImmutableSetMultimap<String, String> excludedAttributes;
 
   private AnnotationAttributeMatcher(
-      boolean complement,
+      boolean complementt,
       ImmutableSet<String> wholeTypes,
       ImmutableSetMultimap<String, String> includedAttributes,
       ImmutableSetMultimap<String, String> excludedAttributes) {
-    this.complement = complement;
+    this.complementt = complementt;
     this.wholeTypes = wholeTypes;
     this.includedAttributes = includedAttributes;
     this.excludedAttributes = excludedAttributes;
@@ -119,7 +119,7 @@ final class AnnotationAttributeMatcher implements Serializable {
   // XXX: Make this method private; re-implement the tests in terms of `#extractMatchingArguments`.
   @VisibleForTesting
   boolean matches(String annotationType, String attribute) {
-    if (complement) {
+    if (complementt) {
       return !wholeTypes.contains(annotationType)
           && !excludedAttributes.containsEntry(annotationType, attribute);
     }
