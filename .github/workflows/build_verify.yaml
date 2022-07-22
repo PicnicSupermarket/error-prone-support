@@ -28,11 +28,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Verify with Maven
+      - name: Run Maven verify
         run: mvn verify -strict-checksums --errors --show-version --batch-mode --update-snapshots --file pom.xml
-
-      - name: Run Maven clean verify
-        run: mvn clean verify
 
       - name: Run self-check on Error Prone Support using the fork
         run: mvn clean verify -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
