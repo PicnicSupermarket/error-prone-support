@@ -75,11 +75,14 @@
         arguments. In particular, JaCoCo relies on this for the configuration
         of its Java agent. -->
         <argLine>
-            <!-- Error Prone makes extensive use of unsupported
+            <!-- The JVM arguments specified in `.mvn/jvm.config` also apply to
+            test JVMs, as those are also non-interactive processess running
+            Error Prone, and thus similarly make extensive use of unsupported
             `javac`-internal APIs, in some cases even reflectively inspecting
-            them. These APIs are accessed at compile time and when running
-            tests. The former case is covered by flags in `.mvn/jvm.config`;
-            the latter is covered here. -->
+            them. -->
+            -XX:ReservedCodeCacheSize=512m
+            -XX:SoftRefLRUPolicyMSPerMB=10
+            -XX:+UseParallelGC
             --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED
@@ -95,7 +98,7 @@
             -XX:TieredStopAtLevel=1
             <!-- We cap memory usage. This is primarily relevant for build agents,
             but locally this should also be more than enough. -->
-            -Xmx512m
+            -Xmx1024m
             <!-- This argument cannot be set through Surefire's
             'systemPropertyVariables' configuration setting. Setting the file
             encoding is necessary because forked unit test invocations
