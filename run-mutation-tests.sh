@@ -2,6 +2,11 @@
 
 set -e -u -o pipefail
 
+if [ "${#}" -gt 1 ]; then
+  echo "Usage: ./$(basename "${0}") [TargetTests]"
+  exit 1
+fi
+
 targetTests=${1:-*}
 
 mvn clean test pitest:mutationCoverage \
