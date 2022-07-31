@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Executes Pitest to determine the code base' mutation test coverage. The set
+# of tests executed can optionally be restricted by name. The results are found
+# in each Maven module's `target/pit-reports` directory.
+
 set -e -u -o pipefail
 
 if [ "${#}" -gt 1 ]; then
