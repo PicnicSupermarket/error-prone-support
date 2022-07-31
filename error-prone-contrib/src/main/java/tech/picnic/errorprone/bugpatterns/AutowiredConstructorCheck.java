@@ -8,6 +8,7 @@ import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.isType;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
@@ -43,7 +44,7 @@ public final class AutowiredConstructorCheck extends BugChecker implements Class
       return Description.NO_MATCH;
     }
 
-    List<AnnotationTree> annotations =
+    ImmutableList<AnnotationTree> annotations =
         AUTOWIRED_ANNOTATION
             .multiMatchResult(Iterables.getOnlyElement(constructors), state)
             .matchingNodes();

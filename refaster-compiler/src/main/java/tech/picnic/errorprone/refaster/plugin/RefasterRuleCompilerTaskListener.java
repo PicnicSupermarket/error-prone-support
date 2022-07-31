@@ -29,6 +29,7 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.StandardLocation;
@@ -91,6 +92,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
       ClassTree tree) {
     ListMultimap<ClassTree, CodeTransformer> rules = ArrayListMultimap.create();
     new TreeScanner<Void, Void>() {
+      @Nullable
       @Override
       public Void visitClass(ClassTree node, Void v) {
         rules.putAll(node, RefasterRuleBuilderScanner.extractRules(node, context));

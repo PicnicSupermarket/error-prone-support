@@ -134,9 +134,9 @@
         <version.auto-service>1.0.1</version.auto-service>
         <version.auto-value>1.9</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
-        <version.error-prone-fork>v${version.error-prone-orig}-picnic-3</version.error-prone-fork>
-        <version.error-prone-orig>2.10.0</version.error-prone-orig>
-        <version.error-prone-slf4j>0.1.4</version.error-prone-slf4j>
+        <version.error-prone-fork>v${version.error-prone-orig}-picnic-2</version.error-prone-fork>
+        <version.error-prone-orig>2.14.0</version.error-prone-orig>
+        <version.error-prone-slf4j>0.1.12</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
@@ -347,6 +347,11 @@
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
                 <version>3.23.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-core</artifactId>
+                <version>2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
@@ -1264,7 +1269,7 @@
                 `BugChecker` test code and the Refaster test files) does not
                 exhibit anti-patterns other than those associated with the
                 check/template under test. Ideally all test cases are realistic. -->
-                <error-prone.self-check-args>-Xep:MethodReferenceUsage:OFF</error-prone.self-check-args>
+                <error-prone.self-check-args>-XepAllSuggestionsAsWarnings -Xep:MethodReferenceUsage:OFF</error-prone.self-check-args>
             </properties>
             <build>
                 <plugins>
@@ -1492,18 +1497,28 @@
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF
+                                    <!-- XXX: Enable this check. -->
+                                    -Xep:BugPatternNaming:OFF
                                     <!-- We don't target JDK 7. -->
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->
                                     -Xep:Java8ApiChecker:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
+                                    <!-- We generally discourage `var` use. -->
+                                    -Xep:Varifier:OFF
                                     <!-- XXX: This check flags false positives.
                                     See https://github.com/google/error-prone/issues/2679. -->
                                     -Xep:VoidMissingNullable:OFF
+                                    -XepOpt:CheckReturnValue:CheckAllConstructors=true
+                                    <!-- XXX: Enable once there are fewer
+                                    false-positives.
+                                    -XepOpt:CheckReturnValue:CheckAllMethods=true -->
+                                    -XepOpt:InlineMe:SkipInliningsWithComments=false
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
+                                    -XepOpt:Nullness:Conservative=false
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}

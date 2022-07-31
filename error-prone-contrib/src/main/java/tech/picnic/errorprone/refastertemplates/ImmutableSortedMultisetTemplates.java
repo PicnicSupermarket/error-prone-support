@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSorte
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 
-import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
@@ -91,14 +90,14 @@ final class ImmutableSortedMultisetTemplates {
   // `reverseOrder`.) Worth the hassle?
   static final class IterableToImmutableSortedMultiset<T extends Comparable<? super T>> {
     @BeforeTemplate
-    ImmutableMultiset<T> before(T[] iterable) {
+    ImmutableSortedMultiset<T> before(T[] iterable) {
       return Refaster.anyOf(
           ImmutableSortedMultiset.<T>naturalOrder().add(iterable).build(),
           Arrays.stream(iterable).collect(toImmutableSortedMultiset(naturalOrder())));
     }
 
     @BeforeTemplate
-    ImmutableMultiset<T> before(Iterator<T> iterable) {
+    ImmutableSortedMultiset<T> before(Iterator<T> iterable) {
       return Refaster.anyOf(
           ImmutableSortedMultiset.copyOf(naturalOrder(), iterable),
           ImmutableSortedMultiset.<T>naturalOrder().addAll(iterable).build(),
@@ -106,7 +105,7 @@ final class ImmutableSortedMultisetTemplates {
     }
 
     @BeforeTemplate
-    ImmutableMultiset<T> before(Iterable<T> iterable) {
+    ImmutableSortedMultiset<T> before(Iterable<T> iterable) {
       return Refaster.anyOf(
           ImmutableSortedMultiset.copyOf(naturalOrder(), iterable),
           ImmutableSortedMultiset.<T>naturalOrder().addAll(iterable).build(),
