@@ -1,5 +1,4 @@
 name: Build and verify Error Prone Support
-
 on:
   pull_request:
     branches:
@@ -7,12 +6,6 @@ on:
   push:
     branches:
       - 'master'
-
-# We run the build twice: once against the original Error Prone release,
-# using only Error Prone checks available on Maven Central, and once against
-# the Picnic Error Prone fork, additionally enabling all checks defined in
-# this project and any Error Prone checks available only from other artifact
-# repositories.
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,23 +13,25 @@ jobs:
       matrix:
         jdk: [ 11, 17 ]
     steps:
-      - uses: actions/checkout@v3
+        # We run the build twice for each supported JDK: once against the
+        # original Error Prone release, using only Error Prone checks available
+        # on Maven Central, and once against the Picnic Error Prone fork,
+        # additionally enabling all checks defined in this project and any
+        # Error Prone checks available only from other artifact repositories.
+      - name: Check out code
+        uses: actions/checkout@v3
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.jdk }}
           distribution: 'temurin'
           cache: maven
-
-      - name: Run Maven verify
-        run: mvn verify -strict-checksums --errors --show-version --batch-mode --update-snapshots --file pom.xml
-
-      - name: Run self-check on Error Prone Support using the fork
+      - name: Display build environment details
+        run: mvn --version
+      - name: Build project against vanilla Error Prone
+        run: mvn install --show-version -U
+      - name: Build project with self-check against Error Prone fork
         run: mvn clean verify -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
 
-      - name: Run Surefire and JaCoCo reporting
-        run: mvn jacoco:prepare-agent surefire:test jacoco:report
-
-# XXX: Enable Codecov once we "go public".
+# XXX: Enable Codecov (`jacoco:prepare-agent surefire:test jacoco:report`) once we "go public".
 # XXX: Enable SonarCloud once we "go public".
-# XXX: Enable JaCoCo reporting.
