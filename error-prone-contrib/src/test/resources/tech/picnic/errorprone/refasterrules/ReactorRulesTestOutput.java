@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -116,14 +117,17 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Flux<String> testMonoFlatMapToFlux() {
-    return Mono.just("foo").flatMap(s -> Mono.just(s + s)).flux();
+    return Mono.just("foo").flatMap(s -> Mono.fromSupplier(() -> s + s)).flux();
   }
 
-  ImmutableSet<Mono<String>> testMonoMap() {
-    return ImmutableSet.of(Mono.just("foo").map(s -> s), Mono.just("bar").map(s -> s.substring(1)));
+  ImmutableSet<Publisher<String>> testMonoMap() {
+    return ImmutableSet.of(
+        Mono.just("foo").map(s -> s),
+        Mono.just("bar").map(s -> s.substring(1)),
+        Mono.just("baz").map(s -> s));
   }
 
-  ImmutableSet<Mono<String>> testMonoMapNotNull() {
+  ImmutableSet<Publisher<String>> testMonoMapNotNull() {
     return ImmutableSet.of(
         Mono.just("foo").mapNotNull(s -> s), Mono.just("bar").mapNotNull(s -> s.substring(1)));
   }
