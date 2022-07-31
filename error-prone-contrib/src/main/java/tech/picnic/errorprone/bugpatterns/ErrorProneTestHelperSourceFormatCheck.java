@@ -32,6 +32,9 @@ import java.util.Optional;
 /**
  * A {@link BugChecker} which flags and corrects improperly formatted Error Prone test code.
  *
+ * <p>All test code should be formatted in accordance with Google Java Format's {@link Formatter}
+ * output, and imports should be ordered according to the {@link Style#GOOGLE Google} style.
+ *
  * <p>This checker inspects inline code passed to {@code
  * com.google.errorprone.CompilationTestHelper} and {@code
  * com.google.errorprone.BugCheckerRefactoringTestHelper}. It requires that this code is properly
