@@ -29,9 +29,9 @@ jobs:
       - name: Display build environment details
         run: mvn --version
       - name: Build project against vanilla Error Prone
-        run: mvn install --show-version -U
+        run: mvn -T1C install --show-version -U
       - name: Build project with self-check against Error Prone fork
-        run: mvn clean verify -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
+        run: mvn -T1C clean verify -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
 
 # XXX: Enable Codecov (`jacoco:prepare-agent surefire:test jacoco:report`) once we "go public".
 # XXX: Enable SonarCloud once we "go public".
