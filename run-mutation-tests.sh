@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -e -u -o pipefail
 
 targetTests=${1:-*}
 
