@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static java.util.function.Predicate.not;
+
 import com.google.common.collect.ImmutableSet;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -64,9 +66,10 @@ final class RefasterTemplatesTest {
   // XXX: Create a JUnit extension to automatically discover the template collections in a given
   // context to make sure the list is exhaustive.
   private static Stream<Arguments> validateTemplateCollectionTestCases() {
-    // XXX: Drop the filter once we have added tests for AssertJ!
+    // XXX: Drop the filter once we have added tests for AssertJ! We can then also replace this
+    // method with `@ValueSource(classes = {...})`.
     return TEMPLATE_COLLECTIONS.stream()
-        .filter(tc -> tc != AssertJTemplates.class)
+        .filter(not(AssertJTemplates.class::equals))
         .map(Arguments::arguments);
   }
 

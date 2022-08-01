@@ -48,9 +48,9 @@ import tech.picnic.errorprone.refaster.runner.CodeTransformers;
 import tech.picnic.errorprone.refaster.runner.RefasterCheck;
 
 /**
- * A {@link BugChecker} that applies a Refaster template collection by delegating to {@link
- * RefasterCheck} and subsequently validates that each template modifies exactly one distinct
- * method, as indicated by each method's name.
+ * A {@link BugChecker} that applies a Refaster template collection to an associated test input file
+ * by delegating to {@link RefasterCheck}, and subsequently validates that each template modifies
+ * exactly one distinct method, as indicated by each method's name.
  */
 @BugPattern(
     name = "RefasterTemplateCollectionValidator",
@@ -118,7 +118,7 @@ public final class RefasterTemplateCollectionValidator extends BugChecker
     String className = clazz.getSimpleName();
 
     BugCheckerRefactoringTestHelper.newInstance(RefasterTemplateCollectionValidator.class, clazz)
-        .setArgs(ImmutableList.of("-XepOpt:" + TEMPLATE_COLLECTION_FLAG + "=" + className))
+        .setArgs(ImmutableList.of("-XepOpt:" + TEMPLATE_COLLECTION_FLAG + '=' + className))
         .addInput(className + "TestInput.java")
         .addOutput(className + "TestOutput.java")
         .doTest(TEXT_MATCH);
@@ -151,7 +151,7 @@ public final class RefasterTemplateCollectionValidator extends BugChecker
           Iterables.getOnlyElement(description.fixes).getReplacements(endPositions);
       for (Replacement replacement : replacements) {
         templateMatches.put(
-            replacement.range(), getSubstringAfterLastChar('.', description.checkName));
+            replacement.range(), getSubstringAfterFinalDelimiter('.', description.checkName));
       }
     }
 
@@ -172,7 +172,7 @@ public final class RefasterTemplateCollectionValidator extends BugChecker
           tree,
           String.format(
               "Did not encounter a test in `%s` for the following template(s)",
-              getSubstringAfterLastChar('/', sourceFile)),
+              getSubstringAfterFinalDelimiter('/', sourceFile)),
           templatesWithoutMatch,
           state);
     }
@@ -194,11 +194,11 @@ public final class RefasterTemplateCollectionValidator extends BugChecker
     SuggestedFix fixWithComment =
         tree instanceof MethodTree
             ? SuggestedFix.prefixWith(tree, comment)
-            : SuggestedFix.postfixWith(tree, "\n" + comment);
+            : SuggestedFix.postfixWith(tree, '\n' + comment);
     state.reportMatch(describeMatch(tree, fixWithComment));
   }
 
-  private static String getSubstringAfterLastChar(char delimiter, String value) {
+  private static String getSubstringAfterFinalDelimiter(char delimiter, String value) {
     int index = value.lastIndexOf(delimiter);
     checkState(index >= 0, "String '%s' does not contain character '%s'", value, delimiter);
     return value.substring(index + 1);

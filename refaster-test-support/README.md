@@ -5,7 +5,7 @@ This module provides utilities to validate Refaster template collections.
 ## What does this module do?
 
 These utilities allow validating the rewrites (or their absence) performed by
-Refaster templates. Each collection of Refaster templates defined in the same
+Refaster templates. Each collection of Refaster templates defined in a single
 top-level class is applied to an input file, and the resulting rewrites should
 match the associated output file.
 
@@ -17,12 +17,12 @@ irregularity will be reported, and the associated template collection test will
 fail. This way developers receive guidance on how to write Refaster template
 tests and assurance that every template is properly tested.
 
-## How to test a collection of Refaster templates?
+## How to test a collection of Refaster templates
 
-In summary, to test Refaster templates using the
-`RefasterTemplateCollectionValidator`, one should create an input and output
-file. The Refaster templates from the collection are applied to the input file
-and should exactly match the contents of the provided output file.
+In a nutshell, to test a Refaster template collection class using
+`RefasterTemplateCollectionValidator`, one should create suitably named input
+and output files. The collection's Refaster templates are applied to the input
+file and must exactly match the contents of the provided output file.
 
 To test Refaster templates, one can create a (parameterized) test for every
 class containing the Refaster templates to invoke the
@@ -54,30 +54,29 @@ To adopt this setup, the following requirements have to be met:
 
 As a result from these tests, unexpected output will be shown in the console.
 
-An example of a folder structure for such a setup is as follows:
-
+An example directory structure for such a setup is as follows:
 ```
-main/
-  java/
-    tech.picnic.errorprone.refastertemplates
-    └── ExampleTemplates.java  -- Contains multiple Refaster templates.
-        └── Example1Template
-        └── Example2Template
-
-test/
-  java/
-    └── tech.picnic.errorprone.refastertemplates
-        └── RefasterCollectionTest.java
-               -- Here the test invokes
-               -- `RefasterTemplateCollectionValidator#validate`.
-  resources/
-    └── tech.picnic.errorprone.refastertemplates
-        └── ExampleTemplatesTestInput.java
-               -- Contains a class named `ExampleTemplatesTest` and
-               -- two methods named `testExample1Template` and
-               -- `testExample2Template`.
-        └── ExampleTemplatesTestOutput.java
-               -- Contains a class named `ExampleTemplatesTest` and
-               -- two methods named `testExample1Template` and
-               -- `testExample2Template`.
+src/
+  main/
+    java/
+      tech.picnic.errorprone.refastertemplates
+      └── ExampleTemplates.java  -- Contains multiple Refaster templates.
+          └── Example1Template
+          └── Example2Template
+  test/
+    java/
+      tech.picnic.errorprone.refastertemplates
+      └── RefasterCollectionTest.java
+             -- This test class invokes
+             -- `RefasterTemplateCollectionValidator#validate`.
+    resources/
+      tech.picnic.errorprone.refastertemplates
+      └── ExampleTemplatesTestInput.java
+             -- Contains a class named `ExampleTemplatesTest` and
+             -- two methods named `testExample1Template` and
+             -- `testExample2Template`.
+      └── ExampleTemplatesTestOutput.java
+             -- Contains a class named `ExampleTemplatesTest` and
+             -- two methods named `testExample1Template` and
+             -- `testExample2Template`.
 ```

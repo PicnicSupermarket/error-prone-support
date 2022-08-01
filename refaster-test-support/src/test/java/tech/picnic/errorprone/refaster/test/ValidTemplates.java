@@ -11,10 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 
-/**
- * Refaster template collection with arbitrary valid examples to validate that having no violations
- * works as expected.
- */
+/** Refaster template collection to validate that having no violations works as expected. */
 final class ValidTemplates {
   private ValidTemplates() {}
 

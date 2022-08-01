@@ -14,7 +14,10 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-/** Scans the classpath for `.refaster` files and loads them as {@link CodeTransformer}s. */
+/**
+ * Scans the classpath for {@value #REFASTER_TEMPLATE_SUFFIX} files and loads them as {@link
+ * CodeTransformer}s.
+ */
 public final class CodeTransformers {
   private static final String REFASTER_TEMPLATE_SUFFIX = ".refaster";
   private static final Supplier<ImmutableListMultimap<String, CodeTransformer>>
@@ -88,7 +91,7 @@ public final class CodeTransformers {
       /* This resource does not appear to be compatible with the current classpath. */
       // XXX: Should we log this?
       return Optional.empty();
-    } catch (IOException | ClassNotFoundException e) {
+    } catch (ClassNotFoundException | IOException e) {
       throw new IllegalStateException("Can't load `CodeTransformer` from " + resource, e);
     }
   }

@@ -1,4 +1,4 @@
-/** Classes used to find Refaster templates on the classpath and to apply them. */
+/** Classes used to locate and apply compiled Refaster templates on. */
 @com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 package tech.picnic.errorprone.refaster.runner;
