@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableRangeMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
@@ -42,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import tech.picnic.errorprone.refaster.runner.CodeTransformers;
 import tech.picnic.errorprone.refaster.runner.RefasterCheck;
 
@@ -61,7 +63,7 @@ public final class RefasterTemplateCollectionValidator extends BugChecker
       "RefasterTemplateCollectionValidator:TemplateCollection";
   private static final String TEST_METHOD_NAME_PREFIX = "test";
 
-  private final ImmutableSet<String> templatesUnderTest;
+  private final ImmutableSortedSet<String> templatesUnderTest;
   private final RefasterCheck delegate;
 
   /**
@@ -93,7 +95,8 @@ public final class RefasterTemplateCollectionValidator extends BugChecker
                 Pattern.quote(templateCollectionUnderTest) + ".*")));
   }
 
-  private static ImmutableSet<String> getTemplatesUnderTest(String templateCollectionUnderTest) {
+  private static ImmutableSortedSet<String> getTemplatesUnderTest(
+      String templateCollectionUnderTest) {
     return CodeTransformers.getAllCodeTransformers().keySet().stream()
         .filter(k -> k.startsWith(templateCollectionUnderTest))
         .map(k -> k.replace(templateCollectionUnderTest + '$', ""))
@@ -208,6 +211,7 @@ public final class RefasterTemplateCollectionValidator extends BugChecker
       this.indexedMatches = indexedMatches;
     }
 
+    @Nullable
     @Override
     public Void visitMethod(MethodTree tree, VisitorState state) {
       if (!ASTHelpers.isGeneratedConstructor(tree)) {

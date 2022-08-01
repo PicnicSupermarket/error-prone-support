@@ -70,8 +70,8 @@ final class RefasterTemplatesTest {
         .map(Arguments::arguments);
   }
 
-  @ParameterizedTest
   @MethodSource("validateTemplateCollectionTestCases")
+  @ParameterizedTest
   void validateTemplateCollection(Class<?> clazz) {
     RefasterTemplateCollectionValidator.validate(clazz);
   }
