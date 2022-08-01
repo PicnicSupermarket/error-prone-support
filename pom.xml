@@ -758,17 +758,15 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.10.1</version>
                     <configuration>
-                        <!-- XXX: MCOMPILER-XXX: The annotation processor's
-                        dependency resolution results in a highly unintuitive
-                        classpath. We can work around this by listing all
-                        dependencies here, if possible, to be able to control
-                        the resolution order. -->
+                        <!-- XXX: MCOMPILER-503: The plugin contructs a highly
+                        unintuitive annotation processor classpath, in which
+                        some indirect dependencies take precedence over
+                        explicitly defined dependencies. This can largely be
+                        mitigated through careful ordering of the dependencies,
+                        but this prevents (where relevant) declaring these
+                        dependencies as part of their corresponding Maven
+                        profile. -->
                         <annotationProcessorPaths>
-                            <path>
-                                <groupId>${groupId.error-prone}</groupId>
-                                <artifactId>error_prone_annotations</artifactId>
-                                <version>${version.error-prone}</version>
-                            </path>
                             <path>
                                 <groupId>${groupId.error-prone}</groupId>
                                 <artifactId>error_prone_core</artifactId>
@@ -778,14 +776,6 @@
                                 <groupId>com.google.auto.service</groupId>
                                 <artifactId>auto-service</artifactId>
                                 <version>${version.auto-service}</version>
-                            </path>
-                            <!-- This is a dependency of some Error Prone
-                            plugins, but for licensing reasons it is not
-                            packaged with the artifact. -->
-                            <path>
-                                <groupId>com.google.code.findbugs</groupId>
-                                <artifactId>jFormatString</artifactId>
-                                <version>${version.findbugs-format-string}</version>
                             </path>
                             <path>
                                 <groupId>com.google.guava</groupId>
