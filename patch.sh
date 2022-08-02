@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Compiles the code base using Error Prone and applies its suggestions. The set
-# of checks applied can optionally be restricted by name.
+# Compiles the code using Error Prone and applies its suggestions. The set of
+# checks applied can optionally be restricted by name.
 #
 # As this script may modify the project's code, it is important to execute it
 # in a clean Git working directory.
