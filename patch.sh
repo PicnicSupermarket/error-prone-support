@@ -3,7 +3,7 @@
 # Compiles the code base using Error Prone and applies its suggestions. The set
 # of checks applied can optionally be restricted by name.
 #
-# As this script may modifiy the project's code, it is important to execute it
+# As this script may modify the project's code, it is important to execute it
 # in a clean Git working directory.
 
 set -e -u -o pipefail
