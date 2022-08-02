@@ -8,7 +8,7 @@ final class ExplicitEnumOrderingTest {
       CompilationTestHelper.newInstance(ExplicitEnumOrdering.class, getClass());
 
   @Test
-  void Identification() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",

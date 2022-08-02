@@ -192,7 +192,7 @@ final class ImmutableMapTemplates {
 
     // XXX: Instead of `Map.Entry::getKey` we could also match `e -> e.getKey()`. But for some
     // reason Refaster doesn't handle that case. This doesn't matter if we roll out use of
-    // `MethodReferenceUsageC`. Same observation applies to a lot of other Refaster checks.
+    // `MethodReferenceUsage`. Same observation applies to a lot of other Refaster checks.
     @BeforeTemplate
     @SuppressWarnings("NullAway")
     ImmutableMap<K, V2> before(Map<K, V1> map) {
