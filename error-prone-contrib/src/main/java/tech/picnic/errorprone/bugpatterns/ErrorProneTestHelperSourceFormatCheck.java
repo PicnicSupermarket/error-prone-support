@@ -136,11 +136,11 @@ public final class ErrorProneTestHelperSourceFormatCheck extends BugChecker
   private static String formatSourceCode(String source, boolean retainUnusedImports)
       throws FormatterException {
     String withReorderedImports = ImportOrderer.reorderImports(source, Style.GOOGLE);
-    String withRemovedImports =
+    String withOptionallyRemovedImports =
         retainUnusedImports
             ? withReorderedImports
             : RemoveUnusedImports.removeUnusedImports(withReorderedImports);
-    return FORMATTER.formatSource(withRemovedImports);
+    return FORMATTER.formatSource(withOptionallyRemovedImports);
   }
 
   private static Optional<String> getConstantSourceCode(
