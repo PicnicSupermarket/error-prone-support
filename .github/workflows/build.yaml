@@ -6,10 +6,10 @@ on:
       - 'master'
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        jdk: [ 11, 17 ]
+        jdk: [ 11.0.16, 17.0.4 ]
     steps:
         # We run the build twice for each supported JDK: once against the
         # original Error Prone release, using only Error Prone checks available
@@ -17,9 +17,9 @@ jobs:
         # additionally enabling all checks defined in this project and any
         # Error Prone checks available only from other artifact repositories.
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.0.2
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v3.4.1
         with:
           java-version: ${{ matrix.jdk }}
           distribution: temurin
@@ -27,9 +27,11 @@ jobs:
       - name: Display build environment details
         run: mvn --version
       - name: Build project against vanilla Error Prone
-        run: mvn -T1C install -U
+        run: mvn -T1C install
       - name: Build project with self-check against Error Prone fork
         run: mvn -T1C clean verify -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
+      - name: Remove project snapshots
+        run: mvn build-helper:remove-project-artifact
 
-# XXX: Enable Codecov (`jacoco:prepare-agent surefire:test jacoco:report`) once we "go public".
+# XXX: Enable Codecov once we "go public".
 # XXX: Enable SonarCloud once we "go public".
