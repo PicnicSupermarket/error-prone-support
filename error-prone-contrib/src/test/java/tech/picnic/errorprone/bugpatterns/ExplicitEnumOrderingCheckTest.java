@@ -12,14 +12,14 @@ final class ExplicitEnumOrderingCheckTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
-            "import static java.lang.annotation.RetentionPolicy.SOURCE;",
             "import static java.lang.annotation.RetentionPolicy.CLASS;",
             "import static java.lang.annotation.RetentionPolicy.RUNTIME;",
+            "import static java.lang.annotation.RetentionPolicy.SOURCE;",
             "import static java.time.chrono.IsoEra.BCE;",
             "import static java.time.chrono.IsoEra.CE;",
             "",
-            "import com.google.common.collect.Ordering;",
             "import com.google.common.collect.ImmutableList;",
+            "import com.google.common.collect.Ordering;",
             "import java.lang.annotation.RetentionPolicy;",
             "import java.time.chrono.IsoEra;",
             "",

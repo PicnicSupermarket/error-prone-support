@@ -237,6 +237,11 @@
                 <artifactId>javac</artifactId>
                 <version>9+181-r4173-1</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.googlejavaformat</groupId>
+                <artifactId>google-java-format</artifactId>
+                <version>1.15.0</version>
+            </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>

@@ -52,7 +52,7 @@ public final class LexicographicalAnnotationListingCheck extends BugChecker
 
     Optional<Fix> fix = tryFixOrdering(originalOrdering, sortedAnnotations, state);
 
-    Description.Builder description = buildDescription(tree);
+    Description.Builder description = buildDescription(originalOrdering.get(0));
     fix.ifPresent(description::addFix);
     return description.build();
   }

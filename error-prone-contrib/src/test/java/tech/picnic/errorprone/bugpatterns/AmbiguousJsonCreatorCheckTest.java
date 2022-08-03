@@ -112,7 +112,6 @@ final class AmbiguousJsonCreatorCheckTest {
             "      return new F(s);",
             "    }",
             "  }",
-            "",
             "}")
         .doTest();
   }
