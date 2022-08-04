@@ -10,8 +10,8 @@ import org.junit.jupiter.params.provider.ValueSource;
  * violations by {@link RefasterTemplateCollection} using the associated {@code TestInput.java} and
  * {@code TestOutput.java} files. Normally, {@link RefasterTemplateCollection} will raise error
  * messages to be rendered in the console or IDE. However, to verify that these error messages are
- * as intended, the {@code *TestOutput.java} files in this package contain error reporting that is
- * normally not present.
+ * emitted as intended, the {@code *TestOutput.java} files in this package contain error reporting
+ * that is normally not present.
  */
 final class RefasterTemplateCollectionTest {
   @ParameterizedTest
