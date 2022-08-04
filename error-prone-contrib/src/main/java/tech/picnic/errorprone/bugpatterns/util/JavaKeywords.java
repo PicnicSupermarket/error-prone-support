@@ -1,9 +1,10 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.bugpatterns.util;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
-final class JavaKeywords {
+/** Utility class that can be used to identify reserved keywords of the Java language. */
+public final class JavaKeywords {
   /**
    * List of all reserved keywords in the Java language.
    *
@@ -95,17 +96,33 @@ final class JavaKeywords {
 
   private JavaKeywords() {}
 
-  /** Tells whether the given string is a reserved keyword in the Java language. */
+  /**
+   * Tells whether the given string is a reserved keyword in the Java language.
+   *
+   * @param str The string of interest.
+   * @return {@code true} if the given string is a reserved keyword in the Java language.
+   */
   public static boolean isReservedKeyword(String str) {
     return RESERVED_KEYWORDS.contains(str);
   }
 
-  /** Tells whether the given string is a contextual keyword in the Java language. */
+  /**
+   * Tells whether the given string is a contextual keyword in the Java language.
+   *
+   * @param str The string of interest.
+   * @return {@code true} if the given string is a contextual keyword in the Java language.
+   */
   public static boolean isContextualKeyword(String str) {
     return CONTEXTUAL_KEYWORDS.contains(str);
   }
 
-  /** Tells whether the given string is a reserved or contextual keyword in the Java language. */
+  /**
+   * Tells whether the given string is a reserved or contextual keyword in the Java language.
+   *
+   * @param str The string of interest.
+   * @return {@code true} if the given string is a reserved or contextual keyword in the Java
+   *     language.
+   */
   public static boolean isKeyword(String str) {
     return ALL_KEYWORDS.contains(str);
   }

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import tech.picnic.errorprone.bugpatterns.util.Util;
 
 /**
  * A {@link BugChecker} which flags string concatenations that produce a format string; in such

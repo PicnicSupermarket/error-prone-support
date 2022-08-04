@@ -32,6 +32,7 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.bugpatterns.util.Util;
 
 /**
  * A {@link BugChecker} which flags {@code Comparator#comparing*} invocations that can be replaced

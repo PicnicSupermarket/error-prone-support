@@ -17,6 +17,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import java.util.List;
+import tech.picnic.errorprone.bugpatterns.util.Util;
 
 /**
  * A {@link BugChecker} which flags method invocations for which all arguments are wrapped using

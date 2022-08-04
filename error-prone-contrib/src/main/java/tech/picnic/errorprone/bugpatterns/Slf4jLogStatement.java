@@ -22,6 +22,7 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree.Kind;
 import java.util.List;
 import java.util.Optional;
+import tech.picnic.errorprone.bugpatterns.util.Util;
 
 /** A {@link BugChecker} which flags SLF4J usages that are likely to be in error. */
 // XXX: The special-casing of Throwable applies only to SLF4J 1.6.0+; see

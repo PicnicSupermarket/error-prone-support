@@ -38,6 +38,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import tech.picnic.errorprone.bugpatterns.util.AnnotationAttributeMatcher;
+import tech.picnic.errorprone.bugpatterns.util.Util;
 
 /**
  * A {@link BugChecker} which flags annotation array listings which aren't sorted lexicographically.

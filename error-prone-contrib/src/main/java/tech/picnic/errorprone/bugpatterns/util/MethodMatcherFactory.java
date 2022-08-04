@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.bugpatterns.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
@@ -15,13 +15,20 @@ import java.util.regex.Pattern;
 /** A method invocation expression {@link Matcher} factory. */
 // XXX: Document better. The expressions accepted here could also be defined using `MethodMatchers`.
 // So explain why this class is still useful.
-final class MethodMatcherFactory {
+public final class MethodMatcherFactory {
   private static final Splitter ARGUMENT_TYPE_SPLITTER =
       Splitter.on(',').trimResults().omitEmptyStrings();
   private static final Pattern METHOD_SIGNATURE =
       Pattern.compile("([^\\s#(,)]+)#([^\\s#(,)]+)\\(((?:[^\\s#(,)]+(?:,[^\\s#(,)]+)*)?)\\)");
 
-  Matcher<ExpressionTree> create(Collection<String> signatures) {
+  /**
+   * Creates a {@link Matcher} of methods with any of the given signatures.
+   *
+   * @param signatures The method signatures of interest.
+   * @return A new {@link Matcher} which accepts invocation expressions of any method identified by
+   *     the given signatures.
+   */
+  public Matcher<ExpressionTree> create(Collection<String> signatures) {
     return anyOf(
         signatures.stream()
             .map(MethodMatcherFactory::createMethodMatcher)

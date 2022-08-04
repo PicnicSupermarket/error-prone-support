@@ -20,6 +20,7 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
 import java.util.List;
 import java.util.Optional;
+import tech.picnic.errorprone.bugpatterns.util.Util;
 
 /**
  * A {@link BugChecker} that flags annotations that are not lexicographically sorted.

@@ -16,6 +16,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.refaster.Refaster;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import tech.picnic.errorprone.bugpatterns.util.Util;
 
 /**
  * A {@link BugChecker} which flags unnecessary {@link Refaster#anyOf(Object[])} usages.

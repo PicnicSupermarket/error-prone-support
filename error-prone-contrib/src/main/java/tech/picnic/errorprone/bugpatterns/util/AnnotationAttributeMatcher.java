@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.bugpatterns.util;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
@@ -28,7 +28,7 @@ import java.util.stream.Stream;
  * <p>This class allows one to define a whitelist or blacklist of annotations or their attributes.
  * Annotations are identified by their fully qualified name.
  */
-final class AnnotationAttributeMatcher implements Serializable {
+public final class AnnotationAttributeMatcher implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final boolean complement;
@@ -59,7 +59,7 @@ final class AnnotationAttributeMatcher implements Serializable {
    * @param exclusions The listed annotations or annotation attributes are not matched.
    * @return A non-{@code null} {@link AnnotationAttributeMatcher}.
    */
-  static AnnotationAttributeMatcher create(
+  public static AnnotationAttributeMatcher create(
       Optional<? extends List<String>> inclusions, Iterable<String> exclusions) {
     Set<String> includedWholeTypes = new HashSet<>();
     Set<String> excludedWholeTypes = new HashSet<>();
@@ -97,7 +97,13 @@ final class AnnotationAttributeMatcher implements Serializable {
     }
   }
 
-  Stream<? extends ExpressionTree> extractMatchingArguments(AnnotationTree tree) {
+  /**
+   * Returns the subset of arguments of the given {@link AnnotationTree} matched by this instance.
+   *
+   * @param tree The annotation AST node to be inspected.
+   * @return Any matching annotation arguments.
+   */
+  public Stream<? extends ExpressionTree> extractMatchingArguments(AnnotationTree tree) {
     Type type = ASTHelpers.getType(tree.getAnnotationType());
     if (type == null) {
       return Stream.empty();

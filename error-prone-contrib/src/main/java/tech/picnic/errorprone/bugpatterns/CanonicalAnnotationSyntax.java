@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import tech.picnic.errorprone.bugpatterns.util.Util;
 
 /** A {@link BugChecker} which flags annotations that could be written more concisely. */
 @AutoService(BugChecker.class)

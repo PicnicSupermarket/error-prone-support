@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.bugpatterns.util;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

@@ -25,6 +25,8 @@ import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.Tree.Kind;
 import java.util.Optional;
+import tech.picnic.errorprone.bugpatterns.util.AnnotationAttributeMatcher;
+import tech.picnic.errorprone.bugpatterns.util.Util;
 
 /**
  * A {@link BugChecker} which flags {@code @RequestMapping} annotations that can be written more

@@ -27,6 +27,7 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
 import java.util.Arrays;
 import java.util.List;
+import tech.picnic.errorprone.bugpatterns.util.Util;
 
 /** A {@link BugChecker} that flags redundant identity conversions. */
 // XXX: Consider detecting cases where a flagged expression is passed to a method, and where removal

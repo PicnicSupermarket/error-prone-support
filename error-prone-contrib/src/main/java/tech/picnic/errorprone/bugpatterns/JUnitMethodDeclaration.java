@@ -11,7 +11,7 @@ import static com.google.errorprone.matchers.Matchers.enclosingClass;
 import static com.google.errorprone.matchers.Matchers.hasModifier;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static java.util.function.Predicate.not;
-import static tech.picnic.errorprone.bugpatterns.JavaKeywords.isReservedKeyword;
+import static tech.picnic.errorprone.bugpatterns.util.JavaKeywords.isReservedKeyword;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
@@ -36,6 +36,7 @@ import com.sun.tools.javac.code.Symbol;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
+import tech.picnic.errorprone.bugpatterns.util.Util;
 
 /** A {@link BugChecker} which flags non-canonical JUnit method declarations. */
 // XXX: Consider introducing a class-level check which enforces that test classes:

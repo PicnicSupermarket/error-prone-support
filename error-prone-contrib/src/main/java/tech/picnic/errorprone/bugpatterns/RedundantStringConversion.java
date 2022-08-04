@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import tech.picnic.errorprone.bugpatterns.util.MethodMatcherFactory;
+import tech.picnic.errorprone.bugpatterns.util.Util;
 
 /** A {@link BugChecker} which flags redundant explicit string conversions. */
 @AutoService(BugChecker.class)
