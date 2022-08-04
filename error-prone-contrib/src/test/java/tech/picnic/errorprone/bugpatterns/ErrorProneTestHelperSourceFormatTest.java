@@ -5,12 +5,12 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class ErrorProneTestHelperSourceFormatCheckTest {
+final class ErrorProneTestHelperSourceFormatTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(ErrorProneTestHelperSourceFormatCheck.class, getClass());
+      CompilationTestHelper.newInstance(ErrorProneTestHelperSourceFormat.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(
-          ErrorProneTestHelperSourceFormatCheck.class, getClass());
+          ErrorProneTestHelperSourceFormat.class, getClass());
 
   @Test
   void identification() {
@@ -20,13 +20,13 @@ final class ErrorProneTestHelperSourceFormatCheckTest {
             "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
             "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
             "import com.google.errorprone.CompilationTestHelper;",
-            "import tech.picnic.errorprone.bugpatterns.EmptyMethodCheck;",
+            "import tech.picnic.errorprone.bugpatterns.EmptyMethod;",
             "",
             "class A {",
             "  private final CompilationTestHelper compilationTestHelper =",
-            "      CompilationTestHelper.newInstance(EmptyMethodCheck.class, getClass());",
+            "      CompilationTestHelper.newInstance(EmptyMethod.class, getClass());",
             "  private final BugCheckerRefactoringTestHelper refactoringTestHelper =",
-            "      BugCheckerRefactoringTestHelper.newInstance(EmptyMethodCheck.class, getClass());",
+            "      BugCheckerRefactoringTestHelper.newInstance(EmptyMethod.class, getClass());",
             "",
             "  void m() {",
             "    compilationTestHelper",
@@ -69,13 +69,13 @@ final class ErrorProneTestHelperSourceFormatCheckTest {
             "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
             "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
             "import com.google.errorprone.CompilationTestHelper;",
-            "import tech.picnic.errorprone.bugpatterns.EmptyMethodCheck;",
+            "import tech.picnic.errorprone.bugpatterns.EmptyMethod;",
             "",
             "class A {",
             "  private final CompilationTestHelper compilationTestHelper =",
-            "      CompilationTestHelper.newInstance(EmptyMethodCheck.class, getClass());",
+            "      CompilationTestHelper.newInstance(EmptyMethod.class, getClass());",
             "  private final BugCheckerRefactoringTestHelper refactoringTestHelper =",
-            "      BugCheckerRefactoringTestHelper.newInstance(EmptyMethodCheck.class, getClass());",
+            "      BugCheckerRefactoringTestHelper.newInstance(EmptyMethod.class, getClass());",
             "",
             "  void m() {",
             "    compilationTestHelper",
@@ -111,13 +111,13 @@ final class ErrorProneTestHelperSourceFormatCheckTest {
             "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
             "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
             "import com.google.errorprone.CompilationTestHelper;",
-            "import tech.picnic.errorprone.bugpatterns.EmptyMethodCheck;",
+            "import tech.picnic.errorprone.bugpatterns.EmptyMethod;",
             "",
             "class A {",
             "  private final CompilationTestHelper compilationTestHelper =",
-            "      CompilationTestHelper.newInstance(EmptyMethodCheck.class, getClass());",
+            "      CompilationTestHelper.newInstance(EmptyMethod.class, getClass());",
             "  private final BugCheckerRefactoringTestHelper refactoringTestHelper =",
-            "      BugCheckerRefactoringTestHelper.newInstance(EmptyMethodCheck.class, getClass());",
+            "      BugCheckerRefactoringTestHelper.newInstance(EmptyMethod.class, getClass());",
             "",
             "  void m() {",
             "    compilationTestHelper",

@@ -49,12 +49,11 @@ import java.util.Optional;
 // Windows; TBD.
 @AutoService(BugChecker.class)
 @BugPattern(
-    name = "ErrorProneTestHelperSourceFormat",
     summary = "Test code should follow the Google Java style",
     linkType = NONE,
     severity = SUGGESTION,
     tags = STYLE)
-public final class ErrorProneTestHelperSourceFormatCheck extends BugChecker
+public final class ErrorProneTestHelperSourceFormat extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Formatter FORMATTER = new Formatter();
