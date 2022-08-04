@@ -53,25 +53,25 @@ import tech.picnic.errorprone.refaster.runner.RefasterCheck;
  * exactly one distinct method, as indicated by each method's name.
  */
 @BugPattern(
-    name = "RefasterTemplateCollectionValidator",
+    name = "RefasterTemplateCollection",
     summary = "Exercises a Refaster template collection",
     severity = ERROR)
-public final class RefasterTemplateCollectionValidator extends BugChecker
+public final class RefasterTemplateCollection extends BugChecker
     implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String TEMPLATE_COLLECTION_FLAG =
-      "RefasterTemplateCollectionValidator:TemplateCollection";
+      "RefasterTemplateCollection:TemplateCollection";
   private static final String TEST_METHOD_NAME_PREFIX = "test";
 
   private final ImmutableSortedSet<String> templatesUnderTest;
   private final RefasterCheck delegate;
 
   /**
-   * Instantiates a {@link RefasterTemplateCollectionValidator} instance.
+   * Instantiates a {@link RefasterTemplateCollection} instance.
    *
    * @param flags Any provided command line flags.
    */
-  public RefasterTemplateCollectionValidator(ErrorProneFlags flags) {
+  public RefasterTemplateCollection(ErrorProneFlags flags) {
     String templateCollectionUnderTest = getTemplateCollectionUnderTest(flags);
     delegate = createRefasterCheck(templateCollectionUnderTest);
     templatesUnderTest = getTemplatesUnderTest(templateCollectionUnderTest);
@@ -117,7 +117,7 @@ public final class RefasterTemplateCollectionValidator extends BugChecker
   public static void validate(Class<?> clazz) {
     String className = clazz.getSimpleName();
 
-    BugCheckerRefactoringTestHelper.newInstance(RefasterTemplateCollectionValidator.class, clazz)
+    BugCheckerRefactoringTestHelper.newInstance(RefasterTemplateCollection.class, clazz)
         .setArgs(ImmutableList.of("-XepOpt:" + TEMPLATE_COLLECTION_FLAG + '=' + className))
         .addInput(className + "TestInput.java")
         .addOutput(className + "TestOutput.java")

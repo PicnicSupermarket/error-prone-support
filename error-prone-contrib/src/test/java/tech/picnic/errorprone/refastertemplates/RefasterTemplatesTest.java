@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateCollectionValidator;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateCollection;
 
 final class RefasterTemplatesTest {
   /** The names of all Refaster template groups defined in this module. */
@@ -76,6 +76,6 @@ final class RefasterTemplatesTest {
   @MethodSource("validateTemplateCollectionTestCases")
   @ParameterizedTest
   void validateTemplateCollection(Class<?> clazz) {
-    RefasterTemplateCollectionValidator.validate(clazz);
+    RefasterTemplateCollection.validate(clazz);
   }
 }

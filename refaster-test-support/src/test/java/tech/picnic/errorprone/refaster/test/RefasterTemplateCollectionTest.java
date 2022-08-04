@@ -4,16 +4,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Validates {@link RefasterTemplateCollectionValidator} error reporting.
+ * Validates {@link RefasterTemplateCollection} error reporting.
  *
  * <p>The goal of the Refaster template collections under test is to verify the reporting of
- * violations by {@link RefasterTemplateCollectionValidator} using the associated {@code
- * TestInput.java} and {@code TestOutput.java} files. Normally, {@link
- * RefasterTemplateCollectionValidator} will raise error messages to be rendered in the console or
- * IDE. However, to verify that these error messages are as intended, the {@code *TestOutput.java}
- * files in this package contain error reporting that is normally not present.
+ * violations by {@link RefasterTemplateCollection} using the associated {@code TestInput.java} and
+ * {@code TestOutput.java} files. Normally, {@link RefasterTemplateCollection} will raise error
+ * messages to be rendered in the console or IDE. However, to verify that these error messages are
+ * as intended, the {@code *TestOutput.java} files in this package contain error reporting that is
+ * normally not present.
  */
-final class RefasterTemplateCollectionValidatorTest {
+final class RefasterTemplateCollectionTest {
   @ParameterizedTest
   @ValueSource(
       classes = {
@@ -25,6 +25,6 @@ final class RefasterTemplateCollectionValidatorTest {
         ValidTemplates.class
       })
   void verifyRefasterTemplateCollections(Class<?> clazz) {
-    RefasterTemplateCollectionValidator.validate(clazz);
+    RefasterTemplateCollection.validate(clazz);
   }
 }
