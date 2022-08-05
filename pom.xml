@@ -143,7 +143,7 @@
         <version.maven>3.6.3</version.maven>
         <version.mockito>4.6.1</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
-        <version.nullaway>0.9.8</version.nullaway>
+        <version.nullaway>0.9.9</version.nullaway>
         <!-- XXX: Two other dependencies are potentially of interest:
         `com.palantir.assertj-automation:assertj-refaster-rules` and
         `com.palantir.baseline:baseline-refaster-rules` contain Refaster rules
