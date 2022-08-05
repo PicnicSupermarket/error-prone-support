@@ -36,7 +36,7 @@ import com.sun.tools.javac.code.Symbol;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
-import tech.picnic.errorprone.bugpatterns.util.Util;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A {@link BugChecker} which flags non-canonical JUnit method declarations. */
 // XXX: Consider introducing a class-level check which enforces that test classes:
@@ -171,7 +171,7 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
   }
 
   private static CharSequence getStaticImportSimpleName(Tree tree, VisitorState state) {
-    String source = Util.treeToString(tree, state);
+    String source = SourceCode.treeToString(tree, state);
     return source.subSequence(source.lastIndexOf('.') + 1, source.length());
   }
 

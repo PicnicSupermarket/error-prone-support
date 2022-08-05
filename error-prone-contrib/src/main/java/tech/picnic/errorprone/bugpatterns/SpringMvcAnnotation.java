@@ -26,7 +26,7 @@ import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.Tree.Kind;
 import java.util.Optional;
 import tech.picnic.errorprone.bugpatterns.util.AnnotationAttributeMatcher;
-import tech.picnic.errorprone.bugpatterns.util.Util;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link BugChecker} which flags {@code @RequestMapping} annotations that can be written more
@@ -93,7 +93,7 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
   private static String extractMethod(ExpressionTree expr, VisitorState state) {
     switch (expr.getKind()) {
       case IDENTIFIER:
-        return Util.treeToString(expr, state);
+        return SourceCode.treeToString(expr, state);
       case MEMBER_SELECT:
         return ((MemberSelectTree) expr).getIdentifier().toString();
       default:
@@ -106,7 +106,7 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
     String newArguments =
         tree.getArguments().stream()
             .filter(not(argToRemove::equals))
-            .map(arg -> Util.treeToString(arg, state))
+            .map(arg -> SourceCode.treeToString(arg, state))
             .collect(joining(", "));
 
     return SuggestedFix.builder()

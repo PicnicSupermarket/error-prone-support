@@ -27,7 +27,7 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
 import java.util.Arrays;
 import java.util.List;
-import tech.picnic.errorprone.bugpatterns.util.Util;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A {@link BugChecker} that flags redundant identity conversions. */
 // XXX: Consider detecting cases where a flagged expression is passed to a method, and where removal
@@ -94,7 +94,7 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
         .setMessage(
             "This method invocation appears redundant; remove it or suppress this warning and "
                 + "add a comment explaining its purpose")
-        .addFix(SuggestedFix.replace(tree, Util.treeToString(sourceTree, state)))
+        .addFix(SuggestedFix.replace(tree, SourceCode.treeToString(sourceTree, state)))
         .addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()))
         .build();
   }

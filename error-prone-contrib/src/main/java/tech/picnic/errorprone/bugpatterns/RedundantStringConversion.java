@@ -42,7 +42,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import tech.picnic.errorprone.bugpatterns.util.MethodMatcherFactory;
-import tech.picnic.errorprone.bugpatterns.util.Util;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A {@link BugChecker} which flags redundant explicit string conversions. */
 @AutoService(BugChecker.class)
@@ -327,7 +327,7 @@ public final class RedundantStringConversion extends BugChecker
     return trySimplify(tree, state, filter)
         .map(
             replacement ->
-                SuggestedFix.builder().replace(tree, Util.treeToString(replacement, state)));
+                SuggestedFix.builder().replace(tree, SourceCode.treeToString(replacement, state)));
   }
 
   private Optional<ExpressionTree> trySimplify(
@@ -351,7 +351,7 @@ public final class RedundantStringConversion extends BugChecker
       default:
         throw new IllegalStateException(
             "Cannot simplify method call with two or more arguments: "
-                + Util.treeToString(tree, state));
+                + SourceCode.treeToString(tree, state));
     }
   }
 
@@ -364,7 +364,7 @@ public final class RedundantStringConversion extends BugChecker
     return Optional.of(methodInvocation.getMethodSelect())
         .filter(methodSelect -> methodSelect.getKind() == Kind.MEMBER_SELECT)
         .map(methodSelect -> ((MemberSelectTree) methodSelect).getExpression())
-        .filter(expr -> !"super".equals(Util.treeToString(expr, state)));
+        .filter(expr -> !"super".equals(SourceCode.treeToString(expr, state)));
   }
 
   private static Optional<ExpressionTree> trySimplifyUnaryMethod(

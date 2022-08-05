@@ -32,7 +32,7 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import tech.picnic.errorprone.bugpatterns.util.Util;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link BugChecker} which flags {@code Comparator#comparing*} invocations that can be replaced
@@ -115,7 +115,7 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
 
     String typeArguments =
         Stream.concat(
-                Stream.of(Util.treeToString(tree.getTypeArguments().get(0), state)),
+                Stream.of(SourceCode.treeToString(tree.getTypeArguments().get(0), state)),
                 Stream.of(cmpType.tsym.getSimpleName())
                     .filter(u -> "comparing".equals(preferredMethodName)))
             .collect(joining(", ", "<", ">"));
@@ -170,7 +170,7 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
       case MEMBER_SELECT:
         MemberSelectTree ms = (MemberSelectTree) tree.getMethodSelect();
         return SuggestedFix.replace(
-            ms, Util.treeToString(ms.getExpression(), state) + '.' + preferredMethodName);
+            ms, SourceCode.treeToString(ms.getExpression(), state) + '.' + preferredMethodName);
       default:
         throw new VerifyException("Unexpected type of expression: " + expr.getKind());
     }

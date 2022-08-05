@@ -20,7 +20,7 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
 import java.util.List;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.util.Util;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link BugChecker} that flags annotations that are not lexicographically sorted.
@@ -60,7 +60,7 @@ public final class LexicographicalAnnotationListing extends BugChecker
   private static ImmutableList<? extends AnnotationTree> sort(
       List<? extends AnnotationTree> annotations, VisitorState state) {
     return annotations.stream()
-        .sorted(comparing(annotation -> Util.treeToString(annotation, state)))
+        .sorted(comparing(annotation -> SourceCode.treeToString(annotation, state)))
         .collect(toImmutableList());
   }
 
@@ -72,7 +72,8 @@ public final class LexicographicalAnnotationListing extends BugChecker
             originalAnnotations.stream(),
             sortedAnnotations.stream(),
             (original, replacement) ->
-                SuggestedFix.builder().replace(original, Util.treeToString(replacement, state)))
+                SuggestedFix.builder()
+                    .replace(original, SourceCode.treeToString(replacement, state)))
         .reduce(SuggestedFix.Builder::merge)
         .map(SuggestedFix.Builder::build);
   }

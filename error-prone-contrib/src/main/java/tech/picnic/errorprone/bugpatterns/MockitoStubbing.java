@@ -17,7 +17,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import java.util.List;
-import tech.picnic.errorprone.bugpatterns.util.Util;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link BugChecker} which flags method invocations for which all arguments are wrapped using
@@ -45,7 +45,7 @@ public final class MockitoStubbing extends BugChecker implements MethodInvocatio
     for (ExpressionTree arg : arguments) {
       suggestedFix.replace(
           arg,
-          Util.treeToString(
+          SourceCode.treeToString(
               Iterables.getOnlyElement(((MethodInvocationTree) arg).getArguments()), state));
     }
 

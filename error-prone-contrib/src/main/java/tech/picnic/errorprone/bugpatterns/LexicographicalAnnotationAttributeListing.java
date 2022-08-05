@@ -39,7 +39,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.AnnotationAttributeMatcher;
-import tech.picnic.errorprone.bugpatterns.util.Util;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link BugChecker} which flags annotation array listings which aren't sorted lexicographically.
@@ -130,7 +130,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
     /* The elements aren't sorted. Suggest the sorted alternative. */
     String suggestion =
         desiredOrdering.stream()
-            .map(expr -> Util.treeToString(expr, state))
+            .map(expr -> SourceCode.treeToString(expr, state))
             .collect(joining(", ", "{", "}"));
     return Optional.of(SuggestedFix.builder().replace(array, suggestion));
   }
@@ -199,7 +199,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
          * Tokens are split on `=` so that e.g. inline Spring property declarations are properly
          * sorted by key, then value.
          */
-        return ImmutableList.copyOf(Util.treeToString(node, state).split("=", -1));
+        return ImmutableList.copyOf(SourceCode.treeToString(node, state).split("=", -1));
       }
     }.scan(array, null);
 

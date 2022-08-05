@@ -16,7 +16,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.refaster.Refaster;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
-import tech.picnic.errorprone.bugpatterns.util.Util;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link BugChecker} which flags unnecessary {@link Refaster#anyOf(Object[])} usages.
@@ -45,7 +45,8 @@ public final class RefasterAnyOfUsage extends BugChecker implements MethodInvoca
         case 1:
           return describeMatch(
               tree,
-              SuggestedFix.replace(tree, Util.treeToString(tree.getArguments().get(0), state)));
+              SuggestedFix.replace(
+                  tree, SourceCode.treeToString(tree.getArguments().get(0), state)));
         default:
           /* Handled below. */
       }

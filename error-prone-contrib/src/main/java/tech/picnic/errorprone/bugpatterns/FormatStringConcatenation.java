@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.Util;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link BugChecker} which flags string concatenations that produce a format string; in such
@@ -250,7 +250,7 @@ public final class FormatStringConcatenation extends BugChecker
       return state.getConstantExpression(formatString.toString())
           + ", "
           + formatArguments.stream()
-              .map(tree -> Util.treeToString(tree, state))
+              .map(tree -> SourceCode.treeToString(tree, state))
               .collect(joining(", "));
     }
   }

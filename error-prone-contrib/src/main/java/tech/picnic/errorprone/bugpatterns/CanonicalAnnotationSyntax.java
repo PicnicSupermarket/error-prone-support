@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import tech.picnic.errorprone.bugpatterns.util.Util;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A {@link BugChecker} which flags annotations that could be written more concisely. */
 @AutoService(BugChecker.class)
@@ -102,7 +102,8 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
     return Optional.of(
         SuggestedFix.replace(
             arg,
-            simplifyAttributeValue(expr, state).orElseGet(() -> Util.treeToString(expr, state))));
+            simplifyAttributeValue(expr, state)
+                .orElseGet(() -> SourceCode.treeToString(expr, state))));
   }
 
   private static Optional<Fix> dropRedundantCurlies(AnnotationTree tree, VisitorState state) {
@@ -137,11 +138,11 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
   private static Optional<String> simplifySingletonArray(NewArrayTree array, VisitorState state) {
     return Optional.of(array.getInitializers())
         .filter(initializers -> initializers.size() == 1)
-        .map(initializers -> Util.treeToString(initializers.get(0), state));
+        .map(initializers -> SourceCode.treeToString(initializers.get(0), state));
   }
 
   private static Optional<String> dropTrailingComma(NewArrayTree array, VisitorState state) {
-    String src = Util.treeToString(array, state);
+    String src = SourceCode.treeToString(array, state);
     return Optional.of(TRAILING_ARRAY_COMMA.matcher(src))
         .filter(Matcher::find)
         .map(m -> src.substring(0, m.start()) + '}');
