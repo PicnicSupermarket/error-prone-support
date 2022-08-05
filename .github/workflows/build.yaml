@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'master'
+      - 'ibabiankou/experiments'
 jobs:
   build:
     runs-on: ubuntu-22.04
