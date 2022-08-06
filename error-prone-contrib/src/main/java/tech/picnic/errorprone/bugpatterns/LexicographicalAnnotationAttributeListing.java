@@ -175,21 +175,21 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
     new TreeScanner<Void, Void>() {
       @Nullable
       @Override
-      public Void visitIdentifier(IdentifierTree node, Void ctx) {
+      public Void visitIdentifier(IdentifierTree node, @Nullable Void ctx) {
         nodes.add(tokenize(node));
         return super.visitIdentifier(node, ctx);
       }
 
       @Nullable
       @Override
-      public Void visitLiteral(LiteralTree node, Void ctx) {
+      public Void visitLiteral(LiteralTree node, @Nullable Void ctx) {
         nodes.add(tokenize(node));
         return super.visitLiteral(node, ctx);
       }
 
       @Nullable
       @Override
-      public Void visitPrimitiveType(PrimitiveTypeTree node, Void ctx) {
+      public Void visitPrimitiveType(PrimitiveTypeTree node, @Nullable Void ctx) {
         nodes.add(tokenize(node));
         return super.visitPrimitiveType(node, ctx);
       }
