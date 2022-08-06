@@ -28,10 +28,10 @@ import java.io.ObjectOutputStream;
 import java.io.UncheckedIOException;
 import java.lang.annotation.Annotation;
 import java.util.Map;
-import javax.annotation.Nullable;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.StandardLocation;
+import org.jspecify.nullness.Nullable;
 import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
 
 /**
@@ -71,10 +71,10 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
 
   private ImmutableMap<ClassTree, CodeTransformer> compileRefasterRules(ClassTree tree) {
     ImmutableMap.Builder<ClassTree, CodeTransformer> rules = ImmutableMap.builder();
-    new TreeScanner<Void, ImmutableClassToInstanceMap<Annotation>>() {
-      @Nullable
+    new TreeScanner<@Nullable Void, ImmutableClassToInstanceMap<Annotation>>() {
       @Override
-      public Void visitClass(ClassTree node, ImmutableClassToInstanceMap<Annotation> annotations) {
+      public @Nullable Void visitClass(
+          ClassTree node, ImmutableClassToInstanceMap<Annotation> annotations) {
         ClassSymbol symbol = ASTHelpers.getSymbol(node);
 
         ImmutableList<CodeTransformer> transformers =
@@ -105,7 +105,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
 
   private static boolean containsRefasterRules(ClassTree tree) {
     return Boolean.TRUE.equals(
-        new TreeScanner<Boolean, Void>() {
+        new TreeScanner<Boolean, @Nullable Void>() {
           @Override
           public Boolean visitAnnotation(AnnotationTree node, @Nullable Void unused) {
             Symbol sym = ASTHelpers.getSymbol(node);

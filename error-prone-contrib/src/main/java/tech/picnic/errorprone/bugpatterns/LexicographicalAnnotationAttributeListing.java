@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.nullness.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.AnnotationAttributeMatcher;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
@@ -184,17 +184,15 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
   private static ImmutableList<ImmutableList<String>> getStructure(ExpressionTree array) {
     ImmutableList.Builder<ImmutableList<String>> nodes = ImmutableList.builder();
 
-    new TreeScanner<Void, Void>() {
-      @Nullable
+    new TreeScanner<@Nullable Void, @Nullable Void>() {
       @Override
-      public Void visitIdentifier(IdentifierTree node, @Nullable Void unused) {
+      public @Nullable Void visitIdentifier(IdentifierTree node, @Nullable Void unused) {
         nodes.add(ImmutableList.of(node.getName().toString()));
         return super.visitIdentifier(node, unused);
       }
 
-      @Nullable
       @Override
-      public Void visitLiteral(LiteralTree node, @Nullable Void unused) {
+      public @Nullable Void visitLiteral(LiteralTree node, @Nullable Void unused) {
         Object value = ASTHelpers.constValue(node);
         nodes.add(
             value instanceof String
@@ -204,9 +202,8 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
         return super.visitLiteral(node, unused);
       }
 
-      @Nullable
       @Override
-      public Void visitPrimitiveType(PrimitiveTypeTree node, @Nullable Void unused) {
+      public @Nullable Void visitPrimitiveType(PrimitiveTypeTree node, @Nullable Void unused) {
         nodes.add(ImmutableList.of(node.getPrimitiveTypeKind().toString()));
         return super.visitPrimitiveType(node, unused);
       }

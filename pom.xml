@@ -244,11 +244,6 @@
                 <version>${version.auto-value}</version>
             </dependency>
             <dependency>
-                <groupId>com.google.code.findbugs</groupId>
-                <artifactId>jsr305</artifactId>
-                <version>3.0.2</version>
-            </dependency>
-            <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
                 <version>1.15.0</version>
@@ -628,11 +623,15 @@
                                         </property>
                                         <property name="illegalClasses" value="com.mongodb.lang.Nullable">
                                             <!-- Instead, please use
-                                            `javax.annotation.Nullable`. -->
+                                            `org.jspecify.nullness.Nullable`. -->
                                         </property>
                                         <property name="illegalClasses" value="io.micrometer.core.lang.Nullable">
                                             <!-- Instead, please use
-                                            `javax.annotation.Nullable`. -->
+                                            `org.jspecify.nullness.Nullable`. -->
+                                        </property>
+                                        <property name="illegalClasses" value="javax.annotation.Nullable">
+                                            <!-- Instead, please use
+                                            `org.jspecify.nullness.Nullable`. -->
                                         </property>
                                         <property name="illegalClasses" value="javax.annotation.concurrent.Immutable">
                                             <!-- Instead, please use
@@ -648,7 +647,7 @@
                                         </property>
                                         <property name="illegalClasses" value="org.springframework.lang.Nullable">
                                             <!-- Instead, please use
-                                            `javax.annotation.Nullable`. -->
+                                            `org.jspecify.nullness.Nullable`. -->
                                         </property>
                                         <property name="illegalPkgs" value="com.amazonaws.annotation" />
                                         <property name="illegalPkgs" value="com.beust.jcommander.internal" />

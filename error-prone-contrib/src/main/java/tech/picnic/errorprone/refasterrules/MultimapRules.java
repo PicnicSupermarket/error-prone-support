@@ -7,7 +7,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Collection;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.nullness.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link Multimap}s. */
@@ -50,8 +50,7 @@ final class MultimapRules {
    */
   static final class MultimapGet<K, V> {
     @BeforeTemplate
-    @Nullable
-    Collection<V> before(Multimap<K, V> multimap, K key) {
+    @Nullable Collection<V> before(Multimap<K, V> multimap, K key) {
       return Refaster.anyOf(multimap.asMap(), Multimaps.asMap(multimap)).get(key);
     }
 
