@@ -9,6 +9,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import org.jspecify.nullness.Nullable;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,14 +21,14 @@ final class RxJava2AdapterTemplates {
   /** Use the fluent API style when using {@link RxJava2Adapter#completableToMono}. */
   static final class CompletableToMono {
     @BeforeTemplate
-    Mono<Void> before(Completable completable) {
+    Mono<@Nullable Void> before(Completable completable) {
       return Refaster.anyOf(
           RxJava2Adapter.completableToMono(completable),
           completable.to(RxJava2Adapter::completableToMono));
     }
 
     @AfterTemplate
-    Mono<Void> after(Completable completable) {
+    Mono<@Nullable Void> after(Completable completable) {
       return completable.as(RxJava2Adapter::completableToMono);
     }
   }

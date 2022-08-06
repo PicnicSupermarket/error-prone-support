@@ -130,7 +130,7 @@ final class StringTemplates {
    */
   // XXX: This template is analogous to `StringValueOf` above. Arguably this is its generalization.
   // If/when Refaster is extended to understand this, delete the template above.
-  static final class StringValueOfMethodReference<T> {
+  static final class StringValueOfMethodReference {
     @BeforeTemplate
     Function<Object, String> before() {
       return Objects::toString;
