@@ -4,10 +4,13 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
+import static com.sun.tools.javac.code.TypeAnnotations.AnnotationType.DECLARATION;
+import static com.sun.tools.javac.code.TypeAnnotations.AnnotationType.TYPE;
 import static java.util.Comparator.comparing;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
@@ -17,10 +20,14 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.TypeAnnotations.AnnotationType;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import org.jspecify.nullness.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
@@ -39,6 +46,9 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class LexicographicalAnnotationListing extends BugChecker
     implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
+  private static final Comparator<@Nullable AnnotationType> BY_ANNOTATION_TYPE =
+      (a, b) ->
+          (a == null || a == DECLARATION) && b == TYPE ? -1 : a == TYPE && b == DECLARATION ? 1 : 0;
 
   /** Instantiates a new {@link LexicographicalAnnotationListing} instance. */
   public LexicographicalAnnotationListing() {}
@@ -50,26 +60,29 @@ public final class LexicographicalAnnotationListing extends BugChecker
       return Description.NO_MATCH;
     }
 
-    ImmutableList<? extends AnnotationTree> sortedAnnotations = sort(originalOrdering, state);
+    ImmutableList<? extends AnnotationTree> sortedAnnotations =
+        sort(originalOrdering, ASTHelpers.getSymbol(tree), state);
     if (originalOrdering.equals(sortedAnnotations)) {
       return Description.NO_MATCH;
     }
 
-    Optional<Fix> fix = tryFixOrdering(originalOrdering, sortedAnnotations, state);
-
-    Description.Builder description = buildDescription(originalOrdering.get(0));
-    fix.ifPresent(description::addFix);
-    return description.build();
+    return describeMatch(
+        originalOrdering.get(0), fixOrdering(originalOrdering, sortedAnnotations, state));
   }
 
   private static ImmutableList<? extends AnnotationTree> sort(
-      List<? extends AnnotationTree> annotations, VisitorState state) {
+      List<? extends AnnotationTree> annotations, Symbol symbol, VisitorState state) {
     return annotations.stream()
-        .sorted(comparing(annotation -> SourceCode.treeToString(annotation, state)))
+        .sorted(
+            comparing(
+                    (AnnotationTree annotation) ->
+                        ASTHelpers.getAnnotationType(annotation, symbol, state),
+                    BY_ANNOTATION_TYPE)
+                .thenComparing(annotation -> SourceCode.treeToString(annotation, state)))
         .collect(toImmutableList());
   }
 
-  private static Optional<Fix> tryFixOrdering(
+  private static Fix fixOrdering(
       List<? extends AnnotationTree> originalAnnotations,
       ImmutableList<? extends AnnotationTree> sortedAnnotations,
       VisitorState state) {
@@ -80,6 +93,7 @@ public final class LexicographicalAnnotationListing extends BugChecker
                 SuggestedFix.builder()
                     .replace(original, SourceCode.treeToString(replacement, state)))
         .reduce(SuggestedFix.Builder::merge)
-        .map(SuggestedFix.Builder::build);
+        .map(SuggestedFix.Builder::build)
+        .orElseThrow(() -> new VerifyException("No annotations were provided"));
   }
 }
