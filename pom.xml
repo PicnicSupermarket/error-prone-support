@@ -96,8 +96,9 @@
             <!-- The test JVMs are short-running. By disabling certain
             expensive JIT optimizations we actually speed up most tests. -->
             -XX:TieredStopAtLevel=1
-            <!-- We cap memory usage. This is primarily relevant for build agents,
-            but locally this should also be more than enough. -->
+            <!-- We cap memory usage. This may be relevant for build agents,
+            but also prevents excessive memory usage by heavily parallelized
+            local builds. -->
             -Xmx1024m
             <!-- This argument cannot be set through Surefire's
             'systemPropertyVariables' configuration setting. Setting the file
