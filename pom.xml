@@ -140,6 +140,7 @@
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
+        <!-- XXX: Configure Renovate to open upgrade PRs for this property. -->
         <version.maven>3.6.3</version.maven>
         <version.mockito>4.6.1</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
@@ -487,14 +488,6 @@
                             </goals>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>io.takari</groupId>
-                    <artifactId>maven</artifactId>
-                    <version>0.7.7</version>
-                    <configuration>
-                        <maven>${version.maven}</maven>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1045,6 +1038,11 @@
                             <version>${version.surefire}</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
