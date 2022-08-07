@@ -3,7 +3,10 @@ package tech.picnic.errorprone.bugpatterns.util;
 import com.google.errorprone.VisitorState;
 import com.sun.source.tree.Tree;
 
-/** A collection of Error Prone utility methods for retrieving source code representations. */
+/**
+ * A collection of Error Prone utility methods for dealing with the source code representation of
+ * AST nodes.
+ */
 // XXX: Can we locate this code in a better place? Maybe contribute it upstream?
 public final class SourceCode {
   private SourceCode() {}
