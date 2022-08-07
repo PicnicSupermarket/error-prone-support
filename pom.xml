@@ -140,7 +140,6 @@
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
-        <!-- XXX: Configure Renovate to open upgrade PRs for this property. -->
         <version.maven>3.6.3</version.maven>
         <version.mockito>4.6.1</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
@@ -338,6 +337,14 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.13.2</version>
+            </dependency>
+            <!-- Specified so that Renovate will file Maven upgrade PRs, which
+            subsequently will cause `maven-enforcer-plugin` to require that
+            developers build the project using the latest Maven release. -->
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-plugin-api</artifactId>
+                <version>${version.maven}</version>
             </dependency>
             <dependency>
                 <groupId>org.aspectj</groupId>
