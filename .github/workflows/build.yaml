@@ -30,7 +30,7 @@ jobs:
         run: mvn -T1C install
       - name: Build project with self-check against Error Prone fork
         run: mvn -T1C clean verify -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
-      - name: Remove project snapshots
+      - name: Remove installed project artifacts
         run: mvn build-helper:remove-project-artifact
 
 # XXX: Enable Codecov once we "go public".
