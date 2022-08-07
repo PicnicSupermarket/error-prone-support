@@ -53,10 +53,7 @@ final class IsArrayTest {
   }
 
   /** A {@link BugChecker} which simply delegates to {@link IsArray}. */
-  @BugPattern(
-      name = "TestChecker",
-      summary = "Flags array-returning method invocations",
-      severity = ERROR)
+  @BugPattern(summary = "Flags array-returning method invocations", severity = ERROR)
   public static final class TestChecker extends BugChecker implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
 

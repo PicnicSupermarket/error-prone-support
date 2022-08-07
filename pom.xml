@@ -1495,8 +1495,6 @@
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF
-                                    <!-- XXX: Enable this check. -->
-                                    -Xep:BugPatternNaming:OFF
                                     <!-- We don't target JDK 7. -->
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->

@@ -20,7 +20,7 @@ final class EqualityTemplates {
      * remaining reference-based equality checks.
      */
     // XXX: This Refaster rule is the topic of https://github.com/google/error-prone/issues/559. We
-    // work around the issue by selecting the "largest replacements". See RefasterCheck.
+    // work around the issue by selecting the "largest replacements". See the `Refaster` check.
     @BeforeTemplate
     boolean before(T a, T b) {
       return Refaster.anyOf(a.equals(b), Objects.equals(a, b));
@@ -34,9 +34,8 @@ final class EqualityTemplates {
   }
 
   /** Prefer {@link Object#equals(Object)} over the equivalent lambda function. */
-  // XXX: As it stands, this rule is a special case of what `MethodReferenceUsageCheck` tries to
-  // achieve. If/when `MethodReferenceUsageCheck` becomes production ready, we should simply drop
-  // this check.
+  // XXX: As it stands, this rule is a special case of what `MethodReferenceUsage` tries to achieve.
+  // If/when `MethodReferenceUsage` becomes production ready, we should simply drop this check.
   // XXX: Alternatively, the rule should be replaced with a plugin which also identifies cases where
   // the arguments are swapped but simplification is possible anyway, by virtue of `v` being
   // non-null.
