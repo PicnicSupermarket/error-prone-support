@@ -138,14 +138,15 @@
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-2</version.error-prone-fork>
         <version.error-prone-orig>2.14.0</version.error-prone-orig>
-        <version.error-prone-slf4j>0.1.12</version.error-prone-slf4j>
+        <version.error-prone-slf4j>0.1.13</version.error-prone-slf4j>
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
+        <!-- XXX: Configure Renovate to open upgrade PRs for this property. -->
         <version.maven>3.6.3</version.maven>
         <version.mockito>4.6.1</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
-        <version.nullaway>0.9.8</version.nullaway>
+        <version.nullaway>0.9.9</version.nullaway>
         <!-- XXX: Two other dependencies are potentially of interest:
         `com.palantir.assertj-automation:assertj-refaster-rules` and
         `com.palantir.baseline:baseline-refaster-rules` contain Refaster rules
@@ -502,14 +503,6 @@
                             </goals>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>io.takari</groupId>
-                    <artifactId>maven</artifactId>
-                    <version>0.7.7</version>
-                    <configuration>
-                        <maven>${version.maven}</maven>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1017,7 +1010,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.12.0</version>
+                    <version>3.12.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1060,6 +1053,11 @@
                             <version>${version.surefire}</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1227,7 +1225,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.9.2</version>
+                    <version>1.9.4</version>
                     <configuration>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
@@ -1515,8 +1513,6 @@
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF
-                                    <!-- XXX: Enable this check. -->
-                                    -Xep:BugPatternNaming:OFF
                                     <!-- We don't target JDK 7. -->
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->

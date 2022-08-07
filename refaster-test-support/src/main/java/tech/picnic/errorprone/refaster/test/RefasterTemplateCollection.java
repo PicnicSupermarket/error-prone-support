@@ -7,7 +7,7 @@ import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.util.Comparator.naturalOrder;
-import static tech.picnic.errorprone.refaster.runner.RefasterCheck.INCLUDED_TEMPLATES_PATTERN_FLAG;
+import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_TEMPLATES_PATTERN_FLAG;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -45,17 +45,14 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import tech.picnic.errorprone.refaster.runner.CodeTransformers;
-import tech.picnic.errorprone.refaster.runner.RefasterCheck;
+import tech.picnic.errorprone.refaster.runner.Refaster;
 
 /**
  * A {@link BugChecker} that applies a Refaster template collection to an associated test input file
- * by delegating to {@link RefasterCheck}, and subsequently validates that each template modifies
- * exactly one distinct method, as indicated by each method's name.
+ * by delegating to the {@link Refaster} checker, and subsequently validates that each template
+ * modifies exactly one distinct method, as indicated by each method's name.
  */
-@BugPattern(
-    name = "RefasterTemplateCollection",
-    summary = "Exercises a Refaster template collection",
-    severity = ERROR)
+@BugPattern(summary = "Exercises a Refaster template collection", severity = ERROR)
 public final class RefasterTemplateCollection extends BugChecker
     implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
@@ -64,7 +61,7 @@ public final class RefasterTemplateCollection extends BugChecker
   private static final String TEST_METHOD_NAME_PREFIX = "test";
 
   private final ImmutableSortedSet<String> templatesUnderTest;
-  private final RefasterCheck delegate;
+  private final Refaster delegate;
 
   /**
    * Instantiates a {@link RefasterTemplateCollection} instance.
@@ -73,7 +70,7 @@ public final class RefasterTemplateCollection extends BugChecker
    */
   public RefasterTemplateCollection(ErrorProneFlags flags) {
     String templateCollectionUnderTest = getTemplateCollectionUnderTest(flags);
-    delegate = createRefasterCheck(templateCollectionUnderTest);
+    delegate = createRefasterChecker(templateCollectionUnderTest);
     templatesUnderTest = getTemplatesUnderTest(templateCollectionUnderTest);
   }
 
@@ -87,8 +84,8 @@ public final class RefasterTemplateCollection extends BugChecker
                         "Error Prone flag `%s` must be specified", TEMPLATE_COLLECTION_FLAG)));
   }
 
-  private static RefasterCheck createRefasterCheck(String templateCollectionUnderTest) {
-    return new RefasterCheck(
+  private static Refaster createRefasterChecker(String templateCollectionUnderTest) {
+    return new Refaster(
         ErrorProneFlags.fromMap(
             ImmutableMap.of(
                 INCLUDED_TEMPLATES_PATTERN_FLAG,
