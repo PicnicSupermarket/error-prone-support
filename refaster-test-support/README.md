@@ -1,6 +1,8 @@
 # Refaster test support
 
-This module provides utilities to validate Refaster template collections.
+This module provides utilities to validate _Refaster template collections_. A
+template collection is a set of Refaster templates represented as static nested
+classes, all located in a shared top-level class.
 
 ## What does this module do?
 
@@ -9,27 +11,27 @@ Refaster templates. Each collection of Refaster templates defined in a single
 top-level class is applied to an input file, and the resulting rewrites should
 match the associated output file.
 
-This extension ensures that each Refaster template is tested, making sure that
-it matches and transforms code as intended. If a Refaster template is not
-covered by a test, if it influences unrelated test code, or if the associated
-test doesn't follow certain established standards, then this irregularity will
-be reported, and the associated template collection test will fail. This way
-developers receive guidance on how to write Refaster template tests and
-assurance that every template is properly tested.
+The validation performed by this module ensures that each Refaster template is
+tested, making sure that it matches and transforms code as intended. If a
+Refaster template is not covered by a test, if it influences unrelated test
+code, or if the associated test doesn't follow certain established standards,
+then this irregularity will be reported, and the associated template collection
+test will fail. This way developers receive guidance on how to write Refaster
+template tests and assurance that every template is properly tested.
 
 ## How to test a collection of Refaster templates
 
-A class that contains one or more Refaster templates is called a Refaster
-template collection. In a nutshell, to test a Refaster template collection
-class using `RefasterTemplateCollection`, one should create suitably named
-input and output files. The collection's Refaster templates are applied to the
-input file and must exactly match the contents of the provided output file.
+In a nutshell, to test a Refaster template collection class using the
+`RefasterTemplateCollection` class, one should create suitably named input and
+output files. The collection's Refaster templates are applied to the input
+file, and the generated patches must exactly produce the contents of the
+associated output file.
 
 To test Refaster templates, one can create a (parameterized) test for every
 class that contains Refaster templates and invoke
 `RefasterTemplateCollection#validate`. This test utility applies the Refaster
-templates in the collection to a provided input file, and expects the result
-to exactly match the contents of a provided output file.
+templates in the collection to a provided input file, and expects the result to
+exactly match the contents of a provided output file.
 
 To adopt this setup, the following requirements have to be met:
 
