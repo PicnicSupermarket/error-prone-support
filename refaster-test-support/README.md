@@ -6,10 +6,10 @@ classes, all located in a shared top-level class.
 
 ## What does this module do?
 
-These utilities allow validating the rewrites (or their absence) performed by
-Refaster templates. Each collection of Refaster templates defined in a single
-top-level class is applied to an input file, and the resulting rewrites should
-match the associated output file.
+These utilities allow for validating the rewrites (or absence thereof) as
+performed by Refaster templates. Each collection of Refaster templates defined
+in a single top-level class is applied to an input file, and the resulting
+rewrites should match the associated output file.
 
 The validation performed by this module ensures that each Refaster template is
 tested, making sure that it matches and transforms code as intended. If a
@@ -47,7 +47,7 @@ To adopt this setup, the following requirements must be met:
   template collection.
 - For every Refaster template in the collection, the input and output file must
   contain a method. The name of the method is equal to the name of the Refaster
-  template prefixed with `test` (e.g. `test<RefasterTemplateInnerClassName>`).
+  template prefixed with `test` (e.g. `test<RefasterTemplateClassName>`).
 - The method contains at least one expression that matches the
   `@BeforeTemplate` of the corresponding Refaster template. As a result, the
   output file contains the same method with an updated expression, matching the
