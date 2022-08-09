@@ -24,8 +24,8 @@ import com.sun.source.tree.Tree;
 /**
  * A {@link BugChecker} which flags instance methods with return type {@link
  * com.google.common.collect.ImmutableSortedSet} defined inside a {@code @Value.Immutable}- or
- * {@code @Value.Modifiable}-annotated type that lack both a default implementation and the
- * {@code @Value.NaturalOrder} annotation.
+ * {@code @Value.Modifiable}-annotated type that lack the {@code @Value.NaturalOrder} or
+ * {@code @Value.ReverseOrder} annotation.
  *
  * <p>Deserialization of the enclosing type then requires that the associated JSON property is
  * present, would result in deserialization problems in case of absent sets.
@@ -35,8 +35,7 @@ import com.sun.source.tree.Tree;
     name = "MissingImmutableSortedSetDefault",
     summary =
         "`ImmutableSortedSet` properties of a `@Value.Immutable` or `@Value.Modifiable` type "
-            + "should be annotated `@Value.NaturalOrder` or `@Value.ReverseOrder`, or provide a "
-            + "default value",
+            + "should be annotated `@Value.NaturalOrder` or `@Value.ReverseOrder`.",
     linkType = NONE,
     severity = ERROR,
     tags = LIKELY_ERROR)
