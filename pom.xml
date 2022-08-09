@@ -73,7 +73,8 @@
         this 'argLine' property instead of the definition of the 'argLine'
         configuration setting allows users or plugins to specify additional
         arguments. In particular, JaCoCo relies on this for the configuration
-        of its Java agent. -->
+        of its Java agent, and Pitest uses this configuration when it spawns
+        additional JVMs. -->
         <argLine>
             <!-- The JVM arguments specified in `.mvn/jvm.config` also apply to
             test JVMs, as those are also non-interactive processess running
@@ -99,7 +100,7 @@
             <!-- We cap memory usage. This may be relevant for build agents,
             but also prevents excessive memory usage by heavily parallelized
             local builds. -->
-            -Xmx1024m
+            -Xmx${argLine.xmx}
             <!-- This argument cannot be set through Surefire's
             'systemPropertyVariables' configuration setting. Setting the file
             encoding is necessary because forked unit test invocations
@@ -118,6 +119,9 @@
             from showing up in the dock and capturing window focus. -->
             -Djava.awt.headless=true
         </argLine>
+        <!-- The maximum amount of heap memory available to forked Surefire
+        processes. Factored out into a separate property to allow overriding. -->
+        <argLine.xmx>1024m</argLine.xmx>
         <!-- Our build system provides a monotonically increasing build number.
         When building locally, this number is obviously absent. So we provide a
         default value. -->
