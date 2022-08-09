@@ -51,6 +51,11 @@ import tech.picnic.errorprone.refaster.runner.Refaster;
  * A {@link BugChecker} that applies a Refaster template collection to an associated test input file
  * by delegating to the {@link Refaster} checker, and subsequently validates that each template
  * modifies exactly one distinct method, as indicated by each method's name.
+ *
+ * <p>The test input and output files must be classpath resources located in the same package as the
+ * template collection class. Their names are derived from the template collection class by
+ * suffixing {@code TestInput.java} and {@code TestOutput.java}, respectively. Each test method's
+ * name must be derived from the template that modifies said method by prefixing {@code test}.
  */
 @BugPattern(summary = "Exercises a Refaster template collection", severity = ERROR)
 public final class RefasterTemplateCollection extends BugChecker
