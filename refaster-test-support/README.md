@@ -16,7 +16,7 @@ tested, making sure that it matches and transforms code as intended. If a
 Refaster template is not covered by a test, if it influences unrelated test
 code, or if the associated test doesn't follow certain established standards,
 then this irregularity will be reported, and the associated template collection
-test will fail. This way developers receive guidance on how to write Refaster
+test will fail. This way, developers receive guidance on how to write Refaster
 template tests and assurance that every template is properly tested.
 
 ## How to test a collection of Refaster templates
@@ -33,12 +33,12 @@ class that contains Refaster templates and invoke
 templates in the collection to a provided input file, and expects the result to
 exactly match the contents of a provided output file.
 
-To adopt this setup, the following requirements have to be met:
+To adopt this setup, the following requirements must be met:
 
-- Create a class with a (parameterized) test method that invokes
-  `RefasterTemplateCollection#validate` and passes the collection(s) to
-  validate. The Refaster template collection must match the naming convention
-  `<TemplateCollectionName>Templates.java`.
+- A class with a (parameterized) test method that invokes
+  `RefasterTemplateCollection#validate` is created which provides the
+  collection(s) to validate. The Refaster template collection must match the
+  naming convention `<TemplateCollectionName>Templates.java`.
 - An input file matching the naming convention
   `<TemplateCollectionName>TemplatesTestInput.java` is added for every template
   collection.
@@ -47,10 +47,10 @@ To adopt this setup, the following requirements have to be met:
   template collection.
 - For every Refaster template in the collection, the input and output file must
   contain a method. The name of the method is equal to the name of the Refaster
-  template prefixed with `test` (e.g. `test<RefasterTemplateClassName>`).
+  template prefixed with `test` (e.g. `test<RefasterTemplateInnerClassName>`).
 - The method contains at least one expression that matches the
-  `@BeforeTemplate` of one specific Refaster template. As a result, the output
-  file contains the same method with an updated expression, matching the
+  `@BeforeTemplate` of the corresponding Refaster template. As a result, the
+  output file contains the same method with an updated expression, matching the
   content of the `@AfterTemplate`. Additionally, incorrect matches of _other_
   Refaster templates in the method are flagged.
 
