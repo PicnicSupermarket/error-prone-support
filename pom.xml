@@ -119,7 +119,7 @@
             from showing up in the dock and capturing window focus. -->
             -Djava.awt.headless=true
         </argLine>
-        <!-- The maximum amoun of heap memory available to forked Surefire
+        <!-- The maximum amount of heap memory available to forked Surefire
         processes. Factored out into a separate property to allow overriding. -->
         <argLine.xmx>1024m</argLine.xmx>
         <!-- Our build system provides a monotonically increasing build number.
