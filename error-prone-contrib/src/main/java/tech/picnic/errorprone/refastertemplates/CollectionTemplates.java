@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
@@ -129,31 +130,32 @@ final class CollectionTemplates {
     }
   }
 
-  static final class CollectionRemoveAllFromCollectionBlock<T, S extends T> {
+  static final class SetRemoveAllCollection<T, S extends T> {
     @BeforeTemplate
-    void before(Collection<T> removeTo, Collection<S> elementsToRemove) {
-      elementsToRemove.forEach(removeTo::remove);
+    void before(Set<T> removeFrom, Collection<S> elementsToRemove) {
+      elementsToRemove.forEach(removeFrom::remove);
     }
 
     @BeforeTemplate
-    void before2(Collection<T> removeTo, Collection<S> elementsToRemove) {
+    void before2(Set<T> removeFrom, Collection<S> elementsToRemove) {
       for (T element : elementsToRemove) {
-        removeTo.remove(element);
+        removeFrom.remove(element);
       }
     }
 
     // XXX: This method is identical to `before2` except for the loop type. Make Refaster smarter so
-    // that this is supported out of the box.
+    // that this is supported out of the box. After doing so, also drop the `S extends T` type
+    // constraint; ideally this check applies to any `S`.
     @BeforeTemplate
-    void before3(Collection<T> removeTo, Collection<S> elementsToRemove) {
+    void before3(Set<T> removeFrom, Collection<S> elementsToRemove) {
       for (S element : elementsToRemove) {
-        removeTo.remove(element);
+        removeFrom.remove(element);
       }
     }
 
     @AfterTemplate
-    void after(Collection<T> removeTo, Collection<S> elementsToRemove) {
-      removeTo.removeAll(elementsToRemove);
+    void after(Set<T> removeFrom, Collection<S> elementsToRemove) {
+      removeFrom.removeAll(elementsToRemove);
     }
   }
 

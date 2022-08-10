@@ -31,6 +31,10 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
     return assertThatIllegalArgumentException().isThrownBy(() -> {}).withMessage("foo");
   }
 
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalArgumentExceptionHasMessageParameters() {
+    return assertThatIllegalArgumentException().isThrownBy(() -> {}).withMessage("foo %s", "bar");
+  }
+
   AbstractObjectAssert<?, ?>
       testAssertThatThrownByIllegalArgumentExceptionHasMessageStartingWith() {
     return assertThatIllegalArgumentException().isThrownBy(() -> {}).withMessageStartingWith("foo");
@@ -55,6 +59,10 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
     return assertThatIllegalStateException().isThrownBy(() -> {}).withMessage("foo");
   }
 
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionHasMessageParameters() {
+    return assertThatIllegalStateException().isThrownBy(() -> {}).withMessage("foo %s", "bar");
+  }
+
   AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionHasMessageStartingWith() {
     return assertThatIllegalStateException().isThrownBy(() -> {}).withMessageStartingWith("foo");
   }
@@ -75,6 +83,10 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
     return assertThatNullPointerException().isThrownBy(() -> {}).withMessage("foo");
   }
 
+  AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionHasMessageParameters() {
+    return assertThatNullPointerException().isThrownBy(() -> {}).withMessage("foo %s", "bar");
+  }
+
   AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionHasMessageStartingWith() {
     return assertThatNullPointerException().isThrownBy(() -> {}).withMessageStartingWith("foo");
   }
@@ -85,6 +97,11 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionHasMessage() {
     return assertThatIOException().isThrownBy(() -> {}).withMessage("foo");
+  }
+
+  @SuppressWarnings("AssertThatThrownByIOException")
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionHasMessageParameters() {
+    return assertThatIOException().isThrownBy(() -> {}).withMessage("foo %s", "bar");
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownBy() {
