@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -52,13 +53,13 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
     return Iterables.removeAll(new ArrayList<>(), ImmutableSet.of("foo"));
   }
 
-  void testCollectionRemoveAllFromCollectionBlock() {
-    ImmutableSet.of("foo").forEach(new ArrayList<>()::remove);
-    for (Number element : ImmutableSet.of(1)) {
-      new ArrayList<Number>().remove(element);
+  void testSetRemoveAllCollection() {
+    ImmutableSet.of("foo").forEach(new HashSet<>()::remove);
+    for (Number element : ImmutableList.of(1)) {
+      new HashSet<Number>().remove(element);
     }
     for (Integer element : ImmutableSet.of(2)) {
-      new ArrayList<Number>().remove(element);
+      new HashSet<Number>().remove(element);
     }
   }
 
