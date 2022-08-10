@@ -23,9 +23,9 @@ template tests and assurance that every template is properly tested.
 
 In a nutshell, to test a Refaster template collection using the
 `RefasterTemplateCollection` class, one should create suitably named input and
-output files. The collection's Refaster templates are applied to the input
-file, and the generated patches must exactly produce the contents of the
-associated output file.
+output source code files. The collection's Refaster templates are applied to
+the input file, and the generated patches must exactly produce the contents of
+the associated output file.
 
 To test Refaster templates, one can create a (parameterized) test for every
 class that contains Refaster templates and invoke
