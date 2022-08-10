@@ -130,7 +130,7 @@ final class CollectionTemplates {
     }
   }
 
-  static final class CollectionRemoveAllFromSetBlock<T, S extends T> {
+  static final class SetRemoveAllCollection<T, S extends T> {
     @BeforeTemplate
     void before(Set<T> removeFrom, Collection<S> elementsToRemove) {
       elementsToRemove.forEach(removeFrom::remove);
