@@ -132,29 +132,29 @@ final class CollectionTemplates {
 
   static final class CollectionRemoveAllFromSetBlock<T, S extends T> {
     @BeforeTemplate
-    void before(Set<T> removeTo, Collection<S> elementsToRemove) {
-      elementsToRemove.forEach(removeTo::remove);
+    void before(Set<T> removeFrom, Collection<S> elementsToRemove) {
+      elementsToRemove.forEach(removeFrom::remove);
     }
 
     @BeforeTemplate
-    void before2(Set<T> removeTo, Collection<S> elementsToRemove) {
+    void before2(Set<T> removeFrom, Collection<S> elementsToRemove) {
       for (T element : elementsToRemove) {
-        removeTo.remove(element);
+        removeFrom.remove(element);
       }
     }
 
     // XXX: This method is identical to `before2` except for the loop type. Make Refaster smarter so
     // that this is supported out of the box.
     @BeforeTemplate
-    void before3(Set<T> removeTo, Collection<S> elementsToRemove) {
+    void before3(Set<T> removeFrom, Collection<S> elementsToRemove) {
       for (S element : elementsToRemove) {
-        removeTo.remove(element);
+        removeFrom.remove(element);
       }
     }
 
     @AfterTemplate
-    void after(Set<T> removeTo, Collection<S> elementsToRemove) {
-      removeTo.removeAll(elementsToRemove);
+    void after(Set<T> removeFrom, Collection<S> elementsToRemove) {
+      removeFrom.removeAll(elementsToRemove);
     }
   }
 
