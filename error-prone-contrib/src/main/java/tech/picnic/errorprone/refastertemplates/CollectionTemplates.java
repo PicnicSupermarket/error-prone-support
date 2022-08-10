@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
@@ -131,7 +132,7 @@ final class CollectionTemplates {
 
   static final class CollectionRemoveAllFromCollectionBlock<T, S extends T> {
     @BeforeTemplate
-    void before(Collection<T> removeTo, Collection<S> elementsToRemove) {
+    void before(Collection<T> removeTo, Set<S> elementsToRemove) {
       elementsToRemove.forEach(removeTo::remove);
     }
 
