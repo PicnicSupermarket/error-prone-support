@@ -13,6 +13,7 @@ import com.google.common.collect.Streams;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class StringTemplatesTest implements RefasterTemplateTestCase {
   @Override

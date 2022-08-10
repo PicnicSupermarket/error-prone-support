@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.AbstractAssert;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJCharSequenceTemplatesTest implements RefasterTemplateTestCase {
   void testAssertThatCharSequenceIsEmpty() {

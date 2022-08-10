@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class ImmutableSetTemplatesTest implements RefasterTemplateTestCase {
   @Override

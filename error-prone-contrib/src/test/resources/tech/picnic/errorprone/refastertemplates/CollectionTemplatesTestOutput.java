@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class CollectionTemplatesTest implements RefasterTemplateTestCase {
   @Override

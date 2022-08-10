@@ -11,6 +11,7 @@ import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 import com.google.common.collect.ImmutableSet;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.WebClient;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class WebClientTemplatesTest implements RefasterTemplateTestCase {
   @Override

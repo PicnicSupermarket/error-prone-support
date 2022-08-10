@@ -41,15 +41,13 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>refaster-compiler</artifactId>
-            <!-- This dependency is declared only as a hint to Maven that
-            compilation depends on it; see the `maven-compiler-plugin`'s
-            `annotationProcessorPaths` configuration below. -->
+            <artifactId>refaster-support</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>refaster-support</artifactId>
+            <artifactId>refaster-test-support</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -205,15 +203,6 @@
     <build>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>com.spotify.fmt</groupId>
-                    <artifactId>fmt-maven-plugin</artifactId>
-                    <configuration>
-                        <additionalSourceDirectories>
-                            <additionalSourceDirectory>${basedir}/src/test/resources</additionalSourceDirectory>
-                        </additionalSourceDirectories>
-                    </configuration>
-                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>

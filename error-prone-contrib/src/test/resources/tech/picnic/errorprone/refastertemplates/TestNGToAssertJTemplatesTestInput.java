@@ -17,6 +17,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import java.util.ArrayList;
 import java.util.Collections;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class TestNGToAssertJTemplatesTest implements RefasterTemplateTestCase {
   @Override

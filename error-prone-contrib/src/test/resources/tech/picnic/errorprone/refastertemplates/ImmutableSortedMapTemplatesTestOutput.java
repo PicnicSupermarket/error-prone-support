@@ -10,6 +10,7 @@ import com.google.common.collect.Streams;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class ImmutableSortedMapTemplatesTest implements RefasterTemplateTestCase {
   @Override

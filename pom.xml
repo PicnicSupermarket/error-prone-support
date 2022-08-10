@@ -41,7 +41,9 @@
     <modules>
         <module>error-prone-contrib</module>
         <module>refaster-compiler</module>
+        <module>refaster-runner</module>
         <module>refaster-support</module>
+        <module>refaster-test-support</module>
     </modules>
 
     <scm>
@@ -198,7 +200,17 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>refaster-runner</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>refaster-support</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>refaster-test-support</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -453,6 +465,9 @@
                     <artifactId>fmt-maven-plugin</artifactId>
                     <version>2.19</version>
                     <configuration>
+                        <additionalSourceDirectories>
+                            <additionalSourceDirectory>${basedir}/src/test/resources</additionalSourceDirectory>
+                        </additionalSourceDirectories>
                         <forkMode>never</forkMode>
                         <failOnError>false</failOnError>
                     </configuration>
@@ -1351,6 +1366,11 @@
                                 <path>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>error-prone-contrib</artifactId>
+                                    <version>${project.version}</version>
+                                </path>
+                                <path>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>refaster-runner</artifactId>
                                     <version>${project.version}</version>
                                 </path>
                             </annotationProcessorPaths>

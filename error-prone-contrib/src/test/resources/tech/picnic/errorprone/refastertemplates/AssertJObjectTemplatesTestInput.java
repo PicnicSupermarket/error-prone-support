@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refastertemplates;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.assertj.core.api.AbstractAssert;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJObjectTemplatesTest implements RefasterTemplateTestCase {
   AbstractAssert<?, ?> testAssertThatIsInstanceOf() {

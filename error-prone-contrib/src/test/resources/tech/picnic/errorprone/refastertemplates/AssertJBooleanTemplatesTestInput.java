@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.AbstractBooleanAssert;
+import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJBooleanTemplatesTest implements RefasterTemplateTestCase {
   AbstractBooleanAssert<?> testAbstractBooleanAssertIsEqualTo() {
