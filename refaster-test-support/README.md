@@ -6,7 +6,7 @@ classes, all located in a shared top-level class.
 
 ## What does this module do?
 
-These utilities allow for validating the rewrites (or absence thereof) as
+These utilities allow for validating the rewrites (or absence of rewrites)
 performed by Refaster templates. Each collection of Refaster templates defined
 in a single top-level class is applied to an input file, and the resulting
 rewrites should match the associated output file.
@@ -21,7 +21,7 @@ template tests and assurance that every template is properly tested.
 
 ## How to test a collection of Refaster templates
 
-In a nutshell, to test a Refaster template collection class using the
+In a nutshell, to test a Refaster template collection using the
 `RefasterTemplateCollection` class, one should create suitably named input and
 output files. The collection's Refaster templates are applied to the input
 file, and the generated patches must exactly produce the contents of the
@@ -35,26 +35,24 @@ exactly match the contents of a provided output file.
 
 To adopt this setup, the following requirements must be met:
 
-- A class with a (parameterized) test method that invokes
-  `RefasterTemplateCollection#validate` is created which provides the
-  collection(s) to validate. The Refaster template collection must match the
-  naming convention `<TemplateCollectionName>Templates.java`.
-- An input file matching the naming convention
-  `<TemplateCollectionName>TemplatesTestInput.java` is added for every template
-  collection.
-- An output file matching the naming convention
-  `<TemplateCollectionName>TemplatesTestOutput.java` file is added for every
-  template collection.
-- For every Refaster template in the collection, the input and output file must
-  contain a method. The name of the method is equal to the name of the Refaster
-  template prefixed with `test` (e.g. `test<RefasterTemplateClassName>`).
-- The method contains at least one expression that matches the
+- Each Refaster template collection must match the naming convention
+  `<TemplateCollectionName>Templates.java`.
+- There is a test class with a (parameterized) test method that invokes
+  `RefasterTemplateCollection#validate` on the template collection(s) to be
+  validated.
+- For every template collection there is an input file matching the naming
+  convention `<TemplateCollectionName>TemplatesTestInput.java`.
+- For every template collection there is an output file matching the naming
+  convention `<TemplateCollectionName>TemplatesTestOutput.java`.
+- For every Refaster template in a collection, the associated input and output
+  files must contain a method that validates the template's behavior. The name
+  of this method must be derived from the name of the Refaster template it aims
+  to validate, prefixed with `test` (i.e. `test<RefasterTemplateClassName>`).
+- Each such method contains at least one expression that matches the
   `@BeforeTemplate` of the corresponding Refaster template. As a result, the
-  output file contains the same method with an updated expression, matching the
-  content of the `@AfterTemplate`. Additionally, incorrect matches of _other_
-  Refaster templates in the method are flagged.
-
-As a result from these tests, unexpected output will be shown in the console.
+  output file must contain the same method with an updated expression, in
+  accordance with the associated `@AfterTemplate`.
+- Such methods must not match any _other_ Refaster templates.
 
 An example directory structure for such a setup is as follows:
 ```

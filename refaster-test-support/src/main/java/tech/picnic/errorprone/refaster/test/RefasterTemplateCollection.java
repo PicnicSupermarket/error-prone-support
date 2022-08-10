@@ -57,6 +57,9 @@ import tech.picnic.errorprone.refaster.runner.Refaster;
  * suffixing {@code TestInput.java} and {@code TestOutput.java}, respectively. Each test method's
  * name must be derived from the template that modifies said method by prefixing {@code test}.
  */
+// XXX: This check currently only validates that one `Refaster.anyOf` branch in one
+// `@BeforeTemplate` method is covered by a test. Review how we can make sure that _all_
+// `@BeforeTemplate` methods and `Refaster.anyOf` branches are covered.
 @BugPattern(summary = "Exercises a Refaster template collection", severity = ERROR)
 public final class RefasterTemplateCollection extends BugChecker
     implements CompilationUnitTreeMatcher {
