@@ -144,7 +144,8 @@ final class CollectionTemplates {
     }
 
     // XXX: This method is identical to `before2` except for the loop type. Make Refaster smarter so
-    // that this is supported out of the box.
+    // that this is supported out of the box. After doing so, also drop the `S extends T` type
+    // constraint; ideally this check applies to any `S`.
     @BeforeTemplate
     void before3(Set<T> removeFrom, Collection<S> elementsToRemove) {
       for (S element : elementsToRemove) {

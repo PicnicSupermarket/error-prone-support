@@ -54,7 +54,6 @@ final class CollectionTemplatesTest implements RefasterTemplateTestCase {
   }
 
   void testSetRemoveAllCollection() {
-    ImmutableList.of("foo").forEach(new ArrayList<>()::remove);
     ImmutableSet.of("foo").forEach(new HashSet<>()::remove);
     for (Number element : ImmutableList.of(1)) {
       new HashSet<Number>().remove(element);
