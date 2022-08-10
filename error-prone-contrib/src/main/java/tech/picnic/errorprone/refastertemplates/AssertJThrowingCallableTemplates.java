@@ -59,6 +59,27 @@ final class AssertJThrowingCallableTemplates {
     }
   }
 
+  static final class AssertThatThrownByIllegalArgumentExceptionHasMessageParameters {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "AssertThatThrownByIllegalArgumentException" /* Matches strictly more specific expressions. */)
+    AbstractObjectAssert<?, ?> before(
+        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
+      return assertThatIllegalArgumentException()
+          .isThrownBy(throwingCallable)
+          .withMessage(message, parameters);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractObjectAssert<?, ?> after(
+        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
+      return assertThatThrownBy(throwingCallable)
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessage(message, parameters);
+    }
+  }
+
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
@@ -145,6 +166,27 @@ final class AssertJThrowingCallableTemplates {
       return assertThatThrownBy(throwingCallable)
           .isInstanceOf(IllegalStateException.class)
           .hasMessage(message);
+    }
+  }
+
+  static final class AssertThatThrownByIllegalStateExceptionHasMessageParameters {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "AssertThatThrownByIllegalStateException" /* Matches strictly more specific expressions. */)
+    AbstractObjectAssert<?, ?> before(
+        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
+      return assertThatIllegalStateException()
+          .isThrownBy(throwingCallable)
+          .withMessage(message, parameters);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractObjectAssert<?, ?> after(
+        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
+      return assertThatThrownBy(throwingCallable)
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessage(message, parameters);
     }
   }
 
@@ -235,6 +277,27 @@ final class AssertJThrowingCallableTemplates {
     }
   }
 
+  static final class AssertThatThrownByNullPointerExceptionHasMessageParameters {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "AssertThatThrownByNullPointerException" /* Matches strictly more specific expressions. */)
+    AbstractObjectAssert<?, ?> before(
+        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
+      return assertThatNullPointerException()
+          .isThrownBy(throwingCallable)
+          .withMessage(message, parameters);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractObjectAssert<?, ?> after(
+        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
+      return assertThatThrownBy(throwingCallable)
+          .isInstanceOf(NullPointerException.class)
+          .hasMessage(message, parameters);
+    }
+  }
+
   static final class AssertThatThrownByNullPointerExceptionHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
@@ -281,6 +344,25 @@ final class AssertJThrowingCallableTemplates {
       return assertThatThrownBy(throwingCallable)
           .isInstanceOf(IOException.class)
           .hasMessage(message);
+    }
+  }
+
+  static final class AssertThatThrownByIOExceptionHasMessageParameters {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "AssertThatThrownByIOException" /* Matches strictly more specific expressions. */)
+    AbstractObjectAssert<?, ?> before(
+        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
+      return assertThatIOException().isThrownBy(throwingCallable).withMessage(message, parameters);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractObjectAssert<?, ?> after(
+        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
+      return assertThatThrownBy(throwingCallable)
+          .isInstanceOf(IOException.class)
+          .hasMessage(message, parameters);
     }
   }
 
