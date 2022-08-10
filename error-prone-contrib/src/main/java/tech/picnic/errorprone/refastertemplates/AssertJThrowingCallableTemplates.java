@@ -59,8 +59,6 @@ final class AssertJThrowingCallableTemplates {
     }
   }
 
-  // XXX: Drop this template in favour of a generic Error Prone check which flags
-  // `String.format(...)` arguments to a wide range of format methods.
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings(
@@ -171,8 +169,6 @@ final class AssertJThrowingCallableTemplates {
     }
   }
 
-  // XXX: Drop this template in favour of a generic Error Prone check which flags
-  // `String.format(...)` arguments to a wide range of format methods.
   static final class AssertThatThrownByIllegalStateExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings(
@@ -281,8 +277,6 @@ final class AssertJThrowingCallableTemplates {
     }
   }
 
-  // XXX: Drop this template in favour of a generic Error Prone check which flags
-  // `String.format(...)` arguments to a wide range of format methods.
   static final class AssertThatThrownByNullPointerExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings(
@@ -353,8 +347,6 @@ final class AssertJThrowingCallableTemplates {
     }
   }
 
-  // XXX: Drop this template in favour of a generic Error Prone check which flags
-  // `String.format(...)` arguments to a wide range of format methods.
   static final class AssertThatThrownByIOExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings(
