@@ -135,6 +135,12 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
         .hasMessage("foo");
   }
 
+  AbstractObjectAssert<?, ?> testAssertThatThrownByHasMessageParameters() {
+    return assertThatThrownBy(() -> {})
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("foo %s", "bar");
+  }
+
   ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>>
       testAbstractThrowableAssertHasMessage() {
     return ImmutableSet.of(

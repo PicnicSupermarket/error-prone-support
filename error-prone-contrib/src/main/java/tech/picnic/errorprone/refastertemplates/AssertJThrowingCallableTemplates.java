@@ -403,6 +403,32 @@ final class AssertJThrowingCallableTemplates {
     }
   }
 
+  static final class AssertThatThrownByHasMessageParameters {
+    @BeforeTemplate
+    @SuppressWarnings("AssertThatThrownBy" /* Matches strictly more specific expressions. */)
+    AbstractObjectAssert<?, ?> before(
+        Class<? extends Throwable> exceptionType,
+        ThrowingCallable throwingCallable,
+        String message,
+        @Repeated Object parameters) {
+      return assertThatExceptionOfType(exceptionType)
+          .isThrownBy(throwingCallable)
+          .withMessage(message, parameters);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractObjectAssert<?, ?> after(
+        Class<? extends Throwable> exceptionType,
+        ThrowingCallable throwingCallable,
+        String message,
+        @Repeated Object parameters) {
+      return assertThatThrownBy(throwingCallable)
+          .isInstanceOf(exceptionType)
+          .hasMessage(message, parameters);
+    }
+  }
+
   // XXX: Drop this template in favour of a generic Error Prone check which flags
   // `String.format(...)` arguments to a wide range of format methods.
   static final class AbstractThrowableAssertHasMessage {
