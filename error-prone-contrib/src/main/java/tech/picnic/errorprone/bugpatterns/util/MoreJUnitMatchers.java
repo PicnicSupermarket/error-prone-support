@@ -58,7 +58,7 @@ public final class MoreJUnitMatchers {
    * @param methodSourceAnnotation The annotation from which to extract value factory method names.
    * @return One or more value factory names.
    */
-  static ImmutableSet<String> getMethodSourceFactoryNames(
+  public static ImmutableSet<String> getMethodSourceFactoryNames(
       AnnotationTree methodSourceAnnotation, MethodTree method) {
     String methodName = method.getName().toString();
     ExpressionTree value = AnnotationMatcherUtils.getArgument(methodSourceAnnotation, "value");
