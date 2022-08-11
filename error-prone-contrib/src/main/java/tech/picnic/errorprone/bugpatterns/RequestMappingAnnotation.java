@@ -63,10 +63,10 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
                       AT_LEAST_ONE,
                       anyOf(
                           isType(ANN_PACKAGE_PREFIX + "PathVariable"),
+                          isType(ANN_PACKAGE_PREFIX + "RequestAttribute"),
                           isType(ANN_PACKAGE_PREFIX + "RequestBody"),
                           isType(ANN_PACKAGE_PREFIX + "RequestHeader"),
-                          isType(ANN_PACKAGE_PREFIX + "RequestParam"),
-                          isType(ANN_PACKAGE_PREFIX + "RequestAttribute"))),
+                          isType(ANN_PACKAGE_PREFIX + "RequestParam"))),
                   isSameType("java.io.InputStream"),
                   isSameType("java.time.ZoneId"),
                   isSameType("java.util.Locale"),
