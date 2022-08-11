@@ -28,7 +28,6 @@ import java.io.ObjectOutputStream;
 import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
@@ -103,16 +102,10 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
   }
 
   private FileObject getOutputFile(TaskEvent taskEvent, ClassTree tree) throws IOException {
-    String packageName =
-        Optional.ofNullable(ASTHelpers.getSymbol(tree))
-            .map(ASTHelpers::enclosingPackage)
-            .map(PackageSymbol::toString)
-            .orElse("");
-    CharSequence className =
-        Optional.ofNullable(ASTHelpers.getSymbol(tree))
-            .map(RefasterRuleCompilerTaskListener::toSimpleFlatName)
-            .orElseGet(tree::getSimpleName);
-    String relativeName = className + ".refaster";
+    ClassSymbol symbol = ASTHelpers.getSymbol(tree);
+    PackageSymbol enclosingPackage = ASTHelpers.enclosingPackage(symbol);
+    String packageName = enclosingPackage == null ? "" : enclosingPackage.toString();
+    String relativeName = toSimpleFlatName(symbol) + ".refaster";
 
     JavaFileManager fileManager = context.get(JavaFileManager.class);
     return fileManager.getFileForOutput(

@@ -6,7 +6,6 @@ import static com.google.errorprone.BugPattern.StandardTags.PERFORMANCE;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
-import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 
 import com.google.auto.service.AutoService;
@@ -84,16 +83,15 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
 
   private static Optional<Fix> attemptMethodInvocationReplacement(
       MethodInvocationTree tree, Type cmpType, boolean isStatic, VisitorState state) {
-    return Optional.ofNullable(ASTHelpers.getSymbol(tree))
-        .map(methodSymbol -> methodSymbol.getSimpleName().toString())
-        .flatMap(
-            actualMethodName ->
-                Optional.of(getPreferredMethod(cmpType, isStatic, state))
-                    .filter(not(actualMethodName::equals)))
-        .map(
-            preferredMethodName ->
-                prefixTypeArgumentsIfRelevant(preferredMethodName, tree, cmpType, state))
-        .map(preferredMethodName -> suggestFix(tree, preferredMethodName, state));
+    String actualMethodName = ASTHelpers.getSymbol(tree).getSimpleName().toString();
+    String preferredMethodName = getPreferredMethod(cmpType, isStatic, state);
+    if (actualMethodName.equals(preferredMethodName)) {
+      return Optional.empty();
+    }
+
+    return Optional.of(
+        suggestFix(
+            tree, prefixTypeArgumentsIfRelevant(preferredMethodName, tree, cmpType, state), state));
   }
 
   /**

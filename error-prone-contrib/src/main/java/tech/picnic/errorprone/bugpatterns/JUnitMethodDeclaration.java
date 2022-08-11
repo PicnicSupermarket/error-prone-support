@@ -176,8 +176,7 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
   }
 
   private static Optional<String> tryCanonicalizeMethodName(MethodTree tree) {
-    return Optional.ofNullable(ASTHelpers.getSymbol(tree))
-        .map(sym -> sym.getQualifiedName().toString())
+    return Optional.of(ASTHelpers.getSymbol(tree).getQualifiedName().toString())
         .filter(name -> name.startsWith(TEST_PREFIX))
         .map(name -> name.substring(TEST_PREFIX.length()))
         .filter(not(String::isEmpty))
