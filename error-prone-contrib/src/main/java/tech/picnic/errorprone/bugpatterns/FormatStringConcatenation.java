@@ -48,7 +48,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 // `Formattable#toString` invocation with a `Formattable#formatTo` invocation. But likely that
 // should be considered a bug fix, too.
 // XXX: Introduce a separate check that adds/removes the `Locale` parameter to `String.format`
-// invocations, as necessary.
+// invocations, as necessary. See also a comment in the `StringJoin` check.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Defer string concatenation to the invoked method",
