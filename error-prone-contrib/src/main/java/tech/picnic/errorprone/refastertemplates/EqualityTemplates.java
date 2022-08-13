@@ -41,13 +41,11 @@ final class EqualityTemplates {
   // non-null.
   static final class EqualsPredicate<T> {
     @BeforeTemplate
-    @SuppressWarnings("NoFunctionalReturnType")
     Predicate<T> before(T v) {
       return e -> v.equals(e);
     }
 
     @AfterTemplate
-    @SuppressWarnings("NoFunctionalReturnType")
     Predicate<T> after(T v) {
       return v::equals;
     }

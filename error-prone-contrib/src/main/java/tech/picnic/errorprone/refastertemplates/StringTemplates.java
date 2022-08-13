@@ -13,7 +13,9 @@ import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /** Refaster templates related to expressions dealing with {@link String}s. */
@@ -103,6 +105,40 @@ final class StringTemplates {
     @AfterTemplate
     String after(CharSequence delimiter, Iterable<? extends CharSequence> elements) {
       return String.join(delimiter, elements);
+    }
+  }
+
+  /**
+   * Prefer direct invocation of {@link String#valueOf(Object)} over the indirection introduced by
+   * {@link Objects#toString(Object)}.
+   */
+  static final class StringValueOf {
+    @BeforeTemplate
+    String before(Object object) {
+      return Objects.toString(object);
+    }
+
+    @AfterTemplate
+    String after(Object object) {
+      return String.valueOf(object);
+    }
+  }
+
+  /**
+   * Prefer direct delegation to {@link String#valueOf(Object)} over the indirection introduced by
+   * {@link Objects#toString(Object)}.
+   */
+  // XXX: This template is analogous to `StringValueOf` above. Arguably this is its generalization.
+  // If/when Refaster is extended to understand this, delete the template above.
+  static final class StringValueOfMethodReference<T> {
+    @BeforeTemplate
+    Function<Object, String> before() {
+      return Objects::toString;
+    }
+
+    @AfterTemplate
+    Function<Object, String> after() {
+      return String::valueOf;
     }
   }
 

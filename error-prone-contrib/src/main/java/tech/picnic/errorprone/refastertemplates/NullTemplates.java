@@ -33,13 +33,11 @@ final class NullTemplates {
   /** Prefer {@link Objects#isNull(Object)} over the equivalent lambda function. */
   static final class IsNullFunction<T> {
     @BeforeTemplate
-    @SuppressWarnings("NoFunctionalReturnType")
     Predicate<T> before() {
       return o -> o == null;
     }
 
     @AfterTemplate
-    @SuppressWarnings("NoFunctionalReturnType")
     Predicate<T> after() {
       return Objects::isNull;
     }
@@ -48,13 +46,11 @@ final class NullTemplates {
   /** Prefer {@link Objects#nonNull(Object)} over the equivalent lambda function. */
   static final class NonNullFunction<T> {
     @BeforeTemplate
-    @SuppressWarnings("NoFunctionalReturnType")
     Predicate<T> before() {
       return o -> o != null;
     }
 
     @AfterTemplate
-    @SuppressWarnings("NoFunctionalReturnType")
     Predicate<T> after() {
       return Objects::nonNull;
     }
