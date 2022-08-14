@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -115,11 +114,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.just("foo").flatMapMany(s -> Mono.fromSupplier(() -> s + s));
   }
 
-  ImmutableSet<Publisher<String>> testMonoMap() {
+  ImmutableSet<Mono<String>> testMonoMap() {
     return ImmutableSet.of(
         Mono.just("foo").flatMap(s -> Mono.just(s)),
-        Mono.just("bar").flatMapMany(s -> Mono.just(s.substring(1))),
-        Mono.just("baz").flatMapMany(s -> Flux.just(s)));
+        Mono.just("bar").flatMap(s -> Mono.just(s.substring(1))),
+        Mono.just("baz").flatMap(s -> Mono.just("bazz")));
   }
 
   ImmutableSet<Flux<String>> testFluxMap() {
@@ -148,10 +147,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just("fooSwitch").switchMap(s -> Flux.just(s)));
   }
 
-  ImmutableSet<Publisher<String>> testMonoMapNotNull() {
+  ImmutableSet<Mono<String>> testMonoMapNotNull() {
     return ImmutableSet.of(
         Mono.just("foo").flatMap(s -> Mono.justOrEmpty(s)),
-        Mono.just("bar").flatMapMany(s -> Mono.justOrEmpty(s.substring(1))));
+        Mono.just("bar").flatMap(s -> Mono.justOrEmpty(s.substring(1))),
+        Mono.just("baz").flatMap(s -> Mono.justOrEmpty("bazz")));
   }
 
   ImmutableSet<Flux<String>> testFluxMapNotNull() {

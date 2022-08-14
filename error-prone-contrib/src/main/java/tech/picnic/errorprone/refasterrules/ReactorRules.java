@@ -379,9 +379,6 @@ final class ReactorRules {
    * Prefer {@link Mono#map(Function)} over alternatives that unnecessarily require an inner
    * subscription.
    */
-  // XXX: The `Flux.just` support impacts the return type. Consider moving this to a separate check
-  // that adds `.flux()`. If so, replace the `Publisher` references here and in the test code to
-  // `Mono`.
   // XXX: Also cover `{Mono,Flux}.fromSupplier(() -> transformation(x))`. (Though it'd be more
   // accurate in some cases to use `mapNotNull` in those cases.)
   abstract static class MonoMap<T, S> {
@@ -389,11 +386,8 @@ final class ReactorRules {
     abstract S transformation(@MayOptionallyUse T value);
 
     @BeforeTemplate
-    Publisher<S> before(Mono<T> mono) {
-      return Refaster.anyOf(
-          mono.flatMap(x -> Mono.just(transformation(x))),
-          mono.flatMapMany(x -> Mono.just(transformation(x))),
-          mono.flatMapMany(x -> Flux.just(transformation(x))));
+    Mono<S> before(Mono<T> mono) {
+      return mono.flatMap(x -> Mono.just(transformation(x)));
     }
 
     @AfterTemplate
@@ -453,18 +447,13 @@ final class ReactorRules {
    * Prefer {@link Mono#mapNotNull(Function)} over alternatives that unnecessarily require an inner
    * subscription.
    */
-  // XXX: The `Flux.just` support impacts the return type. Consider moving this to a separate check
-  // that adds `.flux()`. If so, replace the `Publisher` references here and in the test code to
-  // `Mono`.
   abstract static class MonoMapNotNull<T, S> {
     @Placeholder(allowsIdentity = true)
     abstract S transformation(@MayOptionallyUse T value);
 
     @BeforeTemplate
-    Publisher<S> before(Mono<T> mono) {
-      return Refaster.anyOf(
-          mono.flatMap(x -> Mono.justOrEmpty(transformation(x))),
-          mono.flatMapMany(x -> Mono.justOrEmpty(transformation(x))));
+    Mono<S> before(Mono<T> mono) {
+      return mono.flatMap(x -> Mono.justOrEmpty(transformation(x)));
     }
 
     @AfterTemplate
