@@ -5,12 +5,11 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class MissingImmutableSortedSetDefaultCheckTest {
+final class ImmutablesSortedSetComparatorTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(MissingImmutableSortedSetDefaultCheck.class, getClass());
+      CompilationTestHelper.newInstance(ImmutablesSortedSetComparator.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(
-          MissingImmutableSortedSetDefaultCheck.class, getClass());
+      BugCheckerRefactoringTestHelper.newInstance(ImmutablesSortedSetComparator.class, getClass());
 
   @Test
   void identification() {
@@ -48,7 +47,7 @@ final class MissingImmutableSortedSetDefaultCheckTest {
             "",
             "@Value.Immutable",
             "abstract class C {",
-            "  // BUG: Diagnostic contains: ",
+            "  // BUG: Diagnostic contains:",
             "  abstract ImmutableSortedSet<String> sortedSet();",
             "",
             "  ImmutableSortedSet<String> defaultSortedSet() {",
