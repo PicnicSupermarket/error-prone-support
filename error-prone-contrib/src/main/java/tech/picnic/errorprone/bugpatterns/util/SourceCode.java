@@ -12,6 +12,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.util.ErrorProneToken;
 import com.google.errorprone.util.ErrorProneTokens;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
@@ -26,7 +27,29 @@ public final class SourceCode {
   /** The complement of {@link CharMatcher#whitespace()}. */
   private static final CharMatcher NON_WHITESPACE_MATCHER = CharMatcher.whitespace().negate();
 
+  // XXX: Proper name for this?
+  private static final String TEXT_BLOCK_MARKER = "\"\"\"";
+
   private SourceCode() {}
+
+  /**
+   * Tells whether the given expression is a text block.
+   *
+   * @param tree The AST node of interest.
+   * @param state A {@link VisitorState} describing the context in which the given {@link
+   *     ExpressionTree} is found.
+   * @return {@code true} iff the given expression is a text block.
+   */
+  // XXX: Add tests!
+  public static boolean isTextBlock(ExpressionTree tree, VisitorState state) {
+    if (tree.getKind() != Tree.Kind.STRING_LITERAL) {
+      return false;
+    }
+
+    /* If the source code is unavailable then we assume that this literal is _not_ a text block. */
+    String src = state.getSourceForNode(tree);
+    return src != null && src.startsWith(TEXT_BLOCK_MARKER);
+  }
 
   /**
    * Returns a string representation of the given {@link Tree}, preferring the original source code

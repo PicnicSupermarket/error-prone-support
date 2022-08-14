@@ -5,21 +5,52 @@ import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern;
+import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.ReturnTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
 import javax.lang.model.element.Name;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 final class SourceCodeTest {
+  @DisabledForJreRange(max = JRE.JAVA_14)
+  @Test
+  void isTextBlock() {
+    CompilationTestHelper.newInstance(TextBlockFlagger.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "class A {",
+            "  String negative1() {",
+            "    return toString();",
+            "  }",
+            "",
+            "  String negative2() {",
+            "    return \"foo\";",
+            "  }",
+            "",
+            "  String positive1() {",
+            "    // BUG: Diagnostic contains:",
+            "    return \"\"\"",
+            "    foo",
+            "    \"\"\";",
+            "  }",
+            "}")
+        .doTest();
+  }
+
   @Test
   void deleteWithTrailingWhitespaceAnnotations() {
     BugCheckerRefactoringTestHelper.newInstance(
@@ -226,6 +257,22 @@ final class SourceCodeTest {
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
+  }
+
+  /**
+   * A {@link BugChecker} that delegates to {@link SourceCode#isTextBlock(ExpressionTree,
+   * VisitorState)}.
+   */
+  @BugPattern(summary = "Interacts with `SourceCode` for testing purposes", severity = ERROR)
+  public static final class TextBlockFlagger extends BugChecker implements ReturnTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchReturn(ReturnTree tree, VisitorState state) {
+      return SourceCode.isTextBlock(tree.getExpression(), state)
+          ? describeMatch(tree)
+          : Description.NO_MATCH;
+    }
   }
 
   /**
