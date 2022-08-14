@@ -122,10 +122,51 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.just("baz").flatMapMany(s -> Flux.just(s)));
   }
 
+  ImmutableSet<Flux<String>> testFluxMap() {
+    return ImmutableSet.of(
+        Flux.just("fooConcat").concatMap(s -> Mono.just(s.substring(1))),
+        Flux.just("fooConcat").concatMap(s -> Flux.just("foo")),
+        Flux.just("fooConcat").concatMap(s -> Mono.just(s), 2),
+        Flux.just("fooConcat").concatMap(s -> Flux.just(s), 2),
+        Flux.just("fooConcatDelay").concatMapDelayError(s -> Mono.just(s)),
+        Flux.just("fooConcatDelay").concatMapDelayError(s -> Flux.just(s)),
+        Flux.just("fooConcatDelay").concatMapDelayError(s -> Mono.just(s), 2),
+        Flux.just("fooConcatDelay").concatMapDelayError(s -> Flux.just(s), 2),
+        Flux.just("fooFlat").flatMap(s -> Mono.just(s), 2),
+        Flux.just("fooFlat").flatMap(s -> Flux.just(s), 2),
+        Flux.just("fooFlat").flatMap(s -> Mono.just(s), 2, 2),
+        Flux.just("fooFlat").flatMap(s -> Flux.just(s), 2, 2),
+        Flux.just("fooFlatDelay").flatMapDelayError(s -> Mono.just(s), 2, 2),
+        Flux.just("fooFlatDelay").flatMapDelayError(s -> Flux.just(s), 2, 2),
+        Flux.just("fooSeq").flatMapSequential(s -> Mono.just(s), 2),
+        Flux.just("fooSeq").flatMapSequential(s -> Flux.just(s), 2),
+        Flux.just("fooSeq").flatMapSequential(s -> Mono.just(s), 2, 2),
+        Flux.just("fooSeq").flatMapSequential(s -> Flux.just(s), 2, 2),
+        Flux.just("fooSeqDelay").flatMapSequentialDelayError(s -> Mono.just(s), 2, 2),
+        Flux.just("fooSeqDelay").flatMapSequentialDelayError(s -> Flux.just(s), 2, 2),
+        Flux.just("fooSwitch").switchMap(s -> Mono.just(s)),
+        Flux.just("fooSwitch").switchMap(s -> Flux.just(s)));
+  }
+
   ImmutableSet<Publisher<String>> testMonoMapNotNull() {
     return ImmutableSet.of(
         Mono.just("foo").flatMap(s -> Mono.justOrEmpty(s)),
         Mono.just("bar").flatMapMany(s -> Mono.justOrEmpty(s.substring(1))));
+  }
+
+  ImmutableSet<Flux<String>> testFluxMapNotNull() {
+    return ImmutableSet.of(
+        Flux.just("fooConcat").concatMap(s -> Mono.justOrEmpty(s.substring(1))),
+        Flux.just("fooConcat").concatMap(s -> Mono.justOrEmpty("foo"), 2),
+        Flux.just("fooConcatDelay").concatMapDelayError(s -> Mono.justOrEmpty(s)),
+        Flux.just("fooConcatDelay").concatMapDelayError(s -> Mono.justOrEmpty(s), 2),
+        Flux.just("fooFlat").flatMap(s -> Mono.justOrEmpty(s), 2),
+        Flux.just("fooFlat").flatMap(s -> Mono.justOrEmpty(s), 2, 2),
+        Flux.just("fooFlatDelay").flatMapDelayError(s -> Mono.justOrEmpty(s), 2, 2),
+        Flux.just("fooSeq").flatMapSequential(s -> Mono.justOrEmpty(s), 2),
+        Flux.just("fooSeq").flatMapSequential(s -> Mono.justOrEmpty(s), 2, 2),
+        Flux.just("fooSeqDelay").flatMapSequentialDelayError(s -> Mono.justOrEmpty(s), 2, 2),
+        Flux.just("fooSwitch").switchMap(s -> Mono.justOrEmpty(s)));
   }
 
   Flux<String> testMonoFlux() {

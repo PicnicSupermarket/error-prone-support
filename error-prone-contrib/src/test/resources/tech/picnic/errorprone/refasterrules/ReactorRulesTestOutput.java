@@ -127,9 +127,50 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.just("baz").map(s -> s));
   }
 
+  ImmutableSet<Flux<String>> testFluxMap() {
+    return ImmutableSet.of(
+        Flux.just("fooConcat").map(s -> s.substring(1)),
+        Flux.just("fooConcat").map(s -> "foo"),
+        Flux.just("fooConcat").map(s -> s),
+        Flux.just("fooConcat").map(s -> s),
+        Flux.just("fooConcatDelay").map(s -> s),
+        Flux.just("fooConcatDelay").map(s -> s),
+        Flux.just("fooConcatDelay").map(s -> s),
+        Flux.just("fooConcatDelay").map(s -> s),
+        Flux.just("fooFlat").map(s -> s),
+        Flux.just("fooFlat").map(s -> s),
+        Flux.just("fooFlat").map(s -> s),
+        Flux.just("fooFlat").map(s -> s),
+        Flux.just("fooFlatDelay").map(s -> s),
+        Flux.just("fooFlatDelay").map(s -> s),
+        Flux.just("fooSeq").map(s -> s),
+        Flux.just("fooSeq").map(s -> s),
+        Flux.just("fooSeq").map(s -> s),
+        Flux.just("fooSeq").map(s -> s),
+        Flux.just("fooSeqDelay").map(s -> s),
+        Flux.just("fooSeqDelay").map(s -> s),
+        Flux.just("fooSwitch").map(s -> s),
+        Flux.just("fooSwitch").map(s -> s));
+  }
+
   ImmutableSet<Publisher<String>> testMonoMapNotNull() {
     return ImmutableSet.of(
         Mono.just("foo").mapNotNull(s -> s), Mono.just("bar").mapNotNull(s -> s.substring(1)));
+  }
+
+  ImmutableSet<Flux<String>> testFluxMapNotNull() {
+    return ImmutableSet.of(
+        Flux.just("fooConcat").mapNotNull(s -> s.substring(1)),
+        Flux.just("fooConcat").mapNotNull(s -> "foo"),
+        Flux.just("fooConcatDelay").mapNotNull(s -> s),
+        Flux.just("fooConcatDelay").mapNotNull(s -> s),
+        Flux.just("fooFlat").mapNotNull(s -> s),
+        Flux.just("fooFlat").mapNotNull(s -> s),
+        Flux.just("fooFlatDelay").mapNotNull(s -> s),
+        Flux.just("fooSeq").mapNotNull(s -> s),
+        Flux.just("fooSeq").mapNotNull(s -> s),
+        Flux.just("fooSeqDelay").mapNotNull(s -> s),
+        Flux.just("fooSwitch").mapNotNull(s -> s));
   }
 
   Flux<String> testMonoFlux() {

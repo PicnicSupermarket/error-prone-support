@@ -417,6 +417,10 @@ final class ReactorRules {
       return Refaster.anyOf(
           flux.concatMap(x -> Mono.just(transformation(x))),
           flux.concatMap(x -> Flux.just(transformation(x))),
+          flux.concatMap(x -> Mono.just(transformation(x)), prefetch),
+          flux.concatMap(x -> Flux.just(transformation(x)), prefetch),
+          flux.concatMapDelayError(x -> Mono.just(transformation(x))),
+          flux.concatMapDelayError(x -> Flux.just(transformation(x))),
           flux.concatMapDelayError(x -> Mono.just(transformation(x)), prefetch),
           flux.concatMapDelayError(x -> Flux.just(transformation(x)), prefetch),
           flux.concatMapDelayError(x -> Mono.just(transformation(x)), delayUntilEnd, prefetch),
@@ -481,6 +485,8 @@ final class ReactorRules {
     Publisher<S> before(Flux<T> flux, boolean delayUntilEnd, int maxConcurrency, int prefetch) {
       return Refaster.anyOf(
           flux.concatMap(x -> Mono.justOrEmpty(transformation(x))),
+          flux.concatMap(x -> Mono.justOrEmpty(transformation(x)), prefetch),
+          flux.concatMapDelayError(x -> Mono.justOrEmpty(transformation(x))),
           flux.concatMapDelayError(x -> Mono.justOrEmpty(transformation(x)), prefetch),
           flux.concatMapDelayError(
               x -> Mono.justOrEmpty(transformation(x)), delayUntilEnd, prefetch),
