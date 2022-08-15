@@ -49,12 +49,6 @@ final class StreamTemplatesTest implements RefasterTemplateTestCase {
     return Stream.of("foo").flatMap(v -> Stream.of(v.length())).filter(len -> len > 0);
   }
 
-  ImmutableSet<Stream<String>> testUnwrapOptionalStreamWithFlatMap() {
-    return ImmutableSet.of(
-        Stream.of(Optional.of("foo")).flatMap(Optional::stream),
-        Stream.of(Optional.of("bar")).flatMap(Optional::stream));
-  }
-
   Stream<Integer> testMapOuterStreamAfterFlatMap() {
     return Stream.of("foo").flatMap(v -> Stream.of(v.length())).map(len -> len * 0);
   }

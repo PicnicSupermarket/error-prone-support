@@ -129,21 +129,6 @@ final class StreamTemplates {
     }
   }
 
-  /** Avoid unnecessary call to the filter and map operations when unwrapping an optional stream. */
-  abstract static class UnwrapOptionalStreamWithFlatMap<S> {
-    @BeforeTemplate
-    Stream<S> before(Stream<Optional<S>> stream) {
-      return Refaster.anyOf(
-          stream.filter(Optional::isPresent).map(Optional::get),
-          stream.filter(Optional::isPresent).map(Optional::orElseThrow));
-    }
-
-    @AfterTemplate
-    Stream<S> after(Stream<Optional<S>> stream) {
-      return stream.flatMap(Optional::stream);
-    }
-  }
-
   /** Avoid unnecessary nesting of {@link Stream#map(Function)} operations. */
   abstract static class MapOuterStreamAfterFlatMap<T, S, R> {
     @Placeholder
