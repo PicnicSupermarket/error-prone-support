@@ -229,6 +229,7 @@ final class OptionalTemplates {
     @BeforeTemplate
     Stream<T> before(Stream<Optional<T>> stream) {
       return Refaster.anyOf(
+          stream.filter(Optional::isPresent).map(Optional::get),
           stream.filter(Optional::isPresent).map(Optional::orElseThrow),
           stream.flatMap(Streams::stream));
     }
