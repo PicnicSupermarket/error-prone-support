@@ -3,9 +3,9 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class NestingOptionalsTest {
+final class NestedOptionalsTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(NestingOptionals.class, getClass());
+      CompilationTestHelper.newInstance(NestedOptionals.class, getClass());
 
   @Test
   void identification() {
@@ -13,24 +13,25 @@ final class NestingOptionalsTest {
         .addSourceLines(
             "A.java",
             "import java.util.Optional;",
+            "import java.util.stream.Stream;",
             "",
             "class A {",
             "  void m() {",
+            "    Optional.empty();",
+            "    Optional.of(1);",
             "    // BUG: Diagnostic contains:",
             "    Optional.of(Optional.empty());",
             "    // BUG: Diagnostic contains:",
-            "    Optional.of(1).map(Optional::of);",
+            "    Optional.of(Optional.of(1));",
+            "    Optional.ofNullable(null);",
             "    // BUG: Diagnostic contains:",
-            "    Optional.of(2).map(Optional::of).orElseThrow();",
+            "    Optional.ofNullable((Optional) null);",
+            "    Optional.of(\"foo\").map(String::length);",
             "    // BUG: Diagnostic contains:",
-            "    Optional.of(3).map(value -> Optional.empty());",
+            "    Optional.of(\"foo\").map(Optional::of);",
+            "    Stream.of(\"foo\").findFirst();",
             "    // BUG: Diagnostic contains:",
-            "    Optional.of(4).map(value -> Optional.empty()).orElseThrow();",
-            "",
-            "    Optional.of(5).map(String::valueOf);",
-            "    Optional.of(6).map(value -> value);",
-            "    Optional.of(7).flatMap(Optional::of);",
-            "    Optional.of(8).flatMap(value -> Optional.empty());",
+            "    Stream.of(\"foo\").map(Optional::of).findFirst();",
             "  }",
             "}")
         .doTest();
