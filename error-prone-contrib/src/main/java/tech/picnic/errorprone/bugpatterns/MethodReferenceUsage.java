@@ -100,6 +100,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
         .flatMap(statements -> constructMethodRef(lambdaExpr, statements.get(0)));
   }
 
+  // XXX: Replace nested `Optional` usage.
   @SuppressWarnings("NestedOptionals")
   private static Optional<SuggestedFix.Builder> constructMethodRef(
       LambdaExpressionTree lambdaExpr, MethodInvocationTree subTree) {
@@ -157,6 +158,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
     return constructFix(lambdaExpr, lhsType.tsym, subTree.getIdentifier());
   }
 
+  // XXX: Refactor or replace inner `Optional` with a custom type.
   @SuppressWarnings("NestedOptionals")
   private static Optional<Optional<Name>> matchArguments(
       LambdaExpressionTree lambdaExpr, MethodInvocationTree subTree) {
