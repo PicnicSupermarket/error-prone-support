@@ -6,11 +6,11 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class FluxCollectTest {
+final class NonEmptyMonoTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(FluxCollect.class, getClass());
+      CompilationTestHelper.newInstance(NonEmptyMono.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(FluxCollect.class, getClass());
+      BugCheckerRefactoringTestHelper.newInstance(NonEmptyMono.class, getClass());
 
   @Test
   void identification() {

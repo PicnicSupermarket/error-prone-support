@@ -1,0 +1,85 @@
+package tech.picnic.errorprone.bugpatterns;
+
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.instanceMethod;
+
+import com.google.auto.service.AutoService;
+import com.google.errorprone.BugPattern;
+import com.google.errorprone.VisitorState;
+import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
+import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.matchers.Description;
+import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.MethodInvocationTree;
+import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+
+/**
+ * A {@link BugChecker} which flags {@link Mono} operations that are known to be vacuous, given that
+ * they are invoked on a {@link Mono} that is known not to complete empty.
+ */
+@AutoService(BugChecker.class)
+@BugPattern(
+    summary = "Avoid vacuous operations on known non-empty `Mono`s",
+    linkType = NONE,
+    severity = WARNING,
+    tags = SIMPLIFICATION)
+// XXX: Given more advanced analysis many more expressions could be flagged. Consider
+// `Mono.just(someValue)`, `Flux.just(someNonEmptySequence)`,
+// `someMono.switchIfEmpty(someProvablyNonEmptyMono)` and many other variants.
+// XXX: Consider implementing a similar check for `Publisher`s that are known to complete without
+// emitting a value (e.g. `Mono.empty()`, `someFlux.then()`, ...), or known not to complete normally
+// (`Mono.never()`, `someFlux.repeat()`, `Mono.error(...)`, ...). The later category could
+// potentially be split out further.
+public final class NonEmptyMono extends BugChecker implements MethodInvocationTreeMatcher {
+  private static final long serialVersionUID = 1L;
+  private static final Matcher<ExpressionTree> MONO_SIZE_CHECK =
+      instanceMethod()
+          .onDescendantOf("reactor.core.publisher.Mono")
+          .namedAnyOf("single", "defaultIfEmpty", "switchIfEmpty");
+  private static final Matcher<ExpressionTree> SINGLETON_MONO =
+      anyOf(
+          instanceMethod()
+              .onDescendantOf("reactor.core.publisher.Flux")
+              .namedAnyOf(
+                  "all",
+                  "any",
+                  "collect",
+                  "collectList",
+                  "collectMap",
+                  "collectMultimap",
+                  "collectSortedList",
+                  "count",
+                  "defaultIfEmpty",
+                  "elementAt",
+                  "hasElement",
+                  "hasElements",
+                  "last",
+                  "reduce",
+                  "reduceWith",
+                  "single"),
+          instanceMethod()
+              .onDescendantOf("reactor.core.publisher.Mono")
+              .namedAnyOf("defaultIfEmpty", "hasElement", "single"));
+
+  @Override
+  public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+    if (!MONO_SIZE_CHECK.matches(tree, state)) {
+      return Description.NO_MATCH;
+    }
+
+    ExpressionTree receiver = ASTHelpers.getReceiver(tree);
+    if (!SINGLETON_MONO.matches(receiver, state)) {
+      return Description.NO_MATCH;
+    }
+
+    return describeMatch(
+        tree, SuggestedFix.replace(tree, SourceCode.treeToString(receiver, state)));
+  }
+}
