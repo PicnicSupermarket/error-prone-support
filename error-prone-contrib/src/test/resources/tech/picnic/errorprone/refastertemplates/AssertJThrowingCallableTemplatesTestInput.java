@@ -99,7 +99,6 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
     return assertThatIOException().isThrownBy(() -> {}).withMessage("foo");
   }
 
-  @SuppressWarnings("AssertThatThrownByIOException")
   AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionHasMessageParameters() {
     return assertThatIOException().isThrownBy(() -> {}).withMessage("foo %s", "bar");
   }
@@ -112,6 +111,12 @@ final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTest
     return assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> {})
         .withMessage("foo");
+  }
+
+  AbstractObjectAssert<?, ?> testAssertThatThrownByHasMessageParameters() {
+    return assertThatExceptionOfType(IllegalArgumentException.class)
+        .isThrownBy(() -> {})
+        .withMessage("foo %s", "bar");
   }
 
   ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>>
