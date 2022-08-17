@@ -156,6 +156,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
     return constructFix(lambdaExpr, lhsType.tsym, subTree.getIdentifier());
   }
 
+  @SuppressWarnings("NestingOptionals")
   private static Optional<Optional<Name>> matchArguments(
       LambdaExpressionTree lambdaExpr, MethodInvocationTree subTree) {
     ImmutableList<Name> expectedArguments = getVariables(lambdaExpr);
