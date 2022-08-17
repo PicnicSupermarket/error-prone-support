@@ -42,7 +42,7 @@ public final class NonEmptyMono extends BugChecker implements MethodInvocationTr
   private static final Matcher<ExpressionTree> MONO_SIZE_CHECK =
       instanceMethod()
           .onDescendantOf("reactor.core.publisher.Mono")
-          .namedAnyOf("single", "defaultIfEmpty", "switchIfEmpty");
+          .namedAnyOf("defaultIfEmpty", "single", "switchIfEmpty");
   private static final Matcher<ExpressionTree> SINGLETON_MONO =
       anyOf(
           instanceMethod()
