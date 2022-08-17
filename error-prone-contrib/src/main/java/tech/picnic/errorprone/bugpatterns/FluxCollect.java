@@ -4,7 +4,6 @@ import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
-import static com.sun.source.tree.Tree.Kind.MEMBER_SELECT;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -14,8 +13,8 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -32,14 +31,13 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary =
-        "The collect methods of `Flux` always emit a value. Don't unnecessary check otherwise.",
+    summary = "`Flux`'s collect operations always emit precisely one value",
     linkType = NONE,
     severity = WARNING,
     tags = SIMPLIFICATION)
 public final class FluxCollect extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<ExpressionTree> FLUX_EMPTY_CHECK =
+  private static final Matcher<ExpressionTree> MONO_SIZE_CHECK =
       instanceMethod()
           .onDescendantOf("reactor.core.publisher.Mono")
           .namedAnyOf("single", "defaultIfEmpty", "switchIfEmpty");
@@ -47,24 +45,20 @@ public final class FluxCollect extends BugChecker implements MethodInvocationTre
       instanceMethod()
           .onDescendantOf("reactor.core.publisher.Flux")
           .namedAnyOf(
-              "collect", "collectList", "collectSortedList", "collectMap", "collectMultimap");
+              "collect", "collectList", "collectMap", "collectMultimap", "collectSortedList");
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!FLUX_EMPTY_CHECK.matches(tree, state)) {
+    if (!MONO_SIZE_CHECK.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
-    if (tree.getMethodSelect().getKind() != MEMBER_SELECT) {
-      return Description.NO_MATCH;
-    }
-
-    ExpressionTree selectExpression = ((MemberSelectTree) tree.getMethodSelect()).getExpression();
-    if (!FLUX_COLLECT.matches(selectExpression, state)) {
+    ExpressionTree receiver = ASTHelpers.getReceiver(tree);
+    if (!FLUX_COLLECT.matches(receiver, state)) {
       return Description.NO_MATCH;
     }
 
     return describeMatch(
-        tree, SuggestedFix.replace(tree, SourceCode.treeToString(selectExpression, state)));
+        tree, SuggestedFix.replace(tree, SourceCode.treeToString(receiver, state)));
   }
 }
