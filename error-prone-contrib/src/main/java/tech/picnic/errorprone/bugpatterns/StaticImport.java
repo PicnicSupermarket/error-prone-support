@@ -66,6 +66,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           "com.google.errorprone.BugPattern.LinkType",
           "com.google.errorprone.BugPattern.SeverityLevel",
           "com.google.errorprone.BugPattern.StandardTags",
+          "com.google.errorprone.matchers.Matchers",
           "com.google.errorprone.refaster.ImportPolicy",
           "com.mongodb.client.model.Accumulators",
           "com.mongodb.client.model.Aggregates",
