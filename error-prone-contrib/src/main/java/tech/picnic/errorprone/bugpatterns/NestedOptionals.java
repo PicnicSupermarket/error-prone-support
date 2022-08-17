@@ -2,7 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
-import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Iterables;
@@ -27,7 +27,7 @@ import java.util.Optional;
         "Avoid nesting `Optional`s inside `Optional`s; the resultant code is hard to reason about",
     linkType = NONE,
     severity = WARNING,
-    tags = SIMPLIFICATION)
+    tags = FRAGILE_CODE)
 public final class NestedOptionals extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Supplier<Type> OPTIONAL = Suppliers.typeFromClass(Optional.class);
