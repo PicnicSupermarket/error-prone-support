@@ -18,6 +18,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.MethodTree;
@@ -70,11 +71,11 @@ public final class ImmutablesSortedSetComparator extends BugChecker implements M
       return Description.NO_MATCH;
     }
 
+    SuggestedFix.Builder builder = SuggestedFix.builder();
+    String valueTypeIdentifier =
+        SuggestedFixes.qualifyType(state, builder, "org.immutables.value.Value");
     return describeMatch(
         tree,
-        SuggestedFix.builder()
-            .addImport("org.immutables.value.Value")
-            .prefixWith(tree, "@Value.NaturalOrder ")
-            .build());
+        builder.prefixWith(tree, String.format("@%s.NaturalOrder ", valueTypeIdentifier)).build());
   }
 }
