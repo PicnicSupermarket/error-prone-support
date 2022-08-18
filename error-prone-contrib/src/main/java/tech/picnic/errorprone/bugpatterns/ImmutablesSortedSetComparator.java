@@ -43,7 +43,7 @@ import javax.lang.model.element.Modifier;
 @BugPattern(
     summary =
         "`SortedSet` properties of a `@Value.Immutable` or `@Value.Modifiable` type must be "
-            + "annotated `@Value.NaturalOrder` or `@Value.ReverseOrder`",
+            + "annotated with `@Value.NaturalOrder` or `@Value.ReverseOrder`",
     linkType = NONE,
     severity = ERROR,
     tags = LIKELY_ERROR)
