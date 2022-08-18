@@ -239,9 +239,16 @@ final class OptionalTemplates {
     }
   }
 
-  /** Within a stream's map operation unconditional {@link Optional#get()} calls can be avoided. */
-  // XXX: An alternative approach is to `.flatMap(Optional::stream)`. That may be a bit longer, but
-  // yield nicer code. Think about it.
+  /**
+   * Within a stream's map operation unconditional {@link Optional#orElseThrow()} calls can be
+   * avoided.
+   *
+   * <p><strong>Warning:</strong> this rewrite rule is not completely behavior preserving. The
+   * original code throws an exception if no value is present, while the replacement will silently
+   * continue.
+   */
+  // XXX: An alternative approach is to use `.flatMap(Optional::stream)`. That may be a bit longer,
+  // but yields nicer code. Think about it.
   abstract static class StreamMapToOptionalGet<T, S> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
