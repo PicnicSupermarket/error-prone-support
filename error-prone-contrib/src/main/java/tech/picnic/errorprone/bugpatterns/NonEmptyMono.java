@@ -56,12 +56,10 @@ public final class NonEmptyMono extends BugChecker implements MethodInvocationTr
                   "collectMultimap",
                   "collectSortedList",
                   "count",
-                  "defaultIfEmpty",
                   "elementAt",
                   "hasElement",
                   "hasElements",
                   "last",
-                  "reduce",
                   "reduceWith",
                   "single"),
           instanceMethod()
