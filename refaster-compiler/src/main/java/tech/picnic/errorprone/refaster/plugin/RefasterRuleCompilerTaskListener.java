@@ -72,7 +72,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
     return Boolean.TRUE.equals(
         new TreeScanner<Boolean, Void>() {
           @Override
-          public Boolean visitAnnotation(AnnotationTree node, Void v) {
+          public Boolean visitAnnotation(AnnotationTree node, @Nullable Void v) {
             Symbol sym = ASTHelpers.getSymbol(node);
             return (sym != null
                     && sym.getQualifiedName()
@@ -93,7 +93,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
     new TreeScanner<Void, Void>() {
       @Nullable
       @Override
-      public Void visitClass(ClassTree node, Void v) {
+      public Void visitClass(ClassTree node, @Nullable Void v) {
         rules.putAll(node, RefasterRuleBuilderScanner.extractRules(node, context));
         return super.visitClass(node, null);
       }
