@@ -35,7 +35,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 // `someMono.switchIfEmpty(someProvablyNonEmptyMono)` and many other variants.
 // XXX: Consider implementing a similar check for `Publisher`s that are known to complete without
 // emitting a value (e.g. `Mono.empty()`, `someFlux.then()`, ...), or known not to complete normally
-// (`Mono.never()`, `someFlux.repeat()`, `Mono.error(...)`, ...). The later category could
+// (`Mono.never()`, `someFlux.repeat()`, `Mono.error(...)`, ...). The latter category could
 // potentially be split out further.
 public final class NonEmptyMono extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
@@ -43,7 +43,7 @@ public final class NonEmptyMono extends BugChecker implements MethodInvocationTr
       instanceMethod()
           .onDescendantOf("reactor.core.publisher.Mono")
           .namedAnyOf("defaultIfEmpty", "single", "switchIfEmpty");
-  private static final Matcher<ExpressionTree> SINGLETON_MONO =
+  private static final Matcher<ExpressionTree> NON_EMPTY_MONO =
       anyOf(
           instanceMethod()
               .onDescendantOf("reactor.core.publisher.Flux")
@@ -75,7 +75,7 @@ public final class NonEmptyMono extends BugChecker implements MethodInvocationTr
     }
 
     ExpressionTree receiver = ASTHelpers.getReceiver(tree);
-    if (!SINGLETON_MONO.matches(receiver, state)) {
+    if (!NON_EMPTY_MONO.matches(receiver, state)) {
       return Description.NO_MATCH;
     }
 
