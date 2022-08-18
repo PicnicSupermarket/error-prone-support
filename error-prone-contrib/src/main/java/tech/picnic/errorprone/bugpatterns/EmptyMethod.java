@@ -20,7 +20,6 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import java.util.Optional;
 
 /** A {@link BugChecker} which flags empty methods that seemingly can simply be deleted. */
@@ -47,8 +46,7 @@ public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {
       return Description.NO_MATCH;
     }
 
-    MethodSymbol sym = ASTHelpers.getSymbol(tree);
-    if (sym == null || ASTHelpers.methodCanBeOverridden(sym)) {
+    if (ASTHelpers.methodCanBeOverridden(ASTHelpers.getSymbol(tree))) {
       return Description.NO_MATCH;
     }
 
