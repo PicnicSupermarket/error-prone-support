@@ -244,8 +244,8 @@ final class OptionalTemplates {
    * avoided.
    *
    * <p><strong>Warning:</strong> this rewrite rule is not completely behavior preserving. The
-   * original code throws an exception if no value is present, while the replacement will silently
-   * continue.
+   * original code throws an exception if the mapping operation does not produce a value, while the
+   * replacement does not.
    */
   // XXX: An alternative approach is to use `.flatMap(Optional::stream)`. That may be a bit longer,
   // but yields nicer code. Think about it.
