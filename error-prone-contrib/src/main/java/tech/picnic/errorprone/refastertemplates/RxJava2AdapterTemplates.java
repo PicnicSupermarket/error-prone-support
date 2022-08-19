@@ -9,7 +9,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import org.reactivestreams.Publisher;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,12 +38,12 @@ final class RxJava2AdapterTemplates {
    */
   static final class FlowableToFlux<T> {
     @BeforeTemplate
-    Publisher<T> before(Flowable<T> flowable) {
+    Flux<T> before(Flowable<T> flowable) {
       return Refaster.anyOf(
-          flowable.compose(Flux::from),
+          Flux.from(flowable),
           flowable.to(Flux::from),
           flowable.as(Flux::from),
-          flowable.compose(RxJava2Adapter::flowableToFlux),
+          RxJava2Adapter.flowableToFlux(flowable),
           flowable.to(RxJava2Adapter::flowableToFlux));
     }
 
@@ -60,12 +59,11 @@ final class RxJava2AdapterTemplates {
    */
   static final class FluxToFlowable<T> {
     @BeforeTemplate
-    Publisher<T> before(Flux<T> flux) {
+    Flowable<T> before(Flux<T> flux) {
       return Refaster.anyOf(
           Flowable.fromPublisher(flux),
-          flux.transform(Flowable::fromPublisher),
           flux.as(Flowable::fromPublisher),
-          flux.transform(RxJava2Adapter::fluxToFlowable));
+          RxJava2Adapter.fluxToFlowable(flux));
     }
 
     @AfterTemplate
@@ -132,12 +130,11 @@ final class RxJava2AdapterTemplates {
    */
   static final class MonoToFlowable<T> {
     @BeforeTemplate
-    Publisher<T> before(Mono<T> mono) {
+    Flowable<T> before(Mono<T> mono) {
       return Refaster.anyOf(
           Flowable.fromPublisher(mono),
-          mono.transform(Flowable::fromPublisher),
           mono.as(Flowable::fromPublisher),
-          mono.transform(RxJava2Adapter::monoToFlowable));
+          RxJava2Adapter.monoToFlowable(mono));
     }
 
     @AfterTemplate
