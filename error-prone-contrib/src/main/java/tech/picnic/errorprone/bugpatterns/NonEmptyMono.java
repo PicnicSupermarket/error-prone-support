@@ -17,6 +17,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import java.util.function.BiFunction;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
@@ -62,6 +63,10 @@ public final class NonEmptyMono extends BugChecker implements MethodInvocationTr
                   "last",
                   "reduceWith",
                   "single"),
+          instanceMethod()
+              .onDescendantOf("reactor.core.publisher.Flux")
+              .named("reduce")
+              .withParameters(Object.class.getName(), BiFunction.class.getName()),
           instanceMethod()
               .onDescendantOf("reactor.core.publisher.Mono")
               .namedAnyOf("defaultIfEmpty", "hasElement", "single"));
