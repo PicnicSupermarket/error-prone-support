@@ -4,8 +4,8 @@
 
 # Error Prone Support
 
-![GitHub Actions](ci-badge)
-![Maven central](maven-badge)
+![GitHub Actions][ci-badge]
+![Maven central][maven-badge]
 
 [Getting started](#⚡️-getting-started) •
 [How it works](#💡-how-it-works) •
@@ -17,7 +17,7 @@
 TBD
 
 ## 💡 How it works
-Extending [google/error-prone](error-prone).
+Extending [google/error-prone][error-prone].
 ## ✍️ Contribute
 TBD
 
