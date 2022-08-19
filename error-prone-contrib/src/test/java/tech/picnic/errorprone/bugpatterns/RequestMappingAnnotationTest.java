@@ -129,4 +129,36 @@ final class RequestMappingAnnotationTest {
             "}")
         .doTest();
   }
+
+  // XXX:
+  // https://tedblob.com/spring-boot-bind-request-parameters-to-object/#2-3-use-pojo-to-bind-multiple-parameters
+  // https://stackoverflow.com/questions/33157785/in-java-is-there-any-way-to-tell-if-a-class-is-a-simple-java-class
+  @Test
+  void identificationIgnorePOJO() {
+    compilationTestHelper
+        .addSourceLines(
+            "com/example/Person.java",
+            "package com.example;",
+            "",
+            "  public final class Person {",
+            "    final String name;",
+            "    final int age;",
+            "",
+            "    Person(String name, int age) {",
+            "      this.name = name;",
+            "      this.age = age;",
+            "    }",
+            "  }")
+        .addSourceLines(
+            "com/example/A.java",
+            "package com.example;",
+            "",
+            "import org.springframework.web.bind.annotation.GetMapping;",
+            "",
+            "class A {",
+            "  @GetMapping(\"foo\")",
+            "  public void pojoShouldNotBeFlagged(Person person) {}",
+            "}")
+        .doTest();
+  }
 }
