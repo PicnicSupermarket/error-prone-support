@@ -63,6 +63,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
           "io.swagger.annotations.ApiImplicitParams#value",
           "io.swagger.v3.oas.annotations.Parameters#value",
           "javax.xml.bind.annotation.XmlType#propOrder",
+          "org.springframework.context.annotation.PropertySource#value",
           "org.springframework.test.context.TestPropertySource#locations",
           "org.springframework.test.context.TestPropertySource#value");
   private static final String FLAG_PREFIX = "LexicographicalAnnotationAttributeListing:";
