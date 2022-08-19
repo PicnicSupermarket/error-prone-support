@@ -62,7 +62,10 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
           "com.fasterxml.jackson.annotation.JsonPropertyOrder#value",
           "io.swagger.annotations.ApiImplicitParams#value",
           "io.swagger.v3.oas.annotations.Parameters#value",
-          "javax.xml.bind.annotation.XmlType#propOrder");
+          "javax.xml.bind.annotation.XmlType#propOrder",
+          "org.springframework.context.annotation.PropertySource#value",
+          "org.springframework.test.context.TestPropertySource#locations",
+          "org.springframework.test.context.TestPropertySource#value");
   private static final String FLAG_PREFIX = "LexicographicalAnnotationAttributeListing:";
   private static final String INCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Includes";
   private static final String EXCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Excludes";
