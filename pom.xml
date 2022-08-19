@@ -150,7 +150,7 @@
         <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
-        <version.maven>3.6.3</version.maven>
+        <version.maven>3.8.6</version.maven>
         <version.mockito>4.7.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.9.9</version.nullaway>
