@@ -35,6 +35,7 @@ final class LexicographicalAnnotationAttributeListingTest {
             "import io.swagger.v3.oas.annotations.Parameters;",
             "import java.math.RoundingMode;",
             "import javax.xml.bind.annotation.XmlType;",
+            "import org.springframework.test.context.TestPropertySource;",
             "",
             "interface A {",
             "  @interface Foo {",
@@ -144,7 +145,13 @@ final class LexicographicalAnnotationAttributeListingTest {
             "  A secondEndpoint();",
             "",
             "  @XmlType(propOrder = {\"field2\", \"field1\"})",
-            "  class Dummy {}",
+            "  class FirstDummy {}",
+            "",
+            "  @TestPropertySource(locations = {\"field2\", \"field1\"})",
+            "  class SecondDummy {}",
+            "",
+            "  @TestPropertySource({\"field2\", \"field1\"})",
+            "  class ThirdDummy {}",
             "}")
         .doTest();
   }
