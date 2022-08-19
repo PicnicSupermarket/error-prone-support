@@ -31,6 +31,9 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     linkType = NONE,
     severity = WARNING,
     tags = SIMPLIFICATION)
+// XXX: This check does not simplify `someFlux.defaultIfEmpty(T).{defaultIfEmpty(T),hasElements()}`,
+// as `someFlux.defaultIfEmpty(T)` yields a `Flux` rather than a `Mono`. Consider adding support for
+// these cases.
 // XXX: Given more advanced analysis many more expressions could be flagged. Consider
 // `Mono.just(someValue)`, `Flux.just(someNonEmptySequence)`,
 // `someMono.switchIfEmpty(someProvablyNonEmptyMono)` and many other variants.
