@@ -15,16 +15,16 @@ Error Prone Support is a Picnic-opinionated extension of [Error Prone][error-pro
 [![Licence][licence-badge]][licence]
 [![PRs Welcome][pr-badge]][contribute]
 
-[Getting started](#⚡️-getting-started) •
-[How it works](#💡-how-it-works) •
-[Building](#👷-building) •
-[Contribute](#✍️-contribute)
+[Getting started](#%EF%B8%8F-getting-started) •
+[How it works](#-how-it-works) •
+[Building](#-building) •
+[Contribute](#%EF%B8%8F-contribute)
 
 </div>
 
 ---
 
-## ⚡️ Getting started
+## ⚡ Getting started
 
 Edit your `pom.xml` file to add Error Prone Support to your project.
 
