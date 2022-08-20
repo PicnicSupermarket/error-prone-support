@@ -121,7 +121,11 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     String className = clazz.getSimpleName();
 
     BugCheckerRefactoringTestHelper.newInstance(RefasterRuleCollection.class, clazz)
-        .setArgs(ImmutableList.of("-XepOpt:" + RULE_COLLECTION_FLAG + '=' + className))
+        .setArgs(
+            ImmutableList.of(
+                "-XepOpt:" + RULE_COLLECTION_FLAG + '=' + className,
+                "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+                "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED"))
         .addInput(className + "TestInput.java")
         .addOutput(className + "TestOutput.java")
         .doTest(TEXT_MATCH);

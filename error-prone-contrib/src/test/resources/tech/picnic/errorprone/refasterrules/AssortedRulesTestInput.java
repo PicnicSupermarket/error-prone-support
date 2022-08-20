@@ -10,6 +10,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
+import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.matchers.Description;
+import com.sun.source.tree.Tree;
+import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.stream.Stream;
@@ -86,5 +91,21 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Streams.stream(Splitter.on(':').split("foo")),
         Splitter.on(',').splitToList(new StringBuilder("bar")).stream());
+  }
+
+  BugChecker testDescribeMatch() {
+    return new BugChecker() {
+      Description testDescribeMatch(DiagnosticPosition diagnosticPosition) {
+        return buildDescription(diagnosticPosition).build();
+      }
+
+      Description testDescribeMatch(JCTree tree) {
+        return buildDescription(tree).build();
+      }
+
+      Description testDescribeMatch(Tree tree) {
+        return buildDescription(tree).build();
+      }
+    };
   }
 }

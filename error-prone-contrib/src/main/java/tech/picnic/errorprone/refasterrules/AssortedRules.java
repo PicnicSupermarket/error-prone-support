@@ -13,10 +13,15 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
+import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.matchers.Description;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import com.sun.source.tree.Tree;
+import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -207,6 +212,29 @@ final class AssortedRules {
     @AfterTemplate
     Stream<String> after(Splitter splitter, CharSequence charSequence) {
       return splitter.splitToStream(charSequence);
+    }
+  }
+
+  @SuppressWarnings("serial")
+  static final class DescribeMatch extends BugChecker {
+    @BeforeTemplate
+    Description before(Tree tree) {
+      return buildDescription(tree).build();
+    }
+
+    @BeforeTemplate
+    Description before(DiagnosticPosition tree) {
+      return buildDescription(tree).build();
+    }
+
+    @BeforeTemplate
+    Description before(JCTree tree) {
+      return buildDescription(tree).build();
+    }
+
+    @AfterTemplate
+    Description after(Tree tree) {
+      return describeMatch(tree);
     }
   }
 
