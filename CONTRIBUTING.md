@@ -23,7 +23,7 @@ If you would like to see an improvement, you can file a GitHub issue. Also when 
 
 ## 🚀 Open a Pull Request
 
-All submissions, including submissions by project members, require a review. We use GitHub Pull Requests for this purpose.
+All submissions, including submissions by project members, require at least two reviews. We use GitHub Pull Requests for this purpose.
 
 Before opening a Pull Request, please check if there is not already one open that aims to solve same problem.
 
