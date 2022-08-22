@@ -49,12 +49,6 @@ Edit your `pom.xml` file to add Error Prone Support to your project.
                         <!-- Other Error Prone flags, see
                         https://errorprone.info/docs/flags. -->
                     </arg>
-                    <!-- The Error Prone plugin makes certain
-                    assumptions about the state of the AST at the
-                    moment it is invoked. Those assumptions are met
-                    when using the `simple` compile policy. This
-                    flag may be dropped after resolution of
-                    https://bugs.openjdk.java.net/browse/JDK-8155674. -->
                     <arg>-XDcompilePolicy=simple</arg>
                 </compilerArgs>
             </configuration>
@@ -95,7 +89,7 @@ Want to fix a bug, improve the docs, or add a new feature? That's awesome! Pleas
 [error-prone-repo]: https://github.com/google/error-prone
 [google-java-format]: https://github.com/google/google-java-format
 [licence-badge]: https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
-[licence]: LICENCE
+[licence]: LICENSE.md
 [maven-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
 [maven-eps]: https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
 [maven]: https://maven.apache.org
