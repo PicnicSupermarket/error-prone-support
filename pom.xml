@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.1-alpha-snapshot</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
