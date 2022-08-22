@@ -746,6 +746,7 @@
                                     <module name="VisibilityModifier" />
                                 </module>
                                 <module name="UniqueProperties" />
+                                <module name="io.spring.nohttp.checkstyle.check.NoHttpCheck" />
                             </module>
                         </checkstyleRules>
                         <failOnViolation>false</failOnViolation>
@@ -770,6 +771,11 @@
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
                             <version>10.3.2</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>io.spring.nohttp</groupId>
+                            <artifactId>nohttp-checkstyle</artifactId>
+                            <version>0.0.10</version>
                         </dependency>
                     </dependencies>
                     <executions>
