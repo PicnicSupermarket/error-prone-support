@@ -147,7 +147,6 @@
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-2</version.error-prone-fork>
         <version.error-prone-orig>2.14.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.13</version.error-prone-slf4j>
-        <version.findbugs-format-string>3.0.0</version.findbugs-format-string>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.8.6</version.maven>
@@ -239,13 +238,6 @@
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value-annotations</artifactId>
                 <version>${version.auto-value}</version>
-            </dependency>
-            <!-- Specified as a workaround for
-            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
-            <dependency>
-                <groupId>com.google.code.findbugs</groupId>
-                <artifactId>jFormatString</artifactId>
-                <version>${version.findbugs-format-string}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
@@ -404,11 +396,6 @@
                 <version>${version.mockito}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.reactivestreams</groupId>
-                <artifactId>reactive-streams</artifactId>
-                <version>1.0.4</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
