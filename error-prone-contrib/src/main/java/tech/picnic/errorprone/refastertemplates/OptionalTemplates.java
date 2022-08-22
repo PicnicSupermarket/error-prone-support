@@ -81,13 +81,11 @@ final class OptionalTemplates {
   // generalization. If/when Refaster is extended to understand this, delete the template above.
   static final class OptionalOrElseThrowMethodReference<T> {
     @BeforeTemplate
-    @SuppressWarnings("NoFunctionalReturnType")
     Function<Optional<T>, T> before() {
       return Optional::get;
     }
 
     @AfterTemplate
-    @SuppressWarnings("NoFunctionalReturnType")
     Function<Optional<T>, T> after() {
       return Optional::orElseThrow;
     }
