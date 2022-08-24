@@ -72,7 +72,15 @@ Two other goals that one may find relevant:
 - `mvn fmt:format` formats the code using [`google-java-format`][google-java-format].
 - `mvn pitest:mutationCoverage` runs mutation tests using [PIT][pitest]. The results can be reviewed by opening the respective `target/pit-reports/index.html` files. For more information check the [PIT Maven plugin][pitest-maven].
 
-When loading the project in IntelliJ IDEA (and perhaps other IDEs) errors about the inaccessibility of `com.sun.tools.javac.*` classes may be reported. If this happens, configure your IDE to enable the `add-exports` profile.
+When running the project's tests in IntelliJ IDEA, you might see the following error:
+```
+java: exporting a package from system module jdk.compiler is not allowed with --release
+```
+
+If this happens, go to _Settings -> Build, Execution, Deployment -> Compiler ->
+Java Compiler_ and deselect the option _Use '--release' option for
+cross-compilation (Java 9 and later)_. See [IDEA-288052][idea-288052] for
+details.
 
 ## 💡 How it works
 
@@ -88,6 +96,7 @@ Want to fix a bug, improve the docs, or add a new feature? That's awesome! Pleas
 [error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
 [error-prone-repo]: https://github.com/google/error-prone
 [google-java-format]: https://github.com/google/google-java-format
+[idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
 [licence-badge]: https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
 [licence]: LICENSE.md
 [maven-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue

@@ -11,77 +11,25 @@ request.
 
 ### Building
 
-This is a [Maven][maven] project, so running `mvn clean install` performs a
-full clean build. Some relevant flags:
-- `-Dverification.warn` makes the warnings and errors emitted by various
-  plugins and the Java compiler non-fatal, where possible.
-- `-Dverification.skip` disables various non-essential plugins and compiles the
-  code with minimal checks (i.e. without linting, Error Prone checks, etc.)
-- `-Dversion.error-prone=some-version` runs the build using the specified
-  version of Error Prone. This is useful e.g. when testing a locally built
-  Error Prone SNAPSHOT.
-- `-Perror-prone-fork` run the build using Picnic's [Error Prone
-  fork][error-prone-fork-repo], hosted on [Jitpack][error-prone-fork-jitpack].
-  This fork generally contains a few changes on top of the latest Error Prone
-  release.
-
-Two other goals that one may find relevant:
-- `mvn fmt:format` formats the code using
-  [`google-java-format`][google-java-format].
-- `mvn pitest:mutationCoverage` runs mutation tests using [PIT][pitest]. The
-  results can be reviewed by opening the respective
-  `target/pit-reports/index.html` files. For more information check the [PIT
-  Maven plugin][pitest-maven].
-
-When running the project's tests in IntelliJ IDEA, you might see the following
-error:
-```
-java: exporting a package from system module jdk.compiler is not allowed with --release
-```
-
-If this happens, go to _Settings -> Build, Execution, Deployment -> Compiler ->
-Java Compiler_ and deselect the option _Use '--release' option for
-cross-compilation (Java 9 and later)_. See [IDEA-288052][idea-288052] for
-details.
+See [README.md][main-readme].
 
 ### Contribution guidelines
 
-To the extend possible, the pull request process guards our coding guidelines.
-Some pointers:
-- Checks should we _topical_: Ideally they address a single concern.
-- Where possible checks should provide _fixes_, and ideally these are
-  completely behavior preserving. In order for a check to be adopted by users
-  it must not "get in the way". So for a check which addresses a relatively
-  trivial stylistic concern it is doubly important that the violations it
-  detects can be auto-patched.
-- Make sure you have read Error Prone's [criteria for new
-  checks][error-prone-criteria]. Most guidelines described there apply to this
-  project as well, except that this project _does_ focus quite heavy on style
-  enforcement. But that just makes the previous point doubly important.
-- Make sure that a check's (mutation) coverage is or remains about as high as
-  it can be. Not only does this lead to better tests, it also points out
-  opportunities to simplify the code.
-- Please restrict the scope of a pull request to a single feature or fix. Don't
-  sneak in unrelated changes.
-- When in doubt about whether a pull request will be accepted, please first
-  file an issue to discuss it.
+See [CONTRIBUTING.md][main-contributing].
 
 ### Our wishlist
 
 We expect the following tasks to help improve the quality of this open source
 project:
 
-- Publish the artifact to Maven Central, then document the coordinates in this
-  `README.md`.
 - Document how to enable the checks.
 - Document how to apply patches.
 - Document each of the checks.
 - Add [SonarQube][sonarcloud] and [Codecov][codecov] integrations.
-- Investigate whether it makes sense to include license headers in each file.
-  If so, set that up and enforce it.
+- Investigate whether it makes sense to include license headers in each file. If
+  so, set that up and enforce it.
 - Add non-Java file formatting support, like we have internally at Picnic.
   (I.e., somehow open-source that stuff.)
-- Add relevant "badges" at the top of this `README.md`.
 - Auto-generate a website listing each of the checks, just like the Error Prone
   [bug patterns page][error-prone-bug-patterns]. The [Error Prone
   repository][error-prone-repo] contains code for this.
@@ -253,6 +201,7 @@ but on the flip side Refaster is much less expressive. While this gap can never
 be fully closed, there are some ways in which Refaster's scope of utility could
 be extended. The following is a non-exhaustive list of ideas on how to extend
 Refaster's expressiveness:
+
 - Allow more control over _which_ methods are statically imported by
   `@UseImportPolicy`. Sometimes the `@AfterTemplate` contains more than one
   static method invocation, and only a subset should be statically imported.
@@ -336,14 +285,15 @@ Refaster's expressiveness:
 [error-prone-criteria]: https://errorprone.info/docs/criteria
 [error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
 [error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
-[error-prone]: https://errorprone.info
 [error-prone-repo]: https://github.com/google/error-prone
+[error-prone]: https://errorprone.info
 [forbidden-apis]: https://github.com/policeman-tools/forbidden-apis
 [fossa]: https://fossa.io
 [google-java-format]: https://github.com/google/google-java-format
-[idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
+[main-contributing]: ../CONTRIBUTING.md
+[main-readme]: ../README.md
 [maven]: https://maven.apache.org
 [modernizer-maven-plugin]: https://github.com/gaul/modernizer-maven-plugin
-[pitest]: https://pitest.org
 [pitest-maven]: https://pitest.org/quickstart/maven
+[pitest]: https://pitest.org
 [sonarcloud]: https://sonarcloud.io
