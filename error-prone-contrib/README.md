@@ -282,9 +282,6 @@ Refaster's expressiveness:
 [checkstyle-external-project-tests]: https://github.com/checkstyle/checkstyle/blob/master/wercker.yml
 [codecov]: https://codecov.io
 [error-prone-bug-patterns]: https://errorprone.info/bugpatterns
-[error-prone-criteria]: https://errorprone.info/docs/criteria
-[error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
-[error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
 [error-prone-repo]: https://github.com/google/error-prone
 [error-prone]: https://errorprone.info
 [forbidden-apis]: https://github.com/policeman-tools/forbidden-apis
@@ -292,8 +289,5 @@ Refaster's expressiveness:
 [google-java-format]: https://github.com/google/google-java-format
 [main-contributing]: ../CONTRIBUTING.md
 [main-readme]: ../README.md
-[maven]: https://maven.apache.org
 [modernizer-maven-plugin]: https://github.com/gaul/modernizer-maven-plugin
-[pitest-maven]: https://pitest.org/quickstart/maven
-[pitest]: https://pitest.org
 [sonarcloud]: https://sonarcloud.io
