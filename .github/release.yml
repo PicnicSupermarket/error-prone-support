@@ -1,0 +1,29 @@
+changelog:
+  exclude:
+    labels:
+      - "ignore-changelog"
+  categories:
+    - title: ":rocket: New Error Prone checks and Refaster templates"
+      labels:
+        - "new feature"
+    - title: ":sparkles: Improvements"
+      labels:
+        - "improvement"
+    - title: ":warning: Update considerations and deprecations"
+      labels:
+        - "breaking change"
+        - "deprecation"
+    - title: ":bug: Bug fixes"
+      labels:
+        - "bug"
+        - "bug fix"
+    - title: ":books: Documentation, test and build improvements"
+      labels:
+        - "documentation"
+        - "chore"
+    - title: ":chart_with_upwards_trend: Dependency upgrades"
+      labels:
+        - "dependencies"
+    - title: "Other changes"
+      labels:
+        - "*"
