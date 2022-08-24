@@ -1,32 +1,29 @@
 changelog:
   exclude:
     labels:
-      - ignore-changelog
+      - "ignore-changelog"
   categories:
-    - title: ":rocket: New Error Prone checks"
-      labels:
-        - "error prone check"
-    - title: ":sunny: New Refaster templates"
-      labels:
-        - "refaster template"
-    - title: ":sparkles: New features and improvements"
+    - title: ":rocket: New Error Prone checks and Refaster templates"
       labels:
         - "new feature"
-        - improvement
+    - title: ":sparkles: Improvements"
+      labels:
+        - "improvement"
     - title: ":warning: Update considerations and deprecations"
       labels:
         - "breaking change"
-        - deprecation
+        - "deprecation"
     - title: ":bug: Bug fixes"
       labels:
-        - bug
-    - title: ":books: Documentation, tests and build"
+        - "bug"
+        - "bug fix"
+    - title: ":books: Documentation, test and build improvements"
       labels:
-        - documentation
-        - chores
+        - "documentation"
+        - "chore"
     - title: ":chart_with_upwards_trend: Dependency upgrades"
       labels:
-        - dependencies
+        - "dependencies"
     - title: "Other changes"
       labels:
         - "*"
