@@ -1,0 +1,26 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-changelog
+  categories:
+    - title: ":broom: Update considerations and deprecations"
+      labels:
+        - "breaking change"
+        - deprecation
+    - title: ":sparkles: New features and improvements"
+      labels:
+        - "new feature"
+        - improvement
+    - title: ":lady_beetle: Bug fixes"
+      labels:
+        - bug
+    - title: ":book: Documentation, Tests and Build"
+      labels:
+        - documentation
+        - chores
+    - title: ":warning: Dependency Upgrades"
+      labels:
+        - dependencies
+    - title: "Other changes"
+      labels:
+        - "*"
