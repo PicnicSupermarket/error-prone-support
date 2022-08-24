@@ -3,22 +3,28 @@ changelog:
     labels:
       - ignore-changelog
   categories:
-    - title: ":broom: Update considerations and deprecations"
+    - title: ":rocket: New Error Prone checks"
       labels:
-        - "breaking change"
-        - deprecation
+        - "error prone check"
+    - title: ":sunny: New Refaster templates"
+      labels:
+        - "refaster template"
     - title: ":sparkles: New features and improvements"
       labels:
         - "new feature"
         - improvement
-    - title: ":lady_beetle: Bug fixes"
+    - title: ":warning: Update considerations and deprecations"
+      labels:
+        - "breaking change"
+        - deprecation
+    - title: ":bug: Bug fixes"
       labels:
         - bug
-    - title: ":book: Documentation, Tests and Build"
+    - title: ":books: Documentation, tests and build"
       labels:
         - documentation
         - chores
-    - title: ":warning: Dependency Upgrades"
+    - title: ":chart_with_upwards_trend: Dependency upgrades"
       labels:
         - dependencies
     - title: "Other changes"
