@@ -5,6 +5,7 @@ import com.sun.source.tree.Tree;
 /** Fix a comment here later. */
 public final class Util {
   private Util() {}
+
   /**
    * Returns a unique string representation of the given {@link Tree.Kind}.
    *
