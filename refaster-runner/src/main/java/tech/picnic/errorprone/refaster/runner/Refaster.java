@@ -62,7 +62,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import javax.xml.transform.Source;
 
 /**
  * A {@link BugChecker} which flags code which can be simplified using Refaster templates located on

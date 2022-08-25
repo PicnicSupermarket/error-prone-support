@@ -1553,6 +1553,9 @@
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
                                     -XepOpt:Nullness:Conservative=false
+                                    <!-- XXX: Fix this -->
+                                    -Xep:VoidMissingNullable:OFF
+                                    -Xep:ReturnMissingNullable:OFF
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}
