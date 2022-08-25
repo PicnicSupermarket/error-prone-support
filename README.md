@@ -100,6 +100,7 @@ details.
 ## 💡 How it works
 
 <!-- XXX: Extend this section. -->
+
 Extending [@google/error-prone][error-prone-repo].
 
 ## ✍️ Contributing
@@ -112,20 +113,21 @@ Please read the [contributing document][contribute].
 [contribute]: CONTRIBUTING.md
 [error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
 [error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
-[error-prone-installation-guide]: https://errorprone.info/docs/installation#maven
+[error-prone-installation-guide]:
+  https://errorprone.info/docs/installation#maven
 [error-prone-repo]: https://github.com/google/error-prone
 [google-java-format]: https://github.com/google/google-java-format
 [idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
-[license]: LICENSE.md
 [license-badge]:
   https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
-[maven]: https://maven.apache.org
+[license]: LICENSE.md
 [maven-badge]:
   https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
 [maven-eps]:
   https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
+[maven]: https://maven.apache.org
 [oss-parent-example]:
   https://github.com/PicnicSupermarket/oss-parent/blob/d2fd86f4f3bd16d92983068eb83995207b2e9631/pom.xml#L1000
-[pitest]: https://pitest.org
 [pitest-maven]: https://pitest.org/quickstart/maven
+[pitest]: https://pitest.org
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
