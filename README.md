@@ -3,7 +3,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="logo-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="logo.svg">
-  <img alt="Error Prone Support logo'" src="logo.svg" width="50%">
+  <img alt="Error Prone Support logo" src="logo.svg" width="50%">
 </picture>
 
 # Error Prone Support
@@ -15,7 +15,7 @@ Prone][error-prone-repo] to improve code quality and maintainability.
 > mistakes at compile-time.
 
 [![Maven central][maven-badge]][maven-eps] ![GitHub Actions][ci-badge]
-[![Licence][licence-badge]][licence] [![PRs Welcome][pr-badge]][contribute]
+[![License][license-badge]][license] [![PRs Welcome][pr-badge]][contribute]
 
 [Getting started](#%EF%B8%8F-getting-started) • [Building](#-building) •
 [How it works](#-how-it-works) • [Contribute](#%EF%B8%8F-contribute)
@@ -26,9 +26,11 @@ Prone][error-prone-repo] to improve code quality and maintainability.
 
 ## ⚡ Getting started
 
-Edit your `pom.xml` file to add Error Prone Support to your project. See
-[@PicnicSupermarket/oss-parent/pom.xml][oss-parent-example] for an example
-configuration.
+This guide assumes Error Prone is already setup in your project. If this is not
+the case, please check out the [installation guide]
+[error-prone-installation-guide]. Next, edit your `pom.xml` file to add Error
+Prone Support to your project. See [@PicnicSupermarket/oss-parent/pom.xml]
+[oss-parent-example] for an example configuration.
 
 ```xml
 <build>
@@ -41,7 +43,7 @@ configuration.
                     <path>
                         <groupId>tech.picnic.error-prone-support</groupId>
                         <artifactId>error-prone-support</artifactId>
-                        <version>0.1.0</version>
+                        <version>VERSION</version>
                     </path>
                 </annotationProcessorPaths>
                 <compilerArgs>
@@ -97,9 +99,10 @@ details.
 
 ## 💡 How it works
 
+<!-- XXX: Extend this section. -->
 Extending [@google/error-prone][error-prone-repo].
 
-## ✍️ Contribute
+## ✍️ Contributing
 
 Want to fix a bug, improve the docs, or add a new feature? That's awesome!
 Please read the [contributing document][contribute].
@@ -109,19 +112,20 @@ Please read the [contributing document][contribute].
 [contribute]: CONTRIBUTING.md
 [error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
 [error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
+[error-prone-installation-guide]: https://errorprone.info/docs/installation#maven
 [error-prone-repo]: https://github.com/google/error-prone
 [google-java-format]: https://github.com/google/google-java-format
 [idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
-[licence-badge]:
+[license]: LICENSE.md
+[license-badge]:
   https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
-[licence]: LICENSE.md
+[maven]: https://maven.apache.org
 [maven-badge]:
   https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
 [maven-eps]:
   https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
-[maven]: https://maven.apache.org
 [oss-parent-example]:
   https://github.com/PicnicSupermarket/oss-parent/blob/d2fd86f4f3bd16d92983068eb83995207b2e9631/pom.xml#L1000
-[pitest-maven]: https://pitest.org/quickstart/maven
 [pitest]: https://pitest.org
+[pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
