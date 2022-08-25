@@ -9,16 +9,18 @@
 # Error Prone Support
 
 Error Prone Support is a Picnic-opinionated extension of [Error
-Prone][error-prone-repo] to improve code quality and maintainability.
+Prone][error-prone-orig-repo] to improve code quality and maintainability.
 
-> Error Prone is a static analysis tool for Java that catches common programming
-> mistakes at compile-time.
+> Error Prone is a static analysis tool for Java that catches common
+> programming mistakes at compile-time.
 
-[![Maven central][maven-badge]][maven-eps] ![GitHub Actions][ci-badge]
-[![License][license-badge]][license] [![PRs Welcome][pr-badge]][contribute]
+[![Maven Central][maven-central-badge]][maven-central-search]
+[![GitHub Actions][github-actions-build-badge]][github-actions-build-master]
+[![License][license-badge]][license]
+[![PRs Welcome][pr-badge]][contributing]
 
-[Getting started](#%EF%B8%8F-getting-started) • [Building](#-building) •
-[How it works](#-how-it-works) • [Contribute](#%EF%B8%8F-contribute)
+[Getting started](#-getting-started) • [Building](#-building) •
+[How it works](#-how-it-works) • [Contributing](#%EF%B8%8F-contributing)
 
 </div>
 
@@ -27,65 +29,89 @@ Prone][error-prone-repo] to improve code quality and maintainability.
 ## ⚡ Getting started
 
 This guide assumes Error Prone is already setup in your project. If this is not
-the case, please check out the [installation guide]
-[error-prone-installation-guide]. Next, edit your `pom.xml` file to add Error
-Prone Support to your project. See [@PicnicSupermarket/oss-parent/pom.xml]
-[oss-parent-example] for an example configuration.
+the case, please follow their [installation
+guide][error-prone-installation-guide]. Next, edit your `pom.xml` file to add
+one or more Error Prone Support modules to the `annotationProcessorPaths` of
+the `maven-compiler-plugin`:
 
 ```xml
 <build>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-                <annotationProcessorPaths>
-                    <path>
-                        <groupId>tech.picnic.error-prone-support</groupId>
-                        <artifactId>error-prone-support</artifactId>
-                        <version>VERSION</version>
-                    </path>
-                </annotationProcessorPaths>
-                <compilerArgs>
-                    <!-- Enable and configure Error Prone. -->
-                    <arg>
-                        -Xplugin:ErrorProne
-                        <!-- Other Error Prone flags, see
-                        https://errorprone.info/docs/flags. -->
-                    </arg>
-                    <arg>-XDcompilePolicy=simple</arg>
-                </compilerArgs>
-            </configuration>
-        </plugin>
-    </plugins>
+    <pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <!-- Error Prone itself. -->
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${error-prone.version}</version>
+                        </path>
+                        <!-- Error Prone Support's additional bug checkers. -->
+                        <path>
+                            <groupId>tech.picnic.error-prone-support</groupId>
+                            <artifactId>error-prone-contrib</artifactId>
+                            <version>${error-prone-support.version}</version>
+                        </path>
+                        <!-- Error Prone Support's Refaster templates. -->
+                        <path>
+                            <groupId>tech.picnic.error-prone-support</groupId>
+                            <artifactId>refaster-runner</artifactId>
+                            <version>${error-prone-support.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>
+                            -Xplugin:ErrorProne
+                            <!-- Add other Error Prone flags here. See
+                            https://errorprone.info/docs/flags. -->
+                        </arg>
+                        <arg>-XDcompilePolicy=simple</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </pluginManagement>
 </build>
 ```
 
+<!-- XXX: Reference `oss-parent`'s `pom.xml` once that project also uses Error
+Prone Support. Alteratively reference this projec's `self-check` profile
+definition. -->
+
 ## 👷 Building
 
-This is a [Maven][maven] project, so running `mvn clean install` performs a full
-clean build. Some relevant flags:
-
-- `-Dverification.warn` makes the warnings and errors emitted by various plugins
-  and the Java compiler non-fatal, where possible.
+This is a [Maven][maven-central] project, so running `mvn clean install`
+performs a full clean build. Some relevant flags:
+- `-Dverification.warn` makes the warnings and errors emitted by various
+  plugins and the Java compiler non-fatal, where possible.
 - `-Dverification.skip` disables various non-essential plugins and compiles the
-  code with minimal checks (i.e. without linting, Error Prone checks, etc.)
+  code with minimal checks (i.e. without linting, Error Prone checks, etc.).
 - `-Dversion.error-prone=some-version` runs the build using the specified
-  version of Error Prone. This is useful e.g. when testing a locally built Error
-  Prone SNAPSHOT.
-- `-Perror-prone-fork` run the build using Picnic's [Error Prone
+  version of Error Prone. This is useful e.g. when testing a locally built
+  Error Prone SNAPSHOT.
+- `-Perror-prone-fork` runs the build using Picnic's [Error Prone
   fork][error-prone-fork-repo], hosted on [Jitpack][error-prone-fork-jitpack].
   This fork generally contains a few changes on top of the latest Error Prone
   release.
+- `-Pself-check` runs the checks defined by this project agains itself. Pending
+  a release of [google/error-prone#3301][error-prone-pull-3301], this flag must
+  currently be used in combination with `-Perror-prone-fork`.
 
-Two other goals that one may find relevant:
-
+Some other commands one may find relevant:
 - `mvn fmt:format` formats the code using
   [`google-java-format`][google-java-format].
-- `mvn pitest:mutationCoverage` runs mutation tests using [PIT][pitest]. The
+- `./run-mutation-tests.sh` runs mutation tests using [PIT][pitest]. The
   results can be reviewed by opening the respective
   `target/pit-reports/index.html` files. For more information check the [PIT
   Maven plugin][pitest-maven].
+- `./apply-error-prone-suggestions.sh` applies Error Prone and Error Prone
+  Support code suggestions to this project. Before running this command, make
+  sure to have installed the project (`mvn clean install`) and make sure that
+  the current working directory does not contain unstaged or uncommited
+  changes.
 
 When running the project's tests in IntelliJ IDEA, you might see the following error:
 ```
@@ -99,35 +125,33 @@ details.
 
 ## 💡 How it works
 
-<!-- XXX: Extend this section. -->
+This project provides additional [`BugChecker`][error-prone-bugchecker]
+implementations.
 
-Extending [@google/error-prone][error-prone-repo].
+<!-- XXX: Extend this section. -->
 
 ## ✍️ Contributing
 
-Want to fix a bug, improve the docs, or add a new feature? That's awesome!
-Please read the [contributing document][contribute].
+Want to report or fix a bug, suggest or add a new feature, or improve the
+documentation? That's awesome! Please read [`CONTRIBUTING.md`][contributing].
 
-[ci-badge]:
-  https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml/badge.svg
-[contribute]: CONTRIBUTING.md
+[contributing]: CONTRIBUTING.md
+[error-prone-bugchecker]: https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
 [error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
 [error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
-[error-prone-installation-guide]:
-  https://errorprone.info/docs/installation#maven
-[error-prone-repo]: https://github.com/google/error-prone
+[error-prone-installation-guide]: https://errorprone.info/docs/installation#maven
+[error-prone-orig-repo]: https://github.com/google/error-prone
+[error-prone-pull-3301]: https://github.com/google/error-prone/pull/3301
+[github-actions-build-badge]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml/badge.svg
+[github-actions-build-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml?query=branch%3Amaster
 [google-java-format]: https://github.com/google/google-java-format
 [idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
 [license-badge]:
   https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
 [license]: LICENSE.md
-[maven-badge]:
-  https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
-[maven-eps]:
-  https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
-[maven]: https://maven.apache.org
-[oss-parent-example]:
-  https://github.com/PicnicSupermarket/oss-parent/blob/d2fd86f4f3bd16d92983068eb83995207b2e9631/pom.xml#L1000
-[pitest-maven]: https://pitest.org/quickstart/maven
+[maven-central-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
+[maven-central]: https://maven.apache.org
+[maven-central-search]: https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
 [pitest]: https://pitest.org
+[pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
