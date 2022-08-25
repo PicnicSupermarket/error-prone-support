@@ -58,13 +58,11 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import javax.xml.transform.Source;
 
 /**
  * A {@link BugChecker} which flags code which can be simplified using Refaster templates located on
@@ -99,9 +97,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
    * @param flags Any provided command line flags.
    */
   public Refaster(ErrorProneFlags flags) {
-    List<RefasterRule<?, ?>> refasterRules = getRefasterRules(flags);
-    refasterTemplatesTree =
-        Node.createRefasterTemplateTree(refasterRules, RefasterCheck::extractTemplateIdentifiers);
+    refasterRules = Node.create(getRefasterRules(flags), Refaster::extractTemplateIdentifiers);
   }
 
   @CanIgnoreReturnValue
