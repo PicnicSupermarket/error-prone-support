@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.refaster.runner;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
