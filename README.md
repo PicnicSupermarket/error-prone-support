@@ -16,8 +16,7 @@ Prone][error-prone-orig-repo] to improve code quality and maintainability.
 
 [![Maven Central][maven-central-badge]][maven-central-search]
 [![GitHub Actions][github-actions-build-badge]][github-actions-build-master]
-[![License][license-badge]][license]
-[![PRs Welcome][pr-badge]][contributing]
+[![License][license-badge]][license] [![PRs Welcome][pr-badge]][contributing]
 
 [Getting started](#-getting-started) • [Building](#-building) •
 [How it works](#-how-it-works) • [Contributing](#%EF%B8%8F-contributing)
@@ -28,11 +27,13 @@ Prone][error-prone-orig-repo] to improve code quality and maintainability.
 
 ## ⚡ Getting started
 
-This guide assumes Error Prone is already setup in your project. If this is not
-the case, please follow their [installation
-guide][error-prone-installation-guide]. Next, edit your `pom.xml` file to add
-one or more Error Prone Support modules to the `annotationProcessorPaths` of
-the `maven-compiler-plugin`:
+This library works on top of [Error Prone][error-prone-orig-repo].
+
+1. First, follow Error Prone's [installation
+   guide][error-prone-installation-guide].
+
+2. Next, edit your `pom.xml` file to add one or more Error Prone Support
+   modules to the `annotationProcessorPaths` of the `maven-compiler-plugin`:
 
 ```xml
 <build>
@@ -85,6 +86,7 @@ definition. -->
 
 This is a [Maven][maven-central] project, so running `mvn clean install`
 performs a full clean build. Some relevant flags:
+
 - `-Dverification.warn` makes the warnings and errors emitted by various
   plugins and the Java compiler non-fatal, where possible.
 - `-Dverification.skip` disables various non-essential plugins and compiles the
@@ -101,6 +103,7 @@ performs a full clean build. Some relevant flags:
   currently be used in combination with `-Perror-prone-fork`.
 
 Some other commands one may find relevant:
+
 - `mvn fmt:format` formats the code using
   [`google-java-format`][google-java-format].
 - `./run-mutation-tests.sh` runs mutation tests using [PIT][pitest]. The
@@ -133,25 +136,32 @@ implementations.
 ## ✍️ Contributing
 
 Want to report or fix a bug, suggest or add a new feature, or improve the
-documentation? That's awesome! Please read [`CONTRIBUTING.md`][contributing].
+documentation? That's awesome! Please read our [contributing
+guidelines][contributing].
 
 [contributing]: CONTRIBUTING.md
-[error-prone-bugchecker]: https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
+[error-prone-bugchecker]:
+  https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
 [error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
 [error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
-[error-prone-installation-guide]: https://errorprone.info/docs/installation#maven
+[error-prone-installation-guide]:
+  https://errorprone.info/docs/installation#maven
 [error-prone-orig-repo]: https://github.com/google/error-prone
 [error-prone-pull-3301]: https://github.com/google/error-prone/pull/3301
-[github-actions-build-badge]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml/badge.svg
-[github-actions-build-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml?query=branch%3Amaster
+[github-actions-build-badge]:
+  https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml/badge.svg
+[github-actions-build-master]:
+  https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml?query=branch%3Amaster
 [google-java-format]: https://github.com/google/google-java-format
 [idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
 [license-badge]:
   https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
 [license]: LICENSE.md
-[maven-central-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
+[maven-central-badge]:
+  https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
 [maven-central]: https://maven.apache.org
-[maven-central-search]: https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
+[maven-central-search]:
+  https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
 [pitest]: https://pitest.org
 [pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg

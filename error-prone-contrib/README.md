@@ -11,23 +11,20 @@ request.
 
 ### Building
 
-See [README.md][main-readme].
+See the main [readme][main-readme].
 
 ### Contribution guidelines
 
-See [CONTRIBUTING.md][main-contributing].
+See our [contributing guidelines][main-contributing].
 
 ### Our wishlist
 
 We expect the following tasks to help improve the quality of this open source
 project:
 
-- Document how to enable the checks.
 - Document how to apply patches.
 - Document each of the checks.
 - Add [SonarQube][sonarcloud] and [Codecov][codecov] integrations.
-- Investigate whether it makes sense to include license headers in each file. If
-  so, set that up and enforce it.
 - Add non-Java file formatting support, like we have internally at Picnic.
   (I.e., somehow open-source that stuff.)
 - Auto-generate a website listing each of the checks, just like the Error Prone
@@ -47,7 +44,7 @@ project:
 - Improve an existing check (see `XXX`-marked comments in the code) or write a
   new one (see the list of suggestions below).
 
-### Ideas for new checks
+### Bugchec extension ideas
 
 The following is a list of checks we'd like to see implemented:
 
@@ -72,12 +69,13 @@ The following is a list of checks we'd like to see implemented:
   code and Javadoc `@link` references.
 - A check which simplifies array expressions. It would replace empty array
   expressions of the form `new int[] {}` with `new int[0]`. Statements of the
-  form `byte[] arr = new byte[] {'c'};` would be shortened to `byte[] arr =
-  {'c'};`.
-- A check which replaces expressions of the form `String.format("some prefix
-  %s", arg)` with `"some prefix " + arg`, and similar for simple suffixes. Can
-  perhaps be generalized further, though it's unclear how far. (Well, a
-  `String.format` call without arguments can certainly be simplified, too.)
+  form `byte[] arr = new byte[] {'c'};` would be shortened to
+  `byte[] arr = {'c'};`.
+- A check which replaces expressions of the form
+  `String.format("some prefix %s", arg)` with `"some prefix " + arg`, and
+  similar for simple suffixes. Can perhaps be generalized further, though it's
+  unclear how far. (Well, a `String.format` call without arguments can
+  certainly be simplified, too.)
 - A check which replaces single-character strings with `char`s where possible.
   For example as argument to `StringBuilder.append` and in string
   concatenations.
@@ -122,11 +120,11 @@ The following is a list of checks we'd like to see implemented:
 - A check which flags imports from other test classes.
 - A Guava-specific check which replaces `Joiner.join` calls with `String.join`
   calls in those cases where the latter is a proper substitute for the former.
-- A Guava-specific check which flags `{Immutable,}Multimap` type usages
-  where `{Immutable,}{List,Set}Multimap` would be more appropriate.
-- A Guava-specific check which rewrites `if (conditional) { throw new
-  IllegalArgumentException(); }` and variants to an equivalent `checkArgument`
-  statement. Idem for other exception types.
+- A Guava-specific check which flags `{Immutable,}Multimap` type usages where
+  `{Immutable,}{List,Set}Multimap` would be more appropriate.
+- A Guava-specific check which rewrites
+  `if (conditional) { throw new IllegalArgumentException(); }` and variants to
+  an equivalent `checkArgument` statement. Idem for other exception types.
 - A Guava-specific check which replaces simple anonymous `CacheLoader` subclass
   declarations with `CacheLoader.from(someLambda)`.
 - A Spring-specific check which enforces that methods with the `@Scheduled`
@@ -214,16 +212,16 @@ Refaster's expressiveness:
 - Some Refaster refactorings (e.g. when dealing with lazy evaluation) are valid
   only when some free parameter is a constant, variable reference or some other
   pure expression. Introduce a way to express such a constraint. For example,
-  rewriting `optional1.map(Optional::of).orElse(optional2)` to `optional1.or(()
-  -> optional2)` is not behavior preserving if evaluation of `optional2` has
-  side-effects.
+  rewriting `optional1.map(Optional::of).orElse(optional2)` to
+  `optional1.or(() -> optional2)` is not behavior preserving if evaluation of
+  `optional2` has side-effects.
 - Similarly, certain refactoring operations are only valid if one of the
   matches expressions is not `@Nullable`. It'd be nice to be able to express
   this.
 - Generalize `@Placeholder` support such that rules can reference e.g. "any
   concrete unary method". This would allow refactorings such as
-  `Mono.just(constant).flatmap(this::someFun)` -> `Mono.defer(() ->
-  someFun(constant))`.
+  `Mono.just(constant).flatmap(this::someFun)` ->
+  `Mono.defer(() -> someFun(constant))`.
 - Sometimes a Refaster refactoring can cause the resulting code not to compile
   due to a lack of generic type information. Identify and resolve such
   occurrences. For example, an `@AfterTemplate` may require the insertion of a
@@ -279,7 +277,8 @@ Refaster's expressiveness:
 
 [autorefactor]: https://autorefactor.org
 [bettercodehub]: https://bettercodehub.com
-[checkstyle-external-project-tests]: https://github.com/checkstyle/checkstyle/blob/master/wercker.yml
+[checkstyle-external-project-tests]:
+  https://github.com/checkstyle/checkstyle/blob/master/wercker.yml
 [codecov]: https://codecov.io
 [error-prone-bug-patterns]: https://errorprone.info/bugpatterns
 [error-prone-repo]: https://github.com/google/error-prone
