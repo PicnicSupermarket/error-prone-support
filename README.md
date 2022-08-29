@@ -71,6 +71,10 @@ This library works on top of [Error Prone][error-prone-orig-repo].
                         </arg>
                         <arg>-XDcompilePolicy=simple</arg>
                     </compilerArgs>
+                    <!-- By default, Error Prone Support will raise warnings instead of errors. -->
+                    <showWarnings>true</showWarnings>
+                    <!-- Enable this, if you'd like to fail your build upon warnings. -->
+                    <failOnWarning>true</failOnWarning>
                 </configuration>
             </plugin>
         </plugins>
