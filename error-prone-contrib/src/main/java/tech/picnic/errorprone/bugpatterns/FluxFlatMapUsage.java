@@ -16,12 +16,15 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.suppliers.Suppliers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.tools.javac.code.Type;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import reactor.core.publisher.Flux;
+import tech.picnic.errorprone.bugpatterns.util.NestedTypesUtils;
 
 /**
  * A {@link BugChecker} which flags usages of {@link Flux#flatMap(Function)} and {@link
@@ -55,20 +58,32 @@ public final class FluxFlatMapUsage extends BugChecker
           .onDescendantOf("reactor.core.publisher.Flux")
           .namedAnyOf("flatMap", "flatMapSequential")
           .withParameters(Function.class.getName());
+  private static final com.google.errorprone.suppliers.Supplier<Type> FLUX =
+      Suppliers.typeFromClass(Flux.class);
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     if (!FLUX_FLATMAP.matches(tree, state)) {
       return Description.NO_MATCH;
     }
+    SuggestedFix maxConcurrencyFix =
+        SuggestedFix.builder()
+            .postfixWith(
+                Iterables.getOnlyElement(tree.getArguments()), ", " + MAX_CONCURRENCY_ARG_NAME)
+            .build();
+
+    if (NestedTypesUtils.isSameTypeNested(FLUX, tree, state)) {
+      return buildDescription(tree)
+          .addFix(maxConcurrencyFix)
+          .setMessage(
+              "`Flux#flatMap` and `Flux#flatMapSequential` have subtle semantics;"
+                  + " please explicitly specify the desired amount of concurrency")
+          .build();
+    }
 
     return buildDescription(tree)
         .addFix(SuggestedFixes.renameMethodInvocation(tree, "concatMap", state))
-        .addFix(
-            SuggestedFix.builder()
-                .postfixWith(
-                    Iterables.getOnlyElement(tree.getArguments()), ", " + MAX_CONCURRENCY_ARG_NAME)
-                .build())
+        .addFix(maxConcurrencyFix)
         .build();
   }
 

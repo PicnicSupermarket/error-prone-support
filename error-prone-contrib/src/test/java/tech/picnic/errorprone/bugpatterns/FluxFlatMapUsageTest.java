@@ -33,6 +33,10 @@ final class FluxFlatMapUsageTest {
             "    Flux.just(1).flatMapSequential(Flux::just);",
             "    // BUG: Diagnostic contains:",
             "    Flux.just(1).<String>flatMapSequential(i -> Flux.just(String.valueOf(i)));",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.just(\"test_1\",\"test\").groupBy(String::length).flatMap(Flux::just);",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.just(\"test_1\",\"test\").groupBy(String::length).flatMapSequential(Flux::just);",
             "",
             "    Mono.just(1).flatMap(Mono::just);",
             "    Flux.just(1).concatMap(Flux::just);",
@@ -71,9 +75,12 @@ final class FluxFlatMapUsageTest {
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
+            "  private static final int MAX_CONCURRENCY = 8;",
             "  void m() {",
             "    Flux.just(1).flatMap(Flux::just);",
             "    Flux.just(1).flatMapSequential(Flux::just);",
+            "    Flux.just(\"test_1\",\"test\").groupBy(String::length).flatMap(Flux::just);",
+            "    Flux.just(\"test_1\",\"test\").groupBy(String::length).flatMapSequential(Flux::just);",
             "  }",
             "}")
         .addOutputLines(
@@ -81,9 +88,12 @@ final class FluxFlatMapUsageTest {
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
+            "  private static final int MAX_CONCURRENCY = 8;",
             "  void m() {",
             "    Flux.just(1).concatMap(Flux::just);",
             "    Flux.just(1).concatMap(Flux::just);",
+            "    Flux.just(\"test_1\",\"test\").groupBy(String::length).flatMap(Flux::just, MAX_CONCURRENCY);",
+            "    Flux.just(\"test_1\",\"test\").groupBy(String::length).flatMapSequential(Flux::just, MAX_CONCURRENCY);",
             "  }",
             "}")
         .doTest();
