@@ -27,6 +27,8 @@ Prone][error-prone-orig-repo] to improve code quality and maintainability.
 
 ## ⚡ Getting started
 
+### Installation
+
 This library works on top of [Error Prone][error-prone-orig-repo].
 
 1. First, follow Error Prone's [installation
@@ -86,6 +88,46 @@ This library works on top of [Error Prone][error-prone-orig-repo].
 Prone Support. Alternatively reference this project's `self-check` profile
 definition. -->
 
+### Usage
+
+```java
+import java.util.Optional;
+
+public class Example {
+    static Optional<Optional<Integer>> getOptionalValue() {
+        return Optional.of(Optional.of(1));
+    }
+
+    static BigDecimal getNumber() {
+        return BigDecimal.valueOf(0);
+    }
+}
+```
+
+```shell
+$ mvn clean install
+-------------------------------------------------------------
+[WARNING] COMPILATION WARNING :
+[INFO] -------------------------------------------------------------
+[WARNING] Example.java:[12,34] [tech.picnic.errorprone.refastertemplates.BigDecimalTemplates.BigDecimalZero]
+  null
+  Did you mean 'return BigDecimal.ZERO;'?
+[WARNING] Example.java:[8,27] [NestedOptionals] Avoid nesting `Optional`s inside `Optional`s; the resultant code is hard to reason about
+[INFO] 2 warnings
+[INFO] -------------------------------------------------------------
+```
+
+Two things are kicking in here:
+
+1. A BugChecker pattern to prevent [nested
+   Optionals][bug-checks-nested-optionals]
+2. A Refaster template to write usages of
+   [BigDecimal][refaster-templates-bigdecimal] in a consistent manner as
+   `BigDecimal.ZERO` instead of `BigDecimal.valueOf(0)` or `new BigDecimal(0)`.
+
+Check out all [bug checks][bug-checks] and [refaster
+templates][refaster-templates].
+
 ## 👷 Building
 
 This is a [Maven][maven-central] project, so running `mvn clean install`
@@ -143,6 +185,10 @@ Want to report or fix a bug, suggest or add a new feature, or improve the
 documentation? That's awesome! Please read our [contributing
 guidelines][contributing].
 
+[bug-checks]:
+  error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
+[bug-checks-nested-optionals]:
+  error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/NestedOptionals.java
 [contributing]: CONTRIBUTING.md
 [error-prone-bugchecker]:
   https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
@@ -169,3 +215,7 @@ guidelines][contributing].
 [pitest]: https://pitest.org
 [pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
+[refaster-templates]:
+  error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/
+[refaster-templates-bigdecimal]:
+  error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/BigDecimalTemplates.java
