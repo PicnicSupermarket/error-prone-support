@@ -44,7 +44,7 @@ project:
 - Improve an existing check (see `XXX`-marked comments in the code) or write a
   new one (see the list of suggestions below).
 
-### Bugchec extension ideas
+### BugChecker extension ideas
 
 The following is a list of checks we'd like to see implemented:
 

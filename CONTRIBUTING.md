@@ -12,7 +12,7 @@ If you found a bug, feel free to [report the issue][error-prone-support-issues]
 on GitHub.
 
 Before doing so, please:
-- Verify that issue is reproducible againt the latest version of the project.
+- Verify that issue is reproducible against the latest version of the project.
 - Search through the existing set of issues to see whether the problem is
   already known. With some luck a solution is already in place, or a workaround
   may have been provided.
@@ -21,7 +21,7 @@ When filing a bug report, please include the following:
 - Information about your environment (e.g. the output of `java -version`, as
   well as details on your operating system).
 - A description of what is going on (e.g. logging output, stacktraces).
-- A mininum reproducible example, so that other developers can try to reproduce
+- A minimum reproducible example, so that other developers can try to reproduce
   (and optionally fix) the bug.
 - Any additional information that may be relevant.
 
@@ -40,11 +40,11 @@ requests][error-prone-support-pulls] for this purpose.
 
 Before opening a pull request, please check whether there are any existing
 (open or closed) issues or pull requests addressing the same problem. This
-avoids double work or lots of time spent on a solution that may ultimatly not
+avoids double work or lots of time spent on a solution that may ultimately not
 be accepted. When in doubt, make sure to first raise an
 [issue][error-prone-support-issues] to discuss the idea.
 
-To the extend possible, the pull request process guards our coding guidelines.
+To the extent possible, the pull request process guards our coding guidelines.
 Some pointers:
 - Checks should be _topical_: ideally they address a single concern.
 - Where possible checks should provide _fixes_, and ideally these are

@@ -83,7 +83,7 @@ This library works on top of [Error Prone][error-prone-orig-repo].
 ```
 
 <!-- XXX: Reference `oss-parent`'s `pom.xml` once that project also uses Error
-Prone Support. Alteratively reference this projec's `self-check` profile
+Prone Support. Alternatively reference this project's `self-check` profile
 definition. -->
 
 ## 👷 Building
@@ -102,9 +102,9 @@ performs a full clean build. Some relevant flags:
   fork][error-prone-fork-repo], hosted on [Jitpack][error-prone-fork-jitpack].
   This fork generally contains a few changes on top of the latest Error Prone
   release.
-- `-Pself-check` runs the checks defined by this project agains itself. Pending
-  a release of [google/error-prone#3301][error-prone-pull-3301], this flag must
-  currently be used in combination with `-Perror-prone-fork`.
+- `-Pself-check` runs the checks defined by this project against itself.
+  Pending a release of [google/error-prone#3301][error-prone-pull-3301], this
+  flag must currently be used in combination with `-Perror-prone-fork`.
 
 Some other commands one may find relevant:
 
