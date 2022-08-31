@@ -43,7 +43,7 @@ public final class TestNGClassLevelTestAnnotation extends BugChecker implements 
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    if (!CLASS_TREE.matches(tree, state) || tree.getExtendsClause() != null) {
+    if (!CLASS_TREE.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
