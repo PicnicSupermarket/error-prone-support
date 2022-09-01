@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.REFACTORING;
 import static com.google.errorprone.matchers.Matchers.allOf;
+import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.methodHasVisibility;
@@ -36,8 +37,16 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class TestNGClassLevelTestAnnotation extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ClassTree> CLASS_TREE = hasAnnotation("org.testng.annotations.Test");
-  private static final Matcher<MethodTree> UNMIGRATED_TEST_METHOD =
-      allOf(methodHasVisibility(PUBLIC), not(hasAnnotation("org.testng.annotations.Test")));
+  private static final Matcher<MethodTree> UNMIGRATED_TESTNG_TEST_METHOD =
+      allOf(
+          methodHasVisibility(PUBLIC),
+          not(
+              anyOf(
+                  hasAnnotation("org.testng.annotations.Test"),
+                  hasAnnotation("org.testng.annotations.AfterClass"),
+                  hasAnnotation("org.testng.annotations.AfterMethod"),
+                  hasAnnotation("org.testng.annotations.BeforeClass"),
+                  hasAnnotation("org.testng.annotations.BeforeMethod"))));
   private static final Matcher<AnnotationTree> TESTNG_ANNOTATION =
       isType("org.testng.annotations.Test");
 
@@ -59,7 +68,7 @@ public final class TestNGClassLevelTestAnnotation extends BugChecker implements 
     tree.getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
-        .filter(method -> UNMIGRATED_TEST_METHOD.matches(method, state))
+        .filter(method -> UNMIGRATED_TESTNG_TEST_METHOD.matches(method, state))
         .filter(Predicate.not(ASTHelpers::isGeneratedConstructor))
         .forEach(
             methodTree ->
