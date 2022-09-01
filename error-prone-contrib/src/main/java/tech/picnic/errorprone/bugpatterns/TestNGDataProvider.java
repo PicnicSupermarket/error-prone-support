@@ -37,11 +37,11 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link BugChecker} which flags TestNG {@link org.testng.annotations.DataProvider} methods and
- * provides an equivalent Jupiter {@link org.junit.jupiter.params.ParameterizedTest} replacement.
+ * provides an equivalent JUnit {@link org.junit.jupiter.params.ParameterizedTest} replacement.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Migrate TestNG DataProvider to Jupiter argument streams",
+    summary = "Migrate TestNG DataProvider to JUnit argument streams",
     linkType = NONE,
     tags = REFACTORING,
     severity = ERROR)

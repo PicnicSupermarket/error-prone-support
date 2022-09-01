@@ -29,13 +29,13 @@ import java.util.Optional;
 
 /**
  * A {@link BugChecker} that will flag TestNG {@link org.testng.annotations.Test} annotations that
- * can be migrated to a Jupiter {@link org.junit.jupiter.params.ParameterizedTest}. These methods
- * will only be flagged if a migrated version of the data provider is available, these are migrated
- * using {@link TestNGDataProvider}.
+ * can be migrated to a JUnit {@link org.junit.jupiter.params.ParameterizedTest}. These methods will
+ * only be flagged if a migrated version of the data provider is available, these are migrated using
+ * {@link TestNGDataProvider}.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Migrate TestNG parameterized tests to Jupiter",
+    summary = "Migrate TestNG parameterized tests to JUnit",
     linkType = NONE,
     tags = REFACTORING,
     severity = ERROR)

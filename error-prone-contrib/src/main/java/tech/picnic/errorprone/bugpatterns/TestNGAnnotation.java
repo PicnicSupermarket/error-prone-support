@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.StandardTags.REFACTORING;
 import static com.google.errorprone.matchers.Matchers.isType;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -18,27 +19,38 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
 
 /**
- * A {@link BugChecker} that replaces {@link org.testng.annotations.Test} annotations with Jupiter
- * test annotations.
+ * A {@link BugChecker} that replaces TestNG annotations with their JUnit counterpart, if one exists
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Migrate TestNG test annotation to Jupiter",
+    summary = "Migrate TestNG test annotations to JUnit",
     linkType = NONE,
     severity = WARNING,
     tags = REFACTORING)
 public final class TestNGAnnotation extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<AnnotationTree> TESTNG_ANNOTATION =
-      isType("org.testng.annotations.Test");
+  private static final ImmutableMap<Matcher<AnnotationTree>, String>
+      TESTNG_ANNOTATION_REPLACEMENT_MAP =
+          ImmutableMap.<Matcher<AnnotationTree>, String>builder()
+              .put(isType("org.testng.annotations.AfterClass"), "@org.junit.jupiter.api.AfterAll")
+              .put(isType("org.testng.annotations.AfterMethod"), "@org.junit.jupiter.api.AfterEach")
+              .put(isType("org.testng.annotations.BeforeClass"), "@org.junit.jupiter.api.BeforeAll")
+              .put(
+                  isType("org.testng.annotations.BeforeMethod"),
+                  "@org.junit.jupiter.api.BeforeEach")
+              .put(isType("org.testng.annotations.Test"), "@org.junit.jupiter.api.Test")
+              .build();
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
     SuggestedFix.Builder fix = SuggestedFix.builder();
     ASTHelpers.getAnnotations(tree).stream()
-        .filter(annotation -> TESTNG_ANNOTATION.matches(annotation, state))
         .filter(annotation -> annotation.getArguments().isEmpty())
-        .forEach(annotation -> fix.replace(annotation, "@org.junit.jupiter.api.Test"));
+        .forEach(
+            annotation ->
+                TESTNG_ANNOTATION_REPLACEMENT_MAP.entrySet().stream()
+                    .filter(entry -> entry.getKey().matches(annotation, state))
+                    .forEach(entry -> fix.replace(annotation, entry.getValue())));
 
     return fix.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fix.build());
   }

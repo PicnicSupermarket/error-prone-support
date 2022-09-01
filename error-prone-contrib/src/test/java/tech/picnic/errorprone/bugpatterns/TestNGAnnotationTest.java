@@ -16,10 +16,15 @@ final class TestNGAnnotationTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
+            "import org.testng.annotations.BeforeMethod;",
             "import org.testng.annotations.Test;",
             "",
             "@Test",
             "class A {",
+            "  @BeforeMethod",
+            "  // BUG: Diagnostic contains:",
+            "  public void init() {}",
+            "",
             "  @Test",
             "  // BUG: Diagnostic contains:",
             "  public void foo() {",
@@ -39,23 +44,27 @@ final class TestNGAnnotationTest {
     refactoringTestHelper
         .addInputLines(
             "A.java",
+            "import org.testng.annotations.BeforeMethod;",
             "import org.testng.annotations.Test;",
             "",
             "class A {",
+            "  @BeforeMethod",
+            "  public void init() {}",
+            "",
             "  @Test",
-            "  public void foo() {",
-            "    int number = 10;",
-            "  }",
+            "  public void foo() {}",
             "}")
         .addOutputLines(
             "A.java",
+            "import org.testng.annotations.BeforeMethod;",
             "import org.testng.annotations.Test;",
             "",
             "class A {",
+            "  @org.junit.jupiter.api.BeforeEach",
+            "  public void init() {}",
+            "",
             "  @org.junit.jupiter.api.Test",
-            "  public void foo() {",
-            "    int number = 10;",
-            "  }",
+            "  public void foo() {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
