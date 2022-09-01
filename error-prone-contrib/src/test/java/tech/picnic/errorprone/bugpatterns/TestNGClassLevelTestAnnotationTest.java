@@ -34,10 +34,14 @@ final class TestNGClassLevelTestAnnotationTest {
     refactoringTestHelper
         .addInputLines(
             "A.java",
+            "import org.testng.annotations.BeforeMethod;",
             "import org.testng.annotations.Test;",
             "",
             "@Test",
             "class A {",
+            "  @BeforeMethod",
+            "  public void init() {}",
+            "",
             "  public void foo() {}",
             "",
             "  @Test(priority = 12)",
@@ -51,9 +55,13 @@ final class TestNGClassLevelTestAnnotationTest {
             "}")
         .addOutputLines(
             "A.java",
+            "import org.testng.annotations.BeforeMethod;",
             "import org.testng.annotations.Test;",
             "",
             "class A {",
+            "  @BeforeMethod",
+            "  public void init() {}",
+            "",
             "  @Test",
             "  public void foo() {}",
             "",
