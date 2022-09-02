@@ -19,6 +19,7 @@ import java.util.function.Function;
  *
  * <p>The tree's edges are string-labeled, while its leaves store values of type {@code T}.
  */
+// XXX: Introduce JUnit tests for this class.
 @AutoValue
 abstract class Node<T> {
   static <T> Node<T> create(Map<String, Node<T>> children, ImmutableList<T> values) {
