@@ -91,36 +91,39 @@ definition. -->
 ### Usage
 
 ```java
-import java.util.Optional;
+import com.google.common.collect.ImmutableSet;
+import java.math.BigDecimal;
 
 public class Example {
-    static Optional<Optional<Integer>> getOptionalValue() {
-        return Optional.of(Optional.of(1));
-    }
-
     static BigDecimal getNumber() {
         return BigDecimal.valueOf(0);
+    }
+
+    public ImmutableSet<Integer> getSet() {
+        ImmutableSet<Integer> set = ImmutableSet.of(1);
+        return ImmutableSet.copyOf(set);
     }
 }
 ```
 
 ```shell
 $ mvn clean install
--------------------------------------------------------------
+[INFO] -------------------------------------------------------------
 [WARNING] COMPILATION WARNING :
 [INFO] -------------------------------------------------------------
-[WARNING] Example.java:[12,34] [tech.picnic.errorprone.refastertemplates.BigDecimalTemplates.BigDecimalZero]
+[WARNING] Example.java:[9,34] [tech.picnic.errorprone.refastertemplates.BigDecimalTemplates.BigDecimalZero]
   null
   Did you mean 'return BigDecimal.ZERO;'?
-[WARNING] Example.java:[8,27] [NestedOptionals] Avoid nesting `Optional`s inside `Optional`s; the resultant code is hard to reason about
+[WARNING] Example.java:[14,35] [IdentityConversion] This method invocation appears redundant; remove it or suppress this warning and add a comment explaining its purpose
+  Did you mean 'return set;' or '@SuppressWarnings("IdentityConversion") public ImmutableSet<Integer> getSet() {'?
 [INFO] 2 warnings
 [INFO] -------------------------------------------------------------
 ```
 
 Two things are kicking in here:
 
-1. A BugChecker pattern to prevent [nested
-   Optionals][bug-checks-nested-optionals]
+1. A BugChecker to flag unnecessary [identity
+   conversions][bug-checks-identity-conversion].
 2. A Refaster template to write usages of
    [BigDecimal][refaster-templates-bigdecimal] in a consistent manner as
    `BigDecimal.ZERO` instead of `BigDecimal.valueOf(0)` or `new BigDecimal(0)`.
@@ -187,8 +190,8 @@ guidelines][contributing].
 
 [bug-checks]:
   error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
-[bug-checks-nested-optionals]:
-  error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/NestedOptionals.java
+[bug-checks-identity-conversion]:
+  error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/IdentityConversion.java
 [contributing]: CONTRIBUTING.md
 [error-prone-bugchecker]:
   https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
