@@ -105,7 +105,6 @@ public final class RefasterCheck extends BugChecker implements CompilationUnitTr
         refasterRuleSelectorFactory.createRefasterRuleSelector(refasterRules);
     Set<RefasterRule<?, ?>> candidateRules = refasterRuleSelector.selectCandidateRules(tree);
 
-
     //    DefaultRefasterRuleSelector refasterRuleSelector =
     //        (DefaultRefasterRuleSelector)
     // ruleSelectorFactories.get(0).createRefasterRuleSelector(refasterRules);

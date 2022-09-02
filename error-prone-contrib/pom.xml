@@ -41,22 +41,22 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>refaster-rule-selector</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>refaster-support</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>refaster-test-support</artifactId>
-            <scope>test</scope>
-        </dependency>
-	<dependency>
-	    <groupId>${project.groupId}</groupId>
-	    <artifactId>refaster-rule-selector</artifactId>
-            <scope>provided</scope>
+            <artifactId>refaster-support</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-	    <artifactId>refaster-support</artifactId>
+            <artifactId>refaster-test-support</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

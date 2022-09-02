@@ -15,7 +15,10 @@ public final class SmartRefasterRuleSelectorFactory implements RefasterRuleSelec
   @Override
   public boolean isClassPathCompatible() {
     try {
-      Class.forName("com.google.errorprone.TimingReporter", /* initialize= */ false, Thread.currentThread().getContextClassLoader());
+      Class.forName(
+          "com.google.errorprone.TimingReporter",
+          /* initialize= */ false,
+          Thread.currentThread().getContextClassLoader());
       // THE CLASS IS HERE, THIS IS THE FORK!
       System.out.println("CLASS FOUND!!!");
       return true;
@@ -24,7 +27,7 @@ public final class SmartRefasterRuleSelectorFactory implements RefasterRuleSelec
       return false;
     }
     // XXX: Implement logic to determine whether the fork is on the classpath.
-//    return false;
+    //    return false;
   }
 
   @Override
