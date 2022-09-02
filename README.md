@@ -112,7 +112,6 @@ $ mvn clean install
 [WARNING] COMPILATION WARNING :
 [INFO] -------------------------------------------------------------
 [WARNING] Example.java:[9,34] [tech.picnic.errorprone.refastertemplates.BigDecimalTemplates.BigDecimalZero]
-  null
   Did you mean 'return BigDecimal.ZERO;'?
 [WARNING] Example.java:[14,35] [IdentityConversion] This method invocation appears redundant; remove it or suppress this warning and add a comment explaining its purpose
   Did you mean 'return set;' or '@SuppressWarnings("IdentityConversion") public ImmutableSet<Integer> getSet() {'?
