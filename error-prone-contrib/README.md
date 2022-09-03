@@ -277,8 +277,7 @@ Refaster's expressiveness:
 
 [autorefactor]: https://autorefactor.org
 [bettercodehub]: https://bettercodehub.com
-[checkstyle-external-project-tests]:
-  https://github.com/checkstyle/checkstyle/blob/master/wercker.yml
+[checkstyle-external-project-tests]: https://github.com/checkstyle/checkstyle/blob/master/wercker.yml
 [codecov]: https://codecov.io
 [error-prone-bug-patterns]: https://errorprone.info/bugpatterns
 [error-prone-repo]: https://github.com/google/error-prone

@@ -8,15 +8,17 @@
 
 # Error Prone Support
 
-Error Prone Support is a Picnic-opinionated extension of [Error
-Prone][error-prone-orig-repo] to improve code quality and maintainability.
+Error Prone Support is a Picnic-opinionated extension of Google's [Error
+Prone][error-prone-orig-repo]. It aims to improve code quality, focussing on
+maintainability, consistency and avoidance of common gotchas.
 
 > Error Prone is a static analysis tool for Java that catches common
 > programming mistakes at compile-time.
 
 [![Maven Central][maven-central-badge]][maven-central-search]
 [![GitHub Actions][github-actions-build-badge]][github-actions-build-master]
-[![License][license-badge]][license] [![PRs Welcome][pr-badge]][contributing]
+[![License][license-badge]][license]
+[![PRs Welcome][pr-badge]][contributing]
 
 [Getting started](#-getting-started) • [Building](#-building) •
 [How it works](#-how-it-works) • [Contributing](#%EF%B8%8F-contributing)
@@ -29,11 +31,10 @@ Prone][error-prone-orig-repo] to improve code quality and maintainability.
 
 ### Installation
 
-This library works on top of [Error Prone][error-prone-orig-repo].
+This library is built on top of [Error Prone][error-prone-orig-repo].
 
 1. First, follow Error Prone's [installation
    guide][error-prone-installation-guide].
-
 2. Next, edit your `pom.xml` file to add one or more Error Prone Support
    modules to the `annotationProcessorPaths` of the `maven-compiler-plugin`:
 
@@ -73,10 +74,10 @@ This library works on top of [Error Prone][error-prone-orig-repo].
                         </arg>
                         <arg>-XDcompilePolicy=simple</arg>
                     </compilerArgs>
-                    <!-- By default, Error Prone Support will raise warnings instead of errors. -->
+                    <!-- Some checks raise warnings rather than errors. -->
                     <showWarnings>true</showWarnings>
-                    <!-- Enable this, if you'd like to fail your build upon warnings. -->
-                    <failOnWarning>true</failOnWarning>
+                    <!-- Enable this if you'd like to fail your build upon warnings. -->
+                    <!-- <failOnWarning>true</failOnWarning> -->
                 </configuration>
             </plugin>
         </plugins>
@@ -95,18 +96,18 @@ import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
 
 public class Example {
-    static BigDecimal getNumber() {
-        return BigDecimal.valueOf(0);
-    }
+  static BigDecimal getNumber() {
+    return BigDecimal.valueOf(0);
+  }
 
-    public ImmutableSet<Integer> getSet() {
-        ImmutableSet<Integer> set = ImmutableSet.of(1);
-        return ImmutableSet.copyOf(set);
-    }
+  public ImmutableSet<Integer> getSet() {
+    ImmutableSet<Integer> set = ImmutableSet.of(1);
+    return ImmutableSet.copyOf(set);
+  }
 }
 ```
 
-```shell
+```sh
 $ mvn clean install
 [INFO] -------------------------------------------------------------
 [WARNING] COMPILATION WARNING :
@@ -187,37 +188,26 @@ Want to report or fix a bug, suggest or add a new feature, or improve the
 documentation? That's awesome! Please read our [contributing
 guidelines][contributing].
 
-[bug-checks]:
-  error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
-[bug-checks-identity-conversion]:
-  error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/IdentityConversion.java
+[bug-checks]: error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
+[bug-checks-identity-conversion]: error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/IdentityConversion.java
 [contributing]: CONTRIBUTING.md
-[error-prone-bugchecker]:
-  https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
+[error-prone-bugchecker]: https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
 [error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
 [error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
-[error-prone-installation-guide]:
-  https://errorprone.info/docs/installation#maven
+[error-prone-installation-guide]: https://errorprone.info/docs/installation#maven
 [error-prone-orig-repo]: https://github.com/google/error-prone
 [error-prone-pull-3301]: https://github.com/google/error-prone/pull/3301
-[github-actions-build-badge]:
-  https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml/badge.svg
-[github-actions-build-master]:
-  https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml?query=branch%3Amaster
+[github-actions-build-badge]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml/badge.svg
+[github-actions-build-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml?query=branch%3Amaster
 [google-java-format]: https://github.com/google/google-java-format
 [idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
-[license-badge]:
-  https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
+[license-badge]: https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
 [license]: LICENSE.md
-[maven-central-badge]:
-  https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
+[maven-central-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
 [maven-central]: https://maven.apache.org
-[maven-central-search]:
-  https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
+[maven-central-search]: https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
 [pitest]: https://pitest.org
 [pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
-[refaster-templates]:
-  error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/
-[refaster-templates-bigdecimal]:
-  error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/BigDecimalTemplates.java
+[refaster-templates]: error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/
+[refaster-templates-bigdecimal]: error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/BigDecimalTemplates.java

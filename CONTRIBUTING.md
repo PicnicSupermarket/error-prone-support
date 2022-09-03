@@ -12,7 +12,8 @@ If you found a bug, feel free to [report the issue][error-prone-support-issues]
 on GitHub.
 
 Before doing so, please:
-- Verify that issue is reproducible against the latest version of the project.
+- Verify that the issue is reproducible against the latest version of the
+  project.
 - Search through the existing set of issues to see whether the problem is
   already known. With some luck a solution is already in place, or a workaround
   may have been provided.
