@@ -9,10 +9,12 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -22,16 +24,35 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
+import tech.picnic.errorprone.refaster.util.ThrowsCheckedException;
 
 /** Refaster templates related to Reactor expressions and statements. */
 final class ReactorTemplates {
   private ReactorTemplates() {}
+
+  /**
+   * Prefer {@link Mono#fromSupplier(Supplier)} over {@link Mono#fromCallable(Callable)} where
+   * feasible.
+   */
+  static final class MonoFromSupplier<T> {
+    @BeforeTemplate
+    Mono<T> before(@NotMatches(ThrowsCheckedException.class) Callable<? extends T> supplier) {
+      return Mono.fromCallable(supplier);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Supplier<? extends T> supplier) {
+      return Mono.fromSupplier(supplier);
+    }
+  }
 
   /** Prefer {@link Mono#justOrEmpty(Optional)} over more verbose alternatives. */
   // XXX: If `optional` is a constant and effectively-final expression then the `Mono.defer` can be
   // dropped. Should look into Refaster support for identifying this.
   static final class MonoFromOptional<T> {
     @BeforeTemplate
+    @SuppressWarnings(
+        "MonoFromSupplier" /* `optional` may match a checked exception-throwing expression. */)
     Mono<T> before(Optional<T> optional) {
       return Refaster.anyOf(
           Mono.fromCallable(() -> optional.orElse(null)),

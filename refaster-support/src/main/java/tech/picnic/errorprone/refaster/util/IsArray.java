@@ -6,7 +6,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 
-/** A matcher of array-typed expressions, for use with Refaster's {@code @Matches} annotation. */
+/** A matcher of array-typed expressions. */
 public final class IsArray implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> DELEGATE = isArrayType();
