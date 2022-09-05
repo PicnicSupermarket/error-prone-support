@@ -784,7 +784,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.10.1</version>
                     <configuration>
-                        <!-- XXX: MCOMPILER-503: The plugin contructs a highly
+                        <!-- XXX: MCOMPILER-503: The plugin constructs a highly
                         unintuitive annotation processor classpath, in which
                         some indirect dependencies take precedence over
                         explicitly defined dependencies. This can largely be
