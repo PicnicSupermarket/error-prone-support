@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'master'
+permissions: {}
 jobs:
   build:
     runs-on: ubuntu-22.04
