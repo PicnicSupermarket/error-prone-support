@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refaster.runner;
 
 import com.sun.source.tree.Tree;
 
+// XXX: Drop this in favor of adding it to the class where it's needed?
 /** Fix a comment here later. */
 public final class Util {
   private Util() {}
