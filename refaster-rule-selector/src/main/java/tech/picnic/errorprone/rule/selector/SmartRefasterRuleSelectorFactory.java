@@ -20,10 +20,10 @@ public final class SmartRefasterRuleSelectorFactory implements RefasterRuleSelec
           /* initialize= */ false,
           Thread.currentThread().getContextClassLoader());
       // THE CLASS IS HERE, THIS IS THE FORK!
-      System.out.println("CLASS FOUND!!!");
+      //      System.out.println("CLASS FOUND!!!");
       return true;
     } catch (ClassNotFoundException e) {
-      System.out.println("NOT FOUND!!!");
+      //      System.out.println("NOT FOUND!!!");
       return false;
     }
     // XXX: Implement logic to determine whether the fork is on the classpath.

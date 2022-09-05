@@ -43,6 +43,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>refaster-rule-selector</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service-annotations</artifactId>
             <scope>provided</scope>
@@ -92,6 +97,11 @@
                                 <artifactId>refaster-compiler</artifactId>
                                 <version>${project.version}</version>
                             </path>
+                            <!--                            <path>-->
+                            <!--                                <groupId>${project.groupId}</groupId>-->
+                            <!--                                <artifactId>refaster-rule-selector</artifactId>-->
+                            <!--                                <version>${project.version}</version>-->
+                            <!--                            </path>-->
                         </annotationProcessorPaths>
                         <compilerArgs combine.children="append">
                             <arg>-Xplugin:RefasterRuleCompiler</arg>
