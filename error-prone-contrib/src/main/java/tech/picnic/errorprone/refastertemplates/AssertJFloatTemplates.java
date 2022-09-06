@@ -1,11 +1,13 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractFloatAssert;
 import org.assertj.core.data.Offset;
 
@@ -45,6 +47,19 @@ final class AssertJFloatTemplates {
     }
   }
 
+  static final class AbstractFloatAssertActualIsEqualToExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(float actual, float expected) {
+      return Refaster.anyOf(
+          assertThat(actual == expected).isTrue(), assertThat(actual != expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractFloatAssert<?> after(float actual, float expected) {
+      return assertThat(actual).isEqualTo(expected);
+    }
+  }
+
   static final class AbstractFloatAssertIsNotEqualTo {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert, float n) {
@@ -55,6 +70,19 @@ final class AssertJFloatTemplates {
     @AfterTemplate
     AbstractFloatAssert<?> after(AbstractFloatAssert<?> floatAssert, float n) {
       return floatAssert.isNotEqualTo(n);
+    }
+  }
+
+  static final class AbstractFloatAssertActualIsNotEqualToExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(float actual, float expected) {
+      return Refaster.anyOf(
+          assertThat(actual != expected).isTrue(), assertThat(actual == expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractFloatAssert<?> after(float actual, float expected) {
+      return assertThat(actual).isNotEqualTo(expected);
     }
   }
 
@@ -91,6 +119,58 @@ final class AssertJFloatTemplates {
     @AfterTemplate
     AbstractFloatAssert<?> after(AbstractFloatAssert<?> floatAssert) {
       return floatAssert.isEqualTo(1);
+    }
+  }
+
+  static final class AbstractFloatAssertActualIsLessThanExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(float actual, float expected) {
+      return Refaster.anyOf(
+          assertThat(actual < expected).isTrue(), assertThat(actual >= expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractFloatAssert<?> after(float actual, float expected) {
+      return assertThat(actual).isLessThan(expected);
+    }
+  }
+
+  static final class AbstractFloatAssertActualIsLessThanOrEqualToExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(float actual, float expected) {
+      return Refaster.anyOf(
+          assertThat(actual <= expected).isTrue(), assertThat(actual > expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractFloatAssert<?> after(float actual, float expected) {
+      return assertThat(actual).isLessThanOrEqualTo(expected);
+    }
+  }
+
+  static final class AbstractFloatAssertActualIsGreaterThanExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(float actual, float expected) {
+      return Refaster.anyOf(
+          assertThat(actual > expected).isTrue(), assertThat(actual <= expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractFloatAssert<?> after(float actual, float expected) {
+      return assertThat(actual).isGreaterThan(expected);
+    }
+  }
+
+  static final class AbstractFloatAssertActualIsGreaterThanOrEqualToExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(float actual, float expected) {
+      return Refaster.anyOf(
+          assertThat(actual >= expected).isTrue(), assertThat(actual < expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractFloatAssert<?> after(float actual, float expected) {
+      return assertThat(actual).isGreaterThanOrEqualTo(expected);
     }
   }
 }

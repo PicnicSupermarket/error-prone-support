@@ -1,11 +1,13 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractShortAssert;
 
 final class AssertJShortTemplates {
@@ -24,6 +26,19 @@ final class AssertJShortTemplates {
     }
   }
 
+  static final class AbstractShortAssertActualIsEqualToExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(short actual, short expected) {
+      return Refaster.anyOf(
+          assertThat(actual == expected).isTrue(), assertThat(actual != expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractShortAssert<?> after(short actual, short expected) {
+      return assertThat(actual).isEqualTo(expected);
+    }
+  }
+
   static final class AbstractShortAssertIsNotEqualTo {
     @BeforeTemplate
     AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert, short n) {
@@ -35,6 +50,19 @@ final class AssertJShortTemplates {
     @AfterTemplate
     AbstractShortAssert<?> after(AbstractShortAssert<?> shortAssert, short n) {
       return shortAssert.isNotEqualTo(n);
+    }
+  }
+
+  static final class AbstractShortAssertActualIsNotEqualToExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(short actual, short expected) {
+      return Refaster.anyOf(
+          assertThat(actual != expected).isTrue(), assertThat(actual == expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractShortAssert<?> after(short actual, short expected) {
+      return assertThat(actual).isNotEqualTo(expected);
     }
   }
 
@@ -71,6 +99,58 @@ final class AssertJShortTemplates {
     @AfterTemplate
     AbstractShortAssert<?> after(AbstractShortAssert<?> shortAssert) {
       return shortAssert.isEqualTo((short) 1);
+    }
+  }
+
+  static final class AbstractShortAssertActualIsLessThanExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(short actual, short expected) {
+      return Refaster.anyOf(
+          assertThat(actual < expected).isTrue(), assertThat(actual >= expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractShortAssert<?> after(short actual, short expected) {
+      return assertThat(actual).isLessThan(expected);
+    }
+  }
+
+  static final class AbstractShortAssertActualIsLessThanOrEqualToExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(short actual, short expected) {
+      return Refaster.anyOf(
+          assertThat(actual <= expected).isTrue(), assertThat(actual > expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractShortAssert<?> after(short actual, short expected) {
+      return assertThat(actual).isLessThanOrEqualTo(expected);
+    }
+  }
+
+  static final class AbstractShortAssertActualIsGreaterThanExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(short actual, short expected) {
+      return Refaster.anyOf(
+          assertThat(actual > expected).isTrue(), assertThat(actual <= expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractShortAssert<?> after(short actual, short expected) {
+      return assertThat(actual).isGreaterThan(expected);
+    }
+  }
+
+  static final class AbstractShortAssertActualIsGreaterThanOrEqualToExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(short actual, short expected) {
+      return Refaster.anyOf(
+          assertThat(actual >= expected).isTrue(), assertThat(actual < expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractShortAssert<?> after(short actual, short expected) {
+      return assertThat(actual).isGreaterThanOrEqualTo(expected);
     }
   }
 }

@@ -1,11 +1,13 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractLongAssert;
 
 final class AssertJLongTemplates {
@@ -24,6 +26,19 @@ final class AssertJLongTemplates {
     }
   }
 
+  static final class AbstractLongAssertActualIsEqualToExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(long actual, long expected) {
+      return Refaster.anyOf(
+          assertThat(actual == expected).isTrue(), assertThat(actual != expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractLongAssert<?> after(long actual, long expected) {
+      return assertThat(actual).isEqualTo(expected);
+    }
+  }
+
   static final class AbstractLongAssertIsNotEqualTo {
     @BeforeTemplate
     AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert, long n) {
@@ -34,6 +49,19 @@ final class AssertJLongTemplates {
     @AfterTemplate
     AbstractLongAssert<?> after(AbstractLongAssert<?> longAssert, long n) {
       return longAssert.isNotEqualTo(n);
+    }
+  }
+
+  static final class AbstractLongAssertActualIsNotEqualToExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(long actual, long expected) {
+      return Refaster.anyOf(
+          assertThat(actual != expected).isTrue(), assertThat(actual == expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractLongAssert<?> after(long actual, long expected) {
+      return assertThat(actual).isNotEqualTo(expected);
     }
   }
 
@@ -70,6 +98,58 @@ final class AssertJLongTemplates {
     @AfterTemplate
     AbstractLongAssert<?> after(AbstractLongAssert<?> longAssert) {
       return longAssert.isEqualTo(1);
+    }
+  }
+
+  static final class AbstractLongAssertActualIsLessThanExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(long actual, long expected) {
+      return Refaster.anyOf(
+          assertThat(actual < expected).isTrue(), assertThat(actual >= expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractLongAssert<?> after(long actual, long expected) {
+      return assertThat(actual).isLessThan(expected);
+    }
+  }
+
+  static final class AbstractLongAssertActualIsLessThanOrEqualToExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(long actual, long expected) {
+      return Refaster.anyOf(
+          assertThat(actual <= expected).isTrue(), assertThat(actual > expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractLongAssert<?> after(long actual, long expected) {
+      return assertThat(actual).isLessThanOrEqualTo(expected);
+    }
+  }
+
+  static final class AbstractLongAssertActualIsGreaterThanExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(long actual, long expected) {
+      return Refaster.anyOf(
+          assertThat(actual > expected).isTrue(), assertThat(actual <= expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractLongAssert<?> after(long actual, long expected) {
+      return assertThat(actual).isGreaterThan(expected);
+    }
+  }
+
+  static final class AbstractLongAssertActualIsGreaterThanOrEqualToExpected {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(long actual, long expected) {
+      return Refaster.anyOf(
+          assertThat(actual >= expected).isTrue(), assertThat(actual < expected).isFalse());
+    }
+
+    @AfterTemplate
+    AbstractLongAssert<?> after(long actual, long expected) {
+      return assertThat(actual).isGreaterThanOrEqualTo(expected);
     }
   }
 }
