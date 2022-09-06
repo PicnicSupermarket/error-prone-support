@@ -167,7 +167,7 @@ public final class RedundantStringConversion extends BugChecker
 
     List<SuggestedFix.Builder> fixes = new ArrayList<>();
 
-    // XXX: Not so nice: we try to simplify the RHS twice.
+    // XXX: Avoid trying to simplify the RHS twice.
     ExpressionTree preferredRhs = trySimplify(rhs, state).orElse(rhs);
     if (STRING.matches(preferredRhs, state)) {
       tryFix(lhs, state, ANY_EXPR).ifPresent(fixes::add);
