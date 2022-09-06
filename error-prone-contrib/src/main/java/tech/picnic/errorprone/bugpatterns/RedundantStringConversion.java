@@ -257,15 +257,15 @@ public final class RedundantStringConversion extends BugChecker
 
   // XXX: Write another check which checks that SLF4J patterns don't use `%s` and have a matching
   // number of arguments of the appropriate type. Also flag explicit conversions from `Throwable` to
-  // string as the last logger argument. Suggests either dropping the converison or going with
+  // string as the last logger argument. Suggests either dropping the conversion or going with
   // `Throwable#getMessage()` instead.
   private Optional<SuggestedFix.Builder> tryFixSlf4jLogger(
       List<? extends ExpressionTree> arguments, VisitorState state) {
     /*
-     * SLF4J treats the final argument to a log statement specially if it is a `Throwabe`: it
+     * SLF4J treats the final argument to a log statement specially if it is a `Throwable`: it
      * will always choose to render the associated stacktrace, even if the argument has a
      * matching `{}` placeholder. (In this case the `{}` will simply be logged verbatim.) So if
-     * a log statement's final argument is the string representation of a `Throwble`, then we
+     * a log statement's final argument is the string representation of a `Throwable`, then we
      * must not strip this explicit string conversion, as that would change the statement's
      * semantics.
      */
