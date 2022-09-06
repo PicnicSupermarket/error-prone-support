@@ -5,6 +5,7 @@ import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.common.collect.ImmutableSet;
+import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
@@ -19,10 +20,18 @@ final class AssertJLongTemplatesTest implements RefasterTemplateTestCase {
         assertThat(0L).isCloseTo(1, offset(0L)), assertThat(0L).isCloseTo(1, withPercentage(0)));
   }
 
+  ImmutableSet<AbstractBooleanAssert<?>> testAbstractLongAssertActualIsEqualToExpected() {
+    return ImmutableSet.of(assertThat(1L == 2L).isTrue(), assertThat(1L != 2L).isFalse());
+  }
+
   ImmutableSet<AbstractLongAssert<?>> testAbstractLongAssertIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat(0L).isNotCloseTo(1, offset(0L)),
         assertThat(0L).isNotCloseTo(1, withPercentage(0)));
+  }
+
+  ImmutableSet<AbstractBooleanAssert<?>> testAbstractLongAssertActualIsNotEqualToExpected() {
+    return ImmutableSet.of(assertThat(1L != 2L).isTrue(), assertThat(1L == 2L).isFalse());
   }
 
   AbstractLongAssert<?> testAbstractLongAssertIsZero() {
@@ -35,5 +44,22 @@ final class AssertJLongTemplatesTest implements RefasterTemplateTestCase {
 
   AbstractLongAssert<?> testAbstractLongAssertIsOne() {
     return assertThat(0L).isOne();
+  }
+
+  ImmutableSet<AbstractBooleanAssert<?>> testAbstractLongAssertActualIsLessThanExpected() {
+    return ImmutableSet.of(assertThat(1L < 2L).isTrue(), assertThat(1L >= 2L).isFalse());
+  }
+
+  ImmutableSet<AbstractBooleanAssert<?>> testAbstractLongAssertActualIsLessThanOrEqualToExpected() {
+    return ImmutableSet.of(assertThat(1L <= 2L).isTrue(), assertThat(1L > 2L).isFalse());
+  }
+
+  ImmutableSet<AbstractBooleanAssert<?>> testAbstractLongAssertActualIsGreaterThanExpected() {
+    return ImmutableSet.of(assertThat(1L > 2L).isTrue(), assertThat(1L <= 2L).isFalse());
+  }
+
+  ImmutableSet<AbstractBooleanAssert<?>>
+      testAbstractLongAssertActualIsGreaterThanOrEqualToExpected() {
+    return ImmutableSet.of(assertThat(1L >= 2L).isTrue(), assertThat(1L < 2L).isFalse());
   }
 }

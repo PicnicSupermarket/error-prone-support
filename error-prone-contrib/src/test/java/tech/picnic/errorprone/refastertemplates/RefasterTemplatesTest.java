@@ -19,6 +19,7 @@ final class RefasterTemplatesTest {
           AssertJBooleanTemplates.class,
           AssertJByteTemplates.class,
           AssertJCharSequenceTemplates.class,
+          AssertJComparableTemplates.class,
           AssertJDoubleTemplates.class,
           AssertJEnumerableTemplates.class,
           AssertJFloatTemplates.class,

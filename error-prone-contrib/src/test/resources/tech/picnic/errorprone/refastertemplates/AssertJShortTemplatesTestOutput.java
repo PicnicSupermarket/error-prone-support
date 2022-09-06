@@ -19,10 +19,18 @@ final class AssertJShortTemplatesTest implements RefasterTemplateTestCase {
         assertThat((short) 0).isEqualTo((short) 1), assertThat((short) 0).isEqualTo((short) 1));
   }
 
+  AbstractShortAssert<?> testAbstractShortAssertActualIsEqualToExpected() {
+    return assertThat((short) 1).isEqualTo((short) 2);
+  }
+
   ImmutableSet<AbstractShortAssert<?>> testAbstractShortAssertIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat((short) 0).isNotEqualTo((short) 1),
         assertThat((short) 0).isNotEqualTo((short) 1));
+  }
+
+  AbstractShortAssert<?> testAbstractShortAssertActualIsNotEqualToExpected() {
+    return assertThat((short) 1).isNotEqualTo((short) 2);
   }
 
   AbstractShortAssert<?> testAbstractShortAssertIsZero() {
@@ -35,5 +43,21 @@ final class AssertJShortTemplatesTest implements RefasterTemplateTestCase {
 
   AbstractShortAssert<?> testAbstractShortAssertIsOne() {
     return assertThat((short) 0).isEqualTo((short) 1);
+  }
+
+  AbstractShortAssert<?> testAbstractShortAssertActualIsLessThanExpected() {
+    return assertThat((short) 1).isLessThan((short) 2);
+  }
+
+  AbstractShortAssert<?> testAbstractShortAssertActualIsLessThanOrEqualToExpected() {
+    return assertThat((short) 1).isLessThanOrEqualTo((short) 2);
+  }
+
+  AbstractShortAssert<?> testAbstractShortAssertActualIsGreaterThanExpected() {
+    return assertThat((short) 1).isGreaterThan((short) 2);
+  }
+
+  AbstractShortAssert<?> testAbstractShortAssertActualIsGreaterThanOrEqualToExpected() {
+    return assertThat((short) 1).isGreaterThanOrEqualTo((short) 2);
   }
 }
