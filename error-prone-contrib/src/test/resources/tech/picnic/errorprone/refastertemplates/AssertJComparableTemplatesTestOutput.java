@@ -2,35 +2,24 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
 import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJComparableTemplatesTest implements RefasterTemplateTestCase {
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractComparableAssertActualIsLessThanExpected() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO).isLessThan(BigDecimal.ONE),
-        assertThat(BigDecimal.ZERO).isLessThan(BigDecimal.ONE));
+  AbstractAssert<?, ?> testAbstractComparableAssertActualIsLessThanExpected() {
+    return assertThat(BigDecimal.ZERO).isLessThan(BigDecimal.ONE);
   }
 
-  ImmutableSet<AbstractAssert<?, ?>>
-      testAbstractComparableAssertActualIsLessThanOrEqualToExpected() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO).isLessThanOrEqualTo(BigDecimal.ONE),
-        assertThat(BigDecimal.ZERO).isLessThanOrEqualTo(BigDecimal.ONE));
+  AbstractAssert<?, ?> testAbstractComparableAssertActualIsLessThanOrEqualToExpected() {
+    return assertThat(BigDecimal.ZERO).isLessThanOrEqualTo(BigDecimal.ONE);
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractComparableAssertActualIsGreaterThanExpected() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO).isGreaterThan(BigDecimal.ONE),
-        assertThat(BigDecimal.ZERO).isGreaterThan(BigDecimal.ONE));
+  AbstractAssert<?, ?> testAbstractComparableAssertActualIsGreaterThanExpected() {
+    return assertThat(BigDecimal.ZERO).isGreaterThan(BigDecimal.ONE);
   }
 
-  ImmutableSet<AbstractAssert<?, ?>>
-      testAbstractComparableAssertActualIsGreaterThanOrEqualToExpected() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO).isGreaterThanOrEqualTo(BigDecimal.ONE),
-        assertThat(BigDecimal.ZERO).isGreaterThanOrEqualTo(BigDecimal.ONE));
+  AbstractAssert<?, ?> testAbstractComparableAssertActualIsGreaterThanOrEqualToExpected() {
+    return assertThat(BigDecimal.ZERO).isGreaterThanOrEqualTo(BigDecimal.ONE);
   }
 }

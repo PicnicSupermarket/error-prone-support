@@ -5,7 +5,6 @@ import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.common.collect.ImmutableSet;
-import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractFloatAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
@@ -25,16 +24,8 @@ final class AssertJFloatTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(assertThat(0F).isEqualTo(1), assertThat(0F).isEqualTo(1));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractFloatAssertActualIsEqualToExpected() {
-    return ImmutableSet.of(assertThat(1F).isEqualTo(2F), assertThat(1F).isEqualTo(2F));
-  }
-
   ImmutableSet<AbstractFloatAssert<?>> testAbstractFloatAssertIsNotEqualTo() {
     return ImmutableSet.of(assertThat(0F).isNotEqualTo(1), assertThat(0F).isNotEqualTo(1));
-  }
-
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractFloatAssertActualIsNotEqualToExpected() {
-    return ImmutableSet.of(assertThat(1F).isNotEqualTo(2F), assertThat(1F).isNotEqualTo(2F));
   }
 
   AbstractFloatAssert<?> testAbstractFloatAssertIsZero() {
@@ -47,23 +38,5 @@ final class AssertJFloatTemplatesTest implements RefasterTemplateTestCase {
 
   AbstractFloatAssert<?> testAbstractFloatAssertIsOne() {
     return assertThat(0F).isEqualTo(1);
-  }
-
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractFloatAssertActualIsLessThanExpected() {
-    return ImmutableSet.of(assertThat(1F).isLessThan(2F), assertThat(1F).isLessThan(2F));
-  }
-
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractFloatAssertActualIsLessThanOrEqualToExpected() {
-    return ImmutableSet.of(
-        assertThat(1F).isLessThanOrEqualTo(2F), assertThat(1F).isLessThanOrEqualTo(2F));
-  }
-
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractFloatAssertActualIsGreaterThanExpected() {
-    return ImmutableSet.of(assertThat(1F).isGreaterThan(2F), assertThat(1F).isGreaterThan(2F));
-  }
-
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractFloatAssertActualIsGreaterThanOrEqualToExpected() {
-    return ImmutableSet.of(
-        assertThat(1F).isGreaterThanOrEqualTo(2F), assertThat(1F).isGreaterThanOrEqualTo(2F));
   }
 }

@@ -3,12 +3,11 @@ package tech.picnic.errorprone.refastertemplates;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
-import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractComparableAssert;
+import org.assertj.core.api.AbstractIntegerAssert;
 
 final class AssertJComparableTemplates {
   private AssertJComparableTemplates() {}
@@ -16,10 +15,8 @@ final class AssertJComparableTemplates {
   static final class AbstractComparableAssertActualIsLessThanExpected<
       T extends Comparable<? super T>> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(T actual, T expected) {
-      return Refaster.anyOf(
-          assertThat(actual.compareTo(expected) < 0).isTrue(),
-          assertThat(actual.compareTo(expected) >= 0).isFalse());
+    AbstractIntegerAssert<?> before(T actual, T expected) {
+      return assertThat(actual.compareTo(expected)).isNegative();
     }
 
     @AfterTemplate
@@ -32,10 +29,8 @@ final class AssertJComparableTemplates {
   static final class AbstractComparableAssertActualIsLessThanOrEqualToExpected<
       T extends Comparable<? super T>> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(T actual, T expected) {
-      return Refaster.anyOf(
-          assertThat(actual.compareTo(expected) <= 0).isTrue(),
-          assertThat(actual.compareTo(expected) > 0).isFalse());
+    AbstractIntegerAssert<?> before(T actual, T expected) {
+      return assertThat(actual.compareTo(expected)).isNotPositive();
     }
 
     @AfterTemplate
@@ -48,10 +43,8 @@ final class AssertJComparableTemplates {
   static final class AbstractComparableAssertActualIsGreaterThanExpected<
       T extends Comparable<? super T>> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(T actual, T expected) {
-      return Refaster.anyOf(
-          assertThat(actual.compareTo(expected) > 0).isTrue(),
-          assertThat(actual.compareTo(expected) <= 0).isFalse());
+    AbstractIntegerAssert<?> before(T actual, T expected) {
+      return assertThat(actual.compareTo(expected)).isPositive();
     }
 
     @AfterTemplate
@@ -64,10 +57,8 @@ final class AssertJComparableTemplates {
   static final class AbstractComparableAssertActualIsGreaterThanOrEqualToExpected<
       T extends Comparable<? super T>> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(T actual, T expected) {
-      return Refaster.anyOf(
-          assertThat(actual.compareTo(expected) >= 0).isTrue(),
-          assertThat(actual.compareTo(expected) < 0).isFalse());
+    AbstractIntegerAssert<?> before(T actual, T expected) {
+      return assertThat(actual.compareTo(expected)).isNotNegative();
     }
 
     @AfterTemplate

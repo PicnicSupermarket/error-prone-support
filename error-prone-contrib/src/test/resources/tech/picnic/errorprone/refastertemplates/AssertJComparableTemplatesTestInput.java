@@ -2,35 +2,24 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
 import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJComparableTemplatesTest implements RefasterTemplateTestCase {
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractComparableAssertActualIsLessThanExpected() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE) < 0).isTrue(),
-        assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE) >= 0).isFalse());
+  AbstractAssert<?, ?> testAbstractComparableAssertActualIsLessThanExpected() {
+    return assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE)).isNegative();
   }
 
-  ImmutableSet<AbstractAssert<?, ?>>
-      testAbstractComparableAssertActualIsLessThanOrEqualToExpected() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE) <= 0).isTrue(),
-        assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE) > 0).isFalse());
+  AbstractAssert<?, ?> testAbstractComparableAssertActualIsLessThanOrEqualToExpected() {
+    return assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE)).isNotPositive();
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractComparableAssertActualIsGreaterThanExpected() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE) > 0).isTrue(),
-        assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE) <= 0).isFalse());
+  AbstractAssert<?, ?> testAbstractComparableAssertActualIsGreaterThanExpected() {
+    return assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE)).isPositive();
   }
 
-  ImmutableSet<AbstractAssert<?, ?>>
-      testAbstractComparableAssertActualIsGreaterThanOrEqualToExpected() {
-    return ImmutableSet.of(
-        assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE) >= 0).isTrue(),
-        assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE) < 0).isFalse());
+  AbstractAssert<?, ?> testAbstractComparableAssertActualIsGreaterThanOrEqualToExpected() {
+    return assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE)).isNotNegative();
   }
 }
