@@ -457,7 +457,7 @@ final class RedundantStringConversionTest {
             "      // BUG: Diagnostic contains:",
             "      s + String.valueOf(b),",
             "      // BUG: Diagnostic contains:",
-            "      s += Boolean.toString(false),",
+            "      s + Boolean.toString(false),",
             "      // BUG: Diagnostic contains:",
             "      s + Byte.toString((byte) 0),",
             "      // BUG: Diagnostic contains:",
