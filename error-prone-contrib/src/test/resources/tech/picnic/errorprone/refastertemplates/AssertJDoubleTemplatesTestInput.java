@@ -5,7 +5,7 @@ import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.common.collect.ImmutableSet;
-import org.assertj.core.api.AbstractBooleanAssert;
+import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractDoubleAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
@@ -26,7 +26,7 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
         assertThat(0.0).isCloseTo(1, offset(0.0)), assertThat(0.0).isCloseTo(1, withPercentage(0)));
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractDoubleAssertActualIsEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractDoubleAssertActualIsEqualToExpected() {
     return ImmutableSet.of(assertThat(1.0 == 2.0).isTrue(), assertThat(1.0 != 2.0).isFalse());
   }
 
@@ -36,7 +36,7 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
         assertThat(0.0).isNotCloseTo(1, withPercentage(0)));
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractDoubleAssertActualIsNotEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractDoubleAssertActualIsNotEqualToExpected() {
     return ImmutableSet.of(assertThat(1.0 != 2.0).isTrue(), assertThat(1.0 == 2.0).isFalse());
   }
 
@@ -52,20 +52,19 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
     return assertThat(0.0).isOne();
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractDoubleAssertActualIsLessThanExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractDoubleAssertActualIsLessThanExpected() {
     return ImmutableSet.of(assertThat(1.0 < 2.0).isTrue(), assertThat(1.0 >= 2.0).isFalse());
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>>
-      testAbstractDoubleAssertActualIsLessThanOrEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractDoubleAssertActualIsLessThanOrEqualToExpected() {
     return ImmutableSet.of(assertThat(1.0 <= 2.0).isTrue(), assertThat(1.0 > 2.0).isFalse());
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractDoubleAssertActualIsGreaterThanExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractDoubleAssertActualIsGreaterThanExpected() {
     return ImmutableSet.of(assertThat(1.0 > 2.0).isTrue(), assertThat(1.0 <= 2.0).isFalse());
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>>
+  ImmutableSet<AbstractAssert<?, ?>>
       testAbstractDoubleAssertActualIsGreaterThanOrEqualToExpected() {
     return ImmutableSet.of(assertThat(1.0 >= 2.0).isTrue(), assertThat(1.0 < 2.0).isFalse());
   }

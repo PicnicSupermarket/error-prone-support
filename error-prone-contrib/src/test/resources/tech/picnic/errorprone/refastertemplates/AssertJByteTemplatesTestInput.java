@@ -5,7 +5,7 @@ import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.common.collect.ImmutableSet;
-import org.assertj.core.api.AbstractBooleanAssert;
+import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractByteAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
@@ -21,7 +21,7 @@ final class AssertJByteTemplatesTest implements RefasterTemplateTestCase {
         assertThat((byte) 0).isCloseTo((byte) 1, withPercentage(0)));
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractByteAssertActualIsEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractByteAssertActualIsEqualToExpected() {
     return ImmutableSet.of(
         assertThat((byte) 1 == (byte) 2).isTrue(), assertThat((byte) 1 != (byte) 2).isFalse());
   }
@@ -32,7 +32,7 @@ final class AssertJByteTemplatesTest implements RefasterTemplateTestCase {
         assertThat((byte) 0).isNotCloseTo((byte) 1, withPercentage(0)));
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractByteAssertActualIsNotEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractByteAssertActualIsNotEqualToExpected() {
     return ImmutableSet.of(
         assertThat((byte) 1 != (byte) 2).isTrue(), assertThat((byte) 1 == (byte) 2).isFalse());
   }
@@ -49,23 +49,22 @@ final class AssertJByteTemplatesTest implements RefasterTemplateTestCase {
     return assertThat((byte) 0).isOne();
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractByteAssertActualIsLessThanExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractByteAssertActualIsLessThanExpected() {
     return ImmutableSet.of(
         assertThat((byte) 1 < (byte) 2).isTrue(), assertThat((byte) 1 >= (byte) 2).isFalse());
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractByteAssertActualIsLessThanOrEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractByteAssertActualIsLessThanOrEqualToExpected() {
     return ImmutableSet.of(
         assertThat((byte) 1 <= (byte) 2).isTrue(), assertThat((byte) 1 > (byte) 2).isFalse());
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractByteAssertActualIsGreaterThanExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractByteAssertActualIsGreaterThanExpected() {
     return ImmutableSet.of(
         assertThat((byte) 1 > (byte) 2).isTrue(), assertThat((byte) 1 <= (byte) 2).isFalse());
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>>
-      testAbstractByteAssertActualIsGreaterThanOrEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractByteAssertActualIsGreaterThanOrEqualToExpected() {
     return ImmutableSet.of(
         assertThat((byte) 1 >= (byte) 2).isTrue(), assertThat((byte) 1 < (byte) 2).isFalse());
   }

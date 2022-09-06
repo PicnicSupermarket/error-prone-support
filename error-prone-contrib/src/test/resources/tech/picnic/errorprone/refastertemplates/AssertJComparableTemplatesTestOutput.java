@@ -2,36 +2,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import org.assertj.core.api.AbstractComparableAssert;
+import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJComparableTempletesTest implements RefasterTemplateTestCase {
-  ImmutableSet<AbstractComparableAssert<?, ?>>
-      testAbstractComparableAssertActualIsLessThanExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractComparableAssertActualIsLessThanExpected() {
     return ImmutableSet.of(
         assertThat(BigDecimal.ZERO).isLessThan(BigDecimal.ONE),
-        assertThat(BigInteger.ZERO).isLessThan(BigInteger.ONE));
+        assertThat(BigDecimal.ZERO).isLessThan(BigDecimal.ONE));
   }
 
-  ImmutableSet<AbstractComparableAssert<?, ?>>
+  ImmutableSet<AbstractAssert<?, ?>>
       testAbstractComparableAssertActualIsLessThanOrEqualToExpected() {
     return ImmutableSet.of(
         assertThat(BigDecimal.ZERO).isLessThanOrEqualTo(BigDecimal.ONE),
-        assertThat(BigInteger.ZERO).isLessThanOrEqualTo(BigInteger.ONE));
+        assertThat(BigDecimal.ZERO).isLessThanOrEqualTo(BigDecimal.ONE));
   }
 
-  ImmutableSet<AbstractComparableAssert<?, ?>>
-      testAbstractComparableAssertActualIsGreaterThanExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractComparableAssertActualIsGreaterThanExpected() {
     return ImmutableSet.of(
         assertThat(BigDecimal.ZERO).isGreaterThan(BigDecimal.ONE),
-        assertThat(BigInteger.ZERO).isGreaterThan(BigInteger.ONE));
+        assertThat(BigDecimal.ZERO).isGreaterThan(BigDecimal.ONE));
   }
 
-  ImmutableSet<AbstractComparableAssert<?, ?>>
+  ImmutableSet<AbstractAssert<?, ?>>
       testAbstractComparableAssertActualIsGreaterThanOrEqualToExpected() {
     return ImmutableSet.of(
         assertThat(BigDecimal.ZERO).isGreaterThanOrEqualTo(BigDecimal.ONE),
-        assertThat(BigInteger.ZERO).isGreaterThanOrEqualTo(BigInteger.ONE));
+        assertThat(BigDecimal.ZERO).isGreaterThanOrEqualTo(BigDecimal.ONE));
   }
 }

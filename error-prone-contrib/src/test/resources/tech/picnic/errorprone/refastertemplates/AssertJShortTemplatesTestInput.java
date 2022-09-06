@@ -5,7 +5,7 @@ import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.common.collect.ImmutableSet;
-import org.assertj.core.api.AbstractBooleanAssert;
+import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractShortAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
@@ -21,7 +21,7 @@ final class AssertJShortTemplatesTest implements RefasterTemplateTestCase {
         assertThat((short) 0).isCloseTo((short) 1, withPercentage(0)));
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractShortAssertActualIsEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractShortAssertActualIsEqualToExpected() {
     return ImmutableSet.of(
         assertThat((short) 1 == (short) 2).isTrue(), assertThat((short) 1 != (short) 2).isFalse());
   }
@@ -32,7 +32,7 @@ final class AssertJShortTemplatesTest implements RefasterTemplateTestCase {
         assertThat((short) 0).isNotCloseTo((short) 1, withPercentage(0)));
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractShortAssertActualIsNotEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractShortAssertActualIsNotEqualToExpected() {
     return ImmutableSet.of(
         assertThat((short) 1 != (short) 2).isTrue(), assertThat((short) 1 == (short) 2).isFalse());
   }
@@ -49,24 +49,22 @@ final class AssertJShortTemplatesTest implements RefasterTemplateTestCase {
     return assertThat((short) 0).isOne();
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractShortAssertActualIsLessThanExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractShortAssertActualIsLessThanExpected() {
     return ImmutableSet.of(
         assertThat((short) 1 < (short) 2).isTrue(), assertThat((short) 1 >= (short) 2).isFalse());
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>>
-      testAbstractShortAssertActualIsLessThanOrEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractShortAssertActualIsLessThanOrEqualToExpected() {
     return ImmutableSet.of(
         assertThat((short) 1 <= (short) 2).isTrue(), assertThat((short) 1 > (short) 2).isFalse());
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>> testAbstractShortAssertActualIsGreaterThanExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractShortAssertActualIsGreaterThanExpected() {
     return ImmutableSet.of(
         assertThat((short) 1 > (short) 2).isTrue(), assertThat((short) 1 <= (short) 2).isFalse());
   }
 
-  ImmutableSet<AbstractBooleanAssert<?>>
-      testAbstractShortAssertActualIsGreaterThanOrEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractShortAssertActualIsGreaterThanOrEqualToExpected() {
     return ImmutableSet.of(
         assertThat((short) 1 >= (short) 2).isTrue(), assertThat((short) 1 < (short) 2).isFalse());
   }
