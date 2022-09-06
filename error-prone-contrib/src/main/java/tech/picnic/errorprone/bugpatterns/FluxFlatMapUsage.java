@@ -59,7 +59,7 @@ public final class FluxFlatMapUsage extends BugChecker
           .namedAnyOf("flatMap", "flatMapSequential")
           .withParameters(Function.class.getName());
   private static final com.google.errorprone.suppliers.Supplier<Type> FLUX =
-      Suppliers.typeFromClass(Flux.class);
+      Suppliers.typeFromString("reactor.core.publisher.Flux");
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
