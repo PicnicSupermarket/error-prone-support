@@ -24,8 +24,16 @@ final class AssertJFloatTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(assertThat(0F).isEqualTo(1), assertThat(0F).isEqualTo(1));
   }
 
+  AbstractFloatAssert<?> testAbstractFloatAssertActualIsEqualToExpected() {
+    return assertThat(1F).isEqualTo(2F);
+  }
+
   ImmutableSet<AbstractFloatAssert<?>> testAbstractFloatAssertIsNotEqualTo() {
     return ImmutableSet.of(assertThat(0F).isNotEqualTo(1), assertThat(0F).isNotEqualTo(1));
+  }
+
+  AbstractFloatAssert<?> testAbstractFloatAssertActualIsNotEqualToExpected() {
+    return assertThat(1F).isNotEqualTo(2F);
   }
 
   AbstractFloatAssert<?> testAbstractFloatAssertIsZero() {
@@ -38,5 +46,21 @@ final class AssertJFloatTemplatesTest implements RefasterTemplateTestCase {
 
   AbstractFloatAssert<?> testAbstractFloatAssertIsOne() {
     return assertThat(0F).isEqualTo(1);
+  }
+
+  AbstractFloatAssert<?> testAbstractFloatAssertActualIsLessThanExpected() {
+    return assertThat(1F).isLessThan(2F);
+  }
+
+  AbstractFloatAssert<?> testAbstractFloatAssertActualIsLessThanOrEqualToExpected() {
+    return assertThat(1F).isLessThanOrEqualTo(2F);
+  }
+
+  AbstractFloatAssert<?> testAbstractFloatAssertActualIsGreaterThanExpected() {
+    return assertThat(1F).isGreaterThan(2F);
+  }
+
+  AbstractFloatAssert<?> testAbstractFloatAssertActualIsGreaterThanOrEqualToExpected() {
+    return assertThat(1F).isGreaterThanOrEqualTo(2F);
   }
 }

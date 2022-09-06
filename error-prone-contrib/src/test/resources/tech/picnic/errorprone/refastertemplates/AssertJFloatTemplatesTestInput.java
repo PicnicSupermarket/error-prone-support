@@ -5,6 +5,7 @@ import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.common.collect.ImmutableSet;
+import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractFloatAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
@@ -25,10 +26,18 @@ final class AssertJFloatTemplatesTest implements RefasterTemplateTestCase {
         assertThat(0F).isCloseTo(1, offset(0F)), assertThat(0F).isCloseTo(1, withPercentage(0)));
   }
 
+  ImmutableSet<AbstractBooleanAssert<?>> testAbstractFloatAssertActualIsEqualToExpected() {
+    return ImmutableSet.of(assertThat(1F == 2F).isTrue(), assertThat(1F != 2F).isFalse());
+  }
+
   ImmutableSet<AbstractFloatAssert<?>> testAbstractFloatAssertIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat(0F).isNotCloseTo(1, offset(0F)),
         assertThat(0F).isNotCloseTo(1, withPercentage(0)));
+  }
+
+  ImmutableSet<AbstractBooleanAssert<?>> testAbstractFloatAssertActualIsNotEqualToExpected() {
+    return ImmutableSet.of(assertThat(1F != 2F).isTrue(), assertThat(1F == 2F).isFalse());
   }
 
   AbstractFloatAssert<?> testAbstractFloatAssertIsZero() {
@@ -41,5 +50,23 @@ final class AssertJFloatTemplatesTest implements RefasterTemplateTestCase {
 
   AbstractFloatAssert<?> testAbstractFloatAssertIsOne() {
     return assertThat(0F).isOne();
+  }
+
+  ImmutableSet<AbstractBooleanAssert<?>> testAbstractFloatAssertActualIsLessThanExpected() {
+    return ImmutableSet.of(assertThat(1F < 2F).isTrue(), assertThat(1F >= 2F).isFalse());
+  }
+
+  ImmutableSet<AbstractBooleanAssert<?>>
+      testAbstractFloatAssertActualIsLessThanOrEqualToExpected() {
+    return ImmutableSet.of(assertThat(1F <= 2F).isTrue(), assertThat(1F > 2F).isFalse());
+  }
+
+  ImmutableSet<AbstractBooleanAssert<?>> testAbstractFloatAssertActualIsGreaterThanExpected() {
+    return ImmutableSet.of(assertThat(1F > 2F).isTrue(), assertThat(1F <= 2F).isFalse());
+  }
+
+  ImmutableSet<AbstractBooleanAssert<?>>
+      testAbstractFloatAssertActualIsGreaterThanOrEqualToExpected() {
+    return ImmutableSet.of(assertThat(1F >= 2F).isTrue(), assertThat(1F < 2F).isFalse());
   }
 }

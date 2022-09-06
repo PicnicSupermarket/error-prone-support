@@ -24,8 +24,16 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(assertThat(0.0).isEqualTo(1), assertThat(0.0).isEqualTo(1));
   }
 
+  AbstractDoubleAssert<?> testAbstractDoubleAssertActualIsEqualToExpected() {
+    return assertThat(1.0).isEqualTo(2.0);
+  }
+
   ImmutableSet<AbstractDoubleAssert<?>> testAbstractDoubleAssertIsNotEqualTo() {
     return ImmutableSet.of(assertThat(0.0).isNotEqualTo(1), assertThat(0.0).isNotEqualTo(1));
+  }
+
+  AbstractDoubleAssert<?> testAbstractDoubleAssertActualIsNotEqualToExpected() {
+    return assertThat(1.0).isNotEqualTo(2.0);
   }
 
   AbstractDoubleAssert<?> testAbstractDoubleAssertIsZero() {
@@ -38,5 +46,21 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
 
   AbstractDoubleAssert<?> testAbstractDoubleAssertIsOne() {
     return assertThat(0.0).isEqualTo(1);
+  }
+
+  AbstractDoubleAssert<?> testAbstractDoubleAssertActualIsLessThanExpected() {
+    return assertThat(1.0).isLessThan(2.0);
+  }
+
+  AbstractDoubleAssert<?> testAbstractDoubleAssertActualIsLessThanOrEqualToExpected() {
+    return assertThat(1.0).isLessThanOrEqualTo(2.0);
+  }
+
+  AbstractDoubleAssert<?> testAbstractDoubleAssertActualIsGreaterThanExpected() {
+    return assertThat(1.0).isGreaterThan(2.0);
+  }
+
+  AbstractDoubleAssert<?> testAbstractDoubleAssertActualIsGreaterThanOrEqualToExpected() {
+    return assertThat(1.0).isGreaterThanOrEqualTo(2.0);
   }
 }
