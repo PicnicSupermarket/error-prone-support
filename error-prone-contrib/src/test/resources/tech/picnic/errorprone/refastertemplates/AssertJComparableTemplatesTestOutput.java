@@ -1,3 +1,5 @@
+package tech.picnic.errorprone.refastertemplates;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
@@ -5,7 +7,7 @@ import java.math.BigDecimal;
 import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
-final class AssertJComparableTempletesTest implements RefasterTemplateTestCase {
+final class AssertJComparableTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<AbstractAssert<?, ?>> testAbstractComparableAssertActualIsLessThanExpected() {
     return ImmutableSet.of(
         assertThat(BigDecimal.ZERO).isLessThan(BigDecimal.ONE),
