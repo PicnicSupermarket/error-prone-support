@@ -12,6 +12,34 @@ import org.assertj.core.api.AbstractIntegerAssert;
 final class AssertJComparableTemplates {
   private AssertJComparableTemplates() {}
 
+  static final class AbstractComparableAssertActualIsEqualByComparingToExpected<
+      T extends Comparable<? super T>> {
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before(T actual, T expected) {
+      return assertThat(actual.compareTo(expected)).isEqualTo(0);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractComparableAssert<?, ?> after(T actual, T expected) {
+      return assertThat(actual).isEqualByComparingTo(expected);
+    }
+  }
+
+  static final class AbstractComparableAssertActualIsNotEqualByComparingToExpected<
+      T extends Comparable<? super T>> {
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before(T actual, T expected) {
+      return assertThat(actual.compareTo(expected)).isNotEqualTo(0);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractComparableAssert<?, ?> after(T actual, T expected) {
+      return assertThat(actual).isNotEqualByComparingTo(expected);
+    }
+  }
+
   static final class AbstractComparableAssertActualIsLessThanExpected<
       T extends Comparable<? super T>> {
     @BeforeTemplate

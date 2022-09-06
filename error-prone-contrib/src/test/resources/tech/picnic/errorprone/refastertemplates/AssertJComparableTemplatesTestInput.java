@@ -7,6 +7,14 @@ import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJComparableTemplatesTest implements RefasterTemplateTestCase {
+  AbstractAssert<?, ?> testAbstractComparableAssertActualIsEqualByComparingToExpected() {
+    return assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE)).isEqualTo(0);
+  }
+
+  AbstractAssert<?, ?> testAbstractComparableAssertActualIsNotEqualByComparingToExpected() {
+    return assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE)).isNotEqualTo(0);
+  }
+
   AbstractAssert<?, ?> testAbstractComparableAssertActualIsLessThanExpected() {
     return assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE)).isNegative();
   }
