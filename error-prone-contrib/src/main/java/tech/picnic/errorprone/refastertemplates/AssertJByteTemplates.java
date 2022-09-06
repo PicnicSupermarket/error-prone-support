@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
@@ -7,6 +8,7 @@ import static org.assertj.core.data.Percentage.withPercentage;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractByteAssert;
 
@@ -34,6 +36,7 @@ final class AssertJByteTemplates {
     }
 
     @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractByteAssert<?> after(byte actual, byte expected) {
       return assertThat(actual).isEqualTo(expected);
     }
@@ -61,6 +64,7 @@ final class AssertJByteTemplates {
     }
 
     @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractByteAssert<?> after(byte actual, byte expected) {
       return assertThat(actual).isNotEqualTo(expected);
     }
@@ -110,6 +114,7 @@ final class AssertJByteTemplates {
     }
 
     @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractByteAssert<?> after(byte actual, byte expected) {
       return assertThat(actual).isLessThan(expected);
     }
@@ -123,6 +128,7 @@ final class AssertJByteTemplates {
     }
 
     @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractByteAssert<?> after(byte actual, byte expected) {
       return assertThat(actual).isLessThanOrEqualTo(expected);
     }
@@ -136,6 +142,7 @@ final class AssertJByteTemplates {
     }
 
     @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractByteAssert<?> after(byte actual, byte expected) {
       return assertThat(actual).isGreaterThan(expected);
     }
@@ -149,6 +156,7 @@ final class AssertJByteTemplates {
     }
 
     @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractByteAssert<?> after(byte actual, byte expected) {
       return assertThat(actual).isGreaterThanOrEqualTo(expected);
     }
