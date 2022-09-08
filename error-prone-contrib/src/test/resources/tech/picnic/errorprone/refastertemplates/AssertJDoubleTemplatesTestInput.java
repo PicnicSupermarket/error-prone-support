@@ -33,6 +33,8 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
         assertThat(true != false).isFalse(),
         assertThat((byte) 1 == (byte) 2).isTrue(),
         assertThat((byte) 1 != (byte) 2).isFalse(),
+        assertThat((char) 1 == (char) 2).isTrue(),
+        assertThat((char) 1 != (char) 2).isFalse(),
         assertThat((short) 1 == (short) 2).isTrue(),
         assertThat((short) 1 != (short) 2).isFalse(),
         assertThat(1 == 2).isTrue(),
@@ -58,6 +60,8 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
         assertThat(true == false).isFalse(),
         assertThat((byte) 1 != (byte) 2).isTrue(),
         assertThat((byte) 1 == (byte) 2).isFalse(),
+        assertThat((char) 1 != (char) 2).isTrue(),
+        assertThat((char) 1 == (char) 2).isFalse(),
         assertThat((short) 1 != (short) 2).isTrue(),
         assertThat((short) 1 == (short) 2).isFalse(),
         assertThat(1 != 2).isTrue(),
@@ -86,6 +90,8 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(
         assertThat((byte) 1 < (byte) 2).isTrue(),
         assertThat((byte) 1 >= (byte) 2).isFalse(),
+        assertThat((char) 1 < (char) 2).isTrue(),
+        assertThat((char) 1 >= (char) 2).isFalse(),
         assertThat((short) 1 < (short) 2).isTrue(),
         assertThat((short) 1 >= (short) 2).isFalse(),
         assertThat(1 < 2).isTrue(),
@@ -102,6 +108,8 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(
         assertThat((byte) 1 <= (byte) 2).isTrue(),
         assertThat((byte) 1 > (byte) 2).isFalse(),
+        assertThat((char) 1 <= (char) 2).isTrue(),
+        assertThat((char) 1 > (char) 2).isFalse(),
         assertThat((short) 1 <= (short) 2).isTrue(),
         assertThat((short) 1 > (short) 2).isFalse(),
         assertThat(1 <= 2).isTrue(),
@@ -118,6 +126,8 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(
         assertThat((byte) 1 > (byte) 2).isTrue(),
         assertThat((byte) 1 <= (byte) 2).isFalse(),
+        assertThat((char) 1 > (char) 2).isTrue(),
+        assertThat((char) 1 <= (char) 2).isFalse(),
         assertThat((short) 1 > (short) 2).isTrue(),
         assertThat((short) 1 <= (short) 2).isFalse(),
         assertThat(1 > 2).isTrue(),
@@ -134,6 +144,8 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(
         assertThat((byte) 1 >= (byte) 2).isTrue(),
         assertThat((byte) 1 < (byte) 2).isFalse(),
+        assertThat((char) 1 >= (char) 2).isTrue(),
+        assertThat((char) 1 < (char) 2).isFalse(),
         assertThat((short) 1 >= (short) 2).isTrue(),
         assertThat((short) 1 < (short) 2).isFalse(),
         assertThat(1 >= 2).isTrue(),
