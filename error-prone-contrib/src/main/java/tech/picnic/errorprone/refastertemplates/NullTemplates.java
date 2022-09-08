@@ -9,6 +9,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Objects;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 
 /** Refaster templates related to expressions dealing with (possibly) null values. */
 final class NullTemplates {
@@ -53,6 +54,38 @@ final class NullTemplates {
     @AfterTemplate
     Predicate<T> after() {
       return Objects::nonNull;
+    }
+  }
+
+  /**
+   * Prefer <code>==</code> operator over {@link java.util.Objects#isNull(Object)} on boolean
+   * expressions.
+   */
+  static final class IsNullReference<T> {
+    @BeforeTemplate
+    boolean before(@Nullable T ref) {
+      return Objects.isNull(ref);
+    }
+
+    @AfterTemplate
+    boolean after(@Nullable T ref) {
+      return ref == null;
+    }
+  }
+
+  /**
+   * Prefer <code>!=</code> operator over {@link java.util.Objects#isNull(Object)} on boolean
+   * expressions.
+   */
+  static final class IsNonNullReference<T> {
+    @BeforeTemplate
+    boolean before(@Nullable T ref) {
+      return Objects.nonNull(ref);
+    }
+
+    @AfterTemplate
+    boolean after(@Nullable T ref) {
+      return ref != null;
     }
   }
 }
