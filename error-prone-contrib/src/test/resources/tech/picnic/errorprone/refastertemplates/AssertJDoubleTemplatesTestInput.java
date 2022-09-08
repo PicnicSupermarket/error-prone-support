@@ -26,15 +26,23 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
         assertThat(0.0).isCloseTo(1, offset(0.0)), assertThat(0.0).isCloseTo(1, withPercentage(0)));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractDoubleAssertActualIsEqualToExpected() {
+  @SuppressWarnings("SimplifyBooleanExpression")
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsEqualTo() {
     return ImmutableSet.of(
-        assertThat(1.0 == 2.0).isTrue(),
-        assertThat(1.0 != 2.0).isFalse(),
+        assertThat(true == false).isTrue(),
+        assertThat(true != false).isFalse(),
         assertThat((byte) 1 == (byte) 2).isTrue(),
-        assertThat(1F == 2F).isTrue(),
+        assertThat((byte) 1 != (byte) 2).isFalse(),
+        assertThat((short) 1 == (short) 2).isTrue(),
+        assertThat((short) 1 != (short) 2).isFalse(),
         assertThat(1 == 2).isTrue(),
+        assertThat(1 != 2).isFalse(),
         assertThat(1L == 2L).isTrue(),
-        assertThat((short) 1 == (short) 2).isTrue());
+        assertThat(1L != 2L).isFalse(),
+        assertThat(1F == 2F).isTrue(),
+        assertThat(1F != 2F).isFalse(),
+        assertThat(1.0 == 2.0).isTrue(),
+        assertThat(1.0 != 2.0).isFalse());
   }
 
   ImmutableSet<AbstractDoubleAssert<?>> testAbstractDoubleAssertIsNotEqualTo() {
@@ -43,15 +51,23 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
         assertThat(0.0).isNotCloseTo(1, withPercentage(0)));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractDoubleAssertActualIsNotEqualToExpected() {
+  @SuppressWarnings("SimplifyBooleanExpression")
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotEqualTo() {
     return ImmutableSet.of(
-        assertThat(1.0 != 2.0).isTrue(),
-        assertThat(1.0 == 2.0).isFalse(),
+        assertThat(true != false).isTrue(),
+        assertThat(true == false).isFalse(),
         assertThat((byte) 1 != (byte) 2).isTrue(),
-        assertThat(1F != 2F).isTrue(),
+        assertThat((byte) 1 == (byte) 2).isFalse(),
+        assertThat((short) 1 != (short) 2).isTrue(),
+        assertThat((short) 1 == (short) 2).isFalse(),
         assertThat(1 != 2).isTrue(),
+        assertThat(1 == 2).isFalse(),
         assertThat(1L != 2L).isTrue(),
-        assertThat((short) 1 != (short) 2).isTrue());
+        assertThat(1L == 2L).isFalse(),
+        assertThat(1F != 2F).isTrue(),
+        assertThat(1F == 2F).isFalse(),
+        assertThat(1.0 != 2.0).isTrue(),
+        assertThat(1.0 == 2.0).isFalse());
   }
 
   AbstractDoubleAssert<?> testAbstractDoubleAssertIsZero() {

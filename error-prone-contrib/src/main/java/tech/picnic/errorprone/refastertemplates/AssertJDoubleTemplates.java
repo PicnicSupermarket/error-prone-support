@@ -49,7 +49,13 @@ final class AssertJDoubleTemplates {
     }
   }
 
-  static final class AbstractDoubleAssertActualIsEqualToExpected {
+  static final class AssertThatIsEqualTo {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
+      return Refaster.anyOf(
+          assertThat(actual == expected).isTrue(), assertThat(actual != expected).isFalse());
+    }
+
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {
       return Refaster.anyOf(
@@ -58,7 +64,7 @@ final class AssertJDoubleTemplates {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
+    AbstractBooleanAssert<?> after(boolean actual, boolean expected) {
       return assertThat(actual).isEqualTo(expected);
     }
   }
@@ -77,7 +83,13 @@ final class AssertJDoubleTemplates {
     }
   }
 
-  static final class AbstractDoubleAssertActualIsNotEqualToExpected {
+  static final class AssertThatIsNotEqualTo {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
+      return Refaster.anyOf(
+          assertThat(actual != expected).isTrue(), assertThat(actual == expected).isFalse());
+    }
+
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {
       return Refaster.anyOf(
@@ -86,7 +98,7 @@ final class AssertJDoubleTemplates {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
+    AbstractBooleanAssert<?> after(boolean actual, boolean expected) {
       return assertThat(actual).isNotEqualTo(expected);
     }
   }

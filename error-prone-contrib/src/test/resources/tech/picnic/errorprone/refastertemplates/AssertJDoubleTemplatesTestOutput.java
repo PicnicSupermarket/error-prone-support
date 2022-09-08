@@ -25,30 +25,46 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(assertThat(0.0).isEqualTo(1), assertThat(0.0).isEqualTo(1));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractDoubleAssertActualIsEqualToExpected() {
+  @SuppressWarnings("SimplifyBooleanExpression")
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsEqualTo() {
     return ImmutableSet.of(
-        assertThat(1.0).isEqualTo(2.0),
-        assertThat(1.0).isEqualTo(2.0),
+        assertThat(true).isEqualTo(false),
+        assertThat(true).isEqualTo(false),
         assertThat((byte) 1).isEqualTo((byte) 2),
-        assertThat(1F).isEqualTo(2F),
+        assertThat((byte) 1).isEqualTo((byte) 2),
+        assertThat((short) 1).isEqualTo((short) 2),
+        assertThat((short) 1).isEqualTo((short) 2),
+        assertThat(1).isEqualTo(2),
         assertThat(1).isEqualTo(2),
         assertThat(1L).isEqualTo(2L),
-        assertThat((short) 1).isEqualTo((short) 2));
+        assertThat(1L).isEqualTo(2L),
+        assertThat(1F).isEqualTo(2F),
+        assertThat(1F).isEqualTo(2F),
+        assertThat(1.0).isEqualTo(2.0),
+        assertThat(1.0).isEqualTo(2.0));
   }
 
   ImmutableSet<AbstractDoubleAssert<?>> testAbstractDoubleAssertIsNotEqualTo() {
     return ImmutableSet.of(assertThat(0.0).isNotEqualTo(1), assertThat(0.0).isNotEqualTo(1));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractDoubleAssertActualIsNotEqualToExpected() {
+  @SuppressWarnings("SimplifyBooleanExpression")
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotEqualTo() {
     return ImmutableSet.of(
-        assertThat(1.0).isNotEqualTo(2.0),
-        assertThat(1.0).isNotEqualTo(2.0),
+        assertThat(true).isNotEqualTo(false),
+        assertThat(true).isNotEqualTo(false),
         assertThat((byte) 1).isNotEqualTo((byte) 2),
-        assertThat(1F).isNotEqualTo(2F),
+        assertThat((byte) 1).isNotEqualTo((byte) 2),
+        assertThat((short) 1).isNotEqualTo((short) 2),
+        assertThat((short) 1).isNotEqualTo((short) 2),
+        assertThat(1).isNotEqualTo(2),
         assertThat(1).isNotEqualTo(2),
         assertThat(1L).isNotEqualTo(2L),
-        assertThat((short) 1).isNotEqualTo((short) 2));
+        assertThat(1L).isNotEqualTo(2L),
+        assertThat(1F).isNotEqualTo(2F),
+        assertThat(1F).isNotEqualTo(2F),
+        assertThat(1.0).isNotEqualTo(2.0),
+        assertThat(1.0).isNotEqualTo(2.0));
   }
 
   AbstractDoubleAssert<?> testAbstractDoubleAssertIsZero() {
