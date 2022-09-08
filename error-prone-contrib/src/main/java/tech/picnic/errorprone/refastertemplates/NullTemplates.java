@@ -57,26 +57,20 @@ final class NullTemplates {
     }
   }
 
-  /**
-   * Prefer <code>==</code> operator over {@link java.util.Objects#isNull(Object)} on boolean
-   * expressions.
-   */
-  static final class IsNullReference<T> {
+  /** Prefer the <code>==</code> operator over {@link java.util.Objects#isNull(Object)}. */
+  static final class IsNullReference {
     @BeforeTemplate
-    boolean before(@Nullable T ref) {
-      return Objects.isNull(ref);
+    boolean before(@Nullable Object object) {
+      return Objects.isNull(object);
     }
 
     @AfterTemplate
-    boolean after(@Nullable T ref) {
-      return ref == null;
+    boolean after(@Nullable Object object) {
+      return object == null;
     }
   }
 
-  /**
-   * Prefer <code>!=</code> operator over {@link java.util.Objects#isNull(Object)} on boolean
-   * expressions.
-   */
+  /** Prefer the <code>!=</code> operator over {@link java.util.Objects#isNull(Object)}. */
   static final class IsNonNullReference<T> {
     @BeforeTemplate
     boolean before(@Nullable T ref) {
