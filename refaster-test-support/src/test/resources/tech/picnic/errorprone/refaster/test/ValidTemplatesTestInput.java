@@ -17,7 +17,7 @@ final class ValidTemplatesTest implements RefasterTemplateTestCase {
   }
 
   boolean testStaticImportStringLength() {
-    return "foo" == null || "foo".isEmpty();
+    return "foo" == null || "foo".toCharArray().length == 0;
   }
 
   void testBlockTemplateSetAddElement() {

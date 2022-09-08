@@ -29,7 +29,7 @@ final class ValidTemplates {
   static final class StaticImportStringLength {
     @BeforeTemplate
     boolean before(@Nullable String string) {
-      return string == null || string.isEmpty();
+      return string == null || string.toCharArray().length == 0;
     }
 
     @AfterTemplate
