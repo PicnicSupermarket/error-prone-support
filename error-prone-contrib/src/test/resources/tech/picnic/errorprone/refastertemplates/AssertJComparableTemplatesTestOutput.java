@@ -3,31 +3,31 @@ package tech.picnic.errorprone.refastertemplates;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
-import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractComparableAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class AssertJComparableTemplatesTest implements RefasterTemplateTestCase {
-  AbstractAssert<?, ?> testAbstractComparableAssertActualIsEqualByComparingToExpected() {
+  AbstractComparableAssert<?, ?> testAssertThatIsEqualByComparingTo() {
     return assertThat(BigDecimal.ZERO).isEqualByComparingTo(BigDecimal.ONE);
   }
 
-  AbstractAssert<?, ?> testAbstractComparableAssertActualIsNotEqualByComparingToExpected() {
+  AbstractComparableAssert<?, ?> testAssertThatIsNotEqualByComparingTo() {
     return assertThat(BigDecimal.ZERO).isNotEqualByComparingTo(BigDecimal.ONE);
   }
 
-  AbstractAssert<?, ?> testAbstractComparableAssertActualIsLessThanExpected() {
+  AbstractComparableAssert<?, ?> testAssertThatIsLessThan() {
     return assertThat(BigDecimal.ZERO).isLessThan(BigDecimal.ONE);
   }
 
-  AbstractAssert<?, ?> testAbstractComparableAssertActualIsLessThanOrEqualToExpected() {
+  AbstractComparableAssert<?, ?> testAssertThatIsLessThanOrEqualTo() {
     return assertThat(BigDecimal.ZERO).isLessThanOrEqualTo(BigDecimal.ONE);
   }
 
-  AbstractAssert<?, ?> testAbstractComparableAssertActualIsGreaterThanExpected() {
+  AbstractComparableAssert<?, ?> testAssertThatIsGreaterThan() {
     return assertThat(BigDecimal.ZERO).isGreaterThan(BigDecimal.ONE);
   }
 
-  AbstractAssert<?, ?> testAbstractComparableAssertActualIsGreaterThanOrEqualToExpected() {
+  AbstractComparableAssert<?, ?> testAssertThatIsGreaterThanOrEqualTo() {
     return assertThat(BigDecimal.ZERO).isGreaterThanOrEqualTo(BigDecimal.ONE);
   }
 }

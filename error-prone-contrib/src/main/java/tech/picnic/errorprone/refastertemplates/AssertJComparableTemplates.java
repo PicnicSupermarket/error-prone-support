@@ -12,8 +12,7 @@ import org.assertj.core.api.AbstractIntegerAssert;
 final class AssertJComparableTemplates {
   private AssertJComparableTemplates() {}
 
-  static final class AbstractComparableAssertActualIsEqualByComparingToExpected<
-      T extends Comparable<? super T>> {
+  static final class AssertThatIsEqualByComparingTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
       return assertThat(actual.compareTo(expected)).isEqualTo(0);
@@ -26,8 +25,7 @@ final class AssertJComparableTemplates {
     }
   }
 
-  static final class AbstractComparableAssertActualIsNotEqualByComparingToExpected<
-      T extends Comparable<? super T>> {
+  static final class AssertThatIsNotEqualByComparingTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
       return assertThat(actual.compareTo(expected)).isNotEqualTo(0);
@@ -40,8 +38,7 @@ final class AssertJComparableTemplates {
     }
   }
 
-  static final class AbstractComparableAssertActualIsLessThanExpected<
-      T extends Comparable<? super T>> {
+  static final class AssertThatIsLessThan<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
       return assertThat(actual.compareTo(expected)).isNegative();
@@ -54,8 +51,7 @@ final class AssertJComparableTemplates {
     }
   }
 
-  static final class AbstractComparableAssertActualIsLessThanOrEqualToExpected<
-      T extends Comparable<? super T>> {
+  static final class AssertThatIsLessThanOrEqualTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
       return assertThat(actual.compareTo(expected)).isNotPositive();
@@ -68,8 +64,7 @@ final class AssertJComparableTemplates {
     }
   }
 
-  static final class AbstractComparableAssertActualIsGreaterThanExpected<
-      T extends Comparable<? super T>> {
+  static final class AssertThatIsGreaterThan<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
       return assertThat(actual.compareTo(expected)).isPositive();
@@ -82,8 +77,7 @@ final class AssertJComparableTemplates {
     }
   }
 
-  static final class AbstractComparableAssertActualIsGreaterThanOrEqualToExpected<
-      T extends Comparable<? super T>> {
+  static final class AssertThatIsGreaterThanOrEqualTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
       return assertThat(actual.compareTo(expected)).isNotNegative();
