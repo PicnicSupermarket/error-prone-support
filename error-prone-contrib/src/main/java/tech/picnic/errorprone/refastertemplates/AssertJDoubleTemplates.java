@@ -139,7 +139,7 @@ final class AssertJDoubleTemplates {
     }
   }
 
-  static final class AbstractDoubleAssertActualIsLessThanExpected {
+  static final class AssertThatIsLessThan {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {
       return Refaster.anyOf(
@@ -153,7 +153,7 @@ final class AssertJDoubleTemplates {
     }
   }
 
-  static final class AbstractDoubleAssertActualIsLessThanOrEqualToExpected {
+  static final class AssertThatIsLessThanOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {
       return Refaster.anyOf(
@@ -167,7 +167,7 @@ final class AssertJDoubleTemplates {
     }
   }
 
-  static final class AbstractDoubleAssertActualIsGreaterThanExpected {
+  static final class AssertThatIsGreaterThan {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {
       return Refaster.anyOf(
@@ -181,7 +181,7 @@ final class AssertJDoubleTemplates {
     }
   }
 
-  static final class AbstractDoubleAssertActualIsGreaterThanOrEqualToExpected {
+  static final class AssertThatIsGreaterThanOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {
       return Refaster.anyOf(

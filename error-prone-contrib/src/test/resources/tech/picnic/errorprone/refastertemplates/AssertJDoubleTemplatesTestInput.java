@@ -82,48 +82,67 @@ final class AssertJDoubleTemplatesTest implements RefasterTemplateTestCase {
     return assertThat(0.0).isOne();
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractDoubleAssertActualIsLessThanExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsLessThan() {
     return ImmutableSet.of(
-        assertThat(1.0 < 2.0).isTrue(),
-        assertThat(1.0 >= 2.0).isFalse(),
-        assertThat(((byte) 1) < ((byte) 2)).isTrue(),
-        assertThat(1F < 2F).isTrue(),
+        assertThat((byte) 1 < (byte) 2).isTrue(),
+        assertThat((byte) 1 >= (byte) 2).isFalse(),
+        assertThat((short) 1 < (short) 2).isTrue(),
+        assertThat((short) 1 >= (short) 2).isFalse(),
         assertThat(1 < 2).isTrue(),
+        assertThat(1 >= 2).isFalse(),
         assertThat(1L < 2L).isTrue(),
-        assertThat(((short) 1) < ((short) 2)).isTrue());
+        assertThat(1L >= 2L).isFalse(),
+        assertThat(1F < 2F).isTrue(),
+        assertThat(1F >= 2F).isFalse(),
+        assertThat(1.0 < 2.0).isTrue(),
+        assertThat(1.0 >= 2.0).isFalse());
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractDoubleAssertActualIsLessThanOrEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsLessThanOrEqualTo() {
     return ImmutableSet.of(
-        assertThat(1.0 <= 2.0).isTrue(),
-        assertThat(1.0 > 2.0).isFalse(),
-        assertThat(((byte) 1) <= ((byte) 2)).isTrue(),
-        assertThat(1F <= 2F).isTrue(),
+        assertThat((byte) 1 <= (byte) 2).isTrue(),
+        assertThat((byte) 1 > (byte) 2).isFalse(),
+        assertThat((short) 1 <= (short) 2).isTrue(),
+        assertThat((short) 1 > (short) 2).isFalse(),
         assertThat(1 <= 2).isTrue(),
+        assertThat(1 > 2).isFalse(),
         assertThat(1L <= 2L).isTrue(),
-        assertThat(((short) 1) <= ((short) 2)).isTrue());
+        assertThat(1L > 2L).isFalse(),
+        assertThat(1F <= 2F).isTrue(),
+        assertThat(1F > 2F).isFalse(),
+        assertThat(1.0 <= 2.0).isTrue(),
+        assertThat(1.0 > 2.0).isFalse());
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAbstractDoubleAssertActualIsGreaterThanExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsGreaterThan() {
     return ImmutableSet.of(
-        assertThat(1.0 > 2.0).isTrue(),
-        assertThat(1.0 <= 2.0).isFalse(),
-        assertThat(((byte) 1) > ((byte) 2)).isTrue(),
-        assertThat(1F > 2F).isTrue(),
+        assertThat((byte) 1 > (byte) 2).isTrue(),
+        assertThat((byte) 1 <= (byte) 2).isFalse(),
+        assertThat((short) 1 > (short) 2).isTrue(),
+        assertThat((short) 1 <= (short) 2).isFalse(),
         assertThat(1 > 2).isTrue(),
+        assertThat(1 <= 2).isFalse(),
         assertThat(1L > 2L).isTrue(),
-        assertThat(((short) 1) > ((short) 2)).isTrue());
+        assertThat(1L <= 2L).isFalse(),
+        assertThat(1F > 2F).isTrue(),
+        assertThat(1F <= 2F).isFalse(),
+        assertThat(1.0 > 2.0).isTrue(),
+        assertThat(1.0 <= 2.0).isFalse());
   }
 
-  ImmutableSet<AbstractAssert<?, ?>>
-      testAbstractDoubleAssertActualIsGreaterThanOrEqualToExpected() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsGreaterThanOrEqualTo() {
     return ImmutableSet.of(
-        assertThat(1.0 >= 2.0).isTrue(),
-        assertThat(1.0 < 2.0).isFalse(),
-        assertThat(((byte) 1) >= ((byte) 2)).isTrue(),
-        assertThat(1F >= 2F).isTrue(),
+        assertThat((byte) 1 >= (byte) 2).isTrue(),
+        assertThat((byte) 1 < (byte) 2).isFalse(),
+        assertThat((short) 1 >= (short) 2).isTrue(),
+        assertThat((short) 1 < (short) 2).isFalse(),
         assertThat(1 >= 2).isTrue(),
+        assertThat(1 < 2).isFalse(),
         assertThat(1L >= 2L).isTrue(),
-        assertThat(((short) 1) >= ((short) 2)).isTrue());
+        assertThat(1L < 2L).isFalse(),
+        assertThat(1F >= 2F).isTrue(),
+        assertThat(1F < 2F).isFalse(),
+        assertThat(1.0 >= 2.0).isTrue(),
+        assertThat(1.0 < 2.0).isFalse());
   }
 }
