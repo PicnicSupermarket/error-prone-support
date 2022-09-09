@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNullElse;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
@@ -27,17 +26,13 @@ final class NullTemplatesTest implements RefasterTemplateTestCase {
     return Stream.of("foo").filter(Objects::nonNull).count();
   }
 
-  boolean testIsNullReference() {
-    var ref1 = "foo";
-    var ref2 = Set.of(1, 2, 3);
-    Object ref3 = null;
-    return ref1 == null || ref2 == null || ref3 == null;
+  boolean testObjectEqualsNull() {
+    Object obj = null;
+    return obj == null;
   }
 
-  boolean testIsNonNullReference() {
-    var ref1 = "foo";
-    var ref2 = Set.of(1, 2, 3);
-    Object ref3 = null;
-    return ref1 != null || ref2 != null || ref3 != null;
+  boolean testObjectNotEqualsNull() {
+    Object obj = null;
+    return obj != null;
   }
 }
