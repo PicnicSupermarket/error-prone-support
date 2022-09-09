@@ -24,11 +24,11 @@ final class NullTemplatesTest implements RefasterTemplateTestCase {
     return Stream.of("foo").filter(s -> s != null).count();
   }
 
-  boolean testObjectEqualsNull() {
+  boolean testIsNull() {
     return Objects.isNull("foo");
   }
 
-  boolean testObjectNotEqualsNull() {
+  boolean testIsNotNull() {
     return Objects.nonNull("foo");
   }
 }

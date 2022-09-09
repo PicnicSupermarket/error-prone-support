@@ -58,10 +58,9 @@ final class NullTemplates {
   }
 
   /**
-   * Prefer the <code>==</code> operator over {@link java.util.Objects#isNull(Object)} for null
-   * checks.
+   * Prefer the {@code ==} operator over {@link java.util.Objects#isNull(Object)} for null checks.
    */
-  static final class ObjectEqualsNull {
+  static final class IsNull {
     @BeforeTemplate
     boolean before(@Nullable Object object) {
       return Objects.isNull(object);
@@ -74,10 +73,9 @@ final class NullTemplates {
   }
 
   /**
-   * Prefer the <code>!=</code> operator over {@link java.util.Objects#isNull(Object)} for null
-   * checks.
+   * Prefer the {@code !=} operator over {@link java.util.Objects#isNull(Object)} for null checks.
    */
-  static final class ObjectNotEqualsNull {
+  static final class IsNotNull {
     @BeforeTemplate
     boolean before(@Nullable Object object) {
       return Objects.nonNull(object);
