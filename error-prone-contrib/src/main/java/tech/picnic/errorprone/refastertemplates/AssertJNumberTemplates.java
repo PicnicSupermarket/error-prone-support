@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.assertj.core.api.AbstractBigDecimalAssert;
 import org.assertj.core.api.AbstractBigIntegerAssert;
-import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractByteAssert;
 import org.assertj.core.api.AbstractDoubleAssert;
 import org.assertj.core.api.AbstractFloatAssert;
@@ -24,102 +23,6 @@ import tech.picnic.errorprone.refaster.util.IsCharacter;
 
 final class AssertJNumberTemplates {
   private AssertJNumberTemplates() {}
-
-  static final class AssertThatIsEqualTo {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
-      return Refaster.anyOf(
-          assertThat(actual == expected).isTrue(), assertThat(actual != expected).isFalse());
-    }
-
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
-      return Refaster.anyOf(
-          assertThat(actual == expected).isTrue(), assertThat(actual != expected).isFalse());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractBooleanAssert<?> after(boolean actual, boolean expected) {
-      return assertThat(actual).isEqualTo(expected);
-    }
-  }
-
-  static final class AssertThatIsNotEqualTo {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
-      return Refaster.anyOf(
-          assertThat(actual != expected).isTrue(), assertThat(actual == expected).isFalse());
-    }
-
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
-      return Refaster.anyOf(
-          assertThat(actual != expected).isTrue(), assertThat(actual == expected).isFalse());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractBooleanAssert<?> after(boolean actual, boolean expected) {
-      return assertThat(actual).isNotEqualTo(expected);
-    }
-  }
-
-  static final class AssertThatIsLessThan {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
-      return Refaster.anyOf(
-          assertThat(actual < expected).isTrue(), assertThat(actual >= expected).isFalse());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
-      return assertThat(actual).isLessThan(expected);
-    }
-  }
-
-  static final class AssertThatIsLessThanOrEqualTo {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
-      return Refaster.anyOf(
-          assertThat(actual <= expected).isTrue(), assertThat(actual > expected).isFalse());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
-      return assertThat(actual).isLessThanOrEqualTo(expected);
-    }
-  }
-
-  static final class AssertThatIsGreaterThan {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
-      return Refaster.anyOf(
-          assertThat(actual > expected).isTrue(), assertThat(actual <= expected).isFalse());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
-      return assertThat(actual).isGreaterThan(expected);
-    }
-  }
-
-  static final class AssertThatIsGreaterThanOrEqualTo {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
-      return Refaster.anyOf(
-          assertThat(actual >= expected).isTrue(), assertThat(actual < expected).isFalse());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
-      return assertThat(actual).isGreaterThanOrEqualTo(expected);
-    }
-  }
 
   static final class NumberAssertIsPositive {
     @BeforeTemplate
