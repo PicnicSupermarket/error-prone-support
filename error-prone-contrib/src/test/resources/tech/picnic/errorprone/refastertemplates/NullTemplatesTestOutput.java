@@ -27,12 +27,10 @@ final class NullTemplatesTest implements RefasterTemplateTestCase {
   }
 
   boolean testObjectEqualsNull() {
-    Object obj = null;
-    return obj == null;
+    return "foo" == null;
   }
 
   boolean testObjectNotEqualsNull() {
-    Object obj = null;
-    return obj != null;
+    return "foo" != null;
   }
 }
