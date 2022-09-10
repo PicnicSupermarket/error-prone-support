@@ -29,7 +29,7 @@ final class RefasterTemplatesTest {
           AssertJMapTemplates.class,
           AssertJObjectTemplates.class,
           AssertJOptionalTemplates.class,
-          AssertJPrimitivesTemplates.class,
+          AssertJPrimitiveTemplates.class,
           AssertJShortTemplates.class,
           AssertJStringTemplates.class,
           AssertJThrowingCallableTemplates.class,

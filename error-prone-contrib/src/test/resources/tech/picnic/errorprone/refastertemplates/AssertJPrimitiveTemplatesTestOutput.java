@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
-final class AssertJStringTemplatesTest implements RefasterTemplateTestCase {
+final class AssertJPrimitiveTemplatesTest implements RefasterTemplateTestCase {
   @SuppressWarnings("SimplifyBooleanExpression")
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsEqualTo() {
     return ImmutableSet.of(

@@ -10,8 +10,8 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractDoubleAssert;
 
-final class AssertJPrimitivesTemplates {
-  private AssertJPrimitivesTemplates() {}
+final class AssertJPrimitiveTemplates {
+  private AssertJPrimitiveTemplates() {}
 
   static final class AssertThatIsEqualTo {
     @BeforeTemplate
