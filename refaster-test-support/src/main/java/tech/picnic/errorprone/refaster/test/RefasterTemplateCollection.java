@@ -29,6 +29,7 @@ import com.google.errorprone.fixes.Replacement;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.LineMap;
 import com.sun.source.tree.MethodTree;
@@ -68,6 +69,7 @@ public final class RefasterTemplateCollection extends BugChecker
       "RefasterTemplateCollection:TemplateCollection";
   private static final String TEST_METHOD_NAME_PREFIX = "test";
 
+  private final String templateCollectionUnderTest;
   private final ImmutableSortedSet<String> templatesUnderTest;
   private final Refaster delegate;
 
@@ -77,7 +79,7 @@ public final class RefasterTemplateCollection extends BugChecker
    * @param flags Any provided command line flags.
    */
   public RefasterTemplateCollection(ErrorProneFlags flags) {
-    String templateCollectionUnderTest = getTemplateCollectionUnderTest(flags);
+    templateCollectionUnderTest = getTemplateCollectionUnderTest(flags);
     delegate = createRefasterChecker(templateCollectionUnderTest);
     templatesUnderTest = getTemplatesUnderTest(templateCollectionUnderTest);
   }
@@ -131,6 +133,8 @@ public final class RefasterTemplateCollection extends BugChecker
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
+    reportIncorrectClassName(tree, state);
+
     List<Description> matches = new ArrayList<>();
     delegate.matchCompilationUnit(
         tree,
@@ -145,6 +149,30 @@ public final class RefasterTemplateCollection extends BugChecker
     reportUnexpectedMatches(tree, indexedMatches, state);
 
     return Description.NO_MATCH;
+  }
+
+  private void reportIncorrectClassName(CompilationUnitTree tree, VisitorState state) {
+    String expectedClassName = templateCollectionUnderTest + "Test";
+
+    for (Tree typeDeclaration : tree.getTypeDecls()) {
+      if (typeDeclaration instanceof ClassTree) {
+        if (!((ClassTree) typeDeclaration).getSimpleName().contentEquals(expectedClassName)) {
+          state.reportMatch(
+              describeMatch(
+                  typeDeclaration,
+                  SuggestedFix.prefixWith(
+                      typeDeclaration,
+                      String.format(
+                          "/* ERROR: Class should be named `%s`. */\n", expectedClassName))));
+        }
+      } else {
+        state.reportMatch(
+            describeMatch(
+                typeDeclaration,
+                SuggestedFix.prefixWith(
+                    typeDeclaration, "/* ERROR: Unexpected declaration. */\n")));
+      }
+    }
   }
 
   private static ImmutableRangeMap<Integer, String> indexTemplateMatches(

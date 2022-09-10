@@ -7,7 +7,7 @@ import com.google.common.collect.Iterables;
 import org.assertj.core.api.EnumerableAssert;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
-final class AssertJEnumableTemplatesTest implements RefasterTemplateTestCase {
+final class AssertJEnumerableTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Iterables.class);

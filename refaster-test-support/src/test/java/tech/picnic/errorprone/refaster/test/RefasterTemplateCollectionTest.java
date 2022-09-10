@@ -19,6 +19,7 @@ final class RefasterTemplateCollectionTest {
       classes = {
         MatchInWrongMethodTemplates.class,
         MethodWithoutPrefixTemplates.class,
+        MisnamedTestClassTemplates.class,
         MissingTestAndWrongTestTemplates.class,
         PartialTestMatchTemplates.class,
         TemplateWithoutTestTemplates.class,
