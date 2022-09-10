@@ -5,14 +5,13 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 /** Code to test the Refaster templates from {@link ValidTemplates}. */
 final class ValidTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Objects.class, Strings.class);
+    return ImmutableSet.of(Strings.class);
   }
 
   boolean testStringIsEmpty2() {

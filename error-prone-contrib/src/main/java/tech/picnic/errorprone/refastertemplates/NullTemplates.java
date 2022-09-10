@@ -9,10 +9,37 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Objects;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 
 /** Refaster templates related to expressions dealing with (possibly) null values. */
 final class NullTemplates {
   private NullTemplates() {}
+
+  /** Prefer the {@code ==} operator over {@link Objects#isNull(Object)}. */
+  static final class IsNull {
+    @BeforeTemplate
+    boolean before(@Nullable Object object) {
+      return Objects.isNull(object);
+    }
+
+    @AfterTemplate
+    boolean after(@Nullable Object object) {
+      return object == null;
+    }
+  }
+
+  /** Prefer the {@code !=} operator over {@link Objects#nonNull(Object)}. */
+  static final class IsNotNull {
+    @BeforeTemplate
+    boolean before(@Nullable Object object) {
+      return Objects.nonNull(object);
+    }
+
+    @AfterTemplate
+    boolean after(@Nullable Object object) {
+      return object != null;
+    }
+  }
 
   /** Prefer {@link Objects#requireNonNullElse(Object, Object)} over the Guava alternative. */
   // XXX: This rule is not valid in case `second` is `@Nullable`: in that case the Guava variant

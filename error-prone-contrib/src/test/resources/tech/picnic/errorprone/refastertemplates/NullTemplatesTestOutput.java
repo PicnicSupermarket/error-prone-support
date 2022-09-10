@@ -14,6 +14,14 @@ final class NullTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(MoreObjects.class);
   }
 
+  boolean testIsNull() {
+    return "foo" == null;
+  }
+
+  boolean testIsNotNull() {
+    return "foo" != null;
+  }
+
   String testRequireNonNullElse() {
     return requireNonNullElse("foo", "bar");
   }
