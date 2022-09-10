@@ -14,6 +14,14 @@ final class NullTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(MoreObjects.class);
   }
 
+  boolean testIsNull() {
+    return "foo" == null;
+  }
+
+  boolean testIsNotNull() {
+    return "foo" != null;
+  }
+
   String testRequireNonNullElse() {
     return requireNonNullElse("foo", "bar");
   }
@@ -24,13 +32,5 @@ final class NullTemplatesTest implements RefasterTemplateTestCase {
 
   long testNonNullFunction() {
     return Stream.of("foo").filter(Objects::nonNull).count();
-  }
-
-  boolean testIsNull() {
-    return "foo" == null;
-  }
-
-  boolean testIsNotNull() {
-    return "foo" != null;
   }
 }

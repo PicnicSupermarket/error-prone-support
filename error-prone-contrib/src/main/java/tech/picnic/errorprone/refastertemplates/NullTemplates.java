@@ -15,6 +15,32 @@ import javax.annotation.Nullable;
 final class NullTemplates {
   private NullTemplates() {}
 
+  /** Prefer the {@code ==} operator over {@link Objects#isNull(Object)}. */
+  static final class IsNull {
+    @BeforeTemplate
+    boolean before(@Nullable Object object) {
+      return Objects.isNull(object);
+    }
+
+    @AfterTemplate
+    boolean after(@Nullable Object object) {
+      return object == null;
+    }
+  }
+
+  /** Prefer the {@code !=} operator over {@link Objects#nonNull(Object)}. */
+  static final class IsNotNull {
+    @BeforeTemplate
+    boolean before(@Nullable Object object) {
+      return Objects.nonNull(object);
+    }
+
+    @AfterTemplate
+    boolean after(@Nullable Object object) {
+      return object != null;
+    }
+  }
+
   /** Prefer {@link Objects#requireNonNullElse(Object, Object)} over the Guava alternative. */
   // XXX: This rule is not valid in case `second` is `@Nullable`: in that case the Guava variant
   // will return `null`, while the JDK variant will throw an NPE.
@@ -54,36 +80,6 @@ final class NullTemplates {
     @AfterTemplate
     Predicate<T> after() {
       return Objects::nonNull;
-    }
-  }
-
-  /**
-   * Prefer the {@code ==} operator over {@link java.util.Objects#isNull(Object)} for null checks.
-   */
-  static final class IsNull {
-    @BeforeTemplate
-    boolean before(@Nullable Object object) {
-      return Objects.isNull(object);
-    }
-
-    @AfterTemplate
-    boolean after(@Nullable Object object) {
-      return object == null;
-    }
-  }
-
-  /**
-   * Prefer the {@code !=} operator over {@link java.util.Objects#isNull(Object)} for null checks.
-   */
-  static final class IsNotNull {
-    @BeforeTemplate
-    boolean before(@Nullable Object object) {
-      return Objects.nonNull(object);
-    }
-
-    @AfterTemplate
-    boolean after(@Nullable Object object) {
-      return object != null;
     }
   }
 }
