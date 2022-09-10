@@ -34,9 +34,9 @@ final class FluxFlatMapUsageTest {
             "    // BUG: Diagnostic contains:",
             "    Flux.just(1).<String>flatMapSequential(i -> Flux.just(String.valueOf(i)));",
             "    // BUG: Diagnostic contains:",
-            "    Flux.just(\"test_1\", \"test\").groupBy(String::length).flatMap(Flux::just);",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMap(Flux::just);",
             "    // BUG: Diagnostic contains:",
-            "    Flux.just(\"test_1\", \"test\").groupBy(String::length).flatMapSequential(Flux::just);",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMapSequential(Flux::just);",
             "",
             "    Mono.just(1).flatMap(Mono::just);",
             "    Flux.just(1).concatMap(Flux::just);",
@@ -80,8 +80,8 @@ final class FluxFlatMapUsageTest {
             "  void m() {",
             "    Flux.just(1).flatMap(Flux::just);",
             "    Flux.just(1).flatMapSequential(Flux::just);",
-            "    Flux.just(\"test_1\", \"test\").groupBy(String::length).flatMap(Flux::just);",
-            "    Flux.just(\"test_1\", \"test\").groupBy(String::length).flatMapSequential(Flux::just);",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMap(Flux::just);",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMapSequential(Flux::just);",
             "  }",
             "}")
         .addOutputLines(
@@ -94,10 +94,8 @@ final class FluxFlatMapUsageTest {
             "  void m() {",
             "    Flux.just(1).concatMap(Flux::just);",
             "    Flux.just(1).concatMap(Flux::just);",
-            "    Flux.just(\"test_1\", \"test\").groupBy(String::length).flatMap(Flux::just, MAX_CONCURRENCY);",
-            "    Flux.just(\"test_1\", \"test\")",
-            "        .groupBy(String::length)",
-            "        .flatMapSequential(Flux::just, MAX_CONCURRENCY);",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMap(Flux::just, MAX_CONCURRENCY);",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMapSequential(Flux::just, MAX_CONCURRENCY);",
             "  }",
             "}")
         .doTest();

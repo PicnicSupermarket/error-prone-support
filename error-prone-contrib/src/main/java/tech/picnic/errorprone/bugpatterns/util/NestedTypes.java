@@ -9,8 +9,8 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.util.List;
 
 /** Utility class that can be used to identify nesting of the same type. */
-public final class NestedTypesUtils {
-  private NestedTypesUtils() {}
+public final class NestedTypes {
+  private NestedTypes() {}
 
   /**
    * Checks nesting of the same type.

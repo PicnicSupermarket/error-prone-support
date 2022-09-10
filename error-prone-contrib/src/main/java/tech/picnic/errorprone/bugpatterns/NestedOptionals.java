@@ -15,7 +15,7 @@ import com.google.errorprone.suppliers.Suppliers;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.util.NestedTypesUtils;
+import tech.picnic.errorprone.bugpatterns.util.NestedTypes;
 
 /** A {@link BugChecker} which flags nesting of {@link Optional Optionals}. */
 @AutoService(BugChecker.class)
@@ -31,7 +31,7 @@ public final class NestedOptionals extends BugChecker implements MethodInvocatio
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    return NestedTypesUtils.isSameTypeNested(OPTIONAL, tree, state)
+    return NestedTypes.isSameTypeNested(OPTIONAL, tree, state)
         ? describeMatch(tree)
         : Description.NO_MATCH;
   }

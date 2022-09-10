@@ -24,7 +24,7 @@ import com.sun.tools.javac.code.Type;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import reactor.core.publisher.Flux;
-import tech.picnic.errorprone.bugpatterns.util.NestedTypesUtils;
+import tech.picnic.errorprone.bugpatterns.util.NestedTypes;
 
 /**
  * A {@link BugChecker} which flags usages of {@link Flux#flatMap(Function)} and {@link
@@ -72,7 +72,7 @@ public final class FluxFlatMapUsage extends BugChecker
                 Iterables.getOnlyElement(tree.getArguments()), ", " + MAX_CONCURRENCY_ARG_NAME)
             .build();
 
-    if (NestedTypesUtils.isSameTypeNested(FLUX, tree, state)) {
+    if (NestedTypes.isSameTypeNested(FLUX, tree, state)) {
       return buildDescription(tree)
           .addFix(maxConcurrencyFix)
           .setMessage(
