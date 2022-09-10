@@ -1,10 +1,13 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.allOf;
+import static com.google.errorprone.matchers.Matchers.anyMethod;
 import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.argumentCount;
 import static com.google.errorprone.matchers.Matchers.isNonNullUsingDataflow;
 import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
@@ -13,7 +16,9 @@ import static com.google.errorprone.matchers.method.MethodMatchers.instanceMetho
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.primitives.Primitives;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
@@ -24,6 +29,7 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.suppliers.Suppliers;
 import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.CompoundAssignmentTree;
 import com.sun.source.tree.ExpressionTree;
@@ -41,6 +47,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import tech.picnic.errorprone.bugpatterns.util.MethodMatcherFactory;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
@@ -69,49 +76,30 @@ public final class RedundantStringConversion extends BugChecker
       allOf(STRING, isNonNullUsingDataflow());
   private static final Matcher<ExpressionTree> NOT_FORMATTABLE =
       not(isSubtypeOf(Formattable.class));
-  private static final Matcher<ExpressionTree> WELL_KNOWN_STRING_CONVERSION_METHODS =
+  private static final Matcher<MethodInvocationTree> WELL_KNOWN_STRING_CONVERSION_METHODS =
       anyOf(
-          instanceMethod().onDescendantOfAny(Object.class.getName()).named("toString"),
-          staticMethod()
-              .onClass(Objects.class.getName())
+          instanceMethod()
+              .onDescendantOfAny(Object.class.getName())
               .named("toString")
-              .withParameters(Object.class.getName()),
-          staticMethod()
-              .onClass(String.class.getName())
-              .named("valueOf")
-              .withParameters(Object.class.getName()),
-          staticMethod()
-              .onClass(String.class.getName())
-              .named("valueOf")
-              .withParameters(String.class.getName()),
-          staticMethod()
-              .onClass(Byte.class.getName())
-              .named("toString")
-              .withParameters(byte.class.getName()),
-          staticMethod()
-              .onClass(Character.class.getName())
-              .named("toString")
-              .withParameters(char.class.getName()),
-          staticMethod()
-              .onClass(Short.class.getName())
-              .named("toString")
-              .withParameters(short.class.getName()),
-          staticMethod()
-              .onClass(Integer.class.getName())
-              .named("toString")
-              .withParameters(int.class.getName()),
-          staticMethod()
-              .onClass(Long.class.getName())
-              .named("toString")
-              .withParameters(long.class.getName()),
-          staticMethod()
-              .onClass(Float.class.getName())
-              .named("toString")
-              .withParameters(float.class.getName()),
-          staticMethod()
-              .onClass(Double.class.getName())
-              .named("toString")
-              .withParameters(double.class.getName()));
+              .withNoParameters(),
+          allOf(
+              argumentCount(1),
+              anyOf(
+                  staticMethod()
+                      .onClassAny(
+                          Stream.concat(
+                                  Primitives.allWrapperTypes().stream(), Stream.of(Objects.class))
+                              .map(Class::getName)
+                              .collect(toImmutableSet()))
+                      .named("toString"),
+                  allOf(
+                      staticMethod().onClass(String.class.getName()).named("valueOf"),
+                      not(
+                          anyMethod()
+                              .anyClass()
+                              .withAnyName()
+                              .withParametersOfType(
+                                  ImmutableList.of(Suppliers.arrayOf(Suppliers.CHAR_TYPE))))))));
   private static final Matcher<ExpressionTree> STRINGBUILDER_APPEND_INVOCATION =
       instanceMethod()
           .onDescendantOf(StringBuilder.class.getName())
@@ -127,17 +115,10 @@ public final class RedundantStringConversion extends BugChecker
           staticMethod().onClass(String.class.getName()).named("format"),
           instanceMethod().onDescendantOf(Formatter.class.getName()).named("format"),
           instanceMethod()
-              .onDescendantOf(PrintStream.class.getName())
+              .onDescendantOfAny(PrintStream.class.getName(), PrintWriter.class.getName())
               .namedAnyOf("format", "printf"),
           instanceMethod()
-              .onDescendantOf(PrintStream.class.getName())
-              .namedAnyOf("print", "println")
-              .withParameters(Object.class.getName()),
-          instanceMethod()
-              .onDescendantOf(PrintWriter.class.getName())
-              .namedAnyOf("format", "printf"),
-          instanceMethod()
-              .onDescendantOf(PrintWriter.class.getName())
+              .onDescendantOfAny(PrintStream.class.getName(), PrintWriter.class.getName())
               .namedAnyOf("print", "println")
               .withParameters(Object.class.getName()),
           staticMethod()
@@ -156,7 +137,7 @@ public final class RedundantStringConversion extends BugChecker
           .onDescendantOf("org.slf4j.Logger")
           .namedAnyOf("trace", "debug", "info", "warn", "error");
 
-  private final Matcher<ExpressionTree> conversionMethodMatcher;
+  private final Matcher<MethodInvocationTree> conversionMethodMatcher;
 
   /** Instantiates the default {@link RedundantStringConversion}. */
   public RedundantStringConversion() {
@@ -186,7 +167,7 @@ public final class RedundantStringConversion extends BugChecker
 
     List<SuggestedFix.Builder> fixes = new ArrayList<>();
 
-    // XXX: Not so nice: we try to simplify the RHS twice.
+    // XXX: Avoid trying to simplify the RHS twice.
     ExpressionTree preferredRhs = trySimplify(rhs, state).orElse(rhs);
     if (STRING.matches(preferredRhs, state)) {
       tryFix(lhs, state, ANY_EXPR).ifPresent(fixes::add);
@@ -276,15 +257,15 @@ public final class RedundantStringConversion extends BugChecker
 
   // XXX: Write another check which checks that SLF4J patterns don't use `%s` and have a matching
   // number of arguments of the appropriate type. Also flag explicit conversions from `Throwable` to
-  // string as the last logger argument. Suggests either dropping the converison or going with
+  // string as the last logger argument. Suggests either dropping the conversion or going with
   // `Throwable#getMessage()` instead.
   private Optional<SuggestedFix.Builder> tryFixSlf4jLogger(
       List<? extends ExpressionTree> arguments, VisitorState state) {
     /*
-     * SLF4J treats the final argument to a log statement specially if it is a `Throwabe`: it
+     * SLF4J treats the final argument to a log statement specially if it is a `Throwable`: it
      * will always choose to render the associated stacktrace, even if the argument has a
      * matching `{}` placeholder. (In this case the `{}` will simply be logged verbatim.) So if
-     * a log statement's final argument is the string representation of a `Throwble`, then we
+     * a log statement's final argument is the string representation of a `Throwable`, then we
      * must not strip this explicit string conversion, as that would change the statement's
      * semantics.
      */
@@ -338,11 +319,15 @@ public final class RedundantStringConversion extends BugChecker
   }
 
   private Optional<ExpressionTree> trySimplify(ExpressionTree tree, VisitorState state) {
-    if (tree.getKind() != Kind.METHOD_INVOCATION || !conversionMethodMatcher.matches(tree, state)) {
+    if (tree.getKind() != Kind.METHOD_INVOCATION) {
       return Optional.empty();
     }
 
     MethodInvocationTree methodInvocation = (MethodInvocationTree) tree;
+    if (!conversionMethodMatcher.matches(methodInvocation, state)) {
+      return Optional.empty();
+    }
+
     switch (methodInvocation.getArguments().size()) {
       case 0:
         return trySimplifyNullaryMethod(methodInvocation, state);
@@ -383,7 +368,8 @@ public final class RedundantStringConversion extends BugChecker
         .orElse(Description.NO_MATCH);
   }
 
-  private static Matcher<ExpressionTree> createConversionMethodMatcher(ErrorProneFlags flags) {
+  private static Matcher<MethodInvocationTree> createConversionMethodMatcher(
+      ErrorProneFlags flags) {
     // XXX: ErrorProneFlags#getList splits by comma, but method signatures may also contain commas.
     // For this class methods accepting more than one argument are not valid, but still: not nice.
     return flags
