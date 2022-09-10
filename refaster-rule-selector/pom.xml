@@ -14,6 +14,11 @@
     <!-- XXX: Improve text -->
     <description>Select rules based on the Error Prone distribution.</description>
 
+    <properties>
+        <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>
+        <version.error-prone>v2.14.0-picnic-3</version.error-prone>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>

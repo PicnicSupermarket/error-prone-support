@@ -145,7 +145,7 @@
         <version.auto-service>1.0.1</version.auto-service>
         <version.auto-value>1.9</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
-        <version.error-prone-fork>v${version.error-prone-orig}-picnic-2</version.error-prone-fork>
+        <version.error-prone-fork>v2.14.0-picnic-3</version.error-prone-fork>
         <version.error-prone-orig>2.14.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.15</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
@@ -255,6 +255,13 @@
                 <artifactId>jsr305</artifactId>
                 <version>3.0.2</version>
             </dependency>
+            <!-- XXX: TBH, not sure where this one should go.
+            Discussed this with Stephan. -->
+            <!--            <dependency>-->
+            <!--                <groupId>com.google.errorprone</groupId>-->
+            <!--                <artifactId>error_prone_annotations</artifactId>-->
+            <!--                <version>${version.error-prone-orig}</version>-->
+            <!--            </dependency>-->
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
@@ -1303,7 +1310,7 @@
         <profile>
             <id>error-prone-fork</id>
             <properties>
-                <!--                <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>-->
+                <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>
                 <version.error-prone>${version.error-prone-fork}</version.error-prone>
             </properties>
             <dependencyManagement>

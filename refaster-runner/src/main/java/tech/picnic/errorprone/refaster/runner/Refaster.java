@@ -42,7 +42,9 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.rule.selector.NewFactory;
 import tech.picnic.errorprone.rule.selector.RefasterRuleSelectorFactory;
+import tech.picnic.errorprone.rule.selector.RefasterRuleSelectorFactory.RefasterRuleSelector;
 
 /**
  * A {@link BugChecker} which flags code which can be simplified using Refaster templates located on
@@ -82,15 +84,44 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
 
   @CanIgnoreReturnValue
   @Override
+  @SuppressWarnings("UnusedVariable")
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     // XXX: Inline this variable.
     //    Set<RefasterRule<?, ?>> candidateRules = getCandidateRefasterRules(tree);
 
-    RefasterRuleSelectorFactory refasterRuleSelectorFactory =
-        loadRefasterRuleSelectorFactory(state);
-    RefasterRuleSelectorFactory.RefasterRuleSelector refasterRuleSelector =
-        refasterRuleSelectorFactory.createRefasterRuleSelector(refasterRules);
-    Set<RefasterRule<?, ?>> candidateRules = refasterRuleSelector.selectCandidateRules(tree);
+    RefasterRuleSelector selector =
+        NewFactory.getSelector(Thread.currentThread().getContextClassLoader(), refasterRules);
+    //    boolean isForkOnClassPath;
+    //    try {
+    //      Class<?> clazz =
+    //          Class.forName(
+    //              "com.google.errorprone.ErrorProneOptions",
+    //              /* initialize= */ false,
+    //              Thread.currentThread().getContextClassLoader());
+    //      Optional<Method> forkMethod =
+    //          Arrays.stream(clazz.getDeclaredMethods())
+    //              .filter(method -> Modifier.isPublic(method.getModifiers()))
+    //              .filter(m -> m.getName().equals("isSuggestionsAsWarnings"))
+    //              .findFirst();
+    //      // THE CLASS IS HERE, THIS IS THE FORK!
+    //      isForkOnClassPath = forkMethod.isPresent();
+    //      System.out.println("CLASS FOUND? isForkOnClassPath" + isForkOnClassPath);
+    //      //      isForkOnClassPath = true;
+    //    } catch (ClassNotFoundException e) {
+    //      System.out.println("NOT FOUND!!!");
+    //      isForkOnClassPath = false;
+    //    }
+    //
+    //    RefasterRuleSelectorFactory.RefasterRuleSelector selector =
+    //        NewFactory.getSelector(refasterRules);
+    //    SmartRefasterRuleSelector smartRefasterRuleSelector =
+    //        new SmartRefasterRuleSelector(refasterRules);
+
+    //    RefasterRuleSelectorFactory refasterRuleSelectorFactory =
+    //        loadRefasterRuleSelectorFactory(state);
+    //    RefasterRuleSelectorFactory.RefasterRuleSelector refasterRuleSelector =
+    //        refasterRuleSelectorFactory.createRefasterRuleSelector(refasterRules);
+    Set<RefasterRule<?, ?>> candidateRules = selector.selectCandidateRules(tree);
 
     //    DefaultRefasterRuleSelector refasterRuleSelector =
     //        (DefaultRefasterRuleSelector)
@@ -106,7 +137,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
 
     // XXX: Inline this variable.
     //    Set<RefasterRule<?, ?>> candidateRules = new HashSet<>(); // new getCandidateRules(tree);
-    
+
     // XXX: Remove these debug lines
     // String removeThis =
     // candidateRules.stream().map(Object::toString).collect(joining(","));
@@ -143,6 +174,9 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   //    return candidateRules;
   //  }
 
+  // XXX: Move this to the factory?
+  // XXX: Or find other way to load the other one in the thingy? Determine first if it'll be OK.
+  //  XXX: Something in between should determine if it is OK,
   private static RefasterRuleSelectorFactory loadRefasterRuleSelectorFactory(VisitorState state) {
     JavacProcessingEnvironment processingEnvironment =
         JavacProcessingEnvironment.instance(state.context);
