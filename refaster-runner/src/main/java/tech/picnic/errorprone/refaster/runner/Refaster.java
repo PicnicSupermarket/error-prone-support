@@ -12,7 +12,6 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableRangeSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
@@ -29,22 +28,18 @@ import com.google.errorprone.fixes.Replacement;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.refaster.RefasterRule;
 import com.sun.source.tree.CompilationUnitTree;
-import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import tech.picnic.errorprone.rule.selector.NewFactory;
-import tech.picnic.errorprone.rule.selector.RefasterRuleSelectorFactory;
-import tech.picnic.errorprone.rule.selector.RefasterRuleSelectorFactory.RefasterRuleSelector;
+import tech.picnic.errorprone.rule.selector.DefaultRuleSelectorFactory;
+import tech.picnic.errorprone.rule.selector.RefasterRuleSelector;
 
 /**
  * A {@link BugChecker} which flags code which can be simplified using Refaster templates located on
@@ -89,59 +84,11 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     // XXX: Inline this variable.
     //    Set<RefasterRule<?, ?>> candidateRules = getCandidateRefasterRules(tree);
 
+    DefaultRuleSelectorFactory ruleSelectorFactory = new DefaultRuleSelectorFactory();
     RefasterRuleSelector selector =
-        NewFactory.getSelector(Thread.currentThread().getContextClassLoader(), refasterRules);
-    //    boolean isForkOnClassPath;
-    //    try {
-    //      Class<?> clazz =
-    //          Class.forName(
-    //              "com.google.errorprone.ErrorProneOptions",
-    //              /* initialize= */ false,
-    //              Thread.currentThread().getContextClassLoader());
-    //      Optional<Method> forkMethod =
-    //          Arrays.stream(clazz.getDeclaredMethods())
-    //              .filter(method -> Modifier.isPublic(method.getModifiers()))
-    //              .filter(m -> m.getName().equals("isSuggestionsAsWarnings"))
-    //              .findFirst();
-    //      // THE CLASS IS HERE, THIS IS THE FORK!
-    //      isForkOnClassPath = forkMethod.isPresent();
-    //      System.out.println("CLASS FOUND? isForkOnClassPath" + isForkOnClassPath);
-    //      //      isForkOnClassPath = true;
-    //    } catch (ClassNotFoundException e) {
-    //      System.out.println("NOT FOUND!!!");
-    //      isForkOnClassPath = false;
-    //    }
-    //
-    //    RefasterRuleSelectorFactory.RefasterRuleSelector selector =
-    //        NewFactory.getSelector(refasterRules);
-    //    SmartRefasterRuleSelector smartRefasterRuleSelector =
-    //        new SmartRefasterRuleSelector(refasterRules);
-
-    //    RefasterRuleSelectorFactory refasterRuleSelectorFactory =
-    //        loadRefasterRuleSelectorFactory(state);
-    //    RefasterRuleSelectorFactory.RefasterRuleSelector refasterRuleSelector =
-    //        refasterRuleSelectorFactory.createRefasterRuleSelector(refasterRules);
+        ruleSelectorFactory.createRefasterRuleSelector(
+            Thread.currentThread().getContextClassLoader(), refasterRules);
     Set<RefasterRule<?, ?>> candidateRules = selector.selectCandidateRules(tree);
-
-    //    DefaultRefasterRuleSelector refasterRuleSelector =
-    //        (DefaultRefasterRuleSelector)
-    // ruleSelectorFactories.get(0).createRefasterRuleSelector(refasterRules);
-    //    SmartRefasterRuleSelector smartRefasterRuleSelector =
-    //        (SmartRefasterRuleSelector)
-    // ruleSelectorFactories.get(1).createRefasterRuleSelector(refasterRules);
-    //
-    //    Set<RefasterRule<?, ?>> refasterRules1 = ((RefasterRuleSelector)
-    // refasterRuleSelector).selectCandidateRules(tree);
-    //    Set<RefasterRule<?, ?>> refasterRules2 = ((RefasterRuleSelector)
-    // smartRefasterRuleSelector).selectCandidateRules(tree);
-
-    // XXX: Inline this variable.
-    //    Set<RefasterRule<?, ?>> candidateRules = new HashSet<>(); // new getCandidateRules(tree);
-
-    // XXX: Remove these debug lines
-    // String removeThis =
-    // candidateRules.stream().map(Object::toString).collect(joining(","));
-    // System.out.printf("\nTemplates for %s: \n%s\n", tree.getSourceFile().getName(), removeThis);
 
     /* First, collect all matches. */
     SubContext context = new SubContext(state.context);
@@ -173,22 +120,6 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   //
   //    return candidateRules;
   //  }
-
-  // XXX: Move this to the factory?
-  // XXX: Or find other way to load the other one in the thingy? Determine first if it'll be OK.
-  //  XXX: Something in between should determine if it is OK,
-  private static RefasterRuleSelectorFactory loadRefasterRuleSelectorFactory(VisitorState state) {
-    JavacProcessingEnvironment processingEnvironment =
-        JavacProcessingEnvironment.instance(state.context);
-    ClassLoader loader = processingEnvironment.getProcessorClassLoader();
-    Iterable<RefasterRuleSelectorFactory> ruleSelectorFactory =
-        ServiceLoader.load(RefasterRuleSelectorFactory.class, loader);
-
-    return Arrays.stream(Iterables.toArray(ruleSelectorFactory, RefasterRuleSelectorFactory.class))
-        .filter(RefasterRuleSelectorFactory::isClassPathCompatible)
-        .min(Comparator.comparingInt(RefasterRuleSelectorFactory::priority))
-        .orElseThrow();
-  }
 
   private static List<RefasterRule<?, ?>> getRefasterRules(ErrorProneFlags flags) {
     CodeTransformer compositeCodeTransformer = createCompositeCodeTransformer(flags);
