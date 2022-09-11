@@ -3,6 +3,9 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
+import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
+import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.raw;
+import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.subOf;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -12,10 +15,10 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.suppliers.Suppliers;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.util.NestedTypes;
 
 /** A {@link BugChecker} which flags nesting of {@link Optional Optionals}. */
 @AutoService(BugChecker.class)
@@ -28,10 +31,12 @@ import tech.picnic.errorprone.bugpatterns.util.NestedTypes;
 public final class NestedOptionals extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Supplier<Type> OPTIONAL = Suppliers.typeFromClass(Optional.class);
+  private static final Supplier<Type> OPTIONAL_OF_OPTIONAL =
+      VisitorState.memoize(generic(OPTIONAL, subOf(raw(OPTIONAL))));
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    return NestedTypes.isSameTypeNested(OPTIONAL, tree, state)
+    return state.getTypes().isSubtype(ASTHelpers.getType(tree), OPTIONAL_OF_OPTIONAL.get(state))
         ? describeMatch(tree)
         : Description.NO_MATCH;
   }

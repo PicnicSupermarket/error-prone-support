@@ -4,6 +4,10 @@ import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
+import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
+import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.subOf;
+import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.type;
+import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.unbound;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Iterables;
@@ -16,15 +20,15 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.suppliers.Suppliers;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import reactor.core.publisher.Flux;
-import tech.picnic.errorprone.bugpatterns.util.NestedTypes;
 
 /**
  * A {@link BugChecker} which flags usages of {@link Flux#flatMap(Function)} and {@link
@@ -35,11 +39,12 @@ import tech.picnic.errorprone.bugpatterns.util.NestedTypes;
  * former interleaves values as they are emitted, yielding nondeterministic results. In most cases
  * {@link Flux#concatMap(Function)} should be preferred, as it produces consistent results and
  * avoids potentially saturating the thread pool on which subscription happens. If {@code
- * concatMap}'s single-subscription semantics are undesirable one should invoke a {@code flatMap} or
- * {@code flatMapSequential} overload with an explicit concurrency level.
+ * concatMap}'s sequential-subscription semantics are undesirable one should invoke a {@code
+ * flatMap} or {@code flatMapSequential} overload with an explicit concurrency level.
  *
- * <p>NB: The rarely-used overload {@link Flux#flatMap(Function, Function, Supplier)} is not flagged
- * by this check because there is no clear alternative to point to.
+ * <p>NB: The rarely-used overload {@link Flux#flatMap(Function, Function,
+ * java.util.function.Supplier)} is not flagged by this check because there is no clear alternative
+ * to point to.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -53,38 +58,44 @@ public final class FluxFlatMapUsage extends BugChecker
     implements MethodInvocationTreeMatcher, MemberReferenceTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String MAX_CONCURRENCY_ARG_NAME = "MAX_CONCURRENCY";
+  private static final Supplier<Type> FLUX =
+      Suppliers.typeFromString("reactor.core.publisher.Flux");
   private static final Matcher<ExpressionTree> FLUX_FLATMAP =
       instanceMethod()
-          .onDescendantOf("reactor.core.publisher.Flux")
+          .onDescendantOf(FLUX)
           .namedAnyOf("flatMap", "flatMapSequential")
           .withParameters(Function.class.getName());
-  private static final com.google.errorprone.suppliers.Supplier<Type> FLUX =
-      Suppliers.typeFromString("reactor.core.publisher.Flux");
+  private static final Supplier<Type> FLUX_OF_PUBLISHERS =
+      VisitorState.memoize(
+          generic(FLUX, subOf(generic(type("org.reactivestreams.Publisher"), unbound()))));
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     if (!FLUX_FLATMAP.matches(tree, state)) {
       return Description.NO_MATCH;
     }
-    SuggestedFix maxConcurrencyFix =
+
+    SuggestedFix serializationFix = SuggestedFixes.renameMethodInvocation(tree, "concatMap", state);
+    SuggestedFix concurrencyCapFix =
         SuggestedFix.builder()
             .postfixWith(
                 Iterables.getOnlyElement(tree.getArguments()), ", " + MAX_CONCURRENCY_ARG_NAME)
             .build();
 
-    if (NestedTypes.isSameTypeNested(FLUX, tree, state)) {
-      return buildDescription(tree)
-          .addFix(maxConcurrencyFix)
-          .setMessage(
-              "`Flux#flatMap` and `Flux#flatMapSequential` have subtle semantics;"
-                  + " please explicitly specify the desired amount of concurrency")
-          .build();
+    Description.Builder description = buildDescription(tree);
+
+    if (state.getTypes().isSubtype(ASTHelpers.getType(tree), FLUX_OF_PUBLISHERS.get(state))) {
+      /*
+       * Nested publishers may need to be subscribed to eagerly in order to avoid a deadlock, e.g.
+       * if they are produced by `Flux#groupBy`. In this case we suggest specifying an explicit
+       * concurrently bound in favour of sequential subscriptions using `Flux#concatMap`.
+       */
+      description.addFix(concurrencyCapFix).addFix(serializationFix);
+    } else {
+      description.addFix(serializationFix).addFix(concurrencyCapFix);
     }
 
-    return buildDescription(tree)
-        .addFix(SuggestedFixes.renameMethodInvocation(tree, "concatMap", state))
-        .addFix(maxConcurrencyFix)
-        .build();
+    return description.build();
   }
 
   @Override
