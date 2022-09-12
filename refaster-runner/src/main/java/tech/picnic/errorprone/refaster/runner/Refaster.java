@@ -34,7 +34,6 @@ import com.google.errorprone.refaster.BlockTemplate;
 import com.google.errorprone.refaster.ExpressionTemplate;
 import com.google.errorprone.refaster.RefasterRule;
 import com.google.errorprone.refaster.UAnyOf;
-import com.google.errorprone.refaster.UClassIdent;
 import com.google.errorprone.refaster.UExpression;
 import com.google.errorprone.refaster.UStatement;
 import com.google.errorprone.refaster.UStaticIdent;
@@ -46,6 +45,8 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -164,12 +165,13 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
       RefasterRule<?, ?> refasterRule) {
     ImmutableSet.Builder<ImmutableSet<String>> results = ImmutableSet.builder();
 
-    for (Object template : refasterRule.beforeTemplates()) {
+    for (Object template : RefasterIntrospection.getBeforeTemplates(refasterRule)) {
       if (template instanceof ExpressionTemplate) {
-        UExpression expr = ((ExpressionTemplate) template).expression();
+        UExpression expr = RefasterIntrospection.getExpression((ExpressionTemplate) template);
         results.addAll(extractTemplateIdentifiers(ImmutableList.of(expr)));
       } else if (template instanceof BlockTemplate) {
-        ImmutableList<UStatement> statements = ((BlockTemplate) template).templateStatements();
+        ImmutableList<UStatement> statements =
+            RefasterIntrospection.getTemplateStatements((BlockTemplate) template);
         results.addAll(extractTemplateIdentifiers(statements));
       }
       // XXX: error if other kind of template.
@@ -191,15 +193,15 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
       @Override
       public Void visitIdentifier(IdentifierTree node, List<Set<String>> identifierCombinations) {
         // XXX: Also include the package name if not `java.lang`; it must be present.
-        if (node instanceof UClassIdent) {
+        if (RefasterIntrospection.isUClassIdent(node)) {
           for (Set<String> ids : identifierCombinations) {
-            ids.add(getSimpleName(((UClassIdent) node).getTopLevelClass()));
+            ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(node)));
             ids.add(getIdentifier(node));
           }
         } else if (node instanceof UStaticIdent) {
-          UClassIdent subNode = ((UStaticIdent) node).classIdent();
+          IdentifierTree subNode = RefasterIntrospection.getClassIdent((UStaticIdent) node);
           for (Set<String> ids : identifierCombinations) {
-            ids.add(getSimpleName(subNode.getTopLevelClass()));
+            ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(subNode)));
             ids.add(getIdentifier(subNode));
             ids.add(node.getName().toString());
           }
@@ -224,7 +226,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
           List<Set<String>> base = copy(identifierCombinations);
           identifierCombinations.clear();
 
-          for (UExpression expr : ((UAnyOf) node).expressions()) {
+          for (UExpression expr : RefasterIntrospection.getExpressions((UAnyOf) node)) {
             List<Set<String>> branch = copy(base);
             scan(expr, branch);
             identifierCombinations.addAll(branch);
@@ -379,5 +381,80 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
         .filter(e -> nameFilter.matcher(e.getKey()).matches())
         .map(Map.Entry::getValue)
         .collect(toImmutableList());
+  }
+
+  private static final class RefasterIntrospection {
+    private static final String UCLASS_IDENT_FQCN = "com.google.errorprone.refaster.UClassIdent";
+    private static final Class<?> UCLASS_IDENT = getUClassIdentClass();
+    private static final Method METHOD_REFASTER_RULE_BEFORE_TEMPLATES =
+        getMethod(RefasterRule.class, "beforeTemplates");
+    private static final Method METHOD_EXPRESSION_TEMPLATE_EXPRESSION =
+        getMethod(ExpressionTemplate.class, "expression");
+    private static final Method METHOD_BLOCK_TEMPLATE_TEMPLATE_STATEMENTS =
+        getMethod(BlockTemplate.class, "templateStatements");
+    private static final Method METHOD_USTATIC_IDENT_CLASS_IDENT =
+        getMethod(UStaticIdent.class, "classIdent");
+    private static final Method METHOD_UCLASS_IDENT_GET_TOP_LEVEL_CLASS =
+        getMethod(UCLASS_IDENT, "getTopLevelClass");
+    private static final Method METHOD_UANY_OF_EXPRESSIONS = getMethod(UAnyOf.class, "expressions");
+
+    static boolean isUClassIdent(IdentifierTree tree) {
+      return UCLASS_IDENT.equals(tree.getClass());
+    }
+
+    static ImmutableList<?> getBeforeTemplates(RefasterRule<?, ?> refasterRule) {
+      return invokeMethod(METHOD_REFASTER_RULE_BEFORE_TEMPLATES, refasterRule);
+    }
+
+    static UExpression getExpression(ExpressionTemplate template) {
+      return invokeMethod(METHOD_EXPRESSION_TEMPLATE_EXPRESSION, template);
+    }
+
+    static ImmutableList<UStatement> getTemplateStatements(BlockTemplate template) {
+      return invokeMethod(METHOD_BLOCK_TEMPLATE_TEMPLATE_STATEMENTS, template);
+    }
+
+    // Actually UClassIdent.
+    static IdentifierTree getClassIdent(UStaticIdent tree) {
+      return invokeMethod(METHOD_USTATIC_IDENT_CLASS_IDENT, tree);
+    }
+
+    // XXX: Make nicer. Or rename the other params.
+    static String getTopLevelClass(IdentifierTree uClassIdent) {
+      return invokeMethod(METHOD_UCLASS_IDENT_GET_TOP_LEVEL_CLASS, uClassIdent);
+    }
+
+    static ImmutableList<UExpression> getExpressions(UAnyOf tree) {
+      return invokeMethod(METHOD_UANY_OF_EXPRESSIONS, tree);
+    }
+
+    @SuppressWarnings({"TypeParameterUnusedInFormals", "unchecked"})
+    private static <T> T invokeMethod(Method method, Object instance) {
+      try {
+        return (T) method.invoke(instance);
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        throw new IllegalStateException(String.format("Failed to invoke method `%s`", method), e);
+      }
+    }
+
+    private static Method getMethod(Class<?> clazz, String methodName) {
+      try {
+        Method method = clazz.getDeclaredMethod(methodName);
+        method.setAccessible(true);
+        return method;
+      } catch (NoSuchMethodException e) {
+        throw new IllegalStateException(
+            String.format("No method `%s` on class `%s`", methodName, clazz.getName()), e);
+      }
+    }
+
+    private static Class<?> getUClassIdentClass() {
+      try {
+        return RefasterIntrospection.class.getClassLoader().loadClass(UCLASS_IDENT_FQCN);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException(
+            String.format("Failed to load class `%s`", UCLASS_IDENT_FQCN), e);
+      }
+    }
   }
 }
