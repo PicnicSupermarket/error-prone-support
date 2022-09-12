@@ -13,12 +13,19 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import javax.annotation.Nullable;
 
-abstract class AbstractTestChecker extends BugChecker implements CompilationUnitTreeMatcher {
+/**
+ * An abstract {@link BugChecker} that reports a match for each expression matched by the given
+ * {@link Matcher}.
+ *
+ * <p>Only {@link ExpressionTree}s that represent proper Java expressions (i.e. {@link
+ * ExpressionTree}s that may be matched by Refaster) are considered.
+ */
+abstract class AbstractMatcherTestChecker extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
 
   private final Matcher<ExpressionTree> delegate;
 
-  AbstractTestChecker(Matcher<ExpressionTree> delegate) {
+  AbstractMatcherTestChecker(Matcher<ExpressionTree> delegate) {
     this.delegate = delegate;
   }
 
@@ -27,14 +34,14 @@ abstract class AbstractTestChecker extends BugChecker implements CompilationUnit
     new TreeScanner<Void, Void>() {
       @Nullable
       @Override
-      public Void scan(Tree tree, @Nullable Void p) {
+      public Void scan(Tree tree, @Nullable Void unused) {
         if (tree instanceof ExpressionTree && delegate.matches((ExpressionTree) tree, state)) {
           state.reportMatch(
               Description.builder(tree, canonicalName(), null, defaultSeverity(), message())
                   .build());
         }
 
-        return super.scan(tree, p);
+        return super.scan(tree, unused);
       }
 
       @Nullable
@@ -42,19 +49,19 @@ abstract class AbstractTestChecker extends BugChecker implements CompilationUnit
       public Void visitImport(ImportTree node, @Nullable Void unused) {
         /*
          * We're not interested in matching import statements. While components of these
-         * can be `ExpressionTree`s.
+         * can be `ExpressionTree`s, they will never be matched by Refaster.
          */
         return null;
       }
 
       @Nullable
       @Override
-      public Void visitMethod(MethodTree node, @Nullable Void p) {
+      public Void visitMethod(MethodTree node, @Nullable Void unused) {
         /*
          * We're not interested in matching e.g. parameter and return type declarations. While these
          * can be `ExpressionTree`s, they will never be matched by Refaster.
          */
-        return scan(node.getBody(), p);
+        return scan(node.getBody(), unused);
       }
     }.scan(compilationUnit, null);
 
