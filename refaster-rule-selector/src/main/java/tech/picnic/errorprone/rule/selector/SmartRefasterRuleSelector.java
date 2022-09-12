@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 /** XXX: Write this */
 @AutoService(RefasterRuleSelector.class)
@@ -88,6 +89,7 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
 
     // XXX: Make the scanner static, then make also its helper methods static.
     new TreeScanner<Void, List<Set<String>>>() {
+      @Nullable
       @Override
       public Void visitIdentifier(IdentifierTree node, List<Set<String>> identifierCombinations) {
         // XXX: Also include the package name if not `java.lang`; it must be present.
@@ -117,6 +119,7 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
         return index < 0 ? fcqn : fcqn.substring(index + 1);
       }
 
+      @Nullable
       @Override
       public Void visitMemberReference(
           MemberReferenceTree node, List<Set<String>> identifierCombinations) {
@@ -126,6 +129,7 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
         return null;
       }
 
+      @Nullable
       @Override
       public Void visitMemberSelect(
           MemberSelectTree node, List<Set<String>> identifierCombinations) {
@@ -135,12 +139,14 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
         return null;
       }
 
+      @Nullable
       @Override
       public Void visitAssignment(AssignmentTree node, List<Set<String>> identifierCombinations) {
         registerOperator(node, identifierCombinations);
         return super.visitAssignment(node, identifierCombinations);
       }
 
+      @Nullable
       @Override
       public Void visitCompoundAssignment(
           CompoundAssignmentTree node, List<Set<String>> identifierCombinations) {
@@ -148,12 +154,14 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
         return super.visitCompoundAssignment(node, identifierCombinations);
       }
 
+      @Nullable
       @Override
       public Void visitUnary(UnaryTree node, List<Set<String>> identifierCombinations) {
         registerOperator(node, identifierCombinations);
         return super.visitUnary(node, identifierCombinations);
       }
 
+      @Nullable
       @Override
       public Void visitBinary(BinaryTree node, List<Set<String>> identifierCombinations) {
         registerOperator(node, identifierCombinations);
@@ -165,6 +173,7 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
         identifierCombinations.forEach(ids -> ids.add(treeKindToString(node.getKind())));
       }
 
+      @Nullable
       @Override
       public Void visitOther(Tree node, List<Set<String>> identifierCombinations) {
         if (node instanceof UAnyOf) {
@@ -199,12 +208,14 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
 
     // XXX: Make the scanner static.
     new TreeScanner<Void, Set<String>>() {
+      @Nullable
       @Override
       public Void visitIdentifier(IdentifierTree node, Set<String> identifiers) {
         identifiers.add(node.getName().toString());
         return null;
       }
 
+      @Nullable
       @Override
       public Void visitMemberReference(MemberReferenceTree node, Set<String> identifiers) {
         super.visitMemberReference(node, identifiers);
@@ -212,6 +223,7 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
         return null;
       }
 
+      @Nullable
       @Override
       public Void visitMemberSelect(MemberSelectTree node, Set<String> identifiers) {
         super.visitMemberSelect(node, identifiers);
@@ -219,24 +231,28 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
         return null;
       }
 
+      @Nullable
       @Override
       public Void visitAssignment(AssignmentTree node, Set<String> identifiers) {
         registerOperator(node, identifiers);
         return super.visitAssignment(node, identifiers);
       }
 
+      @Nullable
       @Override
       public Void visitCompoundAssignment(CompoundAssignmentTree node, Set<String> identifiers) {
         registerOperator(node, identifiers);
         return super.visitCompoundAssignment(node, identifiers);
       }
 
+      @Nullable
       @Override
       public Void visitUnary(UnaryTree node, Set<String> identifiers) {
         registerOperator(node, identifiers);
         return super.visitUnary(node, identifiers);
       }
 
+      @Nullable
       @Override
       public Void visitBinary(BinaryTree node, Set<String> identifiers) {
         registerOperator(node, identifiers);

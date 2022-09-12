@@ -145,7 +145,7 @@
         <version.auto-service>1.0.1</version.auto-service>
         <version.auto-value>1.9</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
-        <version.error-prone-fork>v2.14.0-picnic-3</version.error-prone-fork>
+        <version.error-prone-fork>v${version.error-prone-orig}-picnic-3</version.error-prone-fork>
         <version.error-prone-orig>2.14.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.15</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
@@ -1572,9 +1572,6 @@
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
                                     -XepOpt:Nullness:Conservative=false
-                                    <!-- XXX: Fix this -->
-                                    -Xep:VoidMissingNullable:OFF
-                                    -Xep:ReturnMissingNullable:OFF
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}

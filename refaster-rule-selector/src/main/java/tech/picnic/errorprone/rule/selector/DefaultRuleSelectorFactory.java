@@ -36,7 +36,9 @@ public final class DefaultRuleSelectorFactory implements RefasterRuleSelectorFac
           Class.forName(
               "com.google.errorprone.ErrorProneOptions", /* initialize= */ false, classLoader);
     } catch (ClassNotFoundException e) {
-      throw new IllegalStateException("Cannot load `com.google.errorprone.ErrorProneOptions`", e);
+      return false;
+      //      throw new IllegalStateException("Cannot load
+      // `com.google.errorprone.ErrorProneOptions`", e);
     }
 
     return Arrays.stream(clazz.getDeclaredMethods())
