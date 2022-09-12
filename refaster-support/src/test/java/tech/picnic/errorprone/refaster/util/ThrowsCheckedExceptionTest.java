@@ -84,7 +84,7 @@ final class ThrowsCheckedExceptionTest {
   public static final class TestChecker extends AbstractTestChecker {
     private static final long serialVersionUID = 1L;
 
-    // XXX: This is false positive reported by CheckStyle. See
+    // XXX: This is a false positive reported by Checkstyle. See
     // https://github.com/checkstyle/checkstyle/issues/10161#issuecomment-1242732120.
     @SuppressWarnings("RedundantModifier")
     public TestChecker() {
