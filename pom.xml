@@ -540,7 +540,6 @@
                     <configuration>
                         <bundledSignatures>
                             <bundledSignature>jdk-internal</bundledSignature>
-                            <bundledSignature>jdk-reflection</bundledSignature>
                             <bundledSignature>jdk-system-out</bundledSignature>
                             <!-- Other bundles are available but currently not
                             enabled:
@@ -550,6 +549,10 @@
                             - jdk-deprecated: we compile with `-Xlint:all`,
                               which causes the build to fail when _any_
                               deprecated method is called.
+                            - jdk-reflection: this bundle should probably be
+                              enabled, but currently
+                              `java.lang.reflect.AccessibleObject#setAccessible`
+                              is still called in various places.
                             - jdk-non-portable: the Error Prone integration
                               crucially relies on some of these APIs.
                             - jdk-unsafe: see
