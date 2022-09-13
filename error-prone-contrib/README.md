@@ -76,8 +76,7 @@ project:
 - Document how to enable the checks.
 - Document how to apply patches.
 - Document each of the checks.
-- Add Travis CI, [SonarQube][sonarcloud] and [Codecov][codecov]
-  integrations.
+- Add [SonarQube][sonarcloud] and [Codecov][codecov] integrations.
 - Investigate whether it makes sense to include license headers in each file.
   If so, set that up and enforce it.
 - Add non-Java file formatting support, like we have internally at Picnic.
