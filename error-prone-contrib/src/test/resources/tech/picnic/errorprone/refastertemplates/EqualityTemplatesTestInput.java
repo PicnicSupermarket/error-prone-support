@@ -31,11 +31,13 @@ final class EqualityTemplatesTest implements RefasterTemplateTestCase {
     return !!Boolean.TRUE;
   }
 
+  @SuppressWarnings("SimplifyBooleanExpression")
   ImmutableSet<Boolean> testNegation() {
     return ImmutableSet.of(
-        Boolean.TRUE ? !Boolean.FALSE : Boolean.FALSE,
-        !(Boolean.TRUE == Boolean.FALSE),
+        true ? !false : false,
+        !(true == false),
         !((byte) 3 == (byte) 4),
+        !((char) 3 == (char) 4),
         !((short) 3 == (short) 4),
         !(3 == 4),
         !(3L == 4L),
@@ -44,11 +46,13 @@ final class EqualityTemplatesTest implements RefasterTemplateTestCase {
         !(BoundType.OPEN == BoundType.CLOSED));
   }
 
+  @SuppressWarnings("SimplifyBooleanExpression")
   ImmutableSet<Boolean> testIndirectDoubleNegation() {
     return ImmutableSet.of(
-        Boolean.TRUE ? Boolean.FALSE : !Boolean.FALSE,
-        !(Boolean.TRUE != Boolean.FALSE),
+        true ? false : !false,
+        !(true != false),
         !((byte) 3 != (byte) 4),
+        !((char) 3 != (char) 4),
         !((short) 3 != (short) 4),
         !(3 != 4),
         !(3L != 4L),
