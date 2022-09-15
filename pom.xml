@@ -304,7 +304,7 @@
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2020.0.22</version>
+                <version>2020.0.23</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
