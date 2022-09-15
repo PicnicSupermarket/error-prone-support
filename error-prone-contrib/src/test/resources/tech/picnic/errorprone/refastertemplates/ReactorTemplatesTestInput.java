@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,6 +18,15 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(assertThat(0));
+  }
+
+  ImmutableSet<Mono<?>> testMonoFromSupplier() {
+    return ImmutableSet.of(
+        Mono.fromCallable((Callable<?>) null),
+        Mono.fromCallable(() -> getClass().getDeclaredConstructor()),
+        Mono.fromCallable(() -> toString()),
+        Mono.fromCallable(getClass()::getDeclaredConstructor),
+        Mono.fromCallable(this::toString));
   }
 
   ImmutableSet<Mono<Integer>> testMonoFromOptional() {
