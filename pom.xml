@@ -137,6 +137,9 @@
         property allows the `error-prone-fork` profile below to build the
         project using Picnic's Error Prone fork instead. -->
         <groupId.error-prone>com.google.errorprone</groupId.error-prone>
+        <!-- The build timestamp is derived from the most recent commit
+        timestamp in support of reproducible builds. -->
+        <project.build.outputTimestamp>${git.commit.time}</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Dependency and plugin versions that are referenced in more than
         one place. We use these to keep dependencies in sync. Version numbers
@@ -968,9 +971,9 @@
                             <manifestEntries>
                                 <Implementation-Title>${project.name}</Implementation-Title>
                                 <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
-                                <Implementation-Version>${project.version}.${build.number}.${build.revision}</Implementation-Version>
+                                <Implementation-Version>${project.version}.${build.number}.${git.commit.id}</Implementation-Version>
                                 <Rookout-Repository>${project.scm.url}</Rookout-Repository>
-                                <Rookout-Revision>${build.revision}</Rookout-Revision>
+                                <Rookout-Revision>${git.commit.id}</Rookout-Revision>
                             </manifestEntries>
                         </archive>
                     </configuration>
@@ -1077,24 +1080,6 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>3.3.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>3.0.0</version>
-                    <configuration>
-                        <buildNumberPropertyName>build.revision</buildNumberPropertyName>
-                        <revisionOnScmFailure>UNKNOWN</revisionOnScmFailure>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>determine-build-number</id>
-                            <goals>
-                                <goal>create</goal>
-                            </goals>
-                            <phase>validate</phase>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1274,6 +1259,25 @@
                     <artifactId>sonar-maven-plugin</artifactId>
                     <version>3.9.1.2184</version>
                 </plugin>
+                <plugin>
+                    <groupId>pl.project13.maven</groupId>
+                    <artifactId>git-commit-id-plugin</artifactId>
+                    <version>4.9.10</version>
+                    <configuration>
+                        <injectAllReactorProjects>true</injectAllReactorProjects>
+                        <runOnlyOnce>true</runOnlyOnce>
+                        <skipPoms>false</skipPoms>
+                        <dateFormat>yyyy-MM-dd'T'HH:mm:ssXXX</dateFormat>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>retrieve-git-info</id>
+                            <goals>
+                                <goal>revision</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -1282,8 +1286,8 @@
                 <artifactId>maven-source-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>buildnumber-maven-plugin</artifactId>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
