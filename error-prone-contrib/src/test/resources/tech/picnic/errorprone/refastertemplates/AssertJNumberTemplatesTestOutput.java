@@ -81,23 +81,27 @@ final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(
         assertThat((byte) 1).isOdd(),
         assertThat(Byte.valueOf((byte) 1)).isOdd(),
+        assertThat((char) 1 % 2).isEqualTo(1),
+        assertThat(Character.valueOf((char) 1) % 2).isEqualTo(1),
+        assertThat((short) 1).isOdd(),
+        assertThat(Short.valueOf((short) 1)).isOdd(),
         assertThat(1).isOdd(),
         assertThat(Integer.valueOf(1)).isOdd(),
         assertThat(1L).isOdd(),
-        assertThat(Long.valueOf(1)).isOdd(),
-        assertThat((short) 1).isOdd(),
-        assertThat(Short.valueOf((short) 1)).isOdd());
+        assertThat(Long.valueOf(1)).isOdd());
   }
 
   ImmutableSet<NumberAssert<?, ?>> testAssertThatIsEven() {
     return ImmutableSet.of(
         assertThat((byte) 1).isEven(),
         assertThat(Byte.valueOf((byte) 1)).isEven(),
+        assertThat((char) 1 % 2).isEqualTo(0),
+        assertThat(Character.valueOf((char) 1) % 2).isEqualTo(0),
+        assertThat((short) 1).isEven(),
+        assertThat(Short.valueOf((short) 1)).isEven(),
         assertThat(1).isEven(),
         assertThat(Integer.valueOf(1)).isEven(),
         assertThat(1L).isEven(),
-        assertThat(Long.valueOf(1)).isEven(),
-        assertThat((short) 1).isEven(),
-        assertThat(Short.valueOf((short) 1)).isEven());
+        assertThat(Long.valueOf(1)).isEven());
   }
 }

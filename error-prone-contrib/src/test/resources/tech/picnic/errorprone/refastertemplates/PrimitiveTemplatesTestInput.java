@@ -13,6 +13,7 @@ final class PrimitiveTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<Boolean> testLessThan() {
     return ImmutableSet.of(
         !((byte) 3 >= (byte) 4),
+        !((char) 3 >= (char) 4),
         !((short) 3 >= (short) 4),
         !(3 >= 4),
         !(3L >= 4L),
@@ -23,6 +24,7 @@ final class PrimitiveTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<Boolean> testLessThanOrEqualTo() {
     return ImmutableSet.of(
         !((byte) 3 > (byte) 4),
+        !((char) 3 > (char) 4),
         !((short) 3 > (short) 4),
         !(3 > 4),
         !(3L > 4L),
@@ -33,6 +35,7 @@ final class PrimitiveTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<Boolean> testGreaterThan() {
     return ImmutableSet.of(
         !((byte) 3 <= (byte) 4),
+        !((char) 3 <= (char) 4),
         !((short) 3 <= (short) 4),
         !(3 <= 4),
         !(3L <= 4L),
@@ -43,6 +46,7 @@ final class PrimitiveTemplatesTest implements RefasterTemplateTestCase {
   ImmutableSet<Boolean> testGreaterThanOrEqualTo() {
     return ImmutableSet.of(
         !((byte) 3 < (byte) 4),
+        !((char) 3 < (char) 4),
         !((short) 3 < (short) 4),
         !(3 < 4),
         !(3L < 4L),

@@ -68,15 +68,12 @@ final class EqualityTemplates {
    * Don't negate an equality test or use the ternary operator to compare two booleans; directly
    * test for inequality instead.
    */
+  // XXX: Replacing `a ? !b : b` with `a != b` changes semantics if both `a` and `b` are boxed
+  // booleans.
   static final class Negation {
     @BeforeTemplate
     boolean before(boolean a, boolean b) {
       return Refaster.anyOf(!(a == b), a ? !b : b);
-    }
-
-    @BeforeTemplate
-    boolean before(long a, long b) {
-      return !(a == b);
     }
 
     @BeforeTemplate
@@ -99,15 +96,12 @@ final class EqualityTemplates {
    * Don't negate an inequality test or use the ternary operator to compare two booleans; directly
    * test for equality instead.
    */
+  // XXX: Replacing `a ? b : !b` with `a == b` changes semantics if both `a` and `b` are boxed
+  // booleans.
   static final class IndirectDoubleNegation {
     @BeforeTemplate
     boolean before(boolean a, boolean b) {
       return Refaster.anyOf(!(a != b), a ? b : !b);
-    }
-
-    @BeforeTemplate
-    boolean before(long a, long b) {
-      return !(a != b);
     }
 
     @BeforeTemplate

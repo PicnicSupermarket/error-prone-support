@@ -81,23 +81,27 @@ final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(
         assertThat((byte) 1 % 2).isEqualTo(1),
         assertThat(Byte.valueOf((byte) 1) % 2).isEqualTo(1),
+        assertThat((char) 1 % 2).isEqualTo(1),
+        assertThat(Character.valueOf((char) 1) % 2).isEqualTo(1),
+        assertThat((short) 1 % 2).isEqualTo(1),
+        assertThat(Short.valueOf((short) 1) % 2).isEqualTo(1),
         assertThat(1 % 2).isEqualTo(1),
         assertThat(Integer.valueOf(1) % 2).isEqualTo(1),
         assertThat(1L % 2).isEqualTo(1),
-        assertThat(Long.valueOf(1) % 2).isEqualTo(1),
-        assertThat((short) 1 % 2).isEqualTo(1),
-        assertThat(Short.valueOf((short) 1) % 2).isEqualTo(1));
+        assertThat(Long.valueOf(1) % 2).isEqualTo(1));
   }
 
   ImmutableSet<NumberAssert<?, ?>> testAssertThatIsEven() {
     return ImmutableSet.of(
         assertThat((byte) 1 % 2).isEqualTo(0),
         assertThat(Byte.valueOf((byte) 1) % 2).isEqualTo(0),
+        assertThat((char) 1 % 2).isEqualTo(0),
+        assertThat(Character.valueOf((char) 1) % 2).isEqualTo(0),
+        assertThat((short) 1 % 2).isEqualTo(0),
+        assertThat(Short.valueOf((short) 1) % 2).isEqualTo(0),
         assertThat(1 % 2).isEqualTo(0),
         assertThat(Integer.valueOf(1) % 2).isEqualTo(0),
         assertThat(1L % 2).isEqualTo(0),
-        assertThat(Long.valueOf(1) % 2).isEqualTo(0),
-        assertThat((short) 1 % 2).isEqualTo(0),
-        assertThat(Short.valueOf((short) 1) % 2).isEqualTo(0));
+        assertThat(Long.valueOf(1) % 2).isEqualTo(0));
   }
 }

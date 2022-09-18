@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -18,6 +19,7 @@ import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractShortAssert;
 import org.assertj.core.api.NumberAssert;
+import tech.picnic.errorprone.refaster.util.IsCharacter;
 
 final class AssertJNumberTemplates {
   private AssertJNumberTemplates() {}
@@ -226,9 +228,16 @@ final class AssertJNumberTemplates {
     }
   }
 
+  /**
+   * Prefer {@link AbstractLongAssert#isOdd()} (and similar methods for other {@link NumberAssert}
+   * subtypes) over alternatives with less informative error messages.
+   *
+   * <p>Note that {@link org.assertj.core.api.AbstractCharacterAssert} does not implement {@link
+   * NumberAssert} and does not provide an {@code isOdd} test.
+   */
   static final class AssertThatIsOdd {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(int number) {
+    AbstractIntegerAssert<?> before(@NotMatches(IsCharacter.class) int number) {
       return assertThat(number % 2).isEqualTo(1);
     }
 
@@ -244,9 +253,16 @@ final class AssertJNumberTemplates {
     }
   }
 
+  /**
+   * Prefer {@link AbstractLongAssert#isEven()} (and similar methods for other {@link NumberAssert}
+   * subtypes) over alternatives with less informative error messages.
+   *
+   * <p>Note that {@link org.assertj.core.api.AbstractCharacterAssert} does not implement {@link
+   * NumberAssert} and does not provide an {@code isEven} test.
+   */
   static final class AssertThatIsEven {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(int number) {
+    AbstractIntegerAssert<?> before(@NotMatches(IsCharacter.class) int number) {
       return assertThat(number % 2).isEqualTo(0);
     }
 
