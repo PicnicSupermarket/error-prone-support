@@ -229,9 +229,11 @@ final class AssertJNumberTemplates {
   }
 
   /**
-   * Prefer {@link AbstractLongAssert#isOdd()} over more contrived alternatives.
+   * Prefer {@link AbstractLongAssert#isOdd()} (and similar methods for other {@link NumberAssert}
+   * subtypes) over alternatives with less informative error messages.
    *
-   * <p>Note that for {@link Character}s this rewrite would lead to non-compilable code.
+   * <p>Note that {@link org.assertj.core.api.AbstractCharacterAssert} does not implement {@link
+   * NumberAssert} and does not provide an {@code isOdd} test.
    */
   static final class AssertThatIsOdd {
     @BeforeTemplate
@@ -252,9 +254,11 @@ final class AssertJNumberTemplates {
   }
 
   /**
-   * Prefer {@link AbstractLongAssert#isEven()} over more contrived alternatives.
+   * Prefer {@link AbstractLongAssert#isEven()} (and similar methods for other {@link NumberAssert}
+   * subtypes) over alternatives with less informative error messages.
    *
-   * <p>Note that for {@link Character}s this rewrite would lead to non-compilable code.
+   * <p>Note that {@link org.assertj.core.api.AbstractCharacterAssert} does not implement {@link
+   * NumberAssert} and does not provide an {@code isEven} test.
    */
   static final class AssertThatIsEven {
     @BeforeTemplate
