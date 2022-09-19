@@ -11,77 +11,22 @@ request.
 
 ### Building
 
-This is a [Maven][maven] project, so running `mvn clean install` performs a
-full clean build. Some relevant flags:
-- `-Dverification.warn` makes the warnings and errors emitted by various
-  plugins and the Java compiler non-fatal, where possible.
-- `-Dverification.skip` disables various non-essential plugins and compiles the
-  code with minimal checks (i.e. without linting, Error Prone checks, etc.)
-- `-Dversion.error-prone=some-version` runs the build using the specified
-  version of Error Prone. This is useful e.g. when testing a locally built
-  Error Prone SNAPSHOT.
-- `-Perror-prone-fork` run the build using Picnic's [Error Prone
-  fork][error-prone-fork-repo], hosted on [Jitpack][error-prone-fork-jitpack].
-  This fork generally contains a few changes on top of the latest Error Prone
-  release.
-
-Two other goals that one may find relevant:
-- `mvn fmt:format` formats the code using
-  [`google-java-format`][google-java-format].
-- `mvn pitest:mutationCoverage` runs mutation tests using [PIT][pitest]. The
-  results can be reviewed by opening the respective
-  `target/pit-reports/index.html` files. For more information check the [PIT
-  Maven plugin][pitest-maven].
-
-When running the project's tests in IntelliJ IDEA, you might see the following
-error:
-```
-java: exporting a package from system module jdk.compiler is not allowed with --release
-```
-
-If this happens, go to _Settings -> Build, Execution, Deployment -> Compiler ->
-Java Compiler_ and deselect the option _Use '--release' option for
-cross-compilation (Java 9 and later)_. See [IDEA-288052][idea-288052] for
-details.
+See the main [readme][main-readme].
 
 ### Contribution guidelines
 
-To the extend possible, the pull request process guards our coding guidelines.
-Some pointers:
-- Checks should we _topical_: Ideally they address a single concern.
-- Where possible checks should provide _fixes_, and ideally these are
-  completely behavior preserving. In order for a check to be adopted by users
-  it must not "get in the way". So for a check which addresses a relatively
-  trivial stylistic concern it is doubly important that the violations it
-  detects can be auto-patched.
-- Make sure you have read Error Prone's [criteria for new
-  checks][error-prone-criteria]. Most guidelines described there apply to this
-  project as well, except that this project _does_ focus quite heavy on style
-  enforcement. But that just makes the previous point doubly important.
-- Make sure that a check's (mutation) coverage is or remains about as high as
-  it can be. Not only does this lead to better tests, it also points out
-  opportunities to simplify the code.
-- Please restrict the scope of a pull request to a single feature or fix. Don't
-  sneak in unrelated changes.
-- When in doubt about whether a pull request will be accepted, please first
-  file an issue to discuss it.
+See our [contributing guidelines][main-contributing].
 
 ### Our wishlist
 
 We expect the following tasks to help improve the quality of this open source
 project:
 
-- Publish the artifact to Maven Central, then document the coordinates in this
-  `README.md`.
-- Document how to enable the checks.
 - Document how to apply patches.
 - Document each of the checks.
 - Add [SonarQube][sonarcloud] and [Codecov][codecov] integrations.
-- Investigate whether it makes sense to include license headers in each file.
-  If so, set that up and enforce it.
 - Add non-Java file formatting support, like we have internally at Picnic.
   (I.e., somehow open-source that stuff.)
-- Add relevant "badges" at the top of this `README.md`.
 - Auto-generate a website listing each of the checks, just like the Error Prone
   [bug patterns page][error-prone-bug-patterns]. The [Error Prone
   repository][error-prone-repo] contains code for this.
@@ -99,7 +44,7 @@ project:
 - Improve an existing check (see `XXX`-marked comments in the code) or write a
   new one (see the list of suggestions below).
 
-### Ideas for new checks
+### BugChecker extension ideas
 
 The following is a list of checks we'd like to see implemented:
 
@@ -124,12 +69,13 @@ The following is a list of checks we'd like to see implemented:
   code and Javadoc `@link` references.
 - A check which simplifies array expressions. It would replace empty array
   expressions of the form `new int[] {}` with `new int[0]`. Statements of the
-  form `byte[] arr = new byte[] {'c'};` would be shortened to `byte[] arr =
-  {'c'};`.
-- A check which replaces expressions of the form `String.format("some prefix
-  %s", arg)` with `"some prefix " + arg`, and similar for simple suffixes. Can
-  perhaps be generalized further, though it's unclear how far. (Well, a
-  `String.format` call without arguments can certainly be simplified, too.)
+  form `byte[] arr = new byte[] {'c'};` would be shortened to
+  `byte[] arr = {'c'};`.
+- A check which replaces expressions of the form
+  `String.format("some prefix %s", arg)` with `"some prefix " + arg`, and
+  similar for simple suffixes. Can perhaps be generalized further, though it's
+  unclear how far. (Well, a `String.format` call without arguments can
+  certainly be simplified, too.)
 - A check which replaces single-character strings with `char`s where possible.
   For example as argument to `StringBuilder.append` and in string
   concatenations.
@@ -174,11 +120,11 @@ The following is a list of checks we'd like to see implemented:
 - A check which flags imports from other test classes.
 - A Guava-specific check which replaces `Joiner.join` calls with `String.join`
   calls in those cases where the latter is a proper substitute for the former.
-- A Guava-specific check which flags `{Immutable,}Multimap` type usages
-  where `{Immutable,}{List,Set}Multimap` would be more appropriate.
-- A Guava-specific check which rewrites `if (conditional) { throw new
-  IllegalArgumentException(); }` and variants to an equivalent `checkArgument`
-  statement. Idem for other exception types.
+- A Guava-specific check which flags `{Immutable,}Multimap` type usages where
+  `{Immutable,}{List,Set}Multimap` would be more appropriate.
+- A Guava-specific check which rewrites
+  `if (conditional) { throw new IllegalArgumentException(); }` and variants to
+  an equivalent `checkArgument` statement. Idem for other exception types.
 - A Guava-specific check which replaces simple anonymous `CacheLoader` subclass
   declarations with `CacheLoader.from(someLambda)`.
 - A Spring-specific check which enforces that methods with the `@Scheduled`
@@ -253,6 +199,7 @@ but on the flip side Refaster is much less expressive. While this gap can never
 be fully closed, there are some ways in which Refaster's scope of utility could
 be extended. The following is a non-exhaustive list of ideas on how to extend
 Refaster's expressiveness:
+
 - Allow more control over _which_ methods are statically imported by
   `@UseImportPolicy`. Sometimes the `@AfterTemplate` contains more than one
   static method invocation, and only a subset should be statically imported.
@@ -265,16 +212,16 @@ Refaster's expressiveness:
 - Some Refaster refactorings (e.g. when dealing with lazy evaluation) are valid
   only when some free parameter is a constant, variable reference or some other
   pure expression. Introduce a way to express such a constraint. For example,
-  rewriting `optional1.map(Optional::of).orElse(optional2)` to `optional1.or(()
-  -> optional2)` is not behavior preserving if evaluation of `optional2` has
-  side-effects.
+  rewriting `optional1.map(Optional::of).orElse(optional2)` to
+  `optional1.or(() -> optional2)` is not behavior preserving if evaluation of
+  `optional2` has side-effects.
 - Similarly, certain refactoring operations are only valid if one of the
   matches expressions is not `@Nullable`. It'd be nice to be able to express
   this.
 - Generalize `@Placeholder` support such that rules can reference e.g. "any
   concrete unary method". This would allow refactorings such as
-  `Mono.just(constant).flatmap(this::someFun)` -> `Mono.defer(() ->
-  someFun(constant))`.
+  `Mono.just(constant).flatmap(this::someFun)` ->
+  `Mono.defer(() -> someFun(constant))`.
 - Sometimes a Refaster refactoring can cause the resulting code not to compile
   due to a lack of generic type information. Identify and resolve such
   occurrences. For example, an `@AfterTemplate` may require the insertion of a
@@ -333,17 +280,12 @@ Refaster's expressiveness:
 [checkstyle-external-project-tests]: https://github.com/checkstyle/checkstyle/blob/master/wercker.yml
 [codecov]: https://codecov.io
 [error-prone-bug-patterns]: https://errorprone.info/bugpatterns
-[error-prone-criteria]: https://errorprone.info/docs/criteria
-[error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
-[error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
 [error-prone]: https://errorprone.info
 [error-prone-repo]: https://github.com/google/error-prone
 [forbidden-apis]: https://github.com/policeman-tools/forbidden-apis
 [fossa]: https://fossa.io
 [google-java-format]: https://github.com/google/google-java-format
-[idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
-[maven]: https://maven.apache.org
+[main-contributing]: ../CONTRIBUTING.md
+[main-readme]: ../README.md
 [modernizer-maven-plugin]: https://github.com/gaul/modernizer-maven-plugin
-[pitest]: https://pitest.org
-[pitest-maven]: https://pitest.org/quickstart/maven
 [sonarcloud]: https://sonarcloud.io
