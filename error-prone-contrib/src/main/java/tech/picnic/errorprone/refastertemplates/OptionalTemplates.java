@@ -333,13 +333,13 @@ final class OptionalTemplates {
   }
 
   /**
-   * Don't use the redundant chain of {@link Optional#stream()} followed by {@link
-   * Stream#findFirst()}.
+   * Don't use the redundant chain of {@link Optional#stream()} followed by either {@link
+   * Stream#findFirst()} or {@link Stream#findAny()}.
    */
   abstract static class OptionalSkipStreamFindFirst<T> {
     @BeforeTemplate
     Optional<T> before(Optional<T> optional) {
-      return optional.stream().findFirst();
+      return Refaster.anyOf(optional.stream().findFirst(), optional.stream().findAny());
     }
 
     @AfterTemplate
