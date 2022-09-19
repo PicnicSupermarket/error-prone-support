@@ -343,8 +343,8 @@ final class OptionalTemplates {
       return Refaster.anyOf(
           optional.stream().findFirst(),
           optional.stream().findAny(),
-          optional.stream().max(comparator),
-          optional.stream().min(comparator));
+          optional.stream().min(comparator),
+          optional.stream().max(comparator));
     }
 
     @AfterTemplate

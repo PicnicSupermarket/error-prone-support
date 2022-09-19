@@ -106,7 +106,7 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(
         Optional.of("foo").stream().findFirst(),
         Optional.of("bar").stream().findAny(),
-        Optional.of("baz").stream().max(String::compareTo),
-        Optional.of("qux").stream().min(String::compareTo));
+        Optional.of("baz").stream().min(String::compareTo),
+        Optional.of("qux").stream().max(String::compareTo));
   }
 }
