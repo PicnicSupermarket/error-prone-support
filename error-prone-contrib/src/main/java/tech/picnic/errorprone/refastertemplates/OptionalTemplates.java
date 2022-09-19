@@ -9,6 +9,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
@@ -329,6 +330,26 @@ final class OptionalTemplates {
     @AfterTemplate
     Optional<T> after(Optional<T> optional1, Optional<T> optional2) {
       return optional1.or(() -> optional2);
+    }
+  }
+
+  /**
+   * Avoid unnecessary operations on an {@link Optional} that ultimately result in that very same
+   * {@link Optional}.
+   */
+  static final class OptionalIdentity<T> {
+    @BeforeTemplate
+    Optional<T> before(Optional<T> optional, Comparator<? super T> comparator) {
+      return Refaster.anyOf(
+          optional.stream().findFirst(),
+          optional.stream().findAny(),
+          optional.stream().min(comparator),
+          optional.stream().max(comparator));
+    }
+
+    @AfterTemplate
+    Optional<T> after(Optional<T> optional) {
+      return optional;
     }
   }
 

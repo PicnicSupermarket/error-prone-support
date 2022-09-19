@@ -101,4 +101,12 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
         Optional.of("baz").map(Optional::of).orElseGet(() -> Optional.of("qux")),
         Stream.of(Optional.of("quux"), Optional.of("quuz")).flatMap(Optional::stream).findFirst());
   }
+
+  ImmutableSet<Optional<String>> testOptionalIdentity() {
+    return ImmutableSet.of(
+        Optional.of("foo").stream().findFirst(),
+        Optional.of("bar").stream().findAny(),
+        Optional.of("baz").stream().min(String::compareTo),
+        Optional.of("qux").stream().max(String::compareTo));
+  }
 }
