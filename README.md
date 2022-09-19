@@ -39,52 +39,52 @@ it:
 2. Next, edit your `pom.xml` file to add one or more Error Prone Support
    modules to the `annotationProcessorPaths` of the `maven-compiler-plugin`:
 
-```xml
-<build>
-    <pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <annotationProcessorPaths>
-                        <!-- Error Prone itself. -->
-                        <path>
-                            <groupId>com.google.errorprone</groupId>
-                            <artifactId>error_prone_core</artifactId>
-                            <version>${error-prone.version}</version>
-                        </path>
-                        <!-- Error Prone Support's additional bug checkers. -->
-                        <path>
-                            <groupId>tech.picnic.error-prone-support</groupId>
-                            <artifactId>error-prone-contrib</artifactId>
-                            <version>${error-prone-support.version}</version>
-                        </path>
-                        <!-- Error Prone Support's Refaster templates. -->
-                        <path>
-                            <groupId>tech.picnic.error-prone-support</groupId>
-                            <artifactId>refaster-runner</artifactId>
-                            <version>${error-prone-support.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
-                    <compilerArgs>
-                        <arg>
-                            -Xplugin:ErrorProne
-                            <!-- Add other Error Prone flags here. See
-                            https://errorprone.info/docs/flags. -->
-                        </arg>
-                        <arg>-XDcompilePolicy=simple</arg>
-                    </compilerArgs>
-                    <!-- Some checks raise warnings rather than errors. -->
-                    <showWarnings>true</showWarnings>
-                    <!-- Enable this if you'd like to fail your build upon warnings. -->
-                    <!-- <failOnWarning>true</failOnWarning> -->
-                </configuration>
-            </plugin>
-        </plugins>
-    </pluginManagement>
-</build>
-```
+   ```xml
+   <build>
+       <pluginManagement>
+           <plugins>
+               <plugin>
+                   <groupId>org.apache.maven.plugins</groupId>
+                   <artifactId>maven-compiler-plugin</artifactId>
+                   <configuration>
+                       <annotationProcessorPaths>
+                           <!-- Error Prone itself. -->
+                           <path>
+                               <groupId>com.google.errorprone</groupId>
+                               <artifactId>error_prone_core</artifactId>
+                               <version>${error-prone.version}</version>
+                           </path>
+                           <!-- Error Prone Support's additional bug checkers. -->
+                           <path>
+                               <groupId>tech.picnic.error-prone-support</groupId>
+                               <artifactId>error-prone-contrib</artifactId>
+                               <version>${error-prone-support.version}</version>
+                           </path>
+                           <!-- Error Prone Support's Refaster templates. -->
+                           <path>
+                               <groupId>tech.picnic.error-prone-support</groupId>
+                               <artifactId>refaster-runner</artifactId>
+                               <version>${error-prone-support.version}</version>
+                           </path>
+                       </annotationProcessorPaths>
+                       <compilerArgs>
+                           <arg>
+                               -Xplugin:ErrorProne
+                               <!-- Add other Error Prone flags here. See
+                               https://errorprone.info/docs/flags. -->
+                           </arg>
+                           <arg>-XDcompilePolicy=simple</arg>
+                       </compilerArgs>
+                       <!-- Some checks raise warnings rather than errors. -->
+                       <showWarnings>true</showWarnings>
+                       <!-- Enable this if you'd like to fail your build upon warnings. -->
+                       <!-- <failOnWarning>true</failOnWarning> -->
+                   </configuration>
+               </plugin>
+           </plugins>
+       </pluginManagement>
+   </build>
+   ```
 
 <!-- XXX: Reference `oss-parent`'s `pom.xml` once that project also uses Error
 Prone Support. Alternatively reference this project's `self-check` profile
