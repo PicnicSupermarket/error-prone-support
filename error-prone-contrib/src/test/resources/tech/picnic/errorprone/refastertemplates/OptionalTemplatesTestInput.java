@@ -102,7 +102,7 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
         Stream.of(Optional.of("quux"), Optional.of("quuz")).flatMap(Optional::stream).findFirst());
   }
 
-  ImmutableSet<Optional<String>> testOptionalSkipStreamFindFirst() {
+  ImmutableSet<Optional<String>> testOptionalIdentity() {
     return ImmutableSet.of(
         Optional.of("foo").stream().findFirst(), Optional.of("bar").stream().findAny());
   }

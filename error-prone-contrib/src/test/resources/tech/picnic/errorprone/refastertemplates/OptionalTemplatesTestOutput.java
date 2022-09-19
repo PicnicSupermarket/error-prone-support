@@ -99,7 +99,7 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
         Optional.of("quux").or(() -> Optional.of("quuz")));
   }
 
-  ImmutableSet<Optional<String>> testOptionalSkipStreamFindFirst() {
+  ImmutableSet<Optional<String>> testOptionalIdentity() {
     return ImmutableSet.of(Optional.of("foo"), Optional.of("bar"));
   }
 }
