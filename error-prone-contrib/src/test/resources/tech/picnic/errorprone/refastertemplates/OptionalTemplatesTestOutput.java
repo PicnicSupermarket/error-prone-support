@@ -98,4 +98,8 @@ final class OptionalTemplatesTest implements RefasterTemplateTestCase {
         Optional.of("baz").or(() -> Optional.of("qux")),
         Optional.of("quux").or(() -> Optional.of("quuz")));
   }
+
+  Optional<String> testOptionalSkipStreamFindFirst() {
+    return Optional.of("foo");
+  }
 }

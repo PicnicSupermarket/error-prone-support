@@ -332,6 +332,22 @@ final class OptionalTemplates {
     }
   }
 
+  /**
+   * Don't use the redundant chain of {@link Optional#stream()} followed by {@link
+   * Stream#findFirst()}.
+   */
+  abstract static class OptionalSkipStreamFindFirst<T> {
+    @BeforeTemplate
+    Optional<T> before(Optional<T> optional) {
+      return optional.stream().findFirst();
+    }
+
+    @AfterTemplate
+    Optional<T> after(Optional<T> optional) {
+      return optional;
+    }
+  }
+
   // XXX: Add a rule for:
   // `optional.flatMap(x -> pred(x) ? Optional.empty() : Optional.of(x))` and variants.
   // (Maybe canonicalize the inner expression. Maybe we rewrite already.)
