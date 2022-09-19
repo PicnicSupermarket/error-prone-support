@@ -31,7 +31,8 @@ maintainability, consistency and avoidance of common gotchas.
 
 ### Installation
 
-This library is built on top of [Error Prone][error-prone-orig-repo].
+This library is built on top of [Error Prone][error-prone-orig-repo]. To use
+it:
 
 1. First, follow Error Prone's [installation
    guide][error-prone-installation-guide].
@@ -89,7 +90,9 @@ This library is built on top of [Error Prone][error-prone-orig-repo].
 Prone Support. Alternatively reference this project's `self-check` profile
 definition. -->
 
-### Usage
+### Seeing it in action
+
+Consider the following example code:
 
 ```java
 import com.google.common.collect.ImmutableSet;
@@ -107,8 +110,12 @@ public class Example {
 }
 ```
 
+If the [installation](#installation) was successful, then building the above
+code with Maven should yield two compiler warnings:
+
 ```sh
 $ mvn clean install
+...
 [INFO] -------------------------------------------------------------
 [WARNING] COMPILATION WARNING :
 [INFO] -------------------------------------------------------------
@@ -118,22 +125,23 @@ $ mvn clean install
   Did you mean 'return set;' or '@SuppressWarnings("IdentityConversion") public ImmutableSet<Integer> getSet() {'?
 [INFO] 2 warnings
 [INFO] -------------------------------------------------------------
+...
 ```
 
 Two things are kicking in here:
 
-1. A BugChecker to flag unnecessary [identity
-   conversions][bug-checks-identity-conversion].
-2. A Refaster template to write usages of
-   [BigDecimal][refaster-templates-bigdecimal] in a consistent manner as
-   `BigDecimal.ZERO` instead of `BigDecimal.valueOf(0)` or `new BigDecimal(0)`.
+1. An Error Prone [`BugChecker`][error-prone-bugchecker] that flags unnecessary
+   [identity conversions][bug-checks-identity-conversion].
+2. A [Refaster][refaster] template capable of
+   [rewriting][refaster-templates-bigdecimal] expressions of the form
+   `BigDecimal.valueOf(0)` and `new BigDecimal(0)` to `BigDecimal.ZERO`.
 
-Check out all [bug checks][bug-checks] and [refaster
+Be sure to check out all [bug checks][bug-checks] and [refaster
 templates][refaster-templates].
 
 ## 👷 Building
 
-This is a [Maven][maven-central] project, so running `mvn clean install`
+This is a [Maven][maven] project, so running `mvn clean install`
 performs a full clean build. Some relevant flags:
 
 - `-Dverification.warn` makes the warnings and errors emitted by various
@@ -165,7 +173,9 @@ Some other commands one may find relevant:
   the current working directory does not contain unstaged or uncommited
   changes.
 
-When running the project's tests in IntelliJ IDEA, you might see the following error:
+When running the project's tests in IntelliJ IDEA, you might see the following
+error:
+
 ```
 java: exporting a package from system module jdk.compiler is not allowed with --release
 ```
@@ -185,7 +195,7 @@ implementations.
 ## ✍️ Contributing
 
 Want to report or fix a bug, suggest or add a new feature, or improve the
-documentation? That's awesome! Please read our [contributing
+documentation? That's awesome! Please read our [contribution
 guidelines][contributing].
 
 [bug-checks]: error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
@@ -204,10 +214,11 @@ guidelines][contributing].
 [license-badge]: https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
 [license]: LICENSE.md
 [maven-central-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
-[maven-central]: https://maven.apache.org
 [maven-central-search]: https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
+[maven]: https://maven.apache.org
 [pitest]: https://pitest.org
 [pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
-[refaster-templates]: error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/
+[refaster]: https://errorprone.info/docs/refaster
 [refaster-templates-bigdecimal]: error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/BigDecimalTemplates.java
+[refaster-templates]: error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/
