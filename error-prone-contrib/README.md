@@ -240,13 +240,12 @@ Refaster's expressiveness:
   replace SLF4J's `{}` placeholders with `%s` or vice versa. Yet another
   example would be to rewrite `BigDecimal.valueOf("<some-long-value>")` to
   `BigDecimal.valueOf(theParsedLongValue)`.
-- More generally, investigate ways to plug in fully dynamic behavior, e.g.
-  by providing hooks which enable plugging in arbitrary predicates/
-  transformations.
-  The result would be a Refaster/`BugChecker` hybrid. A feature like this could
-  form the basis for many other features listed here. (As a concrete example,
-  consider the ability to reference `com.google.errorprone.matchers.Matcher`
-  implementations.)
+- More generally, investigate ways to plug in fully dynamic behavior, e.g.  by
+  providing hooks which enable plugging in arbitrary
+  predicates/transformations. The result would be a Refaster/`BugChecker`
+  hybrid. A feature like this could form the basis for many other features
+  listed here. (As a concrete example, consider the ability to reference
+  `com.google.errorprone.matchers.Matcher` implementations.)
 - Provide an extension API that enables defining methods or expressions based
   on functional properties. A motivating example is the Java Collections
   framework, which allows many ways to define (im)mutable (un)ordered
