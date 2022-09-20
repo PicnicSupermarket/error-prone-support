@@ -44,7 +44,7 @@ import javax.lang.model.element.Modifier;
     summary =
         "`SortedSet` properties of a `@Value.Immutable` or `@Value.Modifiable` type must be "
             + "annotated with `@Value.NaturalOrder` or `@Value.ReverseOrder`",
-    link = "https://error-prone.picnic.tech/bug_patterns/ImmutablesSortedSetComparator",
+    link = "https://error-prone.picnic.tech/bugpatterns/ImmutablesSortedSetComparator",
     linkType = CUSTOM,
     severity = ERROR,
     tags = LIKELY_ERROR)

@@ -31,7 +31,7 @@ import java.time.LocalTime;
 @BugPattern(
     summary =
         "Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone",
-    link = "https://error-prone.picnic.tech/bug_patterns/TimeZoneUsage",
+    link = "https://error-prone.picnic.tech/bugpatterns/TimeZoneUsage",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)

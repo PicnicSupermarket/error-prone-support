@@ -44,7 +44,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     summary =
         "Ensure invocations of `Comparator#comparing{,Double,Int,Long}` match the return type"
             + " of the provided function",
-    link = "https://error-prone.picnic.tech/bug_patterns/PrimitiveComparison",
+    link = "https://error-prone.picnic.tech/bugpatterns/PrimitiveComparison",
     linkType = CUSTOM,
     severity = WARNING,
     tags = PERFORMANCE)

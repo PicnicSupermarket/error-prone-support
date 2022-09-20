@@ -55,7 +55,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid redundant string conversions when possible",
-    link = "https://error-prone.picnic.tech/bug_patterns/RedundantStringConversion",
+    link = "https://error-prone.picnic.tech/bugpatterns/RedundantStringConversion",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

@@ -50,7 +50,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Where possible, sort annotation array attributes lexicographically",
-    link = "https://error-prone.picnic.tech/bug_patterns/LexicographicalAnnotationAttributeListing",
+    link = "https://error-prone.picnic.tech/bugpatterns/LexicographicalAnnotationAttributeListing",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)

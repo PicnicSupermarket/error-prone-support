@@ -27,7 +27,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "`Refaster#anyOf` should be passed at least two parameters",
-    link = "https://error-prone.picnic.tech/bug_patterns/RefasterAnyOfUsage",
+    link = "https://error-prone.picnic.tech/bugpatterns/RefasterAnyOfUsage",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

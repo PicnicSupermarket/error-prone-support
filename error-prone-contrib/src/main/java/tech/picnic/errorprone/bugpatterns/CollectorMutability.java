@@ -29,7 +29,7 @@ import java.util.stream.Collector;
 @BugPattern(
     summary =
         "Avoid `Collectors.to{List,Map,Set}` in favour of alternatives that emphasize (im)mutability",
-    link = "https://error-prone.picnic.tech/bug_patterns/CollectorMutability",
+    link = "https://error-prone.picnic.tech/bugpatterns/CollectorMutability",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)

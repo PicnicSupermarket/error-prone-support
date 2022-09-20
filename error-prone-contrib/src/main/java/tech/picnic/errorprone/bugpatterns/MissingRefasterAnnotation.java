@@ -25,7 +25,7 @@ import com.sun.source.tree.Tree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "The Refaster template contains a method without any Refaster annotations",
-    link = "https://error-prone.picnic.tech/bug_patterns/MissingRefasterAnnotation",
+    link = "https://error-prone.picnic.tech/bugpatterns/MissingRefasterAnnotation",
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)

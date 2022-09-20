@@ -28,7 +28,7 @@ import java.util.List;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Omit `@Autowired` on a class' sole constructor, as it is redundant",
-    link = "https://error-prone.picnic.tech/bug_patterns/AutowiredConstructor",
+    link = "https://error-prone.picnic.tech/bugpatterns/AutowiredConstructor",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

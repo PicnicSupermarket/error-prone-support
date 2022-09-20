@@ -36,7 +36,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid or clarify identity conversions",
-    link = "https://error-prone.picnic.tech/bug_patterns/IdentityConversion",
+    link = "https://error-prone.picnic.tech/bugpatterns/IdentityConversion",
     linkType = CUSTOM,
     severity = WARNING,
     tags = SIMPLIFICATION)

@@ -51,7 +51,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Defer string concatenation to the invoked method",
-    link = "https://error-prone.picnic.tech/bug_patterns/FormatStringConcatenation",
+    link = "https://error-prone.picnic.tech/bugpatterns/FormatStringConcatenation",
     linkType = CUSTOM,
     severity = WARNING,
     tags = SIMPLIFICATION)

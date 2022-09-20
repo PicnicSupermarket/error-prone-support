@@ -26,7 +26,7 @@ import java.util.Optional;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Empty method can likely be deleted",
-    link = "https://error-prone.picnic.tech/bug_patterns/EmptyMethod",
+    link = "https://error-prone.picnic.tech/bugpatterns/EmptyMethod",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

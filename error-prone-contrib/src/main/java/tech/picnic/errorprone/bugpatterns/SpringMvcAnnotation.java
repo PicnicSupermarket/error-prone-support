@@ -36,7 +36,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @BugPattern(
     summary =
         "Prefer the conciseness of `@{Get,Put,Post,Delete,Patch}Mapping` over `@RequestMapping`",
-    link = "https://error-prone.picnic.tech/bug_patterns/SpringMvcAnnotation",
+    link = "https://error-prone.picnic.tech/bugpatterns/SpringMvcAnnotation",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

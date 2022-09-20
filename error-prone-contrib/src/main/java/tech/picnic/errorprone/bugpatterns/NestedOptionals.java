@@ -25,7 +25,7 @@ import java.util.Optional;
 @BugPattern(
     summary =
         "Avoid nesting `Optional`s inside `Optional`s; the resultant code is hard to reason about",
-    link = "https://error-prone.picnic.tech/bug_patterns/NestedOptionals",
+    link = "https://error-prone.picnic.tech/bugpatterns/NestedOptionals",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)

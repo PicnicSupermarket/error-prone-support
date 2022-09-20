@@ -31,7 +31,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Omit redundant syntax from annotation declarations",
-    link = "https://error-prone.picnic.tech/bug_patterns/CanonicalAnnotationSyntax",
+    link = "https://error-prone.picnic.tech/bugpatterns/CanonicalAnnotationSyntax",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

@@ -52,7 +52,7 @@ import javax.lang.model.element.Name;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer method references over lambda expressions",
-    link = "https://error-prone.picnic.tech/bug_patterns/MethodReferenceUsage",
+    link = "https://error-prone.picnic.tech/bugpatterns/MethodReferenceUsage",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)

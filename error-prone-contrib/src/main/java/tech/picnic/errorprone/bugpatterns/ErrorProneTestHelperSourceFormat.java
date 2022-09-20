@@ -50,7 +50,7 @@ import java.util.Optional;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Test code should follow the Google Java style",
-    link = "https://error-prone.picnic.tech/bug_patterns/ErrorProneTestHelperSourceFormat",
+    link = "https://error-prone.picnic.tech/bugpatterns/ErrorProneTestHelperSourceFormat",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)

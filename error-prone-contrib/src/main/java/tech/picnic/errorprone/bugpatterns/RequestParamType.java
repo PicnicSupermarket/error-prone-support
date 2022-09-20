@@ -25,7 +25,7 @@ import com.sun.source.tree.VariableTree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "`@RequestParam` does not support `ImmutableCollection` and `ImmutableMap` subtypes",
-    link = "https://error-prone.picnic.tech/bug_patterns/RequestParamType",
+    link = "https://error-prone.picnic.tech/bugpatterns/RequestParamType",
     linkType = CUSTOM,
     severity = ERROR,
     tags = LIKELY_ERROR)

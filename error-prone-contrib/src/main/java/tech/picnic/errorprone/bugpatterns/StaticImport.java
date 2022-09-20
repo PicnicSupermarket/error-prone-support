@@ -45,7 +45,7 @@ import java.util.Optional;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Identifier should be statically imported",
-    link = "https://error-prone.picnic.tech/bug_patterns/StaticImport",
+    link = "https://error-prone.picnic.tech/bugpatterns/StaticImport",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

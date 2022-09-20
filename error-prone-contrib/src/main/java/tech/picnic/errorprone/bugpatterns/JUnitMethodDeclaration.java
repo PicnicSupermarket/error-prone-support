@@ -47,7 +47,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "JUnit method declaration can likely be improved",
-    link = "https://error-prone.picnic.tech/bug_patterns/JUnitMethodDeclaration",
+    link = "https://error-prone.picnic.tech/bugpatterns/JUnitMethodDeclaration",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

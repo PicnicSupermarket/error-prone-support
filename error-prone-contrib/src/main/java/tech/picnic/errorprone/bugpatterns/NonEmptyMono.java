@@ -28,7 +28,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid vacuous operations on known non-empty `Mono`s",
-    link = "https://error-prone.picnic.tech/bug_patterns/NonEmptyMono",
+    link = "https://error-prone.picnic.tech/bugpatterns/NonEmptyMono",
     linkType = CUSTOM,
     severity = WARNING,
     tags = SIMPLIFICATION)

@@ -31,7 +31,7 @@ import com.sun.source.tree.MethodInvocationTree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `.isNull()` over `.isEqualTo(null)`",
-    link = "https://error-prone.picnic.tech/bug_patterns/AssertJIsNull",
+    link = "https://error-prone.picnic.tech/bugpatterns/AssertJIsNull",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

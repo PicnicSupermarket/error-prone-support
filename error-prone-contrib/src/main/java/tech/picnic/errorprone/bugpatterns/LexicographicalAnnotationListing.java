@@ -31,7 +31,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Sort annotations lexicographically where possible",
-    link = "https://error-prone.picnic.tech/bug_patterns/LexicographicalAnnotationListing",
+    link = "https://error-prone.picnic.tech/bugpatterns/LexicographicalAnnotationListing",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)

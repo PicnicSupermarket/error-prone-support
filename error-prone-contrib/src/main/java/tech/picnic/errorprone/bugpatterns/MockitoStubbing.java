@@ -26,7 +26,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Don't unnecessarily use Mockito's `eq(...)`",
-    link = "https://error-prone.picnic.tech/bug_patterns/MockitoStubbing",
+    link = "https://error-prone.picnic.tech/bugpatterns/MockitoStubbing",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

@@ -31,7 +31,7 @@ import com.sun.source.tree.Tree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Make sure all `@RequestMapping` method parameters are annotated",
-    link = "https://error-prone.picnic.tech/bug_patterns/RequestMappingAnnotation",
+    link = "https://error-prone.picnic.tech/bugpatterns/RequestMappingAnnotation",
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)

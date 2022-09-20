@@ -33,7 +33,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Make sure SLF4J log statements contain proper placeholders with matching arguments",
-    link = "https://error-prone.picnic.tech/bug_patterns/Slf4jLogStatement",
+    link = "https://error-prone.picnic.tech/bugpatterns/Slf4jLogStatement",
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)

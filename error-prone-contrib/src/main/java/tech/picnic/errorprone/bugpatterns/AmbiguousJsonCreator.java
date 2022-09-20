@@ -26,7 +26,7 @@ import javax.lang.model.element.AnnotationValue;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "`JsonCreator.Mode` should be set for single-argument creators",
-    link = "https://error-prone.picnic.tech/bug_patterns/AmbiguousJsonCreator",
+    link = "https://error-prone.picnic.tech/bugpatterns/AmbiguousJsonCreator",
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)

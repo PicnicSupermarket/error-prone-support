@@ -33,7 +33,7 @@ import com.sun.source.tree.Tree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Scheduled operation must start a new New Relic transaction",
-    link = "https://error-prone.picnic.tech/bug_patterns/ScheduledTransactionTrace",
+    link = "https://error-prone.picnic.tech/bugpatterns/ScheduledTransactionTrace",
     linkType = CUSTOM,
     severity = ERROR,
     tags = LIKELY_ERROR)

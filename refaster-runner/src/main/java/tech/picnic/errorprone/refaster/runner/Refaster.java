@@ -47,7 +47,7 @@ import java.util.stream.Stream;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Write idiomatic code when possible",
-    link = "https://error-prone.picnic.tech/bug_patterns/AmbiguousJsonCreator",
+    link = "https://error-prone.picnic.tech/bugpatterns/AmbiguousJsonCreator",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
