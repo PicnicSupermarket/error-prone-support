@@ -27,8 +27,8 @@ final class ImmutableSetMultimapTemplates {
   private ImmutableSetMultimapTemplates() {}
 
   /** Prefer {@link ImmutableSetMultimap#builder()} over the associated constructor. */
-  // XXX: This drops generic type information, sometimes leading to non-compilable code. Anything
-  // we can do about that?
+  // XXX: This drops generic type information, sometimes leading to non-compilable code. See:
+  // https://github.com/google/error-prone/pull/2706.
   static final class ImmutableSetMultimapBuilder<K, V> {
     @BeforeTemplate
     ImmutableSetMultimap.Builder<K, V> before() {
