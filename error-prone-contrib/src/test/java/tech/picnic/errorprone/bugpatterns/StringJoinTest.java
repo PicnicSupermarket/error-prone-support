@@ -65,7 +65,7 @@ final class StringJoinTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "class A {",
             "  void m() {",
             "    String.format(\"%s\", getClass().getName());",
@@ -79,7 +79,7 @@ final class StringJoinTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "class A {",
             "  void m() {",
             "    String.valueOf(getClass().getName());",

@@ -31,7 +31,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link BugChecker} which flags {@link String#format(String, Object...)} invocations which can
- * be replaced with a {@link String#join(CharSequence, CharSequence...)} or even {@link
+ * be replaced with a {@link String#join(CharSequence, CharSequence...)} or even a {@link
  * String#valueOf} invocation.
  */
 // XXX: What about `v1 + "sep" + v2` and similar expressions? Do we want to rewrite those to
