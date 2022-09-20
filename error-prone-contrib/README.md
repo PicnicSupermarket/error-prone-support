@@ -241,8 +241,8 @@ Refaster's expressiveness:
   example would be to rewrite `BigDecimal.valueOf("<some-long-value>")` to
   `BigDecimal.valueOf(theParsedLongValue)`.
 - More generally, investigate ways to plug in fully dynamic behavior, e.g.
-  by providing hooks which enable plugging in arbitrary predicates/transformations. 
-  The result would be a Refaster/`BugChecker` hybrid. A feature such as this 
+  by providing hooks which enable plugging in arbitrary predicates/transformations.
+  The result would be a Refaster/`BugChecker` hybrid. A feature such as this
   could form the basis for many other features listed here. (As a
   concrete example, consider the ability to reference
   `com.google.errorprone.matchers.Matcher` implementations.)
@@ -250,7 +250,7 @@ Refaster's expressiveness:
   specified functional interface. This would allow rewrites such as
   `Mono.fromCallable(this::doesNotThrowCheckException)` ->
   `Mono.fromSupplier(this::doesNotThrowCheckException)`.
-- Provide an extension API which enables defining methods or expressions based on 
+- Provide an extension API which enables defining methods or expressions based on
   functional properties. A motivating example is the Java Collections
   framework, which allows many ways to define (im)mutable (un)ordered
   collections with(out) duplicates. One could then express things like "match
