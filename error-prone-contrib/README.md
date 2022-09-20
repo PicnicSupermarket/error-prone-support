@@ -216,7 +216,7 @@ Refaster's expressiveness:
   `optional1.or(() -> optional2)` is not behavior preserving if evaluation of
   `optional2` has side-effects.
 - Similarly, certain refactoring operations are only valid if one of the
-  matches expressions is not `@Nullable`. It'd be nice to be able to express
+  matched expressions is not `@Nullable`. It'd be nice to be able to express
   this.
 - Generalize `@Placeholder` support such that rules can reference e.g. "any
   concrete unary method". This would allow refactorings such as
@@ -237,31 +237,31 @@ Refaster's expressiveness:
 - Provide a way to express transformations of compile-time constants. This
   would allow one to e.g. rewrite single-character strings to chars or vice
   versa, thereby accommodating a target API. Another example would be to
-  replace SLF4J's `{}` place holders with `%s` or vice versa. Yet another
+  replace SLF4J's `{}` placeholders with `%s` or vice versa. Yet another
   example would be to rewrite `BigDecimal.valueOf("<some-long-value>")` to
   `BigDecimal.valueOf(theParsedLongValue)`.
-- More generally, investigate ways to plug in in fully dynamic behavior, e.g.
-  by providing hooks using which arbitrary predicates/transformations can be
-  plugged in. The result would be a Refaster/`BugChecker` hybrid. A feature
-  such as this could form the basis for many other features listed here. (As a
+- More generally, investigate ways to plug in fully dynamic behavior, e.g.
+  by providing hooks which enable plugging in arbitrary predicates/transformations. 
+  The result would be a Refaster/`BugChecker` hybrid. A feature such as this 
+  could form the basis for many other features listed here. (As a
   concrete example, consider the ability to reference
   `com.google.errorprone.matchers.Matcher` implementations.)
 - Provide a way to match lambda expressions and method references which match a
   specified functional interface. This would allow rewrites such as
   `Mono.fromCallable(this::doesNotThrowCheckException)` ->
   `Mono.fromSupplier(this::doesNotThrowCheckException)`.
-- Provide an extension API using which methods or expressions can be defined
-  based on functional properties. A motivating example is the Java Collections
+- Provide an extension API which enables defining methods or expressions based on 
+  functional properties. A motivating example is the Java Collections
   framework, which allows many ways to define (im)mutable (un)ordered
   collections with(out) duplicates. One could then express things like "match
-  any method call with collects its inputs into an immutable ordered list". An
+  any method call which collects its inputs into an immutable ordered list". An
   enum analogous to `java.util.stream.Collector.Characteristics` could be used.
   Out of the box JDK and Guava collection factory methods could be classified,
   with the user having the option to extend the classification.
 - Refaster currently unconditionally ignores expressions containing comments.
   Provide two additional modes: (a) match and drop the comments or (b)
   transport the comments to before/after the replaced expression.
-- Extend Refaster to drop imports that come become unnecessary as a result of a
+- Extend Refaster to drop imports that become unnecessary as a result of a
   refactoring. This e.g. allows one to replace a statically import TestNG
   `fail(...)` invocation with a statically imported equivalent AssertJ
   `fail(...)` invocation. (Observe that without an impor cleanup this
@@ -269,7 +269,7 @@ Refaster's expressiveness:
 - Extend the `@Repeated` match semantics such that it also covers non-varargs
   methods. For a motivating example see google/error-prone#568.
 - When matching explicit type references, also match super types. For a
-  motivating example, see the two subtly difference loop definitions in
+  motivating example, see the two subtly different loop definitions in
   `CollectionRemoveAllFromCollectionBlock`.
 - Figure out why Refaster sometimes doesn't match the correct generic overload.
   See the `AssertThatIterableHasOneComparableElementEqualTo` template for an
