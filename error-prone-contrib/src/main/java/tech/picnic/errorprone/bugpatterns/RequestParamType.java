@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
@@ -25,7 +25,8 @@ import com.sun.source.tree.VariableTree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "`@RequestParam` does not support `ImmutableCollection` and `ImmutableMap` subtypes",
-    linkType = NONE,
+    link = "https://error-prone.picnic.tech/bug_patterns/RequestParamType",
+    linkType = CUSTOM,
     severity = ERROR,
     tags = LIKELY_ERROR)
 public final class RequestParamType extends BugChecker implements VariableTreeMatcher {

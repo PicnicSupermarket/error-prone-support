@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 
@@ -25,7 +25,8 @@ import java.util.Optional;
 @BugPattern(
     summary =
         "Avoid nesting `Optional`s inside `Optional`s; the resultant code is hard to reason about",
-    linkType = NONE,
+    link = "https://error-prone.picnic.tech/bug_patterns/NestedOptionals",
+    linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)
 public final class NestedOptionals extends BugChecker implements MethodInvocationTreeMatcher {

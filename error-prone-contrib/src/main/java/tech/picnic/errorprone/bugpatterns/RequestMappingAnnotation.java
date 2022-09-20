@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.ALL;
@@ -31,7 +31,8 @@ import com.sun.source.tree.Tree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Make sure all `@RequestMapping` method parameters are annotated",
-    linkType = NONE,
+    link = "https://error-prone.picnic.tech/bug_patterns/RequestMappingAnnotation",
+    linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)
 public final class RequestMappingAnnotation extends BugChecker implements MethodTreeMatcher {

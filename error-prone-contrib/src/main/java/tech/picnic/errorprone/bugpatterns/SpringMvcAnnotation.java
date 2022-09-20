@@ -1,7 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.base.Verify.verify;
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.function.Predicate.not;
@@ -36,7 +36,8 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @BugPattern(
     summary =
         "Prefer the conciseness of `@{Get,Put,Post,Delete,Patch}Mapping` over `@RequestMapping`",
-    linkType = NONE,
+    link = "https://error-prone.picnic.tech/bug_patterns/SpringMvcAnnotation",
+    linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
 public final class SpringMvcAnnotation extends BugChecker implements AnnotationTreeMatcher {

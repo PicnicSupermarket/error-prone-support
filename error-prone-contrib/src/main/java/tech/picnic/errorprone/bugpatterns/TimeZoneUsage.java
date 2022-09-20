@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 import static com.google.errorprone.matchers.Matchers.allOf;
@@ -31,7 +31,8 @@ import java.time.LocalTime;
 @BugPattern(
     summary =
         "Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone",
-    linkType = NONE,
+    link = "https://error-prone.picnic.tech/bug_patterns/TimeZoneUsage",
+    linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)
 public final class TimeZoneUsage extends BugChecker implements MethodInvocationTreeMatcher {

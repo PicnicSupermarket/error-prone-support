@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
@@ -25,7 +25,8 @@ import com.sun.source.tree.Tree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "The Refaster template contains a method without any Refaster annotations",
-    linkType = NONE,
+    link = "https://error-prone.picnic.tech/bug_patterns/MissingRefasterAnnotation",
+    linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)
 public final class MissingRefasterAnnotation extends BugChecker implements ClassTreeMatcher {

@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.allOf;
@@ -44,7 +44,8 @@ import javax.lang.model.element.Modifier;
     summary =
         "`SortedSet` properties of a `@Value.Immutable` or `@Value.Modifiable` type must be "
             + "annotated with `@Value.NaturalOrder` or `@Value.ReverseOrder`",
-    linkType = NONE,
+    link = "https://error-prone.picnic.tech/bug_patterns/ImmutablesSortedSetComparator",
+    linkType = CUSTOM,
     severity = ERROR,
     tags = LIKELY_ERROR)
 public final class ImmutablesSortedSetComparator extends BugChecker implements MethodTreeMatcher {

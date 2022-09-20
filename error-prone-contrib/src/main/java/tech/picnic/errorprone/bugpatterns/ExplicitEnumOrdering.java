@@ -2,7 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
@@ -36,7 +36,8 @@ import java.util.stream.Stream;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Make sure `Ordering#explicit` lists all of an enum's values",
-    linkType = NONE,
+    link = "https://error-prone.picnic.tech/bug_patterns/ExplicitEnumOrdering",
+    linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)
 public final class ExplicitEnumOrdering extends BugChecker implements MethodInvocationTreeMatcher {

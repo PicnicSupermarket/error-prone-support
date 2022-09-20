@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
@@ -28,7 +28,8 @@ import java.util.List;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Omit `@Autowired` on a class' sole constructor, as it is redundant",
-    linkType = NONE,
+    link = "https://error-prone.picnic.tech/bug_patterns/AutowiredConstructor",
+    linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
 public final class AutowiredConstructor extends BugChecker implements ClassTreeMatcher {
