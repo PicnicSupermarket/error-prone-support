@@ -135,7 +135,7 @@ final class CanonicalAnnotationSyntaxTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/pkg/A.java",
+            "pkg/A.java",
             "package pkg;",
             "",
             "import pkg.A.Foo;",
@@ -206,7 +206,7 @@ final class CanonicalAnnotationSyntaxTest {
             "  A trailingComma3();",
             "}")
         .addOutputLines(
-            "out/pkg/A.java",
+            "pkg/A.java",
             "package pkg;",
             "",
             "import pkg.A.Foo;",
