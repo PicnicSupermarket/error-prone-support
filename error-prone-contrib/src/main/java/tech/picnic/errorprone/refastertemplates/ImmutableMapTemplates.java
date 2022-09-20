@@ -27,7 +27,7 @@ final class ImmutableMapTemplates {
   private ImmutableMapTemplates() {}
 
   /** Prefer {@link ImmutableMap#builder()} over the associated constructor. */
-  // XXX: This drops generic type information, sometimes leading to non-compilable code. See:
+  // XXX: This drops generic type information, sometimes leading to non-compilable code. See
   // https://github.com/google/error-prone/pull/2706.
   static final class ImmutableMapBuilder<K, V> {
     @BeforeTemplate
