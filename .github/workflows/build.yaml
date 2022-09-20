@@ -28,8 +28,8 @@ jobs:
           cache: maven
       - name: Display build environment details
         run: mvn --version
-      - name: Build project against vanilla Error Prone
-        run: mvn -T1C install
+      - name: Build project against vanilla Error Prone, compile Javadoc
+        run: mvn -T1C install javadoc:jar
       - name: Build project with self-check against Error Prone fork
         run: mvn -T1C clean verify -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
       - name: Remove installed project artifacts
