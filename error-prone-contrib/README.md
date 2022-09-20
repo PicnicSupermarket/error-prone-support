@@ -264,7 +264,7 @@ Refaster's expressiveness:
 - Extend Refaster to drop imports that become unnecessary as a result of a
   refactoring. This e.g. allows one to replace a statically import TestNG
   `fail(...)` invocation with a statically imported equivalent AssertJ
-  `fail(...)` invocation. (Observe that without an impor cleanup this
+  `fail(...)` invocation. (Observe that without an import cleanup this
   replacement would cause a compilation error.)
 - Extend the `@Repeated` match semantics such that it also covers non-varargs
   methods. For a motivating example see google/error-prone#568.
