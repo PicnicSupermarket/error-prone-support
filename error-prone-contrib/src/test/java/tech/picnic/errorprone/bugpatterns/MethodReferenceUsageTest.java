@@ -325,7 +325,7 @@ final class MethodReferenceUsageTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import static java.util.Collections.emptyList;",
             "",
             "import java.util.Collections;",
@@ -378,7 +378,7 @@ final class MethodReferenceUsageTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import static java.util.Collections.emptyList;",
             "",
             "import java.util.Collections;",

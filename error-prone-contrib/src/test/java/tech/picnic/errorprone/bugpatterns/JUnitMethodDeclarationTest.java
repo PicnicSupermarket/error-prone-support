@@ -308,7 +308,7 @@ final class JUnitMethodDeclarationTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import static org.junit.jupiter.params.provider.Arguments.arguments;",
             "",
             "import org.junit.jupiter.api.AfterAll;",
@@ -363,7 +363,7 @@ final class JUnitMethodDeclarationTest {
             "  private void testClass() {}",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import static org.junit.jupiter.params.provider.Arguments.arguments;",
             "",
             "import org.junit.jupiter.api.AfterAll;",

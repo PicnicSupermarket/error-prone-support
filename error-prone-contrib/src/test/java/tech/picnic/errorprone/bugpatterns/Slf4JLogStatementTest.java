@@ -98,7 +98,7 @@ final class Slf4JLogStatementTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import org.slf4j.Logger;",
             "import org.slf4j.LoggerFactory;",
             "import org.slf4j.Marker;",
@@ -121,7 +121,7 @@ final class Slf4JLogStatementTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import org.slf4j.Logger;",
             "import org.slf4j.LoggerFactory;",
             "import org.slf4j.Marker;",

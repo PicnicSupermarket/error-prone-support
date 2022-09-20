@@ -120,7 +120,7 @@ final class AmbiguousJsonCreatorTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import com.fasterxml.jackson.annotation.JsonCreator;",
             "",
             "enum A {",
@@ -132,7 +132,7 @@ final class AmbiguousJsonCreatorTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import com.fasterxml.jackson.annotation.JsonCreator;",
             "",
             "enum A {",

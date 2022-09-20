@@ -120,7 +120,7 @@ final class StaticImportTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import static java.util.function.Predicate.not;",
             "",
             "import com.google.common.base.Predicates;",
@@ -190,7 +190,7 @@ final class StaticImportTest {
             "  final class Test {}",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import static com.google.common.collect.ImmutableMap.toImmutableMap;",
             "import static com.google.common.collect.ImmutableSet.toImmutableSet;",
             "import static com.google.errorprone.BugPattern.LinkType.NONE;",

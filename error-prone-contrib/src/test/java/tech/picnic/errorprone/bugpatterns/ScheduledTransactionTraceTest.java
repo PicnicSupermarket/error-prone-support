@@ -47,7 +47,7 @@ final class ScheduledTransactionTraceTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import com.newrelic.api.agent.Trace;",
             "import org.springframework.scheduling.annotation.Scheduled;",
             "",
@@ -68,7 +68,7 @@ final class ScheduledTransactionTraceTest {
             "  void scheduledButImproperlyTraced3() {}",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import com.newrelic.api.agent.Trace;",
             "import org.springframework.scheduling.annotation.Scheduled;",
             "",

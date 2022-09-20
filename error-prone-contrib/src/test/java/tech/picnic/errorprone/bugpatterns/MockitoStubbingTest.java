@@ -57,7 +57,7 @@ final class MockitoStubbingTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import static org.mockito.ArgumentMatchers.eq;",
             "import static org.mockito.Mockito.doAnswer;",
             "import static org.mockito.Mockito.mock;",
@@ -80,7 +80,7 @@ final class MockitoStubbingTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import static org.mockito.ArgumentMatchers.eq;",
             "import static org.mockito.Mockito.doAnswer;",
             "import static org.mockito.Mockito.mock;",
