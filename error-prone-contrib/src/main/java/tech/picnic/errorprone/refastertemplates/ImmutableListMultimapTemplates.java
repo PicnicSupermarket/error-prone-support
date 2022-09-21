@@ -33,8 +33,8 @@ final class ImmutableListMultimapTemplates {
    * Prefer {@link ImmutableListMultimap#builder()} over the associated constructor on constructions
    * that produce a less-specific type.
    */
-  // XXX: This drops generic type information, sometimes leading to non-compilable code. Anything
-  // we can do about that?
+  // XXX: This drops generic type information, sometimes leading to non-compilable code. See
+  // https://github.com/google/error-prone/pull/2706.
   static final class ImmutableListMultimapBuilder<K, V> {
     @BeforeTemplate
     ImmutableMultimap.Builder<K, V> before() {

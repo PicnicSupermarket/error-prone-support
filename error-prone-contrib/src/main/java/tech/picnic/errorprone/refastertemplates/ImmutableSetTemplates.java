@@ -23,8 +23,8 @@ final class ImmutableSetTemplates {
   private ImmutableSetTemplates() {}
 
   /** Prefer {@link ImmutableSet#builder()} over the associated constructor. */
-  // XXX: This drops generic type information, sometimes leading to non-compilable code. Anything
-  // we can do about that?
+  // XXX: This drops generic type information, sometimes leading to non-compilable code. See
+  // https://github.com/google/error-prone/pull/2706.
   static final class ImmutableSetBuilder<T> {
     @BeforeTemplate
     ImmutableSet.Builder<T> before() {
