@@ -118,10 +118,26 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
       ImmutableRangeSet<Integer> ranges = getReplacementRanges(description, endPositions);
       if (ranges.asRanges().stream().noneMatch(replacedSections::intersects)) {
         /* This suggested fix does not overlap with any ("larger") replacement seen until now. Apply it. */
-        state.reportMatch(description);
+        state.reportMatch(withCustomLink(description));
         replacedSections.addAll(ranges);
       }
     }
+  }
+
+  // XXX: Move method down.
+  // XXX: Give method better name.
+  // XXX: Make URL configurable using custom annotation.
+  // XXX: Revisit URL format. Right now this produces
+  // https://error-prone.picnic.tech/refastertemplates/tech.picnic.errorprone.refastertemplates.OptionalTemplates.OptionalOrElseThrow
+  private static Description withCustomLink(Description description) {
+    return Description.builder(
+            description.position,
+            description.checkName,
+            "https://error-prone.picnic.tech/refastertemplates/" + description.checkName,
+            description.severity,
+            description.getMessage())
+        .addAllFixes(description.fixes)
+        .build();
   }
 
   private static int getReplacedCodeSize(Description description, EndPosTable endPositions) {
