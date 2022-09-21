@@ -1,0 +1,10 @@
+# Jekyll generated files
+Gemfile.lock
+.sass-cache
+_site/
+
+# Generated content
+*.bak
+index.md
+bugpatterns/
+refastertemplates/

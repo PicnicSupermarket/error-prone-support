@@ -1,0 +1,28 @@
+# General configuration.
+title: Error Prone Support
+logo: assets/images/favicon.svg
+description: >-
+  Error Prone Support is a Picnic-opinionated extension of Google's Error
+  Prone. It aims to improve code quality, focussing on maintainability,
+  consistency and avoidance of common gotchas.
+
+remote_theme: just-the-docs/just-the-docs
+plugins:
+- jekyll-remote-theme
+
+# Do not deploy through GitHub pages.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+
+permalink: pretty
+
+# Theme configuration.
+search_enabled: true
+heading_anchors: true
+
+nav_external_links:
+  - title: Error Prone Support on GitHub
+    url: https://github.com/PicnicSupermarket/error-prone-support
+    hide_icon: false
