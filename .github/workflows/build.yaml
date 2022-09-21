@@ -2,8 +2,8 @@ name: Build and verify
 on:
   pull_request:
   push:
-    branches:
-      - 'master'
+    branches: [$default-branch]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
