@@ -49,7 +49,6 @@ generate_bugpattern_docs() {
         echo "Generating ${FILENAME}"
         cat > "${FILENAME}" << EOF
 ---
-# Do not modify. This file is generated.
 layout: default
 title: ${NAME}
 parent: Bug Patterns
@@ -91,7 +90,6 @@ generate_refaster_docs() {
         echo "Generating ${FILENAME}"
         cat > "${FILENAME}" << EOF
 ---
-# Do not modify. This file is generated.
 layout: default
 title: ${NAME}
 parent: Refaster templates
@@ -114,7 +112,7 @@ ${EXTRA_DOCS}
 public static void sample() {}
 \`\`\`
 
-<a href="https://github.com/PicnicSupermarket/error-prone-support/blob/master/${TEMPLATE}" class="fs-3 btn external">
+<a href="https://github.com/PicnicSupermarket/error-prone-support/blob/master/${TEMPLATE}" class="fs-3 btn external" target="_blank">
     View source code on GitHub
     <svg viewBox="0 0 24 24" aria-labelledby="svg-external-link-title"><use xlink:href="#svg-external-link"></use></svg>
 </a>

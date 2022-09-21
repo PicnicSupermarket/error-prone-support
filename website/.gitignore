@@ -1,4 +1,5 @@
 # Jekyll generated files
+.jekyll-metadata
 Gemfile.lock
 .sass-cache
 _site/
