@@ -141,11 +141,8 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     for (Description description : byReplacementSize) {
       ImmutableRangeSet<Integer> ranges = getReplacementRanges(description, endPositions);
       if (ranges.asRanges().stream().noneMatch(replacedSections::intersects)) {
-        /*
-         * This suggested fix does not overlap with any ("larger") replacement seen until now, so
-         * apply it.
-         */
-        state.reportMatch(augmentDescription(description, getSeverityOverride(state)));
+        /* This suggested fix does not overlap with any ("larger") replacement seen until now. Apply it. */
+        state.reportMatch(withCustomLink(description));
         replacedSections.addAll(ranges);
       }
     }
