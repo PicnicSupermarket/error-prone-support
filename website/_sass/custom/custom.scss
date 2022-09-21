@@ -1,0 +1,15 @@
+@include mq(lg) {
+    .side-bar {
+        min-width: 400px;
+    }
+
+    .site-nav, .site-header {
+        width: 400px;
+    }
+}    
+
+.external > svg {
+    width: 1rem;
+    height: 1rem;
+    vertical-align: text-bottom;
+}

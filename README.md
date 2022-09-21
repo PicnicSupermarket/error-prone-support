@@ -1,10 +1,10 @@
 <div align="center">
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="logo-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="logo.svg">
-  <img alt="Error Prone Support logo" src="logo.svg" width="50%">
-</picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="logo.svg">
+    <img alt="Error Prone Support logo" src="logo.svg" width="50%">
+  </picture>
+</div>
 
 # Error Prone Support
 
@@ -22,8 +22,6 @@ maintainability, consistency and avoidance of common gotchas.
 
 [Getting started](#-getting-started) • [Building](#-building) •
 [How it works](#-how-it-works) • [Contributing](#%EF%B8%8F-contributing)
-
-</div>
 
 ---
 
