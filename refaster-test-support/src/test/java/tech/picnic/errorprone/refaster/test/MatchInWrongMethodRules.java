@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refaster.test;
 
+import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import tech.picnic.errorprone.refaster.annotation.TemplateCollection;
@@ -8,8 +10,8 @@ import tech.picnic.errorprone.refaster.annotation.TemplateCollection;
 final class MatchInWrongMethodRules {
   private MatchInWrongMethodRules() {}
 
-  // XXX: Test merging/overriding.
-  //  @TemplateCollection(linkPattern = "XXX")
+  // XXX: Demo: nesting overrides.
+  @TemplateCollection(linkPattern = "YYY", severity = ERROR, description = "Foo")
   static final class StringIsEmpty {
     @BeforeTemplate
     boolean before(String string) {
