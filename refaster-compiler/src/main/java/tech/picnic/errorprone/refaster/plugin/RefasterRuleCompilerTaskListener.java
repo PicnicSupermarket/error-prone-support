@@ -1,12 +1,11 @@
 package tech.picnic.errorprone.refaster.plugin;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimaps;
+import com.google.common.collect.ImmutableClassToInstanceMap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.CodeTransformer;
-import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.refaster.RefasterRuleBuilderScanner;
+import com.google.errorprone.refaster.UTemplater;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
@@ -26,12 +25,13 @@ import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.UncheckedIOException;
-import java.util.List;
+import java.lang.annotation.Annotation;
 import java.util.Map;
 import javax.annotation.Nullable;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.StandardLocation;
+import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
 
 /**
  * A variant of {@code com.google.errorprone.refaster.RefasterRuleCompilerAnalyzer} that stores
@@ -58,10 +58,10 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
       return;
     }
 
-    ImmutableListMultimap<ClassTree, CodeTransformer> rules = compileRefasterTemplates(tree);
-    for (Map.Entry<ClassTree, List<CodeTransformer>> rule : Multimaps.asMap(rules).entrySet()) {
+    ImmutableMap<ClassTree, CodeTransformer> rules = compileRefasterTemplates(tree);
+    for (Map.Entry<ClassTree, CodeTransformer> rule : rules.entrySet()) {
       try {
-        outputCodeTransformers(rule.getValue(), getOutputFile(taskEvent, rule.getKey()));
+        outputCodeTransformer(rule.getValue(), getOutputFile(taskEvent, rule.getKey()));
       } catch (IOException e) {
         throw new UncheckedIOException("Failed to persist compiled Refaster templates", e);
       }
@@ -87,18 +87,30 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
         }.scan(tree, null));
   }
 
-  private ImmutableListMultimap<ClassTree, CodeTransformer> compileRefasterTemplates(
-      ClassTree tree) {
-    ListMultimap<ClassTree, CodeTransformer> rules = ArrayListMultimap.create();
-    new TreeScanner<Void, Void>() {
+  private ImmutableMap<ClassTree, CodeTransformer> compileRefasterTemplates(ClassTree tree) {
+    ImmutableMap.Builder<ClassTree, CodeTransformer> rules = ImmutableMap.builder();
+    new TreeScanner<Void, ImmutableClassToInstanceMap<Annotation>>() {
       @Nullable
       @Override
-      public Void visitClass(ClassTree node, @Nullable Void v) {
-        rules.putAll(node, RefasterRuleBuilderScanner.extractRules(node, context));
-        return super.visitClass(node, null);
+      public Void visitClass(ClassTree node, ImmutableClassToInstanceMap<Annotation> annotations) {
+        ImmutableList<CodeTransformer> transformers =
+            ImmutableList.copyOf(RefasterRuleBuilderScanner.extractRules(node, context));
+        if (!transformers.isEmpty()) {
+          rules.put(node, new AnnotatedCompositeCodeTransformer(transformers, annotations));
+        }
+
+        return super.visitClass(
+            node, merge(annotations, UTemplater.annotationMap(ASTHelpers.getSymbol(node))));
       }
-    }.scan(tree, null);
-    return ImmutableListMultimap.copyOf(rules);
+    }.scan(tree, ImmutableClassToInstanceMap.of());
+    return rules.buildOrThrow();
+  }
+
+  // XXX: Move down?
+  private static ImmutableClassToInstanceMap<Annotation> merge(
+      ImmutableClassToInstanceMap<Annotation> left, ImmutableClassToInstanceMap<Annotation> right) {
+    // XXX: Handle duplicates!
+    return ImmutableClassToInstanceMap.<Annotation>builder().putAll(left).putAll(right).build();
   }
 
   private FileObject getOutputFile(TaskEvent taskEvent, ClassTree tree) throws IOException {
@@ -118,10 +130,10 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
     return lastDot < 0 ? flatName : flatName.subSequence(lastDot + 1, flatName.length());
   }
 
-  private static void outputCodeTransformers(List<CodeTransformer> rules, FileObject target)
+  private static void outputCodeTransformer(CodeTransformer codeTransformer, FileObject target)
       throws IOException {
     try (ObjectOutput output = new ObjectOutputStream(target.openOutputStream())) {
-      output.writeObject(CompositeCodeTransformer.compose(rules));
+      output.writeObject(codeTransformer);
     }
   }
 }
