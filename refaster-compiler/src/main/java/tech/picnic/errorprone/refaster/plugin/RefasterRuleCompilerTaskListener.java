@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refaster.plugin;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.refaster.RefasterRuleBuilderScanner;
 import com.google.errorprone.refaster.UTemplater;
@@ -96,7 +97,12 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
         ImmutableList<CodeTransformer> transformers =
             ImmutableList.copyOf(RefasterRuleBuilderScanner.extractRules(node, context));
         if (!transformers.isEmpty()) {
-          rules.put(node, new AnnotatedCompositeCodeTransformer(transformers, annotations));
+          rules.put(
+              node,
+              new AnnotatedCompositeCodeTransformer(
+                  String.valueOf(toSimpleFlatName(ASTHelpers.getSymbol(node))),
+                  transformers,
+                  annotations));
         }
 
         return super.visitClass(
@@ -109,8 +115,10 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
   // XXX: Move down?
   private static ImmutableClassToInstanceMap<Annotation> merge(
       ImmutableClassToInstanceMap<Annotation> left, ImmutableClassToInstanceMap<Annotation> right) {
-    // XXX: Handle duplicates!
-    return ImmutableClassToInstanceMap.<Annotation>builder().putAll(left).putAll(right).build();
+    return ImmutableClassToInstanceMap.<Annotation>builder()
+        .putAll(Maps.filterKeys(left, k -> !right.containsKey(k)))
+        .putAll(right)
+        .build();
   }
 
   private FileObject getOutputFile(TaskEvent taskEvent, ClassTree tree) throws IOException {

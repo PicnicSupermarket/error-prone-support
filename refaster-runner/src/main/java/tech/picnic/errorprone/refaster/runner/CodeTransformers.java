@@ -1,25 +1,18 @@
 package tech.picnic.errorprone.refaster.runner;
 
 import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ResourceInfo;
 import com.google.errorprone.CodeTransformer;
-import com.google.errorprone.DescriptionListener;
-import com.google.errorprone.matchers.Description;
-import com.sun.source.util.TreePath;
-import com.sun.tools.javac.util.Context;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.UncheckedIOException;
-import java.lang.annotation.Annotation;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Supplier;
-import tech.picnic.errorprone.refaster.annotation.TemplateCollection;
 
 /**
  * Scans the classpath for {@value #REFASTER_TEMPLATE_SUFFIX} files and loads them as {@link
@@ -58,12 +51,7 @@ public final class CodeTransformers {
           .ifPresent(
               templateName ->
                   loadCodeTransformer(resource)
-                      .ifPresent(
-                          transformer ->
-                              transformers.put(
-                                  templateName,
-                                  new CodeTransformerDescriptionAdapter(
-                                      templateName, transformer))));
+                      .ifPresent(transformer -> transformers.put(templateName, transformer)));
     }
 
     return transformers.build();
@@ -105,52 +93,6 @@ public final class CodeTransformers {
       return Optional.empty();
     } catch (ClassNotFoundException | IOException e) {
       throw new IllegalStateException("Can't load `CodeTransformer` from " + resource, e);
-    }
-  }
-
-  // XXX: Move to separate file?
-  // XXX: Can we find a better class name?
-  private static final class CodeTransformerDescriptionAdapter implements CodeTransformer {
-    private final String name;
-    private final CodeTransformer delegate;
-
-    private CodeTransformerDescriptionAdapter(String name, CodeTransformer delegate) {
-      this.name = name;
-      this.delegate = delegate;
-    }
-
-    @Override
-    public void apply(TreePath path, Context context, DescriptionListener listener) {
-      TemplateCollection coll = annotations().getInstance(TemplateCollection.class);
-
-      if (coll != null) {
-        coll.linkPattern();
-      }
-
-      delegate.apply(
-          path, context, description -> listener.onDescribed(augmentDescription(description)));
-    }
-
-    @Override
-    public ImmutableClassToInstanceMap<Annotation> annotations() {
-      return delegate.annotations();
-    }
-
-    private Description augmentDescription(Description description) {
-      // XXX: Make this configurable based on a Refaster annotation. (E.g. by allowing users to
-      // specify an optional URL pattern.)
-      // XXX: Replace only the first `$`.
-      // XXX: Review URL format. Currently produced format:
-      // https://error-prone.picnic.tech/refastertemplates/OptionalTemplates#OptionalOrElseThrow
-      // XXX: Test this.
-      return Description.builder(
-              description.position,
-              description.checkName,
-              "https://error-prone.picnic.tech/refastertemplates/" + name.replace('$', '#'),
-              description.severity,
-              "Refactoring opportunity")
-          .addAllFixes(description.fixes)
-          .build();
     }
   }
 }
