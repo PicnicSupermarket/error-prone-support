@@ -19,6 +19,7 @@ import java.lang.annotation.Annotation;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Supplier;
+import tech.picnic.errorprone.refaster.annotation.TemplateCollection;
 
 /**
  * Scans the classpath for {@value #REFASTER_RULE_SUFFIX} files and loads them as {@link
@@ -126,6 +127,12 @@ public final class CodeTransformers {
 
     @Override
     public void apply(TreePath path, Context context, DescriptionListener listener) {
+      TemplateCollection coll = annotations().getInstance(TemplateCollection.class);
+
+      if (coll != null) {
+        coll.linkPattern();
+      }
+
       delegate.apply(
           path, context, description -> listener.onDescribed(augmentDescription(description)));
     }
