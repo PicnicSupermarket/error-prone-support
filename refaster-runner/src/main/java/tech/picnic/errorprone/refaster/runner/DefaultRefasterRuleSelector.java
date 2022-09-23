@@ -15,6 +15,7 @@ import com.google.errorprone.refaster.UAnyOf;
 import com.google.errorprone.refaster.UExpression;
 import com.google.errorprone.refaster.UStatement;
 import com.google.errorprone.refaster.UStaticIdent;
+import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.CompilationUnitTree;
@@ -35,19 +36,63 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 
-/** XXX: Write this */
+/**
+ * A {@link RefasterRuleSelector} algorithm that selects Refaster templates based on the content of
+ * a {@link CompilationUnitTree}.
+ *
+ * <p>The algorithm consists of the following steps:
+ *
+ * <ol>
+ *   <li>Create a {@link Node tree} structure based on the provided Refaster templates.
+ *       <ol>
+ *         <li>Extract all identifiers from the {@link BeforeTemplate}s.
+ *         <li>Sort identifiers lexicographically and collect into a set.
+ *         <li>Add a path to the tree based on the sorted identifiers.
+ *       </ol>
+ *   <li>Extract all identifiers from the {@link CompilationUnitTree} and sort them
+ *       lexicographically.
+ *   <li>Traverse the tree based on the identifiers from the {@link CompilationUnitTree}. Every node
+ *       can contain Refaster templates. Once a node is we found a candidate Refaster template and
+ *       will therefore be added to the list of candidates.
+ * </ol>
+ *
+ * <p>This is an example to explain the algorithm. Consider the templates with identifiers; {@code
+ * T1 = [A, B, C]}, {@code T2 = [B]}, and {@code T3 = [B, D]}. This will result in the following
+ * tree structure:
+ *
+ * <pre>{@code
+ * <root>
+ *    ├── A
+ *    │   └── B
+ *    │       └── C -- T1
+ *    └── B         -- T2
+ *        └── D     -- T3
+ * }</pre>
+ *
+ * // XXX: Add some examples of which source files would match what templates in the tree.
+ *
+ * <p>The tree is traversed based on the identifiers in the {@link CompilationUnitTree}. When a leaf
+ * contains a template and is reached, we can be certain that the identifiers from the {@link
+ * BeforeTemplate} are at least present in the {@link CompilationUnitTree}.
+ *
+ * <p>Since the identifiers are sorted, we can prune parts of the {@link Node tree} while we are
+ * traversing it. Instead of trying to match all Refaster templates against every expression in a
+ * {@link CompilationUnitTree} we now only return a subset of the templates that at least have a
+ * chance of matching. As a result, the performance of Refaster significantly increases.
+ */
+// XXX: AutoService can be removed?
 @AutoService(RefasterRuleSelector.class)
-public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
+public final class DefaultRefasterRuleSelector implements RefasterRuleSelector {
   private final Node<RefasterRule<?, ?>> treeRules;
 
   /**
-   * XXX: Write this
+   * Instantiate the Refaster template selector.
    *
-   * @param refasterRules XXX: Write this
+   * @param refasterRules List of all Refaster templates that are available.
    */
-  public SmartRefasterRuleSelector(List<RefasterRule<?, ?>> refasterRules) {
+  public DefaultRefasterRuleSelector(List<RefasterRule<?, ?>> refasterRules) {
     this.treeRules =
-        Node.create(refasterRules, SmartRefasterRuleSelector::extractTemplateIdentifiers);
+        Node.create(refasterRules, DefaultRefasterRuleSelector::extractTemplateIdentifiers);
   }
 
   @Override
@@ -59,7 +104,7 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
     return candidateRules;
   }
 
-  // XXX: Decompose `RefasterRule`s such that each has exactly one `@BeforeTemplate`.
+  // XXX: Decompose `RefasterRule`s such that each rule has exactly one `@BeforeTemplate`.
   private static ImmutableSet<ImmutableSortedSet<String>> extractTemplateIdentifiers(
       RefasterRule<?, ?> refasterRule) {
     ImmutableSet.Builder<ImmutableSortedSet<String>> results = ImmutableSet.builder();
@@ -168,7 +213,6 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
         return super.visitBinary(node, identifierCombinations);
       }
 
-      // XXX: Rename!
       private void registerOperator(ExpressionTree node, List<Set<String>> identifierCombinations) {
         identifierCombinations.forEach(ids -> ids.add(treeKindToString(node.getKind())));
       }
@@ -202,7 +246,6 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
         .collect(toImmutableSet());
   }
 
-  // XXX: Consider interning!
   private ImmutableSortedSet<String> extractSourceIdentifiers(Tree tree) {
     Set<String> identifiers = new HashSet<>();
 
@@ -259,7 +302,6 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
         return super.visitBinary(node, identifiers);
       }
 
-      // XXX: Rename!
       private void registerOperator(ExpressionTree node, Set<String> identifiers) {
         identifiers.add(treeKindToString(node.getKind()));
       }
@@ -363,8 +405,10 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
 
   private static final class RefasterIntrospection {
     private static final String UCLASS_IDENT_FQCN = "com.google.errorprone.refaster.UClassIdent";
-    private static final String AUTO_VALUE_UCLASS_IDENT_FQCN = "com.google.errorprone.refaster.AutoValue_UClassIdent";
+    private static final String AUTO_VALUE_UCLASS_IDENT_FQCN =
+        "com.google.errorprone.refaster.AutoValue_UClassIdent";
     private static final Class<?> UCLASS_IDENT = getUClassIdentClass();
+    private static final Class<?> UCLASS_AUTOVALUE_IDENT = getUClassIdentAutoValueClass();
     private static final Method METHOD_REFASTER_RULE_BEFORE_TEMPLATES =
         getMethod(RefasterRule.class, "beforeTemplates");
     private static final Method METHOD_EXPRESSION_TEMPLATE_EXPRESSION =
@@ -378,7 +422,7 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
     private static final Method METHOD_UANY_OF_EXPRESSIONS = getMethod(UAnyOf.class, "expressions");
 
     static boolean isUClassIdent(IdentifierTree tree) {
-      return UCLASS_IDENT.equals(tree.getClass());
+      return UCLASS_IDENT.equals(tree.getClass()) || UCLASS_AUTOVALUE_IDENT.equals(tree.getClass());
     }
 
     static ImmutableList<?> getBeforeTemplates(RefasterRule<?, ?> refasterRule) {
@@ -433,6 +477,15 @@ public final class SmartRefasterRuleSelector implements RefasterRuleSelector {
       } catch (ClassNotFoundException e) {
         throw new IllegalStateException(
             String.format("Failed to load class `%s`", UCLASS_IDENT_FQCN), e);
+      }
+    }
+
+    private static Class<?> getUClassIdentAutoValueClass() {
+      try {
+        return RefasterIntrospection.class.getClassLoader().loadClass(AUTO_VALUE_UCLASS_IDENT_FQCN);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException(
+            String.format("Failed to load class `%s`", AUTO_VALUE_UCLASS_IDENT_FQCN), e);
       }
     }
   }
