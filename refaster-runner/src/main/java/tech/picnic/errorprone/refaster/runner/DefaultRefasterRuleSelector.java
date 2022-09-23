@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 
+// XXX: Add some examples of which source files would match what templates in the tree.
+// XXX: Consider this text in general.
 /**
  * A {@link RefasterRuleSelector} algorithm that selects Refaster templates based on the content of
  * a {@link CompilationUnitTree}.
@@ -69,7 +71,6 @@ import javax.annotation.Nullable;
  *        └── D     -- T3
  * }</pre>
  *
- * // XXX: Add some examples of which source files would match what templates in the tree.
  *
  * <p>The tree is traversed based on the identifiers in the {@link CompilationUnitTree}. When a leaf
  * contains a template and is reached, we can be certain that the identifiers from the {@link
@@ -80,8 +81,6 @@ import javax.annotation.Nullable;
  * {@link CompilationUnitTree} we now only return a subset of the templates that at least have a
  * chance of matching. As a result, the performance of Refaster significantly increases.
  */
-// XXX: AutoService can be removed?
-@AutoService(RefasterRuleSelector.class)
 public final class DefaultRefasterRuleSelector implements RefasterRuleSelector {
   private final Node<RefasterRule<?, ?>> treeRules;
 
