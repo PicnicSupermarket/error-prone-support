@@ -17,8 +17,11 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import tech.picnic.errorprone.refaster.annotation.Description;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link Optional}s. */
+@OnlineDocumentation
 final class OptionalRules {
   private OptionalRules() {}
 
@@ -63,7 +66,7 @@ final class OptionalRules {
     }
   }
 
-  /** Prefer {@link Optional#orElseThrow()} over the less explicit {@link Optional#get()}. */
+  @Description("Prefer `Optional#orElseThrow()` over the less explicit `Optional#get()`")
   static final class OptionalOrElseThrow<T> {
     @BeforeTemplate
     @SuppressWarnings("NullAway")
