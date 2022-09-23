@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.refaster.runner;
 
-import static com.google.auto.common.MoreStreams.toImmutableSet;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableRangeSet.toImmutableRangeSet;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
@@ -9,7 +8,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.function.Predicate.not;
-import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.joining;
 
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
@@ -17,8 +16,6 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableRangeSet;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
@@ -35,27 +32,12 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
 import com.google.errorprone.fixes.Replacement;
 import com.google.errorprone.matchers.Description;
-import com.google.errorprone.refaster.BlockTemplate;
-import com.google.errorprone.refaster.ExpressionTemplate;
 import com.google.errorprone.refaster.RefasterRule;
-import com.google.errorprone.refaster.UAnyOf;
-import com.google.errorprone.refaster.UExpression;
-import com.google.errorprone.refaster.UStatement;
-import com.google.errorprone.refaster.UStaticIdent;
 import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.MemberReferenceTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -89,8 +71,10 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
 
   // XXX: Drop this field.
   //  private final CodeTransformer codeTransformer;
-  private final ImmutableListMultimap<ImmutableSet<ImmutableSet<String>>, RefasterRule<?, ?>>
-      refasterRules;
+  //  private final ImmutableListMultimap<ImmutableSet<ImmutableSet<String>>, RefasterRule<?, ?>>
+  //      refasterRules;
+
+  private final List<RefasterRule<?, ?>> refasterRules;
 
   /** Instantiates a default {@link Refaster} instance. */
   public Refaster() {
@@ -107,35 +91,66 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   public Refaster(ErrorProneFlags flags) {
     // XXX: Drop this assignment.
     //    codeTransformer = createCompositeCodeTransformer(flags);
-    refasterRules = loadIndexedRules(flags);
+    //    refasterRules = loadIndexedRules(flags);
+    refasterRules = getRefasterRules(flags);
   }
 
   @CanIgnoreReturnValue
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
-    ImmutableSet<String> sourceIdentifiers = extractSourceIdentifiers(tree);
+    //    ImmutableSet<String> sourceIdentifiers = extractSourceIdentifiers(tree);
+
+    RefasterRuleSelector selector = new SmartRefasterRuleSelector(refasterRules);
+    Set<RefasterRule<?, ?>> candidateRules = selector.selectCandidateRules(tree);
+
+    // XXX: Remove these debug lines
+    String removeThis = candidateRules.stream().map(Object::toString).collect(joining(","));
+    System.out.printf("\nTemplates for %s: \n%s\n", tree.getSourceFile().getName(), removeThis);
 
     /* First, collect all matches. */
+    SubContext context = new SubContext(state.context);
     List<Description> matches = new ArrayList<>();
-    for (Map.Entry<ImmutableSet<ImmutableSet<String>>, Collection<RefasterRule<?, ?>>> e :
-        refasterRules.asMap().entrySet()) {
-      if (e.getKey().stream().anyMatch(sourceIdentifiers::containsAll)) {
-        for (RefasterRule<?, ?> rule : e.getValue()) {
-          try {
-            rule.apply(state.getPath(), new SubContext(state.context), matches::add);
-          } catch (LinkageError le) {
-            // XXX: This `try/catch` block handles the issue described and resolved in
-            // https://github.com/google/error-prone/pull/2456. Drop this block once that change is
-            // released.
-            // XXX: Find a way to identify that we're running Picnic's Error Prone fork and disable
-            // this fallback if so, as it might hide other bugs.
-          }
-        }
+    for (RefasterRule<?, ?> rule : candidateRules) {
+      try {
+        rule.apply(state.getPath(), context, matches::add);
+      } catch (LinkageError e) {
+        // XXX: This `try/catch` block handles the issue described and resolved in
+        // https://github.com/google/error-prone/pull/2456. Drop this block once that change is
+        // released.
+        // XXX: Find a way to identify that we're running Picnic's Error Prone fork and disable this
+        // fallback if so, as it might hide other bugs.
+        return Description.NO_MATCH;
       }
     }
-
     /* Then apply them. */
     applyMatches(matches, ((JCCompilationUnit) tree).endPositions, state);
+
+    /* Any matches were already reported by the code above, directly to the `VisitorState`. */
+    return Description.NO_MATCH;
+
+    //    /* First, collect all matches. */
+    //    List<Description> matches = new ArrayList<>();
+    //    for (Map.Entry<ImmutableSet<ImmutableSet<String>>, Collection<RefasterRule<?, ?>>> e :
+    //        refasterRules.asMap().entrySet()) {
+    //      if (e.getKey().stream().anyMatch(sourceIdentifiers::containsAll)) {
+    //        for (RefasterRule<?, ?> rule : e.getValue()) {
+    //          try {
+    //            rule.apply(state.getPath(), new SubContext(state.context), matches::add);
+    //          } catch (LinkageError le) {
+    //            // XXX: This `try/catch` block handles the issue described and resolved in
+    //            // https://github.com/google/error-prone/pull/2456. Drop this block once that
+    // change is
+    //            // released.
+    //            // XXX: Find a way to identify that we're running Picnic's Error Prone fork and
+    // disable
+    //            // this fallback if so, as it might hide other bugs.
+    //          }
+    //        }
+    //      }
+    //    }
+    //
+    //    /* Then apply them. */
+    //    applyMatches(matches, ((JCCompilationUnit) tree).endPositions, state);
 
     // XXX: drop code below.
     //    /* First, collect all matches. */
@@ -155,7 +170,15 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     //    applyMatches(matches, ((JCCompilationUnit) tree).endPositions, state);
 
     /* Any matches were already reported by the code above, directly to the `VisitorState`. */
-    return Description.NO_MATCH;
+    //    return Description.NO_MATCH;
+  }
+
+  private static List<RefasterRule<?, ?>> getRefasterRules(ErrorProneFlags flags) {
+    CodeTransformer compositeCodeTransformer = createCompositeCodeTransformer(flags);
+
+    List<RefasterRule<?, ?>> refasterRules = new ArrayList<>();
+    collectRefasterRules(compositeCodeTransformer, refasterRules::add);
+    return refasterRules;
   }
 
   private static void collectRefasterRules(
@@ -171,145 +194,146 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     // XXX: Log `else` case?
   }
 
-  private static ImmutableSet<ImmutableSet<String>> extractTemplateIdentifiers(
-      RefasterRule<?, ?> refasterRule) {
-    ImmutableSet.Builder<ImmutableSet<String>> results = ImmutableSet.builder();
-
-    for (Object template : RefasterIntrospection.getBeforeTemplates(refasterRule)) {
-      if (template instanceof ExpressionTemplate) {
-        UExpression expr = RefasterIntrospection.getExpression((ExpressionTemplate) template);
-        results.addAll(extractTemplateIdentifiers(ImmutableList.of(expr)));
-      } else if (template instanceof BlockTemplate) {
-        ImmutableList<UStatement> statements =
-            RefasterIntrospection.getTemplateStatements((BlockTemplate) template);
-        results.addAll(extractTemplateIdentifiers(statements));
-      }
-      // XXX: error if other kind of template.
-    }
-
-    return results.build();
-  }
-
-  // XXX: Consider interning the strings (once a benchmark is in place).
-  private static ImmutableSet<ImmutableSet<String>> extractTemplateIdentifiers(
-      ImmutableList<? extends Tree> trees) {
-    // XXX: Here and below: replace `LinkedHashSet`s with `HashSet` once done.
-    List<Set<String>> identifierCombinations = new ArrayList<>();
-    identifierCombinations.add(new LinkedHashSet<>());
-
-    // XXX: Make the scanner static, then make also its helper methods static.
-    new TreeScanner<Void, List<Set<String>>>() {
-      @Nullable
-      @Override
-      public Void visitIdentifier(IdentifierTree node, List<Set<String>> identifierCombinations) {
-        // XXX: Also include the package name if not `java.lang`; it must be present.
-        if (RefasterIntrospection.isUClassIdent(node)) {
-          for (Set<String> ids : identifierCombinations) {
-            ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(node)));
-            ids.add(getIdentifier(node));
-          }
-        } else if (node instanceof UStaticIdent) {
-          IdentifierTree subNode = RefasterIntrospection.getClassIdent((UStaticIdent) node);
-          for (Set<String> ids : identifierCombinations) {
-            ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(subNode)));
-            ids.add(getIdentifier(subNode));
-            ids.add(node.getName().toString());
-          }
-        }
-
-        return null;
-      }
-
-      private String getIdentifier(IdentifierTree tree) {
-        return getSimpleName(tree.getName().toString());
-      }
-
-      private String getSimpleName(String fcqn) {
-        int index = fcqn.lastIndexOf('.');
-        return index < 0 ? fcqn : fcqn.substring(index + 1);
-      }
-
-      @Nullable
-      @Override
-      public Void visitOther(Tree node, List<Set<String>> identifierCombinations) {
-        if (node instanceof UAnyOf) {
-          List<Set<String>> base = copy(identifierCombinations);
-          identifierCombinations.clear();
-
-          for (UExpression expr : RefasterIntrospection.getExpressions((UAnyOf) node)) {
-            List<Set<String>> branch = copy(base);
-            scan(expr, branch);
-            identifierCombinations.addAll(branch);
-          }
-        }
-
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public Void visitMemberReference(
-          MemberReferenceTree node, List<Set<String>> identifierCombinations) {
-        super.visitMemberReference(node, identifierCombinations);
-        String id = node.getName().toString();
-        identifierCombinations.forEach(ids -> ids.add(id));
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public Void visitMemberSelect(
-          MemberSelectTree node, List<Set<String>> identifierCombinations) {
-        super.visitMemberSelect(node, identifierCombinations);
-        String id = node.getIdentifier().toString();
-        identifierCombinations.forEach(ids -> ids.add(id));
-        return null;
-      }
-
-      private List<Set<String>> copy(List<Set<String>> identifierCombinations) {
-        return identifierCombinations.stream()
-            .map(LinkedHashSet::new)
-            .collect(toCollection(ArrayList::new));
-      }
-    }.scan(trees, identifierCombinations);
-
-    return identifierCombinations.stream().map(ImmutableSet::copyOf).collect(toImmutableSet());
-  }
-
-  // XXX: Consider interning!
-  private static ImmutableSet<String> extractSourceIdentifiers(Tree tree) {
-    // XXX: Replace `LinkedHashSet`s with `HashSet` once done.
-    Set<String> identifiers = new LinkedHashSet<>();
-
-    // XXX: Make the scanner static.
-    new TreeScanner<Void, Set<String>>() {
-      @Nullable
-      @Override
-      public Void visitIdentifier(IdentifierTree node, Set<String> identifiers) {
-        // XXX: Can we be more precise?
-        identifiers.add(node.getName().toString());
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public Void visitMemberReference(MemberReferenceTree node, Set<String> identifiers) {
-        super.visitMemberReference(node, identifiers);
-        identifiers.add(node.getName().toString());
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public Void visitMemberSelect(MemberSelectTree node, Set<String> identifiers) {
-        super.visitMemberSelect(node, identifiers);
-        identifiers.add(node.getIdentifier().toString());
-        return null;
-      }
-    }.scan(tree, identifiers);
-
-    return ImmutableSet.copyOf(identifiers);
-  }
+  //  private static ImmutableSet<ImmutableSet<String>> extractTemplateIdentifiers(
+  //      RefasterRule<?, ?> refasterRule) {
+  //    ImmutableSet.Builder<ImmutableSet<String>> results = ImmutableSet.builder();
+  //
+  //    for (Object template : RefasterIntrospection.getBeforeTemplates(refasterRule)) {
+  //      if (template instanceof ExpressionTemplate) {
+  //        UExpression expr = RefasterIntrospection.getExpression((ExpressionTemplate) template);
+  //        results.addAll(extractTemplateIdentifiers(ImmutableList.of(expr)));
+  //      } else if (template instanceof BlockTemplate) {
+  //        ImmutableList<UStatement> statements =
+  //            RefasterIntrospection.getTemplateStatements((BlockTemplate) template);
+  //        results.addAll(extractTemplateIdentifiers(statements));
+  //      }
+  //      // XXX: error if other kind of template.
+  //    }
+  //
+  //    return results.build();
+  //  }
+  //
+  //  // XXX: Consider interning the strings (once a benchmark is in place).
+  //  private static ImmutableSet<ImmutableSet<String>> extractTemplateIdentifiers(
+  //      ImmutableList<? extends Tree> trees) {
+  //    // XXX: Here and below: replace `LinkedHashSet`s with `HashSet` once done.
+  //    List<Set<String>> identifierCombinations = new ArrayList<>();
+  //    identifierCombinations.add(new LinkedHashSet<>());
+  //
+  //    // XXX: Make the scanner static, then make also its helper methods static.
+  //    new TreeScanner<Void, List<Set<String>>>() {
+  //      @Nullable
+  //      @Override
+  //      public Void visitIdentifier(IdentifierTree node, List<Set<String>> identifierCombinations)
+  // {
+  //        // XXX: Also include the package name if not `java.lang`; it must be present.
+  //        if (RefasterIntrospection.isUClassIdent(node)) {
+  //          for (Set<String> ids : identifierCombinations) {
+  //            ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(node)));
+  //            ids.add(getIdentifier(node));
+  //          }
+  //        } else if (node instanceof UStaticIdent) {
+  //          IdentifierTree subNode = RefasterIntrospection.getClassIdent((UStaticIdent) node);
+  //          for (Set<String> ids : identifierCombinations) {
+  //            ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(subNode)));
+  //            ids.add(getIdentifier(subNode));
+  //            ids.add(node.getName().toString());
+  //          }
+  //        }
+  //
+  //        return null;
+  //      }
+  //
+  //      private String getIdentifier(IdentifierTree tree) {
+  //        return getSimpleName(tree.getName().toString());
+  //      }
+  //
+  //      private String getSimpleName(String fcqn) {
+  //        int index = fcqn.lastIndexOf('.');
+  //        return index < 0 ? fcqn : fcqn.substring(index + 1);
+  //      }
+  //
+  //      @Nullable
+  //      @Override
+  //      public Void visitOther(Tree node, List<Set<String>> identifierCombinations) {
+  //        if (node instanceof UAnyOf) {
+  //          List<Set<String>> base = copy(identifierCombinations);
+  //          identifierCombinations.clear();
+  //
+  //          for (UExpression expr : RefasterIntrospection.getExpressions((UAnyOf) node)) {
+  //            List<Set<String>> branch = copy(base);
+  //            scan(expr, branch);
+  //            identifierCombinations.addAll(branch);
+  //          }
+  //        }
+  //
+  //        return null;
+  //      }
+  //
+  //      @Nullable
+  //      @Override
+  //      public Void visitMemberReference(
+  //          MemberReferenceTree node, List<Set<String>> identifierCombinations) {
+  //        super.visitMemberReference(node, identifierCombinations);
+  //        String id = node.getName().toString();
+  //        identifierCombinations.forEach(ids -> ids.add(id));
+  //        return null;
+  //      }
+  //
+  //      @Nullable
+  //      @Override
+  //      public Void visitMemberSelect(
+  //          MemberSelectTree node, List<Set<String>> identifierCombinations) {
+  //        super.visitMemberSelect(node, identifierCombinations);
+  //        String id = node.getIdentifier().toString();
+  //        identifierCombinations.forEach(ids -> ids.add(id));
+  //        return null;
+  //      }
+  //
+  //      private List<Set<String>> copy(List<Set<String>> identifierCombinations) {
+  //        return identifierCombinations.stream()
+  //            .map(LinkedHashSet::new)
+  //            .collect(toCollection(ArrayList::new));
+  //      }
+  //    }.scan(trees, identifierCombinations);
+  //
+  //    return identifierCombinations.stream().map(ImmutableSet::copyOf).collect(toImmutableSet());
+  //  }
+  //
+  //  // XXX: Consider interning!
+  //  private static ImmutableSet<String> extractSourceIdentifiers(Tree tree) {
+  //    // XXX: Replace `LinkedHashSet`s with `HashSet` once done.
+  //    Set<String> identifiers = new LinkedHashSet<>();
+  //
+  //    // XXX: Make the scanner static.
+  //    new TreeScanner<Void, Set<String>>() {
+  //      @Nullable
+  //      @Override
+  //      public Void visitIdentifier(IdentifierTree node, Set<String> identifiers) {
+  //        // XXX: Can we be more precise?
+  //        identifiers.add(node.getName().toString());
+  //        return null;
+  //      }
+  //
+  //      @Nullable
+  //      @Override
+  //      public Void visitMemberReference(MemberReferenceTree node, Set<String> identifiers) {
+  //        super.visitMemberReference(node, identifiers);
+  //        identifiers.add(node.getName().toString());
+  //        return null;
+  //      }
+  //
+  //      @Nullable
+  //      @Override
+  //      public Void visitMemberSelect(MemberSelectTree node, Set<String> identifiers) {
+  //        super.visitMemberSelect(node, identifiers);
+  //        identifiers.add(node.getIdentifier().toString());
+  //        return null;
+  //      }
+  //    }.scan(tree, identifiers);
+  //
+  //    return ImmutableSet.copyOf(identifiers);
+  //  }
 
   /**
    * Reports a subset of the given matches, such that no two reported matches suggest a replacement
@@ -411,13 +435,13 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   }
 
   // XXX: Move to separate class, in order to be compatible with vanilla EP.
-  private static ImmutableListMultimap<ImmutableSet<ImmutableSet<String>>, RefasterRule<?, ?>>
-      loadIndexedRules(ErrorProneFlags flags) {
-    List<RefasterRule<?, ?>> refasterRules = new ArrayList<>();
-    collectRefasterRules(createCompositeCodeTransformer(flags), refasterRules::add);
-
-    return Multimaps.index(refasterRules, Refaster::extractTemplateIdentifiers);
-  }
+  //  private static ImmutableListMultimap<ImmutableSet<ImmutableSet<String>>, RefasterRule<?, ?>>
+  //      loadIndexedRules(ErrorProneFlags flags) {
+  //    List<RefasterRule<?, ?>> refasterRules = new ArrayList<>();
+  //    collectRefasterRules(createCompositeCodeTransformer(flags), refasterRules::add);
+  //
+  //    return Multimaps.index(refasterRules, Refaster::extractTemplateIdentifiers);
+  //  }
 
   // XXX: instead create an `ImmutableList<RefasterRule>`
   private static CodeTransformer createCompositeCodeTransformer(ErrorProneFlags flags) {
@@ -440,78 +464,81 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
         .collect(toImmutableList());
   }
 
-  private static final class RefasterIntrospection {
-    private static final String UCLASS_IDENT_FQCN = "com.google.errorprone.refaster.UClassIdent";
-    private static final Class<?> UCLASS_IDENT = getUClassIdentClass();
-    private static final Method METHOD_REFASTER_RULE_BEFORE_TEMPLATES =
-        getMethod(RefasterRule.class, "beforeTemplates");
-    private static final Method METHOD_EXPRESSION_TEMPLATE_EXPRESSION =
-        getMethod(ExpressionTemplate.class, "expression");
-    private static final Method METHOD_BLOCK_TEMPLATE_TEMPLATE_STATEMENTS =
-        getMethod(BlockTemplate.class, "templateStatements");
-    private static final Method METHOD_USTATIC_IDENT_CLASS_IDENT =
-        getMethod(UStaticIdent.class, "classIdent");
-    private static final Method METHOD_UCLASS_IDENT_GET_TOP_LEVEL_CLASS =
-        getMethod(UCLASS_IDENT, "getTopLevelClass");
-    private static final Method METHOD_UANY_OF_EXPRESSIONS = getMethod(UAnyOf.class, "expressions");
-
-    static boolean isUClassIdent(IdentifierTree tree) {
-      return UCLASS_IDENT.equals(tree.getClass());
-    }
-
-    static ImmutableList<?> getBeforeTemplates(RefasterRule<?, ?> refasterRule) {
-      return invokeMethod(METHOD_REFASTER_RULE_BEFORE_TEMPLATES, refasterRule);
-    }
-
-    static UExpression getExpression(ExpressionTemplate template) {
-      return invokeMethod(METHOD_EXPRESSION_TEMPLATE_EXPRESSION, template);
-    }
-
-    static ImmutableList<UStatement> getTemplateStatements(BlockTemplate template) {
-      return invokeMethod(METHOD_BLOCK_TEMPLATE_TEMPLATE_STATEMENTS, template);
-    }
-
-    // Actually UClassIdent.
-    static IdentifierTree getClassIdent(UStaticIdent tree) {
-      return invokeMethod(METHOD_USTATIC_IDENT_CLASS_IDENT, tree);
-    }
-
-    // XXX: Make nicer. Or rename the other params.
-    static String getTopLevelClass(IdentifierTree uClassIdent) {
-      return invokeMethod(METHOD_UCLASS_IDENT_GET_TOP_LEVEL_CLASS, uClassIdent);
-    }
-
-    static ImmutableList<UExpression> getExpressions(UAnyOf tree) {
-      return invokeMethod(METHOD_UANY_OF_EXPRESSIONS, tree);
-    }
-
-    @SuppressWarnings({"TypeParameterUnusedInFormals", "unchecked"})
-    private static <T> T invokeMethod(Method method, Object instance) {
-      try {
-        return (T) method.invoke(instance);
-      } catch (IllegalAccessException | InvocationTargetException e) {
-        throw new IllegalStateException(String.format("Failed to invoke method `%s`", method), e);
-      }
-    }
-
-    private static Method getMethod(Class<?> clazz, String methodName) {
-      try {
-        Method method = clazz.getDeclaredMethod(methodName);
-        method.setAccessible(true);
-        return method;
-      } catch (NoSuchMethodException e) {
-        throw new IllegalStateException(
-            String.format("No method `%s` on class `%s`", methodName, clazz.getName()), e);
-      }
-    }
-
-    private static Class<?> getUClassIdentClass() {
-      try {
-        return RefasterIntrospection.class.getClassLoader().loadClass(UCLASS_IDENT_FQCN);
-      } catch (ClassNotFoundException e) {
-        throw new IllegalStateException(
-            String.format("Failed to load class `%s`", UCLASS_IDENT_FQCN), e);
-      }
-    }
-  }
+  //  private static final class RefasterIntrospection {
+  //    private static final String UCLASS_IDENT_FQCN =
+  // "com.google.errorprone.refaster.UClassIdent";
+  //    private static final Class<?> UCLASS_IDENT = getUClassIdentClass();
+  //    private static final Method METHOD_REFASTER_RULE_BEFORE_TEMPLATES =
+  //        getMethod(RefasterRule.class, "beforeTemplates");
+  //    private static final Method METHOD_EXPRESSION_TEMPLATE_EXPRESSION =
+  //        getMethod(ExpressionTemplate.class, "expression");
+  //    private static final Method METHOD_BLOCK_TEMPLATE_TEMPLATE_STATEMENTS =
+  //        getMethod(BlockTemplate.class, "templateStatements");
+  //    private static final Method METHOD_USTATIC_IDENT_CLASS_IDENT =
+  //        getMethod(UStaticIdent.class, "classIdent");
+  //    private static final Method METHOD_UCLASS_IDENT_GET_TOP_LEVEL_CLASS =
+  //        getMethod(UCLASS_IDENT, "getTopLevelClass");
+  //    private static final Method METHOD_UANY_OF_EXPRESSIONS = getMethod(UAnyOf.class,
+  // "expressions");
+  //
+  //    static boolean isUClassIdent(IdentifierTree tree) {
+  //      return UCLASS_IDENT.equals(tree.getClass());
+  //    }
+  //
+  //    static ImmutableList<?> getBeforeTemplates(RefasterRule<?, ?> refasterRule) {
+  //      return invokeMethod(METHOD_REFASTER_RULE_BEFORE_TEMPLATES, refasterRule);
+  //    }
+  //
+  //    static UExpression getExpression(ExpressionTemplate template) {
+  //      return invokeMethod(METHOD_EXPRESSION_TEMPLATE_EXPRESSION, template);
+  //    }
+  //
+  //    static ImmutableList<UStatement> getTemplateStatements(BlockTemplate template) {
+  //      return invokeMethod(METHOD_BLOCK_TEMPLATE_TEMPLATE_STATEMENTS, template);
+  //    }
+  //
+  //    // Actually UClassIdent.
+  //    static IdentifierTree getClassIdent(UStaticIdent tree) {
+  //      return invokeMethod(METHOD_USTATIC_IDENT_CLASS_IDENT, tree);
+  //    }
+  //
+  //    // XXX: Make nicer. Or rename the other params.
+  //    static String getTopLevelClass(IdentifierTree uClassIdent) {
+  //      return invokeMethod(METHOD_UCLASS_IDENT_GET_TOP_LEVEL_CLASS, uClassIdent);
+  //    }
+  //
+  //    static ImmutableList<UExpression> getExpressions(UAnyOf tree) {
+  //      return invokeMethod(METHOD_UANY_OF_EXPRESSIONS, tree);
+  //    }
+  //
+  //    @SuppressWarnings({"TypeParameterUnusedInFormals", "unchecked"})
+  //    private static <T> T invokeMethod(Method method, Object instance) {
+  //      try {
+  //        return (T) method.invoke(instance);
+  //      } catch (IllegalAccessException | InvocationTargetException e) {
+  //        throw new IllegalStateException(String.format("Failed to invoke method `%s`", method),
+  // e);
+  //      }
+  //    }
+  //
+  //    private static Method getMethod(Class<?> clazz, String methodName) {
+  //      try {
+  //        Method method = clazz.getDeclaredMethod(methodName);
+  //        method.setAccessible(true);
+  //        return method;
+  //      } catch (NoSuchMethodException e) {
+  //        throw new IllegalStateException(
+  //            String.format("No method `%s` on class `%s`", methodName, clazz.getName()), e);
+  //      }
+  //    }
+  //
+  //    private static Class<?> getUClassIdentClass() {
+  //      try {
+  //        return RefasterIntrospection.class.getClassLoader().loadClass(UCLASS_IDENT_FQCN);
+  //      } catch (ClassNotFoundException e) {
+  //        throw new IllegalStateException(
+  //            String.format("Failed to load class `%s`", UCLASS_IDENT_FQCN), e);
+  //      }
+  //    }
+  //  }
 }
