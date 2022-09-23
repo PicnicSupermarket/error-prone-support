@@ -6,7 +6,7 @@ labels: bug
 assignees: ""
 ---
 
-**Describe the bug**
+### Describe the bug
 
 <!--A clear and concise description of what the bug or issue is. -->
 
@@ -15,25 +15,25 @@ assignees: ""
 - [ ] I've checked the existing issues to verify this issue is not already
       known.
 
-**Minimal Reproducible Example**
+### Minimal Reproducible Example
 
 <!--A clear and concise description of what happened.
 Please include steps on how to reproduce the issue. -->
 
 <details>
-  <summary>Logs</summary>
+<summary>Logs</summary>
 
-      ```shell
-      your logs here
-      ```
+```shell
+your logs here
+```
 
 </details>
 
-**Expected behavior**
+### Expected behavior
 
 <!--A clear and concise description of what you expected to happen. -->
 
-**Setup:**
+### Setup:
 
 <!-- Please complete the following information: -->
 
@@ -42,6 +42,6 @@ Please include steps on how to reproduce the issue. -->
 - Error Prone version [e.g. `2.15.0`]
 - Error Prone Support version [e.g. `0.2.0`]
 
-**Additional context**
+### Additional context
 
 <!--Provide any other context about the problem here.-->
