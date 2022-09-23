@@ -1,17 +1,17 @@
 package tech.picnic.errorprone.refaster.test;
 
-import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
-
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import tech.picnic.errorprone.refaster.annotation.TemplateCollection;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rule collection to validate reporting of a match occurring in an unexpected place. */
 final class MatchInWrongMethodRules {
   private MatchInWrongMethodRules() {}
 
   // XXX: Demo: nesting overrides.
-  @TemplateCollection(linkPattern = "YYY", severity = ERROR, description = "Foo")
+  //  @Website("YYY")
+  //  @Severity(ERROR)
+  //  @Description("Fooo!")
   static final class StringIsEmpty {
     @BeforeTemplate
     boolean before(String string) {

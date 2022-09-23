@@ -16,6 +16,10 @@
     <dependencies>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
+            <artifactId>error_prone_annotation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_annotations</artifactId>
             <scope>provided</scope>
         </dependency>
