@@ -20,7 +20,7 @@ Before doing so, please:
 
 When filing a bug report, please include the following:
 - Any relevant information about your environment. This should generally
-  include the output of `java -version`, as well as the version of Error Prone
+  include the output of `java --version`, as well as the version of Error Prone
   you're using.
 - A description of what is going on (e.g. logging output, stacktraces).
 - A minimum reproducible example, so that other developers can try to reproduce

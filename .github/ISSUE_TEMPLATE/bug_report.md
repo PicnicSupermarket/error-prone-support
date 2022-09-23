@@ -23,9 +23,9 @@ Please include steps on how to reproduce the issue. -->
 <details>
   <summary>Logs</summary>
 
-```shell
-your logs here
-```
+      ```shell
+      your logs here
+      ```
 
 </details>
 
@@ -33,7 +33,9 @@ your logs here
 
 <!--A clear and concise description of what you expected to happen. -->
 
-**Details setup (please complete the following information):**
+**Setup:**
+
+<!-- Please complete the following information: -->
 
 - Operating system (e.g. MacOS Monterey)
 - Java version (i.e. `java --version`, e.g. `17.0.3`)
