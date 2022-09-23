@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Collections.newSetFromMap;
 import static java.util.stream.Collectors.toCollection;
 
-import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
@@ -70,7 +69,6 @@ import javax.annotation.Nullable;
  *    └── B         -- T2
  *        └── D     -- T3
  * }</pre>
- *
  *
  * <p>The tree is traversed based on the identifiers in the {@link CompilationUnitTree}. When a leaf
  * contains a template and is reached, we can be certain that the identifiers from the {@link
@@ -404,6 +402,9 @@ public final class DefaultRefasterRuleSelector implements RefasterRuleSelector {
 
   private static final class RefasterIntrospection {
     private static final String UCLASS_IDENT_FQCN = "com.google.errorprone.refaster.UClassIdent";
+    // XXX: Probably there is a better way to fix this... For a few BeforeTemplates like
+    // `ImmutableMapBuilder` the algorithm wouldn't match so created this fix for now. About 10
+    // templates would always match.
     private static final String AUTO_VALUE_UCLASS_IDENT_FQCN =
         "com.google.errorprone.refaster.AutoValue_UClassIdent";
     private static final Class<?> UCLASS_IDENT = getUClassIdentClass();
@@ -470,6 +471,7 @@ public final class DefaultRefasterRuleSelector implements RefasterRuleSelector {
       }
     }
 
+    // XXX: This and the next method can be made generic and not be almost 100% duplicate.
     private static Class<?> getUClassIdentClass() {
       try {
         return RefasterIntrospection.class.getClassLoader().loadClass(UCLASS_IDENT_FQCN);
