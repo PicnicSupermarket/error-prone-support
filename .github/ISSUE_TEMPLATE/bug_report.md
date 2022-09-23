@@ -33,7 +33,7 @@ your logs here
 
 <!--A clear and concise description of what you expected to happen. -->
 
-### Setup:
+### Setup
 
 <!-- Please complete the following information: -->
 
