@@ -32,7 +32,6 @@ import javax.annotation.Nullable;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.StandardLocation;
-import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
 
 /**
  * A variant of {@code com.google.errorprone.refaster.RefasterRuleCompilerAnalyzer} that stores
