@@ -1,12 +1,15 @@
 package tech.picnic.errorprone.refaster.plugin;
 
+import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.DescriptionListener;
+import com.google.errorprone.ErrorProneOptions;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.util.Context;
@@ -44,6 +47,12 @@ final class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serial
 
   @Override
   public void apply(TreePath path, Context context, DescriptionListener listener) {
+    // XXX: Reflectively access `suggestionsAsWarnings`!
+    SeverityLevel minSeverity = WARNING;
+    SeverityLevel maxSeverity =
+        context.get(ErrorProneOptions.class).isDropErrorsToWarnings() ? WARNING : ERROR;
+    // XXX: Use these ^ in `getSeverity(...)`.
+
     for (CodeTransformer transformer : transformers) {
       transformer.apply(
           path,
