@@ -1,13 +1,25 @@
 ---
-name: :rocket: Request a new rewrite operation
-about: Suggest a new rewrite operation.
+name: :rocket: Request a new feature
+about: Suggest a new feature.
 title: ''
 labels: 'new feature'
 assignees: ''
 
 ---
 
-**Describe the new rewrite operation**
+### Problem
+
+<!-- Describe the context of the problem you're facing, which you'd like
+    to be solved through Error Prone Support. -->
+
+### Description of the new feature
+
+_Type of improvement_
+- [ ] Support a stylistic preference (bug pattern)
+- [ ] Avoid a common gotcha, or potential problem (bug pattern)
+- [ ] Implement an auto-fix (refaster template)
+
+_Desired change_
 
 <!--
   Provide a clear and concise description of the desired change.
@@ -18,25 +30,28 @@ assignees: ''
     ```java
     // XXX: Write the code to match here.
     ```
+
     to:
     ```java
     // XXX: Write the desired code here.
     ```
 -->
 
-**Motivation**
+### Considerations
 
-<!--
-  Provide a motivation for this request.  
+<!-- Are there considerations for this request.
+     Consider the following questions: -->
 
-  Consider the following questions:
-  - Is the rewrite operation a clea improvement in all cases? 
-  - Are there special cases to consider?
-  - Can we generalize this new rewrite operation?  
--->
+*Is the rewrite operation a clear improvement in all cases?*
 
-**Additional context**
+*Are there special cases to consider?*
 
-<!--
-  Provide any other context about the request here.
--->
+*Can we generalize this new rewrite operation?*
+
+### Participation
+
+- [ ] I'm willing to submit a pull request to implement this improvement.
+
+### Additional context
+
+<!-- Provide any other context about the request here. -->
