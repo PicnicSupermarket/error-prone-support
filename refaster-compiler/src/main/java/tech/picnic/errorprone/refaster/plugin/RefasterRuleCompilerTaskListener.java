@@ -69,25 +69,6 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
     }
   }
 
-  private boolean containsRefasterTemplates(ClassTree tree) {
-    return Boolean.TRUE.equals(
-        new TreeScanner<Boolean, Void>() {
-          @Override
-          public Boolean visitAnnotation(AnnotationTree node, @Nullable Void v) {
-            Symbol sym = ASTHelpers.getSymbol(node);
-            return (sym != null
-                    && sym.getQualifiedName()
-                        .contentEquals(BeforeTemplate.class.getCanonicalName()))
-                || super.visitAnnotation(node, v);
-          }
-
-          @Override
-          public Boolean reduce(Boolean r1, Boolean r2) {
-            return Boolean.TRUE.equals(r1) || Boolean.TRUE.equals(r2);
-          }
-        }.scan(tree, null));
-  }
-
   private ImmutableMap<ClassTree, CodeTransformer> compileRefasterTemplates(ClassTree tree) {
     ImmutableMap.Builder<ClassTree, CodeTransformer> rules = ImmutableMap.builder();
     new TreeScanner<Void, ImmutableClassToInstanceMap<Annotation>>() {
@@ -112,15 +93,6 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
     return rules.buildOrThrow();
   }
 
-  // XXX: Move down?
-  private static ImmutableClassToInstanceMap<Annotation> merge(
-      ImmutableClassToInstanceMap<Annotation> left, ImmutableClassToInstanceMap<Annotation> right) {
-    return ImmutableClassToInstanceMap.<Annotation>builder()
-        .putAll(Maps.filterKeys(left, k -> !right.containsKey(k)))
-        .putAll(right)
-        .build();
-  }
-
   private FileObject getOutputFile(TaskEvent taskEvent, ClassTree tree) throws IOException {
     ClassSymbol symbol = ASTHelpers.getSymbol(tree);
     PackageSymbol enclosingPackage = ASTHelpers.enclosingPackage(symbol);
@@ -130,6 +102,35 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
     JavaFileManager fileManager = context.get(JavaFileManager.class);
     return fileManager.getFileForOutput(
         StandardLocation.CLASS_OUTPUT, packageName, relativeName, taskEvent.getSourceFile());
+  }
+
+  private static boolean containsRefasterTemplates(ClassTree tree) {
+    return Boolean.TRUE.equals(
+        new TreeScanner<Boolean, Void>() {
+          @Override
+          public Boolean visitAnnotation(AnnotationTree node, @Nullable Void unused) {
+            Symbol sym = ASTHelpers.getSymbol(node);
+            return (sym != null
+                    && sym.getQualifiedName()
+                        .contentEquals(BeforeTemplate.class.getCanonicalName()))
+                || super.visitAnnotation(node, unused);
+          }
+
+          @Override
+          public Boolean reduce(Boolean r1, Boolean r2) {
+            return Boolean.TRUE.equals(r1) || Boolean.TRUE.equals(r2);
+          }
+        }.scan(tree, null));
+  }
+
+  /** Merges two annotation mappings, preferring the second over the first in case of conflicts. */
+  private static ImmutableClassToInstanceMap<Annotation> merge(
+      ImmutableClassToInstanceMap<Annotation> first,
+      ImmutableClassToInstanceMap<Annotation> second) {
+    return ImmutableClassToInstanceMap.<Annotation>builder()
+        .putAll(Maps.filterKeys(first, k -> !second.containsKey(k)))
+        .putAll(second)
+        .build();
   }
 
   private static CharSequence toSimpleFlatName(ClassSymbol classSymbol) {
