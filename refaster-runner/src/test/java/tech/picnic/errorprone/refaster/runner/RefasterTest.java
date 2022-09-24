@@ -1,15 +1,23 @@
 package tech.picnic.errorprone.refaster.runner;
 
 import static com.google.common.base.Predicates.containsPattern;
+import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;
+import static java.util.Comparator.naturalOrder;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.CompilationTestHelper;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-// XXX: Verify the reported severity level. There does not appear to be a straightforward way to
-// distinguish these.
-// XXX: Also verify that overriding the severity level works.
 final class RefasterTest {
   private final CompilationTestHelper compilationHelper =
       CompilationTestHelper.newInstance(Refaster.class, getClass())
@@ -52,18 +60,96 @@ final class RefasterTest {
             "  void m() {",
             "    // BUG: Diagnostic matches: StringOfSizeZeroTemplate",
             "    boolean b1 = \"foo\".toCharArray().length == 0;",
-            "",
             "    // BUG: Diagnostic matches: StringOfSizeOneTemplate",
             "    boolean b2 = \"bar\".toCharArray().length == 1;",
-            "",
             "    // BUG: Diagnostic matches: StringOfSizeTwoTemplate",
             "    boolean b3 = \"baz\".toCharArray().length == 2;",
-            "",
             "    // BUG: Diagnostic matches: StringOfSizeThreeTemplate",
             "    boolean b4 = \"qux\".toCharArray().length == 3;",
             "  }",
             "}")
         .doTest();
+  }
+
+  // XXX: Add test cases for `-XepAllSuggestionsAsWarnings`, conditional on the tests running
+  // against the Picnic Error Prone fork.
+  private static Stream<Arguments> reportedSeverityTestCases() {
+    /* { arguments, expectedSeverities } */
+    return Stream.of(
+        arguments(ImmutableList.of(), ImmutableList.of("Note", "warning", "error", "Note")),
+        arguments(ImmutableList.of("-Xep:Refaster:OFF"), ImmutableList.of()),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:DEFAULT"),
+            ImmutableList.of("Note", "warning", "error", "Note")),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:WARN"),
+            ImmutableList.of("warning", "warning", "warning", "warning")),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:ERROR"),
+            ImmutableList.of("error", "error", "error", "error")),
+        arguments(
+            ImmutableList.of("-XepAllErrorsAsWarnings"),
+            ImmutableList.of("Note", "warning", "warning", "Note")),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:OFF", "-XepAllErrorsAsWarnings"), ImmutableList.of()),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllErrorsAsWarnings"),
+            ImmutableList.of("Note", "warning", "warning", "Note")),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:WARN", "-XepAllErrorsAsWarnings"),
+            ImmutableList.of("warning", "warning", "warning", "warning")),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllErrorsAsWarnings"),
+            ImmutableList.of("warning", "warning", "warning", "warning")));
+  }
+
+  /**
+   * Verifies that the bug checker flags the refactoring opportunities with the appropriate severity
+   * level.
+   *
+   * @implNote This test setup is rather awkward, because {@link CompilationTestHelper} does not
+   *     enable direct assertions against the severity of collected diagnostics output.
+   */
+  @MethodSource("reportedSeverityTestCases")
+  @ParameterizedTest
+  void defaultSeverities(
+      ImmutableList<String> arguments, ImmutableList<String> expectedSeverities) {
+    assertThatThrownBy(
+            () ->
+                compilationHelper
+                    .setArgs(arguments)
+                    .addSourceLines(
+                        "A.java",
+                        "class A {",
+                        "  void m() {",
+                        "    boolean[] bs = {",
+                        "      \"foo\".toCharArray().length == 0,",
+                        "      \"bar\".toCharArray().length == 1,",
+                        "      \"baz\".toCharArray().length == 2,",
+                        "      \"qux\".toCharArray().length == 3",
+                        "    };",
+                        "  }",
+                        "}")
+                    .doTest())
+        .isInstanceOf(AssertionError.class)
+        .message()
+        .satisfies(
+            message ->
+                assertThat(extractRefasterSeverities("A.java", message))
+                    .containsExactlyElementsOf(expectedSeverities));
+  }
+
+  private static ImmutableList<String> extractRefasterSeverities(String fileName, String message) {
+    return Pattern.compile(
+            String.format(
+                "/%s:(\\d+): (Note|warning|error): \\[Refaster Rule\\]", Pattern.quote(fileName)))
+        .matcher(message)
+        .results()
+        .collect(
+            toImmutableSortedMap(
+                naturalOrder(), r -> Integer.parseInt(r.group(1)), r -> r.group(2)))
+        .values()
+        .asList();
   }
 
   @Test
