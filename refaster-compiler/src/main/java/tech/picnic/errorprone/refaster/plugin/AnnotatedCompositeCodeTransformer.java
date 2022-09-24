@@ -27,7 +27,9 @@ import java.util.function.Function;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
 
-// XXX: Rename? Use `@AutoValue`?
+// XXX: Can we find a better name for thi class?
+// XXX: Use `@AutoValue`?
+// XXX: Test this class directly. (Right now it's only indirectly tested through `RefasterTest`.)
 final class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serializable {
   private static final long serialVersionUID = 1L;
   private static final Splitter CLASS_NAME_SPLITTER = Splitter.on('.').limit(2);
@@ -63,7 +65,6 @@ final class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serial
 
   private Description augmentDescription(
       Description description, CodeTransformer delegate, Context context) {
-    // XXX: Test this.
     String shortCheckName = getShortCheckName(description.checkName);
     return Description.builder(
             description.position,
