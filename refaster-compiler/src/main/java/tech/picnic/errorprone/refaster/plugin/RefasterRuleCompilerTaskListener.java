@@ -93,19 +93,18 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
       @Nullable
       @Override
       public Void visitClass(ClassTree node, ImmutableClassToInstanceMap<Annotation> annotations) {
+        ClassSymbol symbol = ASTHelpers.getSymbol(node);
+
         ImmutableList<CodeTransformer> transformers =
             ImmutableList.copyOf(RefasterRuleBuilderScanner.extractRules(node, context));
         if (!transformers.isEmpty()) {
           rules.put(
               node,
               new AnnotatedCompositeCodeTransformer(
-                  String.valueOf(toSimpleFlatName(ASTHelpers.getSymbol(node))),
-                  transformers,
-                  annotations));
+                  toPackageName(symbol), transformers, annotations));
         }
 
-        return super.visitClass(
-            node, merge(annotations, UTemplater.annotationMap(ASTHelpers.getSymbol(node))));
+        return super.visitClass(node, merge(annotations, UTemplater.annotationMap(symbol)));
       }
     }.scan(tree, ImmutableClassToInstanceMap.of());
     return rules.buildOrThrow();
@@ -113,13 +112,13 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
 
   private FileObject getOutputFile(TaskEvent taskEvent, ClassTree tree) throws IOException {
     ClassSymbol symbol = ASTHelpers.getSymbol(tree);
-    PackageSymbol enclosingPackage = ASTHelpers.enclosingPackage(symbol);
-    String packageName = enclosingPackage == null ? "" : enclosingPackage.toString();
-    String relativeName = toSimpleFlatName(symbol) + ".refaster";
 
     JavaFileManager fileManager = context.get(JavaFileManager.class);
     return fileManager.getFileForOutput(
-        StandardLocation.CLASS_OUTPUT, packageName, relativeName, taskEvent.getSourceFile());
+        StandardLocation.CLASS_OUTPUT,
+        toPackageName(symbol),
+        toSimpleFlatName(symbol) + ".refaster",
+        taskEvent.getSourceFile());
   }
 
   private static boolean containsRefasterTemplates(ClassTree tree) {
@@ -151,8 +150,13 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
         .build();
   }
 
-  private static CharSequence toSimpleFlatName(ClassSymbol classSymbol) {
-    Name flatName = classSymbol.flatName();
+  private static String toPackageName(ClassSymbol symbol) {
+    PackageSymbol enclosingPackage = ASTHelpers.enclosingPackage(symbol);
+    return enclosingPackage == null ? "" : enclosingPackage.toString();
+  }
+
+  private static CharSequence toSimpleFlatName(ClassSymbol symbol) {
+    Name flatName = symbol.flatName();
     int lastDot = flatName.lastIndexOf((byte) '.');
     return lastDot < 0 ? flatName : flatName.subSequence(lastDot + 1, flatName.length());
   }

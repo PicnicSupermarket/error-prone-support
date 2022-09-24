@@ -12,6 +12,11 @@ final class CodeTransformersTest {
   @Test
   void getAllCodeTransformers() {
     assertThat(CodeTransformers.getAllCodeTransformers().keySet())
-        .containsExactly("FooRules$SimpleRule");
+        .containsExactlyInAnyOrder(
+            "FooTemplates$StringOfSizeZeroTemplate",
+            "FooTemplates$StringOfSizeZeroVerboseTemplate",
+            "FooTemplates$StringOfSizeOneTemplate",
+            "FooTemplates$ExtraGrouping$StringOfSizeTwoTemplate",
+            "FooTemplates$ExtraGrouping$StringOfSizeThreeTemplate");
   }
 }

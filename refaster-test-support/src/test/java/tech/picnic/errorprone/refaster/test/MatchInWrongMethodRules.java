@@ -9,10 +9,6 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class MatchInWrongMethodTemplates {
   private MatchInWrongMethodTemplates() {}
 
-  // XXX: Demo: nesting overrides.
-  //  @Website("YYY")
-  //  @Severity(ERROR)
-  //  @Description("Fooo!")
   static final class StringIsEmpty {
     @BeforeTemplate
     boolean before(String string) {

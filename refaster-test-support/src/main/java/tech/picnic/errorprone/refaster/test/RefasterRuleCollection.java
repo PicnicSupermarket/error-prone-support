@@ -178,8 +178,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
       Set<Replacement> replacements =
           Iterables.getOnlyElement(description.fixes).getReplacements(endPositions);
       for (Replacement replacement : replacements) {
-        ruleMatches.put(
-            replacement.range(), getSubstringAfterFinalDelimiter('.', description.checkName));
+        ruleMatches.put(replacement.range(), extractRefasterTemplateName(description));
       }
     }
 
@@ -224,6 +223,13 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
             ? SuggestedFix.prefixWith(tree, comment)
             : SuggestedFix.postfixWith(tree, '\n' + comment);
     state.reportMatch(describeMatch(tree, fixWithComment));
+  }
+
+  private static String extractRefasterTemplateName(Description description) {
+    String message = description.getRawMessage();
+    int index = message.indexOf(':');
+    checkState(index >= 0, "String '%s' does not contain character '%s'", message, ':');
+    return getSubstringAfterFinalDelimiter('.', message.substring(0, index));
   }
 
   private static String getSubstringAfterFinalDelimiter(char delimiter, String value) {

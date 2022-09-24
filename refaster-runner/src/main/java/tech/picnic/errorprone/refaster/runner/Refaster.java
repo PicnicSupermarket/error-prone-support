@@ -3,7 +3,9 @@ package tech.picnic.errorprone.refaster.runner;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableRangeSet.toImmutableRangeSet;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.function.Predicate.not;
 
@@ -16,9 +18,11 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import com.google.errorprone.BugPattern;
+import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.ErrorProneFlags;
+import com.google.errorprone.ErrorProneOptions.Severity;
 import com.google.errorprone.SubContext;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -33,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -40,8 +45,8 @@ import java.util.stream.Stream;
  * A {@link BugChecker} that flags code that can be simplified using Refaster rules located on the
  * classpath.
  *
- * <p>This checker locates all {@code *.refaster} classpath resources and assumes they contain a
- * {@link CodeTransformer}. The set of loaded Refaster rules can be restricted by passing {@code
+ * <p>This checker locates all {@code *.refaster} classpath resources and assumes that they contain
+ * a {@link CodeTransformer}. The set of loaded Refaster rules can be restricted by passing {@code
  * -XepOpt:Refaster:NamePattern=<someRegex>}.
  */
 @AutoService(BugChecker.class)
@@ -104,7 +109,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
    */
   // XXX: This selection logic solves an issue described in
   // https://github.com/google/error-prone/issues/559. Consider contributing it back upstream.
-  private static void applyMatches(
+  private void applyMatches(
       Iterable<Description> allMatches, EndPosTable endPositions, VisitorState state) {
     ImmutableList<Description> byReplacementSize =
         ImmutableList.sortedCopyOf(
@@ -118,10 +123,50 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
       ImmutableRangeSet<Integer> ranges = getReplacementRanges(description, endPositions);
       if (ranges.asRanges().stream().noneMatch(replacedSections::intersects)) {
         /* This suggested fix does not overlap with any ("larger") replacement seen until now. Apply it. */
-        state.reportMatch(description);
+        state.reportMatch(augmentDescription(description, getSeverityOverride(state)));
         replacedSections.addAll(ranges);
       }
     }
+  }
+
+  private Optional<SeverityLevel> getSeverityOverride(VisitorState state) {
+    return Optional.ofNullable(state.errorProneOptions().getSeverityMap().get(canonicalName()))
+        .flatMap(Refaster::toSeverityLevel);
+  }
+
+  private static Optional<SeverityLevel> toSeverityLevel(Severity severity) {
+    switch (severity) {
+      case DEFAULT:
+        return Optional.empty();
+      case WARN:
+        return Optional.of(WARNING);
+      case ERROR:
+        return Optional.of(ERROR);
+      default:
+        throw new IllegalStateException(String.format("Unsupported severity='%s'", severity));
+    }
+  }
+
+  /**
+   * Updates the given {@link Description}'s details such that {@link
+   * VisitorState#reportMatch(Description)} will override the reported severity only if this bug
+   * checker's severity was explicitly configured.
+   *
+   * <p>The original check name (i.e. the Refaster template name) is prepended to the {@link
+   * Description}'s message. The replacement check name ("Refaster Template") is chosen such that it
+   * is guaranteed not to match any canonical bug checker name (as that could cause {@link
+   * VisitorState#reportMatch(Description)}} to override the reported severity).
+   */
+  private static Description augmentDescription(
+      Description description, Optional<SeverityLevel> severityOverride) {
+    return Description.builder(
+            description.position,
+            "Refaster Rule",
+            description.getLink(),
+            severityOverride.orElse(description.severity),
+            String.format("%s: %s", description.checkName, description.getRawMessage()))
+        .addAllFixes(description.fixes)
+        .build();
   }
 
   private static int getReplacedCodeSize(Description description, EndPosTable endPositions) {
