@@ -4,6 +4,8 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
+import static tech.picnic.errorprone.refaster.annotation.OnlineDocumentation.NESTED_CLASS_URL_PLACEHOLDER;
+import static tech.picnic.errorprone.refaster.annotation.OnlineDocumentation.TOP_LEVEL_CLASS_URL_PLACEHOLDER;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Comparators;
@@ -92,10 +94,10 @@ final class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serial
     String urlPattern =
         getAnnotationValue(OnlineDocumentation.class, OnlineDocumentation::value, delegate, "");
 
-    Iterator<String> nameComponents = CLASS_NAME_SPLITTER.splitToList(checkName).iterator();
+    Iterator<String> nameComponents = CLASS_NAME_SPLITTER.splitToStream(checkName).iterator();
     return urlPattern
-        .replace("${topLevelClassName}", nameComponents.next())
-        .replace("${nestedClassName}", Iterators.getNext(nameComponents, ""));
+        .replace(TOP_LEVEL_CLASS_URL_PLACEHOLDER, nameComponents.next())
+        .replace(NESTED_CLASS_URL_PLACEHOLDER, Iterators.getNext(nameComponents, ""));
   }
 
   private SeverityLevel getSeverity(CodeTransformer delegate) {
