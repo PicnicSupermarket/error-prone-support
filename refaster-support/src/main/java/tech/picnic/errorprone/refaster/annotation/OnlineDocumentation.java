@@ -18,6 +18,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface OnlineDocumentation {
+  // XXX: Introduce placeholder constants!
+
   /**
    * The URL placeholder value that will be replaced with the name of the top-level class in which
    * the annotated Refaster rule is located.
@@ -46,3 +48,4 @@ public @interface OnlineDocumentation {
           + '#'
           + NESTED_CLASS_URL_PLACEHOLDER;
 }
+

@@ -159,8 +159,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
     }
 
     Type lhsType = ASTHelpers.getType(subTree.getExpression());
-    // XXX: Using `.get()` instead of `.orElseThrows()` for demonstration purposes.
-    if (lhsType == null || !expectedInstance.get().equals(lhs)) {
+    if (lhsType == null || !expectedInstance.orElseThrow().equals(lhs)) {
       return Optional.empty();
     }
 
