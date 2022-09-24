@@ -23,7 +23,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 
 /**
- * A {@link BugChecker} which flags {@code @RequestMapping} methods that have one or more parameters
+ * A {@link BugChecker} that flags {@code @RequestMapping} methods that have one or more parameters
  * that appear to lack a relevant annotation.
  *
  * <p>Matched mappings are {@code @{Delete,Get,Patch,Post,Put,Request}Mapping}.

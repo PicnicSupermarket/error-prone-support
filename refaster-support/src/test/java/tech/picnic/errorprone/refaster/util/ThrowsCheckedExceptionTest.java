@@ -79,7 +79,7 @@ final class ThrowsCheckedExceptionTest {
         .doTest();
   }
 
-  /** A {@link BugChecker} which simply delegates to {@link ThrowsCheckedException}. */
+  /** A {@link BugChecker} that simply delegates to {@link ThrowsCheckedException}. */
   @BugPattern(summary = "Flags expressions matched by `ThrowsCheckedException`", severity = ERROR)
   public static final class MatcherTestChecker extends AbstractMatcherTestChecker {
     private static final long serialVersionUID = 1L;

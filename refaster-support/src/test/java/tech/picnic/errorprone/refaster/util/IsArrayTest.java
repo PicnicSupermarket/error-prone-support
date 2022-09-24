@@ -48,7 +48,7 @@ final class IsArrayTest {
         .doTest();
   }
 
-  /** A {@link BugChecker} which simply delegates to {@link IsArray}. */
+  /** A {@link BugChecker} that simply delegates to {@link IsArray}. */
   @BugPattern(summary = "Flags expressions matched by `IsArray`", severity = ERROR)
   public static final class MatcherTestChecker extends AbstractMatcherTestChecker {
     private static final long serialVersionUID = 1L;

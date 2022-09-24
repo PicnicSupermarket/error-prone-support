@@ -38,8 +38,8 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
-/** A {@link BugChecker} which flags non-canonical JUnit method declarations. */
-// XXX: Consider introducing a class-level check which enforces that test classes:
+/** A {@link BugChecker} that flags non-canonical JUnit method declarations. */
+// XXX: Consider introducing a class-level check that enforces that test classes:
 // 1. Are named `*Test` or `Abstract*TestCase`.
 // 2. If not `abstract`, are package-private and don't have public methods and subclasses.
 // 3. Only have private fields.

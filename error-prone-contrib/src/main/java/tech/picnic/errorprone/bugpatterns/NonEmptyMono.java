@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
- * A {@link BugChecker} which flags {@link Mono} operations that are known to be vacuous, given that
+ * A {@link BugChecker} that flags {@link Mono} operations that are known to be vacuous, given that
  * they are invoked on a {@link Mono} that is known not to complete empty.
  */
 @AutoService(BugChecker.class)

@@ -21,7 +21,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.MethodInvocationTree;
 
 /**
- * A {@link BugChecker} which flags AssertJ {@code isEqualTo(null)} checks for simplification.
+ * A {@link BugChecker} that flags AssertJ {@code isEqualTo(null)} checks for simplification.
  *
  * <p>This bug checker cannot be replaced with a simple Refaster template, as the Refaster approach
  * would require that all overloads of {@link org.assertj.core.api.Assert#isEqualTo(Object)} (such

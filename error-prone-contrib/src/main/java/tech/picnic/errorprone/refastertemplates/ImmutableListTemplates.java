@@ -194,7 +194,7 @@ final class ImmutableListTemplates {
    * Prefer {@link ImmutableList#of(Object, Object)} over alternatives that don't communicate the
    * immutability of the resulting list at the type level.
    */
-  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf2<T> {
     @BeforeTemplate
@@ -212,7 +212,7 @@ final class ImmutableListTemplates {
    * Prefer {@link ImmutableList#of(Object, Object, Object)} over alternatives that don't
    * communicate the immutability of the resulting list at the type level.
    */
-  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf3<T> {
     @BeforeTemplate
@@ -230,7 +230,7 @@ final class ImmutableListTemplates {
    * Prefer {@link ImmutableList#of(Object, Object, Object, Object)} over alternatives that don't
    * communicate the immutability of the resulting list at the type level.
    */
-  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf4<T> {
     @BeforeTemplate
@@ -248,7 +248,7 @@ final class ImmutableListTemplates {
    * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object)} over alternatives that
    * don't communicate the immutability of the resulting list at the type level.
    */
-  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf5<T> {
     @BeforeTemplate

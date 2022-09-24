@@ -51,7 +51,7 @@ import java.util.stream.Stream;
 import tech.picnic.errorprone.bugpatterns.util.MethodMatcherFactory;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
-/** A {@link BugChecker} which flags redundant explicit string conversions. */
+/** A {@link BugChecker} that flags redundant explicit string conversions. */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid redundant string conversions when possible",
@@ -224,7 +224,7 @@ public final class RedundantStringConversion extends BugChecker
         .flatMap(args -> tryFix(args.get(index), state, ANY_EXPR));
   }
 
-  // XXX: Write another check which checks that Formatter patterns don't use `{}` and have a
+  // XXX: Write another check that checks that Formatter patterns don't use `{}` and have a
   // matching number of arguments of the appropriate type. Also flag explicit conversions from
   // `Formattable` to string.
   private Optional<SuggestedFix.Builder> tryFixFormatter(
@@ -255,7 +255,7 @@ public final class RedundantStringConversion extends BugChecker
     return tryFixFormatterArguments(arguments, state, ANY_EXPR, ANY_EXPR);
   }
 
-  // XXX: Write another check which checks that SLF4J patterns don't use `%s` and have a matching
+  // XXX: Write another check that checks that SLF4J patterns don't use `%s` and have a matching
   // number of arguments of the appropriate type. Also flag explicit conversions from `Throwable` to
   // string as the last logger argument. Suggests either dropping the conversion or going with
   // `Throwable#getMessage()` instead.

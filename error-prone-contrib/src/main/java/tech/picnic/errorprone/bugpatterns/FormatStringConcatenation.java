@@ -35,8 +35,8 @@ import javax.annotation.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
- * A {@link BugChecker} which flags string concatenations that produce a format string; in such
- * cases the string concatenation should instead be deferred to the invoked method.
+ * A {@link BugChecker} that flags string concatenations that produce a format string; in such cases
+ * the string concatenation should instead be deferred to the invoked method.
  *
  * @implNote This checker is based on the implementation of {@link
  *     com.google.errorprone.bugpatterns.flogger.FloggerStringConcatenation}.
@@ -46,7 +46,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 // should introduce special handling of `Formattable` arguments, as this check would replace a
 // `Formattable#toString` invocation with a `Formattable#formatTo` invocation. But likely that
 // should be considered a bug fix, too.
-// XXX: Introduce a separate check which adds/removes the `Locale` parameter to `String.format`
+// XXX: Introduce a separate check that adds/removes the `Locale` parameter to `String.format`
 // invocations, as necessary.
 @AutoService(BugChecker.class)
 @BugPattern(

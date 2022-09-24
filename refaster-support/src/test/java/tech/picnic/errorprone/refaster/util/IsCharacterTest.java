@@ -48,7 +48,7 @@ final class IsCharacterTest {
         .doTest();
   }
 
-  /** A {@link BugChecker} which simply delegates to {@link IsCharacter}. */
+  /** A {@link BugChecker} that simply delegates to {@link IsCharacter}. */
   @BugPattern(summary = "Flags expressions matched by `IsCharacter`", severity = ERROR)
   public static final class MatcherTestChecker extends AbstractMatcherTestChecker {
     private static final long serialVersionUID = 1L;

@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- * A {@link BugChecker} which flags {@link Ordering#explicit(Object, Object[])}} invocations listing
+ * A {@link BugChecker} that flags {@link Ordering#explicit(Object, Object[])}} invocations listing
  * a subset of an enum type's values.
  */
 @AutoService(BugChecker.class)

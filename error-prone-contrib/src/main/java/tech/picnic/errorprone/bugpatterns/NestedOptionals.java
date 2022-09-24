@@ -20,7 +20,7 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.util.List;
 import java.util.Optional;
 
-/** A {@link BugChecker} which flags nesting of {@link Optional Optionals}. */
+/** A {@link BugChecker} that flags nesting of {@link Optional Optionals}. */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =

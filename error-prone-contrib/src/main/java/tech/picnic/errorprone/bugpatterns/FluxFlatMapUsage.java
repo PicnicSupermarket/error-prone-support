@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 import reactor.core.publisher.Flux;
 
 /**
- * A {@link BugChecker} which flags usages of {@link Flux#flatMap(Function)} and {@link
+ * A {@link BugChecker} that flags usages of {@link Flux#flatMap(Function)} and {@link
  * Flux#flatMapSequential(Function)}.
  *
  * <p>{@link Flux#flatMap(Function)} and {@link Flux#flatMapSequential(Function)} eagerly perform up

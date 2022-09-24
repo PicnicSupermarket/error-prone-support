@@ -24,7 +24,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.util.List;
 
-/** A {@link BugChecker} which flags redundant {@code @Autowired} constructor annotations. */
+/** A {@link BugChecker} that flags redundant {@code @Autowired} constructor annotations. */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Omit `@Autowired` on a class' sole constructor, as it is redundant",

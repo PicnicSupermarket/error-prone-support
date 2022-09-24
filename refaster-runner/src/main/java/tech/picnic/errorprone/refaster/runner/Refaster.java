@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
- * A {@link BugChecker} which flags code which can be simplified using Refaster templates located on
+ * A {@link BugChecker} that flags code which can be simplified using Refaster templates located on
  * the classpath.
  *
  * <p>This checker locates all {@code *.refaster} classpath resources and assumes they contain a

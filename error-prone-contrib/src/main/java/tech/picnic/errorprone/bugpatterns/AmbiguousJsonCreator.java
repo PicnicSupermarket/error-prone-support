@@ -22,7 +22,7 @@ import com.sun.tools.javac.code.Symbol;
 import java.util.Map;
 import javax.lang.model.element.AnnotationValue;
 
-/** A {@link BugChecker} which flags ambiguous {@code @JsonCreator}s in enums. */
+/** A {@link BugChecker} that flags ambiguous {@code @JsonCreator}s in enums. */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "`JsonCreator.Mode` should be set for single-argument creators",

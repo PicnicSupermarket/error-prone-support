@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * A {@link BugChecker} which flags improperly formatted Error Prone test code.
+ * A {@link BugChecker} that flags improperly formatted Error Prone test code.
  *
  * <p>All test code should be formatted in accordance with Google Java Format's {@link Formatter}
  * output, and imports should be ordered according to the {@link Style#GOOGLE Google} style.

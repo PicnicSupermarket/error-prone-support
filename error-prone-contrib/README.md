@@ -64,129 +64,129 @@ The following is a list of checks we'd like to see implemented:
   functionality.
 - A subset of the refactor operations provided by the Eclipse-specific
   [AutoRefactor][autorefactor] plugin.
-- A check which replaces fully qualified types with simple types in contexts
+- A check that replaces fully qualified types with simple types in contexts
   where this does not introduce ambiguity. Should consider both actual Java
   code and Javadoc `@link` references.
-- A check which simplifies array expressions. It would replace empty array
+- A check that simplifies array expressions. It would replace empty array
   expressions of the form `new int[] {}` with `new int[0]`. Statements of the
   form `byte[] arr = new byte[] {'c'};` would be shortened to
   `byte[] arr = {'c'};`.
-- A check which replaces expressions of the form
+- A check that replaces expressions of the form
   `String.format("some prefix %s", arg)` with `"some prefix " + arg`, and
   similar for simple suffixes. Can perhaps be generalized further, though it's
   unclear how far. (Well, a `String.format` call without arguments can
   certainly be simplified, too.)
-- A check which replaces single-character strings with `char`s where possible.
+- A check that replaces single-character strings with `char`s where possible.
   For example as argument to `StringBuilder.append` and in string
   concatenations.
-- A check which adds or removes the first `Locale` argument to `String.format`
+- A check that adds or removes the first `Locale` argument to `String.format`
   and similar calls as necessary. (For example, a format string containing only
   `%s` placeholders is locale-insensitive unless any of the arguments is a
   `Formattable`, while `%f` placeholders _are_ locale-sensitive.)
-- A check which replaces `String.replaceAll` with `String.replace` if the first
+- A check that replaces `String.replaceAll` with `String.replace` if the first
   argument is certainly not a regular expression. And if both arguments are
   single-character strings then the `(char, char)` overload can be invoked
   instead.
-- A check which flags (and ideally, replaces) `try-finally` constructs with
+- A check that flags (and ideally, replaces) `try-finally` constructs with
   equivalent `try-with-resources` constructs.
-- A check which drops exceptions declared in `throws` clauses if they are (a)
+- A check that drops exceptions declared in `throws` clauses if they are (a)
   not actually thrown and (b) the associated method cannot be overridden.
-- A check which tries to statically import certain methods whenever used, if
+- A check that tries to statically import certain methods whenever used, if
   possible. The set of targeted methods should be configurable, but may default
   to e.g. `java.util.Function.identity()`, the static methods exposed by
   `java.util.stream.Collectors` and the various Guava collector factory
   methods.
-- A check which replaces `new Random().someMethod()` calls with
+- A check that replaces `new Random().someMethod()` calls with
   `ThreadLocalRandom.current().someMethod()` calls, to avoid unnecessary
   synchronization.
-- A check which drops `this.` from `this.someMethod()` calls and which
+- A check that drops `this.` from `this.someMethod()` calls and which
   optionally does the same for fields, if no ambiguity arises.
-- A check which replaces `Integer.valueOf` calls with `Integer.parseInt` or
+- A check that replaces `Integer.valueOf` calls with `Integer.parseInt` or
   vice versa in order to prevent auto (un)boxing, and likewise for other number
   types.
-- A check which flags nullable collections.
-- A check which flags `AutoCloseable` resources not managed by a
+- A check that flags nullable collections.
+- A check that flags `AutoCloseable` resources not managed by a
   `try-with-resources` construct. Certain subtypes, such as jOOQ's `DSLContext`
   should be excluded.
-- A check which flags `java.time` methods which implicitly consult the system
+- A check that flags `java.time` methods which implicitly consult the system
   clock, suggesting that a passed-in `Clock` is used instead.
-- A check which flags public methods on public classes which reference
+- A check that flags public methods on public classes which reference
   non-public types. This can cause `IllegalAccessError`s and
   `BootstrapMethodError`s at runtime.
-- A check which swaps the LHS and RHS in expressions of the form
+- A check that swaps the LHS and RHS in expressions of the form
   `nonConstant.equals(someNonNullConstant)`.
-- A check which annotates methods which only throw an exception with
+- A check that annotates methods which only throw an exception with
   `@Deprecated` or ` @DoNotCall`.
-- A check which flags imports from other test classes.
-- A Guava-specific check which replaces `Joiner.join` calls with `String.join`
+- A check that flags imports from other test classes.
+- A Guava-specific check that replaces `Joiner.join` calls with `String.join`
   calls in those cases where the latter is a proper substitute for the former.
-- A Guava-specific check which flags `{Immutable,}Multimap` type usages where
+- A Guava-specific check that flags `{Immutable,}Multimap` type usages where
   `{Immutable,}{List,Set}Multimap` would be more appropriate.
-- A Guava-specific check which rewrites
+- A Guava-specific check that rewrites
   `if (conditional) { throw new IllegalArgumentException(); }` and variants to
   an equivalent `checkArgument` statement. Idem for other exception types.
-- A Guava-specific check which replaces simple anonymous `CacheLoader` subclass
+- A Guava-specific check that replaces simple anonymous `CacheLoader` subclass
   declarations with `CacheLoader.from(someLambda)`.
-- A Spring-specific check which enforces that methods with the `@Scheduled`
+- A Spring-specific check that enforces that methods with the `@Scheduled`
   annotation are also annotated with New Relic's `@Trace` annotation. Such
   methods should ideally not also represent Spring MVC endpoints.
-- A Spring-specific check which enforces that `@RequestMapping` annotations,
+- A Spring-specific check that enforces that `@RequestMapping` annotations,
   when applied to a method, explicitly specify one or more target HTTP methods.
-- A Spring-specific check which looks for classes in which all
-  `@RequestMapping` annotations (and the various aliases) specify the same
-  `path`/`value` property and then moves that path to the class level.
-- A Spring-specific check which flags `@Value("some.property")` annotations, as
+- A Spring-specific check that looks for classes in which all `@RequestMapping`
+  annotations (and the various aliases) specify the same `path`/`value`
+  property and then moves that path to the class level.
+- A Spring-specific check that flags `@Value("some.property")` annotations, as
   these almost certainly should be `@Value("${some.property}")`.
-- A Spring-specific check which drops the `required` attribute from
+- A Spring-specific check that drops the `required` attribute from
   `@RequestParam` annotations when the `defaultValue` attribute is also
   specified.
-- A Spring-specific check which rewrites a class which uses field injection to
+- A Spring-specific check that rewrites a class which uses field injection to
   one which uses constructor injection. This check wouldn't be strictly
   behavior preserving, but could be used for a one-off code base migration.
-- A Spring-specific check which disallows field injection, except in
+- A Spring-specific check that disallows field injection, except in
   `AbstractTestNGSpringContextTests` subclasses. (One known edge case:
   self-injections so that a bean can call itself through an implicit proxy.)
-- A Spring-specific check which verifies that public methods on all classes
+- A Spring-specific check that verifies that public methods on all classes
   whose name matches a certain pattern, e.g. `.*Service`, are annotated
   `@Secured`.
-- A Spring-specific check which verifies that annotations such as
+- A Spring-specific check that verifies that annotations such as
   `@RequestParam` are only present in `@RestController` classes.
-- A Spring-specific check which disallows `@ResponseStatus` on MVC endpoint
+- A Spring-specific check that disallows `@ResponseStatus` on MVC endpoint
   methods, as this prevents communication of error status codes.
-- A Hibernate Validator-specific check which looks for `@UnwrapValidatedValue`
+- A Hibernate Validator-specific check that looks for `@UnwrapValidatedValue`
   usages and migrates the associated constraint annotations to the generic type
   argument to which they (are presumed to) apply.
-- A TestNG-specific check which drops method-level `@Test` annotations if a
+- A TestNG-specific check that drops method-level `@Test` annotations if a
   matching/more specific annotation is already present at the class level.
-- A TestNG-specific check which enforces that all tests are in a group.
-- A TestNG-specific check which flags field assignments in
+- A TestNG-specific check that enforces that all tests are in a group.
+- A TestNG-specific check that flags field assignments in
   `@BeforeMethod`-annotated methods unless the class is annotated
   `@Test(singleThreaded = true)`.
-- A TestNG-specific check which flags usages of the `expectedExceptions`
+- A TestNG-specific check that flags usages of the `expectedExceptions`
   attribute of the `@Test` annotation, pointing to `assertThrows`.
-- A Jongo-specific check which disallows the creation of sparse indices, in
+- A Jongo-specific check that disallows the creation of sparse indices, in
   favour of partial indices.
-- An Immutables-specific check which replaces
+- An Immutables-specific check that replaces
   `checkState`/`IllegalStateException` usages inside a `@Value.Check`-annotated
   method with `checkArgument`/`IllegalArgument`, since the method is invoked
   when a caller attempts to create an immutable instance.
-- An Immutables-specific check which disallows references to collection types
+- An Immutables-specific check that disallows references to collection types
   other than the Guava immutable collections, including inside generic type
   arguments.
-- An SLF4J-specific check which drops or adds a trailing dot from log messages,
+- An SLF4J-specific check that drops or adds a trailing dot from log messages,
   as applicable.
-- A Mockito-specific check which identifies sequences of statements which mock
-  a significant number of methods on a single object with "default data"; such
+- A Mockito-specific check that identifies sequences of statements which mock a
+  significant number of methods on a single object with "default data"; such
   constructions can often benefit from a different type of default answer, such
   as `Answers.RETURNS_MOCKS`.
-- An RxJava-specific check which flags `.toCompletable()` calls on expressions
+- An RxJava-specific check that flags `.toCompletable()` calls on expressions
   of type `Single<Completable>` etc., as most likely
   `.flatMapCompletable(Functions.identity())` was meant instead. Idem for other
   variations.
-- An RxJava-specific check which flags `expr.firstOrError()` calls and suggests
+- An RxJava-specific check that flags `expr.firstOrError()` calls and suggests
   `expr.switchIfEmpty(Single.error(...))`, so that an application-specific
   exception is thrown instead of `NoSuchElementException`.
-- An RxJava-specific check which flags use of `#assertValueSet` without
+- An RxJava-specific check that flags use of `#assertValueSet` without
   `#assertValueCount`, as the former method doesn't do what one may intuitively
   expect it to do. See ReactiveX/RxJava#6151.
 

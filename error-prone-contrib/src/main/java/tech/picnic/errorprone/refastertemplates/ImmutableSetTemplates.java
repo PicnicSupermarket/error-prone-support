@@ -142,7 +142,7 @@ final class ImmutableSetTemplates {
    * Prefer {@link ImmutableSet#of(Object, Object)} over alternatives that don't communicate the
    * immutability of the resulting set at the type level.
    */
-  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf2<T> {
     @BeforeTemplate
@@ -160,7 +160,7 @@ final class ImmutableSetTemplates {
    * Prefer {@link ImmutableSet#of(Object, Object, Object)} over alternatives that don't communicate
    * the immutability of the resulting set at the type level.
    */
-  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf3<T> {
     @BeforeTemplate
@@ -178,7 +178,7 @@ final class ImmutableSetTemplates {
    * Prefer {@link ImmutableSet#of(Object, Object, Object, Object)} over alternatives that don't
    * communicate the immutability of the resulting set at the type level.
    */
-  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf4<T> {
     @BeforeTemplate
@@ -196,7 +196,7 @@ final class ImmutableSetTemplates {
    * Prefer {@link ImmutableSet#of(Object, Object, Object, Object, Object)} over alternatives that
    * don't communicate the immutability of the resulting set at the type level.
    */
-  // XXX: Consider writing an Error Prone check which also flags straightforward
+  // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf5<T> {
     @BeforeTemplate

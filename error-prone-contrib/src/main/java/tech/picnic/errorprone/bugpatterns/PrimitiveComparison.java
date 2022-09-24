@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
- * A {@link BugChecker} which flags {@code Comparator#comparing*} invocations that can be replaced
+ * A {@link BugChecker} that flags {@code Comparator#comparing*} invocations that can be replaced
  * with an equivalent alternative so as to avoid unnecessary (un)boxing.
  */
 // XXX: Add more documentation. Explain how this is useful in the face of refactoring to more
