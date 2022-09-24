@@ -106,8 +106,8 @@ import tech.picnic.errorprone.refaster.util.IsArray;
 // candidates, such as `assertThat(ImmutableSet(foo, bar)).XXX`
 // XXX: Write generic plugin to replace explicit array parameters with varargs (`new int[] {1, 2}`
 // -> `1, 2`).
-// XXX: Write plugin that drops any `.withFailMessage`, which doesn't include a compile-time
-// constant string? Most of these are useless.
+// XXX: Write plugin that drops any `.withFailMessage` that doesn't include a compile-time constant
+// string? Most of these are useless.
 // XXX: Write plugin that identifies `.get().propertyAccess()` and "pushes" this out. Would only
 // nicely work for non-special types, though, cause after `extracting(propertyAccess)` many
 // operations are not available...
