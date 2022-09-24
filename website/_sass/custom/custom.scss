@@ -1,6 +1,6 @@
 // We should override $nav-width(-md), however this breaks code highlighting and other styles.
 // This appears an issue wrt the recommended way:
-// https://just-the-docs.github.io/just-the-docs/docs/customization/#define-a-custom-scheme
+// https://github.com/just-the-docs/just-the-docs/issues/982
 @include mq(lg) {
     .side-bar {
         min-width: 400px;
@@ -9,7 +9,7 @@
     .site-nav, .site-header {
         width: 400px;
     }
-}    
+}
 
 // Add support for external anchor icons.
 .external > svg {
