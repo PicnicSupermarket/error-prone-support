@@ -49,11 +49,11 @@ public final class RefasterTemplateModifiers extends BugChecker
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
     if (!hasMatchingMember(tree, BEFORE_TEMPLATE_METHOD, state)) {
-      /* This is not a Refaster template class. */
+      /* This class does not contain a Refaster template. */
       return Description.NO_MATCH;
     }
 
-    SuggestedFix fix = suggestFix(tree, state);
+    SuggestedFix fix = suggestCanonicalModifiers(tree, state);
     return fix.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fix);
   }
 
@@ -70,13 +70,13 @@ public final class RefasterTemplateModifiers extends BugChecker
             Modifier.PRIVATE,
             Modifier.PROTECTED,
             Modifier.PUBLIC,
-            Modifier.SYNCHRONIZED,
-            Modifier.STATIC)
+            Modifier.STATIC,
+            Modifier.SYNCHRONIZED)
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 
-  private static SuggestedFix suggestFix(ClassTree tree, VisitorState state) {
+  private static SuggestedFix suggestCanonicalModifiers(ClassTree tree, VisitorState state) {
     Set<Modifier> modifiersToAdd = EnumSet.noneOf(Modifier.class);
     Set<Modifier> modifiersToRemove =
         EnumSet.of(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC, Modifier.SYNCHRONIZED);
