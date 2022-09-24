@@ -18,7 +18,21 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface OnlineDocumentation {
-  // XXX: Introduce placeholder constants!
+  /**
+   * The URL placeholder value that will be replaced with the name of the top-level class in which
+   * the annotated Refaster template is located.
+   */
+  String TOP_LEVEL_CLASS_URL_PLACEHOLDER = "${topLevelClassName}";
+  /**
+   * The URL placeholder value that will be replaced with the name of the nested class in which the
+   * annotated Refaster template is located, if applicable.
+   *
+   * <p>If the Refaster template is not defined in a nested class then this placeholder will be
+   * replaced with the empty string. In case the Refaster template is syntactically nested inside a
+   * deeper hierarchy of classes, then this placeholder will be replaced with concatenation of the
+   * names of all these classes (except the top-level class name), separated by dots.
+   */
+  String NESTED_CLASS_URL_PLACEHOLDER = "${nestedClassName}";
 
   /**
    * The URL placeholder value that will be replaced with the name of the top-level class in which
