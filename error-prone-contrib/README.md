@@ -69,13 +69,12 @@ The following is a list of checks we'd like to see implemented:
   code and Javadoc `@link` references.
 - A check that simplifies array expressions. It would replace empty array
   expressions of the form `new int[] {}` with `new int[0]`. Statements of the
-  form `byte[] arr = new byte[] {'c'};` would be shortened to
-  `byte[] arr = {'c'};`.
-- A check that replaces expressions of the form
-  `String.format("some prefix %s", arg)` with `"some prefix " + arg`, and
-  similar for simple suffixes. Can perhaps be generalized further, though it's
-  unclear how far. (Well, a `String.format` call without arguments can
-  certainly be simplified, too.)
+  form `byte[] arr = new byte[] {'c'};` would be shortened to `byte[] arr =
+  {'c'};`.
+- A check that replaces expressions of the form `String.format("some prefix
+  %s", arg)` with `"some prefix " + arg`, and similar for simple suffixes. Can
+  perhaps be generalized further, though it's unclear how far. (Well, a
+  `String.format` call without arguments can certainly be simplified, too.)
 - A check that replaces single-character strings with `char`s where possible.
   For example as argument to `StringBuilder.append` and in string
   concatenations.
@@ -101,8 +100,8 @@ The following is a list of checks we'd like to see implemented:
   synchronization.
 - A check that drops `this.` from `this.someMethod()` calls and which
   optionally does the same for fields, if no ambiguity arises.
-- A check that replaces `Integer.valueOf` calls with `Integer.parseInt` or
-  vice versa in order to prevent auto (un)boxing, and likewise for other number
+- A check that replaces `Integer.valueOf` calls with `Integer.parseInt` or vice
+  versa in order to prevent auto (un)boxing, and likewise for other number
   types.
 - A check that flags nullable collections.
 - A check that flags `AutoCloseable` resources not managed by a
@@ -122,9 +121,9 @@ The following is a list of checks we'd like to see implemented:
   calls in those cases where the latter is a proper substitute for the former.
 - A Guava-specific check that flags `{Immutable,}Multimap` type usages where
   `{Immutable,}{List,Set}Multimap` would be more appropriate.
-- A Guava-specific check that rewrites
-  `if (conditional) { throw new IllegalArgumentException(); }` and variants to
-  an equivalent `checkArgument` statement. Idem for other exception types.
+- A Guava-specific check that rewrites `if (conditional) { throw new
+  IllegalArgumentException(); }` and variants to an equivalent `checkArgument`
+  statement. Idem for other exception types.
 - A Guava-specific check that replaces simple anonymous `CacheLoader` subclass
   declarations with `CacheLoader.from(someLambda)`.
 - A Spring-specific check that enforces that methods with the `@Scheduled`
@@ -212,16 +211,16 @@ Refaster's expressiveness:
 - Some Refaster refactorings (e.g. when dealing with lazy evaluation) are valid
   only when some free parameter is a constant, variable reference or some other
   pure expression. Introduce a way to express such a constraint. For example,
-  rewriting `optional1.map(Optional::of).orElse(optional2)` to
-  `optional1.or(() -> optional2)` is not behavior preserving if evaluation of
-  `optional2` has side effects.
+  rewriting `optional1.map(Optional::of).orElse(optional2)` to `optional1.or(()
+  -> optional2)` is not behavior preserving if evaluation of `optional2` has
+  side effects.
 - Similarly, certain refactoring operations are only valid if one of the
   matched expressions is not `@Nullable`. It'd be nice to be able to express
   this.
 - Generalize `@Placeholder` support such that rules can reference e.g. "any
   concrete unary method". This would allow refactorings such as
-  `Mono.just(constant).flatmap(this::someFun)` ->
-  `Mono.defer(() -> someFun(constant))`.
+  `Mono.just(constant).flatmap(this::someFun)` -> `Mono.defer(() ->
+  someFun(constant))`.
 - Sometimes a Refaster refactoring can cause the resulting code not to compile
   due to a lack of generic type information. Identify and resolve such
   occurrences. For example, an `@AfterTemplate` may require the insertion of a
