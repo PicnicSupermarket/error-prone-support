@@ -8,28 +8,42 @@ import java.lang.annotation.Target;
 /**
  * Signals that a Refaster template or group of Refaster templates comes with online documentation.
  *
- * <p>The provided value may be a full URL, or a URL pattern containing a single {@code %s}
- * placeholder. If a placeholder is present, then it will be replaced with the name of the
- * associated Refaster template any time the URL is rendered.
+ * <p>The provided value may be a full URL, or a URL pattern containing either or both of the
+ * {@value TOP_LEVEL_CLASS_URL_PLACEHOLDER} and {@value NESTED_CLASS_URL_PLACEHOLDER} placeholders.
  *
  * <p>By default it is assumed that the Refaster template(s) are documented on the Error Prone
  * Support website. Annotations on nested classes override the documentation URL associated with any
  * enclosing class.
  */
-// XXX: The documentation is misleading, in that the generated anchor isn't mentioned.
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface OnlineDocumentation {
-  // XXX: Introduce placeholder constants!
+  /**
+   * The URL placeholder value that will be replaced with the name of the top-level class in which
+   * the annotated Refaster template is located.
+   */
+  String TOP_LEVEL_CLASS_URL_PLACEHOLDER = "${topLevelClassName}";
+  /**
+   * The URL placeholder value that will be replaced with the name of the nested class in which the
+   * annotated Refaster template is located, if applicable.
+   *
+   * <p>If the Refaster template is not defined in a nested class then this placeholder will be
+   * replaced with the empty string. In case the Refaster template is syntactically nested inside a
+   * deeper hierarchy of classes, then this placeholder will be replaced with concatenation of the
+   * names of all these classes (except the top-level class name), separated by dots.
+   */
+  String NESTED_CLASS_URL_PLACEHOLDER = "${nestedClassName}";
 
   /**
    * The URL or URL pattern of the website at which the annotated Refaster template(s) are
    * documented.
    *
-   * @return A non-{@code null} string.
+   * @return A non-{@code null} string, optionally containing the {@value
+   *     TOP_LEVEL_CLASS_URL_PLACEHOLDER} and {@value NESTED_CLASS_URL_PLACEHOLDER} placeholders.
    */
-  // XXX: This default is Error Prone Support-specific. Appropriate? (The alternative is to repeat
-  // this URL pattern in many places.) If we drop this, also update the class documentation.
   String value() default
-      "https://error-prone.picnic.tech/refastertemplates/${topLevelClassName}#${nestedClassName}";
+      "https://error-prone.picnic.tech/refastertemplates/"
+          + TOP_LEVEL_CLASS_URL_PLACEHOLDER
+          + '#'
+          + NESTED_CLASS_URL_PLACEHOLDER;
 }
