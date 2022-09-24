@@ -135,7 +135,7 @@ final class ImmutableMapTemplates {
     abstract V valueFunction(@MayOptionallyUse E element);
 
     // XXX: We could add variants in which the entry is created some other way, but we have another
-    // rule which covers canonicalization to `Map.entry`.
+    // rule that covers canonicalization to `Map.entry`.
     @BeforeTemplate
     ImmutableMap<K, V> before(Stream<E> stream) {
       return stream

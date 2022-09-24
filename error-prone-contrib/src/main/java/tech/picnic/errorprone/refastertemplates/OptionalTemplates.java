@@ -166,7 +166,7 @@ final class OptionalTemplates {
   }
 
   /**
-   * Prefer {@link Optional#map} over a {@link Optional#flatMap} which wraps the result of a
+   * Prefer {@link Optional#map} over a {@link Optional#flatMap}, which wraps the result of a
    * transformation in an {@link Optional}; the former operation transforms {@code null} to {@link
    * Optional#empty()}.
    */

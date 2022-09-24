@@ -30,7 +30,7 @@ import org.testng.Assert;
 import org.testng.Assert.ThrowingRunnable;
 
 /**
- * Refaster templates which replace TestNG assertions with equivalent AssertJ assertions.
+ * Refaster templates that replace TestNG assertions with equivalent AssertJ assertions.
  *
  * <p>Some of the classes below have TestNG {@code @BeforeTemplate}s that reference wildcard type
  * bounds ({@code <?>}), while the associated AssertJ {@code @AfterTemplate}s reference stricter
@@ -39,9 +39,9 @@ import org.testng.Assert.ThrowingRunnable;
  * the appropriate (more specific) types _will_ be inferred properly when plugged into AssertJ's
  * API.
  *
- * <p>The following is an example of a TestNG statement which would not be rewritten if it weren't
+ * <p>The following is an example of a TestNG statement, which would not be rewritten if it weren't
  * for the wildcard matching (note that the type parameters of the map on the right-hand side will
- * be inferred to be {@code <Object, Object>} rather than {@code <String, Object>}.)
+ * be inferred to be {@code <Object, Object>} rather than {@code <String, Object>}).
  *
  * <pre>{@code
  * List<Map<String, Object>> myMaps = new ArrayList<>();

@@ -34,7 +34,7 @@ import javax.tools.JavaFileManager;
 import javax.tools.StandardLocation;
 
 /**
- * A variant of {@code com.google.errorprone.refaster.RefasterRuleCompilerAnalyzer} which stores
+ * A variant of {@code com.google.errorprone.refaster.RefasterRuleCompilerAnalyzer} that stores
  * compiled Refaster rules in a {@code .refaster} file next to the compiled {@code .class} file,
  * rather than at a fixed location.
  *

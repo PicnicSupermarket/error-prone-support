@@ -54,7 +54,7 @@ The following is a list of checks we'd like to see implemented:
   signature groups. Using Error Prone's method matchers forbidden method calls
   can easily be identified. But Error Prone can go one step further by
   auto-patching violations. For each violation two fixes can be proposed: a
-  purely behavior-preserving fix which makes the platform-dependent behavior
+  purely behavior-preserving fix, which makes the platform-dependent behavior
   explicit, and another which replaces the platform-dependent behavior with the
   preferred alternative. (Such as using `UTF-8` instead of the system default
   charset.)

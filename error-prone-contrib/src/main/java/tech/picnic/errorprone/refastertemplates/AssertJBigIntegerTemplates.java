@@ -9,7 +9,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.math.BigInteger;
 import org.assertj.core.api.AbstractBigIntegerAssert;
 
-// XXX: If we add a rule which drops unnecessary `L` suffixes from literal longs, then the `0L`/`1L`
+// XXX: If we add a rule that drops unnecessary `L` suffixes from literal longs, then the `0L`/`1L`
 // cases below can go.
 final class AssertJBigIntegerTemplates {
   private AssertJBigIntegerTemplates() {}
