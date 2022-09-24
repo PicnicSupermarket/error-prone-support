@@ -1,11 +1,15 @@
 package tech.picnic.errorprone.refaster.plugin;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.DescriptionListener;
@@ -15,27 +19,26 @@ import com.sun.source.util.TreePath;
 import com.sun.tools.javac.util.Context;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
 
 // XXX: Rename? Use `@AutoValue`?
-// XXX: Should the name _also_ be derived from an annotation? Upshot is limited.
-// XXX: ^ Name could be dropped if we derive it from `description.checkName`, with the assumption
-// that package and class names follow idiomatic Java naming convention. Kinda icky...
 final class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serializable {
   private static final long serialVersionUID = 1L;
+  private static final Splitter CLASS_NAME_SPLITTER = Splitter.on('.').limit(2);
 
-  private final String name;
+  private final String packageName;
   private final ImmutableList<CodeTransformer> transformers;
   private final ImmutableClassToInstanceMap<Annotation> annotations;
 
   AnnotatedCompositeCodeTransformer(
-      String name,
+      String packageName,
       ImmutableList<CodeTransformer> transformers,
       ImmutableClassToInstanceMap<Annotation> annotations) {
-    this.name = name;
+    this.packageName = packageName;
     this.transformers = transformers;
     this.annotations = annotations;
   }
@@ -47,35 +50,52 @@ final class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serial
 
   @Override
   public void apply(TreePath path, Context context, DescriptionListener listener) {
-    // XXX: Reflectively access `suggestionsAsWarnings`!
-    SeverityLevel minSeverity = WARNING;
-    SeverityLevel maxSeverity =
-        context.get(ErrorProneOptions.class).isDropErrorsToWarnings() ? WARNING : ERROR;
-    // XXX: Use these ^ in `getSeverity(...)`.
-
     for (CodeTransformer transformer : transformers) {
       transformer.apply(
           path,
           context,
-          description -> listener.onDescribed(augmentDescription(description, transformer)));
+          description ->
+              listener.onDescribed(augmentDescription(description, transformer, context)));
     }
   }
 
-  private Description augmentDescription(Description description, CodeTransformer delegate) {
-    // XXX: Replace only the first `$`.
+  private Description augmentDescription(
+      Description description, CodeTransformer delegate, Context context) {
     // XXX: Test this.
+    String shortCheckName = getShortCheckName(description.checkName);
     return Description.builder(
             description.position,
-            description.checkName,
-            String.format(getLinkPattern(delegate), name.replace('$', '#')),
-            getSeverity(delegate),
+            shortCheckName,
+            getLinkPattern(delegate, shortCheckName),
+            overrideSeverity(getSeverity(delegate), context),
             getDescription(delegate))
         .addAllFixes(description.fixes)
         .build();
   }
 
-  private String getLinkPattern(CodeTransformer delegate) {
-    return getAnnotationValue(OnlineDocumentation.class, OnlineDocumentation::value, delegate, "");
+  private String getShortCheckName(String fullCheckName) {
+    if (packageName.isEmpty()) {
+      return fullCheckName;
+    }
+
+    String prefix = packageName + '.';
+    checkState(
+        fullCheckName.startsWith(prefix),
+        "Refaster template class '%s' is not located in package '%s'",
+        fullCheckName,
+        packageName);
+
+    return fullCheckName.substring(prefix.length());
+  }
+
+  private String getLinkPattern(CodeTransformer delegate, String checkName) {
+    String urlPattern =
+        getAnnotationValue(OnlineDocumentation.class, OnlineDocumentation::value, delegate, "");
+
+    Iterator<String> nameComponents = CLASS_NAME_SPLITTER.splitToList(checkName).iterator();
+    return urlPattern
+        .replace("${topLevelClassName}", nameComponents.next())
+        .replace("${nestedClassName}", Iterators.getNext(nameComponents, ""));
   }
 
   private SeverityLevel getSeverity(CodeTransformer delegate) {
@@ -101,5 +121,14 @@ final class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serial
   private static <A extends Annotation> Optional<A> getAnnotationValue(
       CodeTransformer codeTransformer, Class<A> annotation) {
     return Optional.ofNullable(codeTransformer.annotations().getInstance(annotation));
+  }
+
+  private static SeverityLevel overrideSeverity(SeverityLevel severity, Context context) {
+    // XXX: Respect `-XepAllSuggestionsAsWarnings` when using the Picnic Error Prone Fork!
+    SeverityLevel minSeverity = SUGGESTION;
+    SeverityLevel maxSeverity =
+        context.get(ErrorProneOptions.class).isDropErrorsToWarnings() ? WARNING : ERROR;
+
+    return Comparators.max(Comparators.min(severity, minSeverity), maxSeverity);
   }
 }

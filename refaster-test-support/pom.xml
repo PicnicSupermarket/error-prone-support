@@ -40,12 +40,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-runner</artifactId>
         </dependency>
-        <!-- XXX: Review need after code finalization. -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>refaster-support</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service-annotations</artifactId>

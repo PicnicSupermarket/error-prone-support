@@ -16,11 +16,12 @@ import java.lang.annotation.Target;
  * Support website. Annotations on nested classes override the documentation URL associated with any
  * enclosing class.
  */
-// XXX: Is the `%s` protocol sufficiently generic for non-Picnic use cases?
 // XXX: The documentation is misleading, in that the generated anchor isn't mentioned.
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface OnlineDocumentation {
+  // XXX: Introduce placeholder constants!
+
   /**
    * The URL or URL pattern of the website at which the annotated Refaster template(s) are
    * documented.
@@ -29,5 +30,6 @@ public @interface OnlineDocumentation {
    */
   // XXX: This default is Error Prone Support-specific. Appropriate? (The alternative is to repeat
   // this URL pattern in many places.) If we drop this, also update the class documentation.
-  String value() default "https://error-prone.picnic.tech/refastertemplates/%s";
+  String value() default
+      "https://error-prone.picnic.tech/refastertemplates/${topLevelClassName}#${nestedClassName}";
 }
