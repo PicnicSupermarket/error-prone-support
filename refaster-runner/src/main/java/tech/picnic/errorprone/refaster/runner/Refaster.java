@@ -89,7 +89,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   @CanIgnoreReturnValue
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
-    RefasterRuleSelector selector = new DefaultRefasterRuleSelector(refasterRules);
+    RefasterRuleSelector selector = new RefasterRuleSelector(refasterRules);
     Set<RefasterRule<?, ?>> candidateRules = selector.selectCandidateRules(tree);
 
     // XXX: Remove these debug lines
