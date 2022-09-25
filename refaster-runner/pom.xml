@@ -37,6 +37,14 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-compiler</artifactId>
+            <!-- XXX: This `runtime` scope declaration ensures that
+            `AnnotatedCompositeCodeTransformer` instances can be deserialized.
+            It also makes our custom Refaster annotations available. The issue
+            with this setup is that `refaster-compiler` has *non*-`provided`
+            dependency declarations on Error Prone, as it should be able to
+            function independently. This could cause classpath issues for users
+            of *this* module. Consider moving
+            `AnnotatedCompositeCodeTransformer` back to `refaster-support`. -->
             <scope>runtime</scope>
         </dependency>
         <dependency>
