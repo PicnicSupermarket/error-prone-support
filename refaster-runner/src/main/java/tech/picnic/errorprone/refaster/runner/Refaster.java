@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
- * A {@link BugChecker} which flags code which can be simplified using Refaster templates located on
+ * A {@link BugChecker} that flags code that can be simplified using Refaster templates located on
  * the classpath.
  *
  * <p>This checker locates all {@code *.refaster} classpath resources and assumes they contain a
@@ -98,9 +98,9 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
    * Reports a subset of the given matches, such that no two reported matches suggest a replacement
    * of the same part of the source code.
    *
-   * <p>In the common case all matches will be reported. In case of overlap the match which replaces
+   * <p>In the common case all matches will be reported. In case of overlap the match that replaces
    * the largest piece of source code is preferred. In case two matches wish to replace exactly the
-   * same piece of code, preference is given to the match which suggests the shortest replacement.
+   * same piece of code, preference is given to the match that suggests the shortest replacement.
    */
   // XXX: This selection logic solves an issue described in
   // https://github.com/google/error-prone/issues/559. Consider contributing it back upstream.

@@ -27,8 +27,8 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 
 /**
- * A {@link BugChecker} which flags methods with Spring's {@code @Scheduled} annotation that lack
- * New Relic Agent's {@code @Trace(dispatcher = true)}.
+ * A {@link BugChecker} that flags methods with Spring's {@code @Scheduled} annotation that lack New
+ * Relic Agent's {@code @Trace(dispatcher = true)}.
  */
 @AutoService(BugChecker.class)
 @BugPattern(

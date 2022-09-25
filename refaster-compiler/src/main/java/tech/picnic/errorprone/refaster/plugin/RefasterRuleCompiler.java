@@ -6,7 +6,7 @@ import com.sun.source.util.Plugin;
 import com.sun.tools.javac.api.BasicJavacTask;
 
 /**
- * A variant of {@code com.google.errorprone.refaster.RefasterRuleCompiler} which outputs a {@code
+ * A variant of {@code com.google.errorprone.refaster.RefasterRuleCompiler} that outputs a {@code
  * fully/qualified/Class.refaster} file for each compiled {@code fully.qualified.Class} that
  * contains a Refaster template.
  */

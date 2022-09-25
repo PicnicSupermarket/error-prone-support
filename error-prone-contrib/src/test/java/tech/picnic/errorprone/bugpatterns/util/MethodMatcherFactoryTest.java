@@ -16,7 +16,7 @@ import com.sun.source.tree.MethodInvocationTree;
 import org.junit.jupiter.api.Test;
 
 final class MethodMatcherFactoryTest {
-  /** A {@link BugChecker} which flags method invocations matched by {@link #TEST_MATCHER}. */
+  /** A {@link BugChecker} that flags method invocations matched by {@link #TEST_MATCHER}. */
   @BugPattern(severity = SUGGESTION, summary = "Flags methods matched by the test matcher.")
   public static final class MatchedMethodsFlagger extends BugChecker
       implements MethodInvocationTreeMatcher {

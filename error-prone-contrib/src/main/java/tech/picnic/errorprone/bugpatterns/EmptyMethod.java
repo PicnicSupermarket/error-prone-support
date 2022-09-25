@@ -22,7 +22,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.util.Optional;
 
-/** A {@link BugChecker} which flags empty methods that seemingly can simply be deleted. */
+/** A {@link BugChecker} that flags empty methods that seemingly can simply be deleted. */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Empty method can likely be deleted",

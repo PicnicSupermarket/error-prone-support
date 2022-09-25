@@ -19,7 +19,7 @@ import com.sun.source.tree.MethodInvocationTree;
 import java.util.stream.Collector;
 
 /**
- * A {@link BugChecker} which flags {@link Collector Collectors} that don't clearly express
+ * A {@link BugChecker} that flags {@link Collector Collectors} that don't clearly express
  * (im)mutability.
  *
  * <p>Replacing such collectors with alternatives that produce immutable collections is preferred.

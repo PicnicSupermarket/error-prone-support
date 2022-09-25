@@ -63,7 +63,7 @@ import tech.picnic.errorprone.refaster.util.IsArray;
 // ^ And variants.
 // XXX: Consider splitting this class into multiple classes.
 // XXX: Some of these rules may not apply given the updated TestNG rewrite rules. Review.
-// XXX: For the templates which "unwrap" explicitly enumerated collections, also introduce variants
+// XXX: For the templates that "unwrap" explicitly enumerated collections, also introduce variants
 // with explicitly enumerated sorted collections. (Requires that the type bound is Comparable.)
 // XXX: Handle `.isEqualTo(explicitlyEnumeratedCollection)`. Can be considered equivalent to
 // `.containsOnly(elements)`. (This does mean the auto-generated code needs to be more advanced.
@@ -106,12 +106,12 @@ import tech.picnic.errorprone.refaster.util.IsArray;
 // candidates, such as `assertThat(ImmutableSet(foo, bar)).XXX`
 // XXX: Write generic plugin to replace explicit array parameters with varargs (`new int[] {1, 2}`
 // -> `1, 2`).
-// XXX: Write plugin which drops any `.withFailMessage` which doesn't include a compile-time
-// constant string? Most of these are useless.
-// XXX: Write plugin which identifies `.get().propertyAccess()` and "pushes" this out. Would only
+// XXX: Write plugin that drops any `.withFailMessage` that doesn't include a compile-time constant
+// string? Most of these are useless.
+// XXX: Write plugin that identifies `.get().propertyAccess()` and "pushes" this out. Would only
 // nicely work for non-special types, though, cause after `extracting(propertyAccess)` many
 // operations are not available...
-// XXX: Write plugin which identifies repeated `assertThat(someProp.xxx)` calls and bundles these
+// XXX: Write plugin that identifies repeated `assertThat(someProp.xxx)` calls and bundles these
 // somehow.
 // XXX: `abstractOptionalAssert.get().satisfies(pred)` ->
 // `abstractOptionalAssert.hasValueSatisfying(pred)`.

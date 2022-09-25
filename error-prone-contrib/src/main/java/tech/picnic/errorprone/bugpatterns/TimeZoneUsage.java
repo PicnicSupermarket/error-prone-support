@@ -26,7 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-/** A {@link BugChecker} which flags illegal time-zone related operations. */
+/** A {@link BugChecker} that flags illegal time-zone related operations. */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =

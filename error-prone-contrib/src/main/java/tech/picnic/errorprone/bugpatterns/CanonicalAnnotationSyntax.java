@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
-/** A {@link BugChecker} which flags annotations that could be written more concisely. */
+/** A {@link BugChecker} that flags annotations that could be written more concisely. */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Omit redundant syntax from annotation declarations",

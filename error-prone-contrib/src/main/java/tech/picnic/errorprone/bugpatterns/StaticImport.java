@@ -27,15 +27,14 @@ import com.sun.tools.javac.code.Type;
 import java.util.Optional;
 
 /**
- * A {@link BugChecker} which flags methods and constants that can and should be statically
- * imported.
+ * A {@link BugChecker} that flags methods and constants that can and should be statically imported.
  */
 // XXX: Tricky cases:
 // - `org.springframework.http.HttpStatus` (not always an improvement, and `valueOf` must
 //    certainly be excluded)
 // - `com.google.common.collect.Tables`
 // - `ch.qos.logback.classic.Level.{DEBUG, ERROR, INFO, TRACE, WARN"}`
-// XXX: Also introduce a check which disallows static imports of certain methods. Candidates:
+// XXX: Also introduce a check that disallows static imports of certain methods. Candidates:
 // - `com.google.common.base.Strings`
 // - `java.util.Optional.empty`
 // - `java.util.Locale.ROOT`

@@ -36,7 +36,7 @@ final class EqualityTemplates {
   /** Prefer {@link Object#equals(Object)} over the equivalent lambda function. */
   // XXX: As it stands, this rule is a special case of what `MethodReferenceUsage` tries to achieve.
   // If/when `MethodReferenceUsage` becomes production ready, we should simply drop this check.
-  // XXX: Alternatively, the rule should be replaced with a plugin which also identifies cases where
+  // XXX: Alternatively, the rule should be replaced with a plugin that also identifies cases where
   // the arguments are swapped but simplification is possible anyway, by virtue of `v` being
   // non-null.
   static final class EqualsPredicate<T> {

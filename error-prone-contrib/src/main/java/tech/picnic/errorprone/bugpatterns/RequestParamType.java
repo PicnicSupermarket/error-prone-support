@@ -21,7 +21,7 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.VariableTree;
 
-/** A {@link BugChecker} which flags {@code @RequestParam} parameters with an unsupported type. */
+/** A {@link BugChecker} that flags {@code @RequestParam} parameters with an unsupported type. */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "`@RequestParam` does not support `ImmutableCollection` and `ImmutableMap` subtypes",

@@ -228,7 +228,7 @@ final class ReactorTemplates {
   /**
    * Prefer a collection using {@link MoreCollectors#toOptional()} over more contrived alternatives.
    */
-  // XXX: Consider creating a plugin which flags/discourages `Mono<Optional<T>>` method return
+  // XXX: Consider creating a plugin that flags/discourages `Mono<Optional<T>>` method return
   // types, just as we discourage nullable `Boolean`s and `Optional`s.
   static final class MonoCollectToOptional<T> {
     @BeforeTemplate

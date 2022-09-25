@@ -159,7 +159,7 @@
         <!-- XXX: Two other dependencies are potentially of interest:
         `com.palantir.assertj-automation:assertj-refaster-rules` and
         `com.palantir.baseline:baseline-refaster-rules` contain Refaster rules
-        which aren't currently applied. We should use
+        that aren't currently applied. We should use
         `RefasterRuleBuilderScanner` to convert those to `.refaster` files so
         that we can pick them up. (But in case of `baseline-refaster-rules`
         perhaps we can simply incorporate all of them.) -->
@@ -1320,7 +1320,7 @@
             </dependencyManagement>
         </profile>
         <profile>
-            <!-- Error Prone checks which are not availabe from Maven Central;
+            <!-- Error Prone checks that are not availabe from Maven Central;
             these are therefore not enabled by default. -->
             <id>non-maven-central</id>
             <properties>
@@ -1507,7 +1507,7 @@
             </build>
         </profile>
         <profile>
-            <!-- An extension of the `build-checks` profile which configures
+            <!-- An extension of the `build-checks` profile that configures
             Error Prone. This configuration is defined in a separate profile so
             that it can be combined with the `patch` profile below, without
             introducing the overhead of other build checks. -->

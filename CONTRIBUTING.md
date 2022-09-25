@@ -51,7 +51,7 @@ Some pointers:
 - Checks should be _topical_: ideally they address a single concern.
 - Where possible checks should provide _fixes_, and ideally these are
   completely behavior-preserving. In order for a check to be adopted by users
-  it must not "get in the way". So for a check which addresses a relatively
+  it must not "get in the way". So for a check that addresses a relatively
   trivial stylistic concern it is doubly important that the violations it
   detects can be auto-patched.
 - Make sure you have read Error Prone's [criteria for new

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
-/** A {@link BugChecker} which flags SLF4J usages that are likely to be in error. */
+/** A {@link BugChecker} that flags SLF4J usages that are likely to be in error. */
 // XXX: The special-casing of Throwable applies only to SLF4J 1.6.0+; see
 // https://www.slf4j.org/faq.html#paramException. That should be documented.
 // XXX: Also simplify `LOG.error(String.format("Something %s", arg), throwable)`.

@@ -82,7 +82,7 @@ final class AssortedTemplates {
    * ImmutableSet#toImmutableSet()} and produces a more compact object.
    *
    * <p><strong>Warning:</strong> this rewrite rule is not completely behavior preserving: while the
-   * original code produces a set which iterates over the elements in encounter order, the
+   * original code produces a set that iterates over the elements in encounter order, the
    * replacement code iterates over the elements in enum definition order.
    */
   // XXX: ^ Consider emitting a comment warning about this fact?
@@ -118,7 +118,7 @@ final class AssortedTemplates {
 
   /** Don't unnecessarily repeat boolean expressions. */
   // XXX: This template captures only the simplest case. `@AlsoNegation` doesn't help. Consider
-  // contributing a Refaster patch which handles the negation in the `@BeforeTemplate` more
+  // contributing a Refaster patch, which handles the negation in the `@BeforeTemplate` more
   // intelligently.
   static final class LogicalImplication {
     @BeforeTemplate

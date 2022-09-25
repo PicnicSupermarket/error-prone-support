@@ -11,7 +11,7 @@
     <artifactId>refaster-compiler</artifactId>
 
     <name>Picnic :: Error Prone Support :: Refaster Compiler</name>
-    <description>Java compiler plugin which identifies and compiles Refaster templates, storing them as resource files on the classpath.</description>
+    <description>A Java compiler plugin that identifies and compiles Refaster templates, storing them as resource files on the classpath.</description>
 
     <dependencies>
         <dependency>

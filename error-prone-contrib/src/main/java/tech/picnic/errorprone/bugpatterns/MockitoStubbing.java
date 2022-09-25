@@ -20,7 +20,7 @@ import java.util.List;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
- * A {@link BugChecker} which flags method invocations for which all arguments are wrapped using
+ * A {@link BugChecker} that flags method invocations for which all arguments are wrapped using
  * {@link org.mockito.Mockito#eq}; this is redundant.
  */
 @AutoService(BugChecker.class)

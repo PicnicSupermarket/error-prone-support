@@ -26,7 +26,7 @@ import java.util.SortedSet;
 import javax.lang.model.element.Modifier;
 
 /**
- * A {@link BugChecker} which flags {@link SortedSet} property declarations inside
+ * A {@link BugChecker} that flags {@link SortedSet} property declarations inside
  * {@code @Value.Immutable}- and {@code @Value.Modifiable}-annotated types that lack a
  * {@code @Value.NaturalOrder} or {@code @Value.ReverseOrder} annotation.
  *
