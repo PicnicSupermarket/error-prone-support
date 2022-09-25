@@ -1,16 +1,16 @@
 package tech.picnic.errorprone.refaster.runner;
 
+import static java.util.Comparator.comparingInt;
+
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -21,12 +21,8 @@ import java.util.function.Function;
  */
 @AutoValue
 abstract class Node<T> {
-  static <T> Node<T> create(Map<String, Node<T>> children, ImmutableList<T> values) {
-    return new AutoValue_Node<>(ImmutableSortedMap.copyOf(children), values);
-  }
-
   static <T> Node<T> create(
-      List<T> values, Function<T, ImmutableSet<ImmutableSortedSet<String>>> pathExtractor) {
+      List<T> values, Function<? super T, ? extends Set<? extends Set<String>>> pathExtractor) {
     BuildNode<T> tree = BuildNode.create();
     tree.register(values, pathExtractor);
     return tree.immutable();
@@ -36,7 +32,11 @@ abstract class Node<T> {
 
   abstract ImmutableList<T> values();
 
-  void collectCandidateTemplates(ImmutableList<String> candidateEdges, Consumer<T> sink) {
+  void collectReachableValues(Set<String> candidateEdges, Consumer<T> sink) {
+    collectReachableValues(ImmutableList.sortedCopyOf(candidateEdges), sink);
+  }
+
+  private void collectReachableValues(ImmutableList<String> candidateEdges, Consumer<T> sink) {
     values().forEach(sink);
 
     if (candidateEdges.isEmpty() || children().isEmpty()) {
@@ -46,7 +46,7 @@ abstract class Node<T> {
     if (children().size() < candidateEdges.size()) {
       for (Map.Entry<String, Node<T>> e : children().entrySet()) {
         if (candidateEdges.contains(e.getKey())) {
-          e.getValue().collectCandidateTemplates(candidateEdges, sink);
+          e.getValue().collectReachableValues(candidateEdges, sink);
         }
       }
     } else {
@@ -54,16 +54,16 @@ abstract class Node<T> {
           candidateEdges.subList(1, candidateEdges.size());
       Node<T> child = children().get(candidateEdges.get(0));
       if (child != null) {
-        child.collectCandidateTemplates(remainingCandidateEdges, sink);
+        child.collectReachableValues(remainingCandidateEdges, sink);
       }
-      collectCandidateTemplates(remainingCandidateEdges, sink);
+      collectReachableValues(remainingCandidateEdges, sink);
     }
   }
 
   @AutoValue
   @SuppressWarnings("AutoValueImmutableFields" /* Type is used only during `Node` construction. */)
   abstract static class BuildNode<T> {
-    static <T> BuildNode<T> create() {
+    private static <T> BuildNode<T> create() {
       return new AutoValue_Node_BuildNode<>(new HashMap<>(), new ArrayList<>());
     }
 
@@ -71,29 +71,41 @@ abstract class Node<T> {
 
     abstract List<T> values();
 
+    /**
+     * Registers all paths to each of the given values.
+     *
+     * <p>Shorter paths are registered first, so that longer paths can be skipped if a strict prefix
+     * leads to the same value.
+     */
     private void register(
-        List<T> values, Function<T, ImmutableSet<ImmutableSortedSet<String>>> pathsExtractor) {
+        List<T> values, Function<? super T, ? extends Set<? extends Set<String>>> pathsExtractor) {
       for (T value : values) {
-        for (ImmutableSet<String> path : pathsExtractor.apply(value)) {
-          registerPath(value, path.asList());
-        }
+        pathsExtractor.apply(value).stream()
+            .sorted(comparingInt(Set::size))
+            .forEach(path -> registerPath(value, ImmutableList.sortedCopyOf(path)));
       }
     }
 
     private void registerPath(T value, ImmutableList<String> path) {
+      if (values().contains(value)) {
+        /* Another (shorter) path already leads to this value. */
+        return;
+      }
+
       path.stream()
           .findFirst()
           .ifPresentOrElse(
               edge ->
                   children()
-                      .computeIfAbsent(edge, k -> BuildNode.create())
+                      .computeIfAbsent(edge, k -> create())
                       .registerPath(value, path.subList(1, path.size())),
               () -> values().add(value));
     }
 
     private Node<T> immutable() {
-      return Node.create(
-          Maps.transformValues(children(), BuildNode::immutable), ImmutableList.copyOf(values()));
+      return new AutoValue_Node<>(
+          ImmutableMap.copyOf(Maps.transformValues(children(), BuildNode::immutable)),
+          ImmutableList.copyOf(values()));
     }
   }
 }
