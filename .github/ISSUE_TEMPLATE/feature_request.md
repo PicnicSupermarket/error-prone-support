@@ -2,15 +2,14 @@
 name: :rocket: Request a new feature
 about: Suggest a new feature.
 title: ''
-labels: 'new feature'
+labels: new feature
 assignees: ''
-
 ---
 
 ### Problem
 
-<!-- Describe the context of the problem you're facing, which you'd like
-    to be solved through Error Prone Support. -->
+<!-- Describe the context of the problem that you're facing, and which you'd
+like to be solved through Error Prone Support. -->
 
 ### Description of the new feature
 
@@ -39,18 +38,17 @@ _Desired change_
 
 ### Considerations
 
-<!-- Are there considerations for this request.
-     Consider the following questions: -->
+<!-- Are there other things to consider? Consider the following questions: -->
 
-*Is the rewrite operation a clear improvement in all cases?*
+*If applicable, is the rewrite operation a clear improvement in all cases?*
 
 *Are there special cases to consider?*
 
-*Can we generalize this new rewrite operation?*
+*Can we further generalize the proposed solution?*
 
 ### Participation
 
-- [ ] I'm willing to submit a pull request to implement this improvement.
+- [ ] I am willing to submit a pull request to implement this improvement.
 
 ### Additional context
 
