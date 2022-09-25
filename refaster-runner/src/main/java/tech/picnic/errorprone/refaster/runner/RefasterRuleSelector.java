@@ -7,7 +7,6 @@ import static java.util.stream.Collectors.toCollection;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.refaster.BlockTemplate;
@@ -131,16 +130,15 @@ final class RefasterRuleSelector {
    */
   Set<RefasterRule<?, ?>> selectCandidateRules(CompilationUnitTree tree) {
     Set<RefasterRule<?, ?>> candidateRules = newSetFromMap(new IdentityHashMap<>());
-    treeRules.collectCandidateTemplates(
-        extractSourceIdentifiers(tree).asList(), candidateRules::add);
+    treeRules.collectReachableValues(extractSourceIdentifiers(tree), candidateRules::add);
 
     return candidateRules;
   }
 
   // XXX: Decompose `RefasterRule`s such that each rule has exactly one `@BeforeTemplate`.
-  private static ImmutableSet<ImmutableSortedSet<String>> extractTemplateIdentifiers(
+  private static ImmutableSet<ImmutableSet<String>> extractTemplateIdentifiers(
       RefasterRule<?, ?> refasterRule) {
-    ImmutableSet.Builder<ImmutableSortedSet<String>> results = ImmutableSet.builder();
+    ImmutableSet.Builder<ImmutableSet<String>> results = ImmutableSet.builder();
 
     for (Object template : RefasterIntrospection.getBeforeTemplates(refasterRule)) {
       if (template instanceof ExpressionTemplate) {
@@ -160,7 +158,7 @@ final class RefasterRuleSelector {
   }
 
   // XXX: Consider interning the strings (once a benchmark is in place).
-  private static ImmutableSet<ImmutableSortedSet<String>> extractTemplateIdentifiers(
+  private static ImmutableSet<ImmutableSet<String>> extractTemplateIdentifiers(
       ImmutableList<? extends Tree> trees) {
     List<Set<String>> identifierCombinations = new ArrayList<>();
     identifierCombinations.add(new HashSet<>());
@@ -274,12 +272,10 @@ final class RefasterRuleSelector {
       }
     }.scan(trees, identifierCombinations);
 
-    return identifierCombinations.stream()
-        .map(ImmutableSortedSet::copyOf)
-        .collect(toImmutableSet());
+    return identifierCombinations.stream().map(ImmutableSet::copyOf).collect(toImmutableSet());
   }
 
-  private ImmutableSortedSet<String> extractSourceIdentifiers(Tree tree) {
+  private Set<String> extractSourceIdentifiers(Tree tree) {
     Set<String> identifiers = new HashSet<>();
 
     // XXX: Make the scanner static.
@@ -340,7 +336,7 @@ final class RefasterRuleSelector {
       }
     }.scan(tree, identifiers);
 
-    return ImmutableSortedSet.copyOf(identifiers);
+    return identifiers;
   }
 
   /**

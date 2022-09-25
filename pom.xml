@@ -1392,6 +1392,9 @@
                         <threads>4</threads>
                         <timeoutFactor>4</timeoutFactor>
                         <timestampedReports>false</timestampedReports>
+                        <excludedClasses>
+                            <excludedClass>*.AutoValue_*</excludedClass>
+                        </excludedClasses>
                     </configuration>
                     <dependencies>
                         <dependency>
