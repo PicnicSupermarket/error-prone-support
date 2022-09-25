@@ -59,7 +59,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
 
   private static final long serialVersionUID = 1L;
 
-  private final List<RefasterRule<?, ?>> refasterRules;
+  private final RefasterRuleSelector selector;
 
   /** Instantiates the default {@link Refaster}. */
   public Refaster() {
@@ -72,13 +72,12 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
    * @param flags Any provided command line flags.
    */
   public Refaster(ErrorProneFlags flags) {
-    refasterRules = getRefasterRules(flags);
+    selector = createRefasterRuleSelector(flags);
   }
 
   @CanIgnoreReturnValue
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
-    RefasterRuleSelector selector = new RefasterRuleSelector(refasterRules);
     Set<RefasterRule<?, ?>> candidateRules = selector.selectCandidateRules(tree);
 
     // XXX: Remove these debug lines
@@ -108,12 +107,12 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     return Description.NO_MATCH;
   }
 
-  private static List<RefasterRule<?, ?>> getRefasterRules(ErrorProneFlags flags) {
+  private static RefasterRuleSelector createRefasterRuleSelector(ErrorProneFlags flags) {
     CodeTransformer compositeCodeTransformer = createCompositeCodeTransformer(flags);
 
     List<RefasterRule<?, ?>> refasterRules = new ArrayList<>();
     collectRefasterRules(compositeCodeTransformer, refasterRules::add);
-    return refasterRules;
+    return new RefasterRuleSelector(refasterRules);
   }
 
   private static void collectRefasterRules(
