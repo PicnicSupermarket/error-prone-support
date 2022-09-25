@@ -4,9 +4,12 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Collections.newSetFromMap;
 import static java.util.stream.Collectors.toCollection;
 
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.errorprone.CodeTransformer;
+import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.refaster.BlockTemplate;
 import com.google.errorprone.refaster.ExpressionTemplate;
 import com.google.errorprone.refaster.RefasterRule;
@@ -33,6 +36,7 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 // XXX: Add some examples of which source files would match what templates in the tree.
@@ -82,13 +86,38 @@ import javax.annotation.Nullable;
 final class RefasterRuleSelector {
   private final Node<RefasterRule<?, ?>> treeRules;
 
+  private RefasterRuleSelector(Node<RefasterRule<?, ?>> treeRules) {
+    this.treeRules = treeRules;
+  }
+
   /**
-   * Instantiate the Refaster template selector.
-   *
-   * @param refasterRules List of all Refaster templates that are available.
+   * Instantiates a new {@link RefasterRuleSelector} backed by the {@link RefasterRule}s referenced
+   * by the given collection of {@link CodeTransformer}s.
    */
-  RefasterRuleSelector(List<RefasterRule<?, ?>> refasterRules) {
-    this.treeRules = Node.create(refasterRules, RefasterRuleSelector::extractTemplateIdentifiers);
+  static RefasterRuleSelector create(ImmutableCollection<CodeTransformer> transformers) {
+    List<RefasterRule<?, ?>> refasterRules = new ArrayList<>();
+    collectRefasterRules(transformers, refasterRules::add);
+    return new RefasterRuleSelector(
+        Node.create(refasterRules, RefasterRuleSelector::extractTemplateIdentifiers));
+  }
+
+  private static void collectRefasterRules(
+      ImmutableCollection<CodeTransformer> transformers, Consumer<RefasterRule<?, ?>> sink) {
+    for (CodeTransformer t : transformers) {
+      collectRefasterRules(t, sink);
+    }
+  }
+
+  private static void collectRefasterRules(
+      CodeTransformer transformer, Consumer<RefasterRule<?, ?>> sink) {
+    if (transformer instanceof RefasterRule) {
+      sink.accept((RefasterRule<?, ?>) transformer);
+    } else if (transformer instanceof CompositeCodeTransformer) {
+      collectRefasterRules(((CompositeCodeTransformer) transformer).transformers(), sink);
+    } else {
+      throw new IllegalStateException(
+          String.format("Can't handle `CodeTransformer` of type '%s'", transformer.getClass()));
+    }
   }
 
   /**

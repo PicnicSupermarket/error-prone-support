@@ -17,7 +17,6 @@ import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.CodeTransformer;
-import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.SubContext;
 import com.google.errorprone.VisitorState;
@@ -35,7 +34,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -59,7 +57,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
 
   private static final long serialVersionUID = 1L;
 
-  private final RefasterRuleSelector selector;
+  private final RefasterRuleSelector ruleSelector;
 
   /** Instantiates the default {@link Refaster}. */
   public Refaster() {
@@ -72,13 +70,13 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
    * @param flags Any provided command line flags.
    */
   public Refaster(ErrorProneFlags flags) {
-    selector = createRefasterRuleSelector(flags);
+    ruleSelector = createRefasterRuleSelector(flags);
   }
 
   @CanIgnoreReturnValue
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
-    Set<RefasterRule<?, ?>> candidateRules = selector.selectCandidateRules(tree);
+    Set<RefasterRule<?, ?>> candidateRules = ruleSelector.selectCandidateRules(tree);
 
     // XXX: Remove these debug lines
     // String removeThis = candidateRules.stream().map(Object::toString).collect(joining(","));
@@ -105,28 +103,6 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
 
     /* Any matches were already reported by the code above, directly to the `VisitorState`. */
     return Description.NO_MATCH;
-  }
-
-  private static RefasterRuleSelector createRefasterRuleSelector(ErrorProneFlags flags) {
-    CodeTransformer compositeCodeTransformer = createCompositeCodeTransformer(flags);
-
-    List<RefasterRule<?, ?>> refasterRules = new ArrayList<>();
-    collectRefasterRules(compositeCodeTransformer, refasterRules::add);
-    return new RefasterRuleSelector(refasterRules);
-  }
-
-  private static void collectRefasterRules(
-      CodeTransformer transformer, Consumer<RefasterRule<?, ?>> sink) {
-    if (transformer instanceof RefasterRule) {
-      sink.accept((RefasterRule<?, ?>) transformer);
-    } else if (transformer instanceof CompositeCodeTransformer) {
-      for (CodeTransformer t : ((CompositeCodeTransformer) transformer).transformers()) {
-        collectRefasterRules(t, sink);
-      }
-    } else {
-      throw new IllegalStateException(
-          String.format("Can't handle `CodeTransformer` of type '%s'", transformer.getClass()));
-    }
   }
 
   /**
@@ -181,11 +157,10 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     return description.fixes.stream().flatMap(fix -> fix.getReplacements(endPositions).stream());
   }
 
-  // XXX: instead create an `ImmutableList<RefasterRule>`
-  private static CodeTransformer createCompositeCodeTransformer(ErrorProneFlags flags) {
+  private static RefasterRuleSelector createRefasterRuleSelector(ErrorProneFlags flags) {
     ImmutableListMultimap<String, CodeTransformer> allTransformers =
         CodeTransformers.getAllCodeTransformers();
-    return CompositeCodeTransformer.compose(
+    return RefasterRuleSelector.create(
         flags
             .get(INCLUDED_TEMPLATES_PATTERN_FLAG)
             .map(Pattern::compile)
