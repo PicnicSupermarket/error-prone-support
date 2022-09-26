@@ -14,8 +14,8 @@ like to be solved through Error Prone Support. -->
 ### Description of the new feature
 
 _Type of improvement_
-- [ ] Support a stylistic preference
-- [ ] Avoid a common gotcha, or potential problem
+- [ ] Support a stylistic preference.
+- [ ] Avoid a common gotcha, or potential problem.
 
 _Desired change_
 
