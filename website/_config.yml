@@ -23,6 +23,14 @@ permalink: pretty # Use /doc/ vs. /doc.html
 search_enabled: true
 heading_anchors: true
 
+callouts:
+  summary:
+    title: Summary
+    color: blue
+  warning:
+    title: Warning
+    color: red
+
 nav_external_links:
   - title: Error Prone Support on GitHub
     url: https://github.com/PicnicSupermarket/error-prone-support

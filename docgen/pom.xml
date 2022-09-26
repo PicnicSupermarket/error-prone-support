@@ -149,7 +149,7 @@
                                             -bug_patterns=${basedir}/../error-prone-contrib/target/generated-sources/annotations/bugPatterns.txt
                                         </argument>
                                         <argument>-docs_repository=${basedir}/target/generated-wiki/</argument>
-                                        <argument>-explanations=${basedir}/../docs/bugpattern-temp/</argument>
+                                        <argument>-explanations=${basedir}/../docs/bugpatterns/</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

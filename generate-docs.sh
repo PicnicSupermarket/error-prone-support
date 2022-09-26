@@ -47,7 +47,7 @@ generate_bugpattern_docs() {
   # This will create markdown files for each bug pattern in `docgen/target/generated-wiki/bugpatterns`
   mvn -P run-annotation-processor compile site -Dverification.skip
 
-  cp -R docgen/target/generated-wiki/bugpatterns/ website/
+  cp -r docgen/target/generated-wiki/bugpatterns/*.md website/bugpatterns
 }
 
 generate_refaster_docs() {
