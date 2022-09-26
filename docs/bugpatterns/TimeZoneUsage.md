@@ -1,6 +1,6 @@
 ---
 layout: default
-title: EmptyMethod
+title: TimeZoneUsage
 parent: Bug Patterns
 nav_order: 1
 ---
@@ -9,9 +9,9 @@ nav_order: 1
 To make changes, edit the @BugPattern annotation or the explanation in docs/bugpattern.
 -->
 
-# EmptyMethod
+# TimeZoneUsage
 
-Simplification
+FragileCode
 
 ${EXTRA_DOCS}
 
@@ -27,16 +27,16 @@ public static void sample() {}
 </a>
 
 
-# EmptyMethod
+# TimeZoneUsage
 
-__Empty method can likely be deleted__
+__Derive the current time from an existing &#96;Clock&#96; Spring bean, and don&#39;t rely on a &#96;Clock&#96;&#39;s time zone__
 
 <div style="float:right;"><table id="metadata">
-<tr><td>Severity</td><td>SUGGESTION</td></tr>
-<tr><td>Tags</td><td>Simplification</td></tr>
+<tr><td>Severity</td><td>WARNING</td></tr>
+<tr><td>Tags</td><td>FragileCode</td></tr>
 </table></div>
 
 
 
 ## Suppression
-Suppress false positives by adding the suppression annotation `@SuppressWarnings("EmptyMethod")` to the enclosing element.
+Suppress false positives by adding the suppression annotation `@SuppressWarnings("TimeZoneUsage")` to the enclosing element.

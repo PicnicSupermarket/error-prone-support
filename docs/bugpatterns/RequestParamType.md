@@ -1,6 +1,6 @@
 ---
 layout: default
-title: EmptyMethod
+title: RequestParamType
 parent: Bug Patterns
 nav_order: 1
 ---
@@ -9,9 +9,9 @@ nav_order: 1
 To make changes, edit the @BugPattern annotation or the explanation in docs/bugpattern.
 -->
 
-# EmptyMethod
+# RequestParamType
 
-Simplification
+LikelyError
 
 ${EXTRA_DOCS}
 
@@ -27,16 +27,16 @@ public static void sample() {}
 </a>
 
 
-# EmptyMethod
+# RequestParamType
 
-__Empty method can likely be deleted__
+__&#96;@RequestParam&#96; does not support &#96;ImmutableCollection&#96; and &#96;ImmutableMap&#96; subtypes__
 
 <div style="float:right;"><table id="metadata">
-<tr><td>Severity</td><td>SUGGESTION</td></tr>
-<tr><td>Tags</td><td>Simplification</td></tr>
+<tr><td>Severity</td><td>ERROR</td></tr>
+<tr><td>Tags</td><td>LikelyError</td></tr>
 </table></div>
 
 
 
 ## Suppression
-Suppress false positives by adding the suppression annotation `@SuppressWarnings("EmptyMethod")` to the enclosing element.
+Suppress false positives by adding the suppression annotation `@SuppressWarnings("RequestParamType")` to the enclosing element.

@@ -1,6 +1,6 @@
 ---
 layout: default
-title: EmptyMethod
+title: RefasterAnyOfUsage
 parent: Bug Patterns
 nav_order: 1
 ---
@@ -9,7 +9,7 @@ nav_order: 1
 To make changes, edit the @BugPattern annotation or the explanation in docs/bugpattern.
 -->
 
-# EmptyMethod
+# RefasterAnyOfUsage
 
 Simplification
 
@@ -27,9 +27,9 @@ public static void sample() {}
 </a>
 
 
-# EmptyMethod
+# RefasterAnyOfUsage
 
-__Empty method can likely be deleted__
+__&#96;Refaster#anyOf&#96; should be passed at least two parameters__
 
 <div style="float:right;"><table id="metadata">
 <tr><td>Severity</td><td>SUGGESTION</td></tr>
@@ -39,4 +39,4 @@ __Empty method can likely be deleted__
 
 
 ## Suppression
-Suppress false positives by adding the suppression annotation `@SuppressWarnings("EmptyMethod")` to the enclosing element.
+Suppress false positives by adding the suppression annotation `@SuppressWarnings("RefasterAnyOfUsage")` to the enclosing element.

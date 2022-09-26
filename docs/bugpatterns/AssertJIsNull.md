@@ -1,6 +1,6 @@
 ---
 layout: default
-title: EmptyMethod
+title: AssertJIsNull
 parent: Bug Patterns
 nav_order: 1
 ---
@@ -9,7 +9,7 @@ nav_order: 1
 To make changes, edit the @BugPattern annotation or the explanation in docs/bugpattern.
 -->
 
-# EmptyMethod
+# AssertJIsNull
 
 Simplification
 
@@ -27,9 +27,9 @@ public static void sample() {}
 </a>
 
 
-# EmptyMethod
+# AssertJIsNull
 
-__Empty method can likely be deleted__
+__Prefer &#96;.isNull()&#96; over &#96;.isEqualTo(null)&#96;__
 
 <div style="float:right;"><table id="metadata">
 <tr><td>Severity</td><td>SUGGESTION</td></tr>
@@ -39,4 +39,4 @@ __Empty method can likely be deleted__
 
 
 ## Suppression
-Suppress false positives by adding the suppression annotation `@SuppressWarnings("EmptyMethod")` to the enclosing element.
+Suppress false positives by adding the suppression annotation `@SuppressWarnings("AssertJIsNull")` to the enclosing element.

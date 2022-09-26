@@ -1,6 +1,6 @@
 ---
 layout: default
-title: EmptyMethod
+title: FluxFlatMapUsage
 parent: Bug Patterns
 nav_order: 1
 ---
@@ -9,9 +9,9 @@ nav_order: 1
 To make changes, edit the @BugPattern annotation or the explanation in docs/bugpattern.
 -->
 
-# EmptyMethod
+# FluxFlatMapUsage
 
-Simplification
+LikelyError
 
 ${EXTRA_DOCS}
 
@@ -27,16 +27,16 @@ public static void sample() {}
 </a>
 
 
-# EmptyMethod
+# FluxFlatMapUsage
 
-__Empty method can likely be deleted__
+__&#96;Flux#flatMap&#96; and &#96;Flux#flatMapSequential&#96; have subtle semantics; please use &#96;Flux#concatMap&#96; or explicitly specify the desired amount of concurrency__
 
 <div style="float:right;"><table id="metadata">
-<tr><td>Severity</td><td>SUGGESTION</td></tr>
-<tr><td>Tags</td><td>Simplification</td></tr>
+<tr><td>Severity</td><td>ERROR</td></tr>
+<tr><td>Tags</td><td>LikelyError</td></tr>
 </table></div>
 
 
 
 ## Suppression
-Suppress false positives by adding the suppression annotation `@SuppressWarnings("EmptyMethod")` to the enclosing element.
+Suppress false positives by adding the suppression annotation `@SuppressWarnings("FluxFlatMapUsage")` to the enclosing element.

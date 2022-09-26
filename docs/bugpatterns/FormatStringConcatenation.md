@@ -1,6 +1,6 @@
 ---
 layout: default
-title: EmptyMethod
+title: FormatStringConcatenation
 parent: Bug Patterns
 nav_order: 1
 ---
@@ -9,7 +9,7 @@ nav_order: 1
 To make changes, edit the @BugPattern annotation or the explanation in docs/bugpattern.
 -->
 
-# EmptyMethod
+# FormatStringConcatenation
 
 Simplification
 
@@ -27,16 +27,16 @@ public static void sample() {}
 </a>
 
 
-# EmptyMethod
+# FormatStringConcatenation
 
-__Empty method can likely be deleted__
+__Defer string concatenation to the invoked method__
 
 <div style="float:right;"><table id="metadata">
-<tr><td>Severity</td><td>SUGGESTION</td></tr>
+<tr><td>Severity</td><td>WARNING</td></tr>
 <tr><td>Tags</td><td>Simplification</td></tr>
 </table></div>
 
 
 
 ## Suppression
-Suppress false positives by adding the suppression annotation `@SuppressWarnings("EmptyMethod")` to the enclosing element.
+Suppress false positives by adding the suppression annotation `@SuppressWarnings("FormatStringConcatenation")` to the enclosing element.

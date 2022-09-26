@@ -1,6 +1,6 @@
 ---
 layout: default
-title: EmptyMethod
+title: AutowiredConstructor
 parent: Bug Patterns
 nav_order: 1
 ---
@@ -9,7 +9,7 @@ nav_order: 1
 To make changes, edit the @BugPattern annotation or the explanation in docs/bugpattern.
 -->
 
-# EmptyMethod
+# AutowiredConstructor
 
 Simplification
 
@@ -27,9 +27,9 @@ public static void sample() {}
 </a>
 
 
-# EmptyMethod
+# AutowiredConstructor
 
-__Empty method can likely be deleted__
+__Omit &#96;@Autowired&#96; on a class&#39; sole constructor, as it is redundant__
 
 <div style="float:right;"><table id="metadata">
 <tr><td>Severity</td><td>SUGGESTION</td></tr>
@@ -39,4 +39,4 @@ __Empty method can likely be deleted__
 
 
 ## Suppression
-Suppress false positives by adding the suppression annotation `@SuppressWarnings("EmptyMethod")` to the enclosing element.
+Suppress false positives by adding the suppression annotation `@SuppressWarnings("AutowiredConstructor")` to the enclosing element.

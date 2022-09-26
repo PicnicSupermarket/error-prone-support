@@ -1,6 +1,6 @@
 ---
 layout: default
-title: EmptyMethod
+title: CanonicalAnnotationSyntax
 parent: Bug Patterns
 nav_order: 1
 ---
@@ -9,7 +9,7 @@ nav_order: 1
 To make changes, edit the @BugPattern annotation or the explanation in docs/bugpattern.
 -->
 
-# EmptyMethod
+# CanonicalAnnotationSyntax
 
 Simplification
 
@@ -27,9 +27,9 @@ public static void sample() {}
 </a>
 
 
-# EmptyMethod
+# CanonicalAnnotationSyntax
 
-__Empty method can likely be deleted__
+__Omit redundant syntax from annotation declarations__
 
 <div style="float:right;"><table id="metadata">
 <tr><td>Severity</td><td>SUGGESTION</td></tr>
@@ -39,4 +39,4 @@ __Empty method can likely be deleted__
 
 
 ## Suppression
-Suppress false positives by adding the suppression annotation `@SuppressWarnings("EmptyMethod")` to the enclosing element.
+Suppress false positives by adding the suppression annotation `@SuppressWarnings("CanonicalAnnotationSyntax")` to the enclosing element.

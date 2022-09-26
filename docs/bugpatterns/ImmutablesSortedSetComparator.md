@@ -1,6 +1,6 @@
 ---
 layout: default
-title: EmptyMethod
+title: ImmutablesSortedSetComparator
 parent: Bug Patterns
 nav_order: 1
 ---
@@ -9,9 +9,9 @@ nav_order: 1
 To make changes, edit the @BugPattern annotation or the explanation in docs/bugpattern.
 -->
 
-# EmptyMethod
+# ImmutablesSortedSetComparator
 
-Simplification
+LikelyError
 
 ${EXTRA_DOCS}
 
@@ -27,16 +27,16 @@ public static void sample() {}
 </a>
 
 
-# EmptyMethod
+# ImmutablesSortedSetComparator
 
-__Empty method can likely be deleted__
+__&#96;SortedSet&#96; properties of a &#96;@Value.Immutable&#96; or &#96;@Value.Modifiable&#96; type must be annotated with &#96;@Value.NaturalOrder&#96; or &#96;@Value.ReverseOrder&#96;__
 
 <div style="float:right;"><table id="metadata">
-<tr><td>Severity</td><td>SUGGESTION</td></tr>
-<tr><td>Tags</td><td>Simplification</td></tr>
+<tr><td>Severity</td><td>ERROR</td></tr>
+<tr><td>Tags</td><td>LikelyError</td></tr>
 </table></div>
 
 
 
 ## Suppression
-Suppress false positives by adding the suppression annotation `@SuppressWarnings("EmptyMethod")` to the enclosing element.
+Suppress false positives by adding the suppression annotation `@SuppressWarnings("ImmutablesSortedSetComparator")` to the enclosing element.

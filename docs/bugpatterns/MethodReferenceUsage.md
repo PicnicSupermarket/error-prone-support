@@ -1,6 +1,6 @@
 ---
 layout: default
-title: EmptyMethod
+title: MethodReferenceUsage
 parent: Bug Patterns
 nav_order: 1
 ---
@@ -9,9 +9,9 @@ nav_order: 1
 To make changes, edit the @BugPattern annotation or the explanation in docs/bugpattern.
 -->
 
-# EmptyMethod
+# MethodReferenceUsage
 
-Simplification
+Style
 
 ${EXTRA_DOCS}
 
@@ -27,16 +27,16 @@ public static void sample() {}
 </a>
 
 
-# EmptyMethod
+# MethodReferenceUsage
 
-__Empty method can likely be deleted__
+__Prefer method references over lambda expressions__
 
 <div style="float:right;"><table id="metadata">
 <tr><td>Severity</td><td>SUGGESTION</td></tr>
-<tr><td>Tags</td><td>Simplification</td></tr>
+<tr><td>Tags</td><td>Style</td></tr>
 </table></div>
 
 
 
 ## Suppression
-Suppress false positives by adding the suppression annotation `@SuppressWarnings("EmptyMethod")` to the enclosing element.
+Suppress false positives by adding the suppression annotation `@SuppressWarnings("MethodReferenceUsage")` to the enclosing element.

@@ -1,6 +1,6 @@
 ---
 layout: default
-title: EmptyMethod
+title: ScheduledTransactionTrace
 parent: Bug Patterns
 nav_order: 1
 ---
@@ -9,9 +9,9 @@ nav_order: 1
 To make changes, edit the @BugPattern annotation or the explanation in docs/bugpattern.
 -->
 
-# EmptyMethod
+# ScheduledTransactionTrace
 
-Simplification
+LikelyError
 
 ${EXTRA_DOCS}
 
@@ -27,16 +27,16 @@ public static void sample() {}
 </a>
 
 
-# EmptyMethod
+# ScheduledTransactionTrace
 
-__Empty method can likely be deleted__
+__Scheduled operation must start a new New Relic transaction__
 
 <div style="float:right;"><table id="metadata">
-<tr><td>Severity</td><td>SUGGESTION</td></tr>
-<tr><td>Tags</td><td>Simplification</td></tr>
+<tr><td>Severity</td><td>ERROR</td></tr>
+<tr><td>Tags</td><td>LikelyError</td></tr>
 </table></div>
 
 
 
 ## Suppression
-Suppress false positives by adding the suppression annotation `@SuppressWarnings("EmptyMethod")` to the enclosing element.
+Suppress false positives by adding the suppression annotation `@SuppressWarnings("ScheduledTransactionTrace")` to the enclosing element.

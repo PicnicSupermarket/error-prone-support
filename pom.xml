@@ -39,6 +39,8 @@
     </developers>
 
     <modules>
+        <module>docgen</module>
+        <module>docgen_processor</module>
         <module>error-prone-contrib</module>
         <module>refaster-compiler</module>
         <module>refaster-runner</module>

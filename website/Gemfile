@@ -1,3 +1,4 @@
 source "https://rubygems.org"
 gem "github-pages", "~> 227"
 gem "rake", "~> 13.0" # Required for "just-the-docs" theme
+gem "webrick", "~> 1.7"
