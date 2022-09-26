@@ -1,9 +1,9 @@
 ---
-name: :rocket: Request a new feature
+name: 🚀 Request a new feature
 about: Suggest a new feature.
-title: ''
+title: ""
 labels: new feature
-assignees: ''
+assignees: ""
 ---
 
 ### Problem
@@ -14,9 +14,8 @@ like to be solved through Error Prone Support. -->
 ### Description of the new feature
 
 _Type of improvement_
-- [ ] Support a stylistic preference (bug pattern)
-- [ ] Avoid a common gotcha, or potential problem (bug pattern)
-- [ ] Implement an auto-fix (refaster template)
+- [ ] Support a stylistic preference
+- [ ] Avoid a common gotcha, or potential problem
 
 _Desired change_
 
