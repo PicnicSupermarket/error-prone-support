@@ -25,22 +25,19 @@ To make changes, edit the @BugPattern annotation or the explanation in docs/bugp
 {{/suppression}}
 
 ## Samples
-### Input
+
+### Before
+
 ```java
 {{#sampleInput}}
 {{{sampleInput}}}
 {{/sampleInput}}
-{{^sampleInput}}
-    public static void sample() {}
-{{/sampleInput}}
 ```
-### Output
+### After
+
 ```java
 {{#sampleOutput}}
-    {{{sampleOutput}}}
-{{/sampleOutput}}
-{{^sampleOutput}}
-    public static void sample() {}
+{{{sampleOutput}}}
 {{/sampleOutput}}
 ```
 

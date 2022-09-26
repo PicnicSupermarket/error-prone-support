@@ -16,14 +16,10 @@
 
 package com.google.errorprone;
 
-import static java.util.stream.Collectors.joining;
-
 import com.google.common.base.Preconditions;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,16 +28,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import org.eclipse.jgit.util.IO;
 
 /** A serialization-friendly POJO of the information in a {@link BugPattern}. */
 public final class BugPatternInstance {
   private static final Formatter FORMATTER = new Formatter();
+
+  private static final Pattern INPUT_LINES_PATTERN = Pattern.compile("\\.addInputLines\\((\\s*?\".*?\",)\n(.*?)\\)\n",
+      Pattern.DOTALL);
+  private static final Pattern OUTPUT_LINES_PATTERN = Pattern.compile("\\.addOutputLines\\((\\s*?\".*?\",)\n(.*?)\\)\n",
+      Pattern.DOTALL);
 
   public String className;
   public String name;
@@ -63,8 +62,7 @@ public final class BugPatternInstance {
     instance.className = element.toString();
 
     BugPattern annotation = element.getAnnotation(BugPattern.class);
-    instance.name =
-        annotation.name().isEmpty() ? element.getSimpleName().toString() : annotation.name();
+    instance.name = annotation.name().isEmpty() ? element.getSimpleName().toString() : annotation.name();
     instance.altNames = annotation.altNames();
     instance.tags = annotation.tags();
     instance.severity = annotation.severity();
@@ -75,44 +73,65 @@ public final class BugPatternInstance {
     Map<String, Object> keyValues = getAnnotation(element, BugPattern.class.getName());
     Object suppression = keyValues.get("suppressionAnnotations");
     if (suppression == null) {
-      instance.suppressionAnnotations = new String[] {SuppressWarnings.class.getName()};
+      instance.suppressionAnnotations = new String[] { SuppressWarnings.class.getName() };
     } else {
       Preconditions.checkState(suppression instanceof List);
       @SuppressWarnings("unchecked") // Always List<? extends AnnotationValue>, see above.
       List<? extends AnnotationValue> resultList = (List<? extends AnnotationValue>) suppression;
-      instance.suppressionAnnotations =
-          resultList.stream().map(AnnotationValue::toString).toArray(String[]::new);
+      instance.suppressionAnnotations = resultList.stream().map(AnnotationValue::toString).toArray(String[]::new);
     }
 
-    Path testPath =
-        Path.of(
-            "error-prone-contrib/src/test/java/"
-                + instance.className.replace(".", "/")
-                + "Test.java");
+    Path testPath = getPath(instance);
     System.out.println("test class for " + instance.name + " = " + testPath.toAbsolutePath());
 
     try {
-      Pattern inputPattern =
-          Pattern.compile("\\.addInputLines\\((\\n.*?\".*?\",)\\n(.*?)\\)\\n", Pattern.DOTALL);
       instance.testContent = String.join("\n", Files.readAllLines(testPath));
-      Matcher inputMatch = inputPattern.matcher(instance.testContent);
-      if (inputMatch.find()) {
-        String inputSrc =
-            inputMatch
-                .group(2) + ",\n";
-        System.out.println(inputSrc);
-        inputSrc = inputSrc.replaceAll("\\s*\"(.*?)\"(,\\n)", "$1\n");
-        System.out.println(inputSrc);
-        inputSrc = inputSrc
-                .replaceAll("\\\\\"(.*?)\\\\\"", "\"$1\"");
-        System.out.println(inputSrc);
-        instance.sampleInput = FORMATTER.formatSource(inputSrc);
-      }
-    } catch (IOException | IllegalStateException | FormatterException e) {
+      instance.sampleInput = getInputLines(instance.testContent);
+      instance.sampleOutput = getOutputLines(instance.testContent);
+    } catch (IOException e) {
       e.printStackTrace();
     }
 
     return instance;
+  }
+
+  private static Path getPath(BugPatternInstance instance) {
+    return Path.of(
+        "error-prone-contrib/src/test/java/"
+            + instance.className.replace(".", "/")
+            + "Test.java");
+  }
+
+  private static String getInputLines(String content) {
+    System.out.println("INPUT:");
+    return getLines(INPUT_LINES_PATTERN, content);
+  }
+
+  private static String getOutputLines(String content) {
+    System.out.println("OUTPUT:");
+    return getLines(OUTPUT_LINES_PATTERN, content);
+  }
+
+  private static String getLines(Pattern pattern, String content) {
+    Matcher match = pattern.matcher(content);
+
+    if (!match.find()) {
+      return "";
+    }
+
+    String lines = match.group(2) + ",\n";
+    System.out.println(lines);
+    lines = lines.replaceAll("\\s*\"(.*?)\"(,\\n)", "$1\n");
+    System.out.println(lines);
+    lines = lines
+        .replaceAll("\\\\\"(.*?)\\\\\"", "\"$1\"");
+    System.out.println(lines);
+
+    try {
+      return FORMATTER.formatSource(lines);
+    } catch (FormatterException e) {
+      return "";
+    }
   }
 
   private static Map<String, Object> getAnnotation(Element element, String name) {
