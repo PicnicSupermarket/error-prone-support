@@ -276,8 +276,8 @@ final class RefasterRuleSelector {
     // templates would always match.
     private static final String AUTO_VALUE_UCLASS_IDENT_FQCN =
         "com.google.errorprone.refaster.AutoValue_UClassIdent";
-    private static final Class<?> UCLASS_IDENT = getUClassIdentClass();
-    private static final Class<?> UCLASS_AUTOVALUE_IDENT = getUClassIdentAutoValueClass();
+    private static final Class<?> UCLASS_IDENT = getClass(UCLASS_IDENT_FQCN);
+    private static final Class<?> UCLASS_AUTOVALUE_IDENT = getClass(AUTO_VALUE_UCLASS_IDENT_FQCN);
     private static final Method METHOD_REFASTER_RULE_BEFORE_TEMPLATES =
         getMethod(RefasterRule.class, "beforeTemplates");
     private static final Method METHOD_EXPRESSION_TEMPLATE_EXPRESSION =
@@ -340,22 +340,11 @@ final class RefasterRuleSelector {
       }
     }
 
-    // XXX: This and the next method can be made generic and not be almost 100% duplicate.
-    private static Class<?> getUClassIdentClass() {
+    private static Class<?> getClass(String fqcn) {
       try {
-        return RefasterIntrospection.class.getClassLoader().loadClass(UCLASS_IDENT_FQCN);
+        return RefasterIntrospection.class.getClassLoader().loadClass(fqcn);
       } catch (ClassNotFoundException e) {
-        throw new IllegalStateException(
-            String.format("Failed to load class `%s`", UCLASS_IDENT_FQCN), e);
-      }
-    }
-
-    private static Class<?> getUClassIdentAutoValueClass() {
-      try {
-        return RefasterIntrospection.class.getClassLoader().loadClass(AUTO_VALUE_UCLASS_IDENT_FQCN);
-      } catch (ClassNotFoundException e) {
-        throw new IllegalStateException(
-            String.format("Failed to load class `%s`", AUTO_VALUE_UCLASS_IDENT_FQCN), e);
+        throw new IllegalStateException(String.format("Failed to load class `%s`", fqcn), e);
       }
     }
   }
