@@ -24,7 +24,7 @@ final class NodeTest {
   private static Stream<Arguments> verifyTestCases() {
     Random random = new Random(0);
 
-    /* { source, random } */
+    /* { treeInput, random } */
     return Stream.of(
         arguments(generateTestInput(random, 0, 0, 0, 0), random),
         arguments(generateTestInput(random, 1, 1, 1, 1), random),
@@ -60,16 +60,15 @@ final class NodeTest {
         arguments(generateTestInput(random, 1000, 5, 10, 10000), random));
   }
 
-  // XXX: Improve `source` param name.
   @MethodSource("verifyTestCases")
   @ParameterizedTest
-  void verify(ImmutableSetMultimap<Integer, ImmutableSet<String>> source, Random random) {
-    Node<Integer> tree = Node.create(source.keySet().asList(), source::get);
+  void verify(ImmutableSetMultimap<Integer, ImmutableSet<String>> treeInput, Random random) {
+    Node<Integer> tree = Node.create(treeInput.keySet().asList(), treeInput::get);
 
     // XXX: Drop.
     // System.out.println(size(tree));
 
-    verifyConstruction(tree, source, random);
+    verifyConstruction(tree, treeInput, random);
   }
 
   // XXX: Drop.
@@ -81,12 +80,12 @@ final class NodeTest {
 
   private static void verifyConstruction(
       Node<Integer> tree,
-      ImmutableSetMultimap<Integer, ImmutableSet<String>> source,
+      ImmutableSetMultimap<Integer, ImmutableSet<String>> treeInput,
       Random random) {
     ImmutableSet<String> allPathValues =
-        source.values().stream().flatMap(ImmutableSet::stream).collect(toImmutableSet());
+        treeInput.values().stream().flatMap(ImmutableSet::stream).collect(toImmutableSet());
 
-    for (Map.Entry<Integer, ImmutableSet<String>> e : source.entries()) {
+    for (Map.Entry<Integer, ImmutableSet<String>> e : treeInput.entries()) {
       verifyReachability(tree, e.getKey(), shuffle(e.getValue(), random), allPathValues, random);
     }
   }
