@@ -16,6 +16,7 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
+  - vendor
 
 permalink: pretty # Use /doc/ vs. /doc.html
 
@@ -37,4 +38,4 @@ social:
   links:
     - https://github.com/PicnicSupermarket
     - https://twitter.com/picnic
-    - https://www.linkedin.com/company/picnictechnologies/
+    - https://www.linkedin.com/company/picnictechnologies

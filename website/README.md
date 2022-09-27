@@ -6,7 +6,7 @@ statically generated using [Jekyll][jekyll].
 
 # Local development
 
-To view the webite on `localhost`, first follow the [Jekyll installation
+To view the website on `localhost`, first follow the [Jekyll installation
 instructions][jekyll-docs-installation]. Once done, in this directory execute:
 
 ```sh
@@ -20,7 +20,7 @@ code modifications will automatically be reflected. (An exception is
 server restarts do not require running `bundle install`, unless `Gemfile` has
 been updated in the interim.
 
-Documentation can be re-generated whist jekyll is running, by executing:
+Documentation can be regenerated whist jekyll is running, by executing:
 
 ```sh
 ../generate-docs.sh
@@ -33,12 +33,12 @@ step-by-step tutorial.
 # Deployment
 
 The website is regenerated and deployed using the
-[`deploy-website.yaml`][error-prone-support-website-deploy-workflow] Github
+[`deploy-website.yaml`][error-prone-support-website-deploy-workflow] GitHub
 Actions workflow any time a change is merged to `master`.
 
-[error-prone-support-website-deploy-workflow]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/deploy-website.yaml
 [error-prone-support-website]: https://error-prone.picnic.tech
+[error-prone-support-website-deploy-workflow]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/deploy-website.yaml
+[jekyll]: https://jekyllrb.com
 [jekyll-docs]: https://jekyllrb.com/docs/
 [jekyll-docs-installation]: https://jekyllrb.com/docs/installation/
-[jekyll]: https://jekyllrb.com
 [localhost-port-4000]: http://127.0.0.1:4000
