@@ -163,178 +163,15 @@ final class RefasterRuleSelector {
     List<Set<String>> identifierCombinations = new ArrayList<>();
     identifierCombinations.add(new HashSet<>());
 
-    // XXX: Make the scanner static, then make also its helper methods static.
-    new TreeScanner<Void, List<Set<String>>>() {
-      @Nullable
-      @Override
-      public Void visitIdentifier(IdentifierTree node, List<Set<String>> identifierCombinations) {
-        // XXX: Also include the package name if not `java.lang`; it must be present.
-        if (RefasterIntrospection.isUClassIdent(node)) {
-          for (Set<String> ids : identifierCombinations) {
-            ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(node)));
-            ids.add(getIdentifier(node));
-          }
-        } else if (node instanceof UStaticIdent) {
-          IdentifierTree subNode = RefasterIntrospection.getClassIdent((UStaticIdent) node);
-          for (Set<String> ids : identifierCombinations) {
-            ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(subNode)));
-            ids.add(getIdentifier(subNode));
-            ids.add(node.getName().toString());
-          }
-        }
-
-        return null;
-      }
-
-      private String getIdentifier(IdentifierTree tree) {
-        return getSimpleName(tree.getName().toString());
-      }
-
-      private String getSimpleName(String fcqn) {
-        int index = fcqn.lastIndexOf('.');
-        return index < 0 ? fcqn : fcqn.substring(index + 1);
-      }
-
-      @Nullable
-      @Override
-      public Void visitMemberReference(
-          MemberReferenceTree node, List<Set<String>> identifierCombinations) {
-        super.visitMemberReference(node, identifierCombinations);
-        String id = node.getName().toString();
-        identifierCombinations.forEach(ids -> ids.add(id));
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public Void visitMemberSelect(
-          MemberSelectTree node, List<Set<String>> identifierCombinations) {
-        super.visitMemberSelect(node, identifierCombinations);
-        String id = node.getIdentifier().toString();
-        identifierCombinations.forEach(ids -> ids.add(id));
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public Void visitAssignment(AssignmentTree node, List<Set<String>> identifierCombinations) {
-        registerOperator(node, identifierCombinations);
-        return super.visitAssignment(node, identifierCombinations);
-      }
-
-      @Nullable
-      @Override
-      public Void visitCompoundAssignment(
-          CompoundAssignmentTree node, List<Set<String>> identifierCombinations) {
-        registerOperator(node, identifierCombinations);
-        return super.visitCompoundAssignment(node, identifierCombinations);
-      }
-
-      @Nullable
-      @Override
-      public Void visitUnary(UnaryTree node, List<Set<String>> identifierCombinations) {
-        registerOperator(node, identifierCombinations);
-        return super.visitUnary(node, identifierCombinations);
-      }
-
-      @Nullable
-      @Override
-      public Void visitBinary(BinaryTree node, List<Set<String>> identifierCombinations) {
-        registerOperator(node, identifierCombinations);
-        return super.visitBinary(node, identifierCombinations);
-      }
-
-      private void registerOperator(ExpressionTree node, List<Set<String>> identifierCombinations) {
-        identifierCombinations.forEach(ids -> ids.add(treeKindToString(node.getKind())));
-      }
-
-      @Nullable
-      @Override
-      public Void visitOther(Tree node, List<Set<String>> identifierCombinations) {
-        if (node instanceof UAnyOf) {
-          List<Set<String>> base = copy(identifierCombinations);
-          identifierCombinations.clear();
-
-          for (UExpression expr : RefasterIntrospection.getExpressions((UAnyOf) node)) {
-            List<Set<String>> branch = copy(base);
-            scan(expr, branch);
-            identifierCombinations.addAll(branch);
-          }
-        }
-
-        return null;
-      }
-
-      private List<Set<String>> copy(List<Set<String>> identifierCombinations) {
-        return identifierCombinations.stream()
-            .map(HashSet::new)
-            .collect(toCollection(ArrayList::new));
-      }
-    }.scan(trees, identifierCombinations);
+    new TemplateIdentifierExtractor().scan(trees, identifierCombinations);
 
     return identifierCombinations.stream().map(ImmutableSet::copyOf).collect(toImmutableSet());
   }
 
-  private Set<String> extractSourceIdentifiers(Tree tree) {
+  private static Set<String> extractSourceIdentifiers(Tree tree) {
     Set<String> identifiers = new HashSet<>();
 
-    // XXX: Make the scanner static.
-    new TreeScanner<Void, Set<String>>() {
-      @Nullable
-      @Override
-      public Void visitIdentifier(IdentifierTree node, Set<String> identifiers) {
-        identifiers.add(node.getName().toString());
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public Void visitMemberReference(MemberReferenceTree node, Set<String> identifiers) {
-        super.visitMemberReference(node, identifiers);
-        identifiers.add(node.getName().toString());
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public Void visitMemberSelect(MemberSelectTree node, Set<String> identifiers) {
-        super.visitMemberSelect(node, identifiers);
-        identifiers.add(node.getIdentifier().toString());
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public Void visitAssignment(AssignmentTree node, Set<String> identifiers) {
-        registerOperator(node, identifiers);
-        return super.visitAssignment(node, identifiers);
-      }
-
-      @Nullable
-      @Override
-      public Void visitCompoundAssignment(CompoundAssignmentTree node, Set<String> identifiers) {
-        registerOperator(node, identifiers);
-        return super.visitCompoundAssignment(node, identifiers);
-      }
-
-      @Nullable
-      @Override
-      public Void visitUnary(UnaryTree node, Set<String> identifiers) {
-        registerOperator(node, identifiers);
-        return super.visitUnary(node, identifiers);
-      }
-
-      @Nullable
-      @Override
-      public Void visitBinary(BinaryTree node, Set<String> identifiers) {
-        registerOperator(node, identifiers);
-        return super.visitBinary(node, identifiers);
-      }
-
-      private void registerOperator(ExpressionTree node, Set<String> identifiers) {
-        identifiers.add(treeKindToString(node.getKind()));
-      }
-    }.scan(tree, identifiers);
+    new SourceIdentifierExtractor().scan(tree, identifiers);
 
     return identifiers;
   }
@@ -520,6 +357,171 @@ final class RefasterRuleSelector {
         throw new IllegalStateException(
             String.format("Failed to load class `%s`", AUTO_VALUE_UCLASS_IDENT_FQCN), e);
       }
+    }
+  }
+
+  private static class TemplateIdentifierExtractor extends TreeScanner<Void, List<Set<String>>> {
+    @Nullable
+    @Override
+    public Void visitIdentifier(IdentifierTree node, List<Set<String>> identifierCombinations) {
+      // XXX: Also include the package name if not `java.lang`; it must be present.
+      if (RefasterIntrospection.isUClassIdent(node)) {
+        for (Set<String> ids : identifierCombinations) {
+          ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(node)));
+          ids.add(getIdentifier(node));
+        }
+      } else if (node instanceof UStaticIdent) {
+        IdentifierTree subNode = RefasterIntrospection.getClassIdent((UStaticIdent) node);
+        for (Set<String> ids : identifierCombinations) {
+          ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(subNode)));
+          ids.add(getIdentifier(subNode));
+          ids.add(node.getName().toString());
+        }
+      }
+
+      return null;
+    }
+
+    private static String getIdentifier(IdentifierTree tree) {
+      return getSimpleName(tree.getName().toString());
+    }
+
+    private static String getSimpleName(String fqcn) {
+      int index = fqcn.lastIndexOf('.');
+      return index < 0 ? fqcn : fqcn.substring(index + 1);
+    }
+
+    @Nullable
+    @Override
+    public Void visitMemberReference(
+        MemberReferenceTree node, List<Set<String>> identifierCombinations) {
+      super.visitMemberReference(node, identifierCombinations);
+      String id = node.getName().toString();
+      identifierCombinations.forEach(ids -> ids.add(id));
+      return null;
+    }
+
+    @Nullable
+    @Override
+    public Void visitMemberSelect(MemberSelectTree node, List<Set<String>> identifierCombinations) {
+      super.visitMemberSelect(node, identifierCombinations);
+      String id = node.getIdentifier().toString();
+      identifierCombinations.forEach(ids -> ids.add(id));
+      return null;
+    }
+
+    @Nullable
+    @Override
+    public Void visitAssignment(AssignmentTree node, List<Set<String>> identifierCombinations) {
+      registerOperator(node, identifierCombinations);
+      return super.visitAssignment(node, identifierCombinations);
+    }
+
+    @Nullable
+    @Override
+    public Void visitCompoundAssignment(
+        CompoundAssignmentTree node, List<Set<String>> identifierCombinations) {
+      registerOperator(node, identifierCombinations);
+      return super.visitCompoundAssignment(node, identifierCombinations);
+    }
+
+    @Nullable
+    @Override
+    public Void visitUnary(UnaryTree node, List<Set<String>> identifierCombinations) {
+      registerOperator(node, identifierCombinations);
+      return super.visitUnary(node, identifierCombinations);
+    }
+
+    @Nullable
+    @Override
+    public Void visitBinary(BinaryTree node, List<Set<String>> identifierCombinations) {
+      registerOperator(node, identifierCombinations);
+      return super.visitBinary(node, identifierCombinations);
+    }
+
+    private static void registerOperator(
+        ExpressionTree node, List<Set<String>> identifierCombinations) {
+      identifierCombinations.forEach(ids -> ids.add(treeKindToString(node.getKind())));
+    }
+
+    @Nullable
+    @Override
+    public Void visitOther(Tree node, List<Set<String>> identifierCombinations) {
+      if (node instanceof UAnyOf) {
+        List<Set<String>> base = copy(identifierCombinations);
+        identifierCombinations.clear();
+
+        for (UExpression expr : RefasterIntrospection.getExpressions((UAnyOf) node)) {
+          List<Set<String>> branch = copy(base);
+          scan(expr, branch);
+          identifierCombinations.addAll(branch);
+        }
+      }
+
+      return null;
+    }
+
+    private static List<Set<String>> copy(List<Set<String>> identifierCombinations) {
+      return identifierCombinations.stream()
+          .map(HashSet::new)
+          .collect(toCollection(ArrayList::new));
+    }
+  }
+
+  private static class SourceIdentifierExtractor extends TreeScanner<Void, Set<String>> {
+    @Nullable
+    @Override
+    public Void visitIdentifier(IdentifierTree node, Set<String> identifiers) {
+      identifiers.add(node.getName().toString());
+      return null;
+    }
+
+    @Nullable
+    @Override
+    public Void visitMemberReference(MemberReferenceTree node, Set<String> identifiers) {
+      super.visitMemberReference(node, identifiers);
+      identifiers.add(node.getName().toString());
+      return null;
+    }
+
+    @Nullable
+    @Override
+    public Void visitMemberSelect(MemberSelectTree node, Set<String> identifiers) {
+      super.visitMemberSelect(node, identifiers);
+      identifiers.add(node.getIdentifier().toString());
+      return null;
+    }
+
+    @Nullable
+    @Override
+    public Void visitAssignment(AssignmentTree node, Set<String> identifiers) {
+      registerOperator(node, identifiers);
+      return super.visitAssignment(node, identifiers);
+    }
+
+    @Nullable
+    @Override
+    public Void visitCompoundAssignment(CompoundAssignmentTree node, Set<String> identifiers) {
+      registerOperator(node, identifiers);
+      return super.visitCompoundAssignment(node, identifiers);
+    }
+
+    @Nullable
+    @Override
+    public Void visitUnary(UnaryTree node, Set<String> identifiers) {
+      registerOperator(node, identifiers);
+      return super.visitUnary(node, identifiers);
+    }
+
+    @Nullable
+    @Override
+    public Void visitBinary(BinaryTree node, Set<String> identifiers) {
+      registerOperator(node, identifiers);
+      return super.visitBinary(node, identifiers);
+    }
+
+    private static void registerOperator(ExpressionTree node, Set<String> identifiers) {
+      identifiers.add(treeKindToString(node.getKind()));
     }
   }
 }
