@@ -28,7 +28,6 @@ import com.google.common.io.LineProcessor;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,12 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.SafeConstructor;
-import org.yaml.snakeyaml.representer.Representer;
 
 /**
  * Reads each line of the bugpatterns.txt tab-delimited data file, and generates a GitHub Jekyll
@@ -104,7 +98,7 @@ class BugPatternFileGenerator implements LineProcessor<List<BugPatternInstance>>
                   "tags", Arrays.stream(pattern.tags).map(Style::styleTag).collect(joining("\n\n")))
               .put("severity", Style.styleSeverity(pattern.severity))
               .put("name", pattern.name)
-              .put("bugpattern", String.format("%s.java", pattern.className))
+              .put("bugpattern", String.format("%s.java", pattern.className.replace(".", "/")))
               .put("className", pattern.className)
               .put("summary", pattern.summary.trim())
               .put("altNames", Joiner.on(", ").join(pattern.altNames))
