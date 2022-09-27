@@ -24,22 +24,21 @@ To make changes, edit the @BugPattern annotation or the explanation in docs/bugp
 {{{suppression}}}
 {{/suppression}}
 
+{{#hasSamples}}
 ## Samples
 
 ### Before
 
 ```java
-{{#sampleInput}}
 {{{sampleInput}}}
-{{/sampleInput}}
 ```
+
 ### After
 
 ```java
-{{#sampleOutput}}
 {{{sampleOutput}}}
-{{/sampleOutput}}
 ```
+{{/hasSamples}}
 
 <a href="https://github.com/PicnicSupermarket/error-prone-support/blob/master/${bugpattern}" class="fs-3 btn external"
    target="_blank">

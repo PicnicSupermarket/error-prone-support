@@ -110,11 +110,9 @@ class BugPatternFileGenerator implements LineProcessor<List<BugPatternInstance>>
               .put("altNames", Joiner.on(", ").join(pattern.altNames))
               .put("explanation", pattern.explanation.trim());
 
-      if (pattern.sampleInput != null) {
+      if (pattern.sampleInput != null && pattern.sampleOutput != null) {
+        templateData.put("hasSamples", true);
         templateData.put("sampleInput", pattern.sampleInput);
-      }
-
-      if (pattern.sampleOutput != null) {
         templateData.put("sampleOutput", pattern.sampleOutput);
       }
 

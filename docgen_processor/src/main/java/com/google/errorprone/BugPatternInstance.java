@@ -23,6 +23,7 @@ import com.google.googlejavaformat.java.FormatterException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,14 +34,15 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 /** A serialization-friendly POJO of the information in a {@link BugPattern}. */
 public final class BugPatternInstance {
   private static final Formatter FORMATTER = new Formatter();
 
-  private static final Pattern INPUT_LINES_PATTERN = Pattern.compile("\\.addInputLines\\((\\s*?\".*?\",)\n(.*?)\\)\n",
-      Pattern.DOTALL);
-  private static final Pattern OUTPUT_LINES_PATTERN = Pattern.compile("\\.addOutputLines\\((\\s*?\".*?\",)\n(.*?)\\)\n",
-      Pattern.DOTALL);
+  private static final Pattern INPUT_LINES_PATTERN = Pattern.compile("\\.addInputLines\\((.*?)\\)\n", Pattern.DOTALL);
+  private static final Pattern OUTPUT_LINES_PATTERN = Pattern.compile("\\.addOutputLines\\((.*?)\\)\n", Pattern.DOTALL);
+  private static final Pattern LINES_PATTERN = Pattern.compile("\"(.*)\"");
 
   public String className;
   public String name;
@@ -103,12 +105,10 @@ public final class BugPatternInstance {
   }
 
   private static String getInputLines(String content) {
-    System.out.println("INPUT:");
     return getLines(INPUT_LINES_PATTERN, content);
   }
 
   private static String getOutputLines(String content) {
-    System.out.println("OUTPUT:");
     return getLines(OUTPUT_LINES_PATTERN, content);
   }
 
@@ -116,22 +116,36 @@ public final class BugPatternInstance {
     Matcher match = pattern.matcher(content);
 
     if (!match.find()) {
-      return "";
+      return null;
     }
 
-    String lines = match.group(2) + ",\n";
-    System.out.println(lines);
-    lines = lines.replaceAll("\\s*\"(.*?)\"(,\\n)", "$1\n");
-    System.out.println(lines);
-    lines = lines
-        .replaceAll("\\\\\"(.*?)\\\\\"", "\"$1\"");
-    System.out.println(lines);
+    String argument = match.group(1);
+
+    List<String> lines = findAllGroups(argument, LINES_PATTERN);
+    // Remove in/A.java and out/A.java
+    lines.remove(0);
+
+    String sampleCode = String.join("\n", lines);
+    sampleCode = StringEscapeUtils.unescapeJava(sampleCode);
 
     try {
-      return FORMATTER.formatSource(lines);
+      return FORMATTER.formatSource(sampleCode);
     } catch (FormatterException e) {
-      return "";
+      e.printStackTrace();
+      return null;
     }
+  }
+
+  private static List<String> findAllGroups(String text, Pattern pattern) {
+    List<String> list = new ArrayList<>();
+    Matcher matcher = pattern.matcher(text);
+    while (matcher.find()) {
+      for (int i = 1; i <= matcher.groupCount(); i++) {
+        list.add(matcher.group(i));
+      }
+    }
+
+    return list;
   }
 
   private static Map<String, Object> getAnnotation(Element element, String name) {
