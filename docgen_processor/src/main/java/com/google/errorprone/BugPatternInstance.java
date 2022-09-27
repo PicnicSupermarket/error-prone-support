@@ -129,7 +129,8 @@ public final class BugPatternInstance {
     sampleCode = StringEscapeUtils.unescapeJava(sampleCode);
 
     try {
-      return FORMATTER.formatSource(sampleCode);
+      // Trim to remove trailing line-break.
+      return FORMATTER.formatSource(sampleCode).trim();
     } catch (FormatterException e) {
       e.printStackTrace();
       return null;
