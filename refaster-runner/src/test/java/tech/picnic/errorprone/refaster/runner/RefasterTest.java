@@ -2,7 +2,6 @@ package tech.picnic.errorprone.refaster.runner;
 
 import static com.google.common.base.Predicates.containsPattern;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
-import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;
 import static java.util.Comparator.naturalOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -10,6 +9,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -107,8 +107,8 @@ final class RefasterTest {
    * Verifies that the bug checker flags the refactoring opportunities with the appropriate severity
    * level.
    *
-   * @implNote This test setup is rather awkward, because {@link CompilationTestHelper} does not
-   *     enable direct assertions against the severity of collected diagnostics output.
+   * @implNote This test setup is rather cumbersome, because the {@link CompilationTestHelper} does
+   *     not enable direct assertions against the severity of collected diagnostics output.
    */
   @MethodSource("reportedSeverityTestCases")
   @ParameterizedTest
@@ -175,7 +175,7 @@ final class RefasterTest {
             "    boolean b4 = \"qux\".length() == 3;",
             "  }",
             "}")
-        .doTest(TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
@@ -201,6 +201,6 @@ final class RefasterTest {
             "    boolean b4 = \"qux\".toCharArray().length == 3;",
             "  }",
             "}")
-        .doTest(TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 }
