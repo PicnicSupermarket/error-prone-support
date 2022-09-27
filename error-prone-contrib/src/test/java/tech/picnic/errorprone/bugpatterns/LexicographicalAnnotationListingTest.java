@@ -114,7 +114,7 @@ final class LexicographicalAnnotationListingTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import java.lang.annotation.Repeatable;",
             "",
             "interface A {",
@@ -176,7 +176,7 @@ final class LexicographicalAnnotationListingTest {
             "  A unsortedRepeatableAnnotation();",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import java.lang.annotation.Repeatable;",
             "",
             "interface A {",

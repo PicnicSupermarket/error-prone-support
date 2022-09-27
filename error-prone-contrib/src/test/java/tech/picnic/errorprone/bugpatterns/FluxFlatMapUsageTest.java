@@ -67,7 +67,7 @@ final class FluxFlatMapUsageTest {
     refactoringTestHelper
         .setFixChooser(FixChoosers.FIRST)
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
@@ -77,7 +77,7 @@ final class FluxFlatMapUsageTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
@@ -94,7 +94,7 @@ final class FluxFlatMapUsageTest {
     refactoringTestHelper
         .setFixChooser(FixChoosers.SECOND)
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
@@ -106,7 +106,7 @@ final class FluxFlatMapUsageTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",

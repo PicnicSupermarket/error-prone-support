@@ -499,7 +499,7 @@ final class PrimitiveComparisonTest {
   void replacementWithPrimitiveVariants() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import java.util.Comparator;",
             "",
             "interface A extends Comparable<A> {",
@@ -536,7 +536,7 @@ final class PrimitiveComparisonTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import java.util.Comparator;",
             "",
             "interface A extends Comparable<A> {",
@@ -579,7 +579,7 @@ final class PrimitiveComparisonTest {
   void replacementWithBoxedVariants() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import java.util.Comparator;",
             "",
             "interface A extends Comparable<A> {",
@@ -609,7 +609,7 @@ final class PrimitiveComparisonTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import java.util.Comparator;",
             "",
             "interface A extends Comparable<A> {",
@@ -645,7 +645,7 @@ final class PrimitiveComparisonTest {
   void replacementWithPrimitiveVariantsUsingStaticImports() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import static java.util.Comparator.comparing;",
             "",
             "import java.util.Comparator;",
@@ -660,7 +660,7 @@ final class PrimitiveComparisonTest {
             "  Comparator<A> dCmp = comparing(o -> 0.0);",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import static java.util.Comparator.comparing;",
             "import static java.util.Comparator.comparingDouble;",
             "import static java.util.Comparator.comparingInt;",
@@ -684,7 +684,7 @@ final class PrimitiveComparisonTest {
   void replacementWithBoxedVariantsUsingStaticImports() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import static java.util.Comparator.comparingDouble;",
             "import static java.util.Comparator.comparingInt;",
             "import static java.util.Comparator.comparingLong;",
@@ -701,7 +701,7 @@ final class PrimitiveComparisonTest {
             "  Comparator<A> dCmp = comparingDouble(o -> Double.valueOf(0));",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import static java.util.Comparator.comparing;",
             "import static java.util.Comparator.comparingDouble;",
             "import static java.util.Comparator.comparingInt;",
@@ -725,7 +725,7 @@ final class PrimitiveComparisonTest {
   void replacementWithPrimitiveVariantsInComplexSyntacticalContext() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import java.util.Comparator;",
             "",
             "interface A extends Comparable<A> {",
@@ -738,7 +738,7 @@ final class PrimitiveComparisonTest {
             "  Comparator<A> dCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> 0.0);",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import java.util.Comparator;",
             "",
             "interface A extends Comparable<A> {",
@@ -757,7 +757,7 @@ final class PrimitiveComparisonTest {
   void replacementWithBoxedVariantsInComplexSyntacticalContext() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import java.util.Comparator;",
             "",
             "interface A extends Comparable<A> {",
@@ -775,7 +775,7 @@ final class PrimitiveComparisonTest {
             "      Comparator.<A, A>comparing(o -> o).thenComparingDouble(o -> Double.valueOf(0));",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import java.util.Comparator;",
             "",
             "interface A extends Comparable<A> {",

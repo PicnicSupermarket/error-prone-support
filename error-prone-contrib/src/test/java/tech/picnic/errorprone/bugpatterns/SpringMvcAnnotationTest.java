@@ -87,7 +87,7 @@ final class SpringMvcAnnotationTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import static org.springframework.web.bind.annotation.RequestMethod.PATCH;",
             "import static org.springframework.web.bind.annotation.RequestMethod.POST;",
             "import static org.springframework.web.bind.annotation.RequestMethod.PUT;",
@@ -117,7 +117,7 @@ final class SpringMvcAnnotationTest {
             "  A curly();",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import static org.springframework.web.bind.annotation.RequestMethod.PATCH;",
             "import static org.springframework.web.bind.annotation.RequestMethod.POST;",
             "import static org.springframework.web.bind.annotation.RequestMethod.PUT;",

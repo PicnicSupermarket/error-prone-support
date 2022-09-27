@@ -311,7 +311,7 @@ final class FormatStringConcatenationTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import static com.google.common.base.Preconditions.checkArgument;",
             "import static org.assertj.core.api.Assertions.assertThat;",
             "",
@@ -360,7 +360,7 @@ final class FormatStringConcatenationTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import static com.google.common.base.Preconditions.checkArgument;",
             "import static org.assertj.core.api.Assertions.assertThat;",
             "",

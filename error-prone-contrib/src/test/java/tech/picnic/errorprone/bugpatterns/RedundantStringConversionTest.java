@@ -511,7 +511,7 @@ final class RedundantStringConversionTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "class A {",
             "  private final Object o = new Object();",
             "  private final String s = o.toString();",
@@ -525,7 +525,7 @@ final class RedundantStringConversionTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "class A {",
             "  private final Object o = new Object();",
             "  private final String s = o.toString();",

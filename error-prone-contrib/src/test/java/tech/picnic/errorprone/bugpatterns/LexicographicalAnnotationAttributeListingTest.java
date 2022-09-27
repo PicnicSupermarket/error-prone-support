@@ -167,7 +167,7 @@ final class LexicographicalAnnotationAttributeListingTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import static java.math.RoundingMode.DOWN;",
             "import static java.math.RoundingMode.UP;",
             "",
@@ -204,7 +204,7 @@ final class LexicographicalAnnotationAttributeListingTest {
             "  A unsortedInnderAnns();",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import static java.math.RoundingMode.DOWN;",
             "import static java.math.RoundingMode.UP;",
             "",

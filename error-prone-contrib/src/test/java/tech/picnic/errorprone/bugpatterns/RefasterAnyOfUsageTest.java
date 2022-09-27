@@ -40,7 +40,7 @@ final class RefasterAnyOfUsageTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "import com.google.errorprone.refaster.Refaster;",
             "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
             "",
@@ -52,7 +52,7 @@ final class RefasterAnyOfUsageTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/A.java",
+            "A.java",
             "import com.google.errorprone.refaster.Refaster;",
             "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
             "",

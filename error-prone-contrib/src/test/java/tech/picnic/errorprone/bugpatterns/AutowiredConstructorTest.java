@@ -73,7 +73,7 @@ final class AutowiredConstructorTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/Container.java",
+            "Container.java",
             "import org.springframework.beans.factory.annotation.Autowired;",
             "",
             "interface Container {",
@@ -89,7 +89,7 @@ final class AutowiredConstructorTest {
             "  }",
             "}")
         .addOutputLines(
-            "out/Container.java",
+            "Container.java",
             "import org.springframework.beans.factory.annotation.Autowired;",
             "",
             "interface Container {",

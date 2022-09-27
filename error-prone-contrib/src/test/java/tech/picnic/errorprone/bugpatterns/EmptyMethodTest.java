@@ -71,13 +71,13 @@ final class EmptyMethodTest {
   void replacement() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java",
+            "A.java",
             "final class A {",
             "  void instanceMethod() {}",
             "",
             "  static void staticMethod() {}",
             "}")
-        .addOutputLines("out/A.java", "final class A {}")
+        .addOutputLines("A.java", "final class A {}")
         .doTest(TestMode.TEXT_MATCH);
   }
 }
