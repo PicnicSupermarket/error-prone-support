@@ -320,12 +320,11 @@ final class RefasterRuleSelector {
       return invokeMethod(METHOD_UANY_OF_EXPRESSIONS, tree);
     }
 
-    @SuppressWarnings({"TypeParameterUnusedInFormals", "unchecked"})
-    private static <T> T invokeMethod(Method method, Object instance) {
+    private static Class<?> getClass(String fqcn) {
       try {
-        return (T) method.invoke(instance);
-      } catch (IllegalAccessException | InvocationTargetException e) {
-        throw new IllegalStateException(String.format("Failed to invoke method `%s`", method), e);
+        return RefasterIntrospection.class.getClassLoader().loadClass(fqcn);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException(String.format("Failed to load class `%s`", fqcn), e);
       }
     }
 
@@ -340,11 +339,12 @@ final class RefasterRuleSelector {
       }
     }
 
-    private static Class<?> getClass(String fqcn) {
+    @SuppressWarnings({"TypeParameterUnusedInFormals", "unchecked"})
+    private static <T> T invokeMethod(Method method, Object instance) {
       try {
-        return RefasterIntrospection.class.getClassLoader().loadClass(fqcn);
-      } catch (ClassNotFoundException e) {
-        throw new IllegalStateException(String.format("Failed to load class `%s`", fqcn), e);
+        return (T) method.invoke(instance);
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        throw new IllegalStateException(String.format("Failed to invoke method `%s`", method), e);
       }
     }
   }
