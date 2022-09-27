@@ -1,8 +1,8 @@
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="logo-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="logo.svg">
-    <img alt="Error Prone Support logo" src="logo.svg" width="50%">
+    <source media="(prefers-color-scheme: dark)" srcset="website/assets/images/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="website/assets/images/logo.svg">
+    <img alt="Error Prone Support logo" src="website/assets/images/logo.svg" width="50%">
   </picture>
 </div>
 

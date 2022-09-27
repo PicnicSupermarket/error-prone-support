@@ -25,8 +25,8 @@ EOF
     if [[ "$OSTYPE" == "darwin"* ]]; then
         SEDOPTION="-i .bak"
     fi
-    sed $SEDOPTION 's/src="/src="assets\/images\//g' ${HOMEPAGE}
-    sed $SEDOPTION 's/srcset="/srcset="assets\/images\//g' ${HOMEPAGE}
+    sed $SEDOPTION 's/src="website\//src="/g' ${HOMEPAGE}
+    sed $SEDOPTION 's/srcset="website\//srcset="/g' ${HOMEPAGE}
 }
 
 # Do it
