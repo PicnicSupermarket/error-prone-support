@@ -1,9 +1,7 @@
 name: Update `error-prone.picnic.tech` website contents
 on:
   push:
-    #branches: [$default-branch]
-    branches:
-      - 'sschroevers/deploy-to-github-pages'
+    branches: [$default-branch]
   workflow_dispatch:
 permissions:
   contents: read

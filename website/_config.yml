@@ -29,6 +29,7 @@ nav_external_links:
     url: https://github.com/PicnicSupermarket/error-prone-support
     hide_icon: false
 
+# Author configuration.
 twitter:
   username: picnic
   card: summary
