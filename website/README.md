@@ -2,20 +2,32 @@
 
 This directory contains the majority of the source code that powers
 [error-prone.picnic.tech][error-prone-support-website]. The website is
-statically generated using [Jekyll][jekyll].
+statically generated using data extracted from source code passed to
+[Jekyll][jekyll] through [Mustache][mustache].
 
 # Local development
 
 To view the website on `localhost`, first follow the [Jekyll installation
-instructions][jekyll-docs-installation]. Once done, in this directory execute:
+instructions][jekyll-docs-installation]. Once done, run the following Maven
+commands in the root of the repository to extract the (test) data from the bug
+patterns and Refaster rule collections. Unless, these classes have been
+changed, this only needs to be executed once.
+
+```sh
+mvn -T1C clean install -Dverification.skip
+```
+
+Then to generate the website content, execute in this
+directory:
 
 ```sh
 bundle install
-../generate-docs.sh && bundle exec jekyll serve --livereload
+bundle exec ruby generate-docs.rb
+bundle exec jekyll serve --livereload --incremental --skip-initial-build
 ```
 
 The website will now be [available][localhost-port-4000] on port 4000. Source
-code modifications (including the result of rerunning `../generate-docs.sh`)
+code modifications (including the result of rerunning `generate-docs.rb`)
 will automatically be reflected. (An exception is `_config.yml`: changes to
 this file require a server restart.) Subsequent server restarts do not require
 running `bundle install`, unless `Gemfile` has been updated in the interim.
@@ -61,4 +73,5 @@ Actions workflow any time a change is merged to `master`.
 [jekyll-docs-installation]: https://jekyllrb.com/docs/installation
 [just-the-docs]: https://just-the-docs.github.io/just-the-docs/
 [localhost-port-4000]: http://127.0.0.1:4000
+[mustache]: https://mustache.github.io/
 [rvm]: https://rvm.io

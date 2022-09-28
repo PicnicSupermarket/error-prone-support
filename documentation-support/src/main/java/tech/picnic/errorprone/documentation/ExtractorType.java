@@ -10,7 +10,10 @@ import java.util.Optional;
 /** An enumeration of {@link Extractor} types. */
 enum ExtractorType {
   BUG_PATTERN("bugpattern", new BugPatternExtractor()),
-  BUG_PATTERN_TEST("bugpattern-test", new BugPatternTestExtractor());
+  BUG_PATTERN_TEST("bugpattern-test", new BugPatternTestExtractor()),
+  //  REFASTER("refaster", new RefasterExtractor()),
+  REFASTER_TEMPLATE_TEST_INPUT("refaster-test-input", new RefasterTestExtractor()),
+  REFASTER_TEMPLATE_TEST_OUTPUT("refaster-test-output", new RefasterTestExtractor());
 
   private static final ImmutableSet<ExtractorType> TYPES =
       Sets.immutableEnumSet(EnumSet.allOf(ExtractorType.class));

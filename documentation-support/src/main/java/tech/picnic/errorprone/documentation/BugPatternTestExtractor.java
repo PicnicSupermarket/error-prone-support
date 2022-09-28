@@ -16,6 +16,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.util.Context;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumenta
   // XXX: Improve support for correctly extracting multiple sources from a single
   // `{BugCheckerRefactoring,Compilation}TestHelper` test.
   @Override
-  public BugPatternTestDocumentation extract(ClassTree tree, Context context) {
+  public BugPatternTestDocumentation extract(ClassTree tree, Context context, TaskEvent event) {
     VisitorState state = VisitorState.createForUtilityPurposes(context);
     CollectBugPatternTests scanner = new CollectBugPatternTests(state);
 

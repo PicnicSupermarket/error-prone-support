@@ -19,16 +19,21 @@ jobs:
           bundler-cache: true
       - name: Configure Github Pages
         uses: actions/configure-pages@v2.1.3
+      - name: Set up JDK
+        uses: actions/setup-java@v3.5.1
+        with:
+          java-version: 17.0.4
+          distribution: temurin
+          cache: maven
+      - name: Compile project and extract data
+        # XXX: Remove `-Dverification.{skip|warn}` and update `website/README.md`
+        # once module `docgen` has no errors.
+        run: |
+          mvn -T1C clean install -DskipTests -Dverification.warn
+          mvn -T1C clean install -DskipTests -Dverification.skip -Pdocgen
       - name: Generate documentation
-        run: ./generate-docs.sh
-      - name: Build website with Jekyll
         working-directory: ./website
-        run: bundle exec jekyll build
-      - name: Validate HTML output
-        working-directory: ./website
-        # XXX: Drop `--disable_external true` once we fully adopted the
-        # "Refaster rules" terminology on our website and in the code.
-        run: bundle exec htmlproofer --disable_external true --check-external-hash false ./_site
+        run: bundle exec ruby generate-docs.rb
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@v1.0.5
         with:

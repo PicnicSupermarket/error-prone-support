@@ -1,8 +1,21 @@
 ruby File.read(".ruby-version").strip
 
 source "https://rubygems.org"
-gem "html-proofer", "4.4.1"
-gem "jekyll", "4.2.2"
-gem "jekyll-sitemap", "1.4"
-gem "just-the-docs", "0.4.0.rc2"
-gem "webrick", "1.7"
+
+group :site_content_generation_dependencies do
+  gem "diffy", "~> 3.4.0"
+  gem "json", "~> 2.6"
+  gem "mustache", "~> 1.0"
+end
+
+group :jekyll_site_dependencies do
+  gem "jekyll", "~> 4.2"
+  gem "jekyll-sitemap", "~>1.4"
+  gem "just-the-docs", "0.4.0.rc3"
+  gem "rake", "~> 13.0"
+  gem "webrick", "~> 1.7"
+end
+
+group :website_validation_dependencies do
+  gem "html-proofer", "4.3"
+end

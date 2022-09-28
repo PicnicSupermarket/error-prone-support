@@ -14,6 +14,7 @@ import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
+import com.sun.source.util.TaskEvent;
 import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.util.Context;
@@ -26,7 +27,7 @@ import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocume
 @Immutable
 final class BugPatternExtractor implements Extractor<BugPatternDocumentation> {
   @Override
-  public BugPatternDocumentation extract(ClassTree tree, Context context) {
+  public BugPatternDocumentation extract(ClassTree tree, Context context, TaskEvent taskEvent) {
     ClassSymbol symbol = ASTHelpers.getSymbol(tree);
     BugPattern annotation = symbol.getAnnotation(BugPattern.class);
     requireNonNull(annotation, "BugPattern annotation must be present");
