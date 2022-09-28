@@ -10,7 +10,7 @@ import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -32,7 +32,7 @@ import java.time.LocalTime;
 @BugPattern(
     summary =
         "Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone",
-    link = BASE_URL_BUGPATTERNS + "TimeZoneUsage",
+    link = BUG_PATTERNS_BASE_URL + "TimeZoneUsage",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)

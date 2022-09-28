@@ -6,7 +6,7 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Comparators;
@@ -51,7 +51,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Where possible, sort annotation array attributes lexicographically",
-    link = BASE_URL_BUGPATTERNS + "LexicographicalAnnotationAttributeListing",
+    link = BUG_PATTERNS_BASE_URL + "LexicographicalAnnotationAttributeListing",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)

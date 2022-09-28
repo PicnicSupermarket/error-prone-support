@@ -9,7 +9,7 @@ import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.isType;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableCollection;
@@ -26,7 +26,7 @@ import com.sun.source.tree.VariableTree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "`@RequestParam` does not support `ImmutableCollection` and `ImmutableMap` subtypes",
-    link = BASE_URL_BUGPATTERNS + "RequestParamType",
+    link = BUG_PATTERNS_BASE_URL + "RequestParamType",
     linkType = CUSTOM,
     severity = ERROR,
     tags = LIKELY_ERROR)

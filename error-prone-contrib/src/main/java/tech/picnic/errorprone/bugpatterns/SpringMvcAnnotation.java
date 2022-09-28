@@ -6,7 +6,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
@@ -37,7 +37,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @BugPattern(
     summary =
         "Prefer the conciseness of `@{Get,Put,Post,Delete,Patch}Mapping` over `@RequestMapping`",
-    link = BASE_URL_BUGPATTERNS + "SpringMvcAnnotation",
+    link = BUG_PATTERNS_BASE_URL + "SpringMvcAnnotation",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

@@ -6,7 +6,7 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static java.util.stream.Collectors.joining;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.Splitter;
@@ -51,7 +51,7 @@ import java.util.Optional;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Test code should follow the Google Java style",
-    link = BASE_URL_BUGPATTERNS + "ErrorProneTestHelperSourceFormat",
+    link = BUG_PATTERNS_BASE_URL + "ErrorProneTestHelperSourceFormat",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)

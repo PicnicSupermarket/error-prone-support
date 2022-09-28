@@ -11,7 +11,7 @@ import static com.google.errorprone.matchers.Matchers.hasModifier;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.methodReturns;
 import static com.google.errorprone.matchers.Matchers.not;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -45,7 +45,7 @@ import javax.lang.model.element.Modifier;
     summary =
         "`SortedSet` properties of a `@Value.Immutable` or `@Value.Modifiable` type must be "
             + "annotated with `@Value.NaturalOrder` or `@Value.ReverseOrder`",
-    link = BASE_URL_BUGPATTERNS + "ImmutablesSortedSetComparator",
+    link = BUG_PATTERNS_BASE_URL + "ImmutablesSortedSetComparator",
     linkType = CUSTOM,
     severity = ERROR,
     tags = LIKELY_ERROR)

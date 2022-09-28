@@ -3,7 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
@@ -32,7 +32,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Omit redundant syntax from annotation declarations",
-    link = BASE_URL_BUGPATTERNS + "CanonicalAnnotationSyntax",
+    link = BUG_PATTERNS_BASE_URL + "CanonicalAnnotationSyntax",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
