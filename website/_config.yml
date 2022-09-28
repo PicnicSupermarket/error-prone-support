@@ -9,7 +9,7 @@ remote_theme: just-the-docs/just-the-docs
 plugins:
 - jekyll-remote-theme
 
-# Do not deploy through GitHub pages.
+# Do not deploy these files through GitHub pages.
 exclude:
   - Gemfile
   - Gemfile.lock
