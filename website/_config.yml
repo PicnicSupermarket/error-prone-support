@@ -1,11 +1,9 @@
 # General configuration.
 title: Error Prone Support
 logo: assets/images/favicon.svg
-url: https://error-prone.picnic.tech/
+url: https://error-prone.picnic.tech
 description: >-
-  Error Prone Support is a Picnic-opinionated extension of Google's Error
-  Prone. It aims to improve code quality, focussing on maintainability,
-  consistency and avoidance of common gotchas.
+  Error Prone extensions: extra bug checkers and a large battery of Refaster templates.
 
 remote_theme: just-the-docs/just-the-docs
 plugins:
