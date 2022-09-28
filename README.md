@@ -8,9 +8,9 @@
 
 # Error Prone Support
 
-Error Prone Support is a [Picnic][picnic-blog]-opinionated extension of Google's 
-[Error Prone][error-prone-orig-repo]. It aims to improve code quality, focussing 
-on maintainability, consistency and avoidance of common pitfalls.
+Error Prone Support is a [Picnic][picnic-blog]-opinionated extension of
+Google's [Error Prone][error-prone-orig-repo]. It aims to improve code quality,
+focussing on maintainability, consistency and avoidance of common pitfalls.
 
 > Error Prone is a static analysis tool for Java that catches common
 > programming mistakes at compile-time.
@@ -142,9 +142,9 @@ templates][refaster-templates].
 
 ## 👷 Developing Error Prone Support
 
-This is a [Maven][maven] project, so running `mvn clean install`
-performs a full clean build and installs the library to your local Maven
-repository. Some relevant flags:
+This is a [Maven][maven] project, so running `mvn clean install` performs a
+full clean build and installs the library to your local Maven repository. Some
+relevant flags:
 
 - `-Dverification.warn` makes the warnings and errors emitted by various
   plugins and the Java compiler non-fatal, where possible.
