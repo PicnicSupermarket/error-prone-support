@@ -7,6 +7,7 @@ import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAS
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isType;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -26,7 +27,7 @@ import java.util.Optional;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Empty method can likely be deleted",
-    link = "https://error-prone.picnic.tech/bugpatterns/EmptyMethod",
+    link = BASE_URL_BUGPATTERNS + "EmptyMethod",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

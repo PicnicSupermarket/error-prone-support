@@ -7,6 +7,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static java.util.stream.Collectors.collectingAndThen;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
@@ -36,7 +37,7 @@ import java.util.stream.Stream;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Make sure `Ordering#explicit` lists all of an enum's values",
-    link = "https://error-prone.picnic.tech/bugpatterns/ExplicitEnumOrdering",
+    link = BASE_URL_BUGPATTERNS + "ExplicitEnumOrdering",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)

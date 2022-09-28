@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.isType;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -26,7 +27,7 @@ import javax.lang.model.element.AnnotationValue;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "`JsonCreator.Mode` should be set for single-argument creators",
-    link = "https://error-prone.picnic.tech/bugpatterns/AmbiguousJsonCreator",
+    link = BASE_URL_BUGPATTERNS + "AmbiguousJsonCreator",
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)

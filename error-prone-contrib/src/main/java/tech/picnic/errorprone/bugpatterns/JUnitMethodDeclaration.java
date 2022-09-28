@@ -11,6 +11,7 @@ import static com.google.errorprone.matchers.Matchers.enclosingClass;
 import static com.google.errorprone.matchers.Matchers.hasModifier;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static java.util.function.Predicate.not;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 import static tech.picnic.errorprone.bugpatterns.util.JavaKeywords.isReservedKeyword;
 
 import com.google.auto.service.AutoService;
@@ -47,7 +48,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "JUnit method declaration can likely be improved",
-    link = "https://error-prone.picnic.tech/bugpatterns/JUnitMethodDeclaration",
+    link = BASE_URL_BUGPATTERNS + "JUnitMethodDeclaration",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

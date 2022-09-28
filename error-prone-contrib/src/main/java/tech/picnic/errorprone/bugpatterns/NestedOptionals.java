@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Iterables;
@@ -25,7 +26,7 @@ import java.util.Optional;
 @BugPattern(
     summary =
         "Avoid nesting `Optional`s inside `Optional`s; the resultant code is hard to reason about",
-    link = "https://error-prone.picnic.tech/bugpatterns/NestedOptionals",
+    link = BASE_URL_BUGPATTERNS + "NestedOptionals",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)

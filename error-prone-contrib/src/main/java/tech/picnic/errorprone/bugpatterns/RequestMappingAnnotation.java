@@ -11,6 +11,7 @@ import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.methodHasParameters;
 import static com.google.errorprone.matchers.Matchers.not;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -31,7 +32,7 @@ import com.sun.source.tree.Tree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Make sure all `@RequestMapping` method parameters are annotated",
-    link = "https://error-prone.picnic.tech/bugpatterns/RequestMappingAnnotation",
+    link = BASE_URL_BUGPATTERNS + "RequestMappingAnnotation",
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)

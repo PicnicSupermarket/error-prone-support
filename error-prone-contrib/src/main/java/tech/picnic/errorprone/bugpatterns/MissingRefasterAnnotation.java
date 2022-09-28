@@ -7,6 +7,7 @@ import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAS
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isType;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -25,7 +26,7 @@ import com.sun.source.tree.Tree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "The Refaster template contains a method without any Refaster annotations",
-    link = "https://error-prone.picnic.tech/bugpatterns/MissingRefasterAnnotation",
+    link = BASE_URL_BUGPATTERNS + "MissingRefasterAnnotation",
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)

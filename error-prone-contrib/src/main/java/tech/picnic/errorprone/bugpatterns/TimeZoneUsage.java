@@ -10,6 +10,7 @@ import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -31,7 +32,7 @@ import java.time.LocalTime;
 @BugPattern(
     summary =
         "Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone",
-    link = "https://error-prone.picnic.tech/bugpatterns/TimeZoneUsage",
+    link = BASE_URL_BUGPATTERNS + "TimeZoneUsage",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)

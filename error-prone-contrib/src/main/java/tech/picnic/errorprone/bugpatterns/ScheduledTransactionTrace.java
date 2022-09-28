@@ -7,6 +7,7 @@ import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAS
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.Matchers.isType;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.common.AnnotationMirrors;
 import com.google.auto.service.AutoService;
@@ -33,7 +34,7 @@ import com.sun.source.tree.Tree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Scheduled operation must start a new New Relic transaction",
-    link = "https://error-prone.picnic.tech/bugpatterns/ScheduledTransactionTrace",
+    link = BASE_URL_BUGPATTERNS + "ScheduledTransactionTrace",
     linkType = CUSTOM,
     severity = ERROR,
     tags = LIKELY_ERROR)

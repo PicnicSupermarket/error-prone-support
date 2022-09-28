@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Iterables;
@@ -26,7 +27,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Don't unnecessarily use Mockito's `eq(...)`",
-    link = "https://error-prone.picnic.tech/bugpatterns/MockitoStubbing",
+    link = BASE_URL_BUGPATTERNS + "MockitoStubbing",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

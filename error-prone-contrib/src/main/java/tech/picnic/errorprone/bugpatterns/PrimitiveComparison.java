@@ -7,6 +7,7 @@ import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static java.util.stream.Collectors.joining;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
@@ -44,7 +45,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     summary =
         "Ensure invocations of `Comparator#comparing{,Double,Int,Long}` match the return type"
             + " of the provided function",
-    link = "https://error-prone.picnic.tech/bugpatterns/PrimitiveComparison",
+    link = BASE_URL_BUGPATTERNS + "PrimitiveComparison",
     linkType = CUSTOM,
     severity = WARNING,
     tags = PERFORMANCE)

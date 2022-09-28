@@ -14,6 +14,7 @@ import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
@@ -55,7 +56,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid redundant string conversions when possible",
-    link = "https://error-prone.picnic.tech/bugpatterns/RedundantStringConversion",
+    link = BASE_URL_BUGPATTERNS + "RedundantStringConversion",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

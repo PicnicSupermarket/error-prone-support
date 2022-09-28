@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.isType;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
@@ -28,7 +29,7 @@ import java.util.List;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Omit `@Autowired` on a class' sole constructor, as it is redundant",
-    link = "https://error-prone.picnic.tech/bugpatterns/AutowiredConstructor",
+    link = BASE_URL_BUGPATTERNS + "AutowiredConstructor",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

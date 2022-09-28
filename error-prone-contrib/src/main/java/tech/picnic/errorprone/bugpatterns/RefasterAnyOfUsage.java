@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -27,7 +28,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "`Refaster#anyOf` should be passed at least two parameters",
-    link = "https://error-prone.picnic.tech/bugpatterns/RefasterAnyOfUsage",
+    link = BASE_URL_BUGPATTERNS + "RefasterAnyOfUsage",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)

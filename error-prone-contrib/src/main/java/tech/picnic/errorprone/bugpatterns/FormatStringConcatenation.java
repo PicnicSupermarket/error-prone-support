@@ -10,6 +10,7 @@ import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static java.util.stream.Collectors.joining;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -51,7 +52,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Defer string concatenation to the invoked method",
-    link = "https://error-prone.picnic.tech/bugpatterns/FormatStringConcatenation",
+    link = BASE_URL_BUGPATTERNS + "FormatStringConcatenation",
     linkType = CUSTOM,
     severity = WARNING,
     tags = SIMPLIFICATION)

@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.Splitter;
@@ -33,7 +34,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Make sure SLF4J log statements contain proper placeholders with matching arguments",
-    link = "https://error-prone.picnic.tech/bugpatterns/Slf4jLogStatement",
+    link = BASE_URL_BUGPATTERNS + "Slf4jLogStatement",
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)

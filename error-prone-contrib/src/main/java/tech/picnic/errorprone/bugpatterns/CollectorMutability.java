@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -29,7 +30,7 @@ import java.util.stream.Collector;
 @BugPattern(
     summary =
         "Avoid `Collectors.to{List,Map,Set}` in favour of alternatives that emphasize (im)mutability",
-    link = "https://error-prone.picnic.tech/bugpatterns/CollectorMutability",
+    link = BASE_URL_BUGPATTERNS + "CollectorMutability",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)

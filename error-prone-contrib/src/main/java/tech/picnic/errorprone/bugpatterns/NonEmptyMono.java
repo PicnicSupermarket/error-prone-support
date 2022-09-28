@@ -5,6 +5,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -28,7 +29,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid vacuous operations on known non-empty `Mono`s",
-    link = "https://error-prone.picnic.tech/bugpatterns/NonEmptyMono",
+    link = BASE_URL_BUGPATTERNS + "NonEmptyMono",
     linkType = CUSTOM,
     severity = WARNING,
     tags = SIMPLIFICATION)

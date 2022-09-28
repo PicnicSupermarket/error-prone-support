@@ -2,7 +2,7 @@ package tech.picnic.errorprone.refaster.runner;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableRangeSet.toImmutableRangeSet;
-import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
+import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.function.Predicate.not;
@@ -47,8 +47,7 @@ import java.util.stream.Stream;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Write idiomatic code when possible",
-    link = "https://error-prone.picnic.tech/bugpatterns/AmbiguousJsonCreator",
-    linkType = CUSTOM,
+    linkType = NONE,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
 public final class Refaster extends BugChecker implements CompilationUnitTreeMatcher {

@@ -7,6 +7,7 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.suppliers.Suppliers.OBJECT_TYPE;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.common.primitives.Primitives;
@@ -36,7 +37,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid or clarify identity conversions",
-    link = "https://error-prone.picnic.tech/bugpatterns/IdentityConversion",
+    link = BASE_URL_BUGPATTERNS + "IdentityConversion",
     linkType = CUSTOM,
     severity = WARNING,
     tags = SIMPLIFICATION)

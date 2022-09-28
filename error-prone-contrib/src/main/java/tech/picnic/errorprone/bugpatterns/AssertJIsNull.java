@@ -8,6 +8,7 @@ import static com.google.errorprone.matchers.Matchers.argument;
 import static com.google.errorprone.matchers.Matchers.argumentCount;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.nullLiteral;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BASE_URL_BUGPATTERNS;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -31,7 +32,7 @@ import com.sun.source.tree.MethodInvocationTree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `.isNull()` over `.isEqualTo(null)`",
-    link = "https://error-prone.picnic.tech/bugpatterns/AssertJIsNull",
+    link = BASE_URL_BUGPATTERNS + "AssertJIsNull",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
