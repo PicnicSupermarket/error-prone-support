@@ -19,7 +19,7 @@ import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractShortAssert;
 import org.assertj.core.api.NumberAssert;
-import tech.picnic.errorprone.refaster.util.IsCharacter;
+import tech.picnic.errorprone.refaster.matchers.IsCharacter;
 
 final class AssertJNumberTemplates {
   private AssertJNumberTemplates() {}

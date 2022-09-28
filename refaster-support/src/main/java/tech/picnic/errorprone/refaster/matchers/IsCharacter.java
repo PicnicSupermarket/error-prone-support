@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refaster.util;
+package tech.picnic.errorprone.refaster.matchers;
 
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isSameType;
