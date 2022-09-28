@@ -8,9 +8,9 @@
 
 # Error Prone Support
 
-Error Prone Support is a Picnic-opinionated extension of Google's [Error
-Prone][error-prone-orig-repo]. It aims to improve code quality, focussing on
-maintainability, consistency and avoidance of common gotchas.
+Error Prone Support is a [Picnic][picnic-blog]-opinionated extension of
+Google's [Error Prone][error-prone-orig-repo]. It aims to improve code quality,
+focussing on maintainability, consistency and avoidance of common pitfalls.
 
 > Error Prone is a static analysis tool for Java that catches common
 > programming mistakes at compile-time.
@@ -20,7 +20,8 @@ maintainability, consistency and avoidance of common gotchas.
 [![License][license-badge]][license]
 [![PRs Welcome][pr-badge]][contributing]
 
-[Getting started](#-getting-started) • [Building](#-building) •
+[Getting started](#-getting-started) •
+[Developing Error Prone Support](#-developing-error-prone-support) •
 [How it works](#-how-it-works) • [Contributing](#%EF%B8%8F-contributing)
 
 </div>
@@ -139,10 +140,11 @@ Two things are kicking in here:
 Be sure to check out all [bug checks][bug-checks] and [refaster
 templates][refaster-templates].
 
-## 👷 Building
+## 👷 Developing Error Prone Support
 
-This is a [Maven][maven] project, so running `mvn clean install`
-performs a full clean build. Some relevant flags:
+This is a [Maven][maven] project, so running `mvn clean install` performs a
+full clean build and installs the library to your local Maven repository. Some
+relevant flags:
 
 - `-Dverification.warn` makes the warnings and errors emitted by various
   plugins and the Java compiler non-fatal, where possible.
@@ -216,6 +218,7 @@ guidelines][contributing].
 [maven-central-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
 [maven-central-search]: https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
 [maven]: https://maven.apache.org
+[picnic-blog]: https://blog.picnic.nl
 [pitest]: https://pitest.org
 [pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
