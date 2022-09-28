@@ -20,7 +20,8 @@ on maintainability, consistency and avoidance of common pitfalls.
 [![License][license-badge]][license]
 [![PRs Welcome][pr-badge]][contributing]
 
-[Getting started](#-getting-started) • [Building](#-building) •
+[Getting started](#-getting-started) •
+[Developing Error Prone Support](#-developing-error-prone-support) •
 [How it works](#-how-it-works) • [Contributing](#%EF%B8%8F-contributing)
 
 </div>
@@ -139,7 +140,7 @@ Two things are kicking in here:
 Be sure to check out all [bug checks][bug-checks] and [refaster
 templates][refaster-templates].
 
-## 👷 Building Error Prone Support
+## 👷 Developing Error Prone Support
 
 This is a [Maven][maven] project, so running `mvn clean install`
 performs a full clean build and installs the library to your local Maven
