@@ -79,7 +79,7 @@
         additional JVMs. -->
         <argLine>
             <!-- The JVM arguments specified in `.mvn/jvm.config` also apply to
-            test JVMs, as those are also non-interactive processess running
+            test JVMs, as those are also non-interactive processes running
             Error Prone, and thus similarly make extensive use of unsupported
             `javac`-internal APIs, in some cases even reflectively inspecting
             them. -->
@@ -111,7 +111,7 @@
             <!-- This argument *can* be set through Surefire's
             'systemPropertyVariables' configuration setting, but by placing it
             here it automatically also applies to the Failsafe plugin. On Unix
-            systems we use a lower-quality source of randomness, so as to avoid
+            systems we use a lower-quality source of randomness, to avoid
             potential slowdown of tests relying on java.security.SecureRandom.
             Note that it is not fatal for the file to not exist, so this
             setting is Windows-compatible. The '/./' syntax is no accident; see
@@ -133,7 +133,7 @@
         <error-prone.patch-args />
         <error-prone.self-check-args />
         <!-- The Maven `groupId` under which Error Prone dependencies are
-        published. By default we use an official Error Prone release. This
+        published. By default, we use an official Error Prone release. This
         property allows the `error-prone-fork` profile below to build the
         project using Picnic's Error Prone fork instead. -->
         <groupId.error-prone>com.google.errorprone</groupId.error-prone>
@@ -1320,7 +1320,7 @@
             </dependencyManagement>
         </profile>
         <profile>
-            <!-- Error Prone checks that are not availabe from Maven Central;
+            <!-- Error Prone checks that are not available from Maven Central;
             these are therefore not enabled by default. -->
             <id>non-maven-central</id>
             <properties>
@@ -1394,7 +1394,7 @@
             </build>
         </profile>
         <profile>
-            <!-- By default we verify various aspects of a module and the
+            <!-- By default, we verify various aspects of a module and the
             artifact(s) it produces. We define these checks in a profile so
             that they can be disabled during development. See also the
             `error-prone` profile defined below. -->
@@ -1591,8 +1591,8 @@
             </properties>
         </profile>
         <profile>
-            <!-- The `build-checks` and `error-prone` profiles enable a whole
-            bunch of additional compile checks. By default those warnings break
+            <!-- The `build-checks` and `error-prone` profiles enable a bunch
+            of additional compile checks. By default, those warnings break
             the build. This profile allows one to collect all build warnings
             without failing the build. -->
             <id>disallow-warnings</id>
