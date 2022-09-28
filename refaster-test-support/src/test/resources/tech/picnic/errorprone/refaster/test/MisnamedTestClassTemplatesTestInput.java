@@ -7,5 +7,5 @@ final class IncorrectNameTemplatesTest implements RefasterTemplateTestCase {
   }
 }
 
-// This is a comment to appease CheckStyle.
+// This is a comment to appease Checkstyle.
 ;
