@@ -12,8 +12,10 @@ plugins:
 
 # Files and directories not to be deployed through GitHub pages.
 exclude:
+  - _templates
   - Gemfile
   - Gemfile.lock
+  - generate-docs.rb
   - README.md
   - vendor
 

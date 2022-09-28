@@ -29,12 +29,20 @@
         </dependency>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
+            <artifactId>error_prone_core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_test_helpers</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>error-prone-contrib</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

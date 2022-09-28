@@ -1,0 +1,74 @@
+---
+layout: default
+title: {{name}}
+description: "{{{summary}}}"
+parent: Bug Patterns
+---
+
+# {{name}} {#{{name}}}
+
+{{#severity_level}}
+{{{content}}}
+  {: .label .label-{{{color}}} }
+{{/severity_level}}
+{{#tags}}
+{{.}}
+  {: .label }
+{{/tags}}
+
+<a href="{{source_url}}" class="fs-3 btn external"
+   target="_blank">
+    View source code on GitHub
+    <svg viewBox="0 0 24 24" aria-labelledby="svg-external-link-title">
+        <use xlink:href="#svg-external-link"></use>
+    </svg>
+</a>
+
+{: .summary-title }
+> Summary
+>
+> {{{summary}}}
+
+{{{explanation}}}
+
+{: .note-title }
+> Suppression
+>
+> Suppress false positives by adding the suppression annotation `@SuppressWarnings("{{name}}")` to 
+> the enclosing element.
+>
+> Disable this pattern completely by adding `-Xep:{{name}}:OFF` as compiler argument.
+{{! XXX: Create an internal page on documenting the usage of compiler flags. }}
+> [Learn more][error-prone-flags].
+
+{{#has_samples}}
+## Samples
+
+{{#has_replacement_samples}}
+### Replacement
+
+Shows the difference in example code before and after the bug pattern is
+applied.
+
+{{#replacement_samples}}
+```diff
+{{{.}}}
+```
+{{/replacement_samples}}
+{{/has_replacement_samples}}
+
+{{#has_identification_samples}}
+### Identification
+
+Shows code lines which will (not) be flagged by this bug pattern. \
+A `//BUG: Diagnostic contains:` comment is placed above any violating line.
+
+{{#identification_samples}}
+```java
+{{{.}}}
+```
+{{/identification_samples}}
+{{/has_identification_samples}}
+{{/has_samples}}
+
+[error-prone-flags]: https://errorprone.info/docs/flags
