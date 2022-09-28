@@ -5,8 +5,8 @@ HOMEPAGE="${WEBSITE_FOLDER}/index.md"
 
 configure() {
     cd "$(git rev-parse --show-toplevel || echo .)" || exit
-    mkdir "${BUGPATTERN_FOLDER}" 2>/dev/null
-    mkdir "${REFASTER_FOLDER}" 2>/dev/null
+    mkdir -p "${BUGPATTERN_FOLDER}"
+    mkdir -p "${REFASTER_FOLDER}"
 }
 
 generate_homepage() {
@@ -29,5 +29,6 @@ EOF
     sed $SEDOPTION 's/srcset="website\//srcset="/g' ${HOMEPAGE}
 }
 
+# Generate the website.
 configure
 generate_homepage

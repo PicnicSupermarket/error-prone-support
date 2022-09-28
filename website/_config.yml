@@ -9,14 +9,14 @@ remote_theme: just-the-docs/just-the-docs
 plugins:
 - jekyll-remote-theme
 
-# Do not deploy these files through GitHub pages.
+# Do not deploy these files and folders through GitHub pages.
 exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
   - vendor
 
-permalink: pretty # Use /doc/ vs. /doc.html
+permalink: pretty # Use /doc/ instead of /doc.html.
 
 # Theme configuration.
 search_enabled: true
