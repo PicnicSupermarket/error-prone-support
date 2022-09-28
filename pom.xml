@@ -39,6 +39,7 @@
     </developers>
 
     <modules>
+        <module>docgen</module>
         <module>error-prone-contrib</module>
         <module>refaster-compiler</module>
         <module>refaster-runner</module>
@@ -822,6 +823,11 @@
                                 <version>${version.error-prone}</version>
                             </path>
                             <path>
+                                <groupId>com.google.auto.value</groupId>
+                                <artifactId>auto-value</artifactId>
+                                <version>${version.auto-value}</version>
+                            </path>
+                            <path>
                                 <groupId>com.google.auto.service</groupId>
                                 <artifactId>auto-service</artifactId>
                                 <version>${version.auto-service}</version>
@@ -1300,6 +1306,31 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>docgen</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <annotationProcessorPaths combine.children="append">
+                                    <path>
+                                        <groupId>${project.groupId}</groupId>
+                                        <artifactId>docgen</artifactId>
+                                        <version>${project.version}</version>
+                                    </path>
+                                </annotationProcessorPaths>
+                                <compilerArgs combine.children="append">
+                                    <arg>-Xplugin:Docgen -XdocsOutputDirectory=${project.build.directory}</arg>
+                                </compilerArgs>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
         <profile>
             <id>error-prone-fork</id>
             <properties>
