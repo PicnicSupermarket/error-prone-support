@@ -3,7 +3,6 @@ on:
   pull_request:
   push:
     branches: [$default-branch]
-  workflow_dispatch:
 permissions:
   contents: read
 jobs:
