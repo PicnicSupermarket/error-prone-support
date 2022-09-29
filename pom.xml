@@ -110,11 +110,12 @@
             -Dfile.encoding=${project.build.sourceEncoding}
             <!-- This argument *can* be set through Surefire's
             'systemPropertyVariables' configuration setting, but by placing it
-            here it automatically also applies to the Failsafe plugin. On Unix
-            systems we use a lower-quality source of randomness, to avoid
-            potential slowdown of tests relying on java.security.SecureRandom.
-            Note that it is not fatal for the file to not exist, so this
-            setting is Windows-compatible. The '/./' syntax is no accident; see
+            here it automatically also applies to the Failsafe plugin. To avoid
+            potential slowdown of tests relying on
+            `java.security.SecureRandom`, on Unix systems we use a
+            lower-quality source of randomness. Note that it is not fatal for
+            the file not to exist, so this setting is Windows-compatible. The
+            `/./` syntax is no accident; see
             https://bugs.openjdk.java.net/browse/JDK-6202721 for details. -->
             -Djava.security.egd=file:/dev/./urandom
             <!-- On Mac OS X, running in headless mode prevents the forked JVMs
@@ -133,7 +134,7 @@
         <error-prone.patch-args />
         <error-prone.self-check-args />
         <!-- The Maven `groupId` under which Error Prone dependencies are
-        published. By default, we use an official Error Prone release. This
+        published. We use an official Error Prone release by default. This
         property allows the `error-prone-fork` profile below to build the
         project using Picnic's Error Prone fork instead. -->
         <groupId.error-prone>com.google.errorprone</groupId.error-prone>
@@ -1592,8 +1593,8 @@
         </profile>
         <profile>
             <!-- The `build-checks` and `error-prone` profiles enable a bunch
-            of additional compile checks. By default, those warnings break
-            the build. This profile allows one to collect all build warnings
+            of additional compile checks. By default, those warnings break the
+            build. This profile allows one to collect all build warnings
             without failing the build. -->
             <id>disallow-warnings</id>
             <activation>
