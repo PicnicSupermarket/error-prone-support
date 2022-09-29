@@ -234,7 +234,7 @@ final class RefasterTest {
               /* initialize= */ false,
               Thread.currentThread().getContextClassLoader());
     } catch (ClassNotFoundException e) {
-      return false;
+      throw new IllegalStateException("Can't load `ErrorProneOptions` class", e);
     }
     return Arrays.stream(clazz.getDeclaredMethods())
         .filter(m -> Modifier.isPublic(m.getModifiers()))
