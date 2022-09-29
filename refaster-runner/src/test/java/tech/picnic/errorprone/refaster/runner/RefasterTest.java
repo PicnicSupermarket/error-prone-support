@@ -11,6 +11,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -71,36 +73,55 @@ final class RefasterTest {
         .doTest();
   }
 
-  // XXX: Add test cases for `-XepAllSuggestionsAsWarnings`, conditional on the tests running
-  // against the Picnic Error Prone fork.
   private static Stream<Arguments> reportedSeverityTestCases() {
     /* { arguments, expectedSeverities } */
-    return Stream.of(
-        arguments(ImmutableList.of(), ImmutableList.of("Note", "warning", "error", "Note")),
-        arguments(ImmutableList.of("-Xep:Refaster:OFF"), ImmutableList.of()),
-        arguments(
-            ImmutableList.of("-Xep:Refaster:DEFAULT"),
-            ImmutableList.of("Note", "warning", "error", "Note")),
-        arguments(
-            ImmutableList.of("-Xep:Refaster:WARN"),
-            ImmutableList.of("warning", "warning", "warning", "warning")),
-        arguments(
-            ImmutableList.of("-Xep:Refaster:ERROR"),
-            ImmutableList.of("error", "error", "error", "error")),
-        arguments(
-            ImmutableList.of("-XepAllErrorsAsWarnings"),
-            ImmutableList.of("Note", "warning", "warning", "Note")),
-        arguments(
-            ImmutableList.of("-Xep:Refaster:OFF", "-XepAllErrorsAsWarnings"), ImmutableList.of()),
-        arguments(
-            ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllErrorsAsWarnings"),
-            ImmutableList.of("Note", "warning", "warning", "Note")),
-        arguments(
-            ImmutableList.of("-Xep:Refaster:WARN", "-XepAllErrorsAsWarnings"),
-            ImmutableList.of("warning", "warning", "warning", "warning")),
-        arguments(
-            ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllErrorsAsWarnings"),
-            ImmutableList.of("warning", "warning", "warning", "warning")));
+
+    Stream<Arguments> forkTestCases =
+        isBuiltWithErrorProneFork()
+            ? Stream.of(
+                arguments(
+                    ImmutableList.of("-Xep:Refaster:OFF", "-XepAllSuggestionsAsWarnings"),
+                    ImmutableList.of()),
+                arguments(
+                    ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllSuggestionsAsWarnings"),
+                    ImmutableList.of("warning", "warning", "error", "warning")),
+                arguments(
+                    ImmutableList.of("-Xep:Refaster:WARN", "-XepAllSuggestionsAsWarnings"),
+                    ImmutableList.of("warning", "warning", "warning", "warning")),
+                arguments(
+                    ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllSuggestionsAsWarnings"),
+                    ImmutableList.of("error", "error", "error", "error")))
+            : Stream.empty();
+
+    return Stream.concat(
+        Stream.of(
+            arguments(ImmutableList.of(), ImmutableList.of("Note", "warning", "error", "Note")),
+            arguments(ImmutableList.of("-Xep:Refaster:OFF"), ImmutableList.of()),
+            arguments(
+                ImmutableList.of("-Xep:Refaster:DEFAULT"),
+                ImmutableList.of("Note", "warning", "error", "Note")),
+            arguments(
+                ImmutableList.of("-Xep:Refaster:WARN"),
+                ImmutableList.of("warning", "warning", "warning", "warning")),
+            arguments(
+                ImmutableList.of("-Xep:Refaster:ERROR"),
+                ImmutableList.of("error", "error", "error", "error")),
+            arguments(
+                ImmutableList.of("-XepAllErrorsAsWarnings"),
+                ImmutableList.of("Note", "warning", "warning", "Note")),
+            arguments(
+                ImmutableList.of("-Xep:Refaster:OFF", "-XepAllErrorsAsWarnings"),
+                ImmutableList.of()),
+            arguments(
+                ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllErrorsAsWarnings"),
+                ImmutableList.of("Note", "warning", "warning", "Note")),
+            arguments(
+                ImmutableList.of("-Xep:Refaster:WARN", "-XepAllErrorsAsWarnings"),
+                ImmutableList.of("warning", "warning", "warning", "warning")),
+            arguments(
+                ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllErrorsAsWarnings"),
+                ImmutableList.of("warning", "warning", "warning", "warning"))),
+        forkTestCases);
   }
 
   /**
@@ -202,5 +223,21 @@ final class RefasterTest {
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
+  }
+
+  private static boolean isBuiltWithErrorProneFork() {
+    Class<?> clazz;
+    try {
+      clazz =
+          Class.forName(
+              "com.google.errorprone.ErrorProneOptions",
+              /* initialize= */ false,
+              Thread.currentThread().getContextClassLoader());
+    } catch (ClassNotFoundException e) {
+      return false;
+    }
+    return Arrays.stream(clazz.getDeclaredMethods())
+        .filter(m -> Modifier.isPublic(m.getModifiers()))
+        .anyMatch(m -> m.getName().equals("isSuggestionsAsWarnings"));
   }
 }
