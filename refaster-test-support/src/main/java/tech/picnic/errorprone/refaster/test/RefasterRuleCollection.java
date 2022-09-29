@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
+import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.util.Comparator.naturalOrder;
 import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_RULES_PATTERN_FLAG;
@@ -60,7 +61,7 @@ import tech.picnic.errorprone.refaster.runner.Refaster;
 // XXX: This check currently only validates that one `Refaster.anyOf` branch in one
 // `@BeforeTemplate` method is covered by a test. Review how we can make sure that _all_
 // `@BeforeTemplate` methods and `Refaster.anyOf` branches are covered.
-@BugPattern(summary = "Exercises a Refaster rule collection", severity = ERROR)
+@BugPattern(summary = "Exercises a Refaster rule collection", linkType = NONE, severity = ERROR)
 @SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
 public final class RefasterRuleCollection extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
