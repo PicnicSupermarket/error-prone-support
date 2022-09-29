@@ -53,7 +53,7 @@ import org.assertj.core.api.ObjectEnumerableAssert;
 import org.assertj.core.api.OptionalDoubleAssert;
 import org.assertj.core.api.OptionalIntAssert;
 import org.assertj.core.api.OptionalLongAssert;
-import tech.picnic.errorprone.refaster.util.IsArray;
+import tech.picnic.errorprone.refaster.matchers.IsArray;
 
 /** Refaster templates related to AssertJ expressions and statements. */
 // XXX: Most `AbstractIntegerAssert` rules can also be applied for other primitive types. Generate

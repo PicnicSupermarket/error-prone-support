@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refaster.util;
+package tech.picnic.errorprone.refaster.matchers;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.VisitorState;

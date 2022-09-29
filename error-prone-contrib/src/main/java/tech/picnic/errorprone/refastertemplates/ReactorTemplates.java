@@ -24,7 +24,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
-import tech.picnic.errorprone.refaster.util.ThrowsCheckedException;
+import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster templates related to Reactor expressions and statements. */
 final class ReactorTemplates {

@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refaster.util;
+package tech.picnic.errorprone.refaster.matchers;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 
@@ -7,49 +7,49 @@ import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.bugpatterns.BugChecker;
 import org.junit.jupiter.api.Test;
 
-final class IsArrayTest {
+final class IsCharacterTest {
   @Test
   void matches() {
     CompilationTestHelper.newInstance(MatcherTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
             "class A {",
-            "  Object negative1() {",
-            "    return alwaysNull();",
+            "  String negative1() {",
+            "    return \"a\";",
             "  }",
             "",
-            "  String negative2() {",
-            "    return alwaysNull();",
+            "  char[] negative2() {",
+            "    return \"a\".toCharArray();",
             "  }",
             "",
-            "  int negative3() {",
-            "    return alwaysNull();",
+            "  byte negative3() {",
+            "    return (byte) 0;",
             "  }",
             "",
-            "  Object[] positive1() {",
+            "  int negative4() {",
+            "    return 0;",
+            "  }",
+            "",
+            "  char positive1() {",
             "    // BUG: Diagnostic contains:",
-            "    return alwaysNull();",
+            "    return 'a';",
             "  }",
             "",
-            "  String[] positive2() {",
+            "  Character positive2() {",
             "    // BUG: Diagnostic contains:",
-            "    return alwaysNull();",
+            "    return (Character) null;",
             "  }",
             "",
-            "  int[] positive3() {",
+            "  char positive3() {",
             "    // BUG: Diagnostic contains:",
-            "    return alwaysNull();",
-            "  }",
-            "",
-            "  private static <T> T alwaysNull() {",
-            "    return null;",
+            "    return (char) 1;",
             "  }",
             "}")
         .doTest();
   }
 
-  /** A {@link BugChecker} that simply delegates to {@link IsArray}. */
-  @BugPattern(summary = "Flags expressions matched by `IsArray`", severity = ERROR)
+  /** A {@link BugChecker} that simply delegates to {@link IsCharacter}. */
+  @BugPattern(summary = "Flags expressions matched by `IsCharacter`", severity = ERROR)
   public static final class MatcherTestChecker extends AbstractMatcherTestChecker {
     private static final long serialVersionUID = 1L;
 
@@ -57,7 +57,7 @@ final class IsArrayTest {
     // https://github.com/checkstyle/checkstyle/issues/10161#issuecomment-1242732120.
     @SuppressWarnings("RedundantModifier")
     public MatcherTestChecker() {
-      super(new IsArray());
+      super(new IsCharacter());
     }
   }
 }
