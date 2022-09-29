@@ -169,8 +169,7 @@ public final class RefasterTemplateCollection extends BugChecker
         state.reportMatch(
             describeMatch(
                 typeDeclaration,
-                SuggestedFix.prefixWith(
-                    typeDeclaration, "/* ERROR: Unexpected declaration. */\n")));
+                SuggestedFix.prefixWith(typeDeclaration, "/* ERROR: Unexpected token. */\n")));
       }
     }
   }
