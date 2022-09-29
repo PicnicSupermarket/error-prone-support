@@ -1,5 +1,5 @@
 /**
- * A collection of annotations that may be placed on Refaster template classes and Refaster template
+ * A collection of annotations that can be placed on Refaster template classes and Refaster template
  * collection classes, thus influencing the way in which associated template matches are reported in
  * non-patch mode.
  */
