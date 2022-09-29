@@ -100,7 +100,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
         if (!transformers.isEmpty()) {
           rules.put(
               node,
-              new AnnotatedCompositeCodeTransformer(
+              AnnotatedCompositeCodeTransformer.create(
                   toPackageName(symbol), transformers, annotations));
         }
 

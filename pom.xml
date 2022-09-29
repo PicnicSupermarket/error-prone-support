@@ -822,6 +822,11 @@
                                 <version>${version.error-prone}</version>
                             </path>
                             <path>
+                                <groupId>com.google.auto.value</groupId>
+                                <artifactId>auto-value</artifactId>
+                                <version>${version.auto-value}</version>
+                            </path>
+                            <path>
                                 <groupId>com.google.auto.service</groupId>
                                 <artifactId>auto-service</artifactId>
                                 <version>${version.auto-service}</version>
@@ -1533,6 +1538,11 @@
                                     failing the build on the first error
                                     encountered. -->
                                     -XepAllErrorsAsWarnings
+                                    <!-- Some generated classes violate Error
+                                    Prone bug patterns. We cannot in all cases
+                                    avoid that, so we simply tell Error Prone
+                                    not to warn about generated code. -->
+                                    -XepDisableWarningsInGeneratedCode
                                     <!-- We want to enable almost all Error
                                     Prone bug pattern checkers, so we enable
                                     all and then selectively deactivate some. -->
