@@ -22,16 +22,13 @@ import com.sun.source.util.TreePath;
 import com.sun.tools.javac.util.Context;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
 
+// XXX: Can we find a better name for this class? `CompositeAnnotatedCodeTransformer`, ...?
 // XXX: Test this class directly. (Right now it's only indirectly tested through `RefasterTest`.)
 @AutoValue
 abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serializable {
@@ -127,25 +124,11 @@ abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Ser
   }
 
   private static SeverityLevel overrideSeverity(SeverityLevel severity, Context context) {
-    ErrorProneOptions errorProneOptions = context.get(ErrorProneOptions.class);
-    SeverityLevel minSeverity = allSuggestionsAsWarnings(errorProneOptions) ? WARNING : SUGGESTION;
-    SeverityLevel maxSeverity = errorProneOptions.isDropErrorsToWarnings() ? WARNING : ERROR;
+    ErrorProneOptions options = context.get(ErrorProneOptions.class);
+    SeverityLevel minSeverity =
+        ErrorProneFork.isSuggestionsAsWarningsEnabled(options) ? WARNING : SUGGESTION;
+    SeverityLevel maxSeverity = options.isDropErrorsToWarnings() ? WARNING : ERROR;
 
     return Comparators.max(Comparators.min(severity, minSeverity), maxSeverity);
-  }
-
-  private static boolean allSuggestionsAsWarnings(ErrorProneOptions errorProneOptions) {
-    try {
-      Optional<Method> isSuggestionsAsWarningsMethod =
-          Arrays.stream(errorProneOptions.getClass().getDeclaredMethods())
-              .filter(m -> Modifier.isPublic(m.getModifiers()))
-              .filter(m -> m.getName().equals("isSuggestionsAsWarnings"))
-              .findFirst();
-      return isSuggestionsAsWarningsMethod.isPresent()
-          && Boolean.TRUE.equals(
-              isSuggestionsAsWarningsMethod.orElseThrow().invoke(errorProneOptions));
-    } catch (IllegalAccessException | InvocationTargetException e) {
-      return false;
-    }
   }
 }
