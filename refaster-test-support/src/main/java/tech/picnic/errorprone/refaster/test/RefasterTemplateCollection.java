@@ -232,7 +232,7 @@ public final class RefasterTemplateCollection extends BugChecker
   private static String extractRefasterTemplateName(Description description) {
     String message = description.getRawMessage();
     int index = message.indexOf(':');
-    checkState(index >= 0, "String '%s' does not contain character '%s'", message, ':');
+    checkState(index >= 0, "String '%s' does not contain character ':'", message);
     return getSubstringAfterFinalDelimiter('.', message.substring(0, index));
   }
 

@@ -22,6 +22,10 @@ import com.sun.source.util.TreePath;
 import com.sun.tools.javac.util.Context;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
@@ -123,11 +127,25 @@ abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Ser
   }
 
   private static SeverityLevel overrideSeverity(SeverityLevel severity, Context context) {
-    // XXX: Respect `-XepAllSuggestionsAsWarnings` when using the Picnic Error Prone Fork!
-    SeverityLevel minSeverity = SUGGESTION;
-    SeverityLevel maxSeverity =
-        context.get(ErrorProneOptions.class).isDropErrorsToWarnings() ? WARNING : ERROR;
+    ErrorProneOptions errorProneOptions = context.get(ErrorProneOptions.class);
+    SeverityLevel minSeverity = allSuggestionsAsWarnings(errorProneOptions) ? WARNING : SUGGESTION;
+    SeverityLevel maxSeverity = errorProneOptions.isDropErrorsToWarnings() ? WARNING : ERROR;
 
     return Comparators.max(Comparators.min(severity, minSeverity), maxSeverity);
+  }
+
+  private static boolean allSuggestionsAsWarnings(ErrorProneOptions errorProneOptions) {
+    try {
+      Optional<Method> isSuggestionsAsWarningsMethod =
+          Arrays.stream(errorProneOptions.getClass().getDeclaredMethods())
+              .filter(m -> Modifier.isPublic(m.getModifiers()))
+              .filter(m -> m.getName().equals("isSuggestionsAsWarnings"))
+              .findFirst();
+      return isSuggestionsAsWarningsMethod.isPresent()
+          && Boolean.TRUE.equals(
+              isSuggestionsAsWarningsMethod.orElseThrow().invoke(errorProneOptions));
+    } catch (IllegalAccessException | InvocationTargetException e) {
+      return false;
+    }
   }
 }
