@@ -19,6 +19,8 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
@@ -259,4 +261,35 @@ final class ComparatorTemplates {
       return Comparators.max(value1, value2, cmp);
     }
   }
+
+  /**
+   * Prefer {@link Comparators#min(Comparable, Comparable)} over {@link BinaryOperator#minBy(Comparator)}for natural ordering.
+   */
+  static final class BinaryOperatorMinByNaturalOrder<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    BiFunction<T, T, T> before() {
+      return BinaryOperator.minBy(naturalOrder());
+    }
+
+    @AfterTemplate
+    BiFunction<T, T, T> after() {
+      return Comparators::min;
+    }
+  }
+
+  /**
+   * Prefer {@link Comparators#max(Comparable, Comparable)} over {@link BinaryOperator#maxBy(Comparator)}for natural ordering.
+   */
+  static final class BinaryOperatorMaxByNaturalOrder<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    BiFunction<T, T, T> before() {
+      return BinaryOperator.maxBy(naturalOrder());
+    }
+
+    @AfterTemplate
+    BiFunction<T, T, T> after() {
+      return Comparators::max;
+    }
+  }
+
 }
