@@ -153,7 +153,7 @@ final class OptionalTemplates {
    * Prefer {@link Optional#filter(Predicate)} over {@link Optional#map(Function)} when converting
    * an {@link Optional} to a boolean.
    */
-  abstract static class MapOptionalToBoolean<T> {
+  static final class MapOptionalToBoolean<T> {
     @BeforeTemplate
     boolean before(Optional<T> optional, Function<? super T, Boolean> predicate) {
       return optional.map(predicate).orElse(Refaster.anyOf(false, Boolean.FALSE));
@@ -315,7 +315,7 @@ final class OptionalTemplates {
   }
 
   /** Prefer {@link Optional#or(Supplier)} over more verbose alternatives. */
-  abstract static class OptionalOrOtherOptional<T> {
+  static final class OptionalOrOtherOptional<T> {
     @BeforeTemplate
     @SuppressWarnings("NestedOptionals" /* Auto-fix for the `NestedOptionals` check. */)
     Optional<T> before(Optional<T> optional1, Optional<T> optional2) {

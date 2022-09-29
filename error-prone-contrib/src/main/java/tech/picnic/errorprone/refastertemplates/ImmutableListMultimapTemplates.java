@@ -141,8 +141,8 @@ final class ImmutableListMultimapTemplates {
   }
 
   /**
-   * Don't map a a stream's elements to map entries, only to subsequently collect them into an
-   * {@link ImmutableListMultimap}. The collection can be performed directly.
+   * Don't map stream's elements to map entries, only to subsequently collect them into an {@link
+   * ImmutableListMultimap}. The collection can be performed directly.
    */
   abstract static class StreamOfMapEntriesToImmutableListMultimap<E, K, V> {
     @Placeholder(allowsIdentity = true)

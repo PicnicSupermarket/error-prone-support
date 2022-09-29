@@ -174,7 +174,7 @@ final class WebClientTemplates {
   }
 
   /** Don't unnecessarily use {@link RequestHeadersUriSpec#uri(Function)}. */
-  abstract static class RequestHeadersUriSpecUri {
+  static final class RequestHeadersUriSpecUri {
     @BeforeTemplate
     RequestHeadersSpec<?> before(
         RequestHeadersUriSpec<?> requestHeadersUriSpec,
