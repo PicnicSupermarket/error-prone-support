@@ -19,7 +19,6 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
@@ -263,33 +262,33 @@ final class ComparatorTemplates {
   }
 
   /**
-   * Prefer {@link Comparators#min(Comparable, Comparable)} over {@link
-   * BinaryOperator#minBy(Comparator)}for natural ordering.
+   * Prefer a method reference to {@link Comparators#min(Comparable, Comparable)} over calling
+   * {@link BinaryOperator#minBy(Comparator)} with {@link Comparator#naturalOrder()}.
    */
-  static final class BinaryOperatorMinByNaturalOrder<T extends Comparable<? super T>> {
+  static final class ComparatorsMin<T extends Comparable<? super T>> {
     @BeforeTemplate
-    BiFunction<T, T, T> before() {
+    BinaryOperator<T> before() {
       return BinaryOperator.minBy(naturalOrder());
     }
 
     @AfterTemplate
-    BiFunction<T, T, T> after() {
+    BinaryOperator<T> after() {
       return Comparators::min;
     }
   }
 
   /**
-   * Prefer {@link Comparators#max(Comparable, Comparable)} over {@link
-   * BinaryOperator#maxBy(Comparator)}for natural ordering.
+   * Prefer a method reference to {@link Comparators#max(Comparable, Comparable)} over calling
+   * {@link BinaryOperator#minBy(Comparator)} with {@link Comparator#naturalOrder()}.
    */
-  static final class BinaryOperatorMaxByNaturalOrder<T extends Comparable<? super T>> {
+  static final class ComparatorsMax<T extends Comparable<? super T>> {
     @BeforeTemplate
-    BiFunction<T, T, T> before() {
+    BinaryOperator<T> before() {
       return BinaryOperator.maxBy(naturalOrder());
     }
 
     @AfterTemplate
-    BiFunction<T, T, T> after() {
+    BinaryOperator<T> after() {
       return Comparators::max;
     }
   }

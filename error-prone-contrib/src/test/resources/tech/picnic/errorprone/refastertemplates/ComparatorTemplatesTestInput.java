@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
@@ -17,12 +16,7 @@ final class ComparatorTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Arrays.class,
-        BinaryOperator.class,
-        Collections.class,
-        ImmutableList.class,
-        ImmutableSet.class,
-        identity());
+        Arrays.class, Collections.class, ImmutableList.class, ImmutableSet.class, identity());
   }
 
   ImmutableSet<Comparator<String>> testNaturalOrder() {
@@ -111,11 +105,11 @@ final class ComparatorTemplatesTest implements RefasterTemplateTestCase {
         Collections.max(ImmutableSet.of(new Object(), new Object()), (a, b) -> 1));
   }
 
-  BiFunction<String, String, String> testBinaryOperatorMinByNaturalOrder() {
+  BinaryOperator<String> testComparatorsMin() {
     return BinaryOperator.minBy(naturalOrder());
   }
 
-  BiFunction<String, String, String> testBinaryOperatorMaxByNaturalOrder() {
+  BinaryOperator<String> testComparatorsMax() {
     return BinaryOperator.maxBy(naturalOrder());
   }
 }
