@@ -179,10 +179,11 @@ public final class RefasterTemplateCollection extends BugChecker
     ImmutableRangeMap.Builder<Integer, String> templateMatches = ImmutableRangeMap.builder();
 
     for (Description description : matches) {
+      String templateName = extractRefasterTemplateName(description);
       Set<Replacement> replacements =
           Iterables.getOnlyElement(description.fixes).getReplacements(endPositions);
       for (Replacement replacement : replacements) {
-        templateMatches.put(replacement.range(), extractRefasterTemplateName(description));
+        templateMatches.put(replacement.range(), templateName);
       }
     }
 
@@ -232,7 +233,7 @@ public final class RefasterTemplateCollection extends BugChecker
   private static String extractRefasterTemplateName(Description description) {
     String message = description.getRawMessage();
     int index = message.indexOf(':');
-    checkState(index >= 0, "String '%s' does not contain character ':'", message);
+    checkState(index >= 0, "Failed to extract Refaster template name from string '%s'", message);
     return getSubstringAfterFinalDelimiter('.', message.substring(0, index));
   }
 

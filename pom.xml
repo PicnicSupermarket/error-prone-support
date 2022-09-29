@@ -622,6 +622,10 @@
                                     </module>
                                     <module name="IllegalIdentifierName" />
                                     <module name="IllegalImport">
+                                        <property name="illegalClasses" value="com.google.auto.common.MoreStreams">
+                                            <!-- Instead, please use Guava's
+                                            `java.util.stream.Collector`s. -->
+                                        </property>
                                         <property name="illegalClasses" value="com.mongodb.lang.Nullable">
                                             <!-- Instead, please use
                                             `javax.annotation.Nullable`. -->
@@ -1262,6 +1266,9 @@
                     <artifactId>pitest-maven</artifactId>
                     <version>1.9.7</version>
                     <configuration>
+                        <excludedClasses>
+                            <excludedClass>*.AutoValue_*</excludedClass>
+                        </excludedClasses>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->
