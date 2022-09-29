@@ -16,6 +16,8 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CompilationTestHelper;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -254,5 +256,21 @@ final class RefasterTest {
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
+  }
+
+  private static boolean isBuiltWithErrorProneFork() {
+    Class<?> clazz;
+    try {
+      clazz =
+          Class.forName(
+              "com.google.errorprone.ErrorProneOptions",
+              /* initialize= */ false,
+              Thread.currentThread().getContextClassLoader());
+    } catch (ClassNotFoundException e) {
+      return false;
+    }
+    return Arrays.stream(clazz.getDeclaredMethods())
+        .filter(m -> Modifier.isPublic(m.getModifiers()))
+        .anyMatch(m -> m.getName().equals("isSuggestionsAsWarnings"));
   }
 }
