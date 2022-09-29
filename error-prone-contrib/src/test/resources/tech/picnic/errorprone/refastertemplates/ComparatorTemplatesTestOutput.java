@@ -11,13 +11,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class ComparatorTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Arrays.class, Collections.class, ImmutableList.class, ImmutableSet.class, identity());
+        Arrays.class,
+        BinaryOperator.class,
+        Collections.class,
+        ImmutableList.class,
+        ImmutableSet.class,
+        identity());
   }
 
   ImmutableSet<Comparator<String>> testNaturalOrder() {

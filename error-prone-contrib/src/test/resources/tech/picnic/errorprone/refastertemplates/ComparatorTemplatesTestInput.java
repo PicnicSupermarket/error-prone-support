@@ -17,7 +17,12 @@ final class ComparatorTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Arrays.class, Collections.class, ImmutableList.class, ImmutableSet.class, identity());
+        Arrays.class,
+        BinaryOperator.class,
+        Collections.class,
+        ImmutableList.class,
+        ImmutableSet.class,
+        identity());
   }
 
   ImmutableSet<Comparator<String>> testNaturalOrder() {

@@ -263,7 +263,8 @@ final class ComparatorTemplates {
   }
 
   /**
-   * Prefer {@link Comparators#min(Comparable, Comparable)} over {@link BinaryOperator#minBy(Comparator)}for natural ordering.
+   * Prefer {@link Comparators#min(Comparable, Comparable)} over {@link
+   * BinaryOperator#minBy(Comparator)}for natural ordering.
    */
   static final class BinaryOperatorMinByNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
@@ -278,7 +279,8 @@ final class ComparatorTemplates {
   }
 
   /**
-   * Prefer {@link Comparators#max(Comparable, Comparable)} over {@link BinaryOperator#maxBy(Comparator)}for natural ordering.
+   * Prefer {@link Comparators#max(Comparable, Comparable)} over {@link
+   * BinaryOperator#maxBy(Comparator)}for natural ordering.
    */
   static final class BinaryOperatorMaxByNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
@@ -291,5 +293,4 @@ final class ComparatorTemplates {
       return Comparators::max;
     }
   }
-
 }
