@@ -7,6 +7,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static tech.picnic.errorprone.refaster.annotation.OnlineDocumentation.NESTED_CLASS_URL_PLACEHOLDER;
 import static tech.picnic.errorprone.refaster.annotation.OnlineDocumentation.TOP_LEVEL_CLASS_URL_PLACEHOLDER;
 
+import com.google.auto.value.AutoValue;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableClassToInstanceMap;
@@ -27,34 +28,29 @@ import java.util.function.Function;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
 
-// XXX: Can we find a better name for thi class?
-// XXX: Use `@AutoValue`?
 // XXX: Test this class directly. (Right now it's only indirectly tested through `RefasterTest`.)
-final class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serializable {
+@AutoValue
+abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serializable {
   private static final long serialVersionUID = 1L;
   private static final Splitter CLASS_NAME_SPLITTER = Splitter.on('.').limit(2);
 
-  private final String packageName;
-  private final ImmutableList<CodeTransformer> transformers;
-  private final ImmutableClassToInstanceMap<Annotation> annotations;
+  abstract String packageName();
 
-  AnnotatedCompositeCodeTransformer(
+  abstract ImmutableList<CodeTransformer> transformers();
+
+  @Override
+  public abstract ImmutableClassToInstanceMap<Annotation> annotations();
+
+  static AnnotatedCompositeCodeTransformer create(
       String packageName,
       ImmutableList<CodeTransformer> transformers,
       ImmutableClassToInstanceMap<Annotation> annotations) {
-    this.packageName = packageName;
-    this.transformers = transformers;
-    this.annotations = annotations;
-  }
-
-  @Override
-  public ImmutableClassToInstanceMap<Annotation> annotations() {
-    return annotations;
+    return new AutoValue_AnnotatedCompositeCodeTransformer(packageName, transformers, annotations);
   }
 
   @Override
   public void apply(TreePath path, Context context, DescriptionListener listener) {
-    for (CodeTransformer transformer : transformers) {
+    for (CodeTransformer transformer : transformers()) {
       transformer.apply(
           path,
           context,
@@ -77,16 +73,16 @@ final class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serial
   }
 
   private String getShortCheckName(String fullCheckName) {
-    if (packageName.isEmpty()) {
+    if (packageName().isEmpty()) {
       return fullCheckName;
     }
 
-    String prefix = packageName + '.';
+    String prefix = packageName() + '.';
     checkState(
         fullCheckName.startsWith(prefix),
         "Refaster template class '%s' is not located in package '%s'",
         fullCheckName,
-        packageName);
+        packageName());
 
     return fullCheckName.substring(prefix.length());
   }
