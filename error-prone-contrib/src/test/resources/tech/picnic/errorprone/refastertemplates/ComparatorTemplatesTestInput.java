@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refastertemplates;
 
+import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 
@@ -8,6 +9,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.function.BinaryOperator;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class ComparatorTemplatesTest implements RefasterTemplateTestCase {
@@ -101,5 +103,13 @@ final class ComparatorTemplatesTest implements RefasterTemplateTestCase {
         Collections.max(Arrays.asList(new Object(), new Object()), (a, b) -> -1),
         Collections.max(ImmutableList.of(new Object(), new Object()), (a, b) -> 0),
         Collections.max(ImmutableSet.of(new Object(), new Object()), (a, b) -> 1));
+  }
+
+  BinaryOperator<String> testComparatorsMin() {
+    return BinaryOperator.minBy(naturalOrder());
+  }
+
+  BinaryOperator<String> testComparatorsMax() {
+    return BinaryOperator.maxBy(naturalOrder());
   }
 }

@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.function.BinaryOperator;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
 
 final class ComparatorTemplatesTest implements RefasterTemplateTestCase {
@@ -89,5 +90,13 @@ final class ComparatorTemplatesTest implements RefasterTemplateTestCase {
         Comparators.max(new Object(), new Object(), (a, b) -> -1),
         Comparators.max(new Object(), new Object(), (a, b) -> 0),
         Comparators.max(new Object(), new Object(), (a, b) -> 1));
+  }
+
+  BinaryOperator<String> testComparatorsMin() {
+    return Comparators::min;
+  }
+
+  BinaryOperator<String> testComparatorsMax() {
+    return Comparators::max;
   }
 }
