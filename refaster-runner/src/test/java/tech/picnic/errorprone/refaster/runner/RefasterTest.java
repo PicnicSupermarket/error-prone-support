@@ -31,7 +31,7 @@ final class RefasterTest {
           .expectErrorMessage(
               "StringOfSizeZeroTemplate",
               containsPattern(
-                  "\\[Refaster Rule\\] FooTemplates\\.StringOfSizeZeroTemplate: Refactoring opportunity\\s+.+\\s+null"))
+                  "\\[Refaster Rule\\] FooTemplates\\.StringOfSizeZeroTemplate: Refactoring opportunity\\s+.+\\s+"))
           .expectErrorMessage(
               "StringOfSizeOneTemplate",
               containsPattern(

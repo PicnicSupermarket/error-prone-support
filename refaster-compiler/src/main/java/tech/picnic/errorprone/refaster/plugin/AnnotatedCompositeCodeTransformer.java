@@ -67,7 +67,7 @@ abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Ser
     return Description.builder(
             description.position,
             shortCheckName,
-            getLinkPattern(delegate, shortCheckName),
+            getLinkPattern(delegate, shortCheckName).orElse(null),
             overrideSeverity(getSeverity(delegate), context),
             getDescription(delegate))
         .addAllFixes(description.fixes)
@@ -89,14 +89,16 @@ abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Ser
     return fullCheckName.substring(prefix.length());
   }
 
-  private String getLinkPattern(CodeTransformer delegate, String checkName) {
-    String urlPattern =
-        getAnnotationValue(OnlineDocumentation.class, OnlineDocumentation::value, delegate, "");
-
+  private Optional<String> getLinkPattern(CodeTransformer delegate, String checkName) {
     Iterator<String> nameComponents = CLASS_NAME_SPLITTER.splitToStream(checkName).iterator();
-    return urlPattern
-        .replace(TOP_LEVEL_CLASS_URL_PLACEHOLDER, nameComponents.next())
-        .replace(NESTED_CLASS_URL_PLACEHOLDER, Iterators.getNext(nameComponents, ""));
+    return getAnnotationValue(OnlineDocumentation.class, OnlineDocumentation::value, delegate)
+        .map(
+            urlPattern ->
+                urlPattern.replace(TOP_LEVEL_CLASS_URL_PLACEHOLDER, nameComponents.next()))
+        .map(
+            urlPattern ->
+                urlPattern.replace(
+                    NESTED_CLASS_URL_PLACEHOLDER, Iterators.getNext(nameComponents, "")));
   }
 
   private SeverityLevel getSeverity(CodeTransformer delegate) {
@@ -105,23 +107,22 @@ abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Ser
      * `tech.picnic.errorprone.refaster.runner.Refaster` bug checker. (The associated
      * `RefasterTest#severityAssignment` test verifies this invariant.)
      */
-    return getAnnotationValue(Severity.class, Severity::value, delegate, SUGGESTION);
+    return getAnnotationValue(Severity.class, Severity::value, delegate).orElse(SUGGESTION);
   }
 
   private String getDescription(CodeTransformer delegate) {
     return getAnnotationValue(
-        tech.picnic.errorprone.refaster.annotation.Description.class,
-        tech.picnic.errorprone.refaster.annotation.Description::value,
-        delegate,
-        "Refactoring opportunity");
+            tech.picnic.errorprone.refaster.annotation.Description.class,
+            tech.picnic.errorprone.refaster.annotation.Description::value,
+            delegate)
+        .orElse("Refactoring opportunity");
   }
 
-  private <A extends Annotation, T> T getAnnotationValue(
-      Class<A> annotation, Function<A, T> extractor, CodeTransformer delegate, T defaultValue) {
+  private <A extends Annotation, T> Optional<T> getAnnotationValue(
+      Class<A> annotation, Function<A, T> extractor, CodeTransformer delegate) {
     return getAnnotationValue(delegate, annotation)
         .or(() -> getAnnotationValue(this, annotation))
-        .map(extractor)
-        .orElse(defaultValue);
+        .map(extractor);
   }
 
   private static <A extends Annotation> Optional<A> getAnnotationValue(
