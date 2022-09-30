@@ -28,7 +28,8 @@ import java.util.function.Function;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
 
-// XXX: Can we find a better name for this class? `CompositeAnnotatedCodeTransformer`, ...?
+// XXX: Can we find a better name for this class? `CompositeAnnotatedCodeTransformer`,
+// `AugmentedCompositeCodeTransformer`, ...?
 // XXX: Test this class directly. (Right now it's only indirectly tested through `RefasterTest`.)
 @AutoValue
 abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serializable {
@@ -99,6 +100,11 @@ abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Ser
   }
 
   private SeverityLevel getSeverity(CodeTransformer delegate) {
+    /*
+     * The default severity should be kept in sync with the default severity of the
+     * `tech.picnic.errorprone.refaster.runner.Refaster` bug checker. (The associated
+     * `RefasterTest#severityAssignment` test verifies this invariant.)
+     */
     return getAnnotationValue(Severity.class, Severity::value, delegate, SUGGESTION);
   }
 
