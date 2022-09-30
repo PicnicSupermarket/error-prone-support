@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskEvent.Kind;
 import com.sun.source.util.TaskListener;
@@ -40,7 +42,7 @@ final class DocgenTaskListener implements TaskListener {
     }
 
     ClassTree tree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
-    if (tree == null || !isBugPattern(tree)) {
+    if (tree == null || !isBugPatternTest(tree)) {
       return;
     }
 
@@ -61,5 +63,12 @@ final class DocgenTaskListener implements TaskListener {
 
   private static boolean isBugPattern(ClassTree tree) {
     return ASTHelpers.hasDirectAnnotationWithSimpleName(tree, BugPattern.class.getSimpleName());
+  }
+
+  private static boolean isBugPatternTest(ClassTree tree) {
+    return tree.getMembers().stream()
+        .filter(VariableTree.class::isInstance)
+        .map(VariableTree.class::cast)
+        .anyMatch(member -> member.getType().toString().equals("BugCheckerRefactoringTestHelper"));
   }
 }
