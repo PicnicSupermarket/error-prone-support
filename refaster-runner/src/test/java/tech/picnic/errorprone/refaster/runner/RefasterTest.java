@@ -1,15 +1,20 @@
 package tech.picnic.errorprone.refaster.runner;
 
 import static com.google.common.base.Predicates.containsPattern;
-import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
-import static java.util.Comparator.naturalOrder;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
+import static java.util.Comparator.comparingInt;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.BugCheckerInfo;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
+import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CompilationTestHelper;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -72,36 +77,44 @@ final class RefasterTest {
         .doTest();
   }
 
-  private static Stream<Arguments> reportedSeverityTestCases() {
+  private static Stream<Arguments> severityAssignmentTestCases() {
+    /*
+     * The _actual_ default severity is assigned by the `CodeTransformer`s to which the `Refaster`
+     * bug checker delegates. Here we verify that the absence of an `@Severity` annotation yields
+     * the same severity as the bug checker's declared severity.
+     */
+    SeverityLevel defaultSeverity = BugCheckerInfo.create(Refaster.class).defaultSeverity();
+
     /* { arguments, expectedSeverities } */
     return Stream.concat(
         Stream.of(
-            arguments(ImmutableList.of(), ImmutableList.of("Note", "warning", "error", "Note")),
+            arguments(
+                ImmutableList.of(), ImmutableList.of(defaultSeverity, WARNING, ERROR, SUGGESTION)),
             arguments(ImmutableList.of("-Xep:Refaster:OFF"), ImmutableList.of()),
             arguments(
                 ImmutableList.of("-Xep:Refaster:DEFAULT"),
-                ImmutableList.of("Note", "warning", "error", "Note")),
+                ImmutableList.of(defaultSeverity, WARNING, ERROR, SUGGESTION)),
             arguments(
                 ImmutableList.of("-Xep:Refaster:WARN"),
-                ImmutableList.of("warning", "warning", "warning", "warning")),
+                ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
             arguments(
                 ImmutableList.of("-Xep:Refaster:ERROR"),
-                ImmutableList.of("error", "error", "error", "error")),
+                ImmutableList.of(ERROR, ERROR, ERROR, ERROR)),
             arguments(
                 ImmutableList.of("-XepAllErrorsAsWarnings"),
-                ImmutableList.of("Note", "warning", "warning", "Note")),
+                ImmutableList.of(defaultSeverity, WARNING, WARNING, SUGGESTION)),
             arguments(
                 ImmutableList.of("-Xep:Refaster:OFF", "-XepAllErrorsAsWarnings"),
                 ImmutableList.of()),
             arguments(
                 ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllErrorsAsWarnings"),
-                ImmutableList.of("Note", "warning", "warning", "Note")),
+                ImmutableList.of(defaultSeverity, WARNING, WARNING, SUGGESTION)),
             arguments(
                 ImmutableList.of("-Xep:Refaster:WARN", "-XepAllErrorsAsWarnings"),
-                ImmutableList.of("warning", "warning", "warning", "warning")),
+                ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
             arguments(
                 ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllErrorsAsWarnings"),
-                ImmutableList.of("warning", "warning", "warning", "warning"))),
+                ImmutableList.of(WARNING, WARNING, WARNING, WARNING))),
         ErrorProneFork.isErrorProneForkAvailable()
             ? Stream.of(
                 arguments(
@@ -109,13 +122,13 @@ final class RefasterTest {
                     ImmutableList.of()),
                 arguments(
                     ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of("warning", "warning", "error", "warning")),
+                    ImmutableList.of(WARNING, WARNING, ERROR, WARNING)),
                 arguments(
                     ImmutableList.of("-Xep:Refaster:WARN", "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of("warning", "warning", "warning", "warning")),
+                    ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
                 arguments(
                     ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of("error", "error", "error", "error")),
+                    ImmutableList.of(ERROR, ERROR, ERROR, ERROR)),
                 arguments(
                     ImmutableList.of(
                         "-Xep:Refaster:OFF",
@@ -127,19 +140,19 @@ final class RefasterTest {
                         "-Xep:Refaster:DEFAULT",
                         "-XepAllErrorsAsWarnings",
                         "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of("warning", "warning", "warning", "warning")),
+                    ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
                 arguments(
                     ImmutableList.of(
                         "-Xep:Refaster:WARN",
                         "-XepAllErrorsAsWarnings",
                         "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of("warning", "warning", "warning", "warning")),
+                    ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
                 arguments(
                     ImmutableList.of(
                         "-Xep:Refaster:ERROR",
                         "-XepAllErrorsAsWarnings",
                         "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of("warning", "warning", "warning", "warning")))
+                    ImmutableList.of(WARNING, WARNING, WARNING, WARNING)))
             : Stream.empty());
   }
 
@@ -150,10 +163,10 @@ final class RefasterTest {
    * @implNote This test setup is rather cumbersome, because the {@link CompilationTestHelper} does
    *     not enable direct assertions against the severity of collected diagnostics output.
    */
-  @MethodSource("reportedSeverityTestCases")
+  @MethodSource("severityAssignmentTestCases")
   @ParameterizedTest
-  void defaultSeverities(
-      ImmutableList<String> arguments, ImmutableList<String> expectedSeverities) {
+  void severityAssignment(
+      ImmutableList<String> arguments, ImmutableList<SeverityLevel> expectedSeverities) {
     assertThatThrownBy(
             () ->
                 compilationHelper
@@ -179,17 +192,30 @@ final class RefasterTest {
                     .containsExactlyElementsOf(expectedSeverities));
   }
 
-  private static ImmutableList<String> extractRefasterSeverities(String fileName, String message) {
+  private static ImmutableList<SeverityLevel> extractRefasterSeverities(
+      String fileName, String message) {
     return Pattern.compile(
             String.format(
                 "/%s:(\\d+): (Note|warning|error): \\[Refaster Rule\\]", Pattern.quote(fileName)))
         .matcher(message)
         .results()
-        .collect(
-            toImmutableSortedMap(
-                naturalOrder(), r -> Integer.parseInt(r.group(1)), r -> r.group(2)))
-        .values()
-        .asList();
+        .sorted(comparingInt(r -> Integer.parseInt(r.group(1))))
+        .map(r -> toSeverityLevel(r.group(2)))
+        .collect(toImmutableList());
+  }
+
+  private static SeverityLevel toSeverityLevel(String compilerDiagnosticsPrefix) {
+    switch (compilerDiagnosticsPrefix) {
+      case "Note":
+        return SUGGESTION;
+      case "warning":
+        return WARNING;
+      case "error":
+        return ERROR;
+      default:
+        throw new IllegalStateException(
+            String.format("Unrecognized diagnostics prefix '%s'", compilerDiagnosticsPrefix));
+    }
   }
 
   @Test
