@@ -9,8 +9,9 @@ import java.lang.annotation.Target;
 /**
  * Describes the severity of a Refaster template or group of Refaster templates.
  *
- * <p>The default severity is {@link SeverityLevel#SUGGESTION}. Annotations on nested classes
- * override the severity associated with any enclosing class.
+ * <p>The default severity is the severity assigned to the {@code Refaster} bug checker, which may
+ * be controlled explicitly by running Error Prone with e.g. {@code -Xep:Refaster:WARN}. Annotations
+ * on nested classes override the severity associated with any enclosing class.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
