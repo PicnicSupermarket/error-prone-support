@@ -92,13 +92,10 @@ abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Ser
   private Optional<String> getLinkPattern(CodeTransformer delegate, String checkName) {
     Iterator<String> nameComponents = CLASS_NAME_SPLITTER.splitToStream(checkName).iterator();
     return getAnnotationValue(OnlineDocumentation.class, OnlineDocumentation::value, delegate)
+        .map(url -> url.replace(TOP_LEVEL_CLASS_URL_PLACEHOLDER, nameComponents.next()))
         .map(
-            urlPattern ->
-                urlPattern.replace(TOP_LEVEL_CLASS_URL_PLACEHOLDER, nameComponents.next()))
-        .map(
-            urlPattern ->
-                urlPattern.replace(
-                    NESTED_CLASS_URL_PLACEHOLDER, Iterators.getNext(nameComponents, "")));
+            url ->
+                url.replace(NESTED_CLASS_URL_PLACEHOLDER, Iterators.getNext(nameComponents, "")));
   }
 
   private SeverityLevel getSeverity(CodeTransformer delegate) {
