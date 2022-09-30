@@ -5,6 +5,7 @@ import static java.util.Comparator.comparingInt;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,8 +33,10 @@ abstract class Node<T> {
 
   abstract ImmutableList<T> values();
 
+  // XXX: Consider having `RefasterRuleSelector` already collect the candidate edges into a
+  // `SortedSet`, as that would likely speed up `ImmutableSortedSet#copyOf`.
   void collectReachableValues(Set<String> candidateEdges, Consumer<T> sink) {
-    collectReachableValues(ImmutableList.sortedCopyOf(candidateEdges), sink);
+    collectReachableValues(ImmutableSortedSet.copyOf(candidateEdges).asList(), sink);
   }
 
   private void collectReachableValues(ImmutableList<String> candidateEdges, Consumer<T> sink) {
@@ -43,20 +46,23 @@ abstract class Node<T> {
       return;
     }
 
-    if (children().size() < candidateEdges.size()) {
+    // For performance reasons we iterate over the smallest set of edges. In case there are fewer
+    // children than candidate edges we iterate over the former, at the cost of not pruning the
+    // set of candidate edges if a transition is made.
+    int candidateEdgeCount = candidateEdges.size();
+    if (children().size() < candidateEdgeCount) {
       for (Map.Entry<String, Node<T>> e : children().entrySet()) {
         if (candidateEdges.contains(e.getKey())) {
           e.getValue().collectReachableValues(candidateEdges, sink);
         }
       }
     } else {
-      ImmutableList<String> remainingCandidateEdges =
-          candidateEdges.subList(1, candidateEdges.size());
-      Node<T> child = children().get(candidateEdges.get(0));
-      if (child != null) {
-        child.collectReachableValues(remainingCandidateEdges, sink);
+      for (int i = 0; i < candidateEdgeCount; i++) {
+        Node<T> child = children().get(candidateEdges.get(i));
+        if (child != null) {
+          child.collectReachableValues(candidateEdges.subList(i + 1, candidateEdgeCount), sink);
+        }
       }
-      collectReachableValues(remainingCandidateEdges, sink);
     }
   }
 
