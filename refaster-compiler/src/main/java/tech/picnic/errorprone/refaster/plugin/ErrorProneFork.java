@@ -39,7 +39,7 @@ public final class ErrorProneFork {
    *
    * @param options The currently active Error Prone options.
    * @return {@code true} iff {@link #isErrorProneForkAvailable() the Error Prone fork is available}
-   *     and the aforementioned flag is configured.
+   *     and the aforementioned flag is set.
    * @see <a href="https://github.com/google/error-prone/pull/3301">google/error-prone#3301</a>
    */
   public static boolean isSuggestionsAsWarningsEnabled(ErrorProneOptions options) {
