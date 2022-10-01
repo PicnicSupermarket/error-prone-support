@@ -24,6 +24,10 @@ jobs:
         with:
           source: website/
           destination: ./_site
+      - name: Validating HTML output
+        uses: athackst/htmlproofer-action@main
+        with:
+          check_external_hash: false
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@v1.0.4
   deploy:
