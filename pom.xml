@@ -211,6 +211,20 @@
         <version.nullaway>0.10.12</version.nullaway>
         <version.pitest-git>1.1.1</version.pitest-git>
         <version.surefire>3.1.2</version.surefire>
+        <version.jmh>1.35</version.jmh>
+        <!-- XXX: Consider providing our own implementation with similar
+        functionaliy, and designing it such that JMH classes would not need to
+        be annotated `@Open`. -->
+        <version.nopen>1.0.1</version.nopen>
+        <!-- XXX: Two other dependencies are potentially of interest:
+        `com.palantir.assertj-automation:assertj-refaster-rules` and
+        `com.palantir.baseline:baseline-refaster-rules` contain Refaster rules
+        that aren't currently applied. We should use
+        `RefasterRuleBuilderScanner` to convert those to `.refaster` files so
+        that we can pick them up. (But in case of `baseline-refaster-rules`
+        perhaps we can simply incorporate all of them.) -->
+        <version.palantir-assertj-automation>0.6.0</version.palantir-assertj-automation>
+        <version.palantir-baseline>4.145.0</version.palantir-baseline>
     </properties>
 
     <dependencyManagement>
@@ -316,12 +330,10 @@
                 <artifactId>truth</artifactId>
                 <version>1.1.5</version>
             </dependency>
-            <!-- Specified as a workaround for
-            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
                 <groupId>com.jakewharton.nopen</groupId>
-                <artifactId>nopen-checker</artifactId>
-                <version>${version.nopen-checker}</version>
+                <artifactId>nopen-annotations</artifactId>
+                <version>${version.nopen}</version>
             </dependency>
             <dependency>
                 <groupId>com.newrelic.agent.java</groupId>
@@ -455,6 +467,11 @@
                         <artifactId>bson-record-codec</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>${version.jmh}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -914,7 +931,7 @@
                             <path>
                                 <groupId>com.jakewharton.nopen</groupId>
                                 <artifactId>nopen-checker</artifactId>
-                                <version>${version.nopen-checker}</version>
+                                <version>${version.nopen}</version>
                             </path>
                             <path>
                                 <groupId>com.uber.nullaway</groupId>
@@ -930,6 +947,11 @@
                                 <groupId>org.mockito</groupId>
                                 <artifactId>mockito-errorprone</artifactId>
                                 <version>${version.mockito}</version>
+                            </path>
+                            <path>
+                                <groupId>org.openjdk.jmh</groupId>
+                                <artifactId>jmh-generator-annprocess</artifactId>
+                                <version>${version.jmh}</version>
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs>
@@ -1218,6 +1240,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
                     <version>2.2.0</version>
                     <configuration>
@@ -1290,6 +1317,7 @@
                                 <!-- -->
                                 GPL-2.0-with-classpath-exception
                                 | CDDL/GPLv2+CE
+                                | GNU General Public License (GPL), version 2, with the Classpath exception
                                 | GNU General Public License, version 2 (GPL2), with the classpath exception
                                 | GNU General Public License, version 2, with the Classpath Exception
                                 | GPL2 w/ CPE
@@ -1736,6 +1764,7 @@
                                     avoid that, so we simply tell Error Prone
                                     not to warn about generated code. -->
                                     -XepDisableWarningsInGeneratedCode
+                                    -XepExcludedPaths:\Q${project.build.directory}${file.separator}\E.*
                                     <!-- We don't target Android. -->
                                     -Xep:AndroidJdkLibsChecker:OFF
                                     <!-- XXX: Enable this once we open-source
@@ -1957,6 +1986,67 @@
                         <artifactId>maven-gpg-plugin</artifactId>
                     </plugin>
                     <?SORTPOM RESUME?>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- Enables execution of a JMH benchmark. Given a benchmark class
+            `tech.picnic.MyBenchmark`, the following command (executed against
+            the (sub)module in which the benchmark resides) will compile and
+            execute said benchmark:
+
+              mvn process-test-classes -Dverification.skip \
+                -Djmh.run-benchmark=tech.picnic.MyBenchmark
+            -->
+            <id>run-jmh-benchmark</id>
+            <activation>
+                <property>
+                    <name>jmh.run-benchmark</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>build-jmh-runtime-classpath</id>
+                                <goals>
+                                    <goal>build-classpath</goal>
+                                </goals>
+                                <configuration>
+                                    <outputProperty>testClasspath</outputProperty>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>run-jmh-benchmark</id>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <phase>process-test-classes</phase>
+                                <configuration>
+                                    <classpathScope>test</classpathScope>
+                                    <mainClass>${jmh.run-benchmark}</mainClass>
+                                    <systemProperties>
+                                        <!-- The runtime classpath is defined
+                                        in this way so that any JVMs forked by
+                                        JMH will have the desired classpath. -->
+                                        <systemProperty>
+                                            <key>java.class.path</key>
+                                            <value>${project.build.testOutputDirectory}${path.separator}${project.build.outputDirectory}${path.separator}${testClasspath}</value>
+                                        </systemProperty>
+                                    </systemProperties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>

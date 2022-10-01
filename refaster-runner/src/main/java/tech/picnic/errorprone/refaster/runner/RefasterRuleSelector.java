@@ -19,14 +19,18 @@ import com.google.errorprone.refaster.UStaticIdent;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BinaryTree;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.CompoundAssignmentTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MemberSelectTree;
+import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.PackageTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.UnaryTree;
+import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -183,7 +187,7 @@ final class RefasterRuleSelector {
    * @throws IllegalArgumentException If the given input is not supported.
    */
   // XXX: Extend list to cover remaining cases; at least for any `Kind` that may appear in a
-  // Refaster template.
+  // Refaster template. (E.g. keywords such as `if`, `instanceof`, `new`, ...)
   private static String treeKindToString(Tree.Kind kind) {
     switch (kind) {
       case ASSIGNMENT:
@@ -458,6 +462,40 @@ final class RefasterRuleSelector {
   }
 
   private static class SourceIdentifierExtractor extends TreeScanner<Void, Set<String>> {
+    @Nullable
+    @Override
+    public Void visitPackage(PackageTree node, Set<String> identifiers) {
+      /* Refaster rules never match package declarations. */
+      return null;
+    }
+
+    @Nullable
+    @Override
+    public Void visitClass(ClassTree node, Set<String> identifiers) {
+      /*
+       * Syntactic details of a class declaration other than the definition of its members do not
+       * need to be reflected in a Refaster rule for it to apply to the class's code.
+       */
+      return scan(node.getMembers(), identifiers);
+    }
+
+    @Nullable
+    @Override
+    public Void visitMethod(MethodTree node, Set<String> identifiers) {
+      /*
+       * Syntactic details of a method declaration other than its body do not need to be reflected
+       * in a Refaster rule for it to apply to the method's code.
+       */
+      return scan(node.getBody(), identifiers);
+    }
+
+    @Nullable
+    @Override
+    public Void visitVariable(VariableTree node, Set<String> identifiers) {
+      /* A variable's modifiers and name do not influence where a Refaster rule matches. */
+      return reduce(scan(node.getInitializer(), identifiers), scan(node.getType(), identifiers));
+    }
+
     @Nullable
     @Override
     public Void visitIdentifier(IdentifierTree node, Set<String> identifiers) {
