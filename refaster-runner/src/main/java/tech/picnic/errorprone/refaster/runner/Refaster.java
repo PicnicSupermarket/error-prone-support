@@ -157,6 +157,8 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     return description.fixes.stream().flatMap(fix -> fix.getReplacements(endPositions).stream());
   }
 
+  // XXX: Add a flag to disable the optimized `RefasterRuleSelector`. That would allow us to verify
+  // that we're not prematurely pruning rules.
   private static RefasterRuleSelector createRefasterRuleSelector(ErrorProneFlags flags) {
     ImmutableListMultimap<String, CodeTransformer> allTransformers =
         CodeTransformers.getAllCodeTransformers();

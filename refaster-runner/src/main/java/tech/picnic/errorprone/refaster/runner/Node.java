@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,8 @@ abstract class Node<T> {
 
   // XXX: Consider having `RefasterRuleSelector` already collect the candidate edges into a
   // `SortedSet`, as that would likely speed up `ImmutableSortedSet#copyOf`.
+  // XXX: If this ^ proves worthwhile, then the test code and benchmark should be updated
+  // accordingly.
   void collectReachableValues(Set<String> candidateEdges, Consumer<T> sink) {
     collectReachableValues(ImmutableSortedSet.copyOf(candidateEdges).asList(), sink);
   }
@@ -86,9 +89,9 @@ abstract class Node<T> {
     private void register(
         List<T> values, Function<? super T, ? extends Set<? extends Set<String>>> pathsExtractor) {
       for (T value : values) {
-        pathsExtractor.apply(value).stream()
-            .sorted(comparingInt(Set::size))
-            .forEach(path -> registerPath(value, ImmutableList.sortedCopyOf(path)));
+        List<? extends Set<String>> paths = new ArrayList<>(pathsExtractor.apply(value));
+        Collections.sort(paths, comparingInt(Set::size));
+        paths.forEach(path -> registerPath(value, ImmutableList.sortedCopyOf(path)));
       }
     }
 
@@ -98,14 +101,13 @@ abstract class Node<T> {
         return;
       }
 
-      path.stream()
-          .findFirst()
-          .ifPresentOrElse(
-              edge ->
-                  children()
-                      .computeIfAbsent(edge, k -> create())
-                      .registerPath(value, path.subList(1, path.size())),
-              () -> values().add(value));
+      if (path.isEmpty()) {
+        values().add(value);
+      } else {
+        children()
+            .computeIfAbsent(path.get(0), k -> create())
+            .registerPath(value, path.subList(1, path.size()));
+      }
     }
 
     private Node<T> immutable() {
