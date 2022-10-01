@@ -199,9 +199,9 @@ Want to report or fix a bug, suggest or add a new feature, or improve the
 documentation? That's awesome! Please read our [contribution
 guidelines][contributing].
 
-[bug-checks]: error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
-[bug-checks-identity-conversion]: error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/IdentityConversion.java
-[contributing]: CONTRIBUTING.md
+[bug-checks]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
+[bug-checks-identity-conversion]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/IdentityConversion.java
+[contributing]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md
 [error-prone-bugchecker]: https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
 [error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
 [error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
@@ -213,7 +213,7 @@ guidelines][contributing].
 [google-java-format]: https://github.com/google/google-java-format
 [idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
 [license-badge]: https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
-[license]: LICENSE.md
+[license]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/LICENSE.md
 [maven-central-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
 [maven-central-search]: https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
 [maven]: https://maven.apache.org
@@ -222,5 +222,5 @@ guidelines][contributing].
 [pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
 [refaster]: https://errorprone.info/docs/refaster
-[refaster-templates-bigdecimal]: error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/BigDecimalTemplates.java
-[refaster-templates]: error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/
+[refaster-templates-bigdecimal]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/BigDecimalTemplates.java
+[refaster-templates]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/
