@@ -15,16 +15,10 @@ bundle install
 ```
 
 The website will now be [available][localhost-port-4000] on port 4000. Source
-code modifications will automatically be reflected. (An exception is
-`_config.yml`: changes to this file require a server restart.) Subsequent
-server restarts do not require running `bundle install`, unless `Gemfile` has
-been updated in the interim.
-
-Documentation can be regenerated whist jekyll is running, by executing:
-
-```sh
-../generate-docs.sh
-```
+code modifications (including the result of rerunning `../generate-docs.sh`)
+will automatically be reflected. (An exception is `_config.yml`: changes to
+this file require a server restart.) Subsequent server restarts do not require
+running `bundle install`, unless `Gemfile` has been updated in the interim.
 
 If you are not familiar with Jekyll, be sure to check out its
 [documentation][jekyll-docs]. It is recommended to follow the provided

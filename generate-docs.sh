@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e -u -o pipefail
+
 WEBSITE_FOLDER="website"
 HOMEPAGE="${WEBSITE_FOLDER}/index.md"
 

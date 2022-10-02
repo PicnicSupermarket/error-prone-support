@@ -3,39 +3,36 @@ title: Error Prone Support
 logo: assets/images/favicon.svg
 url: https://error-prone.picnic.tech
 description: >-
-  Error Prone extensions: extra bug checkers and a large battery of Refaster templates.
+  Error Prone extensions: extra bug checkers and a large battery of Refaster
+  templates.
 
-remote_theme: just-the-docs/just-the-docs
+theme: just-the-docs
 plugins:
-- jekyll-remote-theme
-- jekyll-sitemap
+  - jekyll-sitemap
 
-# Do not deploy these files and folders through GitHub pages.
+# Files and directories not to be deployed through GitHub pages.
 exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
   - vendor
 
-permalink: pretty # Use /doc/ instead of /doc.html.
+# See https://jekyllrb.com/docs/permalinks/#built-in-formats.
+permalink: pretty
 
-# Theme configuration.
-search_enabled: true
-heading_anchors: true
-
+# See https://just-the-docs.github.io/just-the-docs/docs/navigation-structure/#external-navigation-links.
 nav_external_links:
   - title: Error Prone Support on GitHub
     url: https://github.com/PicnicSupermarket/error-prone-support
     hide_icon: false
 
-# Author configuration.
-twitter:
-  username: picnic
-  card: summary
-
+# See https://jekyll.github.io/jekyll-seo-tag/usage/.
 social:
   name: Picnic
   links:
     - https://github.com/PicnicSupermarket
     - https://twitter.com/picnic
     - https://www.linkedin.com/company/picnictechnologies
+twitter:
+  username: picnic
+  card: summary
