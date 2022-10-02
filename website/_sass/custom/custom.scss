@@ -1,6 +1,9 @@
-// We should override $nav-width(-md), however this breaks code highlighting and other styles.
-// This seems to be an issue for following the recommended approach.
-// See https://github.com/just-the-docs/just-the-docs/issues/982.
+// XXX: We should override `$nav-width(-md)`, but this breaks code highlighting
+// and other styles. See
+// https://github.com/just-the-docs/just-the-docs/issues/982.
+// Once the fix for the above issue is released, replace this section with the
+// approach recommended at
+// https://just-the-docs.github.io/just-the-docs/docs/customization/#custom-schemes.
 @include mq(lg) {
     .side-bar {
         min-width: 400px;
