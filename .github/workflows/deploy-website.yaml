@@ -1,7 +1,10 @@
 name: Update `error-prone.picnic.tech` website content
 on:
+  pull_request:
   push:
-    branches: [$default-branch]
+    branches: 
+      - $default-branch
+      - sschroevers/deploy-to-github-pages
 permissions:
   contents: read
   pages: write
@@ -36,6 +39,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-22.04
     needs: build
+    if: github.ref == $default-branch
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
