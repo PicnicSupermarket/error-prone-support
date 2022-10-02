@@ -49,9 +49,11 @@ abstract class Node<T> {
       return;
     }
 
-    // For performance reasons we iterate over the smallest set of edges. In case there are fewer
-    // children than candidate edges we iterate over the former, at the cost of not pruning the
-    // set of candidate edges if a transition is made.
+    /*
+     * For performance reasons we iterate over the smallest set of edges. In case there are fewer
+     * children than candidate edges we iterate over the former, at the cost of not pruning the set
+     * of candidate edges if a transition is made.
+     */
     int candidateEdgeCount = candidateEdges.size();
     if (children().size() < candidateEdgeCount) {
       for (Map.Entry<String, Node<T>> e : children().entrySet()) {
@@ -90,6 +92,10 @@ abstract class Node<T> {
         List<T> values, Function<? super T, ? extends Set<? extends Set<String>>> pathsExtractor) {
       for (T value : values) {
         List<? extends Set<String>> paths = new ArrayList<>(pathsExtractor.apply(value));
+        /*
+         * We sort paths by length ascending, so that in case of two paths where one is an initial
+         * prefix of the other, only the former is encoded (thus saving some space).
+         */
         Collections.sort(paths, comparingInt(Set::size));
         paths.forEach(path -> registerPath(value, ImmutableList.sortedCopyOf(path)));
       }

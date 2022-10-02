@@ -64,7 +64,9 @@ abstract class NodeTestCase<V> {
 
     return Stream.concat(
             Stream.of(ImmutableSet.<String>of()), shuffle(treeInput.values(), random).stream())
-        .limit(random.nextInt(20, 100))
+        // XXX: Use `random.nextInt(20, 100)` once we no longer target JDK 11. (And consider
+        // introducing a Refaster template for this case.)
+        .limit(20 + random.nextInt(80))
         .flatMap(edges -> generateVariations(edges, allEdges, "unused", random))
         .distinct()
         .map(edges -> createTestCaseEntry(treeInput, edges));
