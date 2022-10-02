@@ -20,12 +20,14 @@ exclude:
 # See https://jekyllrb.com/docs/permalinks/#built-in-formats.
 permalink: pretty
 
+# Theme (just-the-docs) configuration.
 # See https://just-the-docs.github.io/just-the-docs/docs/navigation-structure/#external-navigation-links.
 nav_external_links:
   - title: Error Prone Support on GitHub
     url: https://github.com/PicnicSupermarket/error-prone-support
     hide_icon: false
 
+# SEO configuration.
 # See https://jekyll.github.io/jekyll-seo-tag/usage/.
 social:
   name: Picnic
