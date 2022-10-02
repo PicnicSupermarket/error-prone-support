@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.allOf;
@@ -10,6 +10,7 @@ import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static java.util.stream.Collectors.joining;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -51,7 +52,8 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Defer string concatenation to the invoked method",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "FormatStringConcatenation",
+    linkType = CUSTOM,
     severity = WARNING,
     tags = SIMPLIFICATION)
 public final class FormatStringConcatenation extends BugChecker

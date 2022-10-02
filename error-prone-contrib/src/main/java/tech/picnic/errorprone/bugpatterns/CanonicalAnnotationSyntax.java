@@ -1,8 +1,9 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
@@ -31,7 +32,8 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Omit redundant syntax from annotation declarations",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "CanonicalAnnotationSyntax",
+    linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
 public final class CanonicalAnnotationSyntax extends BugChecker implements AnnotationTreeMatcher {

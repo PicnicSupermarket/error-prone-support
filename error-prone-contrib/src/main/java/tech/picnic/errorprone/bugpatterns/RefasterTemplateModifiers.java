@@ -1,10 +1,11 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -34,7 +35,8 @@ import javax.lang.model.element.Modifier;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Refaster class and method definitions should specify a canonical set of modifiers",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "RefasterTemplateModifiers",
+    linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)
 public final class RefasterTemplateModifiers extends BugChecker

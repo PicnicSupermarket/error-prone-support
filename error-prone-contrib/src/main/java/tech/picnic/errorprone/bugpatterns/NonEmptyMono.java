@@ -1,10 +1,11 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -28,7 +29,8 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid vacuous operations on known non-empty `Mono`s",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "NonEmptyMono",
+    linkType = CUSTOM,
     severity = WARNING,
     tags = SIMPLIFICATION)
 // XXX: This check does not simplify `someFlux.defaultIfEmpty(T).{defaultIfEmpty(T),hasElements()}`,

@@ -1,12 +1,13 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.PERFORMANCE;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static java.util.stream.Collectors.joining;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
@@ -44,7 +45,8 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     summary =
         "Ensure invocations of `Comparator#comparing{,Double,Int,Long}` match the return type"
             + " of the provided function",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "PrimitiveComparison",
+    linkType = CUSTOM,
     severity = WARNING,
     tags = PERFORMANCE)
 public final class PrimitiveComparison extends BugChecker implements MethodInvocationTreeMatcher {

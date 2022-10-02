@@ -1,9 +1,10 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Iterables;
@@ -43,7 +44,8 @@ import reactor.core.publisher.Flux;
     summary =
         "`Flux#flatMap` and `Flux#flatMapSequential` have subtle semantics; "
             + "please use `Flux#concatMap` or explicitly specify the desired amount of concurrency",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "FluxFlatMapUsage",
+    linkType = CUSTOM,
     severity = ERROR,
     tags = LIKELY_ERROR)
 public final class FluxFlatMapUsage extends BugChecker

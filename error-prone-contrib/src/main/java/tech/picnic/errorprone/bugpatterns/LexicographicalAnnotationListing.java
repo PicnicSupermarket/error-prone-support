@@ -1,10 +1,11 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static java.util.Comparator.comparing;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
@@ -31,7 +32,8 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Sort annotations lexicographically where possible",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "LexicographicalAnnotationListing",
+    linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)
 public final class LexicographicalAnnotationListing extends BugChecker

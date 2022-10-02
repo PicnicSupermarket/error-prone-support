@@ -1,11 +1,12 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.base.Verify.verify;
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.Splitter;
@@ -33,7 +34,8 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Make sure SLF4J log statements contain proper placeholders with matching arguments",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "Slf4jLogStatement",
+    linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)
 public final class Slf4jLogStatement extends BugChecker implements MethodInvocationTreeMatcher {

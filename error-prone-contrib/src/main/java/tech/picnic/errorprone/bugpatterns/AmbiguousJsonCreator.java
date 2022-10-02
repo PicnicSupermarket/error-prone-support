@@ -1,9 +1,10 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.isType;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -26,7 +27,8 @@ import javax.lang.model.element.AnnotationValue;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "`JsonCreator.Mode` should be set for single-argument creators",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "AmbiguousJsonCreator",
+    linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)
 public final class AmbiguousJsonCreator extends BugChecker implements AnnotationTreeMatcher {

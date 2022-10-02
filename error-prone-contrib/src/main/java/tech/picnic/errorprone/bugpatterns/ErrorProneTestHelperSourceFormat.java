@@ -1,11 +1,12 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static java.util.stream.Collectors.joining;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.Splitter;
@@ -50,7 +51,8 @@ import java.util.Optional;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Test code should follow the Google Java style",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "ErrorProneTestHelperSourceFormat",
+    linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)
 public final class ErrorProneTestHelperSourceFormat extends BugChecker

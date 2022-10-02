@@ -1,12 +1,13 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isType;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -26,7 +27,8 @@ import java.util.Optional;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Empty method can likely be deleted",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "EmptyMethod",
+    linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
 public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {

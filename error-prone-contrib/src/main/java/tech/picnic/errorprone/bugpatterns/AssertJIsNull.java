@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.allOf;
@@ -8,6 +8,7 @@ import static com.google.errorprone.matchers.Matchers.argument;
 import static com.google.errorprone.matchers.Matchers.argumentCount;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.nullLiteral;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -31,7 +32,8 @@ import com.sun.source.tree.MethodInvocationTree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `.isNull()` over `.isEqualTo(null)`",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "AssertJIsNull",
+    linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
 public final class AssertJIsNull extends BugChecker implements MethodInvocationTreeMatcher {

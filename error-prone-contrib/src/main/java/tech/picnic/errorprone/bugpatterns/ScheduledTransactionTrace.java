@@ -1,12 +1,13 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.Matchers.isType;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.common.AnnotationMirrors;
 import com.google.auto.service.AutoService;
@@ -33,7 +34,8 @@ import com.sun.source.tree.Tree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Scheduled operation must start a new New Relic transaction",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "ScheduledTransactionTrace",
+    linkType = CUSTOM,
     severity = ERROR,
     tags = LIKELY_ERROR)
 public final class ScheduledTransactionTrace extends BugChecker implements MethodTreeMatcher {

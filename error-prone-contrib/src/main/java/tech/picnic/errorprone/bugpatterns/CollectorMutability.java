@@ -1,9 +1,10 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -29,7 +30,8 @@ import java.util.stream.Collector;
 @BugPattern(
     summary =
         "Avoid `Collectors.to{List,Map,Set}` in favour of alternatives that emphasize (im)mutability",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "CollectorMutability",
+    linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)
 public final class CollectorMutability extends BugChecker implements MethodInvocationTreeMatcher {
