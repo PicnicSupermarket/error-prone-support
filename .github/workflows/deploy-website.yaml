@@ -39,7 +39,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-22.04
     needs: build
-    if: github.ref == $default-branch
+    if: github.ref == ${{ github.event.repository.default_branch }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
