@@ -1,3 +1,5 @@
 source "https://rubygems.org"
 gem "github-pages", "227"
+gem "jekyll-remote-theme", "~> 0.4.3"
+gem "rake", "~> 13.0"
 gem "html-proofer", "4.4.1"

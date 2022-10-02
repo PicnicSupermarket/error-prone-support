@@ -8,6 +8,7 @@ description: >-
 
 remote_theme: just-the-docs/just-the-docs@v0.4.0.rc2
 plugins:
+  - jekyll-remote-theme
   - jekyll-sitemap
 
 # Files and directories not to be deployed through GitHub pages.
