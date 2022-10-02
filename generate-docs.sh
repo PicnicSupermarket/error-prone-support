@@ -5,8 +5,6 @@ HOMEPAGE="${WEBSITE_FOLDER}/index.md"
 
 configure() {
     cd "$(git rev-parse --show-toplevel || echo .)" || exit
-    mkdir -p "${BUGPATTERN_FOLDER}"
-    mkdir -p "${REFASTER_FOLDER}"
 }
 
 generate_homepage() {
