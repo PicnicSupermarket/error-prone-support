@@ -16,22 +16,24 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3.1.0
+      - uses: ruby/setup-ruby@v1.117.0 # Ruby version set in `.ruby-version`.
+        with:
+          working-directory: ./website
+          bundler-cache: true # Runs `bundle install` and caches installed gems automatically.
       - name: Configure Github Pages
         uses: actions/configure-pages@v2.1.1
       - name: Generate documentation
         run: ./generate-docs.sh
       - name: Build website with Jekyll
-        uses: actions/jekyll-build-pages@v1.0.5
-        with:
-          source: website/
-          destination: ./_site
+        working-directory: ./website
+        run: bundle exec jekyll build
       - name: Validate HTML output
-        uses: anishathalye/proof-html@v1.4.1
-        with:
-          directory: ./_site
-          check_external_hash: false
+        working-directory: ./website
+        run: bundle exec htmlproofer --check-external-hash false ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@v1.0.4
+        with:
+          path: ./website/_site
   deploy:
     if: github.ref == 'refs/heads/master'
     needs: build

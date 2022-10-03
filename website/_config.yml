@@ -6,13 +6,8 @@ description: >-
   Error Prone extensions: extra bug checkers and a large battery of Refaster
   templates.
 
-# XXX: Investigate dropping the remote theme by instead managing just-the-docs
-# using Bundler. This requires changes to the build setup. The upshot is that
-# local and CI build environments would then be in sync.
-# https://github.com/PicnicSupermarket/error-prone-support/pull/253#discussion_r982709523
-remote_theme: just-the-docs/just-the-docs@v0.4.0.rc2
+theme: just-the-docs
 plugins:
-  - jekyll-remote-theme
   - jekyll-sitemap
 
 # Files and directories not to be deployed through GitHub pages.

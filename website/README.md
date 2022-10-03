@@ -24,6 +24,26 @@ If you are not familiar with Jekyll, be sure to check out its
 [documentation][jekyll-docs]. It is recommended to follow the provided
 step-by-step tutorial.
 
+**Switch Ruby versions**
+
+The required Ruby version is set in `.ruby-version`. To switch, you can use
+[rvm][rvm] to manage your Ruby version.
+
+**Resolve bundle issues**
+
+You may get a similar error when running `bundle install`:
+
+```sh
+fatal error: 'openssl/ssl.h' file not found
+```
+
+In that case, run
+
+```sh
+bundle config build.eventmachine --with-cppflags=-I$(brew --prefix openssl)/include
+bundle install
+```
+
 # Deployment
 
 The website is regenerated and deployed using the
@@ -36,3 +56,4 @@ Actions workflow any time a change is merged to `master`.
 [jekyll-docs]: https://jekyllrb.com/docs/
 [jekyll-docs-installation]: https://jekyllrb.com/docs/installation/
 [localhost-port-4000]: http://127.0.0.1:4000
+[rvm]: https://rvm.io/
