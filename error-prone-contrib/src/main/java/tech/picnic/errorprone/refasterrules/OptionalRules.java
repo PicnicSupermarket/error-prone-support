@@ -68,7 +68,7 @@ final class OptionalRules {
     }
   }
 
-  @Description("Prefer `Optional#orElseThrow()` over the less explicit `Optional#get()`")
+  /** Prefer `Optional#orElseThrow()` over the less explicit `Optional#get()` */
   static final class OptionalOrElseThrow<T> {
     @BeforeTemplate
     @SuppressWarnings({
