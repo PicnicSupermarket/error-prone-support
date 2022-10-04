@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import tech.picnic.errorprone.refaster.plugin.ErrorProneFork;
+import tech.picnic.errorprone.refaster.ErrorProneFork;
 
 final class RefasterTest {
   private final CompilationTestHelper compilationHelper =
