@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refaster.plugin;
+package tech.picnic.errorprone.refaster;
 
 import com.google.errorprone.ErrorProneOptions;
 import java.lang.reflect.InvocationTargetException;

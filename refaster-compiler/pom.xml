@@ -16,10 +16,6 @@
     <dependencies>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_annotation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_annotations</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -39,10 +35,6 @@
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service-annotations</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.auto.value</groupId>
-            <artifactId>auto-value-annotations</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
