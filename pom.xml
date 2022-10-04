@@ -213,7 +213,7 @@
         <version.surefire>3.1.2</version.surefire>
         <version.jmh>1.35</version.jmh>
         <!-- XXX: Consider providing our own implementation with similar
-        functionaliy, and designing it such that JMH classes would not need to
+        functionality, and designing it such that JMH classes would not need to
         be annotated `@Open`. -->
         <version.nopen>1.0.1</version.nopen>
         <!-- XXX: Two other dependencies are potentially of interest:
