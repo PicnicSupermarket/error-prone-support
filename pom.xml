@@ -157,7 +157,7 @@
         <version.maven>3.8.6</version.maven>
         <version.mockito>4.8.0</version.mockito>
         <!-- XXX: Consider providing our own implementation with similar
-        functionaliy, and designing it such that JMH classes would not need to
+        functionality, and designing it such that JMH classes would not need to
         be annotated `@Open`. -->
         <version.nopen>1.0.1</version.nopen>
         <version.nullaway>0.10.2</version.nullaway>
