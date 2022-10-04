@@ -1255,7 +1255,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.9.5</version>
+                    <version>1.9.6</version>
                     <configuration>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
