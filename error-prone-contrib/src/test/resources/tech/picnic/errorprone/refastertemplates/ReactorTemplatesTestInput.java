@@ -95,12 +95,12 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return Flux.just(1).map(Number.class::cast);
   }
 
-  Flux<Object> testFluxOnErrorComplete() {
-    return Flux.error(new IllegalStateException()).onErrorResume(e -> Flux.empty());
+  Mono<Integer> testMonoOnErrorComplete() {
+    return Mono.just(1).onErrorResume(e -> Mono.empty());
   }
 
-  Mono<Object> testMonoOnErrorComplete() {
-    return Mono.error(new IllegalStateException()).onErrorResume(e -> Mono.empty());
+  Flux<Integer> testFluxOnErrorComplete() {
+    return Flux.just(1).onErrorResume(e -> Flux.empty());
   }
 
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
