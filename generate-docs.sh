@@ -2,16 +2,14 @@
 
 set -e -u -o pipefail
 
-WEBSITE_FOLDER="website"
-HOMEPAGE="${WEBSITE_FOLDER}/index.md"
-
-configure() {
-    cd "$(git rev-parse --show-toplevel || echo .)" || exit
-}
+REPOSIORY_ROOT="$(git rev-parse --show-toplevel)"
+WEBSITE_ROOT="${REPOSIORY_ROOT}/website"
 
 generate_homepage() {
-    echo "Generating ${HOMEPAGE}"
-    cat > "${HOMEPAGE}" << EOF
+    local homepage="${WEBSITE_ROOT}/index.md"
+
+    echo "Generating ${homepage}..."
+    cat - "${REPOSIORY_ROOT}/README.md" > "${homepage}" << EOF
 ---
 layout: default
 title: Home
@@ -19,16 +17,11 @@ nav_order: 1
 ---
 EOF
 
-    cat "README.md" >> ${HOMEPAGE}
-
-    SEDOPTION="-i"
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        SEDOPTION="-i .bak"
-    fi
-    sed $SEDOPTION 's/src="website\//src="/g' ${HOMEPAGE}
-    sed $SEDOPTION 's/srcset="website\//srcset="/g' ${HOMEPAGE}
+    local macos_compat=""
+    [[ "${OSTYPE}" == "darwin"* ]] && macos_compat="yes"
+    sed -i ${macos_compat:+".bak"} 's/src="website\//src="/g' "${homepage}"
+    sed -i ${macos_compat:+".bak"} 's/srcset="website\//srcset="/g' "${homepage}"
 }
 
 # Generate the website.
-configure
 generate_homepage

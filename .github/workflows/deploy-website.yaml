@@ -5,8 +5,8 @@ on:
     branches: [$default-branch]
 permissions:
   contents: read
-  pages: write
   id-token: write
+  pages: write
 concurrency:
   group: pages
   cancel-in-progress: true
