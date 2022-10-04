@@ -30,12 +30,13 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
 
 /**
- * A {@link CompositeCodeTransformer} that can be augmented with annotations.
+ * A {@link CompositeCodeTransformer} that augments the {@link Description} of Refaster rule
+ * matches.
  *
- * <p>The annotations are used to augment the description of Refaster rule matches.
+ * <p>The content is augmented based on custom {@link tech.picnic.errorprone.refaster.annotation
+ * annotations} available on the matching {@link CodeTransformer} or on this {@link
+ * CompositeCodeTransformer} as a fallback, if any.
  */
-// XXX: Can we find a better name for this class? `CompositeAnnotatedCodeTransformer`,
-// `AugmentedCompositeCodeTransformer`, ...?
 // XXX: Test this class directly. (Right now it's only indirectly tested through `RefasterTest`.)
 @AutoValue
 public abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serializable {
