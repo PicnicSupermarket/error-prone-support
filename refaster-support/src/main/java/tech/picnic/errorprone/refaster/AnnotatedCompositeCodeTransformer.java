@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refaster.plugin;
+package tech.picnic.errorprone.refaster;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CodeTransformer;
+import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.DescriptionListener;
 import com.google.errorprone.ErrorProneOptions;
 import com.google.errorprone.matchers.Description;
@@ -28,11 +29,17 @@ import java.util.function.Function;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
 
+/**
+ * A {@link CompositeCodeTransformer} that can be augmented with annotations.
+ *
+ * <p>The information of the annotations can be used for enriched compilation warnings or errors,
+ * and documentation purposes.
+ */
 // XXX: Can we find a better name for this class? `CompositeAnnotatedCodeTransformer`,
 // `AugmentedCompositeCodeTransformer`, ...?
 // XXX: Test this class directly. (Right now it's only indirectly tested through `RefasterTest`.)
 @AutoValue
-abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serializable {
+public abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serializable {
   private static final long serialVersionUID = 1L;
   private static final Splitter CLASS_NAME_SPLITTER = Splitter.on('.').limit(2);
 
@@ -43,13 +50,22 @@ abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Ser
   @Override
   public abstract ImmutableClassToInstanceMap<Annotation> annotations();
 
-  static AnnotatedCompositeCodeTransformer create(
+  /**
+   * Creates an instance of an {@link AnnotatedCompositeCodeTransformer}.
+   *
+   * @param packageName The package in which the {@link CodeTransformer} resides.
+   * @param transformers The {@link CodeTransformer}s in this {@link CompositeCodeTransformer}.
+   * @param annotations The annotations that are applicable on this {@link CodeTransformer}.
+   * @return An {@link AnnotatedCompositeCodeTransformer} that may be augmented with annotations.
+   */
+  public static AnnotatedCompositeCodeTransformer create(
       String packageName,
       ImmutableList<CodeTransformer> transformers,
       ImmutableClassToInstanceMap<Annotation> annotations) {
     return new AutoValue_AnnotatedCompositeCodeTransformer(packageName, transformers, annotations);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void apply(TreePath path, Context context, DescriptionListener listener) {
     for (CodeTransformer transformer : transformers()) {
