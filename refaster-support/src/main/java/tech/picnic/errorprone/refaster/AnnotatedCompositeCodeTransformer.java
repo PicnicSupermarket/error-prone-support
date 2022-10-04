@@ -32,8 +32,7 @@ import tech.picnic.errorprone.refaster.annotation.Severity;
 /**
  * A {@link CompositeCodeTransformer} that can be augmented with annotations.
  *
- * <p>The content of the annotations can be used for enriched compilation warnings or errors, and
- * documentation purposes.
+ * <p>The annotations are used to augment the description of Refaster rule matches.
  */
 // XXX: Can we find a better name for this class? `CompositeAnnotatedCodeTransformer`,
 // `AugmentedCompositeCodeTransformer`, ...?
