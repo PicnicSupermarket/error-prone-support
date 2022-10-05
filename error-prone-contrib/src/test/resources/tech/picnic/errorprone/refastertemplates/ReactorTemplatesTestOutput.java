@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.MoreCollectors.toOptional;
+import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -92,6 +93,10 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Flux<Number> testFluxCast() {
     return Flux.just(1).cast(Number.class);
+  }
+
+  Flux<String> testFluxFlatMapIterable() {
+    return Flux.just(ImmutableList.of("1")).flatMapIterable(identity());
   }
 
   Mono<Integer> testMonoOnErrorComplete() {

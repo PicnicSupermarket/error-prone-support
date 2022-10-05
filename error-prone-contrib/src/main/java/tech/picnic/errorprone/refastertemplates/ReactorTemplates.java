@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.MoreCollectors;
@@ -268,6 +269,23 @@ final class ReactorTemplates {
     @AfterTemplate
     Flux<S> after(Flux<T> flux) {
       return flux.cast(Refaster.<S>clazz());
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#flatMapIterable(Function)} (Class)} over {@link Flux#flatMap(Function)} with
+   * {@link Flux#fromIterable(Iterable)}.
+   */
+  static final class FluxFlatMapIterable<S> {
+    @BeforeTemplate
+    Flux<S> before(Flux<? extends Iterable<S>> flux) {
+      return flux.flatMap(list -> Flux.fromIterable(list));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Flux<S> after(Flux<? extends Iterable<S>> flux) {
+      return flux.flatMapIterable(identity());
     }
   }
 
