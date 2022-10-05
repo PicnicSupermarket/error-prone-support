@@ -18,7 +18,7 @@ jobs:
         # additionally enabling all checks defined in this project and any
         # Error Prone checks available only from other artifact repositories.
       - name: Check out code
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
       - name: Set up JDK
         uses: actions/setup-java@v3.5.1
         with:
