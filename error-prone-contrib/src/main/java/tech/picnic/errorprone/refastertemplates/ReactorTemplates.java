@@ -273,19 +273,39 @@ final class ReactorTemplates {
   }
 
   /**
-   * Prefer {@link Flux#flatMapIterable(Function)} (Class)} over {@link Flux#flatMap(Function)} with
+   * Prefer {@link Flux#concatMapIterable(Function)} over {@link Flux#concatMap(Function)} with
    * {@link Flux#fromIterable(Iterable)}.
    */
-  static final class FluxFlatMapIterable<S> {
+  static final class FluxConcatMapFromIterable<S> {
     @BeforeTemplate
     Flux<S> before(Flux<? extends Iterable<S>> flux) {
-      return flux.flatMap(list -> Flux.fromIterable(list));
+      return Refaster.anyOf(
+          flux.concatMap(list -> Flux.fromIterable(list)), flux.concatMap(Flux::fromIterable));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Flux<S> after(Flux<? extends Iterable<S>> flux) {
-      return flux.flatMapIterable(identity());
+      return flux.concatMapIterable(identity());
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#flatMapIterable(Function, int)} over {@link Flux#flatMap(Function, int)}
+   * with {@link Flux#fromIterable(Iterable)}.
+   */
+  static final class FluxFlatMapFromIterable<S> {
+    @BeforeTemplate
+    Flux<S> before(Flux<? extends Iterable<S>> flux, int concurrency) {
+      return Refaster.anyOf(
+          flux.flatMap(list -> Flux.fromIterable(list), concurrency),
+          flux.flatMap(Flux::fromIterable, concurrency));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Flux<S> after(Flux<? extends Iterable<S>> flux, int concurrency) {
+      return flux.flatMapIterable(identity(), concurrency);
     }
   }
 

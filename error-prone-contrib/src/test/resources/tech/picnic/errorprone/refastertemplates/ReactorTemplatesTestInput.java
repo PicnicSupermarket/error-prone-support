@@ -95,8 +95,16 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return Flux.just(1).map(Number.class::cast);
   }
 
-  Flux<String> testFluxFlatMapIterable() {
-    return Flux.just(ImmutableList.of("1")).flatMap(list -> Flux.fromIterable(list));
+  ImmutableSet<Flux<String>> testFluxConcatMapFromIterable() {
+    return ImmutableSet.of(
+        Flux.just(ImmutableList.of("1")).concatMap(list -> Flux.fromIterable(list)),
+        Flux.just(ImmutableList.of("1")).concatMap(Flux::fromIterable));
+  }
+
+  ImmutableSet<Flux<String>> testFluxFlatMapFromIterable() {
+    return ImmutableSet.of(
+        Flux.just(ImmutableList.of("1")).flatMap(list -> Flux.fromIterable(list), 1),
+        Flux.just(ImmutableList.of("1")).flatMap(Flux::fromIterable, 2));
   }
 
   Mono<Integer> testMonoOnErrorComplete() {
