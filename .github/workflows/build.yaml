@@ -2,7 +2,7 @@ name: Build and verify
 on:
   pull_request:
   push:
-    branches: [$default-branch]
+    branches: [ master ]
 permissions:
   contents: read
 jobs:
