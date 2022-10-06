@@ -203,8 +203,10 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
         /*
          * Tokens are split on `=` so that e.g. inline Spring property declarations are properly
          * sorted by key, then value.
+         * Leading and trailing double quotes are ignored for sorting purposes.
          */
-        return ImmutableList.copyOf(SourceCode.treeToString(node, state).split("=", -1));
+        return ImmutableList.copyOf(
+            SourceCode.treeToString(node, state).replaceAll("^\"|\"$", "").split("=", -1));
       }
     }.scan(array, null);
 
