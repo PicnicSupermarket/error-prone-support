@@ -52,17 +52,18 @@ final class DocgenTaskListener implements TaskListener {
     }
 
     if (isBugPatternTest(tree)) {
-      BugPatternTestData testData = new BugPatternTestsExtractor().extractData(tree, state);
+      BugPatternTestData testData =
+          new BugPatternTestsExtractor().extractData(tree, taskEvent, state);
       System.out.println(testData);
       writeToFile(testData, "bug-pattern-test-data.jsonl");
-    } else {
+    } else if(isBugPattern(tree)) {
 
-      BugPattern annotation = taskEvent.getTypeElement().getAnnotation(BugPattern.class);
-      BugPatternData bugPatternData =
-          BugPatternData.create(annotation, taskEvent.getTypeElement().getSimpleName().toString());
+      BugPatternData data = new BugPatternExtractor().extractData(tree, taskEvent, state);
 
       System.out.println("Analysing: " + taskEvent.getTypeElement().getSimpleName());
-      writeToFile(bugPatternData, "bug-pattern-data.jsonl");
+      writeToFile(data, "bug-pattern-data.jsonl");
+    } else {
+      System.out.println("~~~~~~~~~!!!!~~~~~~~NOW ANALYSING: " + tree.getSimpleName().toString());
     }
   }
 
