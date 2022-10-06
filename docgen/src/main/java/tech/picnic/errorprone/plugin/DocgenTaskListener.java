@@ -3,22 +3,22 @@ package tech.picnic.errorprone.plugin;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TaskEvent;
-import com.sun.source.util.TaskEvent.Kind;
 import com.sun.source.util.TaskListener;
 import com.sun.tools.javac.api.JavacTrees;
-import com.sun.tools.javac.main.JavaCompiler;
 import com.sun.tools.javac.util.Context;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import tech.picnic.errorprone.plugin.objects.BugPatternData;
 import tech.picnic.errorprone.plugin.objects.BugPatternTestData;
+import tech.picnic.errorprone.plugin.objects.RefasterTemplateTestData;
 
 /** XXX: Write this. */
 final class DocgenTaskListener implements TaskListener {
@@ -42,28 +42,32 @@ final class DocgenTaskListener implements TaskListener {
   @Override
   @SuppressWarnings("SystemOut")
   public void finished(TaskEvent taskEvent) {
-    if (taskEvent.getKind() != Kind.ANALYZE || JavaCompiler.instance(context).errorCount() > 0) {
-      return;
-    }
-
     ClassTree tree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
-    if (tree == null || (!isBugPattern(tree) && !isBugPatternTest(tree))) {
+    if (tree == null
+        || taskEvent.getSourceFile() == null
+        // XXX: Extract to method: `shouldGenerateDocs` or something like that. Return an enum that
+        // shows which type, or could be `NONE`.
+        || (!isBugPattern(tree)
+            && !isBugPatternTest(tree)
+            && !taskEvent.getSourceFile().getName().contains("TestOutput")
+            && !taskEvent.getSourceFile().getName().contains("TestInput"))) {
       return;
     }
 
     if (isBugPatternTest(tree)) {
       BugPatternTestData testData =
           new BugPatternTestsExtractor().extractData(tree, taskEvent, state);
-      System.out.println(testData);
       writeToFile(testData, "bug-pattern-test-data.jsonl");
-    } else if(isBugPattern(tree)) {
-
+    } else if (isBugPattern(tree)) {
       BugPatternData data = new BugPatternExtractor().extractData(tree, taskEvent, state);
 
       System.out.println("Analysing: " + taskEvent.getTypeElement().getSimpleName());
       writeToFile(data, "bug-pattern-data.jsonl");
     } else {
+      ImmutableList<RefasterTemplateTestData> refasterTemplateTestData =
+          new RefasterTestExtractor().extractData(tree, taskEvent, state);
       System.out.println("~~~~~~~~~!!!!~~~~~~~NOW ANALYSING: " + tree.getSimpleName().toString());
+      refasterTemplateTestData.forEach(d -> writeToFile(d, "refaster-test-data.jsonl"));
     }
   }
 
