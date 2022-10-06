@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
@@ -9,6 +10,7 @@ import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -71,6 +73,12 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
   private static final String FLAG_PREFIX = "LexicographicalAnnotationAttributeListing:";
   private static final String INCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Includes";
   private static final String EXCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Excludes";
+  /**
+   * The splitter applied to string-typed annotation arguments prior to lexicographical sorting. By
+   * splitting on {@code =}, strings that represent e.g. inline Spring property declarations are
+   * properly sorted by key, then value.
+   */
+  private static final Splitter STRING_ARGUMENT_SPLITTER = Splitter.on('=');
 
   private final AnnotationAttributeMatcher matcher;
 
@@ -180,33 +188,28 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
     new TreeScanner<Void, Void>() {
       @Nullable
       @Override
-      public Void visitIdentifier(IdentifierTree node, @Nullable Void ctx) {
-        nodes.add(tokenize(node));
-        return super.visitIdentifier(node, ctx);
+      public Void visitIdentifier(IdentifierTree node, @Nullable Void unused) {
+        nodes.add(ImmutableList.of(SourceCode.treeToString(node, state)));
+        return super.visitIdentifier(node, unused);
       }
 
       @Nullable
       @Override
-      public Void visitLiteral(LiteralTree node, @Nullable Void ctx) {
-        nodes.add(tokenize(node));
-        return super.visitLiteral(node, ctx);
+      public Void visitLiteral(LiteralTree node, @Nullable Void unused) {
+        Object value = ASTHelpers.constValue(node);
+        nodes.add(
+            value instanceof String
+                ? STRING_ARGUMENT_SPLITTER.splitToStream((String) value).collect(toImmutableList())
+                : ImmutableList.of(String.valueOf(value)));
+
+        return super.visitLiteral(node, unused);
       }
 
       @Nullable
       @Override
-      public Void visitPrimitiveType(PrimitiveTypeTree node, @Nullable Void ctx) {
-        nodes.add(tokenize(node));
-        return super.visitPrimitiveType(node, ctx);
-      }
-
-      private ImmutableList<String> tokenize(Tree node) {
-        /*
-         * Tokens are split on `=` so that e.g. inline Spring property declarations are properly
-         * sorted by key, then value.
-         * Leading and trailing double quotes are ignored for sorting purposes.
-         */
-        return ImmutableList.copyOf(
-            SourceCode.treeToString(node, state).replaceAll("^\"|\"$", "").split("=", -1));
+      public Void visitPrimitiveType(PrimitiveTypeTree node, @Nullable Void unused) {
+        nodes.add(ImmutableList.of(SourceCode.treeToString(node, state)));
+        return super.visitPrimitiveType(node, unused);
       }
     }.scan(array, null);
 
