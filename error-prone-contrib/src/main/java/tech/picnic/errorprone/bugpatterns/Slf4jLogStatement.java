@@ -29,6 +29,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 // XXX: The special-casing of Throwable applies only to SLF4J 1.6.0+; see
 // https://www.slf4j.org/faq.html#paramException. That should be documented.
 // XXX: Also simplify `LOG.error(String.format("Something %s", arg), throwable)`.
+// XXX: Also simplify `LOG.error(String.join("sep", arg1, arg2), throwable)`? Perhaps too obscure.
 // XXX: Write a similar checker for Spring RestTemplates, String.format and friends, Guava
 // preconditions, ...
 @AutoService(BugChecker.class)

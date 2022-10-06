@@ -86,6 +86,6 @@ public final class ExplicitEnumOrdering extends BugChecker implements MethodInvo
   private static Stream<String> getMissingEnumValues(Type enumType, Set<String> values) {
     Symbol.TypeSymbol typeSymbol = enumType.asElement();
     return Sets.difference(ASTHelpers.enumValues(typeSymbol), values).stream()
-        .map(v -> String.format("%s.%s", typeSymbol.getSimpleName(), v));
+        .map(v -> String.join(".", typeSymbol.getSimpleName(), v));
   }
 }
