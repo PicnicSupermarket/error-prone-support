@@ -1,12 +1,12 @@
-package tech.picnic.errorprone.plugin;
+package tech.picnic.errorprone.plugin.objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.errorprone.BugPattern.SeverityLevel;
 
 @AutoValue
-abstract class RefasterTemplateData {
-  static RefasterTemplateData create(
+public abstract class RefasterTemplateData {
+  public static RefasterTemplateData create(
       String name, String description, String link, SeverityLevel severityLevel) {
     return new AutoValue_RefasterTemplateData(name, description, link, severityLevel);
   }
