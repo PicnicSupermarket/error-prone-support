@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.plugin;
+package tech.picnic.errorprone.plugin.objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -8,8 +8,8 @@ import com.google.errorprone.BugPattern.SeverityLevel;
 import java.util.Arrays;
 
 @AutoValue
-abstract class BugPatternData {
-  static BugPatternData create(BugPattern annotation, String name) {
+public abstract class BugPatternData {
+  public static BugPatternData create(BugPattern annotation, String name) {
     return new AutoValue_BugPatternData(
         name,
         Arrays.toString(annotation.altNames()),
