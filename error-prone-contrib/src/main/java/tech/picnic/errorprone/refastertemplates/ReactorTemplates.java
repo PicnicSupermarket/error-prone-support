@@ -288,7 +288,7 @@ final class ReactorTemplates {
   static final class FluxOnErrorComplete<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux) {
-      return flux.onErrorResume(e -> Flux.empty());
+      return flux.onErrorResume(e -> Refaster.anyOf(Mono.empty(), Flux.empty()));
     }
 
     @AfterTemplate
@@ -301,7 +301,7 @@ final class ReactorTemplates {
   static final class PublisherProbeEmpty<T> {
     @BeforeTemplate
     PublisherProbe<T> before() {
-      return Refaster.anyOf(PublisherProbe.of(Mono.empty()), PublisherProbe.of(Flux.empty()));
+      return PublisherProbe.of(Refaster.anyOf(Mono.empty(), Flux.empty()));
     }
 
     @AfterTemplate
