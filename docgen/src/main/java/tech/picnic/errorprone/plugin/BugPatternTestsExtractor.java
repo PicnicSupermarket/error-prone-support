@@ -13,6 +13,7 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TreeScanner;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -37,7 +38,7 @@ public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTe
           .named("addOutputLines");
 
   @Override
-  public BugPatternTestData extractData(ClassTree tree, VisitorState state) {
+  public BugPatternTestData extractData(ClassTree tree, TaskEvent taskEvent, VisitorState state) {
     String name = tree.getSimpleName().toString().replace("Test", "");
     ScanBugCheckerTestData scanner = new ScanBugCheckerTestData(state);
 
