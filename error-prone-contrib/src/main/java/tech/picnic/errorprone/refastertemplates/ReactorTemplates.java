@@ -271,11 +271,37 @@ final class ReactorTemplates {
     }
   }
 
+  /** Prefer {@link Mono#onErrorComplete()} over more contrived alternatives. */
+  static final class MonoOnErrorComplete<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono) {
+      return mono.onErrorResume(e -> Mono.empty());
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono) {
+      return mono.onErrorComplete();
+    }
+  }
+
+  /** Prefer {@link Flux#onErrorComplete()} over more contrived alternatives. */
+  static final class FluxOnErrorComplete<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux) {
+      return flux.onErrorResume(e -> Refaster.anyOf(Mono.empty(), Flux.empty()));
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux) {
+      return flux.onErrorComplete();
+    }
+  }
+
   /** Prefer {@link PublisherProbe#empty()}} over more verbose alternatives. */
   static final class PublisherProbeEmpty<T> {
     @BeforeTemplate
     PublisherProbe<T> before() {
-      return Refaster.anyOf(PublisherProbe.of(Mono.empty()), PublisherProbe.of(Flux.empty()));
+      return PublisherProbe.of(Refaster.anyOf(Mono.empty(), Flux.empty()));
     }
 
     @AfterTemplate

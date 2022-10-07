@@ -94,6 +94,14 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return Flux.just(1).cast(Number.class);
   }
 
+  Mono<Integer> testMonoOnErrorComplete() {
+    return Mono.just(1).onErrorComplete();
+  }
+
+  ImmutableSet<Flux<Integer>> testFluxOnErrorComplete() {
+    return ImmutableSet.of(Flux.just(1).onErrorComplete(), Flux.just(2).onErrorComplete());
+  }
+
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
     return ImmutableSet.of(PublisherProbe.empty(), PublisherProbe.empty());
   }
