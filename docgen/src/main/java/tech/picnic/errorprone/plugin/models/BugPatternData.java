@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.plugin.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.errorprone.BugPattern.LinkType;
 import com.google.errorprone.BugPattern.SeverityLevel;
@@ -23,32 +22,23 @@ public abstract class BugPatternData {
         name, altNames, linkType, link, tags, summary, explanation, severityLevel, disableable);
   }
 
-  @JsonProperty
   abstract String name();
 
   // XXX: Should be `String[]`.
-  @JsonProperty
   abstract String altNames();
 
-  @JsonProperty
   abstract LinkType linkType();
 
-  @JsonProperty
   abstract String link();
 
   // XXX: Should be `String[]`.
-  @JsonProperty
   abstract String tags();
 
-  @JsonProperty
   abstract String summary();
 
-  @JsonProperty
   abstract String explanation();
 
-  @JsonProperty
   abstract SeverityLevel severityLevel();
 
-  @JsonProperty
   abstract boolean disableable();
 }

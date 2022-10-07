@@ -5,6 +5,8 @@ import static tech.picnic.errorprone.plugin.DocType.BUG_PATTERN_TEST;
 import static tech.picnic.errorprone.plugin.DocType.REFASTER_TEMPLATE_TEST_INPUT;
 import static tech.picnic.errorprone.plugin.DocType.REFASTER_TEMPLATE_TEST_OUTPUT;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -35,6 +37,7 @@ final class DocgenTaskListener implements TaskListener {
 
   private final ObjectMapper mapper =
       new ObjectMapper()
+          .setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
           .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
           .configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
 

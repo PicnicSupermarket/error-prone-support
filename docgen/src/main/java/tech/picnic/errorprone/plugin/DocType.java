@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.plugin;
 
-
 public enum DocType {
   BUG_PATTERN("bug-pattern", new BugPatternExtractor()),
   BUG_PATTERN_TEST("bug-pattern-test", new BugPatternTestsExtractor()),

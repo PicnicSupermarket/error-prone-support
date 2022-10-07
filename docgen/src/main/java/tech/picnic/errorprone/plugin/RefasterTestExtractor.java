@@ -15,9 +15,8 @@ public class RefasterTestExtractor implements DocExtractor<RefasterTemplateColle
   public RefasterTemplateCollectionTestData extractData(
       ClassTree tree, TaskEvent taskEvent, VisitorState state) {
 
-    boolean isInput = taskEvent.getSourceFile().getName().contains("Input");
-
     String templateCollectionName = tree.getSimpleName().toString().replace("Test", "");
+    boolean isInput = taskEvent.getSourceFile().getName().contains("Input");
 
     ImmutableList<RefasterTemplateTestData> templateTests =
         tree.getMembers().stream()
@@ -31,6 +30,6 @@ public class RefasterTestExtractor implements DocExtractor<RefasterTemplateColle
             .collect(toImmutableList());
 
     return RefasterTemplateCollectionTestData.create(
-        templateCollectionName, templateTests, isInput);
+        templateCollectionName, isInput, templateTests);
   }
 }

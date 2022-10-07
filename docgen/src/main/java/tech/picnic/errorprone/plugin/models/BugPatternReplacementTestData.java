@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.plugin.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import javax.annotation.Nullable;
 
@@ -11,10 +10,8 @@ public abstract class BugPatternReplacementTestData {
   }
 
   @Nullable
-  @JsonProperty
   abstract String inputLines();
 
   @Nullable
-  @JsonProperty
   abstract String outputLines();
 }
