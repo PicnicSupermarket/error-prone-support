@@ -1,5 +1,10 @@
 package tech.picnic.errorprone.plugin;
 
+import static tech.picnic.errorprone.plugin.DocType.BUG_PATTERN;
+import static tech.picnic.errorprone.plugin.DocType.BUG_PATTERN_TEST;
+import static tech.picnic.errorprone.plugin.DocType.REFASTER_TEMPLATE_TEST_INPUT;
+import static tech.picnic.errorprone.plugin.DocType.REFASTER_TEMPLATE_TEST_OUTPUT;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -41,32 +46,31 @@ final class DocgenTaskListener implements TaskListener {
   @SuppressWarnings("SystemOut")
   public void finished(TaskEvent taskEvent) {
     ClassTree tree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
-    if (tree == null || taskEvent.getSourceFile() == null) {
+    if (tree == null
+        || taskEvent.getSourceFile() == null
+        || taskEvent.getKind() != TaskEvent.Kind.ANALYZE) {
       return;
     }
 
-    getDocgenPart(tree, taskEvent)
+    getDocType(tree, taskEvent.getSourceFile())
         .ifPresent(
-            docgenPart ->
+            docType ->
                 writeToFile(
-                    docgenPart.getExtractor().extractData(tree, taskEvent, state),
-                    docgenPart.getDataFileName()));
+                    docType.getExtractor().extractData(tree, taskEvent, state),
+                    docType.getOutputFileNamePrefix()));
   }
 
-  private static Optional<DocgenPart> getDocgenPart(ClassTree tree, TaskEvent taskEvent) {
-    JavaFileObject sourceFile = taskEvent.getSourceFile();
-
-    if (isBugPatternTest(tree)) {
-      return Optional.of(DocgenPart.BUGPATTERN_TEST);
-    } else if (isBugPattern(tree)) {
-      return Optional.of(DocgenPart.BUGPATTERN);
+  private static Optional<DocType> getDocType(ClassTree tree, JavaFileObject sourceFile) {
+    if (isBugPattern(tree)) {
+      return Optional.of(BUG_PATTERN);
+    } else if (isBugPatternTest(tree)) {
+      return Optional.of(BUG_PATTERN_TEST);
     } else if (sourceFile.getName().contains("TestInput")) {
-      return Optional.of(DocgenPart.REFASTER_TEMPLATE_TEST_INPUT);
+      return Optional.of(REFASTER_TEMPLATE_TEST_INPUT);
     } else if (sourceFile.getName().contains("TestOutput")) {
-      return Optional.of(DocgenPart.REFASTER_TEMPLATE_TEST_OUTPUT);
-    } else {
-      return Optional.empty();
+      return Optional.of(REFASTER_TEMPLATE_TEST_OUTPUT);
     }
+    return Optional.empty();
   }
 
   private <T> void writeToFile(T data, String fileName) {

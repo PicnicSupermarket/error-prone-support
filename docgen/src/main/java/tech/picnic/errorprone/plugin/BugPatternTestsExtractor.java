@@ -1,10 +1,8 @@
 package tech.picnic.errorprone.plugin;
 
 import static com.google.errorprone.matchers.Matchers.allOf;
-import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
-import static com.google.errorprone.matchers.Matchers.methodIsNamed;
 
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.matchers.Matcher;
@@ -15,15 +13,14 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TreeScanner;
+import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import tech.picnic.errorprone.plugin.objects.BugPatternTestData;
 
 public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTestData> {
   private static final Matcher<MethodTree> BUG_PATTERN_TEST =
-      allOf(
-          hasAnnotation("org.junit.jupiter.api.Test"),
-          anyOf(methodIsNamed("replacement"), methodIsNamed("identification")));
+      allOf(hasAnnotation("org.junit.jupiter.api.Test"));
+  // anyOf(methodIsNamed("replacement"), methodIsNamed("identification"))
   private static final Matcher<ExpressionTree> IDENTIFICATION_SOURCE_LINES =
       instanceMethod()
           .onDescendantOf("com.google.errorprone.CompilationTestHelper")
@@ -55,35 +52,34 @@ public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTe
   private static final class ScanBugCheckerTestData extends TreeScanner<Void, Void> {
     private final VisitorState state;
 
-    private String identification;
-    private String input;
-    private String output;
+    private final List<String> identification = new ArrayList<>();
+    private final List<String> input = new ArrayList<>();
+    private final List<String> output = new ArrayList<>();
 
     ScanBugCheckerTestData(VisitorState state) {
       this.state = state;
     }
 
-    public String getIdentification() {
+    public List<String> getIdentification() {
       return identification;
     }
 
-    public String getInput() {
+    public List<String> getInput() {
       return input;
     }
 
-    public String getOutput() {
+    public List<String> getOutput() {
       return output;
     }
 
-    @Nullable
     @Override
     public Void visitMethodInvocation(MethodInvocationTree node, Void unused) {
       if (IDENTIFICATION_SOURCE_LINES.matches(node, state)) {
-        identification = getSourceLines(node);
+        identification.add(getSourceLines(node));
       } else if (REPLACEMENT_INPUT.matches(node, state)) {
-        input = getSourceLines(node);
+        input.add(getSourceLines(node));
       } else if (REPLACEMENT_OUTPUT.matches(node, state)) {
-        output = getSourceLines(node);
+        output.add(getSourceLines(node));
       }
       return super.visitMethodInvocation(node, unused);
     }
@@ -91,11 +87,6 @@ public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTe
     private String getSourceLines(MethodInvocationTree tree) {
       List<? extends ExpressionTree> sourceLines =
           tree.getArguments().subList(1, tree.getArguments().size());
-
-      return getConstantSourceCode(sourceLines);
-    }
-
-    private String getConstantSourceCode(List<? extends ExpressionTree> sourceLines) {
       StringBuilder source = new StringBuilder();
 
       for (ExpressionTree sourceLine : sourceLines) {
@@ -103,7 +94,6 @@ public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTe
         if (value == null) {
           return "";
         }
-
         source.append(value).append('\n');
       }
 

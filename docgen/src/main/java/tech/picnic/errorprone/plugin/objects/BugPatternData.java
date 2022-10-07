@@ -2,30 +2,31 @@ package tech.picnic.errorprone.plugin.objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.LinkType;
 import com.google.errorprone.BugPattern.SeverityLevel;
-import java.util.Arrays;
 
+/** XXX: Write. */
+// XXX: What about `SuppressionAnnotations` and `DocumentSuppression`?
 @AutoValue
 public abstract class BugPatternData {
-  public static BugPatternData create(BugPattern annotation, String name) {
+  public static BugPatternData create(
+      String name,
+      String altNames,
+      LinkType linkType,
+      String link,
+      String tags,
+      String summary,
+      String explanation,
+      SeverityLevel severityLevel,
+      boolean disableable) {
     return new AutoValue_BugPatternData(
-        name,
-        Arrays.toString(annotation.altNames()),
-        annotation.linkType(),
-        annotation.link(),
-        Arrays.toString(annotation.tags()),
-        annotation.summary(),
-        annotation.explanation(),
-        annotation.severity(),
-        annotation.disableable());
+        name, altNames, linkType, link, tags, summary, explanation, severityLevel, disableable);
   }
 
   @JsonProperty
   abstract String name();
 
-  // Should be String[]
+  // XXX: Should be `String[]`.
   @JsonProperty
   abstract String altNames();
 
@@ -35,8 +36,8 @@ public abstract class BugPatternData {
   @JsonProperty
   abstract String link();
 
+  // XXX: Should be `String[]`.
   @JsonProperty
-  // Should be String[]
   abstract String tags();
 
   @JsonProperty
@@ -50,7 +51,4 @@ public abstract class BugPatternData {
 
   @JsonProperty
   abstract boolean disableable();
-
-  // SuppressionAnnotations?
-  // DocumentSuppression?
 }
