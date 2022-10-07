@@ -55,12 +55,6 @@ final class DocgenTaskListener implements TaskListener {
 
   private static Optional<DocgenPart> getDocgenPart(ClassTree tree, TaskEvent taskEvent) {
     JavaFileObject sourceFile = taskEvent.getSourceFile();
-    if (!isBugPattern(tree)
-        && !isBugPatternTest(tree)
-        && !sourceFile.getName().contains("TestOutput")
-        && !sourceFile.getName().contains("TestInput")) {
-      return Optional.empty();
-    }
 
     if (isBugPatternTest(tree)) {
       return Optional.of(DocgenPart.BUGPATTERN_TEST);
