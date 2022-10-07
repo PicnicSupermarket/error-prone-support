@@ -46,6 +46,7 @@ final class DocgenTaskListener implements TaskListener {
     this.basePath = path.substring(path.indexOf('=') + 1) + "/docs";
     this.state = VisitorState.createForUtilityPurposes(context);
 
+    // XXX: Move this somewhere else?
     try {
       Files.createDirectories(Paths.get(basePath));
     } catch (IOException e) {
@@ -66,7 +67,7 @@ final class DocgenTaskListener implements TaskListener {
         .ifPresent(
             docType ->
                 writeToFile(
-                    docType.getExtractor().extractData(tree, taskEvent, state),
+                    docType.getDocExtractor().extractData(tree, taskEvent, state),
                     docType.getOutputFileNamePrefix(),
                     getSimpleClassName(sourceFile.getName())));
   }

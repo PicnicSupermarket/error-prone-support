@@ -5,6 +5,7 @@ import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.annotations.Var;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
@@ -21,7 +22,7 @@ import tech.picnic.errorprone.plugin.models.BugPatternTestData;
 /** XXX: Write this. */
 // XXX: Take into account `expectUnchanged()`.
 public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTestData> {
-  private static final Matcher<MethodTree> BUG_PATTERN_TEST =
+  private static final Matcher<MethodTree> JUNIT_TEST_METHOD =
       allOf(hasAnnotation("org.junit.jupiter.api.Test"));
   private static final Matcher<ExpressionTree> IDENTIFICATION_SOURCE_LINES =
       instanceMethod()
@@ -44,7 +45,7 @@ public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTe
     tree.getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
-        .filter(m -> BUG_PATTERN_TEST.matches(m, state))
+        .filter(m -> JUNIT_TEST_METHOD.matches(m, state))
         .forEach(m -> scanner.scan(m, null));
 
     return BugPatternTestData.create(
@@ -53,11 +54,11 @@ public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTe
 
   private static final class ScanBugCheckerTestData extends TreeScanner<Void, Void> {
     private final VisitorState state;
-
     private final List<String> identificationTests = new ArrayList<>();
     private final List<BugPatternReplacementTestData> replacementTests = new ArrayList<>();
+
     // XXX: Using this output field is a bit hacky. Come up with a better solution.
-    private String output;
+    @Var private String output;
 
     ScanBugCheckerTestData(VisitorState state) {
       this.state = state;
