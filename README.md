@@ -15,6 +15,10 @@ focussing on maintainability, consistency and avoidance of common pitfalls.
 > Error Prone is a static analysis tool for Java that catches common
 > programming mistakes at compile-time.
 
+Read more on how Picnic uses Error Prone (Support) in the [blog post]
+[picnic-blog-ep-post]: _Picnic loves Error Prone: producing high-quality and
+consistent Java code_.
+
 [![Maven Central][maven-central-badge]][maven-central-search]
 [![GitHub Actions][github-actions-build-badge]][github-actions-build-master]
 [![License][license-badge]][license]
@@ -218,6 +222,7 @@ guidelines][contributing].
 [maven-central-search]: https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
 [maven]: https://maven.apache.org
 [picnic-blog]: https://blog.picnic.nl
+[picnic-blog-ep-post]: https://blog.picnic.nl/picnic-loves-error-prone-producing-high-quality-and-consistent-java-code-b8a566be6886
 [pitest]: https://pitest.org
 [pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
