@@ -16,10 +16,10 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3.1.0
-      - uses: ruby/setup-ruby@v1.117.0 # Ruby version set in `.ruby-version`.
+      - uses: ruby/setup-ruby@v1.117.0
         with:
           working-directory: ./website
-          bundler-cache: true # Runs `bundle install` and caches installed gems automatically.
+          bundler-cache: true
       - name: Configure Github Pages
         uses: actions/configure-pages@v2.1.1
       - name: Generate documentation
