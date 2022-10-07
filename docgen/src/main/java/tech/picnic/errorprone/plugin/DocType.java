@@ -1,10 +1,11 @@
 package tech.picnic.errorprone.plugin;
 
+
 public enum DocType {
-  BUG_PATTERN("bug-pattern-data.jsonl", new BugPatternExtractor()),
-  BUG_PATTERN_TEST("bug-pattern-test-data.jsonl", new BugPatternTestsExtractor()),
-  REFASTER_TEMPLATE_TEST_INPUT("refaster-test-input-data.jsonl", new RefasterTestExtractor()),
-  REFASTER_TEMPLATE_TEST_OUTPUT("refaster-test-output-data.jsonl", new RefasterTestExtractor());
+  BUG_PATTERN("bug-pattern", new BugPatternExtractor()),
+  BUG_PATTERN_TEST("bug-pattern-test", new BugPatternTestsExtractor()),
+  REFASTER_TEMPLATE_TEST_INPUT("refaster-test-input", new RefasterTestExtractor()),
+  REFASTER_TEMPLATE_TEST_OUTPUT("refaster-test-output", new RefasterTestExtractor());
 
   private final String outputFileNamePrefix;
   private final DocExtractor<?> extractor;

@@ -12,14 +12,14 @@ public final class BugPatternExtractor implements DocExtractor<BugPatternData> {
   public BugPatternData extractData(ClassTree tree, TaskEvent taskEvent, VisitorState state) {
     BugPattern annotation = taskEvent.getTypeElement().getAnnotation(BugPattern.class);
     return BugPatternData.create(
-            taskEvent.getTypeElement().getSimpleName().toString(),
-            Arrays.toString(annotation.altNames()),
-            annotation.linkType(),
-            annotation.link(),
-            Arrays.toString(annotation.tags()),
-            annotation.summary(),
-            annotation.explanation(),
-            annotation.severity(),
-            annotation.disableable());
+        taskEvent.getTypeElement().getSimpleName().toString(),
+        Arrays.toString(annotation.altNames()),
+        annotation.linkType(),
+        annotation.link(),
+        Arrays.toString(annotation.tags()),
+        annotation.summary(),
+        annotation.explanation(),
+        annotation.severity(),
+        annotation.disableable());
   }
 }

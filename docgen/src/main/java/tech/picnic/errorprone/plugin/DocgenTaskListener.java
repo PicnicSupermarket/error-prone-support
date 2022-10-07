@@ -54,18 +54,18 @@ final class DocgenTaskListener implements TaskListener {
   @SuppressWarnings("SystemOut")
   public void finished(TaskEvent taskEvent) {
     ClassTree tree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
-    if (tree == null
-        || taskEvent.getSourceFile() == null
-        || taskEvent.getKind() != TaskEvent.Kind.ANALYZE) {
+    JavaFileObject sourceFile = taskEvent.getSourceFile();
+    if (tree == null || sourceFile == null || taskEvent.getKind() != TaskEvent.Kind.ANALYZE) {
       return;
     }
 
-    getDocType(tree, taskEvent.getSourceFile())
+    getDocType(tree, sourceFile)
         .ifPresent(
             docType ->
                 writeToFile(
                     docType.getExtractor().extractData(tree, taskEvent, state),
-                    docType.getOutputFileNamePrefix()));
+                    docType.getOutputFileNamePrefix(),
+                    getSimpleClassName(sourceFile.getName())));
   }
 
   private static Optional<DocType> getDocType(ClassTree tree, JavaFileObject sourceFile) {
@@ -81,8 +81,9 @@ final class DocgenTaskListener implements TaskListener {
     return Optional.empty();
   }
 
-  private <T> void writeToFile(T data, String fileName) {
-    File file = new File(basePath + "/" + fileName);
+  private <T> void writeToFile(T data, String fileName, String name) {
+    File file = new File(basePath + "/" + fileName + "-" + name + ".json");
+    // XXX: Use Path instead of File.
 
     try (FileWriter fileWriter = new FileWriter(file, true)) {
       mapper.writeValue(fileWriter, data);
@@ -101,7 +102,12 @@ final class DocgenTaskListener implements TaskListener {
         && tree.getMembers().stream()
             .filter(VariableTree.class::isInstance)
             .map(VariableTree.class::cast)
-            .anyMatch(
-                member -> member.getType().toString().equals("BugCheckerRefactoringTestHelper"));
+            .anyMatch(vt -> vt.getType().toString().equals("BugCheckerRefactoringTestHelper"));
+  }
+
+  private static String getSimpleClassName(String path) {
+    int index = path.lastIndexOf('/');
+    String fileName = path.substring(index + 1);
+    return fileName.replace(".java", "");
   }
 }

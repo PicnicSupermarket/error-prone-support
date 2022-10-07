@@ -10,8 +10,7 @@ import com.sun.source.util.TaskEvent;
 import tech.picnic.errorprone.plugin.models.RefasterTemplateCollectionTestData;
 import tech.picnic.errorprone.plugin.models.RefasterTemplateTestData;
 
-public class RefasterTestExtractor
-    implements DocExtractor<RefasterTemplateCollectionTestData> {
+public class RefasterTestExtractor implements DocExtractor<RefasterTemplateCollectionTestData> {
   @Override
   public RefasterTemplateCollectionTestData extractData(
       ClassTree tree, TaskEvent taskEvent, VisitorState state) {
@@ -31,6 +30,7 @@ public class RefasterTestExtractor
                         m.getName().toString().replace("test", ""), m.toString()))
             .collect(toImmutableList());
 
-    return RefasterTemplateCollectionTestData.create(templateCollectionName, templateTests, isInput);
+    return RefasterTemplateCollectionTestData.create(
+        templateCollectionName, templateTests, isInput);
   }
 }

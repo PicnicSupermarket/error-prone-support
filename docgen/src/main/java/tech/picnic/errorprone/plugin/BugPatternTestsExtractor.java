@@ -17,10 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import tech.picnic.errorprone.plugin.models.BugPatternTestData;
 
+/** XXX: Write this. */
+// XXX: Take into account `expectUnchanged()`. 
 public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTestData> {
   private static final Matcher<MethodTree> BUG_PATTERN_TEST =
       allOf(hasAnnotation("org.junit.jupiter.api.Test"));
-  // anyOf(methodIsNamed("replacement"), methodIsNamed("identification"))
   private static final Matcher<ExpressionTree> IDENTIFICATION_SOURCE_LINES =
       instanceMethod()
           .onDescendantOf("com.google.errorprone.CompilationTestHelper")
