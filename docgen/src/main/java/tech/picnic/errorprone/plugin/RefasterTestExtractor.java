@@ -7,8 +7,8 @@ import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.util.TaskEvent;
-import tech.picnic.errorprone.plugin.objects.RefasterTemplateCollectionTestData;
-import tech.picnic.errorprone.plugin.objects.RefasterTemplateTestData;
+import tech.picnic.errorprone.plugin.models.RefasterTemplateCollectionTestData;
+import tech.picnic.errorprone.plugin.models.RefasterTemplateTestData;
 
 public class RefasterTestExtractor
     implements DocExtractor<RefasterTemplateCollectionTestData> {

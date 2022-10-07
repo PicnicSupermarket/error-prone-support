@@ -15,7 +15,7 @@ import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TreeScanner;
 import java.util.ArrayList;
 import java.util.List;
-import tech.picnic.errorprone.plugin.objects.BugPatternTestData;
+import tech.picnic.errorprone.plugin.models.BugPatternTestData;
 
 public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTestData> {
   private static final Matcher<MethodTree> BUG_PATTERN_TEST =

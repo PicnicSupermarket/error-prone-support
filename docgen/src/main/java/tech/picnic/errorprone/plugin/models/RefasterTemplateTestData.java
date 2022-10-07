@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.plugin.objects;
+package tech.picnic.errorprone.plugin.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;

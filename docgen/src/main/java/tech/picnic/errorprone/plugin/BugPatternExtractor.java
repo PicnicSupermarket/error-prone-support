@@ -5,7 +5,7 @@ import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.util.TaskEvent;
 import java.util.Arrays;
-import tech.picnic.errorprone.plugin.objects.BugPatternData;
+import tech.picnic.errorprone.plugin.models.BugPatternData;
 
 public final class BugPatternExtractor implements DocExtractor<BugPatternData> {
   @Override
