@@ -134,7 +134,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
     }
 
     List<? extends ExpressionTree> actualOrdering = array.getInitializers();
-    ImmutableList<? extends ExpressionTree> desiredOrdering = doSort(actualOrdering, state);
+    ImmutableList<? extends ExpressionTree> desiredOrdering = doSort(actualOrdering);
     if (actualOrdering.equals(desiredOrdering)) {
       /* In the (presumably) common case the elements are already sorted. */
       return Optional.empty();
@@ -164,12 +164,12 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
   }
 
   private static ImmutableList<? extends ExpressionTree> doSort(
-      Iterable<? extends ExpressionTree> elements, VisitorState state) {
+      Iterable<? extends ExpressionTree> elements) {
     // XXX: Perhaps we should use `Collator` with `.setStrength(Collator.PRIMARY)` and
     // `getCollationKey`. Not clear whether that's worth the hassle at this point.
     return ImmutableList.sortedCopyOf(
         comparing(
-            e -> getStructure(e, state),
+            LexicographicalAnnotationAttributeListing::getStructure,
             Comparators.lexicographical(
                 Comparators.lexicographical(
                     String.CASE_INSENSITIVE_ORDER.thenComparing(naturalOrder())))),
@@ -181,15 +181,14 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
    * performed. This approach disregards e.g. irrelevant whitespace. It also allows special
    * structure within string literals to be respected.
    */
-  private static ImmutableList<ImmutableList<String>> getStructure(
-      ExpressionTree array, VisitorState state) {
+  private static ImmutableList<ImmutableList<String>> getStructure(ExpressionTree array) {
     ImmutableList.Builder<ImmutableList<String>> nodes = ImmutableList.builder();
 
     new TreeScanner<Void, Void>() {
       @Nullable
       @Override
       public Void visitIdentifier(IdentifierTree node, @Nullable Void unused) {
-        nodes.add(ImmutableList.of(SourceCode.treeToString(node, state)));
+        nodes.add(ImmutableList.of(node.getName().toString()));
         return super.visitIdentifier(node, unused);
       }
 
@@ -208,7 +207,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
       @Nullable
       @Override
       public Void visitPrimitiveType(PrimitiveTypeTree node, @Nullable Void unused) {
-        nodes.add(ImmutableList.of(SourceCode.treeToString(node, state)));
+        nodes.add(ImmutableList.of(node.getPrimitiveTypeKind().toString()));
         return super.visitPrimitiveType(node, unused);
       }
     }.scan(array, null);
