@@ -167,7 +167,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
             "Refaster Rule",
             description.getLink(),
             severityOverride.orElse(description.severity),
-            String.format("%s: %s", description.checkName, description.getRawMessage()))
+            String.join(": ", description.checkName, description.getRawMessage()))
         .addAllFixes(description.fixes)
         .build();
   }
