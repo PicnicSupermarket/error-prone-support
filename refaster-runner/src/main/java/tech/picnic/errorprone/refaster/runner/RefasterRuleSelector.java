@@ -7,8 +7,6 @@ import static java.util.stream.Collectors.toCollection;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.errorprone.CodeTransformer;
-import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.refaster.BlockTemplate;
 import com.google.errorprone.refaster.ExpressionTemplate;
 import com.google.errorprone.refaster.RefasterRule;
@@ -39,7 +37,6 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 // XXX: Add some examples of which source files would match what templates in the tree.
@@ -60,8 +57,8 @@ import javax.annotation.Nullable;
  *   <li>Extract all identifiers from the {@link CompilationUnitTree} and sort them
  *       lexicographically.
  *   <li>Traverse the tree based on the identifiers from the {@link CompilationUnitTree}. Every node
- *       can contain Refaster templates. Once a node is we found a candidate Refaster template and
- *       will therefore be added to the list of candidates.
+ *       can contain Refaster templates. Once a node is we found a candidate Refaster template that
+ *       might match some code and will therefore be added to the list of candidates.
  * </ol>
  *
  * <p>This is an example to explain the algorithm. Consider the templates with identifiers; {@code
@@ -77,14 +74,14 @@ import javax.annotation.Nullable;
  *        └── D     -- T3
  * }</pre>
  *
- * <p>The tree is traversed based on the identifiers in the {@link CompilationUnitTree}. When a leaf
- * contains a template and is reached, we can be certain that the identifiers from the {@link
+ * <p>The tree is traversed based on the identifiers in the {@link CompilationUnitTree}. When a node
+ * containing a template is reached, we can be certain that the identifiers from the {@link
  * BeforeTemplate} are at least present in the {@link CompilationUnitTree}.
  *
- * <p>Since the identifiers are sorted, we can prune parts of the {@link Node tree} while we are
+ * <p>Since the identifiers are sorted, we can skip parts of the {@link Node tree} while we are
  * traversing it. Instead of trying to match all Refaster templates against every expression in a
- * {@link CompilationUnitTree} we now only return a subset of the templates that at least have a
- * chance of matching. As a result, the performance of Refaster significantly increases.
+ * {@link CompilationUnitTree} we now only matching a subset of the templates that at least have a
+ * chance of matching. As a result, the performance of Refaster increases significantly.
  */
 final class RefasterRuleSelector {
   private final Node<RefasterRule<?, ?>> treeRules;
@@ -93,34 +90,10 @@ final class RefasterRuleSelector {
     this.treeRules = treeRules;
   }
 
-  /**
-   * Instantiates a new {@link RefasterRuleSelector} backed by the {@link RefasterRule}s referenced
-   * by the given collection of {@link CodeTransformer}s.
-   */
-  static RefasterRuleSelector create(ImmutableCollection<CodeTransformer> transformers) {
-    List<RefasterRule<?, ?>> refasterRules = new ArrayList<>();
-    collectRefasterRules(transformers, refasterRules::add);
+  /** Instantiates a new {@link RefasterRuleSelector} backed by the given {@link RefasterRule}s. */
+  static RefasterRuleSelector create(ImmutableCollection<RefasterRule<?, ?>> refasterRules) {
     return new RefasterRuleSelector(
         Node.create(refasterRules, RefasterRuleSelector::extractTemplateIdentifiers));
-  }
-
-  private static void collectRefasterRules(
-      ImmutableCollection<CodeTransformer> transformers, Consumer<RefasterRule<?, ?>> sink) {
-    for (CodeTransformer t : transformers) {
-      collectRefasterRules(t, sink);
-    }
-  }
-
-  private static void collectRefasterRules(
-      CodeTransformer transformer, Consumer<RefasterRule<?, ?>> sink) {
-    if (transformer instanceof RefasterRule) {
-      sink.accept((RefasterRule<?, ?>) transformer);
-    } else if (transformer instanceof CompositeCodeTransformer) {
-      collectRefasterRules(((CompositeCodeTransformer) transformer).transformers(), sink);
-    } else {
-      throw new IllegalStateException(
-          String.format("Can't handle `CodeTransformer` of type '%s'", transformer.getClass()));
-    }
   }
 
   /**
@@ -135,7 +108,6 @@ final class RefasterRuleSelector {
   Set<RefasterRule<?, ?>> selectCandidateRules(CompilationUnitTree tree) {
     Set<RefasterRule<?, ?>> candidateRules = newSetFromMap(new IdentityHashMap<>());
     treeRules.collectReachableValues(extractSourceIdentifiers(tree), candidateRules::add);
-
     return candidateRules;
   }
 
@@ -166,17 +138,13 @@ final class RefasterRuleSelector {
       ImmutableList<? extends Tree> trees) {
     List<Set<String>> identifierCombinations = new ArrayList<>();
     identifierCombinations.add(new HashSet<>());
-
-    new TemplateIdentifierExtractor().scan(trees, identifierCombinations);
-
+    TemplateIdentifierExtractor.INSTANCE.scan(trees, identifierCombinations);
     return identifierCombinations.stream().map(ImmutableSet::copyOf).collect(toImmutableSet());
   }
 
   private static Set<String> extractSourceIdentifiers(Tree tree) {
     Set<String> identifiers = new HashSet<>();
-
-    new SourceIdentifierExtractor().scan(tree, identifiers);
-
+    SourceIdentifierExtractor.INSTANCE.scan(tree, identifiers);
     return identifiers;
   }
 
@@ -354,6 +322,8 @@ final class RefasterRuleSelector {
   }
 
   private static class TemplateIdentifierExtractor extends TreeScanner<Void, List<Set<String>>> {
+    private static final TemplateIdentifierExtractor INSTANCE = new TemplateIdentifierExtractor();
+
     @Nullable
     @Override
     public Void visitIdentifier(IdentifierTree node, List<Set<String>> identifierCombinations) {
@@ -434,7 +404,8 @@ final class RefasterRuleSelector {
 
     private static void registerOperator(
         ExpressionTree node, List<Set<String>> identifierCombinations) {
-      identifierCombinations.forEach(ids -> ids.add(treeKindToString(node.getKind())));
+      String id = treeKindToString(node.getKind());
+      identifierCombinations.forEach(ids -> ids.add(id));
     }
 
     @Nullable
@@ -462,6 +433,8 @@ final class RefasterRuleSelector {
   }
 
   private static class SourceIdentifierExtractor extends TreeScanner<Void, Set<String>> {
+    private static final SourceIdentifierExtractor INSTANCE = new SourceIdentifierExtractor();
+
     @Nullable
     @Override
     public Void visitPackage(PackageTree node, Set<String> identifiers) {
