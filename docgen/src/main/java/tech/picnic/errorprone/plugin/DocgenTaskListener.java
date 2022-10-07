@@ -3,7 +3,6 @@ package tech.picnic.errorprone.plugin;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.util.ASTHelpers;
@@ -16,9 +15,8 @@ import com.sun.tools.javac.util.Context;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import tech.picnic.errorprone.plugin.objects.BugPatternData;
-import tech.picnic.errorprone.plugin.objects.BugPatternTestData;
-import tech.picnic.errorprone.plugin.objects.RefasterTemplateTestData;
+import java.util.Optional;
+import javax.tools.JavaFileObject;
 
 /** XXX: Write this. */
 final class DocgenTaskListener implements TaskListener {
@@ -43,31 +41,37 @@ final class DocgenTaskListener implements TaskListener {
   @SuppressWarnings("SystemOut")
   public void finished(TaskEvent taskEvent) {
     ClassTree tree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
-    if (tree == null
-        || taskEvent.getSourceFile() == null
-        // XXX: Extract to method: `shouldGenerateDocs` or something like that. Return an enum that
-        // shows which type, or could be `NONE`.
-        || (!isBugPattern(tree)
-            && !isBugPatternTest(tree)
-            && !taskEvent.getSourceFile().getName().contains("TestOutput")
-            && !taskEvent.getSourceFile().getName().contains("TestInput"))) {
+    if (tree == null || taskEvent.getSourceFile() == null) {
       return;
     }
 
-    if (isBugPatternTest(tree)) {
-      BugPatternTestData testData =
-          new BugPatternTestsExtractor().extractData(tree, taskEvent, state);
-      writeToFile(testData, "bug-pattern-test-data.jsonl");
-    } else if (isBugPattern(tree)) {
-      BugPatternData data = new BugPatternExtractor().extractData(tree, taskEvent, state);
+    getDocgenPart(tree, taskEvent)
+        .ifPresent(
+            docgenPart ->
+                writeToFile(
+                    docgenPart.getExtractor().extractData(tree, taskEvent, state),
+                    docgenPart.getDataFileName()));
+  }
 
-      System.out.println("Analysing: " + taskEvent.getTypeElement().getSimpleName());
-      writeToFile(data, "bug-pattern-data.jsonl");
+  private static Optional<DocgenPart> getDocgenPart(ClassTree tree, TaskEvent taskEvent) {
+    JavaFileObject sourceFile = taskEvent.getSourceFile();
+    if (!isBugPattern(tree)
+        && !isBugPatternTest(tree)
+        && !sourceFile.getName().contains("TestOutput")
+        && !sourceFile.getName().contains("TestInput")) {
+      return Optional.empty();
+    }
+
+    if (isBugPatternTest(tree)) {
+      return Optional.of(DocgenPart.BUGPATTERN_TEST);
+    } else if (isBugPattern(tree)) {
+      return Optional.of(DocgenPart.BUGPATTERN);
+    } else if (sourceFile.getName().contains("TestInput")) {
+      return Optional.of(DocgenPart.REFASTER_TEMPLATE_TEST_INPUT);
+    } else if (sourceFile.getName().contains("TestOutput")) {
+      return Optional.of(DocgenPart.REFASTER_TEMPLATE_TEST_OUTPUT);
     } else {
-      ImmutableList<RefasterTemplateTestData> refasterTemplateTestData =
-          new RefasterTestExtractor().extractData(tree, taskEvent, state);
-      System.out.println("~~~~~~~~~!!!!~~~~~~~NOW ANALYSING: " + tree.getSimpleName().toString());
-      refasterTemplateTestData.forEach(d -> writeToFile(d, "refaster-test-data.jsonl"));
+      return Optional.empty();
     }
   }
 
