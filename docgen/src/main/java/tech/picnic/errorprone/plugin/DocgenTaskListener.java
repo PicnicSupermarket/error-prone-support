@@ -20,6 +20,8 @@ import com.sun.tools.javac.util.Context;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 import javax.tools.JavaFileObject;
 
@@ -38,8 +40,14 @@ final class DocgenTaskListener implements TaskListener {
 
   DocgenTaskListener(Context context, String path) {
     this.context = context;
-    this.basePath = path.substring(path.indexOf('=') + 1);
+    this.basePath = path.substring(path.indexOf('=') + 1) + "/docs";
     this.state = VisitorState.createForUtilityPurposes(context);
+
+    try {
+      Files.createDirectories(Paths.get(basePath));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

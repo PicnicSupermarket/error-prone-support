@@ -7,26 +7,30 @@ import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.util.TaskEvent;
+import tech.picnic.errorprone.plugin.objects.RefasterTemplateCollectionTestData;
 import tech.picnic.errorprone.plugin.objects.RefasterTemplateTestData;
 
 public class RefasterTestExtractor
-    implements DocExtractor<ImmutableList<RefasterTemplateTestData>> {
+    implements DocExtractor<RefasterTemplateCollectionTestData> {
   @Override
-  public ImmutableList<RefasterTemplateTestData> extractData(
+  public RefasterTemplateCollectionTestData extractData(
       ClassTree tree, TaskEvent taskEvent, VisitorState state) {
+
+    boolean isInput = taskEvent.getSourceFile().getName().contains("Input");
 
     String templateCollectionName = tree.getSimpleName().toString().replace("Test", "");
 
-    return tree.getMembers().stream()
-        .filter(MethodTree.class::isInstance)
-        .map(MethodTree.class::cast)
-        .filter(m -> m.getName().toString().startsWith("test"))
-        .map(
-            m ->
-                RefasterTemplateTestData.create(
-                    templateCollectionName,
-                    m.getName().toString().replace("test", ""),
-                    m.toString()))
-        .collect(toImmutableList());
+    ImmutableList<RefasterTemplateTestData> templateTests =
+        tree.getMembers().stream()
+            .filter(MethodTree.class::isInstance)
+            .map(MethodTree.class::cast)
+            .filter(m -> m.getName().toString().startsWith("test"))
+            .map(
+                m ->
+                    RefasterTemplateTestData.create(
+                        m.getName().toString().replace("test", ""), m.toString()))
+            .collect(toImmutableList());
+
+    return RefasterTemplateCollectionTestData.create(templateCollectionName, templateTests, isInput);
   }
 }
