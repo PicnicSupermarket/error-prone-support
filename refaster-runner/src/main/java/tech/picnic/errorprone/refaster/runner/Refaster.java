@@ -21,6 +21,7 @@ import com.google.common.collect.TreeRangeSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CodeTransformer;
+import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.ErrorProneOptions.Severity;
 import com.google.errorprone.SubContext;
@@ -39,11 +40,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.inject.Inject;
-import java.util.Set;
-import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 /**
@@ -221,13 +222,35 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   private static RefasterRuleSelector createRefasterRuleSelector(ErrorProneFlags flags) {
     ImmutableListMultimap<String, CodeTransformer> allTransformers =
         CodeTransformers.getAllCodeTransformers();
-    return RefasterRuleSelector.create(
+    List<RefasterRule<?, ?>> refasterRules = new ArrayList<>();
+    collectRefasterRules(
         flags
             .get(INCLUDED_RULES_PATTERN_FLAG)
             .map(Pattern::compile)
             .<ImmutableCollection<CodeTransformer>>map(
                 nameFilter -> filterCodeTransformers(allTransformers, nameFilter))
-            .orElseGet(allTransformers::values));
+            .orElseGet(allTransformers::values),
+        refasterRules::add);
+    return RefasterRuleSelector.create(ImmutableList.copyOf(refasterRules));
+  }
+
+  private static void collectRefasterRules(
+      ImmutableCollection<CodeTransformer> transformers, Consumer<RefasterRule<?, ?>> sink) {
+    for (CodeTransformer t : transformers) {
+      collectRefasterRules(t, sink);
+    }
+  }
+
+  private static void collectRefasterRules(
+      CodeTransformer transformer, Consumer<RefasterRule<?, ?>> sink) {
+    if (transformer instanceof RefasterRule) {
+      sink.accept((RefasterRule<?, ?>) transformer);
+    } else if (transformer instanceof CompositeCodeTransformer) {
+      collectRefasterRules(((CompositeCodeTransformer) transformer).transformers(), sink);
+    } else {
+      throw new IllegalStateException(
+          String.format("Can't handle `CodeTransformer` of type '%s'", transformer.getClass()));
+    }
   }
 
   private static ImmutableList<CodeTransformer> filterCodeTransformers(
