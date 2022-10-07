@@ -17,7 +17,7 @@ focussing on maintainability, consistency and avoidance of common pitfalls.
 
 Read more on how Picnic uses Error Prone (Support) in the blog post [_Picnic
 loves Error Prone: producing high-quality and consistent Java
-code_][picnic-blog-ep-post] .
+code_][picnic-blog-ep-post].
 
 [![Maven Central][maven-central-badge]][maven-central-search]
 [![GitHub Actions][github-actions-build-badge]][github-actions-build-master]
