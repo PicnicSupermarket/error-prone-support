@@ -314,16 +314,16 @@ final class ReactorTemplates {
    * Prefer {@link Flux#concatMapIterable(Function)} over alternatives that require an additional
    * subscription.
    */
-  static final class ConcatMapIterableIdentity<S> {
+  static final class ConcatMapIterableIdentity<T> {
     @BeforeTemplate
-    Flux<S> before(Flux<? extends Iterable<S>> flux) {
+    Flux<T> before(Flux<? extends Iterable<T>> flux) {
       return Refaster.anyOf(
           flux.concatMap(list -> Flux.fromIterable(list)), flux.concatMap(Flux::fromIterable));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Flux<S> after(Flux<? extends Iterable<S>> flux) {
+    Flux<T> after(Flux<? extends Iterable<T>> flux) {
       return flux.concatMapIterable(identity());
     }
   }
@@ -332,9 +332,9 @@ final class ReactorTemplates {
    * Prefer {@link Flux#concatMapIterable(Function, int)} over alternatives that require an
    * additional subscription.
    */
-  static final class ConcatMapIterableIdentityWithPrefetch<S> {
+  static final class ConcatMapIterableIdentityWithPrefetch<T> {
     @BeforeTemplate
-    Flux<S> before(Flux<? extends Iterable<S>> flux, int prefetch) {
+    Flux<T> before(Flux<? extends Iterable<T>> flux, int prefetch) {
       return Refaster.anyOf(
           flux.concatMap(list -> Flux.fromIterable(list), prefetch),
           flux.concatMap(Flux::fromIterable, prefetch));
@@ -342,7 +342,7 @@ final class ReactorTemplates {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Flux<S> after(Flux<? extends Iterable<S>> flux, int prefetch) {
+    Flux<T> after(Flux<? extends Iterable<T>> flux, int prefetch) {
       return flux.concatMapIterable(identity(), prefetch);
     }
   }
