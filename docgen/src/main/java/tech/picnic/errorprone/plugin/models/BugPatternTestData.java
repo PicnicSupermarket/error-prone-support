@@ -9,10 +9,9 @@ import javax.annotation.Nullable;
 public abstract class BugPatternTestData {
   public static BugPatternTestData create(
       String name,
-      List<String> identificationLines,
-      List<String> inputLines,
-      List<String> outputLines) {
-    return new AutoValue_BugPatternTestData(name, identificationLines, inputLines, outputLines);
+      List<String> identificationTests,
+      List<BugPatternReplacementTestData> replacementTests) {
+    return new AutoValue_BugPatternTestData(name, identificationTests, replacementTests);
   }
 
   @JsonProperty
@@ -20,13 +19,9 @@ public abstract class BugPatternTestData {
 
   @Nullable
   @JsonProperty
-  abstract List<String> identificationLines();
+  abstract List<String> identificationTests();
 
   @Nullable
   @JsonProperty
-  abstract List<String> inputLines();
-
-  @Nullable
-  @JsonProperty
-  abstract List<String> outputLines();
+  abstract List<BugPatternReplacementTestData> replacementTests();
 }

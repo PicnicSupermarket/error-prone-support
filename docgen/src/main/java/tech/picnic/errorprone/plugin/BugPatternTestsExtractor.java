@@ -15,10 +15,11 @@ import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TreeScanner;
 import java.util.ArrayList;
 import java.util.List;
+import tech.picnic.errorprone.plugin.models.BugPatternReplacementTestData;
 import tech.picnic.errorprone.plugin.models.BugPatternTestData;
 
 /** XXX: Write this. */
-// XXX: Take into account `expectUnchanged()`. 
+// XXX: Take into account `expectUnchanged()`.
 public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTestData> {
   private static final Matcher<MethodTree> BUG_PATTERN_TEST =
       allOf(hasAnnotation("org.junit.jupiter.api.Test"));
@@ -47,40 +48,37 @@ public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTe
         .forEach(m -> scanner.scan(m, null));
 
     return BugPatternTestData.create(
-        name, scanner.getIdentification(), scanner.getInput(), scanner.getOutput());
+        name, scanner.getIdentificationTests(), scanner.getReplacementTests());
   }
 
   private static final class ScanBugCheckerTestData extends TreeScanner<Void, Void> {
     private final VisitorState state;
 
-    private final List<String> identification = new ArrayList<>();
-    private final List<String> input = new ArrayList<>();
-    private final List<String> output = new ArrayList<>();
+    private final List<String> identificationTests = new ArrayList<>();
+    private final List<BugPatternReplacementTestData> replacementTests = new ArrayList<>();
+    // XXX: Using this output field is a bit hacky. Come up with a better solution.
+    private String output;
 
     ScanBugCheckerTestData(VisitorState state) {
       this.state = state;
     }
 
-    public List<String> getIdentification() {
-      return identification;
+    public List<String> getIdentificationTests() {
+      return identificationTests;
     }
 
-    public List<String> getInput() {
-      return input;
-    }
-
-    public List<String> getOutput() {
-      return output;
+    public List<BugPatternReplacementTestData> getReplacementTests() {
+      return replacementTests;
     }
 
     @Override
     public Void visitMethodInvocation(MethodInvocationTree node, Void unused) {
       if (IDENTIFICATION_SOURCE_LINES.matches(node, state)) {
-        identification.add(getSourceLines(node));
+        identificationTests.add(getSourceLines(node));
       } else if (REPLACEMENT_INPUT.matches(node, state)) {
-        input.add(getSourceLines(node));
+        replacementTests.add(BugPatternReplacementTestData.create(getSourceLines(node), output));
       } else if (REPLACEMENT_OUTPUT.matches(node, state)) {
-        output.add(getSourceLines(node));
+        output = getSourceLines(node);
       }
       return super.visitMethodInvocation(node, unused);
     }

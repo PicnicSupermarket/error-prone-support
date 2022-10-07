@@ -14,10 +14,11 @@ public abstract class RefasterTemplateCollectionTestData {
 
   @JsonProperty
   abstract String templateCollection();
+  
+  @JsonProperty
+  abstract boolean isInput();
 
   @JsonProperty
   abstract List<RefasterTemplateTestData> templateTests();
 
-  @JsonProperty
-  abstract boolean isInput();
 }
