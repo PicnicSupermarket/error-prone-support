@@ -13,8 +13,6 @@ import java.util.Optional;
  *
  * @see <a href="https://github.com/PicnicSupermarket/error-prone">Picnic's Error Prone fork</a>
  */
-// XXX: Add tests for this class. We can at least test `#isErrorProneForkAvailable()` by having
-// Maven inject a corresponding system property.
 public final class ErrorProneFork {
   private static final Optional<Method> ERROR_PRONE_OPTIONS_IS_SUGGESTIONS_AS_WARNINGS_METHOD =
       Arrays.stream(ErrorProneOptions.class.getDeclaredMethods())
