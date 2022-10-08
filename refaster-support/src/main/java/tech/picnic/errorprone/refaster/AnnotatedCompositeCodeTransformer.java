@@ -53,10 +53,10 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
   /**
    * Creates an instance of an {@link AnnotatedCompositeCodeTransformer}.
    *
-   * @param packageName The package in which the {@link CodeTransformer} resides.
-   * @param transformers The {@link CodeTransformer}s in this {@link CompositeCodeTransformer}.
-   * @param annotations The annotations that are applicable on this {@link CodeTransformer}.
-   * @return An {@link AnnotatedCompositeCodeTransformer} that may be augmented with annotations.
+   * @param packageName The package in which the wrapped {@link CodeTransformer}s reside.
+   * @param transformers The {@link CodeTransformer}s to which to delegate.
+   * @param annotations The annotations that are applicable to this {@link CodeTransformer}.
+   * @return A non-{@code null} {@link AnnotatedCompositeCodeTransformer}.
    */
   public static AnnotatedCompositeCodeTransformer create(
       String packageName,
@@ -65,9 +65,8 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
     return new AutoValue_AnnotatedCompositeCodeTransformer(packageName, transformers, annotations);
   }
 
-  /** {@inheritDoc} */
   @Override
-  public void apply(TreePath path, Context context, DescriptionListener listener) {
+  public final void apply(TreePath path, Context context, DescriptionListener listener) {
     for (CodeTransformer transformer : transformers()) {
       transformer.apply(
           path,
