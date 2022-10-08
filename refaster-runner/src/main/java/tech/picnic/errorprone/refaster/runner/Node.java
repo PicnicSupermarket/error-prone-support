@@ -25,7 +25,7 @@ import java.util.function.Function;
 @AutoValue
 abstract class Node<T> {
   static <T> Node<T> create(
-      ImmutableCollection<T> values,
+      ImmutableList<T> values,
       Function<? super T, ? extends Set<? extends Set<String>>> pathExtractor) {
     BuildNode<T> tree = BuildNode.create();
     tree.register(values, pathExtractor);
