@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.MoreCollectors;
@@ -177,6 +178,26 @@ final class ReactorTemplates {
     }
   }
 
+  /** Prefer {@link Flux#concatMap(Function, int)} over more contrived alternatives. */
+  static final class FluxConcatMapWithPrefetch<T, S> {
+    @BeforeTemplate
+    Flux<S> before(
+        Flux<T> flux,
+        Function<? super T, ? extends Publisher<? extends S>> function,
+        int prefetch) {
+      return Refaster.anyOf(
+          flux.flatMap(function, 1, prefetch), flux.flatMapSequential(function, 1, prefetch));
+    }
+
+    @AfterTemplate
+    Flux<S> after(
+        Flux<T> flux,
+        Function<? super T, ? extends Publisher<? extends S>> function,
+        int prefetch) {
+      return flux.concatMap(function, prefetch);
+    }
+  }
+
   /**
    * Prefer {@link Flux#concatMapIterable(Function)} over {@link Flux#flatMapIterable(Function)}, as
    * the former has equivalent semantics but a clearer name.
@@ -190,6 +211,24 @@ final class ReactorTemplates {
     @AfterTemplate
     Flux<S> after(Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function) {
       return flux.concatMapIterable(function);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#concatMapIterable(Function, int)} over {@link Flux#flatMapIterable(Function,
+   * int)}, as the former has equivalent semantics but a clearer name.
+   */
+  static final class FluxConcatMapIterableWithPrefetch<T, S> {
+    @BeforeTemplate
+    Flux<S> before(
+        Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function, int prefetch) {
+      return flux.flatMapIterable(function, prefetch);
+    }
+
+    @AfterTemplate
+    Flux<S> after(
+        Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function, int prefetch) {
+      return flux.concatMapIterable(function, prefetch);
     }
   }
 
@@ -268,6 +307,43 @@ final class ReactorTemplates {
     @AfterTemplate
     Flux<S> after(Flux<T> flux) {
       return flux.cast(Refaster.<S>clazz());
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#concatMapIterable(Function)} over alternatives that require an additional
+   * subscription.
+   */
+  static final class ConcatMapIterableIdentity<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<? extends Iterable<T>> flux) {
+      return Refaster.anyOf(
+          flux.concatMap(list -> Flux.fromIterable(list)), flux.concatMap(Flux::fromIterable));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Flux<T> after(Flux<? extends Iterable<T>> flux) {
+      return flux.concatMapIterable(identity());
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#concatMapIterable(Function, int)} over alternatives that require an
+   * additional subscription.
+   */
+  static final class ConcatMapIterableIdentityWithPrefetch<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<? extends Iterable<T>> flux, int prefetch) {
+      return Refaster.anyOf(
+          flux.concatMap(list -> Flux.fromIterable(list), prefetch),
+          flux.concatMap(Flux::fromIterable, prefetch));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Flux<T> after(Flux<? extends Iterable<T>> flux, int prefetch) {
+      return flux.concatMapIterable(identity(), prefetch);
     }
   }
 

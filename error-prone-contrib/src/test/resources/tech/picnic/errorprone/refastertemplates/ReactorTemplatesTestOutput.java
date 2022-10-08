@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refastertemplates;
 
 import static com.google.common.collect.MoreCollectors.toOptional;
+import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -68,8 +69,17 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
     return ImmutableSet.of(Flux.just(1).concatMap(Mono::just), Flux.just(2).concatMap(Mono::just));
   }
 
+  ImmutableSet<Flux<Integer>> testFluxConcatMapWithPrefetch() {
+    return ImmutableSet.of(
+        Flux.just(1).concatMap(Mono::just, 3), Flux.just(2).concatMap(Mono::just, 4));
+  }
+
   Flux<Integer> testFluxConcatMapIterable() {
     return Flux.just(1, 2).concatMapIterable(ImmutableList::of);
+  }
+
+  Flux<Integer> testFluxConcatMapIterableWithPrefetch() {
+    return Flux.just(1, 2).concatMapIterable(ImmutableList::of, 3);
   }
 
   Flux<String> testMonoFlatMapToFlux() {
@@ -92,6 +102,18 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Flux<Number> testFluxCast() {
     return Flux.just(1).cast(Number.class);
+  }
+
+  ImmutableSet<Flux<String>> testConcatMapIterableIdentity() {
+    return ImmutableSet.of(
+        Flux.just(ImmutableList.of("foo")).concatMapIterable(identity()),
+        Flux.just(ImmutableList.of("bar")).concatMapIterable(identity()));
+  }
+
+  ImmutableSet<Flux<String>> testConcatMapIterableIdentityWithPrefetch() {
+    return ImmutableSet.of(
+        Flux.just(ImmutableList.of("foo")).concatMapIterable(identity(), 1),
+        Flux.just(ImmutableList.of("bar")).concatMapIterable(identity(), 2));
   }
 
   Mono<Integer> testMonoOnErrorComplete() {

@@ -69,8 +69,17 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
         Flux.just(1).flatMap(Mono::just, 1), Flux.just(2).flatMapSequential(Mono::just, 1));
   }
 
+  ImmutableSet<Flux<Integer>> testFluxConcatMapWithPrefetch() {
+    return ImmutableSet.of(
+        Flux.just(1).flatMap(Mono::just, 1, 3), Flux.just(2).flatMapSequential(Mono::just, 1, 4));
+  }
+
   Flux<Integer> testFluxConcatMapIterable() {
     return Flux.just(1, 2).flatMapIterable(ImmutableList::of);
+  }
+
+  Flux<Integer> testFluxConcatMapIterableWithPrefetch() {
+    return Flux.just(1, 2).flatMapIterable(ImmutableList::of, 3);
   }
 
   Flux<String> testMonoFlatMapToFlux() {
@@ -93,6 +102,18 @@ final class ReactorTemplatesTest implements RefasterTemplateTestCase {
 
   Flux<Number> testFluxCast() {
     return Flux.just(1).map(Number.class::cast);
+  }
+
+  ImmutableSet<Flux<String>> testConcatMapIterableIdentity() {
+    return ImmutableSet.of(
+        Flux.just(ImmutableList.of("foo")).concatMap(list -> Flux.fromIterable(list)),
+        Flux.just(ImmutableList.of("bar")).concatMap(Flux::fromIterable));
+  }
+
+  ImmutableSet<Flux<String>> testConcatMapIterableIdentityWithPrefetch() {
+    return ImmutableSet.of(
+        Flux.just(ImmutableList.of("foo")).concatMap(list -> Flux.fromIterable(list), 1),
+        Flux.just(ImmutableList.of("bar")).concatMap(Flux::fromIterable, 2));
   }
 
   Mono<Integer> testMonoOnErrorComplete() {
