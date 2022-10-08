@@ -157,11 +157,11 @@ final class RefasterTest {
   }
 
   /**
-   * Verifies that the bug checker flags the refactoring opportunities with the appropriate severity
+   * Verifies that the bug checker flags refactoring opportunities with the appropriate severity
    * level.
    *
-   * @implNote This test setup is rather cumbersome, because the {@link CompilationTestHelper} does
-   *     not enable direct assertions against the severity of collected diagnostics output.
+   * @implNote This test setup is rather cumbersome, because {@link CompilationTestHelper} does not
+   *     enable direct assertions against the severity of collected diagnostics output.
    */
   @MethodSource("severityAssignmentTestCases")
   @ParameterizedTest

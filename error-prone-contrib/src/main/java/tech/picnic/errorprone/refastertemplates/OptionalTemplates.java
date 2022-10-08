@@ -63,7 +63,7 @@ final class OptionalTemplates {
     }
   }
 
-  /** Prefer `Optional#orElseThrow()` over the less explicit `Optional#get()` */
+  /** Prefer {@link Optional#orElseThrow()} over the less explicit {@link Optional#get()}. */
   static final class OptionalOrElseThrow<T> {
     @BeforeTemplate
     @SuppressWarnings("NullAway")
