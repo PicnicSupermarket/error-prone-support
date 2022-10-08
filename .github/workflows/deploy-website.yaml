@@ -3,10 +3,10 @@ on:
   pull_request:
   push:
     branches: [ master, website ]
-permissions:
-  contents: read
 jobs:
   build:
+    permissions:
+      contents: read
     runs-on: ubuntu-22.04
     steps:
       - name: Check out code
@@ -38,6 +38,7 @@ jobs:
       group: pages
       cancel-in-progress: true
     permissions:
+      contents: read
       id-token: write
       pages: write
     runs-on: ubuntu-22.04
