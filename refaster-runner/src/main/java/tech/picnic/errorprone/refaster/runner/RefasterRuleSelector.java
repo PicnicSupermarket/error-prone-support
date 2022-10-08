@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Collections.newSetFromMap;
 import static java.util.stream.Collectors.toCollection;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.refaster.BlockTemplate;
@@ -91,7 +90,7 @@ final class RefasterRuleSelector {
   }
 
   /** Instantiates a new {@link RefasterRuleSelector} backed by the given {@link RefasterRule}s. */
-  static RefasterRuleSelector create(ImmutableCollection<RefasterRule<?, ?>> refasterRules) {
+  static RefasterRuleSelector create(ImmutableList<RefasterRule<?, ?>> refasterRules) {
     return new RefasterRuleSelector(
         Node.create(refasterRules, RefasterRuleSelector::extractTemplateIdentifiers));
   }
