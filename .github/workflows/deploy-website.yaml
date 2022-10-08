@@ -38,7 +38,6 @@ jobs:
       group: pages
       cancel-in-progress: true
     permissions:
-      contents: read
       id-token: write
       pages: write
     runs-on: ubuntu-22.04
