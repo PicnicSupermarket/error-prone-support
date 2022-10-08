@@ -32,12 +32,13 @@ jobs:
         with:
           path: ./website/_site
   deploy:
-    #if: github.ref == 'refs/heads/website'
+    if: github.ref == 'refs/heads/website'
     needs: build
     concurrency:
       group: pages
       cancel-in-progress: true
     permissions:
+      id-token: write
       pages: write
     runs-on: ubuntu-22.04
     environment:
