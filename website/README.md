@@ -31,13 +31,14 @@ The required Ruby version is set in `.ruby-version`. To switch, you can use
 
 ###### Resolving Bundler issues
 
-On Macos you may get an error such as the following when `bundle install`:
+On macOS, you may get an error such as the following when running `bundle
+install`:
 
 ```sh
 fatal error: 'openssl/ssl.h' file not found
 ```
 
-In that case, run
+In that case, run:
 
 ```sh
 bundle config build.eventmachine --with-cppflags="-I$(brew --prefix openssl)/include"
