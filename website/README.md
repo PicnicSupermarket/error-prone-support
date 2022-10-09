@@ -24,12 +24,12 @@ If you are not familiar with Jekyll, be sure to check out its
 [documentation][jekyll-docs]. It is recommended to follow the provided
 step-by-step tutorial.
 
-###### Switching Ruby versions
+###### Switch Ruby versions
 
 The required Ruby version is set in `.ruby-version`. To switch, you can use
 [rvm][rvm] to manage your Ruby version.
 
-###### Resolving Bundler issues
+###### Resolve Bundler issues
 
 On macOS, you may get an error such as the following when running `bundle
 install`:
