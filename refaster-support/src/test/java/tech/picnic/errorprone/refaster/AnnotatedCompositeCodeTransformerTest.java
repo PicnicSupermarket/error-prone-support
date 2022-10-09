@@ -48,7 +48,7 @@ final class AnnotatedCompositeCodeTransformerTest {
   private static final String SIMPLE_CLASS_NAME = "MyRefasterRule";
 
   private static Stream<Arguments> applyTestCases() {
-    /* { context, packageName, ruleName compositeAnnotations, delegateAnnotations, expectedDescription } */
+    /* { context, packageName, ruleName, compositeAnnotations, delegateAnnotations, expectedDescription } */
     return Stream.of(
         arguments(
             context(),
