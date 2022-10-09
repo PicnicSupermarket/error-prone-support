@@ -2,14 +2,14 @@
 
 set -e -u -o pipefail
 
-REPOSIORY_ROOT="$(git rev-parse --show-toplevel)"
-WEBSITE_ROOT="${REPOSIORY_ROOT}/website"
+REPOSITORY_ROOT="$(git rev-parse --show-toplevel)"
+WEBSITE_ROOT="${REPOSITORY_ROOT}/website"
 
 generate_homepage() {
     local homepage="${WEBSITE_ROOT}/index.md"
 
     echo "Generating ${homepage}..."
-    cat - "${REPOSIORY_ROOT}/README.md" > "${homepage}" << EOF
+    cat - "${REPOSITORY_ROOT}/README.md" > "${homepage}" << EOF
 ---
 layout: default
 title: Home
