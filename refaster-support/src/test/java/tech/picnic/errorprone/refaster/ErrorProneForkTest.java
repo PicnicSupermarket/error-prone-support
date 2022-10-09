@@ -33,7 +33,8 @@ final class ErrorProneForkTest {
 
   @Test
   void isSuggestionsAsWarningsEnabledWithFlag() {
-    assumeTrue(ErrorProneFork.isErrorProneForkAvailable());
+    assumeTrue(
+        ErrorProneFork.isErrorProneForkAvailable(), "The Error Prone fork is not on the classpath");
 
     CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .setArgs("-XepAllSuggestionsAsWarnings")
