@@ -153,7 +153,8 @@ final class RefasterRuleSelector {
     }
   }
 
-  // XXX: Decompose `RefasterRule`s such that each rule has exactly one `@BeforeTemplate`.
+  // XXX: Consider decomposing `RefasterRule`s such that each rule has exactly one
+  // `@BeforeTemplate`.
   private static ImmutableSet<ImmutableSet<String>> extractRuleIdentifiers(
       RefasterRule<?, ?> refasterRule) {
     ImmutableSet.Builder<ImmutableSet<String>> results = ImmutableSet.builder();
@@ -285,13 +286,7 @@ final class RefasterRuleSelector {
 
   private static final class RefasterIntrospection {
     private static final String UCLASS_IDENT_FQCN = "com.google.errorprone.refaster.UClassIdent";
-    // XXX: Probably there is a better way to fix this... For a few BeforeTemplates like
-    // `ImmutableMapBuilder` the algorithm wouldn't match so created this fix for now. About 10
-    // templates would always match.
-    private static final String AUTO_VALUE_UCLASS_IDENT_FQCN =
-        "com.google.errorprone.refaster.AutoValue_UClassIdent";
     private static final Class<?> UCLASS_IDENT = getClass(UCLASS_IDENT_FQCN);
-    private static final Class<?> UCLASS_AUTOVALUE_IDENT = getClass(AUTO_VALUE_UCLASS_IDENT_FQCN);
     private static final Method METHOD_REFASTER_RULE_BEFORE_TEMPLATES =
         getMethod(RefasterRule.class, "beforeTemplates");
     private static final Method METHOD_EXPRESSION_TEMPLATE_EXPRESSION =
@@ -305,7 +300,7 @@ final class RefasterRuleSelector {
     private static final Method METHOD_UANY_OF_EXPRESSIONS = getMethod(UAnyOf.class, "expressions");
 
     static boolean isUClassIdent(IdentifierTree tree) {
-      return UCLASS_IDENT.equals(tree.getClass()) || UCLASS_AUTOVALUE_IDENT.equals(tree.getClass());
+      return UCLASS_IDENT.isAssignableFrom(tree.getClass());
     }
 
     static ImmutableList<?> getBeforeTemplates(RefasterRule<?, ?> refasterRule) {
@@ -320,12 +315,11 @@ final class RefasterRuleSelector {
       return invokeMethod(METHOD_BLOCK_TEMPLATE_TEMPLATE_STATEMENTS, template);
     }
 
-    // Actually UClassIdent.
     static IdentifierTree getClassIdent(UStaticIdent tree) {
       return invokeMethod(METHOD_USTATIC_IDENT_CLASS_IDENT, tree);
     }
 
-    // XXX: Make nicer. Or rename the other params.
+    // Arguments to this method must actually be of the package-private type `UClassIdent`.
     static String getTopLevelClass(IdentifierTree uClassIdent) {
       return invokeMethod(METHOD_UCLASS_IDENT_GET_TOP_LEVEL_CLASS, uClassIdent);
     }

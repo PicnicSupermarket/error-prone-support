@@ -8,7 +8,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +26,9 @@ abstract class Node<T> {
   // there be such an overload?
   static <T> Node<T> create(
       Set<T> values, Function<? super T, ? extends Set<? extends Set<String>>> pathExtractor) {
-    BuildNode<T> tree = BuildNode.create();
+    Builder<T> tree = Builder.create();
     tree.register(values, pathExtractor);
-    return tree.immutable();
+    return tree.build();
   }
 
   abstract ImmutableMap<String, Node<T>> children();
@@ -75,12 +74,12 @@ abstract class Node<T> {
 
   @AutoValue
   @SuppressWarnings("AutoValueImmutableFields" /* Type is used only during `Node` construction. */)
-  abstract static class BuildNode<T> {
-    private static <T> BuildNode<T> create() {
-      return new AutoValue_Node_BuildNode<>(new HashMap<>(), new ArrayList<>());
+  abstract static class Builder<T> {
+    private static <T> Builder<T> create() {
+      return new AutoValue_Node_Builder<>(new HashMap<>(), new ArrayList<>());
     }
 
-    abstract Map<String, BuildNode<T>> children();
+    abstract Map<String, Builder<T>> children();
 
     abstract List<T> values();
 
@@ -98,7 +97,7 @@ abstract class Node<T> {
          * We sort paths by length ascending, so that in case of two paths where one is an initial
          * prefix of the other, only the former is encoded (thus saving some space).
          */
-        Collections.sort(paths, comparingInt(Set::size));
+        paths.sort(comparingInt(Set::size));
         paths.forEach(path -> registerPath(value, ImmutableList.sortedCopyOf(path)));
       }
     }
@@ -118,9 +117,9 @@ abstract class Node<T> {
       }
     }
 
-    private Node<T> immutable() {
+    private Node<T> build() {
       return new AutoValue_Node<>(
-          ImmutableMap.copyOf(Maps.transformValues(children(), BuildNode::immutable)),
+          ImmutableMap.copyOf(Maps.transformValues(children(), Builder::build)),
           ImmutableList.copyOf(values()));
     }
   }
