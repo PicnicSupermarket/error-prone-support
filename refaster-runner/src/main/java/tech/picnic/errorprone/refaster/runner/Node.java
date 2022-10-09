@@ -3,7 +3,6 @@ package tech.picnic.errorprone.refaster.runner;
 import static java.util.Comparator.comparingInt;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -24,9 +23,10 @@ import java.util.function.Function;
  */
 @AutoValue
 abstract class Node<T> {
+  // XXX: Review: should this method accept a `SetMultimap<V, ? extends Set<String>>`, or should
+  // there be such an overload?
   static <T> Node<T> create(
-      ImmutableList<T> values,
-      Function<? super T, ? extends Set<? extends Set<String>>> pathExtractor) {
+      Set<T> values, Function<? super T, ? extends Set<? extends Set<String>>> pathExtractor) {
     BuildNode<T> tree = BuildNode.create();
     tree.register(values, pathExtractor);
     return tree.immutable();
@@ -91,8 +91,7 @@ abstract class Node<T> {
      * leads to the same value.
      */
     private void register(
-        ImmutableCollection<T> values,
-        Function<? super T, ? extends Set<? extends Set<String>>> pathsExtractor) {
+        Set<T> values, Function<? super T, ? extends Set<? extends Set<String>>> pathsExtractor) {
       for (T value : values) {
         List<? extends Set<String>> paths = new ArrayList<>(pathsExtractor.apply(value));
         /*

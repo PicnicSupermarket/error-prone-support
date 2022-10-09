@@ -1287,6 +1287,9 @@
                     <artifactId>pitest-maven</artifactId>
                     <version>1.9.7</version>
                     <configuration>
+                        <excludedClasses>
+                            <excludedClass>*.AutoValue_*</excludedClass>
+                        </excludedClasses>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->
@@ -1352,6 +1355,23 @@
                     </dependency>
                 </dependencies>
             </dependencyManagement>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <configuration>
+                                <systemPropertyVariables>
+                                    <!-- Property used by `ErrorProneForkTest`
+                                    to verify fork indentification. -->
+                                    <error-prone-fork-in-use>true</error-prone-fork-in-use>
+                                </systemPropertyVariables>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
         <profile>
             <!-- Error Prone checks that are not available from Maven Central;
@@ -1567,6 +1587,11 @@
                                     failing the build on the first error
                                     encountered. -->
                                     -XepAllErrorsAsWarnings
+                                    <!-- Some generated classes violate Error
+                                    Prone bug patterns. We cannot in all cases
+                                    avoid that, so we simply tell Error Prone
+                                    not to warn about generated code. -->
+                                    -XepDisableWarningsInGeneratedCode
                                     <!-- We want to enable almost all Error
                                     Prone bug pattern checkers, so we enable
                                     all and then selectively deactivate some. -->

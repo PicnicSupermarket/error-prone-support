@@ -4,8 +4,11 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Collections.newSetFromMap;
 import static java.util.stream.Collectors.toCollection;
 
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.CodeTransformer;
+import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.refaster.BlockTemplate;
 import com.google.errorprone.refaster.ExpressionTemplate;
 import com.google.errorprone.refaster.RefasterRule;
@@ -35,8 +38,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
+import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
 
 // XXX: Add some examples of which source files would match what templates in the tree.
 // XXX: Consider this text in general.
@@ -83,20 +88,24 @@ import javax.annotation.Nullable;
  * chance of matching. As a result, the performance of Refaster increases significantly.
  */
 final class RefasterRuleSelector {
-  private final Node<RefasterRule<?, ?>> treeRules;
+  private final Node<CodeTransformer> codeTransformers;
 
-  private RefasterRuleSelector(Node<RefasterRule<?, ?>> treeRules) {
-    this.treeRules = treeRules;
-  }
-
-  /** Instantiates a new {@link RefasterRuleSelector} backed by the given {@link RefasterRule}s. */
-  static RefasterRuleSelector create(ImmutableList<RefasterRule<?, ?>> refasterRules) {
-    return new RefasterRuleSelector(
-        Node.create(refasterRules, RefasterRuleSelector::extractTemplateIdentifiers));
+  private RefasterRuleSelector(Node<CodeTransformer> codeTransformers) {
+    this.codeTransformers = codeTransformers;
   }
 
   /**
-   * Retrieve a set of Refaster templates that can possibly match based on a {@link
+   * Instantiates a new {@link RefasterRuleSelector} backed by the given {@link CodeTransformer}s.
+   */
+  static RefasterRuleSelector create(ImmutableCollection<CodeTransformer> refasterRules) {
+    Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> ruleIdentifiersByTransformer =
+        indexRuleIdentifiers(refasterRules);
+    return new RefasterRuleSelector(
+        Node.create(ruleIdentifiersByTransformer.keySet(), ruleIdentifiersByTransformer::get));
+  }
+
+  /**
+   * Retrieves a set of Refaster templates that can possibly match based on a {@link
    * CompilationUnitTree}.
    *
    * @param tree The {@link CompilationUnitTree} for which candidate Refaster templates are
@@ -104,25 +113,59 @@ final class RefasterRuleSelector {
    * @return Set of Refaster templates that can possibly match in the provided {@link
    *     CompilationUnitTree}.
    */
-  Set<RefasterRule<?, ?>> selectCandidateRules(CompilationUnitTree tree) {
-    Set<RefasterRule<?, ?>> candidateRules = newSetFromMap(new IdentityHashMap<>());
-    treeRules.collectReachableValues(extractSourceIdentifiers(tree), candidateRules::add);
+  Set<CodeTransformer> selectCandidateRules(CompilationUnitTree tree) {
+    Set<CodeTransformer> candidateRules = newSetFromMap(new IdentityHashMap<>());
+    codeTransformers.collectReachableValues(extractSourceIdentifiers(tree), candidateRules::add);
     return candidateRules;
   }
 
+  private static Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> indexRuleIdentifiers(
+      ImmutableCollection<CodeTransformer> codeTransformers) {
+    IdentityHashMap<CodeTransformer, ImmutableSet<ImmutableSet<String>>> identifiers =
+        new IdentityHashMap<>();
+    for (CodeTransformer transformer : codeTransformers) {
+      collectRuleIdentifiers(transformer, identifiers);
+    }
+    return identifiers;
+  }
+
+  private static void collectRuleIdentifiers(
+      CodeTransformer codeTransformer,
+      Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> identifiers) {
+    if (codeTransformer instanceof CompositeCodeTransformer) {
+      for (CodeTransformer transformer :
+          ((CompositeCodeTransformer) codeTransformer).transformers()) {
+        collectRuleIdentifiers(transformer, identifiers);
+      }
+    } else if (codeTransformer instanceof AnnotatedCompositeCodeTransformer) {
+      AnnotatedCompositeCodeTransformer annotatedTransformer =
+          (AnnotatedCompositeCodeTransformer) codeTransformer;
+      for (Map.Entry<CodeTransformer, ImmutableSet<ImmutableSet<String>>> e :
+          indexRuleIdentifiers(annotatedTransformer.transformers()).entrySet()) {
+        identifiers.put(annotatedTransformer.withTransformer(e.getKey()), e.getValue());
+      }
+    } else if (codeTransformer instanceof RefasterRule) {
+      identifiers.put(
+          codeTransformer, extractRuleIdentifiers((RefasterRule<?, ?>) codeTransformer));
+    } else {
+      /* Unrecognized `CodeTransformer` types are indexed such that they always apply. */
+      identifiers.put(codeTransformer, ImmutableSet.of(ImmutableSet.of()));
+    }
+  }
+
   // XXX: Decompose `RefasterRule`s such that each rule has exactly one `@BeforeTemplate`.
-  private static ImmutableSet<ImmutableSet<String>> extractTemplateIdentifiers(
+  private static ImmutableSet<ImmutableSet<String>> extractRuleIdentifiers(
       RefasterRule<?, ?> refasterRule) {
     ImmutableSet.Builder<ImmutableSet<String>> results = ImmutableSet.builder();
 
     for (Object template : RefasterIntrospection.getBeforeTemplates(refasterRule)) {
       if (template instanceof ExpressionTemplate) {
         UExpression expr = RefasterIntrospection.getExpression((ExpressionTemplate) template);
-        results.addAll(extractTemplateIdentifiers(ImmutableList.of(expr)));
+        results.addAll(extractRuleIdentifiers(ImmutableList.of(expr)));
       } else if (template instanceof BlockTemplate) {
         ImmutableList<UStatement> statements =
             RefasterIntrospection.getTemplateStatements((BlockTemplate) template);
-        results.addAll(extractTemplateIdentifiers(statements));
+        results.addAll(extractRuleIdentifiers(statements));
       } else {
         throw new IllegalStateException(
             String.format("Unexpected template type '%s'", template.getClass()));
@@ -133,7 +176,7 @@ final class RefasterRuleSelector {
   }
 
   // XXX: Consider interning the strings (once a benchmark is in place).
-  private static ImmutableSet<ImmutableSet<String>> extractTemplateIdentifiers(
+  private static ImmutableSet<ImmutableSet<String>> extractRuleIdentifiers(
       ImmutableList<? extends Tree> trees) {
     List<Set<String>> identifierCombinations = new ArrayList<>();
     identifierCombinations.add(new HashSet<>());

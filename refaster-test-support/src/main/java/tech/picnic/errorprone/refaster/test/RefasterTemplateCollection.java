@@ -179,11 +179,11 @@ public final class RefasterTemplateCollection extends BugChecker
     ImmutableRangeMap.Builder<Integer, String> templateMatches = ImmutableRangeMap.builder();
 
     for (Description description : matches) {
+      String templateName = extractRefasterTemplateName(description);
       Set<Replacement> replacements =
           Iterables.getOnlyElement(description.fixes).getReplacements(endPositions);
       for (Replacement replacement : replacements) {
-        templateMatches.put(
-            replacement.range(), getSubstringAfterFinalDelimiter('.', description.checkName));
+        templateMatches.put(replacement.range(), templateName);
       }
     }
 
@@ -228,6 +228,13 @@ public final class RefasterTemplateCollection extends BugChecker
             ? SuggestedFix.prefixWith(tree, comment)
             : SuggestedFix.postfixWith(tree, '\n' + comment);
     state.reportMatch(describeMatch(tree, fixWithComment));
+  }
+
+  private static String extractRefasterTemplateName(Description description) {
+    String message = description.getRawMessage();
+    int index = message.indexOf(':');
+    checkState(index >= 0, "Failed to extract Refaster template name from string '%s'", message);
+    return getSubstringAfterFinalDelimiter('.', message.substring(0, index));
   }
 
   private static String getSubstringAfterFinalDelimiter(char delimiter, String value) {
