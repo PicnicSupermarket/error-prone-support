@@ -1364,7 +1364,7 @@
                             <configuration>
                                 <systemPropertyVariables>
                                     <!-- Property used by `ErrorProneForkTest`
-                                    to verify fork indentification. -->
+                                    to verify fork identification. -->
                                     <error-prone-fork-in-use>true</error-prone-fork-in-use>
                                 </systemPropertyVariables>
                             </configuration>
