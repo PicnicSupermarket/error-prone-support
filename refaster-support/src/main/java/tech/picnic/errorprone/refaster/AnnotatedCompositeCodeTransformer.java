@@ -37,7 +37,6 @@ import tech.picnic.errorprone.refaster.annotation.Severity;
  * annotations} available on the matching {@link CodeTransformer} or on this {@link
  * CompositeCodeTransformer} as a fallback, if any.
  */
-// XXX: Test this class directly. (Right now it's only indirectly tested through `RefasterTest`.)
 @AutoValue
 public abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serializable {
   private static final long serialVersionUID = 1L;
