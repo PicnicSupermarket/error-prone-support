@@ -91,11 +91,6 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     Set<RefasterRule<?, ?>> candidateRules = ruleSelector.selectCandidateRules(tree);
 
-    // XXX: Remove these debug lines
-    // String removeThis = candidateRules.stream().map(Object::toString).collect(joining(","));
-    // System.out.printf("\n---Templates for %s: \n%s\n", tree.getSourceFile().getName(),
-    // removeThis);
-
     /* First, collect all matches. */
     SubContext context = new SubContext(state.context);
     List<Description> matches = new ArrayList<>();
