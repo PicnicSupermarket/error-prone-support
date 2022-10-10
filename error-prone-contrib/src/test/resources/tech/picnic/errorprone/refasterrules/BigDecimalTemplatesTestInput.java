@@ -2,9 +2,9 @@ package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class BigDecimalTemplatesTest implements RefasterTemplateTestCase {
+final class BigDecimalTemplatesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<BigDecimal> testBigDecimalZero() {
     return ImmutableSet.of(BigDecimal.valueOf(0), BigDecimal.valueOf(0L), new BigDecimal("0"));
   }

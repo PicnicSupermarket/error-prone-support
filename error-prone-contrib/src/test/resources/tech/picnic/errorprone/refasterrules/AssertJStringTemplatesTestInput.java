@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractStringAssert;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class AssertJStringTemplatesTest implements RefasterTemplateTestCase {
+final class AssertJStringTemplatesTest implements RefasterRuleCollectionTestCase {
   void testAbstractStringAssertStringIsEmpty() {
     assertThat("foo").isEqualTo("");
   }

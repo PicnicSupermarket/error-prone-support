@@ -11,9 +11,9 @@ import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 import com.google.common.collect.ImmutableSet;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.WebClient;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class WebClientTemplatesTest implements RefasterTemplateTestCase {
+final class WebClientTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(fromValue(""), GET, HEAD, OPTIONS, PATCH, POST, PUT);

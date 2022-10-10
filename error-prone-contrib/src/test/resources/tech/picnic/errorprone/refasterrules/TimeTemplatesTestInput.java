@@ -13,9 +13,9 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class TimeTemplatesTest implements RefasterTemplateTestCase {
+final class TimeTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(ChronoUnit.class);

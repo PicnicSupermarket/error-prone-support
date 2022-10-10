@@ -1,7 +1,7 @@
 package tech.picnic.errorprone.refaster.test;
 
 /** Code to test the Refaster rules from {@link MissingTestAndWrongTestTemplates}. */
-final class MissingTestAndWrongTestTemplatesTest implements RefasterTemplateTestCase {
+final class MissingTestAndWrongTestTemplatesTest implements RefasterRuleCollectionTestCase {
   /*
    *  ERROR: The following matches unexpectedly occurred in method `testWrongName`:
    *  - Template `StringIsEmpty` matches on line 6, while it should match in a method named `testStringIsEmpty`.

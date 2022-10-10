@@ -11,9 +11,9 @@ import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class AssertJThrowingCallableTemplatesTest implements RefasterTemplateTestCase {
+final class AssertJThrowingCallableTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(

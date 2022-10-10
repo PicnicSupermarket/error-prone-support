@@ -13,9 +13,9 @@ import com.google.common.collect.Streams;
 import com.google.common.collect.TreeMultimap;
 import java.util.Map;
 import java.util.stream.Stream;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class ImmutableSetMultimapTemplatesTest implements RefasterTemplateTestCase {
+final class ImmutableSetMultimapTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Streams.class, flatteningToImmutableSetMultimap(null, null));

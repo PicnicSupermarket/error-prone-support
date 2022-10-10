@@ -10,9 +10,9 @@ import io.reactivex.Single;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class RxJava2AdapterTemplatesTest implements RefasterTemplateTestCase {
+final class RxJava2AdapterTemplatesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Mono<Void>> testCompletableToMono() {
     return ImmutableSet.of(
         Completable.complete().as(RxJava2Adapter::completableToMono),

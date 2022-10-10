@@ -6,9 +6,9 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.ImmutableSet;
 import org.mockito.verification.VerificationMode;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class MockitoTemplatesTest implements RefasterTemplateTestCase {
+final class MockitoTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(times(1));

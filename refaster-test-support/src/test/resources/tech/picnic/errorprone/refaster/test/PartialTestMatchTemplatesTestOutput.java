@@ -1,7 +1,7 @@
 package tech.picnic.errorprone.refaster.test;
 
 /** Code to test the Refaster rules from {@link PartialTestMatchTemplates}. */
-final class PartialTestMatchTemplatesTest implements RefasterTemplateTestCase {
+final class PartialTestMatchTemplatesTest implements RefasterRuleCollectionTestCase {
   /*
    *  ERROR: The following matches unexpectedly occurred in method `testStringIsEmpty`:
    *  - Template `StringEquals` matches on line 6, while it should match in a method named `testStringEquals`.

@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.AbstractAssert;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class AssertJPrimitiveTemplatesTest implements RefasterTemplateTestCase {
+final class AssertJPrimitiveTemplatesTest implements RefasterRuleCollectionTestCase {
   @SuppressWarnings("SimplifyBooleanExpression")
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsEqualTo() {
     return ImmutableSet.of(

@@ -3,9 +3,9 @@ package tech.picnic.errorprone.refasterrules;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.assertj.core.api.AbstractAssert;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class AssertJObjectTemplatesTest implements RefasterTemplateTestCase {
+final class AssertJObjectTemplatesTest implements RefasterRuleCollectionTestCase {
   AbstractAssert<?, ?> testAssertThatIsInstanceOf() {
     return assertThat("foo").isInstanceOf(String.class);
   }

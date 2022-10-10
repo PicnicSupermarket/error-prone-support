@@ -2,9 +2,9 @@ package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class PrimitiveTemplatesTest implements RefasterTemplateTestCase {
+final class PrimitiveTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Ints.class);

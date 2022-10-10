@@ -10,9 +10,9 @@ import com.google.common.collect.Streams;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Stream;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class ImmutableSortedSetTemplatesTest implements RefasterTemplateTestCase {
+final class ImmutableSortedSetTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Arrays.class, Streams.class);

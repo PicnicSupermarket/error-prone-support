@@ -6,9 +6,9 @@ import static org.assertj.core.data.Percentage.withPercentage;
 
 import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.AbstractIntegerAssert;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class AssertJIntegerTemplatesTest implements RefasterTemplateTestCase {
+final class AssertJIntegerTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(offset(0), withPercentage(0));

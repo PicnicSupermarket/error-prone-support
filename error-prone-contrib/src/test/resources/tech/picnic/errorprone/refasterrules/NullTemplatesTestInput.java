@@ -4,9 +4,9 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import java.util.Objects;
 import java.util.stream.Stream;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class NullTemplatesTest implements RefasterTemplateTestCase {
+final class NullTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(MoreObjects.class);
