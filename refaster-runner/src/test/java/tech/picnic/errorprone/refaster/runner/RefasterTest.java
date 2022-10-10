@@ -37,7 +37,7 @@ final class RefasterTest {
               containsPattern(
                   "\\[Refaster Rule\\] FooTemplates\\.StringOfSizeOneTemplate: "
                       + "A custom description about matching single-char strings\\s+.+\\s+"
-                      + "\\(see https://error-prone.picnic.tech/refastertemplates/FooTemplates#StringOfSizeOneTemplate\\)"))
+                      + "\\(see https://error-prone.picnic.tech/refasterrules/FooTemplates#StringOfSizeOneTemplate\\)"))
           .expectErrorMessage(
               "StringOfSizeTwoTemplate",
               containsPattern(
