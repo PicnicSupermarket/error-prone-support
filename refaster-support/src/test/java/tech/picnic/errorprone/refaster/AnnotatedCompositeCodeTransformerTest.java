@@ -38,7 +38,7 @@ import tech.picnic.errorprone.refaster.annotation.Severity;
 
 // XXX: Test the `ErrorProneOptions`-based severity override logic. (Right now that logic is tested
 // through `RefasterTest`, but ideally it is covered by tests in this class, closer to the code that
-// implements the relevant logic.)
+// implements the relevant logic.) See the comment in `#context()` below.
 final class AnnotatedCompositeCodeTransformerTest {
   private static final DiagnosticPosition DUMMY_POSITION = mock(DiagnosticPosition.class);
   private static final Fix DUMMY_FIX = mock(Fix.class);
@@ -179,9 +179,10 @@ final class AnnotatedCompositeCodeTransformerTest {
   }
 
   private static Context context() {
+    // XXX: Use `ErrorProneOptions#processArgs` to test the
+    // `AnnotatedCompositeCodeTransformer#overrideSeverity` logic.
     Context context = mock(Context.class);
-    when(context.get(ErrorProneOptions.class))
-        .thenReturn(ErrorProneOptions.processArgs(ImmutableList.of()));
+    when(context.get(ErrorProneOptions.class)).thenReturn(ErrorProneOptions.empty());
     return context;
   }
 
