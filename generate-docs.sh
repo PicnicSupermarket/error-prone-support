@@ -6,8 +6,8 @@ DOCS_FOLDER="docs"
 BUGPATTERN_FOLDER="${WEBSITE_FOLDER}/bugpatterns"
 BUGPATTERN_DOCS_FOLDER="${DOCS_FOLDER}/bugpatterns"
 
-REFASTER_FOLDER="${WEBSITE_FOLDER}/refastertemplates"
-REFASTER_DOCS_FOLDER="${DOCS_FOLDER}/refastertemplates"
+REFASTER_FOLDER="${WEBSITE_FOLDER}/refasterrules"
+REFASTER_DOCS_FOLDER="${DOCS_FOLDER}/refasterrules"
 
 HOMEPAGE="${WEBSITE_FOLDER}/index.md"
 
@@ -63,7 +63,7 @@ generate_refaster_docs() {
 ---
 layout: default
 title: ${NAME}
-parent: Refaster templates
+parent: Refaster Rules
 nav_order: 1
 ---
 
@@ -83,7 +83,7 @@ ${EXTRA_DOCS}
 public static void sample() {}
 \`\`\`
 
-<a href="https://github.com/PicnicSupermarket/error-prone-support/blob/master/${TEMPLATE}" class="fs-3 btn external" target="_blank">
+<a href="https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/${NAME}.java" class="fs-3 btn external" target="_blank">
     View source code on GitHub
     <svg viewBox="0 0 24 24" aria-labelledby="svg-external-link-title"><use xlink:href="#svg-external-link"></use></svg>
 </a>
