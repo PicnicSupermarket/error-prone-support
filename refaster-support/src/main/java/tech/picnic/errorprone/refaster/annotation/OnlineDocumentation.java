@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Signals that a Refaster template or group of Refaster templates comes with online documentation.
+ * Signals that a Refaster rule or group of Refaster rule comes with online documentation.
  *
  * <p>The provided value may be a full URL, or a URL pattern containing either or both of the
  * {@value TOP_LEVEL_CLASS_URL_PLACEHOLDER} and {@value NESTED_CLASS_URL_PLACEHOLDER} placeholders.
@@ -42,7 +42,7 @@ public @interface OnlineDocumentation {
    *     TOP_LEVEL_CLASS_URL_PLACEHOLDER} and {@value NESTED_CLASS_URL_PLACEHOLDER} placeholders.
    */
   String value() default
-      "https://error-prone.picnic.tech/refastertemplates/"
+      "https://error-prone.picnic.tech/refasterrules/"
           + TOP_LEVEL_CLASS_URL_PLACEHOLDER
           + '#'
           + NESTED_CLASS_URL_PLACEHOLDER;
