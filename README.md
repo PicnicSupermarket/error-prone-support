@@ -122,7 +122,7 @@ $ mvn clean install
 [INFO] -------------------------------------------------------------
 [WARNING] COMPILATION WARNING :
 [INFO] -------------------------------------------------------------
-[WARNING] Example.java:[9,34] [tech.picnic.errorprone.refastertemplates.BigDecimalTemplates.BigDecimalZero]
+[WARNING] Example.java:[9,34] [tech.picnic.errorprone.refasterrules.BigDecimalTemplates.BigDecimalZero]
   Did you mean 'return BigDecimal.ZERO;'?
 [WARNING] Example.java:[13,35] [IdentityConversion] This method invocation appears redundant; remove it or suppress this warning and add a comment explaining its purpose
     (see https://error-prone.picnic.tech/bugpatterns/IdentityConversion)
