@@ -4,8 +4,8 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 
 /**
- * Refaster rule collection to validate that matches for one template in a test method meant to
- * cover another template are reported.
+ * Refaster rule collection to validate that matches for one rule in a test method meant to cover
+ * another rule are reported.
  */
 final class PartialTestMatchTemplates {
   private PartialTestMatchTemplates() {}

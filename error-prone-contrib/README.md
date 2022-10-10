@@ -267,7 +267,7 @@ Refaster's expressiveness:
   motivating example, see the two subtly different loop definitions in
   `CollectionRemoveAllFromCollectionExpression`.
 - Figure out why Refaster sometimes doesn't match the correct generic overload.
-  See the `AssertThatIterableHasOneComparableElementEqualTo` template for an
+  See the `AssertThatIterableHasOneComparableElementEqualTo` rule for an
   example.
 
 [autorefactor]: https://autorefactor.org
