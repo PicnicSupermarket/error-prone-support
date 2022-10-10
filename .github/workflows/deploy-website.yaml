@@ -2,7 +2,7 @@ name: Update `error-prone.picnic.tech` website content
 on:
   pull_request:
   push:
-    branches: [ master, develop ]
+    branches: [ master, website ]
 permissions:
   contents: read
   id-token: write
