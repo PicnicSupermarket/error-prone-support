@@ -52,7 +52,7 @@ import java.util.stream.Stream;
     tags = SIMPLIFICATION)
 public final class Refaster extends BugChecker implements CompilationUnitTreeMatcher {
   /** Flag to pass a pattern that restricts which Refaster rules are loaded. */
-  public static final String INCLUDED_TEMPLATES_PATTERN_FLAG = "Refaster:NamePattern";
+  public static final String INCLUDED_RULES_PATTERN_FLAG = "Refaster:NamePattern";
 
   private static final long serialVersionUID = 1L;
 
@@ -151,7 +151,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
         CodeTransformers.getAllCodeTransformers();
     return CompositeCodeTransformer.compose(
         flags
-            .get(INCLUDED_TEMPLATES_PATTERN_FLAG)
+            .get(INCLUDED_RULES_PATTERN_FLAG)
             .map(Pattern::compile)
             .<ImmutableCollection<CodeTransformer>>map(
                 nameFilter -> filterCodeTransformers(allTransformers, nameFilter))
