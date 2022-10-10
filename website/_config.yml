@@ -12,9 +12,13 @@ plugins:
 
 # Files and directories not to be deployed through GitHub pages.
 exclude:
+  - bug-pattern.mustache
   - Gemfile
   - Gemfile.lock
+  - index.mustache
+  - generate-docs.rb
   - README.md
+  - refaster-rule-collection.mustache
   - vendor
 
 # See https://jekyllrb.com/docs/permalinks/#built-in-formats.

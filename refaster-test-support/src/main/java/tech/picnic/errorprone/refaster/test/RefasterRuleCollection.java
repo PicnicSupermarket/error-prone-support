@@ -9,6 +9,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.util.Comparator.naturalOrder;
 import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_RULES_PATTERN_FLAG;
 
+import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
@@ -128,12 +129,13 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     JavaFileObject outputFile =
         FileObjects.forResource(clazz, "output/" + className + "TestOutput.java");
 
-    String inputContent, outputContent;
+    String inputContent;
+    String outputContent;
     try {
       inputContent = inputFile.getCharContent(true).toString();
       outputContent = outputFile.getCharContent(true).toString();
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new VerifyException(e);
     }
 
     BugCheckerRefactoringTestHelper.newInstance(RefasterRuleCollection.class, clazz)

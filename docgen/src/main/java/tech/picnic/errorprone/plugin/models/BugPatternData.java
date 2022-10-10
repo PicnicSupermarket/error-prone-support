@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.plugin.models;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern.LinkType;
 import com.google.errorprone.BugPattern.SeverityLevel;
 
@@ -9,30 +10,40 @@ import com.google.errorprone.BugPattern.SeverityLevel;
 @AutoValue
 public abstract class BugPatternData {
   public static BugPatternData create(
+      String fullyQualifiedName,
       String name,
-      String altNames,
+      ImmutableList<String> altNames,
       LinkType linkType,
       String link,
-      String tags,
+      ImmutableList<String> tags,
       String summary,
       String explanation,
       SeverityLevel severityLevel,
       boolean disableable) {
     return new AutoValue_BugPatternData(
-        name, altNames, linkType, link, tags, summary, explanation, severityLevel, disableable);
+        fullyQualifiedName,
+        name,
+        altNames,
+        linkType,
+        link,
+        tags,
+        summary,
+        explanation,
+        severityLevel,
+        disableable);
   }
+
+  abstract String fullyQualifiedName();
 
   abstract String name();
 
-  // XXX: Should be `String[]`.
-  abstract String altNames();
+  abstract ImmutableList<String> altNames();
 
   abstract LinkType linkType();
 
   abstract String link();
 
-  // XXX: Should be `String[]`.
-  abstract String tags();
+  abstract ImmutableList<String> tags();
 
   abstract String summary();
 

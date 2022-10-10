@@ -1,0 +1,52 @@
+---
+layout: default
+title: {{name}}
+description: "{{{summary}}}"
+parent: Bug Patterns
+nav_order: 1
+---
+
+# {{name}}
+
+{{#severity_level}}
+{{{content}}}
+  {: .label .label-{{{color}}} }
+{{/severity_level}}
+{{#tags}}
+{{.}}
+  {: .label }
+{{/tags}}
+
+{: .summary }
+{{{summary}}}
+
+{{{explanation}}}
+
+{{#suppression}}
+## Suppression
+{{{suppression}}}
+{{/suppression}}
+
+{{#has_samples}}
+## Samples
+
+{{#diff_samples}}
+```diff
+{{{.}}}
+```
+{{/diff_samples}}
+
+{{#java_samples}}
+```java
+{{{.}}}
+```
+{{/java_samples}}
+{{/has_samples}}
+
+<a href="https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/{{bugpattern}}" class="fs-3 btn external"
+   target="_blank">
+    View source code on GitHub
+    <svg viewBox="0 0 24 24" aria-labelledby="svg-external-link-title">
+        <use xlink:href="#svg-external-link"></use>
+    </svg>
+</a>

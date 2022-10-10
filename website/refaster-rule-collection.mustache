@@ -1,0 +1,56 @@
+---
+layout: default
+title: {{{collection_name}}}
+parent: Refaster Rules
+---
+
+# {{{collection_name}}}
+{: .no_toc }
+
+{{#severity_level}}
+{{{content}}}
+  {: .label .label-{{{color}}} }
+{{/severity_level}}
+{{#tags}}
+{{.}}
+  {: .label }
+{{/tags}}
+
+<a href="{{location}}" class="fs-3 btn external"
+   target="_blank">
+    View source code on GitHub
+    <svg viewBox="0 0 24 24" aria-labelledby="svg-external-link-title">
+        <use xlink:href="#svg-external-link"></use>
+    </svg>
+</a>
+
+<details open markdown="block">
+  <summary>
+    Table of contents
+  </summary>
+  {: .text-delta }
+  1. TOC
+  {:toc}
+</details>
+
+{{#rules}}
+## {{rule_name}}
+
+{{#severity_level}}
+{{{content}}}
+  {: .label .label-{{{color}}} }
+{{/severity_level}}
+{{#tags}}
+{{.}}
+  {: .label }
+{{/tags}}
+
+### Samples
+{: .no_toc .text-delta }
+
+{{#samples}}
+```diff
+{{{.}}}
+```
+{{/samples}}
+{{/rules}}

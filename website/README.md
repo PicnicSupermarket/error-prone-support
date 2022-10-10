@@ -2,7 +2,8 @@
 
 This directory contains the majority of the source code that powers
 [error-prone.picnic.tech][error-prone-support-website]. The website is
-statically generated using [Jekyll][jekyll].
+statically generated using data extracted from source code passed to
+[Jekyll][jekyll] through [Mustache][mustache].
 
 # Local development
 
@@ -11,11 +12,12 @@ instructions][jekyll-docs-installation]. Once done, in this directory execute:
 
 ```sh
 bundle install
-../generate-docs.sh && bundle exec jekyll serve --livereload
+bundle exec ruby generate-docs.rb
+bundle exec jekyll serve --livereload -I --skip-initial-build
 ```
 
 The website will now be [available][localhost-port-4000] on port 4000. Source
-code modifications (including the result of rerunning `../generate-docs.sh`)
+code modifications (including the result of rerunning `generate-docs.rb`)
 will automatically be reflected. (An exception is `_config.yml`: changes to
 this file require a server restart.) Subsequent server restarts do not require
 running `bundle install`, unless `Gemfile` has been updated in the interim.
@@ -23,6 +25,9 @@ running `bundle install`, unless `Gemfile` has been updated in the interim.
 If you are not familiar with Jekyll, be sure to check out its
 [documentation][jekyll-docs]. It is recommended to follow the provided
 step-by-step tutorial.
+
+On top of Jekyll, we use the [just-the-docs][just-the-docs] theme, having
+various configuration options itself.
 
 ###### Switch Ruby versions
 
@@ -56,5 +61,7 @@ Actions workflow any time a change is merged to `master`.
 [jekyll]: https://jekyllrb.com
 [jekyll-docs]: https://jekyllrb.com/docs
 [jekyll-docs-installation]: https://jekyllrb.com/docs/installation
+[just-the-docs]: https://just-the-docs.github.io/just-the-docs/
 [localhost-port-4000]: http://127.0.0.1:4000
+[mustache]: https://mustache.github.io/
 [rvm]: https://rvm.io

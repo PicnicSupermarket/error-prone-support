@@ -103,10 +103,16 @@ final class DocgenTaskListener implements TaskListener {
 
   private static boolean isBugPatternTest(ClassTree tree) {
     return tree.getSimpleName().toString().endsWith("Test")
+        // XXX: Instead, omit files from the util directory
+        && !tree.getSimpleName().toString().equals("MethodMatcherFactoryTest")
         && tree.getMembers().stream()
             .filter(VariableTree.class::isInstance)
             .map(VariableTree.class::cast)
-            .anyMatch(vt -> vt.getType().toString().equals("BugCheckerRefactoringTestHelper"));
+            .map(vt -> vt.getType().toString())
+            .anyMatch(
+                vt ->
+                    vt.equals("BugCheckerRefactoringTestHelper")
+                        || vt.equals("CompilationTestHelper"));
   }
 
   private static String getSimpleClassName(String path) {

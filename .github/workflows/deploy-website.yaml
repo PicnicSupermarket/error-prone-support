@@ -22,11 +22,10 @@ jobs:
           bundler-cache: true
       - name: Configure Github Pages
         uses: actions/configure-pages@v2.1.1
+      # XXX: Run website/generate-docs.rb instead.
       - name: Generate documentation
-        run: ./generate-docs.sh
-      - name: Build website with Jekyll
         working-directory: ./website
-        run: bundle exec jekyll build
+        run: bundle exec ruby generate-docs.rb
       - name: Validate HTML output
         working-directory: ./website
         # XXX: Drop `--disable_external true` once we fully adopted the

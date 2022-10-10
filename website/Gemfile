@@ -1,6 +1,9 @@
 ruby File.read(".ruby-version").strip
 
 source "https://rubygems.org"
+gem "diffy", "~> 3.4.0"
 gem "github-pages", "~> 227"
+gem "json", "~> 2.6"
+gem "mustache", "~> 1.0"
 gem "rake", "~> 13.0" # Required for "just-the-docs" theme
 gem "webrick", "~> 1.7"

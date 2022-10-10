@@ -24,6 +24,7 @@ import tech.picnic.errorprone.plugin.models.BugPatternTestData;
 public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTestData> {
   private static final Matcher<MethodTree> JUNIT_TEST_METHOD =
       allOf(hasAnnotation("org.junit.jupiter.api.Test"));
+
   private static final Matcher<ExpressionTree> IDENTIFICATION_SOURCE_LINES =
       instanceMethod()
           .onDescendantOf("com.google.errorprone.CompilationTestHelper")
@@ -84,7 +85,7 @@ public final class BugPatternTestsExtractor implements DocExtractor<BugPatternTe
       return super.visitMethodInvocation(node, unused);
     }
 
-    private String getSourceLines(MethodInvocationTree tree) {
+    private static String getSourceLines(MethodInvocationTree tree) {
       List<? extends ExpressionTree> sourceLines =
           tree.getArguments().subList(1, tree.getArguments().size());
       StringBuilder source = new StringBuilder();
