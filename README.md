@@ -136,12 +136,12 @@ Two things are kicking in here:
 
 1. An Error Prone [`BugChecker`][error-prone-bugchecker] that flags unnecessary
    [identity conversions][bug-checks-identity-conversion].
-2. A [Refaster][refaster] template capable of
-   [rewriting][refaster-templates-bigdecimal] expressions of the form
+2. A [Refaster][refaster] rule capable of
+   [rewriting][refaster-rules-bigdecimal] expressions of the form
    `BigDecimal.valueOf(0)` and `new BigDecimal(0)` to `BigDecimal.ZERO`.
 
 Be sure to check out all [bug checks][bug-checks] and [refaster
-templates][refaster-templates].
+rules][refaster-rules].
 
 ## 👷 Developing Error Prone Support
 
@@ -227,5 +227,5 @@ guidelines][contributing].
 [pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
 [refaster]: https://errorprone.info/docs/refaster
-[refaster-templates-bigdecimal]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/BigDecimalTemplates.java
-[refaster-templates]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/
+[refaster-rules-bigdecimal]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/BigDecimalTemplates.java
+[refaster-rules]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/
