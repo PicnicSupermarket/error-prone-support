@@ -36,22 +36,22 @@ exactly match the contents of a provided output file.
 To adopt this setup, the following requirements must be met:
 
 - Each Refaster rule collection must match the naming convention
-  `<RuleCollectionName>Templates.java`.
+  `<RuleCollectionName>Rules.java`.
 - There is a test class with a (parameterized) test method that invokes
   `RefasterRuleCollection#validate` on the rule collection(s) to be
   validated.
 - For every rule collection there is an input file matching the naming
-  convention `<RuleCollectionName>TemplatesTestInput.java`.
+  convention `<RuleCollectionName>RulesTestInput.java`.
 - For every rule collection there is an output file matching the naming
-  convention `<RuleCollectionName>TemplatesTestOutput.java`.
+  convention `<RuleCollectionName>RulesTestOutput.java`.
 - For every Refaster rule in a collection, the associated input and output
   files must contain a method that validates the rules' behavior. The name of
   this method must be derived from the name of the Refaster rule it aims to
   validate, prefixed with `test` (i.e. `test<RefasterRuleClassName>`).
 - Each such method contains at least one expression that matches the
-  `@BeforeTemplate` of the corresponding Refaster template. As a result, the
-  output file must contain the same method with an updated expression, in
-  accordance with the associated `@AfterTemplate`.
+  `@BeforeTemplate` of the corresponding Refaster rule. As a result, the output
+  file must contain the same method with an updated expression, in accordance
+  with the associated `@AfterTemplate`.
 - Such methods must not match any _other_ Refaster rules.
 
 An example directory structure for such a setup is as follows:
@@ -60,23 +60,23 @@ src/
   main/
     java/
       tech.picnic.errorprone.refasterrules
-      └── ExampleTemplates.java  -- Contains multiple Refaster rules.
-          └── Example1Template
-          └── Example2Template
+      └── ExampleRules.java  -- Contains multiple Refaster rules.
+          └── Example1Rule
+          └── Example2Rule
   test/
     java/
       tech.picnic.errorprone.refasterrules
       └── RefasterCollectionTest.java
              -- This test class invokes
-             -- `RefasterTemplateCollection#validate`.
+             -- `RefasterRuleCollection#validate`.
     resources/
       tech.picnic.errorprone.refasterrules
-      └── ExampleTemplatesTestInput.java
-             -- Contains a class named `ExampleTemplatesTest` and
-             -- two methods named `testExample1Template` and
-             -- `testExample2Template`.
-      └── ExampleTemplatesTestOutput.java
-             -- Contains a class named `ExampleTemplatesTest` and
-             -- two methods named `testExample1Template` and
-             -- `testExample2Template`.
+      └── ExampleRulesTestInput.java
+             -- Contains a class named `ExampleRulesTest` and
+             -- two methods named `testExample1Rule` and
+             -- `testExample2Rule`.
+      └── ExampleRulesTestOutput.java
+             -- Contains a class named `ExampleRulesTest` and
+             -- two methods named `testExample1Rule` and
+             -- `testExample2Rule`.
 ```

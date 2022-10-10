@@ -56,7 +56,7 @@ import tech.picnic.errorprone.refaster.runner.Refaster;
  * <p>The test input and output files must be classpath resources located in the same package as the
  * rule collection class. Their names are derived from the rule collection class by suffixing {@code
  * TestInput.java} and {@code TestOutput.java}, respectively. Each test method's name must be
- * derived from the template that modifies said method by prefixing {@code test}.
+ * derived from the rule that modifies said method by prefixing {@code test}.
  */
 // XXX: This check currently only validates that one `Refaster.anyOf` branch in one
 // `@BeforeTemplate` method is covered by a test. Review how we can make sure that _all_
@@ -109,7 +109,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
 
   /**
    * Verifies that all Refaster rules in the given collection class are covered by precisely one
-   * test method, defined explicitly for the purpose of exercising that template.
+   * test method, defined explicitly for the purpose of exercising that rule.
    *
    * <p>Note that a passing test does not guarantee full coverage: this test does not ascertain that
    * all {@code com.google.errorprone.refaster.Refaster#anyOf} branches are tested. Likewise for
@@ -173,18 +173,18 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
 
   private static ImmutableRangeMap<Integer, String> indexTemplateMatches(
       List<Description> matches, EndPosTable endPositions) {
-    ImmutableRangeMap.Builder<Integer, String> templateMatches = ImmutableRangeMap.builder();
+    ImmutableRangeMap.Builder<Integer, String> ruleMatches = ImmutableRangeMap.builder();
 
     for (Description description : matches) {
       Set<Replacement> replacements =
           Iterables.getOnlyElement(description.fixes).getReplacements(endPositions);
       for (Replacement replacement : replacements) {
-        templateMatches.put(
+        ruleMatches.put(
             replacement.range(), getSubstringAfterFinalDelimiter('.', description.checkName));
       }
     }
 
-    return templateMatches.build();
+    return ruleMatches.build();
   }
 
   private void reportMissingMatches(
@@ -200,7 +200,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
       reportViolations(
           tree,
           String.format(
-              "Did not encounter a test in `%s` for the following template(s)",
+              "Did not encounter a test in `%s` for the following rule(s)",
               getSubstringAfterFinalDelimiter('/', sourceFile)),
           rulesWithoutMatch,
           state);
@@ -244,21 +244,20 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     @Override
     public Void visitMethod(MethodTree tree, VisitorState state) {
       if (!ASTHelpers.isGeneratedConstructor(tree)) {
-        getTemplateUnderTest(tree, state)
-            .ifPresent(
-                templateUnderTest -> reportUnexpectedMatches(tree, templateUnderTest, state));
+        getRuleUnderTest(tree, state)
+            .ifPresent(ruleUnderTest -> reportUnexpectedMatches(tree, ruleUnderTest, state));
       }
 
       return super.visitMethod(tree, state);
     }
 
     private void reportUnexpectedMatches(
-        MethodTree tree, String templateUnderTest, VisitorState state) {
+        MethodTree tree, String ruleUnderTest, VisitorState state) {
       // XXX: Validate that `getMatchesInTree(tree, state)` returns a non-empty result (strictly
-      // speaking one of the values should match `templateUnderTest`, but we can skip that check).
+      // speaking one of the values should match `ruleUnderTest`, but we can skip that check).
 
       ImmutableListMultimap<Long, String> unexpectedMatchesByLineNumber =
-          getUnexpectedMatchesByLineNumber(getMatchesInTree(tree, state), templateUnderTest, state);
+          getUnexpectedMatchesByLineNumber(getMatchesInTree(tree, state), ruleUnderTest, state);
 
       if (!unexpectedMatchesByLineNumber.isEmpty()) {
         reportViolations(
@@ -269,14 +268,14 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
                 .map(
                     e ->
                         String.format(
-                            "Template `%s` matches on line %s, while it should match in a method named `test%s`.",
+                            "Rule `%s` matches on line %s, while it should match in a method named `test%s`.",
                             e.getValue(), e.getKey(), e.getValue()))
                 .collect(toImmutableSet()),
             state);
       }
     }
 
-    private Optional<String> getTemplateUnderTest(MethodTree tree, VisitorState state) {
+    private Optional<String> getRuleUnderTest(MethodTree tree, VisitorState state) {
       String methodName = tree.getName().toString();
       if (methodName.startsWith(TEST_METHOD_NAME_PREFIX)) {
         return Optional.of(methodName.substring(TEST_METHOD_NAME_PREFIX.length()));
@@ -310,10 +309,10 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     }
 
     private ImmutableListMultimap<Long, String> getUnexpectedMatchesByLineNumber(
-        ImmutableRangeMap<Integer, String> matches, String templateUnderTest, VisitorState state) {
+        ImmutableRangeMap<Integer, String> matches, String ruleUnderTest, VisitorState state) {
       LineMap lineMap = state.getPath().getCompilationUnit().getLineMap();
       return matches.asMapOfRanges().entrySet().stream()
-          .filter(e -> !e.getValue().equals(templateUnderTest))
+          .filter(e -> !e.getValue().equals(ruleUnderTest))
           .collect(
               toImmutableListMultimap(
                   e -> lineMap.getLineNumber(e.getKey().lowerEndpoint()), Map.Entry::getValue));

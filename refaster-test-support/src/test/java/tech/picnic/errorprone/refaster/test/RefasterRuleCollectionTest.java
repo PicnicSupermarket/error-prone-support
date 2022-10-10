@@ -17,13 +17,13 @@ final class RefasterRuleCollectionTest {
   @ParameterizedTest
   @ValueSource(
       classes = {
-        MatchInWrongMethodTemplates.class,
-        MethodWithoutPrefixTemplates.class,
-        MisnamedTestClassTemplates.class,
-        MissingTestAndWrongTestTemplates.class,
-        PartialTestMatchTemplates.class,
-        TemplateWithoutTestTemplates.class,
-        ValidTemplates.class
+        MatchInWrongMethodRules.class,
+        MethodWithoutPrefixRules.class,
+        MisnamedTestClassRules.class,
+        MissingTestAndWrongTestRules.class,
+        PartialTestMatchRules.class,
+        RuleWithoutTestRules.class,
+        ValidRules.class
       })
   void verifyRefasterTemplateCollections(Class<?> clazz) {
     RefasterRuleCollection.validate(clazz);
