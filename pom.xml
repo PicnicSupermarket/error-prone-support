@@ -1233,7 +1233,7 @@
                             <!-- Some Refaster rules purposefully use
                             outdated patterns in their `@BeforeTemplate`
                             methods. -->
-                            <ignorePackage>tech.picnic.errorprone.refastertemplates</ignorePackage>
+                            <ignorePackage>tech.picnic.errorprone.refasterrules</ignorePackage>
                         </ignorePackages>
                         <javaVersion>${version.jdk}</javaVersion>
                     </configuration>

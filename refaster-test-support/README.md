@@ -59,18 +59,18 @@ An example directory structure for such a setup is as follows:
 src/
   main/
     java/
-      tech.picnic.errorprone.refastertemplates
+      tech.picnic.errorprone.refasterrules
       └── ExampleTemplates.java  -- Contains multiple Refaster rules.
           └── Example1Template
           └── Example2Template
   test/
     java/
-      tech.picnic.errorprone.refastertemplates
+      tech.picnic.errorprone.refasterrules
       └── RefasterCollectionTest.java
              -- This test class invokes
              -- `RefasterTemplateCollection#validate`.
     resources/
-      tech.picnic.errorprone.refastertemplates
+      tech.picnic.errorprone.refasterrules
       └── ExampleTemplatesTestInput.java
              -- Contains a class named `ExampleTemplatesTest` and
              -- two methods named `testExample1Template` and
