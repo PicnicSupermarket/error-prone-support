@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Code to test the Refaster templates from {@link ValidTemplates}. */
+/** Code to test the Refaster rules from {@link ValidTemplates}. */
 final class ValidTemplatesTest implements RefasterTemplateTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {

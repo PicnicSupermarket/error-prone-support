@@ -18,8 +18,8 @@ import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 
 /**
- * Refaster templates related to AssertJ assertions over expressions that may throw a {@link
- * Throwable} subtype.
+ * Refaster rules related to AssertJ assertions over expressions that may throw a {@link Throwable}
+ * subtype.
  *
  * <p>For reasons of consistency we prefer {@link
  * org.assertj.core.api.Assertions#assertThatThrownBy} over static methods for specific exception

@@ -13,7 +13,7 @@ import java.util.function.IntUnaryOperator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-/** Refaster templates related to expressions dealing with {@link IntStream}s. */
+/** Refaster rules related to expressions dealing with {@link IntStream}s. */
 final class IntStreamTemplates {
   private IntStreamTemplates() {}
 

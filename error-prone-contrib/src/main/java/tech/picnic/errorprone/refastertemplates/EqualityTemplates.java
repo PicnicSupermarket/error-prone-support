@@ -7,7 +7,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-/** Refaster templates related to expressions dealing with (in)equalities. */
+/** Refaster rules related to expressions dealing with (in)equalities. */
 final class EqualityTemplates {
   private EqualityTemplates() {}
 

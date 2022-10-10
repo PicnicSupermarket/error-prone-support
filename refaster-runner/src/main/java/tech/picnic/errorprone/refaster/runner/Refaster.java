@@ -37,11 +37,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
- * A {@link BugChecker} that flags code that can be simplified using Refaster templates located on
- * the classpath.
+ * A {@link BugChecker} that flags code that can be simplified using Refaster rules located on the
+ * classpath.
  *
  * <p>This checker locates all {@code *.refaster} classpath resources and assumes they contain a
- * {@link CodeTransformer}. The set of loaded Refaster templates can be restricted by passing {@code
+ * {@link CodeTransformer}. The set of loaded Refaster rules can be restricted by passing {@code
  * -XepOpt:Refaster:NamePattern=<someRegex>}.
  */
 @AutoService(BugChecker.class)
@@ -51,7 +51,7 @@ import java.util.stream.Stream;
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
 public final class Refaster extends BugChecker implements CompilationUnitTreeMatcher {
-  /** Flag to pass a pattern that restricts which Refaster templates are loaded. */
+  /** Flag to pass a pattern that restricts which Refaster rules are loaded. */
   public static final String INCLUDED_TEMPLATES_PATTERN_FLAG = "Refaster:NamePattern";
 
   private static final long serialVersionUID = 1L;

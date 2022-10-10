@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
-/** Refaster templates related to expressions dealing with (possibly) null values. */
+/** Refaster rules related to expressions dealing with (possibly) null values. */
 final class NullTemplates {
   private NullTemplates() {}
 

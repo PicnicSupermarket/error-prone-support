@@ -55,7 +55,7 @@ import org.assertj.core.api.OptionalIntAssert;
 import org.assertj.core.api.OptionalLongAssert;
 import tech.picnic.errorprone.refaster.matchers.IsArray;
 
-/** Refaster templates related to AssertJ expressions and statements. */
+/** Refaster rules related to AssertJ expressions and statements. */
 // XXX: Most `AbstractIntegerAssert` rules can also be applied for other primitive types. Generate
 // these in separate files.
 // XXX: Also do for BigInteger/BigDecimal?
@@ -118,7 +118,7 @@ import tech.picnic.errorprone.refaster.matchers.IsArray;
 // XXX: `assertThat(ImmutableList.sortedCopyOf(cmp, values)).somethingExactOrder` -> just compare
 // "in any order".
 // XXX: Turns out a lot of this is also covered by https://github.com/palantir/assertj-automation.
-// See how we can combine these things. Do note that (at present) their Refaster templates don't
+// See how we can combine these things. Do note that (at present) their Refaster rules don't
 // show up as Error Prone checks. So we'd have to build an integration for that.
 final class AssertJTemplates {
   private AssertJTemplates() {}

@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-/** Refaster templates related to expressions dealing with {@link ImmutableSetMultimap}s. */
+/** Refaster rules related to expressions dealing with {@link ImmutableSetMultimap}s. */
 final class ImmutableSetMultimapTemplates {
   private ImmutableSetMultimapTemplates() {}
 
@@ -56,7 +56,7 @@ final class ImmutableSetMultimapTemplates {
 
   /** Prefer {@link ImmutableSetMultimap#of(Object, Object)} over more contrived alternatives. */
   // XXX: One can define variants for more than one key-value pair, but at some point the builder
-  // actually produces nicer code. So it's not clear we should add Refaster templates for those
+  // actually produces nicer code. So it's not clear we should add Refaster rules for those
   // variants.
   static final class PairToImmutableSetMultimap<K, V> {
     @BeforeTemplate

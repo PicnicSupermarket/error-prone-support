@@ -30,8 +30,8 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
 /**
- * Assorted Refaster templates that do not (yet) belong in one of the other classes with more
- * topical Refaster templates.
+ * Assorted Refaster rules that do not (yet) belong in one of the other classes with more topical
+ * Refaster rules.
  */
 final class AssortedTemplates {
   private AssortedTemplates() {}

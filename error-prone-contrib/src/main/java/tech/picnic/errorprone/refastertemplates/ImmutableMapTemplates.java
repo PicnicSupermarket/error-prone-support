@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-/** Refaster templates related to expressions dealing with {@link ImmutableMap}s. */
+/** Refaster rules related to expressions dealing with {@link ImmutableMap}s. */
 final class ImmutableMapTemplates {
   private ImmutableMapTemplates() {}
 

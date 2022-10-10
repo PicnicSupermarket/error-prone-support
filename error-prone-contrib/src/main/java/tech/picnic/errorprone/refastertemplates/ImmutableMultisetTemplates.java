@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
-/** Refaster templates related to expressions dealing with {@link ImmutableMultiset}s. */
+/** Refaster rules related to expressions dealing with {@link ImmutableMultiset}s. */
 final class ImmutableMultisetTemplates {
   private ImmutableMultisetTemplates() {}
 

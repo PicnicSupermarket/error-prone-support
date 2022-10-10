@@ -11,9 +11,9 @@ import org.assertj.core.api.AbstractBigDecimalAssert;
 import org.assertj.core.api.BigDecimalAssert;
 
 /**
- * Refaster templates related to AssertJ assertions over {@link BigDecimal}s.
+ * Refaster rules related to AssertJ assertions over {@link BigDecimal}s.
  *
- * <p>Note that, contrary to collections of Refaster templates for other {@link
+ * <p>Note that, contrary to collections of Refaster rules for other {@link
  * org.assertj.core.api.NumberAssert} subtypes, these templates do not rewrite to/from {@link
  * BigDecimalAssert#isEqualTo(Object)} and {@link BigDecimalAssert#isNotEqualTo(Object)}. This is
  * because {@link BigDecimal#equals(Object)} considers not only the numeric value of compared

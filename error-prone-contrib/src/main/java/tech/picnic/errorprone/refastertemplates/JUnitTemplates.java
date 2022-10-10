@@ -9,7 +9,7 @@ import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.junit.jupiter.params.provider.Arguments;
 
-/** Refaster templates related to JUnit expressions and statements. */
+/** Refaster rules related to JUnit expressions and statements. */
 final class JUnitTemplates {
   private JUnitTemplates() {}
 

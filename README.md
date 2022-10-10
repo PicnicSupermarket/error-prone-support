@@ -63,7 +63,7 @@ it:
                                <artifactId>error-prone-contrib</artifactId>
                                <version>${error-prone-support.version}</version>
                            </path>
-                           <!-- Error Prone Support's Refaster templates. -->
+                           <!-- Error Prone Support's Refaster rules. -->
                            <path>
                                <groupId>tech.picnic.error-prone-support</groupId>
                                <artifactId>refaster-runner</artifactId>

@@ -14,7 +14,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Stream;
 
-/** Refaster templates related to expressions dealing with {@link ImmutableSortedMap}s. */
+/** Refaster rules related to expressions dealing with {@link ImmutableSortedMap}s. */
 final class ImmutableSortedMapTemplates {
   private ImmutableSortedMapTemplates() {}
 
@@ -82,7 +82,7 @@ final class ImmutableSortedMapTemplates {
 
   /** Prefer {@link ImmutableSortedMap#of(Object, Object)} over more contrived alternatives. */
   // XXX: One can define variants for more than one key-value pair, but at some point the builder
-  // actually produces nicer code. So it's not clear we should add Refaster templates for those
+  // actually produces nicer code. So it's not clear we should add Refaster rules for those
   // variants.
   // XXX: We could also rewrite builders with non-natural orders, but that would affect
   // `ImmutableSortedMap#comparator()`.

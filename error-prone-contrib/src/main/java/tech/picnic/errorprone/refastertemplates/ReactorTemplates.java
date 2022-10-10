@@ -27,7 +27,7 @@ import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
-/** Refaster templates related to Reactor expressions and statements. */
+/** Refaster rules related to Reactor expressions and statements. */
 final class ReactorTemplates {
   private ReactorTemplates() {}
 

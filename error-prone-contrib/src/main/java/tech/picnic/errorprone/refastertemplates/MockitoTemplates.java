@@ -11,7 +11,7 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 
-/** Refaster templates related to Mockito expressions and statements. */
+/** Refaster rules related to Mockito expressions and statements. */
 final class MockitoTemplates {
   private MockitoTemplates() {}
 
