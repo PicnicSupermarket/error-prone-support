@@ -37,8 +37,8 @@ public final class CodeTransformers {
   }
 
   /**
-   * Scans the classpath for compiled Refaster templates and returns the associated deserialized
-   * {@link CodeTransformer}s, indexed by their name.
+   * Scans the classpath for compiled Refaster rules and returns the associated deserialized {@link
+   * CodeTransformer}s, indexed by their name.
    *
    * @return A mapping from Refaster template names to associated {@link CodeTransformer}s.
    */

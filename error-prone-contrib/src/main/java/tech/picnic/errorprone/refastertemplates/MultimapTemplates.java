@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.Set;
 import javax.annotation.Nullable;
 
-/** Refaster templates related to expressions dealing with {@link Multimap}s. */
+/** Refaster rules related to expressions dealing with {@link Multimap}s. */
 final class MultimapTemplates {
   private MultimapTemplates() {}
 

@@ -13,7 +13,7 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
-/** Refaster templates related to expressions dealing with {@link DoubleStream}s. */
+/** Refaster rules related to expressions dealing with {@link DoubleStream}s. */
 final class DoubleStreamTemplates {
   private DoubleStreamTemplates() {}
 

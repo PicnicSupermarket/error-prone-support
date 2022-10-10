@@ -1,5 +1,5 @@
 /**
- * A Java compiler plugin that identifies and compiles Refaster templates, storing them as resource
+ * A Java compiler plugin that identifies and compiles Refaster rules, storing them as resource
  * files on the classpath.
  */
 @com.google.errorprone.annotations.CheckReturnValue

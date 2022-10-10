@@ -23,7 +23,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/** Refaster templates related to expressions dealing with {@link Stream}s. */
+/** Refaster rules related to expressions dealing with {@link Stream}s. */
 final class StreamTemplates {
   private StreamTemplates() {}
 

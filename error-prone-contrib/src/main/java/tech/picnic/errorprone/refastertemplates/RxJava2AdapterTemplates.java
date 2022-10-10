@@ -14,7 +14,7 @@ import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/** Refaster templates related to expressions dealing with {@link RxJava2Adapter}. */
+/** Refaster rules related to expressions dealing with {@link RxJava2Adapter}. */
 final class RxJava2AdapterTemplates {
   private RxJava2AdapterTemplates() {}
 

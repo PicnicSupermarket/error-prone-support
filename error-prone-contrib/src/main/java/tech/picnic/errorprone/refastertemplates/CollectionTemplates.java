@@ -20,7 +20,7 @@ import java.util.SortedSet;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
 
-/** Refaster templates related to expressions dealing with (arbitrary) collections. */
+/** Refaster rules related to expressions dealing with (arbitrary) collections. */
 // XXX: There are other Guava `Iterables` methods that should not be called if the input is known to
 // be a `Collection`. Add those here.
 final class CollectionTemplates {

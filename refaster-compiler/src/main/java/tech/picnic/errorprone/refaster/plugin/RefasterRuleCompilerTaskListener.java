@@ -63,7 +63,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
       try {
         outputCodeTransformers(rule.getValue(), getOutputFile(taskEvent, rule.getKey()));
       } catch (IOException e) {
-        throw new UncheckedIOException("Failed to persist compiled Refaster templates", e);
+        throw new UncheckedIOException("Failed to persist compiled Refaster rules", e);
       }
     }
   }

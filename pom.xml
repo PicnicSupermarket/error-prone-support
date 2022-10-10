@@ -1230,7 +1230,7 @@
                         </exclusionPatterns>
                         <failOnViolations>false</failOnViolations>
                         <ignorePackages>
-                            <!-- Some Refaster templates purposefully use
+                            <!-- Some Refaster rules purposefully use
                             outdated patterns in their `@BeforeTemplate`
                             methods. -->
                             <ignorePackage>tech.picnic.errorprone.refastertemplates</ignorePackage>

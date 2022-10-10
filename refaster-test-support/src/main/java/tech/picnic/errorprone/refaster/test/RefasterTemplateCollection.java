@@ -111,7 +111,7 @@ public final class RefasterTemplateCollection extends BugChecker
   }
 
   /**
-   * Verifies that all Refaster templates in the given collection class are covered by precisely one
+   * Verifies that all Refaster rules in the given collection class are covered by precisely one
    * test method, defined explicitly for the purpose of exercising that template.
    *
    * <p>Note that a passing test does not guarantee full coverage: this test does not ascertain that

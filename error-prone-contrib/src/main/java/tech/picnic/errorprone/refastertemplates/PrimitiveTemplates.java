@@ -4,7 +4,7 @@ import com.google.common.primitives.Ints;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 
-/** Refaster templates related to expressions dealing with primitives. */
+/** Refaster rules related to expressions dealing with primitives. */
 final class PrimitiveTemplates {
   private PrimitiveTemplates() {}
 

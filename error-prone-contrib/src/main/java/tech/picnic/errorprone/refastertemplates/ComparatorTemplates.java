@@ -25,7 +25,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 
-/** Refaster templates related to expressions dealing with {@link Comparator}s. */
+/** Refaster rules related to expressions dealing with {@link Comparator}s. */
 final class ComparatorTemplates {
   private ComparatorTemplates() {}
 

@@ -22,7 +22,7 @@ import java.time.chrono.ChronoZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 
-/** Refaster templates related to expressions dealing with time. */
+/** Refaster rules related to expressions dealing with time. */
 final class TimeTemplates {
   private TimeTemplates() {}
 

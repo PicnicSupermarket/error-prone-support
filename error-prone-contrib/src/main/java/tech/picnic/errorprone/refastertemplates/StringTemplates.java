@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 
-/** Refaster templates related to expressions dealing with {@link String}s. */
+/** Refaster rules related to expressions dealing with {@link String}s. */
 // XXX: Should we prefer `s -> !s.isEmpty()` or `not(String::isEmpty)`?
 final class StringTemplates {
   private StringTemplates() {}

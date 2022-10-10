@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.refaster.test;
 
-/** Code to test the Refaster templates from {@link MisnamedTestClassTemplates}. */
+/** Code to test the Refaster rules from {@link MisnamedTestClassTemplates}. */
 final class IncorrectNameTemplatesTest implements RefasterTemplateTestCase {
   boolean testStringIsEmpty() {
     return "foo".equals("");

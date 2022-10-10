@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-/** Refaster templates related to expressions dealing with {@link ImmutableList}s. */
+/** Refaster rules related to expressions dealing with {@link ImmutableList}s. */
 final class ImmutableListTemplates {
   private ImmutableListTemplates() {}
 
@@ -154,7 +154,7 @@ final class ImmutableListTemplates {
    * communicate the immutability of the resulting list at the type level.
    */
   // XXX: The `Stream` variant may be too contrived to warrant inclusion. Review its usage if/when
-  // this and similar Refaster templates are replaced with an Error Prone check.
+  // this and similar Refaster rules are replaced with an Error Prone check.
   static final class ImmutableListOf<T> {
     @BeforeTemplate
     List<T> before() {

@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
-/** Refaster templates related to expressions dealing with {@link Optional}s. */
+/** Refaster rules related to expressions dealing with {@link Optional}s. */
 final class OptionalTemplates {
   private OptionalTemplates() {}
 

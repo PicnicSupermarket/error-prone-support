@@ -22,7 +22,7 @@ import org.springframework.web.reactive.function.client.WebClient.RequestHeaders
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
 
 /**
- * Refaster templates related to expressions dealing with {@link
+ * Refaster rules related to expressions dealing with {@link
  * org.springframework.web.reactive.function.client.WebClient} and related types.
  */
 final class WebClientTemplates {

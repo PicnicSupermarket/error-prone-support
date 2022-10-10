@@ -13,7 +13,7 @@ import java.util.function.LongUnaryOperator;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-/** Refaster templates related to expressions dealing with {@link LongStream}s. */
+/** Refaster rules related to expressions dealing with {@link LongStream}s. */
 final class LongStreamTemplates {
   private LongStreamTemplates() {}
 

@@ -15,7 +15,7 @@ import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.Map;
 
-/** Refaster templates related to expressions dealing with {@link Map.Entry} instances. */
+/** Refaster rules related to expressions dealing with {@link Map.Entry} instances. */
 final class MapEntryTemplates {
   private MapEntryTemplates() {}
 

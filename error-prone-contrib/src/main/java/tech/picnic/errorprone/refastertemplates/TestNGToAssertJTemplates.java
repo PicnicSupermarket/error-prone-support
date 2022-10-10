@@ -30,7 +30,7 @@ import org.testng.Assert;
 import org.testng.Assert.ThrowingRunnable;
 
 /**
- * Refaster templates that replace TestNG assertions with equivalent AssertJ assertions.
+ * Refaster rules that replace TestNG assertions with equivalent AssertJ assertions.
  *
  * <p>Some of the classes below have TestNG {@code @BeforeTemplate}s that reference wildcard type
  * bounds ({@code <?>}), while the associated AssertJ {@code @AfterTemplate}s reference stricter
