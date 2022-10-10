@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import tech.picnic.errorprone.refaster.test.RefasterTemplateCollection;
 
-final class RefasterTemplatesTest {
+final class RefasterRulesTest {
   /** The names of all Refaster template groups defined in this module. */
   private static final ImmutableSet<Class<?>> TEMPLATE_COLLECTIONS =
       ImmutableSet.of(
