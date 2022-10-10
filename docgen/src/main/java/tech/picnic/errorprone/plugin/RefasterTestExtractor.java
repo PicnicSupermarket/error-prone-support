@@ -10,11 +10,11 @@ import com.sun.source.util.TaskEvent;
 import tech.picnic.errorprone.plugin.models.RefasterTemplateCollectionTestData;
 import tech.picnic.errorprone.plugin.models.RefasterTemplateTestData;
 
-public class RefasterTestExtractor implements DocExtractor<RefasterTemplateCollectionTestData> {
+public final class RefasterTestExtractor
+    implements DocExtractor<RefasterTemplateCollectionTestData> {
   @Override
   public RefasterTemplateCollectionTestData extractData(
       ClassTree tree, TaskEvent taskEvent, VisitorState state) {
-
     String templateCollectionName = tree.getSimpleName().toString().replace("Test", "");
     boolean isInput = taskEvent.getSourceFile().getName().contains("Input");
 
