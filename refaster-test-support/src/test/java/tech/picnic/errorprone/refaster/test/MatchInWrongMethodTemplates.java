@@ -3,9 +3,7 @@ package tech.picnic.errorprone.refaster.test;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 
-/**
- * Refaster template collection to validate reporting of a match occurring in an unexpected place.
- */
+/** Refaster rule collection to validate reporting of a match occurring in an unexpected place. */
 final class MatchInWrongMethodTemplates {
   private MatchInWrongMethodTemplates() {}
 

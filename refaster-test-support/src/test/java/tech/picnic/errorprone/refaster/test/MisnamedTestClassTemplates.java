@@ -3,7 +3,7 @@ package tech.picnic.errorprone.refaster.test;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 
-/** Refaster template collection to validate reporting of a misnamed test class. */
+/** Refaster rule collection to validate reporting of a misnamed test class. */
 final class MisnamedTestClassTemplates {
   private MisnamedTestClassTemplates() {}
 

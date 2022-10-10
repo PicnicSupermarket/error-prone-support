@@ -7,7 +7,7 @@ import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.util.Comparator.naturalOrder;
-import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_TEMPLATES_PATTERN_FLAG;
+import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_RULES_PATTERN_FLAG;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -49,64 +49,61 @@ import tech.picnic.errorprone.refaster.runner.CodeTransformers;
 import tech.picnic.errorprone.refaster.runner.Refaster;
 
 /**
- * A {@link BugChecker} that applies a Refaster template collection to an associated test input file
- * by delegating to the {@link Refaster} checker, and subsequently validates that each template
- * modifies exactly one distinct method, as indicated by each method's name.
+ * A {@link BugChecker} that applies a Refaster rule collection to an associated test input file by
+ * delegating to the {@link Refaster} checker, and subsequently validates that each rule modifies
+ * exactly one distinct method, as indicated by each method's name.
  *
  * <p>The test input and output files must be classpath resources located in the same package as the
- * template collection class. Their names are derived from the template collection class by
- * suffixing {@code TestInput.java} and {@code TestOutput.java}, respectively. Each test method's
- * name must be derived from the template that modifies said method by prefixing {@code test}.
+ * rule collection class. Their names are derived from the rule collection class by suffixing {@code
+ * TestInput.java} and {@code TestOutput.java}, respectively. Each test method's name must be
+ * derived from the template that modifies said method by prefixing {@code test}.
  */
 // XXX: This check currently only validates that one `Refaster.anyOf` branch in one
 // `@BeforeTemplate` method is covered by a test. Review how we can make sure that _all_
 // `@BeforeTemplate` methods and `Refaster.anyOf` branches are covered.
-@BugPattern(summary = "Exercises a Refaster template collection", severity = ERROR)
-public final class RefasterTemplateCollection extends BugChecker
-    implements CompilationUnitTreeMatcher {
+@BugPattern(summary = "Exercises a Refaster rule collection", severity = ERROR)
+public final class RefasterRuleCollection extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final String TEMPLATE_COLLECTION_FLAG =
+  private static final String RULE_COLLECTION_FLAG =
       "RefasterTemplateCollection:TemplateCollection";
   private static final String TEST_METHOD_NAME_PREFIX = "test";
 
-  private final String templateCollectionUnderTest;
-  private final ImmutableSortedSet<String> templatesUnderTest;
+  private final String ruleCollectionUnderTest;
+  private final ImmutableSortedSet<String> rulesUnderTest;
   private final Refaster delegate;
 
   /**
-   * Instantiates a {@link RefasterTemplateCollection} instance.
+   * Instantiates a {@link RefasterRuleCollection} instance.
    *
    * @param flags Any provided command line flags.
    */
-  public RefasterTemplateCollection(ErrorProneFlags flags) {
-    templateCollectionUnderTest = getTemplateCollectionUnderTest(flags);
-    delegate = createRefasterChecker(templateCollectionUnderTest);
-    templatesUnderTest = getTemplatesUnderTest(templateCollectionUnderTest);
+  public RefasterRuleCollection(ErrorProneFlags flags) {
+    ruleCollectionUnderTest = getRuleCollectionUnderTest(flags);
+    delegate = createRefasterChecker(ruleCollectionUnderTest);
+    rulesUnderTest = getRulesUnderTest(ruleCollectionUnderTest);
   }
 
-  private static String getTemplateCollectionUnderTest(ErrorProneFlags flags) {
+  private static String getRuleCollectionUnderTest(ErrorProneFlags flags) {
     return flags
-        .get(TEMPLATE_COLLECTION_FLAG)
+        .get(RULE_COLLECTION_FLAG)
         .orElseThrow(
             () ->
                 new IllegalStateException(
                     String.format(
-                        "Error Prone flag `%s` must be specified", TEMPLATE_COLLECTION_FLAG)));
+                        "Error Prone flag `%s` must be specified", RULE_COLLECTION_FLAG)));
   }
 
-  private static Refaster createRefasterChecker(String templateCollectionUnderTest) {
+  private static Refaster createRefasterChecker(String ruleCollectionUnderTest) {
     return new Refaster(
         ErrorProneFlags.fromMap(
             ImmutableMap.of(
-                INCLUDED_TEMPLATES_PATTERN_FLAG,
-                Pattern.quote(templateCollectionUnderTest) + ".*")));
+                INCLUDED_RULES_PATTERN_FLAG, Pattern.quote(ruleCollectionUnderTest) + ".*")));
   }
 
-  private static ImmutableSortedSet<String> getTemplatesUnderTest(
-      String templateCollectionUnderTest) {
+  private static ImmutableSortedSet<String> getRulesUnderTest(String ruleCollectionUnderTest) {
     return CodeTransformers.getAllCodeTransformers().keySet().stream()
-        .filter(k -> k.startsWith(templateCollectionUnderTest))
-        .map(k -> k.replace(templateCollectionUnderTest + '$', ""))
+        .filter(k -> k.startsWith(ruleCollectionUnderTest))
+        .map(k -> k.replace(ruleCollectionUnderTest + '$', ""))
         .collect(toImmutableSortedSet(naturalOrder()));
   }
 
@@ -119,13 +116,13 @@ public final class RefasterTemplateCollection extends BugChecker
    * {@code com.google.errorprone.refaster.annotation.BeforeTemplate} methods in case there are
    * multiple.
    *
-   * @param clazz The Refaster template collection under test.
+   * @param clazz The Refaster rule collection under test.
    */
   public static void validate(Class<?> clazz) {
     String className = clazz.getSimpleName();
 
-    BugCheckerRefactoringTestHelper.newInstance(RefasterTemplateCollection.class, clazz)
-        .setArgs(ImmutableList.of("-XepOpt:" + TEMPLATE_COLLECTION_FLAG + '=' + className))
+    BugCheckerRefactoringTestHelper.newInstance(RefasterRuleCollection.class, clazz)
+        .setArgs(ImmutableList.of("-XepOpt:" + RULE_COLLECTION_FLAG + '=' + className))
         .addInput(className + "TestInput.java")
         .addOutput(className + "TestOutput.java")
         .doTest(TEXT_MATCH);
@@ -152,7 +149,7 @@ public final class RefasterTemplateCollection extends BugChecker
   }
 
   private void reportIncorrectClassName(CompilationUnitTree tree, VisitorState state) {
-    String expectedClassName = templateCollectionUnderTest + "Test";
+    String expectedClassName = ruleCollectionUnderTest + "Test";
 
     for (Tree typeDeclaration : tree.getTypeDecls()) {
       if (typeDeclaration instanceof ClassTree) {
@@ -194,18 +191,18 @@ public final class RefasterTemplateCollection extends BugChecker
       CompilationUnitTree tree,
       ImmutableRangeMap<Integer, String> indexedMatches,
       VisitorState state) {
-    ImmutableSet<String> templatesWithoutMatch =
+    ImmutableSet<String> rulesWithoutMatch =
         Sets.difference(
-                templatesUnderTest, ImmutableSet.copyOf(indexedMatches.asMapOfRanges().values()))
+                rulesUnderTest, ImmutableSet.copyOf(indexedMatches.asMapOfRanges().values()))
             .immutableCopy();
-    if (!templatesWithoutMatch.isEmpty()) {
+    if (!rulesWithoutMatch.isEmpty()) {
       String sourceFile = ((JCCompilationUnit) tree).sourcefile.getName();
       reportViolations(
           tree,
           String.format(
               "Did not encounter a test in `%s` for the following template(s)",
               getSubstringAfterFinalDelimiter('/', sourceFile)),
-          templatesWithoutMatch,
+          rulesWithoutMatch,
           state);
     }
   }

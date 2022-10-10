@@ -10,7 +10,7 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Set;
 import javax.annotation.Nullable;
 
-/** Refaster template collection to validate that having no violations works as expected. */
+/** Refaster rule collection to validate that having no violations works as expected. */
 final class ValidTemplates {
   private ValidTemplates() {}
 

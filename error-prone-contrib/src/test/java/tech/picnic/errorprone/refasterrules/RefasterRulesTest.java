@@ -7,11 +7,11 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateCollection;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollection;
 
 final class RefasterRulesTest {
-  /** The names of all Refaster template groups defined in this module. */
-  private static final ImmutableSet<Class<?>> TEMPLATE_COLLECTIONS =
+  /** The names of all Refaster rule groups defined in this module. */
+  private static final ImmutableSet<Class<?>> RULE_COLLECTIONS =
       ImmutableSet.of(
           AssertJTemplates.class,
           AssertJBigDecimalTemplates.class,
@@ -70,7 +70,7 @@ final class RefasterRulesTest {
   private static Stream<Arguments> validateTemplateCollectionTestCases() {
     // XXX: Drop the filter once we have added tests for AssertJ! We can then also replace this
     // method with `@ValueSource(classes = {...})`.
-    return TEMPLATE_COLLECTIONS.stream()
+    return RULE_COLLECTIONS.stream()
         .filter(not(AssertJTemplates.class::equals))
         .map(Arguments::arguments);
   }
@@ -78,6 +78,6 @@ final class RefasterRulesTest {
   @MethodSource("validateTemplateCollectionTestCases")
   @ParameterizedTest
   void validateTemplateCollection(Class<?> clazz) {
-    RefasterTemplateCollection.validate(clazz);
+    RefasterRuleCollection.validate(clazz);
   }
 }
