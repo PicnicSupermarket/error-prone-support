@@ -122,7 +122,7 @@ $ mvn clean install
 [INFO] -------------------------------------------------------------
 [WARNING] COMPILATION WARNING :
 [INFO] -------------------------------------------------------------
-[WARNING] Example.java:[9,34] [tech.picnic.errorprone.refasterrules.BigDecimalTemplates.BigDecimalZero]
+[WARNING] Example.java:[9,34] [tech.picnic.errorprone.refasterrules.BigDecimalRules.BigDecimalZero]
   Did you mean 'return BigDecimal.ZERO;'?
 [WARNING] Example.java:[13,35] [IdentityConversion] This method invocation appears redundant; remove it or suppress this warning and add a comment explaining its purpose
     (see https://error-prone.picnic.tech/bugpatterns/IdentityConversion)
@@ -227,5 +227,5 @@ guidelines][contributing].
 [pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
 [refaster]: https://errorprone.info/docs/refaster
-[refaster-rules-bigdecimal]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/BigDecimalTemplates.java
+[refaster-rules-bigdecimal]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/BigDecimalRules.java
 [refaster-rules]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/

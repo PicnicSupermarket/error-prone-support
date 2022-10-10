@@ -8,7 +8,7 @@ import com.sun.tools.javac.api.BasicJavacTask;
 /**
  * A variant of {@code com.google.errorprone.refaster.RefasterRuleCompiler} that outputs a {@code
  * fully/qualified/Class.refaster} file for each compiled {@code fully.qualified.Class} that
- * contains a Refaster template.
+ * contains a Refaster rule.
  */
 @AutoService(Plugin.class)
 public final class RefasterRuleCompiler implements Plugin {

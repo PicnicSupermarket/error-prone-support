@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test;
 final class CodeTransformersTest {
   /**
    * Verifies that {@link CodeTransformers#getAllCodeTransformers()} finds the code transformer
-   * compiled from {@link FooTemplates} on the classpath.
+   * compiled from {@link FooRules} on the classpath.
    */
   @Test
   void getAllCodeTransformers() {
     assertThat(CodeTransformers.getAllCodeTransformers().keySet())
-        .containsExactly("FooTemplates$SimpleTemplate");
+        .containsExactly("FooRules$SimpleRule");
   }
 }
