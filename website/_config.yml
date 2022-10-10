@@ -4,7 +4,7 @@ logo: assets/images/favicon.svg
 url: https://error-prone.picnic.tech
 description: >-
   Error Prone extensions: extra bug checkers and a large battery of Refaster
-  templates.
+  rules.
 
 theme: just-the-docs
 plugins:

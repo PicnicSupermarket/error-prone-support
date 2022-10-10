@@ -11,7 +11,7 @@ final class MissingRefasterAnnotationTest {
           .expectErrorMessage(
               "X",
               containsPattern(
-                  "The Refaster template contains a method without any Refaster annotations"));
+                  "The Refaster rule contains a method without any Refaster annotations"));
 
   @Test
   void identification() {
@@ -74,17 +74,17 @@ final class MissingRefasterAnnotationTest {
             "    }",
             "  }",
             "",
-            "  static final class ValidRefasterTemplate {",
+            "  static final class ValidRefasterRule {",
             "    @BeforeTemplate",
             "    void unusedPureFunctionCall(Object o) {",
             "      o.toString();",
             "    }",
             "  }",
             "",
-            "  static final class NotARefasterTemplate {",
+            "  static final class NotARefasterRule {",
             "    @Override",
             "    public String toString() {",
-            "      return \"This is not a Refaster template\";",
+            "      return \"This is not a Refaster rule\";",
             "    }",
             "  }",
             "}")

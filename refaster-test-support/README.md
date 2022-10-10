@@ -38,16 +38,16 @@ To adopt this setup, the following requirements must be met:
 - Each Refaster rule collection must match the naming convention
   `<RuleCollectionName>Templates.java`.
 - There is a test class with a (parameterized) test method that invokes
-  `RefasterRuleCollection#validate` on the template collection(s) to be
+  `RefasterRuleCollection#validate` on the rule collection(s) to be
   validated.
 - For every rule collection there is an input file matching the naming
   convention `<RuleCollectionName>TemplatesTestInput.java`.
-- For every template collection there is an output file matching the naming
+- For every rule collection there is an output file matching the naming
   convention `<RuleCollectionName>TemplatesTestOutput.java`.
 - For every Refaster rule in a collection, the associated input and output
-  files must contain a method that validates the template's behavior. The name
-  of this method must be derived from the name of the Refaster template it aims
-  to validate, prefixed with `test` (i.e. `test<RefasterTemplateClassName>`).
+  files must contain a method that validates the rules' behavior. The name of
+  this method must be derived from the name of the Refaster rule it aims to
+  validate, prefixed with `test` (i.e. `test<RefasterRuleClassName>`).
 - Each such method contains at least one expression that matches the
   `@BeforeTemplate` of the corresponding Refaster template. As a result, the
   output file must contain the same method with an updated expression, in

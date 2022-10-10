@@ -1,8 +1,8 @@
 ---
 layout: default
-title: Refaster rules
+title: Refaster Rules
 nav_order: 2
 has_children: true
 ---
 
-# Refaster rules
+# Refaster Rules

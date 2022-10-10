@@ -22,8 +22,8 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 /**
  * A {@link BugChecker} that flags unnecessary {@link Refaster#anyOf(Object[])} usages.
  *
- * <p>Note that this logic can't be implemented as a Refaster template, as the {@link Refaster}
- * class is treated specially.
+ * <p>Note that this logic can't be implemented as a Refaster rule, as the {@link Refaster} class is
+ * treated specially.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
