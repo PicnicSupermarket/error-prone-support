@@ -5,9 +5,9 @@ import com.google.common.collect.ImmutableSet;
 import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.stream.Stream;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class EqualityTemplatesTest implements RefasterTemplateTestCase {
+final class EqualityTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Objects.class);

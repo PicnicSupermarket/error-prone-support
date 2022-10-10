@@ -6,9 +6,9 @@ import java.util.OptionalDouble;
 import java.util.function.DoublePredicate;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class DoubleStreamTemplatesTest implements RefasterTemplateTestCase {
+final class DoubleStreamTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Streams.class);

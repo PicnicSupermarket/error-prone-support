@@ -6,7 +6,8 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 /**
  * Refaster template collection to validate that in the tests all methods have the prefix `test`.
  *
- * <p>The only exception to this is {@link RefasterTemplateTestCase#elidedTypesAndStaticImports()}.
+ * <p>The only exception to this is {@link
+ * RefasterRuleCollectionTestCase#elidedTypesAndStaticImports()}.
  */
 final class MethodWithoutPrefixTemplates {
   private MethodWithoutPrefixTemplates() {}

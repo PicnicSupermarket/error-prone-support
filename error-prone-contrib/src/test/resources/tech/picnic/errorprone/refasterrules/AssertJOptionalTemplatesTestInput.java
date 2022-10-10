@@ -6,9 +6,9 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.OptionalAssert;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class AssertJOptionalTemplatesTest implements RefasterTemplateTestCase {
+final class AssertJOptionalTemplatesTest implements RefasterRuleCollectionTestCase {
   AbstractAssert<?, ?> testAssertThatOptional() {
     return assertThat(Optional.of(new Object()).orElseThrow());
   }

@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import org.assertj.core.api.AbstractComparableAssert;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class AssertJComparableTemplatesTest implements RefasterTemplateTestCase {
+final class AssertJComparableTemplatesTest implements RefasterRuleCollectionTestCase {
   AbstractComparableAssert<?, ?> testAssertThatIsEqualByComparingTo() {
     return assertThat(BigDecimal.ZERO.compareTo(BigDecimal.ONE)).isEqualTo(0);
   }

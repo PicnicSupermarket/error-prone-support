@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /** Code to test the Refaster rules from {@link ValidTemplates}. */
-final class ValidTemplatesTest implements RefasterTemplateTestCase {
+final class ValidTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Strings.class);

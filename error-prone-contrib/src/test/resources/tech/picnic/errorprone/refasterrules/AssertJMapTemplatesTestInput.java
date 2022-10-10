@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableMap;
 import org.assertj.core.api.AbstractMapAssert;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class AssertJMapTemplatesTest implements RefasterTemplateTestCase {
+final class AssertJMapTemplatesTest implements RefasterRuleCollectionTestCase {
   AbstractMapAssert<?, ?, Integer, Integer>
       testAbstractMapAssertContainsExactlyInAnyOrderEntriesOf() {
     return assertThat(ImmutableMap.of(1, 2, 3, 4)).isEqualTo(ImmutableMap.of(1, 2, 3, 4));

@@ -6,9 +6,9 @@ import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.assertj.core.api.NumberAssert;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class AssertJNumberTemplatesTest implements RefasterTemplateTestCase {
+final class AssertJNumberTemplatesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsPositive() {
     return ImmutableSet.of(
         assertThat((byte) 0).isPositive(),

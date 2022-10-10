@@ -8,9 +8,9 @@ import com.google.common.collect.Maps;
 import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.Map;
-import tech.picnic.errorprone.refaster.test.RefasterTemplateTestCase;
+import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class MapEntryTemplatesTest implements RefasterTemplateTestCase {
+final class MapEntryTemplatesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(AbstractMap.class, Maps.class);
