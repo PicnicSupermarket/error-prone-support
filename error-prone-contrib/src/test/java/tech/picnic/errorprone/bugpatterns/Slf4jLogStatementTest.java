@@ -5,7 +5,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class Slf4JLogStatementTest {
+final class Slf4jLogStatementTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(Slf4jLogStatement.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
