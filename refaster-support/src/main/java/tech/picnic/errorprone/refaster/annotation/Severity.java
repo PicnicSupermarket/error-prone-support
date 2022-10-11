@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Describes the severity of a Refaster template or group of Refaster templates.
+ * Describes the severity of a Refaster rule or group of Refaster rules.
  *
  * <p>The default severity is the severity assigned to the {@code Refaster} bug checker, which may
  * be controlled explicitly by running Error Prone with e.g. {@code -Xep:Refaster:WARN}. Annotations
@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface Severity {
   /**
-   * The expected severity of any match of the annotated Refaster template(s).
+   * The expected severity of any match of the annotated Refaster rule(s).
    *
    * @return An Error Prone severity level.
    */

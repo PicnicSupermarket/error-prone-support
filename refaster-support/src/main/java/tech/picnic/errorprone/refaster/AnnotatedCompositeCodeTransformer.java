@@ -96,7 +96,7 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
     String prefix = packageName() + '.';
     checkState(
         fullCheckName.startsWith(prefix),
-        "Refaster template class '%s' is not located in package '%s'",
+        "Refaster rule class '%s' is not located in package '%s'",
         fullCheckName,
         packageName());
 

@@ -13,10 +13,10 @@ final class CodeTransformersTest {
   void getAllCodeTransformers() {
     assertThat(CodeTransformers.getAllCodeTransformers().keySet())
         .containsExactlyInAnyOrder(
-            "FooTemplates$StringOfSizeZeroTemplate",
-            "FooTemplates$StringOfSizeZeroVerboseTemplate",
-            "FooTemplates$StringOfSizeOneTemplate",
-            "FooTemplates$ExtraGrouping$StringOfSizeTwoTemplate",
-            "FooTemplates$ExtraGrouping$StringOfSizeThreeTemplate");
+            "FooRules$StringOfSizeZeroRule",
+            "FooRules$StringOfSizeZeroVerboseRule",
+            "FooRules$StringOfSizeOneRule",
+            "FooRules$ExtraGrouping$StringOfSizeTwoRule",
+            "FooRules$ExtraGrouping$StringOfSizeThreeRule");
   }
 }

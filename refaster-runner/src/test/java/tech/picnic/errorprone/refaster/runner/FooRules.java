@@ -10,12 +10,12 @@ import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
 
-/** An example template collection used to test {@link CodeTransformers} and {@link Refaster}. */
+/** An example rule collection used to test {@link CodeTransformers} and {@link Refaster}. */
 final class FooRules {
   private FooRules() {}
 
-  /** A simple template for testing purposes, lacking any custom annotations. */
-  static final class StringOfSizeZeroTemplate {
+  /** A simple rule for testing purposes, lacking any custom annotations. */
+  static final class StringOfSizeZeroRule {
     @BeforeTemplate
     boolean before(String string) {
       return string.toCharArray().length == 0;
@@ -28,10 +28,10 @@ final class FooRules {
   }
 
   /**
-   * A simple template for testing purposes, matching the same set of expressions as {@link
-   * StringOfSizeZeroTemplate}, but producing a larger replacement string.
+   * A simple rule for testing purposes, matching the same set of expressions as {@link
+   * StringOfSizeZeroRule}, but producing a larger replacement string.
    */
-  static final class StringOfSizeZeroVerboseTemplate {
+  static final class StringOfSizeZeroVerboseRule {
     @BeforeTemplate
     boolean before(String string) {
       return string.toCharArray().length == 0;
@@ -43,11 +43,11 @@ final class FooRules {
     }
   }
 
-  /** A simple template for testing purposes, having several custom annotations. */
+  /** A simple rule for testing purposes, having several custom annotations. */
   @Description("A custom description about matching single-char strings")
   @OnlineDocumentation
   @Severity(WARNING)
-  static final class StringOfSizeOneTemplate {
+  static final class StringOfSizeOneRule {
     @BeforeTemplate
     boolean before(String string) {
       return string.toCharArray().length == 1;
@@ -59,17 +59,15 @@ final class FooRules {
     }
   }
 
-  /**
-   * A nested class with annotations that are inherited by the Refaster templates contained in it.
-   */
+  /** A nested class with annotations that are inherited by the Refaster rules contained in it. */
   @Description("A custom subgroup description")
-  @OnlineDocumentation("https://example.com/template/${topLevelClassName}#${nestedClassName}")
+  @OnlineDocumentation("https://example.com/rule/${topLevelClassName}#${nestedClassName}")
   @Severity(ERROR)
   static final class ExtraGrouping {
     private ExtraGrouping() {}
 
-    /** A simple template for testing purposes, inheriting custom annotations. */
-    static final class StringOfSizeTwoTemplate {
+    /** A simple rule for testing purposes, inheriting custom annotations. */
+    static final class StringOfSizeTwoRule {
       @BeforeTemplate
       boolean before(String string) {
         return string.toCharArray().length == 2;
@@ -81,11 +79,11 @@ final class FooRules {
       }
     }
 
-    /** A simple template for testing purposes, overriding custom annotations. */
+    /** A simple rule for testing purposes, overriding custom annotations. */
     @Description("A custom description about matching three-char strings")
     @OnlineDocumentation("https://example.com/custom")
     @Severity(SUGGESTION)
-    static final class StringOfSizeThreeTemplate {
+    static final class StringOfSizeThreeRule {
       @BeforeTemplate
       boolean before(String string) {
         return string.toCharArray().length == 3;

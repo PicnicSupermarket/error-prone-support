@@ -29,25 +29,25 @@ final class RefasterTest {
       CompilationTestHelper.newInstance(Refaster.class, getClass())
           .matchAllDiagnostics()
           .expectErrorMessage(
-              "StringOfSizeZeroTemplate",
+              "StringOfSizeZeroRule",
               containsPattern(
-                  "\\[Refaster Rule\\] FooTemplates\\.StringOfSizeZeroTemplate: Refactoring opportunity\\s+.+\\s+"))
+                  "\\[Refaster Rule\\] FooRules\\.StringOfSizeZeroRule: Refactoring opportunity\\s+.+\\s+"))
           .expectErrorMessage(
-              "StringOfSizeOneTemplate",
+              "StringOfSizeOneRule",
               containsPattern(
-                  "\\[Refaster Rule\\] FooTemplates\\.StringOfSizeOneTemplate: "
+                  "\\[Refaster Rule\\] FooRules\\.StringOfSizeOneRule: "
                       + "A custom description about matching single-char strings\\s+.+\\s+"
-                      + "\\(see https://error-prone.picnic.tech/refasterrules/FooTemplates#StringOfSizeOneTemplate\\)"))
+                      + "\\(see https://error-prone.picnic.tech/refasterrules/FooRules#StringOfSizeOneRule\\)"))
           .expectErrorMessage(
-              "StringOfSizeTwoTemplate",
+              "StringOfSizeTwoRule",
               containsPattern(
-                  "\\[Refaster Rule\\] FooTemplates\\.ExtraGrouping\\.StringOfSizeTwoTemplate: "
+                  "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeTwoRule: "
                       + "A custom subgroup description\\s+.+\\s+"
-                      + "\\(see https://example.com/template/FooTemplates#ExtraGrouping.StringOfSizeTwoTemplate\\)"))
+                      + "\\(see https://example.com/rule/FooRules#ExtraGrouping.StringOfSizeTwoRule\\)"))
           .expectErrorMessage(
-              "StringOfSizeThreeTemplate",
+              "StringOfSizeThreeRule",
               containsPattern(
-                  "\\[Refaster Rule\\] FooTemplates\\.ExtraGrouping\\.StringOfSizeThreeTemplate: "
+                  "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeThreeRule: "
                       + "A custom description about matching three-char strings\\s+.+\\s+"
                       + "\\(see https://example.com/custom\\)"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
@@ -55,7 +55,7 @@ final class RefasterTest {
   private final BugCheckerRefactoringTestHelper restrictedRefactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())
           .setArgs(
-              "-XepOpt:Refaster:NamePattern=.*\\$(StringOfSizeZeroVerboseTemplate|StringOfSizeTwoTemplate)$");
+              "-XepOpt:Refaster:NamePattern=.*\\$(StringOfSizeZeroVerboseRule|StringOfSizeTwoRule)$");
 
   @Test
   void identification() {
@@ -64,13 +64,13 @@ final class RefasterTest {
             "A.java",
             "class A {",
             "  void m() {",
-            "    // BUG: Diagnostic matches: StringOfSizeZeroTemplate",
+            "    // BUG: Diagnostic matches: StringOfSizeZeroRule",
             "    boolean b1 = \"foo\".toCharArray().length == 0;",
-            "    // BUG: Diagnostic matches: StringOfSizeOneTemplate",
+            "    // BUG: Diagnostic matches: StringOfSizeOneRule",
             "    boolean b2 = \"bar\".toCharArray().length == 1;",
-            "    // BUG: Diagnostic matches: StringOfSizeTwoTemplate",
+            "    // BUG: Diagnostic matches: StringOfSizeTwoRule",
             "    boolean b3 = \"baz\".toCharArray().length == 2;",
-            "    // BUG: Diagnostic matches: StringOfSizeThreeTemplate",
+            "    // BUG: Diagnostic matches: StringOfSizeThreeRule",
             "    boolean b4 = \"qux\".toCharArray().length == 3;",
             "  }",
             "}")

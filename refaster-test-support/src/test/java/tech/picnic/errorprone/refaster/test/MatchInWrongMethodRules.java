@@ -6,8 +6,8 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rule collection to validate reporting of a match occurring in an unexpected place. */
 @OnlineDocumentation
-final class MatchInWrongMethodTemplates {
-  private MatchInWrongMethodTemplates() {}
+final class MatchInWrongMethodRules {
+  private MatchInWrongMethodRules() {}
 
   static final class StringIsEmpty {
     @BeforeTemplate

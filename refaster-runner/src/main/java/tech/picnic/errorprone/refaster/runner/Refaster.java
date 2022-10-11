@@ -154,7 +154,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
    * <p>The assigned severity is overridden only if this bug checker's severity was explicitly
    * configured.
    *
-   * <p>The original check name (i.e. the Refaster template name) is prepended to the {@link
+   * <p>The original check name (i.e. the Refaster rule name) is prepended to the {@link
    * Description}'s message. The replacement check name ("Refaster Rule", a name which includes a
    * space) is chosen such that it is guaranteed not to match any canonical bug checker name (as
    * that could cause {@link VisitorState#reportMatch(Description)}} to override the reported
