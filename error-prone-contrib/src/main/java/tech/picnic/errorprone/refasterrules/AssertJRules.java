@@ -491,7 +491,7 @@ final class AssertJRules {
   }
 
   // XXX: This overload is here because `assertThat` has an overload for `Comparable` types.
-  // Unfortunately this still doesn't convince Refaster to match this template in the context of
+  // Unfortunately this still doesn't convince Refaster to match this rule in the context of
   // Comparable types. Figure out why! Note that this also affects the `AssertThatOptional` rule.
   static final class AssertThatIterableHasOneComparableElementEqualTo<
       S extends Comparable<? super S>, T extends S> {

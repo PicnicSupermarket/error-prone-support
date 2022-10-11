@@ -117,7 +117,7 @@ final class AssortedRules {
   }
 
   /** Don't unnecessarily repeat boolean expressions. */
-  // XXX: This template captures only the simplest case. `@AlsoNegation` doesn't help. Consider
+  // XXX: This rule captures only the simplest case. `@AlsoNegation` doesn't help. Consider
   // contributing a Refaster patch, which handles the negation in the `@BeforeTemplate` more
   // intelligently.
   static final class LogicalImplication {
@@ -172,7 +172,7 @@ final class AssortedRules {
    * Collections#disjoint(Collection, Collection)}.
    */
   // XXX: Other copy operations could be elided too, but these are most common after application of
-  // the `DisjointSets` template defined above. If we ever introduce a generic "makes a copy"
+  // the `DisjointSets` rule defined above. If we ever introduce a generic "makes a copy"
   // stand-in, use it here.
   static final class DisjointCollections<T> {
     @BeforeTemplate

@@ -65,9 +65,9 @@ final class RefasterRulesTest {
           TimeRules.class,
           WebClientRules.class);
 
-  // XXX: Create a JUnit extension to automatically discover the template collections in a given
+  // XXX: Create a JUnit extension to automatically discover the rule collections in a given
   // context to make sure the list is exhaustive.
-  private static Stream<Arguments> validateTemplateCollectionTestCases() {
+  private static Stream<Arguments> validateRuleCollectionTestCases() {
     // XXX: Drop the filter once we have added tests for AssertJ! We can then also replace this
     // method with `@ValueSource(classes = {...})`.
     return RULE_COLLECTIONS.stream()
@@ -75,9 +75,9 @@ final class RefasterRulesTest {
         .map(Arguments::arguments);
   }
 
-  @MethodSource("validateTemplateCollectionTestCases")
+  @MethodSource("validateRuleCollectionTestCases")
   @ParameterizedTest
-  void validateTemplateCollection(Class<?> clazz) {
+  void validateRuleCollection(Class<?> clazz) {
     RefasterRuleCollection.validate(clazz);
   }
 }
