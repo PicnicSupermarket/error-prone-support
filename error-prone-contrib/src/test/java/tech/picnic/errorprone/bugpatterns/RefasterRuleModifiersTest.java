@@ -5,11 +5,11 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class RefasterTemplateModifiersTest {
+final class RefasterRuleModifiersTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(RefasterTemplateModifiers.class, getClass());
+      CompilationTestHelper.newInstance(RefasterRuleModifiers.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(RefasterTemplateModifiers.class, getClass());
+      BugCheckerRefactoringTestHelper.newInstance(RefasterRuleModifiers.class, getClass());
 
   @Test
   void identification() {

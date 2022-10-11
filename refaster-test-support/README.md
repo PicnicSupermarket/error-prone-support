@@ -1,8 +1,8 @@
 # Refaster test support
 
-This module provides utilities to validate _Refaster rule collections_. A
-rule collection is a set of Refaster rules represented as static nested
-classes, all located in a shared top-level class.
+This module provides utilities to validate _Refaster rule collections_. A rule
+collection is a set of Refaster rules represented as static nested classes, all
+located in a shared top-level class.
 
 ## What does this module do?
 
@@ -14,32 +14,31 @@ should match the associated output file.
 The validation performed by this module ensures that each Refaster rule is
 tested, making sure that it matches and transforms code as intended. If a
 Refaster rule is not covered by a test, if it influences unrelated test code,
-or if the associated test doesn't follow certain established standards,
-then this irregularity will be reported, and the associated rule collection
-test will fail. This way, developers receive guidance on how to write Refaster
-rule tests and assurance that every rule is properly tested.
+or if the associated test doesn't follow certain established standards, then
+this irregularity will be reported, and the associated rule collection test
+will fail. This way, developers receive guidance on how to write Refaster rule
+tests and assurance that every rule is properly tested.
 
 ## How to test a collection of Refaster rules
 
 In a nutshell, to test a Refaster rule collection using the
 `RefasterRuleCollection` class, one should create suitably named input and
 output source code files. The collection's Refaster rules are applied to the
-input file, and the generated patches must exactly produce the contents of
-the associated output file.
+input file, and the generated patches must exactly produce the contents of the
+associated output file.
 
 To test Refaster rules, one can create a (parameterized) test for every class
-that contains Refaster rules and invoke
-`RefasterRuleCollection#validate`. This test utility applies the Refaster
-rules in the collection to a provided input file, and expects the result to
-exactly match the contents of a provided output file.
+that contains Refaster rules and invoke `RefasterRuleCollection#validate`. This
+test utility applies the Refaster rules in the collection to a provided input
+file, and expects the result to exactly match the contents of a provided output
+file.
 
 To adopt this setup, the following requirements must be met:
 
 - Each Refaster rule collection must match the naming convention
   `<RuleCollectionName>Rules.java`.
 - There is a test class with a (parameterized) test method that invokes
-  `RefasterRuleCollection#validate` on the rule collection(s) to be
-  validated.
+  `RefasterRuleCollection#validate` on the rule collection(s) to be validated.
 - For every rule collection there is an input file matching the naming
   convention `<RuleCollectionName>RulesTestInput.java`.
 - For every rule collection there is an output file matching the naming

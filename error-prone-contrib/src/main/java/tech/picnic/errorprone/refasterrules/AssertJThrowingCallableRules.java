@@ -429,8 +429,8 @@ final class AssertJThrowingCallableRules {
     }
   }
 
-  // XXX: Drop this rule in favour of a generic Error Prone check that flags
-  // `String.format(...)` arguments to a wide range of format methods.
+  // XXX: Drop this rule in favour of a generic Error Prone check that flags `String.format(...)`
+  // arguments to a wide range of format methods.
   static final class AbstractThrowableAssertHasMessage {
     @BeforeTemplate
     AbstractThrowableAssert<?, ? extends Throwable> before(
@@ -449,8 +449,8 @@ final class AssertJThrowingCallableRules {
     }
   }
 
-  // XXX: Drop this rule in favour of a generic Error Prone check that flags
-  // `String.format(...)` arguments to a wide range of format methods.
+  // XXX: Drop this rule in favour of a generic Error Prone check that flags `String.format(...)`
+  // arguments to a wide range of format methods.
   static final class AbstractThrowableAssertWithFailMessage {
     @BeforeTemplate
     AbstractThrowableAssert<?, ? extends Throwable> before(

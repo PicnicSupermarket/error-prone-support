@@ -172,8 +172,8 @@ final class AssortedRules {
    * Collections#disjoint(Collection, Collection)}.
    */
   // XXX: Other copy operations could be elided too, but these are most common after application of
-  // the `DisjointSets` rule defined above. If we ever introduce a generic "makes a copy"
-  // stand-in, use it here.
+  // the `DisjointSets` rule defined above. If we ever introduce a generic "makes a copy" stand-in,
+  // use it here.
   static final class DisjointCollections<T> {
     @BeforeTemplate
     boolean before(Collection<T> collection1, Collection<T> collection2) {

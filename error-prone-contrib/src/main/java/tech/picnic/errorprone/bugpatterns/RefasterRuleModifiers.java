@@ -35,11 +35,11 @@ import javax.lang.model.element.Modifier;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Refaster class and method definitions should specify a canonical set of modifiers",
-    link = BUG_PATTERNS_BASE_URL + "RefasterTemplateModifiers",
+    link = BUG_PATTERNS_BASE_URL + "RefasterRuleModifiers",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)
-public final class RefasterTemplateModifiers extends BugChecker
+public final class RefasterRuleModifiers extends BugChecker
     implements ClassTreeMatcher, MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> BEFORE_TEMPLATE_METHOD = hasAnnotation(BeforeTemplate.class);

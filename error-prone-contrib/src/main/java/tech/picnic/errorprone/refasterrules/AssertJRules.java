@@ -101,7 +101,7 @@ import tech.picnic.errorprone.refaster.matchers.IsArray;
 // (etc.)
 // XXX: Look into using Assertions#contentOf(URL url, Charset charset) instead of our own test
 // method.
-// XXX: Write Optional rules also for `OptionalInt` and variants.
+// XXX: Write `Optional` rules also for `OptionalInt` and variants.
 // XXX: Write plugin to flag `assertThat(compileTimeConstant)` occurrences. Also other likely
 // candidates, such as `assertThat(ImmutableSet(foo, bar)).XXX`
 // XXX: Write generic plugin to replace explicit array parameters with varargs (`new int[] {1, 2}`
@@ -118,8 +118,8 @@ import tech.picnic.errorprone.refaster.matchers.IsArray;
 // XXX: `assertThat(ImmutableList.sortedCopyOf(cmp, values)).somethingExactOrder` -> just compare
 // "in any order".
 // XXX: Turns out a lot of this is also covered by https://github.com/palantir/assertj-automation.
-// See how we can combine these things. Do note that (at present) their Refaster rules don't
-// show up as Error Prone checks. So we'd have to build an integration for that.
+// See how we can combine these things. Do note that (at present) their Refaster rules don't show up
+// as Error Prone checks. So we'd have to build an integration for that.
 final class AssertJRules {
   private AssertJRules() {}
 
