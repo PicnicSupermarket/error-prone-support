@@ -30,7 +30,7 @@ import com.sun.source.tree.MethodTree;
 public final class TestNGAnnotation extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final ImmutableMap<Matcher<AnnotationTree>, String>
-      TESTNG_ANNOTATION_REPLACEMENT_MAP =
+      TESTNG_ANNOTATION_REPLACEMENTS =
           ImmutableMap.<Matcher<AnnotationTree>, String>builder()
               .put(isType("org.testng.annotations.AfterClass"), "@org.junit.jupiter.api.AfterAll")
               .put(isType("org.testng.annotations.AfterMethod"), "@org.junit.jupiter.api.AfterEach")
@@ -48,7 +48,7 @@ public final class TestNGAnnotation extends BugChecker implements MethodTreeMatc
         .filter(annotation -> annotation.getArguments().isEmpty())
         .forEach(
             annotation ->
-                TESTNG_ANNOTATION_REPLACEMENT_MAP.entrySet().stream()
+                TESTNG_ANNOTATION_REPLACEMENTS.entrySet().stream()
                     .filter(entry -> entry.getKey().matches(annotation, state))
                     .forEach(entry -> fix.replace(annotation, entry.getValue())));
 
