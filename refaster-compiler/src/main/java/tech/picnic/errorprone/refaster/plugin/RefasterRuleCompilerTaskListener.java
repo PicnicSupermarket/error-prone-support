@@ -69,25 +69,6 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
     }
   }
 
-  private boolean containsRefasterRules(ClassTree tree) {
-    return Boolean.TRUE.equals(
-        new TreeScanner<Boolean, Void>() {
-          @Override
-          public Boolean visitAnnotation(AnnotationTree node, @Nullable Void v) {
-            Symbol sym = ASTHelpers.getSymbol(node);
-            return (sym != null
-                    && sym.getQualifiedName()
-                        .contentEquals(BeforeTemplate.class.getCanonicalName()))
-                || super.visitAnnotation(node, v);
-          }
-
-          @Override
-          public Boolean reduce(Boolean r1, Boolean r2) {
-            return Boolean.TRUE.equals(r1) || Boolean.TRUE.equals(r2);
-          }
-        }.scan(tree, null));
-  }
-
   private ImmutableMap<ClassTree, CodeTransformer> compileRefasterRules(ClassTree tree) {
     ImmutableMap.Builder<ClassTree, CodeTransformer> rules = ImmutableMap.builder();
     new TreeScanner<Void, ImmutableClassToInstanceMap<Annotation>>() {
@@ -122,7 +103,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
         taskEvent.getSourceFile());
   }
 
-  private static boolean containsRefasterTemplates(ClassTree tree) {
+  private static boolean containsRefasterRules(ClassTree tree) {
     return Boolean.TRUE.equals(
         new TreeScanner<Boolean, Void>() {
           @Override
