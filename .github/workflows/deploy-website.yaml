@@ -2,7 +2,7 @@ name: Update `error-prone.picnic.tech` website content
 on:
   pull_request:
   push:
-    branches: [ master ]
+    branches: [ master, website ]
 permissions:
   contents: read
   id-token: write
@@ -29,13 +29,15 @@ jobs:
         run: bundle exec jekyll build
       - name: Validate HTML output
         working-directory: ./website
-        run: bundle exec htmlproofer --check-external-hash false ./_site
+        # XXX: Drop `--disable_external true` once we fully adopted the
+        # "Refaster rules" terminology on our website and in the code.
+        run: bundle exec htmlproofer --disable_external true --check-external-hash false ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@v1.0.4
         with:
           path: ./website/_site
   deploy:
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/website'
     needs: build
     runs-on: ubuntu-22.04
     environment:
