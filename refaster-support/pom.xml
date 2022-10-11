@@ -11,7 +11,7 @@
     <artifactId>refaster-support</artifactId>
 
     <name>Picnic :: Error Prone Support :: Refaster Support</name>
-    <description>Helper utilities for use with Refaster templates.</description>
+    <description>Helper utilities for use with Refaster rules.</description>
 
     <dependencies>
         <!-- This dependency is listed out-of-order so as not to confuse the

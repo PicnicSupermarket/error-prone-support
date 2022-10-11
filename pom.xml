@@ -1230,10 +1230,9 @@
                         </exclusionPatterns>
                         <failOnViolations>false</failOnViolations>
                         <ignorePackages>
-                            <!-- Some Refaster templates purposefully use
-                            outdated patterns in their `@BeforeTemplate`
-                            methods. -->
-                            <ignorePackage>tech.picnic.errorprone.refastertemplates</ignorePackage>
+                            <!-- Some Refaster rules purposefully use outdated
+                            patterns in their `@BeforeTemplate` methods. -->
+                            <ignorePackage>tech.picnic.errorprone.refasterrules</ignorePackage>
                         </ignorePackages>
                         <javaVersion>${version.jdk}</javaVersion>
                     </configuration>
@@ -1368,7 +1367,7 @@
                 <!-- XXX: Find a way to assert that test code (both inline
                 `BugChecker` test code and the Refaster test files) does not
                 exhibit anti-patterns other than those associated with the
-                check/template under test. Ideally all test cases are realistic. -->
+                check/rule under test. Ideally all test cases are realistic. -->
                 <error-prone.self-check-args>-XepAllSuggestionsAsWarnings -Xep:MethodReferenceUsage:OFF</error-prone.self-check-args>
             </properties>
             <build>

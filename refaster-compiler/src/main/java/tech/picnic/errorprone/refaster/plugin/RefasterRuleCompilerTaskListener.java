@@ -54,21 +54,21 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
     }
 
     ClassTree tree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
-    if (tree == null || !containsRefasterTemplates(tree)) {
+    if (tree == null || !containsRefasterRules(tree)) {
       return;
     }
 
-    ImmutableListMultimap<ClassTree, CodeTransformer> rules = compileRefasterTemplates(tree);
+    ImmutableListMultimap<ClassTree, CodeTransformer> rules = compileRefasterRules(tree);
     for (Map.Entry<ClassTree, List<CodeTransformer>> rule : Multimaps.asMap(rules).entrySet()) {
       try {
         outputCodeTransformers(rule.getValue(), getOutputFile(taskEvent, rule.getKey()));
       } catch (IOException e) {
-        throw new UncheckedIOException("Failed to persist compiled Refaster templates", e);
+        throw new UncheckedIOException("Failed to persist compiled Refaster rules", e);
       }
     }
   }
 
-  private boolean containsRefasterTemplates(ClassTree tree) {
+  private boolean containsRefasterRules(ClassTree tree) {
     return Boolean.TRUE.equals(
         new TreeScanner<Boolean, Void>() {
           @Override
@@ -87,8 +87,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
         }.scan(tree, null));
   }
 
-  private ImmutableListMultimap<ClassTree, CodeTransformer> compileRefasterTemplates(
-      ClassTree tree) {
+  private ImmutableListMultimap<ClassTree, CodeTransformer> compileRefasterRules(ClassTree tree) {
     ListMultimap<ClassTree, CodeTransformer> rules = ArrayListMultimap.create();
     new TreeScanner<Void, Void>() {
       @Nullable

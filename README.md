@@ -63,7 +63,7 @@ it:
                                <artifactId>error-prone-contrib</artifactId>
                                <version>${error-prone-support.version}</version>
                            </path>
-                           <!-- Error Prone Support's Refaster templates. -->
+                           <!-- Error Prone Support's Refaster rules. -->
                            <path>
                                <groupId>tech.picnic.error-prone-support</groupId>
                                <artifactId>refaster-runner</artifactId>
@@ -122,7 +122,7 @@ $ mvn clean install
 [INFO] -------------------------------------------------------------
 [WARNING] COMPILATION WARNING :
 [INFO] -------------------------------------------------------------
-[WARNING] Example.java:[9,34] [tech.picnic.errorprone.refastertemplates.BigDecimalTemplates.BigDecimalZero]
+[WARNING] Example.java:[9,34] [tech.picnic.errorprone.refasterrules.BigDecimalRules.BigDecimalZero]
   Did you mean 'return BigDecimal.ZERO;'?
 [WARNING] Example.java:[13,35] [IdentityConversion] This method invocation appears redundant; remove it or suppress this warning and add a comment explaining its purpose
     (see https://error-prone.picnic.tech/bugpatterns/IdentityConversion)
@@ -136,12 +136,12 @@ Two things are kicking in here:
 
 1. An Error Prone [`BugChecker`][error-prone-bugchecker] that flags unnecessary
    [identity conversions][bug-checks-identity-conversion].
-2. A [Refaster][refaster] template capable of
-   [rewriting][refaster-templates-bigdecimal] expressions of the form
+2. A [Refaster][refaster] rule capable of
+   [rewriting][refaster-rules-bigdecimal] expressions of the form
    `BigDecimal.valueOf(0)` and `new BigDecimal(0)` to `BigDecimal.ZERO`.
 
 Be sure to check out all [bug checks][bug-checks] and [refaster
-templates][refaster-templates].
+rules][refaster-rules].
 
 ## 👷 Developing Error Prone Support
 
@@ -227,5 +227,5 @@ guidelines][contributing].
 [pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
 [refaster]: https://errorprone.info/docs/refaster
-[refaster-templates-bigdecimal]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/BigDecimalTemplates.java
-[refaster-templates]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refastertemplates/
+[refaster-rules-bigdecimal]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/BigDecimalRules.java
+[refaster-rules]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/

@@ -15,11 +15,11 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Scans the classpath for {@value #REFASTER_TEMPLATE_SUFFIX} files and loads them as {@link
+ * Scans the classpath for {@value #REFASTER_RULE_SUFFIX} files and loads them as {@link
  * CodeTransformer}s.
  */
 public final class CodeTransformers {
-  private static final String REFASTER_TEMPLATE_SUFFIX = ".refaster";
+  private static final String REFASTER_RULE_SUFFIX = ".refaster";
   private static final Supplier<ImmutableListMultimap<String, CodeTransformer>>
       ALL_CODE_TRANSFORMERS = Suppliers.memoize(CodeTransformers::loadAllCodeTransformers);
 
@@ -30,28 +30,28 @@ public final class CodeTransformers {
    *
    * <p>This method returns a cached view; all invocations except the first are very cheap.
    *
-   * @return A mapping from Refaster template names to associated {@link CodeTransformer}s.
+   * @return A mapping from Refaster rule names to associated {@link CodeTransformer}s.
    */
   public static ImmutableListMultimap<String, CodeTransformer> getAllCodeTransformers() {
     return ALL_CODE_TRANSFORMERS.get();
   }
 
   /**
-   * Scans the classpath for compiled Refaster templates and returns the associated deserialized
-   * {@link CodeTransformer}s, indexed by their name.
+   * Scans the classpath for compiled Refaster rules and returns the associated deserialized {@link
+   * CodeTransformer}s, indexed by their name.
    *
-   * @return A mapping from Refaster template names to associated {@link CodeTransformer}s.
+   * @return A mapping from Refaster rule names to associated {@link CodeTransformer}s.
    */
   private static ImmutableListMultimap<String, CodeTransformer> loadAllCodeTransformers() {
     ImmutableListMultimap.Builder<String, CodeTransformer> transformers =
         ImmutableListMultimap.builder();
 
     for (ResourceInfo resource : getClassPathResources()) {
-      getRefasterTemplateName(resource)
+      getRefasterRuleName(resource)
           .ifPresent(
-              templateName ->
+              ruleName ->
                   loadCodeTransformer(resource)
-                      .ifPresent(transformer -> transformers.put(templateName, transformer)));
+                      .ifPresent(transformer -> transformers.put(ruleName, transformer)));
     }
 
     return transformers.build();
@@ -65,15 +65,15 @@ public final class CodeTransformers {
     }
   }
 
-  private static Optional<String> getRefasterTemplateName(ResourceInfo resource) {
+  private static Optional<String> getRefasterRuleName(ResourceInfo resource) {
     String resourceName = resource.getResourceName();
-    if (!resourceName.endsWith(REFASTER_TEMPLATE_SUFFIX)) {
+    if (!resourceName.endsWith(REFASTER_RULE_SUFFIX)) {
       return Optional.empty();
     }
 
     int lastPathSeparator = resourceName.lastIndexOf('/');
     int beginIndex = lastPathSeparator < 0 ? 0 : lastPathSeparator + 1;
-    int endIndex = resourceName.length() - REFASTER_TEMPLATE_SUFFIX.length();
+    int endIndex = resourceName.length() - REFASTER_RULE_SUFFIX.length();
     return Optional.of(resourceName.substring(beginIndex, endIndex));
   }
 
