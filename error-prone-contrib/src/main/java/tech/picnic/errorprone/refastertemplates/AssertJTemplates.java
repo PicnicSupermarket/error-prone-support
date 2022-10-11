@@ -564,7 +564,7 @@ final class AssertJTemplates {
   // Map
   //
 
-  static final class AssertThatMapIsEmpty<K, V> {
+  static final class AbstractMapAssertIsEmpty<K, V> {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
     void before(AbstractMapAssert<?, ?, K, V> mapAssert) {
@@ -615,8 +615,7 @@ final class AssertJTemplates {
     }
   }
 
-  // XXX: Find a better name.
-  static final class AssertThatMapIsEmpty2<K, V> {
+  static final class AssertThatMapIsEmpty<K, V> {
     @BeforeTemplate
     void before(Map<K, V> map) {
       Refaster.anyOf(
@@ -638,7 +637,7 @@ final class AssertJTemplates {
     }
   }
 
-  static final class AssertThatMapIsNotEmpty<K, V> {
+  static final class AbstractMapAssertIsNotEmpty<K, V> {
     @BeforeTemplate
     AbstractMapAssert<?, ?, K, V> before(AbstractMapAssert<?, ?, K, V> mapAssert) {
       return mapAssert.isNotEqualTo(
@@ -657,8 +656,7 @@ final class AssertJTemplates {
     }
   }
 
-  // XXX: Find a better name.
-  static final class AssertThatMapIsNotEmpty2<K, V> {
+  static final class AssertThatMapIsNotEmpty<K, V> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Map<K, V> map) {
       return Refaster.anyOf(

@@ -70,7 +70,7 @@ final class IntStreamTemplatesTest implements RefasterTemplateTestCase {
     return IntStream.of(1).min();
   }
 
-  ImmutableSet<Boolean> testIntStreamNoneMatch() {
+  ImmutableSet<Boolean> testIntStreamNoneMatchIntPredicate() {
     IntPredicate pred = i -> i > 0;
     return ImmutableSet.of(
         IntStream.of(1).noneMatch(n -> n > 1),
@@ -78,7 +78,7 @@ final class IntStreamTemplatesTest implements RefasterTemplateTestCase {
         IntStream.of(3).noneMatch(pred));
   }
 
-  boolean testIntStreamNoneMatch2() {
+  boolean testIntStreamNoneMatch() {
     return IntStream.of(1).noneMatch(n -> n > 1);
   }
 
@@ -87,12 +87,12 @@ final class IntStreamTemplatesTest implements RefasterTemplateTestCase {
         IntStream.of(1).anyMatch(n -> n > 1), IntStream.of(2).anyMatch(n -> n > 2));
   }
 
-  boolean testIntStreamAllMatch() {
+  boolean testIntStreamAllMatchIntPredicate() {
     IntPredicate pred = i -> i > 0;
     return IntStream.of(1).allMatch(pred);
   }
 
-  boolean testIntStreamAllMatch2() {
+  boolean testIntStreamAllMatch() {
     return IntStream.of(1).allMatch(n -> n > 1);
   }
 }

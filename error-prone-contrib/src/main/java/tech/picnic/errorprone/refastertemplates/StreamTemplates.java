@@ -269,7 +269,7 @@ final class StreamTemplates {
   }
 
   /** Prefer {@link Stream#noneMatch(Predicate)} over more contrived alternatives. */
-  static final class StreamNoneMatch<T> {
+  static final class StreamNoneMatchPredicate<T> {
     @BeforeTemplate
     boolean before(Stream<T> stream, Predicate<? super T> predicate) {
       return Refaster.anyOf(
@@ -284,7 +284,7 @@ final class StreamTemplates {
     }
   }
 
-  abstract static class StreamNoneMatch2<T> {
+  abstract static class StreamNoneMatch<T> {
     @Placeholder(allowsIdentity = true)
     abstract boolean test(@MayOptionallyUse T element);
 
@@ -313,7 +313,7 @@ final class StreamTemplates {
     }
   }
 
-  static final class StreamAllMatch<T> {
+  static final class StreamAllMatchPredicate<T> {
     @BeforeTemplate
     boolean before(Stream<T> stream, Predicate<? super T> predicate) {
       return stream.noneMatch(Refaster.anyOf(not(predicate), predicate.negate()));
@@ -325,7 +325,7 @@ final class StreamTemplates {
     }
   }
 
-  abstract static class StreamAllMatch2<T> {
+  abstract static class StreamAllMatch<T> {
     @Placeholder(allowsIdentity = true)
     abstract boolean test(@MayOptionallyUse T element);
 

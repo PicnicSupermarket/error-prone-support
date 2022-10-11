@@ -199,7 +199,7 @@ final class IntStreamTemplates {
   }
 
   /** Prefer {@link IntStream#noneMatch(IntPredicate)} over more contrived alternatives. */
-  static final class IntStreamNoneMatch {
+  static final class IntStreamNoneMatchIntPredicate {
     @BeforeTemplate
     boolean before(IntStream stream, IntPredicate predicate) {
       return Refaster.anyOf(
@@ -214,7 +214,7 @@ final class IntStreamTemplates {
     }
   }
 
-  abstract static class IntStreamNoneMatch2 {
+  abstract static class IntStreamNoneMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse int element);
 
@@ -243,7 +243,7 @@ final class IntStreamTemplates {
     }
   }
 
-  static final class IntStreamAllMatch {
+  static final class IntStreamAllMatchIntPredicate {
     @BeforeTemplate
     boolean before(IntStream stream, IntPredicate predicate) {
       return stream.noneMatch(predicate.negate());
@@ -255,7 +255,7 @@ final class IntStreamTemplates {
     }
   }
 
-  abstract static class IntStreamAllMatch2 {
+  abstract static class IntStreamAllMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse int element);
 

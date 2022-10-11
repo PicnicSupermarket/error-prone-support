@@ -70,7 +70,7 @@ final class LongStreamTemplatesTest implements RefasterTemplateTestCase {
     return LongStream.of(1).min();
   }
 
-  ImmutableSet<Boolean> testLongStreamNoneMatch() {
+  ImmutableSet<Boolean> testLongStreamNoneMatchLongPredicate() {
     LongPredicate pred = i -> i > 0;
     return ImmutableSet.of(
         LongStream.of(1).noneMatch(n -> n > 1),
@@ -78,7 +78,7 @@ final class LongStreamTemplatesTest implements RefasterTemplateTestCase {
         LongStream.of(3).noneMatch(pred));
   }
 
-  boolean testLongStreamNoneMatch2() {
+  boolean testLongStreamNoneMatch() {
     return LongStream.of(1).noneMatch(n -> n > 1);
   }
 
@@ -87,12 +87,12 @@ final class LongStreamTemplatesTest implements RefasterTemplateTestCase {
         LongStream.of(1).anyMatch(n -> n > 1), LongStream.of(2).anyMatch(n -> n > 2));
   }
 
-  boolean testLongStreamAllMatch() {
+  boolean testLongStreamAllMatchLongPredicate() {
     LongPredicate pred = i -> i > 0;
     return LongStream.of(1).allMatch(pred);
   }
 
-  boolean testLongStreamAllMatch2() {
+  boolean testLongStreamAllMatch() {
     return LongStream.of(1).allMatch(n -> n > 1);
   }
 }
