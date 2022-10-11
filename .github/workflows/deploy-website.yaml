@@ -29,7 +29,9 @@ jobs:
         run: bundle exec jekyll build
       - name: Validate HTML output
         working-directory: ./website
-        run: bundle exec htmlproofer --check-external-hash false ./_site
+        # XXX: Drop `--ignore-urls` after we fully adopted terminology
+        # "Refaster rules" on our website and in the code.
+        run: bundle exec htmlproofer --ignore-urls "/www.github.com/" --check-external-hash false ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@v1.0.4
         with:
