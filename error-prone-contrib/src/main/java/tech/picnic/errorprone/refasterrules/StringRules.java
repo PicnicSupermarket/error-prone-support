@@ -128,8 +128,8 @@ final class StringRules {
    * Prefer direct delegation to {@link String#valueOf(Object)} over the indirection introduced by
    * {@link Objects#toString(Object)}.
    */
-  // XXX: This template is analogous to `StringValueOf` above. Arguably this is its generalization.
-  // If/when Refaster is extended to understand this, delete the template above.
+  // XXX: This rule is analogous to `StringValueOf` above. Arguably this is its generalization.
+  // If/when Refaster is extended to understand this, delete the rule above.
   static final class StringValueOfMethodReference {
     @BeforeTemplate
     Function<Object, String> before() {

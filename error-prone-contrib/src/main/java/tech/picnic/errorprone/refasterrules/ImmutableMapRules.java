@@ -313,7 +313,7 @@ final class ImmutableMapRules {
     }
   }
 
-  // XXX: Add a template for this:
+  // XXX: Add a rule for this:
   // Maps.transformValues(streamOfEntries.collect(groupBy(fun)), ImmutableMap::copyOf)
   // ->
   // streamOfEntries.collect(groupBy(fun, toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)))

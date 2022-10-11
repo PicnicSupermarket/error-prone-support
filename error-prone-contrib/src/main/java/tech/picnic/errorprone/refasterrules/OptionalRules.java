@@ -78,8 +78,8 @@ final class OptionalRules {
   }
 
   /** Prefer {@link Optional#orElseThrow()} over the less explicit {@link Optional#get()}. */
-  // XXX: This template is analogous to `OptionalOrElseThrow` above. Arguably this is its
-  // generalization. If/when Refaster is extended to understand this, delete the template above.
+  // XXX: This rule is analogous to `OptionalOrElseThrow` above. Arguably this is its
+  // generalization. If/when Refaster is extended to understand this, delete the rule above.
   static final class OptionalOrElseThrowMethodReference<T> {
     @BeforeTemplate
     Function<Optional<T>, T> before() {

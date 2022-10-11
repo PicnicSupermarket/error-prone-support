@@ -64,8 +64,7 @@ import tech.picnic.errorprone.refaster.runner.Refaster;
 @BugPattern(summary = "Exercises a Refaster rule collection", severity = ERROR)
 public final class RefasterRuleCollection extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final String RULE_COLLECTION_FLAG =
-      "RefasterTemplateCollection:TemplateCollection";
+  private static final String RULE_COLLECTION_FLAG = "RefasterRuleCollection:RuleCollection";
   private static final String TEST_METHOD_NAME_PREFIX = "test";
 
   private final String ruleCollectionUnderTest;
@@ -139,7 +138,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
             .withPath(state.getPath()));
 
     ImmutableRangeMap<Integer, String> indexedMatches =
-        indexTemplateMatches(matches, ((JCCompilationUnit) tree).endPositions);
+        indexRuleMatches(matches, ((JCCompilationUnit) tree).endPositions);
 
     matches.forEach(state::reportMatch);
     reportMissingMatches(tree, indexedMatches, state);
@@ -171,7 +170,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     }
   }
 
-  private static ImmutableRangeMap<Integer, String> indexTemplateMatches(
+  private static ImmutableRangeMap<Integer, String> indexRuleMatches(
       List<Description> matches, EndPosTable endPositions) {
     ImmutableRangeMap.Builder<Integer, String> ruleMatches = ImmutableRangeMap.builder();
 
@@ -282,7 +281,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
       }
 
       /*
-       * Unless this method is `RefasterTemplateTestCase#elidedTypesAndStaticImports`, it's
+       * Unless this method is `RefasterRuleCollectionTestCase#elidedTypesAndStaticImports`, it's
        * misnamed.
        */
       if (!"elidedTypesAndStaticImports".equals(methodName)) {

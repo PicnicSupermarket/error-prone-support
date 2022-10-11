@@ -25,7 +25,7 @@ final class RefasterRuleCollectionTest {
         RuleWithoutTestRules.class,
         ValidRules.class
       })
-  void verifyRefasterTemplateCollections(Class<?> clazz) {
+  void verifyRefasterRuleCollections(Class<?> clazz) {
     RefasterRuleCollection.validate(clazz);
   }
 }

@@ -85,8 +85,8 @@ public final class RefasterTemplateModifiers extends BugChecker
 
     if (!hasMatchingMember(tree, PLACEHOLDER_METHOD, state)) {
       /*
-       * Templates without a `@Placeholder` method should be `final`. Note that Refaster enforces
-       * that `@Placeholder` methods are `abstract`, so templates _with_ such a method will
+       * Rules without a `@Placeholder` method should be `final`. Note that Refaster enforces
+       * that `@Placeholder` methods are `abstract`, so rules _with_ such a method will
        * naturally be `abstract` and non-`final`.
        */
       modifiersToAdd.add(Modifier.FINAL);
