@@ -13,8 +13,10 @@ import org.jspecify.nullness.Nullable;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link RxJava2Adapter}. */
+@OnlineDocumentation
 final class RxJava2AdapterRules {
   private RxJava2AdapterRules() {}
 

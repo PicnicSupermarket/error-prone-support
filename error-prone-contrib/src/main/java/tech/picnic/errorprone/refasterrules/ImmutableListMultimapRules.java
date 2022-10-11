@@ -24,8 +24,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableListMultimap}s. */
+@OnlineDocumentation
 final class ImmutableListMultimapRules {
   private ImmutableListMultimapRules() {}
 

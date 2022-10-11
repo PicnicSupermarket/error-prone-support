@@ -8,7 +8,9 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import org.assertj.core.api.AbstractDoubleAssert;
 import org.assertj.core.data.Offset;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+@OnlineDocumentation
 final class AssertJDoubleRules {
   private AssertJDoubleRules() {}
 

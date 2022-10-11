@@ -6,8 +6,10 @@ import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Objects;
 import java.util.function.Predicate;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with (in)equalities. */
+@OnlineDocumentation
 final class EqualityRules {
   private EqualityRules() {}
 

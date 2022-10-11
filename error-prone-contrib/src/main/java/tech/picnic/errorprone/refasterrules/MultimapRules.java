@@ -8,8 +8,10 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Collection;
 import java.util.Set;
 import javax.annotation.Nullable;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link Multimap}s. */
+@OnlineDocumentation
 final class MultimapRules {
   private MultimapRules() {}
 

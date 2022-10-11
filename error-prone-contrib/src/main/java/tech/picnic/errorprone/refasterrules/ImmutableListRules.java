@@ -20,8 +20,10 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableList}s. */
+@OnlineDocumentation
 final class ImmutableListRules {
   private ImmutableListRules() {}
 

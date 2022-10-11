@@ -8,8 +8,10 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.junit.jupiter.params.provider.Arguments;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to JUnit expressions and statements. */
+@OnlineDocumentation
 final class JUnitRules {
   private JUnitRules() {}
 

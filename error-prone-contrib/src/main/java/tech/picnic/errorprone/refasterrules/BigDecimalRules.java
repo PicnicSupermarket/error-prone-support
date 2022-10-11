@@ -4,8 +4,10 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.math.BigDecimal;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link BigDecimal}s. */
+@OnlineDocumentation
 final class BigDecimalRules {
   private BigDecimalRules() {}
 

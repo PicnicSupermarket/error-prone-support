@@ -14,8 +14,10 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.Map;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link Map.Entry} instances. */
+@OnlineDocumentation
 final class MapEntryRules {
   private MapEntryRules() {}
 

@@ -9,6 +9,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.math.BigDecimal;
 import org.assertj.core.api.AbstractBigDecimalAssert;
 import org.assertj.core.api.BigDecimalAssert;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /**
  * Refaster rules related to AssertJ assertions over {@link BigDecimal}s.
@@ -20,6 +21,7 @@ import org.assertj.core.api.BigDecimalAssert;
  * instances, but also their scale. As a result various seemingly straightforward transformations
  * would actually subtly change the assertion's semantics.
  */
+@OnlineDocumentation
 final class AssertJBigDecimalRules {
   private AssertJBigDecimalRules() {}
 

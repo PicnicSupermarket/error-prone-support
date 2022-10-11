@@ -13,8 +13,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableMultiset}s. */
+@OnlineDocumentation
 final class ImmutableMultisetRules {
   private ImmutableMultisetRules() {}
 

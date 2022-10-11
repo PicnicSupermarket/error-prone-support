@@ -21,8 +21,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableSetMultimap}s. */
+@OnlineDocumentation
 final class ImmutableSetMultimapRules {
   private ImmutableSetMultimapRules() {}
 

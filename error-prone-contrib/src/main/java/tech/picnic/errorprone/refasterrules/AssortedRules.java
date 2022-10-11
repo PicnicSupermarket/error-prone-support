@@ -28,11 +28,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /**
  * Assorted Refaster rules that do not (yet) belong in one of the other classes with more topical
  * Refaster rules.
  */
+@OnlineDocumentation
 final class AssortedRules {
   private AssortedRules() {}
 

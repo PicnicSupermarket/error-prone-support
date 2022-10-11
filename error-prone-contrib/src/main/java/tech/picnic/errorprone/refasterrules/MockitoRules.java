@@ -10,8 +10,10 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to Mockito expressions and statements. */
+@OnlineDocumentation
 final class MockitoRules {
   private MockitoRules() {}
 

@@ -24,8 +24,10 @@ import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link Comparator}s. */
+@OnlineDocumentation
 final class ComparatorRules {
   private ComparatorRules() {}
 

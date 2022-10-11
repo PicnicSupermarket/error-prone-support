@@ -22,8 +22,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link Stream}s. */
+@OnlineDocumentation
 final class StreamRules {
   private StreamRules() {}
 

@@ -3,8 +3,10 @@ package tech.picnic.errorprone.refasterrules;
 import com.google.common.primitives.Ints;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with primitives. */
+@OnlineDocumentation
 final class PrimitiveRules {
   private PrimitiveRules() {}
 

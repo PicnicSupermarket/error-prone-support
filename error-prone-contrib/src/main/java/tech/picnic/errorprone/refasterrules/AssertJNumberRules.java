@@ -19,8 +19,10 @@ import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractShortAssert;
 import org.assertj.core.api.NumberAssert;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsCharacter;
 
+@OnlineDocumentation
 final class AssertJNumberRules {
   private AssertJNumberRules() {}
 
