@@ -5,6 +5,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
+import static reactor.function.TupleUtils.function;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MoreCollectors;
@@ -19,6 +20,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -29,6 +31,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 import reactor.util.context.Context;
+import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
@@ -71,6 +74,35 @@ final class ReactorRules {
     @AfterTemplate
     Mono<T> after(Optional<T> optional) {
       return Mono.defer(() -> Mono.justOrEmpty(optional));
+    }
+  }
+
+  /** Prefer {@link Mono#zip(Mono, Mono)} over a chained {@link Mono#zipWith(Mono)}. */
+  static final class MonoZip<T, S> {
+    @BeforeTemplate
+    Mono<Tuple2<T, S>> before(Mono<T> mono, Mono<S> other) {
+      return mono.zipWith(other);
+    }
+
+    @AfterTemplate
+    Mono<Tuple2<T, S>> after(Mono<T> mono, Mono<S> other) {
+      return Mono.zip(mono, other);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#zip(Mono, Mono)} with a chained combinator over a chained {@link
+   * Mono#zipWith(Mono, BiFunction)}.
+   */
+  static final class MonoZipWithCombinator<T, S, R> {
+    @BeforeTemplate
+    Mono<R> before(Mono<T> mono, Mono<S> other, BiFunction<T, S, R> combinator) {
+      return mono.zipWith(other, combinator);
+    }
+
+    @AfterTemplate
+    Mono<R> after(Mono<T> mono, Mono<S> other, BiFunction<T, S, R> combinator) {
+      return Mono.zip(mono, other).map(function(combinator));
     }
   }
 

@@ -14,9 +14,11 @@ import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 import reactor.util.context.Context;
+import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
@@ -38,6 +40,15 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Mono.defer(() -> Mono.justOrEmpty(Optional.of(1))),
         Mono.defer(() -> Mono.justOrEmpty(Optional.of(2))));
+  }
+
+  Mono<Tuple2<String, Integer>> testMonoZip() {
+    return Mono.zip(Mono.just("foo"), Mono.just(1));
+  }
+
+  Mono<String> testMonoZipWithCombinator() {
+    return Mono.zip(Mono.just("foo"), Mono.just(2))
+        .map(TupleUtils.function((string, count) -> string.repeat(count)));
   }
 
   Mono<Void> testMonoDeferredError() {

@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 import reactor.util.context.Context;
+import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
@@ -36,6 +37,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Mono.fromCallable(() -> Optional.of(1).orElse(null)),
         Mono.fromSupplier(() -> Optional.of(2).orElse(null)));
+  }
+
+  Mono<Tuple2<String, Integer>> testMonoZip() {
+    return Mono.just("foo").zipWith(Mono.just(1));
+  }
+
+  Mono<String> testMonoZipWithCombinator() {
+    return Mono.just("foo").zipWith(Mono.just(2), (string, count) -> string.repeat(count));
   }
 
   Mono<Void> testMonoDeferredError() {
