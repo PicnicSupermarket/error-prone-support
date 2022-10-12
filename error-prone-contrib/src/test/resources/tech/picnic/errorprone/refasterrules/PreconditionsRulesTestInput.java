@@ -15,6 +15,12 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     }
   }
 
+  void testCheckElementIndexWithMessage() {
+    if (1 < 0 || 1 >= 2) {
+      throw new IndexOutOfBoundsException("My index");
+    }
+  }
+
   void testCheckNotNull() {
     if ("foo" == null) {
       throw new NullPointerException();

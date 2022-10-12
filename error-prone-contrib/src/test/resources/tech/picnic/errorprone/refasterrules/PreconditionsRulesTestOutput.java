@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -13,6 +14,10 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
 
   void testCheckArgumentWithMessage() {
     checkArgument(!"foo".isEmpty(), "The string is empty");
+  }
+
+  void testCheckElementIndexWithMessage() {
+    checkElementIndex(1, 2, "My index");
   }
 
   void testCheckNotNull() {

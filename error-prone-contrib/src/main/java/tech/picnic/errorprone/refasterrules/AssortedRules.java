@@ -51,6 +51,26 @@ final class AssortedRules {
     }
   }
 
+  /**
+   * Prefer {@link Objects#checkIndex(int, int)} over less descriptive or more verbose alternatives.
+   *
+   * <p>If a custom error message is desired, consider using Guava's {@link
+   * com.google.common.base.Preconditions#checkElementIndex(int, int, String)}.
+   */
+  static final class CheckIndexConditional {
+    @BeforeTemplate
+    void before2(int index, int size) {
+      if (index < 0 || index >= size) {
+        throw new IndexOutOfBoundsException();
+      }
+    }
+
+    @AfterTemplate
+    void after(int index, int size) {
+      checkIndex(index, size);
+    }
+  }
+
   // XXX: We could add a rule for `new EnumMap(Map<K, ? extends V> m)`, but that constructor does
   // not allow an empty non-EnumMap to be provided.
   static final class CreateEnumMap<K extends Enum<K>, V> {

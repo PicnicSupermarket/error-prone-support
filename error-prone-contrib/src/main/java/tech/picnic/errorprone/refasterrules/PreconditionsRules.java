@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
@@ -46,7 +47,27 @@ final class PreconditionsRules {
     }
   }
 
-  // XXX: Also suggest `checkElementIndex` usage.
+  /**
+   * Prefer {@link Preconditions#checkElementIndex(int, int, String)} over less descriptive or more
+   * verbose alternatives.
+   *
+   * <p>Note that the two-argument {@link Preconditions#checkElementIndex(int, int)} is better
+   * replaced with {@link java.util.Objects#checkIndex(int, int)}.
+   */
+  static final class CheckElementIndexWithMessage {
+    @BeforeTemplate
+    void before(int index, int size, String message) {
+      if (index < 0 || index >= size) {
+        throw new IndexOutOfBoundsException(message);
+      }
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(int index, int size, String message) {
+      checkElementIndex(index, size, message);
+    }
+  }
 
   /** Prefer {@link Preconditions#checkNotNull(Object)} over more verbose alternatives. */
   static final class CheckNotNull<T> {

@@ -41,6 +41,10 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
     return Objects.checkIndex(0, 1);
   }
 
+  void testCheckIndexConditional() {
+    Objects.checkIndex(1, 2);
+  }
+
   Map<RoundingMode, String> testCreateEnumMap() {
     return new EnumMap<>(RoundingMode.class);
   }
