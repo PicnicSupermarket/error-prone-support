@@ -1,24 +1,33 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
   void testCheckArgument() {
-    checkArgument(!"".isEmpty());
+    checkArgument(!"foo".isEmpty());
   }
 
   void testCheckArgumentWithMessage() {
-    checkArgument(!"".isEmpty(), "The string is empty");
+    checkArgument(!"foo".isEmpty(), "The string is empty");
+  }
+
+  void testCheckNotNull() {
+    checkNotNull("foo");
+  }
+
+  void testCheckNotNullWithMessage() {
+    checkNotNull("foo", "The string is null");
   }
 
   void testCheckState() {
-    checkState(!"".isEmpty());
+    checkState(!"foo".isEmpty());
   }
 
   void testCheckStateWithMessage() {
-    checkState(!"".isEmpty(), "The string is empty");
+    checkState(!"foo".isEmpty(), "The string is empty");
   }
 }

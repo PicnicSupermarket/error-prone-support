@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 
@@ -44,6 +45,42 @@ final class PreconditionsRules {
       checkArgument(!condition, message);
     }
   }
+
+  // XXX: Also suggest `checkElementIndex` usage.
+
+  /** Prefer {@link Preconditions#checkNotNull(Object)} over more verbose alternatives. */
+  static final class CheckNotNull<T> {
+    @BeforeTemplate
+    void before(T object) {
+      if (object == null) {
+        throw new NullPointerException();
+      }
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(T object) {
+      checkNotNull(object);
+    }
+  }
+
+  /** Prefer {@link Preconditions#checkNotNull(Object, Object)} over more verbose alternatives. */
+  static final class CheckNotNullWithMessage<T> {
+    @BeforeTemplate
+    void before(T object, String message) {
+      if (object == null) {
+        throw new NullPointerException(message);
+      }
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(T object, String message) {
+      checkNotNull(object, message);
+    }
+  }
+
+  // XXX: Also suggest `checkPositionIndex` usage.
 
   /** Prefer {@link Preconditions#checkState(boolean)} over more verbose alternatives. */
   static final class CheckState {
