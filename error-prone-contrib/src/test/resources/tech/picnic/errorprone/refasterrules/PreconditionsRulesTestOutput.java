@@ -6,19 +6,19 @@ import static com.google.common.base.Preconditions.checkState;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
-  void testCheckArgumentEmpty() {
-    checkArgument(!"".isBlank());
+  void testCheckArgument() {
+    checkArgument(!"".isEmpty());
   }
 
-  void testCheckArgumentMessage() {
-    checkArgument(!"".isBlank(), "The string is empty.");
+  void testCheckArgumentWithMessage() {
+    checkArgument(!"".isEmpty(), "The string is empty");
   }
 
-  void testCheckStateEmpty() {
-    checkState(!"".isBlank());
+  void testCheckState() {
+    checkState(!"".isEmpty());
   }
 
-  void testCheckStateMessage() {
-    checkState(!"".isBlank(), "The string is empty.");
+  void testCheckStateWithMessage() {
+    checkState(!"".isEmpty(), "The string is empty");
   }
 }

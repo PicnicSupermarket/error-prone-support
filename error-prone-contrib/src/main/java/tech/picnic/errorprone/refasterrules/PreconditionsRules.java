@@ -9,15 +9,12 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 
-/** Refaster templates related to expressions dealing with {@link Preconditions}. */
+/** Refaster templates related to statements dealing with {@link Preconditions}. */
 final class PreconditionsRules {
   private PreconditionsRules() {}
 
-  /**
-   * Prefer {@link Preconditions#checkArgument(boolean)} over the more verbose conditional {@code
-   * throw new IllegalArgumentException()}.
-   */
-  static final class CheckArgumentEmpty {
+  /** Prefer {@link Preconditions#checkArgument(boolean)} over more verbose alternatives. */
+  static final class CheckArgument {
     @BeforeTemplate
     void before(boolean condition) {
       if (condition) {
@@ -32,11 +29,8 @@ final class PreconditionsRules {
     }
   }
 
-  /**
-   * Prefer {@link Preconditions#checkArgument(boolean, Object)} over the more verbose conditional
-   * {@code throw new IllegalArgumentException(String)}.
-   */
-  static final class CheckArgumentMessage {
+  /** Prefer {@link Preconditions#checkArgument(boolean, Object)} over more verbose alternatives. */
+  static final class CheckArgumentWithMessage {
     @BeforeTemplate
     void before(boolean condition, String message) {
       if (condition) {
@@ -51,11 +45,8 @@ final class PreconditionsRules {
     }
   }
 
-  /**
-   * Prefer {@link Preconditions#checkState(boolean)} over the more verbose conditional {@code throw
-   * new IllegalStateException()}.
-   */
-  static final class CheckStateEmpty {
+  /** Prefer {@link Preconditions#checkState(boolean)} over more verbose alternatives. */
+  static final class CheckState {
     @BeforeTemplate
     void before(boolean condition) {
       if (condition) {
@@ -70,11 +61,8 @@ final class PreconditionsRules {
     }
   }
 
-  /**
-   * Prefer {@link Preconditions#checkState(boolean, Object)} over the more verbose conditional
-   * {@code throw new IllegalStateException(String)}.
-   */
-  static final class CheckStateMessage {
+  /** Prefer {@link Preconditions#checkState(boolean, Object)} over more verbose alternatives. */
+  static final class CheckStateWithMessage {
     @BeforeTemplate
     void before(boolean condition, String message) {
       if (condition) {

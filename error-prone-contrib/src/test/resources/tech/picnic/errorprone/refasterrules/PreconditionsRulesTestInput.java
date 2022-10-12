@@ -3,27 +3,27 @@ package tech.picnic.errorprone.refasterrules;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
-  void testCheckArgumentEmpty() {
-    if ("".isBlank()) {
+  void testCheckArgument() {
+    if ("".isEmpty()) {
       throw new IllegalArgumentException();
     }
   }
 
-  void testCheckArgumentMessage() {
-    if ("".isBlank()) {
-      throw new IllegalArgumentException("The string is empty.");
+  void testCheckArgumentWithMessage() {
+    if ("".isEmpty()) {
+      throw new IllegalArgumentException("The string is empty");
     }
   }
 
-  void testCheckStateEmpty() {
-    if ("".isBlank()) {
+  void testCheckState() {
+    if ("".isEmpty()) {
       throw new IllegalStateException();
     }
   }
 
-  void testCheckStateMessage() {
-    if ("".isBlank()) {
-      throw new IllegalStateException("The string is empty.");
+  void testCheckStateWithMessage() {
+    if ("".isEmpty()) {
+      throw new IllegalStateException("The string is empty");
     }
   }
 }
