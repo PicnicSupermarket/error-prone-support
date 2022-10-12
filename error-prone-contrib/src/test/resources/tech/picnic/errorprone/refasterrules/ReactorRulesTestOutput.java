@@ -51,6 +51,21 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         .map(TupleUtils.function((string, count) -> string.repeat(count)));
   }
 
+  Flux<Tuple2<String, Integer>> testFluxZip() {
+    return Flux.zip(Flux.just("foo", "bar"), Flux.just(1, 2));
+  }
+
+  Flux<String> testFluxZipWithCombinator() {
+    return Flux.zip(Flux.just("foo", "bar"), Flux.just(1, 2))
+        .map(TupleUtils.function((string, count) -> string.repeat(count)));
+  }
+
+  Flux<String> testFluxZipWithIterable() {
+    return Flux.just("foo", "bar")
+        .zipWithIterable(ImmutableSet.of(1, 2))
+        .map(TupleUtils.function((string, count) -> string.repeat(count)));
+  }
+
   Mono<Void> testMonoDeferredError() {
     return Mono.error(() -> new IllegalStateException());
   }

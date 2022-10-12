@@ -106,6 +106,53 @@ final class ReactorRules {
     }
   }
 
+  /**
+   * Prefer {@link Flux#zip(Publisher, Publisher)} over a chained {@link Flux#zipWith(Publisher)}.
+   */
+  static final class FluxZip<T, S> {
+    @BeforeTemplate
+    Flux<Tuple2<T, S>> before(Flux<T> flux, Publisher<S> other) {
+      return flux.zipWith(other);
+    }
+
+    @AfterTemplate
+    Flux<Tuple2<T, S>> after(Flux<T> flux, Publisher<S> other) {
+      return Flux.zip(flux, other);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#zip(Publisher, Publisher)} with a chained combinator over a chained {@link
+   * Flux#zipWith(Publisher, BiFunction)}.
+   */
+  static final class FluxZipWithCombinator<T, S, R> {
+    @BeforeTemplate
+    Flux<R> before(Flux<T> flux, Publisher<S> other, BiFunction<T, S, R> combinator) {
+      return flux.zipWith(other, combinator);
+    }
+
+    @AfterTemplate
+    Flux<R> after(Flux<T> flux, Publisher<S> other, BiFunction<T, S, R> combinator) {
+      return Flux.zip(flux, other).map(function(combinator));
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#zipWithIterable(Iterable)} with a chained combinator over {@link
+   * Flux#zipWithIterable(Iterable, BiFunction)}.
+   */
+  static final class FluxZipWithIterable<T, S, R> {
+    @BeforeTemplate
+    Flux<R> before(Flux<T> flux, Iterable<S> iterable, BiFunction<T, S, R> combinator) {
+      return flux.zipWithIterable(iterable, combinator);
+    }
+
+    @AfterTemplate
+    Flux<R> after(Flux<T> flux, Iterable<S> iterable, BiFunction<T, S, R> combinator) {
+      return flux.zipWithIterable(iterable).map(function(combinator));
+    }
+  }
+
   /** Don't unnecessarily defer {@link Mono#error(Throwable)}. */
   static final class MonoDeferredError<T> {
     @BeforeTemplate
