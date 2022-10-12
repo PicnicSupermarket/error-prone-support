@@ -6,7 +6,7 @@ description: >-
   Error Prone extensions: extra bug checkers and a large battery of Refaster
   rules.
 
-remote_theme: just-the-docs/just-the-docs
+remote_theme: just-the-docs/just-the-docs@v0.4.0.rc3
 plugins:
   - jekyll-remote-theme
 
