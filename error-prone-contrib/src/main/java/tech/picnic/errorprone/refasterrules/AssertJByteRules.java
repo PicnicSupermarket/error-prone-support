@@ -7,7 +7,9 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import org.assertj.core.api.AbstractByteAssert;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+@OnlineDocumentation
 final class AssertJByteRules {
   private AssertJByteRules() {}
 

@@ -53,6 +53,7 @@ import org.assertj.core.api.ObjectEnumerableAssert;
 import org.assertj.core.api.OptionalDoubleAssert;
 import org.assertj.core.api.OptionalIntAssert;
 import org.assertj.core.api.OptionalLongAssert;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsArray;
 
 /** Refaster rules related to AssertJ expressions and statements. */
@@ -118,8 +119,9 @@ import tech.picnic.errorprone.refaster.matchers.IsArray;
 // XXX: `assertThat(ImmutableList.sortedCopyOf(cmp, values)).somethingExactOrder` -> just compare
 // "in any order".
 // XXX: Turns out a lot of this is also covered by https://github.com/palantir/assertj-automation.
-// See how we can combine these things. Do note that (at present) their Refaster rules don't show up
-// as Error Prone checks. So we'd have to build an integration for that.
+// See how we can combine these things. Do note that (at present) their Refaster rules don't
+// show up as Error Prone checks. So we'd have to build an integration for that.
+@OnlineDocumentation
 final class AssertJRules {
   private AssertJRules() {}
 

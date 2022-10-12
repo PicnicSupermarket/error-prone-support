@@ -5,7 +5,9 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Map;
 import org.assertj.core.api.AbstractMapAssert;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+@OnlineDocumentation
 final class AssertJMapRules {
   private AssertJMapRules() {}
 

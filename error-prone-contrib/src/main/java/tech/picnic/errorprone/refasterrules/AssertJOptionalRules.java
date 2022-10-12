@@ -14,7 +14,9 @@ import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractOptionalAssert;
 import org.assertj.core.api.ObjectAssert;
 import org.assertj.core.api.OptionalAssert;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+@OnlineDocumentation
 final class AssertJOptionalRules {
   private AssertJOptionalRules() {}
 

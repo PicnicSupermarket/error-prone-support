@@ -12,8 +12,10 @@ import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link IntStream}s. */
+@OnlineDocumentation
 final class IntStreamRules {
   private IntStreamRules() {}
 

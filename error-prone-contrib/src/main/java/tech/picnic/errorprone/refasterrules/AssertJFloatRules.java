@@ -8,7 +8,9 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import org.assertj.core.api.AbstractFloatAssert;
 import org.assertj.core.data.Offset;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+@OnlineDocumentation
 final class AssertJFloatRules {
   private AssertJFloatRules() {}
 

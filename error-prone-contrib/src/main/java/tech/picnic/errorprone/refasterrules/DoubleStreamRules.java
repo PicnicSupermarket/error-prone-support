@@ -12,8 +12,10 @@ import java.util.function.DoublePredicate;
 import java.util.function.DoubleUnaryOperator;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link DoubleStream}s. */
+@OnlineDocumentation
 final class DoubleStreamRules {
   private DoubleStreamRules() {}
 

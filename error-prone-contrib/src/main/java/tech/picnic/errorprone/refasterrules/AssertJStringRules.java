@@ -8,7 +8,9 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractStringAssert;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+@OnlineDocumentation
 final class AssertJStringRules {
   private AssertJStringRules() {}
 

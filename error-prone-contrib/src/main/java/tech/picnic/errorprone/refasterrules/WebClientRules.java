@@ -20,11 +20,13 @@ import org.springframework.web.reactive.function.client.WebClient.RequestBodySpe
 import org.springframework.web.reactive.function.client.WebClient.RequestBodyUriSpec;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /**
  * Refaster rules related to expressions dealing with {@link
  * org.springframework.web.reactive.function.client.WebClient} and related types.
  */
+@OnlineDocumentation
 final class WebClientRules {
   private WebClientRules() {}
 

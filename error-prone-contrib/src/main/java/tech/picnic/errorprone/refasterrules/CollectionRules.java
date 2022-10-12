@@ -19,10 +19,12 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with (arbitrary) collections. */
 // XXX: There are other Guava `Iterables` methods that should not be called if the input is known to
 // be a `Collection`. Add those here.
+@OnlineDocumentation
 final class CollectionRules {
   private CollectionRules() {}
 

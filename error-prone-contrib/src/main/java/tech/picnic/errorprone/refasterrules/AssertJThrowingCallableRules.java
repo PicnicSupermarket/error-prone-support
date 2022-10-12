@@ -16,6 +16,7 @@ import java.io.IOException;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /**
  * Refaster rules related to AssertJ assertions over expressions that may throw a {@link Throwable}
@@ -26,6 +27,7 @@ import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
  * types. Note that only the most common assertion expressions are rewritten here; covering all
  * cases would require the implementation of an Error Prone check instead.
  */
+@OnlineDocumentation
 final class AssertJThrowingCallableRules {
   private AssertJThrowingCallableRules() {}
 

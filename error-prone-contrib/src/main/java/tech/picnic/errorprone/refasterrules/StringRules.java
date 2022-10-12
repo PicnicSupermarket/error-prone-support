@@ -17,9 +17,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link String}s. */
 // XXX: Should we prefer `s -> !s.isEmpty()` or `not(String::isEmpty)`?
+@OnlineDocumentation
 final class StringRules {
   private StringRules() {}
 

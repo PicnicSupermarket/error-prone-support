@@ -175,11 +175,11 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     ImmutableRangeMap.Builder<Integer, String> ruleMatches = ImmutableRangeMap.builder();
 
     for (Description description : matches) {
+      String ruleName = extractRefasterRuleName(description);
       Set<Replacement> replacements =
           Iterables.getOnlyElement(description.fixes).getReplacements(endPositions);
       for (Replacement replacement : replacements) {
-        ruleMatches.put(
-            replacement.range(), getSubstringAfterFinalDelimiter('.', description.checkName));
+        ruleMatches.put(replacement.range(), ruleName);
       }
     }
 
@@ -224,6 +224,13 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
             ? SuggestedFix.prefixWith(tree, comment)
             : SuggestedFix.postfixWith(tree, '\n' + comment);
     state.reportMatch(describeMatch(tree, fixWithComment));
+  }
+
+  private static String extractRefasterRuleName(Description description) {
+    String message = description.getRawMessage();
+    int index = message.indexOf(':');
+    checkState(index >= 0, "Failed to extract Refaster rule name from string '%s'", message);
+    return getSubstringAfterFinalDelimiter('.', message.substring(0, index));
   }
 
   private static String getSubstringAfterFinalDelimiter(char delimiter, String value) {

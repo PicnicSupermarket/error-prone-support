@@ -13,8 +13,10 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableSortedMap}s. */
+@OnlineDocumentation
 final class ImmutableSortedMapRules {
   private ImmutableSortedMapRules() {}
 

@@ -12,8 +12,10 @@ import java.util.function.LongPredicate;
 import java.util.function.LongUnaryOperator;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link LongStream}s. */
+@OnlineDocumentation
 final class LongStreamRules {
   private LongStreamRules() {}
 
