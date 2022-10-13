@@ -119,16 +119,13 @@ code with Maven should yield two compiler warnings:
 ```sh
 $ mvn clean install
 ...
-[INFO] -------------------------------------------------------------
-[WARNING] COMPILATION WARNING :
-[INFO] -------------------------------------------------------------
-[WARNING] Example.java:[9,34] [tech.picnic.errorprone.refasterrules.BigDecimalRules.BigDecimalZero]
+[INFO] Example.java:[9,34] [Refaster Rule] BigDecimalRules.BigDecimalZero: Refactoring opportunity
+    (see https://error-prone.picnic.tech/refasterrules/BigDecimalRules#BigDecimalZero)
   Did you mean 'return BigDecimal.ZERO;'?
+...
 [WARNING] Example.java:[13,35] [IdentityConversion] This method invocation appears redundant; remove it or suppress this warning and add a comment explaining its purpose
     (see https://error-prone.picnic.tech/bugpatterns/IdentityConversion)
   Did you mean 'return set;' or '@SuppressWarnings("IdentityConversion") public ImmutableSet<Integer> getSet() {'?
-[INFO] 2 warnings
-[INFO] -------------------------------------------------------------
 ...
 ```
 
