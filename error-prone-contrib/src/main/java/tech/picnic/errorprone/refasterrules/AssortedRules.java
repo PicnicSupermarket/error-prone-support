@@ -59,7 +59,7 @@ final class AssortedRules {
    */
   static final class CheckIndexConditional {
     @BeforeTemplate
-    void before2(int index, int size) {
+    void before(int index, int size) {
       if (index < 0 || index >= size) {
         throw new IndexOutOfBoundsException();
       }
