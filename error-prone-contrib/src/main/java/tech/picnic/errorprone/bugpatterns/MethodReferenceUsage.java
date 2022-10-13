@@ -122,7 +122,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
           return Optional.empty();
         }
         Symbol sym = ASTHelpers.getSymbol(methodSelect);
-        if (!sym.isStatic()) {
+        if (!ASTHelpers.isStatic(sym)) {
           return constructFix(lambdaExpr, "this", methodSelect);
         }
         return constructFix(lambdaExpr, sym.owner, methodSelect);
@@ -192,7 +192,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
     Name sName = target.getSimpleName();
     Optional<SuggestedFix.Builder> fix = constructFix(lambdaExpr, sName, methodName);
 
-    if (!"java.lang".equals(target.packge().toString())) {
+    if (!"java.lang".equals(ASTHelpers.enclosingPackage(target).toString())) {
       Name fqName = target.getQualifiedName();
       if (!sName.equals(fqName)) {
         return fix.map(b -> b.addImport(fqName.toString()));
