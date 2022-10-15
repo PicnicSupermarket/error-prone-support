@@ -379,8 +379,6 @@ final class ReactorRules {
    * Prefer {@link Mono#map(Function)} over alternatives that unnecessarily require an inner
    * subscription.
    */
-  // XXX: Also cover `{Mono,Flux}.fromSupplier(() -> transformation(x))`. (Though it'd be more
-  // accurate in some cases to use `mapNotNull` in those cases.)
   abstract static class MonoMap<T, S> {
     @Placeholder(allowsIdentity = true)
     abstract S transformation(@MayOptionallyUse T value);
@@ -400,8 +398,6 @@ final class ReactorRules {
    * Prefer {@link Flux#map(Function)} over alternatives that unnecessarily require an inner
    * subscription.
    */
-  // XXX: Also cover `{Mono,Flux}.fromSupplier(() -> transformation(x))`. (Though it'd be more
-  // accurate in some cases to use `mapNotNull` in those cases.)
   abstract static class FluxMap<T, S> {
     @Placeholder(allowsIdentity = true)
     abstract S transformation(@MayOptionallyUse T value);
@@ -453,7 +449,10 @@ final class ReactorRules {
 
     @BeforeTemplate
     Mono<S> before(Mono<T> mono) {
-      return mono.flatMap(x -> Mono.justOrEmpty(transformation(x)));
+      return mono.flatMap(
+          x ->
+              Refaster.anyOf(
+                  Mono.justOrEmpty(transformation(x)), Mono.fromSupplier(() -> transformation(x))));
     }
 
     @AfterTemplate
@@ -473,22 +472,80 @@ final class ReactorRules {
     @BeforeTemplate
     Publisher<S> before(Flux<T> flux, boolean delayUntilEnd, int maxConcurrency, int prefetch) {
       return Refaster.anyOf(
-          flux.concatMap(x -> Mono.justOrEmpty(transformation(x))),
-          flux.concatMap(x -> Mono.justOrEmpty(transformation(x)), prefetch),
-          flux.concatMapDelayError(x -> Mono.justOrEmpty(transformation(x))),
-          flux.concatMapDelayError(x -> Mono.justOrEmpty(transformation(x)), prefetch),
+          flux.concatMap(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x)))),
+          flux.concatMap(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              prefetch),
           flux.concatMapDelayError(
-              x -> Mono.justOrEmpty(transformation(x)), delayUntilEnd, prefetch),
-          flux.flatMap(x -> Mono.justOrEmpty(transformation(x)), maxConcurrency),
-          flux.flatMap(x -> Mono.justOrEmpty(transformation(x)), maxConcurrency, prefetch),
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x)))),
+          flux.concatMapDelayError(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              prefetch),
+          flux.concatMapDelayError(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              delayUntilEnd,
+              prefetch),
+          flux.flatMap(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              maxConcurrency),
+          flux.flatMap(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              maxConcurrency,
+              prefetch),
           flux.flatMapDelayError(
-              x -> Mono.justOrEmpty(transformation(x)), maxConcurrency, prefetch),
-          flux.flatMapSequential(x -> Mono.justOrEmpty(transformation(x)), maxConcurrency),
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              maxConcurrency,
+              prefetch),
           flux.flatMapSequential(
-              x -> Mono.justOrEmpty(transformation(x)), maxConcurrency, prefetch),
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              maxConcurrency),
+          flux.flatMapSequential(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              maxConcurrency,
+              prefetch),
           flux.flatMapSequentialDelayError(
-              x -> Mono.justOrEmpty(transformation(x)), maxConcurrency, prefetch),
-          flux.switchMap(x -> Mono.justOrEmpty(transformation(x))));
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              maxConcurrency,
+              prefetch),
+          flux.switchMap(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x)))));
     }
 
     @AfterTemplate
