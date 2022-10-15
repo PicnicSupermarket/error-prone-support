@@ -148,6 +148,7 @@ final class ReactorRules {
     }
 
     @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Flux<R> after(Flux<T> flux, Iterable<S> iterable, BiFunction<T, S, R> combinator) {
       return flux.zipWithIterable(iterable).map(function(combinator));
     }
