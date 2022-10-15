@@ -77,7 +77,11 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#zip(Mono, Mono)} over a chained {@link Mono#zipWith(Mono)}. */
+  /**
+   * Prefer {@link Mono#zip(Mono, Mono)} over a chained {@link Mono#zipWith(Mono)}, as the former
+   * better conveys that the {@link Mono}s may be subscribed to concurrently, and generalizes to
+   * combining three or more reactive streams.
+   */
   static final class MonoZip<T, S> {
     @BeforeTemplate
     Mono<Tuple2<T, S>> before(Mono<T> mono, Mono<S> other) {
@@ -92,7 +96,8 @@ final class ReactorRules {
 
   /**
    * Prefer {@link Mono#zip(Mono, Mono)} with a chained combinator over a chained {@link
-   * Mono#zipWith(Mono, BiFunction)}.
+   * Mono#zipWith(Mono, BiFunction)}, as the former better conveys that the {@link Mono}s may be
+   * subscribed to concurrently, and generalizes to combining three or more reactive streams.
    */
   static final class MonoZipWithCombinator<T, S, R> {
     @BeforeTemplate
@@ -107,7 +112,9 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#zip(Publisher, Publisher)} over a chained {@link Flux#zipWith(Publisher)}.
+   * Prefer {@link Flux#zip(Publisher, Publisher)} over a chained {@link Flux#zipWith(Publisher)},
+   * as the former better conveys that the {@link Publisher}s may be subscribed to concurrently, and
+   * generalizes to combining three or more reactive streams.
    */
   static final class FluxZip<T, S> {
     @BeforeTemplate
@@ -123,7 +130,8 @@ final class ReactorRules {
 
   /**
    * Prefer {@link Flux#zip(Publisher, Publisher)} with a chained combinator over a chained {@link
-   * Flux#zipWith(Publisher, BiFunction)}.
+   * Flux#zipWith(Publisher, BiFunction)}, as the former better conveys that the {@link Publisher}s
+   * may be subscribed to concurrently, and generalizes to combining three or more reactive streams.
    */
   static final class FluxZipWithCombinator<T, S, R> {
     @BeforeTemplate
@@ -139,7 +147,7 @@ final class ReactorRules {
 
   /**
    * Prefer {@link Flux#zipWithIterable(Iterable)} with a chained combinator over {@link
-   * Flux#zipWithIterable(Iterable, BiFunction)}.
+   * Flux#zipWithIterable(Iterable, BiFunction)}, as the former generally yields more readable code.
    */
   static final class FluxZipWithIterable<T, S, R> {
     @BeforeTemplate

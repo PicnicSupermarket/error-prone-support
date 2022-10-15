@@ -44,7 +44,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Mono<String> testMonoZipWithCombinator() {
-    return Mono.just("foo").zipWith(Mono.just(2), (string, count) -> string.repeat(count));
+    return Mono.just("foo").zipWith(Mono.just(1), String::repeat);
   }
 
   Flux<Tuple2<String, Integer>> testFluxZip() {
@@ -52,13 +52,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Flux<String> testFluxZipWithCombinator() {
-    return Flux.just("foo", "bar")
-        .zipWith(Flux.just(1, 2), (string, count) -> string.repeat(count));
+    return Flux.just("foo", "bar").zipWith(Flux.just(1, 2), String::repeat);
   }
 
   Flux<String> testFluxZipWithIterable() {
-    return Flux.just("foo", "bar")
-        .zipWithIterable(ImmutableSet.of(1, 2), (string, count) -> string.repeat(count));
+    return Flux.just("foo", "bar").zipWithIterable(ImmutableSet.of(1, 2), String::repeat);
   }
 
   Mono<Void> testMonoDeferredError() {
