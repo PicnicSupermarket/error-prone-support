@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkPositionIndex;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 
@@ -101,7 +102,43 @@ final class PreconditionsRules {
     }
   }
 
-  // XXX: Also suggest `checkPositionIndex` usage.
+  /**
+   * Prefer {@link Preconditions#checkPositionIndex(int, int)} over less descriptive or more verbose
+   * alternatives.
+   */
+  static final class CheckPositionIndex {
+    @BeforeTemplate
+    void before(int index, int size) {
+      if (index < 0 || index > size) {
+        throw new IndexOutOfBoundsException();
+      }
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(int index, int size) {
+      checkPositionIndex(index, size);
+    }
+  }
+
+  /**
+   * Prefer {@link Preconditions#checkPositionIndex(int, int, String)} over less descriptive or more
+   * verbose alternatives.
+   */
+  static final class CheckPositionIndexWithMessage {
+    @BeforeTemplate
+    void before(int index, int size, String message) {
+      if (index < 0 || index > size) {
+        throw new IndexOutOfBoundsException(message);
+      }
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(int index, int size, String message) {
+      checkPositionIndex(index, size, message);
+    }
+  }
 
   /** Prefer {@link Preconditions#checkState(boolean)} over more verbose alternatives. */
   static final class CheckState {
