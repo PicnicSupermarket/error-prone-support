@@ -11,8 +11,10 @@ import com.google.common.base.Preconditions;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster templates related to statements dealing with {@link Preconditions}. */
+@OnlineDocumentation
 final class PreconditionsRules {
   private PreconditionsRules() {}
 
