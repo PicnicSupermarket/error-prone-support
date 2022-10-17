@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        jdk: [ 11.0.16, 17.0.4 ]
+        jdk: [ 11.0.16, 16.0.2, 17.0.4, 18.0.2, 19 ]
     steps:
         # We run the build twice for each supported JDK: once against the
         # original Error Prone release, using only Error Prone checks available
