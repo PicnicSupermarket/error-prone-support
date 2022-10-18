@@ -72,6 +72,9 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
               .namedAnyOf("concat", "firstWithSignal", "from", "merge"),
           staticMethod().onClass("reactor.core.publisher.Mono").namedAnyOf("from", "fromDirect"));
 
+  /** Instantiates the default {@link IdentityConversion}. */
+  public IdentityConversion() {}
+
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     List<? extends ExpressionTree> arguments = tree.getArguments();

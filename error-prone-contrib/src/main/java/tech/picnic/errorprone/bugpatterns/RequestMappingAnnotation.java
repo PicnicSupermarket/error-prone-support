@@ -83,6 +83,9 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
                   isSameType("org.springframework.web.util.UriBuilder"),
                   isSameType("org.springframework.web.util.UriComponentsBuilder"))));
 
+  /** Instantiates the default {@link RequestMappingAnnotation}. */
+  public RequestMappingAnnotation() {}
+
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
     // XXX: Auto-add `@RequestParam` where applicable.

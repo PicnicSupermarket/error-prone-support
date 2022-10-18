@@ -46,6 +46,9 @@ public final class ScheduledTransactionTrace extends BugChecker implements Metho
   private static final MultiMatcher<Tree, AnnotationTree> TRACE_ANNOTATION =
       annotations(AT_LEAST_ONE, isType(TRACE_ANNOTATION_FQCN));
 
+  /** Instantiates the default {@link ScheduledTransactionTrace}. */
+  public ScheduledTransactionTrace() {}
+
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
     if (!IS_SCHEDULED.matches(tree, state)) {

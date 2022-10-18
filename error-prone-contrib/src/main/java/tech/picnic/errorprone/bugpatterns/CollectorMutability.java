@@ -45,6 +45,9 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
   private static final Matcher<ExpressionTree> SET_COLLECTOR =
       staticMethod().anyClass().named("toSet");
 
+  /** Instantiates the default {@link CollectorMutability}. */
+  public CollectorMutability() {}
+
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     if (!COLLECTOR_METHOD.matches(tree, state)) {

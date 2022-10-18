@@ -19,6 +19,9 @@ import java.util.Collection;
 public final class ThrowsCheckedException implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
 
+  /** Instantiates the default {@link ThrowsCheckedException}. */
+  public ThrowsCheckedException() {}
+
   @Override
   public boolean matches(ExpressionTree tree, VisitorState state) {
     return containsCheckedException(getThrownTypes(tree, state), state);
