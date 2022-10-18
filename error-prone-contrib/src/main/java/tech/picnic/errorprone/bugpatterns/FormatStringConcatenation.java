@@ -129,6 +129,9 @@ public final class FormatStringConcatenation extends BugChecker
           .onDescendantOf("org.slf4j.Logger")
           .namedAnyOf("debug", "error", "info", "trace", "warn");
 
+  /** Instantiates the default {@link FormatStringConcatenation}. */
+  public FormatStringConcatenation() {}
+
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     if (hasNonConstantStringConcatenationArgument(tree, 0, state)) {

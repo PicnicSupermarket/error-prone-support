@@ -21,6 +21,9 @@ public final class MethodMatcherFactory {
   private static final Pattern METHOD_SIGNATURE =
       Pattern.compile("([^\\s#(,)]+)#([^\\s#(,)]+)\\(((?:[^\\s#(,)]+(?:,[^\\s#(,)]+)*)?)\\)");
 
+  /** Instantiates the default {@link MethodMatcherFactory}. */
+  public MethodMatcherFactory() {}
+
   /**
    * Creates a {@link Matcher} of methods with any of the given signatures.
    *

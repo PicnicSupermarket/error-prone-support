@@ -34,6 +34,9 @@ public final class NestedOptionals extends BugChecker implements MethodInvocatio
   private static final long serialVersionUID = 1L;
   private static final Supplier<Type> OPTIONAL = Suppliers.typeFromClass(Optional.class);
 
+  /** Instantiates the default {@link NestedOptionals}. */
+  public NestedOptionals() {}
+
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     return isOptionalOfOptional(tree, state) ? describeMatch(tree) : Description.NO_MATCH;

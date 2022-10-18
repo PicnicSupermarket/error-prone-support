@@ -57,6 +57,9 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
           .put("PUT", "PutMapping")
           .build();
 
+  /** Instantiates the default {@link SpringMvcAnnotation}. */
+  public SpringMvcAnnotation() {}
+
   @Override
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
     // XXX: We could remove the `@RequestMapping` import if not other usages remain.

@@ -48,6 +48,9 @@ public final class Slf4jLogStatement extends BugChecker implements MethodInvocat
           .onDescendantOf("org.slf4j.Logger")
           .namedAnyOf("trace", "debug", "info", "warn", "error");
 
+  /** Instantiates the default {@link Slf4jLogStatement}. */
+  public Slf4jLogStatement() {}
+
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     if (!SLF4J_LOGGER_INVOCATION.matches(tree, state)) {

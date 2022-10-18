@@ -79,6 +79,9 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
               isType("org.junit.jupiter.api.BeforeAll"),
               isType("org.junit.jupiter.api.BeforeEach")));
 
+  /** Instantiates the default {@link JUnitMethodDeclaration}. */
+  public JUnitMethodDeclaration() {}
+
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
     if (HAS_UNMODIFIABLE_SIGNATURE.matches(tree, state)) {

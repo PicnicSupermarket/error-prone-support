@@ -58,6 +58,9 @@ public final class FluxFlatMapUsage extends BugChecker
           .namedAnyOf("flatMap", "flatMapSequential")
           .withParameters(Function.class.getName());
 
+  /** Instantiates the default {@link FluxFlatMapUsage}. */
+  public FluxFlatMapUsage() {}
+
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     if (!FLUX_FLATMAP.matches(tree, state)) {
