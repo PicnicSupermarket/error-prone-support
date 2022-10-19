@@ -5,6 +5,7 @@ import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MoreCollectors;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -25,6 +26,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
+import reactor.util.context.Context;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
@@ -372,6 +374,19 @@ final class ReactorRules {
     @AfterTemplate
     Flux<T> after(Flux<T> flux) {
       return flux.onErrorComplete();
+    }
+  }
+
+  /** Prefer {@link reactor.util.context.Context#empty()}} over more verbose alternatives. */
+  static final class ContextEmpty<T> {
+    @BeforeTemplate
+    Context before() {
+      return Context.of(ImmutableMap.of());
+    }
+
+    @AfterTemplate
+    Context after() {
+      return Context.empty();
     }
   }
 

@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
+import reactor.util.context.Context;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
@@ -124,6 +126,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Flux.just(1).onErrorResume(e -> Mono.empty()),
         Flux.just(2).onErrorResume(e -> Flux.empty()));
+  }
+
+  Context testContextEmpty() {
+    return Context.of(ImmutableMap.of());
   }
 
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
