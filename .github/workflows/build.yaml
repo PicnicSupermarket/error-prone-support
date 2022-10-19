@@ -14,15 +14,18 @@ jobs:
         jdk: [ 11.0.16, 16.0.2, 17.0.4, 18.0.2, 19 ]
         distribution: [ temurin ]
         include:
-          - jdk: 20-ea
+          - os: ubuntu-22.04
             experimental: true
+            jdk: 20-ea
             distribution: zulu
-          - jdk: 19
-            os: macos-latest
+          - os: macos-latest
             experimental: false
-          - os: windows-latest
             jdk: 19
+            distribution: zulu
+          - os: windows-latest
             experimental: false
+            jdk: 19
+            distribution: zulu
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     steps:
