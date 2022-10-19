@@ -46,6 +46,7 @@ final class AssortedRules {
     }
 
     @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     int after(int index, int size) {
       return checkIndex(index, size);
     }
@@ -66,6 +67,7 @@ final class AssortedRules {
     }
 
     @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(int index, int size) {
       checkIndex(index, size);
     }
