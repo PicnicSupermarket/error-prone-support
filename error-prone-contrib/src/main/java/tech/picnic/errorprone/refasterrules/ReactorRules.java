@@ -378,7 +378,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link reactor.util.context.Context#empty()}} over more verbose alternatives. */
-  static final class ContextEmpty<T> {
+  static final class ContextEmpty {
     @BeforeTemplate
     Context before() {
       return Context.of(ImmutableMap.of());
