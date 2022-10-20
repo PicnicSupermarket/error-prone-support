@@ -156,7 +156,7 @@ final class MoreTypesTest {
   }
 
   /**
-   * A {@link BugChecker} which flags method invocations that are a subtype of any type contained in
+   * A {@link BugChecker} that flags method invocations that are a subtype of any type contained in
    * {@link #TYPES}.
    */
   @BugPattern(summary = "Flags invocations of methods with select return types", severity = ERROR)
