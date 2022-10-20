@@ -37,6 +37,12 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
     return Preconditions.checkElementIndex(0, 1);
   }
 
+  void testCheckIndexConditional() {
+    if (1 < 0 || 1 >= 2) {
+      throw new IndexOutOfBoundsException();
+    }
+  }
+
   Map<RoundingMode, String> testCreateEnumMap() {
     return new HashMap<>();
   }

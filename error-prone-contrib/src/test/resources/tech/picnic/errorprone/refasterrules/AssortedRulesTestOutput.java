@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Sets.toImmutableEnumSet;
+import static java.util.Objects.checkIndex;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -19,7 +20,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -38,7 +38,11 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   int testCheckIndex() {
-    return Objects.checkIndex(0, 1);
+    return checkIndex(0, 1);
+  }
+
+  void testCheckIndexConditional() {
+    checkIndex(1, 2);
   }
 
   Map<RoundingMode, String> testCreateEnumMap() {

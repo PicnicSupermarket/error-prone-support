@@ -46,8 +46,30 @@ final class AssortedRules {
     }
 
     @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     int after(int index, int size) {
       return checkIndex(index, size);
+    }
+  }
+
+  /**
+   * Prefer {@link Objects#checkIndex(int, int)} over less descriptive or more verbose alternatives.
+   *
+   * <p>If a custom error message is desired, consider using Guava's {@link
+   * com.google.common.base.Preconditions#checkElementIndex(int, int, String)}.
+   */
+  static final class CheckIndexConditional {
+    @BeforeTemplate
+    void before(int index, int size) {
+      if (index < 0 || index >= size) {
+        throw new IndexOutOfBoundsException();
+      }
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(int index, int size) {
+      checkIndex(index, size);
     }
   }
 

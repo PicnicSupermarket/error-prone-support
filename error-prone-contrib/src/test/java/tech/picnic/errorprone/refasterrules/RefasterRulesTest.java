@@ -56,6 +56,7 @@ final class RefasterRulesTest {
           MultimapRules.class,
           NullRules.class,
           OptionalRules.class,
+          PreconditionsRules.class,
           PrimitiveRules.class,
           ReactorRules.class,
           RxJava2AdapterRules.class,
