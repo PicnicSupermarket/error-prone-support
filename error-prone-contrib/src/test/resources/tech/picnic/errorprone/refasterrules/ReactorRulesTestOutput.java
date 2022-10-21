@@ -500,7 +500,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Context> testContextEmpty() {
-    return ImmutableSet.of(Context.empty(), Context.empty());
+    return ImmutableSet.of(Context.empty(), Context.of(ImmutableMap.of(1, 2)));
   }
 
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
@@ -516,13 +516,17 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<StepVerifier.Step<Integer>> testStepVerifierStepIdentity() {
-    return ImmutableSet.of(StepVerifier.create(Mono.just(1)), StepVerifier.create(Mono.just(2)));
+    return ImmutableSet.of(
+        Mono.just(1).as(StepVerifier::create),
+        Mono.just(2).as(StepVerifier::create),
+        Mono.just(3).as(StepVerifier::create),
+        Mono.just(4).as(StepVerifier::create).expectNextSequence(ImmutableList.of(5)));
   }
 
   ImmutableSet<StepVerifier.Step<String>> testStepVerifierStepExpectNext() {
     return ImmutableSet.of(
-        StepVerifier.create(Mono.just("foo")).expectNext("bar"),
-        StepVerifier.create(Mono.just("baz")).expectNext("qux"));
+        Mono.just("foo").as(StepVerifier::create).expectNext("bar"),
+        Mono.just("baz").as(StepVerifier::create).expectNext("qux"));
   }
 
   StepVerifier.Step<?> testFluxAsStepVerifierExpectNext() {
@@ -530,34 +534,35 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Duration testStepVerifierLastStepVerifyComplete() {
-    return StepVerifier.create(Mono.empty()).verifyComplete();
+    return Mono.empty().as(StepVerifier::create).verifyComplete();
   }
 
   Duration testStepVerifierLastStepVerifyError() {
-    return StepVerifier.create(Mono.empty()).verifyError();
+    return Mono.empty().as(StepVerifier::create).verifyError();
   }
 
   ImmutableSet<Duration> testStepVerifierLastStepVerifyErrorClass() {
     return ImmutableSet.of(
-        StepVerifier.create(Mono.empty()).verifyError(IllegalArgumentException.class),
-        StepVerifier.create(Mono.empty()).verifyError(IllegalStateException.class),
-        StepVerifier.create(Mono.empty()).verifyError(AssertionError.class));
+        Mono.empty().as(StepVerifier::create).verifyError(IllegalArgumentException.class),
+        Mono.empty().as(StepVerifier::create).verifyError(IllegalStateException.class),
+        Mono.empty().as(StepVerifier::create).verifyError(AssertionError.class));
   }
 
   Duration testStepVerifierLastStepVerifyErrorMatches() {
-    return StepVerifier.create(Mono.empty())
+    return Mono.empty()
+        .as(StepVerifier::create)
         .verifyErrorMatches(IllegalArgumentException.class::equals);
   }
 
   Duration testStepVerifierLastStepVerifyErrorSatisfies() {
-    return StepVerifier.create(Mono.empty()).verifyErrorSatisfies(t -> {});
+    return Mono.empty().as(StepVerifier::create).verifyErrorSatisfies(t -> {});
   }
 
   Duration testStepVerifierLastStepVerifyErrorMessage() {
-    return StepVerifier.create(Mono.empty()).verifyErrorMessage("foo");
+    return Mono.empty().as(StepVerifier::create).verifyErrorMessage("foo");
   }
 
   Duration testStepVerifierLastStepVerifyTimeout() {
-    return StepVerifier.create(Mono.empty()).verifyTimeout(Duration.ZERO);
+    return Mono.empty().as(StepVerifier::create).verifyTimeout(Duration.ZERO);
   }
 }

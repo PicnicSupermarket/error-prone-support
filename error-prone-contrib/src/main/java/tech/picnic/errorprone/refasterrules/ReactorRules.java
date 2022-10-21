@@ -12,12 +12,12 @@ import static reactor.function.TupleUtils.function;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
@@ -26,8 +26,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
@@ -48,6 +48,7 @@ import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
+import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster rules related to Reactor expressions and statements. */
@@ -1555,12 +1556,12 @@ final class ReactorRules {
   }
 
   /** Prefer {@link reactor.util.context.Context#empty()}} over more verbose alternatives. */
-  // XXX: Consider introducing an `IsEmpty` matcher that identifies a wide range of guaranteed-empty
-  // `Collection` and `Map` expressions.
+  // XXX: Introduce Refaster rules or a `BugChecker` that maps `(Immutable)Map.of(k, v)` to
+  // `Context.of(k, v)` and likewise for multi-pair overloads.
   static final class ContextEmpty {
     @BeforeTemplate
-    Context before() {
-      return Context.of(Refaster.anyOf(new HashMap<>(), ImmutableMap.of()));
+    Context before(@Matches(IsEmpty.class) Map<?, ?> map) {
+      return Context.of(map);
     }
 
     @AfterTemplate
@@ -1609,13 +1610,13 @@ final class ReactorRules {
   }
 
   /** Don't unnecessarily have {@link StepVerifier.Step} expect no elements. */
-  // XXX: Given an `IsEmpty` matcher that identifies a wide range of guaranteed-empty `Iterable`
-  // expressions, consider also simplifying `step.expectNextSequence(someEmptyIterable)`.
   static final class StepVerifierStepIdentity<T> {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
-    StepVerifier.Step<T> before(StepVerifier.Step<T> step) {
-      return Refaster.anyOf(step.expectNext(), step.expectNextCount(0));
+    StepVerifier.Step<T> before(
+        StepVerifier.Step<T> step, @Matches(IsEmpty.class) Iterable<? extends T> iterable) {
+      return Refaster.anyOf(
+          step.expectNext(), step.expectNextCount(0), step.expectNextSequence(iterable));
     }
 
     @AfterTemplate
