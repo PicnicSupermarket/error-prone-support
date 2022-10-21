@@ -19,7 +19,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(assertThat(0));
+    return ImmutableSet.of(assertThat(0), ImmutableMap.class);
   }
 
   ImmutableSet<Mono<?>> testMonoFromSupplier() {
