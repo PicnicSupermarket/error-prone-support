@@ -15,6 +15,7 @@ import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -378,10 +379,12 @@ final class ReactorRules {
   }
 
   /** Prefer {@link reactor.util.context.Context#empty()}} over more verbose alternatives. */
+  // XXX: Consider introducing an `IsEmpty` matcher that identifies a wide range of guaranteed-empty
+  // `Collection` and `Map` expressions.
   static final class ContextEmpty {
     @BeforeTemplate
     Context before() {
-      return Context.of(ImmutableMap.of());
+      return Context.of(Refaster.anyOf(new HashMap<>(), ImmutableMap.of()));
     }
 
     @AfterTemplate

@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
@@ -19,7 +20,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(assertThat(0), ImmutableMap.class);
+    return ImmutableSet.of(assertThat(0), HashMap.class, ImmutableMap.class);
   }
 
   ImmutableSet<Mono<?>> testMonoFromSupplier() {
@@ -128,8 +129,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just(2).onErrorResume(e -> Flux.empty()));
   }
 
-  Context testContextEmpty() {
-    return Context.of(ImmutableMap.of());
+  ImmutableSet<Context> testContextEmpty() {
+    return ImmutableSet.of(Context.of(new HashMap<>()), Context.of(ImmutableMap.of()));
   }
 
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
