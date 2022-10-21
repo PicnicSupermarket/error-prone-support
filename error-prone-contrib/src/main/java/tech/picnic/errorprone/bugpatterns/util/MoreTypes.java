@@ -33,7 +33,7 @@ public final class MoreTypes {
   private MoreTypes() {}
 
   /**
-   * Creates a supplier of the type with the given fully qualified class name.
+   * Creates a supplier of the type with the given fully qualified name.
    *
    * <p>This method should only be used when building more complex types in combination with other
    * {@link MoreTypes} methods. In other cases prefer directly calling {@link
