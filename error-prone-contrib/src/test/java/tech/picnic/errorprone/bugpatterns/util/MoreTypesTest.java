@@ -4,7 +4,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.raw;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.subOf;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.supOf;
+import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.superOf;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.type;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.unbound;
 
@@ -27,13 +27,16 @@ import org.junit.jupiter.api.Test;
 final class MoreTypesTest {
   private static final ImmutableSet<Supplier<Type>> TYPES =
       ImmutableSet.of(
+          // Invalid types.
           type("java.lang.Nonexistent"),
+          generic(type("java.util.Integer"), unbound()),
+          // Valid types.
           type("java.lang.String"),
           type("java.lang.Number"),
-          supOf(type("java.lang.Number")),
+          superOf(type("java.lang.Number")),
           subOf(type("java.lang.Number")),
           type("java.lang.Integer"),
-          supOf(type("java.lang.Integer")),
+          superOf(type("java.lang.Integer")),
           subOf(type("java.lang.Integer")),
           type("java.util.Optional"),
           raw(type("java.util.Optional")),
@@ -43,24 +46,24 @@ final class MoreTypesTest {
           raw(type("java.util.Collection")),
           generic(type("java.util.Collection"), unbound()),
           generic(type("java.util.Collection"), type("java.lang.Number")),
-          generic(type("java.util.Collection"), supOf(type("java.lang.Number"))),
+          generic(type("java.util.Collection"), superOf(type("java.lang.Number"))),
           generic(type("java.util.Collection"), subOf(type("java.lang.Number"))),
           generic(type("java.util.Collection"), type("java.lang.Integer")),
-          generic(type("java.util.Collection"), supOf(type("java.lang.Integer"))),
+          generic(type("java.util.Collection"), superOf(type("java.lang.Integer"))),
           generic(type("java.util.Collection"), subOf(type("java.lang.Integer"))),
           type("java.util.List"),
           raw(type("java.util.List")),
           generic(type("java.util.List"), unbound()),
           generic(type("java.util.List"), type("java.lang.Number")),
-          generic(type("java.util.List"), supOf(type("java.lang.Number"))),
+          generic(type("java.util.List"), superOf(type("java.lang.Number"))),
           generic(type("java.util.List"), subOf(type("java.lang.Number"))),
           generic(type("java.util.List"), type("java.lang.Integer")),
-          generic(type("java.util.List"), supOf(type("java.lang.Integer"))),
+          generic(type("java.util.List"), superOf(type("java.lang.Integer"))),
           generic(type("java.util.List"), subOf(type("java.lang.Integer"))),
           generic(
               type("java.util.Map"),
               type("java.lang.String"),
-              subOf(generic(type("java.util.Collection"), supOf(type("java.lang.Short"))))));
+              subOf(generic(type("java.util.Collection"), superOf(type("java.lang.Short"))))));
 
   @Test
   void matcher() {
