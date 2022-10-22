@@ -40,7 +40,7 @@ public final class LexicographicalAnnotationListing extends BugChecker
     implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
 
-  /** Instantiates the default {@link LexicographicalAnnotationListing}. */
+  /** Instantiates a new {@link LexicographicalAnnotationListing} instance. */
   public LexicographicalAnnotationListing() {}
 
   @Override

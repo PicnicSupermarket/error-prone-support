@@ -44,7 +44,7 @@ public final class AssertJIsNull extends BugChecker implements MethodInvocationT
           argumentCount(1),
           argument(0, nullLiteral()));
 
-  /** Instantiates the default {@link AssertJIsNull}. */
+  /** Instantiates a new {@link AssertJIsNull} instance. */
   public AssertJIsNull() {}
 
   @Override

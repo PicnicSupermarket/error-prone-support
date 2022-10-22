@@ -57,7 +57,7 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
           .put("PUT", "PutMapping")
           .build();
 
-  /** Instantiates the default {@link SpringMvcAnnotation}. */
+  /** Instantiates a new {@link SpringMvcAnnotation} instance. */
   public SpringMvcAnnotation() {}
 
   @Override

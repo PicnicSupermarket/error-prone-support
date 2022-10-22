@@ -46,7 +46,7 @@ public final class ExplicitEnumOrdering extends BugChecker implements MethodInvo
   private static final Matcher<ExpressionTree> EXPLICIT_ORDERING =
       staticMethod().onClass(Ordering.class.getName()).named("explicit");
 
-  /** Instantiates the default {@link ExplicitEnumOrdering}. */
+  /** Instantiates a new {@link ExplicitEnumOrdering} instance. */
   public ExplicitEnumOrdering() {}
 
   @Override

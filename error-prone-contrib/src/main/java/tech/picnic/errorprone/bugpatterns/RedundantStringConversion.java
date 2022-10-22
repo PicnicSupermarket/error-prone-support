@@ -141,7 +141,7 @@ public final class RedundantStringConversion extends BugChecker
 
   private final Matcher<MethodInvocationTree> conversionMethodMatcher;
 
-  /** Instantiates the default {@link RedundantStringConversion}. */
+  /** Instantiates a default {@link RedundantStringConversion} instance. */
   public RedundantStringConversion() {
     this(ErrorProneFlags.empty());
   }

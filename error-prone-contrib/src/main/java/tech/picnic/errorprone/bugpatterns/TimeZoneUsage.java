@@ -62,7 +62,7 @@ public final class TimeZoneUsage extends BugChecker implements MethodInvocationT
               .named("now"),
           staticMethod().onClassAny(Instant.class.getName()).named("now").withNoParameters());
 
-  /** Instantiates the default {@link TimeZoneUsage}. */
+  /** Instantiates a new {@link TimeZoneUsage} instance. */
   public TimeZoneUsage() {}
 
   @Override

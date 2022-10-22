@@ -37,7 +37,7 @@ public final class RefasterAnyOfUsage extends BugChecker implements MethodInvoca
   private static final Matcher<ExpressionTree> REFASTER_ANY_OF =
       staticMethod().onClass(Refaster.class.getName()).named("anyOf");
 
-  /** Instantiates the default {@link RefasterAnyOfUsage}. */
+  /** Instantiates a new {@link RefasterAnyOfUsage} instance. */
   public RefasterAnyOfUsage() {}
 
   @Override

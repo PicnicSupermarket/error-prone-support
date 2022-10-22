@@ -37,7 +37,7 @@ public final class RequestParamType extends BugChecker implements VariableTreeMa
           annotations(AT_LEAST_ONE, isType("org.springframework.web.bind.annotation.RequestParam")),
           anyOf(isSubtypeOf(ImmutableCollection.class), isSubtypeOf(ImmutableMap.class)));
 
-  /** Instantiates the default {@link RequestParamType}. */
+  /** Instantiates a new {@link RequestParamType} instance. */
   public RequestParamType() {}
 
   @Override

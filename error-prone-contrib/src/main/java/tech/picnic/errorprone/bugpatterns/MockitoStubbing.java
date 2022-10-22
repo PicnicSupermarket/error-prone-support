@@ -36,7 +36,7 @@ public final class MockitoStubbing extends BugChecker implements MethodInvocatio
   private static final Matcher<ExpressionTree> MOCKITO_EQ_METHOD =
       staticMethod().onClass("org.mockito.ArgumentMatchers").named("eq");
 
-  /** Instantiates the default {@link MockitoStubbing}. */
+  /** Instantiates a new {@link MockitoStubbing} instance. */
   public MockitoStubbing() {}
 
   @Override

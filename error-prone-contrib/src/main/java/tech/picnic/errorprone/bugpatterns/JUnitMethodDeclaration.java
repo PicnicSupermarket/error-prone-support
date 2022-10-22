@@ -79,7 +79,7 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
               isType("org.junit.jupiter.api.BeforeAll"),
               isType("org.junit.jupiter.api.BeforeEach")));
 
-  /** Instantiates the default {@link JUnitMethodDeclaration}. */
+  /** Instantiates a new {@link JUnitMethodDeclaration} instance. */
   public JUnitMethodDeclaration() {}
 
   @Override

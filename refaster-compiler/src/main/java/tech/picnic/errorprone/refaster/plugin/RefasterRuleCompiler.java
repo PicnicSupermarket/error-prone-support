@@ -12,7 +12,7 @@ import com.sun.tools.javac.api.BasicJavacTask;
  */
 @AutoService(Plugin.class)
 public final class RefasterRuleCompiler implements Plugin {
-  /** Instantiates the default {@link RefasterRuleCompiler}. */
+  /** Instantiates a new {@link RefasterRuleCompiler} instance. */
   public RefasterRuleCompiler() {}
 
   @Override

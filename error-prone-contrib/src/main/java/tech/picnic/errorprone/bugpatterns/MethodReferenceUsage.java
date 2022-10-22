@@ -60,7 +60,7 @@ import javax.lang.model.element.Name;
 public final class MethodReferenceUsage extends BugChecker implements LambdaExpressionTreeMatcher {
   private static final long serialVersionUID = 1L;
 
-  /** Instantiates the default {@link MethodReferenceUsage}. */
+  /** Instantiates a new {@link MethodReferenceUsage} instance. */
   public MethodReferenceUsage() {}
 
   @Override

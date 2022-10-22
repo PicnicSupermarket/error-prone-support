@@ -36,7 +36,7 @@ public final class AmbiguousJsonCreator extends BugChecker implements Annotation
   private static final Matcher<AnnotationTree> IS_JSON_CREATOR_ANNOTATION =
       isType("com.fasterxml.jackson.annotation.JsonCreator");
 
-  /** Instantiates the default {@link AmbiguousJsonCreator}. */
+  /** Instantiates a new {@link AmbiguousJsonCreator} instance. */
   public AmbiguousJsonCreator() {}
 
   @Override
