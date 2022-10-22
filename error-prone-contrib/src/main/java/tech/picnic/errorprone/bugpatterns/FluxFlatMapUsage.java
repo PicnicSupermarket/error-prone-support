@@ -58,7 +58,7 @@ public final class FluxFlatMapUsage extends BugChecker
           .namedAnyOf("flatMap", "flatMapSequential")
           .withParameters(Function.class.getName());
 
-  /** Instantiates the default {@link FluxFlatMapUsage}. */
+  /** Instantiates a new {@link FluxFlatMapUsage} instance. */
   public FluxFlatMapUsage() {}
 
   @Override

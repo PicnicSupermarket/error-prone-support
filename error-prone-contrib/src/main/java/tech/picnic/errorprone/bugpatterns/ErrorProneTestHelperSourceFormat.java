@@ -72,7 +72,7 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
           .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper.ExpectOutput")
           .named("addOutputLines");
 
-  /** Instantiates the default {@link ErrorProneTestHelperSourceFormat}. */
+  /** Instantiates a new {@link ErrorProneTestHelperSourceFormat} instance. */
   public ErrorProneTestHelperSourceFormat() {}
 
   @Override

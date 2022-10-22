@@ -46,7 +46,7 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
               CanonicalAnnotationSyntax::dropRedundantValueAttribute,
               CanonicalAnnotationSyntax::dropRedundantCurlies);
 
-  /** Instantiates the default {@link CanonicalAnnotationSyntax}. */
+  /** Instantiates a new {@link CanonicalAnnotationSyntax} instance. */
   public CanonicalAnnotationSyntax() {}
 
   @Override

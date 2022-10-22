@@ -38,7 +38,7 @@ public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {
           AT_LEAST_ONE,
           anyOf(isType("java.lang.Override"), isType("org.aspectj.lang.annotation.Pointcut")));
 
-  /** Instantiates the default {@link EmptyMethod}. */
+  /** Instantiates a new {@link EmptyMethod} instance. */
   public EmptyMethod() {}
 
   @Override

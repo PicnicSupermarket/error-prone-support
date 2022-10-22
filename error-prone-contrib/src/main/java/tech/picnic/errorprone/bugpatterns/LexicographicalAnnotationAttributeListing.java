@@ -82,7 +82,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
 
   private final AnnotationAttributeMatcher matcher;
 
-  /** Instantiates the default {@link LexicographicalAnnotationAttributeListing}. */
+  /** Instantiates a default {@link LexicographicalAnnotationAttributeListing} instance. */
   public LexicographicalAnnotationAttributeListing() {
     this(ErrorProneFlags.empty());
   }

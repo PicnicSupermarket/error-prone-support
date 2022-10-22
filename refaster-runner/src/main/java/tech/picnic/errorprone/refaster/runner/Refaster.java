@@ -61,11 +61,10 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
 
   private static final long serialVersionUID = 1L;
 
-  // For more details, see https://bugs.openjdk.org/browse/JDK-8274336.
-  @SuppressWarnings("serial")
+  @SuppressWarnings("serial" /* Concrete instance will be `Serializable`. */)
   private final CodeTransformer codeTransformer;
 
-  /** Instantiates the default {@link Refaster}. */
+  /** Instantiates a default {@link Refaster} instance. */
   public Refaster() {
     this(ErrorProneFlags.empty());
   }

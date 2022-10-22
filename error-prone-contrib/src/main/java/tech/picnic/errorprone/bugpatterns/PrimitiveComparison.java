@@ -70,7 +70,7 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
               .named("thenComparing")
               .withParameters(Function.class.getName()));
 
-  /** Instantiates the default {@link PrimitiveComparison}. */
+  /** Instantiates a new {@link PrimitiveComparison} instance. */
   public PrimitiveComparison() {}
 
   @Override

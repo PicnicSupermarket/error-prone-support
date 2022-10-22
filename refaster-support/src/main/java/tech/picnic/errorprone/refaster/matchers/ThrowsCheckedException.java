@@ -19,7 +19,7 @@ import java.util.Collection;
 public final class ThrowsCheckedException implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
 
-  /** Instantiates the default {@link ThrowsCheckedException}. */
+  /** Instantiates a new {@link ThrowsCheckedException} instance. */
   public ThrowsCheckedException() {}
 
   @Override

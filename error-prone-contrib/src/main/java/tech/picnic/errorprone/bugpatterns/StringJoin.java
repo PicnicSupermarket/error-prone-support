@@ -52,7 +52,7 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
       Suppliers.typeFromClass(CharSequence.class);
   private static final Supplier<Type> FORMATTABLE_TYPE = Suppliers.typeFromClass(Formattable.class);
 
-  /** Instantiates the default {@link StringJoin}. */
+  /** Instantiates a new {@link StringJoin} instance. */
   public StringJoin() {}
 
   @Override
