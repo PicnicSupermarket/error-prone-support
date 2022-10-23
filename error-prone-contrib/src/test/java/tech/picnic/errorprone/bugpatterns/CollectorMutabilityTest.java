@@ -66,6 +66,23 @@ final class CollectorMutabilityTest {
   }
 
   @Test
+  void identificationWithoutGuavaOnClasspath() {
+    compilationTestHelper
+        .withClasspath()
+        .addSourceLines(
+            "A.java",
+            "import java.util.stream.Collectors;",
+            "import java.util.stream.Stream;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    Stream.empty().collect(Collectors.toList());",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
   void replacementFirstSuggestedFix() {
     refactoringTestHelper
         .addInputLines(

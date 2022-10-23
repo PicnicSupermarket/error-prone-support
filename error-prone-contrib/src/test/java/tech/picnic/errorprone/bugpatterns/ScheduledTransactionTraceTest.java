@@ -4,6 +4,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
+import org.springframework.scheduling.annotation.Scheduled;
 
 final class ScheduledTransactionTraceTest {
   private final CompilationTestHelper compilationTestHelper =
@@ -39,6 +40,21 @@ final class ScheduledTransactionTraceTest {
             "  @Scheduled(fixedDelay = 1)",
             "  @Trace(dispatcher = true)",
             "  void scheduledAndProperlyTraced() {}",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void identificationWithoutNewRelicAgentApiOnClasspath() {
+    compilationTestHelper
+        .withClasspath(Scheduled.class)
+        .addSourceLines(
+            "A.java",
+            "import org.springframework.scheduling.annotation.Scheduled;",
+            "",
+            "class A {",
+            "  @Scheduled(fixedDelay = 1)",
+            "  void scheduledButNotTraced() {}",
             "}")
         .doTest();
   }
