@@ -5,8 +5,10 @@ import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
@@ -14,12 +16,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
+import reactor.util.context.Context;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(assertThat(0));
+    return ImmutableSet.of(assertThat(0), HashMap.class, ImmutableMap.class);
   }
 
   ImmutableSet<Mono<?>> testMonoFromSupplier() {
@@ -122,6 +125,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Flux<Integer>> testFluxOnErrorComplete() {
     return ImmutableSet.of(Flux.just(1).onErrorComplete(), Flux.just(2).onErrorComplete());
+  }
+
+  ImmutableSet<Context> testContextEmpty() {
+    return ImmutableSet.of(Context.empty(), Context.empty());
   }
 
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {

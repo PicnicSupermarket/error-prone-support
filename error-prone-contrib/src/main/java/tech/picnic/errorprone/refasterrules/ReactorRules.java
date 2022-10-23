@@ -5,6 +5,7 @@ import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MoreCollectors;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -14,6 +15,7 @@ import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -25,6 +27,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
+import reactor.util.context.Context;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
@@ -372,6 +375,21 @@ final class ReactorRules {
     @AfterTemplate
     Flux<T> after(Flux<T> flux) {
       return flux.onErrorComplete();
+    }
+  }
+
+  /** Prefer {@link reactor.util.context.Context#empty()}} over more verbose alternatives. */
+  // XXX: Consider introducing an `IsEmpty` matcher that identifies a wide range of guaranteed-empty
+  // `Collection` and `Map` expressions.
+  static final class ContextEmpty {
+    @BeforeTemplate
+    Context before() {
+      return Context.of(Refaster.anyOf(new HashMap<>(), ImmutableMap.of()));
+    }
+
+    @AfterTemplate
+    Context after() {
+      return Context.empty();
     }
   }
 
