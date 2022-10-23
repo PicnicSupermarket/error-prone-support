@@ -70,6 +70,9 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
               .named("thenComparing")
               .withParameters(Function.class.getName()));
 
+  /** Instantiates a new {@link PrimitiveComparison} instance. */
+  public PrimitiveComparison() {}
+
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     boolean isStatic = STATIC_COMPARISON_METHOD.matches(tree, state);

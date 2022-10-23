@@ -46,6 +46,9 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
               CanonicalAnnotationSyntax::dropRedundantValueAttribute,
               CanonicalAnnotationSyntax::dropRedundantCurlies);
 
+  /** Instantiates a new {@link CanonicalAnnotationSyntax} instance. */
+  public CanonicalAnnotationSyntax() {}
+
   @Override
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
     return FIX_FACTORIES.stream()

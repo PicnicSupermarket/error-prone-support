@@ -72,6 +72,9 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
           .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper.ExpectOutput")
           .named("addOutputLines");
 
+  /** Instantiates a new {@link ErrorProneTestHelperSourceFormat} instance. */
+  public ErrorProneTestHelperSourceFormat() {}
+
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     boolean isOutputSource = OUTPUT_SOURCE_ACCEPTING_METHOD.matches(tree, state);

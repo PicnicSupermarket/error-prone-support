@@ -190,6 +190,9 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           "of",
           "valueOf");
 
+  /** Instantiates a new {@link StaticImport} instance. */
+  public StaticImport() {}
+
   @Override
   public Description matchMemberSelect(MemberSelectTree tree, VisitorState state) {
     if (!isCandidateContext(state) || !isCandidate(tree)) {

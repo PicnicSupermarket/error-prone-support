@@ -48,6 +48,9 @@ public final class RefasterRuleModifiers extends BugChecker
   private static final Matcher<Tree> REFASTER_METHOD =
       anyOf(BEFORE_TEMPLATE_METHOD, AFTER_TEMPLATE_METHOD, PLACEHOLDER_METHOD);
 
+  /** Instantiates a new {@link RefasterRuleModifiers} instance. */
+  public RefasterRuleModifiers() {}
+
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
     if (!hasMatchingMember(tree, BEFORE_TEMPLATE_METHOD, state)) {

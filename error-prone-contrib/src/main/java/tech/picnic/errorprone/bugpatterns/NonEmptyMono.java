@@ -76,6 +76,9 @@ public final class NonEmptyMono extends BugChecker implements MethodInvocationTr
               .onDescendantOf("reactor.core.publisher.Mono")
               .namedAnyOf("defaultIfEmpty", "hasElement", "single"));
 
+  /** Instantiates a new {@link NonEmptyMono} instance. */
+  public NonEmptyMono() {}
+
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     if (!MONO_SIZE_CHECK.matches(tree, state)) {

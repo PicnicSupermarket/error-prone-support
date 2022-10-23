@@ -14,6 +14,9 @@ public final class IsCharacter implements Matcher<ExpressionTree> {
   private static final Matcher<ExpressionTree> DELEGATE =
       anyOf(isSameType(CHAR_TYPE), isSameType(Character.class));
 
+  /** Instantiates a new {@link IsCharacter} instance. */
+  public IsCharacter() {}
+
   @Override
   public boolean matches(ExpressionTree tree, VisitorState state) {
     return DELEGATE.matches(tree, state);

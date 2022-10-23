@@ -44,6 +44,9 @@ public final class AssertJIsNull extends BugChecker implements MethodInvocationT
           argumentCount(1),
           argument(0, nullLiteral()));
 
+  /** Instantiates a new {@link AssertJIsNull} instance. */
+  public AssertJIsNull() {}
+
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     if (!ASSERT_IS_EQUAL_TO_NULL.matches(tree, state)) {

@@ -40,6 +40,9 @@ public final class MissingRefasterAnnotation extends BugChecker implements Class
               isType("com.google.errorprone.refaster.annotation.BeforeTemplate"),
               isType("com.google.errorprone.refaster.annotation.AfterTemplate")));
 
+  /** Instantiates a new {@link MissingRefasterAnnotation} instance. */
+  public MissingRefasterAnnotation() {}
+
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
     long methodTypes =

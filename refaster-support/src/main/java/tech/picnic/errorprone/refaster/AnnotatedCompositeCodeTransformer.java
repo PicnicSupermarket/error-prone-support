@@ -42,6 +42,8 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
   private static final long serialVersionUID = 1L;
   private static final Splitter CLASS_NAME_SPLITTER = Splitter.on('.').limit(2);
 
+  AnnotatedCompositeCodeTransformer() {}
+
   abstract String packageName();
 
   abstract ImmutableList<CodeTransformer> transformers();

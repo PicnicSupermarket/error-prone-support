@@ -38,6 +38,9 @@ public final class AutowiredConstructor extends BugChecker implements ClassTreeM
   private static final MultiMatcher<Tree, AnnotationTree> AUTOWIRED_ANNOTATION =
       annotations(AT_LEAST_ONE, isType("org.springframework.beans.factory.annotation.Autowired"));
 
+  /** Instantiates a new {@link AutowiredConstructor} instance. */
+  public AutowiredConstructor() {}
+
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
     List<MethodTree> constructors = ASTHelpers.getConstructors(tree);
