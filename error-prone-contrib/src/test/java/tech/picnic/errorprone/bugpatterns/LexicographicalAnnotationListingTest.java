@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Predicates.containsPattern;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -9,9 +7,7 @@ import org.junit.jupiter.api.Test;
 
 final class LexicographicalAnnotationListingTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
-          .expectErrorMessage(
-              "X", containsPattern("Sort annotations lexicographically where possible"));
+      CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(
           LexicographicalAnnotationListing.class, getClass());
@@ -58,11 +54,11 @@ final class LexicographicalAnnotationListingTest {
             "    String[] value() default {};",
             "  }",
             "",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Foo",
             "  @Bar",
             "  A unsortedSimpleCase();",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Foo()",
             "  @Bar()",
             "  A unsortedWithParens();",
@@ -74,12 +70,12 @@ final class LexicographicalAnnotationListingTest {
             "  @Foo()",
             "  A sortedAnnotationsOneWithParens();",
             "",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Foo",
             "  @Baz",
             "  @Bar",
             "  A threeUnsortedAnnotationsSameInitialLetter();",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Bar",
             "  @Foo()",
             "  @Baz",
@@ -90,16 +86,16 @@ final class LexicographicalAnnotationListingTest {
             "  @Foo()",
             "  A threeSortedAnnotations();",
             "",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Foo({\"b\"})",
             "  @Bar({\"a\"})",
             "  A unsortedWithStringAttributes();",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Baz(str = {\"a\", \"b\"})",
             "  @Foo(ints = {1, 0})",
             "  @Bar",
             "  A unsortedWithAttributes();",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Bar",
             "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
             "  @Baz",
@@ -114,13 +110,13 @@ final class LexicographicalAnnotationListingTest {
             "  @Foo(ints = {1, 2})",
             "  @Foo({\"b\"})",
             "  A sortedRepeatableAnnotation();",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
             "  @Bar",
             "  @Foo(ints = {1, 2})",
             "  A unsortedRepeatableAnnotation();",
             "",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Baz",
             "  @Bar",
             "  default @FooTypeUse @BarTypeUse A unsortedWithTypeUseAnnotations() {",
