@@ -1223,6 +1223,9 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
                     <version>2.13.0</version>
+                    <configuration>
+                        <updateBuildOutputTimestampPolicy>never</updateBuildOutputTimestampPolicy>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.gaul</groupId>
