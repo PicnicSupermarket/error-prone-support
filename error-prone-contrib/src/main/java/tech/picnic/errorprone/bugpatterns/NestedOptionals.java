@@ -39,9 +39,6 @@ public final class NestedOptionals extends BugChecker implements MethodInvocatio
   /** Instantiates a new {@link NestedOptionals} instance. */
   public NestedOptionals() {}
 
-  /** Instantiates a new {@link NestedOptionals} instance. */
-  public NestedOptionals() {}
-
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     return state.getTypes().isSubtype(ASTHelpers.getType(tree), OPTIONAL_OF_OPTIONAL.get(state))

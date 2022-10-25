@@ -53,9 +53,6 @@ public final class LexicographicalAnnotationListing extends BugChecker
   /** Instantiates a new {@link LexicographicalAnnotationListing} instance. */
   public LexicographicalAnnotationListing() {}
 
-  /** Instantiates a new {@link LexicographicalAnnotationListing} instance. */
-  public LexicographicalAnnotationListing() {}
-
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
     List<? extends AnnotationTree> originalOrdering = tree.getModifiers().getAnnotations();
