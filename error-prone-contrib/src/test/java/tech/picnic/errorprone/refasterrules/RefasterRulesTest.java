@@ -73,6 +73,7 @@ final class RefasterRulesTest {
   private static Stream<Arguments> validateRuleCollectionTestCases() {
     // XXX: Drop the filter once we have added tests for AssertJ! We can then also replace this
     // method with `@ValueSource(classes = {...})`.
+    /* { clazz } */
     return RULE_COLLECTIONS.stream()
         .filter(not(AssertJRules.class::equals))
         .map(Arguments::arguments);
