@@ -7,10 +7,27 @@ permissions:
   contents: read
 jobs:
   build:
-    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        jdk: [ 11.0.16, 17.0.4 ]
+        os: [ ubuntu-22.04 ]
+        jdk: [ 11.0.16, 17.0.4, 19 ]
+        distribution: [ temurin ]
+        experimental: [ false ]
+        include:
+          - os: macos-12
+            jdk: 17.0.4
+            distribution: temurin
+            experimental: false
+          - os: windows-2022
+            jdk: 17.0.4
+            distribution: temurin
+            experimental: false
+          - os: ubuntu-22.04
+            jdk: 20-ea
+            distribution: zulu
+            experimental: true
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
     steps:
         # We run the build twice for each supported JDK: once against the
         # original Error Prone release, using only Error Prone checks available
@@ -23,7 +40,7 @@ jobs:
         uses: actions/setup-java@v3.6.0
         with:
           java-version: ${{ matrix.jdk }}
-          distribution: temurin
+          distribution: ${{ matrix.distribution }}
           cache: maven
       - name: Display build environment details
         run: mvn --version
