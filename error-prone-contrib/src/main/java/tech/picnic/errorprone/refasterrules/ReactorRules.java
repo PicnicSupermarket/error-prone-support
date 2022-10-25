@@ -144,7 +144,16 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#take(long, boolean)} over {@link Flux#take(long)} to limit generation. */
+  /**
+   * Prefer {@link Flux#take(long, boolean)} over {@link Flux#take(long)}.
+   *
+   * <p>In Reactor versions prior to 3.5.0, `Flux#take(long)` makes an unbounded request upstream,
+   * and is equivalent to `Flux#take(long, false)`. In 3.5.0, the behavior of `Flux#take(long)` will
+   * change to that of `Flux#take(long, true)`.
+   *
+   * <p>The intent with this Refaster rule is to get the new behavior before upgrading to Reactor
+   * 3.5.0.
+   */
   static final class FluxTake<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, long n) {
