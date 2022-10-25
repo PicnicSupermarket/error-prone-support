@@ -144,7 +144,8 @@ final class ReactorRules {
     }
   }
 
-  static final class FluxTakeGenerationLimit<T> {
+  /** Prefer {@link Flux#take(long, boolean)} over {@link Flux#take(long)} to limit generation. */
+  static final class FluxTake<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, long n) {
       return flux.take(n);
