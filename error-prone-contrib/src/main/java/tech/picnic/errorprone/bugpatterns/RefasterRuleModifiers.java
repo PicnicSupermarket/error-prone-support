@@ -29,7 +29,7 @@ import java.util.Set;
 import javax.lang.model.element.Modifier;
 
 /**
- * A {@link BugChecker} which suggests a canonical set of modifiers for Refaster class and method
+ * A {@link BugChecker} that suggests a canonical set of modifiers for Refaster class and method
  * definitions.
  */
 @AutoService(BugChecker.class)

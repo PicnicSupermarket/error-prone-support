@@ -101,7 +101,8 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           "org.springframework.http.HttpMethod",
           "org.springframework.http.MediaType",
           "org.testng.Assert",
-          "reactor.function.TupleUtils");
+          "reactor.function.TupleUtils",
+          "tech.picnic.errorprone.bugpatterns.util.MoreTypes");
 
   /** Type members that should be statically imported. */
   @VisibleForTesting
