@@ -21,7 +21,7 @@ jobs:
           working-directory: ./website
           bundler-cache: true
       - name: Configure Github Pages
-        uses: actions/configure-pages@v2.1.1
+        uses: actions/configure-pages@v2.1.2
       - name: Generate documentation
         run: ./generate-docs.sh
       - name: Build website with Jekyll
