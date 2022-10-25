@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Predicates.containsPattern;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -9,9 +7,7 @@ import org.junit.jupiter.api.Test;
 
 final class LexicographicalAnnotationListingTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
-          .expectErrorMessage(
-              "X", containsPattern("Sort annotations lexicographically where possible"));
+      CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(
           LexicographicalAnnotationListing.class, getClass());
@@ -21,7 +17,9 @@ final class LexicographicalAnnotationListingTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
+            "import java.lang.annotation.ElementType;",
             "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
             "",
             "interface A {",
             "  @Repeatable(Foos.class)",
@@ -33,6 +31,7 @@ final class LexicographicalAnnotationListingTest {
             "    Bar[] anns() default {};",
             "  }",
             "",
+            "  @Target(ElementType.METHOD)",
             "  @interface Bar {",
             "    String[] value() default {};",
             "  }",
@@ -45,11 +44,21 @@ final class LexicographicalAnnotationListingTest {
             "    Foo[] value();",
             "  }",
             "",
-            "  // BUG: Diagnostic matches: X",
+            "  @Target(ElementType.TYPE_USE)",
+            "  @interface FooTypeUse {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @Target(ElementType.TYPE_USE)",
+            "  @interface BarTypeUse {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains:",
             "  @Foo",
             "  @Bar",
             "  A unsortedSimpleCase();",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Foo()",
             "  @Bar()",
             "  A unsortedWithParens();",
@@ -61,12 +70,12 @@ final class LexicographicalAnnotationListingTest {
             "  @Foo()",
             "  A sortedAnnotationsOneWithParens();",
             "",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Foo",
             "  @Baz",
             "  @Bar",
             "  A threeUnsortedAnnotationsSameInitialLetter();",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Bar",
             "  @Foo()",
             "  @Baz",
@@ -77,16 +86,16 @@ final class LexicographicalAnnotationListingTest {
             "  @Foo()",
             "  A threeSortedAnnotations();",
             "",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Foo({\"b\"})",
             "  @Bar({\"a\"})",
             "  A unsortedWithStringAttributes();",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Baz(str = {\"a\", \"b\"})",
             "  @Foo(ints = {1, 0})",
             "  @Bar",
             "  A unsortedWithAttributes();",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Bar",
             "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
             "  @Baz",
@@ -101,11 +110,23 @@ final class LexicographicalAnnotationListingTest {
             "  @Foo(ints = {1, 2})",
             "  @Foo({\"b\"})",
             "  A sortedRepeatableAnnotation();",
-            "  // BUG: Diagnostic matches: X",
+            "  // BUG: Diagnostic contains:",
             "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
             "  @Bar",
             "  @Foo(ints = {1, 2})",
             "  A unsortedRepeatableAnnotation();",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  default @FooTypeUse @BarTypeUse A unsortedTypeAnnotations() {",
+            "    return null;",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  @Baz",
+            "  @Bar",
+            "  default @FooTypeUse @BarTypeUse A unsortedTypeUseAndOtherAnnotations() {",
+            "    return null;",
+            "  }",
             "}")
         .doTest();
   }
@@ -115,7 +136,9 @@ final class LexicographicalAnnotationListingTest {
     refactoringTestHelper
         .addInputLines(
             "A.java",
+            "import java.lang.annotation.ElementType;",
             "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
             "",
             "interface A {",
             "  @Repeatable(Foos.class)",
@@ -127,6 +150,7 @@ final class LexicographicalAnnotationListingTest {
             "    Bar[] anns() default {};",
             "  }",
             "",
+            "  @Target(ElementType.METHOD)",
             "  @interface Bar {",
             "    String[] value() default {};",
             "  }",
@@ -137,6 +161,16 @@ final class LexicographicalAnnotationListingTest {
             "",
             "  @interface Foos {",
             "    Foo[] value();",
+            "  }",
+            "",
+            "  @Target(ElementType.TYPE_USE)",
+            "  @interface FooTypeUse {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @Target(ElementType.TYPE_USE)",
+            "  @interface BarTypeUse {",
+            "    String[] value() default {};",
             "  }",
             "",
             "  @Bar",
@@ -174,10 +208,18 @@ final class LexicographicalAnnotationListingTest {
             "  @Bar",
             "  @Foo(ints = {1, 2})",
             "  A unsortedRepeatableAnnotation();",
+            "",
+            "  @Baz",
+            "  @Bar",
+            "  default @FooTypeUse @BarTypeUse A unsortedWithTypeUseAnnotations() {",
+            "    return null;",
+            "  }",
             "}")
         .addOutputLines(
             "A.java",
+            "import java.lang.annotation.ElementType;",
             "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
             "",
             "interface A {",
             "  @Repeatable(Foos.class)",
@@ -189,6 +231,7 @@ final class LexicographicalAnnotationListingTest {
             "    Bar[] anns() default {};",
             "  }",
             "",
+            "  @Target(ElementType.METHOD)",
             "  @interface Bar {",
             "    String[] value() default {};",
             "  }",
@@ -199,6 +242,16 @@ final class LexicographicalAnnotationListingTest {
             "",
             "  @interface Foos {",
             "    Foo[] value();",
+            "  }",
+            "",
+            "  @Target(ElementType.TYPE_USE)",
+            "  @interface FooTypeUse {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @Target(ElementType.TYPE_USE)",
+            "  @interface BarTypeUse {",
+            "    String[] value() default {};",
             "  }",
             "",
             "  @Bar",
@@ -236,6 +289,12 @@ final class LexicographicalAnnotationListingTest {
             "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
             "  @Foo(ints = {1, 2})",
             "  A unsortedRepeatableAnnotation();",
+            "",
+            "  @Bar",
+            "  @Baz",
+            "  default @BarTypeUse @FooTypeUse A unsortedWithTypeUseAnnotations() {",
+            "    return null;",
+            "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
