@@ -26,6 +26,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZonedDateTime;
 
 /** A {@link BugChecker} that flags illegal time-zone related operations. */
 @AutoService(BugChecker.class)
@@ -58,7 +61,10 @@ public final class TimeZoneUsage extends BugChecker implements MethodInvocationT
               .onClassAny(
                   LocalDate.class.getName(),
                   LocalDateTime.class.getName(),
-                  LocalTime.class.getName())
+                  LocalTime.class.getName(),
+                  OffsetDateTime.class.getName(),
+                  OffsetTime.class.getName(),
+                  ZonedDateTime.class.getName())
               .named("now"),
           staticMethod().onClassAny(Instant.class.getName()).named("now").withNoParameters());
 
