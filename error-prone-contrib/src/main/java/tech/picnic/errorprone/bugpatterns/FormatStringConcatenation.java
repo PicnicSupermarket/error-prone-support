@@ -32,7 +32,7 @@ import com.sun.source.util.SimpleTreeVisitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.nullness.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
@@ -207,7 +207,7 @@ public final class FormatStringConcatenation extends BugChecker
   }
 
   private static class ReplacementArgumentsConstructor
-      extends SimpleTreeVisitor<Void, VisitorState> {
+      extends SimpleTreeVisitor<@Nullable Void, VisitorState> {
     private final StringBuilder formatString = new StringBuilder();
     private final List<Tree> formatArguments = new ArrayList<>();
     private final String formatSpecifier;
@@ -216,9 +216,8 @@ public final class FormatStringConcatenation extends BugChecker
       this.formatSpecifier = formatSpecifier;
     }
 
-    @Nullable
     @Override
-    public Void visitBinary(BinaryTree tree, VisitorState state) {
+    public @Nullable Void visitBinary(BinaryTree tree, VisitorState state) {
       if (tree.getKind() == Kind.PLUS && isStringTyped(tree, state)) {
         tree.getLeftOperand().accept(this, state);
         tree.getRightOperand().accept(this, state);
@@ -229,15 +228,13 @@ public final class FormatStringConcatenation extends BugChecker
       return null;
     }
 
-    @Nullable
     @Override
-    public Void visitParenthesized(ParenthesizedTree tree, VisitorState state) {
+    public @Nullable Void visitParenthesized(ParenthesizedTree tree, VisitorState state) {
       return tree.getExpression().accept(this, state);
     }
 
-    @Nullable
     @Override
-    protected Void defaultAction(Tree tree, VisitorState state) {
+    protected @Nullable Void defaultAction(Tree tree, VisitorState state) {
       appendExpression(tree);
       return null;
     }

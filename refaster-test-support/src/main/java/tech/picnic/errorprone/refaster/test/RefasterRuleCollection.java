@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
+import org.jspecify.nullness.Nullable;
 import tech.picnic.errorprone.refaster.runner.CodeTransformers;
 import tech.picnic.errorprone.refaster.runner.Refaster;
 
@@ -239,16 +239,15 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     return value.substring(index + 1);
   }
 
-  private class UnexpectedMatchReporter extends TreeScanner<Void, VisitorState> {
+  private class UnexpectedMatchReporter extends TreeScanner<@Nullable Void, VisitorState> {
     private final ImmutableRangeMap<Integer, String> indexedMatches;
 
     UnexpectedMatchReporter(ImmutableRangeMap<Integer, String> indexedMatches) {
       this.indexedMatches = indexedMatches;
     }
 
-    @Nullable
     @Override
-    public Void visitMethod(MethodTree tree, VisitorState state) {
+    public @Nullable Void visitMethod(MethodTree tree, VisitorState state) {
       if (!ASTHelpers.isGeneratedConstructor(tree)) {
         getRuleUnderTest(tree, state)
             .ifPresent(ruleUnderTest -> reportUnexpectedMatches(tree, ruleUnderTest, state));

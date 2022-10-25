@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.nullness.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /**
@@ -89,14 +89,12 @@ final class AssortedRules {
 
   static final class MapGetOrNull<K, V, L> {
     @BeforeTemplate
-    @Nullable
-    V before(Map<K, V> map, L key) {
+    @Nullable V before(Map<K, V> map, L key) {
       return map.getOrDefault(key, null);
     }
 
     @AfterTemplate
-    @Nullable
-    V after(Map<K, V> map, L key) {
+    @Nullable V after(Map<K, V> map, L key) {
       return map.get(key);
     }
   }
@@ -134,8 +132,7 @@ final class AssortedRules {
     }
 
     @AfterTemplate
-    @Nullable
-    T after(Iterator<T> iterator, T defaultValue) {
+    @Nullable T after(Iterator<T> iterator, T defaultValue) {
       return Iterators.getNext(iterator, defaultValue);
     }
   }

@@ -11,7 +11,7 @@ import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
-import javax.annotation.Nullable;
+import org.jspecify.nullness.Nullable;
 
 /**
  * An abstract {@link BugChecker} that reports a match for each expression matched by the given
@@ -31,10 +31,9 @@ abstract class AbstractMatcherTestChecker extends BugChecker implements Compilat
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree compilationUnit, VisitorState state) {
-    new TreeScanner<Void, Void>() {
-      @Nullable
+    new TreeScanner<@Nullable Void, @Nullable Void>() {
       @Override
-      public Void scan(Tree tree, @Nullable Void unused) {
+      public @Nullable Void scan(Tree tree, @Nullable Void unused) {
         if (tree instanceof ExpressionTree && delegate.matches((ExpressionTree) tree, state)) {
           state.reportMatch(
               Description.builder(tree, canonicalName(), null, defaultSeverity(), message())
@@ -44,9 +43,8 @@ abstract class AbstractMatcherTestChecker extends BugChecker implements Compilat
         return super.scan(tree, unused);
       }
 
-      @Nullable
       @Override
-      public Void visitImport(ImportTree node, @Nullable Void unused) {
+      public @Nullable Void visitImport(ImportTree node, @Nullable Void unused) {
         /*
          * We're not interested in matching import statements. While components of these
          * can be `ExpressionTree`s, they will never be matched by Refaster.
@@ -54,9 +52,8 @@ abstract class AbstractMatcherTestChecker extends BugChecker implements Compilat
         return null;
       }
 
-      @Nullable
       @Override
-      public Void visitMethod(MethodTree node, @Nullable Void unused) {
+      public @Nullable Void visitMethod(MethodTree node, @Nullable Void unused) {
         /*
          * We're not interested in matching e.g. parameter and return type declarations. While these
          * can be `ExpressionTree`s, they will never be matched by Refaster.

@@ -3,5 +3,5 @@
  * files on the classpath.
  */
 @com.google.errorprone.annotations.CheckReturnValue
-@javax.annotation.ParametersAreNonnullByDefault
+@org.jspecify.nullness.NullMarked
 package tech.picnic.errorprone.refaster.plugin;
