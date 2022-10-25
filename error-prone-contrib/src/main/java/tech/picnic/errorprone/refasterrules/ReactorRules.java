@@ -144,6 +144,18 @@ final class ReactorRules {
     }
   }
 
+  static final class FluxTakeGenerationLimit<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, long n) {
+      return flux.take(n);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, long n) {
+      return flux.take(n, /* limitRequest= */ true);
+    }
+  }
+
   /** Don't unnecessarily pass an empty publisher to {@link Mono#switchIfEmpty(Mono)}. */
   static final class MonoSwitchIfEmptyOfEmptyPublisher<T> {
     @BeforeTemplate
