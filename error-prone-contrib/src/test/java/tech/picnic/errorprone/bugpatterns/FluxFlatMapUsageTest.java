@@ -4,6 +4,7 @@ import static com.google.errorprone.BugCheckerRefactoringTestHelper.newInstance;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +34,14 @@ final class FluxFlatMapUsageTest {
             "    Flux.just(1).flatMapSequential(Flux::just);",
             "    // BUG: Diagnostic contains:",
             "    Flux.just(1).<String>flatMapSequential(i -> Flux.just(String.valueOf(i)));",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMap(Flux::just);",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.just(1, 2).groupBy(i -> i).<String>flatMap(i -> Flux.just(String.valueOf(i)));",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMapSequential(Flux::just);",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.just(1, 2).groupBy(i -> i).<String>flatMapSequential(i -> Flux.just(String.valueOf(i)));",
             "",
             "    Mono.just(1).flatMap(Mono::just);",
             "    Flux.just(1).concatMap(Flux::just);",
@@ -71,9 +80,13 @@ final class FluxFlatMapUsageTest {
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
+            "  private static final int MAX_CONCURRENCY = 8;",
+            "",
             "  void m() {",
             "    Flux.just(1).flatMap(Flux::just);",
             "    Flux.just(1).flatMapSequential(Flux::just);",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMap(Flux::just);",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMapSequential(Flux::just);",
             "  }",
             "}")
         .addOutputLines(
@@ -81,12 +94,16 @@ final class FluxFlatMapUsageTest {
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
+            "  private static final int MAX_CONCURRENCY = 8;",
+            "",
             "  void m() {",
             "    Flux.just(1).concatMap(Flux::just);",
             "    Flux.just(1).concatMap(Flux::just);",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMap(Flux::just, MAX_CONCURRENCY);",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMapSequential(Flux::just, MAX_CONCURRENCY);",
             "  }",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
@@ -103,6 +120,8 @@ final class FluxFlatMapUsageTest {
             "  void m() {",
             "    Flux.just(1).flatMap(Flux::just);",
             "    Flux.just(1).flatMapSequential(Flux::just);",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMap(Flux::just);",
+            "    Flux.just(1, 2).groupBy(i -> i).flatMapSequential(Flux::just);",
             "  }",
             "}")
         .addOutputLines(
@@ -115,8 +134,10 @@ final class FluxFlatMapUsageTest {
             "  void m() {",
             "    Flux.just(1).flatMap(Flux::just, MAX_CONCURRENCY);",
             "    Flux.just(1).flatMapSequential(Flux::just, MAX_CONCURRENCY);",
+            "    Flux.just(1, 2).groupBy(i -> i).concatMap(Flux::just);",
+            "    Flux.just(1, 2).groupBy(i -> i).concatMap(Flux::just);",
             "  }",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 }
