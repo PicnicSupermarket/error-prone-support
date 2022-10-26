@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.MoreCollectors.toOptional;
+import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +29,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 import reactor.util.context.Context;
+import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.Severity;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster rules related to Reactor expressions and statements. */
@@ -141,6 +144,34 @@ final class ReactorRules {
     @AfterTemplate
     Mono<S> after(Mono<T> mono, S object) {
       return mono.thenReturn(object);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#take(long, boolean)} over {@link Flux#take(long)}.
+   *
+   * <p>In Reactor versions prior to 3.5.0, {@code Flux#take(long)} makes an unbounded request
+   * upstream, and is equivalent to {@code Flux#take(long, false)}. In 3.5.0, the behavior of {@code
+   * Flux#take(long)} will change to that of {@code Flux#take(long, true)}.
+   *
+   * <p>The intent with this Refaster rule is to get the new behavior before upgrading to Reactor
+   * 3.5.0.
+   */
+  // XXX: Drop this rule some time after upgrading to Reactor 3.6.0, or introduce a way to apply
+  // this rule only when an older version of Reactor is on the classpath.
+  // XXX: Once Reactor 3.6.0 is out, introduce a rule that rewrites code in the opposite direction.
+  @Description(
+      "Prior to Reactor 3.5.0, `take(n)` requests and unbounded number of elements upstream.")
+  @Severity(WARNING)
+  static final class FluxTake<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, long n) {
+      return flux.take(n);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, long n) {
+      return flux.take(n, /* limitRequest= */ true);
     }
   }
 
