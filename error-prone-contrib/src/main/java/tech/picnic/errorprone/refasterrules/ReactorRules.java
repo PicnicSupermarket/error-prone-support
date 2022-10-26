@@ -362,16 +362,195 @@ final class ReactorRules {
    */
   abstract static class MonoFlatMapToFlux<T, S> {
     @Placeholder(allowsIdentity = true)
-    abstract Mono<S> valueTransformation(@MayOptionallyUse T value);
+    abstract Mono<S> transformation(@MayOptionallyUse T value);
 
     @BeforeTemplate
     Flux<S> before(Mono<T> mono) {
-      return mono.flatMapMany(v -> valueTransformation(v));
+      return mono.flatMapMany(v -> transformation(v));
     }
 
     @AfterTemplate
     Flux<S> after(Mono<T> mono) {
-      return mono.flatMap(v -> valueTransformation(v)).flux();
+      return mono.flatMap(v -> transformation(v)).flux();
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#map(Function)} over alternatives that unnecessarily require an inner
+   * subscription.
+   */
+  abstract static class MonoMap<T, S> {
+    @Placeholder(allowsIdentity = true)
+    abstract S transformation(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Mono<S> before(Mono<T> mono) {
+      return mono.flatMap(x -> Mono.just(transformation(x)));
+    }
+
+    @AfterTemplate
+    Mono<S> after(Mono<T> mono) {
+      return mono.map(x -> transformation(x));
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#map(Function)} over alternatives that unnecessarily require an inner
+   * subscription.
+   */
+  abstract static class FluxMap<T, S> {
+    @Placeholder(allowsIdentity = true)
+    abstract S transformation(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Flux<S> before(Flux<T> flux, boolean delayUntilEnd, int maxConcurrency, int prefetch) {
+      return Refaster.anyOf(
+          flux.concatMap(x -> Mono.just(transformation(x))),
+          flux.concatMap(x -> Flux.just(transformation(x))),
+          flux.concatMap(x -> Mono.just(transformation(x)), prefetch),
+          flux.concatMap(x -> Flux.just(transformation(x)), prefetch),
+          flux.concatMapDelayError(x -> Mono.just(transformation(x))),
+          flux.concatMapDelayError(x -> Flux.just(transformation(x))),
+          flux.concatMapDelayError(x -> Mono.just(transformation(x)), prefetch),
+          flux.concatMapDelayError(x -> Flux.just(transformation(x)), prefetch),
+          flux.concatMapDelayError(x -> Mono.just(transformation(x)), delayUntilEnd, prefetch),
+          flux.concatMapDelayError(x -> Flux.just(transformation(x)), delayUntilEnd, prefetch),
+          flux.flatMap(x -> Mono.just(transformation(x)), maxConcurrency),
+          flux.flatMap(x -> Flux.just(transformation(x)), maxConcurrency),
+          flux.flatMap(x -> Mono.just(transformation(x)), maxConcurrency, prefetch),
+          flux.flatMap(x -> Flux.just(transformation(x)), maxConcurrency, prefetch),
+          flux.flatMapDelayError(x -> Mono.just(transformation(x)), maxConcurrency, prefetch),
+          flux.flatMapDelayError(x -> Flux.just(transformation(x)), maxConcurrency, prefetch),
+          flux.flatMapSequential(x -> Mono.just(transformation(x)), maxConcurrency),
+          flux.flatMapSequential(x -> Flux.just(transformation(x)), maxConcurrency),
+          flux.flatMapSequential(x -> Mono.just(transformation(x)), maxConcurrency, prefetch),
+          flux.flatMapSequential(x -> Flux.just(transformation(x)), maxConcurrency, prefetch),
+          flux.flatMapSequentialDelayError(
+              x -> Mono.just(transformation(x)), maxConcurrency, prefetch),
+          flux.flatMapSequentialDelayError(
+              x -> Flux.just(transformation(x)), maxConcurrency, prefetch),
+          flux.switchMap(x -> Mono.just(transformation(x))),
+          flux.switchMap(x -> Flux.just(transformation(x))));
+    }
+
+    @AfterTemplate
+    Flux<S> after(Flux<T> flux) {
+      return flux.map(x -> transformation(x));
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#mapNotNull(Function)} over alternatives that unnecessarily require an inner
+   * subscription.
+   */
+  abstract static class MonoMapNotNull<T, S> {
+    @Placeholder(allowsIdentity = true)
+    abstract S transformation(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Mono<S> before(Mono<T> mono) {
+      return mono.flatMap(
+          x ->
+              Refaster.anyOf(
+                  Mono.justOrEmpty(transformation(x)), Mono.fromSupplier(() -> transformation(x))));
+    }
+
+    @AfterTemplate
+    Mono<S> after(Mono<T> mono) {
+      return mono.mapNotNull(x -> transformation(x));
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#mapNotNull(Function)} over alternatives that unnecessarily require an inner
+   * subscription.
+   */
+  abstract static class FluxMapNotNull<T, S> {
+    @Placeholder(allowsIdentity = true)
+    abstract S transformation(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Publisher<S> before(Flux<T> flux, boolean delayUntilEnd, int maxConcurrency, int prefetch) {
+      return Refaster.anyOf(
+          flux.concatMap(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x)))),
+          flux.concatMap(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              prefetch),
+          flux.concatMapDelayError(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x)))),
+          flux.concatMapDelayError(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              prefetch),
+          flux.concatMapDelayError(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              delayUntilEnd,
+              prefetch),
+          flux.flatMap(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              maxConcurrency),
+          flux.flatMap(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              maxConcurrency,
+              prefetch),
+          flux.flatMapDelayError(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              maxConcurrency,
+              prefetch),
+          flux.flatMapSequential(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              maxConcurrency),
+          flux.flatMapSequential(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              maxConcurrency,
+              prefetch),
+          flux.flatMapSequentialDelayError(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x))),
+              maxConcurrency,
+              prefetch),
+          flux.switchMap(
+              x ->
+                  Refaster.anyOf(
+                      Mono.justOrEmpty(transformation(x)),
+                      Mono.fromSupplier(() -> transformation(x)))));
+    }
+
+    @AfterTemplate
+    Flux<S> after(Flux<T> flux) {
+      return flux.mapNotNull(x -> transformation(x));
     }
   }
 
