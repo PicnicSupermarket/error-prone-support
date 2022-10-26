@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3.1.0
-      - uses: ruby/setup-ruby@v1.118.0
+      - uses: ruby/setup-ruby@v1.120.0
         with:
           working-directory: ./website
           bundler-cache: true
