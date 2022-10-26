@@ -5,6 +5,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
+import static reactor.function.TupleUtils.function;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MoreCollectors;
@@ -19,6 +20,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -29,6 +31,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 import reactor.util.context.Context;
+import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
@@ -71,6 +74,91 @@ final class ReactorRules {
     @AfterTemplate
     Mono<T> after(Optional<T> optional) {
       return Mono.defer(() -> Mono.justOrEmpty(optional));
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#zip(Mono, Mono)} over a chained {@link Mono#zipWith(Mono)}, as the former
+   * better conveys that the {@link Mono}s may be subscribed to concurrently, and generalizes to
+   * combining three or more reactive streams.
+   */
+  static final class MonoZip<T, S> {
+    @BeforeTemplate
+    Mono<Tuple2<T, S>> before(Mono<T> mono, Mono<S> other) {
+      return mono.zipWith(other);
+    }
+
+    @AfterTemplate
+    Mono<Tuple2<T, S>> after(Mono<T> mono, Mono<S> other) {
+      return Mono.zip(mono, other);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#zip(Mono, Mono)} with a chained combinator over a chained {@link
+   * Mono#zipWith(Mono, BiFunction)}, as the former better conveys that the {@link Mono}s may be
+   * subscribed to concurrently, and generalizes to combining three or more reactive streams.
+   */
+  static final class MonoZipWithCombinator<T, S, R> {
+    @BeforeTemplate
+    Mono<R> before(Mono<T> mono, Mono<S> other, BiFunction<T, S, R> combinator) {
+      return mono.zipWith(other, combinator);
+    }
+
+    @AfterTemplate
+    Mono<R> after(Mono<T> mono, Mono<S> other, BiFunction<T, S, R> combinator) {
+      return Mono.zip(mono, other).map(function(combinator));
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#zip(Publisher, Publisher)} over a chained {@link Flux#zipWith(Publisher)},
+   * as the former better conveys that the {@link Publisher}s may be subscribed to concurrently, and
+   * generalizes to combining three or more reactive streams.
+   */
+  static final class FluxZip<T, S> {
+    @BeforeTemplate
+    Flux<Tuple2<T, S>> before(Flux<T> flux, Publisher<S> other) {
+      return flux.zipWith(other);
+    }
+
+    @AfterTemplate
+    Flux<Tuple2<T, S>> after(Flux<T> flux, Publisher<S> other) {
+      return Flux.zip(flux, other);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#zip(Publisher, Publisher)} with a chained combinator over a chained {@link
+   * Flux#zipWith(Publisher, BiFunction)}, as the former better conveys that the {@link Publisher}s
+   * may be subscribed to concurrently, and generalizes to combining three or more reactive streams.
+   */
+  static final class FluxZipWithCombinator<T, S, R> {
+    @BeforeTemplate
+    Flux<R> before(Flux<T> flux, Publisher<S> other, BiFunction<T, S, R> combinator) {
+      return flux.zipWith(other, combinator);
+    }
+
+    @AfterTemplate
+    Flux<R> after(Flux<T> flux, Publisher<S> other, BiFunction<T, S, R> combinator) {
+      return Flux.zip(flux, other).map(function(combinator));
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#zipWithIterable(Iterable)} with a chained combinator over {@link
+   * Flux#zipWithIterable(Iterable, BiFunction)}, as the former generally yields more readable code.
+   */
+  static final class FluxZipWithIterable<T, S, R> {
+    @BeforeTemplate
+    Flux<R> before(Flux<T> flux, Iterable<S> iterable, BiFunction<T, S, R> combinator) {
+      return flux.zipWithIterable(iterable, combinator);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Flux<R> after(Flux<T> flux, Iterable<S> iterable, BiFunction<T, S, R> combinator) {
+      return flux.zipWithIterable(iterable).map(function(combinator));
     }
   }
 

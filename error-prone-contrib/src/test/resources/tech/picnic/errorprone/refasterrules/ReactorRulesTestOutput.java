@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
+import static reactor.function.TupleUtils.function;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -14,9 +15,11 @@ import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 import reactor.util.context.Context;
+import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
@@ -38,6 +41,29 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Mono.defer(() -> Mono.justOrEmpty(Optional.of(1))),
         Mono.defer(() -> Mono.justOrEmpty(Optional.of(2))));
+  }
+
+  Mono<Tuple2<String, Integer>> testMonoZip() {
+    return Mono.zip(Mono.just("foo"), Mono.just(1));
+  }
+
+  Mono<String> testMonoZipWithCombinator() {
+    return Mono.zip(Mono.just("foo"), Mono.just(1)).map(TupleUtils.function(String::repeat));
+  }
+
+  Flux<Tuple2<String, Integer>> testFluxZip() {
+    return Flux.zip(Flux.just("foo", "bar"), Flux.just(1, 2));
+  }
+
+  Flux<String> testFluxZipWithCombinator() {
+    return Flux.zip(Flux.just("foo", "bar"), Flux.just(1, 2))
+        .map(TupleUtils.function(String::repeat));
+  }
+
+  Flux<String> testFluxZipWithIterable() {
+    return Flux.just("foo", "bar")
+        .zipWithIterable(ImmutableSet.of(1, 2))
+        .map(function(String::repeat));
   }
 
   Mono<Void> testMonoDeferredError() {
