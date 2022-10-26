@@ -42,13 +42,13 @@ final class AnnotationAttributeReplacementTest {
             "import org.testng.annotations.Test;",
             "",
             "class A {",
-            "  @Test(priority = 1, description = \"test\")",
+            "  @Test(priority = 1, groups = \"unit\", description = \"test\")",
             "  public void foo() {}",
             "}")
         .addOutputLines(
             "A.java",
             "import org.junit.jupiter.api.MethodOrderer;",
-            "import org.junit.jupiter.api.TestMethodOrder;",
+                "import org.junit.jupiter.api.TestMethodOrder;",
             "import org.testng.annotations.Test;",
             "",
             "@TestMethodOrder(MethodOrderer.OrderAnnotation.class)",
@@ -56,6 +56,7 @@ final class AnnotationAttributeReplacementTest {
             "  @Test",
             "  @org.junit.jupiter.api.Order(1)",
             "  @org.junit.jupiter.api.DisplayName(\"test\")",
+            "  @org.junit.jupiter.api.Tag(\"unit\")",
             "  public void foo() {}",
             "}")
         .doTest(TEXT_MATCH);

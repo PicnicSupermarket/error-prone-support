@@ -105,6 +105,24 @@ public final class AnnotationAttributeReplacement extends BugChecker implements 
                                                   SourceCode.treeToString(
                                                       assignmentTree.getExpression(), state))))
                                       .build()))
+              .put(
+                  singleArgumentMatcher("org.testng.annotations.Test#groups"),
+                  (annotation, argument, state) ->
+                      Optional.of(argument)
+                          .filter(AssignmentTree.class::isInstance)
+                          .map(AssignmentTree.class::cast)
+                          .map(
+                              assignmentTree ->
+                                  SuggestedFix.builder()
+                                      .merge(removeAnnotationArgument(annotation, argument, state))
+                                      .merge(
+                                          SuggestedFix.postfixWith(
+                                              annotation,
+                                              String.format(
+                                                  "\n@org.junit.jupiter.api.Tag(%s)",
+                                                  SourceCode.treeToString(
+                                                      assignmentTree.getExpression(), state))))
+                                      .build()))
               .build();
 
   @Override
