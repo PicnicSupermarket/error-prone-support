@@ -49,6 +49,12 @@ public enum ThirdPartyLibrary {
   @SuppressWarnings("ImmutableEnumChecker" /* Supplier is deterministic. */)
   private final Supplier<Boolean> canUse;
 
+  /**
+   * Instantiates a {@link ThirdPartyLibrary} enum value.
+   *
+   * @param witnessFqcn The fully-qualified class name of a type that is expected to be on the
+   *     classpath iff the associated third-party library is on the classpath.
+   */
   ThirdPartyLibrary(String witnessFqcn) {
     this.canUse = VisitorState.memoize(state -> canIntroduceUsage(witnessFqcn, state));
   }
@@ -60,7 +66,7 @@ public enum ThirdPartyLibrary {
    * @param state The context under consideration.
    * @return {@code true} iff it is okay to assume or create a dependency on this library.
    */
-  public boolean canUse(VisitorState state) {
+  public boolean isIntroductionAllowed(VisitorState state) {
     return canUse.get(state);
   }
 

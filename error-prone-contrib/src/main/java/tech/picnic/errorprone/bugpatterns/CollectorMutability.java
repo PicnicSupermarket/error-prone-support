@@ -51,7 +51,8 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!ThirdPartyLibrary.GUAVA.canUse(state) || !COLLECTOR_METHOD.matches(tree, state)) {
+    if (!ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)
+        || !COLLECTOR_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 

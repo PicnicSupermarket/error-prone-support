@@ -22,7 +22,7 @@ final class ThirdPartyLibraryTest {
       CompilationTestHelper.newInstance(TestChecker.class, getClass());
 
   @Test
-  void canUse() {
+  void isIntroductionAllowed() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -32,7 +32,7 @@ final class ThirdPartyLibraryTest {
   }
 
   @Test
-  void canUseWitnessClassesInSymtab() {
+  void isIntroductionAllowedWitnessClassesInSymtab() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -54,7 +54,7 @@ final class ThirdPartyLibraryTest {
   }
 
   @Test
-  void canUseWitnessClassesPartiallyOnClassPath() {
+  void isIntroductionAllowedWitnessClassesPartiallyOnClassPath() {
     compilationTestHelper
         .withClasspath(ImmutableList.class, Flux.class)
         .addSourceLines(
@@ -65,7 +65,7 @@ final class ThirdPartyLibraryTest {
   }
 
   @Test
-  void canUseWitnessClassesNotOnClassPath() {
+  void isIntroductionAllowedWitnessClassesNotOnClassPath() {
     compilationTestHelper
         .withClasspath()
         .addSourceLines(
@@ -78,7 +78,7 @@ final class ThirdPartyLibraryTest {
 
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  void canUseIgnoreClasspathCompat(boolean ignoreClassPath) {
+  void isIntroductionAllowedIgnoreClasspathCompat(boolean ignoreClassPath) {
     compilationTestHelper
         .setArgs("-XepOpt:ErrorProneSupport:IgnoreClasspathCompat=" + ignoreClassPath)
         .withClasspath(ImmutableList.class, Flux.class)
@@ -104,7 +104,10 @@ final class ThirdPartyLibraryTest {
       return buildDescription(tree)
           .setMessage(
               Arrays.stream(ThirdPartyLibrary.values())
-                  .map(lib -> String.join(": ", lib.name(), String.valueOf(lib.canUse(state))))
+                  .map(
+                      lib ->
+                          String.join(
+                              ": ", lib.name(), String.valueOf(lib.isIntroductionAllowed(state))))
                   .collect(joining(", ")))
           .build();
     }

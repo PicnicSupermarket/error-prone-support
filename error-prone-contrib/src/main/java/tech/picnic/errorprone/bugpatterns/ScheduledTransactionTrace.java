@@ -52,7 +52,7 @@ public final class ScheduledTransactionTrace extends BugChecker implements Metho
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    if (!ThirdPartyLibrary.NEW_RELIC_AGENT_API.canUse(state)
+    if (!ThirdPartyLibrary.NEW_RELIC_AGENT_API.isIntroductionAllowed(state)
         || !IS_SCHEDULED.matches(tree, state)) {
       return Description.NO_MATCH;
     }
