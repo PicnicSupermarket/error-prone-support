@@ -210,6 +210,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just(ImmutableList.of("bar")).concatMapIterable(identity(), 2));
   }
 
+  Mono<Integer> testMonoDoOnError() {
+    return Mono.just(1).doOnError(IllegalArgumentException.class, e -> {});
+  }
+
+  Flux<Integer> testFluxDoOnError() {
+    return Flux.just(1).doOnError(IllegalArgumentException.class, e -> {});
+  }
+
   Mono<Integer> testMonoOnErrorComplete() {
     return Mono.just(1).onErrorComplete();
   }
@@ -218,8 +226,59 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Flux.just(1).onErrorComplete(), Flux.just(2).onErrorComplete());
   }
 
+  ImmutableSet<Mono<Integer>> testMonoOnErrorCompleteClass() {
+    return ImmutableSet.of(
+        Mono.just(1).onErrorComplete(IllegalArgumentException.class),
+        Mono.just(2).onErrorComplete(IllegalStateException.class));
+  }
+
+  ImmutableSet<Flux<Integer>> testFluxOnErrorCompleteClass() {
+    return ImmutableSet.of(
+        Flux.just(1).onErrorComplete(IllegalArgumentException.class),
+        Flux.just(2).onErrorComplete(IllegalStateException.class),
+        Flux.just(3).onErrorComplete(AssertionError.class));
+  }
+
+  Mono<Integer> testMonoOnErrorCompletePredicate() {
+    return Mono.just(1).onErrorComplete(e -> e.getCause() == null);
+  }
+
+  ImmutableSet<Flux<Integer>> testFluxOnErrorCompletePredicate() {
+    return ImmutableSet.of(
+        Flux.just(1).onErrorComplete(e -> e.getCause() == null),
+        Flux.just(2).onErrorComplete(e -> e.getCause() != null));
+  }
+
+  Mono<Integer> testMonoOnErrorContinue() {
+    return Mono.just(1).onErrorContinue(IllegalArgumentException.class, (e, v) -> {});
+  }
+
+  Flux<Integer> testFluxOnErrorContinue() {
+    return Flux.just(1).onErrorContinue(IllegalArgumentException.class, (e, v) -> {});
+  }
+
+  Mono<Integer> testMonoOnErrorMap() {
+    return Mono.just(1).onErrorMap(IllegalArgumentException.class, e -> e);
+  }
+
+  Flux<Integer> testFluxOnErrorMap() {
+    return Flux.just(1).onErrorMap(IllegalArgumentException.class, e -> e);
+  }
+
   Mono<Integer> testMonoOnErrorResume() {
     return Mono.just(1).onErrorResume(IllegalArgumentException.class, e -> Mono.just(2));
+  }
+
+  Flux<Integer> testFluxOnErrorResume() {
+    return Flux.just(1).onErrorResume(IllegalArgumentException.class, e -> Flux.just(2));
+  }
+
+  Mono<Integer> testMonoOnErrorReturn() {
+    return Mono.just(1).onErrorReturn(IllegalArgumentException.class, 2);
+  }
+
+  Flux<Integer> testFluxOnErrorReturn() {
+    return Flux.just(1).onErrorReturn(IllegalArgumentException.class, 2);
   }
 
   ImmutableSet<Context> testContextEmpty() {
