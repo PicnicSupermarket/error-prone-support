@@ -3,15 +3,12 @@ on:
   pull_request:
   push:
     branches: [ master, website ]
-permissions:
-  contents: read
-  id-token: write
-  pages: write
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   build:
+    permissions:
+      contents: read
     runs-on: ubuntu-22.04
     steps:
       - name: Check out code
@@ -39,6 +36,9 @@ jobs:
   deploy:
     if: github.ref == 'refs/heads/website'
     needs: build
+    permissions:
+      id-token: write
+      pages: write
     runs-on: ubuntu-22.04
     environment:
       name: github-pages
