@@ -676,6 +676,19 @@ final class ReactorRules {
     }
   }
 
+  /** Drop redundant {@link Class#isInstance} in {@link Mono#onErrorResume(Function)}. */
+  static final class MonoOnErrorResume<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Class<? extends Throwable> clazz, Mono<T> other) {
+      return mono.onErrorResume(clazz::isInstance, e -> other);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Class<? extends Throwable> clazz, Mono<T> other) {
+      return mono.onErrorResume(clazz, e -> other);
+    }
+  }
+
   /** Prefer {@link reactor.util.context.Context#empty()}} over more verbose alternatives. */
   // XXX: Consider introducing an `IsEmpty` matcher that identifies a wide range of guaranteed-empty
   // `Collection` and `Map` expressions.

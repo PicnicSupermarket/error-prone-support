@@ -218,6 +218,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just(2).onErrorResume(e -> Flux.empty()));
   }
 
+  Mono<Integer> testMonoOnErrorResume() {
+    return Mono.just(1)
+        .onErrorResume(IllegalArgumentException.class::isInstance, e -> Mono.just(2));
+  }
+
   ImmutableSet<Context> testContextEmpty() {
     return ImmutableSet.of(Context.of(new HashMap<>()), Context.of(ImmutableMap.of()));
   }
