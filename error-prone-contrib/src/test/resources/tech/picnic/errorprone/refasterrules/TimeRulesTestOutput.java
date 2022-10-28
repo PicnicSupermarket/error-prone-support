@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -35,8 +36,24 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
         ZoneOffset.UTC);
   }
 
-  OffsetDateTime testInstantAtOffset() {
+  LocalDate testInstantToLocalDate() {
+    return Instant.EPOCH.atOffset(ZoneOffset.UTC).toLocalDate();
+  }
+
+  LocalDateTime testInstantToLocalDateTime() {
+    return Instant.EPOCH.atOffset(ZoneOffset.UTC).toLocalDateTime();
+  }
+
+  LocalTime testInstantToLocalTime() {
+    return Instant.EPOCH.atOffset(ZoneOffset.UTC).toLocalTime();
+  }
+
+  OffsetDateTime testInstantToOffsetDateTime() {
     return Instant.EPOCH.atOffset(ZoneOffset.UTC);
+  }
+
+  OffsetTime testInstantToOffsetTime() {
+    return Instant.EPOCH.atOffset(ZoneOffset.UTC).toOffsetTime();
   }
 
   Clock testUtcClock() {

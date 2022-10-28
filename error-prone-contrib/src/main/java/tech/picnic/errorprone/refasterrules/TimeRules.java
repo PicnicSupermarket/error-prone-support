@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -64,8 +65,47 @@ final class TimeRules {
     }
   }
 
+  /** Prefer more fluent way of converting an instant to a local date. */
+  static final class InstantToLocalDate {
+    @BeforeTemplate
+    LocalDate before(Instant instant, ZoneOffset zoneOffset) {
+      return LocalDate.ofInstant(instant, zoneOffset);
+    }
+
+    @AfterTemplate
+    LocalDate after(Instant instant, ZoneOffset zoneOffset) {
+      return instant.atOffset(zoneOffset).toLocalDate();
+    }
+  }
+
+  /** Prefer more fluent way of converting an instant to a local date time. */
+  static final class InstantToLocalDateTime {
+    @BeforeTemplate
+    LocalDateTime before(Instant instant, ZoneOffset zoneOffset) {
+      return LocalDateTime.ofInstant(instant, zoneOffset);
+    }
+
+    @AfterTemplate
+    LocalDateTime after(Instant instant, ZoneOffset zoneOffset) {
+      return instant.atOffset(zoneOffset).toLocalDateTime();
+    }
+  }
+
+  /** Prefer more fluent way of converting an instant to a local time. */
+  static final class InstantToLocalTime {
+    @BeforeTemplate
+    LocalTime before(Instant instant, ZoneOffset zoneOffset) {
+      return LocalTime.ofInstant(instant, zoneOffset);
+    }
+
+    @AfterTemplate
+    LocalTime after(Instant instant, ZoneOffset zoneOffset) {
+      return instant.atOffset(zoneOffset).toLocalTime();
+    }
+  }
+
   /** Prefer {@link Instant#atOffset(ZoneOffset)} over the more verbose alternative. */
-  static final class InstantAtOffset {
+  static final class InstantToOffsetDateTime {
     @BeforeTemplate
     OffsetDateTime before(Instant instant, ZoneOffset zoneOffset) {
       return OffsetDateTime.ofInstant(instant, zoneOffset);
@@ -74,6 +114,19 @@ final class TimeRules {
     @AfterTemplate
     OffsetDateTime after(Instant instant, ZoneOffset zoneOffset) {
       return instant.atOffset(zoneOffset);
+    }
+  }
+
+  /** Prefer more fluent way of converting an instant to an offset time. */
+  static final class InstantToOffsetTime {
+    @BeforeTemplate
+    OffsetTime before(Instant instant, ZoneOffset zoneOffset) {
+      return OffsetTime.ofInstant(instant, zoneOffset);
+    }
+
+    @AfterTemplate
+    OffsetTime after(Instant instant, ZoneOffset zoneOffset) {
+      return instant.atOffset(zoneOffset).toOffsetTime();
     }
   }
 
