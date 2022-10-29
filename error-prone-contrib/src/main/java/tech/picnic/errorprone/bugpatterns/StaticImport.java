@@ -189,8 +189,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           "INSTANCE",
           "newBuilder",
           "of",
-          "valueOf",
-          "values");
+          "valueOf");
 
   /** Instantiates a new {@link StaticImport} instance. */
   public StaticImport() {}
