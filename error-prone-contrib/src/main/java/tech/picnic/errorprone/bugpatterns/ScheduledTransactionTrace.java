@@ -26,6 +26,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
 /**
  * A {@link BugChecker} that flags methods with Spring's {@code @Scheduled} annotation that lack New
@@ -51,7 +52,8 @@ public final class ScheduledTransactionTrace extends BugChecker implements Metho
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    if (!IS_SCHEDULED.matches(tree, state)) {
+    if (!ThirdPartyLibrary.NEW_RELIC_AGENT_API.isIntroductionAllowed(state)
+        || !IS_SCHEDULED.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 

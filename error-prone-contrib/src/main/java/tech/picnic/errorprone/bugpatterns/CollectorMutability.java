@@ -18,6 +18,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import java.util.stream.Collector;
+import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
 /**
  * A {@link BugChecker} that flags {@link Collector Collectors} that don't clearly express
@@ -50,7 +51,8 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!COLLECTOR_METHOD.matches(tree, state)) {
+    if (!ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)
+        || !COLLECTOR_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
