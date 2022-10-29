@@ -22,8 +22,6 @@ final class IsInstanceUsageTest {
             "    // BUG: Diagnostic contains:",
             "    Flux.just(1).filter(i -> i instanceof Integer);",
             "    // BUG: Diagnostic contains:",
-            "    Flux.just(1).filter(i -> Integer.class.isInstance(i));",
-            "    // BUG: Diagnostic contains:",
             "    Flux.just(1).onErrorResume(t -> t instanceof Exception, t -> Flux.empty());",
             "",
             "    Flux.just(1).filter(Integer.class::isInstance);",
@@ -44,7 +42,6 @@ final class IsInstanceUsageTest {
             "class A {",
             "  void m() {",
             "    Flux.just(1).filter(i -> i instanceof Integer);",
-            "    Flux.just(1).filter(i -> Integer.class.isInstance(i));",
             "  }",
             "}")
         .addOutputLines(
@@ -53,7 +50,6 @@ final class IsInstanceUsageTest {
             "",
             "class A {",
             "  void m() {",
-            "    Flux.just(1).filter(Integer.class::isInstance);",
             "    Flux.just(1).filter(Integer.class::isInstance);",
             "  }",
             "}")

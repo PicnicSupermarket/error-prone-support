@@ -106,6 +106,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
   }
 
   // XXX: Replace nested `Optional` usage.
+  // XXX: Cover for deeper method invocation like `T.class.isInstance(i)`.
   @SuppressWarnings("NestedOptionals")
   private static Optional<SuggestedFix.Builder> constructMethodRef(
       LambdaExpressionTree lambdaExpr, MethodInvocationTree subTree) {
