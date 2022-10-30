@@ -20,6 +20,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -650,6 +651,42 @@ final class ReactorRules {
     }
   }
 
+  /**
+   * Prefer {@link Mono#doOnError(Class, Consumer)} over {@link Mono#doOnError(Predicate, Consumer)}
+   * where possible.
+   */
+  static final class MonoDoOnError<T> {
+    @BeforeTemplate
+    Mono<T> before(
+        Mono<T> mono, Class<? extends Throwable> clazz, Consumer<? super Throwable> onError) {
+      return mono.doOnError(clazz::isInstance, onError);
+    }
+
+    @AfterTemplate
+    Mono<T> after(
+        Mono<T> mono, Class<? extends Throwable> clazz, Consumer<? super Throwable> onError) {
+      return mono.doOnError(clazz, onError);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#doOnError(Class, Consumer)} over {@link Flux#doOnError(Predicate, Consumer)}
+   * where possible.
+   */
+  static final class FluxDoOnError<T> {
+    @BeforeTemplate
+    Flux<T> before(
+        Flux<T> flux, Class<? extends Throwable> clazz, Consumer<? super Throwable> onError) {
+      return flux.doOnError(clazz::isInstance, onError);
+    }
+
+    @AfterTemplate
+    Flux<T> after(
+        Flux<T> flux, Class<? extends Throwable> clazz, Consumer<? super Throwable> onError) {
+      return flux.doOnError(clazz, onError);
+    }
+  }
+
   /** Prefer {@link Mono#onErrorComplete()} over more contrived alternatives. */
   static final class MonoOnErrorComplete<T> {
     @BeforeTemplate
@@ -673,6 +710,225 @@ final class ReactorRules {
     @AfterTemplate
     Flux<T> after(Flux<T> flux) {
       return flux.onErrorComplete();
+    }
+  }
+
+  /** Prefer {@link Mono#onErrorComplete(Class)}} over more contrived alternatives. */
+  static final class MonoOnErrorCompleteClass<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Class<? extends Throwable> clazz) {
+      return Refaster.anyOf(
+          mono.onErrorComplete(clazz::isInstance), mono.onErrorResume(clazz, e -> Mono.empty()));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Class<? extends Throwable> clazz) {
+      return mono.onErrorComplete(clazz);
+    }
+  }
+
+  /** Prefer {@link Flux#onErrorComplete(Class)}} over more contrived alternatives. */
+  static final class FluxOnErrorCompleteClass<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Class<? extends Throwable> clazz) {
+      return Refaster.anyOf(
+          flux.onErrorComplete(clazz::isInstance),
+          flux.onErrorResume(clazz, e -> Refaster.anyOf(Mono.empty(), Flux.empty())));
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Class<? extends Throwable> clazz) {
+      return flux.onErrorComplete(clazz);
+    }
+  }
+
+  /** Prefer {@link Mono#onErrorComplete(Predicate)}} over more contrived alternatives. */
+  static final class MonoOnErrorCompletePredicate<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Predicate<? super Throwable> predicate) {
+      return mono.onErrorResume(predicate, e -> Mono.empty());
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Predicate<? super Throwable> predicate) {
+      return mono.onErrorComplete(predicate);
+    }
+  }
+
+  /** Prefer {@link Flux#onErrorComplete(Predicate)}} over more contrived alternatives. */
+  static final class FluxOnErrorCompletePredicate<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Predicate<? super Throwable> predicate) {
+      return flux.onErrorResume(predicate, e -> Refaster.anyOf(Mono.empty(), Flux.empty()));
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Predicate<? super Throwable> predicate) {
+      return flux.onErrorComplete(predicate);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#onErrorContinue(Class, BiConsumer)} over {@link
+   * Mono#onErrorContinue(Predicate, BiConsumer)} where possible.
+   */
+  static final class MonoOnErrorContinue<T> {
+    @BeforeTemplate
+    Mono<T> before(
+        Mono<T> mono,
+        Class<? extends Throwable> clazz,
+        BiConsumer<Throwable, Object> errorConsumer) {
+      return mono.onErrorContinue(clazz::isInstance, errorConsumer);
+    }
+
+    @AfterTemplate
+    Mono<T> after(
+        Mono<T> mono,
+        Class<? extends Throwable> clazz,
+        BiConsumer<Throwable, Object> errorConsumer) {
+      return mono.onErrorContinue(clazz, errorConsumer);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#onErrorContinue(Class, BiConsumer)} over {@link
+   * Flux#onErrorContinue(Predicate, BiConsumer)} where possible.
+   */
+  static final class FluxOnErrorContinue<T> {
+    @BeforeTemplate
+    Flux<T> before(
+        Flux<T> flux,
+        Class<? extends Throwable> clazz,
+        BiConsumer<Throwable, Object> errorConsumer) {
+      return flux.onErrorContinue(clazz::isInstance, errorConsumer);
+    }
+
+    @AfterTemplate
+    Flux<T> after(
+        Flux<T> flux,
+        Class<? extends Throwable> clazz,
+        BiConsumer<Throwable, Object> errorConsumer) {
+      return flux.onErrorContinue(clazz, errorConsumer);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#onErrorMap(Class, Function)} over {@link Mono#onErrorMap(Predicate,
+   * Function)} where possible.
+   */
+  static final class MonoOnErrorMap<T> {
+    @BeforeTemplate
+    Mono<T> before(
+        Mono<T> mono,
+        Class<? extends Throwable> clazz,
+        Function<? super Throwable, ? extends Throwable> mapper) {
+      return mono.onErrorMap(clazz::isInstance, mapper);
+    }
+
+    @AfterTemplate
+    Mono<T> after(
+        Mono<T> mono,
+        Class<? extends Throwable> clazz,
+        Function<? super Throwable, ? extends Throwable> mapper) {
+      return mono.onErrorMap(clazz, mapper);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#onErrorMap(Class, Function)} over {@link Flux#onErrorMap(Predicate,
+   * Function)} where possible.
+   */
+  static final class FluxOnErrorMap<T> {
+    @BeforeTemplate
+    Flux<T> before(
+        Flux<T> flux,
+        Class<? extends Throwable> clazz,
+        Function<? super Throwable, ? extends Throwable> mapper) {
+      return flux.onErrorMap(clazz::isInstance, mapper);
+    }
+
+    @AfterTemplate
+    Flux<T> after(
+        Flux<T> flux,
+        Class<? extends Throwable> clazz,
+        Function<? super Throwable, ? extends Throwable> mapper) {
+      return flux.onErrorMap(clazz, mapper);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#onErrorResume(Class, Function)} over {@link Mono#onErrorResume(Predicate,
+   * Function)} where possible.
+   */
+  static final class MonoOnErrorResume<T> {
+    @BeforeTemplate
+    Mono<T> before(
+        Mono<T> mono,
+        Class<? extends Throwable> clazz,
+        Function<? super Throwable, ? extends Mono<? extends T>> fallback) {
+      return mono.onErrorResume(clazz::isInstance, fallback);
+    }
+
+    @AfterTemplate
+    Mono<T> after(
+        Mono<T> mono,
+        Class<? extends Throwable> clazz,
+        Function<? super Throwable, ? extends Mono<? extends T>> fallback) {
+      return mono.onErrorResume(clazz, fallback);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#onErrorResume(Class, Function)} over {@link Flux#onErrorResume(Predicate,
+   * Function)} where possible.
+   */
+  static final class FluxOnErrorResume<T> {
+    @BeforeTemplate
+    Flux<T> before(
+        Flux<T> flux,
+        Class<? extends Throwable> clazz,
+        Function<? super Throwable, ? extends Publisher<? extends T>> fallback) {
+      return flux.onErrorResume(clazz::isInstance, fallback);
+    }
+
+    @AfterTemplate
+    Flux<T> after(
+        Flux<T> flux,
+        Class<? extends Throwable> clazz,
+        Function<? super Throwable, ? extends Publisher<? extends T>> fallback) {
+      return flux.onErrorResume(clazz, fallback);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#onErrorReturn(Class, Object)} over {@link Mono#onErrorReturn(Predicate,
+   * Object)} where possible.
+   */
+  static final class MonoOnErrorReturn<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Class<? extends Throwable> clazz, T fallbackValue) {
+      return mono.onErrorReturn(clazz::isInstance, fallbackValue);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Class<? extends Throwable> clazz, T fallbackValue) {
+      return mono.onErrorReturn(clazz, fallbackValue);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#onErrorReturn(Class, Object)} over {@link Flux#onErrorReturn(Predicate,
+   * Object)} where possible.
+   */
+  static final class FluxOnErrorReturn<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Class<? extends Throwable> clazz, T fallbackValue) {
+      return flux.onErrorReturn(clazz::isInstance, fallbackValue);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Class<? extends Throwable> clazz, T fallbackValue) {
+      return flux.onErrorReturn(clazz, fallbackValue);
     }
   }
 
