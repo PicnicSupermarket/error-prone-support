@@ -36,24 +36,41 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
         ZoneOffset.UTC);
   }
 
-  LocalDate testInstantToLocalDate() {
-    return Instant.EPOCH.atOffset(ZoneOffset.UTC).toLocalDate();
+  ImmutableSet<LocalDate> testInstantToLocalDate() {
+    return ImmutableSet.of(
+        LocalDate.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Amsterdam")),
+        LocalDate.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Paris")),
+        LocalDate.ofInstant(Instant.EPOCH, ZoneOffset.UTC),
+        LocalDate.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")));
   }
 
-  LocalDateTime testInstantToLocalDateTime() {
-    return Instant.EPOCH.atOffset(ZoneOffset.UTC).toLocalDateTime();
+  ImmutableSet<LocalDateTime> testInstantToLocalDateTime() {
+    return ImmutableSet.of(
+        LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Amsterdam")),
+        LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")),
+        LocalDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC));
   }
 
-  LocalTime testInstantToLocalTime() {
-    return Instant.EPOCH.atOffset(ZoneOffset.UTC).toLocalTime();
+  ImmutableSet<LocalTime> testInstantToLocalTime() {
+    return ImmutableSet.of(
+        LocalTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Amsterdam")),
+        LocalTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Paris")),
+        LocalTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC),
+        LocalTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")));
   }
 
   OffsetDateTime testInstantToOffsetDateTime() {
     return Instant.EPOCH.atOffset(ZoneOffset.UTC);
   }
 
-  OffsetTime testInstantToOffsetTime() {
-    return Instant.EPOCH.atOffset(ZoneOffset.UTC).toOffsetTime();
+  ImmutableSet<OffsetTime> testInstantToOffsetTime() {
+    return ImmutableSet.of(
+        OffsetTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Amsterdam")),
+        OffsetTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC));
+  }
+
+  ZonedDateTime testInstantToZonedDateTime() {
+    return Instant.EPOCH.atZone(ZoneOffset.UTC);
   }
 
   Clock testUtcClock() {

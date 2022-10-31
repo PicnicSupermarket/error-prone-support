@@ -36,24 +36,41 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
         ZoneId.from(ZoneOffset.UTC));
   }
 
-  LocalDate testInstantToLocalDate() {
-    return LocalDate.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
+  ImmutableSet<LocalDate> testInstantToLocalDate() {
+    return ImmutableSet.of(
+        Instant.EPOCH.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate(),
+        Instant.EPOCH.atZone(ZoneId.of("Europe/Paris")).toOffsetDateTime().toLocalDate(),
+        Instant.EPOCH.atOffset(ZoneOffset.UTC).toLocalDate(),
+        LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")).toLocalDate());
   }
 
-  LocalDateTime testInstantToLocalDateTime() {
-    return LocalDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
+  ImmutableSet<LocalDateTime> testInstantToLocalDateTime() {
+    return ImmutableSet.of(
+        Instant.EPOCH.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDateTime(),
+        Instant.EPOCH.atZone(ZoneId.of("Europe/Berlin")).toOffsetDateTime().toLocalDateTime(),
+        Instant.EPOCH.atOffset(ZoneOffset.UTC).toLocalDateTime());
   }
 
-  LocalTime testInstantToLocalTime() {
-    return LocalTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
+  ImmutableSet<LocalTime> testInstantToLocalTime() {
+    return ImmutableSet.of(
+        Instant.EPOCH.atZone(ZoneId.of("Europe/Amsterdam")).toLocalTime(),
+        Instant.EPOCH.atZone(ZoneId.of("Europe/Paris")).toOffsetDateTime().toLocalTime(),
+        Instant.EPOCH.atOffset(ZoneOffset.UTC).toLocalTime(),
+        LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")).toLocalTime());
   }
 
   OffsetDateTime testInstantToOffsetDateTime() {
     return OffsetDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
   }
 
-  OffsetTime testInstantToOffsetTime() {
-    return OffsetTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
+  ImmutableSet<OffsetTime> testInstantToOffsetTime() {
+    return ImmutableSet.of(
+        Instant.EPOCH.atZone(ZoneId.of("Europe/Amsterdam")).toOffsetDateTime().toOffsetTime(),
+        Instant.EPOCH.atOffset(ZoneOffset.UTC).toOffsetTime());
+  }
+
+  ZonedDateTime testInstantToZonedDateTime() {
+    return ZonedDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
   }
 
   Clock testUtcClock() {
