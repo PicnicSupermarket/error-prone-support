@@ -64,6 +64,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
       ImmutableSet.of(
           // XXX: unless JsonPropertyOrder#alphabetic is true...
           "com.fasterxml.jackson.annotation.JsonPropertyOrder#value",
+          "com.picnic.jooq.annotation.SpringPostgresTestContainer#flywaySchemas",
           "io.swagger.annotations.ApiImplicitParams#value",
           "io.swagger.v3.oas.annotations.Parameters#value",
           "javax.xml.bind.annotation.XmlType#propOrder",
