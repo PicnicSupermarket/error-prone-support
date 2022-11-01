@@ -66,7 +66,7 @@ final class TimeRules {
     }
   }
 
-  static final class InstantToLocalDate {
+  static final class LocalDateOfInstant {
     @BeforeTemplate
     LocalDate before(Instant instant, ZoneId zoneId) {
       return Refaster.anyOf(
@@ -86,7 +86,7 @@ final class TimeRules {
     }
   }
 
-  static final class InstantToLocalDateTime {
+  static final class LocalDateTimeOfInstant {
     @BeforeTemplate
     LocalDateTime before(Instant instant, ZoneId zoneId) {
       return Refaster.anyOf(
@@ -105,7 +105,7 @@ final class TimeRules {
     }
   }
 
-  static final class InstantToLocalTime {
+  static final class LocalTimeOfInstant {
     @BeforeTemplate
     LocalTime before(Instant instant, ZoneId zoneId) {
       return Refaster.anyOf(
@@ -126,7 +126,7 @@ final class TimeRules {
   }
 
   /** Prefer {@link Instant#atOffset(ZoneOffset)} over the more verbose alternative. */
-  static final class InstantToOffsetDateTime {
+  static final class InstantAtOffset {
     @BeforeTemplate
     OffsetDateTime before(Instant instant, ZoneOffset zoneOffset) {
       return OffsetDateTime.ofInstant(instant, zoneOffset);
@@ -138,7 +138,7 @@ final class TimeRules {
     }
   }
 
-  static final class InstantToOffsetTime {
+  static final class OffsetTimeOfInstant {
     @BeforeTemplate
     OffsetTime before(Instant instant, ZoneId zoneId) {
       return instant.atZone(zoneId).toOffsetDateTime().toOffsetTime();
@@ -156,7 +156,7 @@ final class TimeRules {
   }
 
   /** Prefer {@link Instant#atZone(ZoneId)} over the more verbose alternative. */
-  static final class InstantToZonedDateTime {
+  static final class InstantAtZone {
     @BeforeTemplate
     ZonedDateTime before(Instant instant, ZoneId zoneId) {
       return ZonedDateTime.ofInstant(instant, zoneId);

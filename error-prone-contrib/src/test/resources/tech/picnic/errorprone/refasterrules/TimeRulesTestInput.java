@@ -36,7 +36,7 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
         ZoneId.from(ZoneOffset.UTC));
   }
 
-  ImmutableSet<LocalDate> testInstantToLocalDate() {
+  ImmutableSet<LocalDate> testLocalDateOfInstant() {
     return ImmutableSet.of(
         Instant.EPOCH.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate(),
         Instant.EPOCH.atZone(ZoneId.of("Europe/Paris")).toOffsetDateTime().toLocalDate(),
@@ -44,14 +44,14 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
         LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")).toLocalDate());
   }
 
-  ImmutableSet<LocalDateTime> testInstantToLocalDateTime() {
+  ImmutableSet<LocalDateTime> testLocalDateTimeOfInstant() {
     return ImmutableSet.of(
         Instant.EPOCH.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDateTime(),
         Instant.EPOCH.atZone(ZoneId.of("Europe/Berlin")).toOffsetDateTime().toLocalDateTime(),
         Instant.EPOCH.atOffset(ZoneOffset.UTC).toLocalDateTime());
   }
 
-  ImmutableSet<LocalTime> testInstantToLocalTime() {
+  ImmutableSet<LocalTime> testLocalTimeOfInstant() {
     return ImmutableSet.of(
         Instant.EPOCH.atZone(ZoneId.of("Europe/Amsterdam")).toLocalTime(),
         Instant.EPOCH.atZone(ZoneId.of("Europe/Paris")).toOffsetDateTime().toLocalTime(),
@@ -59,17 +59,17 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
         LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")).toLocalTime());
   }
 
-  OffsetDateTime testInstantToOffsetDateTime() {
+  OffsetDateTime testInstantAtOffset() {
     return OffsetDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
   }
 
-  ImmutableSet<OffsetTime> testInstantToOffsetTime() {
+  ImmutableSet<OffsetTime> testOffsetTimeOfInstant() {
     return ImmutableSet.of(
         Instant.EPOCH.atZone(ZoneId.of("Europe/Amsterdam")).toOffsetDateTime().toOffsetTime(),
         Instant.EPOCH.atOffset(ZoneOffset.UTC).toOffsetTime());
   }
 
-  ZonedDateTime testInstantToZonedDateTime() {
+  ZonedDateTime testInstantAtZone() {
     return ZonedDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
   }
 
