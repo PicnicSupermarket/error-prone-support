@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
@@ -41,6 +42,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @BugPattern(
     summary = "Prefer `String#join` over `String#format`",
     link = BUG_PATTERNS_BASE_URL + "StringJoin",
+    linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
 public final class StringJoin extends BugChecker implements MethodInvocationTreeMatcher {
