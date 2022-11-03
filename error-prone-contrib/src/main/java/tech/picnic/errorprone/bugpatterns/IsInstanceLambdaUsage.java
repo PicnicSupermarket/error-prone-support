@@ -2,7 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
-import static com.google.errorprone.BugPattern.StandardTags.STYLE;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -27,15 +27,15 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `Class::isInstance` method reference over equivalent lambda expression",
-    link = BUG_PATTERNS_BASE_URL + "IsInstanceUsage",
+    link = BUG_PATTERNS_BASE_URL + "IsInstanceLambdaUsage",
     linkType = CUSTOM,
     severity = SUGGESTION,
-    tags = STYLE)
-public final class IsInstanceUsage extends BugChecker implements LambdaExpressionTreeMatcher {
+    tags = SIMPLIFICATION)
+public final class IsInstanceLambdaUsage extends BugChecker implements LambdaExpressionTreeMatcher {
   private static final long serialVersionUID = 1L;
 
-  /** Instantiates a new {@link IsInstanceUsage} instance. */
-  public IsInstanceUsage() {}
+  /** Instantiates a new {@link IsInstanceLambdaUsage} instance. */
+  public IsInstanceLambdaUsage() {}
 
   @Override
   public Description matchLambdaExpression(LambdaExpressionTree tree, VisitorState state) {

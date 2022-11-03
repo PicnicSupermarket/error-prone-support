@@ -5,11 +5,11 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class IsInstanceUsageTest {
+final class IsInstanceLambdaUsageTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(IsInstanceUsage.class, getClass());
+      CompilationTestHelper.newInstance(IsInstanceLambdaUsage.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(IsInstanceUsage.class, getClass());
+      BugCheckerRefactoringTestHelper.newInstance(IsInstanceLambdaUsage.class, getClass());
 
   @Test
   void identification() {
