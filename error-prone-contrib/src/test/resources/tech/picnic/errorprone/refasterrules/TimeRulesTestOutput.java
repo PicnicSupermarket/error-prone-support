@@ -39,24 +39,29 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<LocalDate> testLocalDateOfInstant() {
     return ImmutableSet.of(
         LocalDate.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Amsterdam")),
-        LocalDate.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Paris")),
         LocalDate.ofInstant(Instant.EPOCH, ZoneOffset.UTC),
-        LocalDate.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")));
+        LocalDate.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")),
+        LocalDate.ofInstant(Instant.EPOCH, ZoneOffset.MIN));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimeOfInstant() {
     return ImmutableSet.of(
         LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Amsterdam")),
-        LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")),
-        LocalDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC));
+        LocalDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC),
+        LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")));
   }
 
   ImmutableSet<LocalTime> testLocalTimeOfInstant() {
     return ImmutableSet.of(
         LocalTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Amsterdam")),
-        LocalTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Paris")),
         LocalTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC),
-        LocalTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")));
+        LocalTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")),
+        LocalTime.ofInstant(Instant.EPOCH, ZoneOffset.MIN),
+        LocalTime.ofInstant(Instant.EPOCH, ZoneOffset.MAX));
+  }
+
+  OffsetDateTime testOffsetDateTimeOfInstant() {
+    return OffsetDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
   }
 
   OffsetDateTime testInstantAtOffset() {
