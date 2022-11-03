@@ -1,10 +1,12 @@
 package tech.picnic.errorprone.refasterrules;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Collection;
+import java.util.Map;
 import org.assertj.core.api.EnumerableAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -59,6 +61,18 @@ final class AssertJEnumerableRules {
     @AfterTemplate
     EnumerableAssert<?, S> after(EnumerableAssert<?, S> enumAssert, Iterable<T> iterable) {
       return enumAssert.hasSameSizeAs(iterable);
+    }
+  }
+
+  static final class EnumerableAssertMapHasSameSizeAs<S, T, U> {
+    @BeforeTemplate
+    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, Map<T, U> map) {
+      return enumAssert.hasSize(map.size());
+    }
+
+    @AfterTemplate
+    EnumerableAssert<?, S> after(EnumerableAssert<?, S> enumAssert, Map<T, U> map) {
+      return enumAssert.hasSameSizeAs(map.entrySet());
     }
   }
 }

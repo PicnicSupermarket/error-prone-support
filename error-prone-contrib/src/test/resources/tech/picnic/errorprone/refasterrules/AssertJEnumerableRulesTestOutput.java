@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refasterrules;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import org.assertj.core.api.EnumerableAssert;
@@ -28,5 +29,10 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
         assertThat(ImmutableSet.of(1)).hasSameSizeAs(ImmutableSet.of(2)),
         assertThat(ImmutableSet.of(3)).hasSameSizeAs(ImmutableSet.of(4)),
         assertThat(ImmutableSet.of(5)).hasSameSizeAs(new Integer[0]));
+  }
+
+  ImmutableSet<EnumerableAssert<?, Integer>> testEnumerableAssertMapHasSameSizeAs() {
+    return ImmutableSet.of(
+        assertThat(ImmutableSet.of(1)).hasSameSizeAs(ImmutableMap.of(2, 3).entrySet()));
   }
 }
