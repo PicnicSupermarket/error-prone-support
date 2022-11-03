@@ -37,6 +37,8 @@ import javax.lang.model.element.Name;
 
 /**
  * A {@link BugChecker} that flags lambda expressions that can be replaced with method references.
+ *
+ * @see IsInstanceUsage
  */
 // XXX: Other custom expressions we could rewrite:
 // - `a -> "str" + a` to `"str"::concat`. But only if `str` is provably non-null.
@@ -50,6 +52,9 @@ import javax.lang.model.element.Name;
 // `not(some::reference)`.
 // XXX: This check is extremely inefficient due to its reliance on `SuggestedFixes.compilesWithFix`.
 // Palantir's `LambdaMethodReference` check seems to suffer a similar issue at this time.
+// XXX: Expressions of the form `i -> SomeType.class.isInstance(i)` are not replaced; fix that using
+// a suitable generalization.
+// XXX: Consider folding the `IsInstanceUsage` check into this class.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer method references over lambda expressions",
@@ -106,7 +111,6 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
   }
 
   // XXX: Replace nested `Optional` usage.
-  // XXX: Cover for deeper method invocation like `T.class.isInstance(i)`.
   @SuppressWarnings("NestedOptionals")
   private static Optional<SuggestedFix.Builder> constructMethodRef(
       LambdaExpressionTree lambdaExpr, MethodInvocationTree subTree) {

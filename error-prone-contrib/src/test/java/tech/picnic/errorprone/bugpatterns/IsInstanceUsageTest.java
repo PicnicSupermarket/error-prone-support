@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -15,18 +16,13 @@ final class IsInstanceUsageTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
-            "import reactor.core.publisher.Flux;",
+            "import java.util.stream.Stream;",
             "",
             "class A {",
             "  void m() {",
             "    // BUG: Diagnostic contains:",
-            "    Flux.just(1).filter(i -> i instanceof Integer);",
-            "    // BUG: Diagnostic contains:",
-            "    Flux.just(1).onErrorResume(t -> t instanceof Exception, t -> Flux.empty());",
-            "",
-            "    Flux.just(1).filter(Integer.class::isInstance);",
-            "    Flux.just(1).onErrorResume(Exception.class, t -> Flux.empty());",
-            "    Flux.just(1).onErrorResume(Exception.class::isInstance, t -> Flux.empty());",
+            "    Stream.of(1).filter(i -> i instanceof Integer);",
+            "    Stream.of(2).filter(Integer.class::isInstance);",
             "  }",
             "}")
         .doTest();
@@ -37,22 +33,22 @@ final class IsInstanceUsageTest {
     refactoringTestHelper
         .addInputLines(
             "A.java",
-            "import reactor.core.publisher.Flux;",
+            "import java.util.stream.Stream;",
             "",
             "class A {",
             "  void m() {",
-            "    Flux.just(1).filter(i -> i instanceof Integer);",
+            "    Stream.of(1).filter(i -> i instanceof Integer);",
             "  }",
             "}")
         .addOutputLines(
             "A.java",
-            "import reactor.core.publisher.Flux;",
+            "import java.util.stream.Stream;",
             "",
             "class A {",
             "  void m() {",
-            "    Flux.just(1).filter(Integer.class::isInstance);",
+            "    Stream.of(1).filter(Integer.class::isInstance);",
             "  }",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 }
