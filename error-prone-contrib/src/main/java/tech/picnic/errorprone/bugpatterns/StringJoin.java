@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
