@@ -103,4 +103,13 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Optional.of("foo"), Optional.of("bar"), Optional.of("baz"), Optional.of("qux"));
   }
+
+  ImmutableSet<Optional<String>> testOptionalFilter() {
+    return ImmutableSet.of(
+        Optional.of("foo").filter(String::isEmpty), Optional.of("bar").filter(String::isEmpty));
+  }
+
+  Optional<String> testOptionalMap() {
+    return Optional.of(1).map(String::valueOf);
+  }
 }

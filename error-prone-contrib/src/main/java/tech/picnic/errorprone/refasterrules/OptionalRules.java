@@ -355,6 +355,42 @@ final class OptionalRules {
     }
   }
 
+  /**
+   * Avoid unnecessary {@link Optional} to {@link Stream} conversion when filtering a value of the
+   * former type.
+   */
+  static final class OptionalFilter<T> {
+    @BeforeTemplate
+    Optional<T> before(Optional<T> optional, Predicate<? super T> predicate) {
+      return Refaster.anyOf(
+          optional.stream().filter(predicate).findFirst(),
+          optional.stream().filter(predicate).findAny());
+    }
+
+    @AfterTemplate
+    Optional<T> after(Optional<T> optional, Predicate<? super T> predicate) {
+      return optional.filter(predicate);
+    }
+  }
+
+  /**
+   * Avoid unnecessary {@link Optional} to {@link Stream} conversion when mapping a value of the
+   * former type.
+   */
+  // XXX: If `StreamMapFirst` also simplifies `.findAny()` expressions, then this rule can be
+  // dropped in favour of `StreamMapFirst` and `OptionalIdentity`.
+  static final class OptionalMap<S, T> {
+    @BeforeTemplate
+    Optional<? extends T> before(Optional<S> optional, Function<? super S, ? extends T> function) {
+      return optional.stream().map(function).findAny();
+    }
+
+    @AfterTemplate
+    Optional<? extends T> after(Optional<S> optional, Function<? super S, ? extends T> function) {
+      return optional.map(function);
+    }
+  }
+
   // XXX: Add a rule for:
   // `optional.flatMap(x -> pred(x) ? Optional.empty() : Optional.of(x))` and variants.
   // (Maybe canonicalize the inner expression. Maybe we rewrite already.)
