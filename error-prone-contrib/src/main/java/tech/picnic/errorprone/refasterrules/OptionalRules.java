@@ -356,15 +356,15 @@ final class OptionalRules {
   }
 
   /**
-   * Avoid unnecessary {@link Optional} to {@link Stream} conversion when filtering that ultimately
-   * returns the same result.
+   * Avoid unnecessary {@link Optional} to {@link Stream} conversion when filtering a value of the
+   * former type.
    */
-  static final class OptionalStreamFilter<T> {
+  static final class OptionalFilter<T> {
     @BeforeTemplate
     Optional<T> before(Optional<T> optional, Predicate<? super T> predicate) {
       return Refaster.anyOf(
-          optional.stream().filter(predicate).findAny(),
-          optional.stream().filter(predicate).findFirst());
+          optional.stream().filter(predicate).findFirst(),
+          optional.stream().filter(predicate).findAny());
     }
 
     @AfterTemplate
@@ -374,14 +374,15 @@ final class OptionalRules {
   }
 
   /**
-   * Avoid unnecessary {@link Optional} to {@link Stream} conversion when mapping that ultimately
-   * returns the same result.
+   * Avoid unnecessary {@link Optional} to {@link Stream} conversion when mapping a value of the
+   * former type.
    */
-  static final class OptionalStreamMap<S, T> {
+  // XXX: If `StreamMapFirst` also simplifies `.findAny()` expressions, then this rule can be
+  // dropped in favour of `StreamMapFirst` and `OptionalIdentity`.
+  static final class OptionalMap<S, T> {
     @BeforeTemplate
     Optional<? extends T> before(Optional<S> optional, Function<? super S, ? extends T> function) {
-      return Refaster.anyOf(
-          optional.stream().map(function).findAny(), optional.stream().map(function).findFirst());
+      return optional.stream().map(function).findAny();
     }
 
     @AfterTemplate
