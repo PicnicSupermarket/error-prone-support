@@ -72,8 +72,8 @@ final class TimeRules {
     LocalDate before(Instant instant, ZoneId zoneId) {
       return Refaster.anyOf(
           instant.atZone(zoneId).toLocalDate(),
-          OffsetDateTime.ofInstant(instant, zoneId).toLocalDate(),
-          LocalDateTime.ofInstant(instant, zoneId).toLocalDate());
+          LocalDateTime.ofInstant(instant, zoneId).toLocalDate(),
+          OffsetDateTime.ofInstant(instant, zoneId).toLocalDate());
     }
 
     @BeforeTemplate
@@ -113,9 +113,9 @@ final class TimeRules {
     LocalTime before(Instant instant, ZoneId zoneId) {
       return Refaster.anyOf(
           instant.atZone(zoneId).toLocalTime(),
+          LocalDateTime.ofInstant(instant, zoneId).toLocalTime(),
           OffsetDateTime.ofInstant(instant, zoneId).toLocalTime(),
-          OffsetTime.ofInstant(instant, zoneId).toLocalTime(),
-          LocalDateTime.ofInstant(instant, zoneId).toLocalTime());
+          OffsetTime.ofInstant(instant, zoneId).toLocalTime());
     }
 
     @BeforeTemplate
