@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -35,8 +36,46 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
         ZoneOffset.UTC);
   }
 
+  ImmutableSet<LocalDate> testLocalDateOfInstant() {
+    return ImmutableSet.of(
+        LocalDate.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Amsterdam")),
+        LocalDate.ofInstant(Instant.EPOCH, ZoneOffset.UTC),
+        LocalDate.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")),
+        LocalDate.ofInstant(Instant.EPOCH, ZoneOffset.MIN));
+  }
+
+  ImmutableSet<LocalDateTime> testLocalDateTimeOfInstant() {
+    return ImmutableSet.of(
+        LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Amsterdam")),
+        LocalDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC),
+        LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")));
+  }
+
+  ImmutableSet<LocalTime> testLocalTimeOfInstant() {
+    return ImmutableSet.of(
+        LocalTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Amsterdam")),
+        LocalTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC),
+        LocalTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Berlin")),
+        LocalTime.ofInstant(Instant.EPOCH, ZoneOffset.MIN),
+        LocalTime.ofInstant(Instant.EPOCH, ZoneOffset.MAX));
+  }
+
+  OffsetDateTime testOffsetDateTimeOfInstant() {
+    return OffsetDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
+  }
+
   OffsetDateTime testInstantAtOffset() {
     return Instant.EPOCH.atOffset(ZoneOffset.UTC);
+  }
+
+  ImmutableSet<OffsetTime> testOffsetTimeOfInstant() {
+    return ImmutableSet.of(
+        OffsetTime.ofInstant(Instant.EPOCH, ZoneId.of("Europe/Amsterdam")),
+        OffsetTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC));
+  }
+
+  ZonedDateTime testInstantAtZone() {
+    return Instant.EPOCH.atZone(ZoneOffset.UTC);
   }
 
   Clock testUtcClock() {
