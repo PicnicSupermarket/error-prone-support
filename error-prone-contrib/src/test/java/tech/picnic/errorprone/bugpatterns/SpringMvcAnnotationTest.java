@@ -19,7 +19,6 @@ final class SpringMvcAnnotationTest {
             "import static org.springframework.web.bind.annotation.RequestMethod.DELETE;",
             "import static org.springframework.web.bind.annotation.RequestMethod.GET;",
             "import static org.springframework.web.bind.annotation.RequestMethod.HEAD;",
-            "import static org.springframework.web.bind.annotation.RequestMethod.PATCH;",
             "import static org.springframework.web.bind.annotation.RequestMethod.POST;",
             "import static org.springframework.web.bind.annotation.RequestMethod.PUT;",
             "",

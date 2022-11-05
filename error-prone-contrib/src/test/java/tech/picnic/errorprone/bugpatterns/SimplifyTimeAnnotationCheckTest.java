@@ -19,11 +19,14 @@ public final class SimplifyTimeAnnotationCheckTest {
             "import org.junit.jupiter.api.Timeout;",
             "",
             "interface A {",
-            "  @Timeout(6) A noSimplification();",
+            "  @Timeout(6)",
+            "  A noSimplification();",
             "  // BUG: Diagnostic contains:",
-            "  @Timeout(60) A simple();",
+            "  @Timeout(60)",
+            "  A simple();",
             "  // BUG: Diagnostic contains:",
-            "  @Timeout(value = 60 * 1000, unit = TimeUnit.MILLISECONDS) A explicitUnit();",
+            "  @Timeout(value = 60 * 1000, unit = TimeUnit.MILLISECONDS)",
+            "  A explicitUnit();",
             "}")
         .doTest();
   }
@@ -37,8 +40,11 @@ public final class SimplifyTimeAnnotationCheckTest {
             "",
             "interface A {",
             "  // BUG: Diagnostic contains:",
-            "  @Scheduled(fixedDelay = 6_000) A scheduledFixedDelay();",
-            "  @Scheduled(fixedDelay = 6_000, fixedRateString = \"\") A bannedAttribute();",
+            "  @Scheduled(fixedDelay = 6_000)",
+            "  A scheduledFixedDelay();",
+            "",
+            "  @Scheduled(fixedDelay = 6_000, fixedRateString = \"\")",
+            "  A bannedAttribute();",
             "}")
         .doTest();
   }
@@ -52,11 +58,20 @@ public final class SimplifyTimeAnnotationCheckTest {
             "import org.springframework.scheduling.annotation.Scheduled;",
             "",
             "interface A {",
-            "  @Timeout(value = 60) A simple();",
-            "  @Scheduled(fixedDelay = 6_000) A scheduledFixedDelay();",
-            "  @Scheduled(fixedDelay = 5_000, initialDelay = 6_000, fixedRate = 7_000) A scheduledMultiple();",
-            "  @Scheduled(fixedDelay = 60_000, initialDelay = 6_000, fixedRate = 7_000) A scheduledCommonUnit();",
-            "  @Scheduled(fixedDelay = 5, initialDelay = 6_000, fixedRate = 7_000) A scheduledNoSimplification();",
+            "  @Timeout(value = 60)",
+            "  A simple();",
+            "",
+            "  @Scheduled(fixedDelay = 6_000)",
+            "  A scheduledFixedDelay();",
+            "",
+            "  @Scheduled(fixedDelay = 5_000, initialDelay = 6_000, fixedRate = 7_000)",
+            "  A scheduledMultiple();",
+            "",
+            "  @Scheduled(fixedDelay = 60_000, initialDelay = 6_000, fixedRate = 7_000)",
+            "  A scheduledCommonUnit();",
+            "",
+            "  @Scheduled(fixedDelay = 5, initialDelay = 6_000, fixedRate = 7_000)",
+            "  A scheduledNoSimplification();",
             "}")
         .addOutputLines(
             "out/A.java",
@@ -67,11 +82,20 @@ public final class SimplifyTimeAnnotationCheckTest {
             "import org.springframework.scheduling.annotation.Scheduled;",
             "",
             "interface A {",
-            "  @Timeout(value = 1, unit = MINUTES) A simple();",
-            "  @Scheduled(timeUnit = SECONDS, fixedDelay = 6) A scheduledFixedDelay();",
-            "  @Scheduled(timeUnit = SECONDS, fixedDelay = 5, initialDelay = 6, fixedRate = 7) A scheduledMultiple();",
-            "  @Scheduled(timeUnit = SECONDS, fixedDelay = 60, initialDelay = 6, fixedRate = 7) A scheduledCommonUnit();",
-            "  @Scheduled(fixedDelay = 5, initialDelay = 6_000, fixedRate = 7_000) A scheduledNoSimplification();",
+            "  @Timeout(value = 1, unit = MINUTES)",
+            "  A simple();",
+            "",
+            "  @Scheduled(timeUnit = SECONDS, fixedDelay = 6)",
+            "  A scheduledFixedDelay();",
+            "",
+            "  @Scheduled(timeUnit = SECONDS, fixedDelay = 5, initialDelay = 6, fixedRate = 7)",
+            "  A scheduledMultiple();",
+            "",
+            "  @Scheduled(timeUnit = SECONDS, fixedDelay = 60, initialDelay = 6, fixedRate = 7)",
+            "  A scheduledCommonUnit();",
+            "",
+            "  @Scheduled(fixedDelay = 5, initialDelay = 6_000, fixedRate = 7_000)",
+            "  A scheduledNoSimplification();",
             "}")
         .doTest();
   }
@@ -84,7 +108,8 @@ public final class SimplifyTimeAnnotationCheckTest {
             "import org.junit.jupiter.api.Timeout;",
             "",
             "interface A {",
-            "  @Timeout(60) A simple();",
+            "  @Timeout(60)",
+            "  A simple();",
             "}")
         .addOutputLines(
             "out/A.java",
@@ -93,7 +118,8 @@ public final class SimplifyTimeAnnotationCheckTest {
             "import org.junit.jupiter.api.Timeout;",
             "",
             "interface A {",
-            "  @Timeout(value = 1, unit = MINUTES) A simple();",
+            "  @Timeout(value = 1, unit = MINUTES)",
+            "  A simple();",
             "}")
         .doTest();
   }
@@ -102,13 +128,18 @@ public final class SimplifyTimeAnnotationCheckTest {
   void replacementFqcn() {
     refactoringTestHelper
         .addInputLines(
-            "in/A.java", "interface A {", "  @org.junit.jupiter.api.Timeout(60) A simple();", "}")
+            "in/A.java",
+            "interface A {",
+            "  @org.junit.jupiter.api.Timeout(60)",
+            "  A simple();",
+            "}")
         .addOutputLines(
             "out/A.java",
             "import static java.util.concurrent.TimeUnit.MINUTES;",
             "",
             "interface A {",
-            "  @org.junit.jupiter.api.Timeout(value = 1, unit = MINUTES) A simple();",
+            "  @org.junit.jupiter.api.Timeout(value = 1, unit = MINUTES)",
+            "  A simple();",
             "}")
         .doTest();
   }

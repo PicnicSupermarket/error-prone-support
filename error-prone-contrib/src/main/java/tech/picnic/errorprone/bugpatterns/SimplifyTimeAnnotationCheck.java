@@ -3,6 +3,11 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
+import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static java.util.Objects.requireNonNull;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
@@ -12,9 +17,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.LinkType;
-import com.google.errorprone.BugPattern.SeverityLevel;
-import com.google.errorprone.BugPattern.StandardTags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
@@ -35,6 +37,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.bugpatterns.util.AnnotationAttributeMatcher;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link BugChecker} which flags annotations with time attributes that can be written more
@@ -42,15 +46,18 @@ import java.util.stream.Stream;
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    name = "SimplifyTimeAnnotation",
     summary = "Simplifies annotations which express an amount of time using a `TimeUnit`",
-    linkType = LinkType.NONE,
-    severity = SeverityLevel.WARNING,
-    tags = StandardTags.SIMPLIFICATION)
+    link = BUG_PATTERNS_BASE_URL + "SimplifyTimeAnnotation",
+    linkType = CUSTOM,
+    severity = WARNING,
+    tags = SIMPLIFICATION)
 public final class SimplifyTimeAnnotationCheck extends BugChecker implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final AnnotationAttributeMatcher ARGUMENT_SELECTOR =
       createAnnotationAttributeMatcher();
+
+  /** Instantiates a new {@link SimplifyTimeAnnotationCheck} instance. */
+  public SimplifyTimeAnnotationCheck() {}
 
   @Override
   public Description matchAnnotation(AnnotationTree annotationTree, VisitorState state) {
@@ -89,7 +96,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
 
     ImmutableMap<String, Number> timeValues =
         annotationDescriptor.timeFields.stream()
-            .map(field -> Maps.immutableEntry(field, getValue(field, indexedAttributes)))
+            .map(field -> Map.entry(field, getValue(field, indexedAttributes)))
             .filter(entry -> entry.getValue().isPresent())
             .collect(toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().orElseThrow()));
 
@@ -129,7 +136,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
                     .values()));
 
     return getExplicitAttributesFix(
-        annotation, simplifications, annotationDescriptor.timeUnitField, commonUnit);
+        annotation, simplifications, annotationDescriptor.timeUnitField, commonUnit, state);
   }
 
   private static boolean containsAnyAttributeOf(
@@ -152,7 +159,7 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
       TimeUnit newTimeUnit,
       VisitorState state) {
     String synthesizedAnnotation =
-        Util.treeToString(annotation, state)
+        SourceCode.treeToString(annotation, state)
             .replaceFirst(
                 "\\(.+\\)",
                 String.format("(value=%s, %s=%s)", newValue, timeUnitField, newTimeUnit.name()));
@@ -166,15 +173,17 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
       AnnotationTree annotation,
       Map<String, TimeSimplifier.Simplification> simplifications,
       String timeUnitField,
-      TimeUnit newUnit) {
+      TimeUnit newUnit,
+      VisitorState state) {
     return simplifications.entrySet().stream()
         .map(
             simplificationEntry ->
                 SuggestedFixes.updateAnnotationArgumentValues(
-                        annotation, timeUnitField, ImmutableList.of(newUnit.name()))
+                        annotation, state, timeUnitField, ImmutableList.of(newUnit.name()))
                     .merge(
                         SuggestedFixes.updateAnnotationArgumentValues(
                             annotation,
+                            state,
                             simplificationEntry.getKey(),
                             ImmutableList.of(
                                 String.valueOf(simplificationEntry.getValue().toUnit(newUnit))))))
@@ -215,8 +224,10 @@ public final class SimplifyTimeAnnotationCheck extends BugChecker implements Ann
     MethodSymbol argumentSymbol =
         (MethodSymbol)
             Iterables.getOnlyElement(
-                scope.getSymbols(symbol -> symbol.getQualifiedName().contentEquals(argument)));
-    return (VarSymbol) argumentSymbol.getDefaultValue().getValue();
+                ASTHelpers.scope(scope)
+                    .getSymbols(symbol -> symbol.getQualifiedName().contentEquals(argument)));
+    return (VarSymbol)
+        requireNonNull(argumentSymbol.getDefaultValue(), "Default value missing").getValue();
   }
 
   private static AnnotationAttributeMatcher createAnnotationAttributeMatcher() {
