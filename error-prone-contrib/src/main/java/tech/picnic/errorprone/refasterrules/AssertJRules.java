@@ -3,12 +3,9 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
@@ -22,9 +19,7 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,19 +27,16 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import org.assertj.core.api.AbstractAssert;
-import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractCollectionAssert;
 import org.assertj.core.api.AbstractComparableAssert;
 import org.assertj.core.api.AbstractDoubleAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractLongAssert;
-import org.assertj.core.api.AbstractMapAssert;
 import org.assertj.core.api.IterableAssert;
 import org.assertj.core.api.ListAssert;
 import org.assertj.core.api.MapAssert;
@@ -566,173 +558,8 @@ final class AssertJRules {
   // Map
   //
 
-  static final class AssertThatMapIsEmpty<K, V> {
-    @BeforeTemplate
-    @SuppressWarnings("unchecked")
-    void before(AbstractMapAssert<?, ?, K, V> mapAssert) {
-      Refaster.anyOf(
-          mapAssert.containsExactlyEntriesOf(
-              Refaster.anyOf(
-                  ImmutableMap.of(),
-                  ImmutableBiMap.of(),
-                  ImmutableSortedMap.of(),
-                  new HashMap<>(),
-                  new LinkedHashMap<>(),
-                  new TreeMap<>())),
-          mapAssert.hasSameSizeAs(
-              Refaster.anyOf(
-                  ImmutableMap.of(),
-                  ImmutableBiMap.of(),
-                  ImmutableSortedMap.of(),
-                  new HashMap<>(),
-                  new LinkedHashMap<>(),
-                  new TreeMap<>())),
-          mapAssert.isEqualTo(
-              Refaster.anyOf(
-                  ImmutableMap.of(),
-                  ImmutableBiMap.of(),
-                  ImmutableSortedMap.of(),
-                  new HashMap<>(),
-                  new LinkedHashMap<>(),
-                  new TreeMap<>())),
-          mapAssert.containsOnlyKeys(
-              Refaster.anyOf(
-                  ImmutableList.of(),
-                  new ArrayList<>(),
-                  ImmutableSet.of(),
-                  new HashSet<>(),
-                  new LinkedHashSet<>(),
-                  ImmutableSortedSet.of(),
-                  new TreeSet<>(),
-                  ImmutableMultiset.of(),
-                  ImmutableSortedMultiset.of())),
-          mapAssert.containsExactly(),
-          mapAssert.containsOnly(),
-          mapAssert.containsOnlyKeys());
-    }
-
-    @AfterTemplate
-    void after(AbstractMapAssert<?, ?, K, V> mapAssert) {
-      mapAssert.isEmpty();
-    }
-  }
-
-  // XXX: Find a better name.
-  static final class AssertThatMapIsEmpty2<K, V> {
-    @BeforeTemplate
-    void before(Map<K, V> map) {
-      Refaster.anyOf(
-          assertThat(map).hasSize(0),
-          assertThat(map.isEmpty()).isTrue(),
-          assertThat(map.size()).isEqualTo(0L),
-          assertThat(map.size()).isNotPositive());
-    }
-
-    @BeforeTemplate
-    void before2(Map<K, V> map) {
-      assertThat(Refaster.anyOf(map.keySet(), map.values())).isEmpty();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Map<K, V> map) {
-      assertThat(map).isEmpty();
-    }
-  }
-
-  static final class AssertThatMapIsNotEmpty<K, V> {
-    @BeforeTemplate
-    AbstractMapAssert<?, ?, K, V> before(AbstractMapAssert<?, ?, K, V> mapAssert) {
-      return mapAssert.isNotEqualTo(
-          Refaster.anyOf(
-              ImmutableMap.of(),
-              ImmutableBiMap.of(),
-              ImmutableSortedMap.of(),
-              new HashMap<>(),
-              new LinkedHashMap<>(),
-              new TreeMap<>()));
-    }
-
-    @AfterTemplate
-    AbstractMapAssert<?, ?, K, V> after(AbstractMapAssert<?, ?, K, V> mapAssert) {
-      return mapAssert.isNotEmpty();
-    }
-  }
-
-  // XXX: Find a better name.
-  static final class AssertThatMapIsNotEmpty2<K, V> {
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(Map<K, V> map) {
-      return Refaster.anyOf(
-          assertThat(map.isEmpty()).isFalse(),
-          assertThat(map.size()).isNotEqualTo(0),
-          assertThat(map.size()).isPositive(),
-          assertThat(Refaster.anyOf(map.keySet(), map.values())).isNotEmpty());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    MapAssert<K, V> after(Map<K, V> map) {
-      return assertThat(map).isNotEmpty();
-    }
-  }
-
-  static final class AssertThatMapHasSize<K, V> {
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(Map<K, V> map, int length) {
-      return Refaster.anyOf(
-          assertThat(map.size()).isEqualTo(length),
-          assertThat(Refaster.anyOf(map.keySet(), map.values())).hasSize(length));
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    MapAssert<K, V> after(Map<K, V> map, int length) {
-      return assertThat(map).hasSize(length);
-    }
-  }
-
-  static final class AssertThatMapsHaveSameSize<K, V> {
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(Map<K, V> map1, Map<K, V> map2) {
-      return assertThat(map1)
-          .hasSize(Refaster.anyOf(map2.size(), map2.keySet().size(), map2.values().size()));
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    MapAssert<K, V> after(Map<K, V> map1, Map<K, V> map2) {
-      return assertThat(map1).hasSameSizeAs(map2);
-    }
-  }
-
-  // XXX: Should also add a rule (elsewhere) to simplify `map.keySet().contains(key)`.
-  static final class AssertThatMapContainsKey<K, V> {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(Map<K, V> map, K key) {
-      return assertThat(map.containsKey(key)).isTrue();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    MapAssert<K, V> after(Map<K, V> map, K key) {
-      return assertThat(map).containsKey(key);
-    }
-  }
-
-  static final class AssertThatMapDoesNotContainKey<K, V> {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(Map<K, V> map, K key) {
-      return assertThat(map.containsKey(key)).isFalse();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    MapAssert<K, V> after(Map<K, V> map, K key) {
-      return assertThat(map).doesNotContainKey(key);
-    }
-  }
-
+  // XXX: To match in all cases there'll need to be a `@BeforeTemplate` variant for each
+  // `assertThat` overload. Consider defining a `BugChecker` instead.
   static final class AssertThatMapContainsEntry<K, V> {
     @BeforeTemplate
     ObjectAssert<?> before(Map<K, V> map, K key, V value) {

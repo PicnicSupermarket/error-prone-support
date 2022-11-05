@@ -168,9 +168,8 @@ final class StreamRules {
    * Where possible, clarify that a mapping operation will be applied only to a single stream
    * element.
    */
-  // XXX: Implement a similar rule for `.findAny()`. For parallel streams this wouldn't be quite the
-  // same, so such a rule requires a `Matcher` that heuristically identifies `Stream` expressions
-  // with deterministic order.
+  // XXX: Consider whether to have a similar rule for `.findAny()`. For parallel streams it
+  // wouldn't be quite the same....
   // XXX: This change is not equivalent for `null`-returning functions, as the original code throws
   // an NPE if the first element is `null`, while the latter yields an empty `Optional`.
   static final class StreamMapFirst<T, S> {

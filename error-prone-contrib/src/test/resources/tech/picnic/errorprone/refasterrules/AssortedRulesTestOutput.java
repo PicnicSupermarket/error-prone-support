@@ -8,18 +8,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
-import java.math.RoundingMode;
 import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -27,7 +22,6 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        HashMap.class,
         HashSet.class,
         Iterables.class,
         Preconditions.class,
@@ -43,14 +37,6 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
 
   void testCheckIndexConditional() {
     checkIndex(1, 2);
-  }
-
-  Map<RoundingMode, String> testCreateEnumMap() {
-    return new EnumMap<>(RoundingMode.class);
-  }
-
-  String testMapGetOrNull() {
-    return ImmutableMap.of(1, "foo").get("bar");
   }
 
   ImmutableSet<BoundType> testStreamToImmutableEnumSet() {
@@ -93,14 +79,6 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
 
   boolean testIterableIsEmpty() {
     return Iterables.isEmpty(ImmutableList.of());
-  }
-
-  Stream<String> testMapKeyStream() {
-    return ImmutableMap.of("foo", 1).keySet().stream();
-  }
-
-  Stream<Integer> testMapValueStream() {
-    return ImmutableMap.of("foo", 1).values().stream();
   }
 
   ImmutableSet<Stream<String>> testSplitToStream() {
