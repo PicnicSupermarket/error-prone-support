@@ -34,25 +34,25 @@ import org.jspecify.annotations.Nullable;
 public final class MoreJUnitMatchers {
   /** Matches JUnit Jupiter test methods. */
   public static final MultiMatcher<MethodTree, AnnotationTree> TEST_METHOD =
-      annotations(
-          AT_LEAST_ONE,
-          anyOf(
-              isType("org.junit.jupiter.api.Test"),
-              hasMetaAnnotation("org.junit.jupiter.api.TestTemplate")));
+          annotations(
+                  AT_LEAST_ONE,
+                  anyOf(
+                          isType("org.junit.jupiter.api.Test"),
+                          hasMetaAnnotation("org.junit.jupiter.api.TestTemplate")));
   /** Matches JUnit Jupiter setup and teardown methods. */
   public static final MultiMatcher<MethodTree, AnnotationTree> SETUP_OR_TEARDOWN_METHOD =
-      annotations(
-          AT_LEAST_ONE,
-          anyOf(
-              isType("org.junit.jupiter.api.AfterAll"),
-              isType("org.junit.jupiter.api.AfterEach"),
-              isType("org.junit.jupiter.api.BeforeAll"),
-              isType("org.junit.jupiter.api.BeforeEach")));
+          annotations(
+                  AT_LEAST_ONE,
+                  anyOf(
+                          isType("org.junit.jupiter.api.AfterAll"),
+                          isType("org.junit.jupiter.api.AfterEach"),
+                          isType("org.junit.jupiter.api.BeforeAll"),
+                          isType("org.junit.jupiter.api.BeforeEach")));
   /**
    * Matches methods that have a {@link org.junit.jupiter.params.provider.MethodSource} annotation.
    */
   public static final MultiMatcher<MethodTree, AnnotationTree> HAS_METHOD_SOURCE =
-      annotations(AT_LEAST_ONE, isType("org.junit.jupiter.params.provider.MethodSource"));
+          annotations(AT_LEAST_ONE, isType("org.junit.jupiter.params.provider.MethodSource"));
 
   private MoreJUnitMatchers() {}
 
@@ -64,7 +64,7 @@ public final class MoreJUnitMatchers {
    * @return One or more value factory names.
    */
   static ImmutableSet<String> getMethodSourceFactoryNames(
-      AnnotationTree methodSourceAnnotation, MethodTree method) {
+          AnnotationTree methodSourceAnnotation, MethodTree method) {
     String methodName = method.getName().toString();
     ExpressionTree value = AnnotationMatcherUtils.getArgument(methodSourceAnnotation, "value");
 
@@ -73,15 +73,15 @@ public final class MoreJUnitMatchers {
     }
 
     return ((NewArrayTree) value)
-        .getInitializers().stream()
+            .getInitializers().stream()
             .map(name -> toMethodSourceFactoryName(name, methodName))
             .collect(toImmutableSet());
   }
 
   private static String toMethodSourceFactoryName(
-      @Nullable ExpressionTree tree, String annotatedMethodName) {
+          @Nullable ExpressionTree tree, String annotatedMethodName) {
     return requireNonNullElse(
-        Strings.emptyToNull(ASTHelpers.constValue(tree, String.class)), annotatedMethodName);
+            Strings.emptyToNull(ASTHelpers.constValue(tree, String.class)), annotatedMethodName);
   }
 
   /**
@@ -94,13 +94,13 @@ public final class MoreJUnitMatchers {
    *     {@link Optional#empty()} if there is more than one.
    */
   public static Optional<String> extractSingleFactoryMethodName(
-      AnnotationTree methodSourceAnnotation) {
+          AnnotationTree methodSourceAnnotation) {
     ExpressionTree attributeExpression =
-        ((AssignmentTree) Iterables.getOnlyElement(methodSourceAnnotation.getArguments()))
-            .getExpression();
+            ((AssignmentTree) Iterables.getOnlyElement(methodSourceAnnotation.getArguments()))
+                    .getExpression();
     Type attributeType = ASTHelpers.getType(attributeExpression);
     return attributeType.getKind() == TypeKind.ARRAY
-        ? Optional.empty()
-        : Optional.of(attributeType.stringValue());
+            ? Optional.empty()
+            : Optional.of(attributeType.stringValue());
   }
 }
