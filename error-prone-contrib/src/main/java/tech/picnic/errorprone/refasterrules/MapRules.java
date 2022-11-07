@@ -110,7 +110,7 @@ final class MapRules {
   static final class MapIsEmpty<K, V> {
     @BeforeTemplate
     boolean before(Map<K, V> map) {
-      return map.keySet().isEmpty();
+      return Refaster.anyOf(map.keySet(), map.values(), map.entrySet()).isEmpty();
     }
 
     @AfterTemplate
