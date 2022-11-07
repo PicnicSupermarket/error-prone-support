@@ -105,4 +105,17 @@ final class MapRules {
       return map.values().stream();
     }
   }
+
+  /** Prefer {@link Map#isEmpty()} over more contrived alternatives. */
+  static final class MapIsEmpty<K, V> {
+    @BeforeTemplate
+    boolean before(Map<K, V> map) {
+      return map.keySet().isEmpty();
+    }
+
+    @AfterTemplate
+    boolean after(Map<K, V> map) {
+      return map.isEmpty();
+    }
+  }
 }

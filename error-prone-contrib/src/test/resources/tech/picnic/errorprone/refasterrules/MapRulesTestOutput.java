@@ -45,4 +45,8 @@ final class MapRulesTest implements RefasterRuleCollectionTestCase {
   Stream<Integer> testMapValueStream() {
     return ImmutableMap.of("foo", 1).values().stream();
   }
+
+  Stream<boolean> testMapIsEmpty() {
+    return ImmutableMap.of("foo", 1).isEmpty();
+  }
 }
