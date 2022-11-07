@@ -3,8 +3,10 @@ package tech.picnic.errorprone.bugpatterns.util;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.Tree;
 import javax.lang.model.element.Name;
 
 /**
@@ -33,12 +35,13 @@ public final class MoreASTHelpers {
   /**
    * Determines if there are any methods with the given name in the given class.
    *
-   * @param enclosingClass The class to search in.
    * @param methodName The method name to search for.
+   * @param state A {@link VisitorState} describing the context in which the given {@link Tree} is
+   *     found.
    * @return Whether there are any methods with the given name in the given class.
    */
-  public static boolean isMethodInEnclosingClass(ClassTree enclosingClass, String methodName) {
-    return enclosingClass.getMembers().stream()
+  public static boolean isMethodInEnclosingClass(String methodName, VisitorState state) {
+    return state.findEnclosing(ClassTree.class).getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
         .map(MethodTree::getName)

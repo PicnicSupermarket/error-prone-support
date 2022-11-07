@@ -24,7 +24,7 @@ import javax.lang.model.type.TypeKind;
  *
  * <p>These are additions to the ones from {@link com.google.errorprone.matchers.JUnitMatchers}.
  */
-public final class MoreJUnitJupiterMatchers {
+public final class MoreJUnitMatchers {
   /** Matches JUnit Jupiter test methods. */
   public static final MultiMatcher<MethodTree, AnnotationTree> TEST_METHOD =
       annotations(
@@ -49,7 +49,7 @@ public final class MoreJUnitJupiterMatchers {
   public static final Matcher<MethodTree> HAS_METHOD_SOURCE =
       allOf(annotations(AT_LEAST_ONE, isType("org.junit.jupiter.params.provider.MethodSource")));
 
-  private MoreJUnitJupiterMatchers() {}
+  private MoreJUnitMatchers() {}
 
   /**
    * Extracts the name of the JUnit factory method from a {@link
