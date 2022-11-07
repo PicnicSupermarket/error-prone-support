@@ -3,12 +3,14 @@ package tech.picnic.errorprone.bugpatterns.util;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.collect.ImmutableList;
-import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import javax.lang.model.element.Name;
 
-/** A set of helper methods for working with the AST. */
+/**
+ * A set of helper methods for working with the AST, adding on to the ones from {@link
+ * com.google.errorprone.util.ASTHelpers}.
+ */
 public final class MoreASTHelpers {
   private MoreASTHelpers() {}
 
@@ -17,7 +19,7 @@ public final class MoreASTHelpers {
    *
    * @param enclosingClass The class to search in.
    * @param methodName The method name to search for.
-   * @return The method trees of the methods with the given name in the class.
+   * @return The {@link MethodTree}s of the methods with the given name in the given class.
    */
   public static ImmutableList<MethodTree> findMethods(ClassTree enclosingClass, String methodName) {
     return enclosingClass.getMembers().stream()
@@ -27,8 +29,15 @@ public final class MoreASTHelpers {
         .collect(toImmutableList());
   }
 
-  static boolean isMethodInEnclosingClass(String methodName, VisitorState state) {
-    return state.findEnclosing(ClassTree.class).getMembers().stream()
+  /**
+   * Determines if there are any methods with the given name in the given class.
+   *
+   * @param enclosingClass The class to search in.
+   * @param methodName The method name to search for.
+   * @return Whether there are any methods with the given name in the given class.
+   */
+  public static boolean isMethodInEnclosingClass(ClassTree enclosingClass, String methodName) {
+    return enclosingClass.getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
         .map(MethodTree::getName)

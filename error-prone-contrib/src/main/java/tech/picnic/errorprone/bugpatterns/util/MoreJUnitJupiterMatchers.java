@@ -19,9 +19,12 @@ import com.sun.tools.javac.code.Type;
 import java.util.Optional;
 import javax.lang.model.type.TypeKind;
 
-/** A set of JUnit-specific helpers for working with the AST. */
-public final class MoreJUnitMatchers {
-  /** Matches JUnit test methods. */
+/**
+ * A set of JUnit Jupiter-specific helper methods and {@link Matcher Matchers}, adding on to the
+ * ones from {@link com.google.errorprone.matchers.JUnitMatchers}.
+ */
+public final class MoreJUnitJupiterMatchers {
+  /** Matches JUnit Jupiter test methods. */
   public static final MultiMatcher<MethodTree, AnnotationTree> TEST_METHOD =
       annotations(
           AT_LEAST_ONE,
@@ -40,12 +43,12 @@ public final class MoreJUnitMatchers {
               isType("org.junit.jupiter.api.BeforeEach")));
 
   /**
-   * Matches methods which have a {@link org.junit.jupiter.params.provider.MethodSource} annotation.
+   * Matches methods that have a {@link org.junit.jupiter.params.provider.MethodSource} annotation.
    */
   public static final Matcher<MethodTree> HAS_METHOD_SOURCE =
       allOf(annotations(AT_LEAST_ONE, isType("org.junit.jupiter.params.provider.MethodSource")));
 
-  private MoreJUnitMatchers() {}
+  private MoreJUnitJupiterMatchers() {}
 
   /**
    * Extracts the name of the JUnit factory method from a {@link
