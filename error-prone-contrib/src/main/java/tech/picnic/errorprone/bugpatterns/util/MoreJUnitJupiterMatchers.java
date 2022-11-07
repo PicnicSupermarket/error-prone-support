@@ -20,8 +20,9 @@ import java.util.Optional;
 import javax.lang.model.type.TypeKind;
 
 /**
- * A set of JUnit Jupiter-specific helper methods and {@link Matcher Matchers}, adding on to the
- * ones from {@link com.google.errorprone.matchers.JUnitMatchers}.
+ * A set of JUnit Jupiter-specific helper methods and {@link Matcher Matchers}.
+ *
+ * <p>These are additions to the ones from {@link com.google.errorprone.matchers.JUnitMatchers}.
  */
 public final class MoreJUnitJupiterMatchers {
   /** Matches JUnit Jupiter test methods. */
@@ -56,8 +57,8 @@ public final class MoreJUnitJupiterMatchers {
    *
    * @param methodSourceAnnotation The {@link org.junit.jupiter.params.provider.MethodSource}
    *     annotation to extract a method name from.
-   * @return The name of the factory methods referred to in the annotation if there is only one, or
-   *     {@link Optional#empty()} if there is more than one.
+   * @return The name of the factory method referred to in the annotation. Alternatively, {@link
+   *     Optional#empty()} if there is more than one.
    */
   public static Optional<String> extractSingleFactoryMethodName(
       AnnotationTree methodSourceAnnotation) {

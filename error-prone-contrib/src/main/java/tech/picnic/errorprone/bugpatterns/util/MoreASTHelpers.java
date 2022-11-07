@@ -8,8 +8,9 @@ import com.sun.source.tree.MethodTree;
 import javax.lang.model.element.Name;
 
 /**
- * A set of helper methods for working with the AST, adding on to the ones from {@link
- * com.google.errorprone.util.ASTHelpers}.
+ * A set of helper methods for working with the AST.
+ *
+ * <p>These are additions to the ones from {@link com.google.errorprone.util.ASTHelpers}.
  */
 public final class MoreASTHelpers {
   private MoreASTHelpers() {}

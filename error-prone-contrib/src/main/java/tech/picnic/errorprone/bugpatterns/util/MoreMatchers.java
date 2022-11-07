@@ -1,12 +1,17 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.predicates.TypePredicate;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 
-/** A collection of methods to enhance the use of {@link Matcher}s. */
+/**
+ * A collection of methods to enhance the use of {@link Matcher}s.
+ *
+ * <p>These are additions to the ones from {@link Matchers}.
+ */
 public final class MoreMatchers {
   private MoreMatchers() {}
 
