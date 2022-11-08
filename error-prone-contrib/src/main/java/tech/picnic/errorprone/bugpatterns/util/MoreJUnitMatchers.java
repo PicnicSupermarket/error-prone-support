@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
-import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isType;
@@ -20,7 +19,7 @@ import java.util.Optional;
 import javax.lang.model.type.TypeKind;
 
 /**
- * A set of JUnit Jupiter-specific helper methods and {@link Matcher Matchers}.
+ * A set of JUnit-specific helper methods and {@link Matcher Matchers}.
  *
  * <p>These are additions to the ones from {@link com.google.errorprone.matchers.JUnitMatchers}.
  */
@@ -47,7 +46,7 @@ public final class MoreJUnitMatchers {
    * Matches methods that have a {@link org.junit.jupiter.params.provider.MethodSource} annotation.
    */
   public static final Matcher<MethodTree> HAS_METHOD_SOURCE =
-      allOf(annotations(AT_LEAST_ONE, isType("org.junit.jupiter.params.provider.MethodSource")));
+      annotations(AT_LEAST_ONE, isType("org.junit.jupiter.params.provider.MethodSource"));
 
   private MoreJUnitMatchers() {}
 
