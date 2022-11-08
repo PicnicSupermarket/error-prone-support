@@ -10,7 +10,7 @@ import com.sun.tools.javac.code.Symbol;
 /**
  * A collection of methods to enhance the use of {@link Matcher}s.
  *
- * <p>These are additions to the ones from {@link Matchers}.
+ * <p>These methods are additions to the ones from {@link Matchers}.
  */
 public final class MoreMatchers {
   private MoreMatchers() {}

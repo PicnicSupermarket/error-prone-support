@@ -11,7 +11,8 @@ import com.sun.source.tree.Tree;
 /**
  * A set of helper methods for working with the AST.
  *
- * <p>These are additions to the ones from {@link com.google.errorprone.util.ASTHelpers}.
+ * <p>These helper methods are additions to the ones from {@link
+ * com.google.errorprone.util.ASTHelpers}.
  */
 public final class MoreASTHelpers {
   private MoreASTHelpers() {}
