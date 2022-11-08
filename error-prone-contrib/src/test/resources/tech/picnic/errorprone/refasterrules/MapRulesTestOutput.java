@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
+final class MapRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(HashMap.class);
