@@ -21,7 +21,8 @@ import javax.lang.model.type.TypeKind;
 /**
  * A set of JUnit-specific helper methods and {@link Matcher Matchers}.
  *
- * <p>These are additions to the ones from {@link com.google.errorprone.matchers.JUnitMatchers}.
+ * <p>These helper methods are additions to the ones from {@link
+ * com.google.errorprone.matchers.JUnitMatchers}.
  */
 public final class MoreJUnitMatchers {
   /** Matches JUnit Jupiter test methods. */
