@@ -7,7 +7,6 @@ import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
-import javax.lang.model.element.Name;
 
 /**
  * A set of helper methods for working with the AST.
@@ -18,14 +17,15 @@ public final class MoreASTHelpers {
   private MoreASTHelpers() {}
 
   /**
-   * Finds methods with the given name in the given class.
+   * Finds methods with the given name in the enclosing class.
    *
-   * @param enclosingClass The class to search in.
    * @param methodName The method name to search for.
-   * @return The {@link MethodTree}s of the methods with the given name in the given class.
+   * @param state A {@link VisitorState} describing the context in which the given {@link Tree} is
+   *     to be found.
+   * @return The {@link MethodTree}s of the methods with the given name in the enclosing class.
    */
-  public static ImmutableList<MethodTree> findMethods(ClassTree enclosingClass, String methodName) {
-    return enclosingClass.getMembers().stream()
+  public static ImmutableList<MethodTree> findMethods(String methodName, VisitorState state) {
+    return state.findEnclosing(ClassTree.class).getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
         .filter(method -> method.getName().contentEquals(methodName))
@@ -33,19 +33,14 @@ public final class MoreASTHelpers {
   }
 
   /**
-   * Determines if there are any methods with the given name in the given class.
+   * Determines if there are any methods with the given name in the enclosing class.
    *
    * @param methodName The method name to search for.
    * @param state A {@link VisitorState} describing the context in which the given {@link Tree} is
-   *     found.
-   * @return Whether there are any methods with the given name in the given class.
+   *     to be found.
+   * @return Whether there are any methods with the given name in the enclosing class.
    */
   public static boolean isMethodInEnclosingClass(String methodName, VisitorState state) {
-    return state.findEnclosing(ClassTree.class).getMembers().stream()
-        .filter(MethodTree.class::isInstance)
-        .map(MethodTree.class::cast)
-        .map(MethodTree::getName)
-        .map(Name::toString)
-        .anyMatch(methodName::equals);
+    return !findMethods(methodName, state).isEmpty();
   }
 }
