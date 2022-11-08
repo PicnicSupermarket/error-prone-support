@@ -22,6 +22,13 @@ final class MapRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableMap.of(1, "foo").getOrDefault("bar", null);
   }
 
+  ImmutableSet<Boolean> testMapIsEmpty() {
+    return ImmutableSet.of(
+        ImmutableMap.of("foo", 1).keySet().isEmpty(),
+        ImmutableMap.of("bar", 2).values().isEmpty(),
+        ImmutableMap.of("baz", 3).entrySet().isEmpty());
+  }
+
   ImmutableSet<Integer> testMapSize() {
     return ImmutableSet.of(
         ImmutableMap.of("foo", 1).keySet().size(),
@@ -43,12 +50,5 @@ final class MapRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<Integer> testMapValueStream() {
     return ImmutableMap.of("foo", 1).entrySet().stream().map(Map.Entry::getValue);
-  }
-
-  ImmutableSet<Boolean> testMapIsEmpty() {
-    return ImmutableSet.of(
-        ImmutableMap.of("foo", 1).keySet().isEmpty(),
-        ImmutableMap.of("bar", 2).values().isEmpty(),
-        ImmutableMap.of("baz", 3).entrySet().isEmpty());
   }
 }

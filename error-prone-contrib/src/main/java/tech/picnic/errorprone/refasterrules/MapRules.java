@@ -41,6 +41,19 @@ final class MapRules {
     }
   }
 
+  /** Prefer {@link Map#isEmpty()} over more contrived alternatives. */
+  static final class MapIsEmpty<K, V> {
+    @BeforeTemplate
+    boolean before(Map<K, V> map) {
+      return Refaster.anyOf(map.keySet(), map.values(), map.entrySet()).isEmpty();
+    }
+
+    @AfterTemplate
+    boolean after(Map<K, V> map) {
+      return map.isEmpty();
+    }
+  }
+
   /** Prefer {@link Map#size()} over more contrived alternatives. */
   static final class MapSize<K, V> {
     @BeforeTemplate
@@ -103,19 +116,6 @@ final class MapRules {
     @AfterTemplate
     Stream<V> after(Map<K, V> map) {
       return map.values().stream();
-    }
-  }
-
-  /** Prefer {@link Map#isEmpty()} over more contrived alternatives. */
-  static final class MapIsEmpty<K, V> {
-    @BeforeTemplate
-    boolean before(Map<K, V> map) {
-      return Refaster.anyOf(map.keySet(), map.values(), map.entrySet()).isEmpty();
-    }
-
-    @AfterTemplate
-    boolean after(Map<K, V> map) {
-      return map.isEmpty();
     }
   }
 }
