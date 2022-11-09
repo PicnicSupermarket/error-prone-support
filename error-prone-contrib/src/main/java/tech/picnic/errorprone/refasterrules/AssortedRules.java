@@ -19,11 +19,8 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -70,32 +67,6 @@ final class AssortedRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(int index, int size) {
       checkIndex(index, size);
-    }
-  }
-
-  // XXX: We could add a rule for `new EnumMap(Map<K, ? extends V> m)`, but that constructor does
-  // not allow an empty non-EnumMap to be provided.
-  static final class CreateEnumMap<K extends Enum<K>, V> {
-    @BeforeTemplate
-    Map<K, V> before() {
-      return new HashMap<>();
-    }
-
-    @AfterTemplate
-    Map<K, V> after() {
-      return new EnumMap<>(Refaster.<K>clazz());
-    }
-  }
-
-  static final class MapGetOrNull<K, V, L> {
-    @BeforeTemplate
-    @Nullable V before(Map<K, V> map, L key) {
-      return map.getOrDefault(key, null);
-    }
-
-    @AfterTemplate
-    @Nullable V after(Map<K, V> map, L key) {
-      return map.get(key);
     }
   }
 
@@ -221,32 +192,6 @@ final class AssortedRules {
     @AfterTemplate
     boolean after(Iterable<T> iterable) {
       return Iterables.isEmpty(iterable);
-    }
-  }
-
-  /** Don't unnecessarily use {@link Map#entrySet()}. */
-  static final class MapKeyStream<K, V> {
-    @BeforeTemplate
-    Stream<K> before(Map<K, V> map) {
-      return map.entrySet().stream().map(Map.Entry::getKey);
-    }
-
-    @AfterTemplate
-    Stream<K> after(Map<K, V> map) {
-      return map.keySet().stream();
-    }
-  }
-
-  /** Don't unnecessarily use {@link Map#entrySet()}. */
-  static final class MapValueStream<K, V> {
-    @BeforeTemplate
-    Stream<V> before(Map<K, V> map) {
-      return map.entrySet().stream().map(Map.Entry::getValue);
-    }
-
-    @AfterTemplate
-    Stream<V> after(Map<K, V> map) {
-      return map.values().stream();
     }
   }
 
