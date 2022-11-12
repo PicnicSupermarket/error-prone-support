@@ -1,4 +1,4 @@
-# Updates a pull request based on the corresponding mutation test analysis
+# Updates a pull request based on the corresponding mutation testing analysis
 # performed by the `pitest-analyze-pr.yml` workflow. See
 # https://blog.pitest.org/oss-pitest-pr/ for details.
 name: "Mutation testing: post results"
