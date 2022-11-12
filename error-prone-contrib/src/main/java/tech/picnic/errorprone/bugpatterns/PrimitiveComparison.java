@@ -75,12 +75,12 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (tree.toString().equals("XXX")) {
+    boolean isStatic = STATIC_COMPARISON_METHOD.matches(tree, state);
+    if (!isStatic && !INSTANCE_COMPARISON_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
-    boolean isStatic = STATIC_COMPARISON_METHOD.matches(tree, state);
-    if (!isStatic && !INSTANCE_COMPARISON_METHOD.matches(tree, state)) {
+    if (state.getSourceForNode(tree).equals("XXX")) {
       return Description.NO_MATCH;
     }
 
