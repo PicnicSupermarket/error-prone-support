@@ -1,0 +1,54 @@
+# Performs mutation test analysis on the files changed by a pull request and
+# uploads the results. The associated PR is subsequently updated by the
+# `pitest-update-pr.yml` workflow. See https://blog.pitest.org/oss-pitest-pr/
+# for details.
+name: Pitest: analyze PR
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  analyze-pr:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 2
+      - name: Set up JDK
+        uses: actions/setup-java@v3.6.0
+        with:
+          java-version: 17
+          distribution: temurin
+          cache: maven
+      - name: Run Pitest
+        run: mvn test pitest:mutationCoverage -DargLine.xmx=2048m -Dverification.skip -Dfeatures="+GIT(from[HEAD~1]), +gitci"
+      - name: Aggregate Pitest reports
+        run: mvn pitest-git:aggregate
+      - name: Upload Pitest reports as artifact
+        uses: actions/upload-pages-artifact@v1.0.4
+        with:
+          name: pitest-reports
+          path: ./target/pit-reports-ci/
+  # XXX: Drop the job below. Here only for testing purposes.
+  update-pr:
+    needs: analyze-pr
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3.1.0
+      - name: Set up JDK
+        uses: actions/setup-java@v3.6.0
+        with:
+          java-version: 17
+          distribution: temurin
+          cache: maven
+      - name: Download Pitest analysis artifact
+        uses: dawidd6/action-download-artifact@v2.24.2
+        with:
+          workflow: ${{ github.event.workflow_run.workflow_id }}
+          name: pitest-reports
+          path: target/pit-reports-ci
+          workflow_conclusion: success
+      - name: Update PR
+        run: mvn -DrepoToken=${{ secrets.GITHUB_TOKEN }} pitest-github:updatePR

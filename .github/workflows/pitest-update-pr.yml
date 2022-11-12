@@ -1,0 +1,33 @@
+# Updates a pull request based on the corresponding mutation test analysis
+# performed by the `pitest-analyze-pr.yml` workflow. See
+# https://blog.pitest.org/oss-pitest-pr/ for details.
+name: Pitest: update PR
+on:
+  workflow_run:
+    workflows: ["Pitest: analyze PR"]
+    types:
+      - completed
+permissions:
+  contents: read
+jobs:
+  update-pr:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3.1.0
+      - name: Set up JDK
+        uses: actions/setup-java@v3.6.0
+        with:
+          java-version: 17
+          distribution: temurin
+          cache: maven
+      - name: Download Pitest analysis artifact
+        uses: dawidd6/action-download-artifact@v2.24.2
+        with:
+          workflow: ${{ github.event.workflow_run.workflow_id }}
+          name: pitest-reports
+          path: target/pit-reports-ci
+          workflow_conclusion: success
+      - name: Update PR
+        run: mvn -DrepoToken=${{ secrets.GITHUB_TOKEN }} pitest-github:updatePR
