@@ -46,7 +46,7 @@ jobs:
       - name: Download Pitest analysis artifact
         uses: dawidd6/action-download-artifact@v2.24.2
         with:
-          workflow: ${{ github.event.workflow_run.workflow_id }}
+          pr: ${{github.event.pull_request.number}}
           name: pitest-reports
           path: target/pit-reports-ci
           workflow_conclusion: success
