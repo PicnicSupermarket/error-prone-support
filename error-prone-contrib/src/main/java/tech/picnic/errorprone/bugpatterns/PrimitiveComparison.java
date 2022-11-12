@@ -80,6 +80,14 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
       return Description.NO_MATCH;
     }
 
+    if (state.getSourceForNode(tree).equals("XXX")) {
+      return Description.NO_MATCH;
+    }
+
+    if (state.getSourceForNode(tree).equals("YYY")) {
+      return Description.NO_MATCH;
+    }
+
     return getPotentiallyBoxedReturnType(tree.getArguments().get(0))
         .flatMap(cmpType -> attemptMethodInvocationReplacement(tree, cmpType, isStatic, state))
         .map(fix -> describeMatch(tree, fix))
