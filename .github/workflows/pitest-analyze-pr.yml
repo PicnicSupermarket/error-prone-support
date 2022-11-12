@@ -49,6 +49,5 @@ jobs:
           pr: ${{github.event.pull_request.number}}
           name: pitest-reports
           path: target/pit-reports-ci
-          workflow_conclusion: success
       - name: Update PR
         run: mvn -DrepoToken=${{ secrets.GITHUB_TOKEN }} pitest-github:updatePR
