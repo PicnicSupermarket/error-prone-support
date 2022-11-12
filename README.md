@@ -166,7 +166,7 @@ Some other commands one may find relevant:
 
 - `mvn fmt:format` formats the code using
   [`google-java-format`][google-java-format].
-- `./run-mutation-tests.sh` runs mutation tests using [PIT][pitest]. The
+- `./run-mutation-tests.sh` runs mutation tests using [Pitest][pitest]. The
   results can be reviewed by opening the respective
   `target/pit-reports/index.html` files. For more information check the [PIT
   Maven plugin][pitest-maven].

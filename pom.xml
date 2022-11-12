@@ -1241,13 +1241,13 @@
                     <artifactId>pitest-maven</artifactId>
                     <version>1.9.11</version>
                     <configuration>
-                        <failWhenNoMutations>false</failWhenNoMutations>
                         <excludedClasses>
                             <!-- AutoValue generated classes. -->
                             <excludedClass>*.AutoValue_*</excludedClass>
                             <!-- Refaster rule collections. -->
                             <excludedClass>*.refaster*.*Rules*</excludedClass>
                         </excludedClasses>
+                        <failWhenNoMutations>false</failWhenNoMutations>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->

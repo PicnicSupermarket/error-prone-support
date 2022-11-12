@@ -2,7 +2,7 @@
 # uploads the results. The associated PR is subsequently updated by the
 # `pitest-update-pr.yml` workflow. See https://blog.pitest.org/oss-pitest-pr/
 # for details.
-name: "Pitest: analyze PR"
+name: "Mutation testing"
 on:
   pull_request:
 permissions:
@@ -24,7 +24,7 @@ jobs:
       - name: Run Pitest
         run: mvn test pitest:mutationCoverage -DargLine.xmx=2048m -Dverification.skip -Dfeatures="+GIT(from[HEAD~1]), +gitci"
       - name: Aggregate Pitest reports
-        run: mvn pitest-git:aggregate
+        run: mvn pitest-git:aggregate -DtrailingText="Mutation testing report by [Pitest](https://pitest.org/). Review any surviving mutants by inspecting the line comments under _Files changed_, or the full report under _Checks -> Mutation testing_."
       - name: Upload Pitest reports as artifact
         uses: actions/upload-artifact@v3.1.1
         with:
@@ -54,4 +54,4 @@ jobs:
           name: pitest-reports
           path: target/pit-reports-ci
       - name: Update PR
-        run: mvn -DrepoToken=${{ secrets.GITHUB_TOKEN }} pitest-github:updatePR
+        run: mvn pitest-github:updatePR
