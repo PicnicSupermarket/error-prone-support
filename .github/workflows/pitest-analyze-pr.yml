@@ -30,28 +30,3 @@ jobs:
         with:
           name: pitest-reports
           path: ./target/pit-reports-ci
-  # XXX: Drop the job below. Here only for testing purposes.
-  update-pr:
-    permissions:
-      actions: read
-      checks: write
-      contents: read
-      pull-requests: write
-    needs: analyze-pr
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3.1.0
-      - name: Set up JDK
-        uses: actions/setup-java@v3.6.0
-        with:
-          java-version: 17
-          distribution: temurin
-          cache: maven
-      - name: Download Pitest analysis artifact
-        uses: actions/download-artifact@v3.0.1
-        with:
-          name: pitest-reports
-          path: ./target/pit-reports-ci
-      - name: Update PR
-        run: mvn -DrepoToken="${{ secrets.GITHUB_TOKEN }}" pitest-github:updatePR
