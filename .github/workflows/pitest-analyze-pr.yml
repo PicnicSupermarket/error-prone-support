@@ -26,7 +26,7 @@ jobs:
       - name: Aggregate Pitest reports
         run: mvn pitest-git:aggregate
       - name: Upload Pitest reports as artifact
-        uses: actions/upload-pages-artifact@v1.0.4
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: pitest-reports
           path: ./target/pit-reports-ci/
