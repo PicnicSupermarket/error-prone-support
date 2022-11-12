@@ -32,6 +32,8 @@ jobs:
           path: ./target/pit-reports-ci/
   # XXX: Drop the job below. Here only for testing purposes.
   update-pr:
+    permissions:
+      actions: read
     needs: analyze-pr
     runs-on: ubuntu-22.04
     steps:
