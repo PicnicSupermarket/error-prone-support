@@ -1,7 +1,7 @@
 # Updates a pull request based on the corresponding mutation test analysis
 # performed by the `pitest-analyze-pr.yml` workflow. See
 # https://blog.pitest.org/oss-pitest-pr/ for details.
-name: Pitest: update PR
+name: "Pitest: update PR"
 on:
   workflow_run:
     workflows: ["Pitest: analyze PR"]

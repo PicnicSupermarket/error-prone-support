@@ -2,7 +2,7 @@
 # uploads the results. The associated PR is subsequently updated by the
 # `pitest-update-pr.yml` workflow. See https://blog.pitest.org/oss-pitest-pr/
 # for details.
-name: Pitest: analyze PR
+name: "Pitest: analyze PR"
 on:
   pull_request:
 permissions:
