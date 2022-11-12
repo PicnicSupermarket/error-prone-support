@@ -9,6 +9,7 @@ on:
       - completed
 permissions:
   actions: read
+  checks: write
   contents: read
 jobs:
   update-pr:

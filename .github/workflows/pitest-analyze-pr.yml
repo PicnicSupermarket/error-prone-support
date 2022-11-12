@@ -34,6 +34,7 @@ jobs:
   update-pr:
     permissions:
       actions: read
+      checks: write
     needs: analyze-pr
     runs-on: ubuntu-22.04
     steps:
