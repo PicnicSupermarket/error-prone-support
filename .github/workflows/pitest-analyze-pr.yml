@@ -46,9 +46,8 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Download Pitest analysis artifact
-        uses: dawidd6/action-download-artifact@v2.24.2
+        uses: actions/download-artifact@v3.0.1
         with:
-          pr: ${{github.event.pull_request.number}}
           name: pitest-reports
           path: target/pit-reports-ci
       - name: Update PR
