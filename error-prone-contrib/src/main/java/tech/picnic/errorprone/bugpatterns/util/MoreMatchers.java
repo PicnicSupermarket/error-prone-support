@@ -19,7 +19,7 @@ public final class MoreMatchers {
    * Determines whether an expression has a meta annotation of the given class name. This includes
    * annotations inherited from superclasses due to {@link java.lang.annotation.Inherited}.
    *
-   * @param <T> The type of the expression tree.
+   * @param <T> The type of the expression tree. // XXX: Not  expression per se.
    * @param annotationClass The binary class name of the annotation (e.g. "
    *     org.jspecify.nullness.Nullable", or "some.package.OuterClassName$InnerClassName")
    * @return A {@link Matcher} that matches expressions with the specified meta annotation.
