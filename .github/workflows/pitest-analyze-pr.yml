@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.1
         with:
           name: pitest-reports
-          path: ./target/pit-reports-ci/
+          path: ./target/pit-reports-ci
   # XXX: Drop the job below. Here only for testing purposes.
   update-pr:
     permissions:
@@ -54,4 +54,4 @@ jobs:
           name: pitest-reports
           path: target/pit-reports-ci
       - name: Update PR
-        run: mvn pitest-github:updatePR
+        run: mvn -DrepoToken="${{ secrets.GITHUB_TOKEN }}" pitest-github:updatePR
