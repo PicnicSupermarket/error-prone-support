@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 
 final class MoreMatchersTest {
   @Test
-  void matcher() {
+  void hasMetaAnnotation() {
     CompilationTestHelper.newInstance(TestMatcher.class, getClass())
         .addSourceLines(
-            "/A.java",
+            "A.java",
             "import org.junit.jupiter.api.AfterAll;",
             "import org.junit.jupiter.api.RepeatedTest;",
             "import org.junit.jupiter.api.Test;",
@@ -25,7 +25,7 @@ final class MoreMatchersTest {
             "import org.junit.jupiter.params.ParameterizedTest;",
             "",
             "class A {",
-            "  private void negative1() {}",
+            "  void negative1() {}",
             "",
             "  @Test",
             "  void negative2() {}",
@@ -38,26 +38,25 @@ final class MoreMatchersTest {
             "",
             "  // BUG: Diagnostic contains:",
             "  @ParameterizedTest",
-            "  void testBar() {}",
+            "  void positive1() {}",
             "",
             "  // BUG: Diagnostic contains:",
             "  @RepeatedTest(2)",
-            "  void testBaz() {}",
+            "  void positive2() {}",
             "}")
         .doTest();
   }
 
-  /** A {@link BugChecker} that delegates to `MoreMatchers#hasMetaAnnotation`. */
+  /** A {@link BugChecker} that delegates to {@link MoreMatchers#hasMetaAnnotation(String)} . */
   @BugPattern(summary = "Interacts with `MoreMatchers` for testing purposes", severity = ERROR)
   public static final class TestMatcher extends BugChecker implements AnnotationTreeMatcher {
     private static final long serialVersionUID = 1L;
-
     private static final Matcher<AnnotationTree> DELEGATE =
         MoreMatchers.hasMetaAnnotation("org.junit.jupiter.api.TestTemplate");
 
     @Override
     public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
-      return DELEGATE.matches(tree, state) ? buildDescription(tree).build() : Description.NO_MATCH;
+      return DELEGATE.matches(tree, state) ? describeMatch(tree) : Description.NO_MATCH;
     }
   }
 }

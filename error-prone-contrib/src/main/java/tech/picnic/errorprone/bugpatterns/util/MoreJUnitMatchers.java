@@ -5,8 +5,10 @@ import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAS
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isType;
+import static java.util.Objects.requireNonNullElse;
 import static tech.picnic.errorprone.bugpatterns.util.MoreMatchers.hasMetaAnnotation;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.matchers.AnnotationMatcherUtils;
 import com.google.errorprone.matchers.Matcher;
@@ -16,6 +18,7 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
+import org.jspecify.nullness.Nullable;
 
 /**
  * A collection of JUnit-specific helper methods and {@link Matcher}s.
@@ -43,7 +46,7 @@ public final class MoreJUnitMatchers {
   /**
    * Matches methods that have a {@link org.junit.jupiter.params.provider.MethodSource} annotation.
    */
-  public static final Matcher<MethodTree> HAS_METHOD_SOURCE =
+  public static final MultiMatcher<MethodTree, AnnotationTree> HAS_METHOD_SOURCE =
       annotations(AT_LEAST_ONE, isType("org.junit.jupiter.params.provider.MethodSource"));
 
   private MoreJUnitMatchers() {}
@@ -57,17 +60,22 @@ public final class MoreJUnitMatchers {
    */
   static ImmutableSet<String> getMethodSourceFactoryNames(
       AnnotationTree methodSourceAnnotation, MethodTree method) {
+    String methodName = method.getName().toString();
     ExpressionTree value = AnnotationMatcherUtils.getArgument(methodSourceAnnotation, "value");
 
     if (!(value instanceof NewArrayTree)) {
-      return ImmutableSet.of(ASTHelpers.constValue(value, String.class));
+      return ImmutableSet.of(toMethodSourceFactoryName(value, methodName));
     }
 
-    NewArrayTree arrayTree = (NewArrayTree) value;
-    return arrayTree.getInitializers().isEmpty()
-        ? ImmutableSet.of(method.getName().toString())
-        : arrayTree.getInitializers().stream()
-            .map(name -> ASTHelpers.constValue(name, String.class))
+    return ((NewArrayTree) value)
+        .getInitializers().stream()
+            .map(name -> toMethodSourceFactoryName(name, methodName))
             .collect(toImmutableSet());
+  }
+
+  private static String toMethodSourceFactoryName(
+      @Nullable ExpressionTree tree, String annotatedMethodName) {
+    return requireNonNullElse(
+        Strings.emptyToNull(ASTHelpers.constValue(tree, String.class)), annotatedMethodName);
   }
 }
