@@ -8,24 +8,27 @@ import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 
 /**
- * A collection of methods to enhance the use of {@link Matcher}s.
+ * A collection of general-purpose {@link Matcher}s.
  *
- * <p>These methods are additions to the ones from {@link Matchers}.
+ * <p>These methods are additions to the ones found in {@link Matchers}.
  */
 public final class MoreMatchers {
   private MoreMatchers() {}
 
   /**
-   * Determines whether a tree has a meta annotation of the given class name. This includes
-   * annotations inherited from superclasses due to {@link java.lang.annotation.Inherited}.
+   * Returns a {@link Matcher} that determines whether a given tree has a meta annotation of the
+   * specified type.
    *
-   * @param <T> The type of the tree.
-   * @param annotationClass The binary class name of the annotation (e.g. "
-   *     org.jspecify.nullness.Nullable", or "some.package.OuterClassName$InnerClassName")
+   * <p>This includes annotations inherited from superclasses due to {@link
+   * java.lang.annotation.Inherited}.
+   *
+   * @param <T> The type of tree to match against.
+   * @param annotationType The binary type name of the annotation (e.g.
+   *     "org.jspecify.nullness.Nullable", or "some.package.OuterClassName$InnerClassName")
    * @return A {@link Matcher} that matches trees with the specified meta annotation.
    */
-  public static <T extends Tree> Matcher<T> hasMetaAnnotation(String annotationClass) {
-    TypePredicate typePredicate = hasAnnotation(annotationClass);
+  public static <T extends Tree> Matcher<T> hasMetaAnnotation(String annotationType) {
+    TypePredicate typePredicate = hasAnnotation(annotationType);
     return (tree, state) -> {
       Symbol sym = ASTHelpers.getSymbol(tree);
       return sym != null && typePredicate.apply(sym.type, state);

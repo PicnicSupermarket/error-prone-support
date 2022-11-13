@@ -1,32 +1,34 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
 
 /**
- * A set of helper methods for working with the AST.
+ * A collection of helper methods for working with the AST.
  *
- * <p>These helper methods are additions to the ones from {@link
+ * <p>These methods are additions to the ones found in {@link
  * com.google.errorprone.util.ASTHelpers}.
  */
 public final class MoreASTHelpers {
   private MoreASTHelpers() {}
 
   /**
-   * Finds methods with the given name in the enclosing class.
+   * Finds methods with the specified name in given the {@link VisitorState}'s current enclosing
+   * class.
    *
    * @param methodName The method name to search for.
-   * @param state A {@link VisitorState} describing the context in which the given {@link Tree} is
-   *     to be found.
+   * @param state The {@link VisitorState} from which to derive the enclosing class of interest.
    * @return The {@link MethodTree}s of the methods with the given name in the enclosing class.
    */
-  public static ImmutableList<MethodTree> findMethods(String methodName, VisitorState state) {
-    return state.findEnclosing(ClassTree.class).getMembers().stream()
+  public static ImmutableList<MethodTree> findMethods(CharSequence methodName, VisitorState state) {
+    ClassTree clazz = state.findEnclosing(ClassTree.class);
+    checkArgument(clazz != null, "Visited node is not enclosed by a class");
+    return clazz.getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
         .filter(method -> method.getName().contentEquals(methodName))
@@ -34,14 +36,14 @@ public final class MoreASTHelpers {
   }
 
   /**
-   * Determines if there are any methods with the given name in the enclosing class.
+   * Determines whether there are any methods with the specified name in given the {@link
+   * VisitorState}'s current enclosing class.
    *
    * @param methodName The method name to search for.
-   * @param state A {@link VisitorState} describing the context in which the given {@link Tree} is
-   *     to be found.
+   * @param state The {@link VisitorState} from which to derive the enclosing class of interest.
    * @return Whether there are any methods with the given name in the enclosing class.
    */
-  public static boolean isMethodInEnclosingClass(String methodName, VisitorState state) {
+  public static boolean isMethodInEnclosingClass(CharSequence methodName, VisitorState state) {
     return !findMethods(methodName, state).isEmpty();
   }
 }
