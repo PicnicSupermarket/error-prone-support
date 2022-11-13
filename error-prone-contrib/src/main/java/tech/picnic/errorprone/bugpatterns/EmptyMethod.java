@@ -14,7 +14,6 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
-import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
@@ -22,6 +21,7 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.util.Optional;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A {@link BugChecker} that flags empty methods that seemingly can simply be deleted. */
 @AutoService(BugChecker.class)
@@ -55,7 +55,7 @@ public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {
       return Description.NO_MATCH;
     }
 
-    return describeMatch(tree, SuggestedFix.delete(tree));
+    return describeMatch(tree, SourceCode.deleteWithTrailingWhitespace(tree, state));
   }
 
   private static boolean isInPossibleTestHelperClass(VisitorState state) {
