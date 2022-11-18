@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3.1.0
-      - uses: ruby/setup-ruby@v1.121.0
+      - uses: ruby/setup-ruby@v1.123.0
         with:
           working-directory: ./website
           bundler-cache: true
