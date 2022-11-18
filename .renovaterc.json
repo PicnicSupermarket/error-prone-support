@@ -10,7 +10,8 @@
     },
     {
       "matchPackagePatterns": [
-        "^com\\.palantir\\.baseline:baseline-error-prone$"
+        "^com\\.palantir\\.baseline:baseline-error-prone$",
+        "^ruby\/setup-ruby$"
       ],
       "schedule": "* * 1 * *"
     }
