@@ -178,8 +178,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just(1).switchMap(n -> Mono.fromSupplier(() -> n * 2)));
   }
 
-  Flux<String> testMonoFlux() {
-    return Flux.concat(Mono.just("foo"));
+  ImmutableSet<Flux<String>> testMonoFlux() {
+    return ImmutableSet.of(Flux.concat(Mono.just("foo")), Mono.just("bar").flatMapMany(Flux::just));
   }
 
   ImmutableSet<Mono<Optional<String>>> testMonoCollectToOptional() {
