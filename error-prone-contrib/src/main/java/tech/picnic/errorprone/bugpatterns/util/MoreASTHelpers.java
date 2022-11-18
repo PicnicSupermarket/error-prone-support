@@ -43,7 +43,7 @@ public final class MoreASTHelpers {
    * @param state The {@link VisitorState} from which to derive the enclosing class of interest.
    * @return Whether there are any methods with the given name in the enclosing class.
    */
-  public static boolean isMethodInEnclosingClass(CharSequence methodName, VisitorState state) {
+  public static boolean methodExistsInEnclosingClass(CharSequence methodName, VisitorState state) {
     return !findMethods(methodName, state).isEmpty();
   }
 }

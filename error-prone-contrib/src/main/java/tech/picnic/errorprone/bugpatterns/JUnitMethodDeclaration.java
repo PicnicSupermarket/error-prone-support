@@ -125,7 +125,7 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
    * </ul>
    */
   private static Optional<String> findMethodRenameBlocker(String methodName, VisitorState state) {
-    if (MoreASTHelpers.isMethodInEnclosingClass(methodName, state)) {
+    if (MoreASTHelpers.methodExistsInEnclosingClass(methodName, state)) {
       return Optional.of(
           String.format("a method named `%s` already exists in this class", methodName));
     }
