@@ -559,7 +559,7 @@ final class ReactorRules {
   static final class MonoFlux<T> {
     @BeforeTemplate
     Flux<T> before(Mono<T> mono) {
-      return Refaster.anyOf(Flux.concat(mono), mono.flatMapMany(Flux::just));
+      return Refaster.anyOf(mono.flatMapMany(Flux::just), Flux.concat(mono));
     }
 
     @AfterTemplate
