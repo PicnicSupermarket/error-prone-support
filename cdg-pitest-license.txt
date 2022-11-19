@@ -1,4 +1,4 @@
-#Licence file for pitest extensions
+#License file for pitest extensions
 #Mon Nov 07 08:41:17 GMT 2022
 expires=07/11/2023
 keyVersion=1
