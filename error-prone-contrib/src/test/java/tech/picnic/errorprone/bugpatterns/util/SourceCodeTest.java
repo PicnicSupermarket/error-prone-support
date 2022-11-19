@@ -167,8 +167,9 @@ final class SourceCodeTest {
   }
 
   /**
-   * Uses {@link SourceCode#deleteWithTrailingWhitespace(Tree, VisitorState)} to suggest the
-   * deletion of annotations and methods with a name containing {@value DELETION_MARKER}.
+   * A {@link BugChecker} that uses {@link SourceCode#deleteWithTrailingWhitespace(Tree,
+   * VisitorState)} to suggest the deletion of annotations and methods with a name containing
+   * {@value DELETION_MARKER}.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
   public static final class TestChecker extends BugChecker

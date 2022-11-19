@@ -12,7 +12,6 @@ import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
  * A collection of Error Prone utility methods for dealing with the source code representation of
  * AST nodes.
  */
-// XXX: Can we locate this code in a better place? Maybe contribute it upstream?
 public final class SourceCode {
   /** The complement of {@link CharMatcher#whitespace()}. */
   private static final CharMatcher NON_WHITESPACE_MATCHER = CharMatcher.whitespace().negate();
