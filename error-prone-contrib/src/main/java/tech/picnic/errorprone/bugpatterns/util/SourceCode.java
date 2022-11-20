@@ -53,9 +53,10 @@ public final class SourceCode {
       return SuggestedFix.delete(tree);
     }
 
-    int actualEnd = NON_WHITESPACE_MATCHER.indexIn(sourceCode, endPos);
-    return actualEnd == -1
-        ? SuggestedFix.delete(tree)
-        : SuggestedFix.replace(((DiagnosticPosition) tree).getStartPosition(), actualEnd, "");
+    int whitespaceEndPos = NON_WHITESPACE_MATCHER.indexIn(sourceCode, endPos);
+    return SuggestedFix.replace(
+        ((DiagnosticPosition) tree).getStartPosition(),
+        whitespaceEndPos == -1 ? sourceCode.length() : whitespaceEndPos,
+        "");
   }
 }
