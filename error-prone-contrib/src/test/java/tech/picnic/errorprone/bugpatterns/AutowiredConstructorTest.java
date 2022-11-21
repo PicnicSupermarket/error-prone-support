@@ -94,13 +94,11 @@ final class AutowiredConstructorTest {
             "",
             "interface Container {",
             "  class A {",
-            "",
             "    @Deprecated",
             "    A() {}",
             "  }",
             "",
             "  class B {",
-            "",
             "    B(String x) {}",
             "  }",
             "}")

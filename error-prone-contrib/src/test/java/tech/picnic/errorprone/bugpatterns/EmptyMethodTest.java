@@ -76,8 +76,18 @@ final class EmptyMethodTest {
             "  void instanceMethod() {}",
             "",
             "  static void staticMethod() {}",
+            "",
+            "  static void staticMethodWithComment() {",
+            "    /* Foo. */",
+            "  }",
             "}")
-        .addOutputLines("A.java", "final class A {}")
+        .addOutputLines(
+            "A.java",
+            "final class A {",
+            "  static void staticMethodWithComment() {",
+            "    /* Foo. */",
+            "  }",
+            "}")
         .doTest(TestMode.TEXT_MATCH);
   }
 }

@@ -15,7 +15,6 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
-import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.MultiMatcher;
 import com.google.errorprone.util.ASTHelpers;
@@ -24,6 +23,7 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.util.List;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A {@link BugChecker} that flags redundant {@code @Autowired} constructor annotations. */
 @AutoService(BugChecker.class)
@@ -62,6 +62,6 @@ public final class AutowiredConstructor extends BugChecker implements ClassTreeM
      * leave flagging the unused import to Error Prone's `RemoveUnusedImports` check.
      */
     AnnotationTree annotation = Iterables.getOnlyElement(annotations);
-    return describeMatch(annotation, SuggestedFix.delete(annotation));
+    return describeMatch(annotation, SourceCode.deleteWithTrailingWhitespace(annotation, state));
   }
 }
