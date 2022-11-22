@@ -56,6 +56,7 @@ public final class MoreJUnitMatchers {
    * org.junit.jupiter.params.provider.MethodSource} annotation.
    *
    * @param methodSourceAnnotation The annotation from which to extract value factory method names.
+   * @param method The test method which has a method source annotation.
    * @return One or more value factory names.
    */
   public static ImmutableSet<String> getMethodSourceFactoryNames(
