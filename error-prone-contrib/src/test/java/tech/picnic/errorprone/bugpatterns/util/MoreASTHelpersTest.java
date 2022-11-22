@@ -1,9 +1,9 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
-import static java.util.stream.Collectors.joining;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
@@ -21,20 +21,20 @@ final class MoreASTHelpersTest {
         .addSourceLines(
             "A.java",
             "class A {",
-            "  // BUG: Diagnostic contains: foo: 1, bar: 2, baz: 0",
+            "  // BUG: Diagnostic contains: {foo=1, bar=2, baz=0}",
             "  void foo() {}",
             "",
-            "  // BUG: Diagnostic contains: foo: 1, bar: 2, baz: 0",
+            "  // BUG: Diagnostic contains: {foo=1, bar=2, baz=0}",
             "  void bar() {}",
             "",
-            "  // BUG: Diagnostic contains: foo: 1, bar: 2, baz: 0",
+            "  // BUG: Diagnostic contains: {foo=1, bar=2, baz=0}",
             "  void bar(int i) {}",
             "",
             "  static class B {",
-            "    // BUG: Diagnostic contains: foo: 0, bar: 1, baz: 1",
+            "    // BUG: Diagnostic contains: {foo=0, bar=1, baz=1}",
             "    void bar() {}",
             "",
-            "    // BUG: Diagnostic contains: foo: 0, bar: 1, baz: 1",
+            "    // BUG: Diagnostic contains: {foo=0, bar=1, baz=1}",
             "    void baz() {}",
             "  }",
             "}")
@@ -47,24 +47,30 @@ final class MoreASTHelpersTest {
         .addSourceLines(
             "A.java",
             "class A {",
-            "  // BUG: Diagnostic contains: foo: true, bar: true, baz: false",
+            "  // BUG: Diagnostic contains: {foo=true, bar=true, baz=false}",
             "  void foo() {}",
             "",
-            "  // BUG: Diagnostic contains: foo: true, bar: true, baz: false",
+            "  // BUG: Diagnostic contains: {foo=true, bar=true, baz=false}",
             "  void bar() {}",
             "",
-            "  // BUG: Diagnostic contains: foo: true, bar: true, baz: false",
+            "  // BUG: Diagnostic contains: {foo=true, bar=true, baz=false}",
             "  void bar(int i) {}",
             "",
             "  static class B {",
-            "    // BUG: Diagnostic contains: foo: false, bar: true, baz: true",
+            "    // BUG: Diagnostic contains: {foo=false, bar=true, baz=true}",
             "    void bar() {}",
             "",
-            "    // BUG: Diagnostic contains: foo: false, bar: true, baz: true",
+            "    // BUG: Diagnostic contains: {foo=false, bar=true, baz=true}",
             "    void baz() {}",
             "  }",
             "}")
         .doTest();
+  }
+
+  private static String createDiagnosticsMessage(
+      BiFunction<String, VisitorState, Object> valueFunction, VisitorState state) {
+    return Maps.toMap(ImmutableSet.of("foo", "bar", "baz"), key -> valueFunction.apply(key, state))
+        .toString();
   }
 
   /**
@@ -100,14 +106,5 @@ final class MoreASTHelpersTest {
           .setMessage(createDiagnosticsMessage(MoreASTHelpers::methodExistsInEnclosingClass, state))
           .build();
     }
-  }
-
-  private static String createDiagnosticsMessage(
-      BiFunction<String, VisitorState, Object> function, VisitorState state) {
-    return ImmutableSet.of("foo", "bar", "baz").stream()
-        .map(
-            methodName ->
-                String.join(": ", methodName, String.valueOf(function.apply(methodName, state))))
-        .collect(joining(", "));
   }
 }

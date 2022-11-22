@@ -24,7 +24,7 @@ public final class MoreMatchers {
    *
    * @param <T> The type of tree to match against.
    * @param annotationType The binary type name of the annotation (e.g.
-   *     "org.jspecify.nullness.Nullable", or "some.package.OuterClassName$InnerClassName")
+   *     "org.jspecify.annotations.Nullable", or "some.package.OuterClassName$InnerClassName")
    * @return A {@link Matcher} that matches trees with the specified meta annotation.
    */
   public static <T extends Tree> Matcher<T> hasMetaAnnotation(String annotationType) {
