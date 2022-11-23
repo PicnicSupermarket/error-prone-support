@@ -10,7 +10,7 @@
     },
     {
       "matchPackagePatterns": [
-        "^ruby\/setup-ruby$"
+        "^ruby\\/setup-ruby$"
       ],
       "schedule": "* * 1 * *"
     }
