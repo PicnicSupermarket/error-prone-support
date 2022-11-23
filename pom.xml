@@ -157,15 +157,6 @@
         <version.mockito>4.9.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.10.5</version.nullaway>
-        <!-- XXX: Two other dependencies are potentially of interest:
-        `com.palantir.assertj-automation:assertj-refaster-rules` and
-        `com.palantir.baseline:baseline-refaster-rules` contain Refaster rules
-        that aren't currently applied. We should use
-        `RefasterRuleBuilderScanner` to convert those to `.refaster` files so
-        that we can pick them up. (But in case of `baseline-refaster-rules`
-        perhaps we can simply incorporate all of them.) -->
-        <version.palantir-assertj-automation>0.6.0</version.palantir-assertj-automation>
-        <version.palantir-baseline>4.145.0</version.palantir-baseline>
         <version.surefire>2.22.2</version.surefire>
     </properties>
 
@@ -278,20 +269,6 @@
                 <groupId>com.newrelic.agent.java</groupId>
                 <artifactId>newrelic-api</artifactId>
                 <version>7.11.1</version>
-            </dependency>
-            <!-- Specified as a workaround for
-            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
-            <dependency>
-                <groupId>com.palantir.assertj-automation</groupId>
-                <artifactId>assertj-error-prone</artifactId>
-                <version>${version.palantir-assertj-automation}</version>
-            </dependency>
-            <!-- Specified as a workaround for
-            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
-            <dependency>
-                <groupId>com.palantir.baseline</groupId>
-                <artifactId>baseline-error-prone</artifactId>
-                <version>${version.palantir-baseline}</version>
             </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
@@ -844,20 +821,6 @@
                                 <artifactId>nopen-checker</artifactId>
                                 <version>${version.nopen-checker}</version>
                             </path>
-                            <!-- XXX: Before enabling these plugins we'll
-                            need to resolve some violations. Some of the
-                            checks will need to be disabled.
-                            <path>
-                                <groupId>com.palantir.assertj-automation</groupId>
-                                <artifactId>assertj-error-prone</artifactId>
-                                <version>${version.palantir-assertj-automation}</version>
-                            </path>
-                            <path>
-                                <groupId>com.palantir.baseline</groupId>
-                                <artifactId>baseline-error-prone</artifactId>
-                                <version>${version.palantir-baseline}</version>
-                            </path>
-                            -->
                             <path>
                                 <groupId>com.uber.nullaway</groupId>
                                 <artifactId>nullaway</artifactId>
