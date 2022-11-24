@@ -127,6 +127,7 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
   }
 
   // XXX: Drop this.
+  /** Add nice comment. */
   public int testing(String x) {
     if (x.equals("x")) {
       return 0;
