@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -16,6 +18,13 @@ final class PrimitiveComparisonTest {
   // - The `BugCheckerRefactoringTestHelper` throws an exception in this case.
   // - During actual compilation only the first replacement is applied.
   // XXX: Can we perhaps work-around this by describing the fixes in reverse order?
+
+  @Test
+  void testingTest() {
+    PrimitiveComparison primitiveComparison = new PrimitiveComparison();
+    assertThat(primitiveComparison.testing("x")).isEqualTo(0);
+    assertThat(primitiveComparison.testing("y")).isEqualTo(1);
+  }
 
   // The logic for `char` and `short` is exactly analogous to the `byte` case.
   @Test
