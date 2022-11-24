@@ -1,6 +1,5 @@
 # Arcmutate license for Error Prone Support, requested by sending an email to
 # support@arcmutate.com.
-# Mon Nov 07 08:41:17 GMT 2022
 expires=07/11/2023
 keyVersion=1
 signature=MhZxMbnO6UovNfllM0JuVWkZyvRT3/G5o/uT0Mm36c7200VpZNVu03gTAGivnl9W5RzvZhfpIHccuQ5ctjQkrqhsFSrl4fyqPqu3y5V2fsHIdFXP/G72EGj6Kay9ndLpaEHalqE0bEwxdnHMzEYq5y3O9vUPv8MhUl57xk+rvBo\=
