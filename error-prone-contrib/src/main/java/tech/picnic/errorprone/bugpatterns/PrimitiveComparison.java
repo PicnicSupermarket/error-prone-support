@@ -126,15 +126,6 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
     return typeArguments + preferredMethodName;
   }
 
-  // XXX: Drop this.
-  /** Add nice comment. */
-  public int testing(String x) {
-    if (x.equals("x")) {
-      return 0;
-    }
-    return 1;
-  }
-
   private static String getPreferredMethod(Type cmpType, boolean isStatic, VisitorState state) {
     Types types = state.getTypes();
     Symtab symtab = state.getSymtab();

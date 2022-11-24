@@ -22,7 +22,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3.6.0
         with:
-          java-version: 17
+          java-version: 17.0.4
           distribution: temurin
           cache: maven
       - name: Download Pitest analysis artifact
