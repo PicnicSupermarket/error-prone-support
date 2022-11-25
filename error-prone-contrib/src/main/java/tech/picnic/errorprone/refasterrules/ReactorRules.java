@@ -264,6 +264,19 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Mono#defaultIfEmpty(Object)} over more contrived alternatives. */
+  static final class MonoSwitchIfEmptyOfMonoJust<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, T object) {
+      return mono.switchIfEmpty(Mono.just(object));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, T object) {
+      return mono.defaultIfEmpty(object);
+    }
+  }
+
   /** Don't unnecessarily pass an empty publisher to {@link Mono#switchIfEmpty(Mono)}. */
   static final class MonoSwitchIfEmptyOfEmptyPublisher<T> {
     @BeforeTemplate
