@@ -603,9 +603,7 @@ final class ReactorRules {
   static final class MonoCollectToOptional<T> {
     @BeforeTemplate
     Mono<Optional<T>> before(Mono<T> mono) {
-      return Refaster.anyOf(
-          mono.map(Optional::of).defaultIfEmpty(Optional.empty()),
-          mono.map(Optional::of).switchIfEmpty(Mono.just(Optional.empty())));
+      return mono.map(Optional::of).defaultIfEmpty(Optional.empty());
     }
 
     @AfterTemplate
