@@ -90,13 +90,13 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1, 2, 3).take(1, true);
   }
 
-  Mono<String> testMonoSwitchIfEmptyOfMonoJust() {
+  Mono<String> testMonoDefaultIfEmpty() {
     return Mono.just("foo").defaultIfEmpty("bar");
   }
 
-  ImmutableSet<Flux<String>> testFluxSwitchIfEmptyOfMonoOrFluxJust() {
+  ImmutableSet<Flux<String>> testFluxDefaultIfEmpty() {
     return ImmutableSet.of(
-        Flux.just("foo").defaultIfEmpty("bar"), Flux.just("bar").defaultIfEmpty("baz"));
+        Flux.just("foo").defaultIfEmpty("bar"), Flux.just("baz").defaultIfEmpty("qux"));
   }
 
   Mono<Integer> testMonoSwitchIfEmptyOfEmptyPublisher() {

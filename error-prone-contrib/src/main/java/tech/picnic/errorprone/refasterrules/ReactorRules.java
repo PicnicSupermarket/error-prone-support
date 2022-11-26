@@ -265,7 +265,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#defaultIfEmpty(Object)} over more contrived alternatives. */
-  static final class MonoSwitchIfEmptyOfMonoJust<T> {
+  static final class MonoDefaultIfEmpty<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono, T object) {
       return mono.switchIfEmpty(Mono.just(object));
@@ -278,7 +278,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#defaultIfEmpty(Object)} over more contrived alternatives. */
-  static final class FluxSwitchIfEmptyOfMonoOrFluxJust<T> {
+  static final class FluxDefaultIfEmpty<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, T object) {
       return flux.switchIfEmpty(Refaster.anyOf(Mono.just(object), Flux.just(object)));
