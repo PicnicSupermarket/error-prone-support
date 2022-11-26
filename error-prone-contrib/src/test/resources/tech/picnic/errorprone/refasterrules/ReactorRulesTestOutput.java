@@ -206,6 +206,27 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).cast(Number.class);
   }
 
+  Mono<String> testMonoFlatMapIdentity() {
+    return Mono.just("foo").flatMap(Mono::just);
+  }
+
+  ImmutableSet<Flux<String>> testFlatMapManyIdentity() {
+    return ImmutableSet.of(
+        Mono.just("foo").flatMapMany(Mono::just), Mono.just("foo").flatMapMany(Flux::just));
+  }
+
+  ImmutableSet<Flux<String>> testConcatMapIdentity() {
+    return ImmutableSet.of(
+        Flux.just("foo", "bar").concatMap(Mono::just),
+        Flux.just("foo", "bar").concatMap(Flux::just));
+  }
+
+  ImmutableSet<Flux<String>> testConcatMapIdentityWithPrefetch() {
+    return ImmutableSet.of(
+        Flux.just("foo", "bar").concatMap(Mono::just, 1),
+        Flux.just("foo", "bar").concatMap(Flux::just, 1));
+  }
+
   ImmutableSet<Flux<String>> testConcatMapIterableIdentity() {
     return ImmutableSet.of(
         Flux.just(ImmutableList.of("foo")).concatMapIterable(identity()),

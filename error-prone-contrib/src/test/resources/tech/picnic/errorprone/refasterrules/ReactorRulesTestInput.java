@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -205,6 +206,28 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Flux<Number> testFluxCast() {
     return Flux.just(1).map(Number.class::cast);
+  }
+
+  Mono<String> testMonoFlatMapIdentity() {
+    return Mono.just("foo").map(Mono::just).flatMap(identity());
+  }
+
+  ImmutableSet<Flux<String>> testFlatMapManyIdentity() {
+    return ImmutableSet.of(
+        Mono.just("foo").map(Mono::just).flatMapMany(identity()),
+        Mono.just("foo").map(Flux::just).flatMapMany(identity()));
+  }
+
+  ImmutableSet<Flux<String>> testConcatMapIdentity() {
+    return ImmutableSet.of(
+        Flux.just("foo", "bar").map(Mono::just).concatMap(identity()),
+        Flux.just("foo", "bar").map(Flux::just).concatMap(identity()));
+  }
+
+  ImmutableSet<Flux<String>> testConcatMapIdentityWithPrefetch() {
+    return ImmutableSet.of(
+        Flux.just("foo", "bar").map(Mono::just).concatMap(identity(), 1),
+        Flux.just("foo", "bar").map(Flux::just).concatMap(identity(), 1));
   }
 
   ImmutableSet<Flux<String>> testConcatMapIterableIdentity() {

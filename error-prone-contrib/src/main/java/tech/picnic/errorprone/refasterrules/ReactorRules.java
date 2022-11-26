@@ -639,6 +639,58 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Mono#flatMap(Function)} over more contrived alternatives. */
+  static final class MonoFlatMapIdentity<S, T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<S> mono, Function<S, Mono<T>> function) {
+      return mono.map(function).flatMap(identity());
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<S> mono, Function<S, Mono<T>> function) {
+      return mono.flatMap(function);
+    }
+  }
+
+  /** Prefer {@link Mono#flatMapMany(Function)} over more contrived alternatives. */
+  static final class FlatMapManyIdentity<S, T> {
+    @BeforeTemplate
+    Flux<T> before(Mono<S> mono, Function<S, ? extends Publisher<T>> function) {
+      return mono.map(function).flatMapMany(identity());
+    }
+
+    @AfterTemplate
+    Flux<T> after(Mono<S> mono, Function<S, ? extends Publisher<T>> function) {
+      return mono.flatMapMany(function);
+    }
+  }
+
+  /** Prefer {@link Flux#concatMap(Function)} over more contrived alternatives. */
+  static final class ConcatMapIdentity<S, T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<S> flux, Function<S, ? extends Publisher<T>> function) {
+      return flux.map(function).concatMap(identity());
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<S> flux, Function<S, ? extends Publisher<T>> function) {
+      return flux.concatMap(function);
+    }
+  }
+
+  /** Prefer {@link Flux#concatMap(Function, int)} over more contrived alternatives. */
+  static final class ConcatMapIdentityWithPrefetch<S, T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<S> flux, Function<S, ? extends Publisher<T>> function, int prefetch) {
+      return flux.map(function).concatMap(identity(), prefetch);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<S> flux, Function<S, ? extends Publisher<T>> function, int prefetch) {
+      return flux.concatMap(function, prefetch);
+    }
+  }
+
   /**
    * Prefer {@link Flux#concatMapIterable(Function)} over alternatives that require an additional
    * subscription.
