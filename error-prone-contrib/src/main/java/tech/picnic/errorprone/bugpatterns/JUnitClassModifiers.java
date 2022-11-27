@@ -1,8 +1,8 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
-import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
-import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.annotations;
@@ -29,19 +29,19 @@ import com.sun.source.tree.ClassTree;
 import javax.lang.model.element.Modifier;
 
 /**
- * A {@link BugChecker} that flags non-final and non package-private JUnit test class declarations.
+ * A {@link BugChecker} that flags non-final and non package-private JUnit test class declarations,
+ * unless abstract.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "JUnit test classes should be declared as package private final",
+    summary = "Non-abstract JUnit test classes should be declared package-private and final",
     linkType = CUSTOM,
-    link = BUG_PATTERNS_BASE_URL + "JUnitClassDeclaration",
-    severity = WARNING,
-    tags = SIMPLIFICATION)
+    link = BUG_PATTERNS_BASE_URL + "JUnitClassModifiers",
+    severity = SUGGESTION,
+    tags = STYLE)
 public final class JUnitClassModifiers extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
-
-  private static final Matcher<ClassTree> NON_FINAL_TEST_CLASS =
+  private static final Matcher<ClassTree> TEST_CLASS_WITH_INCORRECT_MODIFIERS =
       allOf(
           not(
               annotations(
@@ -62,7 +62,7 @@ public final class JUnitClassModifiers extends BugChecker implements ClassTreeMa
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    if (!NON_FINAL_TEST_CLASS.matches(tree, state)) {
+    if (!TEST_CLASS_WITH_INCORRECT_MODIFIERS.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
