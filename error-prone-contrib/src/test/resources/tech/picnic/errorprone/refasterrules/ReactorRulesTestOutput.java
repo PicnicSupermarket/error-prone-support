@@ -108,12 +108,17 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Flux<Integer>> testFluxConcatMap() {
-    return ImmutableSet.of(Flux.just(1).concatMap(Mono::just), Flux.just(2).concatMap(Mono::just));
+    return ImmutableSet.of(
+        Flux.just(1).concatMap(Mono::just),
+        Flux.just(2).concatMap(Mono::just),
+        Flux.just(3).concatMap(Mono::just));
   }
 
   ImmutableSet<Flux<Integer>> testFluxConcatMapWithPrefetch() {
     return ImmutableSet.of(
-        Flux.just(1).concatMap(Mono::just, 3), Flux.just(2).concatMap(Mono::just, 4));
+        Flux.just(1).concatMap(Mono::just, 3),
+        Flux.just(2).concatMap(Mono::just, 4),
+        Flux.just(3).concatMap(Mono::just, 5));
   }
 
   Flux<Integer> testFluxConcatMapIterable() {
@@ -206,25 +211,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).cast(Number.class);
   }
 
-  Mono<String> testMonoFlatMapIdentity() {
+  Mono<String> testMonoFlatMap() {
     return Mono.just("foo").flatMap(Mono::just);
   }
 
-  ImmutableSet<Flux<String>> testFlatMapManyIdentity() {
-    return ImmutableSet.of(
-        Mono.just("foo").flatMapMany(Mono::just), Mono.just("foo").flatMapMany(Flux::just));
-  }
-
-  ImmutableSet<Flux<String>> testConcatMapIdentity() {
-    return ImmutableSet.of(
-        Flux.just("foo", "bar").concatMap(Mono::just),
-        Flux.just("foo", "bar").concatMap(Flux::just));
-  }
-
-  ImmutableSet<Flux<String>> testConcatMapIdentityWithPrefetch() {
-    return ImmutableSet.of(
-        Flux.just("foo", "bar").concatMap(Mono::just, 1),
-        Flux.just("foo", "bar").concatMap(Flux::just, 1));
+  Flux<String> testMonoFlatMapMany() {
+    return Mono.just("foo").flatMapMany(Mono::just);
   }
 
   ImmutableSet<Flux<String>> testConcatMapIterableIdentity() {

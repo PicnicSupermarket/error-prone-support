@@ -320,7 +320,10 @@ final class ReactorRules {
   static final class FluxConcatMap<T, S> {
     @BeforeTemplate
     Flux<S> before(Flux<T> flux, Function<? super T, ? extends Publisher<? extends S>> function) {
-      return Refaster.anyOf(flux.flatMap(function, 1), flux.flatMapSequential(function, 1));
+      return Refaster.anyOf(
+          flux.flatMap(function, 1),
+          flux.flatMapSequential(function, 1),
+          flux.map(function).concatMap(identity()));
     }
 
     @AfterTemplate
@@ -337,7 +340,9 @@ final class ReactorRules {
         Function<? super T, ? extends Publisher<? extends S>> function,
         int prefetch) {
       return Refaster.anyOf(
-          flux.flatMap(function, 1, prefetch), flux.flatMapSequential(function, 1, prefetch));
+          flux.flatMap(function, 1, prefetch),
+          flux.flatMapSequential(function, 1, prefetch),
+          flux.map(function).concatMap(identity(), prefetch));
     }
 
     @AfterTemplate
@@ -640,54 +645,28 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#flatMap(Function)} over more contrived alternatives. */
-  static final class MonoFlatMapIdentity<S, T> {
+  static final class MonoFlatMap<S, T> {
     @BeforeTemplate
-    Mono<T> before(Mono<S> mono, Function<S, Mono<T>> function) {
+    Mono<T> before(Mono<S> mono, Function<? super S, ? extends Mono<? extends T>> function) {
       return mono.map(function).flatMap(identity());
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<S> mono, Function<S, Mono<T>> function) {
+    Mono<T> after(Mono<S> mono, Function<? super S, ? extends Mono<? extends T>> function) {
       return mono.flatMap(function);
     }
   }
 
   /** Prefer {@link Mono#flatMapMany(Function)} over more contrived alternatives. */
-  static final class FlatMapManyIdentity<S, T> {
+  static final class MonoFlatMapMany<S, T> {
     @BeforeTemplate
-    Flux<T> before(Mono<S> mono, Function<S, ? extends Publisher<T>> function) {
+    Flux<T> before(Mono<S> mono, Function<? super S, ? extends Publisher<? extends T>> function) {
       return mono.map(function).flatMapMany(identity());
     }
 
     @AfterTemplate
-    Flux<T> after(Mono<S> mono, Function<S, ? extends Publisher<T>> function) {
+    Flux<T> after(Mono<S> mono, Function<? super S, ? extends Publisher<? extends T>> function) {
       return mono.flatMapMany(function);
-    }
-  }
-
-  /** Prefer {@link Flux#concatMap(Function)} over more contrived alternatives. */
-  static final class ConcatMapIdentity<S, T> {
-    @BeforeTemplate
-    Flux<T> before(Flux<S> flux, Function<S, ? extends Publisher<T>> function) {
-      return flux.map(function).concatMap(identity());
-    }
-
-    @AfterTemplate
-    Flux<T> after(Flux<S> flux, Function<S, ? extends Publisher<T>> function) {
-      return flux.concatMap(function);
-    }
-  }
-
-  /** Prefer {@link Flux#concatMap(Function, int)} over more contrived alternatives. */
-  static final class ConcatMapIdentityWithPrefetch<S, T> {
-    @BeforeTemplate
-    Flux<T> before(Flux<S> flux, Function<S, ? extends Publisher<T>> function, int prefetch) {
-      return flux.map(function).concatMap(identity(), prefetch);
-    }
-
-    @AfterTemplate
-    Flux<T> after(Flux<S> flux, Function<S, ? extends Publisher<T>> function, int prefetch) {
-      return flux.concatMap(function, prefetch);
     }
   }
 

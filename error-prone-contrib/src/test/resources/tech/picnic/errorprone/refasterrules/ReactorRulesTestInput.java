@@ -105,12 +105,16 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Flux<Integer>> testFluxConcatMap() {
     return ImmutableSet.of(
-        Flux.just(1).flatMap(Mono::just, 1), Flux.just(2).flatMapSequential(Mono::just, 1));
+        Flux.just(1).flatMap(Mono::just, 1),
+        Flux.just(2).flatMapSequential(Mono::just, 1),
+        Flux.just(3).map(Mono::just).concatMap(identity()));
   }
 
   ImmutableSet<Flux<Integer>> testFluxConcatMapWithPrefetch() {
     return ImmutableSet.of(
-        Flux.just(1).flatMap(Mono::just, 1, 3), Flux.just(2).flatMapSequential(Mono::just, 1, 4));
+        Flux.just(1).flatMap(Mono::just, 1, 3),
+        Flux.just(2).flatMapSequential(Mono::just, 1, 4),
+        Flux.just(3).map(Mono::just).concatMap(identity(), 5));
   }
 
   Flux<Integer> testFluxConcatMapIterable() {
@@ -208,26 +212,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).map(Number.class::cast);
   }
 
-  Mono<String> testMonoFlatMapIdentity() {
+  Mono<String> testMonoFlatMap() {
     return Mono.just("foo").map(Mono::just).flatMap(identity());
   }
 
-  ImmutableSet<Flux<String>> testFlatMapManyIdentity() {
-    return ImmutableSet.of(
-        Mono.just("foo").map(Mono::just).flatMapMany(identity()),
-        Mono.just("foo").map(Flux::just).flatMapMany(identity()));
-  }
-
-  ImmutableSet<Flux<String>> testConcatMapIdentity() {
-    return ImmutableSet.of(
-        Flux.just("foo", "bar").map(Mono::just).concatMap(identity()),
-        Flux.just("foo", "bar").map(Flux::just).concatMap(identity()));
-  }
-
-  ImmutableSet<Flux<String>> testConcatMapIdentityWithPrefetch() {
-    return ImmutableSet.of(
-        Flux.just("foo", "bar").map(Mono::just).concatMap(identity(), 1),
-        Flux.just("foo", "bar").map(Flux::just).concatMap(identity(), 1));
+  Flux<String> testMonoFlatMapMany() {
+    return Mono.just("foo").map(Mono::just).flatMapMany(identity());
   }
 
   ImmutableSet<Flux<String>> testConcatMapIterableIdentity() {
