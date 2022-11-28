@@ -320,7 +320,10 @@ final class ReactorRules {
   static final class FluxConcatMap<T, S> {
     @BeforeTemplate
     Flux<S> before(Flux<T> flux, Function<? super T, ? extends Publisher<? extends S>> function) {
-      return Refaster.anyOf(flux.flatMap(function, 1), flux.flatMapSequential(function, 1));
+      return Refaster.anyOf(
+          flux.flatMap(function, 1),
+          flux.flatMapSequential(function, 1),
+          flux.map(function).concatMap(identity()));
     }
 
     @AfterTemplate
@@ -337,7 +340,9 @@ final class ReactorRules {
         Function<? super T, ? extends Publisher<? extends S>> function,
         int prefetch) {
       return Refaster.anyOf(
-          flux.flatMap(function, 1, prefetch), flux.flatMapSequential(function, 1, prefetch));
+          flux.flatMap(function, 1, prefetch),
+          flux.flatMapSequential(function, 1, prefetch),
+          flux.map(function).concatMap(identity(), prefetch));
     }
 
     @AfterTemplate
@@ -636,6 +641,32 @@ final class ReactorRules {
     @AfterTemplate
     Flux<S> after(Flux<T> flux) {
       return flux.cast(Refaster.<S>clazz());
+    }
+  }
+
+  /** Prefer {@link Mono#flatMap(Function)} over more contrived alternatives. */
+  static final class MonoFlatMap<S, T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<S> mono, Function<? super S, ? extends Mono<? extends T>> function) {
+      return mono.map(function).flatMap(identity());
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<S> mono, Function<? super S, ? extends Mono<? extends T>> function) {
+      return mono.flatMap(function);
+    }
+  }
+
+  /** Prefer {@link Mono#flatMapMany(Function)} over more contrived alternatives. */
+  static final class MonoFlatMapMany<S, T> {
+    @BeforeTemplate
+    Flux<T> before(Mono<S> mono, Function<? super S, ? extends Publisher<? extends T>> function) {
+      return mono.map(function).flatMapMany(identity());
+    }
+
+    @AfterTemplate
+    Flux<T> after(Mono<S> mono, Function<? super S, ? extends Publisher<? extends T>> function) {
+      return mono.flatMapMany(function);
     }
   }
 
