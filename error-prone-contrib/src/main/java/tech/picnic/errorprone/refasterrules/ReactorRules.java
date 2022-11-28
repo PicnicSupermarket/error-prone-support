@@ -264,6 +264,32 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Mono#defaultIfEmpty(Object)} over more contrived alternatives. */
+  static final class MonoDefaultIfEmpty<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, T object) {
+      return mono.switchIfEmpty(Mono.just(object));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, T object) {
+      return mono.defaultIfEmpty(object);
+    }
+  }
+
+  /** Prefer {@link Flux#defaultIfEmpty(Object)} over more contrived alternatives. */
+  static final class FluxDefaultIfEmpty<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, T object) {
+      return flux.switchIfEmpty(Refaster.anyOf(Mono.just(object), Flux.just(object)));
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, T object) {
+      return flux.defaultIfEmpty(object);
+    }
+  }
+
   /** Don't unnecessarily pass an empty publisher to {@link Mono#switchIfEmpty(Mono)}. */
   static final class MonoSwitchIfEmptyOfEmptyPublisher<T> {
     @BeforeTemplate
@@ -577,9 +603,7 @@ final class ReactorRules {
   static final class MonoCollectToOptional<T> {
     @BeforeTemplate
     Mono<Optional<T>> before(Mono<T> mono) {
-      return Refaster.anyOf(
-          mono.map(Optional::of).defaultIfEmpty(Optional.empty()),
-          mono.map(Optional::of).switchIfEmpty(Mono.just(Optional.empty())));
+      return mono.map(Optional::of).defaultIfEmpty(Optional.empty());
     }
 
     @AfterTemplate
