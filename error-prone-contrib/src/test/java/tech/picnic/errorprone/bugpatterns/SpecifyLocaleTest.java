@@ -19,8 +19,6 @@ final class SpecifyLocaleTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
-            "import java.util.Locale;",
-            "",
             "class A {",
             "  void m() {",
             "    // BUG: Diagnostic contains:",
