@@ -157,6 +157,7 @@
         <version.mockito>4.9.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.10.5</version.nullaway>
+        <version.pitest-git>1.0.1</version.pitest-git>
         <version.surefire>2.22.2</version.surefire>
     </properties>
 
@@ -427,6 +428,16 @@
                             <phase>verify</phase>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>com.groupcdg</groupId>
+                    <artifactId>pitest-git-maven-plugin</artifactId>
+                    <version>${version.pitest-git}</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.groupcdg</groupId>
+                    <artifactId>pitest-github-maven-plugin</artifactId>
+                    <version>${version.pitest-git}</version>
                 </plugin>
                 <plugin>
                     <groupId>com.spotify.fmt</groupId>
@@ -1231,8 +1242,12 @@
                     <version>1.9.11</version>
                     <configuration>
                         <excludedClasses>
+                            <!-- AutoValue generated classes. -->
                             <excludedClass>*.AutoValue_*</excludedClass>
+                            <!-- Refaster rule collections. -->
+                            <excludedClass>*.refaster*.*Rules*</excludedClass>
                         </excludedClasses>
+                        <failWhenNoMutations>false</failWhenNoMutations>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->
@@ -1241,6 +1256,11 @@
                         <timestampedReports>false</timestampedReports>
                     </configuration>
                     <dependencies>
+                        <dependency>
+                            <groupId>com.groupcdg</groupId>
+                            <artifactId>pitest-git-plugin</artifactId>
+                            <version>${version.pitest-git}</version>
+                        </dependency>
                         <dependency>
                             <groupId>org.pitest</groupId>
                             <artifactId>pitest-junit5-plugin</artifactId>

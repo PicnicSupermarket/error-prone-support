@@ -1,0 +1,37 @@
+# Performs mutation testing analysis on the files changed by a pull request and
+# uploads the results. The associated PR is subsequently updated by the
+# `pitest-update-pr.yml` workflow. See https://blog.pitest.org/oss-pitest-pr/
+# for details.
+name: "Mutation testing"
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  analyze-pr:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 2
+      - name: Set up JDK
+        uses: actions/setup-java@v3.6.0
+        with:
+          java-version: 17.0.4
+          distribution: temurin
+          cache: maven
+      - name: Run Pitest
+        # By running with features `+GIT(from[HEAD~1]), +gitci`, Pitest only
+        # analyzes lines changed in the associated pull request, as GitHub
+        # exposes the changes unique to the PR as a single commit on top of the
+        # target branch. See https://blog.pitest.org/pitest-pr-setup for
+        # details.
+        run: mvn test pitest:mutationCoverage -DargLine.xmx=2048m -Dverification.skip -Dfeatures="+GIT(from[HEAD~1]), +gitci"
+      - name: Aggregate Pitest reports
+        run: mvn pitest-git:aggregate -DkilledEmoji=":tada:" -DmutantEmoji=":zombie:" -DtrailingText="Mutation testing report by [Pitest](https://pitest.org/). Review any surviving mutants by inspecting the line comments under [_Files changed_](${{ github.event.number }}/files)."
+      - name: Upload Pitest reports as artifact
+        uses: actions/upload-artifact@v3.1.1
+        with:
+          name: pitest-reports
+          path: ./target/pit-reports-ci
