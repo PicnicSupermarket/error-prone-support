@@ -872,14 +872,14 @@
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>3.4.0</version>
                     <configuration>
+                        <!-- XXX: Drop `ignoreAllNonTestScoped` once
+                        https://issues.apache.org/jira/browse/MNG-6058 is
+                        resolved. (See
+                        https://issues.apache.org/jira/browse/MDEP-791 for
+                        context.) -->
+                        <ignoreAllNonTestScoped>true</ignoreAllNonTestScoped>
                         <ignoreDirect>false</ignoreDirect>
                         <ignoreNonCompile>true</ignoreNonCompile>
-                        <!-- XXX: Drop/review this configuration once
-                        https://issues.apache.org/jira/browse/MDEP-791 is
-                        resolved. -->
-                        <ignoredNonTestScopedDependencies>
-                            <ignoredNonTestScopedDependency>*</ignoredNonTestScopedDependency>
-                        </ignoredNonTestScopedDependencies>
                     </configuration>
                 </plugin>
                 <plugin>
