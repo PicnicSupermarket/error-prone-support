@@ -25,6 +25,8 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.matchers.MultiMatcher;
+import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import javax.lang.model.element.Modifier;
 
@@ -43,12 +45,6 @@ public final class JUnitClassModifiers extends BugChecker implements ClassTreeMa
   private static final long serialVersionUID = 1L;
   private static final Matcher<ClassTree> TEST_CLASS_WITH_INCORRECT_MODIFIERS =
       allOf(
-          not(
-              annotations(
-                  AT_LEAST_ONE,
-                  anyOf(
-                      isType("org.springframework.context.annotation.Configuration"),
-                      hasMetaAnnotation("org.springframework.context.annotation.Configuration")))),
           hasMethod(TEST_METHOD),
           not(hasModifier(Modifier.ABSTRACT)),
           anyOf(
@@ -56,6 +52,14 @@ public final class JUnitClassModifiers extends BugChecker implements ClassTreeMa
               hasModifier(Modifier.PRIVATE),
               hasModifier(Modifier.PROTECTED),
               hasModifier(Modifier.PUBLIC)));
+
+  private static final MultiMatcher<ClassTree, AnnotationTree>
+      TEST_CLASS_WITH_SPRING_CONFIGURATION =
+          annotations(
+              AT_LEAST_ONE,
+              anyOf(
+                  isType("org.springframework.context.annotation.Configuration"),
+                  hasMetaAnnotation("org.springframework.context.annotation.Configuration")));
 
   /** Instantiates a new {@link JUnitClassModifiers} instance. */
   public JUnitClassModifiers() {}
@@ -67,12 +71,17 @@ public final class JUnitClassModifiers extends BugChecker implements ClassTreeMa
     }
 
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
-    SuggestedFixes.addModifiers(tree, state, Modifier.FINAL).ifPresent(fixBuilder::merge);
     SuggestedFixes.removeModifiers(
             tree.getModifiers(),
             state,
             ImmutableSet.of(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC))
         .ifPresent(fixBuilder::merge);
+
+    if (!TEST_CLASS_WITH_SPRING_CONFIGURATION.matches(tree, state)) {
+      SuggestedFixes.addModifiers(tree, state, Modifier.FINAL).ifPresent(fixBuilder::merge);
+    } else if (tree.getModifiers().getFlags().isEmpty()) {
+      return Description.NO_MATCH;
+    }
 
     return describeMatch(tree, fixBuilder.build());
   }
