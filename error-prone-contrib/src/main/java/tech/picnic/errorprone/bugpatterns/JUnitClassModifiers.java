@@ -70,6 +70,11 @@ public final class JUnitClassModifiers extends BugChecker implements ClassTreeMa
       return Description.NO_MATCH;
     }
 
+    boolean hasSpringConfiguration = TEST_CLASS_WITH_SPRING_CONFIGURATION.matches(tree, state);
+    if (hasSpringConfiguration && tree.getModifiers().getFlags().isEmpty()) {
+      return Description.NO_MATCH;
+    }
+
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
     SuggestedFixes.removeModifiers(
             tree.getModifiers(),
@@ -77,10 +82,8 @@ public final class JUnitClassModifiers extends BugChecker implements ClassTreeMa
             ImmutableSet.of(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC))
         .ifPresent(fixBuilder::merge);
 
-    if (!TEST_CLASS_WITH_SPRING_CONFIGURATION.matches(tree, state)) {
+    if (!hasSpringConfiguration) {
       SuggestedFixes.addModifiers(tree, state, Modifier.FINAL).ifPresent(fixBuilder::merge);
-    } else if (tree.getModifiers().getFlags().isEmpty()) {
-      return Description.NO_MATCH;
     }
 
     return describeMatch(tree, fixBuilder.build());
