@@ -36,14 +36,15 @@ public final class SpecifyLocale extends BugChecker implements MethodInvocationT
   private static final Matcher<ExpressionTree> STRING_TO_UPPER_OR_LOWER_CASE =
       instanceMethod()
           .onExactClass(String.class.getName())
-          .namedAnyOf("toLowerCase", "toUpperCase");
+          .namedAnyOf("toLowerCase", "toUpperCase")
+          .withNoParameters();
 
   /** Instantiates a new {@link SpecifyLocale} instance. */
   public SpecifyLocale() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (STRING_TO_UPPER_OR_LOWER_CASE.matches(tree, state) && tree.getArguments().isEmpty()) {
+    if (STRING_TO_UPPER_OR_LOWER_CASE.matches(tree, state)) {
       return buildDescription(tree)
           .addFix(buildFix("Locale.ROOT", tree, state))
           .addFix(buildFix("Locale.getDefault()", tree, state))
