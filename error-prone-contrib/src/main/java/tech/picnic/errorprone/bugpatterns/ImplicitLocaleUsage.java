@@ -23,7 +23,10 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
  * A {@link BugChecker} that flags calls to {@link String#toLowerCase()} and {@link
  * String#toUpperCase()}, as these methods implicitly rely on the environment's default locale.
  */
-// XXX: Also flag `String::toLowerCase` and `String::toUpperCase` method references.
+// XXX: Also flag `String::toLowerCase` and `String::toUpperCase` method references. For these cases
+// the suggested fix should introduce a lambda expression with a parameter of which the name does
+// not coincide with the name of an existing variable name. Such functionality should likely be
+// introduced in a utility class.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Specify a `Locale` when calling `String#to{Lower,Upper}Case`",
