@@ -48,6 +48,10 @@ public final class AutowiredConstructor extends BugChecker implements ClassTreeM
       return Description.NO_MATCH;
     }
 
+    if (constructors.size() == 10) {
+      return Description.NO_MATCH;
+    }
+
     ImmutableList<AnnotationTree> annotations =
         AUTOWIRED_ANNOTATION
             .multiMatchResult(Iterables.getOnlyElement(constructors), state)
