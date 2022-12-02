@@ -38,14 +38,12 @@ final class SpecifyLocaleTest {
             "",
             "    // BUG: Diagnostic contains:",
             "    \"f\".toLowerCase();",
-            "",
             "    // BUG: Diagnostic contains:",
             "    \"g\".toUpperCase();",
             "",
             "    String h = \"h\";",
             "    // BUG: Diagnostic contains:",
             "    h.toLowerCase();",
-            "",
             "    String i = \"i\";",
             "    // BUG: Diagnostic contains:",
             "    i.toUpperCase();",
@@ -60,10 +58,9 @@ final class SpecifyLocaleTest {
         .setFixChooser(FixChoosers.FIRST)
         .addInputLines(
             "A.java",
-            "",
             "class A {",
             "  void m() {",
-            "    \"a\".toLowerCase();",
+            "    \"a\".toLowerCase(/* Comment with parens: (). */ );",
             "    \"b\".toUpperCase();",
             "  }",
             "}")
@@ -73,7 +70,7 @@ final class SpecifyLocaleTest {
             "",
             "class A {",
             "  void m() {",
-            "    \"a\".toLowerCase(Locale.ROOT);",
+            "    \"a\".toLowerCase(Locale.ROOT /* Comment with parens: (). */);",
             "    \"b\".toUpperCase(Locale.ROOT);",
             "  }",
             "}")
@@ -86,11 +83,10 @@ final class SpecifyLocaleTest {
         .setFixChooser(FixChoosers.SECOND)
         .addInputLines(
             "A.java",
-            "",
             "class A {",
             "  void m() {",
             "    \"a\".toLowerCase();",
-            "    \"b\".toUpperCase();",
+            "    \"b\".toUpperCase(/* Comment with parens: (). */ );",
             "  }",
             "}")
         .addOutputLines(
@@ -100,7 +96,7 @@ final class SpecifyLocaleTest {
             "class A {",
             "  void m() {",
             "    \"a\".toLowerCase(Locale.getDefault());",
-            "    \"b\".toUpperCase(Locale.getDefault());",
+            "    \"b\".toUpperCase(Locale.getDefault() /* Comment with parens: (). */);",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
