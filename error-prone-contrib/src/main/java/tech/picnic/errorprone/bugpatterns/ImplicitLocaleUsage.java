@@ -27,11 +27,11 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Specify a `Locale` when calling `String#to{Lower,Upper}Case`",
-    link = BUG_PATTERNS_BASE_URL + "SpecifyLocale",
+    link = BUG_PATTERNS_BASE_URL + "ImplicitLocaleUsage",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)
-public final class SpecifyLocale extends BugChecker implements MethodInvocationTreeMatcher {
+public final class ImplicitLocaleUsage extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> DEFAULT_LOCALE_CASE_CONVERSION =
       instanceMethod()
@@ -39,8 +39,8 @@ public final class SpecifyLocale extends BugChecker implements MethodInvocationT
           .namedAnyOf("toLowerCase", "toUpperCase")
           .withNoParameters();
 
-  /** Instantiates a new {@link SpecifyLocale} instance. */
-  public SpecifyLocale() {}
+  /** Instantiates a new {@link ImplicitLocaleUsage} instance. */
+  public ImplicitLocaleUsage() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {

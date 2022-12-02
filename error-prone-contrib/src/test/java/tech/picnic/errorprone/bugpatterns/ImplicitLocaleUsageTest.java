@@ -8,11 +8,11 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class SpecifyLocaleTest {
+final class ImplicitLocaleUsageTest {
   private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(SpecifyLocale.class, getClass());
+      CompilationTestHelper.newInstance(ImplicitLocaleUsage.class, getClass());
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      newInstance(SpecifyLocale.class, getClass());
+      newInstance(ImplicitLocaleUsage.class, getClass());
 
   @Test
   void identification() {
