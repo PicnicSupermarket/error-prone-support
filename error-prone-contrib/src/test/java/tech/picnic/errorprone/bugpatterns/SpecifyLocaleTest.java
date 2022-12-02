@@ -19,21 +19,36 @@ final class SpecifyLocaleTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
+            "import static java.util.Locale.ROOT;",
+            "",
+            "import java.util.Locale;",
+            "",
             "class A {",
             "  void m() {",
-            "    // BUG: Diagnostic contains:",
-            "    \"a\".toUpperCase();",
+            "    \"a\".toLowerCase(Locale.ROOT);",
+            "    \"a\".toUpperCase(Locale.ROOT);",
+            "    \"b\".toLowerCase(ROOT);",
+            "    \"b\".toUpperCase(ROOT);",
+            "    \"c\".toLowerCase(Locale.getDefault());",
+            "    \"c\".toUpperCase(Locale.getDefault());",
+            "    \"d\".toLowerCase(Locale.ENGLISH);",
+            "    \"d\".toUpperCase(Locale.ENGLISH);",
+            "    \"e\".toLowerCase(new Locale(\"foo\"));",
+            "    \"e\".toUpperCase(new Locale(\"foo\"));",
             "",
             "    // BUG: Diagnostic contains:",
-            "    \"b\".toLowerCase();",
+            "    \"f\".toLowerCase();",
             "",
-            "    String c = \"c\";",
             "    // BUG: Diagnostic contains:",
-            "    c.toUpperCase();",
+            "    \"g\".toUpperCase();",
             "",
-            "    String d = \"d\";",
+            "    String h = \"h\";",
             "    // BUG: Diagnostic contains:",
-            "    d.toLowerCase();",
+            "    h.toLowerCase();",
+            "",
+            "    String i = \"i\";",
+            "    // BUG: Diagnostic contains:",
+            "    i.toUpperCase();",
             "  }",
             "}")
         .doTest();
@@ -48,8 +63,8 @@ final class SpecifyLocaleTest {
             "",
             "class A {",
             "  void m() {",
-            "    \"a\".toUpperCase();",
-            "    \"b\".toLowerCase();",
+            "    \"a\".toLowerCase();",
+            "    \"b\".toUpperCase();",
             "  }",
             "}")
         .addOutputLines(
@@ -58,8 +73,8 @@ final class SpecifyLocaleTest {
             "",
             "class A {",
             "  void m() {",
-            "    \"a\".toUpperCase(Locale.ROOT);",
-            "    \"b\".toLowerCase(Locale.ROOT);",
+            "    \"a\".toLowerCase(Locale.ROOT);",
+            "    \"b\".toUpperCase(Locale.ROOT);",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
@@ -74,8 +89,8 @@ final class SpecifyLocaleTest {
             "",
             "class A {",
             "  void m() {",
-            "    \"a\".toUpperCase();",
-            "    \"b\".toLowerCase();",
+            "    \"a\".toLowerCase();",
+            "    \"b\".toUpperCase();",
             "  }",
             "}")
         .addOutputLines(
@@ -84,8 +99,8 @@ final class SpecifyLocaleTest {
             "",
             "class A {",
             "  void m() {",
-            "    \"a\".toUpperCase(Locale.getDefault());",
-            "    \"b\".toLowerCase(Locale.getDefault());",
+            "    \"a\".toLowerCase(Locale.getDefault());",
+            "    \"b\".toUpperCase(Locale.getDefault());",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);

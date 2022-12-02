@@ -1,7 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
-import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
@@ -21,19 +21,18 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link BugChecker} that flags {@link String#toLowerCase()} or {@link String#toUpperCase()}
- * which do not specify a Locale.
+ * which do not specify a {@code Locale}.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary =
-        "Specify `Locale.ROOT` or `Locale.getDefault()` when calling `String#to{Lower,Upper}Case` without a specific Locale",
+    summary = "Specify a `Locale` when calling `String#to{Lower,Upper}Case`",
     link = BUG_PATTERNS_BASE_URL + "SpecifyLocale",
     linkType = CUSTOM,
-    severity = WARNING,
+    severity = SUGGESTION,
     tags = LIKELY_ERROR)
 public final class SpecifyLocale extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<ExpressionTree> STRING_TO_UPPER_OR_LOWER_CASE =
+  private static final Matcher<ExpressionTree> STRING_TO_LOWER_OR_UPPER_CASE =
       instanceMethod()
           .onExactClass(String.class.getName())
           .namedAnyOf("toLowerCase", "toUpperCase")
@@ -44,21 +43,20 @@ public final class SpecifyLocale extends BugChecker implements MethodInvocationT
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (STRING_TO_UPPER_OR_LOWER_CASE.matches(tree, state)) {
-      return buildDescription(tree)
-          .addFix(buildFix("Locale.ROOT", tree, state))
-          .addFix(buildFix("Locale.getDefault()", tree, state))
-          .build();
+    if (!STRING_TO_LOWER_OR_UPPER_CASE.matches(tree, state)) {
+      return Description.NO_MATCH;
     }
-    return Description.NO_MATCH;
+
+    return buildDescription(tree)
+        .addFix(suggestLocale("Locale.ROOT", tree, state))
+        .addFix(suggestLocale("Locale.getDefault()", tree, state))
+        .build();
   }
 
-  private static Fix buildFix(
-      String localeToSpecify, MethodInvocationTree tree, VisitorState state) {
+  private static Fix suggestLocale(String locale, MethodInvocationTree tree, VisitorState state) {
     return SuggestedFix.builder()
-        .replace(
-            tree, SourceCode.treeToString(tree, state).replace("()", "(" + localeToSpecify + ")"))
         .addImport("java.util.Locale")
+        .replace(tree, SourceCode.treeToString(tree, state).replace("()", "(" + locale + ")"))
         .build();
   }
 }
