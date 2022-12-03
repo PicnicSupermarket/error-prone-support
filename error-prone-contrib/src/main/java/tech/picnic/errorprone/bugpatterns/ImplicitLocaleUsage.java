@@ -58,6 +58,10 @@ public final class ImplicitLocaleUsage extends BugChecker implements MethodInvoc
   }
 
   private static Fix suggestLocale(MethodInvocationTree tree, String locale, VisitorState state) {
+    // XXX: The logic that replaces the first parenthesis assumes that `tree` does not have a source
+    // code representation such as `str.toLowerCase/* Some comment with parens (). */()`. In such a
+    // case the comment, rather than the method invocation arguments, will be modified. Implement a
+    // generic solution for this.
     return SuggestedFix.builder()
         .addImport("java.util.Locale")
         .replace(tree, SourceCode.treeToString(tree, state).replaceFirst("\\(", '(' + locale))
