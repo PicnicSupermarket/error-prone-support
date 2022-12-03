@@ -25,8 +25,6 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
-import com.google.errorprone.matchers.MultiMatcher;
-import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import javax.lang.model.element.Modifier;
 
@@ -43,23 +41,21 @@ import javax.lang.model.element.Modifier;
     tags = STYLE)
 public final class JUnitClassModifiers extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
+  private static final Matcher<ClassTree> HAS_SPRING_CONFIGURATION_ANNOTATION =
+      annotations(
+          AT_LEAST_ONE,
+          anyOf(
+              isType("org.springframework.context.annotation.Configuration"),
+              hasMetaAnnotation("org.springframework.context.annotation.Configuration")));
   private static final Matcher<ClassTree> TEST_CLASS_WITH_INCORRECT_MODIFIERS =
       allOf(
           hasMethod(TEST_METHOD),
           not(hasModifier(Modifier.ABSTRACT)),
           anyOf(
-              not(hasModifier(Modifier.FINAL)),
               hasModifier(Modifier.PRIVATE),
               hasModifier(Modifier.PROTECTED),
-              hasModifier(Modifier.PUBLIC)));
-
-  private static final MultiMatcher<ClassTree, AnnotationTree>
-      TEST_CLASS_WITH_SPRING_CONFIGURATION =
-          annotations(
-              AT_LEAST_ONE,
-              anyOf(
-                  isType("org.springframework.context.annotation.Configuration"),
-                  hasMetaAnnotation("org.springframework.context.annotation.Configuration")));
+              hasModifier(Modifier.PUBLIC),
+              allOf(not(hasModifier(Modifier.FINAL)), not(HAS_SPRING_CONFIGURATION_ANNOTATION))));
 
   /** Instantiates a new {@link JUnitClassModifiers} instance. */
   public JUnitClassModifiers() {}
@@ -70,11 +66,6 @@ public final class JUnitClassModifiers extends BugChecker implements ClassTreeMa
       return Description.NO_MATCH;
     }
 
-    boolean hasSpringConfiguration = TEST_CLASS_WITH_SPRING_CONFIGURATION.matches(tree, state);
-    if (hasSpringConfiguration && tree.getModifiers().getFlags().isEmpty()) {
-      return Description.NO_MATCH;
-    }
-
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
     SuggestedFixes.removeModifiers(
             tree.getModifiers(),
@@ -82,7 +73,7 @@ public final class JUnitClassModifiers extends BugChecker implements ClassTreeMa
             ImmutableSet.of(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC))
         .ifPresent(fixBuilder::merge);
 
-    if (!hasSpringConfiguration) {
+    if (!HAS_SPRING_CONFIGURATION_ANNOTATION.matches(tree, state)) {
       SuggestedFixes.addModifiers(tree, state, Modifier.FINAL).ifPresent(fixBuilder::merge);
     }
 
