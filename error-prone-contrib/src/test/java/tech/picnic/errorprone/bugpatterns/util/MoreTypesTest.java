@@ -151,7 +151,7 @@ final class MoreTypesTest {
      * @implNote The return value of this method should not be assigned to a field, as that would
      *     prevent mutations introduced by Pitest from being killed.
      */
-    private ImmutableSet<Supplier<Type>> getTestTypes() {
+    private static ImmutableSet<Supplier<Type>> getTestTypes() {
       return ImmutableSet.of(
           // Invalid types.
           type("java.lang.Nonexistent"),
