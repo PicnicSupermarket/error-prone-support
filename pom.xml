@@ -1248,6 +1248,10 @@
                             <excludedClass>*.refaster*.*Rules*</excludedClass>
                         </excludedClasses>
                         <failWhenNoMutations>false</failWhenNoMutations>
+                        <mutators>
+                            <mutator>EXTENDED</mutator>
+                            <mutator>STRONGER</mutator>
+                        </mutators>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->
@@ -1260,6 +1264,16 @@
                             <groupId>com.groupcdg</groupId>
                             <artifactId>pitest-git-plugin</artifactId>
                             <version>${version.pitest-git}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.groupcdg.arcmutate</groupId>
+                            <artifactId>base</artifactId>
+                            <version>1.0.1</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.groupcdg.pitest</groupId>
+                            <artifactId>pitest-accelerator-junit5</artifactId>
+                            <version>1.0.4</version>
                         </dependency>
                         <dependency>
                             <groupId>org.pitest</groupId>
