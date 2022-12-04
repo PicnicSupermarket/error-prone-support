@@ -289,6 +289,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   }
 
   private static Matcher<ExpressionTree> isArrayArgumentValueCandidate() {
-    return anyOf(classLiteral((t, s) -> true), (t, s) -> ASTHelpers.constValue(t) != null);
+    return anyOf(
+        classLiteral((tree, state) -> true), (tree, state) -> ASTHelpers.constValue(tree) != null);
   }
 }
