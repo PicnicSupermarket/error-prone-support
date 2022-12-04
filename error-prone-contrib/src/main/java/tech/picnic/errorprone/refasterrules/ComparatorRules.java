@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,6 +25,7 @@ import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
+import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link Comparator}s. */
@@ -37,7 +39,10 @@ final class ComparatorRules {
     @BeforeTemplate
     Comparator<T> before() {
       return Refaster.anyOf(
-          comparing(Refaster.anyOf(identity(), v -> v)), Comparator.<T>reverseOrder().reversed());
+          T::compareTo,
+          comparing(Refaster.anyOf(identity(), v -> v)),
+          Collections.<T>reverseOrder(reverseOrder()),
+          Comparator.<T>reverseOrder().reversed());
     }
 
     @AfterTemplate
@@ -51,7 +56,10 @@ final class ComparatorRules {
   static final class ReverseOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
     Comparator<T> before() {
-      return Comparator.<T>naturalOrder().reversed();
+      return Refaster.anyOf(
+          Collections.reverseOrder(),
+          Collections.<T>reverseOrder(naturalOrder()),
+          Comparator.<T>naturalOrder().reversed());
     }
 
     @AfterTemplate
@@ -189,15 +197,54 @@ final class ComparatorRules {
     }
   }
 
+  /** Prefer {@link Comparable#compareTo(Object)}} over more verbose alternatives. */
+  static final class CompareTo<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    int before(T value1, T value2) {
+      return Refaster.anyOf(
+          Comparator.<T>naturalOrder().compare(value1, value2),
+          Comparator.<T>reverseOrder().compare(value2, value1));
+    }
+
+    @AfterTemplate
+    int after(T value1, T value2) {
+      return value1.compareTo(value2);
+    }
+  }
+
+  /**
+   * Avoid unnecessary creation of a {@link Stream} to determine the minimum of a known collection
+   * of values.
+   */
+  static final class MinOfVarargs<T> {
+    @BeforeTemplate
+    @SuppressWarnings("StreamOfArray" /* In practice individual values are provided. */)
+    T before(@Repeated T value, Comparator<T> cmp) {
+      return Stream.of(Refaster.asVarargs(value)).min(cmp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(@Repeated T value, Comparator<T> cmp) {
+      return Collections.min(Arrays.asList(value), cmp);
+    }
+  }
+
   /** Prefer {@link Comparators#min(Comparable, Comparable)}} over more verbose alternatives. */
   static final class MinOfPairNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
     T before(T value1, T value2) {
-      return Collections.min(
-          Refaster.anyOf(
-              Arrays.asList(value1, value2),
-              ImmutableList.of(value1, value2),
-              ImmutableSet.of(value1, value2)));
+      return Refaster.anyOf(
+          value1.compareTo(value2) <= 0 ? value1 : value2,
+          value1.compareTo(value2) > 0 ? value2 : value1,
+          value2.compareTo(value1) < 0 ? value2 : value1,
+          value2.compareTo(value1) >= 0 ? value1 : value2,
+          Comparators.min(value1, value2, naturalOrder()),
+          Comparators.max(value1, value2, reverseOrder()),
+          Collections.min(
+              Refaster.anyOf(
+                  Arrays.asList(value1, value2),
+                  ImmutableList.of(value1, value2),
+                  ImmutableSet.of(value1, value2))));
     }
 
     @AfterTemplate
@@ -212,12 +259,17 @@ final class ComparatorRules {
   static final class MinOfPairCustomOrder<T> {
     @BeforeTemplate
     T before(T value1, T value2, Comparator<T> cmp) {
-      return Collections.min(
-          Refaster.anyOf(
-              Arrays.asList(value1, value2),
-              ImmutableList.of(value1, value2),
-              ImmutableSet.of(value1, value2)),
-          cmp);
+      return Refaster.anyOf(
+          cmp.compare(value1, value2) <= 0 ? value1 : value2,
+          cmp.compare(value1, value2) > 0 ? value2 : value1,
+          cmp.compare(value2, value1) < 0 ? value2 : value1,
+          cmp.compare(value2, value1) >= 0 ? value1 : value2,
+          Collections.min(
+              Refaster.anyOf(
+                  Arrays.asList(value1, value2),
+                  ImmutableList.of(value1, value2),
+                  ImmutableSet.of(value1, value2)),
+              cmp));
     }
 
     @AfterTemplate
@@ -226,15 +278,39 @@ final class ComparatorRules {
     }
   }
 
+  /**
+   * Avoid unnecessary creation of a {@link Stream} to determine the maximum of a known collection
+   * of values.
+   */
+  static final class MaxOfVarargs<T> {
+    @BeforeTemplate
+    @SuppressWarnings("StreamOfArray" /* In practice individual values are provided. */)
+    T before(@Repeated T value, Comparator<T> cmp) {
+      return Stream.of(Refaster.asVarargs(value)).max(cmp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(@Repeated T value, Comparator<T> cmp) {
+      return Collections.max(Arrays.asList(value), cmp);
+    }
+  }
+
   /** Prefer {@link Comparators#max(Comparable, Comparable)}} over more verbose alternatives. */
   static final class MaxOfPairNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
     T before(T value1, T value2) {
-      return Collections.max(
-          Refaster.anyOf(
-              Arrays.asList(value1, value2),
-              ImmutableList.of(value1, value2),
-              ImmutableSet.of(value1, value2)));
+      return Refaster.anyOf(
+          value1.compareTo(value2) >= 0 ? value1 : value2,
+          value1.compareTo(value2) < 0 ? value2 : value1,
+          value2.compareTo(value1) > 0 ? value2 : value1,
+          value2.compareTo(value1) <= 0 ? value1 : value2,
+          Comparators.max(value1, value2, naturalOrder()),
+          Comparators.min(value1, value2, reverseOrder()),
+          Collections.max(
+              Refaster.anyOf(
+                  Arrays.asList(value1, value2),
+                  ImmutableList.of(value1, value2),
+                  ImmutableSet.of(value1, value2))));
     }
 
     @AfterTemplate
@@ -249,12 +325,17 @@ final class ComparatorRules {
   static final class MaxOfPairCustomOrder<T> {
     @BeforeTemplate
     T before(T value1, T value2, Comparator<T> cmp) {
-      return Collections.max(
-          Refaster.anyOf(
-              Arrays.asList(value1, value2),
-              ImmutableList.of(value1, value2),
-              ImmutableSet.of(value1, value2)),
-          cmp);
+      return Refaster.anyOf(
+          cmp.compare(value1, value2) >= 0 ? value1 : value2,
+          cmp.compare(value1, value2) < 0 ? value2 : value1,
+          cmp.compare(value2, value1) > 0 ? value2 : value1,
+          cmp.compare(value2, value1) <= 0 ? value1 : value2,
+          Collections.max(
+              Refaster.anyOf(
+                  Arrays.asList(value1, value2),
+                  ImmutableList.of(value1, value2),
+                  ImmutableSet.of(value1, value2)),
+              cmp));
     }
 
     @AfterTemplate
