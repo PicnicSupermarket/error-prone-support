@@ -52,6 +52,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.fromSupplier(() -> Optional.of(2).orElse(null)));
   }
 
+  ImmutableSet<Mono<Integer>> testMonoFromOptionalSwitchIfEmpty() {
+    return ImmutableSet.of(
+        Optional.of(1).map(Mono::just).orElse(Mono.just(2)),
+        Optional.of(3).map(Mono::justOrEmpty).orElse(Mono.just(4)));
+  }
+
   Mono<Tuple2<String, Integer>> testMonoZip() {
     return Mono.just("foo").zipWith(Mono.just(1));
   }

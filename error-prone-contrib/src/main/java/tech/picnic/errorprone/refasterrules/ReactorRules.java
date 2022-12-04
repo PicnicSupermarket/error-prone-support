@@ -119,6 +119,24 @@ final class ReactorRules {
   }
 
   /**
+   * Prefer a {@link Mono#justOrEmpty(Optional)} and {@link Mono#switchIfEmpty(Mono)} chain over
+   * more contrived alternatives.
+   */
+  static final class MonoFromOptionalSwitchIfEmpty<T> {
+    @BeforeTemplate
+    Mono<T> before(Optional<T> optional, Mono<T> alternative) {
+      return optional
+          .map(Refaster.<Function<T, Mono<T>>>anyOf(Mono::just, Mono::justOrEmpty))
+          .orElse(alternative);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Optional<T> optional, Mono<T> alternative) {
+      return Mono.justOrEmpty(optional).switchIfEmpty(alternative);
+    }
+  }
+
+  /**
    * Prefer {@link Mono#zip(Mono, Mono)} over a chained {@link Mono#zipWith(Mono)}, as the former
    * better conveys that the {@link Mono}s may be subscribed to concurrently, and generalizes to
    * combining three or more reactive streams.
