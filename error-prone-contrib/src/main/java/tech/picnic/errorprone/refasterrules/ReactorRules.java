@@ -64,7 +64,7 @@ final class ReactorRules {
   static final class MonoEmpty<T> {
     @BeforeTemplate
     Mono<T> before() {
-      return Refaster.anyOf(Mono.just(null), Mono.justOrEmpty(null));
+      return Refaster.anyOf(Mono.justOrEmpty(null), Mono.justOrEmpty(Optional.empty()));
     }
 
     @AfterTemplate
@@ -73,16 +73,28 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#justOrEmpty(Optional)} over more contrived alternatives. */
-  static final class MonoJustOrEmpty<T> {
+  /** Prefer {@link Mono#just(Object)} over more contrived alternatives. */
+  static final class MonoJust<T> {
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
-    Mono<T> before(@Nullable T value) {
-      return Mono.justOrEmpty(Refaster.anyOf(Optional.of(value), Optional.ofNullable(value)));
+    Mono<T> before(T value) {
+      return Mono.justOrEmpty(Optional.of(value));
     }
 
     @AfterTemplate
-    Mono<T> after(@Nullable T value) {
+    Mono<T> after(T value) {
+      return Mono.just(value);
+    }
+  }
+
+  /** Prefer {@link Mono#justOrEmpty(Object)} over more contrived alternatives. */
+  static final class MonoJustOrEmpty<@Nullable T> {
+    @BeforeTemplate
+    Mono<T> before(T value) {
+      return Mono.justOrEmpty(Optional.ofNullable(value));
+    }
+
+    @AfterTemplate
+    Mono<T> after(T value) {
       return Mono.justOrEmpty(value);
     }
   }
