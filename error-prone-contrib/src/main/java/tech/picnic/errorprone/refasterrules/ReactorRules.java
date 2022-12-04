@@ -64,7 +64,7 @@ final class ReactorRules {
   static final class MonoEmpty<T> {
     @BeforeTemplate
     Mono<T> before() {
-      return Mono.justOrEmpty(null);
+      return Refaster.anyOf(Mono.just(null), Mono.justOrEmpty(null));
     }
 
     @AfterTemplate
