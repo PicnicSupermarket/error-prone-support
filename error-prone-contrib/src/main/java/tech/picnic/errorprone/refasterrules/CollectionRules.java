@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -401,6 +402,19 @@ final class CollectionRules {
     @AfterTemplate
     Optional<T> after(Queue<T> queue) {
       return Optional.ofNullable(queue.poll());
+    }
+  }
+
+  /** Prefer calling {@link Collection#forEach} ()} over more contrived alternatives. */
+  static final class CollectionForEach<T> {
+    @BeforeTemplate
+    void before(Collection<T> collection, Consumer<T> consumer) {
+      collection.stream().forEach(consumer);
+    }
+
+    @AfterTemplate
+    void after(Collection<T> collection, Consumer<T> consumer) {
+      collection.forEach(consumer);
     }
   }
 
