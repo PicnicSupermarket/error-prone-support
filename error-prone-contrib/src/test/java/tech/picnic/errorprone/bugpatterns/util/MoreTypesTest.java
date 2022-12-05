@@ -25,46 +25,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 final class MoreTypesTest {
-  private static final ImmutableSet<Supplier<Type>> TYPES =
-      ImmutableSet.of(
-          // Invalid types.
-          type("java.lang.Nonexistent"),
-          generic(type("java.util.Integer"), unbound()),
-          // Valid types.
-          type("java.lang.String"),
-          type("java.lang.Number"),
-          superOf(type("java.lang.Number")),
-          subOf(type("java.lang.Number")),
-          type("java.lang.Integer"),
-          superOf(type("java.lang.Integer")),
-          subOf(type("java.lang.Integer")),
-          type("java.util.Optional"),
-          raw(type("java.util.Optional")),
-          generic(type("java.util.Optional"), unbound()),
-          generic(type("java.util.Optional"), type("java.lang.Number")),
-          type("java.util.Collection"),
-          raw(type("java.util.Collection")),
-          generic(type("java.util.Collection"), unbound()),
-          generic(type("java.util.Collection"), type("java.lang.Number")),
-          generic(type("java.util.Collection"), superOf(type("java.lang.Number"))),
-          generic(type("java.util.Collection"), subOf(type("java.lang.Number"))),
-          generic(type("java.util.Collection"), type("java.lang.Integer")),
-          generic(type("java.util.Collection"), superOf(type("java.lang.Integer"))),
-          generic(type("java.util.Collection"), subOf(type("java.lang.Integer"))),
-          type("java.util.List"),
-          raw(type("java.util.List")),
-          generic(type("java.util.List"), unbound()),
-          generic(type("java.util.List"), type("java.lang.Number")),
-          generic(type("java.util.List"), superOf(type("java.lang.Number"))),
-          generic(type("java.util.List"), subOf(type("java.lang.Number"))),
-          generic(type("java.util.List"), type("java.lang.Integer")),
-          generic(type("java.util.List"), superOf(type("java.lang.Integer"))),
-          generic(type("java.util.List"), subOf(type("java.lang.Integer"))),
-          generic(
-              type("java.util.Map"),
-              type("java.lang.String"),
-              subOf(generic(type("java.util.Collection"), superOf(type("java.lang.Short"))))));
-
   @Test
   void matcher() {
     CompilationTestHelper.newInstance(SubtypeFlagger.class, getClass())
@@ -159,8 +119,8 @@ final class MoreTypesTest {
   }
 
   /**
-   * A {@link BugChecker} that flags method invocations that are a subtype of any type contained in
-   * {@link #TYPES}.
+   * A {@link BugChecker} that flags method invocations that are a subtype of any type defined by
+   * {@link #getTestTypes()}.
    */
   @BugPattern(summary = "Flags invocations of methods with select return types", severity = ERROR)
   public static final class SubtypeFlagger extends BugChecker
@@ -173,7 +133,7 @@ final class MoreTypesTest {
 
       List<String> matches = new ArrayList<>();
 
-      for (Supplier<Type> type : TYPES) {
+      for (Supplier<Type> type : getTestTypes()) {
         Type testType = type.get(state);
         if (testType != null && state.getTypes().isSubtype(treeType, testType)) {
           matches.add(Signatures.prettyType(testType));
@@ -183,6 +143,53 @@ final class MoreTypesTest {
       return matches.isEmpty()
           ? Description.NO_MATCH
           : buildDescription(tree).setMessage(matches.toString()).build();
+    }
+
+    /**
+     * Returns the type suppliers under test.
+     *
+     * @implNote The return value of this method should not be assigned to a field, as that would
+     *     prevent mutations introduced by Pitest from being killed.
+     */
+    private static ImmutableSet<Supplier<Type>> getTestTypes() {
+      return ImmutableSet.of(
+          // Invalid types.
+          type("java.lang.Nonexistent"),
+          generic(type("java.util.Integer"), unbound()),
+          // Valid types.
+          type("java.lang.String"),
+          type("java.lang.Number"),
+          superOf(type("java.lang.Number")),
+          subOf(type("java.lang.Number")),
+          type("java.lang.Integer"),
+          superOf(type("java.lang.Integer")),
+          subOf(type("java.lang.Integer")),
+          type("java.util.Optional"),
+          raw(type("java.util.Optional")),
+          generic(type("java.util.Optional"), unbound()),
+          generic(type("java.util.Optional"), type("java.lang.Number")),
+          type("java.util.Collection"),
+          raw(type("java.util.Collection")),
+          generic(type("java.util.Collection"), unbound()),
+          generic(type("java.util.Collection"), type("java.lang.Number")),
+          generic(type("java.util.Collection"), superOf(type("java.lang.Number"))),
+          generic(type("java.util.Collection"), subOf(type("java.lang.Number"))),
+          generic(type("java.util.Collection"), type("java.lang.Integer")),
+          generic(type("java.util.Collection"), superOf(type("java.lang.Integer"))),
+          generic(type("java.util.Collection"), subOf(type("java.lang.Integer"))),
+          type("java.util.List"),
+          raw(type("java.util.List")),
+          generic(type("java.util.List"), unbound()),
+          generic(type("java.util.List"), type("java.lang.Number")),
+          generic(type("java.util.List"), superOf(type("java.lang.Number"))),
+          generic(type("java.util.List"), subOf(type("java.lang.Number"))),
+          generic(type("java.util.List"), type("java.lang.Integer")),
+          generic(type("java.util.List"), superOf(type("java.lang.Integer"))),
+          generic(type("java.util.List"), subOf(type("java.lang.Integer"))),
+          generic(
+              type("java.util.Map"),
+              type("java.lang.String"),
+              subOf(generic(type("java.util.Collection"), superOf(type("java.lang.Short"))))));
     }
   }
 }
