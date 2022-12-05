@@ -137,6 +137,8 @@ final class ReactorRules {
   /**
    * Prefer a {@link Mono#justOrEmpty(Optional)} and {@link Mono#switchIfEmpty(Mono)} chain over
    * more contrived alternatives.
+   *
+   * <p>In particular, avoid mixing of the {@link Optional} and {@link Mono} APIs.
    */
   static final class MonoFromOptionalSwitchIfEmpty<T> {
     @BeforeTemplate
