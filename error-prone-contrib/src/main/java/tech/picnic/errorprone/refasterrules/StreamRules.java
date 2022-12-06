@@ -167,6 +167,35 @@ final class StreamRules {
     }
   }
 
+  /** Apply filtering before sorting to reduce the number of elements to sort. */
+  abstract static class SortAfterFilter<T> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream, Predicate<? super T> predicate) {
+      return stream.sorted().filter(predicate);
+    }
+
+    @AfterTemplate
+    Stream<T> after(Stream<T> stream, Predicate<? super T> predicate) {
+      return stream.filter(predicate).sorted();
+    }
+  }
+
+  /** Apply filter before sorting with a comparator to reduce the number of elements to sort. */
+  abstract static class SortWithComparatorAfterFilter<T> {
+    @BeforeTemplate
+    Stream<T> before(
+        Stream<T> stream, Predicate<? super T> predicate, Comparator<? super T> comparator) {
+      return stream.sorted(comparator).filter(predicate);
+    }
+
+    @AfterTemplate
+    Stream<T> after(
+        Stream<T> stream, Predicate<? super T> predicate, Comparator<? super T> comparator) {
+      return stream.filter(predicate).sorted(comparator);
+    }
+  }
+
+
   /**
    * Where possible, clarify that a mapping operation will be applied only to a single stream
    * element.

@@ -378,4 +378,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   Duration testStepVerifierLastStepVerifyTimeout() {
     return StepVerifier.create(Mono.empty()).verifyTimeout(Duration.ZERO);
   }
+
+  Flux<Integer> testSortAfterFilter() {
+    return Flux.just(1, 4, 3, 2).filter(i -> i % 2 == 0).sort();
+  }
+
+  Flux<Integer> testSortWithComparatorAfterFilter() {
+    return Flux.just(1, 4, 3, 2)
+        .filter(i -> i % 2 == 0)
+        .sort(Comparator.comparingInt(Integer::intValue).reversed());
+  }
 }

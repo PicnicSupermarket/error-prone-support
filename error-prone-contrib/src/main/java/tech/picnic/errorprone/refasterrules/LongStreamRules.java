@@ -154,6 +154,19 @@ final class LongStreamRules {
     }
   }
 
+  /** Apply filtering before sorting to reduce the number of elements to sort. */
+  static final class SortAfterFilter {
+    @BeforeTemplate
+    LongStream before(LongStream stream, LongPredicate predicate) {
+      return stream.sorted().filter(predicate);
+    }
+
+    @AfterTemplate
+    LongStream after(LongStream stream, LongPredicate predicate) {
+      return stream.filter(predicate).sorted();
+    }
+  }
+
   /** In order to test whether a stream has any element, simply try to find one. */
   static final class LongStreamIsEmpty {
     @BeforeTemplate

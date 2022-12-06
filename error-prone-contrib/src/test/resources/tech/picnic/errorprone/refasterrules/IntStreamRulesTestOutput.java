@@ -50,6 +50,10 @@ final class IntStreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1).flatMapToInt(v -> IntStream.of(v * v)).flatMap(IntStream::of);
   }
 
+  IntStream testSortAfterFilter() {
+    return IntStream.of(1, 4, 3, 2).filter(i -> i % 2 == 0).sorted();
+  }
+
   ImmutableSet<Boolean> testIntStreamIsEmpty() {
     return ImmutableSet.of(
         IntStream.of(1).findAny().isEmpty(),

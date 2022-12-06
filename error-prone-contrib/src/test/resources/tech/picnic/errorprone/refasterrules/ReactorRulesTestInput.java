@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -384,5 +385,15 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Duration testStepVerifierLastStepVerifyTimeout() {
     return StepVerifier.create(Mono.empty()).expectTimeout(Duration.ZERO).verify();
+  }
+
+  Flux<Integer> testSortAfterFilter() {
+    return Flux.just(1, 4, 3, 2).sort().filter(i -> i % 2 == 0);
+  }
+
+  Flux<Integer> testSortWithComparatorAfterFilter() {
+    return Flux.just(1, 4, 3, 2)
+        .sort(Comparator.comparingInt(Integer::intValue).reversed())
+        .filter(i -> i % 2 == 0);
   }
 }

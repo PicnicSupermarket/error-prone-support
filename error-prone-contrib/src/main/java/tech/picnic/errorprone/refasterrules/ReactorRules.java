@@ -17,6 +17,7 @@ import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -1244,6 +1245,33 @@ final class ReactorRules {
     @AfterTemplate
     Duration after(StepVerifier.LastStep step, Duration duration) {
       return step.verifyTimeout(duration);
+    }
+  }
+
+  /** Apply filtering before sorting to reduce the number of elements to sort. */
+  static final class SortAfterFilter<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate) {
+      return flux.sort().filter(predicate);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate) {
+      return flux.filter(predicate).sort();
+    }
+  }
+
+  /** Apply filtering before sorting with a comparator to reduce the number of elements to sort. */
+  abstract static class SortWithComparatorAfterFilter<T> {
+    @BeforeTemplate
+    Flux<T> before(
+        Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
+      return flux.sort(comparator).filter(predicate);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
+      return flux.filter(predicate).sort(comparator);
     }
   }
 }
