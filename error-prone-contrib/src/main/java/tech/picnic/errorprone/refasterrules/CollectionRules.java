@@ -405,15 +405,15 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer calling {@link Collection#forEach} ()} over more contrived alternatives. */
+  /** Prefer {@link Collection#forEach(Consumer)} over more contrived alternatives. */
   static final class CollectionForEach<T> {
     @BeforeTemplate
-    void before(Collection<T> collection, Consumer<T> consumer) {
+    void before(Collection<T> collection, Consumer<? super T> consumer) {
       collection.stream().forEach(consumer);
     }
 
     @AfterTemplate
-    void after(Collection<T> collection, Consumer<T> consumer) {
+    void after(Collection<T> collection, Consumer<? super T> consumer) {
       collection.forEach(consumer);
     }
   }
