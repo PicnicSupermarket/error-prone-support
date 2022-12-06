@@ -186,4 +186,8 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
             ? Optional.ofNullable(new LinkedList<String>().remove())
             : Optional.empty());
   }
+
+  void testCollectionForEach() {
+    ImmutableSet.of(1).stream().forEach(String::valueOf);
+  }
 }
