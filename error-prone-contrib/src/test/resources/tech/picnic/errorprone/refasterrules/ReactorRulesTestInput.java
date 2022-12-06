@@ -34,6 +34,18 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.fromCallable(this::toString));
   }
 
+  ImmutableSet<Mono<String>> testMonoEmpty() {
+    return ImmutableSet.of(Mono.justOrEmpty(null), Mono.justOrEmpty(Optional.empty()));
+  }
+
+  Mono<Integer> testMonoJust() {
+    return Mono.justOrEmpty(Optional.of(1));
+  }
+
+  Mono<Integer> testMonoJustOrEmpty() {
+    return Mono.justOrEmpty(Optional.ofNullable(1));
+  }
+
   ImmutableSet<Mono<Integer>> testMonoFromOptional() {
     return ImmutableSet.of(
         Mono.fromCallable(() -> Optional.of(1).orElse(null)),

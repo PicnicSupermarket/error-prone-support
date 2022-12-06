@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import org.jspecify.nullness.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -56,6 +57,45 @@ final class ReactorRules {
     @AfterTemplate
     Mono<T> after(Supplier<? extends T> supplier) {
       return Mono.fromSupplier(supplier);
+    }
+  }
+
+  /** Prefer {@link Mono#empty()} over more contrived alternatives. */
+  static final class MonoEmpty<T> {
+    @BeforeTemplate
+    Mono<T> before() {
+      return Refaster.anyOf(Mono.justOrEmpty(null), Mono.justOrEmpty(Optional.empty()));
+    }
+
+    @AfterTemplate
+    Mono<T> after() {
+      return Mono.empty();
+    }
+  }
+
+  /** Prefer {@link Mono#just(Object)} over more contrived alternatives. */
+  static final class MonoJust<T> {
+    @BeforeTemplate
+    Mono<T> before(T value) {
+      return Mono.justOrEmpty(Optional.of(value));
+    }
+
+    @AfterTemplate
+    Mono<T> after(T value) {
+      return Mono.just(value);
+    }
+  }
+
+  /** Prefer {@link Mono#justOrEmpty(Object)} over more contrived alternatives. */
+  static final class MonoJustOrEmpty<@Nullable T> {
+    @BeforeTemplate
+    Mono<T> before(T value) {
+      return Mono.justOrEmpty(Optional.ofNullable(value));
+    }
+
+    @AfterTemplate
+    Mono<T> after(T value) {
+      return Mono.justOrEmpty(value);
     }
   }
 
