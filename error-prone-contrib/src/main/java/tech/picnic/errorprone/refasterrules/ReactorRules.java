@@ -1262,10 +1262,9 @@ final class ReactorRules {
   }
 
   /** Apply filtering before sorting with a comparator to reduce the number of elements to sort. */
-  abstract static class SortWithComparatorAfterFilter<T> {
+  static final class SortWithComparatorAfterFilter<T> {
     @BeforeTemplate
-    Flux<T> before(
-        Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
+    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
       return flux.sort(comparator).filter(predicate);
     }
 

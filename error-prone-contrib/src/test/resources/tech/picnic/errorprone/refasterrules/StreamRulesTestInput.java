@@ -138,7 +138,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<Integer> testSortWithComparatorAfterFilter() {
     return Stream.of(1, 4, 3, 2)
-            .sorted(Comparator.comparingInt(Integer::intValue).reversed())
-            .filter(i -> i % 2 == 0);
+        .sorted(Comparator.comparingInt(Integer::intValue).reversed())
+        .filter(i -> i % 2 == 0);
   }
 }
