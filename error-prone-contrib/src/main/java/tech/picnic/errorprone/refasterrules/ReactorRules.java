@@ -119,6 +119,40 @@ final class ReactorRules {
   }
 
   /**
+   * Try to avoid expressions of type {@code Optional<Mono<T>>}, but if you must map an {@link
+   * Optional} to this type, prefer using {@link Mono#just(Object)}.
+   */
+  static final class OptionalMapMonoJust<T> {
+    @BeforeTemplate
+    Optional<Mono<T>> before(Optional<T> optional) {
+      return optional.map(Mono::justOrEmpty);
+    }
+
+    @AfterTemplate
+    Optional<Mono<T>> after(Optional<T> optional) {
+      return optional.map(Mono::just);
+    }
+  }
+
+  /**
+   * Prefer a {@link Mono#justOrEmpty(Optional)} and {@link Mono#switchIfEmpty(Mono)} chain over
+   * more contrived alternatives.
+   *
+   * <p>In particular, avoid mixing of the {@link Optional} and {@link Mono} APIs.
+   */
+  static final class MonoFromOptionalSwitchIfEmpty<T> {
+    @BeforeTemplate
+    Mono<T> before(Optional<T> optional, Mono<T> mono) {
+      return optional.map(Mono::just).orElse(mono);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Optional<T> optional, Mono<T> mono) {
+      return Mono.justOrEmpty(optional).switchIfEmpty(mono);
+    }
+  }
+
+  /**
    * Prefer {@link Mono#zip(Mono, Mono)} over a chained {@link Mono#zipWith(Mono)}, as the former
    * better conveys that the {@link Mono}s may be subscribed to concurrently, and generalizes to
    * combining three or more reactive streams.
