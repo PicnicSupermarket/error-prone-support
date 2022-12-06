@@ -18,6 +18,6 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<BigDecimal> testBigDecimalFactoryMethod() {
-    return ImmutableSet.of(new BigDecimal(0), new BigDecimal(0L));
+    return ImmutableSet.of(new BigDecimal(2), new BigDecimal(2L), new BigDecimal(2.0));
   }
 }

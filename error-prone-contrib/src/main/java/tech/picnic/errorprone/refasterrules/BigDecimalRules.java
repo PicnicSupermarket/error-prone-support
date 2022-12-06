@@ -50,17 +50,17 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer {@link BigDecimal#valueOf(long)} over the associated constructor. */
-  // XXX: Ideally we'd also rewrite `BigDecimal.valueOf("<some-integer-value>")`, but it doesn't
+  /** Prefer {@link BigDecimal#valueOf(double)} over the associated constructor. */
+  // XXX: Ideally we'd also rewrite `new BigDecimal("<some-integer-value>")`, but it doesn't
   // appear that's currently possible with Error Prone.
   static final class BigDecimalFactoryMethod {
     @BeforeTemplate
-    BigDecimal before(long value) {
+    BigDecimal before(double value) {
       return new BigDecimal(value);
     }
 
     @AfterTemplate
-    BigDecimal after(long value) {
+    BigDecimal after(double value) {
       return BigDecimal.valueOf(value);
     }
   }
