@@ -77,6 +77,9 @@ final class StreamRules {
    * Prefer {@link Arrays#stream(Object[])} over {@link Stream#of(Object[])}, as the former is
    * clearer.
    */
+  // XXX: Introduce a `Matcher` that identifies `Refaster.asVarargs(...)` invocations and annotate
+  // the `array` parameter as `@NotMatches(IsRefasterAsVarargs.class)`. Then elsewhere
+  // `@SuppressWarnings("StreamOfArray")` annotations can be dropped.
   static final class StreamOfArray<T> {
     @BeforeTemplate
     Stream<T> before(T[] array) {
