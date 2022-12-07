@@ -62,8 +62,9 @@ final class ComparatorRules {
           Comparator.<T>naturalOrder().reversed());
     }
 
+    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)` if/when
+    // https://github.com/google/error-prone/pull/3584 is merged and released.
     @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<T> after() {
       return reverseOrder();
     }
