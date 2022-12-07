@@ -17,7 +17,7 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(BigDecimal.TEN, BigDecimal.TEN, BigDecimal.TEN);
   }
 
-  ImmutableSet<BigDecimal> testBigDecimalFactoryMethod() {
-    return ImmutableSet.of(BigDecimal.valueOf(0), BigDecimal.valueOf(0L));
+  ImmutableSet<BigDecimal> testBigDecimalValueOf() {
+    return ImmutableSet.of(BigDecimal.valueOf(2), BigDecimal.valueOf(2L), BigDecimal.valueOf(2.0));
   }
 }
