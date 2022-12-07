@@ -54,7 +54,7 @@ final class BigDecimalRules {
   // XXX: Ideally we also rewrite `new BigDecimal("<some-integer-value>")` in cases where the
   // specified number can be represented as an `int` or `long`, but that requires a custom
   // `BugChecker`.
-  static final class BigDecimalFactoryMethod {
+  static final class BigDecimalValueOf {
     @BeforeTemplate
     BigDecimal before(double value) {
       return new BigDecimal(value);
