@@ -9,7 +9,6 @@ import static java.util.stream.Collectors.joining;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -19,7 +18,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Objects.class, Streams.class, not(null), reverseOrder());
+    return ImmutableSet.of(Objects.class, Streams.class, not(null));
   }
 
   String testJoining() {
@@ -131,13 +130,11 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of("foo").allMatch(s -> s.isBlank());
   }
 
-  Stream<Integer> testSortAfterFilter() {
+  Stream<Integer> testStreamFilterSorted() {
     return Stream.of(1, 4, 3, 2).filter(i -> i % 2 == 0).sorted();
   }
 
-  Stream<Integer> testSortWithComparatorAfterFilter() {
-    return Stream.of(1, 4, 3, 2)
-        .filter(i -> i % 2 == 0)
-        .sorted(Comparator.comparingInt(Integer::intValue).reversed());
+  Stream<Integer> testStreamFilterSortedWithComparator() {
+    return Stream.of(1, 4, 3, 2).filter(i -> i % 2 == 0).sorted(reverseOrder());
   }
 }

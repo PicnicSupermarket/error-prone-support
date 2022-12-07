@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,7 +8,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -387,13 +387,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return StepVerifier.create(Mono.empty()).expectTimeout(Duration.ZERO).verify();
   }
 
-  Flux<Integer> testSortAfterFilter() {
+  Flux<Integer> testStreamFilterSorted() {
     return Flux.just(1, 4, 3, 2).sort().filter(i -> i % 2 == 0);
   }
 
-  Flux<Integer> testSortWithComparatorAfterFilter() {
-    return Flux.just(1, 4, 3, 2)
-        .sort(Comparator.comparingInt(Integer::intValue).reversed())
-        .filter(i -> i % 2 == 0);
+  Flux<Integer> testStreamFilterSortedWithComparator() {
+    return Flux.just(1, 4, 3, 2).sort(reverseOrder()).filter(i -> i % 2 == 0);
   }
 }

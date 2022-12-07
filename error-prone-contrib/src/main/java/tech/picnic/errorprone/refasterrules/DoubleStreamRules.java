@@ -141,8 +141,11 @@ final class DoubleStreamRules {
     }
   }
 
-  /** Apply filtering before sorting to reduce the number of elements to sort. */
-  static final class SortAfterFilter {
+  /**
+   * Apply {@link DoubleStream#filter(DoublePredicate)} before {@link DoubleStream#sorted()} to
+   * reduce the number of elements to sort.
+   */
+  static final class DoubleStreamFilterSorted {
     @BeforeTemplate
     DoubleStream before(DoubleStream stream, DoublePredicate predicate) {
       return stream.sorted().filter(predicate);

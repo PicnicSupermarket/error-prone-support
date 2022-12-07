@@ -167,8 +167,11 @@ final class StreamRules {
     }
   }
 
-  /** Apply filtering before sorting to reduce the number of elements to sort. */
-  static final class SortAfterFilter<T> {
+  /**
+   * Apply {@link Stream#filter(Predicate)} before {@link Stream#sorted()} to reduce the number of
+   * elements to sort.
+   */
+  static final class StreamFilterSorted<T> {
     @BeforeTemplate
     Stream<T> before(Stream<T> stream, Predicate<? super T> predicate) {
       return stream.sorted().filter(predicate);
@@ -180,8 +183,11 @@ final class StreamRules {
     }
   }
 
-  /** Apply filter before sorting with a comparator to reduce the number of elements to sort. */
-  static final class SortWithComparatorAfterFilter<T> {
+  /**
+   * Apply {@link Stream#filter(Predicate)} before {@link Stream#sorted(Comparator)} to reduce the
+   * number of elements to sort.
+   */
+  static final class StreamFilterSortedWithComparator<T> {
     @BeforeTemplate
     Stream<T> before(
         Stream<T> stream, Predicate<? super T> predicate, Comparator<? super T> comparator) {

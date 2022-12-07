@@ -154,8 +154,11 @@ final class LongStreamRules {
     }
   }
 
-  /** Apply filtering before sorting to reduce the number of elements to sort. */
-  static final class SortAfterFilter {
+  /**
+   * Apply {@link LongStream#filter(LongPredicate)} before {@link LongStream#sorted()} to reduce the
+   * number of elements to sort.
+   */
+  static final class LongStreamFilterSorted {
     @BeforeTemplate
     LongStream before(LongStream stream, LongPredicate predicate) {
       return stream.sorted().filter(predicate);

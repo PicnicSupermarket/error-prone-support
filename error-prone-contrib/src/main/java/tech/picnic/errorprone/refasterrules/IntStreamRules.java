@@ -154,8 +154,11 @@ final class IntStreamRules {
     }
   }
 
-  /** Apply filtering before sorting to reduce the number of elements to sort. */
-  static final class SortAfterFilter {
+  /**
+   * Apply {@link IntStream#filter(IntPredicate)} before {@link IntStream#sorted()} to reduce the
+   * number of elements to sort.
+   */
+  static final class IntStreamFilterSorted {
     @BeforeTemplate
     IntStream before(IntStream stream, IntPredicate predicate) {
       return stream.sorted().filter(predicate);
