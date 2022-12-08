@@ -323,11 +323,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).onErrorReturn(IllegalArgumentException.class, 2);
   }
 
-  Flux<Integer> testStreamFilterSort() {
+  Flux<Integer> testFluxFilterSort() {
     return Flux.just(1, 4, 3, 2).filter(i -> i % 2 == 0).sort();
   }
 
-  Flux<Integer> testStreamFilterSortWithComparator() {
+  Flux<Integer> testFluxFilterSortWithComparator() {
     return Flux.just(1, 4, 3, 2).filter(i -> i % 2 == 0).sort(reverseOrder());
   }
 

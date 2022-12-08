@@ -1067,7 +1067,7 @@ final class ReactorRules {
    * Apply {@link Flux#filter(Predicate)} before {@link Flux#sort()} to reduce the number of
    * elements to sort.
    */
-  static final class StreamFilterSort<T> {
+  static final class FluxFilterSort<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, Predicate<? super T> predicate) {
       return flux.sort().filter(predicate);
@@ -1083,7 +1083,7 @@ final class ReactorRules {
    * Apply {@link Flux#filter(Predicate)} before {@link Flux#sort(Comparator)} to reduce the number
    * of elements to sort.
    */
-  static final class StreamFilterSortWithComparator<T> {
+  static final class FluxFilterSortWithComparator<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
       return flux.sort(comparator).filter(predicate);
