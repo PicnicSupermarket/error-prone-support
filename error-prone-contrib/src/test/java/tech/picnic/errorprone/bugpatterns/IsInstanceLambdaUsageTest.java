@@ -16,7 +16,6 @@ final class IsInstanceLambdaUsageTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
-            "import com.google.common.collect.ImmutableSet;",
             "import java.util.stream.Stream;",
             "",
             "class A {",
