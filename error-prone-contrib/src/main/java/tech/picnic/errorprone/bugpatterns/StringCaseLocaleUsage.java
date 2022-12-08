@@ -4,9 +4,11 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
+import static com.sun.tools.javac.parser.Tokens.TokenKind.RPAREN;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -15,8 +17,11 @@ import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.util.ASTHelpers;
+import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.tools.javac.util.Position;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
@@ -51,29 +56,34 @@ public final class StringCaseLocaleUsage extends BugChecker implements MethodInv
       return Description.NO_MATCH;
     }
 
+    int closingParenPosition = getClosingParenPosition(tree, state);
+    if (closingParenPosition == Position.NOPOS) {
+      return describeMatch(tree);
+    }
+
     return buildDescription(tree)
-        .addFix(suggestLocale(tree, "Locale.ROOT", state))
-        .addFix(suggestLocale(tree, "Locale.getDefault()", state))
+        .addFix(suggestLocale(closingParenPosition, "Locale.ROOT"))
+        .addFix(suggestLocale(closingParenPosition, "Locale.getDefault()"))
         .build();
   }
 
-  private static Fix suggestLocale(MethodInvocationTree tree, String locale, VisitorState state) {
-    // XXX: The logic that replaces the last parenthesis assumes that `tree` does not have a source
-    // code representation such as `str.toLowerCase(/* Some comment with parens (). */)`. In such a
-    // case the comment, rather than the method invocation arguments, will be modified. Implement a
-    // generic solution for this.
-    String source = SourceCode.treeToString(tree, state);
-    int indexOfLastOpeningBracket = source.lastIndexOf('(');
-    String sourceAfterLastOpeningBracket = source.substring(indexOfLastOpeningBracket);
-    int indexOfClosingBracket = sourceAfterLastOpeningBracket.indexOf(')');
+  private static Fix suggestLocale(int insertPosition, String locale) {
     return SuggestedFix.builder()
         .addImport("java.util.Locale")
-        .replace(
-            tree,
-            source.substring(0, indexOfLastOpeningBracket)
-                + "("
-                + locale
-                + sourceAfterLastOpeningBracket.substring(indexOfClosingBracket))
+        .replace(insertPosition, insertPosition, locale)
         .build();
+  }
+
+  private static int getClosingParenPosition(MethodInvocationTree tree, VisitorState state) {
+    int startPosition = ASTHelpers.getStartPosition(tree);
+    if (startPosition == Position.NOPOS) {
+      return Position.NOPOS;
+    }
+
+    return Streams.findLast(
+            ErrorProneTokens.getTokens(SourceCode.treeToString(tree, state), state.context).stream()
+                .filter(t -> t.kind() == RPAREN))
+        .map(token -> startPosition + token.pos())
+        .orElse(Position.NOPOS);
   }
 }
