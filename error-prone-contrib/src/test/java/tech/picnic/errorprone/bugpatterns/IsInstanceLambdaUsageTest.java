@@ -16,6 +16,7 @@ final class IsInstanceLambdaUsageTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
+            "import com.google.common.collect.ImmutableSet;",
             "import java.util.stream.Stream;",
             "",
             "class A {",
@@ -23,6 +24,7 @@ final class IsInstanceLambdaUsageTest {
             "    // BUG: Diagnostic contains:",
             "    Stream.of(1).filter(i -> i instanceof Integer);",
             "    Stream.of(2).filter(Integer.class::isInstance);",
+            "    Stream.of(1).filter(i -> i.getClass() instanceof Class);",
             "  }",
             "}")
         .doTest();

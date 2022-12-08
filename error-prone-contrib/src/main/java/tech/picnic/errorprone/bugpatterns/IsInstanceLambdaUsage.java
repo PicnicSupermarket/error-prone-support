@@ -39,7 +39,9 @@ public final class IsInstanceLambdaUsage extends BugChecker implements LambdaExp
 
   @Override
   public Description matchLambdaExpression(LambdaExpressionTree tree, VisitorState state) {
-    if (tree.getKind() != Kind.LAMBDA_EXPRESSION || tree.getBody().getKind() != Kind.INSTANCE_OF) {
+    if (tree.getKind() != Kind.LAMBDA_EXPRESSION
+        || tree.getBody().getKind() != Kind.INSTANCE_OF
+        || ((InstanceOfTree) tree.getBody()).getExpression().getKind() != Kind.IDENTIFIER) {
       return Description.NO_MATCH;
     }
 
