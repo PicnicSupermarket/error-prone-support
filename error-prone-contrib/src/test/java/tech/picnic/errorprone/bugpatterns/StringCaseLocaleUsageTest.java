@@ -62,6 +62,13 @@ final class StringCaseLocaleUsageTest {
             "  void m() {",
             "    \"a\".toLowerCase(/* Comment with parens: (). */ );",
             "    \"b\".toUpperCase();",
+            "",
+            "    getString().toLowerCase();",
+            "    getString().toUpperCase/* Comment with parens: (). */();",
+            "  }",
+            "",
+            "  private String getString() {",
+            "    return \"\";",
             "  }",
             "}")
         .addOutputLines(
@@ -70,8 +77,15 @@ final class StringCaseLocaleUsageTest {
             "",
             "class A {",
             "  void m() {",
-            "    \"a\".toLowerCase(Locale.ROOT /* Comment with parens: (). */);",
+            "    \"a\".toLowerCase(/* Comment with parens: (Locale.ROOT). */ );",
             "    \"b\".toUpperCase(Locale.ROOT);",
+            "",
+            "    getString().toLowerCase(Locale.ROOT);",
+            "    getString().toUpperCase /* Comment with parens: (). */(Locale.ROOT);",
+            "  }",
+            "",
+            "  private String getString() {",
+            "    return \"\";",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
@@ -87,6 +101,13 @@ final class StringCaseLocaleUsageTest {
             "  void m() {",
             "    \"a\".toLowerCase();",
             "    \"b\".toUpperCase(/* Comment with parens: (). */ );",
+            "",
+            "    getString().toLowerCase();",
+            "    getString().toUpperCase/* Comment with parens: (). */();",
+            "  }",
+            "",
+            "  private String getString() {",
+            "    return \"\";",
             "  }",
             "}")
         .addOutputLines(
@@ -96,7 +117,14 @@ final class StringCaseLocaleUsageTest {
             "class A {",
             "  void m() {",
             "    \"a\".toLowerCase(Locale.getDefault());",
-            "    \"b\".toUpperCase(Locale.getDefault() /* Comment with parens: (). */);",
+            "    \"b\".toUpperCase(/* Comment with parens: (Locale.getDefault()). */ );",
+            "",
+            "    getString().toLowerCase(Locale.getDefault());",
+            "    getString().toUpperCase /* Comment with parens: (). */(Locale.getDefault());",
+            "  }",
+            "",
+            "  private String getString() {",
+            "    return \"\";",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);

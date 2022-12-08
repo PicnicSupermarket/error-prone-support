@@ -58,13 +58,22 @@ public final class StringCaseLocaleUsage extends BugChecker implements MethodInv
   }
 
   private static Fix suggestLocale(MethodInvocationTree tree, String locale, VisitorState state) {
-    // XXX: The logic that replaces the first parenthesis assumes that `tree` does not have a source
-    // code representation such as `str.toLowerCase/* Some comment with parens (). */()`. In such a
+    // XXX: The logic that replaces the last parenthesis assumes that `tree` does not have a source
+    // code representation such as `str.toLowerCase(/* Some comment with parens (). */)`. In such a
     // case the comment, rather than the method invocation arguments, will be modified. Implement a
     // generic solution for this.
+    String source = SourceCode.treeToString(tree, state);
+    int indexOfLastOpeningBracket = source.lastIndexOf('(');
+    String sourceAfterLastOpeningBracket = source.substring(indexOfLastOpeningBracket);
+    int indexOfClosingBracket = sourceAfterLastOpeningBracket.indexOf(')');
     return SuggestedFix.builder()
         .addImport("java.util.Locale")
-        .replace(tree, SourceCode.treeToString(tree, state).replaceFirst("\\(", '(' + locale))
+        .replace(
+            tree,
+            source.substring(0, indexOfLastOpeningBracket)
+                + "("
+                + locale
+                + sourceAfterLastOpeningBracket.substring(indexOfClosingBracket))
         .build();
   }
 }
