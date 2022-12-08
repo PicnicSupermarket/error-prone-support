@@ -17,22 +17,23 @@ you'd like to be solved through Error Prone Support. -->
 
 - [ ] Support a stylistic preference.
 - [ ] Avoid a common gotcha, or potential problem.
+- [ ] Improve performance.
 
 <!--
 Here, provide a clear and concise description of the desired change.
 
 If possible, provide a simple and minimal example using the following format:
-
-  I would like to rewrite the following code:
-  ```java
-  // XXX: Write the code to match here.
-  ```
-
-  to:
-  ```java
-  // XXX: Write the desired code here.
-  ```
 -->
+
+I would like to rewrite the following code:
+```java
+// XXX: Write the code to match here.
+```
+
+to:
+```java
+// XXX: Write the desired code here.
+```
 
 ### Considerations
 
