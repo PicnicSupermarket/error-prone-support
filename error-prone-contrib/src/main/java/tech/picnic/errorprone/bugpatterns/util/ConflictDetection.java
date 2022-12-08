@@ -1,7 +1,7 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
 import static tech.picnic.errorprone.bugpatterns.util.JavaKeywords.isReservedKeyword;
-import static tech.picnic.errorprone.bugpatterns.util.MoreASTHelpers.isMethodInEnclosingClass;
+import static tech.picnic.errorprone.bugpatterns.util.MoreASTHelpers.methodExistsInEnclosingClass;
 
 import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ImportTree;
@@ -36,7 +36,7 @@ public final class ConflictDetection {
    *     {@link Optional#empty()} if no blocker was found.
    */
   public static Optional<String> findMethodRenameBlocker(String methodName, VisitorState state) {
-    if (MoreASTHelpers.methodExistsInEnclosingClass(methodName, state)) {
+    if (methodExistsInEnclosingClass(methodName, state)) {
       return Optional.of(
           String.format("a method named `%s` already exists in this class", methodName));
     }

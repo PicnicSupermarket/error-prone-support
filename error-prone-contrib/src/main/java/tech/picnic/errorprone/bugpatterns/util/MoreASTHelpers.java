@@ -29,10 +29,10 @@ public final class MoreASTHelpers {
     ClassTree clazz = state.findEnclosing(ClassTree.class);
     checkArgument(clazz != null, "Visited node is not enclosed by a class");
     return clazz.getMembers().stream()
-            .filter(MethodTree.class::isInstance)
-            .map(MethodTree.class::cast)
-            .filter(method -> method.getName().contentEquals(methodName))
-            .collect(toImmutableList());
+        .filter(MethodTree.class::isInstance)
+        .map(MethodTree.class::cast)
+        .filter(method -> method.getName().contentEquals(methodName))
+        .collect(toImmutableList());
   }
 
   /**
