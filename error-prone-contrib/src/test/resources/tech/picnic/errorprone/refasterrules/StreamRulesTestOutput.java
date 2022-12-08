@@ -57,6 +57,14 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of("foo").flatMap(v -> Stream.of(v.length())).flatMap(Stream::of);
   }
 
+  Stream<Integer> testStreamFilterSorted() {
+    return Stream.of(1, 4, 3, 2).filter(i -> i % 2 == 0).sorted();
+  }
+
+  Stream<Integer> testStreamFilterSortedWithComparator() {
+    return Stream.of(1, 4, 3, 2).filter(i -> i % 2 == 0).sorted(reverseOrder());
+  }
+
   ImmutableSet<Optional<Integer>> testStreamMapFirst() {
     return ImmutableSet.of(
         Stream.of("foo").findFirst().map(s -> s.length()),
@@ -128,13 +136,5 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   boolean testStreamAllMatch2() {
     return Stream.of("foo").allMatch(s -> s.isBlank());
-  }
-
-  Stream<Integer> testStreamFilterSorted() {
-    return Stream.of(1, 4, 3, 2).filter(i -> i % 2 == 0).sorted();
-  }
-
-  Stream<Integer> testStreamFilterSortedWithComparator() {
-    return Stream.of(1, 4, 3, 2).filter(i -> i % 2 == 0).sorted(reverseOrder());
   }
 }

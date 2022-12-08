@@ -328,6 +328,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).onErrorReturn(IllegalArgumentException.class::isInstance, 2);
   }
 
+  Flux<Integer> testStreamFilterSort() {
+    return Flux.just(1, 4, 3, 2).sort().filter(i -> i % 2 == 0);
+  }
+
+  Flux<Integer> testStreamFilterSortWithComparator() {
+    return Flux.just(1, 4, 3, 2).sort(reverseOrder()).filter(i -> i % 2 == 0);
+  }
+
   ImmutableSet<Context> testContextEmpty() {
     return ImmutableSet.of(Context.of(new HashMap<>()), Context.of(ImmutableMap.of()));
   }
@@ -385,13 +393,5 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Duration testStepVerifierLastStepVerifyTimeout() {
     return StepVerifier.create(Mono.empty()).expectTimeout(Duration.ZERO).verify();
-  }
-
-  Flux<Integer> testStreamFilterSorted() {
-    return Flux.just(1, 4, 3, 2).sort().filter(i -> i % 2 == 0);
-  }
-
-  Flux<Integer> testStreamFilterSortedWithComparator() {
-    return Flux.just(1, 4, 3, 2).sort(reverseOrder()).filter(i -> i % 2 == 0);
   }
 }

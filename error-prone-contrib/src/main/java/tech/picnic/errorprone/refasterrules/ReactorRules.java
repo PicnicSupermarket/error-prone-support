@@ -1063,6 +1063,38 @@ final class ReactorRules {
     }
   }
 
+  /**
+   * Apply {@link Flux#filter(Predicate)} before {@link Flux#sort()} to reduce the number of
+   * elements to sort.
+   */
+  static final class StreamFilterSort<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate) {
+      return flux.sort().filter(predicate);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate) {
+      return flux.filter(predicate).sort();
+    }
+  }
+
+  /**
+   * Apply {@link Flux#filter(Predicate)} before {@link Flux#sort(Comparator)} to reduce the number
+   * of elements to sort.
+   */
+  static final class StreamFilterSortWithComparator<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
+      return flux.sort(comparator).filter(predicate);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
+      return flux.filter(predicate).sort(comparator);
+    }
+  }
+
   /** Prefer {@link reactor.util.context.Context#empty()}} over more verbose alternatives. */
   // XXX: Consider introducing an `IsEmpty` matcher that identifies a wide range of guaranteed-empty
   // `Collection` and `Map` expressions.
@@ -1245,38 +1277,6 @@ final class ReactorRules {
     @AfterTemplate
     Duration after(StepVerifier.LastStep step, Duration duration) {
       return step.verifyTimeout(duration);
-    }
-  }
-
-  /**
-   * Apply {@link Flux#filter(Predicate)} before {@link Flux#sort()} to reduce the number of
-   * elements to sort.
-   */
-  static final class StreamFilterSorted<T> {
-    @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate) {
-      return flux.sort().filter(predicate);
-    }
-
-    @AfterTemplate
-    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate) {
-      return flux.filter(predicate).sort();
-    }
-  }
-
-  /**
-   * Apply {@link Flux#filter(Predicate)} before {@link Flux#sort(Comparator)} to reduce the number
-   * of elements to sort.
-   */
-  static final class StreamFilterSortedWithComparator<T> {
-    @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
-      return flux.sort(comparator).filter(predicate);
-    }
-
-    @AfterTemplate
-    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
-      return flux.filter(predicate).sort(comparator);
     }
   }
 }
