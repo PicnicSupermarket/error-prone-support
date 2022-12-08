@@ -41,11 +41,11 @@
     <modules>
         <module>documentation-support</module>
         <module>error-prone-contrib</module>
+        <module>migration-util</module>
         <module>refaster-compiler</module>
         <module>refaster-runner</module>
         <module>refaster-support</module>
         <module>refaster-test-support</module>
-        <module>refaster-support</module>
     </modules>
 
     <scm>
@@ -244,6 +244,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>documentation-support</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>migration-util</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

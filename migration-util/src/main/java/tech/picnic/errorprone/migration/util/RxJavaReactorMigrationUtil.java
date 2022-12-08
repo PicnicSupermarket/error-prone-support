@@ -6,7 +6,6 @@ import io.reactivex.internal.fuseable.ConditionalSubscriber;
 import io.reactivex.internal.fuseable.QueueSubscription;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.CoreSubscriber;
@@ -210,7 +209,8 @@ public final class RxJavaReactorMigrationUtil {
 
       @Override
       @SuppressWarnings("unchecked")
-      public void onSubscribe(@Nonnull Subscription s) {
+      // XXX: Add `@Nonnull` here?
+      public void onSubscribe(Subscription s) {
         if (Operators.validate(this.subscription, s)) {
           this.subscription = s;
           if (s instanceof Fuseable.QueueSubscription) {
@@ -270,12 +270,12 @@ public final class RxJavaReactorMigrationUtil {
       }
 
       @Override
-      public boolean offer(@Nonnull T value) {
+      public boolean offer(T value) {
         throw new UnsupportedOperationException("Should not be called");
       }
 
       @Override
-      public boolean offer(@Nonnull T v1, @Nonnull T v2) {
+      public boolean offer(T v1, T v2) {
         throw new UnsupportedOperationException("Should not be called");
       }
     }
@@ -293,7 +293,7 @@ public final class RxJavaReactorMigrationUtil {
 
       @Override
       @SuppressWarnings("unchecked")
-      public void onSubscribe(@Nonnull Subscription s) {
+      public void onSubscribe(Subscription s) {
         if (Operators.validate(this.subscription, s)) {
           this.subscription = s;
           if (s instanceof QueueSubscription) {
@@ -310,7 +310,7 @@ public final class RxJavaReactorMigrationUtil {
       }
 
       @Override
-      public boolean tryOnNext(@Nonnull T t) {
+      public boolean tryOnNext(T t) {
         return actual.tryOnNext(t);
       }
 
@@ -363,12 +363,12 @@ public final class RxJavaReactorMigrationUtil {
       }
 
       @Override
-      public boolean offer(@Nonnull T v1) {
+      public boolean offer(T v1) {
         throw new UnsupportedOperationException("Should not be called!");
       }
 
       @Override
-      public boolean offer(@Nonnull T v1, @Nonnull T v2) {
+      public boolean offer(T v1, T v2) {
         throw new UnsupportedOperationException("Should not be called!");
       }
     }
