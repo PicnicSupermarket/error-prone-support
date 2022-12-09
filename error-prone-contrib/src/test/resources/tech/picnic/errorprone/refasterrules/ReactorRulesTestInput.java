@@ -221,6 +221,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.concat(Mono.just("baz")));
   }
 
+  Mono<Void> testMonoFluxThen() {
+    return Mono.just("foo").flux().then();
+  }
+
+  Mono<Void> testMonoVoidThen() {
+    return Mono.just("foo").then().then();
+  }
+
   Mono<Optional<String>> testMonoCollectToOptional() {
     return Mono.just("foo").map(Optional::of).defaultIfEmpty(Optional.empty());
   }

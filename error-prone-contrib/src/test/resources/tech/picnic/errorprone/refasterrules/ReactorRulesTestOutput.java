@@ -220,6 +220,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.just("foo").flux(), Mono.just("bar").flux(), Mono.just("baz").flux());
   }
 
+  Mono<Void> testMonoFluxThen() {
+    return Mono.just("foo").then();
+  }
+
+  Mono<Void> testMonoVoidThen() {
+    return Mono.just("foo").then();
+  }
+
   Mono<Optional<String>> testMonoCollectToOptional() {
     return Mono.just("foo").flux().collect(toOptional());
   }

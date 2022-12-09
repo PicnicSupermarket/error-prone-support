@@ -675,6 +675,34 @@ final class ReactorRules {
     }
   }
 
+  /** Don't unnecessarily convert {@link Mono} to {@link Flux}. */
+  @SuppressWarnings("VoidMissingNullable")
+  static final class MonoFluxThen<T> {
+    @BeforeTemplate
+    Mono<Void> before(Mono<T> mono) {
+      return mono.flux().then();
+    }
+
+    @AfterTemplate
+    Mono<Void> after(Mono<T> mono) {
+      return mono.then();
+    }
+  }
+
+  /** Don't unnecessarily call {@link Mono#then()} on a {@code Mono<Void>} . */
+  @SuppressWarnings("VoidMissingNullable")
+  static final class MonoVoidThen {
+    @BeforeTemplate
+    Mono<Void> before(Mono<Void> mono) {
+      return mono.then();
+    }
+
+    @AfterTemplate
+    Mono<Void> after(Mono<Void> mono) {
+      return mono;
+    }
+  }
+
   /**
    * Prefer a collection using {@link MoreCollectors#toOptional()} over more contrived alternatives.
    */
