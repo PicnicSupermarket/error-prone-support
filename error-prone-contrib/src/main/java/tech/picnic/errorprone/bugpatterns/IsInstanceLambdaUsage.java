@@ -6,15 +6,18 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.LambdaExpressionTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.Tree.Kind;
+import com.sun.source.tree.VariableTree;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
@@ -39,17 +42,19 @@ public final class IsInstanceLambdaUsage extends BugChecker implements LambdaExp
 
   @Override
   public Description matchLambdaExpression(LambdaExpressionTree tree, VisitorState state) {
-    if (tree.getKind() != Kind.LAMBDA_EXPRESSION
-        || tree.getBody().getKind() != Kind.INSTANCE_OF
-        || ((InstanceOfTree) tree.getBody()).getExpression().getKind() != Kind.IDENTIFIER) {
+    if (tree.getParameters().size() != 1 || tree.getBody().getKind() != Kind.INSTANCE_OF) {
+      return Description.NO_MATCH;
+    }
+
+    VariableTree param = Iterables.getOnlyElement(tree.getParameters());
+    InstanceOfTree instanceOf = (InstanceOfTree) tree.getBody();
+    if (!ASTHelpers.getSymbol(param).equals(ASTHelpers.getSymbol(instanceOf.getExpression()))) {
       return Description.NO_MATCH;
     }
 
     return describeMatch(
         tree,
         SuggestedFix.replace(
-            tree,
-            SourceCode.treeToString(((InstanceOfTree) tree.getBody()).getType(), state)
-                + ".class::isInstance"));
+            tree, SourceCode.treeToString(instanceOf.getType(), state) + ".class::isInstance"));
   }
 }
