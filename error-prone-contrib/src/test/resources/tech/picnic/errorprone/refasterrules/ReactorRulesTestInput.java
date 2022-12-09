@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -325,6 +326,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Flux<Integer> testFluxOnErrorReturn() {
     return Flux.just(1).onErrorReturn(IllegalArgumentException.class::isInstance, 2);
+  }
+
+  Flux<Integer> testFluxFilterSort() {
+    return Flux.just(1, 4, 3, 2).sort().filter(i -> i % 2 == 0);
+  }
+
+  Flux<Integer> testFluxFilterSortWithComparator() {
+    return Flux.just(1, 4, 3, 2).sort(reverseOrder()).filter(i -> i % 2 == 0);
   }
 
   ImmutableSet<Context> testContextEmpty() {

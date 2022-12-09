@@ -154,6 +154,22 @@ final class IntStreamRules {
     }
   }
 
+  /**
+   * Apply {@link IntStream#filter(IntPredicate)} before {@link IntStream#sorted()} to reduce the
+   * number of elements to sort.
+   */
+  static final class IntStreamFilterSorted {
+    @BeforeTemplate
+    IntStream before(IntStream stream, IntPredicate predicate) {
+      return stream.sorted().filter(predicate);
+    }
+
+    @AfterTemplate
+    IntStream after(IntStream stream, IntPredicate predicate) {
+      return stream.filter(predicate).sorted();
+    }
+  }
+
   /** In order to test whether a stream has any element, simply try to find one. */
   static final class IntStreamIsEmpty {
     @BeforeTemplate

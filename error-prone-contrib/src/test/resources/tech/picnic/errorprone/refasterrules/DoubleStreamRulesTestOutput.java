@@ -46,6 +46,10 @@ final class DoubleStreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1).flatMapToDouble(v -> DoubleStream.of(v * v)).flatMap(DoubleStream::of);
   }
 
+  DoubleStream testDoubleStreamFilterSorted() {
+    return DoubleStream.of(1, 4, 3, 2).filter(d -> d % 2 == 0).sorted();
+  }
+
   ImmutableSet<Boolean> testDoubleStreamIsEmpty() {
     return ImmutableSet.of(
         DoubleStream.of(1).findAny().isEmpty(),

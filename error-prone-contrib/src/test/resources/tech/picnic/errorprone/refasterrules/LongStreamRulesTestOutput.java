@@ -50,6 +50,10 @@ final class LongStreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1).flatMapToLong(v -> LongStream.of(v * v)).flatMap(LongStream::of);
   }
 
+  LongStream testLongStreamFilterSorted() {
+    return LongStream.of(1, 4, 3, 2).filter(l -> l % 2 == 0).sorted();
+  }
+
   ImmutableSet<Boolean> testLongStreamIsEmpty() {
     return ImmutableSet.of(
         LongStream.of(1).findAny().isEmpty(),

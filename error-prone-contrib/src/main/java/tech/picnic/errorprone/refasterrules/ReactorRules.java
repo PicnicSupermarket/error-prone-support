@@ -17,6 +17,7 @@ import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -1059,6 +1060,38 @@ final class ReactorRules {
     @AfterTemplate
     Flux<T> after(Flux<T> flux, Class<? extends Throwable> clazz, T fallbackValue) {
       return flux.onErrorReturn(clazz, fallbackValue);
+    }
+  }
+
+  /**
+   * Apply {@link Flux#filter(Predicate)} before {@link Flux#sort()} to reduce the number of
+   * elements to sort.
+   */
+  static final class FluxFilterSort<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate) {
+      return flux.sort().filter(predicate);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate) {
+      return flux.filter(predicate).sort();
+    }
+  }
+
+  /**
+   * Apply {@link Flux#filter(Predicate)} before {@link Flux#sort(Comparator)} to reduce the number
+   * of elements to sort.
+   */
+  static final class FluxFilterSortWithComparator<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
+      return flux.sort(comparator).filter(predicate);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
+      return flux.filter(predicate).sort(comparator);
     }
   }
 

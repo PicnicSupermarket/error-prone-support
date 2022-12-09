@@ -16,7 +16,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Objects.class, Streams.class, not(null), reverseOrder());
+    return ImmutableSet.of(Objects.class, Streams.class, not(null));
   }
 
   String testJoining() {
@@ -54,6 +54,14 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<Integer> testFlatMapOuterStreamAfterFlatMap() {
     return Stream.of("foo").flatMap(v -> Stream.of(v.length()).flatMap(Stream::of));
+  }
+
+  Stream<Integer> testStreamFilterSorted() {
+    return Stream.of(1, 4, 3, 2).sorted().filter(i -> i % 2 == 0);
+  }
+
+  Stream<Integer> testStreamFilterSortedWithComparator() {
+    return Stream.of(1, 4, 3, 2).sorted(reverseOrder()).filter(i -> i % 2 == 0);
   }
 
   ImmutableSet<Optional<Integer>> testStreamMapFirst() {
