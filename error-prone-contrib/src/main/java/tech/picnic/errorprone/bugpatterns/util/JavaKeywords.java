@@ -4,7 +4,19 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 /** Utility class that can be used to identify reserved keywords of the Java language. */
+// XXX: This class is no longer only about keywords. Consider changing its name and class-level
+// documentation.
 public final class JavaKeywords {
+  /**
+   * Enumeration of boolean and null literals.
+   *
+   * @see <a href="https://docs.oracle.com/javase/specs/jls/se17/html/jls-3.html#jls-3.10.3">JDK 17
+   *     JLS section 3.10.3: Boolean Literals</a>
+   * @see <a href="https://docs.oracle.com/javase/specs/jls/se17/html/jls-3.html#jls-3.10.8">JDK 17
+   *     JLS section 3.10.8: The Null Literal</a>
+   */
+  private static final ImmutableSet<String> BOOLEAN_AND_NULL_LITERALS =
+      ImmutableSet.of("true", "false", "null");
   /**
    * List of all reserved keywords in the Java language.
    *
@@ -64,7 +76,6 @@ public final class JavaKeywords {
           "void",
           "volatile",
           "while");
-
   /**
    * List of all contextual keywords in the Java language.
    *
@@ -89,12 +100,27 @@ public final class JavaKeywords {
           "var",
           "with",
           "yield");
-
   /** List of all keywords in the Java language. */
   private static final ImmutableSet<String> ALL_KEYWORDS =
       Sets.union(RESERVED_KEYWORDS, CONTEXTUAL_KEYWORDS).immutableCopy();
 
   private JavaKeywords() {}
+
+  /**
+   * Tells whether the given string is a valid identifier in the Java language.
+   *
+   * @param str The string of interest.
+   * @return {@code true} if the given string is a valid identifier in the Java language.
+   * @see <a href="https://docs.oracle.com/javase/specs/jls/se17/html/jls-3.html#jls-3.8">JDK 17 JLS
+   *     section 3.8: Identifiers</a>
+   */
+  public static boolean isValidIdentifier(String str) {
+    return !str.isEmpty()
+        && !isReservedKeyword(str)
+        && !BOOLEAN_AND_NULL_LITERALS.contains(str)
+        && Character.isJavaIdentifierStart(str.codePointAt(0))
+        && str.codePoints().skip(1).allMatch(Character::isUnicodeIdentifierPart);
+  }
 
   /**
    * Tells whether the given string is a reserved keyword in the Java language.
