@@ -1,0 +1,43 @@
+# If requested by means of a pull request comment, runs integration tests
+# against the project, using the code found on the pull request branch.
+# XXX: Generalize this to a matrix build of multiple integration tests,
+# possibly using multiple JDK or OS versions.
+# XXX: Investigate whether the comment can specify which integration tests run
+# run. See this example of a dynamic build matrix:
+# https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
+name: "Integration tests"
+on:
+  issue_comment:
+    types: [ created ]
+permissions:
+  contents: read
+jobs:
+  run-integration-tests:
+    name: On-demand integration test
+    if: |
+      github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          persist-credentials: false
+          ref: refs/pull/${{ github.event.issue.number }}/head
+      - name: Set up JDK
+        uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
+        with:
+          java-version: 17.0.8
+          distribution: temurin
+          cache: maven
+      - name: Install project to local Maven repository
+        run: mvn -T1C install -DskipTests -Dverification.skip
+      - name: Run integration test
+        run: xvfb-run ./integration-tests/checkstyle-10.12.4.sh "${{ runner.temp }}/artifacts"
+      - name: Upload artifacts on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        with:
+          name: integration-test-checkstyle-10.12.4
+          path: "${{ runner.temp }}/artifacts"
+      - name: Remove installed project artifacts
+        run: mvn build-helper:remove-project-artifact

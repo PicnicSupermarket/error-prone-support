@@ -9,3 +9,6 @@
 target
 *.iml
 *.swp
+
+# The Git repositories checked out by the integration test framework.
+integration-tests/.repos
