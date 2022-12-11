@@ -34,6 +34,7 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.suppliers.Suppliers;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.CompoundAssignmentTree;
 import com.sun.source.tree.ExpressionTree;
@@ -361,7 +362,7 @@ public final class RedundantStringConversion extends BugChecker
     return Optional.of(methodInvocation.getMethodSelect())
         .filter(methodSelect -> methodSelect.getKind() == Kind.MEMBER_SELECT)
         .map(methodSelect -> ((MemberSelectTree) methodSelect).getExpression())
-        .filter(expr -> !"super".equals(SourceCode.treeToString(expr, state)));
+        .filter(expr -> !ASTHelpers.isSuper(expr));
   }
 
   private static Optional<ExpressionTree> trySimplifyUnaryMethod(
