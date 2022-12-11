@@ -365,11 +365,19 @@ final class ReactorRules {
     }
   }
 
-  /** Don't unnecessarily pass an empty publisher to {@link Mono#switchIfEmpty(Mono)}. */
-  static final class MonoSwitchIfEmptyOfEmptyPublisher<T> {
+  /** Don't unnecessarily transform a {@link Mono} to an equivalent instance. */
+  static final class MonoIdentity<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono) {
       return mono.switchIfEmpty(Mono.empty());
+    }
+
+    // XXX: Review the suppression once NullAway has better support for generics. Keep an eye on
+    // https://github.com/uber/NullAway/issues?q=is%3Aopen+generics.
+    @BeforeTemplate
+    @SuppressWarnings("NullAway" /* False positive. */)
+    Mono<@Nullable Void> before2(Mono<@Nullable Void> mono) {
+      return mono.then();
     }
 
     @AfterTemplate
@@ -675,31 +683,16 @@ final class ReactorRules {
     }
   }
 
-  /** Don't unnecessarily convert {@link Mono} to {@link Flux}. */
-  @SuppressWarnings("VoidMissingNullable")
-  static final class MonoFluxThen<T> {
+  /** Prefer direct invocation of {@link Mono#then()}} over more contrived alternatives. */
+  static final class MonoThen<T> {
     @BeforeTemplate
-    Mono<Void> before(Mono<T> mono) {
+    Mono<@Nullable Void> before(Mono<T> mono) {
       return mono.flux().then();
     }
 
     @AfterTemplate
-    Mono<Void> after(Mono<T> mono) {
+    Mono<@Nullable Void> after(Mono<T> mono) {
       return mono.then();
-    }
-  }
-
-  /** Don't unnecessarily call {@link Mono#then()} on a {@code Mono<Void>} . */
-  @SuppressWarnings("VoidMissingNullable")
-  static final class MonoVoidThen {
-    @BeforeTemplate
-    Mono<Void> before(Mono<Void> mono) {
-      return mono.then();
-    }
-
-    @AfterTemplate
-    Mono<Void> after(Mono<Void> mono) {
-      return mono;
     }
   }
 
