@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -15,11 +16,24 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.ReturnTree;
+import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-@BugPattern(linkType = CUSTOM, summary = "Apply naming algorithm", severity = ERROR)
+@BugPattern(
+    linkType = CUSTOM,
+    link = BUG_PATTERNS_BASE_URL + "RefasterRuleNaming",
+    summary = "Apply naming algorithm",
+    severity = ERROR)
 public final class RefasterRuleNaming extends BugChecker implements ClassTreeMatcher {
   private static final Matcher<Tree> BEFORE_TEMPLATE_METHOD = hasAnnotation(BeforeTemplate.class);
   private static final Matcher<Tree> AFTER_TEMPLATE_METHOD = hasAnnotation(AfterTemplate.class);
@@ -44,7 +58,7 @@ public final class RefasterRuleNaming extends BugChecker implements ClassTreeMat
 
     // XXX: Check if there is nicer way to get the only element from the list of members.
     MethodTree afterTemplate = Iterables.getOnlyElement(collect);
-    String canonicalName = deduceCanonicalRefasterRuleName(afterTemplate);
+    String canonicalName = deduceCanonicalRefasterRuleName(afterTemplate, state).orElse("");
     return tree.getSimpleName().contentEquals(canonicalName)
         ? Description.NO_MATCH
         : buildDescription(tree)
@@ -52,16 +66,45 @@ public final class RefasterRuleNaming extends BugChecker implements ClassTreeMat
             .build();
   }
 
-  private static String deduceCanonicalRefasterRuleName(MethodTree tree) {
+  // XXX: Get the first After template.
+  // XXX: Otherwise get the first beforetemplate and use that as import.
+  // XXX: In that case, prefix with `Flag`.
+  // XXX: Use the expression:
+  //  1. Get the objects on which a method is invoked.
+  //  2. Check if there are many overloads, if so specify the extra name.
+  //  3. Look at what else is after that and repeat.
+  private static Optional<String> deduceCanonicalRefasterRuleName(
+      MethodTree tree, VisitorState state) {
     System.out.println("Tree: " + state.getSourceForNode(tree));
-    // XXX: Get the first After template.
-    // XXX: Otherwise get the first beforetemplate and use that as import.
-    // XXX: In that case, prefix with `Flag`.
-    // XXX: Use the expression:
-    //  1. Get the objects on which a method is invoked.
-    //  2. Check if there are many overloads, if so specify the extra name.
-    //  3. Look at what else is after that and repeat.
-    return "something";
+    StatementTree statement = tree.getBody().getStatements().get(0);
+    if (!(statement instanceof ReturnTree)) {
+      return Optional.empty();
+    }
+
+    ExpressionTree expression = ((ReturnTree) statement).getExpression();
+    Symbol symbol = ASTHelpers.getSymbol(expression);
+
+    List<Symbol> methodsFromType =
+        getMethodsFromType(symbol.owner.type, symbol.name.toString(), state);
+
+    String start = symbol.owner.getSimpleName().toString();
+
+    if (methodsFromType.size() == 1) {
+      return Optional.of(start + symbol.getSimpleName());
+    }
+
+    return Optional.of("something");
+  }
+
+  private static List<Symbol> getMethodsFromType(Type type, String name, VisitorState state) {
+    List<Symbol> list = new ArrayList<>();
+    type.tsym
+        .members()
+        .getSymbolsByName(state.getName(name))
+        .iterator()
+        .forEachRemaining(list::add);
+
+    return list;
   }
 
   // XXX: Copied over from RuleModifiers.
