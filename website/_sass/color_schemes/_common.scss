@@ -1,5 +1,25 @@
-footer > img#logo {
+// Add support for external anchor icons.
+.external > svg {
+  width: 1rem;
+  vertical-align: text-bottom;
+}
+
+.label {
+  // Reduce spacing from $sp-2 to $sp-1.
+  margin-left: $sp-1 !important;
+  margin-right: $sp-1 !important;
+
+  &:first-of-type {
+    margin-left: 0;
+  }
+}
+
+footer {
+  text-align: center;
+
+  img#logo {
     width: 2rem;
     margin: 0 auto;
     display: block;
+  }
 }
