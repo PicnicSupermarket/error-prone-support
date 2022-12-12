@@ -44,7 +44,7 @@ public final class RefasterRuleNaming extends BugChecker implements ClassTreeMat
 
     // XXX: Check if there is nicer way to get the only element from the list of members.
     MethodTree afterTemplate = Iterables.getOnlyElement(collect);
-    String canonicalName = deduceCanonicalRefasterRuleName(afterTemplate, state);
+    String canonicalName = deduceCanonicalRefasterRuleName(afterTemplate);
     return tree.getSimpleName().contentEquals(canonicalName)
         ? Description.NO_MATCH
         : buildDescription(tree)
@@ -52,7 +52,15 @@ public final class RefasterRuleNaming extends BugChecker implements ClassTreeMat
             .build();
   }
 
-  private String deduceCanonicalRefasterRuleName(MethodTree tree, VisitorState state) {
+  private static String deduceCanonicalRefasterRuleName(MethodTree tree) {
+    System.out.println("Tree: " + state.getSourceForNode(tree));
+    // XXX: Get the first After template.
+    // XXX: Otherwise get the first beforetemplate and use that as import.
+    // XXX: In that case, prefix with `Flag`.
+    // XXX: Use the expression:
+    //  1. Get the objects on which a method is invoked.
+    //  2. Check if there are many overloads, if so specify the extra name.
+    //  3. Look at what else is after that and repeat.
     return "something";
   }
 
