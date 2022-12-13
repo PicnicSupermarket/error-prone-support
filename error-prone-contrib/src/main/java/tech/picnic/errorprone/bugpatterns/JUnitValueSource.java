@@ -125,7 +125,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
             methodSourceAnnotation ->
                 getSoleLocalFactoryName(methodSourceAnnotation, tree)
                     .filter(factory -> !hasSiblingReferencingValueFactory(tree, factory, state))
-                    .flatMap(factory -> findNullarySibling(tree, factory, state))
+                    .flatMap(factory -> findNullaryFactorySibling(tree, factory, state))
                     .flatMap(
                         factoryMethod ->
                             tryConstructValueSourceFix(
@@ -155,7 +155,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
         .isPresent();
   }
 
-  private static Optional<MethodTree> findNullarySibling(
+  private static Optional<MethodTree> findNullaryFactorySibling(
       MethodTree tree, String methodName, VisitorState state) {
     return findMatchingSibling(
         tree, m -> m.getParameters().isEmpty() && m.getName().contentEquals(methodName), state);
