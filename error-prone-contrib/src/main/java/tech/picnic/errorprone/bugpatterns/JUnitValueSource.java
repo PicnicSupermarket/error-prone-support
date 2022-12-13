@@ -142,7 +142,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   private static Optional<String> getSoleLocalFactoryName(
       AnnotationTree methodSourceAnnotation, MethodTree method) {
     return getElementIfSingleton(getMethodSourceFactoryNames(methodSourceAnnotation, method))
-        .filter(name -> name.indexOf('#') < 0);
+        .filter(name -> !name.contains("#"));
   }
 
   /**
