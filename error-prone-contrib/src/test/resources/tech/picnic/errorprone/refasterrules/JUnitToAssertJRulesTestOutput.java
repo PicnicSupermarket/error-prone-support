@@ -3,6 +3,8 @@ package tech.picnic.errorprone.refasterrules;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableSet;
@@ -44,5 +46,29 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
 
     void testAssertFalseWithMessageSupplier() {
         assertThat(true).withFailMessage(() -> "foo").isFalse();
+    }
+
+    void testAssertNull() {
+        assertThat(new Object()).isNull();
+    }
+
+    void testAssertNullWithMessage() {
+        assertThat(new Object()).withFailMessage("foo").isNull();
+    }
+
+    void testAssertNullWithMessageSupplier() {
+        assertThat(new Object()).withFailMessage(() -> "foo").isNull();
+    }
+
+    void testAssertNotNull() {
+        assertThat(new Object()).isNotNull();
+    }
+
+    void testAssertNotNullWithMessage() {
+        assertThat(new Object()).withFailMessage("foo").isNotNull();
+    }
+
+    void testAssertNotNullWithMessageSupplier() {
+        assertThat(new Object()).withFailMessage(() -> "foo").isNotNull();
     }
 }
