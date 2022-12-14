@@ -39,4 +39,19 @@ final class NestedOptionalsTest {
             "}")
         .doTest();
   }
+
+  @Test
+  void failingTypeCheck() {
+    compilationTestHelper
+        .addSourceLines(
+            "B.java",
+            "import java.time.temporal.ChronoUnit;",
+            "",
+            "class B {",
+            "  void m() {",
+            "    java.time.Duration.of(1, ChronoUnit.YEARS);",
+            "  }",
+            "}")
+        .doTest();
+  }
 }
