@@ -50,6 +50,7 @@ final class RefasterRulesTest {
           ImmutableSortedSetRules.class,
           IntStreamRules.class,
           JUnitRules.class,
+          JUnitToAssertJRules.class,
           LongStreamRules.class,
           MapEntryRules.class,
           MapRules.class,
