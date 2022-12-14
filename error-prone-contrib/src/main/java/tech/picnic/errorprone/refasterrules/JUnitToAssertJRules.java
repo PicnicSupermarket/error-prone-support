@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.errorprone.annotations.DoNotCall;
@@ -221,8 +223,85 @@ final class JUnitToAssertJRules {
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertIterableEquals
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertLinesMatch
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertNotEquals
-    // XXX: Rewrite org.junit.jupiter.api.Assertions.assertSame
-    // XXX: Rewrite org.junit.jupiter.api.Assertions.assertNotSame
+
+    static final class AssertSame {
+        @BeforeTemplate
+        void before(Object actual, Object expected) {
+            assertSame(expected, actual);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(Object actual, Object expected) {
+            assertThat(actual).isSameAs(expected);
+        }
+    }
+
+    static final class AssertSameWithMessage {
+        @BeforeTemplate
+        void before(Object actual, Object expected, String message) {
+            assertSame(expected, actual, message);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(Object actual, Object expected, String message) {
+            assertThat(actual).withFailMessage(message).isSameAs(expected);
+        }
+    }
+
+    static final class AssertSameWithMessageSupplier {
+        @BeforeTemplate
+        void before(Object actual, Object expected, Supplier<String> messageSupplier) {
+            assertSame(expected, actual, messageSupplier);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(Object actual, Object expected, Supplier<String> messageSupplier) {
+            assertThat(actual).withFailMessage(messageSupplier).isSameAs(expected);
+        }
+    }
+
+    static final class AssertNotSame {
+        @BeforeTemplate
+        void before(Object actual, Object expected) {
+            assertNotSame(expected, actual);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(Object actual, Object expected) {
+            assertThat(actual).isNotSameAs(expected);
+        }
+    }
+
+    static final class AssertNotSameWithMessage {
+        @BeforeTemplate
+        void before(Object actual, Object expected, String message) {
+            assertNotSame(expected, actual, message);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(Object actual, Object expected, String message) {
+            assertThat(actual).withFailMessage(message).isNotSameAs(expected);
+        }
+    }
+
+    static final class AssertNotSameWithMessageSupplier {
+        @BeforeTemplate
+        void before(Object actual, Object expected, Supplier<String> messageSupplier) {
+            assertNotSame(expected, actual, messageSupplier);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(Object actual, Object expected, Supplier<String> messageSupplier) {
+            assertThat(actual).withFailMessage(messageSupplier).isNotSameAs(expected);
+        }
+    }
+
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertAll
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertThrowsExactly
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertThrows
