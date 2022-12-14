@@ -2,20 +2,61 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.function.Supplier;
+import org.junit.jupiter.api.Assertions;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules to replace JUnit assertions with AssertJ equivalents. */
 @OnlineDocumentation
 final class JUnitToAssertJRules {
     private JUnitToAssertJRules() {}
-    
-    // XXX: Rewrite org.junit.jupiter.api.Assertions.fail
+
+    static final class Fail {
+        @BeforeTemplate
+        void before() {
+            Assertions.fail();
+        }
+
+        @AfterTemplate
+        @DoNotCall
+        void after() {
+            throw new AssertionError();
+        }
+    }
+
+    static final class FailWithMessage {
+        @BeforeTemplate
+        void before(String message) {
+            Assertions.fail(message);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(String message) {
+            fail(message);
+        }
+    }
+
+    static final class FailWithMessageAndThrowable {
+        @BeforeTemplate
+        void before(String message, Throwable throwable) {
+            Assertions.fail(message, throwable);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(String message, Throwable throwable) {
+            fail(message, throwable);
+        }
+    }
 
     static final class AssertTrue {
         @BeforeTemplate
@@ -56,7 +97,45 @@ final class JUnitToAssertJRules {
         }
     }
 
-    // XXX: Rewrite org.junit.jupiter.api.Assertions.assertFalse
+    static final class AssertFalse {
+        @BeforeTemplate
+        void before(boolean condition) {
+            assertFalse(condition);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(boolean condition) {
+            assertThat(condition).isFalse();
+        }
+    }
+
+    static final class AssertFalseWithMessage {
+        @BeforeTemplate
+        void before(boolean condition, String message) {
+            assertFalse(condition, message);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(boolean condition, String message) {
+            assertThat(condition).withFailMessage(message).isFalse();
+        }
+    }
+
+    static final class AssertFalseWithMessageSupplier {
+        @BeforeTemplate
+        void before(boolean condition, Supplier<String> messageSupplier) {
+            assertFalse(condition, messageSupplier);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(boolean condition, Supplier<String> messageSupplier) {
+            assertThat(condition).withFailMessage(messageSupplier).isFalse();
+        }
+    }
+
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertNull
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertNotNull
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertEquals
