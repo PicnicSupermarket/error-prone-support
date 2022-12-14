@@ -41,11 +41,11 @@ public final class NestedOptionals extends BugChecker implements MethodInvocatio
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    Type stateType = OPTIONAL_OF_OPTIONAL.get(state);
-    if (stateType != null && state.getTypes().isSubtype(ASTHelpers.getType(tree), stateType)) {
-      return describeMatch(tree);
-    } else {
+    Type type = OPTIONAL_OF_OPTIONAL.get(state);
+    if (type == null || !state.getTypes().isSubtype(ASTHelpers.getType(tree), type)) {
       return Description.NO_MATCH;
     }
+
+    return describeMatch(tree);
   }
 }

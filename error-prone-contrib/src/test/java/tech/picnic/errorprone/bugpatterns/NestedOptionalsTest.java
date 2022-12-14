@@ -41,15 +41,15 @@ final class NestedOptionalsTest {
   }
 
   @Test
-  void failingTypeCheck() {
+  void identificationOptionalTypeNotLoaded() {
     compilationTestHelper
         .addSourceLines(
-            "B.java",
-            "import java.time.temporal.ChronoUnit;",
+            "A.java",
+            "import java.time.Duration;",
             "",
-            "class B {",
+            "class A {",
             "  void m() {",
-            "    java.time.Duration.of(1, ChronoUnit.YEARS);",
+            "    Duration.ofSeconds(1);",
             "  }",
             "}")
         .doTest();
