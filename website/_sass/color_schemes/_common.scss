@@ -5,13 +5,8 @@
 }
 
 .label {
-  // Reduce spacing from `$sp-2` to `$sp-1`.
-  margin-left: $sp-1 !important;
-  margin-right: $sp-1 !important;
-
-  &:first-of-type {
-    margin-left: 0;
-  }
+  // Reduce spacing between labels and align with surrounding elements.
+  margin-left: 0 !important;
 }
 
 footer {
