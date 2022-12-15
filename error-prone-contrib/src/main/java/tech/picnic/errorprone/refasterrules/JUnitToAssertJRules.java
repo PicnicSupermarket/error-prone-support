@@ -2,12 +2,17 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.errorprone.annotations.DoNotCall;
@@ -15,7 +20,10 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.function.Supplier;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.api.function.ThrowingSupplier;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules to replace JUnit assertions with AssertJ equivalents. */
@@ -303,9 +311,139 @@ final class JUnitToAssertJRules {
     }
 
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertAll
-    // XXX: Rewrite org.junit.jupiter.api.Assertions.assertThrowsExactly
-    // XXX: Rewrite org.junit.jupiter.api.Assertions.assertThrows
-    // XXX: Rewrite org.junit.jupiter.api.Assertions.assertDoesNotThrow
+
+    static final class AssertThrowsExactly<T extends Throwable> {
+        @BeforeTemplate
+        void before(Executable runnable, Class<T> clazz) {
+            assertThrowsExactly(clazz, runnable);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(ThrowingCallable runnable, Class<T> clazz) {
+            assertThatThrownBy(runnable).isExactlyInstanceOf(clazz);
+        }
+    }
+
+    static final class AssertThrowsExactlyWithMessage<T extends Throwable> {
+        @BeforeTemplate
+        void before(Executable runnable, Class<T> clazz, String message) {
+            assertThrowsExactly(clazz, runnable, message);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(ThrowingCallable runnable, Class<T> clazz, String message) {
+            assertThatThrownBy(runnable).withFailMessage(message).isExactlyInstanceOf(clazz);
+        }
+    }
+
+    static final class AssertThrowsExactlyWithMessageSupplier<T extends Throwable> {
+        @BeforeTemplate
+        void before(Executable runnable, Class<T> clazz, Supplier<String> messageSupplier) {
+            assertThrowsExactly(clazz, runnable, messageSupplier);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(ThrowingCallable runnable, Class<T> clazz, Supplier<String> messageSupplier) {
+            assertThatThrownBy(runnable).withFailMessage(messageSupplier).isExactlyInstanceOf(clazz);
+        }
+    }
+
+    static final class AssertThrows<T extends Throwable> {
+        @BeforeTemplate
+        void before(Executable runnable, Class<T> clazz) {
+            assertThrows(clazz, runnable);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(ThrowingCallable runnable, Class<T> clazz) {
+            assertThatThrownBy(runnable).isInstanceOf(clazz);
+        }
+    }
+
+    static final class AssertThrowsWithMessage<T extends Throwable> {
+        @BeforeTemplate
+        void before(Executable runnable, Class<T> clazz, String message) {
+            assertThrows(clazz, runnable, message);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(ThrowingCallable runnable, Class<T> clazz, String message) {
+            assertThatThrownBy(runnable).withFailMessage(message).isInstanceOf(clazz);
+        }
+    }
+
+    static final class AssertThrowsWithMessageSupplier<T extends Throwable> {
+        @BeforeTemplate
+        void before(Executable runnable, Class<T> clazz, Supplier<String> messageSupplier) {
+            assertThrows(clazz, runnable, messageSupplier);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(ThrowingCallable runnable, Class<T> clazz, Supplier<String> messageSupplier) {
+            assertThatThrownBy(runnable).withFailMessage(messageSupplier).isInstanceOf(clazz);
+        }
+    }
+
+    static final class AssertDoesNotThrow {
+        @BeforeTemplate
+        void before(Executable runnable) {
+            assertDoesNotThrow(runnable);
+        }
+
+        @BeforeTemplate
+        void before(ThrowingSupplier<?> runnable) {
+            assertDoesNotThrow(runnable);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(ThrowingCallable runnable) {
+            assertThatCode(runnable).doesNotThrowAnyException();
+        }
+    }
+
+    static final class AssertDoesNotThrowWithMessage {
+        @BeforeTemplate
+        void before(Executable runnable, String message) {
+            assertDoesNotThrow(runnable, message);
+        }
+
+        @BeforeTemplate
+        void before(ThrowingSupplier<?> runnable, String message) {
+            assertDoesNotThrow(runnable, message);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(ThrowingCallable runnable, String message) {
+            assertThatCode(runnable).withFailMessage(message).doesNotThrowAnyException();
+        }
+    }
+
+    static final class AssertDoesNotThrowWithMessageSupplier {
+        @BeforeTemplate
+        void before(Executable runnable, Supplier<String> messageSupplier) {
+            assertDoesNotThrow(runnable, messageSupplier);
+        }
+
+        @BeforeTemplate
+        void before(ThrowingSupplier<?> runnable, Supplier<String> messageSupplier) {
+            assertDoesNotThrow(runnable, messageSupplier);
+        }
+
+        @AfterTemplate
+        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+        void after(ThrowingCallable runnable, Supplier<String> messageSupplier) {
+            assertThatCode(runnable).withFailMessage(messageSupplier).doesNotThrowAnyException();
+        }
+    }
+
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertTimeout
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertTimeoutPreemptively
     // XXX: Rewrite org.junit.jupiter.api.Assertions.assertInstanceOf

@@ -1,12 +1,18 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableSet;
@@ -108,5 +114,43 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
         Object actual = new Object();
         Object expected = new Object();
         assertThat(actual).withFailMessage(() -> "foo").isNotSameAs(expected);
+    }
+
+    void testAssertThrowsExactly() {
+        assertThatThrownBy(() -> {}).isExactlyInstanceOf(IllegalStateException.class);
+    }
+
+    void testAssertThrowsExactlyWithMessage() {
+        assertThatThrownBy(() -> {}).withFailMessage("foo")
+                .isExactlyInstanceOf(IllegalStateException.class);
+    }
+
+    void testAssertThrowsExactlyWithMessageSupplier() {
+        assertThatThrownBy(() -> {}).withFailMessage(() -> "foo")
+                .isExactlyInstanceOf(IllegalStateException.class);
+    }
+
+    void testAssertThrows() {
+        assertThatThrownBy(() -> {}).isInstanceOf(IllegalStateException.class);
+    }
+
+    void testAssertThrowsWithMessage() {
+        assertThatThrownBy(() -> {}).withFailMessage("foo").isInstanceOf(IllegalStateException.class);
+    }
+
+    void testAssertThrowsWithMessageSupplier() {
+        assertThatThrownBy(() -> {}).withFailMessage(() -> "foo").isInstanceOf(IllegalStateException.class);
+    }
+
+    void testAssertDoesNotThrow() {
+        assertThatCode(() -> {}).doesNotThrowAnyException();
+    }
+
+    void testAssertDoesNotThrowWithMessage() {
+        assertThatCode(() -> {}).withFailMessage("foo").doesNotThrowAnyException();
+    }
+
+    void testAssertDoesNotThrowWithMessageSupplier() {
+        assertThatCode(() -> {}).withFailMessage(() -> "foo").doesNotThrowAnyException();
     }
 }
