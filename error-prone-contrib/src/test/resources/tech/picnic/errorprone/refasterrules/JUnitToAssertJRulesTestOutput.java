@@ -20,137 +20,169 @@ import org.junit.jupiter.api.Assertions;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
-    void testFail() {
-        throw new AssertionError();
-    }
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(
+        (Runnable) () -> assertDoesNotThrow(() -> null),
+        (Runnable) () -> assertFalse(true),
+        (Runnable) () -> assertInstanceOf(null, null),
+        (Runnable) () -> assertNotNull(null),
+        (Runnable) () -> assertNotSame(null, null),
+        (Runnable) () -> assertNull(null),
+        (Runnable) () -> assertSame(null, null),
+        (Runnable) () -> assertThrows(null, null),
+        (Runnable) () -> assertThrowsExactly(null, null),
+        (Runnable) () -> assertTrue(true),
+        (Runnable) () -> Assertions.fail());
+  }
 
-    void testFailWithMessage() {
-        fail("foo");
-    }
+  void testFail() {
+    throw new AssertionError();
+  }
 
-    void testFailWithMessageAndThrowable() {
-        fail("foo", new IllegalStateException());
-    }
+  void testFailWithMessage() {
+    fail("foo");
+  }
 
-    void testAssertTrue() {
-        assertThat(true).isTrue();
-    }
+  void testFailWithMessageAndThrowable() {
+    fail("foo", new IllegalStateException());
+  }
 
-    void testAssertTrueWithMessage() {
-        assertThat(true).withFailMessage("foo").isTrue();
-    }
+  void testAssertTrue() {
+    assertThat(true).isTrue();
+  }
 
-    void testAssertTrueWithMessageSupplier() {
-        assertThat(true).withFailMessage(() -> "foo").isTrue();
-    }
+  void testAssertTrueWithMessage() {
+    assertThat(true).withFailMessage("foo").isTrue();
+  }
 
-    void testAssertFalse() {
-        assertThat(true).isFalse();
-    }
+  void testAssertTrueWithMessageSupplier() {
+    assertThat(true).withFailMessage(() -> "foo").isTrue();
+  }
 
-    void testAssertFalseWithMessage() {
-        assertThat(true).withFailMessage("foo").isFalse();
-    }
+  void testAssertFalse() {
+    assertThat(true).isFalse();
+  }
 
-    void testAssertFalseWithMessageSupplier() {
-        assertThat(true).withFailMessage(() -> "foo").isFalse();
-    }
+  void testAssertFalseWithMessage() {
+    assertThat(true).withFailMessage("foo").isFalse();
+  }
 
-    void testAssertNull() {
-        assertThat(new Object()).isNull();
-    }
+  void testAssertFalseWithMessageSupplier() {
+    assertThat(true).withFailMessage(() -> "foo").isFalse();
+  }
 
-    void testAssertNullWithMessage() {
-        assertThat(new Object()).withFailMessage("foo").isNull();
-    }
+  void testAssertNull() {
+    assertThat(new Object()).isNull();
+  }
 
-    void testAssertNullWithMessageSupplier() {
-        assertThat(new Object()).withFailMessage(() -> "foo").isNull();
-    }
+  void testAssertNullWithMessage() {
+    assertThat(new Object()).withFailMessage("foo").isNull();
+  }
 
-    void testAssertNotNull() {
-        assertThat(new Object()).isNotNull();
-    }
+  void testAssertNullWithMessageSupplier() {
+    assertThat(new Object()).withFailMessage(() -> "foo").isNull();
+  }
 
-    void testAssertNotNullWithMessage() {
-        assertThat(new Object()).withFailMessage("foo").isNotNull();
-    }
+  void testAssertNotNull() {
+    assertThat(new Object()).isNotNull();
+  }
 
-    void testAssertNotNullWithMessageSupplier() {
-        assertThat(new Object()).withFailMessage(() -> "foo").isNotNull();
-    }
+  void testAssertNotNullWithMessage() {
+    assertThat(new Object()).withFailMessage("foo").isNotNull();
+  }
 
-    void testAssertSame() {
-        Object actual = new Object();
-        Object expected = new Object();
-        assertThat(actual).isSameAs(expected);
-    }
+  void testAssertNotNullWithMessageSupplier() {
+    assertThat(new Object()).withFailMessage(() -> "foo").isNotNull();
+  }
 
-    void testAssertSameWithMessage() {
-        Object actual = new Object();
-        Object expected = new Object();
-        assertThat(actual).withFailMessage("foo").isSameAs(expected);
-    }
+  void testAssertSame() {
+    Object actual = new Object();
+    Object expected = new Object();
+    assertThat(actual).isSameAs(expected);
+  }
 
-    void testAssertSameWithMessageSupplier() {
-        Object actual = new Object();
-        Object expected = new Object();
-        assertThat(actual).withFailMessage(() -> "foo").isSameAs(expected);
-    }
+  void testAssertSameWithMessage() {
+    Object actual = new Object();
+    Object expected = new Object();
+    assertThat(actual).withFailMessage("foo").isSameAs(expected);
+  }
 
-    void testAssertNotSame() {
-        Object actual = new Object();
-        Object expected = new Object();
-        assertThat(actual).isNotSameAs(expected);
-    }
+  void testAssertSameWithMessageSupplier() {
+    Object actual = new Object();
+    Object expected = new Object();
+    assertThat(actual).withFailMessage(() -> "foo").isSameAs(expected);
+  }
 
-    void testAssertNotSameWithMessage() {
-        Object actual = new Object();
-        Object expected = new Object();
-        assertThat(actual).withFailMessage("foo").isNotSameAs(expected);
-    }
+  void testAssertNotSame() {
+    Object actual = new Object();
+    Object expected = new Object();
+    assertThat(actual).isNotSameAs(expected);
+  }
 
-    void testAssertNotSameWithMessageSupplier() {
-        Object actual = new Object();
-        Object expected = new Object();
-        assertThat(actual).withFailMessage(() -> "foo").isNotSameAs(expected);
-    }
+  void testAssertNotSameWithMessage() {
+    Object actual = new Object();
+    Object expected = new Object();
+    assertThat(actual).withFailMessage("foo").isNotSameAs(expected);
+  }
 
-    void testAssertThrowsExactly() {
-        assertThatThrownBy(() -> {}).isExactlyInstanceOf(IllegalStateException.class);
-    }
+  void testAssertNotSameWithMessageSupplier() {
+    Object actual = new Object();
+    Object expected = new Object();
+    assertThat(actual).withFailMessage(() -> "foo").isNotSameAs(expected);
+  }
 
-    void testAssertThrowsExactlyWithMessage() {
-        assertThatThrownBy(() -> {}).withFailMessage("foo")
-                .isExactlyInstanceOf(IllegalStateException.class);
-    }
+  void testAssertThrowsExactly() {
+    assertThatThrownBy(() -> {}).isExactlyInstanceOf(IllegalStateException.class);
+  }
 
-    void testAssertThrowsExactlyWithMessageSupplier() {
-        assertThatThrownBy(() -> {}).withFailMessage(() -> "foo")
-                .isExactlyInstanceOf(IllegalStateException.class);
-    }
+  void testAssertThrowsExactlyWithMessage() {
+    assertThatThrownBy(() -> {})
+        .withFailMessage("foo")
+        .isExactlyInstanceOf(IllegalStateException.class);
+  }
 
-    void testAssertThrows() {
-        assertThatThrownBy(() -> {}).isInstanceOf(IllegalStateException.class);
-    }
+  void testAssertThrowsExactlyWithMessageSupplier() {
+    assertThatThrownBy(() -> {})
+        .withFailMessage(() -> "foo")
+        .isExactlyInstanceOf(IllegalStateException.class);
+  }
 
-    void testAssertThrowsWithMessage() {
-        assertThatThrownBy(() -> {}).withFailMessage("foo").isInstanceOf(IllegalStateException.class);
-    }
+  void testAssertThrows() {
+    assertThatThrownBy(() -> {}).isInstanceOf(IllegalStateException.class);
+  }
 
-    void testAssertThrowsWithMessageSupplier() {
-        assertThatThrownBy(() -> {}).withFailMessage(() -> "foo").isInstanceOf(IllegalStateException.class);
-    }
+  void testAssertThrowsWithMessage() {
+    assertThatThrownBy(() -> {}).withFailMessage("foo").isInstanceOf(IllegalStateException.class);
+  }
 
-    void testAssertDoesNotThrow() {
-        assertThatCode(() -> {}).doesNotThrowAnyException();
-    }
+  void testAssertThrowsWithMessageSupplier() {
+    assertThatThrownBy(() -> {})
+        .withFailMessage(() -> "foo")
+        .isInstanceOf(IllegalStateException.class);
+  }
 
-    void testAssertDoesNotThrowWithMessage() {
-        assertThatCode(() -> {}).withFailMessage("foo").doesNotThrowAnyException();
-    }
+  void testAssertDoesNotThrow() {
+    assertThatCode(() -> {}).doesNotThrowAnyException();
+  }
 
-    void testAssertDoesNotThrowWithMessageSupplier() {
-        assertThatCode(() -> {}).withFailMessage(() -> "foo").doesNotThrowAnyException();
-    }
+  void testAssertDoesNotThrowWithMessage() {
+    assertThatCode(() -> {}).withFailMessage("foo").doesNotThrowAnyException();
+  }
+
+  void testAssertDoesNotThrowWithMessageSupplier() {
+    assertThatCode(() -> {}).withFailMessage(() -> "foo").doesNotThrowAnyException();
+  }
+
+  void testAssertInstanceOf() {
+    assertThat(new Object()).isInstanceOf(Object.class);
+  }
+
+  void testAssertInstanceOfWithMessage() {
+    assertThat(new Object()).withFailMessage("foo").isInstanceOf(Object.class);
+  }
+
+  void testAssertInstanceOfWithMessageSupplier() {
+    assertThat(new Object()).withFailMessage(() -> "foo").isInstanceOf(Object.class);
+  }
 }
