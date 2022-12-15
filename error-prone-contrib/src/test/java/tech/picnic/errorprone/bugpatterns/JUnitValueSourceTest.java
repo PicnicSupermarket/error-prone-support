@@ -155,6 +155,21 @@ final class JUnitValueSourceTest {
             "  @MethodSource(\"argumentsInValueFactoryTestCases\")",
             "  void argumentsInValueFactory(int foo) {}",
             "",
+            "  private static Arguments[] emptyValueFactoryTestCases() {",
+            "    return new Arguments[] {};",
+            "  }",
+            "",
+            "  @ParameterizedTest",
+            "  @MethodSource(\"emptyValueFactoryTestCases\")",
+            "  void emptyValueFactory(int foo) {}",
+            "",
+            "  private static Arguments[] invalidValueFactoryArgumentsTestCases() {",
+            "    return new Arguments[] {arguments(1), arguments(new Object() {})};",
+            "  }",
+            "",
+            "  @ParameterizedTest",
+            "  @MethodSource(\"invalidValueFactoryArgumentsTestCases\")",
+            "  void invalidValueFactoryArguments(int foo) {}",
             "}")
         .doTest();
   }

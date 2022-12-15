@@ -283,6 +283,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
 
       NewArrayTree newArray = (NewArrayTree) tree;
       return newArray.getDimensions().isEmpty()
+          && !newArray.getInitializers().isEmpty()
           && newArray.getInitializers().stream()
               .allMatch(element -> elementMatcher.matches(element, state));
     };
