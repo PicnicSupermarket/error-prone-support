@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
+import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
@@ -27,14 +28,20 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
+// XXX: Support `BlockTemplate` naming.
+// XXX: How to handle e.g. `ImmutableList.of(e1, e2)`.
+/** A {@link BugChecker} that flags incorrectly named Refaster rules. */
+@AutoService(BugChecker.class)
 @BugPattern(
     linkType = CUSTOM,
     link = BUG_PATTERNS_BASE_URL + "RefasterRuleNaming",
     summary = "Apply naming algorithm",
     severity = ERROR)
 public final class RefasterRuleNaming extends BugChecker implements ClassTreeMatcher {
+  private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> BEFORE_TEMPLATE_METHOD = hasAnnotation(BeforeTemplate.class);
   private static final Matcher<Tree> AFTER_TEMPLATE_METHOD = hasAnnotation(AfterTemplate.class);
 
@@ -73,6 +80,7 @@ public final class RefasterRuleNaming extends BugChecker implements ClassTreeMat
   //  1. Get the objects on which a method is invoked.
   //  2. Check if there are many overloads, if so specify the extra name.
   //  3. Look at what else is after that and repeat.
+  @SuppressWarnings("SystemOut")
   private static Optional<String> deduceCanonicalRefasterRuleName(
       MethodTree tree, VisitorState state) {
     System.out.println("Tree: " + state.getSourceForNode(tree));
@@ -90,7 +98,9 @@ public final class RefasterRuleNaming extends BugChecker implements ClassTreeMat
     String start = symbol.owner.getSimpleName().toString();
 
     if (methodsFromType.size() == 1) {
-      return Optional.of(start + symbol.getSimpleName());
+      String simpleName = symbol.getSimpleName().toString();
+      String firstLetter = simpleName.substring(0, 1).toUpperCase(Locale.ROOT);
+      return Optional.of(start + firstLetter + simpleName.substring(1));
     }
 
     return Optional.of("something");
