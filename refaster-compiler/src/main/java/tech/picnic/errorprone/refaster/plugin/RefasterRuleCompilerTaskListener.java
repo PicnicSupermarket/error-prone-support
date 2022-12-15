@@ -31,7 +31,7 @@ import java.util.Map;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.StandardLocation;
-import org.jspecify.nullness.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
 
 /**

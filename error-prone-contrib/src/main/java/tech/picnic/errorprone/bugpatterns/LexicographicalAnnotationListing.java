@@ -27,7 +27,7 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.TypeAnnotations.AnnotationType;
 import java.util.Comparator;
 import java.util.List;
-import org.jspecify.nullness.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**

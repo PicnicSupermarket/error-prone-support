@@ -27,7 +27,7 @@ import com.sun.tools.javac.util.Convert;
 import java.util.Formattable;
 import java.util.Iterator;
 import java.util.List;
-import org.jspecify.nullness.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**

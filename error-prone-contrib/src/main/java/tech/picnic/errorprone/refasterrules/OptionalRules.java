@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-import org.jspecify.nullness.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link Optional}s. */

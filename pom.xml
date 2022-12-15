@@ -611,15 +611,15 @@
                                         </property>
                                         <property name="illegalClasses" value="com.mongodb.lang.Nullable">
                                             <!-- Instead, please use
-                                            `org.jspecify.nullness.Nullable`. -->
+                                            `org.jspecify.annotations.Nullable`. -->
                                         </property>
                                         <property name="illegalClasses" value="io.micrometer.core.lang.Nullable">
                                             <!-- Instead, please use
-                                            `org.jspecify.nullness.Nullable`. -->
+                                            `org.jspecify.annotations.Nullable`. -->
                                         </property>
                                         <property name="illegalClasses" value="javax.annotation.Nullable">
                                             <!-- Instead, please use
-                                            `org.jspecify.nullness.Nullable`. -->
+                                            `org.jspecify.annotations.Nullable`. -->
                                         </property>
                                         <property name="illegalClasses" value="javax.annotation.concurrent.Immutable">
                                             <!-- Instead, please use
@@ -635,7 +635,7 @@
                                         </property>
                                         <property name="illegalClasses" value="org.springframework.lang.Nullable">
                                             <!-- Instead, please use
-                                            `org.jspecify.nullness.Nullable`. -->
+                                            `org.jspecify.annotations.Nullable`. -->
                                         </property>
                                         <property name="illegalPkgs" value="com.amazonaws.annotation" />
                                         <property name="illegalPkgs" value="com.beust.jcommander.internal" />

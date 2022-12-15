@@ -7,7 +7,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.jspecify.nullness.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link Map} instances. */

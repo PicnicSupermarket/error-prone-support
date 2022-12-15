@@ -4,5 +4,5 @@
  * non-patch mode.
  */
 @com.google.errorprone.annotations.CheckReturnValue
-@org.jspecify.nullness.NullMarked
+@org.jspecify.annotations.NullMarked
 package tech.picnic.errorprone.refaster.annotation;

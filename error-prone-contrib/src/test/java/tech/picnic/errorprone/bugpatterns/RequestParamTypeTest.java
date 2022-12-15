@@ -19,7 +19,7 @@ final class RequestParamTypeTest {
             "import java.util.List;",
             "import java.util.Map;",
             "import java.util.Set;",
-            "import org.jspecify.nullness.Nullable;",
+            "import org.jspecify.annotations.Nullable;",
             "import org.springframework.web.bind.annotation.DeleteMapping;",
             "import org.springframework.web.bind.annotation.GetMapping;",
             "import org.springframework.web.bind.annotation.PostMapping;",

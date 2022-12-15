@@ -32,7 +32,7 @@ import com.sun.source.util.SimpleTreeVisitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.jspecify.nullness.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
