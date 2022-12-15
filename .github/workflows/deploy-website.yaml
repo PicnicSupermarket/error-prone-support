@@ -28,7 +28,7 @@ jobs:
         working-directory: ./website
         # XXX: Drop `--disable_external true` once we fully adopted the
         # "Refaster rules" terminology on our website and in the code.
-        run: bundle exec htmlproofer --disable_external true --check-external-hash false ./_site
+        run: bundle exec htmlproofer --disable_external true --check-external-hash false --ignore-urls "/favicon.ico" ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@v1.0.5
         with:
