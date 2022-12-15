@@ -686,10 +686,6 @@
                                             <!-- Instead, please use
                                             `com.google.common.collect.Streams`. -->
                                         </property>
-                                        <property name="illegalClasses" value="org\.junit\.jupiter\.api\.Assertions(\..*?)?">
-                                            <!-- Instead, please use
-                                            `org.assertj.core.api.Assertions`. -->
-                                        </property>
                                         <property name="illegalClasses" value="org\.springframework\.stereotype\.(Component|Controller|Service)">
                                             <!-- We don't use Spring's
                                             component scanning, so `@Component`
