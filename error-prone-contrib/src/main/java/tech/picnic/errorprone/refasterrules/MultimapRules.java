@@ -50,7 +50,8 @@ final class MultimapRules {
    */
   static final class MultimapGet<K, V> {
     @BeforeTemplate
-    @Nullable Collection<V> before(Multimap<K, V> multimap, K key) {
+    @Nullable
+    Collection<V> before(Multimap<K, V> multimap, K key) {
       return Refaster.anyOf(multimap.asMap(), Multimaps.asMap(multimap)).get(key);
     }
 

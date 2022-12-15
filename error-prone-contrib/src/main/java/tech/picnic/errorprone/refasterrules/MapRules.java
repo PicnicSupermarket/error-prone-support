@@ -31,12 +31,14 @@ final class MapRules {
 
   static final class MapGetOrNull<K, V, T> {
     @BeforeTemplate
-    @Nullable V before(Map<K, V> map, T key) {
+    @Nullable
+    V before(Map<K, V> map, T key) {
       return map.getOrDefault(key, null);
     }
 
     @AfterTemplate
-    @Nullable V after(Map<K, V> map, T key) {
+    @Nullable
+    V after(Map<K, V> map, T key) {
       return map.get(key);
     }
   }
