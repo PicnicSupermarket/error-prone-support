@@ -142,6 +142,19 @@ final class JUnitValueSourceTest {
             "  @ParameterizedTest",
             "  @MethodSource(\"lambdaReturnTestCases\")",
             "  void lambdaReturn(int... i) {}",
+            "",
+            "  @ParameterizedTest",
+            "  @MethodSource(\"tech.picnic.errorprone.foo.FooTestCases#fooTestCases\")",
+            "  void staticMethodReference(int foo) {}",
+            "",
+            "  private static Stream<Arguments> argumentsInValueFactoryTestCases(int amount) {",
+            "    return Stream.of(arguments(1), Arguments.of(2));",
+            "  }",
+            "",
+            "  @ParameterizedTest",
+            "  @MethodSource(\"argumentsInValueFactoryTestCases\")",
+            "  void argumentsInValueFactory(int foo) {}",
+            "",
             "}")
         .doTest();
   }
