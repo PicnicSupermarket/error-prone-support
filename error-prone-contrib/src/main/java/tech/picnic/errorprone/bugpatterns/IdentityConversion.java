@@ -32,7 +32,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A {@link BugChecker} that flags redundant identity conversions. */
 // XXX: Consider detecting cases where a flagged expression is passed to a method, and where removal
-// of the identify conversion would cause a different method overload to be selected. Depending on
+// of the identity conversion would cause a different method overload to be selected. Depending on
 // the target method such a modification may change the code's semantics or performance.
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -70,7 +70,10 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
           staticMethod()
               .onClass("reactor.core.publisher.Flux")
               .namedAnyOf("concat", "firstWithSignal", "from", "merge"),
-          staticMethod().onClass("reactor.core.publisher.Mono").namedAnyOf("from", "fromDirect"));
+          staticMethod().onClass("reactor.core.publisher.Mono").namedAnyOf("from", "fromDirect"),
+          staticMethod()
+              .onClass("com.google.errorprone.matchers.Matchers")
+              .namedAnyOf("allOf", "anyOf"));
 
   /** Instantiates a new {@link IdentityConversion} instance. */
   public IdentityConversion() {}
