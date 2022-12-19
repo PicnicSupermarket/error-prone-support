@@ -165,9 +165,9 @@ final class IdentityConversionTest {
             "    Mono<Integer> m2 = Mono.fromDirect(Mono.just(1));",
             "",
             "    // BUG: Diagnostic contains:",
-            "    Matcher allOfMatcher = Matchers.allOf(annotations(AT_LEAST_ONE, isType(\"foo\")));",
+            "    Matcher matcher1 = Matchers.allOf(annotations(AT_LEAST_ONE, isType(\"foo\")));",
             "    // BUG: Diagnostic contains:",
-            "    Matcher anyOfMatcher = Matchers.anyOf(annotations(AT_LEAST_ONE, isType(\"foo\")));",
+            "    Matcher matcher2 = Matchers.anyOf(annotations(AT_LEAST_ONE, isType(\"bar\")));",
             "  }",
             "}")
         .doTest();

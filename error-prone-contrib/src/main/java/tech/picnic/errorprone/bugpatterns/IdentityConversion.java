@@ -60,6 +60,9 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
                   "com.google.common.collect.ImmutableTable")
               .named("copyOf"),
           staticMethod()
+              .onClass("com.google.errorprone.matchers.Matchers")
+              .namedAnyOf("allOf", "anyOf"),
+          staticMethod()
               .onClassAny(
                   Primitives.allWrapperTypes().stream()
                       .map(Class::getName)
@@ -70,10 +73,7 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
           staticMethod()
               .onClass("reactor.core.publisher.Flux")
               .namedAnyOf("concat", "firstWithSignal", "from", "merge"),
-          staticMethod().onClass("reactor.core.publisher.Mono").namedAnyOf("from", "fromDirect"),
-          staticMethod()
-              .onClass("com.google.errorprone.matchers.Matchers")
-              .namedAnyOf("allOf", "anyOf"));
+          staticMethod().onClass("reactor.core.publisher.Mono").namedAnyOf("from", "fromDirect"));
 
   /** Instantiates a new {@link IdentityConversion} instance. */
   public IdentityConversion() {}
