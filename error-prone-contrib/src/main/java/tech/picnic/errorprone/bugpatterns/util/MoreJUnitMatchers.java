@@ -23,7 +23,7 @@ import com.sun.source.tree.NewArrayTree;
 import com.sun.tools.javac.code.Type;
 import java.util.Optional;
 import javax.lang.model.type.TypeKind;
-import org.jspecify.nullness.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A collection of JUnit-specific helper methods and {@link Matcher}s.
