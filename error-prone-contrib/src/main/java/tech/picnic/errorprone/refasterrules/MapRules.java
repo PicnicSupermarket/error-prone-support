@@ -7,7 +7,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.jspecify.nullness.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link Map} instances. */
@@ -31,12 +31,14 @@ final class MapRules {
 
   static final class MapGetOrNull<K, V, T> {
     @BeforeTemplate
-    @Nullable V before(Map<K, V> map, T key) {
+    @Nullable
+    V before(Map<K, V> map, T key) {
       return map.getOrDefault(key, null);
     }
 
     @AfterTemplate
-    @Nullable V after(Map<K, V> map, T key) {
+    @Nullable
+    V after(Map<K, V> map, T key) {
       return map.get(key);
     }
   }

@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.jspecify.nullness.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.AnnotationAttributeMatcher;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 

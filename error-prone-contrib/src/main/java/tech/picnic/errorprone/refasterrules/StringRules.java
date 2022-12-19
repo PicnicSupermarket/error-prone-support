@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import org.jspecify.nullness.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link String}s. */

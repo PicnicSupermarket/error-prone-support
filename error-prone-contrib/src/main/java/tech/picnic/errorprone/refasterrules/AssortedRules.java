@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.jspecify.nullness.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /**
@@ -103,7 +103,8 @@ final class AssortedRules {
     }
 
     @AfterTemplate
-    @Nullable T after(Iterator<T> iterator, T defaultValue) {
+    @Nullable
+    T after(Iterator<T> iterator, T defaultValue) {
       return Iterators.getNext(iterator, defaultValue);
     }
   }
