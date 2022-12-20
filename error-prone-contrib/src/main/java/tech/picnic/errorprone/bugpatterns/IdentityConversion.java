@@ -32,7 +32,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A {@link BugChecker} that flags redundant identity conversions. */
 // XXX: Consider detecting cases where a flagged expression is passed to a method, and where removal
-// of the identify conversion would cause a different method overload to be selected. Depending on
+// of the identity conversion would cause a different method overload to be selected. Depending on
 // the target method such a modification may change the code's semantics or performance.
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -45,6 +45,13 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> IS_CONVERSION_METHOD =
       anyOf(
+          staticMethod()
+              .onClassAny(
+                  Primitives.allWrapperTypes().stream()
+                      .map(Class::getName)
+                      .collect(toImmutableSet()))
+              .named("valueOf"),
+          staticMethod().onClass(String.class.getName()).named("valueOf"),
           staticMethod()
               .onClassAny(
                   "com.google.common.collect.ImmutableBiMap",
@@ -60,12 +67,8 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
                   "com.google.common.collect.ImmutableTable")
               .named("copyOf"),
           staticMethod()
-              .onClassAny(
-                  Primitives.allWrapperTypes().stream()
-                      .map(Class::getName)
-                      .collect(toImmutableSet()))
-              .named("valueOf"),
-          staticMethod().onClass(String.class.getName()).named("valueOf"),
+              .onClass("com.google.errorprone.matchers.Matchers")
+              .namedAnyOf("allOf", "anyOf"),
           staticMethod().onClass("reactor.adapter.rxjava.RxJava2Adapter"),
           staticMethod()
               .onClass("reactor.core.publisher.Flux")
