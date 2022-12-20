@@ -313,7 +313,6 @@ final class JUnitToAssertJRules {
 
   // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertAll`.
 
-  // XXX: Switch params?
   static final class AssertThatThrownByIsExactlyInstanceOf<T extends Throwable> {
     @BeforeTemplate
     void before(Executable runnable, Class<T> clazz) {
