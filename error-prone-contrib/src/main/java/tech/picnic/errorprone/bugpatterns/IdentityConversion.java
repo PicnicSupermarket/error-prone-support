@@ -47,6 +47,13 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
       anyOf(
           staticMethod()
               .onClassAny(
+                  Primitives.allWrapperTypes().stream()
+                      .map(Class::getName)
+                      .collect(toImmutableSet()))
+              .named("valueOf"),
+          staticMethod().onClass(String.class.getName()).named("valueOf"),
+          staticMethod()
+              .onClassAny(
                   "com.google.common.collect.ImmutableBiMap",
                   "com.google.common.collect.ImmutableList",
                   "com.google.common.collect.ImmutableListMultimap",
@@ -62,13 +69,6 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
           staticMethod()
               .onClass("com.google.errorprone.matchers.Matchers")
               .namedAnyOf("allOf", "anyOf"),
-          staticMethod()
-              .onClassAny(
-                  Primitives.allWrapperTypes().stream()
-                      .map(Class::getName)
-                      .collect(toImmutableSet()))
-              .named("valueOf"),
-          staticMethod().onClass(String.class.getName()).named("valueOf"),
           staticMethod().onClass("reactor.adapter.rxjava.RxJava2Adapter"),
           staticMethod()
               .onClass("reactor.core.publisher.Flux")
