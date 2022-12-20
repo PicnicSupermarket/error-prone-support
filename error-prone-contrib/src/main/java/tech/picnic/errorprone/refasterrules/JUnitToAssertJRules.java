@@ -32,7 +32,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class JUnitToAssertJRules {
   private JUnitToAssertJRules() {}
 
-  static final class Fail {
+  static final class ThrowNewAssertionError {
     @BeforeTemplate
     void before() {
       Assertions.fail();
@@ -71,7 +71,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertTrue {
+  static final class AssertThatIsTrue {
     @BeforeTemplate
     void before(boolean condition) {
       assertTrue(condition);
@@ -84,7 +84,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertTrueWithMessage {
+  static final class AssertThatWithFailMessageStringIsTrue {
     @BeforeTemplate
     void before(boolean condition, String message) {
       assertTrue(condition, message);
@@ -97,7 +97,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertTrueWithMessageSupplier {
+  static final class AssertThatWithFailMessageSupplierIsTrue {
     @BeforeTemplate
     void before(boolean condition, Supplier<String> messageSupplier) {
       assertTrue(condition, messageSupplier);
@@ -110,7 +110,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertFalse {
+  static final class AssertThatIsFalse {
     @BeforeTemplate
     void before(boolean condition) {
       assertFalse(condition);
@@ -123,7 +123,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertFalseWithMessage {
+  static final class AssertThatWithFailMessageStringIsFalse {
     @BeforeTemplate
     void before(boolean condition, String message) {
       assertFalse(condition, message);
@@ -136,7 +136,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertFalseWithMessageSupplier {
+  static final class AssertThatWithFailMessageSupplierIsFalse {
     @BeforeTemplate
     void before(boolean condition, Supplier<String> messageSupplier) {
       assertFalse(condition, messageSupplier);
@@ -149,7 +149,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertNull {
+  static final class AssertThatIsNull {
     @BeforeTemplate
     void before(Object object) {
       assertNull(object);
@@ -162,7 +162,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertNullWithMessage {
+  static final class AssertThatWithFailMessageStringIsNull {
     @BeforeTemplate
     void before(Object object, String message) {
       assertNull(object, message);
@@ -175,20 +175,20 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertNullWithMessageSupplier {
+  static final class AssertThatWithFailMessageSupplierIsNull {
     @BeforeTemplate
-    void before(Object object, Supplier<String> messageSupplier) {
-      assertNull(object, messageSupplier);
+    void before(Object object, Supplier<String> supplier) {
+      assertNull(object, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object, Supplier<String> messageSupplier) {
-      assertThat(object).withFailMessage(messageSupplier).isNull();
+    void after(Object object, Supplier<String> supplier) {
+      assertThat(object).withFailMessage(supplier).isNull();
     }
   }
 
-  static final class AssertNotNull {
+  static final class AssertThatIsNotNull {
     @BeforeTemplate
     void before(Object object) {
       assertNotNull(object);
@@ -201,7 +201,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertNotNullWithMessage {
+  static final class AssertThatWithFailMessageStringIsNotNull {
     @BeforeTemplate
     void before(Object object, String message) {
       assertNotNull(object, message);
@@ -214,26 +214,26 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertNotNullWithMessageSupplier {
+  static final class AssertThatWithFailMessageSupplierIsNotNull {
     @BeforeTemplate
-    void before(Object object, Supplier<String> messageSupplier) {
-      assertNotNull(object, messageSupplier);
+    void before(Object object, Supplier<String> supplier) {
+      assertNotNull(object, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object, Supplier<String> messageSupplier) {
-      assertThat(object).withFailMessage(messageSupplier).isNotNull();
+    void after(Object object, Supplier<String> supplier) {
+      assertThat(object).withFailMessage(supplier).isNotNull();
     }
   }
 
-  // XXX: Rewrite org.junit.jupiter.api.Assertions.assertEquals
-  // XXX: Rewrite org.junit.jupiter.api.Assertions.assertArrayEquals
-  // XXX: Rewrite org.junit.jupiter.api.Assertions.assertIterableEquals
-  // XXX: Rewrite org.junit.jupiter.api.Assertions.assertLinesMatch
-  // XXX: Rewrite org.junit.jupiter.api.Assertions.assertNotEquals
+  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertEquals`.
+  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertArrayEquals`.
+  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertIterableEquals`.
+  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertLinesMatch`.
+  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertNotEquals`.
 
-  static final class AssertSame {
+  static final class AssertThatIsSameAs {
     @BeforeTemplate
     void before(Object actual, Object expected) {
       assertSame(expected, actual);
@@ -246,7 +246,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertSameWithMessage {
+  static final class AssertThatWithFailMessageStringIsSameAs {
     @BeforeTemplate
     void before(Object actual, Object expected, String message) {
       assertSame(expected, actual, message);
@@ -259,7 +259,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertSameWithMessageSupplier {
+  static final class AssertThatWithFailMessageSupplierIsSameAs {
     @BeforeTemplate
     void before(Object actual, Object expected, Supplier<String> messageSupplier) {
       assertSame(expected, actual, messageSupplier);
@@ -272,7 +272,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertNotSame {
+  static final class AssertThatIsNotSameAs {
     @BeforeTemplate
     void before(Object actual, Object expected) {
       assertNotSame(expected, actual);
@@ -285,7 +285,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertNotSameWithMessage {
+  static final class AssertThatWithFailMessageStringIsNotSameAs {
     @BeforeTemplate
     void before(Object actual, Object expected, String message) {
       assertNotSame(expected, actual, message);
@@ -298,7 +298,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertNotSameWithMessageSupplier {
+  static final class AssertThatWithFailMessageSupplierIsNotSameAs {
     @BeforeTemplate
     void before(Object actual, Object expected, Supplier<String> messageSupplier) {
       assertNotSame(expected, actual, messageSupplier);
@@ -311,9 +311,10 @@ final class JUnitToAssertJRules {
     }
   }
 
-  // XXX: Rewrite org.junit.jupiter.api.Assertions.assertAll
+  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertAll`.
 
-  static final class AssertThrowsExactly<T extends Throwable> {
+  // XXX: Switch params?
+  static final class AssertThatThrownByIsExactlyInstanceOf<T extends Throwable> {
     @BeforeTemplate
     void before(Executable runnable, Class<T> clazz) {
       assertThrowsExactly(clazz, runnable);
@@ -326,7 +327,8 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertThrowsExactlyWithMessage<T extends Throwable> {
+  static final class AssertThatThrownByWithFailMessageStringIsExactlyInstanceOf<
+      T extends Throwable> {
     @BeforeTemplate
     void before(Executable runnable, Class<T> clazz, String message) {
       assertThrowsExactly(clazz, runnable, message);
@@ -339,7 +341,8 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertThrowsExactlyWithMessageSupplier<T extends Throwable> {
+  static final class AssertThatThrownByWithFailMessageSupplierIsExactlyInstanceOf<
+      T extends Throwable> {
     @BeforeTemplate
     void before(Executable runnable, Class<T> clazz, Supplier<String> messageSupplier) {
       assertThrowsExactly(clazz, runnable, messageSupplier);
@@ -352,7 +355,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertThrows<T extends Throwable> {
+  static final class AssertThatThrownByIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
     void before(Executable runnable, Class<T> clazz) {
       assertThrows(clazz, runnable);
@@ -365,7 +368,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertThrowsWithMessage<T extends Throwable> {
+  static final class AssertThatThrownByWithFailMessageStringIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
     void before(Executable runnable, Class<T> clazz, String message) {
       assertThrows(clazz, runnable, message);
@@ -378,7 +381,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertThrowsWithMessageSupplier<T extends Throwable> {
+  static final class AssertThatThrownByWithFailMessageSupplierIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
     void before(Executable runnable, Class<T> clazz, Supplier<String> messageSupplier) {
       assertThrows(clazz, runnable, messageSupplier);
@@ -391,7 +394,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertDoesNotThrow {
+  static final class AssertThatCodeDoesNotThrowAnyException {
     @BeforeTemplate
     void before(Executable runnable) {
       assertDoesNotThrow(runnable);
@@ -409,7 +412,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertDoesNotThrowWithMessage {
+  static final class AssertThatCodeWithFailMessageStringDoesNotThrowAnyException {
     @BeforeTemplate
     void before(Executable runnable, String message) {
       assertDoesNotThrow(runnable, message);
@@ -427,7 +430,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertDoesNotThrowWithMessageSupplier {
+  static final class AssertThatCodeWithFailMessageSupplierDoesNotThrowAnyException {
     @BeforeTemplate
     void before(Executable runnable, Supplier<String> messageSupplier) {
       assertDoesNotThrow(runnable, messageSupplier);
@@ -445,10 +448,10 @@ final class JUnitToAssertJRules {
     }
   }
 
-  // XXX: Rewrite org.junit.jupiter.api.Assertions.assertTimeout
-  // XXX: Rewrite org.junit.jupiter.api.Assertions.assertTimeoutPreemptively
+  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertTimeout`.
+  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertTimeoutPreemptively`.
 
-  static final class AssertInstanceOf<T> {
+  static final class AssertThatIsInstanceOf<T> {
     @BeforeTemplate
     void before(Object object, Class<T> clazz) {
       assertInstanceOf(clazz, object);
@@ -461,7 +464,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertInstanceOfWithMessage<T> {
+  static final class AssertThatWithFailMessageStringIsInstanceOf<T> {
     @BeforeTemplate
     void before(Object object, Class<T> clazz, String message) {
       assertInstanceOf(clazz, object, message);
@@ -474,7 +477,7 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertInstanceOfWithMessageSupplier<T> {
+  static final class AssertThatWithFailMessageSupplierIsInstanceOf<T> {
     @BeforeTemplate
     void before(Object object, Class<T> clazz, Supplier<String> messageSupplier) {
       assertInstanceOf(clazz, object, messageSupplier);
