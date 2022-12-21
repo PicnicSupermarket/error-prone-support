@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 final class JavaKeywordsTest {
   private static Stream<Arguments> isValidIdentifierTestCases() {
+    /* { str, expected } */
     return Stream.of(
         arguments("", false),
         arguments("public", false),
@@ -21,6 +22,7 @@ final class JavaKeywordsTest {
         arguments("a%\0", false),
         arguments("a", true),
         arguments("a0", true),
+        arguments("_a0", true),
         arguments("test", true));
   }
 
