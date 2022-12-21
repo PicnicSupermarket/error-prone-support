@@ -142,7 +142,7 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
   }
 
   private static boolean isExistingMethodName(Type clazz, String name, VisitorState state) {
-    return ASTHelpers.matchingMethods(state.getName(name), x -> true, clazz, state.getTypes())
+    return ASTHelpers.matchingMethods(state.getName(name), method -> true, clazz, state.getTypes())
         .findAny()
         .isPresent();
   }
