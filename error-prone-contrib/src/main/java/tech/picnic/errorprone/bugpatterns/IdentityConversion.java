@@ -23,6 +23,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ASTHelpers.TargetType;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
@@ -95,6 +96,15 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
 
     if (!state.getTypes().isSameType(sourceType, resultType)
         && !isConvertibleWithWellDefinedEquality(sourceType, targetType.type(), state)) {
+      return Description.NO_MATCH;
+    }
+
+    if (sourceType.isPrimitive()
+        && state.getPath().getParentPath().getLeaf() instanceof MemberSelectTree) {
+      /*
+       * The result of the conversion method is dereferenced, while the source type is a primitive:
+       * dropping the conversion would yield uncompilable code.
+       */
       return Description.NO_MATCH;
     }
 
