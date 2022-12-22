@@ -3,21 +3,19 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
-import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.allOf;
-import static com.google.errorprone.matchers.Matchers.annotations;
-import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.enclosingClass;
 import static com.google.errorprone.matchers.Matchers.hasModifier;
-import static com.google.errorprone.matchers.Matchers.isType;
+import static com.google.errorprone.matchers.Matchers.not;
 import static java.util.function.Predicate.not;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.bugpatterns.util.JavaKeywords.isReservedKeyword;
+import static tech.picnic.errorprone.bugpatterns.util.JavaKeywords.isValidIdentifier;
 import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.SETUP_OR_TEARDOWN_METHOD;
 import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.TEST_METHOD;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -26,14 +24,15 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
-import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symbol.MethodSymbol;
+import com.sun.tools.javac.code.Type;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
-import tech.picnic.errorprone.bugpatterns.util.MoreASTHelpers;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A {@link BugChecker} that flags non-canonical JUnit method declarations. */
@@ -53,21 +52,19 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
   private static final long serialVersionUID = 1L;
   private static final String TEST_PREFIX = "test";
   private static final ImmutableSet<Modifier> ILLEGAL_MODIFIERS =
-      ImmutableSet.of(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC);
-  private static final Matcher<MethodTree> HAS_UNMODIFIABLE_SIGNATURE =
-      anyOf(
-          annotations(AT_LEAST_ONE, isType("java.lang.Override")),
-          allOf(
-              Matchers.not(hasModifier(Modifier.FINAL)),
-              Matchers.not(hasModifier(Modifier.PRIVATE)),
-              enclosingClass(hasModifier(Modifier.ABSTRACT))));
+      Sets.immutableEnumSet(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC);
+  private static final Matcher<MethodTree> IS_LIKELY_OVERRIDDEN =
+      allOf(
+          not(hasModifier(Modifier.FINAL)),
+          not(hasModifier(Modifier.PRIVATE)),
+          enclosingClass(hasModifier(Modifier.ABSTRACT)));
 
   /** Instantiates a new {@link JUnitMethodDeclaration} instance. */
   public JUnitMethodDeclaration() {}
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    if (HAS_UNMODIFIABLE_SIGNATURE.matches(tree, state)) {
+    if (IS_LIKELY_OVERRIDDEN.matches(tree, state) || isOverride(tree, state)) {
       return Description.NO_MATCH;
     }
 
@@ -89,10 +86,11 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
 
   private void suggestTestMethodRenameIfApplicable(
       MethodTree tree, SuggestedFix.Builder fixBuilder, VisitorState state) {
-    tryCanonicalizeMethodName(tree)
+    MethodSymbol symbol = ASTHelpers.getSymbol(tree);
+    tryCanonicalizeMethodName(symbol)
         .ifPresent(
             newName ->
-                findMethodRenameBlocker(newName, state)
+                findMethodRenameBlocker(symbol, newName, state)
                     .ifPresentOrElse(
                         blocker -> reportMethodRenameBlocker(tree, blocker, state),
                         () -> fixBuilder.merge(SuggestedFixes.renameMethod(tree, newName, state))));
@@ -124,21 +122,29 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
    *       consideration cannot be referenced directly.)
    * </ul>
    */
-  private static Optional<String> findMethodRenameBlocker(String methodName, VisitorState state) {
-    if (MoreASTHelpers.methodExistsInEnclosingClass(methodName, state)) {
+  private static Optional<String> findMethodRenameBlocker(
+      MethodSymbol method, String newName, VisitorState state) {
+    if (isExistingMethodName(method.owner.type, newName, state)) {
       return Optional.of(
-          String.format("a method named `%s` already exists in this class", methodName));
+          String.format(
+              "a method named `%s` is already defined in this class or a supertype", newName));
     }
 
-    if (isSimpleNameStaticallyImported(methodName, state)) {
-      return Optional.of(String.format("`%s` is already statically imported", methodName));
+    if (isSimpleNameStaticallyImported(newName, state)) {
+      return Optional.of(String.format("`%s` is already statically imported", newName));
     }
 
-    if (isReservedKeyword(methodName)) {
-      return Optional.of(String.format("`%s` is a reserved keyword", methodName));
+    if (!isValidIdentifier(newName)) {
+      return Optional.of(String.format("`%s` is not a valid identifier", newName));
     }
 
     return Optional.empty();
+  }
+
+  private static boolean isExistingMethodName(Type clazz, String name, VisitorState state) {
+    return ASTHelpers.matchingMethods(state.getName(name), method -> true, clazz, state.getTypes())
+        .findAny()
+        .isPresent();
   }
 
   private static boolean isSimpleNameStaticallyImported(String simpleName, VisitorState state) {
@@ -154,12 +160,18 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
     return source.subSequence(source.lastIndexOf('.') + 1, source.length());
   }
 
-  private static Optional<String> tryCanonicalizeMethodName(MethodTree tree) {
-    return Optional.of(ASTHelpers.getSymbol(tree).getQualifiedName().toString())
+  private static Optional<String> tryCanonicalizeMethodName(Symbol symbol) {
+    return Optional.of(symbol.getQualifiedName().toString())
         .filter(name -> name.startsWith(TEST_PREFIX))
         .map(name -> name.substring(TEST_PREFIX.length()))
         .filter(not(String::isEmpty))
         .map(name -> Character.toLowerCase(name.charAt(0)) + name.substring(1))
         .filter(name -> !Character.isDigit(name.charAt(0)));
+  }
+
+  private static boolean isOverride(MethodTree tree, VisitorState state) {
+    return ASTHelpers.streamSuperMethods(ASTHelpers.getSymbol(tree), state.getTypes())
+        .findAny()
+        .isPresent();
   }
 }
