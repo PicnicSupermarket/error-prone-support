@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refastertemplates;
+package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
@@ -41,7 +41,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import tech.picnic.errorprone.migration.util.RxJavaReactorMigrationUtil;
-import tech.picnic.errorprone.refaster.util.IsArray;
+import tech.picnic.errorprone.refaster.matchers.IsArray;
 
 /** The Refaster templates for the migration of the RxJava {@link Flowable} to Reactor. */
 final class RxJavaFlowableToReactorTemplates {

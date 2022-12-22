@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refastertemplates;
+package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.MoreCollectors.toOptional;
 
