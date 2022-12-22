@@ -11,10 +11,6 @@ final class JUnitValueSourceTest {
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(JUnitValueSource.class, getClass());
 
-  // XXX: Combine `identification` tests, focussing on what should _not_ be flagged.
-  // XXX: Still to test (likely not exhaustive):
-  // - Run PITest and check what other cases should be covered.
-
   @Test
   void identification() {
     compilationTestHelper
@@ -44,11 +40,11 @@ final class JUnitValueSourceTest {
             "",
             "  @ParameterizedTest",
             "  @MethodSource(\"multipleUsagesTestCases\")",
-            "  void multipleUsage1(int foo) {}",
+            "  void multipleUsages1(int foo) {}",
             "",
             "  @ParameterizedTest",
             "  @MethodSource(\"multipleUsagesTestCases\")",
-            "  void multipleUsage2(int bar) {}",
+            "  void multipleUsages2(int bar) {}",
             "",
             "  private static Stream<Arguments> multipleParametersTestCases() {",
             "    return Stream.of(arguments(1, 2), arguments(3, 4));",
