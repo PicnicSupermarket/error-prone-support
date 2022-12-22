@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static java.util.Objects.requireNonNullElse;
+import static java.util.Objects.requireNonNullElseGet;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
@@ -22,8 +23,12 @@ final class NullRulesTest implements RefasterRuleCollectionTestCase {
     return "foo" != null;
   }
 
-  String testRequireNonNullElse() {
-    return requireNonNullElse("foo", "bar");
+  ImmutableSet<String> testRequireNonNullElse() {
+    return ImmutableSet.of(requireNonNullElse("foo", "bar"), requireNonNullElse("foo", "bar"));
+  }
+
+  String testRequireNonNullElseGet() {
+    return requireNonNullElseGet("foo", () -> "bar");
   }
 
   long testIsNullFunction() {

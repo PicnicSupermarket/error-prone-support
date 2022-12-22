@@ -20,8 +20,13 @@ final class NullRulesTest implements RefasterRuleCollectionTestCase {
     return Objects.nonNull("foo");
   }
 
-  String testRequireNonNullElse() {
-    return MoreObjects.firstNonNull("foo", "bar");
+  ImmutableSet<String> testRequireNonNullElse() {
+    return ImmutableSet.of(
+        MoreObjects.firstNonNull("foo", "bar"), java.util.Optional.ofNullable("foo").orElse("bar"));
+  }
+
+  String testRequireNonNullElseGet() {
+    return java.util.Optional.ofNullable("foo").orElseGet(() -> "bar");
   }
 
   long testIsNullFunction() {
