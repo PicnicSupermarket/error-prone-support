@@ -1,0 +1,15 @@
+{
+  "fullyQualifiedName": "pkg.TestChecker",
+  "name": "OtherName",
+  "altNames": [
+    "Check"
+  ],
+  "link": "https://error-prone.picnic.tech",
+  "tags": [
+    "Simplification"
+  ],
+  "summary": "Example summary",
+  "explanation": "Example explanation",
+  "severityLevel": "SUGGESTION",
+  "disableable": false
+}

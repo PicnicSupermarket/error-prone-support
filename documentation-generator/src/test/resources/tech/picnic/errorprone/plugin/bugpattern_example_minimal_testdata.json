@@ -1,0 +1,11 @@
+{
+  "fullyQualifiedName": "pkg.MinimalTestChecker",
+  "name": "MinimalTestChecker",
+  "altNames": [],
+  "link": "",
+  "tags": [],
+  "summary": "Example summary",
+  "explanation": "",
+  "severityLevel": "ERROR",
+  "disableable": true
+}
