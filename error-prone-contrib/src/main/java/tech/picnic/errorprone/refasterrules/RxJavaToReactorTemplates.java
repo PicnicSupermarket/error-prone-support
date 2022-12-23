@@ -7,11 +7,13 @@ import static java.util.function.Function.identity;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.matchers.IsMethodReferenceOrLambdaHasReturnStatement;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.CanTransformToTargetType;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
@@ -133,8 +135,8 @@ final class RxJavaToReactorTemplates {
   static final class RemoveUtilCallable<T> {
     @BeforeTemplate
     Supplier<T> before(
-        //        @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class)
-        @CanTransformToTargetType Callable<T> callable) {
+        @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class) @CanTransformToTargetType
+            Callable<T> callable) {
       return RxJavaReactorMigrationUtil.callableAsSupplier(callable);
     }
 
@@ -148,8 +150,7 @@ final class RxJavaToReactorTemplates {
   static final class UnnecessaryFunctionConversion<I, O> {
     @BeforeTemplate
     java.util.function.Function<? extends I, ? extends O> before(
-        //        @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class)
-        @CanTransformToTargetType
+        @NotMatches(IsMethodReferenceOrLambdaHasReturnStatement.class) @CanTransformToTargetType
             io.reactivex.functions.Function<? extends I, ? extends O> function) {
       return RxJavaReactorMigrationUtil.toJdkFunction(function);
     }
