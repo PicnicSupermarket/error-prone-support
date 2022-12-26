@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.collect.ImmutableList.builder;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
@@ -7,7 +8,9 @@ import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
@@ -19,17 +22,21 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 
 // XXX: Support `BlockTemplate` naming.
 // XXX: How to handle e.g. `ImmutableList.of(e1, e2)`.
@@ -44,6 +51,17 @@ public final class RefasterRuleNaming extends BugChecker implements ClassTreeMat
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> BEFORE_TEMPLATE_METHOD = hasAnnotation(BeforeTemplate.class);
   private static final Matcher<Tree> AFTER_TEMPLATE_METHOD = hasAnnotation(AfterTemplate.class);
+
+  private static final ImmutableMap<String, String> DEFAULT_PARAM_MAPPING =
+      ImmutableMap.of(
+          "int",
+          "IntOnly",
+          "int-int",
+          "Ints",
+          "string",
+          "StringOnly",
+          "string-int",
+          "StringAndInt");
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
@@ -89,21 +107,52 @@ public final class RefasterRuleNaming extends BugChecker implements ClassTreeMat
       return Optional.empty();
     }
 
-    ExpressionTree expression = ((ReturnTree) statement).getExpression();
-    Symbol symbol = ASTHelpers.getSymbol(expression);
+    ImmutableList<MethodInvocationTree> methodInvocations =
+        getMethodInvocations((ReturnTree) statement).reverse();
 
-    List<Symbol> methodsFromType =
-        getMethodsFromType(symbol.owner.type, symbol.name.toString(), state);
+    //    ExpressionTree expression = ((ReturnTree) statement).getExpression();
 
-    String start = symbol.owner.getSimpleName().toString();
+    StringBuilder test = new StringBuilder();
+    for (MethodInvocationTree mit : methodInvocations) {
+      Symbol symbol = ASTHelpers.getSymbol(mit.getMethodSelect());
+      List<Symbol> methodsFromType =
+          getMethodsFromType(symbol.owner.type, symbol.name.toString(), state);
 
-    if (methodsFromType.size() == 1) {
+      String start = symbol.owner.getSimpleName().toString();
+      //      if (methodsFromType.size() == 1) {
       String simpleName = symbol.getSimpleName().toString();
       String firstLetter = simpleName.substring(0, 1).toUpperCase(Locale.ROOT);
-      return Optional.of(start + firstLetter + simpleName.substring(1));
+      test.append(start).append(firstLetter).append(simpleName.substring(1));
+      //      }
     }
 
-    return Optional.of("something");
+    return Optional.of(test.toString());
+  }
+
+  @VisibleForTesting
+  // XXX: Add tests.
+  public String stringifyParams(ImmutableList<VarSymbol> params) {
+    ImmutableList.Builder<String> builder = builder();
+    for (VarSymbol param : params) {
+      builder.add(param.type.tsym.name.toString());
+    }
+    return builder.build().stream().collect(Collectors.joining("-")).toLowerCase(Locale.ROOT);
+  }
+
+  // XXX: Is there a better way to do this?
+  private static ImmutableList<MethodInvocationTree> getMethodInvocations(ReturnTree tree) {
+    ImmutableList.Builder<MethodInvocationTree> nodes = ImmutableList.builder();
+
+    new TreeScanner<@Nullable Void, @Nullable Void>() {
+      @Override
+      public @Nullable Void visitMethodInvocation(
+          MethodInvocationTree node, @Nullable Void unused) {
+        nodes.add(node);
+        return super.visitMethodInvocation(node, unused);
+      }
+    }.scan(tree, null);
+
+    return nodes.build();
   }
 
   private static List<Symbol> getMethodsFromType(Type type, String name, VisitorState state) {
