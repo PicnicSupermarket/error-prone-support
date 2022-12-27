@@ -315,135 +315,135 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatThrownByIsExactlyInstanceOf<T extends Throwable> {
     @BeforeTemplate
-    void before(Executable runnable, Class<T> clazz) {
-      assertThrowsExactly(clazz, runnable);
+    void before(Executable throwingCallable, Class<T> clazz) {
+      assertThrowsExactly(clazz, throwingCallable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable runnable, Class<T> clazz) {
-      assertThatThrownBy(runnable).isExactlyInstanceOf(clazz);
+    void after(ThrowingCallable throwingCallable, Class<T> clazz) {
+      assertThatThrownBy(throwingCallable).isExactlyInstanceOf(clazz);
     }
   }
 
   static final class AssertThatThrownByWithFailMessageStringIsExactlyInstanceOf<
       T extends Throwable> {
     @BeforeTemplate
-    void before(Executable runnable, Class<T> clazz, String message) {
-      assertThrowsExactly(clazz, runnable, message);
+    void before(Executable throwingCallable, Class<T> clazz, String message) {
+      assertThrowsExactly(clazz, throwingCallable, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable runnable, Class<T> clazz, String message) {
-      assertThatThrownBy(runnable).withFailMessage(message).isExactlyInstanceOf(clazz);
+    void after(ThrowingCallable throwingCallable, Class<T> clazz, String message) {
+      assertThatThrownBy(throwingCallable).withFailMessage(message).isExactlyInstanceOf(clazz);
     }
   }
 
   static final class AssertThatThrownByWithFailMessageSupplierIsExactlyInstanceOf<
       T extends Throwable> {
     @BeforeTemplate
-    void before(Executable runnable, Class<T> clazz, Supplier<String> supplier) {
-      assertThrowsExactly(clazz, runnable, supplier);
+    void before(Executable throwingCallable, Class<T> clazz, Supplier<String> supplier) {
+      assertThrowsExactly(clazz, throwingCallable, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable runnable, Class<T> clazz, Supplier<String> supplier) {
-      assertThatThrownBy(runnable).withFailMessage(supplier).isExactlyInstanceOf(clazz);
+    void after(ThrowingCallable throwingCallable, Class<T> clazz, Supplier<String> supplier) {
+      assertThatThrownBy(throwingCallable).withFailMessage(supplier).isExactlyInstanceOf(clazz);
     }
   }
 
   static final class AssertThatThrownByIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
-    void before(Executable runnable, Class<T> clazz) {
-      assertThrows(clazz, runnable);
+    void before(Executable throwingCallable, Class<T> clazz) {
+      assertThrows(clazz, throwingCallable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable runnable, Class<T> clazz) {
-      assertThatThrownBy(runnable).isInstanceOf(clazz);
+    void after(ThrowingCallable throwingCallable, Class<T> clazz) {
+      assertThatThrownBy(throwingCallable).isInstanceOf(clazz);
     }
   }
 
   static final class AssertThatThrownByWithFailMessageStringIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
-    void before(Executable runnable, Class<T> clazz, String message) {
-      assertThrows(clazz, runnable, message);
+    void before(Executable throwingCallable, Class<T> clazz, String message) {
+      assertThrows(clazz, throwingCallable, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable runnable, Class<T> clazz, String message) {
-      assertThatThrownBy(runnable).withFailMessage(message).isInstanceOf(clazz);
+    void after(ThrowingCallable throwingCallable, Class<T> clazz, String message) {
+      assertThatThrownBy(throwingCallable).withFailMessage(message).isInstanceOf(clazz);
     }
   }
 
   static final class AssertThatThrownByWithFailMessageSupplierIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
-    void before(Executable runnable, Class<T> clazz, Supplier<String> supplier) {
-      assertThrows(clazz, runnable, supplier);
+    void before(Executable throwingCallable, Class<T> clazz, Supplier<String> supplier) {
+      assertThrows(clazz, throwingCallable, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable runnable, Class<T> clazz, Supplier<String> supplier) {
-      assertThatThrownBy(runnable).withFailMessage(supplier).isInstanceOf(clazz);
+    void after(ThrowingCallable throwingCallable, Class<T> clazz, Supplier<String> supplier) {
+      assertThatThrownBy(throwingCallable).withFailMessage(supplier).isInstanceOf(clazz);
     }
   }
 
   static final class AssertThatCodeDoesNotThrowAnyException {
     @BeforeTemplate
-    void before(Executable runnable) {
-      assertDoesNotThrow(runnable);
+    void before(Executable throwingCallable) {
+      assertDoesNotThrow(throwingCallable);
     }
 
     @BeforeTemplate
-    void before(ThrowingSupplier<?> runnable) {
-      assertDoesNotThrow(runnable);
+    void before(ThrowingSupplier<?> throwingCallable) {
+      assertDoesNotThrow(throwingCallable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable runnable) {
-      assertThatCode(runnable).doesNotThrowAnyException();
+    void after(ThrowingCallable throwingCallable) {
+      assertThatCode(throwingCallable).doesNotThrowAnyException();
     }
   }
 
   static final class AssertThatCodeWithFailMessageStringDoesNotThrowAnyException {
     @BeforeTemplate
-    void before(Executable runnable, String message) {
-      assertDoesNotThrow(runnable, message);
+    void before(Executable throwingCallable, String message) {
+      assertDoesNotThrow(throwingCallable, message);
     }
 
     @BeforeTemplate
-    void before(ThrowingSupplier<?> runnable, String message) {
-      assertDoesNotThrow(runnable, message);
+    void before(ThrowingSupplier<?> throwingCallable, String message) {
+      assertDoesNotThrow(throwingCallable, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable runnable, String message) {
-      assertThatCode(runnable).withFailMessage(message).doesNotThrowAnyException();
+    void after(ThrowingCallable throwingCallable, String message) {
+      assertThatCode(throwingCallable).withFailMessage(message).doesNotThrowAnyException();
     }
   }
 
   static final class AssertThatCodeWithFailMessageSupplierDoesNotThrowAnyException {
     @BeforeTemplate
-    void before(Executable runnable, Supplier<String> supplier) {
-      assertDoesNotThrow(runnable, supplier);
+    void before(Executable throwingCallable, Supplier<String> supplier) {
+      assertDoesNotThrow(throwingCallable, supplier);
     }
 
     @BeforeTemplate
-    void before(ThrowingSupplier<?> runnable, Supplier<String> supplier) {
-      assertDoesNotThrow(runnable, supplier);
+    void before(ThrowingSupplier<?> throwingCallable, Supplier<String> supplier) {
+      assertDoesNotThrow(throwingCallable, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable runnable, Supplier<String> supplier) {
-      assertThatCode(runnable).withFailMessage(supplier).doesNotThrowAnyException();
+    void after(ThrowingCallable throwingCallable, Supplier<String> supplier) {
+      assertThatCode(throwingCallable).withFailMessage(supplier).doesNotThrowAnyException();
     }
   }
 
