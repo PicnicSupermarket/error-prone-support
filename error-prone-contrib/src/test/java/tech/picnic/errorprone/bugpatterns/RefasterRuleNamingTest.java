@@ -143,17 +143,16 @@ final class RefasterRuleNamingTest {
   public static final class StringifyMethodInvocationTestChecker extends BugChecker
       implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
-    private final RefasterRuleNaming refasterRuleNaming = new RefasterRuleNaming();
 
     @Override
     public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-      String result =
-          refasterRuleNaming.stringifyParams(
+      String matching =
+          RefasterRuleNaming.stringifyParams(
               ImmutableList.copyOf(ASTHelpers.getSymbol(tree).params()));
 
-      return result.isEmpty()
+      return matching.isEmpty()
           ? Description.NO_MATCH
-          : buildDescription(tree).setMessage(result).build();
+          : buildDescription(tree).setMessage(matching).build();
     }
   }
 }

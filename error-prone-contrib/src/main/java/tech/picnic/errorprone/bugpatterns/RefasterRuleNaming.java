@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.collect.ImmutableList.builder;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
@@ -29,13 +28,14 @@ import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.StringJoiner;
 import org.jspecify.annotations.Nullable;
 
 // XXX: Support `BlockTemplate` naming.
@@ -110,8 +110,6 @@ public final class RefasterRuleNaming extends BugChecker implements ClassTreeMat
     ImmutableList<MethodInvocationTree> methodInvocations =
         getMethodInvocations((ReturnTree) statement).reverse();
 
-    //    ExpressionTree expression = ((ReturnTree) statement).getExpression();
-
     StringBuilder test = new StringBuilder();
     for (MethodInvocationTree mit : methodInvocations) {
       Symbol symbol = ASTHelpers.getSymbol(mit.getMethodSelect());
@@ -119,24 +117,29 @@ public final class RefasterRuleNaming extends BugChecker implements ClassTreeMat
           getMethodsFromType(symbol.owner.type, symbol.name.toString(), state);
 
       String start = symbol.owner.getSimpleName().toString();
-      //      if (methodsFromType.size() == 1) {
-      String simpleName = symbol.getSimpleName().toString();
-      String firstLetter = simpleName.substring(0, 1).toUpperCase(Locale.ROOT);
-      test.append(start).append(firstLetter).append(simpleName.substring(1));
-      //      }
+      String simple = symbol.getSimpleName().toString();
+      if (methodsFromType.size() == 1) {
+        String firstLetter = simple.substring(0, 1).toUpperCase(Locale.ROOT);
+        test.append(start).append(firstLetter).append(simple.substring(1));
+      } else if (methodsFromType.size() > 2) {
+        String s = stringifyParams(ImmutableList.copyOf(((MethodSymbol) symbol).params()));
+        String thing = DEFAULT_PARAM_MAPPING.get(s);
+        test.append(simple).append(thing);
+      } else {
+        test.append(simple);
+      }
     }
 
     return Optional.of(test.toString());
   }
 
   @VisibleForTesting
-  // XXX: Add tests.
-  public String stringifyParams(ImmutableList<VarSymbol> params) {
-    ImmutableList.Builder<String> builder = builder();
+  static String stringifyParams(ImmutableList<VarSymbol> params) {
+    StringJoiner joiner = new StringJoiner("-");
     for (VarSymbol param : params) {
-      builder.add(param.type.tsym.name.toString());
+      joiner.add(param.type.tsym.name);
     }
-    return builder.build().stream().collect(Collectors.joining("-")).toLowerCase(Locale.ROOT);
+    return joiner.toString().toLowerCase(Locale.ROOT);
   }
 
   // XXX: Is there a better way to do this?
