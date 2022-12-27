@@ -73,157 +73,157 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatIsTrue {
     @BeforeTemplate
-    void before(boolean condition) {
-      assertTrue(condition);
+    void before(boolean actual) {
+      assertTrue(actual);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition) {
-      assertThat(condition).isTrue();
+    void after(boolean actual) {
+      assertThat(actual).isTrue();
     }
   }
 
   static final class AssertThatWithFailMessageStringIsTrue {
     @BeforeTemplate
-    void before(boolean condition, String message) {
-      assertTrue(condition, message);
+    void before(boolean actual, String message) {
+      assertTrue(actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition, String message) {
-      assertThat(condition).withFailMessage(message).isTrue();
+    void after(boolean actual, String message) {
+      assertThat(actual).withFailMessage(message).isTrue();
     }
   }
 
   static final class AssertThatWithFailMessageSupplierIsTrue {
     @BeforeTemplate
-    void before(boolean condition, Supplier<String> supplier) {
-      assertTrue(condition, supplier);
+    void before(boolean actual, Supplier<String> supplier) {
+      assertTrue(actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition, Supplier<String> supplier) {
-      assertThat(condition).withFailMessage(supplier).isTrue();
+    void after(boolean actual, Supplier<String> supplier) {
+      assertThat(actual).withFailMessage(supplier).isTrue();
     }
   }
 
   static final class AssertThatIsFalse {
     @BeforeTemplate
-    void before(boolean condition) {
-      assertFalse(condition);
+    void before(boolean actual) {
+      assertFalse(actual);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition) {
-      assertThat(condition).isFalse();
+    void after(boolean actual) {
+      assertThat(actual).isFalse();
     }
   }
 
   static final class AssertThatWithFailMessageStringIsFalse {
     @BeforeTemplate
-    void before(boolean condition, String message) {
-      assertFalse(condition, message);
+    void before(boolean actual, String message) {
+      assertFalse(actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition, String message) {
-      assertThat(condition).withFailMessage(message).isFalse();
+    void after(boolean actual, String message) {
+      assertThat(actual).withFailMessage(message).isFalse();
     }
   }
 
   static final class AssertThatWithFailMessageSupplierIsFalse {
     @BeforeTemplate
-    void before(boolean condition, Supplier<String> supplier) {
-      assertFalse(condition, supplier);
+    void before(boolean actual, Supplier<String> supplier) {
+      assertFalse(actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition, Supplier<String> supplier) {
-      assertThat(condition).withFailMessage(supplier).isFalse();
+    void after(boolean actual, Supplier<String> supplier) {
+      assertThat(actual).withFailMessage(supplier).isFalse();
     }
   }
 
   static final class AssertThatIsNull {
     @BeforeTemplate
-    void before(Object object) {
-      assertNull(object);
+    void before(Object actual) {
+      assertNull(actual);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object) {
-      assertThat(object).isNull();
+    void after(Object actual) {
+      assertThat(actual).isNull();
     }
   }
 
   static final class AssertThatWithFailMessageStringIsNull {
     @BeforeTemplate
-    void before(Object object, String message) {
-      assertNull(object, message);
+    void before(Object actual, String message) {
+      assertNull(actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object, String message) {
-      assertThat(object).withFailMessage(message).isNull();
+    void after(Object actual, String message) {
+      assertThat(actual).withFailMessage(message).isNull();
     }
   }
 
   static final class AssertThatWithFailMessageSupplierIsNull {
     @BeforeTemplate
-    void before(Object object, Supplier<String> supplier) {
-      assertNull(object, supplier);
+    void before(Object actual, Supplier<String> supplier) {
+      assertNull(actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object, Supplier<String> supplier) {
-      assertThat(object).withFailMessage(supplier).isNull();
+    void after(Object actual, Supplier<String> supplier) {
+      assertThat(actual).withFailMessage(supplier).isNull();
     }
   }
 
   static final class AssertThatIsNotNull {
     @BeforeTemplate
-    void before(Object object) {
-      assertNotNull(object);
+    void before(Object actual) {
+      assertNotNull(actual);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object) {
-      assertThat(object).isNotNull();
+    void after(Object actual) {
+      assertThat(actual).isNotNull();
     }
   }
 
   static final class AssertThatWithFailMessageStringIsNotNull {
     @BeforeTemplate
-    void before(Object object, String message) {
-      assertNotNull(object, message);
+    void before(Object actual, String message) {
+      assertNotNull(actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object, String message) {
-      assertThat(object).withFailMessage(message).isNotNull();
+    void after(Object actual, String message) {
+      assertThat(actual).withFailMessage(message).isNotNull();
     }
   }
 
   static final class AssertThatWithFailMessageSupplierIsNotNull {
     @BeforeTemplate
-    void before(Object object, Supplier<String> supplier) {
-      assertNotNull(object, supplier);
+    void before(Object actual, Supplier<String> supplier) {
+      assertNotNull(actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object, Supplier<String> supplier) {
-      assertThat(object).withFailMessage(supplier).isNotNull();
+    void after(Object actual, Supplier<String> supplier) {
+      assertThat(actual).withFailMessage(supplier).isNotNull();
     }
   }
 
@@ -452,40 +452,40 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatIsInstanceOf<T> {
     @BeforeTemplate
-    void before(Object object, Class<T> clazz) {
-      assertInstanceOf(clazz, object);
+    void before(Object actual, Class<T> clazz) {
+      assertInstanceOf(clazz, actual);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object, Class<T> clazz) {
-      assertThat(object).isInstanceOf(clazz);
+    void after(Object actual, Class<T> clazz) {
+      assertThat(actual).isInstanceOf(clazz);
     }
   }
 
   static final class AssertThatWithFailMessageStringIsInstanceOf<T> {
     @BeforeTemplate
-    void before(Object object, Class<T> clazz, String message) {
-      assertInstanceOf(clazz, object, message);
+    void before(Object actual, Class<T> clazz, String message) {
+      assertInstanceOf(clazz, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object, Class<T> clazz, String message) {
-      assertThat(object).withFailMessage(message).isInstanceOf(clazz);
+    void after(Object actual, Class<T> clazz, String message) {
+      assertThat(actual).withFailMessage(message).isInstanceOf(clazz);
     }
   }
 
   static final class AssertThatWithFailMessageSupplierIsInstanceOf<T> {
     @BeforeTemplate
-    void before(Object object, Class<T> clazz, Supplier<String> supplier) {
-      assertInstanceOf(clazz, object, supplier);
+    void before(Object actual, Class<T> clazz, Supplier<String> supplier) {
+      assertInstanceOf(clazz, actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object, Class<T> clazz, Supplier<String> supplier) {
-      assertThat(object).withFailMessage(supplier).isInstanceOf(clazz);
+    void after(Object actual, Class<T> clazz, Supplier<String> supplier) {
+      assertThat(actual).withFailMessage(supplier).isInstanceOf(clazz);
     }
   }
 }
