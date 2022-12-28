@@ -6,13 +6,14 @@ import static java.util.Objects.requireNonNullElseGet;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class NullRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(MoreObjects.class);
+    return ImmutableSet.of(MoreObjects.class, Optional.class);
   }
 
   boolean testIsNull() {
@@ -24,7 +25,7 @@ final class NullRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<String> testRequireNonNullElse() {
-    return ImmutableSet.of(requireNonNullElse("foo", "bar"), requireNonNullElse("foo", "bar"));
+    return ImmutableSet.of(requireNonNullElse("foo", "bar"), requireNonNullElse("baz", "qux"));
   }
 
   String testRequireNonNullElseGet() {

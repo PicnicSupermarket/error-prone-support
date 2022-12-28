@@ -5,9 +5,9 @@ import static java.util.Objects.requireNonNullElse;
 import static java.util.Objects.requireNonNullElseGet;
 
 import com.google.common.base.MoreObjects;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Objects;
 import java.util.Optional;
@@ -48,21 +48,17 @@ final class NullRules {
   }
 
   /**
-   * Prefer {@link Objects#requireNonNullElse(Object, Object)} over the Guava and Optional
+   * Prefer {@link Objects#requireNonNullElse(Object, Object)} over non-JDK or more contrived
    * alternatives.
    */
   // XXX: This rule is not valid in case `second` is `@Nullable`: in that case the Guava and
-  // Optional variants
-  // will return `null`, while the Objects.requireNonNullElse variant will throw an NPE.
+  // `Optional` variants will return `null`, where the `requireNonNullElse` alternative will throw
+  // an NPE.
   static final class RequireNonNullElse<T> {
     @BeforeTemplate
     T before(T first, T second) {
-      return MoreObjects.firstNonNull(first, second);
-    }
-
-    @BeforeTemplate
-    T beforeOptional(T first, T second) {
-      return Optional.ofNullable(first).orElse(second);
+      return Refaster.anyOf(
+          MoreObjects.firstNonNull(first, second), Optional.ofNullable(first).orElse(second));
     }
 
     @AfterTemplate
@@ -73,21 +69,22 @@ final class NullRules {
   }
 
   /**
-   * Prefer {@link Objects#requireNonNullElseGet(Object, Supplier)} over {@link Optional}{@code
-   * .ofNullable(Object).orElseGet(Supplier)}
+   * Prefer {@link Objects#requireNonNullElseGet(Object, Supplier)} over more contrived
+   * alternatives.
    */
-  // XXX: This rule is not valid in case `supplier` may return `null`: Optional will return `null`,
-  // while the `requireNonNullElseGet` replacement will throw an NPE.
-  static final class RequireNonNullElseGet<T, S extends Supplier<T>> {
+  // XXX: This rule is not valid in case `supplier` yields `@Nullable` values: in that case the
+  // `Optional` variant will return `null`, where the `requireNonNullElseGet` alternative will throw
+  // an NPE.
+  static final class RequireNonNullElseGet<T, S extends T> {
     @BeforeTemplate
-    T before(T object, S defaultSupplier) {
-      return Optional.ofNullable(object).orElseGet(defaultSupplier);
+    T before(T object, Supplier<S> supplier) {
+      return Optional.ofNullable(object).orElseGet(supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    T after(T object, S defaultSupplier) {
-      return requireNonNullElseGet(object, defaultSupplier);
+    T after(T object, Supplier<S> supplier) {
+      return requireNonNullElseGet(object, supplier);
     }
   }
 
