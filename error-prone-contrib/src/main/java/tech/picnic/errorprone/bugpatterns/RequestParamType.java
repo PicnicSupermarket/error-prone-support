@@ -77,8 +77,8 @@ public final class RequestParamType extends BugChecker implements VariableTreeMa
   private static ImmutableList<Matcher<Tree>> getSupportedClasses(
       ImmutableList<String> inclusions) {
     return inclusions.stream()
-        .filter(inclusion -> !inclusion.isEmpty())
         .map(String::trim)
+        .filter(inclusion -> !inclusion.isEmpty())
         .map(inclusion -> isSubtypeOf(createClass(inclusion)))
         .collect(toImmutableList());
   }
