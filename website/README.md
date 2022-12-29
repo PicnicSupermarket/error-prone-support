@@ -24,7 +24,7 @@ If you are not familiar with Jekyll, be sure to check out its
 [documentation][jekyll-docs]. It is recommended to follow the provided
 step-by-step tutorial.
 
-We use the [just-the-docs][just-the-docs] Jekyll theme which also includes
+We use the [Just the Docs][just-the-docs] Jekyll theme, which also includes
 several configuration options.
 
 ###### Switch Ruby versions
