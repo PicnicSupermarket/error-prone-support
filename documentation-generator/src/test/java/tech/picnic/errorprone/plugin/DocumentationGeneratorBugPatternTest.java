@@ -14,7 +14,7 @@ import org.junit.jupiter.api.io.TempDir;
 final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorCompilerBasedTest {
   @Test
   void wrongPathFails() {
-    assertThatThrownBy(() -> compile("  wrong-path"))
+    assertThatThrownBy(() -> compile("\nwrong-path"))
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("Error while creating directory '%sdocs'", File.separator);
   }
