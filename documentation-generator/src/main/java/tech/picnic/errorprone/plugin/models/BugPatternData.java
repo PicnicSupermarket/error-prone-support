@@ -8,6 +8,9 @@ import com.google.errorprone.BugPattern.SeverityLevel;
 // XXX: What about `SuppressionAnnotations` and `DocumentSuppression`?
 @AutoValue
 public abstract class BugPatternData {
+  /** Instantiates a new {@link BugPatternData} instance. */
+  public BugPatternData() {}
+
   /**
    * Creates an instance of {@link BugPatternData}.
    *

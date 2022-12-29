@@ -12,6 +12,9 @@ import tech.picnic.errorprone.plugin.models.BugPatternData;
  * A {@link DocumentationExtractor} that describes how to extract data from a {@code BugChecker}.
  */
 public final class BugPatternExtractor implements DocumentationExtractor<BugPatternData> {
+  /** Instantiates a new {@link BugPatternExtractor} instance. */
+  public BugPatternExtractor() {}
+
   @Override
   public BugPatternData extractData(ClassTree tree, TaskEvent taskEvent) {
     ClassSymbol symbol = ASTHelpers.getSymbol(tree);

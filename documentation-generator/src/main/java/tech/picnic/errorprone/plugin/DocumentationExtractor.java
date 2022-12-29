@@ -6,6 +6,8 @@ import com.sun.source.util.TaskEvent;
 /**
  * Interface implemented by a class that defines how to extract {@link T} from a given {@link
  * ClassTree}.
+ *
+ * @param <T> The resulting type of the data that is extracted.
  */
 public interface DocumentationExtractor<T> {
   /**
