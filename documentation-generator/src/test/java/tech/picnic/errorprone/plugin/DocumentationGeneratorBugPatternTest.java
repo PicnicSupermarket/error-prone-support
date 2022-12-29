@@ -19,6 +19,15 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
   }
 
   @Test
+  void noClass(@TempDir Path directory) {
+    Path outputPath = directory.resolve("pkg").toAbsolutePath();
+    compile(outputPath.toString(), "package pkg;");
+
+    assertThat(outputPath.resolve("docs/bugpattern-CompilerBasedTestInput.json").toFile().exists())
+        .isFalse();
+  }
+
+  @Test
   void noJsonExpected(@TempDir Path directory) {
     Path outputPath = directory.resolve("pkg").toAbsolutePath();
     compile(

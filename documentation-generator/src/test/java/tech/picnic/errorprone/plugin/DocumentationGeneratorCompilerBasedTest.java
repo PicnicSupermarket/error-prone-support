@@ -39,6 +39,9 @@ abstract class DocumentationGeneratorCompilerBasedTest {
     CompilationUnitTree compilationUnitTree = Iterables.getOnlyElement(task.parse());
     task.analyze();
 
+    if (compilationUnitTree.getTypeDecls().isEmpty()) {
+      return;
+    }
     Tree classTree = Iterables.getOnlyElement(compilationUnitTree.getTypeDecls());
     ClassSymbol classSymbol = (ClassSymbol) ASTHelpers.getSymbol(classTree);
 

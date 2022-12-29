@@ -5,7 +5,6 @@ import static tech.picnic.errorprone.plugin.DocumentationType.BUG_PATTERN;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.util.ASTHelpers;
@@ -33,9 +32,7 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   private final Context context;
   private final String basePath;
   private final ObjectMapper mapper =
-      new ObjectMapper()
-          .setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
-          .configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, /* state= */ false);
+      new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 
   DocumentationGeneratorTaskListener(Context context, String path) {
     this.context = context;
