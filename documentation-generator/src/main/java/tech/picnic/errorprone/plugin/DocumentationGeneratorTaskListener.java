@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
@@ -36,7 +35,6 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   private final ObjectMapper mapper =
       new ObjectMapper()
           .setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
-          .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, /* state= */ false)
           .configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, /* state= */ false);
 
   DocumentationGeneratorTaskListener(Context context, String path) {
@@ -79,14 +77,14 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   }
 
   private <T> void writeToFile(T data, String fileName, String name) {
-    String path = URI.create(basePath + "/" + fileName + "-" + name + ".json").toString();
-    File file = Paths.get(path).toFile();
+    String fileLocation = URI.create(basePath + "/" + fileName + "-" + name + ".json").toString();
+    File file = Paths.get(fileLocation).toFile();
 
     try (FileWriter fileWriter = new FileWriter(file, UTF_8, /* append= */ true)) {
       mapper.writeValue(fileWriter, data);
-      fileWriter.write("\n");
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(
+          String.format("Could not write to file '%s'", fileLocation), e);
     }
   }
 

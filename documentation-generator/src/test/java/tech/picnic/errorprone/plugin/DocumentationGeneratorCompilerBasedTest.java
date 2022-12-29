@@ -20,7 +20,7 @@ import javax.tools.JavaFileObject;
 
 abstract class DocumentationGeneratorCompilerBasedTest {
   public void compile(String outputDirectory, String... lines) {
-    compile(outputDirectory, FileObjects.forSourceLines("CompilerBasedTestInput", lines));
+    compile(outputDirectory, FileObjects.forSourceLines("CompilerBasedTestInput.java", lines));
   }
 
   private static void compile(String outputDirectory, JavaFileObject javaFileObject) {

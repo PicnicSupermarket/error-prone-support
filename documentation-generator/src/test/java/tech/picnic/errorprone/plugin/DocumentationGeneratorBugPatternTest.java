@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.errorprone.FileObjects;
 import java.io.IOException;
@@ -10,6 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorCompilerBasedTest {
+  @Test
+  void wrongPathFails() {
+    assertThatThrownBy(() -> compile("  wrong-path"))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Error while creating directory '/docs'");
+  }
+
   @Test
   void noJsonExpected(@TempDir Path directory) {
     Path outputPath = directory.resolve("pkg").toAbsolutePath();
