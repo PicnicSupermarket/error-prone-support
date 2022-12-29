@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.errorprone.FileObjects;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +16,7 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
   void wrongPathFails() {
     assertThatThrownBy(() -> compile("  wrong-path"))
         .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Error while creating directory '/docs'");
+        .hasMessage("Error while creating directory '%sdocs'", File.separator);
   }
 
   @Test
@@ -23,7 +24,11 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
     Path outputPath = directory.resolve("pkg").toAbsolutePath();
     compile(outputPath.toString(), "package pkg;");
 
-    assertThat(outputPath.resolve("docs/bugpattern-CompilerBasedTestInput.json").toFile().exists())
+    assertThat(
+            outputPath
+                .resolve("docs" + File.separator + "bugpattern-CompilerBasedTestInput.json")
+                .toFile()
+                .exists())
         .isFalse();
   }
 
@@ -36,7 +41,11 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
         "",
         "public final class TestCheckerWithoutAnnotation extends BugChecker {}");
 
-    assertThat(outputPath.resolve("docs/bugpattern-CompilerBasedTestInput.json").toFile().exists())
+    assertThat(
+            outputPath
+                .resolve("docs " + File.separator + "bugpattern-CompilerBasedTestInput.json")
+                .toFile()
+                .exists())
         .isFalse();
   }
 
@@ -58,7 +67,10 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
         FileObjects.forResource(getClass(), "bugpattern_example_minimal_testdata.json")
             .getCharContent(true);
 
-    assertThat(Files.readString(outputPath.resolve("docs/bugpattern-CompilerBasedTestInput.json")))
+    assertThat(
+            Files.readString(
+                outputPath.resolve(
+                    "docs" + File.separator + "bugpattern-CompilerBasedTestInput.json")))
         .isEqualToIgnoringWhitespace(expectedJson);
   }
 
@@ -89,7 +101,10 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
         FileObjects.forResource(getClass(), "bugpattern_example_testdata.json")
             .getCharContent(true);
 
-    assertThat(Files.readString(outputPath.resolve("docs/bugpattern-CompilerBasedTestInput.json")))
+    assertThat(
+            Files.readString(
+                outputPath.resolve(
+                    "docs" + File.separator + "bugpattern-CompilerBasedTestInput.json")))
         .isEqualToIgnoringWhitespace(expectedJson);
   }
 }

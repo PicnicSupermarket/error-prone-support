@@ -36,7 +36,7 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
 
   DocumentationGeneratorTaskListener(Context context, String path) {
     this.context = context;
-    this.basePath = path.substring(path.indexOf('=') + 1) + "/docs";
+    this.basePath = path.substring(path.indexOf('=') + 1) + File.separator + "docs";
 
     // XXX: Should we extract this method?
     Path docsPath = Paths.get(basePath);
@@ -74,7 +74,8 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   }
 
   private <T> void writeToFile(T data, String fileName, String name) {
-    String fileLocation = URI.create(basePath + "/" + fileName + "-" + name + ".json").toString();
+    String fileLocation =
+        URI.create(basePath + File.separator + fileName + "-" + name + ".json").toString();
     File file = Paths.get(fileLocation).toFile();
 
     try (FileWriter fileWriter = new FileWriter(file, UTF_8, /* append= */ true)) {
