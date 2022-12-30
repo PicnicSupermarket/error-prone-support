@@ -28,6 +28,12 @@ nav_external_links:
     url: https://github.com/PicnicSupermarket/error-prone-support
     hide_icon: false
 
+callouts:
+  summary:
+    color: blue
+  note:
+    color: grey-dk
+
 # SEO configuration.
 # See https://jekyll.github.io/jekyll-seo-tag/usage.
 social:

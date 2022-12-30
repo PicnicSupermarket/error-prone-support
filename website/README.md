@@ -24,6 +24,9 @@ If you are not familiar with Jekyll, be sure to check out its
 [documentation][jekyll-docs]. It is recommended to follow the provided
 step-by-step tutorial.
 
+We use the [Just the Docs][just-the-docs] Jekyll theme, which also includes
+several configuration options.
+
 ###### Switch Ruby versions
 
 The required Ruby version is set in `.ruby-version`. To switch, you can use
@@ -56,5 +59,6 @@ Actions workflow any time a change is merged to `master`.
 [jekyll]: https://jekyllrb.com
 [jekyll-docs]: https://jekyllrb.com/docs
 [jekyll-docs-installation]: https://jekyllrb.com/docs/installation
+[just-the-docs]: https://just-the-docs.github.io/just-the-docs/
 [localhost-port-4000]: http://127.0.0.1:4000
 [rvm]: https://rvm.io
