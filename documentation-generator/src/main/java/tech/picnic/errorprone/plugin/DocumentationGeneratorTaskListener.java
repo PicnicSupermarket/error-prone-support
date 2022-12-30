@@ -17,7 +17,6 @@ import com.sun.tools.javac.util.Context;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -74,15 +73,13 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   }
 
   private <T> void writeToFile(T data, String fileName, String name) {
-    String fileLocation =
-        URI.create(basePath + File.separator + fileName + "-" + name + ".json").toString();
-    File file = Paths.get(fileLocation).toFile();
+    File file = Paths.get(basePath, String.format("%s-%s.json", fileName, name)).toFile();
 
     try (FileWriter fileWriter = new FileWriter(file, UTF_8, /* append= */ true)) {
       mapper.writeValue(fileWriter, data);
     } catch (IOException e) {
       throw new IllegalStateException(
-          String.format("Could not write to file '%s'", fileLocation), e);
+          String.format("Could not write to file '%s'", file.getPath()), e);
     }
   }
 
