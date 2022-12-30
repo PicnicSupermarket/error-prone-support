@@ -60,7 +60,7 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
 
     assertThat(
             outputPath
-                .resolve("docs " + File.separator + "bugpattern-CompilerBasedTestInput.json")
+                .resolve("docs" + File.separator + "bugpattern-CompilerBasedTestInput.json")
                 .toFile()
                 .exists())
         .isFalse();
