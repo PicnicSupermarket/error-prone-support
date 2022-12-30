@@ -2,21 +2,37 @@ package tech.picnic.errorprone.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
 import com.google.errorprone.FileObjects;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 
 final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorCompilerBasedTest {
   @Test
-  void wrongPathFails() {
-    assertThatThrownBy(() -> compile("\nwrong-path"))
+  @EnabledOnOs(WINDOWS)
+  void wrongPathFailsWindows() {
+    wrongPathFails('?');
+  }
+
+  @Test
+  @DisabledOnOs(WINDOWS)
+  void wrongPathFailsOtherOperatingSystems() {
+    wrongPathFails('/');
+  }
+
+  private void wrongPathFails(char invalidCharacter) {
+    String invalidPath = invalidCharacter + "wrong-path";
+    assertThatThrownBy(() -> compile(invalidPath))
         .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Error while creating directory '%sdocs'", File.separator);
+        .hasMessage("Error while creating directory '%s'", Paths.get(invalidPath, "docs"));
   }
 
   @Test
