@@ -372,10 +372,7 @@ final class ReactorRules {
       return mono.switchIfEmpty(Mono.empty());
     }
 
-    // XXX: Review the suppression once NullAway has better support for generics. Keep an eye on
-    // https://github.com/uber/NullAway/issues?q=is%3Aopen+generics.
     @BeforeTemplate
-    @SuppressWarnings("NullAway" /* False positive. */)
     Mono<@Nullable Void> before2(Mono<@Nullable Void> mono) {
       return mono.then();
     }
