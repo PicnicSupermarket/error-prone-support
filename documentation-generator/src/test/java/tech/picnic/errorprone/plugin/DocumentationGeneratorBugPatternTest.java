@@ -9,22 +9,22 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 
 final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorCompilerBasedTest {
-  @Test
   @EnabledOnOs(WINDOWS)
+  @Test
   void wrongPathFailsWindows() {
     wrongPathFails('?');
   }
 
-  @Test
   @DisabledOnOs(WINDOWS)
+  @Test
   void wrongPathFailsOtherOperatingSystems() {
+    // Strictly speaking we are validating here that we cannot write to a RO FS.
     wrongPathFails('/');
   }
 
@@ -32,7 +32,8 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
     String invalidPath = invalidCharacter + "wrong-path";
     assertThatThrownBy(() -> compile(invalidPath))
         .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Error while creating directory '%s'", Paths.get(invalidPath, "docs"));
+        .hasMessage(
+            "Error while creating directory with path '%s'", invalidPath + File.separator + "docs");
   }
 
   @Test

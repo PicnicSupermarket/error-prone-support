@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -38,12 +39,12 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
     this.basePath = path.substring(path.indexOf('=') + 1) + File.separator + "docs";
 
     // XXX: Should we extract this method?
-    Path docsPath = Paths.get(basePath);
     try {
+      Path docsPath = Paths.get(basePath);
       Files.createDirectories(docsPath);
-    } catch (IOException e) {
+    } catch (IOException | InvalidPathException e) {
       throw new IllegalStateException(
-          String.format("Error while creating directory '%s'", docsPath), e);
+          String.format("Error while creating directory with path '%s'", basePath), e);
     }
   }
 
