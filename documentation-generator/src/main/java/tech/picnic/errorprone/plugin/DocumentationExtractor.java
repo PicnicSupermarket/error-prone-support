@@ -18,5 +18,15 @@ public interface DocumentationExtractor<T> {
    *     compilation.
    * @return A non-null instance of {@link T}.
    */
-  T extractData(ClassTree tree, TaskEvent taskEvent);
+  T extract(ClassTree tree, TaskEvent taskEvent);
+
+  /**
+   * Tells whether this {@link DocumentationExtractor extractor} can extract documentation content
+   * from the given {@link ClassTree tree}.
+   *
+   * @param tree The {@link ClassTree} to check whether documentation can be extracted or not.
+   * @return {@code true} iff documentation can be extracted
+   */
+  // XXX: `JavaFileObject` will most likely be added as parameter to help identify other `DocType`s.
+  boolean canExtract(ClassTree tree);
 }

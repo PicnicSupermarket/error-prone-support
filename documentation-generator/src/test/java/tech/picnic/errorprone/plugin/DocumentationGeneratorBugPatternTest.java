@@ -1,10 +1,11 @@
 package tech.picnic.errorprone.plugin;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
-import com.google.errorprone.FileObjects;
+import com.google.common.io.Resources;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,11 +43,8 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
     compile(outputPath.toString(), "package pkg;");
 
     assertThat(
-            outputPath
-                .resolve("docs" + File.separator + "bugpattern-CompilerBasedTestInput.json")
-                .toFile()
-                .exists())
-        .isFalse();
+            outputPath.resolve("docs").resolve("bugpattern-CompilerBasedTestInput.json").toFile())
+        .doesNotExist();
   }
 
   @Test
@@ -59,11 +57,8 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
         "public final class TestCheckerWithoutAnnotation extends BugChecker {}");
 
     assertThat(
-            outputPath
-                .resolve("docs" + File.separator + "bugpattern-CompilerBasedTestInput.json")
-                .toFile()
-                .exists())
-        .isFalse();
+            outputPath.resolve("docs").resolve("bugpattern-CompilerBasedTestInput.json").toFile())
+        .doesNotExist();
   }
 
   @Test
@@ -80,15 +75,10 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
         "@BugPattern(summary = \"Example summary\", severity = BugPattern.SeverityLevel.ERROR)",
         "public final class MinimalTestChecker extends BugChecker {}");
 
-    CharSequence expectedJson =
-        FileObjects.forResource(getClass(), "bugpattern_example_minimal_testdata.json")
-            .getCharContent(true);
-
     assertThat(
             Files.readString(
-                outputPath.resolve(
-                    "docs" + File.separator + "bugpattern-CompilerBasedTestInput.json")))
-        .isEqualToIgnoringWhitespace(expectedJson);
+                outputPath.resolve("docs").resolve("bugpattern-CompilerBasedTestInput.json")))
+        .isEqualToIgnoringWhitespace(getResource("bugpattern_example_minimal_testdata.json"));
   }
 
   @Test
@@ -114,14 +104,14 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
         "    disableable = false)",
         "public final class TestChecker extends BugChecker {}");
 
-    CharSequence expectedJson =
-        FileObjects.forResource(getClass(), "bugpattern_example_testdata.json")
-            .getCharContent(true);
-
     assertThat(
             Files.readString(
-                outputPath.resolve(
-                    "docs" + File.separator + "bugpattern-CompilerBasedTestInput.json")))
-        .isEqualToIgnoringWhitespace(expectedJson);
+                outputPath.resolve("docs").resolve("bugpattern-CompilerBasedTestInput.json")))
+        .isEqualToIgnoringWhitespace(getResource("bugpattern_example_testdata.json"));
+  }
+
+  private static String getResource(String resourceName) throws IOException {
+    return Resources.toString(
+        Resources.getResource(DocumentationGeneratorBugPatternTest.class, resourceName), UTF_8);
   }
 }

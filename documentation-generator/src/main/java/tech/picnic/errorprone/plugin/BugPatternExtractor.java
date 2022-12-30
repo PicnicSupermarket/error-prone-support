@@ -16,7 +16,7 @@ public final class BugPatternExtractor implements DocumentationExtractor<BugPatt
   public BugPatternExtractor() {}
 
   @Override
-  public BugPatternData extractData(ClassTree tree, TaskEvent taskEvent) {
+  public BugPatternData extract(ClassTree tree, TaskEvent taskEvent) {
     ClassSymbol symbol = ASTHelpers.getSymbol(tree);
     BugPattern annotation = symbol.getAnnotation(BugPattern.class);
 
@@ -30,5 +30,10 @@ public final class BugPatternExtractor implements DocumentationExtractor<BugPatt
         annotation.explanation(),
         annotation.severity(),
         annotation.disableable());
+  }
+
+  @Override
+  public boolean canExtract(ClassTree tree) {
+    return ASTHelpers.hasDirectAnnotationWithSimpleName(tree, BugPattern.class.getSimpleName());
   }
 }
