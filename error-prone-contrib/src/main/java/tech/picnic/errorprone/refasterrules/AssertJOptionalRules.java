@@ -22,7 +22,6 @@ final class AssertJOptionalRules {
 
   static final class AssertThatOptional<T> {
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
     ObjectAssert<T> before(Optional<T> optional) {
       return assertThat(optional.orElseThrow());
     }
