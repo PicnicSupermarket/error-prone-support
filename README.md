@@ -38,6 +38,8 @@ code_][picnic-blog-ep-post].
 This library is built on top of [Error Prone][error-prone-orig-repo]. To use
 it:
 
+#### Maven
+
 1. First, follow Error Prone's [installation
    guide][error-prone-installation-guide].
 2. Next, edit your `pom.xml` file to add one or more Error Prone Support
@@ -93,6 +95,33 @@ it:
 <!-- XXX: Reference `oss-parent`'s `pom.xml` once that project also uses Error
 Prone Support. Alternatively reference this project's `self-check` profile
 definition. -->
+
+#### Gradle (Groovy)
+
+- Add `net.ltgt.errorprone` plugin to your `build.gradle` file with one or 
+  more Error Prone Support modules:
+
+   ```groovy
+   plugins {
+       // The gradle plugin is an external contribution.
+       // The documentation and code is at: https://github.com/tbroyer/gradle-errorprone-plugin
+       id("net.ltgt.errorprone") version "${errorPronePluginVersion}"
+   }
+   
+   dependencies {
+       // Error Prone itself.
+       errorprone("com.google.errorprone:error_prone_core:${errorProneVersion}")
+       // Error Prone Support's additional bug checkers.
+       errorprone("tech.picnic.error-prone-support:error-prone-contrib:${errorProneSupportVersion}")
+       // Error Prone Support's Refaster rules.
+       errorprone("tech.picnic.error-prone-support:refaster-runner:${errorProneSupportVersion}")
+   }
+   
+   // Configure Error Prone
+   tasks.withType(JavaCompile).configureEach {
+       options.errorprone.disableWarningsInGeneratedCode = true
+   }
+   ```
 
 ### Seeing it in action
 
