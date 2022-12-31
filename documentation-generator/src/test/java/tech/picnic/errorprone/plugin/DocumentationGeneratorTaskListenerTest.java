@@ -18,9 +18,9 @@ import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 
-abstract class DocumentationGeneratorCompilerBasedTest {
+abstract class DocumentationGeneratorTaskListenerTest {
   public void compile(String outputDirectory, String... lines) {
-    compile(outputDirectory, FileObjects.forSourceLines("CompilerBasedTestInput.java", lines));
+    compile(outputDirectory, FileObjects.forSourceLines("TaskListenerTestInput.java", lines));
   }
 
   private static void compile(String outputDirectory, JavaFileObject javaFileObject) {

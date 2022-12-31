@@ -15,7 +15,7 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 
-final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorCompilerBasedTest {
+final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorTaskListenerTest {
   @EnabledOnOs(WINDOWS)
   @Test
   void wrongPathFailsWindows() {
@@ -25,15 +25,15 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
   @DisabledOnOs(WINDOWS)
   @Test
   void wrongPathFailsOtherOperatingSystems() {
-    // Strictly speaking we are validating here that we cannot write to a RO FS.
+    // Strictly speaking we are validating here that we cannot write to a Read-only file system.
     wrongPathFails('/');
   }
 
   private void wrongPathFails(char invalidCharacter) {
     String invalidPath = invalidCharacter + "wrong-path";
     assertThatThrownBy(() -> compile(invalidPath))
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessage(
+        .hasCauseInstanceOf(IllegalStateException.class)
+        .hasMessageEndingWith(
             "Error while creating directory with path '%s'", invalidPath + File.separator + "docs");
   }
 
@@ -42,8 +42,7 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
     Path outputPath = directory.resolve("pkg").toAbsolutePath();
     compile(outputPath.toString(), "package pkg;");
 
-    assertThat(
-            outputPath.resolve("docs").resolve("bugpattern-CompilerBasedTestInput.json").toFile())
+    assertThat(outputPath.resolve("docs").resolve("bugpattern-TaskListenerTestInput.json").toFile())
         .doesNotExist();
   }
 
@@ -56,8 +55,7 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
         "",
         "public final class TestCheckerWithoutAnnotation extends BugChecker {}");
 
-    assertThat(
-            outputPath.resolve("docs").resolve("bugpattern-CompilerBasedTestInput.json").toFile())
+    assertThat(outputPath.resolve("docs").resolve("bugpattern-TaskListenerTestInput.json").toFile())
         .doesNotExist();
   }
 
@@ -77,7 +75,7 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
 
     assertThat(
             Files.readString(
-                outputPath.resolve("docs").resolve("bugpattern-CompilerBasedTestInput.json")))
+                outputPath.resolve("docs").resolve("bugpattern-TaskListenerTestInput.json")))
         .isEqualToIgnoringWhitespace(getResource("bugpattern_example_minimal_testdata.json"));
   }
 
@@ -106,7 +104,7 @@ final class DocumentationGeneratorBugPatternTest extends DocumentationGeneratorC
 
     assertThat(
             Files.readString(
-                outputPath.resolve("docs").resolve("bugpattern-CompilerBasedTestInput.json")))
+                outputPath.resolve("docs").resolve("bugpattern-TaskListenerTestInput.json")))
         .isEqualToIgnoringWhitespace(getResource("bugpattern_example_testdata.json"));
   }
 

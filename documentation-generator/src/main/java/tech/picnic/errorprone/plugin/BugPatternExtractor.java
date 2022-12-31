@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.plugin;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.util.ASTHelpers;
@@ -19,6 +21,7 @@ public final class BugPatternExtractor implements DocumentationExtractor<BugPatt
   public BugPatternData extract(ClassTree tree, TaskEvent taskEvent) {
     ClassSymbol symbol = ASTHelpers.getSymbol(tree);
     BugPattern annotation = symbol.getAnnotation(BugPattern.class);
+    checkArgument(annotation != null, "BugPattern annotation must be present");
 
     return BugPatternData.create(
         symbol.getQualifiedName().toString(),

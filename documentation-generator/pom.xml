@@ -11,7 +11,7 @@
     <artifactId>documentation-generator</artifactId>
 
     <name>Picnic :: Error Prone Support :: Documentation Generation</name>
-    <description>Extracts data to generate the documentation</description>
+    <description>Extracts data to generate the documentation.</description>
 
     <dependencies>
         <dependency>

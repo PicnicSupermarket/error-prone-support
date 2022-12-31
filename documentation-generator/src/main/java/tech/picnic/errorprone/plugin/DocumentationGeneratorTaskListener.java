@@ -24,33 +24,36 @@ import java.util.Optional;
 import javax.tools.JavaFileObject;
 
 /**
- * A {@link TaskListener} that identifies files that contain content relevant for in the
- * documentation.
+ * A {@link TaskListener} that identifies and extracts relevant content for documentation and writes
+ * it to disk.
  */
 final class DocumentationGeneratorTaskListener implements TaskListener {
-  private final Context context;
-  private final Path basePath;
-  private final ObjectMapper mapper =
+  private static final ObjectMapper MAPPER =
       new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+  private final Context context;
+  private final String path;
+  private Path basePath;
 
   DocumentationGeneratorTaskListener(Context context, String path) {
     this.context = context;
+    this.path = path;
+    this.basePath = Paths.get(path);
+  }
 
-    // XXX: Should we extract this method?
-    String docsPath = path.substring(path.indexOf('=') + 1) + File.separator + "docs";
-    try {
-      this.basePath = Files.createDirectories(Paths.get(docsPath));
-    } catch (IOException | InvalidPathException e) {
-      throw new IllegalStateException(
-          String.format("Error while creating directory with path '%s'", docsPath), e);
-    }
+  @Override
+  public void started(TaskEvent taskEvent) {
+    createDirectoriesForPath();
   }
 
   @Override
   public void finished(TaskEvent taskEvent) {
+    if (taskEvent.getKind() != Kind.ANALYZE) {
+      return;
+    }
+
     ClassTree classTree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
     JavaFileObject sourceFile = taskEvent.getSourceFile();
-    if (classTree == null || sourceFile == null || taskEvent.getKind() != Kind.ANALYZE) {
+    if (classTree == null || sourceFile == null) {
       return;
     }
 
@@ -59,8 +62,18 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
             documentationType ->
                 writeToFile(
                     documentationType.getDocumentationExtractor().extract(classTree, taskEvent),
-                    documentationType.getOutputFileNamePrefix(),
+                    documentationType.getIdentifier(),
                     getSimpleClassName(sourceFile.toUri())));
+  }
+
+  private void createDirectoriesForPath() {
+    String docsPath = path.substring(path.indexOf('=') + 1) + File.separator + "docs";
+    try {
+      basePath = Files.createDirectories(Paths.get(docsPath));
+    } catch (IOException | InvalidPathException e) {
+      throw new IllegalStateException(
+          String.format("Error while creating directory with path '%s'", docsPath), e);
+    }
   }
 
   // XXX: `JavaFileObject` will most likely be added as parameter to help identify other `DocType`s.
@@ -74,7 +87,7 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
     File file = basePath.resolve(String.format("%s-%s.json", fileName, name)).toFile();
 
     try (FileWriter fileWriter = new FileWriter(file, UTF_8, /* append= */ true)) {
-      mapper.writeValue(fileWriter, data);
+      MAPPER.writeValue(fileWriter, data);
     } catch (IOException e) {
       throw new IllegalStateException(
           String.format("Could not write to file '%s'", file.getPath()), e);
