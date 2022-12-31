@@ -22,11 +22,10 @@ jobs:
             jdk: 17.0.4
             distribution: temurin
             experimental: false
-          # XXX: Re-enable this build after upgrading to Error Prone 2.17.
-          #- os: ubuntu-22.04
-          #  jdk: 20-ea
-          #  distribution: zulu
-          #  experimental: true
+          - os: ubuntu-22.04
+            jdk: 20-ea
+            distribution: zulu
+            experimental: true
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     steps:
