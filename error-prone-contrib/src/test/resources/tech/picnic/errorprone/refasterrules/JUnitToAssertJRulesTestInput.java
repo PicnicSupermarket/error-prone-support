@@ -19,29 +19,33 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        (Runnable) () -> assertDoesNotThrow(() -> null),
-        () -> assertFalse(true),
-        () -> assertInstanceOf(null, null),
-        () -> assertNotNull(null),
-        () -> assertNotSame(null, null),
-        () -> assertNull(null),
-        () -> assertSame(null, null),
-        () -> assertThrows(null, null),
-        () -> assertThrowsExactly(null, null),
-        () -> assertTrue(true),
-        () -> Assertions.fail());
+        Assertions.class,
+        assertDoesNotThrow(() -> null),
+        assertInstanceOf(null, null),
+        assertThrows(null, null),
+        assertThrowsExactly(null, null),
+        (Runnable) () -> assertFalse(true),
+        (Runnable) () -> assertNotNull(null),
+        (Runnable) () -> assertNotSame(null, null),
+        (Runnable) () -> assertNull(null),
+        (Runnable) () -> assertSame(null, null),
+        (Runnable) () -> assertTrue(true));
   }
 
   void testThrowNewAssertionError() {
     Assertions.fail();
   }
 
-  void testFailWithMessage() {
-    Assertions.fail("foo");
+  Object testFailWithMessage() {
+    return Assertions.fail("foo");
   }
 
-  void testFailWithMessageAndThrowable() {
-    Assertions.fail("foo", new IllegalStateException());
+  Object testFailWithMessageAndThrowable() {
+    return Assertions.fail("foo", new IllegalStateException());
+  }
+
+  void testFailWithThrowable() {
+    Assertions.fail(new IllegalStateException());
   }
 
   void testAssertThatIsTrue() {
@@ -93,39 +97,27 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertThatIsSameAs() {
-    Object actual = new Object();
-    Object expected = new Object();
-    assertSame(expected, actual);
+    assertSame("foo", "bar");
   }
 
   void testAssertThatWithFailMessageStringIsSameAs() {
-    Object actual = new Object();
-    Object expected = new Object();
-    assertSame(expected, actual, "foo");
+    assertSame("foo", "bar", "baz");
   }
 
   void testAssertThatWithFailMessageSupplierIsSameAs() {
-    Object actual = new Object();
-    Object expected = new Object();
-    assertSame(expected, actual, () -> "foo");
+    assertSame("foo", "bar", () -> "baz");
   }
 
   void testAssertThatIsNotSameAs() {
-    Object actual = new Object();
-    Object expected = new Object();
-    assertNotSame(expected, actual);
+    assertNotSame("foo", "bar");
   }
 
   void testAssertThatWithFailMessageStringIsNotSameAs() {
-    Object actual = new Object();
-    Object expected = new Object();
-    assertNotSame(expected, actual, "foo");
+    assertNotSame("foo", "bar", "baz");
   }
 
   void testAssertThatWithFailMessageSupplierIsNotSameAs() {
-    Object actual = new Object();
-    Object expected = new Object();
-    assertNotSame(expected, actual, () -> "foo");
+    assertNotSame("foo", "bar", () -> "baz");
   }
 
   void testAssertThatThrownByIsExactlyInstanceOf() {
@@ -154,14 +146,17 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
 
   void testAssertThatCodeDoesNotThrowAnyException() {
     assertDoesNotThrow(() -> {});
+    assertDoesNotThrow(() -> toString());
   }
 
   void testAssertThatCodeWithFailMessageStringDoesNotThrowAnyException() {
     assertDoesNotThrow(() -> {}, "foo");
+    assertDoesNotThrow(() -> toString(), "bar");
   }
 
   void testAssertThatCodeWithFailMessageSupplierDoesNotThrowAnyException() {
     assertDoesNotThrow(() -> {}, () -> "foo");
+    assertDoesNotThrow(() -> toString(), () -> "bar");
   }
 
   void testAssertThatIsInstanceOf() {

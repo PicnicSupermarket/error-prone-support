@@ -23,29 +23,33 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        (Runnable) () -> assertDoesNotThrow(() -> null),
-        () -> assertFalse(true),
-        () -> assertInstanceOf(null, null),
-        () -> assertNotNull(null),
-        () -> assertNotSame(null, null),
-        () -> assertNull(null),
-        () -> assertSame(null, null),
-        () -> assertThrows(null, null),
-        () -> assertThrowsExactly(null, null),
-        () -> assertTrue(true),
-        () -> Assertions.fail());
+        Assertions.class,
+        assertDoesNotThrow(() -> null),
+        assertInstanceOf(null, null),
+        assertThrows(null, null),
+        assertThrowsExactly(null, null),
+        (Runnable) () -> assertFalse(true),
+        (Runnable) () -> assertNotNull(null),
+        (Runnable) () -> assertNotSame(null, null),
+        (Runnable) () -> assertNull(null),
+        (Runnable) () -> assertSame(null, null),
+        (Runnable) () -> assertTrue(true));
   }
 
   void testThrowNewAssertionError() {
     throw new AssertionError();
   }
 
-  void testFailWithMessage() {
-    fail("foo");
+  Object testFailWithMessage() {
+    return fail("foo");
   }
 
-  void testFailWithMessageAndThrowable() {
-    fail("foo", new IllegalStateException());
+  Object testFailWithMessageAndThrowable() {
+    return fail("foo", new IllegalStateException());
+  }
+
+  void testFailWithThrowable() {
+    throw new AssertionError(new IllegalStateException());
   }
 
   void testAssertThatIsTrue() {
@@ -97,39 +101,27 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertThatIsSameAs() {
-    Object actual = new Object();
-    Object expected = new Object();
-    assertThat(actual).isSameAs(expected);
+    assertThat("bar").isSameAs("foo");
   }
 
   void testAssertThatWithFailMessageStringIsSameAs() {
-    Object actual = new Object();
-    Object expected = new Object();
-    assertThat(actual).withFailMessage("foo").isSameAs(expected);
+    assertThat("bar").withFailMessage("baz").isSameAs("foo");
   }
 
   void testAssertThatWithFailMessageSupplierIsSameAs() {
-    Object actual = new Object();
-    Object expected = new Object();
-    assertThat(actual).withFailMessage(() -> "foo").isSameAs(expected);
+    assertThat("bar").withFailMessage(() -> "baz").isSameAs("foo");
   }
 
   void testAssertThatIsNotSameAs() {
-    Object actual = new Object();
-    Object expected = new Object();
-    assertThat(actual).isNotSameAs(expected);
+    assertThat("bar").isNotSameAs("foo");
   }
 
   void testAssertThatWithFailMessageStringIsNotSameAs() {
-    Object actual = new Object();
-    Object expected = new Object();
-    assertThat(actual).withFailMessage("foo").isNotSameAs(expected);
+    assertThat("bar").withFailMessage("baz").isNotSameAs("foo");
   }
 
   void testAssertThatWithFailMessageSupplierIsNotSameAs() {
-    Object actual = new Object();
-    Object expected = new Object();
-    assertThat(actual).withFailMessage(() -> "foo").isNotSameAs(expected);
+    assertThat("bar").withFailMessage(() -> "baz").isNotSameAs("foo");
   }
 
   void testAssertThatThrownByIsExactlyInstanceOf() {
@@ -164,14 +156,17 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
 
   void testAssertThatCodeDoesNotThrowAnyException() {
     assertThatCode(() -> {}).doesNotThrowAnyException();
+    assertThatCode(() -> toString()).doesNotThrowAnyException();
   }
 
   void testAssertThatCodeWithFailMessageStringDoesNotThrowAnyException() {
     assertThatCode(() -> {}).withFailMessage("foo").doesNotThrowAnyException();
+    assertThatCode(() -> toString()).withFailMessage("bar").doesNotThrowAnyException();
   }
 
   void testAssertThatCodeWithFailMessageSupplierDoesNotThrowAnyException() {
     assertThatCode(() -> {}).withFailMessage(() -> "foo").doesNotThrowAnyException();
+    assertThatCode(() -> toString()).withFailMessage(() -> "bar").doesNotThrowAnyException();
   }
 
   void testAssertThatIsInstanceOf() {

@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -27,10 +28,37 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.function.ThrowingSupplier;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
-/** Refaster rules to replace JUnit assertions with AssertJ equivalents. */
+/**
+ * Refaster rules to replace JUnit assertions with AssertJ equivalents.
+ *
+ * <p>Note that, while both libraries throw an {@link AssertionError} in case of an assertion
+ * failure, the exact subtype used generally differs.
+ */
+// XXX: Not all `org.assertj.core.api.Assertions` methods have an associated Refaster rule yet;
+// expand this class.
+// XXX: Introduce a `@Matcher` on `Executable` and `ThrowingSupplier` expressions, such that they
+// are only matched if they are also compatible with the `ThrowingCallable` functional interface.
+// When implementing such a matcher, note that expressions with a non-void return type such as
+// `() -> toString()` match both `ThrowingSupplier` and `ThrowingCallable`, but `() -> "constant"`
+// is only compatible with the former.
 @OnlineDocumentation
 final class JUnitToAssertJRules {
   private JUnitToAssertJRules() {}
+
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(
+        Assertions.class,
+        assertDoesNotThrow(() -> null),
+        assertInstanceOf(null, null),
+        assertThrows(null, null),
+        assertThrowsExactly(null, null),
+        (Runnable) () -> assertFalse(true),
+        (Runnable) () -> assertNotNull(null),
+        (Runnable) () -> assertNotSame(null, null),
+        (Runnable) () -> assertNull(null),
+        (Runnable) () -> assertSame(null, null),
+        (Runnable) () -> assertTrue(true));
+  }
 
   static final class ThrowNewAssertionError {
     @BeforeTemplate
@@ -45,29 +73,42 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class FailWithMessage {
+  static final class FailWithMessage<T> {
     @BeforeTemplate
-    void before(String message) {
-      Assertions.fail(message);
+    T before(String message) {
+      return Assertions.fail(message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(String message) {
-      fail(message);
+    T after(String message) {
+      return fail(message);
     }
   }
 
-  static final class FailWithMessageAndThrowable {
+  static final class FailWithMessageAndThrowable<T> {
     @BeforeTemplate
-    void before(String message, Throwable throwable) {
-      Assertions.fail(message, throwable);
+    T before(String message, Throwable throwable) {
+      return Assertions.fail(message, throwable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(String message, Throwable throwable) {
-      fail(message, throwable);
+    T after(String message, Throwable throwable) {
+      return fail(message, throwable);
+    }
+  }
+
+  static final class FailWithThrowable {
+    @BeforeTemplate
+    void before(Throwable throwable) {
+      Assertions.fail(throwable);
+    }
+
+    @AfterTemplate
+    @DoNotCall
+    void after(Throwable throwable) {
+      throw new AssertionError(throwable);
     }
   }
 
@@ -227,12 +268,6 @@ final class JUnitToAssertJRules {
     }
   }
 
-  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertEquals`.
-  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertArrayEquals`.
-  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertIterableEquals`.
-  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertLinesMatch`.
-  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertNotEquals`.
-
   static final class AssertThatIsSameAs {
     @BeforeTemplate
     void before(Object actual, Object expected) {
@@ -310,8 +345,6 @@ final class JUnitToAssertJRules {
       assertThat(actual).withFailMessage(supplier).isNotSameAs(expected);
     }
   }
-
-  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertAll`.
 
   static final class AssertThatThrownByIsExactlyInstanceOf<T extends Throwable> {
     @BeforeTemplate
@@ -446,9 +479,6 @@ final class JUnitToAssertJRules {
       assertThatCode(throwingCallable).withFailMessage(supplier).doesNotThrowAnyException();
     }
   }
-
-  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertTimeout`.
-  // XXX: Rewrite `org.junit.jupiter.api.Assertions.assertTimeoutPreemptively`.
 
   static final class AssertThatIsInstanceOf<T> {
     @BeforeTemplate
