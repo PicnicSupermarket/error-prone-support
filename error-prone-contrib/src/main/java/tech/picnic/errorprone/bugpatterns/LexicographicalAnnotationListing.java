@@ -36,6 +36,8 @@ import tech.picnic.errorprone.utils.SourceCode;
  * <p>The idea behind this checker is that maintaining a sorted sequence simplifies conflict
  * resolution, and can even avoid it if two branches add the same annotation.
  */
+// XXX: Duplicate entries are often a mistake. Consider introducing a similar `BugChecker` that
+// flags duplicates.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Sort annotations lexicographically where possible",
