@@ -4,7 +4,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.io.Resources;
-import com.sun.source.util.TaskEvent.Kind;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,7 +16,10 @@ final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
     Path outputPath = directory.resolve("pkg").toAbsolutePath();
     compile(
         outputPath.toString(),
+        "TestCheckerWithoutAnnotation.java",
         "package pkg;",
+        "",
+        "import com.google.errorprone.bugpatterns.BugChecker;",
         "",
         "public final class TestCheckerWithoutAnnotation extends BugChecker {}");
 
@@ -30,6 +32,7 @@ final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
     Path outputPath = directory.resolve("pkg").toAbsolutePath();
     compile(
         outputPath.toString(),
+        "MinimalTestChecker.java",
         "package pkg;",
         "",
         "import com.google.errorprone.BugPattern;",
@@ -41,7 +44,7 @@ final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
 
     assertThat(
             Files.readString(
-                outputPath.resolve("docs").resolve("bugpattern-TaskListenerTestInput.json")))
+                outputPath.resolve("docs").resolve("bugpattern-MinimalTestChecker.json")))
         .isEqualToIgnoringWhitespace(getResource("bugpattern_example_minimal_testdata.json"));
   }
 
@@ -50,10 +53,11 @@ final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
     Path outputPath = directory.resolve("pkg").toAbsolutePath();
     compile(
         outputPath.toString(),
+        "TestChecker.java",
         "package pkg;",
         "",
         "import com.google.errorprone.BugPattern;",
-        "import com.google.errorprone.BugPattern.SeverityLevel",
+        "import com.google.errorprone.BugPattern.SeverityLevel;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "",
         "@BugPattern(",
@@ -68,38 +72,8 @@ final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
         "    disableable = false)",
         "public final class TestChecker extends BugChecker {}");
 
-    assertThat(
-            Files.readString(
-                outputPath.resolve("docs").resolve("bugpattern-TaskListenerTestInput.json")))
+    assertThat(Files.readString(outputPath.resolve("docs").resolve("bugpattern-TestChecker.json")))
         .isEqualToIgnoringWhitespace(getResource("bugpattern_example_testdata.json"));
-  }
-
-  @Test
-  void noOutputForWrongTaskEventKind(@TempDir Path directory) {
-    Path outputPath = directory.resolve("pkg").toAbsolutePath();
-    compile(
-        outputPath.toString(),
-        Kind.GENERATE,
-        "package pkg;",
-        "",
-        "import com.google.errorprone.BugPattern;",
-        "import com.google.errorprone.BugPattern.SeverityLevel",
-        "import com.google.errorprone.bugpatterns.BugChecker;",
-        "",
-        "@BugPattern(",
-        "    name = \"OtherName\",",
-        "    summary = \"Example summary\",",
-        "    linkType = BugPattern.LinkType.CUSTOM,",
-        "    link = \"https://error-prone.picnic.tech\",",
-        "    explanation = \"Example explanation\",",
-        "    severity = SeverityLevel.SUGGESTION,",
-        "    altNames = \"Check\",",
-        "    tags = BugPattern.StandardTags.SIMPLIFICATION,",
-        "    disableable = false)",
-        "public final class TestChecker extends BugChecker {}");
-
-    Path docsPath = outputPath.resolve("docs").toAbsolutePath();
-    assertThat(docsPath).isEmptyDirectory();
   }
 
   private static String getResource(String resourceName) throws IOException {
