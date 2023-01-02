@@ -35,9 +35,9 @@ final class DocumentationGeneratorTaskListenerTest extends TaskListenerCompilerB
   }
 
   @Test
-  void noDirectoryForTaskEventKindOtherThenAnalyze(@TempDir Path directory) {
+  void emptyDirectoryWhenNotStartingKindAnalyze(@TempDir Path directory) {
     Path outputPath = directory.resolve("pkg").toAbsolutePath();
-    compile(outputPath.toString(), Kind.ANALYZE, "package pkg;");
+    compile(outputPath.toString(), Kind.GENERATE, "package pkg;");
 
     assertThat(directory).isEmptyDirectory();
   }
