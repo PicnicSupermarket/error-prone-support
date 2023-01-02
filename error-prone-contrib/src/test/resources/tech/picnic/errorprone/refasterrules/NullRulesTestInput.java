@@ -3,13 +3,14 @@ package tech.picnic.errorprone.refasterrules;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class NullRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(MoreObjects.class);
+    return ImmutableSet.of(MoreObjects.class, Optional.class);
   }
 
   boolean testIsNull() {
@@ -20,8 +21,13 @@ final class NullRulesTest implements RefasterRuleCollectionTestCase {
     return Objects.nonNull("foo");
   }
 
-  String testRequireNonNullElse() {
-    return MoreObjects.firstNonNull("foo", "bar");
+  ImmutableSet<String> testRequireNonNullElse() {
+    return ImmutableSet.of(
+        MoreObjects.firstNonNull("foo", "bar"), Optional.ofNullable("baz").orElse("qux"));
+  }
+
+  String testRequireNonNullElseGet() {
+    return Optional.ofNullable("foo").orElseGet(() -> "bar");
   }
 
   long testIsNullFunction() {
