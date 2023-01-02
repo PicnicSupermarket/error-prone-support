@@ -150,7 +150,7 @@
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-2</version.error-prone-fork>
         <version.error-prone-orig>2.16</version.error-prone-orig>
-        <version.error-prone-slf4j>0.1.16</version.error-prone-slf4j>
+        <version.error-prone-slf4j>0.1.17</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.8.6</version.maven>
