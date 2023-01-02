@@ -4,16 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
-import com.google.common.collect.ImmutableList;
-import com.google.errorprone.FileManagers;
-import com.google.errorprone.FileObjects;
-import com.sun.tools.javac.api.JavacTaskImpl;
-import com.sun.tools.javac.api.JavacTool;
+import com.sun.source.util.TaskEvent.Kind;
 import java.io.File;
-import java.io.Writer;
 import java.nio.file.Path;
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaFileObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -42,6 +35,14 @@ final class DocumentationGeneratorTaskListenerTest extends TaskListenerCompilerB
   }
 
   @Test
+  void noDirectoryForTaskEventKindOtherThenAnalyze(@TempDir Path directory) {
+    Path outputPath = directory.resolve("pkg").toAbsolutePath();
+    compile(outputPath.toString(), Kind.ANALYZE, "package pkg;");
+
+    assertThat(directory).isEmptyDirectory();
+  }
+
+  @Test
   void noClassNoOutput(@TempDir Path directory) {
     Path outputPath = directory.resolve("pkg").toAbsolutePath();
     compile(outputPath.toString(), "package pkg;");
@@ -51,22 +52,10 @@ final class DocumentationGeneratorTaskListenerTest extends TaskListenerCompilerB
   }
 
   @Test
-  void twoArgumentsFailsInitPlugin() {
-    JavaFileObject javaFileObject =
-        FileObjects.forSourceLines("TaskListenerTestInput.java", "package pkg;");
-    JavacTaskImpl task =
-        (JavacTaskImpl)
-            JavacTool.create()
-                .getTask(
-                    Writer.nullWriter(),
-                    FileManagers.testFileManager(),
-                    new DiagnosticCollector<>(),
-                    ImmutableList.of(
-                        "-Xplugin:DocumentationGenerator -XdocsOutputDirectory=arg1 -XdocsOutputDirectory=arg2"),
-                    ImmutableList.of(),
-                    ImmutableList.of(javaFileObject));
+  void twoArgumentsFailsInitPlugin(@TempDir Path directory) {
+    Path outputPath = directory.resolve("pkg").toAbsolutePath();
 
-    assertThatThrownBy(task::call)
+    assertThatThrownBy(() -> compile(outputPath + " -XdocsOutputDirectory=arg2", "package pkg;"))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("Specify only one output path");
   }

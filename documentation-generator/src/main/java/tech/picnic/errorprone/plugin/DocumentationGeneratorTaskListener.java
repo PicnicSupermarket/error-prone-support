@@ -43,7 +43,9 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
 
   @Override
   public void started(TaskEvent taskEvent) {
-    createDirectoriesForPath();
+    if (taskEvent.getKind() == Kind.ANALYZE) {
+      createDirectoriesForPath();
+    }
   }
 
   @Override

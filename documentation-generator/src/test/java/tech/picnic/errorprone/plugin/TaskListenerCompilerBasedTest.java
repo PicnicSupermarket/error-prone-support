@@ -47,6 +47,10 @@ abstract class TaskListenerCompilerBasedTest {
     CompilationUnitTree compilationUnitTree = Iterables.getOnlyElement(task.parse());
     task.analyze();
 
+    for (TaskListener tl : task.getTaskListeners()) {
+      tl.started(new TaskEvent(taskEventKind));
+    }
+
     if (compilationUnitTree.getTypeDecls().isEmpty()) {
       return;
     }
