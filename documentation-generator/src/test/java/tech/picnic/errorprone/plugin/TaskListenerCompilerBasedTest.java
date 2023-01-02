@@ -26,7 +26,6 @@ abstract class TaskListenerCompilerBasedTest {
                 ImmutableList.of(),
                 ImmutableList.of(javaFileObject));
 
-    task.parse();
-    task.analyze();
+    task.call();
   }
 }
