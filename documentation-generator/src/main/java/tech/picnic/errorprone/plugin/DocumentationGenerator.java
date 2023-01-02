@@ -23,7 +23,7 @@ public final class DocumentationGenerator implements Plugin {
 
   @Override
   public void init(JavacTask javacTask, String... args) {
-    checkArgument(args.length == 1, "Specify one output path");
+    checkArgument(args.length == 1, "Specify only one output path");
     javacTask.addTaskListener(
         new DocumentationGeneratorTaskListener(((BasicJavacTask) javacTask).getContext(), args[0]));
   }
