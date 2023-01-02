@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.plugin;
 
+import static com.google.common.base.Preconditions.checkState;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.stream;
 
@@ -22,22 +23,22 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import javax.tools.JavaFileObject;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A {@link TaskListener} that identifies and extracts relevant content for documentation and writes
  * it to disk.
  */
 final class DocumentationGeneratorTaskListener implements TaskListener {
-  private static final ObjectMapper MAPPER =
+  private static final ObjectMapper OBJECT_MAPPER =
       new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
   private final Context context;
   private final String path;
-  private Path basePath;
+  private @Nullable Path basePath;
 
   DocumentationGeneratorTaskListener(Context context, String path) {
     this.context = context;
     this.path = path;
-    this.basePath = Paths.get(path);
   }
 
   @Override
@@ -84,10 +85,11 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   }
 
   private <T> void writeToFile(T data, String fileName, String name) {
+    checkState(basePath != null, "`basePath` has to be initialized");
     File file = basePath.resolve(String.format("%s-%s.json", fileName, name)).toFile();
 
     try (FileWriter fileWriter = new FileWriter(file, UTF_8, /* append= */ true)) {
-      MAPPER.writeValue(fileWriter, data);
+      OBJECT_MAPPER.writeValue(fileWriter, data);
     } catch (IOException e) {
       throw new IllegalStateException(
           String.format("Could not write to file '%s'", file.getPath()), e);
