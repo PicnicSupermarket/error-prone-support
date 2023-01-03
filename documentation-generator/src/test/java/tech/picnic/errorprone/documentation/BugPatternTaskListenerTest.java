@@ -1,8 +1,8 @@
-package tech.picnic.errorprone.plugin;
+package tech.picnic.errorprone.documentation;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.picnic.errorprone.plugin.DocumentationGenerator.DOCS_DIRECTORY;
+import static tech.picnic.errorprone.documentation.DocumentationGenerator.DOCS_DIRECTORY;
 
 import com.google.common.io.Resources;
 import java.io.IOException;

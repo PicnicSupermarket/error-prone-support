@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.plugin;
+package tech.picnic.errorprone.documentation;
 
 import static com.google.common.base.Preconditions.checkArgument;
 

@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.plugin;
+package tech.picnic.errorprone.documentation;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

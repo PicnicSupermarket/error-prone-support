@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.plugin;
+package tech.picnic.errorprone.documentation;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.stream;

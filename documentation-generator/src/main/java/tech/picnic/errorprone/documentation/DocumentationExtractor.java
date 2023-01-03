@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.plugin;
+package tech.picnic.errorprone.documentation;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.util.TaskEvent;

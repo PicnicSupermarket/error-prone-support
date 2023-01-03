@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.plugin;
+package tech.picnic.errorprone.documentation;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.nio.file.attribute.AclEntryPermission.ADD_SUBDIRECTORY;
@@ -7,7 +7,7 @@ import static java.nio.file.attribute.AclEntryPermission.WRITE_DATA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
-import static tech.picnic.errorprone.plugin.DocumentationGenerator.DOCS_DIRECTORY;
+import static tech.picnic.errorprone.documentation.DocumentationGenerator.DOCS_DIRECTORY;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;

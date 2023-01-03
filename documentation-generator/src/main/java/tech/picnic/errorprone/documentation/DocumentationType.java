@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.plugin;
+package tech.picnic.errorprone.documentation;
 
 /**
  * The {@link DocumentationType types} of documentation that can be identified and extracted from

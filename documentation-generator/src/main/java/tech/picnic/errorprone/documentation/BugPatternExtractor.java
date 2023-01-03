@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.plugin;
+package tech.picnic.errorprone.documentation;
 
 import static java.util.Objects.requireNonNull;
 
@@ -7,7 +7,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.util.TaskEvent;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import tech.picnic.errorprone.plugin.models.BugPattern;
+import tech.picnic.errorprone.documentation.models.BugPattern;
 
 /**
  * A {@link DocumentationExtractor} that describes how to extract data from a {@code BugChecker}.

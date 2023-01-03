@@ -1,10 +1,10 @@
-package tech.picnic.errorprone.plugin;
+package tech.picnic.errorprone.documentation;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
-import static tech.picnic.errorprone.plugin.DocumentationGenerator.DOCS_DIRECTORY;
-import static tech.picnic.errorprone.plugin.DocumentationGenerator.OUTPUT_DIRECTORY_OPTION;
-import static tech.picnic.errorprone.plugin.DocumentationGenerator.getDocsPath;
+import static tech.picnic.errorprone.documentation.DocumentationGenerator.DOCS_DIRECTORY;
+import static tech.picnic.errorprone.documentation.DocumentationGenerator.OUTPUT_DIRECTORY_OPTION;
+import static tech.picnic.errorprone.documentation.DocumentationGenerator.getDocsPath;
 
 import java.io.File;
 import java.nio.file.InvalidPathException;

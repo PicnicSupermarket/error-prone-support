@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.plugin;
+package tech.picnic.errorprone.documentation;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.FileObjects;
