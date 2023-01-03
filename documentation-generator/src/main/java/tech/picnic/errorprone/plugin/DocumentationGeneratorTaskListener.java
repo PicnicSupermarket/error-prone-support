@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.plugin;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.stream;
 
@@ -18,12 +17,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import javax.tools.JavaFileObject;
-import org.jspecify.annotations.Nullable;
 
 /**
  * A {@link TaskListener} that identifies and extracts relevant content for documentation and writes
@@ -33,18 +30,17 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   private static final ObjectMapper OBJECT_MAPPER =
       new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
   private final Context context;
-  private final String path;
-  private @Nullable Path basePath;
+  private final Path docsPath;
 
-  DocumentationGeneratorTaskListener(Context context, String path) {
+  DocumentationGeneratorTaskListener(Context context, Path path) {
     this.context = context;
-    this.path = path;
+    this.docsPath = path;
   }
 
   @Override
   public void started(TaskEvent taskEvent) {
     if (taskEvent.getKind() == Kind.ANALYZE) {
-      createDirectoriesForPath();
+      createDocsDirectory();
     }
   }
 
@@ -60,35 +56,33 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
       return;
     }
 
-    getDocumentationType(classTree)
+    findDocumentationType(classTree)
         .ifPresent(
             documentationType ->
                 writeToFile(
-                    documentationType.getDocumentationExtractor().extract(classTree, taskEvent),
                     documentationType.getIdentifier(),
-                    getSimpleClassName(sourceFile.toUri())));
+                    getSimpleClassName(sourceFile.toUri()),
+                    documentationType.getDocumentationExtractor().extract(classTree, taskEvent)));
   }
 
-  private void createDirectoriesForPath() {
-    String docsPath = path.substring(path.indexOf('=') + 1) + File.separator + "docs";
+  private void createDocsDirectory() {
     try {
-      basePath = Files.createDirectories(Paths.get(docsPath));
-    } catch (IOException | InvalidPathException e) {
+      Files.createDirectories(docsPath);
+    } catch (IOException e) {
       throw new IllegalStateException(
           String.format("Error while creating directory with path '%s'", docsPath), e);
     }
   }
 
   // XXX: `JavaFileObject` will most likely be added as parameter to help identify other `DocType`s.
-  private static Optional<DocumentationType> getDocumentationType(ClassTree tree) {
+  private static Optional<DocumentationType> findDocumentationType(ClassTree tree) {
     return stream(DocumentationType.values())
         .filter(type -> type.getDocumentationExtractor().canExtract(tree))
         .findFirst();
   }
 
-  private <T> void writeToFile(T data, String fileName, String name) {
-    checkState(basePath != null, "`basePath` has to be initialized");
-    File file = basePath.resolve(String.format("%s-%s.json", fileName, name)).toFile();
+  private <T> void writeToFile(String identifier, String className, T data) {
+    File file = docsPath.resolve(String.format("%s-%s.json", identifier, className)).toFile();
 
     try (FileWriter fileWriter = new FileWriter(file, UTF_8, /* append= */ true)) {
       OBJECT_MAPPER.writeValue(fileWriter, data);

@@ -1,5 +1,9 @@
 package tech.picnic.errorprone.plugin;
 
+/**
+ * The {@link DocumentationType types} of documentation that can be identified and extracted from
+ * the source code.
+ */
 enum DocumentationType {
   BUG_PATTERN("bugpattern", new BugPatternExtractor());
 

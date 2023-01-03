@@ -1,29 +1,26 @@
 package tech.picnic.errorprone.plugin;
 
-import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.errorprone.BugPattern;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.util.TaskEvent;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import tech.picnic.errorprone.plugin.models.BugPatternData;
+import tech.picnic.errorprone.plugin.models.BugPattern;
 
 /**
  * A {@link DocumentationExtractor} that describes how to extract data from a {@code BugChecker}.
  */
-public final class BugPatternExtractor implements DocumentationExtractor<BugPatternData> {
-  /** Instantiates a new {@link BugPatternExtractor} instance. */
-  public BugPatternExtractor() {}
-
+final class BugPatternExtractor implements DocumentationExtractor<BugPattern> {
   @Override
-  public BugPatternData extract(ClassTree tree, TaskEvent taskEvent) {
+  public BugPattern extract(ClassTree tree, TaskEvent taskEvent) {
     ClassSymbol symbol = ASTHelpers.getSymbol(tree);
-    BugPattern annotation = symbol.getAnnotation(BugPattern.class);
-    checkState(annotation != null, "BugPattern annotation must be present");
+    com.google.errorprone.BugPattern annotation =
+        symbol.getAnnotation(com.google.errorprone.BugPattern.class);
+    requireNonNull(annotation, "BugPattern annotation must be present");
 
-    return BugPatternData.create(
+    return BugPattern.create(
         symbol.getQualifiedName().toString(),
         annotation.name().isEmpty() ? tree.getSimpleName().toString() : annotation.name(),
         ImmutableList.copyOf(annotation.altNames()),
@@ -37,6 +34,7 @@ public final class BugPatternExtractor implements DocumentationExtractor<BugPatt
 
   @Override
   public boolean canExtract(ClassTree tree) {
-    return ASTHelpers.hasDirectAnnotationWithSimpleName(tree, BugPattern.class.getSimpleName());
+    return ASTHelpers.hasDirectAnnotationWithSimpleName(
+        tree, com.google.errorprone.BugPattern.class.getSimpleName());
   }
 }

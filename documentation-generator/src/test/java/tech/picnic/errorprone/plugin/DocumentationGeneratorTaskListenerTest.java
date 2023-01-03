@@ -2,7 +2,7 @@ package tech.picnic.errorprone.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.condition.OS.WINDOWS;
+import static tech.picnic.errorprone.plugin.DocumentationGenerator.DOCS_DIRECTORY;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.FileObjects;
@@ -11,49 +11,40 @@ import com.sun.source.util.TaskEvent.Kind;
 import com.sun.source.util.TaskListener;
 import com.sun.tools.javac.api.JavacTaskImpl;
 import com.sun.tools.javac.api.JavacTool;
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystemException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 
 final class DocumentationGeneratorTaskListenerTest extends TaskListenerCompilerBasedTest {
-  @EnabledOnOs(WINDOWS)
   @Test
-  void wrongPathFailsWindows() {
-    wrongPathFails('?');
-  }
+  void readOnlyFileSystem(@TempDir Path directory) throws IOException {
+    Path testPath = Files.createDirectory(directory.resolve("test"));
+    testPath.toFile().setReadOnly();
 
-  @DisabledOnOs(WINDOWS)
-  @Test
-  void wrongPathFailsOtherOperatingSystems() {
-    // Strictly speaking we are validating here that we cannot write to a Read-only file system.
-    wrongPathFails('/');
-  }
-
-  private void wrongPathFails(char invalidCharacter) {
-    String invalidPath = invalidCharacter + "wrong-path";
-    assertThatThrownBy(() -> compile(invalidPath, "A.java", "public class A {}"))
+    assertThatThrownBy(() -> compile(testPath, "A.java", "public class A {}"))
+        .hasRootCauseInstanceOf(FileSystemException.class)
         .hasCauseInstanceOf(IllegalStateException.class)
         .hasMessageEndingWith(
-            "Error while creating directory with path '%s'", invalidPath + File.separator + "docs");
+            "Error while creating directory with path '%s'", testPath.resolve(DOCS_DIRECTORY));
   }
 
   @Test
   void emptyDirectoryWhenNotStartingKindAnalyze(@TempDir Path directory) {
-    Path outputPath = directory.resolve("pkg").toAbsolutePath();
-    compile(outputPath.toString(), "A.java", "package pkg;");
+    Path outputPath = directory.resolve("pkg");
+    compile(outputPath, "A.java", "package pkg;");
 
     assertThat(directory).isEmptyDirectory();
   }
 
   @Test
   void noClassNoOutput(@TempDir Path directory) {
-    Path outputPath = directory.resolve("pkg").toAbsolutePath();
-    compile(outputPath.toString(), "A.java", "package pkg;");
+    Path outputPath = directory.resolve("pkg");
+    compile(outputPath, "A.java", "package pkg;");
 
     assertThat(directory).isEmptyDirectory();
   }

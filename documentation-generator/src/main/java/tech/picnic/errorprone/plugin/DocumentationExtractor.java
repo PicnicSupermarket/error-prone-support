@@ -4,7 +4,7 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.util.TaskEvent;
 
 /**
- * Interface implemented by a classes that define how to extract {@link T} from a given {@link
+ * Interface implemented by classes that define how to extract {@link T} from a given {@link
  * ClassTree}.
  *
  * @param <T> The resulting type of the data that is extracted.

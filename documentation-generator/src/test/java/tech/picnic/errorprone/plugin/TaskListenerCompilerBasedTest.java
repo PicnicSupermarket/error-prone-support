@@ -4,10 +4,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.errorprone.FileObjects;
 import com.sun.tools.javac.api.JavacTaskImpl;
 import com.sun.tools.javac.api.JavacTool;
+import java.nio.file.Path;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 
 abstract class TaskListenerCompilerBasedTest {
+  public void compile(Path path, String fileName, String... lines) {
+    performCompilationForFile(
+        path.toAbsolutePath().toString(), FileObjects.forSourceLines(fileName, lines));
+  }
+
   public void compile(String outputDirectory, String fileName, String... lines) {
     performCompilationForFile(outputDirectory, FileObjects.forSourceLines(fileName, lines));
   }

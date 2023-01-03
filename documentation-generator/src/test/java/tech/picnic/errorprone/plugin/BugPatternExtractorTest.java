@@ -40,7 +40,7 @@ final class BugPatternExtractorTest {
       BugPatternExtractor extractor = new BugPatternExtractor();
 
       assertThatThrownBy(() -> extractor.extract(tree, event))
-          .isInstanceOf(IllegalStateException.class)
+          .isInstanceOf(NullPointerException.class)
           .hasMessage("BugPattern annotation must be present");
 
       return Description.NO_MATCH;
