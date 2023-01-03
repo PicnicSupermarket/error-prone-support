@@ -7,6 +7,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.Plugin;
 import com.sun.tools.javac.api.BasicJavacTask;
+import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
@@ -41,9 +42,9 @@ public final class DocumentationGenerator implements Plugin {
     validateOutputDirectoryOption(option.length == 2, docsPathArg);
     validateOutputDirectoryOption(option[0].equals(OUTPUT_DIRECTORY_OPTION), docsPathArg);
 
-    String basePath = option[1];
+    String basePath = option[1] + File.separator + DOCS_DIRECTORY;
     try {
-      return Path.of(basePath, DOCS_DIRECTORY);
+      return Path.of(basePath);
     } catch (InvalidPathException e) {
       throw new IllegalArgumentException(
           String.format("Error while creating path '%s'", basePath), e);
