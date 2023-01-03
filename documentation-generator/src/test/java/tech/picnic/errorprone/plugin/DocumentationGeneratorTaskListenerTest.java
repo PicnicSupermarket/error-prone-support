@@ -24,7 +24,7 @@ final class DocumentationGeneratorTaskListenerTest extends TaskListenerCompilerB
   @Test
   void readOnlyFileSystem(@TempDir Path directory) throws IOException {
     Path testPath = Files.createDirectory(directory.resolve("test"));
-    testPath.toFile().setReadOnly();
+    testPath.toFile().setWritable(false, false);
 
     assertThatThrownBy(() -> compile(testPath, "A.java", "public class A {}"))
         .hasRootCauseInstanceOf(FileSystemException.class)

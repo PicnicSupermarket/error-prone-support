@@ -19,7 +19,7 @@ final class DocumentationGeneratorTest {
   void invalidPath() {
     String basePath = '?' + "path";
     assertThatThrownBy(() -> getDocsPath(basePath))
-        .hasCauseInstanceOf(IllegalArgumentException.class)
+        .isInstanceOf(IllegalArgumentException.class)
         .hasRootCauseInstanceOf(InvalidPathException.class)
         .hasMessageEndingWith(
             "Error while creating path '%s'", basePath + File.separator + DOCS_DIRECTORY);
