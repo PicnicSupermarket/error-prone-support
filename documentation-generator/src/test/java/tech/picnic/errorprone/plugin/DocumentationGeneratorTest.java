@@ -18,7 +18,7 @@ final class DocumentationGeneratorTest {
   @Test
   void invalidPath() {
     String basePath = '?' + "path";
-    assertThatThrownBy(() -> getDocsPath(basePath))
+    assertThatThrownBy(() -> getDocsPath(OUTPUT_DIRECTORY_OPTION + '=' + basePath))
         .isInstanceOf(IllegalArgumentException.class)
         .hasCauseInstanceOf(InvalidPathException.class)
         .hasMessageEndingWith(
