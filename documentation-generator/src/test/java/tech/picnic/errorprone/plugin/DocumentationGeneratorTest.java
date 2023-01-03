@@ -22,8 +22,7 @@ final class DocumentationGeneratorTest {
         .hasCauseInstanceOf(IllegalArgumentException.class)
         .hasRootCauseInstanceOf(InvalidPathException.class)
         .hasMessageEndingWith(
-            "Error while creating directory with path '%s'",
-            basePath + File.separator + DOCS_DIRECTORY);
+            "Error while creating path '%s'", basePath + File.separator + DOCS_DIRECTORY);
   }
 
   @ParameterizedTest

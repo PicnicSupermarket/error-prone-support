@@ -46,7 +46,7 @@ public final class DocumentationGenerator implements Plugin {
       return Path.of(basePath, DOCS_DIRECTORY);
     } catch (InvalidPathException e) {
       throw new IllegalArgumentException(
-          String.format("Error while creating directory with path '%s'", basePath), e);
+          String.format("Error while creating path '%s'", basePath), e);
     }
   }
 
