@@ -26,7 +26,7 @@ final class DocumentationGeneratorTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"", "nothing", "invalidOption=Test", "-XdocsOutputDirectory"})
+  @ValueSource(strings = {"", "-XdocsOutputDirectory", "invalidOption=Test", "nothing"})
   void invalidOption(String docsPathArg) {
     assertThatThrownBy(() -> getDocsPath(docsPathArg))
         .isInstanceOf(IllegalArgumentException.class)
