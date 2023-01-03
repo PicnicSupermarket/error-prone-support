@@ -7,12 +7,12 @@ import com.google.errorprone.BugPattern.SeverityLevel;
 /** A class that contains information related to a {@code BugChecker}. */
 // XXX: What about `SuppressionAnnotations` and `DocumentSuppression`?
 @AutoValue
-public abstract class BugPattern {
-  /** Instantiates a new {@link BugPattern} instance. */
-  public BugPattern() {}
+public abstract class BugPatternDocumentation {
+  /** Instantiates a new {@link BugPatternDocumentation} instance. */
+  public BugPatternDocumentation() {}
 
   /**
-   * Creates an instance of {@link BugPattern}.
+   * Creates an instance of {@link BugPatternDocumentation}.
    *
    * @param fullyQualifiedName The FQN of the {@code BugChecker}.
    * @param name The simple name of the {@code BugChecker}.
@@ -25,7 +25,7 @@ public abstract class BugPattern {
    * @param disableable Describes whether the check can be disabled using command-line flags.
    * @return A non-{@code null} {@code BugPattern}.
    */
-  public static BugPattern create(
+  public static BugPatternDocumentation create(
       String fullyQualifiedName,
       String name,
       ImmutableList<String> altNames,
@@ -35,7 +35,7 @@ public abstract class BugPattern {
       String explanation,
       SeverityLevel severityLevel,
       boolean disableable) {
-    return new AutoValue_BugPattern(
+    return new AutoValue_BugPatternDocumentation(
         fullyQualifiedName,
         name,
         altNames,

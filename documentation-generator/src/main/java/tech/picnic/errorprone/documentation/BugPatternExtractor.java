@@ -3,24 +3,24 @@ package tech.picnic.errorprone.documentation;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.BugPattern;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.util.TaskEvent;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import tech.picnic.errorprone.documentation.models.BugPattern;
+import tech.picnic.errorprone.documentation.models.BugPatternDocumentation;
 
 /**
  * A {@link DocumentationExtractor} that describes how to extract data from a {@code BugChecker}.
  */
-final class BugPatternExtractor implements DocumentationExtractor<BugPattern> {
+final class BugPatternExtractor implements DocumentationExtractor<BugPatternDocumentation> {
   @Override
-  public BugPattern extract(ClassTree tree, TaskEvent taskEvent) {
+  public BugPatternDocumentation extract(ClassTree tree, TaskEvent taskEvent) {
     ClassSymbol symbol = ASTHelpers.getSymbol(tree);
-    com.google.errorprone.BugPattern annotation =
-        symbol.getAnnotation(com.google.errorprone.BugPattern.class);
+    BugPattern annotation = symbol.getAnnotation(BugPattern.class);
     requireNonNull(annotation, "BugPattern annotation must be present");
 
-    return BugPattern.create(
+    return BugPatternDocumentation.create(
         symbol.getQualifiedName().toString(),
         annotation.name().isEmpty() ? tree.getSimpleName().toString() : annotation.name(),
         ImmutableList.copyOf(annotation.altNames()),
@@ -34,7 +34,6 @@ final class BugPatternExtractor implements DocumentationExtractor<BugPattern> {
 
   @Override
   public boolean canExtract(ClassTree tree) {
-    return ASTHelpers.hasDirectAnnotationWithSimpleName(
-        tree, com.google.errorprone.BugPattern.class.getSimpleName());
+    return ASTHelpers.hasDirectAnnotationWithSimpleName(tree, BugPattern.class.getSimpleName());
   }
 }

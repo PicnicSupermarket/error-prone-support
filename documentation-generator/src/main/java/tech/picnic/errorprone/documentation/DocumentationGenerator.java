@@ -30,7 +30,7 @@ public final class DocumentationGenerator implements Plugin {
 
   @Override
   public void init(JavacTask javacTask, String... args) {
-    checkArgument(args.length == 1, "Specify only one output path");
+    checkArgument(args.length == 1, "Only a single path can be provided");
     javacTask.addTaskListener(
         new DocumentationGeneratorTaskListener(
             ((BasicJavacTask) javacTask).getContext(), getDocsPath(args[0])));
