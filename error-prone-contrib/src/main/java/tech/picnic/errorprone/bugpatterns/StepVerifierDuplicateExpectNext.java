@@ -1,11 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
-import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
-import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
-import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
-
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
@@ -20,13 +14,21 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
+import java.util.stream.StreamSupport;
+
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 /**
  * A {@link BugChecker} that flags duplicated usages of {@link StepVerifier.Step#expectNext} in
@@ -65,27 +67,29 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!STEP_EXPECTNEXT.matches(tree, state)) {
+    // If the parent matches, this node will be considered when the parent parses its children, so we consider it not to match
+    if (!STEP_EXPECTNEXT.matches(tree, state) || getParent(tree).map(t -> STEP_EXPECTNEXT.matches(t, state)).orElse(false)) {
       return Description.NO_MATCH;
     }
 
-    MethodInvocationTree parent = tree;
-    List<ExpressionTree> args = new ArrayList<>();
-    while(STEP_EXPECTNEXT.matches(getParent(parent), state)){
-      parent = getParent(parent);
-      args.addAll(parent.getArguments());
+    MethodInvocationTree child = tree;
+    List<ExpressionTree> newArgs = new ArrayList<>();
+    for(int i = 2; getChild(state, i).map(t -> STEP_EXPECTNEXT.matches(t, state)).orElse(false); i+=2){
+      // We checked in the loop condition that the child is present, so this is safe
+      child = getChild(state, i).orElseThrow();
+      newArgs.addAll(child.getArguments());
     }
 
-    if (args.isEmpty()) {
+    if (newArgs.isEmpty()) {
       return Description.NO_MATCH;
     }
 
-    String newArgument =
-        tree.getArguments().stream().map(Object::toString).collect(Collectors.joining(", "));
+    String newArgument = newArgs.stream().map(Object::toString).collect(Collectors.joining(", "));
+    List<? extends ExpressionTree> myArgs = tree.getArguments();
     SuggestedFix.Builder argumentsFix =
-        SuggestedFix.builder().postfixWith(args.get(args.size() - 1), ", " + newArgument);
-    int startPosition = state.getEndPosition(parent);
-    int endPosition = state.getEndPosition(tree);
+        SuggestedFix.builder().postfixWith(myArgs.get(myArgs.size() - 1), ", " + newArgument);
+    int startPosition = state.getEndPosition(tree);
+    int endPosition = state.getEndPosition(child);
 
     SuggestedFix removeDuplicateCall = SuggestedFix.replace(startPosition, endPosition, "");
     Description.Builder description = buildDescription(tree);
@@ -93,8 +97,20 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
     return description.build();
   }
 
-  private MethodInvocationTree getParent(MethodInvocationTree tree) {
-    MemberSelectTree ms = (MemberSelectTree) tree.getMethodSelect();
-    return (MethodInvocationTree) (ms).getExpression();
+  private Optional<MethodInvocationTree> getParent(MethodInvocationTree tree) {
+    return Optional.of(tree.getMethodSelect())
+            .filter(ms -> ms instanceof MemberSelectTree)
+            .map(ms -> ((MemberSelectTree) ms).getExpression())
+            .filter(expr -> expr instanceof MethodInvocationTree)
+            .map(expr -> (MethodInvocationTree) expr);
+  }
+
+  private Optional<MethodInvocationTree> getChild(VisitorState state, int skip) {
+    return StreamSupport
+            .stream(state.getPath().spliterator(), false)
+            .skip(skip)
+            .findFirst()
+            .filter(expr -> expr instanceof MethodInvocationTree)
+            .map(expr -> (MethodInvocationTree) expr);
   }
 }
