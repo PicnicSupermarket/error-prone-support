@@ -1,5 +1,11 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
@@ -14,37 +20,20 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
-import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
-import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
-import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
-import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import reactor.test.StepVerifier;
 
 /**
  * A {@link BugChecker} that flags duplicated usages of {@link StepVerifier.Step#expectNext} in
  * favor of the overloaded variant.
  *
- * <p>{@link Flux#flatMap(Function)} and {@link Flux#flatMapSequential(Function)} eagerly perform up
- * to {@link reactor.util.concurrent.Queues#SMALL_BUFFER_SIZE} subscriptions. Additionally, the
- * former interleaves values as they are emitted, yielding nondeterministic results. In most cases
- * {@link Flux#concatMap(Function)} should be preferred, as it produces consistent results and
- * avoids potentially saturating the thread pool on which subscription happens. If {@code
- * concatMap}'s sequential-subscription semantics are undesirable one should invoke a {@code
- * flatMap} or {@code flatMapSequential} overload with an explicit concurrency level.
- *
- * <p>NB: The rarely-used overload {@link Flux#flatMap(Function, Function,
- * java.util.function.Supplier)} is not flagged by this check because there is no clear alternative
- * to point to.
+ * <p>Chaining {@link StepVerifier.Step#expectNext} calls can make the code more verbose than it has
+ * to be. Since {@link StepVerifier.Step#expectNext} offers several overload functions, those should
+ * be preferred over chaining {@link StepVerifier.Step#expectNext} calls.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -67,14 +56,22 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    // If the parent matches, this node will be considered when the parent parses its children, so we consider it not to match
-    if (!STEP_EXPECTNEXT.matches(tree, state) || getParent(tree).map(t -> STEP_EXPECTNEXT.matches(t, state)).orElse(false)) {
+    // If the parent matches, this node will be considered when the parent parses its children, so
+    // we consider it not to match
+    if (!STEP_EXPECTNEXT.matches(tree, state)
+        || getParent(tree).map(t -> STEP_EXPECTNEXT.matches(t, state)).orElse(false)) {
       return Description.NO_MATCH;
     }
 
     MethodInvocationTree child = tree;
     List<ExpressionTree> newArgs = new ArrayList<>();
-    for(int i = 2; getChild(state, i).map(t -> STEP_EXPECTNEXT.matches(t, state)).orElse(false); i+=2){
+
+    // The nodes are organized as MethodInvocationTree -> MemberSelectTree -> MethodInvocationTree
+    // -> ...
+    // We skip 2 to find the next method call in the call chain.
+    for (int i = 2;
+        getChild(state, i).map(t -> STEP_EXPECTNEXT.matches(t, state)).orElse(false);
+        i += 2) {
       // We checked in the loop condition that the child is present, so this is safe
       child = getChild(state, i).orElseThrow();
       newArgs.addAll(child.getArguments());
@@ -99,18 +96,17 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
 
   private Optional<MethodInvocationTree> getParent(MethodInvocationTree tree) {
     return Optional.of(tree.getMethodSelect())
-            .filter(ms -> ms instanceof MemberSelectTree)
-            .map(ms -> ((MemberSelectTree) ms).getExpression())
-            .filter(expr -> expr instanceof MethodInvocationTree)
-            .map(expr -> (MethodInvocationTree) expr);
+        .filter(ms -> ms instanceof MemberSelectTree)
+        .map(ms -> ((MemberSelectTree) ms).getExpression())
+        .filter(expr -> expr instanceof MethodInvocationTree)
+        .map(expr -> (MethodInvocationTree) expr);
   }
 
   private Optional<MethodInvocationTree> getChild(VisitorState state, int skip) {
-    return StreamSupport
-            .stream(state.getPath().spliterator(), false)
-            .skip(skip)
-            .findFirst()
-            .filter(expr -> expr instanceof MethodInvocationTree)
-            .map(expr -> (MethodInvocationTree) expr);
+    return StreamSupport.stream(state.getPath().spliterator(), false)
+        .skip(skip)
+        .findFirst()
+        .filter(expr -> expr instanceof MethodInvocationTree)
+        .map(expr -> (MethodInvocationTree) expr);
   }
 }
