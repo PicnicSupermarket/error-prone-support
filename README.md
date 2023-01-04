@@ -36,7 +36,7 @@ code_][picnic-blog-ep-post].
 ### Installation
 
 This library is built on top of [Error Prone][error-prone-orig-repo]. To use
-it:
+it, read the installation guide for Maven or Gradle below.
 
 #### Maven
 
@@ -96,18 +96,14 @@ it:
 Prone Support. Alternatively reference this project's `self-check` profile
 definition. -->
 
-#### Gradle (Groovy)
+#### Gradle
 
-- Add `net.ltgt.errorprone` plugin to your `build.gradle` file with one or 
-  more Error Prone Support modules:
+1. First, follow the [installation guide]
+   [error-prone-gradle-installation-guide] of the `gradle-errorprone-plugin`.
+2. Next, edit your `build.gradle` file to add one or more Error Prone Support
+   modules:
 
    ```groovy
-   plugins {
-       // The gradle plugin is an external contribution.
-       // The documentation and code is at: https://github.com/tbroyer/gradle-errorprone-plugin
-       id("net.ltgt.errorprone") version "${errorPronePluginVersion}"
-   }
-   
    dependencies {
        // Error Prone itself.
        errorprone("com.google.errorprone:error_prone_core:${errorProneVersion}")
@@ -117,9 +113,11 @@ definition. -->
        errorprone("tech.picnic.error-prone-support:refaster-runner:${errorProneSupportVersion}")
    }
    
-   // Configure Error Prone
    tasks.withType(JavaCompile).configureEach {
        options.errorprone.disableWarningsInGeneratedCode = true
+       // Add other Error Prone flags here. See:
+       // - https://github.com/tbroyer/gradle-errorprone-plugin#configuration
+       // - https://errorprone.info/docs/flags
    }
    ```
 
@@ -236,6 +234,7 @@ guidelines][contributing].
 [error-prone-bugchecker]: https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
 [error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
 [error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
+[error-prone-gradle-installation-guide]: https://github.com/tbroyer/gradle-errorprone-plugin
 [error-prone-installation-guide]: https://errorprone.info/docs/installation#maven
 [error-prone-orig-repo]: https://github.com/google/error-prone
 [error-prone-pull-3301]: https://github.com/google/error-prone/pull/3301
