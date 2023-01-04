@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.AnnotationAttributeMatcher;
+import tech.picnic.errorprone.bugpatterns.util.Flags;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
@@ -220,7 +221,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
 
   private static ImmutableList<String> excludedAnnotations(ErrorProneFlags flags) {
     Set<String> exclusions = new HashSet<>();
-    flags.getList(EXCLUDED_ANNOTATIONS_FLAG).ifPresent(exclusions::addAll);
+    exclusions.addAll(Flags.getList(flags, EXCLUDED_ANNOTATIONS_FLAG));
     exclusions.addAll(BLACKLISTED_ANNOTATIONS);
     return ImmutableList.copyOf(exclusions);
   }

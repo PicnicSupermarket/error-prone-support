@@ -49,6 +49,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.bugpatterns.util.Flags;
 import tech.picnic.errorprone.bugpatterns.util.MethodMatcherFactory;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
@@ -63,9 +64,8 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class RedundantStringConversion extends BugChecker
     implements BinaryTreeMatcher, CompoundAssignmentTreeMatcher, MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final String FLAG_PREFIX = "RedundantStringConversion:";
   private static final String EXTRA_STRING_CONVERSION_METHODS_FLAG =
-      FLAG_PREFIX + "ExtraConversionMethods";
+      "RedundantStringConversion:ExtraConversionMethods";
 
   @SuppressWarnings("UnnecessaryLambda")
   private static final Matcher<ExpressionTree> ANY_EXPR = (t, s) -> true;
@@ -374,10 +374,9 @@ public final class RedundantStringConversion extends BugChecker
       ErrorProneFlags flags) {
     // XXX: ErrorProneFlags#getList splits by comma, but method signatures may also contain commas.
     // For this class methods accepting more than one argument are not valid, but still: not nice.
-    return flags
-        .getList(EXTRA_STRING_CONVERSION_METHODS_FLAG)
-        .map(new MethodMatcherFactory()::create)
-        .map(m -> anyOf(WELL_KNOWN_STRING_CONVERSION_METHODS, m))
-        .orElse(WELL_KNOWN_STRING_CONVERSION_METHODS);
+    return anyOf(
+        WELL_KNOWN_STRING_CONVERSION_METHODS,
+        new MethodMatcherFactory()
+            .create(Flags.getList(flags, EXTRA_STRING_CONVERSION_METHODS_FLAG)));
   }
 }
