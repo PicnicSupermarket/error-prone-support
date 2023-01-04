@@ -14,7 +14,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class MapRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(HashMap.class, requireNonNullElse("foo", "bar"));
+    return ImmutableSet.of(HashMap.class, requireNonNullElse(null, null));
   }
 
   Map<RoundingMode, String> testCreateEnumMap() {
