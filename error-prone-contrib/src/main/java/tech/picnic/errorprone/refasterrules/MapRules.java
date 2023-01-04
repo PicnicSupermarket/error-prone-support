@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.Objects.requireNonNullElse;
+
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -40,6 +42,23 @@ final class MapRules {
     @Nullable
     V after(Map<K, V> map, T key) {
       return map.get(key);
+    }
+  }
+
+  /**
+   * Prefer {@link Map#getOrDefault(Object, Object)} over more contrived alternatives. Note that
+   * this method may return null instead of throwing a NPE.
+   */
+  static final class MapGetOrDefault<K, V, T> {
+    @BeforeTemplate
+    V before(Map<K, V> map, T key, V defaultValue) {
+      return requireNonNullElse(map.get(key), defaultValue);
+    }
+
+    @AfterTemplate
+    @Nullable
+    V after(Map<K, V> map, T key, V defaultValue) {
+      return map.getOrDefault(key, defaultValue);
     }
   }
 

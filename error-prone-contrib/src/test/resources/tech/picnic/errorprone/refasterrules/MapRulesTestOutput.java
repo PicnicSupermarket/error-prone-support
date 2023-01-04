@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.Objects.requireNonNullElse;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.math.RoundingMode;
@@ -12,7 +14,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class MapRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(HashMap.class);
+    return ImmutableSet.of(HashMap.class, requireNonNullElse("foo", "bar"));
   }
 
   Map<RoundingMode, String> testCreateEnumMap() {
@@ -21,6 +23,10 @@ final class MapRulesTest implements RefasterRuleCollectionTestCase {
 
   String testMapGetOrNull() {
     return ImmutableMap.of(1, "foo").get("bar");
+  }
+
+  String testMapGetOrDefault() {
+    return ImmutableMap.of(1, "foo").getOrDefault("bar", "baz");
   }
 
   ImmutableSet<Boolean> testMapIsEmpty() {
