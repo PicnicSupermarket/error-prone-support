@@ -20,6 +20,8 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -67,14 +69,17 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
       return Description.NO_MATCH;
     }
 
-    MemberSelectTree ms = (MemberSelectTree) tree.getMethodSelect();
-    MethodInvocationTree parent = (MethodInvocationTree) (ms).getExpression();
-    boolean matches = STEP_EXPECTNEXT.matches(parent, state);
-    if (!matches) {
+    MethodInvocationTree parent = tree;
+    List<ExpressionTree> args = new ArrayList<>();
+    while(STEP_EXPECTNEXT.matches(getParent(parent), state)){
+      parent = getParent(parent);
+      args.addAll(parent.getArguments());
+    }
+
+    if (args.isEmpty()) {
       return Description.NO_MATCH;
     }
 
-    List<? extends ExpressionTree> args = parent.getArguments();
     String newArgument =
         tree.getArguments().stream().map(Object::toString).collect(Collectors.joining(", "));
     SuggestedFix.Builder argumentsFix =
@@ -86,5 +91,10 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
     Description.Builder description = buildDescription(tree);
     description.addFix(argumentsFix.merge(removeDuplicateCall).build());
     return description.build();
+  }
+
+  private MethodInvocationTree getParent(MethodInvocationTree tree) {
+    MemberSelectTree ms = (MemberSelectTree) tree.getMethodSelect();
+    return (MethodInvocationTree) (ms).getExpression();
   }
 }

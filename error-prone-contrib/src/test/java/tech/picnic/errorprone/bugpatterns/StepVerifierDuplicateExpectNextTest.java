@@ -14,7 +14,7 @@ public class StepVerifierDuplicateExpectNextTest {
       newInstance(StepVerifierDuplicateExpectNext.class, getClass());
 
   @Test
-  void replacementFirstSuggestedFix() {
+  void refactorDuplicateCalls() {
     refactoringTestHelper
         .addInputLines(
             "A.java",
@@ -23,7 +23,6 @@ public class StepVerifierDuplicateExpectNextTest {
             "",
             "class A {",
             "  void m() {",
-            "     // BUG Diagnotics contains:",
             "     Flux.just(0, 1).as(StepVerifier::create).expectNext(0).expectNext(1);",
             "  }",
             "}")
@@ -41,7 +40,7 @@ public class StepVerifierDuplicateExpectNextTest {
   }
 
   @Test
-  void replacement2() {
+  void refactorDuplicatesWithSucceedingStatement() {
     refactoringTestHelper
         .addInputLines(
             "A.java",
@@ -64,5 +63,57 @@ public class StepVerifierDuplicateExpectNextTest {
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void refactorThreeDuplicates() {
+    refactoringTestHelper
+            .addInputLines(
+                    "A.java",
+                    "import reactor.core.publisher.Flux;",
+                    "import reactor.test.StepVerifier;",
+                    "",
+                    "class A {",
+                    "  void m() {",
+                    "     Flux.just(0, 1, 2).as(StepVerifier::create).expectNext(0).expectNext(1).expectNext(2).verifyComplete();",
+                    "  }",
+                    "}")
+            .addOutputLines(
+                    "A.java",
+                    "import reactor.core.publisher.Flux;",
+                    "import reactor.test.StepVerifier;",
+                    "",
+                    "class A {",
+                    "  void m() {",
+                    "    Flux.just(0, 1, 2).as(StepVerifier::create).expectNext(0, 1, 2).verifyComplete();",
+                    "  }",
+                    "}")
+            .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void dontRefactorSingleCall() {
+    refactoringTestHelper
+            .addInputLines(
+                    "A.java",
+                    "import reactor.core.publisher.Flux;",
+                    "import reactor.test.StepVerifier;",
+                    "",
+                    "class A {",
+                    "  void m() {",
+                    "     Flux.just(0, 1).as(StepVerifier::create).expectNext(0).verifyComplete();",
+                    "  }",
+                    "}")
+            .addOutputLines(
+                    "A.java",
+                    "import reactor.core.publisher.Flux;",
+                    "import reactor.test.StepVerifier;",
+                    "",
+                    "class A {",
+                    "  void m() {",
+                    "    Flux.just(0, 1).as(StepVerifier::create).expectNext(0).verifyComplete();",
+                    "  }",
+                    "}")
+            .doTest(TestMode.TEXT_MATCH);
   }
 }
