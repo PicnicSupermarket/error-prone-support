@@ -20,6 +20,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.tree.JCTree;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,11 +70,11 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
     // The nodes are organized as MethodInvocationTree -> MemberSelectTree -> MethodInvocationTree
     // -> ...
     // We skip 2 to find the next method call in the call chain.
-    for (int i = 2;
-        getChild(state, i).map(t -> STEP_EXPECTNEXT.matches(t, state)).orElse(false);
-        i += 2) {
+    for (int nodeIndex = 2;
+        getChild(state, nodeIndex).filter(t -> STEP_EXPECTNEXT.matches(t, state)).isEmpty();
+        nodeIndex += 2) {
       // We checked in the loop condition that the child is present, so this is safe
-      child = getChild(state, i).orElseThrow();
+      child = getChild(state, nodeIndex).orElseThrow();
       newArgs.addAll(child.getArguments());
     }
 
@@ -103,10 +104,12 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
   }
 
   private Optional<MethodInvocationTree> getChild(VisitorState state, int skip) {
+    int startPos = ((JCTree) state.getPath().getLeaf()).pos;
     return StreamSupport.stream(state.getPath().spliterator(), false)
         .skip(skip)
         .findFirst()
         .filter(expr -> expr instanceof MethodInvocationTree)
-        .map(expr -> (MethodInvocationTree) expr);
+        .map(expr -> (MethodInvocationTree) expr)
+        .filter(m -> ((JCTree) m).pos > startPos);
   }
 }
