@@ -58,7 +58,7 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     // If the parent matches, this node will be considered when the parent parses its children, so
-    // we consider it not to match
+    // we don't match it.
     if (!STEP_EXPECTNEXT.matches(tree, state)
         || getParent(tree).map(t -> STEP_EXPECTNEXT.matches(t, state)).orElse(false)) {
       return Description.NO_MATCH;
@@ -68,7 +68,6 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
     List<ExpressionTree> newArgs = new ArrayList<>();
 
     // The nodes are organized as MethodInvocationTree -> MemberSelectTree -> MethodInvocationTree
-    // -> ...
     // We skip 2 to find the next method call in the call chain.
     for (int nodeIndex = 2;
         getChild(state, nodeIndex).filter(t -> STEP_EXPECTNEXT.matches(t, state)).isEmpty();
