@@ -10,12 +10,6 @@ final class LexicographicalAnnotationAttributeListingTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(
           LexicographicalAnnotationAttributeListing.class, getClass());
-  private final CompilationTestHelper restrictedCompilationTestHelper =
-      CompilationTestHelper.newInstance(LexicographicalAnnotationAttributeListing.class, getClass())
-          .setArgs(
-              ImmutableList.of(
-                  "-XepOpt:LexicographicalAnnotationAttributeListing:Includes=pkg.A.Foo,pkg.A.Bar",
-                  "-XepOpt:LexicographicalAnnotationAttributeListing:Excludes=pkg.A.Bar#value"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(
           LexicographicalAnnotationAttributeListing.class, getClass());
@@ -246,7 +240,11 @@ final class LexicographicalAnnotationAttributeListingTest {
   @Test
   void filtering() {
     /* Some violations are not flagged because they are not in- or excluded. */
-    restrictedCompilationTestHelper
+    CompilationTestHelper.newInstance(LexicographicalAnnotationAttributeListing.class, getClass())
+        .setArgs(
+            ImmutableList.of(
+                "-XepOpt:LexicographicalAnnotationAttributeListing:Includes=pkg.A.Foo,pkg.A.Bar",
+                "-XepOpt:LexicographicalAnnotationAttributeListing:Excludes=pkg.A.Bar#value"))
         .addSourceLines(
             "pkg/A.java",
             "package pkg;",

@@ -52,10 +52,6 @@ final class RefasterTest {
                       + "\\(see https://example.com/custom\\)"));
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass());
-  private final BugCheckerRefactoringTestHelper restrictedRefactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())
-          .setArgs(
-              "-XepOpt:Refaster:NamePattern=.*\\$(StringOfSizeZeroVerboseRule|StringOfSizeTwoRule)$");
 
   @Test
   void identification() {
@@ -246,7 +242,9 @@ final class RefasterTest {
 
   @Test
   void restrictedReplacement() {
-    restrictedRefactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())
+        .setArgs(
+            "-XepOpt:Refaster:NamePattern=.*\\$(StringOfSizeZeroVerboseRule|StringOfSizeTwoRule)$")
         .addInputLines(
             "A.java",
             "class A {",
