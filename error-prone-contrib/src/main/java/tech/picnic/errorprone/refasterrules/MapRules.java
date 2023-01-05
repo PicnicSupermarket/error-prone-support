@@ -46,9 +46,8 @@ final class MapRules {
   }
 
   /** Prefer {@link Map#getOrDefault(Object, Object)} over more contrived alternatives. */
-  // Note that
-  // XXX: `requireNonNullElse` throws an NPE if the second argument is `null`, while the alternative
-  // does not.
+  // XXX: Note that `requireNonNullElse` throws an NPE if the second argument is `null`, while the
+  // alternative does not.
   static final class MapGetOrDefault<K, V, T> {
     @BeforeTemplate
     V before(Map<K, V> map, T key, V defaultValue) {
