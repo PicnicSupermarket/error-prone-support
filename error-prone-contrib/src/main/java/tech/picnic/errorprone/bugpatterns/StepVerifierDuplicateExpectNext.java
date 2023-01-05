@@ -71,7 +71,7 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
     // The nodes are organized as MethodInvocationTree -> MemberSelectTree -> MethodInvocationTree
     // We skip 2 to find the next method call in the call chain.
     for (int nodeIndex = 2;
-        getChild(state, nodeIndex).filter(t -> STEP_EXPECTNEXT.matches(t, state)).isEmpty();
+        getChild(state, nodeIndex).map(t -> STEP_EXPECTNEXT.matches(t, state)).orElse(false);
         nodeIndex += 2) {
       // We checked in the loop condition that the child is present, so this is safe
       child = getChild(state, nodeIndex).orElseThrow();
