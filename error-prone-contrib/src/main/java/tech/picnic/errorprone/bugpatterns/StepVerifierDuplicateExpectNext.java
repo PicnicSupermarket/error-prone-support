@@ -105,7 +105,7 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
 
   private static Optional<MethodInvocationTree> getChild(VisitorState state, int skip) {
     int startPos = ((JCTree) state.getPath().getLeaf()).pos;
-    return StreamSupport.stream(state.getPath().spliterator(), /* parallel= */false)
+    return StreamSupport.stream(state.getPath().spliterator(), /* parallel= */ false)
         .skip(skip)
         .findFirst()
         .filter(expr -> expr instanceof MethodInvocationTree)
