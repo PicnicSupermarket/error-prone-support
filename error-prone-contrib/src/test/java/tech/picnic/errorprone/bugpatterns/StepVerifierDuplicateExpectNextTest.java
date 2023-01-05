@@ -6,7 +6,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import org.junit.jupiter.api.Test;
 
-public class StepVerifierDuplicateExpectNextTest {
+final class StepVerifierDuplicateExpectNextTest {
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
       newInstance(StepVerifierDuplicateExpectNext.class, getClass());
 
@@ -98,7 +98,12 @@ public class StepVerifierDuplicateExpectNextTest {
             "",
             "class A {",
             "  void m() {",
-            "     Flux.just(0, 1, 2, 3, 4, 5, 6).as(StepVerifier::create).expectNext(0, 1).expectNext(2, 3).expectNext(4, 5, 6).verifyComplete();",
+            "     Flux.just(0, 1, 2, 3, 4, 5, 6)",
+            "          .as(StepVerifier::create)",
+            "          .expectNext(0, 1)",
+            "          .expectNext(2, 3)",
+            "          .expectNext(4, 5, 6)",
+            "          .verifyComplete();",
             "  }",
             "}")
         .addOutputLines(
@@ -108,7 +113,10 @@ public class StepVerifierDuplicateExpectNextTest {
             "",
             "class A {",
             "  void m() {",
-            "    Flux.just(0, 1, 2, 3, 4, 5, 6).as(StepVerifier::create).expectNext(0, 1, 2, 3, 4, 5, 6).verifyComplete();",
+            "    Flux.just(0, 1, 2, 3, 4, 5, 6)",
+            "          .as(StepVerifier::create)",
+            "          .expectNext(0, 1, 2, 3, 4, 5, 6)",
+            "          .verifyComplete();",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);

@@ -9,6 +9,7 @@ import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.annotations.Var;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
@@ -64,7 +65,7 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
       return Description.NO_MATCH;
     }
 
-    MethodInvocationTree child = tree;
+    @Var MethodInvocationTree child = tree;
     List<ExpressionTree> newArgs = new ArrayList<>();
 
     // The nodes are organized as MethodInvocationTree -> MemberSelectTree -> MethodInvocationTree
@@ -94,7 +95,7 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
     return description.build();
   }
 
-  private Optional<MethodInvocationTree> getParent(MethodInvocationTree tree) {
+  private static Optional<MethodInvocationTree> getParent(MethodInvocationTree tree) {
     return Optional.of(tree.getMethodSelect())
         .filter(ms -> ms instanceof MemberSelectTree)
         .map(ms -> ((MemberSelectTree) ms).getExpression())
@@ -102,9 +103,9 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
         .map(expr -> (MethodInvocationTree) expr);
   }
 
-  private Optional<MethodInvocationTree> getChild(VisitorState state, int skip) {
+  private static Optional<MethodInvocationTree> getChild(VisitorState state, int skip) {
     int startPos = ((JCTree) state.getPath().getLeaf()).pos;
-    return StreamSupport.stream(state.getPath().spliterator(), false)
+    return StreamSupport.stream(state.getPath().spliterator(), /* parallel= */false)
         .skip(skip)
         .findFirst()
         .filter(expr -> expr instanceof MethodInvocationTree)
