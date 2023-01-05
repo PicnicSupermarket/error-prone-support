@@ -1237,7 +1237,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.10.3</version>
+                    <version>1.10.4</version>
                     <configuration>
                         <excludedClasses>
                             <!-- AutoValue generated classes. -->
