@@ -44,15 +44,17 @@ final class BadStaticImportTest {
     compilationTestHelper
         .addSourceLines(
             "A.java",
-            "import static java.time.Clock.systemUTC;",
-            "import static java.util.Optional.empty;",
             "import static com.google.common.collect.ImmutableList.copyOf;",
-            "import static com.google.common.collect.ImmutableMap.of;",
+            "import static java.time.Clock.systemUTC;",
             "import static java.time.Instant.MAX;",
             "import static java.time.Instant.MIN;",
+            "import static java.util.Collections.min;",
             "import static java.util.Locale.ROOT;",
-            "import java.time.Clock;",
+            "import static java.util.Optional.empty;",
+            "",
             "import com.google.common.collect.ImmutableList;",
+            "import com.google.common.collect.ImmutableSet;",
+            "import java.time.Clock;",
             "import java.util.Locale;",
             "",
             "class A {",
@@ -76,24 +78,29 @@ final class BadStaticImportTest {
             "    Object c1 = MIN;",
             "    // BUG: Diagnostic contains:",
             "    Object c2 = MAX;",
+            "",
+            "    // BUG: Diagnostic contains:",
+            "    ImmutableSet.of(min(ImmutableSet.of()));",
             "  }",
             "}")
         .doTest();
   }
 
-  // XXX: Add more counterexamples
   @Test
   void replaceSimpleMethodInvocation() {
     refactoringTestHelper
         .addInputLines(
             "A.java",
-            "import static java.time.Clock.systemUTC;",
-            "import static java.util.Optional.empty;",
             "import static com.google.common.collect.ImmutableList.copyOf;",
+            "import static java.time.Clock.systemUTC;",
             "import static java.time.Instant.MAX;",
             "import static java.time.Instant.MIN;",
+            "import static java.util.Collections.min;",
             "import static java.util.Locale.ROOT;",
+            "import static java.util.Optional.empty;",
+            "",
             "import com.google.common.collect.ImmutableList;",
+            "import com.google.common.collect.ImmutableSet;",
             "import java.time.Clock;",
             "import java.util.Locale;",
             "",
@@ -112,13 +119,17 @@ final class BadStaticImportTest {
             "",
             "    Object c1 = MIN;",
             "    Object c2 = MAX;",
+            "",
+            "    ImmutableSet.of(min(ImmutableSet.of()));",
             "  }",
             "}")
         .addOutputLines(
             "A.java",
             "import com.google.common.collect.ImmutableList;",
+            "import com.google.common.collect.ImmutableSet;",
             "import java.time.Clock;",
             "import java.time.Instant;",
+            "import java.util.Collections;",
             "import java.util.Locale;",
             "import java.util.Optional;",
             "",
@@ -137,6 +148,8 @@ final class BadStaticImportTest {
             "",
             "    Object c1 = Instant.MIN;",
             "    Object c2 = Instant.MAX;",
+            "",
+            "    ImmutableSet.of(Collections.min(ImmutableSet.of()));",
             "  }",
             "}")
         .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);

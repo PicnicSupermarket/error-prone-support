@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static tech.picnic.errorprone.bugpatterns.StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -22,9 +23,6 @@ import com.sun.tools.javac.code.Symbol;
 
 /** A {@link BugChecker} that flags methods and constants that should not be statically imported. */
 // XXX: Also introduce checks that disallows the following candidates:
-// - `com.google.common.base.Strings`
-// - `java.util.Optional.empty`
-// - `java.util.Locale.ROOT`
 // - `ZoneOffset.ofHours` and other `ofXXX`-style methods.
 // - `java.time.Clock`.
 // - Several other `java.time` classes.
@@ -123,7 +121,7 @@ public final class BadStaticImport extends BugChecker
   @Override
   public Description matchIdentifier(IdentifierTree tree, VisitorState state) {
     Symbol symbol = ASTHelpers.getSymbol(tree);
-    if (isCandidate(symbol)) {
+    if (isMatch(symbol)) {
       return getDescription(tree, state, symbol);
     }
 
@@ -141,23 +139,29 @@ public final class BadStaticImport extends BugChecker
 
   @SuppressWarnings("NullAway")
   private static String getImportToRemove(Symbol symbol) {
-    return String.format(
-        "%s.%s",
-        symbol.getEnclosingElement().getQualifiedName().toString(),
-        symbol.getSimpleName().toString());
+    return String.join(
+        ".", symbol.getEnclosingElement().getQualifiedName(), symbol.getSimpleName());
   }
 
-  private static boolean isCandidate(Symbol symbol) {
+  private static boolean isMatch(Symbol symbol) {
     Symbol enclosingSymbol = symbol.getEnclosingElement();
-
     if (enclosingSymbol == null) {
       return false;
     }
 
     String qualifiedTypeName = enclosingSymbol.getQualifiedName().toString();
+    String identifierName = symbol.getSimpleName().toString();
+    return !isExempted(qualifiedTypeName, identifierName)
+        && isCandidate(qualifiedTypeName, identifierName);
+  }
+
+  private static boolean isCandidate(String qualifiedTypeName, String identifierName) {
     return BAD_STATIC_IMPORT_CANDIDATE_TYPES.contains(qualifiedTypeName)
-        || BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(
-            qualifiedTypeName, symbol.getSimpleName().toString())
-        || BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(symbol.getSimpleName().toString());
+        || BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(qualifiedTypeName, identifierName)
+        || BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(identifierName);
+  }
+
+  private static boolean isExempted(String qualifiedTypeName, String identifierName) {
+    return STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(qualifiedTypeName, identifierName);
   }
 }
