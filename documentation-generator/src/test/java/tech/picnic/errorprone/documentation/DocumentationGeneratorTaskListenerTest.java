@@ -54,7 +54,7 @@ final class DocumentationGeneratorTaskListenerTest extends TaskListenerCompilerB
 
   @DisabledOnOs(WINDOWS)
   @Test
-  void readOnlyFileSystemOtherOperationSystems(@TempDir Path directory) throws IOException {
+  void readOnlyFileSystemOtherOperatingSystems(@TempDir Path directory) throws IOException {
     Path testPath = Files.createDirectory(directory.resolve("test"));
     testPath.toFile().setWritable(false);
 
