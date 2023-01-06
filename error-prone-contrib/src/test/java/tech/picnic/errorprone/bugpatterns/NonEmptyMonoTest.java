@@ -7,14 +7,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class NonEmptyMonoTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(NonEmptyMono.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(NonEmptyMono.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(NonEmptyMono.class, getClass())
         .addSourceLines(
             "A.java",
             "import static com.google.common.collect.ImmutableList.toImmutableList;",
@@ -111,7 +106,7 @@ final class NonEmptyMonoTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(NonEmptyMono.class, getClass())
         .addInputLines(
             "A.java",
             "import static com.google.common.collect.ImmutableList.toImmutableList;",

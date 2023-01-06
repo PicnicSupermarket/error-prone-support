@@ -8,17 +8,12 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class StringJoinTest {
-  private final CompilationTestHelper compilationHelper =
-      CompilationTestHelper.newInstance(StringJoin.class, getClass())
-          .expectErrorMessage(
-              "valueOf", containsPattern("Prefer `String#valueOf` over `String#format`"))
-          .expectErrorMessage("join", containsPattern("Prefer `String#join` over `String#format`"));
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(StringJoin.class, getClass());
-
   @Test
   void identification() {
-    compilationHelper
+    CompilationTestHelper.newInstance(StringJoin.class, getClass())
+        .expectErrorMessage(
+            "valueOf", containsPattern("Prefer `String#valueOf` over `String#format`"))
+        .expectErrorMessage("join", containsPattern("Prefer `String#join` over `String#format`"))
         .addSourceLines(
             "A.java",
             "import java.util.Formattable;",
@@ -63,7 +58,7 @@ final class StringJoinTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(StringJoin.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",

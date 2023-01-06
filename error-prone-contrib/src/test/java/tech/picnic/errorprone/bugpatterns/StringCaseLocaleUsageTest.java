@@ -2,21 +2,15 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.newInstance;
 
-import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class StringCaseLocaleUsageTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(StringCaseLocaleUsage.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      newInstance(StringCaseLocaleUsage.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(StringCaseLocaleUsage.class, getClass())
         .addSourceLines(
             "A.java",
             "import static java.util.Locale.ROOT;",
@@ -54,7 +48,7 @@ final class StringCaseLocaleUsageTest {
 
   @Test
   void replacementFirstSuggestedFix() {
-    refactoringTestHelper
+    newInstance(StringCaseLocaleUsage.class, getClass())
         .setFixChooser(FixChoosers.FIRST)
         .addInputLines(
             "A.java",
@@ -93,7 +87,7 @@ final class StringCaseLocaleUsageTest {
 
   @Test
   void replacementSecondSuggestedFix() {
-    refactoringTestHelper
+    newInstance(StringCaseLocaleUsage.class, getClass())
         .setFixChooser(FixChoosers.SECOND)
         .addInputLines(
             "A.java",

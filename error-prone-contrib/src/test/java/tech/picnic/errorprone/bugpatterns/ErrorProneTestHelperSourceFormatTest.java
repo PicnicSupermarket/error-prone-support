@@ -6,15 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class ErrorProneTestHelperSourceFormatTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(ErrorProneTestHelperSourceFormat.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(
-          ErrorProneTestHelperSourceFormat.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(ErrorProneTestHelperSourceFormat.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
@@ -63,7 +57,7 @@ final class ErrorProneTestHelperSourceFormatTest {
      * Verifies that import sorting and code formatting is performed unconditionally, while unused
      * imports are removed unless part of a `BugCheckerRefactoringTestHelper` expected output file.
      */
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(ErrorProneTestHelperSourceFormat.class, getClass())
         .addInputLines(
             "A.java",
             "import com.google.errorprone.BugCheckerRefactoringTestHelper;",

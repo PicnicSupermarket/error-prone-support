@@ -40,9 +40,6 @@ final class MethodMatcherFactoryTest {
                   "com.example.A#m2(java.lang.String)",
                   "com.example.sub.B#m3(int,int)"));
 
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(MatchedMethodsFlagger.class, getClass());
-
   @Test
   void createWithMalformedSignatures() {
     MethodMatcherFactory factory = new MethodMatcherFactory();
@@ -58,7 +55,7 @@ final class MethodMatcherFactoryTest {
 
   @Test
   void matcher() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(MatchedMethodsFlagger.class, getClass())
         .addSourceLines(
             "com/example/A.java",
             "package com.example;",

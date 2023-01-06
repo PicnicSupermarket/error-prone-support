@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class IsInstanceLambdaUsageTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(IsInstanceLambdaUsage.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(IsInstanceLambdaUsage.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(IsInstanceLambdaUsage.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.util.stream.Stream;",
@@ -46,7 +41,7 @@ final class IsInstanceLambdaUsageTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(IsInstanceLambdaUsage.class, getClass())
         .addInputLines(
             "A.java",
             "import java.util.stream.Stream;",

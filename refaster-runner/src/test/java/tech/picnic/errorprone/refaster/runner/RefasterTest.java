@@ -25,37 +25,32 @@ import org.junit.jupiter.params.provider.MethodSource;
 import tech.picnic.errorprone.refaster.ErrorProneFork;
 
 final class RefasterTest {
-  private final CompilationTestHelper compilationHelper =
-      CompilationTestHelper.newInstance(Refaster.class, getClass())
-          .matchAllDiagnostics()
-          .expectErrorMessage(
-              "StringOfSizeZeroRule",
-              containsPattern(
-                  "\\[Refaster Rule\\] FooRules\\.StringOfSizeZeroRule: Refactoring opportunity\\s+.+\\s+"))
-          .expectErrorMessage(
-              "StringOfSizeOneRule",
-              containsPattern(
-                  "\\[Refaster Rule\\] FooRules\\.StringOfSizeOneRule: "
-                      + "A custom description about matching single-char strings\\s+.+\\s+"
-                      + "\\(see https://error-prone.picnic.tech/refasterrules/FooRules#StringOfSizeOneRule\\)"))
-          .expectErrorMessage(
-              "StringOfSizeTwoRule",
-              containsPattern(
-                  "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeTwoRule: "
-                      + "A custom subgroup description\\s+.+\\s+"
-                      + "\\(see https://example.com/rule/FooRules#ExtraGrouping.StringOfSizeTwoRule\\)"))
-          .expectErrorMessage(
-              "StringOfSizeThreeRule",
-              containsPattern(
-                  "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeThreeRule: "
-                      + "A custom description about matching three-char strings\\s+.+\\s+"
-                      + "\\(see https://example.com/custom\\)"));
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass());
-
   @Test
   void identification() {
-    compilationHelper
+    CompilationTestHelper.newInstance(Refaster.class, getClass())
+        .matchAllDiagnostics()
+        .expectErrorMessage(
+            "StringOfSizeZeroRule",
+            containsPattern(
+                "\\[Refaster Rule\\] FooRules\\.StringOfSizeZeroRule: Refactoring opportunity\\s+.+\\s+"))
+        .expectErrorMessage(
+            "StringOfSizeOneRule",
+            containsPattern(
+                "\\[Refaster Rule\\] FooRules\\.StringOfSizeOneRule: "
+                    + "A custom description about matching single-char strings\\s+.+\\s+"
+                    + "\\(see https://error-prone.picnic.tech/refasterrules/FooRules#StringOfSizeOneRule\\)"))
+        .expectErrorMessage(
+            "StringOfSizeTwoRule",
+            containsPattern(
+                "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeTwoRule: "
+                    + "A custom subgroup description\\s+.+\\s+"
+                    + "\\(see https://example.com/rule/FooRules#ExtraGrouping.StringOfSizeTwoRule\\)"))
+        .expectErrorMessage(
+            "StringOfSizeThreeRule",
+            containsPattern(
+                "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeThreeRule: "
+                    + "A custom description about matching three-char strings\\s+.+\\s+"
+                    + "\\(see https://example.com/custom\\)"))
         .addSourceLines(
             "A.java",
             "class A {",
@@ -165,7 +160,30 @@ final class RefasterTest {
       ImmutableList<String> arguments, ImmutableList<SeverityLevel> expectedSeverities) {
     assertThatThrownBy(
             () ->
-                compilationHelper
+                CompilationTestHelper.newInstance(Refaster.class, getClass())
+                    .matchAllDiagnostics()
+                    .expectErrorMessage(
+                        "StringOfSizeZeroRule",
+                        containsPattern(
+                            "\\[Refaster Rule\\] FooRules\\.StringOfSizeZeroRule: Refactoring opportunity\\s+.+\\s+"))
+                    .expectErrorMessage(
+                        "StringOfSizeOneRule",
+                        containsPattern(
+                            "\\[Refaster Rule\\] FooRules\\.StringOfSizeOneRule: "
+                                + "A custom description about matching single-char strings\\s+.+\\s+"
+                                + "\\(see https://error-prone.picnic.tech/refasterrules/FooRules#StringOfSizeOneRule\\)"))
+                    .expectErrorMessage(
+                        "StringOfSizeTwoRule",
+                        containsPattern(
+                            "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeTwoRule: "
+                                + "A custom subgroup description\\s+.+\\s+"
+                                + "\\(see https://example.com/rule/FooRules#ExtraGrouping.StringOfSizeTwoRule\\)"))
+                    .expectErrorMessage(
+                        "StringOfSizeThreeRule",
+                        containsPattern(
+                            "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeThreeRule: "
+                                + "A custom description about matching three-char strings\\s+.+\\s+"
+                                + "\\(see https://example.com/custom\\)"))
                     .setArgs(arguments)
                     .addSourceLines(
                         "A.java",
@@ -216,7 +234,7 @@ final class RefasterTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",

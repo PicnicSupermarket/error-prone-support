@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class ImmutablesSortedSetComparatorTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(ImmutablesSortedSetComparator.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(ImmutablesSortedSetComparator.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(ImmutablesSortedSetComparator.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.google.common.collect.ContiguousSet;",
@@ -109,7 +104,7 @@ final class ImmutablesSortedSetComparatorTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(ImmutablesSortedSetComparator.class, getClass())
         .addInputLines(
             "A.java",
             "import com.google.common.collect.ImmutableSortedSet;",
@@ -147,7 +142,7 @@ final class ImmutablesSortedSetComparatorTest {
 
   @Test
   void replacementWithImportClash() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(ImmutablesSortedSetComparator.class, getClass())
         .addInputLines(
             "MySpringService.java",
             "import com.google.common.collect.ImmutableSortedSet;",

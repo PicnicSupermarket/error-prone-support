@@ -7,16 +7,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class LexicographicalAnnotationAttributeListingTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(
-          LexicographicalAnnotationAttributeListing.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(
-          LexicographicalAnnotationAttributeListing.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(LexicographicalAnnotationAttributeListing.class, getClass())
         .addSourceLines(
             "A.java",
             "import static java.math.RoundingMode.DOWN;",
@@ -159,7 +152,8 @@ final class LexicographicalAnnotationAttributeListingTest {
   // `CanonicalAnnotationSyntax` checker correct the situation in a subsequent run.
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(
+            LexicographicalAnnotationAttributeListing.class, getClass())
         .addInputLines(
             "A.java",
             "import static java.math.RoundingMode.DOWN;",

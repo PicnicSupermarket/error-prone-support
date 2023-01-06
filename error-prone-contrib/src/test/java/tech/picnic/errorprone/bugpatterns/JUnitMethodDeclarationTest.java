@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class JUnitMethodDeclarationTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(JUnitMethodDeclaration.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(JUnitMethodDeclaration.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(JUnitMethodDeclaration.class, getClass())
         .addSourceLines(
             "A.java",
             "import static org.junit.jupiter.params.provider.Arguments.arguments;",
@@ -345,7 +340,7 @@ final class JUnitMethodDeclarationTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(JUnitMethodDeclaration.class, getClass())
         .addInputLines(
             "A.java",
             "import static org.junit.jupiter.params.provider.Arguments.arguments;",

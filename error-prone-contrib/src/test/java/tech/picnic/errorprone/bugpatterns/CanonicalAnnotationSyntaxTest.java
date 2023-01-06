@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class CanonicalAnnotationSyntaxTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(CanonicalAnnotationSyntax.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(CanonicalAnnotationSyntax.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(CanonicalAnnotationSyntax.class, getClass())
         .addSourceLines(
             "pkg/A.java",
             "package pkg;",
@@ -133,7 +128,7 @@ final class CanonicalAnnotationSyntaxTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(CanonicalAnnotationSyntax.class, getClass())
         .addInputLines(
             "pkg/A.java",
             "package pkg;",

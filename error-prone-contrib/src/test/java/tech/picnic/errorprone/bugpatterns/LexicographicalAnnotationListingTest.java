@@ -6,15 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class LexicographicalAnnotationListingTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(
-          LexicographicalAnnotationListing.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.lang.annotation.ElementType;",
@@ -133,7 +127,7 @@ final class LexicographicalAnnotationListingTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
         .addInputLines(
             "A.java",
             "import java.lang.annotation.ElementType;",

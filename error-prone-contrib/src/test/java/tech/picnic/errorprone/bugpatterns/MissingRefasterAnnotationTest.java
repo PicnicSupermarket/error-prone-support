@@ -6,16 +6,12 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class MissingRefasterAnnotationTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(MissingRefasterAnnotation.class, getClass())
-          .expectErrorMessage(
-              "X",
-              containsPattern(
-                  "The Refaster rule contains a method without any Refaster annotations"));
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(MissingRefasterAnnotation.class, getClass())
+        .expectErrorMessage(
+            "X",
+            containsPattern("The Refaster rule contains a method without any Refaster annotations"))
         .addSourceLines(
             "A.java",
             "import com.google.errorprone.refaster.annotation.AfterTemplate;",

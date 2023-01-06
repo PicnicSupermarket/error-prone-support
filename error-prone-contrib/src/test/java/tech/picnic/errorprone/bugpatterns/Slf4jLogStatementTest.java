@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class Slf4jLogStatementTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(Slf4jLogStatement.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(Slf4jLogStatement.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(Slf4jLogStatement.class, getClass())
         .addSourceLines(
             "A.java",
             "import org.slf4j.Logger;",
@@ -96,7 +91,7 @@ final class Slf4jLogStatementTest {
   // XXX: Drop what's unused.
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(Slf4jLogStatement.class, getClass())
         .addInputLines(
             "A.java",
             "import org.slf4j.Logger;",

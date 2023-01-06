@@ -8,11 +8,6 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class StaticImportTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(StaticImport.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(StaticImport.class, getClass());
-
   @Test
   void candidateMethodsAreNotRedundant() {
     assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
@@ -33,7 +28,7 @@ final class StaticImportTest {
 
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(StaticImport.class, getClass())
         .addSourceLines(
             "A.java",
             "import static com.google.common.collect.ImmutableMap.toImmutableMap;",
@@ -118,7 +113,7 @@ final class StaticImportTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(StaticImport.class, getClass())
         .addInputLines(
             "A.java",
             "import static java.util.function.Predicate.not;",

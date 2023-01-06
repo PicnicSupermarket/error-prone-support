@@ -5,22 +5,16 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
+// XXX: There are no tests for multiple replacements within the same expression:
+// - Error Prone doesn't currently support this, it seems.
+// - The `BugCheckerRefactoringTestHelper` throws an exception in this case.
+// - During actual compilation only the first replacement is applied.
+// XXX: Can we perhaps work-around this by describing the fixes in reverse order?
 final class PrimitiveComparisonTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(PrimitiveComparison.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(PrimitiveComparison.class, getClass());
-
-  // XXX: There are no tests for multiple replacements within the same expression:
-  // - Error Prone doesn't currently support this, it seems.
-  // - The `BugCheckerRefactoringTestHelper` throws an exception in this case.
-  // - During actual compilation only the first replacement is applied.
-  // XXX: Can we perhaps work-around this by describing the fixes in reverse order?
-
-  // The logic for `char` and `short` is exactly analogous to the `byte` case.
+  /* The logic for `char` and `short` is exactly analogous to the `byte` case. */
   @Test
   void byteComparison() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(PrimitiveComparison.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.util.Comparator;",
@@ -120,7 +114,7 @@ final class PrimitiveComparisonTest {
 
   @Test
   void intComparison() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(PrimitiveComparison.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.util.Comparator;",
@@ -227,7 +221,7 @@ final class PrimitiveComparisonTest {
 
   @Test
   void longComparison() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(PrimitiveComparison.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.util.Comparator;",
@@ -318,7 +312,7 @@ final class PrimitiveComparisonTest {
 
   @Test
   void floatComparison() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(PrimitiveComparison.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.util.Comparator;",
@@ -386,7 +380,7 @@ final class PrimitiveComparisonTest {
 
   @Test
   void doubleComparison() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(PrimitiveComparison.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.util.Comparator;",
@@ -461,7 +455,7 @@ final class PrimitiveComparisonTest {
 
   @Test
   void stringComparison() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(PrimitiveComparison.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.util.Comparator;",
@@ -497,7 +491,7 @@ final class PrimitiveComparisonTest {
 
   @Test
   void replacementWithPrimitiveVariants() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(PrimitiveComparison.class, getClass())
         .addInputLines(
             "A.java",
             "import java.util.Comparator;",
@@ -577,7 +571,7 @@ final class PrimitiveComparisonTest {
 
   @Test
   void replacementWithBoxedVariants() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(PrimitiveComparison.class, getClass())
         .addInputLines(
             "A.java",
             "import java.util.Comparator;",
@@ -643,7 +637,7 @@ final class PrimitiveComparisonTest {
 
   @Test
   void replacementWithPrimitiveVariantsUsingStaticImports() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(PrimitiveComparison.class, getClass())
         .addInputLines(
             "A.java",
             "import static java.util.Comparator.comparing;",
@@ -682,7 +676,7 @@ final class PrimitiveComparisonTest {
 
   @Test
   void replacementWithBoxedVariantsUsingStaticImports() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(PrimitiveComparison.class, getClass())
         .addInputLines(
             "A.java",
             "import static java.util.Comparator.comparingDouble;",
@@ -723,7 +717,7 @@ final class PrimitiveComparisonTest {
 
   @Test
   void replacementWithPrimitiveVariantsInComplexSyntacticalContext() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(PrimitiveComparison.class, getClass())
         .addInputLines(
             "A.java",
             "import java.util.Comparator;",
@@ -755,7 +749,7 @@ final class PrimitiveComparisonTest {
 
   @Test
   void replacementWithBoxedVariantsInComplexSyntacticalContext() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(PrimitiveComparison.class, getClass())
         .addInputLines(
             "A.java",
             "import java.util.Comparator;",

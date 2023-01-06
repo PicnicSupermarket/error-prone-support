@@ -2,21 +2,15 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.newInstance;
 
-import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class FluxFlatMapUsageTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(FluxFlatMapUsage.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      newInstance(FluxFlatMapUsage.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(FluxFlatMapUsage.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.util.function.BiFunction;",
@@ -73,7 +67,7 @@ final class FluxFlatMapUsageTest {
 
   @Test
   void replacementFirstSuggestedFix() {
-    refactoringTestHelper
+    newInstance(FluxFlatMapUsage.class, getClass())
         .setFixChooser(FixChoosers.FIRST)
         .addInputLines(
             "A.java",
@@ -108,7 +102,7 @@ final class FluxFlatMapUsageTest {
 
   @Test
   void replacementSecondSuggestedFix() {
-    refactoringTestHelper
+    newInstance(FluxFlatMapUsage.class, getClass())
         .setFixChooser(FixChoosers.SECOND)
         .addInputLines(
             "A.java",
