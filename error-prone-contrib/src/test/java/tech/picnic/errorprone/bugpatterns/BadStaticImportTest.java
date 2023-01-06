@@ -22,6 +22,30 @@ final class BadStaticImportTest {
   }
 
   @Test
+  void badTypesDontClashWithStaticImportCandidates() {
+    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_TYPES)
+        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
+
+    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_TYPES)
+        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.keySet());
+  }
+
+  @Test
+  void badMembersDontClashWithStaticImportCandidates() {
+    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
+        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
+
+    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.values())
+        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_EXEMPTED_IDENTIFIERS);
+  }
+
+  @Test
+  void badIdentifiersDontClashWithStaticImportCandidates() {
+    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS)
+        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.values());
+  }
+
+  @Test
   void identifySimpleMethodInvocation() {
     compilationTestHelper
         .addSourceLines(
