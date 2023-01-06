@@ -12,7 +12,8 @@ import org.junit.jupiter.api.Test;
 // XXX: Can we perhaps work-around this by describing the fixes in reverse order?
 final class PrimitiveComparisonTest {
   /**
-   * @implNote The logic for `char` and `short` is exactly analogous to the `byte` case.
+   * @implNote The logic for {@code char} and {@code short} is exactly analogous to the {@code byte}
+   *     case.
    */
   @Test
   void byteComparison() {

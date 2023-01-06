@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugCheckerRefactoringTestHelper.newInstance;
-
+import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -67,7 +66,7 @@ final class FluxFlatMapUsageTest {
 
   @Test
   void replacementFirstSuggestedFix() {
-    newInstance(FluxFlatMapUsage.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(FluxFlatMapUsage.class, getClass())
         .setFixChooser(FixChoosers.FIRST)
         .addInputLines(
             "A.java",
@@ -102,7 +101,7 @@ final class FluxFlatMapUsageTest {
 
   @Test
   void replacementSecondSuggestedFix() {
-    newInstance(FluxFlatMapUsage.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(FluxFlatMapUsage.class, getClass())
         .setFixChooser(FixChoosers.SECOND)
         .addInputLines(
             "A.java",

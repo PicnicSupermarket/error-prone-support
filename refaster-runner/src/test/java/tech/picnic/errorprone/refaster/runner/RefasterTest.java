@@ -50,12 +50,6 @@ final class RefasterTest {
                   "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeThreeRule: "
                       + "A custom description about matching three-char strings\\s+.+\\s+"
                       + "\\(see https://example.com/custom\\)"));
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass());
-  private final BugCheckerRefactoringTestHelper restrictedRefactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())
-          .setArgs(
-              "-XepOpt:Refaster:NamePattern=.*\\$(StringOfSizeZeroVerboseRule|StringOfSizeTwoRule)$");
 
   @Test
   void identification() {
@@ -220,7 +214,7 @@ final class RefasterTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
@@ -246,7 +240,9 @@ final class RefasterTest {
 
   @Test
   void restrictedReplacement() {
-    restrictedRefactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())
+        .setArgs(
+            "-XepOpt:Refaster:NamePattern=.*\\$(StringOfSizeZeroVerboseRule|StringOfSizeTwoRule)$")
         .addInputLines(
             "A.java",
             "class A {",
