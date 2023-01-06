@@ -4,12 +4,14 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.Plugin;
 import com.sun.tools.javac.api.BasicJavacTask;
 import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * A compiler {@link Plugin plugin} that analyzes and extracts relevant information for
@@ -38,11 +40,11 @@ public final class DocumentationGenerator implements Plugin {
 
   @VisibleForTesting
   static Path getDocsPath(String docsPathArg) {
-    String[] option = docsPathArg.split("=", 2);
-    validateOutputDirectoryOption(option.length == 2, docsPathArg);
-    validateOutputDirectoryOption(option[0].equals(OUTPUT_DIRECTORY_OPTION), docsPathArg);
+    List<String> option = Splitter.on("=").splitToList(docsPathArg);
+    validateOutputDirectoryOption(option.size() == 2, docsPathArg);
+    validateOutputDirectoryOption(option.get(0).equals(OUTPUT_DIRECTORY_OPTION), docsPathArg);
 
-    String basePath = option[1] + File.separator + DOCS_DIRECTORY;
+    String basePath = option.get(1) + File.separator + DOCS_DIRECTORY;
     try {
       return Path.of(basePath);
     } catch (InvalidPathException e) {
