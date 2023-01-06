@@ -28,6 +28,7 @@ import java.util.Set;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.testng.Assert;
 import org.testng.Assert.ThrowingRunnable;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /**
  * Refaster rules that replace TestNG assertions with equivalent AssertJ assertions.
@@ -72,6 +73,7 @@ import org.testng.Assert.ThrowingRunnable;
 // XXX: As-is these rules do not result in a complete migration:
 // - Expressions containing comments are skipped due to a limitation of Refaster.
 // - Assertions inside lambda expressions are also skipped. Unclear why.
+@OnlineDocumentation
 final class TestNGToAssertJRules {
   private TestNGToAssertJRules() {}
 
