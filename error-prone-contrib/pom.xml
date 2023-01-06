@@ -223,9 +223,16 @@
                                 <artifactId>refaster-support</artifactId>
                                 <version>${project.version}</version>
                             </path>
+                            <path>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>documentation-generator</artifactId>
+                                <version>${project.version}</version>
+                            </path>
                         </annotationProcessorPaths>
                         <compilerArgs combine.children="append">
                             <arg>-Xplugin:RefasterRuleCompiler</arg>
+                            <arg>-Xplugin:DocumentationGenerator
+                                -XdocsOutputDirectory=${project.build.directory}</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>
