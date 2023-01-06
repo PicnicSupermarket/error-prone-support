@@ -220,17 +220,17 @@
                         <annotationProcessorPaths combine.children="append">
                             <path>
                                 <groupId>${project.groupId}</groupId>
+                                <artifactId>documentation-generator</artifactId>
+                                <version>${project.version}</version>
+                            </path>
+                            <path>
+                                <groupId>${project.groupId}</groupId>
                                 <artifactId>refaster-compiler</artifactId>
                                 <version>${project.version}</version>
                             </path>
                             <path>
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>refaster-support</artifactId>
-                                <version>${project.version}</version>
-                            </path>
-                            <path>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>documentation-generator</artifactId>
                                 <version>${project.version}</version>
                             </path>
                         </annotationProcessorPaths>
