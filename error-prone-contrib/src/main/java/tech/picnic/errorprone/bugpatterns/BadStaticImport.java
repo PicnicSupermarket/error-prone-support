@@ -120,15 +120,15 @@ public final class BadStaticImport extends BugChecker
 
   @Override
   public Description matchIdentifier(IdentifierTree tree, VisitorState state) {
-    Symbol symbol = ASTHelpers.getSymbol(tree);
-    if (isMatch(symbol)) {
-      return getDescription(tree, state, symbol);
+    if (isMatch(tree)) {
+      return getDescription(tree, state);
     }
 
     return Description.NO_MATCH;
   }
 
-  private Description getDescription(IdentifierTree tree, VisitorState state, Symbol symbol) {
+  private Description getDescription(IdentifierTree tree, VisitorState state) {
+    Symbol symbol = ASTHelpers.getSymbol(tree);
     SuggestedFix.Builder builder =
         SuggestedFix.builder().removeStaticImport(getImportToRemove(symbol));
     String replacement =
@@ -143,7 +143,12 @@ public final class BadStaticImport extends BugChecker
         ".", symbol.getEnclosingElement().getQualifiedName(), symbol.getSimpleName());
   }
 
-  private static boolean isMatch(Symbol symbol) {
+  private static boolean isMatch(IdentifierTree tree) {
+    Symbol symbol = ASTHelpers.getSymbol(tree);
+    if (symbol == null) {
+      return false;
+    }
+
     Symbol enclosingSymbol = symbol.getEnclosingElement();
     if (enclosingSymbol == null) {
       return false;
