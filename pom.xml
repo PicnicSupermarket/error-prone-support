@@ -1350,6 +1350,37 @@
 
     <profiles>
         <profile>
+            <!-- Adds the `documentation-generation` module as an annotation
+            processor to scan the classpath and extract bug pattern data used
+            in documentation generation. Assumes that a prior build has already
+            installed the project in the local Maven repository. -->
+            <!-- XXX: Maybe rename to `generate-docs`? -->
+            <id>documentation-generation</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <annotationProcessorPaths combine.children="append">
+                                    <path>
+                                        <groupId>${project.groupId}</groupId>
+                                        <artifactId>documentation-generator</artifactId>
+                                        <version>${project.version}</version>
+                                    </path>
+                                </annotationProcessorPaths>
+                                <compilerArgs combine.children="append">
+                                    <arg>-Xplugin:DocumentationGenerator
+                                        -XdocsOutputDirectory=${project.build.directory}</arg>
+                                </compilerArgs>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
             <id>error-prone-fork</id>
             <properties>
                 <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>
