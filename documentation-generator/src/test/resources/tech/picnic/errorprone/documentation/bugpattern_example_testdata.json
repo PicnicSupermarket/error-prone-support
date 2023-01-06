@@ -11,5 +11,5 @@
   "summary": "Example summary",
   "explanation": "Example explanation",
   "severityLevel": "SUGGESTION",
-  "disableable": false
+  "canDisable": false
 }

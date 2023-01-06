@@ -22,7 +22,7 @@ public abstract class BugPatternDocumentation {
    * @param summary The summary of the {@code BugChecker}.
    * @param explanation The explanation of the {@code BugChecker}.
    * @param severityLevel The {@code SeverityLevel} provided in {@code @BugPattern}.
-   * @param disableable Describes whether the check can be disabled using command-line flags.
+   * @param canDisable Describes whether the check can be disabled using command-line flags.
    * @return A non-{@code null} {@code BugPattern}.
    */
   public static BugPatternDocumentation create(
@@ -34,7 +34,7 @@ public abstract class BugPatternDocumentation {
       String summary,
       String explanation,
       SeverityLevel severityLevel,
-      boolean disableable) {
+      boolean canDisable) {
     return new AutoValue_BugPatternDocumentation(
         fullyQualifiedName,
         name,
@@ -44,7 +44,7 @@ public abstract class BugPatternDocumentation {
         summary,
         explanation,
         severityLevel,
-        disableable);
+        canDisable);
   }
 
   abstract String fullyQualifiedName();
@@ -63,5 +63,5 @@ public abstract class BugPatternDocumentation {
 
   abstract SeverityLevel severityLevel();
 
-  abstract boolean disableable();
+  abstract boolean canDisable();
 }
