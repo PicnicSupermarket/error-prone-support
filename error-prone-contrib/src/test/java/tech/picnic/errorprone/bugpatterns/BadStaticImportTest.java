@@ -25,18 +25,12 @@ final class BadStaticImportTest {
   void badTypesDontClashWithStaticImportCandidates() {
     assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_TYPES)
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
-
-    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_TYPES)
-        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.keySet());
   }
 
   @Test
   void badMembersDontClashWithStaticImportCandidates() {
-    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
-        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
-
-    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.values())
-        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_EXEMPTED_IDENTIFIERS);
+    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.entries())
+        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.entries());
   }
 
   @Test
@@ -54,9 +48,12 @@ final class BadStaticImportTest {
             "import static java.util.Optional.empty;",
             "import static com.google.common.collect.ImmutableList.copyOf;",
             "import static com.google.common.collect.ImmutableMap.of;",
+            "import static java.time.Instant.MAX;",
+            "import static java.time.Instant.MIN;",
+            "import static java.util.Locale.ROOT;",
             "import java.time.Clock;",
             "import com.google.common.collect.ImmutableList;",
-
+            "import java.util.Locale;",
             "",
             "class A {",
             "  void m() {",
@@ -70,6 +67,15 @@ final class BadStaticImportTest {
             "    // BUG: Diagnostic contains:",
             "    Object l1 = copyOf(ImmutableList.of());",
             "    Object l2 = ImmutableList.copyOf(ImmutableList.of());",
+            "",
+            "    // BUG: Diagnostic contains:",
+            "    Locale lo1 = ROOT;",
+            "    Locale lo2 = Locale.ROOT;",
+            "",
+            "    // BUG: Diagnostic contains:",
+            "    Object c1 = MIN;",
+            "    // BUG: Diagnostic contains:",
+            "    Object c2 = MAX;",
             "  }",
             "}")
         .doTest();
@@ -84,8 +90,12 @@ final class BadStaticImportTest {
             "import static java.time.Clock.systemUTC;",
             "import static java.util.Optional.empty;",
             "import static com.google.common.collect.ImmutableList.copyOf;",
+            "import static java.time.Instant.MAX;",
+            "import static java.time.Instant.MIN;",
+            "import static java.util.Locale.ROOT;",
             "import com.google.common.collect.ImmutableList;",
             "import java.time.Clock;",
+            "import java.util.Locale;",
             "",
             "class A {",
             "  void m() {",
@@ -96,12 +106,20 @@ final class BadStaticImportTest {
             "",
             "    Object l1 = copyOf(ImmutableList.of());",
             "    Object l2 = ImmutableList.copyOf(ImmutableList.of());",
+            "",
+            "    Locale lo1 = ROOT;",
+            "    Locale lo2 = Locale.ROOT;",
+            "",
+            "    Object c1 = MIN;",
+            "    Object c2 = MAX;",
             "  }",
             "}")
         .addOutputLines(
             "A.java",
             "import com.google.common.collect.ImmutableList;",
             "import java.time.Clock;",
+            "import java.time.Instant;",
+            "import java.util.Locale;",
             "import java.util.Optional;",
             "",
             "class A {",
@@ -113,64 +131,9 @@ final class BadStaticImportTest {
             "",
             "    Object l1 = ImmutableList.copyOf(ImmutableList.of());",
             "    Object l2 = ImmutableList.copyOf(ImmutableList.of());",
-            "  }",
-            "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
-  }
-
-  @Test
-  void identifySimpleFieldAccess() {
-    compilationTestHelper
-        .addSourceLines(
-            "A.java",
-            "import static java.time.Instant.MAX;",
-            "import static java.time.Instant.MIN;",
-            "import static java.util.Locale.ROOT;",
-            "import java.util.Locale;",
             "",
-            "class A {",
-            "  void m() {",
-            "    // BUG: Diagnostic contains:",
-            "    Locale l1 = ROOT;",
-            "    Locale l2 = Locale.ROOT;",
-            "",
-            "    // BUG: Diagnostic contains:",
-            "    Object c1 = MIN;",
-            "    // BUG: Diagnostic contains:",
-            "    Object c2 = MAX;",
-            "  }",
-            "}")
-        .doTest();
-  }
-
-  @Test
-  void replaceSimpleFieldAccess() {
-    refactoringTestHelper
-        .addInputLines(
-            "A.java",
-            "import static java.time.Instant.MAX;",
-            "import static java.time.Instant.MIN;",
-            "import static java.util.Locale.ROOT;",
-            "import java.util.Locale;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    Locale l1 = ROOT;",
-            "    Locale l2 = Locale.ROOT;",
-            "",
-            "    Object c1 = MIN;",
-            "    Object c2 = MAX;",
-            "  }",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "import java.time.Instant;",
-            "import java.util.Locale;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    Locale l1 = Locale.ROOT;",
-            "    Locale l2 = Locale.ROOT;",
+            "    Locale lo1 = Locale.ROOT;",
+            "    Locale lo2 = Locale.ROOT;",
             "",
             "    Object c1 = Instant.MIN;",
             "    Object c2 = Instant.MAX;",

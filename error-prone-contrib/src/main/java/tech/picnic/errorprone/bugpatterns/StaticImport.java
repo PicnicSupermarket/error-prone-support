@@ -4,10 +4,11 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.Objects.requireNonNull;
+import static tech.picnic.errorprone.bugpatterns.BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS;
+import static tech.picnic.errorprone.bugpatterns.BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.errorprone.BugPattern;
@@ -35,14 +36,6 @@ import java.util.Optional;
 //    certainly be excluded)
 // - `com.google.common.collect.Tables`
 // - `ch.qos.logback.classic.Level.{DEBUG, ERROR, INFO, TRACE, WARN"}`
-// XXX: Also introduce a check that disallows static imports of certain methods. Candidates:
-// - `com.google.common.base.Strings`
-// - `java.util.Optional.empty`
-// - `java.util.Locale.ROOT`
-// - `ZoneOffset.ofHours` and other `ofXXX`-style methods.
-// - `java.time.Clock`.
-// - Several other `java.time` classes.
-// - Likely any of `*.{ZERO, ONE, MIX, MAX, MIN_VALUE, MAX_VALUE}`.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Identifier should be statically imported",
@@ -55,9 +48,12 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
 
   /**
    * Types whose members should be statically imported, unless exempted by {@link
-   * #STATIC_IMPORT_EXEMPTED_MEMBERS} or {@link #STATIC_IMPORT_EXEMPTED_IDENTIFIERS}.
+   * BadStaticImport#BAD_STATIC_IMPORT_CANDIDATE_MEMBERS} or {@link
+   * BadStaticImport#BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS}.
+   *
+   * <p>Types listed here should be mutually exclusive with {@link
+   * BadStaticImport#BAD_STATIC_IMPORT_CANDIDATE_TYPES}
    */
-  @VisibleForTesting
   static final ImmutableSet<String> STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of(
           "com.google.common.base.Preconditions",
@@ -104,8 +100,15 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           "reactor.function.TupleUtils",
           "tech.picnic.errorprone.bugpatterns.util.MoreTypes");
 
-  /** Type members that should be statically imported. */
-  @VisibleForTesting
+  /**
+   * Type members that should be statically imported.
+   *
+   * <p>This should be mutually exclusive with {@link
+   * BadStaticImport#BAD_STATIC_IMPORT_CANDIDATE_MEMBERS}
+   *
+   * <p>Identifiers listed by {@link BadStaticImport#BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS} should
+   * be mutually exclusive with identifiers listed here.
+   */
   static final ImmutableSetMultimap<String, String> STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
           .putAll(
@@ -142,55 +145,6 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
               "requireNonNullElseGet")
           .putAll("com.google.common.collect.Comparators", "emptiesFirst", "emptiesLast")
           .build();
-
-  /**
-   * Type members that should never be statically imported.
-   *
-   * <p>Identifiers listed by {@link #STATIC_IMPORT_EXEMPTED_IDENTIFIERS} should be omitted from
-   * this collection.
-   */
-  // XXX: Perhaps the set of exempted `java.util.Collections` methods is too strict. For now any
-  // method name that could be considered "too vague" or could conceivably mean something else in a
-  // specific context is left out.
-  @VisibleForTesting
-  static final ImmutableSetMultimap<String, String> STATIC_IMPORT_EXEMPTED_MEMBERS =
-      ImmutableSetMultimap.<String, String>builder()
-          .put("com.google.common.base.Predicates", "contains")
-          .put("com.mongodb.client.model.Filters", "empty")
-          .putAll(
-              "java.util.Collections",
-              "addAll",
-              "copy",
-              "fill",
-              "list",
-              "max",
-              "min",
-              "nCopies",
-              "rotate",
-              "sort",
-              "swap")
-          .putAll("java.util.regex.Pattern", "compile", "matches", "quote")
-          .put("org.springframework.http.MediaType", "ALL")
-          .build();
-
-  /**
-   * Identifiers that should never be statically imported.
-   *
-   * <p>This should be a superset of the identifiers flagged by {@link
-   * com.google.errorprone.bugpatterns.BadImport}.
-   */
-  @VisibleForTesting
-  static final ImmutableSet<String> STATIC_IMPORT_EXEMPTED_IDENTIFIERS =
-      ImmutableSet.of(
-          "builder",
-          "create",
-          "copyOf",
-          "from",
-          "getDefaultInstance",
-          "INSTANCE",
-          "newBuilder",
-          "of",
-          "valueOf");
 
   /** Instantiates a new {@link StaticImport} instance. */
   public StaticImport() {}
@@ -229,13 +183,13 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
 
   private static boolean isCandidate(MemberSelectTree tree) {
     String identifier = tree.getIdentifier().toString();
-    if (STATIC_IMPORT_EXEMPTED_IDENTIFIERS.contains(identifier)) {
+    if (BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(identifier)) {
       return false;
     }
 
     Type type = ASTHelpers.getType(tree.getExpression());
     return type != null
-        && !STATIC_IMPORT_EXEMPTED_MEMBERS.containsEntry(type.toString(), identifier);
+        && !BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type.toString(), identifier);
   }
 
   private static Optional<String> getCandidateSimpleName(StaticImportInfo importInfo) {

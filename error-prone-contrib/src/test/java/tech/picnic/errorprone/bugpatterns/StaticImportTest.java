@@ -15,18 +15,6 @@ final class StaticImportTest {
   }
 
   @Test
-  void exemptedMembersAreNotVacuous() {
-    assertThat(StaticImport.STATIC_IMPORT_EXEMPTED_MEMBERS.keySet())
-        .isSubsetOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
-  }
-
-  @Test
-  void exemptedMembersAreNotRedundant() {
-    assertThat(StaticImport.STATIC_IMPORT_EXEMPTED_MEMBERS.values())
-        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_EXEMPTED_IDENTIFIERS);
-  }
-
-  @Test
   void identification() {
     CompilationTestHelper.newInstance(StaticImport.class, getClass())
         .addSourceLines(
