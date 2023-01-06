@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
+import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -25,7 +26,6 @@ import com.sun.tools.javac.tree.JCTree;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import reactor.test.StepVerifier;
 
@@ -61,7 +61,7 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
     // If the parent matches, this node will be considered when the parent parses its children, so
     // we don't match it.
     if (!STEP_EXPECTNEXT.matches(tree, state)
-        || getParent(tree).map(t -> STEP_EXPECTNEXT.matches(t, state)).orElse(false)) {
+        || getParent(tree).filter(t -> STEP_EXPECTNEXT.matches(t, state)).isPresent()) {
       return Description.NO_MATCH;
     }
 
@@ -71,7 +71,7 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
     // The nodes are organized as MethodInvocationTree -> MemberSelectTree -> MethodInvocationTree
     // We skip 2 to find the next method call in the call chain.
     for (int nodeIndex = 2;
-        getChild(state, nodeIndex).map(t -> STEP_EXPECTNEXT.matches(t, state)).orElse(false);
+        getChild(state, nodeIndex).filter(t -> STEP_EXPECTNEXT.matches(t, state)).isPresent();
         nodeIndex += 2) {
       // We checked in the loop condition that the child is present, so this is safe
       child = getChild(state, nodeIndex).orElseThrow();
@@ -82,7 +82,7 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
       return Description.NO_MATCH;
     }
 
-    String newArgument = newArgs.stream().map(Object::toString).collect(Collectors.joining(", "));
+    String newArgument = newArgs.stream().map(Object::toString).collect(joining(", "));
     List<? extends ExpressionTree> myArgs = tree.getArguments();
     SuggestedFix.Builder argumentsFix =
         SuggestedFix.builder().postfixWith(myArgs.get(myArgs.size() - 1), ", " + newArgument);
@@ -97,9 +97,9 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
 
   private static Optional<MethodInvocationTree> getParent(MethodInvocationTree tree) {
     return Optional.of(tree.getMethodSelect())
-        .filter(ms -> ms instanceof MemberSelectTree)
+        .filter(MemberSelectTree.class::isInstance)
         .map(ms -> ((MemberSelectTree) ms).getExpression())
-        .filter(expr -> expr instanceof MethodInvocationTree)
+        .filter(MethodInvocationTree.class::isInstance)
         .map(expr -> (MethodInvocationTree) expr);
   }
 
@@ -108,7 +108,7 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
     return StreamSupport.stream(state.getPath().spliterator(), /* parallel= */ false)
         .skip(skip)
         .findFirst()
-        .filter(expr -> expr instanceof MethodInvocationTree)
+        .filter(MethodInvocationTree.class::isInstance)
         .map(expr -> (MethodInvocationTree) expr)
         .filter(m -> ((JCTree) m).pos > startPos);
   }

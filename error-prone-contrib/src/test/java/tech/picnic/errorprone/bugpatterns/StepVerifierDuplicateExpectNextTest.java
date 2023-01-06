@@ -20,7 +20,7 @@ final class StepVerifierDuplicateExpectNextTest {
             "",
             "class A {",
             "  void m() {",
-            "     Flux.just(0, 1).as(StepVerifier::create).expectNext(0).expectNext(1);",
+            "    Flux.just(0, 1).as(StepVerifier::create).expectNext(0).expectNext(1);",
             "  }",
             "}")
         .addOutputLines(
@@ -46,7 +46,7 @@ final class StepVerifierDuplicateExpectNextTest {
             "",
             "class A {",
             "  void m() {",
-            "     Flux.just(0, 1).as(StepVerifier::create).expectNext(0).expectNext(1).verifyComplete();",
+            "    Flux.just(0, 1).as(StepVerifier::create).expectNext(0).expectNext(1).verifyComplete();",
             "  }",
             "}")
         .addOutputLines(
@@ -72,7 +72,12 @@ final class StepVerifierDuplicateExpectNextTest {
             "",
             "class A {",
             "  void m() {",
-            "     Flux.just(0, 1, 2).as(StepVerifier::create).expectNext(0).expectNext(1).expectNext(2).verifyComplete();",
+            "    Flux.just(0, 1, 2)",
+            "        .as(StepVerifier::create)",
+            "        .expectNext(0)",
+            "        .expectNext(1)",
+            "        .expectNext(2)",
+            "        .verifyComplete();",
             "  }",
             "}")
         .addOutputLines(
@@ -98,12 +103,12 @@ final class StepVerifierDuplicateExpectNextTest {
             "",
             "class A {",
             "  void m() {",
-            "     Flux.just(0, 1, 2, 3, 4, 5, 6)",
-            "          .as(StepVerifier::create)",
-            "          .expectNext(0, 1)",
-            "          .expectNext(2, 3)",
-            "          .expectNext(4, 5, 6)",
-            "          .verifyComplete();",
+            "    Flux.just(0, 1, 2, 3, 4, 5, 6)",
+            "        .as(StepVerifier::create)",
+            "        .expectNext(0, 1)",
+            "        .expectNext(2, 3)",
+            "        .expectNext(4, 5, 6)",
+            "        .verifyComplete();",
             "  }",
             "}")
         .addOutputLines(
@@ -114,9 +119,9 @@ final class StepVerifierDuplicateExpectNextTest {
             "class A {",
             "  void m() {",
             "    Flux.just(0, 1, 2, 3, 4, 5, 6)",
-            "          .as(StepVerifier::create)",
-            "          .expectNext(0, 1, 2, 3, 4, 5, 6)",
-            "          .verifyComplete();",
+            "        .as(StepVerifier::create)",
+            "        .expectNext(0, 1, 2, 3, 4, 5, 6)",
+            "        .verifyComplete();",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
@@ -127,24 +132,31 @@ final class StepVerifierDuplicateExpectNextTest {
     refactoringTestHelper
         .addInputLines(
             "A.java",
+            "import java.util.Map;",
             "import reactor.core.publisher.Flux;",
             "import reactor.test.StepVerifier;",
-            "import java.util.Map;",
             "",
             "class A {",
             "  void m() {",
-            "     Flux.just(Map.of(\"a\", \"b\".toUpperCase()), Map.of(\"c\", \"d\".toUpperCase())).as(StepVerifier::create).expectNext(Map.of(\"a\", \"b\".toUpperCase())).expectNext(Map.of(\"c\", \"d\".toUpperCase())).verifyComplete();",
+            "    Flux.just(Map.of(\"a\", \"b\".toUpperCase()), Map.of(\"c\", \"d\".toUpperCase()))",
+            "        .as(StepVerifier::create)",
+            "        .expectNext(Map.of(\"a\", \"b\".toUpperCase()))",
+            "        .expectNext(Map.of(\"c\", \"d\".toUpperCase()))",
+            "        .verifyComplete();",
             "  }",
             "}")
         .addOutputLines(
             "A.java",
+            "import java.util.Map;",
             "import reactor.core.publisher.Flux;",
             "import reactor.test.StepVerifier;",
-            "import java.util.Map;",
             "",
             "class A {",
             "  void m() {",
-            "     Flux.just(Map.of(\"a\", \"b\".toUpperCase()), Map.of(\"c\", \"d\".toUpperCase())).as(StepVerifier::create).expectNext(Map.of(\"a\", \"b\".toUpperCase()), Map.of(\"c\", \"d\".toUpperCase())).verifyComplete();",
+            "    Flux.just(Map.of(\"a\", \"b\".toUpperCase()), Map.of(\"c\", \"d\".toUpperCase()))",
+            "        .as(StepVerifier::create)",
+            "        .expectNext(Map.of(\"a\", \"b\".toUpperCase()), Map.of(\"c\", \"d\".toUpperCase()))",
+            "        .verifyComplete();",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
@@ -160,7 +172,7 @@ final class StepVerifierDuplicateExpectNextTest {
             "",
             "class A {",
             "  void m() {",
-            "     Mono.just(0).as(StepVerifier::create).expectNext(0).verifyComplete();",
+            "    Mono.just(0).as(StepVerifier::create).expectNext(0).verifyComplete();",
             "  }",
             "}")
         .addOutputLines(
