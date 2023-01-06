@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.sun.tools.javac.code.Kinds.Kind.TYP;
 import static tech.picnic.errorprone.bugpatterns.StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -18,8 +19,11 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
+import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A {@link BugChecker} that flags methods and constants that should not be statically imported. */
 // XXX: Also introduce checks that disallows the following candidates:
@@ -120,7 +124,7 @@ public final class BadStaticImport extends BugChecker
 
   @Override
   public Description matchIdentifier(IdentifierTree tree, VisitorState state) {
-    if (isMatch(tree)) {
+    if (isMatch(tree, state)) {
       return getDescription(tree, state);
     }
 
@@ -143,19 +147,23 @@ public final class BadStaticImport extends BugChecker
         ".", symbol.getEnclosingElement().getQualifiedName(), symbol.getSimpleName());
   }
 
-  private static boolean isMatch(IdentifierTree tree) {
+  private static boolean isMatch(IdentifierTree tree, VisitorState state) {
     Symbol symbol = ASTHelpers.getSymbol(tree);
     if (symbol == null) {
       return false;
     }
 
     Symbol enclosingSymbol = symbol.getEnclosingElement();
-    if (enclosingSymbol == null) {
+    if (enclosingSymbol == null || enclosingSymbol.kind != TYP) {
+      return false;
+    }
+
+    String identifierName = symbol.getSimpleName().toString();
+    if (!isIdentifierStaticallyImported(identifierName, state)) {
       return false;
     }
 
     String qualifiedTypeName = enclosingSymbol.getQualifiedName().toString();
-    String identifierName = symbol.getSimpleName().toString();
     return !isExempted(qualifiedTypeName, identifierName)
         && isCandidate(qualifiedTypeName, identifierName);
   }
@@ -168,5 +176,18 @@ public final class BadStaticImport extends BugChecker
 
   private static boolean isExempted(String qualifiedTypeName, String identifierName) {
     return STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(qualifiedTypeName, identifierName);
+  }
+
+  private static boolean isIdentifierStaticallyImported(String identifierName, VisitorState state) {
+    return state.getPath().getCompilationUnit().getImports().stream()
+        .filter(ImportTree::isStatic)
+        .map(ImportTree::getQualifiedIdentifier)
+        .map(tree -> getStaticImportIdentifier(tree, state))
+        .anyMatch(identifierName::contentEquals);
+  }
+
+  private static CharSequence getStaticImportIdentifier(Tree tree, VisitorState state) {
+    String source = SourceCode.treeToString(tree, state);
+    return source.subSequence(source.lastIndexOf('.') + 1, source.length());
   }
 }

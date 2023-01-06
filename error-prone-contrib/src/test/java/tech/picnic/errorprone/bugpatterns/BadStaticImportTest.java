@@ -40,7 +40,7 @@ final class BadStaticImportTest {
   }
 
   @Test
-  void identifySimpleMethodInvocation() {
+  void identification() {
     compilationTestHelper
         .addSourceLines(
             "A.java",
@@ -81,13 +81,22 @@ final class BadStaticImportTest {
             "",
             "    // BUG: Diagnostic contains:",
             "    ImmutableSet.of(min(ImmutableSet.of()));",
+            "",
+            "    Object builder = null;",
+            "    // Not flagged because identifier is variable name",
+            "    Object lBuilder = ImmutableList.of(builder);",
+            "",
+            "    // Not flagged because method is not statically imported",
+            "    create();",
             "  }",
+            "",
+            "  void create() {}",
             "}")
         .doTest();
   }
 
   @Test
-  void replaceSimpleMethodInvocation() {
+  void replacement() {
     refactoringTestHelper
         .addInputLines(
             "A.java",
