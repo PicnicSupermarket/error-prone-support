@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugCheckerRefactoringTestHelper.newInstance;
-
+import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -48,7 +47,7 @@ final class StringCaseLocaleUsageTest {
 
   @Test
   void replacementFirstSuggestedFix() {
-    newInstance(StringCaseLocaleUsage.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(StringCaseLocaleUsage.class, getClass())
         .setFixChooser(FixChoosers.FIRST)
         .addInputLines(
             "A.java",
@@ -87,7 +86,7 @@ final class StringCaseLocaleUsageTest {
 
   @Test
   void replacementSecondSuggestedFix() {
-    newInstance(StringCaseLocaleUsage.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(StringCaseLocaleUsage.class, getClass())
         .setFixChooser(FixChoosers.SECOND)
         .addInputLines(
             "A.java",

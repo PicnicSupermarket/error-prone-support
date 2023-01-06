@@ -25,32 +25,41 @@ import org.junit.jupiter.params.provider.MethodSource;
 import tech.picnic.errorprone.refaster.ErrorProneFork;
 
 final class RefasterTest {
+  private final CompilationTestHelper compilationHelper =
+      CompilationTestHelper.newInstance(Refaster.class, getClass())
+          .matchAllDiagnostics()
+          .expectErrorMessage(
+              "StringOfSizeZeroRule",
+              containsPattern(
+                  "\\[Refaster Rule\\] FooRules\\.StringOfSizeZeroRule: Refactoring opportunity\\s+.+\\s+"))
+          .expectErrorMessage(
+              "StringOfSizeOneRule",
+              containsPattern(
+                  "\\[Refaster Rule\\] FooRules\\.StringOfSizeOneRule: "
+                      + "A custom description about matching single-char strings\\s+.+\\s+"
+                      + "\\(see https://error-prone.picnic.tech/refasterrules/FooRules#StringOfSizeOneRule\\)"))
+          .expectErrorMessage(
+              "StringOfSizeTwoRule",
+              containsPattern(
+                  "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeTwoRule: "
+                      + "A custom subgroup description\\s+.+\\s+"
+                      + "\\(see https://example.com/rule/FooRules#ExtraGrouping.StringOfSizeTwoRule\\)"))
+          .expectErrorMessage(
+              "StringOfSizeThreeRule",
+              containsPattern(
+                  "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeThreeRule: "
+                      + "A custom description about matching three-char strings\\s+.+\\s+"
+                      + "\\(see https://example.com/custom\\)"));
+  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
+      BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass());
+  private final BugCheckerRefactoringTestHelper restrictedRefactoringTestHelper =
+      BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())
+          .setArgs(
+              "-XepOpt:Refaster:NamePattern=.*\\$(StringOfSizeZeroVerboseRule|StringOfSizeTwoRule)$");
+
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(Refaster.class, getClass())
-        .matchAllDiagnostics()
-        .expectErrorMessage(
-            "StringOfSizeZeroRule",
-            containsPattern(
-                "\\[Refaster Rule\\] FooRules\\.StringOfSizeZeroRule: Refactoring opportunity\\s+.+\\s+"))
-        .expectErrorMessage(
-            "StringOfSizeOneRule",
-            containsPattern(
-                "\\[Refaster Rule\\] FooRules\\.StringOfSizeOneRule: "
-                    + "A custom description about matching single-char strings\\s+.+\\s+"
-                    + "\\(see https://error-prone.picnic.tech/refasterrules/FooRules#StringOfSizeOneRule\\)"))
-        .expectErrorMessage(
-            "StringOfSizeTwoRule",
-            containsPattern(
-                "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeTwoRule: "
-                    + "A custom subgroup description\\s+.+\\s+"
-                    + "\\(see https://example.com/rule/FooRules#ExtraGrouping.StringOfSizeTwoRule\\)"))
-        .expectErrorMessage(
-            "StringOfSizeThreeRule",
-            containsPattern(
-                "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeThreeRule: "
-                    + "A custom description about matching three-char strings\\s+.+\\s+"
-                    + "\\(see https://example.com/custom\\)"))
+    compilationHelper
         .addSourceLines(
             "A.java",
             "class A {",
@@ -160,30 +169,7 @@ final class RefasterTest {
       ImmutableList<String> arguments, ImmutableList<SeverityLevel> expectedSeverities) {
     assertThatThrownBy(
             () ->
-                CompilationTestHelper.newInstance(Refaster.class, getClass())
-                    .matchAllDiagnostics()
-                    .expectErrorMessage(
-                        "StringOfSizeZeroRule",
-                        containsPattern(
-                            "\\[Refaster Rule\\] FooRules\\.StringOfSizeZeroRule: Refactoring opportunity\\s+.+\\s+"))
-                    .expectErrorMessage(
-                        "StringOfSizeOneRule",
-                        containsPattern(
-                            "\\[Refaster Rule\\] FooRules\\.StringOfSizeOneRule: "
-                                + "A custom description about matching single-char strings\\s+.+\\s+"
-                                + "\\(see https://error-prone.picnic.tech/refasterrules/FooRules#StringOfSizeOneRule\\)"))
-                    .expectErrorMessage(
-                        "StringOfSizeTwoRule",
-                        containsPattern(
-                            "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeTwoRule: "
-                                + "A custom subgroup description\\s+.+\\s+"
-                                + "\\(see https://example.com/rule/FooRules#ExtraGrouping.StringOfSizeTwoRule\\)"))
-                    .expectErrorMessage(
-                        "StringOfSizeThreeRule",
-                        containsPattern(
-                            "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeThreeRule: "
-                                + "A custom description about matching three-char strings\\s+.+\\s+"
-                                + "\\(see https://example.com/custom\\)"))
+                compilationHelper
                     .setArgs(arguments)
                     .addSourceLines(
                         "A.java",
@@ -234,7 +220,7 @@ final class RefasterTest {
 
   @Test
   void replacement() {
-    BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())
+    refactoringTestHelper
         .addInputLines(
             "A.java",
             "class A {",
@@ -260,9 +246,7 @@ final class RefasterTest {
 
   @Test
   void restrictedReplacement() {
-    BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())
-        .setArgs(
-            "-XepOpt:Refaster:NamePattern=.*\\$(StringOfSizeZeroVerboseRule|StringOfSizeTwoRule)$")
+    restrictedRefactoringTestHelper
         .addInputLines(
             "A.java",
             "class A {",

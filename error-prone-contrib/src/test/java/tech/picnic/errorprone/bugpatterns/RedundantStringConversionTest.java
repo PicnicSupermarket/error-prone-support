@@ -10,9 +10,19 @@ import org.junit.jupiter.api.Test;
 // `String.valueOf(null)` may not. That is because the latter matches `String#valueOf(char[])`. We
 // could special-case `null` arguments, but that doesn't seem worth the trouble.
 final class RedundantStringConversionTest {
+  private final CompilationTestHelper compilationTestHelper =
+      CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass());
+  private final CompilationTestHelper customizedCompilationTestHelper =
+      CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass())
+          .setArgs(
+              ImmutableList.of(
+                  "-XepOpt:RedundantStringConversion:ExtraConversionMethods=java.lang.Enum#name(),A#name(),A.B#toString(int)"));
+  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
+      BugCheckerRefactoringTestHelper.newInstance(RedundantStringConversion.class, getClass());
+
   @Test
   void identificationOfIdentityTransformation() {
-    CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass())
+    compilationTestHelper
         .addSourceLines(
             "A.java",
             "class A {",
@@ -35,7 +45,7 @@ final class RedundantStringConversionTest {
 
   @Test
   void identificationWithinMutatingAssignment() {
-    CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass())
+    compilationTestHelper
         .addSourceLines(
             "A.java",
             "import java.math.BigInteger;",
@@ -96,7 +106,7 @@ final class RedundantStringConversionTest {
 
   @Test
   void identificationWithinBinaryOperation() {
-    CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass())
+    compilationTestHelper
         .addSourceLines(
             "A.java",
             "import java.math.BigInteger;",
@@ -191,7 +201,7 @@ final class RedundantStringConversionTest {
 
   @Test
   void identificationWithinStringBuilderMethod() {
-    CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass())
+    compilationTestHelper
         .addSourceLines(
             "A.java",
             "import java.math.BigInteger;",
@@ -246,7 +256,7 @@ final class RedundantStringConversionTest {
   // XXX: Also test the other formatter methods.
   @Test
   void identificationWithinFormatterMethod() {
-    CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass())
+    compilationTestHelper
         .addSourceLines(
             "A.java",
             "import java.util.Formattable;",
@@ -291,7 +301,7 @@ final class RedundantStringConversionTest {
 
   @Test
   void identificationWithinGuavaGuardMethod() {
-    CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass())
+    compilationTestHelper
         .addSourceLines(
             "A.java",
             "import static com.google.common.base.Preconditions.checkArgument;",
@@ -351,7 +361,7 @@ final class RedundantStringConversionTest {
 
   @Test
   void identificationWithinSlf4jLoggerMethod() {
-    CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass())
+    compilationTestHelper
         .addSourceLines(
             "A.java",
             "import java.util.Formattable;",
@@ -406,10 +416,7 @@ final class RedundantStringConversionTest {
 
   @Test
   void identificationOfCustomConversionMethod() {
-    CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass())
-        .setArgs(
-            ImmutableList.of(
-                "-XepOpt:RedundantStringConversion:ExtraConversionMethods=java.lang.Enum#name(),A#name(),A.B#toString(int)"))
+    customizedCompilationTestHelper
         .addSourceLines(
             "A.java",
             "import java.math.RoundingMode;",
@@ -502,7 +509,7 @@ final class RedundantStringConversionTest {
 
   @Test
   void replacement() {
-    BugCheckerRefactoringTestHelper.newInstance(RedundantStringConversion.class, getClass())
+    refactoringTestHelper
         .addInputLines(
             "A.java",
             "class A {",

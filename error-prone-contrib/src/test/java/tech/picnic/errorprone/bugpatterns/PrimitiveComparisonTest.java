@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Test;
 // - During actual compilation only the first replacement is applied.
 // XXX: Can we perhaps work-around this by describing the fixes in reverse order?
 final class PrimitiveComparisonTest {
-  /* The logic for `char` and `short` is exactly analogous to the `byte` case. */
+  /**
+   * @implNote The logic for `char` and `short` is exactly analogous to the `byte` case.
+   */
   @Test
   void byteComparison() {
     CompilationTestHelper.newInstance(PrimitiveComparison.class, getClass())
