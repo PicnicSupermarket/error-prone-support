@@ -46,6 +46,7 @@ public final class MockitoMockClassReference extends BugChecker
           argumentCount(1),
           argument(0, isSameType(Class.class.getName())),
           staticMethod().onClass("org.mockito.Mockito").namedAnyOf("mock", "spy"));
+  // XXX: Replace `var` usage with explicit type instead.
   private static final Matcher<VariableTree> INCOMPATIBLE_VARIABLE_TREE =
       anyOf(ASTHelpers::hasNoExplicitType, MockitoMockClassReference::hasTypeDifference);
 
