@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.allOf;
+import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.argument;
 import static com.google.errorprone.matchers.Matchers.argumentCount;
 import static com.google.errorprone.matchers.Matchers.isSameType;
@@ -40,29 +41,34 @@ import com.sun.source.tree.VariableTree;
 public final class MockitoMockClassReference extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<MethodInvocationTree> MOCKITO_MOCK_METHOD_INVOCATION =
+  private static final Matcher<MethodInvocationTree> SUPPORTED_MOCKITO_METHOD_INVOCATION =
       allOf(
           argumentCount(1),
           argument(0, isSameType(Class.class.getName())),
           staticMethod().onClass("org.mockito.Mockito").namedAnyOf("mock", "spy"));
+  private static final Matcher<VariableTree> INCOMPATIBLE_VARIABLE_TREE =
+      anyOf(ASTHelpers::hasNoExplicitType, MockitoMockClassReference::hasTypeDifference);
 
   /** Instantiates a new {@link MockitoMockClassReference} instance. */
   public MockitoMockClassReference() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!MOCKITO_MOCK_METHOD_INVOCATION.matches(tree, state)) {
+    if (!SUPPORTED_MOCKITO_METHOD_INVOCATION.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
     Tree parent = state.getPath().getParentPath().getLeaf();
     if (parent.getKind() == VARIABLE
-        && ASTHelpers.hasNoExplicitType((VariableTree) parent, state)) {
+        && INCOMPATIBLE_VARIABLE_TREE.matches((VariableTree) parent, state)) {
       return Description.NO_MATCH;
     }
 
-    // XXX: TODO: Only suggest in case type is the same.
-    // XXX: TODO: Drop obsolete unchecked suppress warnings? <-- maybe a check in itself.
     return describeMatch(tree, SuggestedFix.delete(tree.getArguments().get(0)));
+  }
+
+  private static boolean hasTypeDifference(VariableTree tree, VisitorState state) {
+    return !ASTHelpers.isSameType(
+        ASTHelpers.getType(tree), ASTHelpers.getType(tree.getInitializer()), state);
   }
 }
