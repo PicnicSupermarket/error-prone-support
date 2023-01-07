@@ -59,6 +59,7 @@ public final class MockitoMockClassReference extends BugChecker
       return Description.NO_MATCH;
     }
 
+    // XXX: TODO: Add similar matchers for usage in a ReturnTree and the method's return type.
     Tree parent = state.getPath().getParentPath().getLeaf();
     if (parent.getKind() == VARIABLE
         && INCOMPATIBLE_VARIABLE_TREE.matches((VariableTree) parent, state)) {
