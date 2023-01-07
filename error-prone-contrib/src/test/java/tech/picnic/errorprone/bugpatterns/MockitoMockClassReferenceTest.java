@@ -50,6 +50,38 @@ final class MockitoMockClassReferenceTest {
   }
 
   @Test
+  void unimplementedCases() {
+    // XXX: Move to identification once fixed.
+    compilationTestHelper
+        .addSourceLines(
+            "A.java",
+            "import static org.mockito.Mockito.mock;",
+            "",
+            "import java.math.BigInteger;",
+            "import java.util.List;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    // This case is arguable as it is unsafe in any case.",
+            "    // This currently is not identified as the `erasure` is the same.",
+            "    List<String> genericallyTypedMock = mock(List.class);",
+            "",
+            "    // This case is problematic and should not be replaced.",
+            "    // The real type of `variableTypedMock` is `BigInteger`.",
+            "    // But when replaced, it will be `Number`.",
+            "    Class<? extends Number> variableType = BigInteger.class;",
+            "    Number variableTypedMock = mock(variableType);",
+            "  }",
+            "",
+            "  <T extends Number> T getGenericMock(Class<T> clazz) {",
+            "    // No idea how to detect type T as part of generics usage.",
+            "    return mock(clazz);",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
   void replacement() {
     refactoringTestHelper
         .addInputLines(
