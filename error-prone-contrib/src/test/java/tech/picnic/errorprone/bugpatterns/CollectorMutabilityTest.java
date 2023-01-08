@@ -8,14 +8,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class CollectorMutabilityTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(CollectorMutability.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(CollectorMutability.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(CollectorMutability.class, getClass())
         .addSourceLines(
             "A.java",
             "import static com.google.common.collect.ImmutableList.toImmutableList;",
@@ -67,7 +62,7 @@ final class CollectorMutabilityTest {
 
   @Test
   void identificationWithoutGuavaOnClasspath() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(CollectorMutability.class, getClass())
         .withClasspath()
         .addSourceLines(
             "A.java",
@@ -84,7 +79,7 @@ final class CollectorMutabilityTest {
 
   @Test
   void replacementFirstSuggestedFix() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(CollectorMutability.class, getClass())
         .addInputLines(
             "A.java",
             "import static java.util.stream.Collectors.toList;",
@@ -141,7 +136,7 @@ final class CollectorMutabilityTest {
 
   @Test
   void replacementSecondSuggestedFix() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(CollectorMutability.class, getClass())
         .setFixChooser(SECOND)
         .addInputLines(
             "A.java",

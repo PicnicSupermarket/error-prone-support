@@ -4,16 +4,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class RequestParamTypeTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(RequestParamType.class, getClass());
-  private final CompilationTestHelper restrictedCompilationTestHelper =
-      CompilationTestHelper.newInstance(RequestParamType.class, getClass())
-          .setArgs(
-              "-XepOpt:RequestParamType:SupportedCustomTypes=com.google.common.collect.ImmutableSet,com.google.common.collect.ImmutableSortedMultiset");
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(RequestParamType.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.google.common.collect.ImmutableBiMap;",
@@ -70,7 +63,9 @@ final class RequestParamTypeTest {
 
   @Test
   void identificationRestricted() {
-    restrictedCompilationTestHelper
+    CompilationTestHelper.newInstance(RequestParamType.class, getClass())
+        .setArgs(
+            "-XepOpt:RequestParamType:SupportedCustomTypes=com.google.common.collect.ImmutableSet,com.google.common.collect.ImmutableSortedMultiset")
         .addSourceLines(
             "A.java",
             "import com.google.common.collect.ImmutableBiMap;",

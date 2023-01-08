@@ -4,12 +4,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class RequestMappingAnnotationTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(RequestMappingAnnotation.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(RequestMappingAnnotation.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.io.InputStream;",

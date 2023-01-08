@@ -4,12 +4,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class ExplicitEnumOrderingTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(ExplicitEnumOrdering.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(ExplicitEnumOrdering.class, getClass())
         .addSourceLines(
             "A.java",
             "import static java.lang.annotation.RetentionPolicy.CLASS;",

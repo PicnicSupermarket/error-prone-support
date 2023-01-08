@@ -7,14 +7,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class IdentityConversionTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(IdentityConversion.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(IdentityConversion.class, getClass())
         .addSourceLines(
             "A.java",
             "import static com.google.errorprone.matchers.Matchers.instanceMethod;",
@@ -184,7 +179,7 @@ final class IdentityConversionTest {
 
   @Test
   void replacementFirstSuggestedFix() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass())
         .setFixChooser(FixChoosers.FIRST)
         .addInputLines(
             "A.java",
@@ -291,7 +286,7 @@ final class IdentityConversionTest {
 
   @Test
   void replacementSecondSuggestedFix() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass())
         .setFixChooser(FixChoosers.SECOND)
         .addInputLines(
             "A.java",

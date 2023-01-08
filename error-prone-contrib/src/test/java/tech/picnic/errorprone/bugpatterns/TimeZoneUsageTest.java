@@ -4,12 +4,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class TimeZoneUsageTest {
-  private final CompilationTestHelper compilationHelper =
-      CompilationTestHelper.newInstance(TimeZoneUsage.class, getClass());
-
   @Test
   void identification() {
-    compilationHelper
+    CompilationTestHelper.newInstance(TimeZoneUsage.class, getClass())
         .addSourceLines(
             "A.java",
             "import static java.time.ZoneOffset.UTC;",

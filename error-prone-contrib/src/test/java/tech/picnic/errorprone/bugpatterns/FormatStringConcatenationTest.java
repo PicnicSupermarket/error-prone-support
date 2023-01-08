@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class FormatStringConcatenationTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(FormatStringConcatenation.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(FormatStringConcatenation.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(FormatStringConcatenation.class, getClass())
         .addSourceLines(
             "A.java",
             "import static com.google.common.base.Preconditions.checkArgument;",
@@ -309,7 +304,7 @@ final class FormatStringConcatenationTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(FormatStringConcatenation.class, getClass())
         .addInputLines(
             "A.java",
             "import static com.google.common.base.Preconditions.checkArgument;",

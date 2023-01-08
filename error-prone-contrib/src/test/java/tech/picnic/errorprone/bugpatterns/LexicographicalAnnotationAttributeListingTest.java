@@ -7,22 +7,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class LexicographicalAnnotationAttributeListingTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(
-          LexicographicalAnnotationAttributeListing.class, getClass());
-  private final CompilationTestHelper restrictedCompilationTestHelper =
-      CompilationTestHelper.newInstance(LexicographicalAnnotationAttributeListing.class, getClass())
-          .setArgs(
-              ImmutableList.of(
-                  "-XepOpt:LexicographicalAnnotationAttributeListing:Includes=pkg.A.Foo,pkg.A.Bar",
-                  "-XepOpt:LexicographicalAnnotationAttributeListing:Excludes=pkg.A.Bar#value"));
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(
-          LexicographicalAnnotationAttributeListing.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(LexicographicalAnnotationAttributeListing.class, getClass())
         .addSourceLines(
             "A.java",
             "import static java.math.RoundingMode.DOWN;",
@@ -165,7 +152,8 @@ final class LexicographicalAnnotationAttributeListingTest {
   // `CanonicalAnnotationSyntax` checker correct the situation in a subsequent run.
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(
+            LexicographicalAnnotationAttributeListing.class, getClass())
         .addInputLines(
             "A.java",
             "import static java.math.RoundingMode.DOWN;",
@@ -246,7 +234,11 @@ final class LexicographicalAnnotationAttributeListingTest {
   @Test
   void filtering() {
     /* Some violations are not flagged because they are not in- or excluded. */
-    restrictedCompilationTestHelper
+    CompilationTestHelper.newInstance(LexicographicalAnnotationAttributeListing.class, getClass())
+        .setArgs(
+            ImmutableList.of(
+                "-XepOpt:LexicographicalAnnotationAttributeListing:Includes=pkg.A.Foo,pkg.A.Bar",
+                "-XepOpt:LexicographicalAnnotationAttributeListing:Excludes=pkg.A.Bar#value"))
         .addSourceLines(
             "pkg/A.java",
             "package pkg;",

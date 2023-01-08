@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class RefasterRuleModifiersTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(RefasterRuleModifiers.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(RefasterRuleModifiers.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(RefasterRuleModifiers.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
@@ -136,7 +131,7 @@ final class RefasterRuleModifiersTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(RefasterRuleModifiers.class, getClass())
         .addInputLines(
             "A.java",
             "import com.google.errorprone.refaster.annotation.BeforeTemplate;",

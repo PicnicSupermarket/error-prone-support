@@ -7,14 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.annotation.Scheduled;
 
 final class ScheduledTransactionTraceTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(ScheduledTransactionTrace.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(ScheduledTransactionTrace.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(ScheduledTransactionTrace.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.newrelic.api.agent.Trace;",
@@ -46,7 +41,7 @@ final class ScheduledTransactionTraceTest {
 
   @Test
   void identificationWithoutNewRelicAgentApiOnClasspath() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(ScheduledTransactionTrace.class, getClass())
         .withClasspath(Scheduled.class)
         .addSourceLines(
             "A.java",
@@ -61,7 +56,7 @@ final class ScheduledTransactionTraceTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(ScheduledTransactionTrace.class, getClass())
         .addInputLines(
             "A.java",
             "import com.newrelic.api.agent.Trace;",

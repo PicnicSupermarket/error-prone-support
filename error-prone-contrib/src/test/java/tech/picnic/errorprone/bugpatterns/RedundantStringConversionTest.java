@@ -12,13 +12,6 @@ import org.junit.jupiter.api.Test;
 final class RedundantStringConversionTest {
   private final CompilationTestHelper compilationTestHelper =
       CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass());
-  private final CompilationTestHelper customizedCompilationTestHelper =
-      CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass())
-          .setArgs(
-              ImmutableList.of(
-                  "-XepOpt:RedundantStringConversion:ExtraConversionMethods=java.lang.Enum#name(),A#name(),A.B#toString(int)"));
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(RedundantStringConversion.class, getClass());
 
   @Test
   void identificationOfIdentityTransformation() {
@@ -416,7 +409,10 @@ final class RedundantStringConversionTest {
 
   @Test
   void identificationOfCustomConversionMethod() {
-    customizedCompilationTestHelper
+    CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass())
+        .setArgs(
+            ImmutableList.of(
+                "-XepOpt:RedundantStringConversion:ExtraConversionMethods=java.lang.Enum#name(),A#name(),A.B#toString(int)"))
         .addSourceLines(
             "A.java",
             "import java.math.RoundingMode;",
@@ -509,7 +505,7 @@ final class RedundantStringConversionTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(RedundantStringConversion.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
