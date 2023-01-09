@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.util.ASTHelpers.getSymbol;
 import static com.sun.tools.javac.code.Kinds.Kind.TYP;
 import static tech.picnic.errorprone.bugpatterns.StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
@@ -17,10 +18,9 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
-import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.ImportTree;
-import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
@@ -38,8 +38,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
-public final class BadStaticImport extends BugChecker
-    implements BugChecker.MethodInvocationTreeMatcher, BugChecker.IdentifierTreeMatcher {
+public final class BadStaticImport extends BugChecker implements BugChecker.IdentifierTreeMatcher {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -50,7 +49,7 @@ public final class BadStaticImport extends BugChecker
    * StaticImport#STATIC_IMPORT_CANDIDATE_TYPES}
    */
   static final ImmutableSet<String> BAD_STATIC_IMPORT_CANDIDATE_TYPES =
-      ImmutableSet.of("com.google.common.base.Strings", "java.time.Clock");
+      ImmutableSet.of("com.google.common.base.Strings", "java.time.Clock", "java.time.ZoneOffset");
 
   /**
    * Type members that should never be statically imported.
@@ -103,6 +102,7 @@ public final class BadStaticImport extends BugChecker
           "getDefaultInstance",
           "INSTANCE",
           "MIN",
+          "MIN_VALUE",
           "MAX",
           "newBuilder",
           "of",
@@ -110,17 +110,6 @@ public final class BadStaticImport extends BugChecker
 
   /** Instantiates a new {@link BadStaticImport} instance. */
   public BadStaticImport() {}
-
-  @Override
-  public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    ExpressionTree expr = tree.getMethodSelect();
-    switch (expr.getKind()) {
-      case IDENTIFIER:
-        return matchIdentifier((IdentifierTree) tree.getMethodSelect(), state);
-      default:
-        return Description.NO_MATCH;
-    }
-  }
 
   @Override
   public Description matchIdentifier(IdentifierTree tree, VisitorState state) {
@@ -159,6 +148,9 @@ public final class BadStaticImport extends BugChecker
     }
 
     String identifierName = symbol.getSimpleName().toString();
+    if (isDefinedInThisFile(symbol, state.getPath().getCompilationUnit())) {
+      return false;
+    }
     if (!isIdentifierStaticallyImported(identifierName, state)) {
       return false;
     }
@@ -166,6 +158,16 @@ public final class BadStaticImport extends BugChecker
     String qualifiedTypeName = enclosingSymbol.getQualifiedName().toString();
     return !isExempted(qualifiedTypeName, identifierName)
         && isCandidate(qualifiedTypeName, identifierName);
+  }
+
+  private static boolean isDefinedInThisFile(Symbol symbol, CompilationUnitTree tree) {
+    return tree.getTypeDecls().stream()
+        .anyMatch(
+            t -> {
+              Symbol topLevelClass = getSymbol(t);
+              return topLevelClass instanceof Symbol.ClassSymbol
+                  && symbol.isEnclosedBy((Symbol.ClassSymbol) topLevelClass);
+            });
   }
 
   private static boolean isCandidate(String qualifiedTypeName, String identifierName) {
