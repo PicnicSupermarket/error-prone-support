@@ -1,20 +1,14 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class MockitoMockClassReferenceTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(MockitoMockClassReference.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(MockitoMockClassReference.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(MockitoMockClassReference.class, getClass())
         .addSourceLines(
             "A.java",
             "import static org.mockito.Mockito.mock;",
@@ -52,7 +46,7 @@ final class MockitoMockClassReferenceTest {
   @Test
   void unimplementedCases() {
     // XXX: Move to identification once fixed.
-    compilationTestHelper
+    CompilationTestHelper.newInstance(MockitoMockClassReference.class, getClass())
         .addSourceLines(
             "A.java",
             "import static org.mockito.Mockito.mock;",
@@ -83,7 +77,7 @@ final class MockitoMockClassReferenceTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(MockitoMockClassReference.class, getClass())
         .addInputLines(
             "A.java",
             "import static org.mockito.Mockito.mock;",
@@ -99,12 +93,14 @@ final class MockitoMockClassReferenceTest {
             "    runnableMock = mock(Runnable.class);",
             "    List<String> listOfStringsMock = mock(List.class);",
             "    List genericListMock = mock(List.class);",
+            "",
             "    var unknownTypeMock = mock(Integer.class);",
             "    Integer namedMock = mock(Integer.class, \"name\");",
             "",
             "    Runnable runnableSpy = spy(Runnable.class);",
             "    List<String> listOfStringsSpy = spy(List.class);",
             "    List genericListSpy = spy(List.class);",
+            "",
             "    var unknownTypeSpy = spy(Integer.class);",
             "    Object objectSpy = spy(new Object());",
             "  }",
@@ -124,16 +120,18 @@ final class MockitoMockClassReferenceTest {
             "    runnableMock = mock();",
             "    List<String> listOfStringsMock = mock();",
             "    List genericListMock = mock();",
+            "",
             "    var unknownTypeMock = mock(Integer.class);",
             "    Integer namedMock = mock(Integer.class, \"name\");",
             "",
             "    Runnable runnableSpy = spy();",
             "    List<String> listOfStringsSpy = spy();",
             "    List genericListSpy = spy();",
+            "",
             "    var unknownTypeSpy = spy(Integer.class);",
             "    Object objectSpy = spy(new Object());",
             "  }",
             "}")
-        .doTest(TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 }

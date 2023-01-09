@@ -13,6 +13,7 @@ import static com.sun.source.tree.Tree.Kind.VARIABLE;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -41,13 +42,13 @@ import com.sun.source.tree.VariableTree;
 public final class MockitoMockClassReference extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<MethodInvocationTree> SUPPORTED_MOCKITO_METHOD_INVOCATION =
+  private static final Matcher<MethodInvocationTree> MOCKITO_MOCK_OR_SPY =
       allOf(
           argumentCount(1),
           argument(0, isSameType(Class.class.getName())),
           staticMethod().onClass("org.mockito.Mockito").namedAnyOf("mock", "spy"));
   // XXX: Replace `var` usage with explicit type instead.
-  private static final Matcher<VariableTree> INCOMPATIBLE_VARIABLE_TREE =
+  private static final Matcher<VariableTree> INCOMPATIBLE_VARIABLE =
       anyOf(ASTHelpers::hasNoExplicitType, MockitoMockClassReference::hasTypeDifference);
 
   /** Instantiates a new {@link MockitoMockClassReference} instance. */
@@ -55,18 +56,18 @@ public final class MockitoMockClassReference extends BugChecker
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!SUPPORTED_MOCKITO_METHOD_INVOCATION.matches(tree, state)) {
+    if (!MOCKITO_MOCK_OR_SPY.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
-    // XXX: TODO: Add similar matchers for usage in a ReturnTree and the method's return type.
+    // XXX: Add similar matchers for usage in a ReturnTree and the method's return type.
     Tree parent = state.getPath().getParentPath().getLeaf();
     if (parent.getKind() == VARIABLE
-        && INCOMPATIBLE_VARIABLE_TREE.matches((VariableTree) parent, state)) {
+        && INCOMPATIBLE_VARIABLE.matches((VariableTree) parent, state)) {
       return Description.NO_MATCH;
     }
 
-    return describeMatch(tree, SuggestedFix.delete(tree.getArguments().get(0)));
+    return describeMatch(tree, SuggestedFix.delete(Iterables.getOnlyElement(tree.getArguments())));
   }
 
   private static boolean hasTypeDifference(VariableTree tree, VisitorState state) {
