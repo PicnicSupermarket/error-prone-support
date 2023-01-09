@@ -77,6 +77,7 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
     }
   }
 
+  @SuppressWarnings("RestrictedApiChecker" /* We create a heavily customized `Description` here. */)
   private Description augmentDescription(
       Description description, CodeTransformer delegate, Context context) {
     String shortCheckName = getShortCheckName(description.checkName);
