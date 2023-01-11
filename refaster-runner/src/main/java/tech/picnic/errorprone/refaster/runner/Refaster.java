@@ -161,6 +161,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
    * that could cause {@link VisitorState#reportMatch(Description)}} to override the reported
    * severity).
    */
+  @SuppressWarnings("RestrictedApiChecker" /* We create a heavily customized `Description` here. */)
   private static Description augmentDescription(
       Description description, Optional<SeverityLevel> severityOverride) {
     return Description.builder(
