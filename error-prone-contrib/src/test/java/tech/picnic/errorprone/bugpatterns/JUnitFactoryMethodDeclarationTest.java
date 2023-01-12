@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class JUnitFactoryMethodDeclarationTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(JUnitFactoryMethodDeclaration.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(JUnitFactoryMethodDeclaration.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(JUnitFactoryMethodDeclaration.class, getClass())
         .addSourceLines(
             "A.java",
             "import static org.junit.jupiter.params.provider.Arguments.arguments;",
@@ -74,8 +69,8 @@ final class JUnitFactoryMethodDeclarationTest {
             "",
             "  void method5TestCases() {}",
             "",
-            "  // BUG: Diagnostic contains:  The test cases should be supplied by a method named",
-            "  // `method5TestCases` (but note that a method named `method5TestCases`  already defined in this",
+            "  // BUG: Diagnostic contains: The test cases should be supplied by a method named",
+            "  // `method5TestCases` (but note that a method named `method5TestCases` is already defined in this",
             "  // class or a supertype)",
             "  private static Stream<Arguments> testCasesForMethod5() {",
             "    /* { foo, bar, baz } */",
@@ -147,7 +142,7 @@ final class JUnitFactoryMethodDeclarationTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(JUnitFactoryMethodDeclaration.class, getClass())
         .addInputLines(
             "A.java",
             "import static org.junit.jupiter.params.provider.Arguments.arguments;",

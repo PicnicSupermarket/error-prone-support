@@ -47,7 +47,7 @@ import tech.picnic.errorprone.bugpatterns.util.MoreASTHelpers;
 import tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers;
 
 /**
- * A {@link BugChecker} that flags non-canonical JUnit factory method declarations.
+ * A {@link BugChecker} that flags non-canonical JUnit factory method declarations and usages.
  *
  * <p>At Picnic, we consider a JUnit factory method canonical if it:
  *
