@@ -16,12 +16,10 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
-import com.google.errorprone.suppliers.Supplier;
-import com.google.errorprone.suppliers.Suppliers;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,38 +28,35 @@ import java.util.stream.StreamSupport;
 import reactor.test.StepVerifier;
 
 /**
- * A {@link BugChecker} that flags duplicated usages of {@link StepVerifier.Step#expectNext} in
- * favor of the overloaded variant.
+ * A {@link BugChecker} that flags chained usages of {@link StepVerifier.Step#expectNext} in favor
+ * of the overloaded variant.
  *
- * <p>Chaining {@link StepVerifier.Step#expectNext} calls can make the code more verbose than it has
- * to be. Since {@link StepVerifier.Step#expectNext} offers several overload functions, those should
- * be preferred over chaining {@link StepVerifier.Step#expectNext} calls.
+ * <p>Chaining multiple calls of {@link StepVerifier.Step#expectNext} can make the code more verbose
+ * than necessary. Instead of chaining multiple calls, the overloaded variants of {@link
+ * StepVerifier.Step#expectNext} should be preferred.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary =
-        "When chaining multiple `StepVerifier.Step#expectNext` calls, please use the varargs overload instead",
-    link = BUG_PATTERNS_BASE_URL + "StepVerifierDuplicateExpectNext",
+    summary = "Prefer `StepVerifier.Step#expectNext` varargs overload over chaining multiple calls",
+    link = BUG_PATTERNS_BASE_URL + "StepVerifierExpectNextUsage",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
-public final class StepVerifierDuplicateExpectNext extends BugChecker
+public final class StepVerifierExpectNextUsage extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Supplier<Type> STEP =
-      Suppliers.typeFromString("reactor.test.StepVerifier.Step");
-  private static final Matcher<ExpressionTree> STEP_EXPECTNEXT =
-      instanceMethod().onDescendantOf(STEP).named("expectNext");
+  private static final Matcher<ExpressionTree> STEP_EXPECT_NEXT =
+      instanceMethod().onDescendantOf("reactor.test.StepVerifier.Step").named("expectNext");
 
-  /** Instantiates a new {@link StepVerifierDuplicateExpectNext} instance. */
-  public StepVerifierDuplicateExpectNext() {}
+  /** Instantiates a new {@link StepVerifierExpectNextUsage} instance. */
+  public StepVerifierExpectNextUsage() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     // If the parent matches, this node will be considered when the parent parses its children, so
     // we don't match it.
-    if (!STEP_EXPECTNEXT.matches(tree, state)
-        || getParent(tree).filter(t -> STEP_EXPECTNEXT.matches(t, state)).isPresent()) {
+    if (!STEP_EXPECT_NEXT.matches(tree, state)
+        || getParent(tree).filter(t -> STEP_EXPECT_NEXT.matches(t, state)).isPresent()) {
       return Description.NO_MATCH;
     }
 
@@ -71,10 +66,10 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
     // The nodes are organized as MethodInvocationTree -> MemberSelectTree -> MethodInvocationTree
     // We skip 2 to find the next method call in the call chain.
     for (int nodeIndex = 2;
-        getChild(state, nodeIndex).filter(t -> STEP_EXPECTNEXT.matches(t, state)).isPresent();
+        getChild(nodeIndex, state).filter(t -> STEP_EXPECT_NEXT.matches(t, state)).isPresent();
         nodeIndex += 2) {
       // We checked in the loop condition that the child is present, so this is safe
-      child = getChild(state, nodeIndex).orElseThrow();
+      child = getChild(nodeIndex, state).orElseThrow();
       newArgs.addAll(child.getArguments());
     }
 
@@ -100,16 +95,16 @@ public final class StepVerifierDuplicateExpectNext extends BugChecker
         .filter(MemberSelectTree.class::isInstance)
         .map(ms -> ((MemberSelectTree) ms).getExpression())
         .filter(MethodInvocationTree.class::isInstance)
-        .map(expr -> (MethodInvocationTree) expr);
+        .map(MethodInvocationTree.class::cast);
   }
 
-  private static Optional<MethodInvocationTree> getChild(VisitorState state, int skip) {
-    int startPos = ((JCTree) state.getPath().getLeaf()).pos;
+  private static Optional<MethodInvocationTree> getChild(int skip, VisitorState state) {
+    int startPosition = ASTHelpers.getStartPosition(state.getPath().getLeaf());
     return StreamSupport.stream(state.getPath().spliterator(), /* parallel= */ false)
         .skip(skip)
         .findFirst()
         .filter(MethodInvocationTree.class::isInstance)
-        .map(expr -> (MethodInvocationTree) expr)
-        .filter(m -> ((JCTree) m).pos > startPos);
+        .map(MethodInvocationTree.class::cast)
+        .filter(m -> ((JCTree) m).pos > startPosition);
   }
 }

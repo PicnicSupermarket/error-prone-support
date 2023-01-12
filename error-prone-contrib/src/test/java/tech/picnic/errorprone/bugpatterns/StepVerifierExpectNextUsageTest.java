@@ -1,14 +1,12 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugCheckerRefactoringTestHelper.newInstance;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import org.junit.jupiter.api.Test;
 
-final class StepVerifierDuplicateExpectNextTest {
+final class StepVerifierExpectNextUsageTest {
   private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      newInstance(StepVerifierDuplicateExpectNext.class, getClass());
+      BugCheckerRefactoringTestHelper.newInstance(StepVerifierExpectNextUsage.class, getClass());
 
   @Test
   void refactorDuplicateCalls() {
@@ -175,17 +173,8 @@ final class StepVerifierDuplicateExpectNextTest {
             "    Mono.just(0).as(StepVerifier::create).expectNext(0).verifyComplete();",
             "  }",
             "}")
-        .addOutputLines(
-            "A.java",
-            "import reactor.core.publisher.Mono;",
-            "import reactor.test.StepVerifier;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    Mono.just(0).as(StepVerifier::create).expectNext(0).verifyComplete();",
-            "  }",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .expectUnchanged()
+        .doTest();
   }
 
   @Test
@@ -209,24 +198,7 @@ final class StepVerifierDuplicateExpectNextTest {
             "                .expectNext(Mono.just(0).as(StepVerifier::create).expectNext(0)));",
             "  }",
             "}")
-        .addOutputLines(
-            "A.java",
-            "import reactor.core.publisher.Mono;",
-            "import reactor.test.StepVerifier;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    Mono.just(",
-            "            Mono.just(Mono.just(0).as(StepVerifier::create).expectNext(0))",
-            "                .as(StepVerifier::create)",
-            "                .expectNext(Mono.just(0).as(StepVerifier::create).expectNext(0)))",
-            "        .as(StepVerifier::create)",
-            "        .expectNext(",
-            "            Mono.just(Mono.just(0).as(StepVerifier::create).expectNext(0))",
-            "                .as(StepVerifier::create)",
-            "                .expectNext(Mono.just(0).as(StepVerifier::create).expectNext(0)));",
-            "  }",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .expectUnchanged()
+        .doTest();
   }
 }
