@@ -85,7 +85,7 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
     tryCanonicalizeMethodName(symbol)
         .ifPresent(
             newName ->
-                findMethodRenameBlocker(newName, state)
+                findMethodRenameBlocker(symbol, newName, state)
                     .ifPresentOrElse(
                         blocker -> reportMethodRenameBlocker(tree, blocker, state),
                         () -> fixBuilder.merge(SuggestedFixes.renameMethod(tree, newName, state))));

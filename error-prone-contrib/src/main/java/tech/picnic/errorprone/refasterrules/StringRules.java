@@ -29,7 +29,12 @@ final class StringRules {
   static final class StringIsEmpty {
     @BeforeTemplate
     boolean before(String str) {
-      return Refaster.anyOf(str.length() == 0, str.length() <= 0, str.length() < 1);
+      return str.equals("");
+    }
+
+    @BeforeTemplate
+    boolean before2(String str) {
+      return str.length() == 0;
     }
 
     @AfterTemplate

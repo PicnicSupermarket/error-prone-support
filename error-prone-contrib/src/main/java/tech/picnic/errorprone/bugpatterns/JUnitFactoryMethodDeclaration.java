@@ -122,7 +122,9 @@ public final class JUnitFactoryMethodDeclaration extends BugChecker implements M
       return ImmutableList.of();
     }
 
-    Optional<String> blocker = findMethodRenameBlocker(expectedFactoryMethodName, state);
+    Optional<String> blocker =
+        findMethodRenameBlocker(
+            ASTHelpers.getSymbol(factoryMethod), expectedFactoryMethodName, state);
     if (blocker.isPresent()) {
       reportMethodRenameBlocker(
           factoryMethod, blocker.orElseThrow(), expectedFactoryMethodName, state);

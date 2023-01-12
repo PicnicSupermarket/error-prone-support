@@ -6,7 +6,9 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MethodTree;
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +25,8 @@ final class ConflictDetectionTest {
             "    foo3t();",
             "  }",
             "",
-            "  // BUG: Diagnostic contains: [RenameBlockerFlagger] a method named `foo2t` already exists in this",
-            "  // class",
+            "  // BUG: Diagnostic contains: [RenameBlockerFlagger] a method named `foo2t` is already defined in",
+            "  // this class or a supertype",
             "  private void foo2() {}",
             "",
             "  private void foo2t() {}",
@@ -32,7 +34,7 @@ final class ConflictDetectionTest {
             "  // BUG: Diagnostic contains: [RenameBlockerFlagger] `foo3t` is already statically imported",
             "  private void foo3() {}",
             "",
-            "  // BUG: Diagnostic contains: [RenameBlockerFlagger] `int` is a reserved keyword",
+            "  // BUG: Diagnostic contains: [RenameBlockerFlagger] `int` is not a valid identifier",
             "  private void in() {}",
             "}")
         .addSourceLines(
@@ -46,13 +48,13 @@ final class ConflictDetectionTest {
   }
 
   @BugPattern(summary = "Flags blockers for renaming methods", severity = ERROR)
-  public static final class RenameBlockerFlagger extends BugChecker
-      implements BugChecker.MethodTreeMatcher {
+  public static final class RenameBlockerFlagger extends BugChecker implements MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
 
     @Override
     public Description matchMethod(MethodTree tree, VisitorState state) {
-      return ConflictDetection.findMethodRenameBlocker(tree.getName() + "t", state)
+      return ConflictDetection.findMethodRenameBlocker(
+              ASTHelpers.getSymbol(tree), tree.getName() + "t", state)
           .map(blocker -> buildDescription(tree).setMessage(blocker).build())
           .orElse(Description.NO_MATCH);
     }

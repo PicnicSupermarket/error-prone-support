@@ -1,11 +1,13 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
-import static tech.picnic.errorprone.bugpatterns.util.JavaKeywords.isReservedKeyword;
-import static tech.picnic.errorprone.bugpatterns.util.MoreASTHelpers.methodExistsInEnclosingClass;
+import static tech.picnic.errorprone.bugpatterns.util.JavaKeywords.isValidIdentifier;
 
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.Tree;
+import com.sun.tools.javac.code.Symbol.MethodSymbol;
+import com.sun.tools.javac.code.Type;
 import java.util.Optional;
 
 /**
@@ -30,26 +32,35 @@ public final class ConflictDetection {
    *       consideration cannot be referenced directly.)
    * </ul>
    *
-   * @param methodName The proposed name to assign.
+   * @param method XXX The proposed name to assign.
+   * @param newName The proposed name to assign.
    * @param state The {@link VisitorState} to use for searching for blockers.
    * @return A human-readable argument against assigning the proposed name to an existing method, or
    *     {@link Optional#empty()} if no blocker was found.
    */
-  public static Optional<String> findMethodRenameBlocker(String methodName, VisitorState state) {
-    if (methodExistsInEnclosingClass(methodName, state)) {
+  public static Optional<String> findMethodRenameBlocker(
+      MethodSymbol method, String newName, VisitorState state) {
+    if (isExistingMethodName(method.owner.type, newName, state)) {
       return Optional.of(
-          String.format("a method named `%s` already exists in this class", methodName));
+          String.format(
+              "a method named `%s` is already defined in this class or a supertype", newName));
     }
 
-    if (isSimpleNameStaticallyImported(methodName, state)) {
-      return Optional.of(String.format("`%s` is already statically imported", methodName));
+    if (isSimpleNameStaticallyImported(newName, state)) {
+      return Optional.of(String.format("`%s` is already statically imported", newName));
     }
 
-    if (isReservedKeyword(methodName)) {
-      return Optional.of(String.format("`%s` is a reserved keyword", methodName));
+    if (!isValidIdentifier(newName)) {
+      return Optional.of(String.format("`%s` is not a valid identifier", newName));
     }
 
     return Optional.empty();
+  }
+
+  private static boolean isExistingMethodName(Type clazz, String name, VisitorState state) {
+    return ASTHelpers.matchingMethods(state.getName(name), method -> true, clazz, state.getTypes())
+        .findAny()
+        .isPresent();
   }
 
   private static boolean isSimpleNameStaticallyImported(String simpleName, VisitorState state) {
