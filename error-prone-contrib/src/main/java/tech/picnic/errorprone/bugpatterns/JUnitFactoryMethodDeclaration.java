@@ -67,7 +67,6 @@ import tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers;
     tags = STYLE)
 public final class JUnitFactoryMethodDeclaration extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
-
   private static final Matcher<MethodTree> HAS_UNMODIFIABLE_SIGNATURE =
       anyOf(
           annotations(AT_LEAST_ONE, isType("java.lang.Override")),
@@ -167,13 +166,7 @@ public final class JUnitFactoryMethodDeclaration extends BugChecker implements M
 
   private ImmutableList<Description> getReturnStatementCommentFixes(
       MethodTree testMethod, MethodTree factoryMethod, VisitorState state) {
-    ImmutableList<String> parameterNames =
-        testMethod.getParameters().stream()
-            .map(VariableTree::getName)
-            .map(Object::toString)
-            .collect(toImmutableList());
-
-    String expectedComment = parameterNames.stream().collect(joining(", ", "/* { ", " } */"));
+    String expectedComment = createCommentContainingParameters(testMethod);
 
     List<? extends StatementTree> statements = factoryMethod.getBody().getStatements();
 
@@ -199,6 +192,13 @@ public final class JUnitFactoryMethodDeclaration extends BugChecker implements M
                     .addFix(SuggestedFix.prefixWith(s, expectedComment + "\n"))
                     .build())
         .collect(toImmutableList());
+  }
+
+  private static String createCommentContainingParameters(MethodTree testMethod) {
+    return testMethod.getParameters().stream()
+        .map(VariableTree::getName)
+        .map(Object::toString)
+        .collect(joining(", ", "/* { ", " } */"));
   }
 
   private static boolean hasExpectedComment(
