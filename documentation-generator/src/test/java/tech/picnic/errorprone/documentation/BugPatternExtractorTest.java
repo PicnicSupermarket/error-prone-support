@@ -10,40 +10,37 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.ClassTree;
-import com.sun.source.util.TaskEvent;
-import com.sun.source.util.TaskEvent.Kind;
 import org.junit.jupiter.api.Test;
 
 final class BugPatternExtractorTest {
   @Test
-  void bugPatternAnnotationIsPresent() {
-    CompilationTestHelper.newInstance(ExtractBugPatternDataTestChecker.class, getClass())
+  void bugPatternAnnotationIsAbsent() {
+    CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .addSourceLines(
-            "pkg/TestChecker.java",
-            "package pkg;",
-            "",
+            "TestChecker.java",
             "import com.google.errorprone.bugpatterns.BugChecker;",
             "",
+            "// BUG: Diagnostic contains: Can extract: false",
             "public final class TestChecker extends BugChecker {}")
         .doTest();
   }
 
   /** A {@link BugChecker} that validates the {@link BugPatternExtractor}. */
   @BugPattern(summary = "Validates `BugPatternExtractor` extraction", severity = ERROR)
-  public static final class ExtractBugPatternDataTestChecker extends BugChecker
-      implements ClassTreeMatcher {
+  public static final class TestChecker extends BugChecker implements ClassTreeMatcher {
     private static final long serialVersionUID = 1L;
 
     @Override
     public Description matchClass(ClassTree tree, VisitorState state) {
-      TaskEvent event = new TaskEvent(Kind.ANALYZE);
       BugPatternExtractor extractor = new BugPatternExtractor();
 
-      assertThatThrownBy(() -> extractor.extract(tree, event))
+      assertThatThrownBy(() -> extractor.extract(tree, state.context))
           .isInstanceOf(NullPointerException.class)
           .hasMessage("BugPattern annotation must be present");
 
-      return Description.NO_MATCH;
+      return buildDescription(tree)
+          .setMessage(String.format("Can extract: %s", extractor.canExtract(tree)))
+          .build();
     }
   }
 }

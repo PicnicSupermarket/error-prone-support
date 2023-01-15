@@ -92,7 +92,7 @@ final class DocumentationGeneratorTaskListenerTest extends TaskListenerCompilerB
     assertThatThrownBy(
             () -> compile(outputPath + " -XdocsOutputDirectory=arg2", "A.java", "package pkg;"))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("Only a single path can be provided");
+        .hasMessage("Precisely one path must be provided");
   }
 
   @Test

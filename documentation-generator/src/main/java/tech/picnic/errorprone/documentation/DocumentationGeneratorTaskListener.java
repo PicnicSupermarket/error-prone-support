@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.documentation;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Arrays.stream;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -15,11 +14,11 @@ import com.sun.tools.javac.util.Context;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 import javax.tools.JavaFileObject;
 
 /**
@@ -29,6 +28,7 @@ import javax.tools.JavaFileObject;
 final class DocumentationGeneratorTaskListener implements TaskListener {
   private static final ObjectMapper OBJECT_MAPPER =
       new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+
   private final Context context;
   private final Path docsPath;
 
@@ -56,13 +56,13 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
       return;
     }
 
-    findDocumentationType(classTree)
+    DocumentationType.findMatchingType(classTree)
         .ifPresent(
             documentationType ->
                 writeToFile(
                     documentationType.getIdentifier(),
                     getSimpleClassName(sourceFile.toUri()),
-                    documentationType.getDocumentationExtractor().extract(classTree, taskEvent)));
+                    documentationType.getDocumentationExtractor().extract(classTree, context)));
   }
 
   private void createDocsDirectory() {
@@ -74,21 +74,14 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
     }
   }
 
-  // XXX: `JavaFileObject` will most likely be added as parameter to help identify other `DocType`s.
-  private static Optional<DocumentationType> findDocumentationType(ClassTree tree) {
-    return stream(DocumentationType.values())
-        .filter(type -> type.getDocumentationExtractor().canExtract(tree))
-        .findFirst();
-  }
-
   private <T> void writeToFile(String identifier, String className, T data) {
     File file = docsPath.resolve(String.format("%s-%s.json", identifier, className)).toFile();
 
+    // XXX: Document why `append=true`, or use `new FileWriter(file, UTF_8)` instead.
     try (FileWriter fileWriter = new FileWriter(file, UTF_8, /* append= */ true)) {
       OBJECT_MAPPER.writeValue(fileWriter, data);
     } catch (IOException e) {
-      throw new IllegalStateException(
-          String.format("Could not write to file '%s'", file.getPath()), e);
+      throw new UncheckedIOException(String.format("Cannot write to file '%s'", file.getPath()), e);
     }
   }
 

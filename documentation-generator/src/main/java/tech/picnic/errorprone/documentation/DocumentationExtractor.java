@@ -1,32 +1,33 @@
 package tech.picnic.errorprone.documentation;
 
+import com.google.errorprone.annotations.Immutable;
 import com.sun.source.tree.ClassTree;
-import com.sun.source.util.TaskEvent;
+import com.sun.tools.javac.util.Context;
 
 /**
- * Interface implemented by classes that define how to extract {@link T} from a given {@link
- * ClassTree}.
+ * Interface implemented by classes that define how to extract data of some type {@link T} from a
+ * given {@link ClassTree}.
  *
- * @param <T> The resulting type of the data that is extracted.
+ * @param <T> The type of data that is extracted.
  */
+@Immutable
 interface DocumentationExtractor<T> {
   /**
    * Extracts and returns an instance of {@link T} using the provided arguments.
    *
-   * @param tree The {@link ClassTree} to analyze and extract {@link T} from.
-   * @param taskEvent The {@link TaskEvent} containing information about the current state of the
-   *     compilation.
+   * @param tree The {@link ClassTree} to analyze and from which to extract instances of {@link T}.
+   * @param context The {@link Context} in which the current compilation takes place.
    * @return A non-null instance of {@link T}.
    */
-  T extract(ClassTree tree, TaskEvent taskEvent);
+  // XXX: Drop `Context` parameter unless used.
+  T extract(ClassTree tree, Context context);
 
   /**
-   * Tells whether this {@link DocumentationExtractor extractor} can extract documentation content
-   * from the given {@link ClassTree tree}.
+   * Tells whether this {@link DocumentationExtractor} can extract documentation content from the
+   * given {@link ClassTree}.
    *
-   * @param tree The {@link ClassTree} to check whether documentation can be extracted or not.
-   * @return {@code true} iff documentation can be extracted.
+   * @param tree The {@link ClassTree} of interest.
+   * @return {@code true} iff documentation extraction is supported.
    */
-  // XXX: `JavaFileObject` will most likely be added as parameter to help identify other `DocType`s.
   boolean canExtract(ClassTree tree);
 }

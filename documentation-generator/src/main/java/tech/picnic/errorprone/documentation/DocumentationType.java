@@ -1,15 +1,19 @@
 package tech.picnic.errorprone.documentation;
 
-/**
- * The {@link DocumentationType types} of documentation that can be identified and extracted from
- * the source code.
- */
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import com.sun.source.tree.ClassTree;
+import java.util.EnumSet;
+import java.util.Optional;
+
+/** The types of documentation that can be identified and extracted from the source code. */
 enum DocumentationType {
   BUG_PATTERN("bugpattern", new BugPatternExtractor());
 
-  private final String identifier;
+  private static final ImmutableSet<DocumentationType> TYPES =
+      Sets.immutableEnumSet(EnumSet.allOf(DocumentationType.class));
 
-  @SuppressWarnings("ImmutableEnumChecker" /* `DocumentationExtractor` is effectively immutable. */)
+  private final String identifier;
   private final DocumentationExtractor<?> docExtractor;
 
   DocumentationType(String identifier, DocumentationExtractor<?> documentationExtractor) {
@@ -23,5 +27,11 @@ enum DocumentationType {
 
   DocumentationExtractor<?> getDocumentationExtractor() {
     return docExtractor;
+  }
+
+  static Optional<DocumentationType> findMatchingType(ClassTree tree) {
+    return TYPES.stream()
+        .filter(type -> type.getDocumentationExtractor().canExtract(tree))
+        .findFirst();
   }
 }

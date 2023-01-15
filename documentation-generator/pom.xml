@@ -17,7 +17,6 @@
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_annotation</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
@@ -27,7 +26,6 @@
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_check_api</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
@@ -41,6 +39,10 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto</groupId>
+            <artifactId>auto-common</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>

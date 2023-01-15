@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+// XXX: Even though this class _also_ exercises `DocumentationGenerator` and
+// `DocumentationGeneratorTaskListener`, move these tests to `BugPatternExtractorTest`.
 final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
   private Path outputPath;
 
@@ -37,26 +39,55 @@ final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
   @Test
   void minimalBugPattern() throws IOException {
     compile(
-        outputPath.toString(),
-        "MinimalTestChecker.java",
+        outputPath,
+        "MinimalBugChecker.java",
         "package pkg;",
         "",
         "import com.google.errorprone.BugPattern;",
         "import com.google.errorprone.BugPattern.SeverityLevel;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "",
-        "@BugPattern(summary = \"Example summary\", severity = BugPattern.SeverityLevel.ERROR)",
-        "public final class MinimalTestChecker extends BugChecker {}");
+        "@BugPattern(summary = \"MinimalBugChecker summary\", severity = SeverityLevel.ERROR)",
+        "public final class MinimalBugChecker extends BugChecker {}");
 
-    assertThat(readFile("bugpattern-MinimalTestChecker.json"))
-        .isEqualToIgnoringWhitespace(getResource("bugpattern_example_minimal_testdata.json"));
+    assertThat(readFile("bugpattern-MinimalBugChecker.json"))
+        .isEqualToIgnoringWhitespace(getResource("bugpattern-documentation-minimal.json"));
   }
 
   @Test
   void completeBugPattern() throws IOException {
     compile(
-        outputPath.toString(),
-        "TestChecker.java",
+        outputPath,
+        "CompleteBugChecker.java",
+        "package pkg;",
+        "",
+        "import com.google.errorprone.BugPattern;",
+        "import com.google.errorprone.BugPattern.SeverityLevel;",
+        "import com.google.errorprone.bugpatterns.BugChecker;",
+        "import org.junit.jupiter.api.Test;",
+        "",
+        "@BugPattern(",
+        "    name = \"OtherName\",",
+        "    summary = \"CompleteBugChecker summary\",",
+        "    linkType = BugPattern.LinkType.CUSTOM,",
+        "    link = \"https://error-prone.picnic.tech\",",
+        "    explanation = \"Example explanation\",",
+        "    severity = SeverityLevel.SUGGESTION,",
+        "    altNames = \"Check\",",
+        "    tags = BugPattern.StandardTags.SIMPLIFICATION,",
+        "    disableable = false,",
+        "    suppressionAnnotations = {BugPattern.class, Test.class})",
+        "public final class CompleteBugChecker extends BugChecker {}");
+
+    assertThat(readFile("bugpattern-CompleteBugChecker.json"))
+        .isEqualToIgnoringWhitespace(getResource("bugpattern-documentation-complete.json"));
+  }
+
+  @Test
+  void undocumentedSuppressionBugPattern() throws IOException {
+    compile(
+        outputPath,
+        "UndocumentedSuppressionBugPattern.java",
         "package pkg;",
         "",
         "import com.google.errorprone.BugPattern;",
@@ -64,25 +95,22 @@ final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "",
         "@BugPattern(",
-        "    name = \"OtherName\",",
-        "    summary = \"Example summary\",",
-        "    linkType = BugPattern.LinkType.CUSTOM,",
-        "    link = \"https://error-prone.picnic.tech\",",
-        "    explanation = \"Example explanation\",",
-        "    severity = SeverityLevel.SUGGESTION,",
-        "    altNames = \"Check\",",
-        "    tags = BugPattern.StandardTags.SIMPLIFICATION,",
-        "    disableable = false)",
-        "public final class TestChecker extends BugChecker {}");
+        "    summary = \"UndocumentedSuppressionBugPattern summary\",",
+        "    severity = SeverityLevel.WARNING,",
+        "    documentSuppression = false)",
+        "public final class UndocumentedSuppressionBugPattern extends BugChecker {}");
 
-    assertThat(readFile("bugpattern-TestChecker.json"))
-        .isEqualToIgnoringWhitespace(getResource("bugpattern_example_testdata.json"));
+    assertThat(readFile("bugpattern-UndocumentedSuppressionBugPattern.json"))
+        .isEqualToIgnoringWhitespace(
+            getResource("bugpattern-documentation-undocumented-suppression.json"));
   }
 
   private String readFile(String fileName) throws IOException {
     return Files.readString(outputPath.resolve(DOCS_DIRECTORY).resolve(fileName));
   }
 
+  // XXX: Once we support only JDK 15+, drop this method in favour of including the resources as
+  // text blocks in this class.
   private static String getResource(String resourceName) throws IOException {
     return Resources.toString(
         Resources.getResource(BugPatternTaskListenerTest.class, resourceName), UTF_8);

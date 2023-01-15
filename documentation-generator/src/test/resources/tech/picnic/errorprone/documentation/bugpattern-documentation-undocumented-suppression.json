@@ -1,0 +1,12 @@
+{
+  "fullyQualifiedName": "pkg.UndocumentedSuppressionBugPattern",
+  "name": "UndocumentedSuppressionBugPattern",
+  "altNames": [],
+  "link": "",
+  "tags": [],
+  "summary": "UndocumentedSuppressionBugPattern summary",
+  "explanation": "",
+  "severityLevel": "WARNING",
+  "canDisable": true,
+  "suppressionAnnotations": []
+}
