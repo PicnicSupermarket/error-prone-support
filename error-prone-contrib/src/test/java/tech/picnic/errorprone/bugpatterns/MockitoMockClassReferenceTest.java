@@ -28,7 +28,11 @@ final class MockitoMockClassReferenceTest {
             "    variableMock = mock(Integer.class);",
             "    // BUG: Diagnostic contains:",
             "    List nonGenericallyTypedMock = mock(List.class);",
-            "    var dynamicallyTypedMock = mock(Integer.class);",
+            "    // BUG: Diagnostic contains:",
+            "    List<String> genericallyTypedMock = mock(List.class);",
+            "    var nonExplicitlyTypedMock = mock(Integer.class);",
+            "    Class<? extends Number> variableType = Integer.class;",
+            "    Number variableTypedMock = mock(variableType);",
             "    Integer namedMock = mock(Integer.class, \"name\");",
             "    Object subtypeMock = mock(Integer.class);",
             "",
@@ -36,40 +40,24 @@ final class MockitoMockClassReferenceTest {
             "    String equalTypedSpy = spy(String.class);",
             "    // BUG: Diagnostic contains:",
             "    List nonGenericallyTypedSpy = spy(List.class);",
-            "    var dynamicallyTypedSpy = spy(Integer.class);",
+            "    // BUG: Diagnostic contains:",
+            "    List<String> genericallyTypedSpy = spy(List.class);",
+            "    var nonExplicitlyTypedSpy = spy(Integer.class);",
+            "    Number subtypeSpy = spy(Integer.class);",
             "    Object objectSpy = spy(new Object());",
             "  }",
-            "}")
-        .doTest();
-  }
-
-  @Test
-  void unimplementedCases() {
-    // XXX: Move to identification once fixed.
-    CompilationTestHelper.newInstance(MockitoMockClassReference.class, getClass())
-        .addSourceLines(
-            "A.java",
-            "import static org.mockito.Mockito.mock;",
             "",
-            "import java.math.BigInteger;",
-            "import java.util.List;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    // This case is arguable as it is unsafe in any case.",
-            "    // This currently is not identified as the `erasure` is the same.",
-            "    List<String> genericallyTypedMock = mock(List.class);",
-            "",
-            "    // This case is problematic and should not be replaced.",
-            "    // The real type of `variableTypedMock` is `BigInteger`.",
-            "    // But when replaced, it will be `Number`.",
-            "    Class<? extends Number> variableType = BigInteger.class;",
-            "    Number variableTypedMock = mock(variableType);",
+            "  Integer getIntegerMock() {",
+            "    // BUG: Diagnostic contains:",
+            "    return mock(Integer.class);",
             "  }",
             "",
-            "  <T extends Number> T getGenericMock(Class<T> clazz) {",
-            "    // No idea how to detect type T as part of generics usage.",
+            "  <T> T getGenericMock(Class<T> clazz) {",
             "    return mock(clazz);",
+            "  }",
+            "",
+            "  Number getSubTypeMock() {",
+            "    return mock(Integer.class);",
             "  }",
             "}")
         .doTest();
@@ -104,6 +92,10 @@ final class MockitoMockClassReferenceTest {
             "    var unknownTypeSpy = spy(Integer.class);",
             "    Object objectSpy = spy(new Object());",
             "  }",
+            "",
+            "  Integer getIntegerMock() {",
+            "    return mock(Integer.class);",
+            "  }",
             "}")
         .addOutputLines(
             "A.java",
@@ -130,6 +122,10 @@ final class MockitoMockClassReferenceTest {
             "",
             "    var unknownTypeSpy = spy(Integer.class);",
             "    Object objectSpy = spy(new Object());",
+            "  }",
+            "",
+            "  Integer getIntegerMock() {",
+            "    return mock();",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
