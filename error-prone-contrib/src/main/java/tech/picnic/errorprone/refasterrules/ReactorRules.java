@@ -377,6 +377,11 @@ final class ReactorRules {
       return mono.then();
     }
 
+    @BeforeTemplate
+    Mono<T> before3(Mono<T> mono) {
+      return mono.flux().next();
+    }
+
     @AfterTemplate
     Mono<T> after(Mono<T> mono) {
       return mono;
