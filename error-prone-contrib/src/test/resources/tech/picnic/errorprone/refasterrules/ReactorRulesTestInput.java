@@ -118,8 +118,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Mono<?>> testMonoIdentity() {
     return ImmutableSet.of(
         Mono.just(1).switchIfEmpty(Mono.empty()),
-        Mono.<Void>empty().then(),
-        Mono.just(2).flux().next());
+        Mono.just(2).flux().next(),
+        Mono.<Void>empty().then());
   }
 
   ImmutableSet<Flux<Integer>> testFluxSwitchIfEmptyOfEmptyPublisher() {

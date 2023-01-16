@@ -369,17 +369,12 @@ final class ReactorRules {
   static final class MonoIdentity<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono) {
-      return mono.switchIfEmpty(Mono.empty());
+      return Refaster.anyOf(mono.switchIfEmpty(Mono.empty()), mono.flux().next());
     }
 
     @BeforeTemplate
     Mono<@Nullable Void> before2(Mono<@Nullable Void> mono) {
       return mono.then();
-    }
-
-    @BeforeTemplate
-    Mono<T> before3(Mono<T> mono) {
-      return mono.flux().next();
     }
 
     @AfterTemplate
