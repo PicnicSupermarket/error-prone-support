@@ -369,7 +369,7 @@ final class ReactorRules {
   static final class MonoIdentity<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono) {
-      return mono.switchIfEmpty(Mono.empty());
+      return Refaster.anyOf(mono.switchIfEmpty(Mono.empty()), mono.flux().next());
     }
 
     @BeforeTemplate
