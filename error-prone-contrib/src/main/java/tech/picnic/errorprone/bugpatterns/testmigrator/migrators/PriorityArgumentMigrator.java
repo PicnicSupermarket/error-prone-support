@@ -17,15 +17,15 @@ public class PriorityArgumentMigrator implements ArgumentMigrator {
       ExpressionTree content,
       VisitorState state) {
     return SuggestedFix.builder()
+        .addImport("org.junit.jupiter.api.Order")
+        .addImport("org.junit.jupiter.api.TestMethodOrder")
+        .addImport("org.junit.jupiter.api.MethodOrderer")
         .merge(
             SuggestedFix.prefixWith(
-                methodTree,
-                String.format(
-                    "@org.junit.jupiter.api.Order(%s)\n", SourceCode.treeToString(content, state))))
+                methodTree, String.format("@Order(%s)\n", SourceCode.treeToString(content, state))))
         .merge(
             SuggestedFix.prefixWith(
-                context.getClassTree(),
-                "@org.junit.jupiter.api.TestMethodOrder(org.junit.jupiter.api.MethodOrderer.OrderAnnotation.class)\n"))
+                context.getClassTree(), "@TestMethodOrder(MethodOrderer.OrderAnnotation.class)\n"))
         .build();
   }
 

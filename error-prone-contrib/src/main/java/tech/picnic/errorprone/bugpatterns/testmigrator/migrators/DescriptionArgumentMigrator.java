@@ -16,10 +16,13 @@ public class DescriptionArgumentMigrator implements ArgumentMigrator {
       MethodTree methodTree,
       ExpressionTree content,
       VisitorState state) {
-    return SuggestedFix.prefixWith(
-        methodTree,
-        String.format(
-            "@org.junit.jupiter.api.DisplayName(%s)\n", SourceCode.treeToString(content, state)));
+    return SuggestedFix.builder()
+        .addImport("org.junit.jupiter.api.DisplayName")
+        .merge(
+            SuggestedFix.prefixWith(
+                methodTree,
+                String.format("@DisplayName(%s)\n", SourceCode.treeToString(content, state))))
+        .build();
   }
 
   @Override
