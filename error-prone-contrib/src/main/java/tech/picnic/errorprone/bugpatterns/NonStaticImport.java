@@ -4,7 +4,6 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.sun.tools.javac.code.Kinds.Kind.TYP;
-import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.bugpatterns.StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -123,8 +122,7 @@ public final class NonStaticImport extends BugChecker implements IdentifierTreeM
     }
 
     SuggestedFix.Builder builder = SuggestedFix.builder();
-    String replacement =
-        SuggestedFixes.qualifyType(state, builder, symbol.getEnclosingElement()) + ".";
+    String replacement = SuggestedFixes.qualifyType(state, builder, symbol.owner) + ".";
 
     return describeMatch(
         tree,
@@ -135,15 +133,12 @@ public final class NonStaticImport extends BugChecker implements IdentifierTreeM
   }
 
   private static String getImportToRemove(Symbol symbol) {
-    return String.join(
-        ".",
-        requireNonNull(symbol.getEnclosingElement()).getQualifiedName(),
-        symbol.getSimpleName());
+    return String.join(".", symbol.owner.getQualifiedName(), symbol.getSimpleName());
   }
 
   private static boolean isMatch(Symbol symbol, VisitorState state) {
-    Symbol enclosingSymbol = symbol.getEnclosingElement();
-    if (enclosingSymbol == null || enclosingSymbol.kind != TYP) {
+    Symbol enclosingSymbol = symbol.owner;
+    if (enclosingSymbol.kind != TYP) {
       return false;
     }
 
