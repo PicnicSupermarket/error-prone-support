@@ -29,7 +29,7 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         (Runnable) () -> assertEquals(new byte[0], null),
-        (Runnable) () -> assertEqualsNoOrder(null, null),
+        (Runnable) () -> assertEqualsNoOrder((Object[]) null, null),
         (Runnable) () -> assertFalse(true),
         (Runnable) () -> assertNotEquals(new byte[0], null),
         (Runnable) () -> assertNotNull(null),
