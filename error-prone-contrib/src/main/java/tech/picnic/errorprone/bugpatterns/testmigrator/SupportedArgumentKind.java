@@ -6,12 +6,14 @@ import java.util.Optional;
 import tech.picnic.errorprone.bugpatterns.TestNGMetadata;
 import tech.picnic.errorprone.bugpatterns.testmigrator.migrators.DataProviderArgumentMigrator;
 import tech.picnic.errorprone.bugpatterns.testmigrator.migrators.DescriptionArgumentMigrator;
+import tech.picnic.errorprone.bugpatterns.testmigrator.migrators.ExpectedExceptionsArgumentMigrator;
 import tech.picnic.errorprone.bugpatterns.testmigrator.migrators.PriorityArgumentMigrator;
 
 public enum SupportedArgumentKind {
   PRIORITY("priority", new PriorityArgumentMigrator()),
   DESCRIPTION("description", new DescriptionArgumentMigrator()),
-  DATAPROVIDER("dataProvider", new DataProviderArgumentMigrator());
+  DATAPROVIDER("dataProvider", new DataProviderArgumentMigrator()),
+  EXPECTED_EXCEPTIONS("expectedExceptions", new ExpectedExceptionsArgumentMigrator());
   private final String name;
 
   @SuppressWarnings("ImmutableEnumChecker" /* `SupportedArgumentKind` is effectively immutable. */)
