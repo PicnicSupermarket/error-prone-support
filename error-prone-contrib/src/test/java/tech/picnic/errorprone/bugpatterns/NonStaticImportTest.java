@@ -3,56 +3,54 @@ package tech.picnic.errorprone.bugpatterns;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class BadStaticImportTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(BadStaticImport.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(BadStaticImport.class, getClass());
-
+final class NonStaticImportTest {
   @Test
   void candidateMembersAreNotRedundant() {
-    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
-        .doesNotContainAnyElementsOf(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_TYPES);
+    assertThat(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
+        .doesNotContainAnyElementsOf(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_TYPES);
 
-    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.values())
-        .doesNotContainAnyElementsOf(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS);
+    assertThat(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.values())
+        .doesNotContainAnyElementsOf(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS);
   }
 
   @Test
   void badTypesDontClashWithStaticImportCandidates() {
-    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_TYPES)
+    assertThat(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_TYPES)
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
   }
 
   @Test
   void badMembersDontClashWithStaticImportCandidates() {
-    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.entries())
+    assertThat(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.entries())
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.entries());
   }
 
   @Test
   void badIdentifiersDontClashWithStaticImportCandidates() {
-    assertThat(BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS)
+    assertThat(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS)
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.values());
   }
 
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(NonStaticImport.class, getClass())
         .addSourceLines(
             "pkg/B.java",
             "package pkg;",
             "",
-            "public class B {",
+            "public final class B {",
             "  public int MIN = 1;",
             "",
             "  public static class INSTANCE {}",
             "}")
         .addSourceLines(
-            "A.java",
+            "pkg/A.java",
+            "package pkg;",
+            "",
             "import static com.google.common.collect.ImmutableList.copyOf;",
             "import static java.lang.Integer.MIN_VALUE;",
             "import static java.time.Clock.systemUTC;",
@@ -67,8 +65,10 @@ final class BadStaticImportTest {
             "import com.google.common.collect.ImmutableList;",
             "import com.google.common.collect.ImmutableSet;",
             "import java.time.Clock;",
+            "import java.time.Instant;",
+            "import java.time.ZoneOffset;",
             "import java.util.Locale;",
-            "import pkg.B;",
+            "import java.util.Optional;",
             "import pkg.B.INSTANCE;",
             "",
             "class A {",
@@ -80,20 +80,23 @@ final class BadStaticImportTest {
             "    Clock.systemUTC();",
             "",
             "    // BUG: Diagnostic contains:",
-            "    Object o1 = empty();",
+            "    Optional<Integer> optional1 = empty();",
+            "    Optional<Integer> optional2 = Optional.empty();",
             "",
             "    // BUG: Diagnostic contains:",
-            "    Object l1 = copyOf(ImmutableList.of());",
-            "    Object l2 = ImmutableList.copyOf(ImmutableList.of());",
+            "    ImmutableList<Integer> list1 = copyOf(ImmutableList.of());",
+            "    ImmutableList<Integer> list2 = ImmutableList.copyOf(ImmutableList.of());",
             "",
             "    // BUG: Diagnostic contains:",
-            "    Locale lo1 = ROOT;",
-            "    Locale lo2 = Locale.ROOT;",
+            "    Locale locale1 = ROOT;",
+            "    Locale locale2 = Locale.ROOT;",
             "",
             "    // BUG: Diagnostic contains:",
-            "    Object c1 = MIN;",
+            "    Instant instant1 = MIN;",
+            "    Instant instant2 = Instant.MIN;",
             "    // BUG: Diagnostic contains:",
-            "    Object c2 = MAX;",
+            "    Instant instant3 = MAX;",
+            "    Instant instant4 = Instant.MAX;",
             "",
             "    // BUG: Diagnostic contains:",
             "    ImmutableSet.of(min(ImmutableSet.of()));",
@@ -102,23 +105,23 @@ final class BadStaticImportTest {
             "    // Not flagged because identifier is variable",
             "    Object lBuilder = ImmutableList.of(builder);",
             "",
-            "    // Not flagged because member of type is not a candidate",
+            "    // Not flagged because member of type is not a candidate.",
             "    Locale lo3 = ENGLISH;",
             "",
-            "    // Not flagged because member of type is exempted",
-            "    Object utc = UTC;",
+            "    // Not flagged because member of type is exempted.",
+            "    ZoneOffset utc = UTC;",
             "",
-            "    // Not flagged because method is not statically imported",
+            "    // Not flagged because method is not statically imported.",
             "    create();",
             "",
-            "    // Not flagged because identifier is not statically imported",
-            "    // A member variable did overwrite the statically imported identifier",
-            "    Integer x1 = MIN_VALUE;",
+            "    // Not flagged because identifier is not statically imported.",
+            "    // A member variable did overwrite the statically imported identifier.",
+            "    Integer i1 = MIN_VALUE;",
             "",
-            "    // Not flagged because identifier is not statically imported",
-            "    Integer x2 = new B().MIN;",
+            "    // Not flagged because identifier is not statically imported.",
+            "    Integer i2 = new B().MIN;",
             "",
-            "    // Not flagged because identifier is not statically imported",
+            "    // Not flagged because identifier is not statically imported.",
             "    Object inst = new INSTANCE();",
             "  }",
             "",
@@ -129,7 +132,7 @@ final class BadStaticImportTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(NonStaticImport.class, getClass())
         .addInputLines(
             "A.java",
             "import static com.google.common.collect.ImmutableList.copyOf;",
@@ -143,14 +146,17 @@ final class BadStaticImportTest {
             "import com.google.common.collect.ImmutableList;",
             "import com.google.common.collect.ImmutableSet;",
             "import java.time.Clock;",
+            "import java.time.Instant;",
             "import java.util.Locale;",
+            "import java.util.Optional;",
             "",
             "class A {",
             "  void m() {",
             "    systemUTC();",
             "    Clock.systemUTC();",
             "",
-            "    Object o1 = empty();",
+            "    Optional<Integer> o1 = empty();",
+            "    Optional<Integer> o2 = Optional.empty();",
             "",
             "    Object l1 = copyOf(ImmutableList.of());",
             "    Object l2 = ImmutableList.copyOf(ImmutableList.of());",
@@ -158,8 +164,8 @@ final class BadStaticImportTest {
             "    Locale lo1 = ROOT;",
             "    Locale lo2 = Locale.ROOT;",
             "",
-            "    Object c1 = MIN;",
-            "    Object c2 = MAX;",
+            "    Instant i1 = MIN;",
+            "    Instant i2 = MAX;",
             "",
             "    ImmutableSet.of(min(ImmutableSet.of()));",
             "  }",
@@ -179,7 +185,8 @@ final class BadStaticImportTest {
             "    Clock.systemUTC();",
             "    Clock.systemUTC();",
             "",
-            "    Object o1 = Optional.empty();",
+            "    Optional<Integer> o1 = Optional.empty();",
+            "    Optional<Integer> o2 = Optional.empty();",
             "",
             "    Object l1 = ImmutableList.copyOf(ImmutableList.of());",
             "    Object l2 = ImmutableList.copyOf(ImmutableList.of());",
@@ -187,12 +194,12 @@ final class BadStaticImportTest {
             "    Locale lo1 = Locale.ROOT;",
             "    Locale lo2 = Locale.ROOT;",
             "",
-            "    Object c1 = Instant.MIN;",
-            "    Object c2 = Instant.MAX;",
+            "    Instant i1 = Instant.MIN;",
+            "    Instant i2 = Instant.MAX;",
             "",
             "    ImmutableSet.of(Collections.min(ImmutableSet.of()));",
             "  }",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 }

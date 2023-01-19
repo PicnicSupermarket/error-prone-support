@@ -4,8 +4,8 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.Objects.requireNonNull;
-import static tech.picnic.errorprone.bugpatterns.BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS;
-import static tech.picnic.errorprone.bugpatterns.BadStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS;
+import static tech.picnic.errorprone.bugpatterns.NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS;
+import static tech.picnic.errorprone.bugpatterns.NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -48,11 +48,11 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
 
   /**
    * Types whose members should be statically imported, unless exempted by {@link
-   * BadStaticImport#BAD_STATIC_IMPORT_CANDIDATE_MEMBERS} or {@link
-   * BadStaticImport#BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS}.
+   * NonStaticImport#BAD_STATIC_IMPORT_CANDIDATE_MEMBERS} or {@link
+   * NonStaticImport#BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS}.
    *
    * <p>Types listed here should be mutually exclusive with {@link
-   * BadStaticImport#BAD_STATIC_IMPORT_CANDIDATE_TYPES}
+   * NonStaticImport#BAD_STATIC_IMPORT_CANDIDATE_TYPES}.
    */
   static final ImmutableSet<String> STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of(
@@ -104,9 +104,9 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
    * Type members that should be statically imported.
    *
    * <p>This should be mutually exclusive with {@link
-   * BadStaticImport#BAD_STATIC_IMPORT_CANDIDATE_MEMBERS}
+   * NonStaticImport#BAD_STATIC_IMPORT_CANDIDATE_MEMBERS}.
    *
-   * <p>Identifiers listed by {@link BadStaticImport#BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS} should
+   * <p>Identifiers listed by {@link NonStaticImport#BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS} should
    * be mutually exclusive with identifiers listed here.
    */
   static final ImmutableSetMultimap<String, String> STATIC_IMPORT_CANDIDATE_MEMBERS =

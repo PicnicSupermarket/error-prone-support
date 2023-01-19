@@ -2,8 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
-import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
-import static com.google.errorprone.util.ASTHelpers.getSymbol;
+import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.sun.tools.javac.code.Kinds.Kind.TYP;
 import static tech.picnic.errorprone.bugpatterns.StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
@@ -14,6 +13,7 @@ import com.google.common.collect.ImmutableSetMultimap;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.bugpatterns.BugChecker.IdentifierTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
@@ -23,6 +23,7 @@ import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A {@link BugChecker} that flags methods and constants that should not be statically imported. */
@@ -34,11 +35,11 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Identifier should not be statically imported",
-    link = BUG_PATTERNS_BASE_URL + "BadStaticImport",
+    link = BUG_PATTERNS_BASE_URL + "NonStaticImport",
     linkType = CUSTOM,
     severity = SUGGESTION,
-    tags = SIMPLIFICATION)
-public final class BadStaticImport extends BugChecker implements BugChecker.IdentifierTreeMatcher {
+    tags = STYLE)
+public final class NonStaticImport extends BugChecker implements IdentifierTreeMatcher {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -46,7 +47,7 @@ public final class BadStaticImport extends BugChecker implements BugChecker.Iden
    * StaticImport#STATIC_IMPORT_CANDIDATE_MEMBERS}.
    *
    * <p>Types listed here should be mutually exclusive with {@link
-   * StaticImport#STATIC_IMPORT_CANDIDATE_TYPES}
+   * StaticImport#STATIC_IMPORT_CANDIDATE_TYPES}.
    */
   static final ImmutableSet<String> BAD_STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of("com.google.common.base.Strings", "java.time.Clock", "java.time.ZoneOffset");
@@ -57,7 +58,7 @@ public final class BadStaticImport extends BugChecker implements BugChecker.Iden
    * <p>Identifiers listed by {@link #BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS} should be omitted
    * from this collection.
    *
-   * <p>This should be mutually exclusive with {@link StaticImport#STATIC_IMPORT_CANDIDATE_MEMBERS}
+   * <p>This should be mutually exclusive with {@link StaticImport#STATIC_IMPORT_CANDIDATE_MEMBERS}.
    */
   // XXX: Perhaps the set of exempted `java.util.Collections` methods is too strict. For now any
   // method name that could be considered "too vague" or could conceivably mean something else in a
@@ -96,31 +97,29 @@ public final class BadStaticImport extends BugChecker implements BugChecker.Iden
   static final ImmutableSet<String> BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS =
       ImmutableSet.of(
           "builder",
-          "create",
           "copyOf",
+          "create",
           "from",
           "getDefaultInstance",
           "INSTANCE",
+          "MAX",
+          "MAX_VALUE",
           "MIN",
           "MIN_VALUE",
-          "MAX",
           "newBuilder",
+          "newInstance",
           "of",
           "valueOf");
 
-  /** Instantiates a new {@link BadStaticImport} instance. */
-  public BadStaticImport() {}
+  /** Instantiates a new {@link NonStaticImport} instance. */
+  public NonStaticImport() {}
 
   @Override
   public Description matchIdentifier(IdentifierTree tree, VisitorState state) {
-    if (isMatch(tree, state)) {
-      return getDescription(tree, state);
+    if (!isMatch(tree, state)) {
+      return Description.NO_MATCH;
     }
 
-    return Description.NO_MATCH;
-  }
-
-  private Description getDescription(IdentifierTree tree, VisitorState state) {
     Symbol symbol = ASTHelpers.getSymbol(tree);
     SuggestedFix.Builder builder =
         SuggestedFix.builder().removeStaticImport(getImportToRemove(symbol));
@@ -147,10 +146,10 @@ public final class BadStaticImport extends BugChecker implements BugChecker.Iden
       return false;
     }
 
-    String identifierName = symbol.getSimpleName().toString();
     if (isDefinedInThisFile(symbol, state.getPath().getCompilationUnit())) {
       return false;
     }
+    String identifierName = symbol.getSimpleName().toString();
     if (!isIdentifierStaticallyImported(identifierName, state)) {
       return false;
     }
@@ -164,9 +163,9 @@ public final class BadStaticImport extends BugChecker implements BugChecker.Iden
     return tree.getTypeDecls().stream()
         .anyMatch(
             t -> {
-              Symbol topLevelClass = getSymbol(t);
-              return topLevelClass instanceof Symbol.ClassSymbol
-                  && symbol.isEnclosedBy((Symbol.ClassSymbol) topLevelClass);
+              Symbol topLevelClass = ASTHelpers.getSymbol(t);
+              return topLevelClass instanceof ClassSymbol
+                  && symbol.isEnclosedBy((ClassSymbol) topLevelClass);
             });
   }
 
