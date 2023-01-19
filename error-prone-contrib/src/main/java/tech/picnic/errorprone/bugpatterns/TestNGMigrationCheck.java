@@ -53,15 +53,13 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
 
       @Override
       public Void visitMethod(MethodTree tree, TestNGMetadata metaData) {
+        TestNGMigrationContext context = new TestNGMigrationContext(metaData.getClassTree());
         metaData
             .getAnnotation(tree)
-            .filter(SupportedArgumentKind::canMigrateTest)
+            .filter(annotation -> SupportedArgumentKind.canMigrateTest(context, annotation))
             .ifPresent(
                 annotation -> {
-                  TestNGMigrationContext context =
-                      new TestNGMigrationContext(metaData.getClassTree());
                   SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
-
                   buildArgumentFixes(context, annotation, tree, state).forEach(fixBuilder::merge);
                   fixBuilder.merge(buildAnnotationFixes(annotation, tree, state));
 
@@ -97,14 +95,18 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
     if (annotation.getArgumentNames().contains("dataProvider")) {
       String dataProviderName =
           SourceCode.treeToString(annotation.getArguments().get("dataProvider"), state);
-      builder.merge(
-          SuggestedFix.prefixWith(
-              methodTree,
-              "@org.junit.jupiter.params.ParameterizedTest\n  @org.junit.jupiter.params.provider.MethodSource("
-                  + dataProviderName
-                  + ")\n"));
+      builder
+          .addImport("org.junit.jupiter.params.ParameterizedTest")
+          .addImport("org.junit.jupiter.params.provider.MethodSource")
+          .removeImport("org.testng.annotations.Test")
+          .merge(
+              SuggestedFix.prefixWith(
+                  methodTree, "@ParameterizedTest\n  @MethodSource(" + dataProviderName + ")\n"));
     } else {
-      builder.merge(SuggestedFix.prefixWith(methodTree, "@org.junit.jupiter.api.Test\n"));
+      builder
+          .removeImport("org.testng.annotations.Test")
+          .addImport("org.junit.jupiter.api.Test")
+          .merge(SuggestedFix.prefixWith(methodTree, "@Test\n"));
     }
 
     return builder.build();

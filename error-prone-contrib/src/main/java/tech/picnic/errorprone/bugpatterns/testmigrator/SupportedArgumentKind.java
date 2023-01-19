@@ -26,10 +26,12 @@ public enum SupportedArgumentKind {
     return fixer;
   }
 
-  public static boolean canMigrateTest(TestNGMetadata.TestNGAnnotation annotation) {
+  public static boolean canMigrateTest(
+      TestNGMigrationContext context, TestNGMetadata.TestNGAnnotation annotation) {
     return annotation.getArgumentNames().stream()
         .map(SupportedArgumentKind::matchArgument)
-        .allMatch(Optional::isPresent);
+        .filter(Optional::isPresent)
+        .allMatch(optKind -> optKind.get().getFixer().canFix(context, annotation));
   }
 
   public static Optional<SupportedArgumentKind> matchArgument(String argument) {

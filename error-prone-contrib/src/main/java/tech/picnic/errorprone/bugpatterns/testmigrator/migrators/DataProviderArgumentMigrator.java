@@ -42,21 +42,12 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
         "Tried migrating DataProvider that cannot be migrated!");
 
     SuggestedFix.Builder builder = SuggestedFix.builder();
-    if (migrationState == MigrationState.NOT_MIGRATED) {
-      // fix value factory
-      Optional<SuggestedFix> dataProviderMigration =
-          migrateDataProvider(dataProviderName, context.getClassTree(), state);
-      if (dataProviderMigration.isPresent()) {
-        builder.merge(dataProviderMigration.get());
-        context.setDataProviderMigrationState(dataProviderName, MigrationState.MIGRATED);
-      } else {
-        context.setDataProviderMigrationState(dataProviderName, MigrationState.CANNOT_MIGRATE);
-      }
+    if (migrationState == MigrationState.MIGRATED) {
+      return SuggestedFix.emptyFix();
     }
 
-    // fix test method
-
-    return builder.build();
+    // fix value factory
+    return fixValueFactory(dataProviderName, context, state).orElseThrow();
   }
 
   @Override
@@ -71,6 +62,19 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
         && migrationState != MigrationState.CANNOT_MIGRATE;
   }
 
+  private static Optional<SuggestedFix> fixValueFactory(
+      String dataProviderName, TestNGMigrationContext context, VisitorState state) {
+    Optional<SuggestedFix> dataProviderMigration =
+        migrateDataProvider(dataProviderName, context.getClassTree(), state);
+    if (dataProviderMigration.isPresent()) {
+      context.setDataProviderMigrationState(dataProviderName, MigrationState.MIGRATED);
+    } else {
+      context.setDataProviderMigrationState(dataProviderName, MigrationState.CANNOT_MIGRATE);
+    }
+
+    return dataProviderMigration;
+  }
+
   private static Optional<SuggestedFix> migrateDataProvider(
       String methodName, ClassTree classTree, VisitorState state) {
     MethodTree methodTree = getDataProviderMethodTree(classTree, methodName).orElseThrow();
@@ -83,6 +87,7 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
                     .addStaticImport("org.junit.jupiter.params.provider.Arguments.arguments")
                     .addImport("java.util.stream.Stream")
                     .addImport("org.junit.jupiter.params.provider.Arguments")
+                    .removeImport("org.testng.annotations.DataProvider")
                     .merge(SuggestedFix.delete(methodTree))
                     .merge(
                         SuggestedFix.postfixWith(
