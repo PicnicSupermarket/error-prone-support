@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.sun.tools.javac.code.Kinds.Kind.TYP;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.bugpatterns.StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -116,31 +117,31 @@ public final class NonStaticImport extends BugChecker implements IdentifierTreeM
 
   @Override
   public Description matchIdentifier(IdentifierTree tree, VisitorState state) {
-    if (!isMatch(tree, state)) {
+    Symbol symbol = ASTHelpers.getSymbol(tree);
+    if (!isMatch(symbol, state)) {
       return Description.NO_MATCH;
     }
 
-    Symbol symbol = ASTHelpers.getSymbol(tree);
-    SuggestedFix.Builder builder =
-        SuggestedFix.builder().removeStaticImport(getImportToRemove(symbol));
+    SuggestedFix.Builder builder = SuggestedFix.builder();
     String replacement =
         SuggestedFixes.qualifyType(state, builder, symbol.getEnclosingElement()) + ".";
-    builder.prefixWith(tree, replacement);
-    return describeMatch(tree, builder.build());
+
+    return describeMatch(
+        tree,
+        builder
+            .removeStaticImport(getImportToRemove(symbol))
+            .prefixWith(tree, replacement)
+            .build());
   }
 
-  @SuppressWarnings("NullAway")
   private static String getImportToRemove(Symbol symbol) {
     return String.join(
-        ".", symbol.getEnclosingElement().getQualifiedName(), symbol.getSimpleName());
+        ".",
+        requireNonNull(symbol.getEnclosingElement()).getQualifiedName(),
+        symbol.getSimpleName());
   }
 
-  private static boolean isMatch(IdentifierTree tree, VisitorState state) {
-    Symbol symbol = ASTHelpers.getSymbol(tree);
-    if (symbol == null) {
-      return false;
-    }
-
+  private static boolean isMatch(Symbol symbol, VisitorState state) {
     Symbol enclosingSymbol = symbol.getEnclosingElement();
     if (enclosingSymbol == null || enclosingSymbol.kind != TYP) {
       return false;
