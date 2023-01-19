@@ -1,0 +1,123 @@
+package tech.picnic.errorprone.bugpatterns;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static com.google.errorprone.BugPattern.StandardTags.REFACTORING;
+
+import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.errorprone.BugPattern;
+import com.google.errorprone.VisitorState;
+import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
+import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.matchers.Description;
+import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.MethodTree;
+import com.sun.source.util.TreeScanner;
+import java.util.Optional;
+import tech.picnic.errorprone.bugpatterns.testmigrator.SupportedArgumentKind;
+import tech.picnic.errorprone.bugpatterns.testmigrator.TestNGMigrationContext;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+
+@AutoService(BugChecker.class)
+@BugPattern(
+    summary = "Migrate TestNG tests to JUnit",
+    linkType = NONE,
+    tags = REFACTORING,
+    severity = ERROR)
+public final class TestNGMigrationCheck extends BugChecker implements CompilationUnitTreeMatcher {
+  private static final long serialVersionUID = 1L;
+
+  @Override
+  public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
+    TestNGScanner scanner = new TestNGScanner(state);
+    scanner.scan(tree, null);
+    ImmutableMap<ClassTree, TestNGMetadata> metadataMap = scanner.buildMetaDataTree();
+
+    new TreeScanner<Void, TestNGMetadata>() {
+      @Override
+      public Void visitClass(ClassTree node, TestNGMetadata testNGMetadata) {
+        TestNGMetadata metadata = metadataMap.getOrDefault(node, null);
+        if (metadata == null) {
+          return super.visitClass(node, testNGMetadata);
+        }
+
+        super.visitClass(node, metadata);
+        return null;
+      }
+
+      @Override
+      public Void visitMethod(MethodTree tree, TestNGMetadata metaData) {
+        metaData
+            .getAnnotation(tree)
+            .filter(SupportedArgumentKind::canMigrateTest)
+            .ifPresent(
+                annotation -> {
+                  TestNGMigrationContext context =
+                      new TestNGMigrationContext(metaData.getClassTree());
+                  SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
+
+                  buildArgumentFixes(context, annotation, tree, state).forEach(fixBuilder::merge);
+                  fixBuilder.merge(buildAnnotationFixes(annotation, tree, state));
+
+                  state.reportMatch(
+                      describeMatch(annotation.getAnnotationTree(), fixBuilder.build()));
+                });
+        return super.visitMethod(tree, metaData);
+      }
+    }.scan(tree, null);
+
+    /* All suggested fixes are directly reported to the visitor state already! */
+    return Description.NO_MATCH;
+  }
+
+  private ImmutableList<SuggestedFix> buildArgumentFixes(
+      TestNGMigrationContext context,
+      TestNGMetadata.TestNGAnnotation annotation,
+      MethodTree methodTree,
+      VisitorState state) {
+    return annotation.getArguments().entrySet().stream()
+        .map(
+            entry ->
+                trySuggestFix(context, methodTree, entry.getKey(), entry.getValue(), state)
+                    .orElseThrow())
+        .collect(toImmutableList());
+  }
+
+  private static SuggestedFix buildAnnotationFixes(
+      TestNGMetadata.TestNGAnnotation annotation, MethodTree methodTree, VisitorState state) {
+
+    SuggestedFix.Builder builder =
+        SuggestedFix.builder().merge(SuggestedFix.delete(annotation.getAnnotationTree()));
+    if (annotation.getArgumentNames().contains("dataProvider")) {
+      String dataProviderName =
+          SourceCode.treeToString(annotation.getArguments().get("dataProvider"), state);
+      builder.merge(
+          SuggestedFix.prefixWith(
+              methodTree,
+              "@org.junit.jupiter.params.ParameterizedTest\n  @org.junit.jupiter.params.provider.MethodSource("
+                  + dataProviderName
+                  + ")\n"));
+    } else {
+      builder.merge(SuggestedFix.prefixWith(methodTree, "@org.junit.jupiter.api.Test\n"));
+    }
+
+    return builder.build();
+  }
+
+  private static Optional<SuggestedFix> trySuggestFix(
+      TestNGMigrationContext context,
+      MethodTree methodTree,
+      String argumentName,
+      ExpressionTree argumentContent,
+      VisitorState state) {
+    return SupportedArgumentKind.matchArgument(argumentName)
+        .map(SupportedArgumentKind::getFixer)
+        .map(fixer -> fixer.createFix(context, methodTree, argumentContent, state));
+  }
+}

@@ -26,16 +26,12 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import java.util.Optional;
-import org.junit.jupiter.api.function.Executable;
 import org.testng.annotations.Test;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link BugChecker} which flags {@link Test#expectedExceptions()} and suggests a JUnit
  * equivalent replacement.
- *
- * <p>The method body is wrapped in a {@link org.junit.jupiter.api.Assertions#assertThrows(Class,
- * Executable)} statement.
  *
  * <p>This {@link BugChecker} does not support migrating more than one exception and will therefore
  * omit extra {@code expectedExceptions}. As this is not behavior preserving, a note with
