@@ -138,7 +138,7 @@ public final class NonStaticImport extends BugChecker implements IdentifierTreeM
 
   private static boolean isMatch(Symbol symbol, VisitorState state) {
     Symbol enclosingSymbol = symbol.owner;
-    if (enclosingSymbol.kind != TYP) {
+    if (enclosingSymbol == null || enclosingSymbol.kind != TYP) {
       return false;
     }
 
