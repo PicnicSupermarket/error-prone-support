@@ -17,15 +17,15 @@ public enum SupportedArgumentKind {
   private final String name;
 
   @SuppressWarnings("ImmutableEnumChecker" /* `SupportedArgumentKind` is effectively immutable. */)
-  private final ArgumentMigrator fixer;
+  private final ArgumentMigrator argumentMigrator;
 
-  SupportedArgumentKind(String name, ArgumentMigrator fixer) {
+  SupportedArgumentKind(String name, ArgumentMigrator argumentMigrator) {
     this.name = name;
-    this.fixer = fixer;
+    this.argumentMigrator = argumentMigrator;
   }
 
-  public ArgumentMigrator getFixer() {
-    return fixer;
+  public ArgumentMigrator getArgumentMigrator() {
+    return argumentMigrator;
   }
 
   public static boolean canMigrateTest(
@@ -33,7 +33,7 @@ public enum SupportedArgumentKind {
     return annotation.getArgumentNames().stream()
         .map(SupportedArgumentKind::matchArgument)
         .filter(Optional::isPresent)
-        .allMatch(optKind -> optKind.get().getFixer().canFix(context, annotation));
+        .allMatch(optKind -> optKind.get().getArgumentMigrator().canFix(context, annotation));
   }
 
   public static Optional<SupportedArgumentKind> matchArgument(String argument) {

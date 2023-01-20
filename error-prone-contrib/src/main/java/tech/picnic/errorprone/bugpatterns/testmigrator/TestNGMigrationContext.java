@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TestNGMigrationContext {
-  private ClassTree classTree;
-  private Map<String, MigrationState> migratedDataProviders = new HashMap<>();
+  private final ClassTree classTree;
+  private final Map<String, MigrationState> migratedDataProviders = new HashMap<>();
 
   public TestNGMigrationContext(ClassTree classTree) {
     this.classTree = classTree;
@@ -24,7 +24,7 @@ public class TestNGMigrationContext {
     migratedDataProviders.put(dataProviderName, state);
   }
 
-  public static enum MigrationState {
+  public enum MigrationState {
     NOT_MIGRATED,
     MIGRATED,
     CANNOT_MIGRATE;

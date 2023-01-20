@@ -119,7 +119,7 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
       ExpressionTree argumentContent,
       VisitorState state) {
     return SupportedArgumentKind.matchArgument(argumentName)
-        .map(SupportedArgumentKind::getFixer)
+        .map(SupportedArgumentKind::getArgumentMigrator)
         .map(fixer -> fixer.createFix(context, methodTree, argumentContent, state));
   }
 }
