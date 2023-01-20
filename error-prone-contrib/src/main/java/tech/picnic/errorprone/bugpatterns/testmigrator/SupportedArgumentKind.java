@@ -28,6 +28,7 @@ public enum SupportedArgumentKind {
     return argumentMigrator;
   }
 
+  // XXX: Move this logic elsewhere?
   public static boolean canMigrateTest(
       TestNGMigrationContext context, TestNGMetadata.TestNGAnnotation annotation) {
     return annotation.getArgumentNames().stream()

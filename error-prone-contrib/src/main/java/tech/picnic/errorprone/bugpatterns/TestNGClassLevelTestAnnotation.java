@@ -78,6 +78,7 @@ public final class TestNGClassLevelTestAnnotation extends BugChecker implements 
                         String.format(
                             "%s\n", SourceCode.treeToString(testAnnotation.get(), state)))));
 
+    // XXX: `.get()` is not allowed, use `.orElseThrow()`. Maybe run the selfcheck ;).
     fix.delete(testAnnotation.get());
 
     return describeMatch(testAnnotation.get(), fix.build());

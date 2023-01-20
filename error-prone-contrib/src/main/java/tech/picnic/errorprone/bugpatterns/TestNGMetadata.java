@@ -20,7 +20,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public class TestNGMetadata {
   private final ClassTree classTree;
   private @Nullable TestNGAnnotation classLevelAnnotation;
-  private Map<MethodTree, TestNGAnnotation> methodAnnotationMap = new HashMap<>();
+  private final Map<MethodTree, TestNGAnnotation> methodAnnotationMap = new HashMap<>();
   private final List<TestNGDataProvider> dataProviders = new ArrayList<>();
 
   public TestNGMetadata(ClassTree classTree) {
@@ -31,6 +31,7 @@ public class TestNGMetadata {
     return Optional.ofNullable(methodAnnotationMap.get(methodTree));
   }
 
+  // XXX: This is unused?
   public ImmutableSet<MethodTree> getTestsUsingValueFactory(
       TestNGDataProvider dataProvider, VisitorState state) {
     return methodAnnotationMap.entrySet().stream()

@@ -15,6 +15,8 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 
+// XXX: Add Javadoc with explanation what it does. The name (and probably functionality) is
+// relatively generic, but we need to explain this a bit :wink:.
 public class TestNGScanner extends TreeScanner<Void, TestNGMetadata> {
   private final VisitorState state;
   private final ImmutableMap.Builder<ClassTree, TestNGMetadata> metadataBuilder =
@@ -45,6 +47,7 @@ public class TestNGScanner extends TreeScanner<Void, TestNGMetadata> {
       return super.visitMethod(tree, testNGMetadata);
     }
 
+    // XXX: Do we need the `orElse(null)`? We can probably use the `Optional` API right?
     TestNGMetadata.TestNGAnnotation annotation =
         getTestNGAnnotation(tree, state)
             .orElse(testNGMetadata.getClassLevelAnnotation().orElse(null));
@@ -58,9 +61,12 @@ public class TestNGScanner extends TreeScanner<Void, TestNGMetadata> {
   public ImmutableMap<ClassTree, TestNGMetadata> buildMetaDataTree() {
     return metadataBuilder.build();
   }
+  // XXX: `Tree` suffix is not that clear here. is it from `classtree` or that we are building a tree?
 
   private static Optional<TestNGMetadata.TestNGAnnotation> getTestNGAnnotation(
       Tree tree, VisitorState state) {
+    // XXX: I think there is a method to get a specific annotation from a tree. Not sure if that is
+    // usable here though.
     return ASTHelpers.getAnnotations(tree).stream()
         .filter(annotation -> TESTNG_ANNOTATION.matches(annotation, state))
         .findFirst()
