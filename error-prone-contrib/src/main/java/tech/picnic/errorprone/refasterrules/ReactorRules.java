@@ -1307,11 +1307,10 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid accidental blocking with {@link Flux#toStream()} */
+  /** Avoid accidental blocking with {@link Flux#toStream()}. */
   // XXX: The alternative may lose some performance due to
   // buffering and prefetching
   static final class FluxToStream<T> {
-
     @BeforeTemplate
     Stream<T> before(Flux<T> flux) {
       return flux.toStream();
@@ -1323,10 +1322,9 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid accidental blocking with {@link Flux#toIterable()} */
+  /** Avoid accidental blocking with {@link Flux#toIterable()}. */
   // XXX: The alternative may lose some performance due to buffering and prefetching
   static final class FluxToIterable<T> {
-
     @BeforeTemplate
     Iterable<T> before(Flux<T> flux) {
       return flux.toIterable();
