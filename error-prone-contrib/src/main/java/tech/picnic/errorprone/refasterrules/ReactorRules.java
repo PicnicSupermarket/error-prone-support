@@ -20,6 +20,7 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
@@ -1332,7 +1333,7 @@ final class ReactorRules {
     }
 
     @AfterTemplate
-    Iterable<T> after(Flux<T> flux) {
+    List<T> after(Flux<T> flux) {
       return flux.collect(toList()).block();
     }
   }
