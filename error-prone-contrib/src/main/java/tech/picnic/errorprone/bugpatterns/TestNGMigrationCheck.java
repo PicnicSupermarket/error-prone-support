@@ -24,6 +24,7 @@ import tech.picnic.errorprone.bugpatterns.testmigrator.SupportedArgumentKind;
 import tech.picnic.errorprone.bugpatterns.testmigrator.TestNGMigrationContext;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
+// XXX: Also here and other places. Try to add more Javadocs :D.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Migrate TestNG tests to JUnit",
@@ -33,11 +34,15 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class TestNGMigrationCheck extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
 
+  // XXX: Default constructor komen.
+  // XXX: Constructor met parameter voor "aggressive" mode. Add tests for this as well :wink:
+
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     TestNGScanner scanner = new TestNGScanner(state);
     scanner.scan(tree, null);
     ImmutableMap<ClassTree, TestNGMetadata> metadataMap = scanner.buildMetaDataTree();
+    // XXX: Don't use map suffix. Try to come with more meaningful name :).
 
     new TreeScanner<Void, TestNGMetadata>() {
       @Override
@@ -89,7 +94,8 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
 
   private static SuggestedFix buildAnnotationFixes(
       TestNGMetadata.TestNGAnnotation annotation, MethodTree methodTree, VisitorState state) {
-
+    // XXX: Should we remove the qualifier; TestNGMetadata? Maybe change name of TestNGAnnotation to
+    // not need the qualifier?
     SuggestedFix.Builder builder =
         SuggestedFix.builder().merge(SuggestedFix.delete(annotation.getAnnotationTree()));
     if (annotation.getArgumentNames().contains("dataProvider")) {
@@ -118,6 +124,7 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
       String argumentName,
       ExpressionTree argumentContent,
       VisitorState state) {
+    // XXX: Come up with more concrete name of `matchArgument`?
     return SupportedArgumentKind.matchArgument(argumentName)
         .map(SupportedArgumentKind::getArgumentMigrator)
         .map(fixer -> fixer.createFix(context, methodTree, argumentContent, state));

@@ -48,6 +48,8 @@ public final class TestNGParameterized extends BugChecker implements MethodTreeM
   private static final Matcher<AnnotationTree> TESTNG_ANNOTATION =
       isType("org.testng.annotations.Test");
 
+  // XXX: Just placed it here but drop all "old" migration code.
+
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
     Optional<? extends AnnotationTree> testAnnotation =
