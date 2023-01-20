@@ -4,6 +4,7 @@ import static com.google.common.collect.MoreCollectors.toOptional;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static reactor.function.TupleUtils.function;
 
@@ -27,6 +28,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -1301,6 +1303,37 @@ final class ReactorRules {
     @AfterTemplate
     Duration after(StepVerifier.LastStep step, Duration duration) {
       return step.verifyTimeout(duration);
+    }
+  }
+
+  /** Avoid accidental blocking with {@link Flux#toStream()} */
+  // XXX: The alternative may lose some performance due to
+  // buffering and prefetching
+  static final class FluxToStream<T> {
+
+    @BeforeTemplate
+    Stream<T> before(Flux<T> flux) {
+      return flux.toStream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(Flux<T> flux) {
+      return flux.collect(toList()).block().stream();
+    }
+  }
+
+  /** Avoid accidental blocking with {@link Flux#toIterable()} */
+  // XXX: The alternative may lose some performance due to buffering and prefetching
+  static final class FluxToIterable<T> {
+
+    @BeforeTemplate
+    Iterable<T> before(Flux<T> flux) {
+      return flux.toIterable();
+    }
+
+    @AfterTemplate
+    Iterable<T> after(Flux<T> flux) {
+      return flux.collect(toList()).block();
     }
   }
 }

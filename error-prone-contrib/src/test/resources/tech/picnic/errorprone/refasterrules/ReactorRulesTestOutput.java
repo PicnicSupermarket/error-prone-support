@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -26,7 +28,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(assertThat(0), HashMap.class, ImmutableMap.class);
+    return ImmutableSet.of(assertThat(0), Collectors.class, HashMap.class, ImmutableMap.class);
   }
 
   ImmutableSet<Mono<?>> testMonoFromSupplier() {
@@ -390,5 +392,13 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Duration testStepVerifierLastStepVerifyTimeout() {
     return StepVerifier.create(Mono.empty()).verifyTimeout(Duration.ZERO);
+  }
+
+  Stream<Integer> testFluxToStream() {
+    return Flux.just(1, 2, 3).collect(Collectors.toList()).block().stream();
+  }
+
+  Iterable<Integer> testFluxToIterable() {
+    return Flux.just(1, 2, 3).collect(Collectors.toList()).block();
   }
 }
