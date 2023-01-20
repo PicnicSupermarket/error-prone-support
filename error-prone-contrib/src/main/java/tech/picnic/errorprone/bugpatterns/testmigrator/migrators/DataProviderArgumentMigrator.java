@@ -66,11 +66,10 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
       String dataProviderName, TestNGMigrationContext context, VisitorState state) {
     Optional<SuggestedFix> dataProviderMigration =
         migrateDataProvider(dataProviderName, context.getClassTree(), state);
-    if (dataProviderMigration.isPresent()) {
-      context.setDataProviderMigrationState(dataProviderName, MigrationState.MIGRATED);
-    } else {
-      context.setDataProviderMigrationState(dataProviderName, MigrationState.CANNOT_MIGRATE);
-    }
+
+    MigrationState migrationState =
+        dataProviderMigration.isPresent() ? MigrationState.MIGRATED : MigrationState.CANNOT_MIGRATE;
+    context.setDataProviderMigrationState(dataProviderName, migrationState);
 
     return dataProviderMigration;
   }
