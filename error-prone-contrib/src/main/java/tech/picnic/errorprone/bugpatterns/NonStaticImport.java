@@ -117,7 +117,7 @@ public final class NonStaticImport extends BugChecker implements IdentifierTreeM
   @Override
   public Description matchIdentifier(IdentifierTree tree, VisitorState state) {
     Symbol symbol = ASTHelpers.getSymbol(tree);
-    if (!isMatch(symbol, state)) {
+    if (symbol == null || !isMatch(symbol, state)) {
       return Description.NO_MATCH;
     }
 
