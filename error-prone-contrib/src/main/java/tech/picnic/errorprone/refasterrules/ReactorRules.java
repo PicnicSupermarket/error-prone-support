@@ -474,6 +474,11 @@ final class ReactorRules {
    * Flux}.
    */
   abstract static class MonoFlatMapToFlux<T, S> {
+    // XXX: I'd be more expressive if this `@Placeholder` were replaced with a `Function<? super T,
+    // ? extends Mono<? extends S>>` parameter, so that compatible non-lambda expression arguments
+    // to `flatMapMany` are also matched. However, the type inferred for lambda and method reference
+    // expressions passed to `flatMapMany` appears to always be `Function<T, Publisher<? extends
+    // S>>`, which doesn't match. Find a solution.
     @Placeholder(allowsIdentity = true)
     abstract Mono<S> transformation(@MayOptionallyUse T value);
 
