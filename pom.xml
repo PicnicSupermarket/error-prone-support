@@ -662,6 +662,10 @@
                                         <property name="allowNonPrintableEscapes" value="true" />
                                     </module>
                                     <module name="AvoidNoArgumentSuperConstructorCall" />
+                                    <!-- XXX: Review whether to enable this rule:
+                                    <module name="CyclomaticComplexity">
+                                        <property name="switchBlockAsSingleDecisionPoint" value="true" />
+                                    </module>-->
                                     <module name="DeclarationOrder">
                                         <!-- We don't enforce sorting fields by
                                         their visibility modifier, for two

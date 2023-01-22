@@ -25,4 +25,10 @@ final class AssertJObjectRulesTest implements RefasterRuleCollectionTestCase {
   AbstractAssert<?, ?> testAssertThatHasToString() {
     return assertThat(new Object().toString()).isEqualTo("foo");
   }
+
+  AbstractAssert<?, ?> testAbstractAssertAsInstanceOfMatches() {
+    return assertThat((Object) new IllegalStateException())
+        .isInstanceOf(RuntimeException.class)
+        .matches(t -> !((Exception) t).toString().isEmpty());
+  }
 }

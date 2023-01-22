@@ -147,6 +147,9 @@ public final class RedundantStringConversion extends BugChecker
       instanceMethod()
           .onDescendantOf("org.slf4j.Logger")
           .namedAnyOf("trace", "debug", "info", "warn", "error");
+  // XXX: Also add support for:
+  // org.springframework.web.util.UriBuilder#queryParam(String name, Object... values)
+  // org.springframework.web.util.UriBuilder#replaceQueryParam(String name, Object... values)
 
   private final Matcher<MethodInvocationTree> conversionMethodMatcher;
 
