@@ -24,10 +24,18 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
+/**
+ * A {@link BugChecker} that flags usages of such Flux methods that are documented to block, but
+ * that behaviour is not apparent from their signature.
+ *
+ * <p>The alternatives suggested are explicitly blocking operators, highlighting actual behavior.
+ */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "`Flux#toStream` and `Flux#toIterable` are documented to block, but this is not apparent from the method signature; please make sure that they are used with this in mind.",
+        "`Flux#toStream` and `Flux#toIterable` are documented to block, "
+            + "but this is not apparent from the method signature; "
+            + "please make sure that they are used with this in mind.",
     link = BUG_PATTERNS_BASE_URL + "ImplicitBlockingFluxOperation",
     linkType = CUSTOM,
     severity = ERROR,
@@ -45,6 +53,9 @@ public class ImplicitBlockingFluxOperation extends BugChecker
       FLUX_METHOD.named("toStream").withNoParameters();
   private static final Matcher<ExpressionTree> FLUX_IMPLICIT_BLOCKING_METHOD =
       anyOf(FLUX_TO_ITERABLE, FLUX_TO_STREAM);
+
+  /** Instantiates a new {@link ImplicitBlockingFluxOperation} instance. */
+  public ImplicitBlockingFluxOperation() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
@@ -86,8 +97,11 @@ public class ImplicitBlockingFluxOperation extends BugChecker
   }
 
   /**
+   * merges `flux.collect(...).block()...` fix into given fix with specified collector and postfix
+   * to match the original expression tree.
+   *
    * @param collector expression
-   * @return `collect(...).block()...` fix with specified collector and postfix to match the
+   * @return `flux.collect(...).block()...` fix with specified collector and postfix to match the
    *     original expression tree.
    */
   private static SuggestedFix.Builder getCollectAndBlockFix(
@@ -97,13 +111,13 @@ public class ImplicitBlockingFluxOperation extends BugChecker
     String flux =
         state.getSourceForNode(tree).substring(0, state.getSourceForNode(tree).indexOf("."));
     String replacement = String.format("%s.collect(%s).block()%s", flux, collector, postfix);
-    // fix.merge(SuggestedFix.replace(startPos, endPos, replacement));
     fix.merge(SuggestedFix.replace(tree, replacement));
     return fix;
   }
 
   /**
-   * @return postfix for `Flux.collect(...).block()` fix to match the original expression tree.
+   * finds the extension of `Flux.collect(...).block()` expression to match the original expression
+   * tree.
    */
   private static String getCollectAndBlockFixPostfix(
       MethodInvocationTree tree, VisitorState state) {
