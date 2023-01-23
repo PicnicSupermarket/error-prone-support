@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 // XXX: Can we perhaps work-around this by describing the fixes in reverse order?
 final class PrimitiveComparisonTest {
   /**
+   * Identification test for primitive {@code byte} comparisons.
+   *
    * @implNote The logic for {@code char} and {@code short} is exactly analogous to the {@code byte}
    *     case.
    */
