@@ -135,6 +135,6 @@ final class ImplicitBlockingFluxOperationTest {
             "    return Flux.just(1, 2, 3);",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
   }
 }

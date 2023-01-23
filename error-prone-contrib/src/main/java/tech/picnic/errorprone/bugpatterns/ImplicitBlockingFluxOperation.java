@@ -17,25 +17,25 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.method.MethodMatchers;
-import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.suppliers.Suppliers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.tools.javac.code.Type;
 import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
 /**
- * A {@link BugChecker} that flags usages of such Flux methods that are documented to block, but
- * that behaviour is not apparent from their signature.
+ * A {@link BugChecker} that flags usages of Flux methods that are documented to block, but that
+ * behaviour is not apparent from their signature.
  *
- * <p>The alternatives suggested are explicitly blocking operators, highlighting actual behavior.
+ * <p>The alternatives suggested are explicitly blocking operators, highlighting actual behavior,
+ * not adequate for automatic replacements, they need manual review.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary =
+    explanation =
         "`Flux#toStream` and `Flux#toIterable` are documented to block, "
             + "but this is not apparent from the method signature; "
             + "please make sure that they are used with this in mind.",
+    summary = "Accidental blocking of `Flux` with convenience method.",
     link = BUG_PATTERNS_BASE_URL + "ImplicitBlockingFluxOperation",
     linkType = CUSTOM,
     severity = ERROR,
@@ -43,10 +43,8 @@ import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 public class ImplicitBlockingFluxOperation extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Supplier<Type> FLUX =
-      Suppliers.typeFromString("reactor.core.publisher.Flux");
-  public static final MethodMatchers.MethodClassMatcher FLUX_METHOD =
-      instanceMethod().onDescendantOf(FLUX);
+  private static final MethodMatchers.MethodClassMatcher FLUX_METHOD =
+      instanceMethod().onDescendantOf(Suppliers.typeFromString("reactor.core.publisher.Flux"));
   private static final Matcher<ExpressionTree> FLUX_TO_ITERABLE =
       FLUX_METHOD.named("toIterable").withNoParameters();
   private static final Matcher<ExpressionTree> FLUX_TO_STREAM =
