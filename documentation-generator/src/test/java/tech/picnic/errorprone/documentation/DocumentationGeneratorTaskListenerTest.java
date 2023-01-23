@@ -31,7 +31,7 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 
-final class DocumentationGeneratorTaskListenerTest extends TaskListenerCompilerBasedTest {
+final class DocumentationGeneratorTaskListenerTest {
   @EnabledOnOs(WINDOWS)
   @Test
   void readOnlyFileSystemWindows(@TempDir Path directory) throws IOException {
@@ -62,7 +62,8 @@ final class DocumentationGeneratorTaskListenerTest extends TaskListenerCompilerB
   }
 
   private void readOnlyFileSystemFailsToWrite(Path testPath) {
-    assertThatThrownBy(() -> compile(testPath, "A.java", "public class A {}"))
+    assertThatThrownBy(
+            () -> TaskListenerCompiler.compile(testPath, "A.java", "public class A {}"))
         .hasRootCauseInstanceOf(FileSystemException.class)
         .hasCauseInstanceOf(IllegalStateException.class)
         .hasMessageEndingWith(
@@ -72,7 +73,7 @@ final class DocumentationGeneratorTaskListenerTest extends TaskListenerCompilerB
   @Test
   void emptyDirectoryWhenNotStartingKindAnalyze(@TempDir Path directory) {
     Path outputPath = directory.resolve("pkg");
-    compile(outputPath, "A.java", "package pkg;");
+    TaskListenerCompiler.compile(outputPath, "A.java", "package pkg;");
 
     assertThat(directory).isEmptyDirectory();
   }
@@ -80,7 +81,7 @@ final class DocumentationGeneratorTaskListenerTest extends TaskListenerCompilerB
   @Test
   void noClassNoOutput(@TempDir Path directory) {
     Path outputPath = directory.resolve("pkg");
-    compile(outputPath, "A.java", "package pkg;");
+    TaskListenerCompiler.compile(outputPath, "A.java", "package pkg;");
 
     assertThat(directory).isEmptyDirectory();
   }
@@ -90,7 +91,9 @@ final class DocumentationGeneratorTaskListenerTest extends TaskListenerCompilerB
     Path outputPath = directory.resolve("pkg").toAbsolutePath();
 
     assertThatThrownBy(
-            () -> compile(outputPath + " -XdocsOutputDirectory=arg2", "A.java", "package pkg;"))
+            () ->
+                TaskListenerCompiler.compile(
+                    outputPath + " -XdocsOutputDirectory=arg2", "A.java", "package pkg;"))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("Precisely one path must be provided");
   }

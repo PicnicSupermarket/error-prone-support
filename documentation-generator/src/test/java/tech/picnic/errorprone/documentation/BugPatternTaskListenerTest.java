@@ -14,7 +14,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 // XXX: Even though this class _also_ exercises `DocumentationGenerator` and
 // `DocumentationGeneratorTaskListener`, move these tests to `BugPatternExtractorTest`.
-final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
+final class BugPatternTaskListenerTest {
   private Path outputPath;
 
   @BeforeEach
@@ -24,7 +24,7 @@ final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
 
   @Test
   void noJsonExpected() {
-    compile(
+    TaskListenerCompiler.compile(
         outputPath,
         "TestCheckerWithoutAnnotation.java",
         "package pkg;",
@@ -38,7 +38,7 @@ final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
 
   @Test
   void minimalBugPattern() throws IOException {
-    compile(
+    TaskListenerCompiler.compile(
         outputPath,
         "MinimalBugChecker.java",
         "package pkg;",
@@ -56,7 +56,7 @@ final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
 
   @Test
   void completeBugPattern() throws IOException {
-    compile(
+    TaskListenerCompiler.compile(
         outputPath,
         "CompleteBugChecker.java",
         "package pkg;",
@@ -85,7 +85,7 @@ final class BugPatternTaskListenerTest extends TaskListenerCompilerBasedTest {
 
   @Test
   void undocumentedSuppressionBugPattern() throws IOException {
-    compile(
+    TaskListenerCompiler.compile(
         outputPath,
         "UndocumentedSuppressionBugPattern.java",
         "package pkg;",

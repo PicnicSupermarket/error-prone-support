@@ -8,17 +8,18 @@ import java.nio.file.Path;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 
-// XXX: Convert this to a utility class.
 // XXX: Compiled classes should be written to an in-memory file-system such as `jimfs` instead.
 // XXX: Generalize and move this class so that it can also be used by `refaster-compiler`.
 // XXX: Add support for this class to the `ErrorProneTestHelperSourceFormat` check.
-abstract class TaskListenerCompilerBasedTest {
-  public void compile(Path path, String fileName, String... lines) {
+public final class TaskListenerCompiler {
+  private TaskListenerCompiler() {}
+
+  public static void compile(Path path, String fileName, String... lines) {
     performCompilationForFile(
         path.toAbsolutePath().toString(), FileObjects.forSourceLines(fileName, lines));
   }
 
-  public void compile(String outputDirectory, String fileName, String... lines) {
+  public static void compile(String outputDirectory, String fileName, String... lines) {
     performCompilationForFile(outputDirectory, FileObjects.forSourceLines(fileName, lines));
   }
 
