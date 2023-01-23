@@ -6,7 +6,6 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class ImplicitBlockingFluxOperationTest {
-
   @Test
   void identification() {
     CompilationTestHelper.newInstance(ImplicitBlockingFluxOperation.class, getClass())
