@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -61,7 +62,7 @@ final class ImplicitBlockingFluxOperationTest {
             "    return Flux.just(1, 2, 3);",
             "  }",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
@@ -98,7 +99,7 @@ final class ImplicitBlockingFluxOperationTest {
             "    return Flux.just(1, 2, 3);",
             "  }",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
@@ -111,12 +112,8 @@ final class ImplicitBlockingFluxOperationTest {
             "",
             "class A {",
             "  void m() {",
-            "    flux().toIterable();",
-            "    flux().toStream();",
-            "  }",
-            "",
-            "  Flux<Integer> flux() {",
-            "    return Flux.just(1, 2, 3);",
+            "    Flux.just(1).toIterable();",
+            "    Flux.just(2).toStream();",
             "  }",
             "}")
         .addOutputLines(
@@ -127,14 +124,10 @@ final class ImplicitBlockingFluxOperationTest {
             "",
             "class A {",
             "  void m() {",
-            "    flux().collect(toUnmodifiableList()).block();",
-            "    flux().collect(toUnmodifiableList()).block().stream();",
-            "  }",
-            "",
-            "  Flux<Integer> flux() {",
-            "    return Flux.just(1, 2, 3);",
+            "    Flux.just(1).collect(toUnmodifiableList()).block();",
+            "    Flux.just(2).collect(toUnmodifiableList()).block().stream();",
             "  }",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 }
