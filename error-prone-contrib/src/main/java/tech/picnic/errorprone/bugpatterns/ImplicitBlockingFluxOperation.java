@@ -16,7 +16,6 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
-import com.google.errorprone.matchers.method.MethodMatchers;
 import com.google.errorprone.suppliers.Suppliers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
@@ -43,12 +42,16 @@ import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 public class ImplicitBlockingFluxOperation extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final MethodMatchers.MethodClassMatcher FLUX_METHOD =
-      instanceMethod().onDescendantOf(Suppliers.typeFromString("reactor.core.publisher.Flux"));
   private static final Matcher<ExpressionTree> FLUX_TO_ITERABLE =
-      FLUX_METHOD.named("toIterable").withNoParameters();
+      instanceMethod()
+          .onDescendantOf(Suppliers.typeFromString("reactor.core.publisher.Flux"))
+          .named("toIterable")
+          .withNoParameters();
   private static final Matcher<ExpressionTree> FLUX_TO_STREAM =
-      FLUX_METHOD.named("toStream").withNoParameters();
+      instanceMethod()
+          .onDescendantOf(Suppliers.typeFromString("reactor.core.publisher.Flux"))
+          .named("toStream")
+          .withNoParameters();
   private static final Matcher<ExpressionTree> FLUX_IMPLICIT_BLOCKING_METHOD =
       anyOf(FLUX_TO_ITERABLE, FLUX_TO_STREAM);
 
