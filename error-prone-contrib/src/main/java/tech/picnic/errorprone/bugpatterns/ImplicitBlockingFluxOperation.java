@@ -99,8 +99,8 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
     String postfix = getCollectAndBlockFixPostfix(tree, state);
 
     // XXX: replace DIY string replace fix with something more resilient
-    String source = state.getSourceForNode(tree);
-    String flux = source.substring(0, source.indexOf("."));
+    String methodSelectSource = state.getSourceForNode(tree.getMethodSelect());
+    String flux = methodSelectSource.substring(0, methodSelectSource.lastIndexOf("."));
     String replacement = String.format("%s.collect(%s).block()%s", flux, collector, postfix);
     fix.merge(SuggestedFix.replace(tree, replacement));
     return fix;
