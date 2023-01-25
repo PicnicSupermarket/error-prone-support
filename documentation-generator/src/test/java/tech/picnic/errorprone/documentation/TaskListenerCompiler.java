@@ -1,9 +1,11 @@
 package tech.picnic.errorprone.documentation;
 
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.FileManagers;
 import com.google.errorprone.FileObjects;
 import com.sun.tools.javac.api.JavacTaskImpl;
 import com.sun.tools.javac.api.JavacTool;
+import com.sun.tools.javac.file.JavacFileManager;
 import java.nio.file.Path;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -25,12 +27,13 @@ public final class TaskListenerCompiler {
 
   private static void performCompilationForFile(
       String outputDirectory, JavaFileObject javaFileObject) {
+    JavacFileManager javacFileManager = FileManagers.testFileManager();
     JavaCompiler compiler = JavacTool.create();
     JavacTaskImpl task =
         (JavacTaskImpl)
             compiler.getTask(
                 null,
-                null,
+                javacFileManager,
                 null,
                 ImmutableList.of(
                     "-Xplugin:DocumentationGenerator -XdocsOutputDirectory=" + outputDirectory),
