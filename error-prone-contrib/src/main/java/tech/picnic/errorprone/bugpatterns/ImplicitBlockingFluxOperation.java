@@ -5,34 +5,29 @@ import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
+import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.unbound;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
-import com.google.errorprone.annotations.Var;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.suppliers.Suppliers;
 import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ErrorProneToken;
 import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.util.Position;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
-import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
@@ -62,6 +57,8 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
           .onDescendantOf(Suppliers.typeFromString("reactor.core.publisher.Flux"))
           .namedAnyOf("toIterable", "toStream")
           .withNoParameters();
+  private static final Supplier<Type> STREAM =
+      VisitorState.memoize(generic(Suppliers.typeFromClass(Stream.class), unbound()));
 
   /** Instantiates a new {@link ImplicitBlockingFluxOperation} instance. */
   public ImplicitBlockingFluxOperation() {}
@@ -105,17 +102,10 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
     SuggestedFix.Builder fix = replaceMethodInvocation(tree, collectMethodInvocation, state);
     fix.merge(additionalFix);
 
-    Optional<TypeSymbol> resultTypeSymbol =
-        Optional.ofNullable(ASTHelpers.getResultType(tree)).map(Type::asElement);
-
-    if (resultTypeSymbol.isEmpty()) {
-      // XXX: Check if this can actually happen... I think it should go well in all cases actually.
-      throw new IllegalStateException();
-    }
-
-    @Var String postfix = ".block()";
-    postfix +=
-        isClassValidSubstituteFor(resultTypeSymbol.orElseThrow(), Stream.class) ? ".stream()" : "";
+    String postfix =
+        state.getTypes().isSubtype(ASTHelpers.getResultType(tree), STREAM.get(state))
+            ? ".block().stream()"
+            : ".block()";
     return fix.postfixWith(tree, postfix).build();
   }
 
@@ -141,31 +131,5 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
 
     return SuggestedFix.builder()
         .replace(methodInvocationStartPosition, methodInvocationEndPosition, replacement);
-  }
-
-  // XXX: Replace with prewritten solution. (?)
-  private static boolean isClassValidSubstituteFor(TypeSymbol symbol, Class<?> replacement) {
-    return getAllSuperOf(replacement).stream()
-        .anyMatch(
-            clazz ->
-                Objects.equals(
-                    replacement.getCanonicalName(), symbol.getQualifiedName().toString()));
-  }
-
-  // XXX: Replace with prewritten solution. (?)
-  private static Set<Class<?>> getAllSuperOf(@Nullable Class<?> clazz) {
-    if (clazz == null) {
-      return ImmutableSet.of();
-    }
-
-    Set<Class<?>> superTypes = new HashSet<>();
-
-    superTypes.add(clazz);
-    for (Class<?> superInterface : clazz.getInterfaces()) {
-      superTypes.addAll(getAllSuperOf(superInterface));
-    }
-    superTypes.addAll(getAllSuperOf(clazz.getSuperclass()));
-
-    return superTypes;
   }
 }
