@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
@@ -22,8 +23,10 @@ final class ImplicitBlockingFluxOperationTest {
             "    Flux.just(1).toIterable();",
             "    // BUG: Diagnostic contains:",
             "    Flux.just(2).toStream();",
+            "    // BUG: Diagnostic contains:",
+            "    long count = Flux.just(3).toStream().count();",
             "",
-            "    Flux.just(4).toStream(16);",
+            "    Flux.just(3).toStream(16);",
             "  }",
             "}")
         .doTest();
@@ -51,7 +54,6 @@ final class ImplicitBlockingFluxOperationTest {
   @Test
   void replacementFirstSuggestedFix() {
     BugCheckerRefactoringTestHelper.newInstance(ImplicitBlockingFluxOperation.class, getClass())
-        .setFixChooser(FixChoosers.FIRST)
         .addInputLines(
             "A.java",
             "import reactor.core.publisher.Flux;",
@@ -73,7 +75,7 @@ final class ImplicitBlockingFluxOperationTest {
             "    Flux.just(2).toStream();",
             "  }",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
@@ -87,7 +89,7 @@ final class ImplicitBlockingFluxOperationTest {
             "class A {",
             "  void m() {",
             "    Flux.just(1).toIterable();",
-            "    Flux.just(2).toStream();",
+            "    Flux.just(2).toStream().count();",
             "  }",
             "}")
         .addOutputLines(
@@ -99,10 +101,10 @@ final class ImplicitBlockingFluxOperationTest {
             "class A {",
             "  void m() {",
             "    Flux.just(1).collect(toImmutableList()).block();",
-            "    Flux.just(2).collect(toImmutableList()).block().stream();",
+            "    Flux.just(2).collect(toImmutableList()).block().stream().count();",
             "  }",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
@@ -133,6 +135,6 @@ final class ImplicitBlockingFluxOperationTest {
             "    Flux.just(3).collect(toUnmodifiableList()).block().stream().findAny();",
             "  }",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 }

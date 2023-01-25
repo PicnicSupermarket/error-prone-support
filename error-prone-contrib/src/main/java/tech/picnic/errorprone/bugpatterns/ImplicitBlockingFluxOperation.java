@@ -4,14 +4,14 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
-import static com.google.errorprone.util.ASTHelpers.*;
-import static java.util.Collections.emptySet;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.annotations.Var;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
@@ -19,6 +19,7 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.suppliers.Suppliers;
+import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ErrorProneToken;
 import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.ExpressionTree;
@@ -31,7 +32,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
@@ -44,11 +45,11 @@ import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
  */
 @AutoService(BugChecker.class)
 @BugPattern(
+    summary = "Accidental blocking of `Flux` with convenience method",
     explanation =
         "`Flux#toStream` and `Flux#toIterable` are documented to block, "
             + "but this is not apparent from the method signature; "
             + "please make sure that they are used with this in mind",
-    summary = "Accidental blocking of `Flux` with convenience method",
     link = BUG_PATTERNS_BASE_URL + "ImplicitBlockingFluxOperation",
     linkType = CUSTOM,
     severity = SUGGESTION,
@@ -75,66 +76,56 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
 
     description.addFix(SuggestedFixes.addSuppressWarnings(state, "ImplicitBlockingFluxOperation"));
     if (ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)) {
-      description.addFix(getGuavaFix(tree, state));
+      description.addFix(trySuggestGuava(tree, state));
     }
-    description.addFix(getUnmodifiableListFix(tree, state));
+    description.addFix(trySuggestImmutableList(tree, state));
 
     return description.build();
   }
 
-  private static SuggestedFix getGuavaFix(MethodInvocationTree tree, VisitorState state) {
-    SuggestedFix.Builder imports = SuggestedFix.builder();
+  private static SuggestedFix trySuggestGuava(MethodInvocationTree tree, VisitorState state) {
+    SuggestedFix.Builder fix = SuggestedFix.builder();
     String toImmutableList =
         SuggestedFixes.qualifyStaticImport(
-            "com.google.common.collect.ImmutableList.toImmutableList", imports, state);
-    String collector = toImmutableList + "()";
+            "com.google.common.collect.ImmutableList.toImmutableList", fix, state);
 
-    return replaceMethodInvocationWithCollect(tree, collector, imports.build(), state);
+    return replaceMethodInvocationWithCollect(tree, toImmutableList + "()", fix.build(), state);
   }
 
-  private static SuggestedFix getUnmodifiableListFix(
+  private static SuggestedFix trySuggestImmutableList(
       MethodInvocationTree tree, VisitorState state) {
-    SuggestedFix.Builder imports = SuggestedFix.builder();
-    String toUnmodifiableList =
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+    String toUnmodifiableListWithFqcn =
         SuggestedFixes.qualifyStaticImport(
-            "java.util.stream.Collectors.toUnmodifiableList", imports, state);
-    String collector = toUnmodifiableList + "()";
+            "java.util.stream.Collectors.toUnmodifiableList", fix, state);
 
-    return replaceMethodInvocationWithCollect(tree, collector, imports.build(), state);
+    return replaceMethodInvocationWithCollect(
+        tree, toUnmodifiableListWithFqcn + "()", fix.build(), state);
   }
 
   // XXX: Assumes that the generated `collect(...)` expression will evaluate to
   // `Mono<Collection<?>>`
-  // XXX: May return `emptyFix`.
   private static SuggestedFix replaceMethodInvocationWithCollect(
       MethodInvocationTree tree,
       String collectArgument,
-      SuggestedFix additionalFixes,
+      SuggestedFix additionalFix,
       VisitorState state) {
     String collectMethodInvocation = String.format("collect(%s)", collectArgument);
     SuggestedFix.Builder fix = replaceMethodInvocation(tree, collectMethodInvocation, state);
-    fix.merge(additionalFixes);
+    fix.merge(additionalFix);
 
-    TypeSymbol resultTypeSymbol =
-        Optional.ofNullable(getResultType(tree)).map(Type::asElement).orElse(null);
+    Optional<TypeSymbol> resultTypeSymbol =
+        Optional.ofNullable(ASTHelpers.getResultType(tree)).map(Type::asElement);
 
-    if (Objects.isNull(resultTypeSymbol)) {
-      return SuggestedFix.emptyFix();
+    if (resultTypeSymbol.isEmpty()) {
+      // XXX: Check if this can actually happen... I think it should go well in all cases actually.
+      throw new IllegalStateException();
     }
 
-    if (isClassValidSubstituteFor(resultTypeSymbol, Stream.class)) {
-      fix.postfixWith(tree, ".block().stream()");
-      return fix.build();
-    }
-
-    if (isClassValidSubstituteFor(resultTypeSymbol, Iterable.class)) {
-      fix.postfixWith(tree, ".block()");
-      return fix.build();
-    }
-
-    // XXX: Expected a replacement that evaluates to a type that we don't handle. Should be
-    // impossible to get here, as we only match `toStream` and `toIterable`.
-    return SuggestedFix.emptyFix();
+    @Var String postfix = ".block()";
+    postfix +=
+        isClassValidSubstituteFor(resultTypeSymbol.orElseThrow(), Stream.class) ? ".stream()" : "";
+    return fix.postfixWith(tree, postfix).build();
   }
 
   // XXX: Assumes that the specified tree is valid, has starting position and contains the matched
@@ -145,7 +136,7 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
     ImmutableList<ErrorProneToken> tokens =
         ErrorProneTokens.getTokens(SourceCode.treeToString(tree, state), state.context);
 
-    int treeStartPosition = getStartPosition(tree);
+    int treeStartPosition = ASTHelpers.getStartPosition(tree);
     int methodInvocationStartPosition =
         tokens.stream()
             .filter(token -> isTokenTheInvokedMethod(tree, token))
@@ -160,8 +151,7 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
 
   // XXX: Replace with prewritten solution (?) or rewrite it in a more resilient way.
   private static boolean isTokenTheInvokedMethod(MethodInvocationTree tree, ErrorProneToken token) {
-    return token.hasName()
-        && Objects.equals(token.name().toString(), getSymbol(tree).getQualifiedName().toString());
+    return token.hasName() && token.name().equals(ASTHelpers.getSymbol(tree).getQualifiedName());
   }
 
   // XXX: Replace with prewritten solution. (?)
@@ -175,8 +165,8 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
 
   // XXX: Replace with prewritten solution. (?)
   private static Set<Class<?>> getAllSuperOf(@Nullable Class<?> clazz) {
-    if (Objects.isNull(clazz)) {
-      return emptySet();
+    if (clazz == null) {
+      return ImmutableSet.of();
     }
 
     Set<Class<?>> superTypes = new HashSet<>();
