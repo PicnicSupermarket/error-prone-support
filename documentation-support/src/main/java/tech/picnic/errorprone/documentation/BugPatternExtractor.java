@@ -19,11 +19,9 @@ import com.sun.tools.javac.util.Context;
 import javax.lang.model.element.AnnotationValue;
 import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocumentation;
 
-/**
- * A {@link DocumentationExtractor} that describes how to extract data from a {@code BugChecker}.
- */
+/** A {@link Extractor} that describes how to extract data from a {@code BugChecker}. */
 @Immutable
-final class BugPatternExtractor implements DocumentationExtractor<BugPatternDocumentation> {
+final class BugPatternExtractor implements Extractor<BugPatternDocumentation> {
   @Override
   public BugPatternDocumentation extract(ClassTree tree, Context context) {
     ClassSymbol symbol = ASTHelpers.getSymbol(tree);

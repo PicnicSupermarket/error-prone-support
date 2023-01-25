@@ -14,24 +14,22 @@ enum DocumentationType {
       Sets.immutableEnumSet(EnumSet.allOf(DocumentationType.class));
 
   private final String identifier;
-  private final DocumentationExtractor<?> docExtractor;
+  private final Extractor<?> docExtractor;
 
-  DocumentationType(String identifier, DocumentationExtractor<?> documentationExtractor) {
+  DocumentationType(String identifier, Extractor<?> extractor) {
     this.identifier = identifier;
-    this.docExtractor = documentationExtractor;
+    this.docExtractor = extractor;
   }
 
   String getIdentifier() {
     return identifier;
   }
 
-  DocumentationExtractor<?> getDocumentationExtractor() {
+  Extractor<?> getExtractor() {
     return docExtractor;
   }
 
   static Optional<DocumentationType> findMatchingType(ClassTree tree) {
-    return TYPES.stream()
-        .filter(type -> type.getDocumentationExtractor().canExtract(tree))
-        .findFirst();
+    return TYPES.stream().filter(type -> type.getExtractor().canExtract(tree)).findFirst();
   }
 }

@@ -62,7 +62,7 @@ final class DocumentationGeneratorTaskListenerTest {
   }
 
   private static void readOnlyFileSystemFailsToWrite(Path testPath) {
-    assertThatThrownBy(() -> TaskListenerCompiler.compile(testPath, "A.java", "public class A {}"))
+    assertThatThrownBy(() -> JavacTaskCompilation.compile(testPath, "A.java", "public class A {}"))
         .hasRootCauseInstanceOf(FileSystemException.class)
         .hasCauseInstanceOf(IllegalStateException.class)
         .hasMessageEndingWith(
@@ -72,7 +72,7 @@ final class DocumentationGeneratorTaskListenerTest {
   @Test
   void emptyDirectoryWhenNotStartingKindAnalyze(@TempDir Path directory) {
     Path outputPath = directory.resolve("pkg");
-    TaskListenerCompiler.compile(outputPath, "A.java", "package pkg;");
+    JavacTaskCompilation.compile(outputPath, "A.java", "package pkg;");
 
     assertThat(directory).isEmptyDirectory();
   }
@@ -80,7 +80,7 @@ final class DocumentationGeneratorTaskListenerTest {
   @Test
   void noClassNoOutput(@TempDir Path directory) {
     Path outputPath = directory.resolve("pkg");
-    TaskListenerCompiler.compile(outputPath, "A.java", "package pkg;");
+    JavacTaskCompilation.compile(outputPath, "A.java", "package pkg;");
 
     assertThat(directory).isEmptyDirectory();
   }
@@ -91,7 +91,7 @@ final class DocumentationGeneratorTaskListenerTest {
 
     assertThatThrownBy(
             () ->
-                TaskListenerCompiler.compile(
+                JavacTaskCompilation.compile(
                     outputPath + " -XdocsOutputDirectory=arg2", "A.java", "package pkg;"))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("Precisely one path must be provided");

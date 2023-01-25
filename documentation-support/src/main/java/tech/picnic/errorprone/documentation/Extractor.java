@@ -11,7 +11,7 @@ import com.sun.tools.javac.util.Context;
  * @param <T> The type of data that is extracted.
  */
 @Immutable
-interface DocumentationExtractor<T> {
+interface Extractor<T> {
   /**
    * Extracts and returns an instance of {@link T} using the provided arguments.
    *
@@ -23,8 +23,8 @@ interface DocumentationExtractor<T> {
   T extract(ClassTree tree, Context context);
 
   /**
-   * Tells whether this {@link DocumentationExtractor} can extract documentation content from the
-   * given {@link ClassTree}.
+   * Tells whether this {@link Extractor} can extract documentation content from the given {@link
+   * ClassTree}.
    *
    * @param tree The {@link ClassTree} of interest.
    * @return {@code true} iff documentation extraction is supported.

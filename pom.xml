@@ -39,7 +39,7 @@
     </developers>
 
     <modules>
-        <module>documentation-generator</module>
+        <module>documentation-support</module>
         <module>error-prone-contrib</module>
         <module>refaster-compiler</module>
         <module>refaster-runner</module>
@@ -191,7 +191,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>documentation-generator</artifactId>
+                <artifactId>documentation-support</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

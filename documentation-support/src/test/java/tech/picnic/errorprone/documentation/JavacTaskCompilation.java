@@ -10,11 +10,10 @@ import java.nio.file.Path;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 
-// XXX: Compiled classes should be written to an in-memory file-system such as `jimfs` instead.
 // XXX: Generalize and move this class so that it can also be used by `refaster-compiler`.
 // XXX: Add support for this class to the `ErrorProneTestHelperSourceFormat` check.
-public final class TaskListenerCompiler {
-  private TaskListenerCompiler() {}
+public final class JavacTaskCompilation {
+  private JavacTaskCompilation() {}
 
   public static void compile(Path path, String fileName, String... lines) {
     performCompilationForFile(

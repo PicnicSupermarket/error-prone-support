@@ -31,7 +31,7 @@ final class BugPatternExtractorTest {
 
   @Test
   void noJsonExpected() {
-    TaskListenerCompiler.compile(
+    JavacTaskCompilation.compile(
         outputPath,
         "TestCheckerWithoutAnnotation.java",
         "package pkg;",
@@ -45,7 +45,7 @@ final class BugPatternExtractorTest {
 
   @Test
   void minimalBugPattern() throws IOException {
-    TaskListenerCompiler.compile(
+    JavacTaskCompilation.compile(
         outputPath,
         "MinimalBugChecker.java",
         "package pkg;",
@@ -63,7 +63,7 @@ final class BugPatternExtractorTest {
 
   @Test
   void completeBugPattern() throws IOException {
-    TaskListenerCompiler.compile(
+    JavacTaskCompilation.compile(
         outputPath,
         "CompleteBugChecker.java",
         "package pkg;",
@@ -92,7 +92,7 @@ final class BugPatternExtractorTest {
 
   @Test
   void undocumentedSuppressionBugPattern() throws IOException {
-    TaskListenerCompiler.compile(
+    JavacTaskCompilation.compile(
         outputPath,
         "UndocumentedSuppressionBugPattern.java",
         "package pkg;",

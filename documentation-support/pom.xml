@@ -8,7 +8,7 @@
         <version>0.7.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>documentation-generator</artifactId>
+    <artifactId>documentation-support</artifactId>
 
     <name>Picnic :: Error Prone Support :: Documentation Generation</name>
     <description>Extracts data to generate the documentation.</description>

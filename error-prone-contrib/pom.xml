@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>documentation-generator</artifactId>
+            <artifactId>documentation-support</artifactId>
             <!-- This dependency is declared only as a hint to Maven that
             compilation depends on it; see the `maven-compiler-plugin`'s
             `annotationProcessorPaths` configuration below. -->
@@ -223,7 +223,7 @@
                         <annotationProcessorPaths combine.children="append">
                             <path>
                                 <groupId>${project.groupId}</groupId>
-                                <artifactId>documentation-generator</artifactId>
+                                <artifactId>documentation-support</artifactId>
                                 <version>${project.version}</version>
                             </path>
                             <path>

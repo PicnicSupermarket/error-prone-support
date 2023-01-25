@@ -62,7 +62,7 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
                 writeToFile(
                     documentationType.getIdentifier(),
                     getSimpleClassName(sourceFile.toUri()),
-                    documentationType.getDocumentationExtractor().extract(classTree, context)));
+                    documentationType.getExtractor().extract(classTree, context)));
   }
 
   private void createDocsDirectory() {
