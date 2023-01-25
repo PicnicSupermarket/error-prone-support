@@ -5,8 +5,6 @@ import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.unbound;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
@@ -26,8 +24,8 @@ import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.util.Position;
-import java.util.stream.Stream;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
@@ -57,8 +55,7 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
           .onDescendantOf(Suppliers.typeFromString("reactor.core.publisher.Flux"))
           .namedAnyOf("toIterable", "toStream")
           .withNoParameters();
-  private static final Supplier<Type> STREAM =
-      VisitorState.memoize(generic(Suppliers.typeFromClass(Stream.class), unbound()));
+  private static final Supplier<Type> STREAM = Suppliers.typeFromString("java.util.stream.Stream");
 
   /** Instantiates a new {@link ImplicitBlockingFluxOperation} instance. */
   public ImplicitBlockingFluxOperation() {}
@@ -102,8 +99,9 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
     SuggestedFix.Builder fix = replaceMethodInvocation(tree, collectMethodInvocation, state);
     fix.merge(additionalFix);
 
+    Types types = state.getTypes();
     String postfix =
-        state.getTypes().isSubtype(ASTHelpers.getResultType(tree), STREAM.get(state))
+        types.isSubtype(ASTHelpers.getResultType(tree), types.erasure(STREAM.get(state)))
             ? ".block().stream()"
             : ".block()";
     return fix.postfixWith(tree, postfix).build();
