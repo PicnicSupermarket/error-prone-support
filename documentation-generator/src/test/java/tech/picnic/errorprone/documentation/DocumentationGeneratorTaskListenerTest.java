@@ -61,9 +61,8 @@ final class DocumentationGeneratorTaskListenerTest {
     readOnlyFileSystemFailsToWrite(testPath);
   }
 
-  private void readOnlyFileSystemFailsToWrite(Path testPath) {
-    assertThatThrownBy(
-            () -> TaskListenerCompiler.compile(testPath, "A.java", "public class A {}"))
+  private static void readOnlyFileSystemFailsToWrite(Path testPath) {
+    assertThatThrownBy(() -> TaskListenerCompiler.compile(testPath, "A.java", "public class A {}"))
         .hasRootCauseInstanceOf(FileSystemException.class)
         .hasCauseInstanceOf(IllegalStateException.class)
         .hasMessageEndingWith(
