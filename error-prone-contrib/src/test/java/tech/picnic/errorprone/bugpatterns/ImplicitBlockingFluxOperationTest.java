@@ -22,6 +22,8 @@ final class ImplicitBlockingFluxOperationTest {
             "    Flux.just(1).toIterable();",
             "    // BUG: Diagnostic contains:",
             "    Flux.just(2).toStream();",
+            "",
+            "    Flux.just(4).toStream(16);",
             "  }",
             "}")
         .doTest();
@@ -115,6 +117,7 @@ final class ImplicitBlockingFluxOperationTest {
             "  void m() {",
             "    Flux.just(1).toIterable();",
             "    Flux.just(2).toStream();",
+            "    Flux.just(3).toStream().findAny();",
             "  }",
             "}")
         .addOutputLines(
@@ -127,6 +130,7 @@ final class ImplicitBlockingFluxOperationTest {
             "  void m() {",
             "    Flux.just(1).collect(toUnmodifiableList()).block();",
             "    Flux.just(2).collect(toUnmodifiableList()).block().stream();",
+            "    Flux.just(3).collect(toUnmodifiableList()).block().stream().findAny();",
             "  }",
             "}")
         .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);

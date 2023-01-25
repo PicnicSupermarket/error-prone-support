@@ -4,9 +4,12 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
+import static com.google.errorprone.util.ASTHelpers.*;
+import static java.util.Collections.emptySet;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -16,8 +19,19 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.suppliers.Suppliers;
+import com.google.errorprone.util.ErrorProneToken;
+import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.tools.javac.code.Symbol.TypeSymbol;
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.util.Position;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
@@ -69,51 +83,110 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
   }
 
   private static SuggestedFix getGuavaFix(MethodInvocationTree tree, VisitorState state) {
-    SuggestedFix.Builder guavaFix = SuggestedFix.builder();
+    SuggestedFix.Builder imports = SuggestedFix.builder();
     String toImmutableList =
         SuggestedFixes.qualifyStaticImport(
-            "com.google.common.collect.ImmutableList.toImmutableList", guavaFix, state);
-    return getCollectAndBlockFix(tree, state, guavaFix, toImmutableList + "()").build();
+            "com.google.common.collect.ImmutableList.toImmutableList", imports, state);
+    String collector = toImmutableList + "()";
+
+    return replaceMethodInvocationWithCollect(tree, collector, imports.build(), state);
   }
 
   private static SuggestedFix getUnmodifiableListFix(
       MethodInvocationTree tree, VisitorState state) {
-    SuggestedFix.Builder unmodifiableListFix = SuggestedFix.builder();
+    SuggestedFix.Builder imports = SuggestedFix.builder();
     String toUnmodifiableList =
         SuggestedFixes.qualifyStaticImport(
-            "java.util.stream.Collectors.toUnmodifiableList", unmodifiableListFix, state);
-    return getCollectAndBlockFix(tree, state, unmodifiableListFix, toUnmodifiableList + "()")
-        .build();
+            "java.util.stream.Collectors.toUnmodifiableList", imports, state);
+    String collector = toUnmodifiableList + "()";
+
+    return replaceMethodInvocationWithCollect(tree, collector, imports.build(), state);
   }
 
-  /**
-   * Merges `flux.collect(...).block()...` fix into given fix with specified collector and postfix
-   * to match the original expression tree.
-   *
-   * @param collector expression.
-   * @return `flux.collect(...).block()...` fix with specified collector and postfix to match the
-   *     original expression tree.
-   */
-  private static SuggestedFix.Builder getCollectAndBlockFix(
-      MethodInvocationTree tree, VisitorState state, SuggestedFix.Builder fix, String collector) {
-    String postfix = getCollectAndBlockFixPostfix(tree, state);
+  // XXX: Assumes that the generated `collect(...)` expression will evaluate to
+  // `Mono<Collection<?>>`
+  // XXX: May return `emptyFix`.
+  private static SuggestedFix replaceMethodInvocationWithCollect(
+      MethodInvocationTree tree,
+      String collectArgument,
+      SuggestedFix additionalFixes,
+      VisitorState state) {
+    String collectMethodInvocation = String.format("collect(%s)", collectArgument);
+    SuggestedFix.Builder fix = replaceMethodInvocation(tree, collectMethodInvocation, state);
+    fix.merge(additionalFixes);
 
-    // XXX: replace DIY string replace fix with something more resilient
-    String methodSelectSource = state.getSourceForNode(tree.getMethodSelect());
-    String flux = methodSelectSource.substring(0, methodSelectSource.lastIndexOf("."));
-    String replacement = String.format("%s.collect(%s).block()%s", flux, collector, postfix);
-    fix.merge(SuggestedFix.replace(tree, replacement));
-    return fix;
+    TypeSymbol resultTypeSymbol =
+        Optional.ofNullable(getResultType(tree)).map(Type::asElement).orElse(null);
+
+    if (Objects.isNull(resultTypeSymbol)) {
+      return SuggestedFix.emptyFix();
+    }
+
+    if (isClassValidSubstituteFor(resultTypeSymbol, Stream.class)) {
+      fix.postfixWith(tree, ".block().stream()");
+      return fix.build();
+    }
+
+    if (isClassValidSubstituteFor(resultTypeSymbol, Iterable.class)) {
+      fix.postfixWith(tree, ".block()");
+      return fix.build();
+    }
+
+    // XXX: Expected a replacement that evaluates to a type that we don't handle. Should be
+    // impossible to get here, as we only match `toStream` and `toIterable`.
+    return SuggestedFix.emptyFix();
   }
 
-  /**
-   * Finds the extension of `Flux.collect(...).block()` expression to match the original expression
-   * tree.
-   */
-  private static String getCollectAndBlockFixPostfix(
-      MethodInvocationTree tree, VisitorState state) {
-    return SourceCode.treeToString(tree.getMethodSelect(), state).endsWith("toIterable")
-        ? ""
-        : ".stream()";
+  // XXX: Assumes that the specified tree is valid, has starting position and contains the matched
+  // method invocation.
+  // XXX: Assumes that the specified tree's end is the matched method invocation's end.
+  private static SuggestedFix.Builder replaceMethodInvocation(
+      MethodInvocationTree tree, String replacement, VisitorState state) {
+    ImmutableList<ErrorProneToken> tokens =
+        ErrorProneTokens.getTokens(SourceCode.treeToString(tree, state), state.context);
+
+    int treeStartPosition = getStartPosition(tree);
+    int methodInvocationStartPosition =
+        tokens.stream()
+            .filter(token -> isTokenTheInvokedMethod(tree, token))
+            .findFirst()
+            .map(token -> treeStartPosition + token.pos())
+            .orElse(Position.NOPOS);
+    int methodInvocationEndPosition = treeStartPosition + tokens.get(tokens.size() - 1).endPos();
+
+    return SuggestedFix.builder()
+        .replace(methodInvocationStartPosition, methodInvocationEndPosition, replacement);
+  }
+
+  // XXX: Replace with prewritten solution (?) or rewrite it in a more resilient way.
+  private static boolean isTokenTheInvokedMethod(MethodInvocationTree tree, ErrorProneToken token) {
+    return token.hasName()
+        && Objects.equals(token.name().toString(), getSymbol(tree).getQualifiedName().toString());
+  }
+
+  // XXX: Replace with prewritten solution. (?)
+  private static boolean isClassValidSubstituteFor(TypeSymbol symbol, Class<?> replacement) {
+    return getAllSuperOf(replacement).stream()
+        .anyMatch(
+            clazz ->
+                Objects.equals(
+                    replacement.getCanonicalName(), symbol.getQualifiedName().toString()));
+  }
+
+  // XXX: Replace with prewritten solution. (?)
+  private static Set<Class<?>> getAllSuperOf(@Nullable Class<?> clazz) {
+    if (Objects.isNull(clazz)) {
+      return emptySet();
+    }
+
+    Set<Class<?>> superTypes = new HashSet<>();
+
+    superTypes.add(clazz);
+    for (Class<?> superInterface : clazz.getInterfaces()) {
+      superTypes.addAll(getAllSuperOf(superInterface));
+    }
+    superTypes.addAll(getAllSuperOf(clazz.getSuperclass()));
+
+    return superTypes;
   }
 }
