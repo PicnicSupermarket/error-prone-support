@@ -76,31 +76,22 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
 
     description.addFix(SuggestedFixes.addSuppressWarnings(state, "ImplicitBlockingFluxOperation"));
     if (ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)) {
-      description.addFix(trySuggestGuava(tree, state));
+      description.addFix(
+          trySuggestFix("com.google.common.collect.ImmutableList.toImmutableList", tree, state));
     }
-    description.addFix(trySuggestImmutableList(tree, state));
+    description.addFix(
+        trySuggestFix("java.util.stream.Collectors.toUnmodifiableList", tree, state));
 
     return description.build();
   }
 
-  private static SuggestedFix trySuggestGuava(MethodInvocationTree tree, VisitorState state) {
+  private static SuggestedFix trySuggestFix(
+      String fullyQualifiedMethodInvocation, MethodInvocationTree tree, VisitorState state) {
     SuggestedFix.Builder fix = SuggestedFix.builder();
-    String toImmutableList =
-        SuggestedFixes.qualifyStaticImport(
-            "com.google.common.collect.ImmutableList.toImmutableList", fix, state);
+    String replacement =
+        SuggestedFixes.qualifyStaticImport(fullyQualifiedMethodInvocation, fix, state);
 
-    return replaceMethodInvocationWithCollect(tree, toImmutableList + "()", fix.build(), state);
-  }
-
-  private static SuggestedFix trySuggestImmutableList(
-      MethodInvocationTree tree, VisitorState state) {
-    SuggestedFix.Builder fix = SuggestedFix.builder();
-    String toUnmodifiableListWithFqcn =
-        SuggestedFixes.qualifyStaticImport(
-            "java.util.stream.Collectors.toUnmodifiableList", fix, state);
-
-    return replaceMethodInvocationWithCollect(
-        tree, toUnmodifiableListWithFqcn + "()", fix.build(), state);
+    return replaceMethodInvocationWithCollect(tree, replacement + "()", fix.build(), state);
   }
 
   // XXX: Assumes that the generated `collect(...)` expression will evaluate to
@@ -139,7 +130,10 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
     int treeStartPosition = ASTHelpers.getStartPosition(tree);
     int methodInvocationStartPosition =
         tokens.stream()
-            .filter(token -> isTokenTheInvokedMethod(tree, token))
+            .filter(
+                token ->
+                    token.hasName()
+                        && token.name().equals(ASTHelpers.getSymbol(tree).getQualifiedName()))
             .findFirst()
             .map(token -> treeStartPosition + token.pos())
             .orElse(Position.NOPOS);
@@ -147,11 +141,6 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
 
     return SuggestedFix.builder()
         .replace(methodInvocationStartPosition, methodInvocationEndPosition, replacement);
-  }
-
-  // XXX: Replace with prewritten solution (?) or rewrite it in a more resilient way.
-  private static boolean isTokenTheInvokedMethod(MethodInvocationTree tree, ErrorProneToken token) {
-    return token.hasName() && token.name().equals(ASTHelpers.getSymbol(tree).getQualifiedName());
   }
 
   // XXX: Replace with prewritten solution. (?)
