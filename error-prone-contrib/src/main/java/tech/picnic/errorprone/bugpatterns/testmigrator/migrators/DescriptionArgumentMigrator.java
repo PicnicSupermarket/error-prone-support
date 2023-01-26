@@ -26,8 +26,7 @@ public class DescriptionArgumentMigrator implements ArgumentMigrator {
   }
 
   @Override
-  public boolean canFix(
-      TestNGMigrationContext context, TestNGMetadata.TestNGAnnotation annotation) {
+  public boolean canFix(TestNGMigrationContext context, TestNGMetadata.Annotation annotation) {
     return annotation.getArguments().containsKey("description");
   }
 }

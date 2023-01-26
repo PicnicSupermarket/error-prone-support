@@ -20,6 +20,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.testmigrator.SupportedArgumentKind;
 import tech.picnic.errorprone.bugpatterns.testmigrator.TestNGMigrationContext;
@@ -35,21 +36,26 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     severity = ERROR)
 public final class TestNGMigrationCheck extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
+  private final boolean aggressiveMigration;
 
-  // XXX: Default constructor komen.
-  // XXX: Constructor met parameter voor "aggressive" mode. Add tests for this as well :wink:
+  public TestNGMigrationCheck() {
+    this(true);
+  }
+
+  public TestNGMigrationCheck(boolean aggressiveMigration) {
+    this.aggressiveMigration = aggressiveMigration;
+  }
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     TestNGScanner scanner = new TestNGScanner(state);
     scanner.scan(tree, null);
-    ImmutableMap<ClassTree, TestNGMetadata> metadataMap = scanner.buildMetaDataTree();
-    // XXX: Don't use map suffix. Try to come with more meaningful name :).
+    ImmutableMap<ClassTree, TestNGMetadata> classMetaData = scanner.buildMetaDataTree();
 
     new TreeScanner<@Nullable Void, TestNGMetadata>() {
       @Override
       public @Nullable Void visitClass(ClassTree node, TestNGMetadata testNGMetadata) {
-        TestNGMetadata metadata = metadataMap.get(node);
+        TestNGMetadata metadata = classMetaData.get(node);
         if (metadata == null) {
           return super.visitClass(node, testNGMetadata);
         }
@@ -60,10 +66,11 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
 
       @Override
       public @Nullable Void visitMethod(MethodTree tree, TestNGMetadata metaData) {
-        TestNGMigrationContext context = new TestNGMigrationContext(metaData.getClassTree());
+        TestNGMigrationContext context =
+            new TestNGMigrationContext(aggressiveMigration, metaData.getClassTree());
         metaData
             .getAnnotation(tree)
-            .filter(annotation -> SupportedArgumentKind.canMigrateTest(context, annotation))
+            .filter(annotation -> canMigrateTest(context, annotation))
             .ifPresent(
                 annotation -> {
                   SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
@@ -83,7 +90,7 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
 
   private static ImmutableList<SuggestedFix> buildArgumentFixes(
       TestNGMigrationContext context,
-      TestNGMetadata.TestNGAnnotation annotation,
+      TestNGMetadata.Annotation annotation,
       MethodTree methodTree,
       VisitorState state) {
     return annotation.getArguments().entrySet().stream()
@@ -95,9 +102,7 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
   }
 
   private static SuggestedFix buildAnnotationFixes(
-      TestNGMetadata.TestNGAnnotation annotation, MethodTree methodTree, VisitorState state) {
-    // XXX: Should we remove the qualifier; TestNGMetadata? Maybe change name of TestNGAnnotation to
-    // not need the qualifier?
+      TestNGMetadata.Annotation annotation, MethodTree methodTree, VisitorState state) {
     SuggestedFix.Builder builder =
         SuggestedFix.builder().merge(SuggestedFix.delete(annotation.getAnnotationTree()));
     if (annotation.getArgumentNames().contains("dataProvider")) {
@@ -120,14 +125,25 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
     return builder.build();
   }
 
+  private static boolean canMigrateTest(
+      TestNGMigrationContext context, TestNGMetadata.Annotation annotation) {
+    Stream<SupportedArgumentKind> kindStream =
+        annotation.getArgumentNames().stream()
+            .map(SupportedArgumentKind::fromString)
+            .flatMap(Optional::stream);
+
+    return context.isAggressiveMigration()
+        ? kindStream.anyMatch(kind -> kind.getArgumentMigrator().canFix(context, annotation))
+        : kindStream.allMatch(kind -> kind.getArgumentMigrator().canFix(context, annotation));
+  }
+
   private static Optional<SuggestedFix> trySuggestFix(
       TestNGMigrationContext context,
       MethodTree methodTree,
       String argumentName,
       ExpressionTree argumentContent,
       VisitorState state) {
-    // XXX: Come up with more concrete name of `matchArgument`?
-    return SupportedArgumentKind.matchArgument(argumentName)
+    return SupportedArgumentKind.fromString(argumentName)
         .map(SupportedArgumentKind::getArgumentMigrator)
         .map(fixer -> fixer.createFix(context, methodTree, argumentContent, state));
   }

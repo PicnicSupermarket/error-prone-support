@@ -50,7 +50,7 @@ public class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata> {
     }
 
     // XXX: Do we need the `orElse(null)`? We can probably use the `Optional` API right?
-    TestNGMetadata.TestNGAnnotation annotation =
+    TestNGMetadata.Annotation annotation =
         getTestNGAnnotation(tree, state)
             .orElse(testNGMetadata.getClassLevelAnnotation().orElse(null));
     if (annotation == null) {
@@ -66,7 +66,7 @@ public class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata> {
   // XXX: `Tree` suffix is not that clear here. is it from `classtree` or that we are building a
   // tree?
 
-  private static Optional<TestNGMetadata.TestNGAnnotation> getTestNGAnnotation(
+  private static Optional<TestNGMetadata.Annotation> getTestNGAnnotation(
       Tree tree, VisitorState state) {
     // XXX: I think there is a method to get a specific annotation from a tree. Not sure if that is
     // usable here though.
@@ -75,7 +75,7 @@ public class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata> {
         .findFirst()
         .map(
             annotationTree ->
-                new TestNGMetadata.TestNGAnnotation(
+                new TestNGMetadata.Annotation(
                     annotationTree,
                     annotationTree.getArguments().stream()
                         .filter(AssignmentTree.class::isInstance)

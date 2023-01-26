@@ -66,9 +66,9 @@ final class TestNGScannerTest {
     public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
       TestNGScanner scanner = new TestNGScanner(state);
       scanner.scan(tree, null);
-      ImmutableMap<ClassTree, TestNGMetadata> metaDataMap = scanner.buildMetaDataTree();
+      ImmutableMap<ClassTree, TestNGMetadata> classMetaData = scanner.buildMetaDataTree();
 
-      metaDataMap.forEach(
+      classMetaData.forEach(
           (classTree, metaData) -> {
             metaData
                 .getClassLevelAnnotation()
