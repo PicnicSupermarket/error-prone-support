@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.bugpatterns.testmigrator;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static tech.picnic.errorprone.bugpatterns.testmigrator.TestNGUtil.TESTNG_ANNOTATION;
@@ -14,6 +14,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
+import tech.picnic.errorprone.bugpatterns.TestNGMetadata;
 
 // XXX: Add Javadoc with explanation what it does. The name (and probably functionality) is
 // relatively generic, but we need to explain this a bit :wink:.

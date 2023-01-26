@@ -2,9 +2,9 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.errorprone.VisitorState;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 public class TestNGMetadata {
   private final ClassTree classTree;
@@ -30,23 +29,7 @@ public class TestNGMetadata {
   public Optional<TestNGAnnotation> getAnnotation(MethodTree methodTree) {
     return Optional.ofNullable(methodAnnotationMap.get(methodTree));
   }
-
-  // XXX: This is unused?
-  public ImmutableSet<MethodTree> getTestsUsingValueFactory(
-      TestNGDataProvider dataProvider, VisitorState state) {
-    return methodAnnotationMap.entrySet().stream()
-        .filter(entry -> entry.getValue().getArgumentNames().contains("dataProvider"))
-        .filter(
-            entry -> {
-              ExpressionTree dataProviderNameTree =
-                  entry.getValue().getArguments().get("dataProvider");
-              String dataProviderName = SourceCode.treeToString(dataProviderNameTree, state);
-              return dataProvider.valueFactoryName.equals(dataProviderName);
-            })
-        .map(Map.Entry::getKey)
-        .collect(toImmutableSet());
-  }
-
+  
   public void addTestAnnotation(MethodTree methodTree, TestNGAnnotation annotation) {
     methodAnnotationMap.put(methodTree, annotation);
   }
@@ -65,6 +48,10 @@ public class TestNGMetadata {
 
   public void addDataProvider(MethodTree methodTree) {
     dataProviders.add(new TestNGDataProvider(methodTree));
+  }
+
+  public ImmutableList<TestNGDataProvider> getDataProviders() {
+    return ImmutableList.copyOf(dataProviders);
   }
 
   public static class TestNGAnnotation {
@@ -97,6 +84,10 @@ public class TestNGMetadata {
     public TestNGDataProvider(MethodTree methodTree) {
       this.methodTree = methodTree;
       this.valueFactoryName = methodTree.getName().toString();
+    }
+
+    public MethodTree getMethodTree() {
+      return methodTree;
     }
   }
 }

@@ -22,6 +22,7 @@ import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import tech.picnic.errorprone.bugpatterns.testmigrator.SupportedArgumentKind;
 import tech.picnic.errorprone.bugpatterns.testmigrator.TestNGMigrationContext;
+import tech.picnic.errorprone.bugpatterns.testmigrator.TestNGScanner;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 // XXX: Also here and other places. Try to add more Javadocs :D.
