@@ -65,6 +65,14 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       public @Nullable Void visitMethod(MethodTree tree, TestNGMetadata metaData) {
         TestNGMigrationContext context =
             new TestNGMigrationContext(aggressiveMigration, metaData.getClassTree());
+
+        // make sure we ALL tests in the class can be migrated
+        if (!context.isAggressiveMigration()
+            && !metaData.getAnnotations().stream()
+                .allMatch(annotation -> canMigrateTest(context, annotation))) {
+          return super.visitMethod(tree, metaData);
+        }
+
         metaData
             .getAnnotation(tree)
             .filter(annotation -> canMigrateTest(context, annotation))
@@ -122,14 +130,10 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
 
   private static boolean canMigrateTest(
       TestNGMigrationContext context, TestNGMetadata.Annotation annotation) {
-    Stream<SupportedArgumentKind> kindStream =
-        annotation.getArgumentNames().stream()
-            .map(SupportedArgumentKind::fromString)
-            .flatMap(Optional::stream);
-
-    return context.isAggressiveMigration()
-        ? kindStream.anyMatch(kind -> kind.getArgumentMigrator().canFix(context, annotation))
-        : kindStream.allMatch(kind -> kind.getArgumentMigrator().canFix(context, annotation));
+    return annotation.getArgumentNames().stream()
+        .map(SupportedArgumentKind::fromString)
+        .flatMap(Optional::stream)
+        .allMatch(kind -> kind.getArgumentMigrator().canFix(context, annotation));
   }
 
   private static Optional<SuggestedFix> trySuggestFix(
