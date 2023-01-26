@@ -11,6 +11,7 @@ final class TestNGJUnitMigrationTest {
     CompilationTestHelper.newInstance(TestNGJUnitMigration.class, getClass())
         .addSourceLines(
             "A.java",
+            "import java.util.stream.Stream;",
             "import org.testng.annotations.DataProvider;",
             "import org.testng.annotations.Test;",
             "",
@@ -41,6 +42,14 @@ final class TestNGJUnitMigrationTest {
             "  @DataProvider",
             "  private static Object[][] unusedDataProvider() {",
             "    return new Object[][] {{1}, {2}};",
+            "  }",
+            "",
+            "  @Test(dataProvider = \"notMigratableDataProviderTestCases\")",
+            "  public void notMigratableDataProvider(int foo) {}",
+            "",
+            "  @DataProvider",
+            "  private static Object[][] notMigratableDataProviderTestCases() {",
+            "    return Stream.of(1, 2, 3).map(i -> new Object[] {i}).toArray(Object[][]::new);",
             "  }",
             "}")
         .doTest();

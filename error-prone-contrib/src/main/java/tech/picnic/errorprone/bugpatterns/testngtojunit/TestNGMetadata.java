@@ -17,19 +17,23 @@ import org.jspecify.annotations.Nullable;
 public class TestNGMetadata {
   private final ClassTree classTree;
   private TestNGMetadata.@Nullable Annotation classLevelAnnotation;
-  private final Map<MethodTree, Annotation> methodAnnotationMap = new HashMap<>();
+  private final Map<MethodTree, Annotation> methodAnnotations = new HashMap<>();
   private final List<DataProvider> dataProviders = new ArrayList<>();
 
   public TestNGMetadata(ClassTree classTree) {
     this.classTree = classTree;
   }
 
+  public ImmutableSet<Annotation> getAnnotations() {
+    return ImmutableSet.copyOf(methodAnnotations.values());
+  }
+
   public Optional<Annotation> getAnnotation(MethodTree methodTree) {
-    return Optional.ofNullable(methodAnnotationMap.get(methodTree));
+    return Optional.ofNullable(methodAnnotations.get(methodTree));
   }
 
   public void addTestAnnotation(MethodTree methodTree, Annotation annotation) {
-    methodAnnotationMap.put(methodTree, annotation);
+    methodAnnotations.put(methodTree, annotation);
   }
 
   public void setClassLevelAnnotation(Annotation classLevelAnnotation) {
