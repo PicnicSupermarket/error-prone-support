@@ -34,7 +34,8 @@ public enum SupportedArgumentKind {
     return annotation.getArgumentNames().stream()
         .map(SupportedArgumentKind::matchArgument)
         .filter(Optional::isPresent)
-        .allMatch(optKind -> optKind.get().getArgumentMigrator().canFix(context, annotation));
+        .allMatch(
+            optKind -> optKind.orElseThrow().getArgumentMigrator().canFix(context, annotation));
   }
 
   public static Optional<SupportedArgumentKind> matchArgument(String argument) {

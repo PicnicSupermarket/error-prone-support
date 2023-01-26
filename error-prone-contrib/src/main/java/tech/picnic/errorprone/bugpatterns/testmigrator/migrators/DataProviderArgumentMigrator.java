@@ -41,7 +41,6 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
         migrationState != MigrationState.CANNOT_MIGRATE,
         "Tried migrating DataProvider that cannot be migrated!");
 
-    SuggestedFix.Builder builder = SuggestedFix.builder();
     if (migrationState == MigrationState.MIGRATED) {
       return SuggestedFix.emptyFix();
     }
@@ -59,7 +58,7 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
         getDataProviderMethodTree(context.getClassTree(), dataProviderName).orElseThrow();
     Optional<ReturnTree> returnTree = getReturnTree(methodTree);
     return returnTree.isPresent()
-        && getDataProviderReturnTree(returnTree.get()).isPresent()
+        && getDataProviderReturnTree(returnTree.orElseThrow()).isPresent()
         && migrationState != MigrationState.CANNOT_MIGRATE;
   }
 
@@ -88,7 +87,7 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
       return Optional.empty();
     }
 
-    return getDataProviderReturnTree(returnTree.get())
+    return getDataProviderReturnTree(returnTree.orElseThrow())
         .map(
             dataProviderReturnTree ->
                 SuggestedFix.builder()
@@ -104,7 +103,7 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
                                 classTree.getSimpleName().toString(),
                                 methodName,
                                 methodTree,
-                                returnTree.get(),
+                                returnTree.orElseThrow(),
                                 dataProviderReturnTree,
                                 state)))
                     .build());

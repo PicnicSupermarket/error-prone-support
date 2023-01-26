@@ -14,21 +14,22 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.TestNGMetadata;
 
 // XXX: Add Javadoc with explanation what it does. The name (and probably functionality) is
 // relatively generic, but we need to explain this a bit :wink:.
-public class TestNGScanner extends TreeScanner<Void, TestNGMetadata> {
+public class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata> {
   private final VisitorState state;
   private final ImmutableMap.Builder<ClassTree, TestNGMetadata> metadataBuilder =
-      new ImmutableMap.Builder<>();
+      ImmutableMap.builder();
 
   public TestNGScanner(VisitorState state) {
     this.state = state;
   }
 
   @Override
-  public Void visitClass(ClassTree tree, TestNGMetadata testNGMetadata) {
+  public @Nullable Void visitClass(ClassTree tree, TestNGMetadata testNGMetadata) {
     TestNGMetadata meta = new TestNGMetadata(tree);
     getTestNGAnnotation(tree, state).ifPresent(meta::setClassLevelAnnotation);
     super.visitClass(tree, meta);
@@ -38,7 +39,7 @@ public class TestNGScanner extends TreeScanner<Void, TestNGMetadata> {
   }
 
   @Override
-  public Void visitMethod(MethodTree tree, TestNGMetadata testNGMetadata) {
+  public @Nullable Void visitMethod(MethodTree tree, TestNGMetadata testNGMetadata) {
     if (ASTHelpers.isGeneratedConstructor(tree)) {
       return super.visitMethod(tree, testNGMetadata);
     }
@@ -62,7 +63,8 @@ public class TestNGScanner extends TreeScanner<Void, TestNGMetadata> {
   public ImmutableMap<ClassTree, TestNGMetadata> buildMetaDataTree() {
     return metadataBuilder.build();
   }
-  // XXX: `Tree` suffix is not that clear here. is it from `classtree` or that we are building a tree?
+  // XXX: `Tree` suffix is not that clear here. is it from `classtree` or that we are building a
+  // tree?
 
   private static Optional<TestNGMetadata.TestNGAnnotation> getTestNGAnnotation(
       Tree tree, VisitorState state) {
