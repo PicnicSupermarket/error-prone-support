@@ -17,8 +17,11 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.TestNGMetadata;
 
-// XXX: Add Javadoc with explanation what it does. The name (and probably functionality) is
-// relatively generic, but we need to explain this a bit :wink:.
+/**
+ * A {@link TreeScanner} which will scan a {@link com.sun.source.tree.CompilationUnitTree} and
+ * collect data required for the migration from each class in the compilation unit. <br>
+ * This data can be retrieved using {@link #buildMetaDataTree()}.
+ */
 public class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata> {
   private final VisitorState state;
   private final ImmutableMap.Builder<ClassTree, TestNGMetadata> metadataBuilder =
