@@ -1,13 +1,13 @@
-package tech.picnic.errorprone.bugpatterns.testmigrator;
+package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
-import tech.picnic.errorprone.bugpatterns.TestNGMetadata;
+import java.util.Optional;
 
 public interface ArgumentMigrator {
-  SuggestedFix createFix(
+  Optional<SuggestedFix> createFix(
       TestNGMigrationContext context,
       MethodTree methodTree,
       ExpressionTree content,

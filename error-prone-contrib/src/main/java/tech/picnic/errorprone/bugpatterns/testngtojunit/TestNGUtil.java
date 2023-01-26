@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testmigrator;
+package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.Matchers.isType;

@@ -1,14 +1,14 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class TestNGMigrationCheckTest {
+final class TestNGJUnitMigrationTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(TestNGMigrationCheck.class, getClass())
+    CompilationTestHelper.newInstance(TestNGJUnitMigration.class, getClass())
         .addSourceLines(
             "A.java",
             "import org.testng.annotations.DataProvider;",
@@ -34,12 +34,12 @@ final class TestNGMigrationCheckTest {
             "  public void dataProvider(int foo) {}",
             "",
             "  @DataProvider",
-            "  public static Object[][] dataProviderTestCases() {",
+            "  private static Object[][] dataProviderTestCases() {",
             "    return new Object[][] {{1}, {2}};",
             "  }",
             "",
             "  @DataProvider",
-            "  public static Object[][] unusedDataProvider() {",
+            "  private static Object[][] unusedDataProvider() {",
             "    return new Object[][] {{1}, {2}};",
             "  }",
             "}")
@@ -48,7 +48,7 @@ final class TestNGMigrationCheckTest {
 
   @Test
   void replacement() {
-    BugCheckerRefactoringTestHelper.newInstance(TestNGMigrationCheck.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(TestNGJUnitMigration.class, getClass())
         .addInputLines(
             "A.java",
             "import org.testng.annotations.DataProvider;",

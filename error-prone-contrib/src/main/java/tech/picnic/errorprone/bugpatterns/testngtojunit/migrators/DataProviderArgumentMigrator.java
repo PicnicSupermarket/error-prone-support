@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testmigrator.migrators;
+package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.sun.source.tree.Tree.Kind.NEW_ARRAY;
@@ -22,15 +22,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.TestNGMetadata;
-import tech.picnic.errorprone.bugpatterns.testmigrator.ArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testmigrator.TestNGMigrationContext;
-import tech.picnic.errorprone.bugpatterns.testmigrator.TestNGMigrationContext.MigrationState;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.ArgumentMigrator;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMetadata;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMigrationContext;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMigrationContext.MigrationState;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 public class DataProviderArgumentMigrator implements ArgumentMigrator {
   @Override
-  public SuggestedFix createFix(
+  public Optional<SuggestedFix> createFix(
       TestNGMigrationContext context,
       MethodTree methodTree,
       ExpressionTree content,
@@ -42,11 +42,10 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
         "Tried migrating DataProvider that cannot be migrated!");
 
     if (migrationState == MigrationState.MIGRATED) {
-      return SuggestedFix.emptyFix();
+      return Optional.empty();
     }
 
-    // fix value factory
-    return fixValueFactory(dataProviderName, context, state).orElseThrow();
+    return fixValueFactory(dataProviderName, context, state);
   }
 
   @Override

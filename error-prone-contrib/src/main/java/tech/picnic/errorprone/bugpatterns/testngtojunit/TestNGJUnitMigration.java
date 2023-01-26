@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
@@ -22,9 +22,6 @@ import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.testmigrator.SupportedArgumentKind;
-import tech.picnic.errorprone.bugpatterns.testmigrator.TestNGMigrationContext;
-import tech.picnic.errorprone.bugpatterns.testmigrator.TestNGScanner;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 // XXX: Also here and other places. Try to add more Javadocs :D.
@@ -34,15 +31,15 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     linkType = NONE,
     tags = REFACTORING,
     severity = ERROR)
-public final class TestNGMigrationCheck extends BugChecker implements CompilationUnitTreeMatcher {
+public final class TestNGJUnitMigration extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
   private final boolean aggressiveMigration;
 
-  public TestNGMigrationCheck() {
+  public TestNGJUnitMigration() {
     this(true);
   }
 
-  public TestNGMigrationCheck(boolean aggressiveMigration) {
+  public TestNGJUnitMigration(boolean aggressiveMigration) {
     this.aggressiveMigration = aggressiveMigration;
   }
 
@@ -111,13 +108,11 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
       builder
           .addImport("org.junit.jupiter.params.ParameterizedTest")
           .addImport("org.junit.jupiter.params.provider.MethodSource")
-          .removeImport("org.testng.annotations.Test")
           .merge(
               SuggestedFix.prefixWith(
                   methodTree, "@ParameterizedTest\n  @MethodSource(" + dataProviderName + ")\n"));
     } else {
       builder
-          .removeImport("org.testng.annotations.Test")
           .addImport("org.junit.jupiter.api.Test")
           .merge(SuggestedFix.prefixWith(methodTree, "@Test\n"));
     }
@@ -145,6 +140,6 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
       VisitorState state) {
     return SupportedArgumentKind.fromString(argumentName)
         .map(SupportedArgumentKind::getArgumentMigrator)
-        .map(fixer -> fixer.createFix(context, methodTree, argumentContent, state));
+        .flatMap(fixer -> fixer.createFix(context, methodTree, argumentContent, state));
   }
 }

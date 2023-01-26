@@ -1,12 +1,12 @@
-package tech.picnic.errorprone.bugpatterns.testmigrator;
+package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
 import static java.util.Arrays.stream;
 
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.testmigrator.migrators.DataProviderArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testmigrator.migrators.DescriptionArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testmigrator.migrators.ExpectedExceptionsArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testmigrator.migrators.PriorityArgumentMigrator;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.DataProviderArgumentMigrator;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.DescriptionArgumentMigrator;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.ExpectedExceptionsArgumentMigrator;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.PriorityArgumentMigrator;
 
 public enum SupportedArgumentKind {
   PRIORITY("priority", new PriorityArgumentMigrator()),
