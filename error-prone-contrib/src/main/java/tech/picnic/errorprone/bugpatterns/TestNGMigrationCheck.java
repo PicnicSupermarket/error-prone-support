@@ -20,6 +20,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.testmigrator.SupportedArgumentKind;
 import tech.picnic.errorprone.bugpatterns.testmigrator.TestNGMigrationContext;
 import tech.picnic.errorprone.bugpatterns.testmigrator.TestNGScanner;
@@ -45,10 +46,10 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
     ImmutableMap<ClassTree, TestNGMetadata> metadataMap = scanner.buildMetaDataTree();
     // XXX: Don't use map suffix. Try to come with more meaningful name :).
 
-    new TreeScanner<Void, TestNGMetadata>() {
+    new TreeScanner<@Nullable Void, TestNGMetadata>() {
       @Override
-      public Void visitClass(ClassTree node, TestNGMetadata testNGMetadata) {
-        TestNGMetadata metadata = metadataMap.getOrDefault(node, null);
+      public @Nullable Void visitClass(ClassTree node, TestNGMetadata testNGMetadata) {
+        TestNGMetadata metadata = metadataMap.get(node);
         if (metadata == null) {
           return super.visitClass(node, testNGMetadata);
         }
@@ -58,7 +59,7 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
       }
 
       @Override
-      public Void visitMethod(MethodTree tree, TestNGMetadata metaData) {
+      public @Nullable Void visitMethod(MethodTree tree, TestNGMetadata metaData) {
         TestNGMigrationContext context = new TestNGMigrationContext(metaData.getClassTree());
         metaData
             .getAnnotation(tree)
@@ -80,16 +81,16 @@ public final class TestNGMigrationCheck extends BugChecker implements Compilatio
     return Description.NO_MATCH;
   }
 
-  private ImmutableList<SuggestedFix> buildArgumentFixes(
+  private static ImmutableList<SuggestedFix> buildArgumentFixes(
       TestNGMigrationContext context,
       TestNGMetadata.TestNGAnnotation annotation,
       MethodTree methodTree,
       VisitorState state) {
     return annotation.getArguments().entrySet().stream()
-        .map(
+        .flatMap(
             entry ->
                 trySuggestFix(context, methodTree, entry.getKey(), entry.getValue(), state)
-                    .orElseThrow())
+                    .stream())
         .collect(toImmutableList());
   }
 

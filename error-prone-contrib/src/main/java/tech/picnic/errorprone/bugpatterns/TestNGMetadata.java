@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -29,7 +27,7 @@ public class TestNGMetadata {
   public Optional<TestNGAnnotation> getAnnotation(MethodTree methodTree) {
     return Optional.ofNullable(methodAnnotationMap.get(methodTree));
   }
-  
+
   public void addTestAnnotation(MethodTree methodTree, TestNGAnnotation annotation) {
     methodAnnotationMap.put(methodTree, annotation);
   }
@@ -73,17 +71,15 @@ public class TestNGMetadata {
     }
 
     public ImmutableSet<String> getArgumentNames() {
-      return arguments.keySet().stream().collect(toImmutableSet());
+      return arguments.keySet();
     }
   }
 
   public static class TestNGDataProvider {
     private final MethodTree methodTree;
-    private final String valueFactoryName;
 
     public TestNGDataProvider(MethodTree methodTree) {
       this.methodTree = methodTree;
-      this.valueFactoryName = methodTree.getName().toString();
     }
 
     public MethodTree getMethodTree() {

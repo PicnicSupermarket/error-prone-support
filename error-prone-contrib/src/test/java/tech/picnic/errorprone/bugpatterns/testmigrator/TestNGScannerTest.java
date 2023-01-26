@@ -34,20 +34,20 @@ final class TestNGScannerTest {
             "@Test",
             "class A {",
             "",
-            "  void inferClassLevelAnnotation () {}",
+            "  void inferClassLevelAnnotation() {}",
             "",
             "  // BUG: Diagnostic contains:",
             "  @Test(description = \"foo\")",
-            "  void localAnnotation () {}",
+            "  void localAnnotation() {}",
             "",
             "  // BUG: Diagnostic contains:",
             "  @Test(dataProvider = \"dataProviderTestCases\")",
-            "  void dataProvider () {}",
+            "  void dataProvider() {}",
             "",
             "  @DataProvider",
             "  // BUG: Diagnostic contains:",
-            "  public static Object[][] dataProviderTestCases () {",
-            "     return new Object[][] {{1},{2}};",
+            "  public static Object[][] dataProviderTestCases() {",
+            "    return new Object[][] {{1}, {2}};",
             "  }",
             "}")
         .doTest();
@@ -90,8 +90,7 @@ final class TestNGScannerTest {
                 .filter(MethodTree.class::isInstance)
                 .map(MethodTree.class::cast)
                 .map(metaData::getAnnotation)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .filter(not(isEqual(metaData.getClassLevelAnnotation().orElse(null))))
                 .forEach(
                     annotation -> {

@@ -7,10 +7,12 @@ import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
 
-public class TestNGUtil {
+public final class TestNGUtil {
   public static final Matcher<AnnotationTree> TESTNG_ANNOTATION =
       isType("org.testng.annotations.Test");
 
   public static final Matcher<MethodTree> VALUE_FACTORY_METHOD =
       hasAnnotation("org.testng.annotations.DataProvider");
+
+  private TestNGUtil() {}
 }
