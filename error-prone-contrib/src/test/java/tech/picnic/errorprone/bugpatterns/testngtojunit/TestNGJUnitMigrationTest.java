@@ -56,6 +56,40 @@ final class TestNGJUnitMigrationTest {
   }
 
   @Test
+  void identificationConservativeMode() {
+    CompilationTestHelper.newInstance(TestNGJUnitMigration.class, getClass())
+        .setArgs("-XepOpt:ErrorProneSupport:AggressiveTestNGJUnitMigration=false")
+        .addSourceLines(
+            "A.java",
+            "import java.util.stream.Stream;",
+            "import org.testng.annotations.DataProvider;",
+            "import org.testng.annotations.Test;",
+            "",
+            "@Test",
+            "public class A {",
+            "  public void classLevelAnnotation() {}",
+            "",
+            "  @Test(description = \"bar\")",
+            "  public void methodAnnotation() {}",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  @Test",
+            "  public static class B {",
+            "    public void nestedClass() {}",
+            "  }",
+            "",
+            "  @Test(dataProvider = \"notMigratableDataProviderTestCases\")",
+            "  public void notMigratableDataProvider(int foo) {}",
+            "",
+            "  @DataProvider",
+            "  private static Object[][] notMigratableDataProviderTestCases() {",
+            "    return Stream.of(1, 2, 3).map(i -> new Object[] {i}).toArray(Object[][]::new);",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
   void replacement() {
     BugCheckerRefactoringTestHelper.newInstance(TestNGJUnitMigration.class, getClass())
         .addInputLines(
