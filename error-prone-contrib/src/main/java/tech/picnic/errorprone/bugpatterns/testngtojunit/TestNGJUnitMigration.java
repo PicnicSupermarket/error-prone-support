@@ -20,7 +20,6 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
@@ -33,15 +32,10 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     severity = ERROR)
 public final class TestNGJUnitMigration extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private final boolean aggressiveMigration;
+  private static final String ENABLE_AGGRESSIVE_MIGRATION_MODE_FLAG =
+      "ErrorProneSupport:AggressiveTestNGJUnitMigration";
 
-  public TestNGJUnitMigration() {
-    this(true);
-  }
-
-  public TestNGJUnitMigration(boolean aggressiveMigration) {
-    this.aggressiveMigration = aggressiveMigration;
-  }
+  public TestNGJUnitMigration() {}
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
@@ -64,7 +58,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       @Override
       public @Nullable Void visitMethod(MethodTree tree, TestNGMetadata metaData) {
         TestNGMigrationContext context =
-            new TestNGMigrationContext(aggressiveMigration, metaData.getClassTree());
+            new TestNGMigrationContext(isAggressiveMode(state), metaData.getClassTree());
 
         // make sure we ALL tests in the class can be migrated
         if (!context.isAggressiveMigration()
@@ -145,5 +139,13 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
     return SupportedArgumentKind.fromString(argumentName)
         .map(SupportedArgumentKind::getArgumentMigrator)
         .flatMap(fixer -> fixer.createFix(context, methodTree, argumentContent, state));
+  }
+
+  private static boolean isAggressiveMode(VisitorState state) {
+    return state
+        .errorProneOptions()
+        .getFlags()
+        .getBoolean(ENABLE_AGGRESSIVE_MIGRATION_MODE_FLAG)
+        .orElse(true);
   }
 }
