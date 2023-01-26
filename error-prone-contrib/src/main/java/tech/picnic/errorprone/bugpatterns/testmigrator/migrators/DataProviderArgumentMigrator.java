@@ -50,8 +50,7 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
   }
 
   @Override
-  public boolean canFix(
-      TestNGMigrationContext context, TestNGMetadata.TestNGAnnotation annotation) {
+  public boolean canFix(TestNGMigrationContext context, TestNGMetadata.Annotation annotation) {
     String dataProviderName = getDataProviderName(annotation.getArguments().get("dataProvider"));
     MigrationState migrationState = context.getDataProviderMigrationState(dataProviderName);
     MethodTree methodTree =

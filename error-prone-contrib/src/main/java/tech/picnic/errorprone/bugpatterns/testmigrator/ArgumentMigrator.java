@@ -13,5 +13,5 @@ public interface ArgumentMigrator {
       ExpressionTree content,
       VisitorState state);
 
-  boolean canFix(TestNGMigrationContext context, TestNGMetadata.TestNGAnnotation annotation);
+  boolean canFix(TestNGMigrationContext context, TestNGMetadata.Annotation annotation);
 }

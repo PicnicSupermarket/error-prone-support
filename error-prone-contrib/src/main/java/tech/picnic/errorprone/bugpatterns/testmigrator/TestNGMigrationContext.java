@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TestNGMigrationContext {
+  private final boolean aggressiveMigration;
   private final ClassTree classTree;
   private final Map<String, MigrationState> migratedDataProviders = new HashMap<>();
 
-  public TestNGMigrationContext(ClassTree classTree) {
+  public TestNGMigrationContext(boolean aggressiveMigration, ClassTree classTree) {
+    this.aggressiveMigration = aggressiveMigration;
     this.classTree = classTree;
   }
 
@@ -22,6 +24,10 @@ public class TestNGMigrationContext {
 
   public void setDataProviderMigrationState(String dataProviderName, MigrationState state) {
     migratedDataProviders.put(dataProviderName, state);
+  }
+
+  public boolean isAggressiveMigration() {
+    return aggressiveMigration;
   }
 
   public enum MigrationState {

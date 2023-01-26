@@ -16,27 +16,27 @@ import org.jspecify.annotations.Nullable;
 
 public class TestNGMetadata {
   private final ClassTree classTree;
-  private @Nullable TestNGAnnotation classLevelAnnotation;
-  private final Map<MethodTree, TestNGAnnotation> methodAnnotationMap = new HashMap<>();
+  private TestNGMetadata.@Nullable Annotation classLevelAnnotation;
+  private final Map<MethodTree, Annotation> methodAnnotationMap = new HashMap<>();
   private final List<TestNGDataProvider> dataProviders = new ArrayList<>();
 
   public TestNGMetadata(ClassTree classTree) {
     this.classTree = classTree;
   }
 
-  public Optional<TestNGAnnotation> getAnnotation(MethodTree methodTree) {
+  public Optional<Annotation> getAnnotation(MethodTree methodTree) {
     return Optional.ofNullable(methodAnnotationMap.get(methodTree));
   }
 
-  public void addTestAnnotation(MethodTree methodTree, TestNGAnnotation annotation) {
+  public void addTestAnnotation(MethodTree methodTree, Annotation annotation) {
     methodAnnotationMap.put(methodTree, annotation);
   }
 
-  public void setClassLevelAnnotation(TestNGAnnotation classLevelAnnotation) {
+  public void setClassLevelAnnotation(Annotation classLevelAnnotation) {
     this.classLevelAnnotation = classLevelAnnotation;
   }
 
-  public Optional<TestNGAnnotation> getClassLevelAnnotation() {
+  public Optional<Annotation> getClassLevelAnnotation() {
     return Optional.ofNullable(classLevelAnnotation);
   }
 
@@ -52,11 +52,11 @@ public class TestNGMetadata {
     return ImmutableList.copyOf(dataProviders);
   }
 
-  public static class TestNGAnnotation {
+  public static class Annotation {
     private final AnnotationTree annotationTree;
     private final ImmutableMap<String, ExpressionTree> arguments;
 
-    public TestNGAnnotation(
+    public Annotation(
         AnnotationTree annotationTree, ImmutableMap<String, ExpressionTree> arguments) {
       this.annotationTree = annotationTree;
       this.arguments = arguments;

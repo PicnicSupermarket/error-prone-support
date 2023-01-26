@@ -3,7 +3,6 @@ package tech.picnic.errorprone.bugpatterns.testmigrator;
 import static java.util.Arrays.stream;
 
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.TestNGMetadata;
 import tech.picnic.errorprone.bugpatterns.testmigrator.migrators.DataProviderArgumentMigrator;
 import tech.picnic.errorprone.bugpatterns.testmigrator.migrators.DescriptionArgumentMigrator;
 import tech.picnic.errorprone.bugpatterns.testmigrator.migrators.ExpectedExceptionsArgumentMigrator;
@@ -28,17 +27,7 @@ public enum SupportedArgumentKind {
     return argumentMigrator;
   }
 
-  // XXX: Move this logic elsewhere?
-  public static boolean canMigrateTest(
-      TestNGMigrationContext context, TestNGMetadata.TestNGAnnotation annotation) {
-    return annotation.getArgumentNames().stream()
-        .map(SupportedArgumentKind::matchArgument)
-        .filter(Optional::isPresent)
-        .allMatch(
-            optKind -> optKind.orElseThrow().getArgumentMigrator().canFix(context, annotation));
-  }
-
-  public static Optional<SupportedArgumentKind> matchArgument(String argument) {
+  public static Optional<SupportedArgumentKind> fromString(String argument) {
     return stream(values()).filter(value -> value.name.equals(argument)).findFirst();
   }
 }
