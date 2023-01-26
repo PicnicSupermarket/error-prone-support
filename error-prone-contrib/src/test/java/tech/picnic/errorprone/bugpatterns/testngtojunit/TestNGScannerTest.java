@@ -1,22 +1,22 @@
-package tech.picnic.errorprone.bugpatterns.testmigrator;
+package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.joining;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import tech.picnic.errorprone.bugpatterns.TestNGMetadata;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 final class TestNGScannerTest {
   private final CompilationTestHelper compilationTestHelper =
@@ -30,24 +30,42 @@ final class TestNGScannerTest {
             "import org.testng.annotations.DataProvider;",
             "import org.testng.annotations.Test;",
             "",
-            "// BUG: Diagnostic contains:",
+            "// BUG: Diagnostic contains: class: A arguments: {  }",
             "@Test",
             "class A {",
             "",
             "  void inferClassLevelAnnotation() {}",
             "",
-            "  // BUG: Diagnostic contains:",
-            "  @Test(description = \"foo\")",
+            "  // BUG: Diagnostic contains: class: A arguments: {  }",
+            "  @Test",
             "  void localAnnotation() {}",
             "",
-            "  // BUG: Diagnostic contains:",
+            "  // BUG: Diagnostic contains: class: A arguments: { description: \"foo\" }",
+            "  @Test(description = \"foo\")",
+            "  void singleArgument() {}",
+            "",
+            "  // BUG: Diagnostic contains: class: A arguments: { priority: 1, description: \"foo\" }",
+            "  @Test(priority = 1, description = \"foo\")",
+            "  void multipleArguments() {}",
+            "",
+            "  // BUG: Diagnostic contains: class: A arguments: { dataProvider: \"dataProviderTestCases\" }",
             "  @Test(dataProvider = \"dataProviderTestCases\")",
             "  void dataProvider() {}",
             "",
             "  @DataProvider",
-            "  // BUG: Diagnostic contains:",
-            "  public static Object[][] dataProviderTestCases() {",
+            "  // BUG: Diagnostic contains: class: A dataProvider: dataProviderTestCases",
+            "  private static Object[][] dataProviderTestCases() {",
             "    return new Object[][] {{1}, {2}};",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains: class: B arguments: { description: \"nested\" }",
+            "  @Test(description = \"nested\")",
+            "  class B {",
+            "    public void nestedTest() {}",
+            "",
+            "    // BUG: Diagnostic contains: class: B arguments: { priority: 1 }",
+            "    @Test(priority = 1)",
+            "    public void nestedTestWithArguments() {}",
             "  }",
             "}")
         .doTest();
@@ -75,15 +93,22 @@ final class TestNGScannerTest {
                 .ifPresent(
                     annotation ->
                         state.reportMatch(
-                            describeMatch(
-                                annotation.getAnnotationTree(), SuggestedFix.emptyFix())));
+                            buildDescription(annotation.getAnnotationTree())
+                                .setMessage(
+                                    createAnnotationDiagnosticMessage(classTree, annotation, state))
+                                .build()));
 
             metaData
                 .getDataProviders()
                 .forEach(
                     dataProvider -> {
                       state.reportMatch(
-                          describeMatch(dataProvider.getMethodTree(), SuggestedFix.emptyFix()));
+                          buildDescription(dataProvider.getMethodTree())
+                              .setMessage(
+                                  String.format(
+                                      "class: %s dataProvider: %s",
+                                      classTree.getSimpleName(), dataProvider.getName()))
+                              .build());
                     });
 
             classTree.getMembers().stream()
@@ -95,11 +120,27 @@ final class TestNGScannerTest {
                 .forEach(
                     annotation -> {
                       state.reportMatch(
-                          describeMatch(annotation.getAnnotationTree(), SuggestedFix.emptyFix()));
+                          buildDescription(annotation.getAnnotationTree())
+                              .setMessage(
+                                  createAnnotationDiagnosticMessage(classTree, annotation, state))
+                              .build());
                     });
           });
 
       return Description.NO_MATCH;
+    }
+
+    private static String createAnnotationDiagnosticMessage(
+        ClassTree classTree, TestNGMetadata.Annotation annotation, VisitorState state) {
+      return String.format(
+          "class: %s arguments: { %s }",
+          classTree.getSimpleName(),
+          annotation.getArguments().entrySet().stream()
+              .map(
+                  entry ->
+                      String.join(
+                          ": ", entry.getKey(), SourceCode.treeToString(entry.getValue(), state)))
+              .collect(joining(", ")));
     }
   }
 }

@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testmigrator;
+package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
 import com.sun.source.tree.ClassTree;
 import java.util.HashMap;

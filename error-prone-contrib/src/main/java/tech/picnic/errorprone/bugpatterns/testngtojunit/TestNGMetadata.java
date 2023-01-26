@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -18,7 +18,7 @@ public class TestNGMetadata {
   private final ClassTree classTree;
   private TestNGMetadata.@Nullable Annotation classLevelAnnotation;
   private final Map<MethodTree, Annotation> methodAnnotationMap = new HashMap<>();
-  private final List<TestNGDataProvider> dataProviders = new ArrayList<>();
+  private final List<DataProvider> dataProviders = new ArrayList<>();
 
   public TestNGMetadata(ClassTree classTree) {
     this.classTree = classTree;
@@ -45,10 +45,10 @@ public class TestNGMetadata {
   }
 
   public void addDataProvider(MethodTree methodTree) {
-    dataProviders.add(new TestNGDataProvider(methodTree));
+    dataProviders.add(new DataProvider(methodTree));
   }
 
-  public ImmutableList<TestNGDataProvider> getDataProviders() {
+  public ImmutableList<DataProvider> getDataProviders() {
     return ImmutableList.copyOf(dataProviders);
   }
 
@@ -75,15 +75,21 @@ public class TestNGMetadata {
     }
   }
 
-  public static class TestNGDataProvider {
+  public static class DataProvider {
     private final MethodTree methodTree;
+    private final String name;
 
-    public TestNGDataProvider(MethodTree methodTree) {
+    public DataProvider(MethodTree methodTree) {
       this.methodTree = methodTree;
+      this.name = methodTree.getName().toString();
     }
 
     public MethodTree getMethodTree() {
       return methodTree;
+    }
+
+    public String getName() {
+      return name;
     }
   }
 }

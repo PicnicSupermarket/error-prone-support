@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testmigrator.migrators;
+package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators;
 
 import static com.google.auto.common.MoreStreams.toImmutableList;
 import static com.sun.source.tree.Tree.Kind.MEMBER_SELECT;
@@ -12,14 +12,14 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.TestNGMetadata;
-import tech.picnic.errorprone.bugpatterns.testmigrator.ArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testmigrator.TestNGMigrationContext;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.ArgumentMigrator;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMetadata;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMigrationContext;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 public class ExpectedExceptionsArgumentMigrator implements ArgumentMigrator {
   @Override
-  public SuggestedFix createFix(
+  public Optional<SuggestedFix> createFix(
       TestNGMigrationContext context,
       MethodTree methodTree,
       ExpressionTree content,
@@ -41,7 +41,7 @@ public class ExpectedExceptionsArgumentMigrator implements ArgumentMigrator {
               String.join(", ", removedExceptions)));
     }
 
-    return fix.build();
+    return Optional.of(fix.build());
   }
 
   @Override
