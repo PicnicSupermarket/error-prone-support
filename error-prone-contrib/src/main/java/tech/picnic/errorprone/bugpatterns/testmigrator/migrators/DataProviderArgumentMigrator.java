@@ -57,9 +57,14 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
     MigrationState migrationState = context.getDataProviderMigrationState(dataProviderName);
     MethodTree methodTree =
         getDataProviderMethodTree(context.getClassTree(), dataProviderName).orElseThrow();
-    ReturnTree returnTree = getReturnTree(methodTree);
-    return getDataProviderReturnTree(returnTree).isPresent()
+    Optional<ReturnTree> returnTree = getReturnTree(methodTree);
+    return returnTree.isPresent()
+        && getDataProviderReturnTree(returnTree.get()).isPresent()
         && migrationState != MigrationState.CANNOT_MIGRATE;
+  }
+
+  private static String getDataProviderName(ExpressionTree expressionTree) {
+    return (String) ((LiteralTree) expressionTree).getValue();
   }
 
   private static Optional<SuggestedFix> fixValueFactory(
@@ -77,9 +82,13 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
   private static Optional<SuggestedFix> migrateDataProvider(
       String methodName, ClassTree classTree, VisitorState state) {
     MethodTree methodTree = getDataProviderMethodTree(classTree, methodName).orElseThrow();
-    ReturnTree returnTree = getReturnTree(methodTree);
 
-    return getDataProviderReturnTree(returnTree)
+    Optional<ReturnTree> returnTree = getReturnTree(methodTree);
+    if (returnTree.isEmpty()) {
+      return Optional.empty();
+    }
+
+    return getDataProviderReturnTree(returnTree.get())
         .map(
             dataProviderReturnTree ->
                 SuggestedFix.builder()
@@ -95,7 +104,7 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
                                 classTree.getSimpleName().toString(),
                                 methodName,
                                 methodTree,
-                                returnTree,
+                                returnTree.get(),
                                 dataProviderReturnTree,
                                 state)))
                     .build());
@@ -110,12 +119,11 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
         .findFirst();
   }
 
-  private static ReturnTree getReturnTree(MethodTree methodTree) {
+  private static Optional<ReturnTree> getReturnTree(MethodTree methodTree) {
     return methodTree.getBody().getStatements().stream()
         .filter(ReturnTree.class::isInstance)
         .findFirst()
-        .map(ReturnTree.class::cast)
-        .orElseThrow();
+        .map(ReturnTree.class::cast);
   }
 
   private static Optional<NewArrayTree> getDataProviderReturnTree(ReturnTree returnTree) {
@@ -217,9 +225,5 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
         "\t\t%s\n\t\targuments(%s)",
         comments.stream().map(Tokens.Comment::getText).collect(joining("\n")),
         argSource.substring(1, argSource.length() - 1));
-  }
-
-  private static String getDataProviderName(ExpressionTree expressionTree) {
-    return (String) ((LiteralTree) expressionTree).getValue();
   }
 }
