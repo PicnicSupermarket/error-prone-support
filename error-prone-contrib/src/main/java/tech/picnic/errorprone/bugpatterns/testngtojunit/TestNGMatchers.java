@@ -7,12 +7,15 @@ import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
 
-public final class TestNGUtil {
+// XXX: It would be awesome to have a test for this class as well. It should be very similar to
+// `MoreJUnitMatchersTest`.
+public final class TestNGMatchers {
   public static final Matcher<AnnotationTree> TESTNG_ANNOTATION =
       isType("org.testng.annotations.Test");
 
-  public static final Matcher<MethodTree> VALUE_FACTORY_METHOD =
+  // XXX: Should `VALUE` be in this name?
+  public static final Matcher<MethodTree> TESTNG_VALUE_FACTORY_METHOD =
       hasAnnotation("org.testng.annotations.DataProvider");
 
-  private TestNGUtil() {}
+  private TestNGMatchers() {}
 }

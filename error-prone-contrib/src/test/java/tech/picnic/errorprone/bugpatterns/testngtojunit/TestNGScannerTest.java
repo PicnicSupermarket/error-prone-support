@@ -10,6 +10,7 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
@@ -19,12 +20,14 @@ import org.junit.jupiter.api.Test;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 final class TestNGScannerTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(TestNGScannerTest.TestChecker.class, getClass());
-
+  // XXX: We are missing some tests here.
+  // - Nested class.
+  // - JUnit class that is already migrated.
+  // - Normal class that shouldn't trigger? Or a negative example at least.
+  // - Some not supported things as well.
   @Test
   void classLevelAndMethodLevel() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .addSourceLines(
             "A.java",
             "import org.testng.annotations.DataProvider;",
@@ -76,8 +79,7 @@ final class TestNGScannerTest {
    * collected.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `TestNGScanner` for testing purposes")
-  public static final class TestChecker extends BugChecker
-      implements BugChecker.CompilationUnitTreeMatcher {
+  public static final class TestChecker extends BugChecker implements CompilationUnitTreeMatcher {
     private static final long serialVersionUID = 1L;
 
     @Override

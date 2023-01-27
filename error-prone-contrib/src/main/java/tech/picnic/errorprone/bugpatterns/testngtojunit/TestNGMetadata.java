@@ -12,11 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.jspecify.annotations.Nullable;
 
-public class TestNGMetadata {
+public final class TestNGMetadata {
   private final ClassTree classTree;
-  private TestNGMetadata.@Nullable Annotation classLevelAnnotation;
+  private TestNGMetadata.Annotation classLevelAnnotation;
   private final Map<MethodTree, Annotation> methodAnnotations = new HashMap<>();
   private final List<DataProvider> dataProviders = new ArrayList<>();
 
@@ -56,6 +55,14 @@ public class TestNGMetadata {
     return ImmutableList.copyOf(dataProviders);
   }
 
+  // XXX: Hmm not sure if `Annotation` is the ideal name for this. It might be rather confusing IMO.
+  // Now it's not clear this is our own object and what it actual does? Now it's used with
+  // `TestNGMetaData.Annotation` however it should also be clear without having to prefix it with
+  // the qualifier. Maybe adding the `MetaData` suffix to this would clarify a lot (also for
+  // `DataProvider` class).
+  // XXX: It would be nice to also use `@AutoValue` for this. This is kind of the "default" for
+  // creating POJO's in EPS. For other examples, see the PR that is open that is about introducing
+  // `documentation-support`.
   public static class Annotation {
     private final AnnotationTree annotationTree;
     private final ImmutableMap<String, ExpressionTree> arguments;

@@ -134,6 +134,10 @@ final class TestNGJUnitMigrationTest {
             "import org.junit.jupiter.params.ParameterizedTest;",
             "import org.junit.jupiter.params.provider.Arguments;",
             "import org.junit.jupiter.params.provider.MethodSource;",
+            // XXX: Running `mvn clean install` (in this case still with `-Dverification.warn`) will
+            // show that the `org.testng.annotation.Test` import is still here. I think that makes
+            // sense, we indeed agreed on not deleting that and letting other checks take care of
+            // that. So we should probably fully qualify the Jupiter
             "",
             "@TestMethodOrder(MethodOrderer.OrderAnnotation.class)",
             "class A {",

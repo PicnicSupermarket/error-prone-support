@@ -4,7 +4,9 @@ import com.sun.source.tree.ClassTree;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TestNGMigrationContext {
+// XXX: Same goes for this class, it should be using `@AutoValue`. See my other comment about this
+// for context.
+public final class TestNGMigrationContext {
   private final boolean aggressiveMigration;
   private final ClassTree classTree;
   private final Map<String, MigrationState> migratedDataProviders = new HashMap<>();
