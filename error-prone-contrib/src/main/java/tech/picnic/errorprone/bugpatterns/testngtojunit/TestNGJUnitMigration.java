@@ -60,7 +60,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
         TestNGMigrationContext context =
             new TestNGMigrationContext(isAggressiveMode(state), metaData.getClassTree());
 
-        // make sure we ALL tests in the class can be migrated
+        /* Make sure ALL tests in the class can be migrated. */
         if (!context.isAggressiveMigration()
             && !metaData.getAnnotations().stream()
                 .allMatch(annotation -> canMigrateTest(context, annotation))) {
@@ -141,6 +141,9 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
         .flatMap(fixer -> fixer.createFix(context, methodTree, argumentContent, state));
   }
 
+  // XXX: This should happen in the constructor just like `RequestParamType`.
+  // XXX: Nit: instead of "aggressiveMode" I would flip it and call it "conservativeMode". That's
+  // how its called in Error Prone as well.
   private static boolean isAggressiveMode(VisitorState state) {
     return state
         .errorProneOptions()

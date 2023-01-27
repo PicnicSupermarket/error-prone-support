@@ -61,7 +61,7 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
   }
 
   private static String getDataProviderName(ExpressionTree expressionTree) {
-    return (String) ((LiteralTree) expressionTree).getValue();
+    return ((LiteralTree) expressionTree).getValue().toString();
   }
 
   private static Optional<SuggestedFix> fixValueFactory(

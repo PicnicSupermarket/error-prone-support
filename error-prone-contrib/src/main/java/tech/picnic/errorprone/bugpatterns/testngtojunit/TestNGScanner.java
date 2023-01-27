@@ -1,8 +1,8 @@
 package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGUtil.TESTNG_ANNOTATION;
-import static tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGUtil.VALUE_FACTORY_METHOD;
+import static tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMatchers.TESTNG_ANNOTATION;
+import static tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMatchers.TESTNG_VALUE_FACTORY_METHOD;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.VisitorState;
@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  * collect data required for the migration from each class in the compilation unit. <br>
  * This data can be retrieved using {@link #buildMetaDataTree()}.
  */
-public class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata> {
+public final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata> {
   private final VisitorState state;
   private final ImmutableMap.Builder<ClassTree, TestNGMetadata> metadataBuilder =
       ImmutableMap.builder();
@@ -46,7 +46,7 @@ public class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata> {
       return super.visitMethod(tree, testNGMetadata);
     }
 
-    if (VALUE_FACTORY_METHOD.matches(tree, state)) {
+    if (TESTNG_VALUE_FACTORY_METHOD.matches(tree, state)) {
       testNGMetadata.addDataProvider(tree);
       return super.visitMethod(tree, testNGMetadata);
     }
