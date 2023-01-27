@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.7.1-SNAPSHOT</version>
+    <version>0.8.0</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -48,7 +48,7 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:PicnicSupermarket/error-prone-support.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v0.8.0</tag>
         <url>https://github.com/PicnicSupermarket/error-prone-support</url>
     </scm>
     <issueManagement>
@@ -711,7 +711,7 @@
                                     <module name="InvalidJavadocPosition" />
                                     <module name="JavadocBlockTagLocation" />
                                     <module name="JavadocStyle">
-                                        <property name="checkEmptyJavadoc" value="true"/>
+                                        <property name="checkEmptyJavadoc" value="true" />
                                     </module>
                                     <module name="LocalVariableName" />
                                     <module name="MatchXpath">
