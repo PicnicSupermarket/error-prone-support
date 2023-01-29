@@ -26,6 +26,7 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.util.Position;
+import java.util.Optional;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
@@ -70,16 +71,16 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
 
     description.addFix(SuggestedFixes.addSuppressWarnings(state, "ImplicitBlockingFluxOperation"));
     if (ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)) {
-      description.addFix(
-          trySuggestFix("com.google.common.collect.ImmutableList.toImmutableList", tree, state));
+      trySuggestFix("com.google.common.collect.ImmutableList.toImmutableList", tree, state)
+          .ifPresent(description::addFix);
     }
-    description.addFix(
-        trySuggestFix("java.util.stream.Collectors.toUnmodifiableList", tree, state));
+    trySuggestFix("java.util.stream.Collectors.toUnmodifiableList", tree, state)
+        .ifPresent(description::addFix);
 
     return description.build();
   }
 
-  private static SuggestedFix trySuggestFix(
+  private static Optional<SuggestedFix> trySuggestFix(
       String fullyQualifiedMethodInvocation, MethodInvocationTree tree, VisitorState state) {
     SuggestedFix.Builder fix = SuggestedFix.builder();
     String replacement =
@@ -90,27 +91,27 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
 
   // XXX: Assumes that the generated `collect(...)` expression will evaluate to
   // `Mono<Collection<?>>`
-  private static SuggestedFix replaceMethodInvocationWithCollect(
+  private static Optional<SuggestedFix> replaceMethodInvocationWithCollect(
       MethodInvocationTree tree,
       String collectArgument,
       SuggestedFix additionalFix,
       VisitorState state) {
     String collectMethodInvocation = String.format("collect(%s)", collectArgument);
-    SuggestedFix.Builder fix = replaceMethodInvocation(tree, collectMethodInvocation, state);
-    fix.merge(additionalFix);
-
-    Types types = state.getTypes();
-    String postfix =
-        types.isSubtype(ASTHelpers.getResultType(tree), types.erasure(STREAM.get(state)))
-            ? ".block().stream()"
-            : ".block()";
-    return fix.postfixWith(tree, postfix).build();
+    return replaceMethodInvocation(tree, collectMethodInvocation, state)
+        .map(fix -> fix.merge(additionalFix))
+        .map(
+            fix -> {
+              Types types = state.getTypes();
+              String postfix =
+                  types.isSubtype(ASTHelpers.getResultType(tree), types.erasure(STREAM.get(state)))
+                      ? ".block().stream()"
+                      : ".block()";
+              return fix.postfixWith(tree, postfix);
+            })
+        .map(SuggestedFix.Builder::build);
   }
 
-  // XXX: Assumes that the specified tree is valid, has starting position and contains the matched
-  // method invocation.
-  // XXX: Assumes that the specified tree's end is the matched method invocation's end.
-  private static SuggestedFix.Builder replaceMethodInvocation(
+  private static Optional<SuggestedFix.Builder> replaceMethodInvocation(
       MethodInvocationTree tree, String replacement, VisitorState state) {
     ImmutableList<ErrorProneToken> tokens =
         ErrorProneTokens.getTokens(SourceCode.treeToString(tree, state), state.context);
@@ -125,9 +126,15 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
             .findFirst()
             .map(token -> treeStartPosition + token.pos())
             .orElse(Position.NOPOS);
+
+    if (treeStartPosition == Position.NOPOS || methodInvocationStartPosition == Position.NOPOS) {
+      return Optional.empty();
+    }
+
     int methodInvocationEndPosition = treeStartPosition + tokens.get(tokens.size() - 1).endPos();
 
-    return SuggestedFix.builder()
-        .replace(methodInvocationStartPosition, methodInvocationEndPosition, replacement);
+    return Optional.of(
+        SuggestedFix.builder()
+            .replace(methodInvocationStartPosition, methodInvocationEndPosition, replacement));
   }
 }
