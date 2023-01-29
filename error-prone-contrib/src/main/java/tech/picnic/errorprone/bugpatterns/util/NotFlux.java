@@ -13,6 +13,9 @@ import reactor.core.publisher.Flux;
  * @param <T> has no purpose other than to match the signature of {@link Flux}.
  */
 public final class NotFlux<T> {
+  /** Instantiates a new {@link NotFlux} instance. */
+  public NotFlux() {}
+
   /**
    * mocks {@link Flux#toIterable()}.
    *
