@@ -10,14 +10,19 @@ import static tech.picnic.errorprone.bugpatterns.util.MoreMatchers.hasMetaAnnota
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.errorprone.matchers.AnnotationMatcherUtils;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.MultiMatcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
+import com.sun.tools.javac.code.Type;
+import java.util.Optional;
+import javax.lang.model.type.TypeKind;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -77,5 +82,25 @@ public final class MoreJUnitMatchers {
       @Nullable ExpressionTree tree, String annotatedMethodName) {
     return requireNonNullElse(
         Strings.emptyToNull(ASTHelpers.constValue(tree, String.class)), annotatedMethodName);
+  }
+
+  /**
+   * Extracts the name of the JUnit factory method from a {@link
+   * org.junit.jupiter.params.provider.MethodSource} annotation.
+   *
+   * @param methodSourceAnnotation The {@link org.junit.jupiter.params.provider.MethodSource}
+   *     annotation to extract a method name from.
+   * @return The name of the factory method referred to in the annotation. Alternatively, {@link
+   *     Optional#empty()} if there is more than one.
+   */
+  public static Optional<String> extractSingleFactoryMethodName(
+      AnnotationTree methodSourceAnnotation) {
+    ExpressionTree attributeExpression =
+        ((AssignmentTree) Iterables.getOnlyElement(methodSourceAnnotation.getArguments()))
+            .getExpression();
+    Type attributeType = ASTHelpers.getType(attributeExpression);
+    return attributeType.getKind() == TypeKind.ARRAY
+        ? Optional.empty()
+        : Optional.of(attributeType.stringValue());
   }
 }
