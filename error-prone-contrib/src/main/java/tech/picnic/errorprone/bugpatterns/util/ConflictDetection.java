@@ -10,9 +10,7 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Type;
 import java.util.Optional;
 
-/**
- * A set of helper methods for finding conflicts which would be caused by applying certain fixes.
- */
+/** A set of helper methods for detecting conflicts that would be caused when applying fixes. */
 public final class ConflictDetection {
   private ConflictDetection() {}
 
@@ -25,17 +23,16 @@ public final class ConflictDetection {
    *
    * <ul>
    *   <li>Whether the rename would merely introduce a method overload, rather than clashing with an
-   *       existing method declaration.
-   *   <li>Whether the rename would cause a method in a superclass to be overridden.
+   *       existing method declaration in its class or a supertype.
    *   <li>Whether the rename would in fact clash with a static import. (It could be that a static
    *       import of the same name is only referenced from lexical scopes in which the method under
    *       consideration cannot be referenced directly.)
    * </ul>
    *
-   * @param method The method considered for being renamed.
-   * @param newName The proposed name to assign.
-   * @param state The {@link VisitorState} to use for searching for blockers.
-   * @return A human-readable argument against assigning the proposed name to an existing method, or
+   * @param method The method considered for renaming.
+   * @param newName The newly proposed name for the method.
+   * @param state The {@link VisitorState} to use when searching for blockers.
+   * @return A human-readable argument against assigning the proposed name to the given method, or
    *     {@link Optional#empty()} if no blocker was found.
    */
   public static Optional<String> findMethodRenameBlocker(

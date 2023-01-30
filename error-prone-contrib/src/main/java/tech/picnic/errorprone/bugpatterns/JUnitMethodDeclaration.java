@@ -8,7 +8,6 @@ import static com.google.errorprone.matchers.Matchers.enclosingClass;
 import static com.google.errorprone.matchers.Matchers.hasModifier;
 import static com.google.errorprone.matchers.Matchers.not;
 import static java.util.function.Predicate.not;
-import static tech.picnic.errorprone.bugpatterns.util.ConflictDetection.findMethodRenameBlocker;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.SETUP_OR_TEARDOWN_METHOD;
 import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.TEST_METHOD;
@@ -29,6 +28,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
+import tech.picnic.errorprone.bugpatterns.util.ConflictDetection;
 
 /** A {@link BugChecker} that flags non-canonical JUnit method declarations. */
 // XXX: Consider introducing a class-level check that enforces that test classes:
@@ -85,7 +85,7 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
     tryCanonicalizeMethodName(symbol)
         .ifPresent(
             newName ->
-                findMethodRenameBlocker(symbol, newName, state)
+                ConflictDetection.findMethodRenameBlocker(symbol, newName, state)
                     .ifPresentOrElse(
                         blocker -> reportMethodRenameBlocker(tree, blocker, state),
                         () -> fixBuilder.merge(SuggestedFixes.renameMethod(tree, newName, state))));
