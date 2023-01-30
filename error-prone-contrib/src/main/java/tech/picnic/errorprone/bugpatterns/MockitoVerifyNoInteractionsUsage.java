@@ -48,6 +48,9 @@ public final class MockitoVerifyNoInteractionsUsage extends BugChecker
   private static final Matcher<ExpressionTree> VERIFY_NO_INTERACTIONS =
       staticMethod().onClass("org.mockito.Mockito").named("verifyNoInteractions");
 
+  /** Instantiates a new {@link MockitoVerifyNoInteractionsUsage} instance. */
+  public MockitoVerifyNoInteractionsUsage() {}
+
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
     if (!TEST_METHOD.matches(tree, state)) {
