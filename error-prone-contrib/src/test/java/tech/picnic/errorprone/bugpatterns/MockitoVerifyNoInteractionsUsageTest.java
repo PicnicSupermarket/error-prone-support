@@ -72,6 +72,13 @@ final class MockitoVerifyNoInteractionsUsageTest {
             "    assertThat(str).isEqualTo(\"test\");",
             "    verifyNoInteractions(mock5);",
             "  }",
+            "",
+            "  void testNonTestMethod() {",
+            "    Object mock1 = mock(Object.class);",
+            "    Object mock2 = mock(Object.class);",
+            "    verifyNoInteractions(mock1);",
+            "    verifyNoInteractions(mock2);",
+            "  }",
             "}")
         .addSourceLines(
             "B.java",
@@ -151,6 +158,13 @@ final class MockitoVerifyNoInteractionsUsageTest {
             "    Mockito.verifyNoInteractions(mock4);",
             "    assertThat(str).isEqualTo(\"test\");",
             "    verifyNoInteractions(mock5);",
+            "  }",
+            "",
+            "  void testNonTestMethod() {",
+            "    Object mock1 = mock(Object.class);",
+            "    Object mock2 = mock(Object.class);",
+            "    Mockito.verifyNoInteractions(mock1);",
+            "    Mockito.verifyNoInteractions(mock2);",
             "  }",
             "}")
         .doTest();
