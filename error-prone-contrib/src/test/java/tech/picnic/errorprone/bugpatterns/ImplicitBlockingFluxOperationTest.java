@@ -42,8 +42,7 @@ final class ImplicitBlockingFluxOperationTest {
   void identificationWithoutGuavaOnClasspath() {
     CompilationTestHelper.newInstance(ImplicitBlockingFluxOperation.class, getClass())
         .withClasspath(Publisher.class, CorePublisher.class, Flux.class)
-        .expectErrorMessage(
-            "X", not(containsPattern("toImmutableList")))
+        .expectErrorMessage("X", not(containsPattern("toImmutableList")))
         .addSourceLines(
             "A.java",
             "import reactor.core.publisher.Flux;",
