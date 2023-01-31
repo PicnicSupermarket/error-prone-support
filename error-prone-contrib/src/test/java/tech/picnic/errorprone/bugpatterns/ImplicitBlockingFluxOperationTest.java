@@ -1,5 +1,8 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.base.Predicates.containsPattern;
+import static com.google.common.base.Predicates.not;
+
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
@@ -39,15 +42,17 @@ final class ImplicitBlockingFluxOperationTest {
   void identificationWithoutGuavaOnClasspath() {
     CompilationTestHelper.newInstance(ImplicitBlockingFluxOperation.class, getClass())
         .withClasspath(Publisher.class, CorePublisher.class, Flux.class)
+        .expectErrorMessage(
+            "X", not(containsPattern("toImmutableList")))
         .addSourceLines(
             "A.java",
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
             "  void m() {",
-            "    // BUG: Diagnostic contains:",
+            "    // BUG: Diagnostic matches: X",
             "    Flux.just(1).toIterable();",
-            "    // BUG: Diagnostic contains:",
+            "    // BUG: Diagnostic matches: X",
             "    Flux.just(2).toStream();",
             "  }",
             "}")
