@@ -1,13 +1,14 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 
 final class NotFluxTest {
-  @SuppressWarnings("UnusedVariable")
   @Test
   void signature() {
     NotFlux<?> notFlux = new NotFlux<>();
-    var unusedIterable = notFlux.toIterable();
-    var unusedStream = notFlux.toStream();
+    assertThat(notFlux.toIterable()).isNotNull();
+    assertThat(notFlux.toStream()).isNotNull();
   }
 }
