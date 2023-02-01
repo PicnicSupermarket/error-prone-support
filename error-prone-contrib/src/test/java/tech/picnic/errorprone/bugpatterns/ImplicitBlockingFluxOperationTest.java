@@ -18,6 +18,8 @@ final class ImplicitBlockingFluxOperationTest {
     CompilationTestHelper.newInstance(ImplicitBlockingFluxOperation.class, getClass())
         .addSourceLines(
             "A.java",
+            "import com.google.common.collect.ImmutableList;",
+            "import java.util.stream.Stream;",
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
