@@ -89,25 +89,20 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
     return replaceMethodInvocationWithCollect(tree, replacement + "()", fix.build(), state);
   }
 
-  // XXX: Assumes that the generated `collect(...)` expression will evaluate to
-  // `Mono<Collection<?>>`
   private static Optional<SuggestedFix> replaceMethodInvocationWithCollect(
       MethodInvocationTree tree,
       String collectArgument,
       SuggestedFix additionalFix,
       VisitorState state) {
     String collectMethodInvocation = String.format("collect(%s)", collectArgument);
+    Types types = state.getTypes();
+    String postFix =
+        types.isSubtype(ASTHelpers.getResultType(tree), types.erasure(STREAM.get(state)))
+            ? ".block().stream()"
+            : ".block()";
     return replaceMethodInvocation(tree, collectMethodInvocation, state)
         .map(fix -> fix.merge(additionalFix))
-        .map(
-            fix -> {
-              Types types = state.getTypes();
-              String postfix =
-                  types.isSubtype(ASTHelpers.getResultType(tree), types.erasure(STREAM.get(state)))
-                      ? ".block().stream()"
-                      : ".block()";
-              return fix.postfixWith(tree, postfix);
-            })
+        .map(fix -> fix.postfixWith(tree, postFix))
         .map(SuggestedFix.Builder::build);
   }
 

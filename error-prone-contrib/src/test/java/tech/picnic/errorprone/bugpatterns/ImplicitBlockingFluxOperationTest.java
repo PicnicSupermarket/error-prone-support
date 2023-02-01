@@ -19,7 +19,6 @@ final class ImplicitBlockingFluxOperationTest {
         .addSourceLines(
             "A.java",
             "import reactor.core.publisher.Flux;",
-            "import tech.picnic.errorprone.bugpatterns.util.NotFlux;",
             "",
             "class A {",
             "  void m() {",
@@ -31,8 +30,18 @@ final class ImplicitBlockingFluxOperationTest {
             "    long count = Flux.just(3).toStream().count();",
             "",
             "    Flux.just(3).toStream(16);",
-            "    new NotFlux().toIterable();",
-            "    new NotFlux().toStream();",
+            "    new Foo().toIterable();",
+            "    new Foo().toStream();",
+            "  }",
+            "",
+            "  public final class Foo<T> {",
+            "    public Iterable<T> toIterable() {",
+            "      return ImmutableList.of();",
+            "    }",
+            "",
+            "    public Stream<T> toStream() {",
+            "      return Stream.empty();",
+            "    }",
             "  }",
             "}")
         .doTest();
