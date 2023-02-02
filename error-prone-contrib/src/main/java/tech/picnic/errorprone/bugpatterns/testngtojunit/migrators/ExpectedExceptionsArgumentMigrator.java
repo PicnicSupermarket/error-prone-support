@@ -6,33 +6,37 @@ import static com.sun.source.tree.Tree.Kind.NEW_ARRAY;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.ArgumentMigrator;
+import org.testng.annotations.Test;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMetadata;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMigrationContext;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
-public class ExpectedExceptionsArgumentMigrator implements ArgumentMigrator {
+/** An {@link Migrator} that migrates the {@link Test#expectedExceptions()} argument. */
+@Immutable
+public class ExpectedExceptionsArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       TestNGMigrationContext context,
       MethodTree methodTree,
-      ExpressionTree content,
+      ExpressionTree argumentValue,
       VisitorState state) {
 
-    String expectedException = getExpectedException(content, state).orElseThrow();
+    String expectedException = getExpectedException(argumentValue, state).orElseThrow();
     SuggestedFix.Builder fix =
         SuggestedFix.builder()
             .replace(
                 methodTree.getBody(),
                 buildWrappedBody(methodTree.getBody(), expectedException, state));
 
-    ImmutableList<String> removedExceptions = getRemovedExceptions(content, state);
+    ImmutableList<String> removedExceptions = getRemovedExceptions(argumentValue, state);
     if (!removedExceptions.isEmpty()) {
       fix.prefixWith(
           methodTree,
@@ -45,8 +49,9 @@ public class ExpectedExceptionsArgumentMigrator implements ArgumentMigrator {
   }
 
   @Override
-  public boolean canFix(TestNGMigrationContext context, TestNGMetadata.Annotation annotation) {
-    return annotation.getArgumentNames().contains("expectedExceptions");
+  public boolean canFix(
+      TestNGMigrationContext context, TestNGMetadata.AnnotationMetadata annotationMetadata) {
+    return annotationMetadata.getArguments().containsKey("expectedExceptions");
   }
 
   private static Optional<String> getExpectedException(

@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
+import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -13,94 +14,100 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * POJO containing data collected using {@link TestNGScanner} for use in {@link
+ * TestNGJUnitMigration}.
+ */
 public final class TestNGMetadata {
   private final ClassTree classTree;
-  private TestNGMetadata.Annotation classLevelAnnotation;
-  private final Map<MethodTree, Annotation> methodAnnotations = new HashMap<>();
-  private final List<DataProvider> dataProviders = new ArrayList<>();
+  private AnnotationMetadata classLevelAnnotationMetadata;
+  private final Map<MethodTree, AnnotationMetadata> methodAnnotations = new HashMap<>();
+  private final List<DataProviderMetadata> dataProviderMetadata = new ArrayList<>();
 
-  public TestNGMetadata(ClassTree classTree) {
+  TestNGMetadata(ClassTree classTree) {
     this.classTree = classTree;
   }
 
-  public ImmutableSet<Annotation> getAnnotations() {
+  ImmutableSet<AnnotationMetadata> getAnnotations() {
     return ImmutableSet.copyOf(methodAnnotations.values());
   }
 
-  public Optional<Annotation> getAnnotation(MethodTree methodTree) {
+  Optional<AnnotationMetadata> getAnnotation(MethodTree methodTree) {
     return Optional.ofNullable(methodAnnotations.get(methodTree));
   }
 
-  public void addTestAnnotation(MethodTree methodTree, Annotation annotation) {
-    methodAnnotations.put(methodTree, annotation);
+  void addTestAnnotation(MethodTree methodTree, AnnotationMetadata annotationMetadata) {
+    methodAnnotations.put(methodTree, annotationMetadata);
   }
 
-  public void setClassLevelAnnotation(Annotation classLevelAnnotation) {
-    this.classLevelAnnotation = classLevelAnnotation;
+  void setClassLevelAnnotation(AnnotationMetadata classLevelAnnotationMetadata) {
+    this.classLevelAnnotationMetadata = classLevelAnnotationMetadata;
   }
 
-  public Optional<Annotation> getClassLevelAnnotation() {
-    return Optional.ofNullable(classLevelAnnotation);
+  Optional<AnnotationMetadata> getClassLevelAnnotation() {
+    return Optional.ofNullable(classLevelAnnotationMetadata);
   }
 
-  public ClassTree getClassTree() {
+  ClassTree getClassTree() {
     return classTree;
   }
 
-  public void addDataProvider(MethodTree methodTree) {
-    dataProviders.add(new DataProvider(methodTree));
+  void addDataProvider(MethodTree methodTree) {
+    dataProviderMetadata.add(DataProviderMetadata.create(methodTree));
   }
 
-  public ImmutableList<DataProvider> getDataProviders() {
-    return ImmutableList.copyOf(dataProviders);
+  ImmutableList<DataProviderMetadata> getDataProviders() {
+    return ImmutableList.copyOf(dataProviderMetadata);
   }
 
-  // XXX: Hmm not sure if `Annotation` is the ideal name for this. It might be rather confusing IMO.
-  // Now it's not clear this is our own object and what it actual does? Now it's used with
-  // `TestNGMetaData.Annotation` however it should also be clear without having to prefix it with
-  // the qualifier. Maybe adding the `MetaData` suffix to this would clarify a lot (also for
-  // `DataProvider` class).
-  // XXX: It would be nice to also use `@AutoValue` for this. This is kind of the "default" for
-  // creating POJO's in EPS. For other examples, see the PR that is open that is about introducing
-  // `documentation-support`.
-  public static class Annotation {
-    private final AnnotationTree annotationTree;
-    private final ImmutableMap<String, ExpressionTree> arguments;
+  /**
+   * POJO containing data for a specific {@link org.testng.annotations.Test} annotation for use in
+   * {@link TestNGJUnitMigration}.
+   */
+  @AutoValue
+  public abstract static class AnnotationMetadata {
+    abstract AnnotationTree getAnnotationTree();
 
-    public Annotation(
+    /**
+     * A mapping for all arguments in the annotation to their value.
+     *
+     * @return an {@link ImmutableMap} mapping each annotation argument to their respective value.
+     */
+    public abstract ImmutableMap<String, ExpressionTree> getArguments();
+
+    /**
+     * Instantiate a new {@link AnnotationMetadata}.
+     *
+     * @param annotationTree the annotation tree
+     * @param arguments the arguments in that annotation tree
+     * @return the new {@link AnnotationMetadata} instance
+     */
+    public static AnnotationMetadata create(
         AnnotationTree annotationTree, ImmutableMap<String, ExpressionTree> arguments) {
-      this.annotationTree = annotationTree;
-      this.arguments = arguments;
-    }
-
-    public AnnotationTree getAnnotationTree() {
-      return annotationTree;
-    }
-
-    public ImmutableMap<String, ExpressionTree> getArguments() {
-      return arguments;
-    }
-
-    public ImmutableSet<String> getArgumentNames() {
-      return arguments.keySet();
+      return new AutoValue_TestNGMetadata_AnnotationMetadata(annotationTree, arguments);
     }
   }
 
-  public static class DataProvider {
-    private final MethodTree methodTree;
-    private final String name;
+  /**
+   * POJO containing data for a specific {@link org.testng.annotations.DataProvider} annotation for
+   * use in {@link TestNGJUnitMigration}.
+   */
+  @AutoValue
+  public abstract static class DataProviderMetadata {
 
-    public DataProvider(MethodTree methodTree) {
-      this.methodTree = methodTree;
-      this.name = methodTree.getName().toString();
-    }
+    abstract MethodTree getMethodTree();
 
-    public MethodTree getMethodTree() {
-      return methodTree;
-    }
+    abstract String getName();
 
-    public String getName() {
-      return name;
+    /**
+     * Instantiate a new {@link DataProviderMetadata} instance.
+     *
+     * @param methodTree the value factory method tree
+     * @return a new {@link DataProviderMetadata} instance
+     */
+    public static DataProviderMetadata create(MethodTree methodTree) {
+      return new AutoValue_TestNGMetadata_DataProviderMetadata(
+          methodTree, methodTree.getName().toString());
     }
   }
 }

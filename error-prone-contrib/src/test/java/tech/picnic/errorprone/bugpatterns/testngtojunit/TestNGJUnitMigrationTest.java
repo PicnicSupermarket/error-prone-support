@@ -20,6 +20,8 @@ final class TestNGJUnitMigrationTest {
             "public class A {",
             "  public void classLevelAnnotation() {}",
             "",
+            "  private void notATest() {}",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Test(description = \"bar\")",
             "  public void methodAnnotation() {}",
@@ -58,7 +60,7 @@ final class TestNGJUnitMigrationTest {
   @Test
   void identificationConservativeMode() {
     CompilationTestHelper.newInstance(TestNGJUnitMigration.class, getClass())
-        .setArgs("-XepOpt:ErrorProneSupport:AggressiveTestNGJUnitMigration=false")
+        .setArgs("-XepOpt:TestNGJUnitMigration:ConservativeMode=true")
         .addSourceLines(
             "A.java",
             "import java.util.stream.Stream;",

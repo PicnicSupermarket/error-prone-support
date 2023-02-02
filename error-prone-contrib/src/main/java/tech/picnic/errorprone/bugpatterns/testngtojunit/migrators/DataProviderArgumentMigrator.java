@@ -7,6 +7,7 @@ import static java.util.stream.Collectors.toMap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ErrorProneToken;
@@ -22,21 +23,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.ArgumentMigrator;
+import org.testng.annotations.Test;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMetadata;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMigrationContext;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMigrationContext.MigrationState;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
-public class DataProviderArgumentMigrator implements ArgumentMigrator {
+/** An {@link Migrator} that migrates the {@link Test#dataProvider()} argument. */
+@Immutable
+public class DataProviderArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       TestNGMigrationContext context,
       MethodTree methodTree,
-      ExpressionTree content,
+      ExpressionTree argumentValue,
       VisitorState state) {
-    String dataProviderName = getDataProviderName(content);
-    MigrationState migrationState = context.getDataProviderMigrationState(dataProviderName);
+    String dataProviderName = getDataProviderName(argumentValue);
+    MigrationState migrationState =
+        context
+            .getMigratedDataProviders()
+            .getOrDefault(dataProviderName, MigrationState.NOT_MIGRATED);
     checkState(
         migrationState != MigrationState.CANNOT_MIGRATE,
         "Tried migrating DataProvider that cannot be migrated!");
@@ -49,9 +56,14 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
   }
 
   @Override
-  public boolean canFix(TestNGMigrationContext context, TestNGMetadata.Annotation annotation) {
-    String dataProviderName = getDataProviderName(annotation.getArguments().get("dataProvider"));
-    MigrationState migrationState = context.getDataProviderMigrationState(dataProviderName);
+  public boolean canFix(
+      TestNGMigrationContext context, TestNGMetadata.AnnotationMetadata annotationMetadata) {
+    String dataProviderName =
+        getDataProviderName(annotationMetadata.getArguments().get("dataProvider"));
+    MigrationState migrationState =
+        context
+            .getMigratedDataProviders()
+            .getOrDefault(dataProviderName, MigrationState.NOT_MIGRATED);
     MethodTree methodTree =
         getDataProviderMethodTree(context.getClassTree(), dataProviderName).orElseThrow();
     Optional<ReturnTree> returnTree = getReturnTree(methodTree);
@@ -71,7 +83,7 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
 
     MigrationState migrationState =
         dataProviderMigration.isPresent() ? MigrationState.MIGRATED : MigrationState.CANNOT_MIGRATE;
-    context.setDataProviderMigrationState(dataProviderName, migrationState);
+    context.getMigratedDataProviders().put(dataProviderName, migrationState);
 
     return dataProviderMigration;
   }

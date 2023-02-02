@@ -1,21 +1,25 @@
 package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators;
 
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.ArgumentMigrator;
+import org.testng.annotations.Test;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMetadata;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMigrationContext;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
-public class DescriptionArgumentMigrator implements ArgumentMigrator {
+/** An {@link Migrator} that migrates the {@link Test#description()} argument. */
+@Immutable
+public class DescriptionArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       TestNGMigrationContext context,
       MethodTree methodTree,
-      ExpressionTree content,
+      ExpressionTree argumentValue,
       VisitorState state) {
     return Optional.of(
         SuggestedFix.builder()
@@ -23,12 +27,14 @@ public class DescriptionArgumentMigrator implements ArgumentMigrator {
             .merge(
                 SuggestedFix.prefixWith(
                     methodTree,
-                    String.format("@DisplayName(%s)\n", SourceCode.treeToString(content, state))))
+                    String.format(
+                        "@DisplayName(%s)\n", SourceCode.treeToString(argumentValue, state))))
             .build());
   }
 
   @Override
-  public boolean canFix(TestNGMigrationContext context, TestNGMetadata.Annotation annotation) {
-    return annotation.getArguments().containsKey("description");
+  public boolean canFix(
+      TestNGMigrationContext context, TestNGMetadata.AnnotationMetadata annotationMetadata) {
+    return annotationMetadata.getArguments().containsKey("description");
   }
 }
