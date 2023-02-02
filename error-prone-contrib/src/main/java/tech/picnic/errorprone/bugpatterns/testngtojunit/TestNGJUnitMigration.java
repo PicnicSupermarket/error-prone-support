@@ -9,6 +9,7 @@ import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.BugPattern;
+import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
@@ -21,9 +22,20 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import org.testng.annotations.Test;
 
-// XXX: Also here and other places. Try to add more Javadocs :D.
+/**
+ * A {@link BugChecker} that migrates TestNG unit tests to JUnit 5.
+ *
+ * <p>Supported TestNG annotation arguments are:
+ *
+ * <ul>
+ *   <li>{@link Test#dataProvider()}
+ *   <li>{@link Test#description()}
+ *   <li>{@link Test#expectedExceptions()}
+ *   <li>{@link Test#priority()}
+ * </ul>
+ */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Migrate TestNG tests to JUnit",
@@ -32,16 +44,32 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     severity = ERROR)
 public final class TestNGJUnitMigration extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final String ENABLE_AGGRESSIVE_MIGRATION_MODE_FLAG =
-      "ErrorProneSupport:AggressiveTestNGJUnitMigration";
+  private static final String CONSERVATIVE_MIGRATION_MODE_FLAG =
+      "TestNGJUnitMigration:ConservativeMode";
+  private final boolean conservativeMode;
 
-  public TestNGJUnitMigration() {}
+  /**
+   * Instantiates a new {@link TestNGJUnitMigration} instance. This will default to aggressive
+   * migration mode.
+   */
+  public TestNGJUnitMigration() {
+    this(ErrorProneFlags.empty());
+  }
+
+  /**
+   * Instantiates a new {@link TestNGJUnitMigration} with the specified {@link ErrorProneFlags}.
+   *
+   * @param flags the error-prone flags used to set the migration mode
+   */
+  public TestNGJUnitMigration(ErrorProneFlags flags) {
+    this.conservativeMode = flags.getBoolean(CONSERVATIVE_MIGRATION_MODE_FLAG).orElse(false);
+  }
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     TestNGScanner scanner = new TestNGScanner(state);
     scanner.scan(tree, null);
-    ImmutableMap<ClassTree, TestNGMetadata> classMetaData = scanner.buildMetaDataTree();
+    ImmutableMap<ClassTree, TestNGMetadata> classMetaData = scanner.buildMetaDataForEachClassTree();
 
     new TreeScanner<@Nullable Void, TestNGMetadata>() {
       @Override
@@ -58,10 +86,10 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       @Override
       public @Nullable Void visitMethod(MethodTree tree, TestNGMetadata metaData) {
         TestNGMigrationContext context =
-            new TestNGMigrationContext(isAggressiveMode(state), metaData.getClassTree());
+            TestNGMigrationContext.create(conservativeMode, metaData.getClassTree());
 
         /* Make sure ALL tests in the class can be migrated. */
-        if (!context.isAggressiveMigration()
+        if (context.isConservativeMode()
             && !metaData.getAnnotations().stream()
                 .allMatch(annotation -> canMigrateTest(context, annotation))) {
           return super.visitMethod(tree, metaData);
@@ -73,8 +101,12 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
             .ifPresent(
                 annotation -> {
                   SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
+
+                  // migrate arguments
                   buildArgumentFixes(context, annotation, tree, state).forEach(fixBuilder::merge);
-                  fixBuilder.merge(buildAnnotationFixes(annotation, tree, state));
+
+                  // @Test annotation fix
+                  fixBuilder.merge(buildAnnotationFixes(annotation, tree));
 
                   state.reportMatch(
                       describeMatch(annotation.getAnnotationTree(), fixBuilder.build()));
@@ -89,10 +121,10 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
 
   private static ImmutableList<SuggestedFix> buildArgumentFixes(
       TestNGMigrationContext context,
-      TestNGMetadata.Annotation annotation,
+      TestNGMetadata.AnnotationMetadata annotationMetadata,
       MethodTree methodTree,
       VisitorState state) {
-    return annotation.getArguments().entrySet().stream()
+    return annotationMetadata.getArguments().entrySet().stream()
         .flatMap(
             entry ->
                 trySuggestFix(context, methodTree, entry.getKey(), entry.getValue(), state)
@@ -101,33 +133,34 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   }
 
   private static SuggestedFix buildAnnotationFixes(
-      TestNGMetadata.Annotation annotation, MethodTree methodTree, VisitorState state) {
+      TestNGMetadata.AnnotationMetadata annotationMetadata, MethodTree methodTree) {
     SuggestedFix.Builder builder =
-        SuggestedFix.builder().merge(SuggestedFix.delete(annotation.getAnnotationTree()));
-    if (annotation.getArgumentNames().contains("dataProvider")) {
-      String dataProviderName =
-          SourceCode.treeToString(annotation.getArguments().get("dataProvider"), state);
-      builder
-          .addImport("org.junit.jupiter.params.ParameterizedTest")
-          .addImport("org.junit.jupiter.params.provider.MethodSource")
-          .merge(
-              SuggestedFix.prefixWith(
-                  methodTree, "@ParameterizedTest\n  @MethodSource(" + dataProviderName + ")\n"));
-    } else {
+        SuggestedFix.builder().merge(SuggestedFix.delete(annotationMetadata.getAnnotationTree()));
+    if (!annotationMetadata.getArguments().containsKey("dataProvider")) {
       builder
           .addImport("org.junit.jupiter.api.Test")
           .merge(SuggestedFix.prefixWith(methodTree, "@Test\n"));
+      //      String dataProviderName =
+      //          SourceCode.treeToString(annotationMetadata.getArguments().get("dataProvider"),
+      // state);
+      //      builder
+      //          .addImport("org.junit.jupiter.params.ParameterizedTest")
+      //          .addImport("org.junit.jupiter.params.provider.MethodSource")
+      //          .merge(
+      //              SuggestedFix.prefixWith(
+      //                  methodTree, "@ParameterizedTest\n  @MethodSource(" + dataProviderName +
+      // ")\n"));
     }
 
     return builder.build();
   }
 
   private static boolean canMigrateTest(
-      TestNGMigrationContext context, TestNGMetadata.Annotation annotation) {
-    return annotation.getArgumentNames().stream()
+      TestNGMigrationContext context, TestNGMetadata.AnnotationMetadata annotationMetadata) {
+    return annotationMetadata.getArguments().keySet().stream()
         .map(SupportedArgumentKind::fromString)
         .flatMap(Optional::stream)
-        .allMatch(kind -> kind.getArgumentMigrator().canFix(context, annotation));
+        .allMatch(kind -> kind.getArgumentMigrator().canFix(context, annotationMetadata));
   }
 
   private static Optional<SuggestedFix> trySuggestFix(
@@ -139,16 +172,5 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
     return SupportedArgumentKind.fromString(argumentName)
         .map(SupportedArgumentKind::getArgumentMigrator)
         .flatMap(fixer -> fixer.createFix(context, methodTree, argumentContent, state));
-  }
-
-  // XXX: This should happen in the constructor just like `RequestParamType`.
-  // XXX: Nit: instead of "aggressiveMode" I would flip it and call it "conservativeMode". That's
-  // how its called in Error Prone as well.
-  private static boolean isAggressiveMode(VisitorState state) {
-    return state
-        .errorProneOptions()
-        .getFlags()
-        .getBoolean(ENABLE_AGGRESSIVE_MIGRATION_MODE_FLAG)
-        .orElse(true);
   }
 }

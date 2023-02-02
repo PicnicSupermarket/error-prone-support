@@ -1,7 +1,7 @@
 package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMatchers.TESTNG_ANNOTATION;
+import static tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMatchers.TESTNG_TEST_ANNOTATION;
 import static tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMatchers.TESTNG_VALUE_FACTORY_METHOD;
 
 import com.google.common.collect.ImmutableMap;
@@ -19,14 +19,14 @@ import org.jspecify.annotations.Nullable;
 /**
  * A {@link TreeScanner} which will scan a {@link com.sun.source.tree.CompilationUnitTree} and
  * collect data required for the migration from each class in the compilation unit. <br>
- * This data can be retrieved using {@link #buildMetaDataTree()}.
+ * This data can be retrieved using {@link #buildMetaDataForEachClassTree()}.
  */
-public final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata> {
+final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata> {
   private final VisitorState state;
   private final ImmutableMap.Builder<ClassTree, TestNGMetadata> metadataBuilder =
       ImmutableMap.builder();
 
-  public TestNGScanner(VisitorState state) {
+  TestNGScanner(VisitorState state) {
     this.state = state;
   }
 
@@ -51,33 +51,27 @@ public final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetad
       return super.visitMethod(tree, testNGMetadata);
     }
 
-    // XXX: Do we need the `orElse(null)`? We can probably use the `Optional` API right?
-    TestNGMetadata.Annotation annotation =
-        getTestNGAnnotation(tree, state)
-            .orElse(testNGMetadata.getClassLevelAnnotation().orElse(null));
-    if (annotation == null) {
-      return super.visitMethod(tree, testNGMetadata);
-    }
-    testNGMetadata.addTestAnnotation(tree, annotation);
+    getTestNGAnnotation(tree, state)
+        .or(testNGMetadata::getClassLevelAnnotation)
+        .ifPresent(annotation -> testNGMetadata.addTestAnnotation(tree, annotation));
+
     return super.visitMethod(tree, testNGMetadata);
   }
 
-  public ImmutableMap<ClassTree, TestNGMetadata> buildMetaDataTree() {
+  public ImmutableMap<ClassTree, TestNGMetadata> buildMetaDataForEachClassTree() {
     return metadataBuilder.build();
   }
-  // XXX: `Tree` suffix is not that clear here. is it from `classtree` or that we are building a
-  // tree?
 
-  private static Optional<TestNGMetadata.Annotation> getTestNGAnnotation(
+  private static Optional<TestNGMetadata.AnnotationMetadata> getTestNGAnnotation(
       Tree tree, VisitorState state) {
     // XXX: I think there is a method to get a specific annotation from a tree. Not sure if that is
     // usable here though.
     return ASTHelpers.getAnnotations(tree).stream()
-        .filter(annotation -> TESTNG_ANNOTATION.matches(annotation, state))
+        .filter(annotation -> TESTNG_TEST_ANNOTATION.matches(annotation, state))
         .findFirst()
         .map(
             annotationTree ->
-                new TestNGMetadata.Annotation(
+                TestNGMetadata.AnnotationMetadata.create(
                     annotationTree,
                     annotationTree.getArguments().stream()
                         .filter(AssignmentTree.class::isInstance)

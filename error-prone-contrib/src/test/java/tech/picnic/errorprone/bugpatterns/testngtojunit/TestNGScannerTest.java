@@ -86,7 +86,8 @@ final class TestNGScannerTest {
     public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
       TestNGScanner scanner = new TestNGScanner(state);
       scanner.scan(tree, null);
-      ImmutableMap<ClassTree, TestNGMetadata> classMetaData = scanner.buildMetaDataTree();
+      ImmutableMap<ClassTree, TestNGMetadata> classMetaData =
+          scanner.buildMetaDataForEachClassTree();
 
       classMetaData.forEach(
           (classTree, metaData) -> {
@@ -133,11 +134,13 @@ final class TestNGScannerTest {
     }
 
     private static String createAnnotationDiagnosticMessage(
-        ClassTree classTree, TestNGMetadata.Annotation annotation, VisitorState state) {
+        ClassTree classTree,
+        TestNGMetadata.AnnotationMetadata annotationMetadata,
+        VisitorState state) {
       return String.format(
           "class: %s arguments: { %s }",
           classTree.getSimpleName(),
-          annotation.getArguments().entrySet().stream()
+          annotationMetadata.getArguments().entrySet().stream()
               .map(
                   entry ->
                       String.join(
