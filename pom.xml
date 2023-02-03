@@ -913,7 +913,6 @@
                                 <version>${version.maven}</version>
                             </requireMavenVersion>
                             <requirePluginVersions />
-                            <requireSameVersionsReactor />
                             <requireUpperBoundDeps>
                                 <excludes>
                                     <!-- XXX:
