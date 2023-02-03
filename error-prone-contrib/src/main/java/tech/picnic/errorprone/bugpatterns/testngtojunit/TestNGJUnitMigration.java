@@ -23,6 +23,7 @@ import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.testng.annotations.Test;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.AnnotationMigrator;
 
 /**
  * A {@link BugChecker} that migrates TestNG unit tests to JUnit 5.
@@ -106,7 +107,10 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
                   buildArgumentFixes(context, annotation, tree, state).forEach(fixBuilder::merge);
 
                   // @Test annotation fix
-                  fixBuilder.merge(buildAnnotationFixes(annotation, tree));
+                  //                  fixBuilder.merge(buildAnnotationFixes(annotation, tree));
+                  new AnnotationMigrator()
+                      .createFix(context, tree, annotation, state)
+                      .ifPresent(fixBuilder::merge);
 
                   state.reportMatch(
                       describeMatch(annotation.getAnnotationTree(), fixBuilder.build()));

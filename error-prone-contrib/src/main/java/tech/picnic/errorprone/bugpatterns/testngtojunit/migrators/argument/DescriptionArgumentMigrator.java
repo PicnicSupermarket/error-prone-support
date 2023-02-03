@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators;
+package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument;
 
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
@@ -7,14 +7,15 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
 import org.testng.annotations.Test;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.ArgumentMigrator;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMetadata;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMigrationContext;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
-/** An {@link Migrator} that migrates the {@link Test#priority()} argument. */
+/** An {@link Migrator} that migrates the {@link Test#description()} argument. */
 @Immutable
-public class PriorityArgumentMigrator implements Migrator {
+public class DescriptionArgumentMigrator implements ArgumentMigrator {
   @Override
   public Optional<SuggestedFix> createFix(
       TestNGMigrationContext context,
@@ -23,23 +24,18 @@ public class PriorityArgumentMigrator implements Migrator {
       VisitorState state) {
     return Optional.of(
         SuggestedFix.builder()
-            .addImport("org.junit.jupiter.api.Order")
-            .addImport("org.junit.jupiter.api.TestMethodOrder")
-            .addImport("org.junit.jupiter.api.MethodOrderer")
+            .addImport("org.junit.jupiter.api.DisplayName")
             .merge(
                 SuggestedFix.prefixWith(
                     methodTree,
-                    String.format("@Order(%s)\n", SourceCode.treeToString(argumentValue, state))))
-            .merge(
-                SuggestedFix.prefixWith(
-                    context.getClassTree(),
-                    "@TestMethodOrder(MethodOrderer.OrderAnnotation.class)\n"))
+                    String.format(
+                        "@DisplayName(%s)\n", SourceCode.treeToString(argumentValue, state))))
             .build());
   }
 
   @Override
   public boolean canFix(
       TestNGMigrationContext context, TestNGMetadata.AnnotationMetadata annotationMetadata) {
-    return annotationMetadata.getArguments().containsKey("priority");
+    return annotationMetadata.getArguments().containsKey("description");
   }
 }

@@ -3,10 +3,10 @@ package tech.picnic.errorprone.bugpatterns.testngtojunit;
 import static java.util.Arrays.stream;
 
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.DataProviderArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.DescriptionArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.ExpectedExceptionsArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.PriorityArgumentMigrator;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument.DataProviderArgumentMigrator;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument.DescriptionArgumentMigrator;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument.ExpectedExceptionsArgumentMigrator;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument.PriorityArgumentMigrator;
 
 /** The annotation argument kinds that are supported by the TestNG -> JUnit migration. */
 enum SupportedArgumentKind {
@@ -17,14 +17,14 @@ enum SupportedArgumentKind {
 
   private final String name;
 
-  private final Migrator argumentMigrator;
+  private final ArgumentMigrator argumentMigrator;
 
-  SupportedArgumentKind(String name, Migrator argumentMigrator) {
+  SupportedArgumentKind(String name, ArgumentMigrator argumentMigrator) {
     this.name = name;
     this.argumentMigrator = argumentMigrator;
   }
 
-  Migrator getArgumentMigrator() {
+  ArgumentMigrator getArgumentMigrator() {
     return argumentMigrator;
   }
 

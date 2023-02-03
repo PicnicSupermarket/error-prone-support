@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators;
+package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.sun.source.tree.Tree.Kind.NEW_ARRAY;
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.testng.annotations.Test;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.ArgumentMigrator;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMetadata;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMigrationContext;
@@ -32,7 +33,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** An {@link Migrator} that migrates the {@link Test#dataProvider()} argument. */
 @Immutable
-public class DataProviderArgumentMigrator implements Migrator {
+public class DataProviderArgumentMigrator implements ArgumentMigrator {
   @Override
   public Optional<SuggestedFix> createFix(
       TestNGMigrationContext context,
