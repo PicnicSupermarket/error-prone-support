@@ -28,29 +28,19 @@ import java.util.Optional;
  * {@link org.testng.annotations.Test} annotation to JUnit.
  */
 @Immutable
-public interface Migrator {
+public interface Migrator<T> {
   /**
    * Attempt to create a fix for a specific annotation.
    *
    * @param context the context of the current migration
    * @param methodTree the method tree the annotation is on
-   * @param argumentValue the value of annotation argument
+   * @param dataValue the value of annotation argument
    * @param state the visitor state
    * @return an {@link Optional} containing the created fix.
    */
   Optional<SuggestedFix> createFix(
       TestNGMigrationContext context,
       MethodTree methodTree,
-      ExpressionTree argumentValue,
+      T dataValue,
       VisitorState state);
-
-  /**
-   * Get whether the specified annotation can be migrated.
-   *
-   * @param context the context of the current migration
-   * @param annotationMetadata the annotation to check
-   * @return {@code true} if the annotation argument can be migrated or else {@code false}
-   */
-  boolean canFix(
-      TestNGMigrationContext context, TestNGMetadata.AnnotationMetadata annotationMetadata);
 }
