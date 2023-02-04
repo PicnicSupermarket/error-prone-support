@@ -10,8 +10,8 @@
 
     <artifactId>documentation-support</artifactId>
 
-    <name>Picnic :: Error Prone Support :: Documentation Generation</name>
-    <description>Extracts data to generate the documentation.</description>
+    <name>Picnic :: Error Prone Support :: Documentation Support</name>
+    <description>Data extraction support for the purpose of documentation generation.</description>
 
     <dependencies>
         <dependency>

@@ -22,8 +22,8 @@ import java.nio.file.Paths;
 import javax.tools.JavaFileObject;
 
 /**
- * A {@link TaskListener} that identifies and extracts relevant content for documentation and writes
- * it to disk.
+ * A {@link TaskListener} that identifies and extracts relevant content for documentation generation
+ * and writes it to disk.
  */
 final class DocumentationGeneratorTaskListener implements TaskListener {
   private static final ObjectMapper OBJECT_MAPPER =
@@ -77,8 +77,7 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   private <T> void writeToFile(String identifier, String className, T data) {
     File file = docsPath.resolve(String.format("%s-%s.json", identifier, className)).toFile();
 
-    // XXX: Document why `append=true`, or use `new FileWriter(file, UTF_8)` instead.
-    try (FileWriter fileWriter = new FileWriter(file, UTF_8, /* append= */ true)) {
+    try (FileWriter fileWriter = new FileWriter(file, UTF_8)) {
       OBJECT_MAPPER.writeValue(fileWriter, data);
     } catch (IOException e) {
       throw new UncheckedIOException(String.format("Cannot write to file '%s'", file.getPath()), e);

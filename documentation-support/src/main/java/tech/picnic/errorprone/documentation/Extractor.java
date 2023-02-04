@@ -27,7 +27,7 @@ interface Extractor<T> {
    * ClassTree}.
    *
    * @param tree The {@link ClassTree} of interest.
-   * @return {@code true} iff documentation extraction is supported.
+   * @return {@code true} iff data extraction is supported.
    */
   boolean canExtract(ClassTree tree);
 }

@@ -239,7 +239,7 @@
                         </annotationProcessorPaths>
                         <compilerArgs combine.children="append">
                             <arg>-Xplugin:RefasterRuleCompiler</arg>
-                            <arg>-Xplugin:DocumentationGenerator -XdocsOutputDirectory=${project.build.directory}</arg>
+                            <arg>-Xplugin:DocumentationGenerator -XoutputDirectory=${project.build.directory}/docs</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>

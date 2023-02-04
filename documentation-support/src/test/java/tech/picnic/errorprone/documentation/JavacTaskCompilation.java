@@ -15,9 +15,9 @@ import javax.tools.JavaFileObject;
 public final class JavacTaskCompilation {
   private JavacTaskCompilation() {}
 
-  public static void compile(Path path, String fileName, String... lines) {
+  public static void compile(Path outputDirectory, String fileName, String... lines) {
     performCompilationForFile(
-        path.toAbsolutePath().toString(), FileObjects.forSourceLines(fileName, lines));
+        outputDirectory.toAbsolutePath().toString(), FileObjects.forSourceLines(fileName, lines));
   }
 
   public static void compile(String outputDirectory, String fileName, String... lines) {
@@ -35,7 +35,7 @@ public final class JavacTaskCompilation {
                 javacFileManager,
                 null,
                 ImmutableList.of(
-                    "-Xplugin:DocumentationGenerator -XdocsOutputDirectory=" + outputDirectory),
+                    "-Xplugin:DocumentationGenerator -XoutputDirectory=" + outputDirectory),
                 ImmutableList.of(),
                 ImmutableList.of(javaFileObject));
 

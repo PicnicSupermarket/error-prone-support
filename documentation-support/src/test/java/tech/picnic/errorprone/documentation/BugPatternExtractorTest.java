@@ -4,7 +4,6 @@ import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static tech.picnic.errorprone.documentation.DocumentationGenerator.DOCS_DIRECTORY;
 
 import com.google.common.io.Resources;
 import com.google.errorprone.BugPattern;
@@ -17,36 +16,26 @@ import com.sun.source.tree.ClassTree;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 final class BugPatternExtractorTest {
-  private Path outputPath;
-
-  @BeforeEach
-  void setUp(@TempDir Path directory) {
-    outputPath = directory.resolve("pkg");
-  }
-
   @Test
-  void noJsonExpected() {
+  void noBugPattern(@TempDir Path outputDirectory) {
     JavacTaskCompilation.compile(
-        outputPath,
+        outputDirectory,
         "TestCheckerWithoutAnnotation.java",
-        "package pkg;",
-        "",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "",
         "public final class TestCheckerWithoutAnnotation extends BugChecker {}");
 
-    assertThat(outputPath.resolve(DOCS_DIRECTORY).toAbsolutePath()).isEmptyDirectory();
+    assertThat(outputDirectory.toAbsolutePath()).isEmptyDirectory();
   }
 
   @Test
-  void minimalBugPattern() throws IOException {
+  void minimalBugPattern(@TempDir Path outputDirectory) throws IOException {
     JavacTaskCompilation.compile(
-        outputPath,
+        outputDirectory,
         "MinimalBugChecker.java",
         "package pkg;",
         "",
@@ -57,14 +46,16 @@ final class BugPatternExtractorTest {
         "@BugPattern(summary = \"MinimalBugChecker summary\", severity = SeverityLevel.ERROR)",
         "public final class MinimalBugChecker extends BugChecker {}");
 
-    assertThat(readFile("bugpattern-MinimalBugChecker.json"))
-        .isEqualToIgnoringWhitespace(getResource("bugpattern-documentation-minimal.json"));
+    verifyFileMatchesResource(
+        outputDirectory,
+        "bugpattern-MinimalBugChecker.json",
+        "bugpattern-documentation-minimal.json");
   }
 
   @Test
-  void completeBugPattern() throws IOException {
+  void completeBugPattern(@TempDir Path outputDirectory) throws IOException {
     JavacTaskCompilation.compile(
-        outputPath,
+        outputDirectory,
         "CompleteBugChecker.java",
         "package pkg;",
         "",
@@ -86,14 +77,16 @@ final class BugPatternExtractorTest {
         "    suppressionAnnotations = {BugPattern.class, Test.class})",
         "public final class CompleteBugChecker extends BugChecker {}");
 
-    assertThat(readFile("bugpattern-CompleteBugChecker.json"))
-        .isEqualToIgnoringWhitespace(getResource("bugpattern-documentation-complete.json"));
+    verifyFileMatchesResource(
+        outputDirectory,
+        "bugpattern-CompleteBugChecker.json",
+        "bugpattern-documentation-complete.json");
   }
 
   @Test
-  void undocumentedSuppressionBugPattern() throws IOException {
+  void undocumentedSuppressionBugPattern(@TempDir Path outputDirectory) throws IOException {
     JavacTaskCompilation.compile(
-        outputPath,
+        outputDirectory,
         "UndocumentedSuppressionBugPattern.java",
         "package pkg;",
         "",
@@ -107,9 +100,10 @@ final class BugPatternExtractorTest {
         "    documentSuppression = false)",
         "public final class UndocumentedSuppressionBugPattern extends BugChecker {}");
 
-    assertThat(readFile("bugpattern-UndocumentedSuppressionBugPattern.json"))
-        .isEqualToIgnoringWhitespace(
-            getResource("bugpattern-documentation-undocumented-suppression.json"));
+    verifyFileMatchesResource(
+        outputDirectory,
+        "bugpattern-UndocumentedSuppressionBugPattern.json",
+        "bugpattern-documentation-undocumented-suppression.json");
   }
 
   @Test
@@ -143,12 +137,15 @@ final class BugPatternExtractorTest {
     }
   }
 
-  private String readFile(String fileName) throws IOException {
-    return Files.readString(outputPath.resolve(DOCS_DIRECTORY).resolve(fileName));
+  private static void verifyFileMatchesResource(
+      Path outputDirectory, String fileName, String resourceName) throws IOException {
+    assertThat(Files.readString(outputDirectory.resolve(fileName)))
+        .isEqualToIgnoringWhitespace(getResource(resourceName));
   }
 
   // XXX: Once we support only JDK 15+, drop this method in favour of including the resources as
-  // text blocks in this class.
+  // text blocks in this class. (This also requires renaming the `verifyFileMatchesResource`
+  // method.)
   private static String getResource(String resourceName) throws IOException {
     return Resources.toString(
         Resources.getResource(BugPatternExtractorTest.class, resourceName), UTF_8);

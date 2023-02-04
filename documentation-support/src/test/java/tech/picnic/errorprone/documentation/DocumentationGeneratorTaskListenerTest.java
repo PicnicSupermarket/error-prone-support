@@ -2,12 +2,9 @@ package tech.picnic.errorprone.documentation;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.nio.file.attribute.AclEntryPermission.ADD_SUBDIRECTORY;
-import static java.nio.file.attribute.AclEntryPermission.APPEND_DATA;
-import static java.nio.file.attribute.AclEntryPermission.WRITE_DATA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
-import static tech.picnic.errorprone.documentation.DocumentationGenerator.DOCS_DIRECTORY;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -35,38 +32,35 @@ final class DocumentationGeneratorTaskListenerTest {
   @EnabledOnOs(WINDOWS)
   @Test
   void readOnlyFileSystemWindows(@TempDir Path directory) throws IOException {
-    Path testPath = Files.createDirectory(directory.resolve("test"));
-    AclFileAttributeView view = Files.getFileAttributeView(testPath, AclFileAttributeView.class);
+    AclFileAttributeView view = Files.getFileAttributeView(directory, AclFileAttributeView.class);
     view.setAcl(
         view.getAcl().stream()
             .map(
                 entry ->
                     AclEntry.newBuilder(entry)
                         .setPermissions(
-                            Sets.difference(
-                                entry.permissions(),
-                                ImmutableSet.of(WRITE_DATA, APPEND_DATA, ADD_SUBDIRECTORY)))
+                            Sets.difference(entry.permissions(), ImmutableSet.of(ADD_SUBDIRECTORY)))
                         .build())
             .collect(toImmutableList()));
 
-    readOnlyFileSystemFailsToWrite(testPath);
+    readOnlyFileSystemFailsToWrite(directory.resolve("nonexistent"));
   }
 
   @DisabledOnOs(WINDOWS)
   @Test
-  void readOnlyFileSystemOtherOperatingSystems(@TempDir Path directory) throws IOException {
-    Path testPath = Files.createDirectory(directory.resolve("test"));
-    testPath.toFile().setWritable(false);
+  void readOnlyFileSystemOtherOperatingSystems(@TempDir Path directory) {
+    assertThat(directory.toFile().setWritable(false))
+        .describedAs("Failed to make test directory unwritable")
+        .isTrue();
 
-    readOnlyFileSystemFailsToWrite(testPath);
+    readOnlyFileSystemFailsToWrite(directory.resolve("nonexistent"));
   }
 
   private static void readOnlyFileSystemFailsToWrite(Path testPath) {
     assertThatThrownBy(() -> JavacTaskCompilation.compile(testPath, "A.java", "public class A {}"))
         .hasRootCauseInstanceOf(FileSystemException.class)
         .hasCauseInstanceOf(IllegalStateException.class)
-        .hasMessageEndingWith(
-            "Error while creating directory with path '%s'", testPath.resolve(DOCS_DIRECTORY));
+        .hasMessageEndingWith("Error while creating directory with path '%s'", testPath);
   }
 
   @Test
@@ -92,7 +86,7 @@ final class DocumentationGeneratorTaskListenerTest {
     assertThatThrownBy(
             () ->
                 JavacTaskCompilation.compile(
-                    outputPath + " -XdocsOutputDirectory=arg2", "A.java", "package pkg;"))
+                    outputPath + " -XoutputDirectory=arg2", "A.java", "package pkg;"))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("Precisely one path must be provided");
   }
@@ -115,8 +109,7 @@ final class DocumentationGeneratorTaskListenerTest {
                 null,
                 null,
                 null,
-                ImmutableList.of(
-                    "-Xplugin:DocumentationGenerator -XdocsOutputDirectory=" + outputPath),
+                ImmutableList.of("-Xplugin:DocumentationGenerator -XoutputDirectory=" + outputPath),
                 ImmutableList.of(),
                 ImmutableList.of(javaFileObject));
 

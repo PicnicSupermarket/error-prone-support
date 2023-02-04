@@ -19,7 +19,9 @@ import com.sun.tools.javac.util.Context;
 import javax.lang.model.element.AnnotationValue;
 import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocumentation;
 
-/** A {@link Extractor} that describes how to extract data from a {@code BugChecker}. */
+/**
+ * An {@link Extractor} that describes how to extract data from a {@code @BugPattern} annotation.
+ */
 @Immutable
 final class BugPatternExtractor implements Extractor<BugPatternDocumentation> {
   @Override
@@ -47,8 +49,8 @@ final class BugPatternExtractor implements Extractor<BugPatternDocumentation> {
   }
 
   /**
-   * Returns the fully-qualified class names of specified by the {@link BugPattern} annotation
-   * located on the given tree.
+   * Returns the fully-qualified class names of suppression annotations specified by the {@link
+   * BugPattern} annotation located on the given tree.
    *
    * @implNote This method cannot simply invoke {@link BugPattern#suppressionAnnotations()}, as that
    *     will yield an "Attempt to access Class objects for TypeMirrors" exception.
