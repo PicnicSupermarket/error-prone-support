@@ -322,6 +322,11 @@
                 <artifactId>junit</artifactId>
                 <version>4.13.2</version>
             </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>1.12.22</version>
+            </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
             developers build the project using the latest Maven release. -->
@@ -895,7 +900,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.1</version>
                     <configuration>
                         <fail>false</fail>
                         <rules>
@@ -913,7 +918,6 @@
                                 <version>${version.maven}</version>
                             </requireMavenVersion>
                             <requirePluginVersions />
-                            <requireSameVersionsReactor />
                             <requireUpperBoundDeps>
                                 <excludes>
                                     <!-- XXX:
