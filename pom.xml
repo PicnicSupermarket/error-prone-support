@@ -904,8 +904,37 @@
                     <configuration>
                         <fail>false</fail>
                         <rules>
+                            <banCircularDependencies />
+                            <banDependencyManagementScope />
+                            <banDuplicateClasses>
+                                <dependencies>
+                                    <dependency>
+                                        <groupId>org.checkerframework</groupId>
+                                        <artifactId>dataflow-errorprone</artifactId>
+                                        <!-- This package is contained in
+                                        Checker Framework's `checker-qual` and
+                                        `dataflow-errorprone` modules. Error
+                                        Prone requires the latter, while Guava
+                                        pulls in the former. Since the package
+                                        contains mostly annotations, this is
+                                        not expected to cause trouble in
+                                        practice. -->
+                                        <ignoreClasses>
+                                            <ignoreClass>org.checkerframework.dataflow.qual.*</ignoreClass>
+                                        </ignoreClasses>
+                                    </dependency>
+                                </dependencies>
+                                <findAllDuplicates>true</findAllDuplicates>
+                            </banDuplicateClasses>
                             <banDuplicatePomDependencyVersions />
+                            <!-- XXX: Enable this rule once it no longer
+                            "downloads the internet". See
+                            https://issues.apache.org/jira/browse/MENFORCER-467.
+                            <banDynamicVersions />-->
                             <dependencyConvergence />
+                            <enforceBytecodeVersion>
+                                <maxJdkVersion>${version.jdk}</maxJdkVersion>
+                            </enforceBytecodeVersion>
                             <requireEncoding>
                                 <acceptAsciiSubset>true</acceptAsciiSubset>
                                 <encoding>ISO-8859-1</encoding>
@@ -917,6 +946,7 @@
                             <requireMavenVersion>
                                 <version>${version.maven}</version>
                             </requireMavenVersion>
+                            <requireNoRepositories />
                             <requirePluginVersions />
                             <requireUpperBoundDeps>
                                 <excludes>
@@ -1339,6 +1369,30 @@
             <build>
                 <pluginManagement>
                     <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-enforcer-plugin</artifactId>
+                            <configuration>
+                                <rules>
+                                    <banDuplicateClasses>
+                                        <!-- The original
+                                        `error_prone_annotations` dependency
+                                        contains the same classes as those
+                                        provided by the corresponding Picnic
+                                        Error Prone fork artifact. -->
+                                        <dependencies combine.children="append">
+                                            <dependency>
+                                                <groupId>com.google.errorprone</groupId>
+                                                <artifactId>error_prone_annotations</artifactId>
+                                                <ignoreClasses>
+                                                    <ignoreClass>*</ignoreClass>
+                                                </ignoreClasses>
+                                            </dependency>
+                                        </dependencies>
+                                    </banDuplicateClasses>
+                                </rules>
+                            </configuration>
+                        </plugin>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-surefire-plugin</artifactId>
