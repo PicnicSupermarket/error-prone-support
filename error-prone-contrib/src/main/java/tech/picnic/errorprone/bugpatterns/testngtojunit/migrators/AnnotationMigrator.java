@@ -12,7 +12,6 @@ public class AnnotationMigrator implements Migrator<TestNGMetadata.AnnotationMet
 
   @Override
   public Optional<SuggestedFix> createFix(
-      TestNGMigrationContext context,
       MethodTree methodTree,
       TestNGMetadata.AnnotationMetadata dataValue,
       VisitorState state) {
