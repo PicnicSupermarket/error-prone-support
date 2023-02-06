@@ -9,6 +9,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.BlockTree;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
@@ -25,19 +26,16 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public class ExpectedExceptionsArgumentMigrator implements ArgumentMigrator {
   @Override
   public Optional<SuggestedFix> createFix(
-      TestNGMigrationContext context,
-      MethodTree methodTree,
-      ExpressionTree argumentValue,
-      VisitorState state) {
+      ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
 
-    String expectedException = getExpectedException(argumentValue, state).orElseThrow();
+    String expectedException = getExpectedException(dataValue, state).orElseThrow();
     SuggestedFix.Builder fix =
         SuggestedFix.builder()
             .replace(
                 methodTree.getBody(),
                 buildWrappedBody(methodTree.getBody(), expectedException, state));
 
-    ImmutableList<String> removedExceptions = getRemovedExceptions(argumentValue, state);
+    ImmutableList<String> removedExceptions = getRemovedExceptions(dataValue, state);
     if (!removedExceptions.isEmpty()) {
       fix.prefixWith(
           methodTree,
@@ -51,8 +49,11 @@ public class ExpectedExceptionsArgumentMigrator implements ArgumentMigrator {
 
   @Override
   public boolean canFix(
-      TestNGMigrationContext context, TestNGMetadata.AnnotationMetadata annotationMetadata) {
-    return annotationMetadata.getArguments().containsKey("expectedExceptions");
+      TestNGMetadata metadata,
+      TestNGMetadata.AnnotationMetadata annotation,
+      MethodTree methodTree,
+      VisitorState state) {
+    return annotation.getArguments().containsKey("expectedExceptions");
   }
 
   private static Optional<String> getExpectedException(

@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
@@ -16,12 +17,10 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 /** An {@link Migrator} that migrates the {@link Test#priority()} argument. */
 @Immutable
 public class PriorityArgumentMigrator implements ArgumentMigrator {
+
   @Override
   public Optional<SuggestedFix> createFix(
-      TestNGMigrationContext context,
-      MethodTree methodTree,
-      ExpressionTree argumentValue,
-      VisitorState state) {
+      ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
     return Optional.of(
         SuggestedFix.builder()
             .addImport("org.junit.jupiter.api.Order")
@@ -30,17 +29,19 @@ public class PriorityArgumentMigrator implements ArgumentMigrator {
             .merge(
                 SuggestedFix.prefixWith(
                     methodTree,
-                    String.format("@Order(%s)\n", SourceCode.treeToString(argumentValue, state))))
+                    String.format("@Order(%s)\n", SourceCode.treeToString(dataValue, state))))
             .merge(
                 SuggestedFix.prefixWith(
-                    context.getClassTree(),
-                    "@TestMethodOrder(MethodOrderer.OrderAnnotation.class)\n"))
+                    classTree, "@TestMethodOrder(MethodOrderer.OrderAnnotation.class)\n"))
             .build());
   }
 
   @Override
   public boolean canFix(
-      TestNGMigrationContext context, TestNGMetadata.AnnotationMetadata annotationMetadata) {
-    return annotationMetadata.getArguments().containsKey("priority");
+      TestNGMetadata metadata,
+      TestNGMetadata.AnnotationMetadata annotation,
+      MethodTree methodTree,
+      VisitorState state) {
+    return annotation.getArguments().containsKey("priority");
   }
 }
