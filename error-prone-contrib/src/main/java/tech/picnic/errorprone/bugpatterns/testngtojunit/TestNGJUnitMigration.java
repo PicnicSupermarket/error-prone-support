@@ -92,24 +92,30 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
         /* Make sure ALL tests in the class can be migrated. */
         if (context.isConservativeMode()
             && !metaData.getAnnotations().stream()
-                .allMatch(annotation -> canMigrateTest(context, annotation))) {
+                .allMatch(
+                    annotation ->
+                        canMigrateTest(
+                            metaData.getClassTree(), tree, metaData, annotation, state))) {
           return super.visitMethod(tree, metaData);
         }
 
         metaData
             .getAnnotation(tree)
-            .filter(annotation -> canMigrateTest(context, annotation))
+            .filter(
+                annotation ->
+                    canMigrateTest(metaData.getClassTree(), tree, metaData, annotation, state))
             .ifPresent(
                 annotation -> {
                   SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
 
                   // migrate arguments
-                  buildArgumentFixes(context, annotation, tree, state).forEach(fixBuilder::merge);
+                  buildArgumentFixes(metaData.getClassTree(), annotation, tree, state)
+                      .forEach(fixBuilder::merge);
 
                   // @Test annotation fix
                   //                  fixBuilder.merge(buildAnnotationFixes(annotation, tree));
                   new AnnotationMigrator()
-                      .createFix(context, tree, annotation, state)
+                      .createFix(metaData.getClassTree(), tree, annotation, state)
                       .ifPresent(fixBuilder::merge);
 
                   state.reportMatch(
@@ -124,14 +130,14 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   }
 
   private static ImmutableList<SuggestedFix> buildArgumentFixes(
-      TestNGMigrationContext context,
+      ClassTree classTree,
       TestNGMetadata.AnnotationMetadata annotationMetadata,
       MethodTree methodTree,
       VisitorState state) {
     return annotationMetadata.getArguments().entrySet().stream()
         .flatMap(
             entry ->
-                trySuggestFix(context, methodTree, entry.getKey(), entry.getValue(), state)
+                trySuggestFix(classTree, methodTree, entry.getKey(), entry.getValue(), state)
                     .stream())
         .collect(toImmutableList());
   }
@@ -160,21 +166,27 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   }
 
   private static boolean canMigrateTest(
-      TestNGMigrationContext context, TestNGMetadata.AnnotationMetadata annotationMetadata) {
+      ClassTree classTree,
+      MethodTree methodTree,
+      TestNGMetadata metadata,
+      TestNGMetadata.AnnotationMetadata annotationMetadata,
+      VisitorState state) {
     return annotationMetadata.getArguments().keySet().stream()
         .map(SupportedArgumentKind::fromString)
         .flatMap(Optional::stream)
-        .allMatch(kind -> kind.getArgumentMigrator().canFix(context, annotationMetadata));
+        .allMatch(
+            kind ->
+                kind.getArgumentMigrator().canFix(metadata, annotationMetadata, methodTree, state));
   }
 
   private static Optional<SuggestedFix> trySuggestFix(
-      TestNGMigrationContext context,
+      ClassTree classTree,
       MethodTree methodTree,
       String argumentName,
       ExpressionTree argumentContent,
       VisitorState state) {
     return SupportedArgumentKind.fromString(argumentName)
         .map(SupportedArgumentKind::getArgumentMigrator)
-        .flatMap(fixer -> fixer.createFix(context, methodTree, argumentContent, state));
+        .flatMap(fixer -> fixer.createFix(classTree, methodTree, argumentContent, state));
   }
 }

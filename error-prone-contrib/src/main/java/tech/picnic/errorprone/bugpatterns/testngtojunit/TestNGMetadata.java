@@ -1,63 +1,87 @@
 package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
  * POJO containing data collected using {@link TestNGScanner} for use in {@link
  * TestNGJUnitMigration}.
  */
-public final class TestNGMetadata {
-  private final ClassTree classTree;
-  private AnnotationMetadata classLevelAnnotationMetadata;
-  private final Map<MethodTree, AnnotationMetadata> methodAnnotations = new HashMap<>();
-  private final List<DataProviderMetadata> dataProviderMetadata = new ArrayList<>();
+@AutoValue
+public abstract class TestNGMetadata {
+  abstract ClassTree getClassTree();
 
-  TestNGMetadata(ClassTree classTree) {
-    this.classTree = classTree;
+  abstract AnnotationMetadata getClassLevelAnnotationMetadata();
+
+  abstract ImmutableMap<MethodTree, AnnotationMetadata> getMethodAnnotations();
+
+  /**
+   * Get the {@link org.testng.annotations.DataProvider}s that are able to migratable.
+   *
+   * @return an {@link ImmutableMap} mapping the name of the data provider to it's respective
+   *     metadata.
+   */
+  public abstract ImmutableMap<String, DataProviderMetadata> getDataProviderMetadata();
+
+  static Builder builder() {
+    return new AutoValue_TestNGMetadata.Builder();
+  }
+
+  @AutoValue.Builder
+  abstract static class Builder {
+    private final ImmutableMap.Builder<MethodTree, AnnotationMetadata> methodAnnotationsBuilder =
+        new ImmutableMap.Builder<>();
+
+    private final ImmutableMap.Builder<String, DataProviderMetadata> dataProviderMetadataBuilder =
+        new ImmutableMap.Builder<>();
+
+    abstract Builder setClassTree(ClassTree value);
+
+    abstract AnnotationMetadata getClassLevelAnnotationMetadata();
+
+    Optional<AnnotationMetadata> getOptClassLevelAnnotationMetadata() {
+      try {
+        return Optional.of(getClassLevelAnnotationMetadata());
+      } catch (IllegalStateException ignored) {
+        return Optional.empty();
+      }
+    }
+
+    abstract Builder setClassLevelAnnotationMetadata(AnnotationMetadata value);
+
+    abstract Builder setMethodAnnotations(ImmutableMap<MethodTree, AnnotationMetadata> value);
+
+    ImmutableMap.Builder<MethodTree, AnnotationMetadata> methodAnnotationsBuilder() {
+      return methodAnnotationsBuilder;
+    }
+
+    abstract Builder setDataProviderMetadata(ImmutableMap<String, DataProviderMetadata> value);
+
+    ImmutableMap.Builder<String, DataProviderMetadata> dataProviderMetadataBuilder() {
+      return dataProviderMetadataBuilder;
+    }
+
+    abstract TestNGMetadata autoBuild();
+
+    TestNGMetadata build() {
+      setMethodAnnotations(methodAnnotationsBuilder.build());
+      setDataProviderMetadata(dataProviderMetadataBuilder.build());
+      return autoBuild();
+    }
   }
 
   ImmutableSet<AnnotationMetadata> getAnnotations() {
-    return ImmutableSet.copyOf(methodAnnotations.values());
+    return ImmutableSet.copyOf(getMethodAnnotations().values());
   }
 
   Optional<AnnotationMetadata> getAnnotation(MethodTree methodTree) {
-    return Optional.ofNullable(methodAnnotations.get(methodTree));
-  }
-
-  void addTestAnnotation(MethodTree methodTree, AnnotationMetadata annotationMetadata) {
-    methodAnnotations.put(methodTree, annotationMetadata);
-  }
-
-  void setClassLevelAnnotation(AnnotationMetadata classLevelAnnotationMetadata) {
-    this.classLevelAnnotationMetadata = classLevelAnnotationMetadata;
-  }
-
-  Optional<AnnotationMetadata> getClassLevelAnnotation() {
-    return Optional.ofNullable(classLevelAnnotationMetadata);
-  }
-
-  ClassTree getClassTree() {
-    return classTree;
-  }
-
-  void addDataProvider(MethodTree methodTree) {
-    dataProviderMetadata.add(DataProviderMetadata.create(methodTree));
-  }
-
-  ImmutableList<DataProviderMetadata> getDataProviders() {
-    return ImmutableList.copyOf(dataProviderMetadata);
+    return Optional.ofNullable(getMethodAnnotations().get(methodTree));
   }
 
   /**

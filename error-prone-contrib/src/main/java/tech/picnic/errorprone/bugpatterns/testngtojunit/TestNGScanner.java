@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  * collect data required for the migration from each class in the compilation unit. <br>
  * This data can be retrieved using {@link #buildMetaDataForEachClassTree()}.
  */
-final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata> {
+final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Builder> {
   private final VisitorState state;
   private final ImmutableMap.Builder<ClassTree, TestNGMetadata> metadataBuilder =
       ImmutableMap.builder();
@@ -31,31 +31,34 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata> {
   }
 
   @Override
-  public @Nullable Void visitClass(ClassTree tree, TestNGMetadata testNGMetadata) {
-    TestNGMetadata meta = new TestNGMetadata(tree);
-    getTestNGAnnotation(tree, state).ifPresent(meta::setClassLevelAnnotation);
-    super.visitClass(tree, meta);
-    metadataBuilder.put(tree, meta);
+  public @Nullable Void visitClass(ClassTree tree, TestNGMetadata.Builder _builder) {
+    TestNGMetadata.Builder builder = TestNGMetadata.builder();
+    builder.setClassTree(tree);
+    getTestNGAnnotation(tree, state).ifPresent(builder::setClassLevelAnnotationMetadata);
+    super.visitClass(tree, builder);
+    metadataBuilder.put(tree, builder.build());
 
     return null;
   }
 
   @Override
-  public @Nullable Void visitMethod(MethodTree tree, TestNGMetadata testNGMetadata) {
+  public @Nullable Void visitMethod(MethodTree tree, TestNGMetadata.Builder builder) {
     if (ASTHelpers.isGeneratedConstructor(tree)) {
-      return super.visitMethod(tree, testNGMetadata);
+      return super.visitMethod(tree, builder);
     }
 
     if (TESTNG_VALUE_FACTORY_METHOD.matches(tree, state)) {
-      testNGMetadata.addDataProvider(tree);
-      return super.visitMethod(tree, testNGMetadata);
+      builder
+          .dataProviderMetadataBuilder()
+          .put(tree.getName().toString(), TestNGMetadata.DataProviderMetadata.create(tree));
+      return super.visitMethod(tree, builder);
     }
 
     getTestNGAnnotation(tree, state)
-        .or(testNGMetadata::getClassLevelAnnotation)
-        .ifPresent(annotation -> testNGMetadata.addTestAnnotation(tree, annotation));
+        .or(builder::getOptClassLevelAnnotationMetadata)
+        .ifPresent(annotation -> builder.methodAnnotationsBuilder().put(tree, annotation));
 
-    return super.visitMethod(tree, testNGMetadata);
+    return super.visitMethod(tree, builder);
   }
 
   public ImmutableMap<ClassTree, TestNGMetadata> buildMetaDataForEachClassTree() {
