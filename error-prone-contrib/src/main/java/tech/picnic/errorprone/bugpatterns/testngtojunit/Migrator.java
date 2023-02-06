@@ -30,17 +30,17 @@ import java.util.Optional;
 @Immutable
 public interface Migrator<T> {
   /**
-   * Attempt to create a fix for a specific annotation.
+   * Attempt to create a {@link SuggestedFix}.
    *
-   * @param context the context of the current migration
    * @param methodTree the method tree the annotation is on
    * @param dataValue the value of annotation argument
    * @param state the visitor state
    * @return an {@link Optional} containing the created fix.
    */
   Optional<SuggestedFix> createFix(
-      TestNGMigrationContext context,
       MethodTree methodTree,
       T dataValue,
       VisitorState state);
+
+  boolean canFix (MethodTree methodTree, T dataValue, VisitorState state);
 }

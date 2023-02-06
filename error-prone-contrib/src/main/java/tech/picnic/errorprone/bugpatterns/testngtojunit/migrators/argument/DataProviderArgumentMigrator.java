@@ -36,7 +36,6 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public class DataProviderArgumentMigrator implements ArgumentMigrator {
   @Override
   public Optional<SuggestedFix> createFix(
-      TestNGMigrationContext context,
       MethodTree methodTree,
       ExpressionTree argumentValue,
       VisitorState state) {
