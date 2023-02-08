@@ -1,0 +1,17 @@
+{
+  "name": "IdentityConversion",
+  "identificationTests": [
+    "public final class A {\n  public void m() {\n    // BUG: Diagnostic contains:\n    Boolean b = Boolean.valueOf(Boolean.FALSE);\n}\n}\n",
+    "public final class B {\n  public void m() {\n    // BUG: Diagnostic contains:\n    Boolean b = Boolean.valueOf(Boolean.FALSE);\n}\n}\n"
+  ],
+  "replacementTests": [
+    {
+      "inputLines": "import com.google.common.collect.ImmutableSet;\n\npublic final class A {\n  public void m() {\n    ImmutableSet<Object> set = ImmutableSet.copyOf(ImmutableSet.of());\n  }\n}\n",
+      "outputLines": "import com.google.common.collect.ImmutableSet;\n\npublic final class A {\n  public void m() {\n    ImmutableSet<Object> set = ImmutableSet.of();\n  }\n}\n"
+    },
+    {
+      "inputLines": "import com.google.common.collect.ImmutableSet;\n\npublic final class B {\n  public void m() {\n    ImmutableSet<Object> set = ImmutableSet.copyOf(ImmutableSet.of());\n  }\n}\n",
+      "outputLines": "import com.google.common.collect.ImmutableSet;\n\npublic final class B {\n  public void m() {\n    ImmutableSet<Object> set = ImmutableSet.of();\n  }\n}\n"
+    }
+  ]
+}

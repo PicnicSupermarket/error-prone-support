@@ -1,0 +1,14 @@
+{
+  "name": "IdentityConversion",
+  "identificationTests": [],
+  "replacementTests": [
+    {
+      "inputLines": "public final class B {}\n",
+      "outputLines": "public final class B {}\n"
+    },
+    {
+      "inputLines": "public final class A {}\n",
+      "outputLines": "public final class A {}\n"
+    }
+  ]
+}
