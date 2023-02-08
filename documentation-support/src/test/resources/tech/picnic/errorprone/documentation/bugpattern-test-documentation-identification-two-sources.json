@@ -1,0 +1,8 @@
+{
+  "name": "IdentityConversion",
+  "identificationTests": [
+    "public final class B {}\n",
+    "public final class A {}\n"
+  ],
+  "replacementTests": []
+}

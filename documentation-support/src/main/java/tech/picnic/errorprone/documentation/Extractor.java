@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.documentation;
 
+import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
 import com.sun.source.tree.ClassTree;
 import com.sun.tools.javac.util.Context;
@@ -27,7 +28,9 @@ interface Extractor<T> {
    * ClassTree}.
    *
    * @param tree The {@link ClassTree} of interest.
+   * @param state A {@link VisitorState} describes the context in which the given {@link ClassTree}
+   *     is found.
    * @return {@code true} iff data extraction is supported.
    */
-  boolean canExtract(ClassTree tree);
+  boolean canExtract(ClassTree tree, VisitorState state);
 }

@@ -146,7 +146,7 @@ final class BugPatternExtractorTest {
           .hasMessage("BugPattern annotation must be present");
 
       return buildDescription(tree)
-          .setMessage(String.format("Can extract: %s", extractor.canExtract(tree)))
+          .setMessage(String.format("Can extract: %s", extractor.canExtract(tree, state)))
           .build();
     }
   }
