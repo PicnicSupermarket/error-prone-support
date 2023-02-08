@@ -12,10 +12,10 @@ import org.reactivestreams.Publisher;
 import reactor.core.CorePublisher;
 import reactor.core.publisher.Flux;
 
-final class ImplicitBlockingFluxOperationTest {
+final class ImplicitBlockingFluxTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(ImplicitBlockingFluxOperation.class, getClass())
+    CompilationTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.google.common.collect.ImmutableList;",
@@ -51,8 +51,8 @@ final class ImplicitBlockingFluxOperationTest {
 
   @Test
   void identificationWithoutGuavaOnClasspath() {
-    CompilationTestHelper.newInstance(ImplicitBlockingFluxOperation.class, getClass())
-        .withClasspath(Publisher.class, CorePublisher.class, Flux.class)
+    CompilationTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
+        .withClasspath(CorePublisher.class, Flux.class, Publisher.class)
         .expectErrorMessage("X", not(containsPattern("toImmutableList")))
         .addSourceLines(
             "A.java",
@@ -71,7 +71,7 @@ final class ImplicitBlockingFluxOperationTest {
 
   @Test
   void replacementFirstSuggestedFix() {
-    BugCheckerRefactoringTestHelper.newInstance(ImplicitBlockingFluxOperation.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
         .addInputLines(
             "A.java",
             "import reactor.core.publisher.Flux;",
@@ -87,7 +87,7 @@ final class ImplicitBlockingFluxOperationTest {
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
-            "  @SuppressWarnings(\"ImplicitBlockingFluxOperation\")",
+            "  @SuppressWarnings(\"ImplicitBlockingFlux\")",
             "  void m() {",
             "    Flux.just(1).toIterable();",
             "    Flux.just(2).toStream();",
@@ -98,7 +98,7 @@ final class ImplicitBlockingFluxOperationTest {
 
   @Test
   void replacementSecondSuggestedFix() {
-    BugCheckerRefactoringTestHelper.newInstance(ImplicitBlockingFluxOperation.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
         .setFixChooser(FixChoosers.SECOND)
         .addInputLines(
             "A.java",
@@ -127,7 +127,7 @@ final class ImplicitBlockingFluxOperationTest {
 
   @Test
   void replacementThirdSuggestedFix() {
-    BugCheckerRefactoringTestHelper.newInstance(ImplicitBlockingFluxOperation.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
         .setFixChooser(FixChoosers.THIRD)
         .addInputLines(
             "A.java",
@@ -142,15 +142,15 @@ final class ImplicitBlockingFluxOperationTest {
             "}")
         .addOutputLines(
             "A.java",
-            "import static java.util.stream.Collectors.toUnmodifiableList;",
+            "import static java.util.stream.Collectors.toList;",
             "",
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
             "  void m() {",
-            "    Flux.just(1).collect(toUnmodifiableList()).block();",
-            "    Flux.just(2).collect(toUnmodifiableList()).block().stream();",
-            "    Flux.just(3).collect(toUnmodifiableList()).block().stream().findAny();",
+            "    Flux.just(1).collect(toList()).block();",
+            "    Flux.just(2).collect(toList()).block().stream();",
+            "    Flux.just(3).collect(toList()).block().stream().findAny();",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);

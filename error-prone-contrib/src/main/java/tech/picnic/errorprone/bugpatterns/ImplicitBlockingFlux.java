@@ -31,25 +31,23 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
 /**
- * A {@link BugChecker} that flags usages of {@link reactor.core.publisher.Flux} methods that are
- * documented to block, but that behaviour is not apparent from their signature.
+ * A {@link BugChecker} that flags {@link reactor.core.publisher.Flux} operators that are implicitly
+ * blocking.
  *
  * <p>The alternatives suggested are explicitly blocking operators, highlighting actual behavior,
  * not adequate for automatic replacements, they need manual review.
+ *
+ * <p>`Flux#toStream` and `Flux#toIterable` are documented to block, but this is not apparent from
+ * the method signature; please make sure that they are used with this in mind.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Accidental blocking of `Flux` with convenience method",
-    explanation =
-        "`Flux#toStream` and `Flux#toIterable` are documented to block, "
-            + "but this is not apparent from the method signature; "
-            + "please make sure that they are used with this in mind",
-    link = BUG_PATTERNS_BASE_URL + "ImplicitBlockingFluxOperation",
+    link = BUG_PATTERNS_BASE_URL + "ImplicitBlockingFlux",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)
-public final class ImplicitBlockingFluxOperation extends BugChecker
-    implements MethodInvocationTreeMatcher {
+public final class ImplicitBlockingFlux extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> FLUX_WITH_IMPLICIT_BLOCK =
       instanceMethod()
@@ -58,8 +56,8 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
           .withNoParameters();
   private static final Supplier<Type> STREAM = Suppliers.typeFromString("java.util.stream.Stream");
 
-  /** Instantiates a new {@link ImplicitBlockingFluxOperation} instance. */
-  public ImplicitBlockingFluxOperation() {}
+  /** Instantiates a new {@link ImplicitBlockingFlux} instance. */
+  public ImplicitBlockingFlux() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
@@ -69,13 +67,12 @@ public final class ImplicitBlockingFluxOperation extends BugChecker
 
     Description.Builder description = buildDescription(tree);
 
-    description.addFix(SuggestedFixes.addSuppressWarnings(state, "ImplicitBlockingFluxOperation"));
+    description.addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()));
     if (ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)) {
       trySuggestFix("com.google.common.collect.ImmutableList.toImmutableList", tree, state)
           .ifPresent(description::addFix);
     }
-    trySuggestFix("java.util.stream.Collectors.toUnmodifiableList", tree, state)
-        .ifPresent(description::addFix);
+    trySuggestFix("java.util.stream.Collectors.toList", tree, state).ifPresent(description::addFix);
 
     return description.build();
   }
