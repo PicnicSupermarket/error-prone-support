@@ -9,6 +9,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.SeverityLevel;
+import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
@@ -44,7 +45,7 @@ final class BugPatternExtractor implements Extractor<BugPatternDocumentation> {
   }
 
   @Override
-  public boolean canExtract(ClassTree tree) {
+  public boolean canExtract(ClassTree tree, VisitorState state) {
     return ASTHelpers.hasDirectAnnotationWithSimpleName(tree, BugPattern.class.getSimpleName());
   }
 

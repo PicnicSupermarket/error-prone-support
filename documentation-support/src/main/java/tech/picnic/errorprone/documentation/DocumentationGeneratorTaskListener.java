@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskEvent.Kind;
@@ -57,7 +58,7 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
       return;
     }
 
-    ExtractorType.findMatchingType(classTree)
+    ExtractorType.findMatchingType(classTree, VisitorState.createForUtilityPurposes(context))
         .ifPresent(
             extractorType ->
                 writeToFile(
