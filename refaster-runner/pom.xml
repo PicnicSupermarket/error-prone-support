@@ -12,6 +12,7 @@
 
     <name>Picnic :: Error Prone Support :: Refaster Runner</name>
     <description>Exposes Refaster rules found on the classpath through a regular Error Prone check.</description>
+    <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
         <dependency>

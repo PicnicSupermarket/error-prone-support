@@ -12,6 +12,7 @@
 
     <name>Picnic :: Error Prone Support :: Contrib</name>
     <description>Extra Error Prone plugins by Picnic.</description>
+    <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
         <dependency>

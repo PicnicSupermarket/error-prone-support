@@ -12,6 +12,7 @@
 
     <name>Picnic :: Error Prone Support :: Refaster Compiler</name>
     <description>A Java compiler plugin that identifies and compiles Refaster rules, storing them as resource files on the classpath.</description>
+    <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
         <dependency>

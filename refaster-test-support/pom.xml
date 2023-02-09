@@ -12,6 +12,7 @@
 
     <name>Picnic :: Error Prone Support :: Refaster Test Support</name>
     <description>Opinionated utilities for the testing of Refaster rules.</description>
+    <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
         <dependency>
