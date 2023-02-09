@@ -2,9 +2,10 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.base.Predicates.containsPattern;
 import static com.google.common.base.Predicates.not;
+import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.SECOND;
+import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.THIRD;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
@@ -99,7 +100,7 @@ final class ImplicitBlockingFluxTest {
   @Test
   void replacementSecondSuggestedFix() {
     BugCheckerRefactoringTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
-        .setFixChooser(FixChoosers.SECOND)
+        .setFixChooser(SECOND)
         .addInputLines(
             "A.java",
             "import reactor.core.publisher.Flux;",
@@ -128,7 +129,7 @@ final class ImplicitBlockingFluxTest {
   @Test
   void replacementThirdSuggestedFix() {
     BugCheckerRefactoringTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
-        .setFixChooser(FixChoosers.THIRD)
+        .setFixChooser(THIRD)
         .addInputLines(
             "A.java",
             "import reactor.core.publisher.Flux;",
