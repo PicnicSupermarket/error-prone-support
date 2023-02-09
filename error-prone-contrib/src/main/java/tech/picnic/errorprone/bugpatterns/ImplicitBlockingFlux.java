@@ -69,26 +69,26 @@ public final class ImplicitBlockingFlux extends BugChecker implements MethodInvo
 
   private static SuggestedFix trySuggestFix(
       String fullyQualifiedMethodInvocation, MethodInvocationTree tree, VisitorState state) {
-    SuggestedFix.Builder fix = SuggestedFix.builder();
+    SuggestedFix.Builder importFix = SuggestedFix.builder();
     String replacement =
-        SuggestedFixes.qualifyStaticImport(fullyQualifiedMethodInvocation, fix, state);
+        SuggestedFixes.qualifyStaticImport(fullyQualifiedMethodInvocation, importFix, state);
 
-    return replaceMethodInvocationWithCollect(tree, replacement + "()", fix.build(), state);
+    return replaceWithExplicitBlock(tree, replacement + "()", importFix.build(), state);
   }
 
-  private static SuggestedFix replaceMethodInvocationWithCollect(
+  private static SuggestedFix replaceWithExplicitBlock(
       MethodInvocationTree tree,
       String collectArgument,
-      SuggestedFix additionalFix,
+      SuggestedFix importFix,
       VisitorState state) {
-    String collectMethodInvocation = String.format("collect(%s)", collectArgument);
+    String collect = String.format("collect(%s)", collectArgument);
     Types types = state.getTypes();
     String explicitBlock =
         types.isSubtype(ASTHelpers.getResultType(tree), types.erasure(STREAM.get(state)))
             ? ".block().stream()"
             : ".block()";
-    return replaceMethodInvocation(tree, collectMethodInvocation, state)
-        .merge(additionalFix)
+    return replaceMethodInvocation(tree, collect, state)
+        .merge(importFix)
         .postfixWith(tree, explicitBlock)
         .build();
   }
