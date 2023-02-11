@@ -24,7 +24,6 @@ import java.nio.file.attribute.AclFileAttributeView;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -46,7 +45,6 @@ final class DocumentationGeneratorTaskListenerTest {
     readOnlyFileSystemFailsToWrite(directory.resolve("nonexistent"));
   }
 
-  @DisabledOnOs(WINDOWS)
   @Test
   void readOnlyFileSystemOtherOperatingSystems(@TempDir Path directory) {
     assertThat(directory.toFile().setWritable(false))
