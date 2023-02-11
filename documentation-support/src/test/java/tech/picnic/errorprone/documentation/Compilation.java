@@ -12,20 +12,22 @@ import javax.tools.JavaFileObject;
 
 // XXX: Generalize and move this class so that it can also be used by `refaster-compiler`.
 // XXX: Add support for this class to the `ErrorProneTestHelperSourceFormat` check.
-public final class JavacTaskCompilation {
-  private JavacTaskCompilation() {}
+public final class Compilation {
+  private Compilation() {}
 
-  public static void compile(Path outputDirectory, String fileName, String... lines) {
-    performCompilationForFile(
-        outputDirectory.toAbsolutePath().toString(), FileObjects.forSourceLines(fileName, lines));
+  public static void compileWithDocumentationGenerator(
+      Path outputDirectory, String fileName, String... lines) {
+    compileWithDocumentationGenerator(outputDirectory.toAbsolutePath().toString(), fileName, lines);
   }
 
-  public static void compile(String outputDirectory, String fileName, String... lines) {
-    performCompilationForFile(outputDirectory, FileObjects.forSourceLines(fileName, lines));
+  public static void compileWithDocumentationGenerator(
+      String outputDirectory, String fileName, String... lines) {
+    compile(
+        ImmutableList.of("-Xplugin:DocumentationGenerator -XoutputDirectory=" + outputDirectory),
+        FileObjects.forSourceLines(fileName, lines));
   }
 
-  private static void performCompilationForFile(
-      String outputDirectory, JavaFileObject javaFileObject) {
+  private static void compile(ImmutableList<String> options, JavaFileObject javaFileObject) {
     JavacFileManager javacFileManager = FileManagers.testFileManager();
     JavaCompiler compiler = JavacTool.create();
     JavacTaskImpl task =
@@ -34,8 +36,7 @@ public final class JavacTaskCompilation {
                 null,
                 javacFileManager,
                 null,
-                ImmutableList.of(
-                    "-Xplugin:DocumentationGenerator -XoutputDirectory=" + outputDirectory),
+                options,
                 ImmutableList.of(),
                 ImmutableList.of(javaFileObject));
 

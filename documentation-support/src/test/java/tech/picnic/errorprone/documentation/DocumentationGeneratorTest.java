@@ -2,13 +2,11 @@ package tech.picnic.errorprone.documentation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.condition.OS.WINDOWS;
 import static tech.picnic.errorprone.documentation.DocumentationGenerator.OUTPUT_DIRECTORY_FLAG;
 
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -28,10 +26,9 @@ final class DocumentationGeneratorTest {
         .hasMessage("'%s' must be of the form '%s=<value>'", pathArg, OUTPUT_DIRECTORY_FLAG);
   }
 
-  @EnabledOnOs(WINDOWS)
   @Test
-  void getOutputPathOnWindows() {
-    String basePath = '?' + "path";
+  void getOutputPathWithInvalidPath() {
+    String basePath = "path-with-null-char-\0";
     assertThatThrownBy(
             () -> DocumentationGenerator.getOutputPath(OUTPUT_DIRECTORY_FLAG + '=' + basePath))
         .isInstanceOf(IllegalArgumentException.class)

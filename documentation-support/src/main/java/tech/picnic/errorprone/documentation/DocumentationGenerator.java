@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
  * A compiler {@link Plugin} that analyzes and extracts relevant information for documentation
  * purposes from processed files.
  */
+// XXX: Find a better name for this class; it doesn't generate documentation per se.
 @AutoService(Plugin.class)
 public final class DocumentationGenerator implements Plugin {
   @VisibleForTesting static final String OUTPUT_DIRECTORY_FLAG = "-XoutputDirectory";

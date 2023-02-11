@@ -25,6 +25,7 @@ import javax.tools.JavaFileObject;
  * A {@link TaskListener} that identifies and extracts relevant content for documentation generation
  * and writes it to disk.
  */
+// XXX: Find a better name for this class; it doesn't generate documentation per se.
 final class DocumentationGeneratorTaskListener implements TaskListener {
   private static final ObjectMapper OBJECT_MAPPER =
       new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);

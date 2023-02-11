@@ -22,7 +22,7 @@ import org.junit.jupiter.api.io.TempDir;
 final class BugPatternExtractorTest {
   @Test
   void noBugPattern(@TempDir Path outputDirectory) {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "TestCheckerWithoutAnnotation.java",
         "import com.google.errorprone.bugpatterns.BugChecker;",
@@ -34,7 +34,7 @@ final class BugPatternExtractorTest {
 
   @Test
   void minimalBugPattern(@TempDir Path outputDirectory) throws IOException {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "MinimalBugChecker.java",
         "package pkg;",
@@ -54,7 +54,7 @@ final class BugPatternExtractorTest {
 
   @Test
   void completeBugPattern(@TempDir Path outputDirectory) throws IOException {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "CompleteBugChecker.java",
         "package pkg;",
@@ -85,7 +85,7 @@ final class BugPatternExtractorTest {
 
   @Test
   void undocumentedSuppressionBugPattern(@TempDir Path outputDirectory) throws IOException {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "UndocumentedSuppressionBugPattern.java",
         "package pkg;",
@@ -118,6 +118,20 @@ final class BugPatternExtractorTest {
         .doTest();
   }
 
+  private static void verifyFileMatchesResource(
+      Path outputDirectory, String fileName, String resourceName) throws IOException {
+    assertThat(Files.readString(outputDirectory.resolve(fileName)))
+        .isEqualToIgnoringWhitespace(getResource(resourceName));
+  }
+
+  // XXX: Once we support only JDK 15+, drop this method in favour of including the resources as
+  // text blocks in this class. (This also requires renaming the `verifyFileMatchesResource`
+  // method.)
+  private static String getResource(String resourceName) throws IOException {
+    return Resources.toString(
+        Resources.getResource(BugPatternExtractorTest.class, resourceName), UTF_8);
+  }
+
   /** A {@link BugChecker} that validates the {@link BugPatternExtractor}. */
   @BugPattern(summary = "Validates `BugPatternExtractor` extraction", severity = ERROR)
   public static final class TestChecker extends BugChecker implements ClassTreeMatcher {
@@ -135,19 +149,5 @@ final class BugPatternExtractorTest {
           .setMessage(String.format("Can extract: %s", extractor.canExtract(tree)))
           .build();
     }
-  }
-
-  private static void verifyFileMatchesResource(
-      Path outputDirectory, String fileName, String resourceName) throws IOException {
-    assertThat(Files.readString(outputDirectory.resolve(fileName)))
-        .isEqualToIgnoringWhitespace(getResource(resourceName));
-  }
-
-  // XXX: Once we support only JDK 15+, drop this method in favour of including the resources as
-  // text blocks in this class. (This also requires renaming the `verifyFileMatchesResource`
-  // method.)
-  private static String getResource(String resourceName) throws IOException {
-    return Resources.toString(
-        Resources.getResource(BugPatternExtractorTest.class, resourceName), UTF_8);
   }
 }
