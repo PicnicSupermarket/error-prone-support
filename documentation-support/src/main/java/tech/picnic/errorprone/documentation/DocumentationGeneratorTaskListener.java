@@ -56,13 +56,13 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
       return;
     }
 
-    DocumentationType.findMatchingType(classTree)
+    ExtractorType.findMatchingType(classTree)
         .ifPresent(
-            documentationType ->
+            extractorType ->
                 writeToFile(
-                    documentationType.getIdentifier(),
+                    extractorType.getIdentifier(),
                     getSimpleClassName(sourceFile.toUri()),
-                    documentationType.getExtractor().extract(classTree, context)));
+                    extractorType.getExtractor().extract(classTree, context)));
   }
 
   private void createDocsDirectory() {

@@ -6,19 +6,19 @@ import com.sun.source.tree.ClassTree;
 import java.util.EnumSet;
 import java.util.Optional;
 
-/** The types of documentation that can be identified and extracted from the source code. */
-enum DocumentationType {
+/** An enumeration of {@link Extractor} types. */
+enum ExtractorType {
   BUG_PATTERN("bugpattern", new BugPatternExtractor());
 
-  private static final ImmutableSet<DocumentationType> TYPES =
-      Sets.immutableEnumSet(EnumSet.allOf(DocumentationType.class));
+  private static final ImmutableSet<ExtractorType> TYPES =
+      Sets.immutableEnumSet(EnumSet.allOf(ExtractorType.class));
 
   private final String identifier;
-  private final Extractor<?> docExtractor;
+  private final Extractor<?> extractor;
 
-  DocumentationType(String identifier, Extractor<?> extractor) {
+  ExtractorType(String identifier, Extractor<?> extractor) {
     this.identifier = identifier;
-    this.docExtractor = extractor;
+    this.extractor = extractor;
   }
 
   String getIdentifier() {
@@ -26,10 +26,10 @@ enum DocumentationType {
   }
 
   Extractor<?> getExtractor() {
-    return docExtractor;
+    return extractor;
   }
 
-  static Optional<DocumentationType> findMatchingType(ClassTree tree) {
+  static Optional<ExtractorType> findMatchingType(ClassTree tree) {
     return TYPES.stream().filter(type -> type.getExtractor().canExtract(tree)).findFirst();
   }
 }
