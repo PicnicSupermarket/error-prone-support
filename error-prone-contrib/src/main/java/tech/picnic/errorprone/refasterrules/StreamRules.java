@@ -19,7 +19,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -381,7 +383,8 @@ final class StreamRules {
     }
   }
 
-  static final class StreamMapReduceIntSum<T> {
+  // XXX: Introduce a `@Matches(IsLambdaExpressionOrMethodReference.class)` guard for the `mapper`.
+  static final class StreamMapToIntSum<T> {
     @BeforeTemplate
     int before(Stream<T> stream, Function<? super T, Integer> mapper) {
       return stream.map(mapper).reduce(0, Integer::sum);
@@ -390,6 +393,32 @@ final class StreamRules {
     @AfterTemplate
     int after(Stream<T> stream, ToIntFunction<T> mapper) {
       return stream.mapToInt(mapper).sum();
+    }
+  }
+
+  // XXX: Introduce a `@Matches(IsLambdaExpressionOrMethodReference.class)` guard for the `mapper`.
+  static final class StreamMapToDoubleSum<T> {
+    @BeforeTemplate
+    double before(Stream<T> stream, Function<? super T, Double> mapper) {
+      return stream.map(mapper).reduce(0.0, Double::sum);
+    }
+
+    @AfterTemplate
+    double after(Stream<T> stream, ToDoubleFunction<T> mapper) {
+      return stream.mapToDouble(mapper).sum();
+    }
+  }
+
+  // XXX: Introduce a `@Matches(IsLambdaExpressionOrMethodReference.class)` guard for the `mapper`.
+  static final class StreamMapToLongSum<T> {
+    @BeforeTemplate
+    long before(Stream<T> stream, Function<? super T, Long> mapper) {
+      return stream.map(mapper).reduce(0L, Long::sum);
+    }
+
+    @AfterTemplate
+    long after(Stream<T> stream, ToLongFunction<T> mapper) {
+      return stream.mapToLong(mapper).sum();
     }
   }
 }

@@ -139,9 +139,21 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of("foo").noneMatch(s -> !s.isBlank());
   }
 
-  ImmutableSet<Integer> testStreamMapReduceIntSum() {
+  ImmutableSet<Integer> testStreamMapToIntSum() {
     return ImmutableSet.of(
-        Stream.of(2).map(i -> i * 2).reduce(0, Integer::sum),
-        Stream.of("foo").map(String::length).reduce(0, Integer::sum));
+        Stream.of(1).map(i -> i * 2).reduce(0, Integer::sum),
+        Stream.of("1").map(Integer::parseInt).reduce(0, Integer::sum));
+  }
+
+  ImmutableSet<Double> testStreamMapToDoubleSum() {
+    return ImmutableSet.of(
+        Stream.of(1).map(i -> i * 2.0).reduce(0.0, Double::sum),
+        Stream.of("1").map(Double::parseDouble).reduce(0.0, Double::sum));
+  }
+
+  ImmutableSet<Long> testStreamMapToLongSum() {
+    return ImmutableSet.of(
+        Stream.of(1).map(i -> i * 2L).reduce(0L, Long::sum),
+        Stream.of("1").map(Long::parseLong).reduce(0L, Long::sum));
   }
 }
