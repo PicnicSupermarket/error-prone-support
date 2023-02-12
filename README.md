@@ -112,7 +112,7 @@ definition. -->
        // Error Prone Support's Refaster rules.
        errorprone("tech.picnic.error-prone-support:refaster-runner:${errorProneSupportVersion}")
    }
-   
+
    tasks.withType(JavaCompile).configureEach {
        options.errorprone.disableWarningsInGeneratedCode = true
        // Add other Error Prone flags here. See:
