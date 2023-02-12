@@ -40,7 +40,7 @@ final class ConflictDetectionTest {
             "  // BUG: Diagnostic contains: `int` is not a valid identifier",
             "  void in() {}",
             "",
-            "  class B {",
+            "  static class B {",
             "    static void method3t() {}",
             "  }",
             "}")
