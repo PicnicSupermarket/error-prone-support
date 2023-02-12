@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -377,6 +378,18 @@ final class StreamRules {
     @AfterTemplate
     boolean after(Stream<T> stream) {
       return stream.allMatch(e -> test(e));
+    }
+  }
+
+  static final class StreamMapReduceIntSum<T> {
+    @BeforeTemplate
+    int before(Stream<T> stream, Function<? super T, Integer> mapper) {
+      return stream.map(mapper).reduce(0, Integer::sum);
+    }
+
+    @AfterTemplate
+    int after(Stream<T> stream, ToIntFunction<T> mapper) {
+      return stream.mapToInt(mapper).sum();
     }
   }
 }

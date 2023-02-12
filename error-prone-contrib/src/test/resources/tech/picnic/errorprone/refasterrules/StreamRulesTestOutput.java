@@ -137,4 +137,9 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   boolean testStreamAllMatch2() {
     return Stream.of("foo").allMatch(s -> s.isBlank());
   }
+
+  ImmutableSet<Integer> testStreamMapReduceIntSum() {
+    return ImmutableSet.of(
+        Stream.of(2).mapToInt(i -> i * 2).sum(), Stream.of("foo").mapToInt(String::length).sum());
+  }
 }
