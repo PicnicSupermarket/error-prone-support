@@ -35,11 +35,12 @@ public class DataProviderMigrator implements Migrator<Void> {
     return migrateDataProvider(methodTree, classTree, state);
   }
 
-  @Override
-  public boolean canFix(TestNGMetadata metadata, TestNGMetadata.AnnotationMetadata annotation, MethodTree methodTree, VisitorState state) {
+  public boolean canFix(MethodTree methodTree) {
     Optional<ReturnTree> returnTree = getReturnTree(methodTree);
-    return returnTree.isPresent()
-            && returnTree.map(DataProviderMigrator::getDataProviderReturnTree).isPresent();
+    boolean res = returnTree.isPresent()
+            && returnTree.flatMap(DataProviderMigrator::getDataProviderReturnTree).isPresent();
+
+    return res;
   }
 
   private static Optional<SuggestedFix> migrateDataProvider(

@@ -37,6 +37,7 @@ final class TestNGJUnitMigrationTest {
             "  public void dataProvider(int foo) {}",
             "",
             "  @DataProvider",
+            "  // BUG: Diagnostic contains:",
             "  private static Object[][] dataProviderTestCases() {",
             "    return new Object[][] {{1}, {2}};",
             "  }",

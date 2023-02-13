@@ -32,6 +32,7 @@ final class TestNGScannerTest {
             "A.java",
             "import org.testng.annotations.DataProvider;",
             "import org.testng.annotations.Test;",
+            "import java.util.stream.Stream;",
             "",
             "// BUG: Diagnostic contains: class: A arguments: {  }",
             "@Test",
@@ -59,6 +60,10 @@ final class TestNGScannerTest {
             "  // BUG: Diagnostic contains: class: A dataProvider: dataProviderTestCases",
             "  private static Object[][] dataProviderTestCases() {",
             "    return new Object[][] {{1}, {2}};",
+            "  }",
+            "",
+            "  private static Object[][] notMigratableDataProviderTestCases() {",
+            "    return Stream.of(1, 2, 3).map(i -> new Object[] {i}).toArray(Object[][]::new);",
             "  }",
             "",
             "  // BUG: Diagnostic contains: class: B arguments: { description: \"nested\" }",
@@ -92,7 +97,7 @@ final class TestNGScannerTest {
       classMetaData.forEach(
           (classTree, metaData) -> {
             metaData
-                .getClassLevelAnnotation()
+                .getClassLevelAnnotationMetadata()
                 .ifPresent(
                     annotation ->
                         state.reportMatch(
@@ -102,7 +107,8 @@ final class TestNGScannerTest {
                                 .build()));
 
             metaData
-                .getDataProviders()
+                .getDataProviderMetadata()
+                .values()
                 .forEach(
                     dataProvider -> {
                       state.reportMatch(
@@ -119,7 +125,7 @@ final class TestNGScannerTest {
                 .map(MethodTree.class::cast)
                 .map(metaData::getAnnotation)
                 .flatMap(Optional::stream)
-                .filter(not(isEqual(metaData.getClassLevelAnnotation().orElse(null))))
+                .filter(not(isEqual(metaData.getClassLevelAnnotationMetadata().orElse(null))))
                 .forEach(
                     annotation -> {
                       state.reportMatch(
