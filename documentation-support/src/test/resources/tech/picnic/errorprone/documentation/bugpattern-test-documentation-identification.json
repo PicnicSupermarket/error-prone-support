@@ -1,7 +1,7 @@
 {
-  "name": "IdentityConversion",
+  "name": "TestChecker",
   "identificationTests": [
-    "public final class A {\n  public void m() {\n    // BUG: Diagnostic contains:\n    Boolean b = Boolean.valueOf(Boolean.FALSE);\n}\n}\n"
+    "class A {}\n"
   ],
   "replacementTests": []
 }

@@ -52,7 +52,6 @@ final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumenta
         scanner.getReplacementTests());
   }
 
-  // XXX: Further improve the heuristics for determining what a BugPattern test is.
   @Override
   public boolean canExtract(ClassTree tree, VisitorState state) {
     String className = tree.getSimpleName().toString();

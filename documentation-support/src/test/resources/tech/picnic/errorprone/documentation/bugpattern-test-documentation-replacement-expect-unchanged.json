@@ -1,9 +1,9 @@
 {
-  "name": "IdentityConversion",
+  "name": "TestChecker",
   "identificationTests": [],
   "replacementTests": [
     {
-      "inputLines": "public final class A {}\n",
+      "inputLines": "class A {}\n",
       "outputLines": ""
     }
   ]
