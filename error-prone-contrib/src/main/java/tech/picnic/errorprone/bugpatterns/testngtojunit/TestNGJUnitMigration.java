@@ -93,7 +93,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
           return super.visitMethod(tree, metaData);
         }
 
-        final DataProviderMigrator dataProviderMigrator = new DataProviderMigrator();
+        DataProviderMigrator dataProviderMigrator = new DataProviderMigrator();
         metaData
             .getDataProvidersInUse()
             .forEach(
@@ -143,29 +143,6 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
                 trySuggestFix(classTree, methodTree, entry.getKey(), entry.getValue(), state)
                     .stream())
         .collect(toImmutableList());
-  }
-
-  private static SuggestedFix buildAnnotationFixes(
-      TestNGMetadata.AnnotationMetadata annotationMetadata, MethodTree methodTree) {
-    SuggestedFix.Builder builder =
-        SuggestedFix.builder().merge(SuggestedFix.delete(annotationMetadata.getAnnotationTree()));
-    if (!annotationMetadata.getArguments().containsKey("dataProvider")) {
-      builder
-          .addImport("org.junit.jupiter.api.Test")
-          .merge(SuggestedFix.prefixWith(methodTree, "@Test\n"));
-      //      String dataProviderName =
-      //          SourceCode.treeToString(annotationMetadata.getArguments().get("dataProvider"),
-      // state);
-      //      builder
-      //          .addImport("org.junit.jupiter.params.ParameterizedTest")
-      //          .addImport("org.junit.jupiter.params.provider.MethodSource")
-      //          .merge(
-      //              SuggestedFix.prefixWith(
-      //                  methodTree, "@ParameterizedTest\n  @MethodSource(" + dataProviderName +
-      // ")\n"));
-    }
-
-    return builder.build();
   }
 
   private static boolean canMigrateTest(

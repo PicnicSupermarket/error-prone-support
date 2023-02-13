@@ -30,9 +30,9 @@ final class TestNGScannerTest {
     CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .addSourceLines(
             "A.java",
+            "import java.util.stream.Stream;",
             "import org.testng.annotations.DataProvider;",
             "import org.testng.annotations.Test;",
-            "import java.util.stream.Stream;",
             "",
             "// BUG: Diagnostic contains: class: A arguments: {  }",
             "@Test",

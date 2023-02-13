@@ -5,7 +5,5 @@ import org.junit.jupiter.api.Test;
 final class PriorityArgumentMigratorTest {
 
   @Test
-  void createFix() {
-    PriorityArgumentMigrator migrator = new PriorityArgumentMigrator();
-  }
+  void createFix() {}
 }
