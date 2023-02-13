@@ -41,6 +41,14 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>documentation-support</artifactId>
+            <!-- This dependency is declared only as a hint to Maven that
+            compilation depends on it; see the `maven-compiler-plugin`'s
+            `annotationProcessorPaths` configuration below. -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>refaster-support</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -215,6 +223,11 @@
                         <annotationProcessorPaths combine.children="append">
                             <path>
                                 <groupId>${project.groupId}</groupId>
+                                <artifactId>documentation-support</artifactId>
+                                <version>${project.version}</version>
+                            </path>
+                            <path>
+                                <groupId>${project.groupId}</groupId>
                                 <artifactId>refaster-compiler</artifactId>
                                 <version>${project.version}</version>
                             </path>
@@ -226,6 +239,7 @@
                         </annotationProcessorPaths>
                         <compilerArgs combine.children="append">
                             <arg>-Xplugin:RefasterRuleCompiler</arg>
+                            <arg>-Xplugin:DocumentationGenerator -XoutputDirectory=${project.build.directory}/docs</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>
