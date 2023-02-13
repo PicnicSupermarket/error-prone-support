@@ -13,7 +13,7 @@ import org.junit.jupiter.api.io.TempDir;
 final class BugPatternTestExtractorTest {
   @Test
   void noBugPatternTest(@TempDir Path outputDirectory) {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "TestCheckerWithoutAnnotation.java",
         "import com.google.errorprone.bugpatterns.BugChecker;",
@@ -25,59 +25,58 @@ final class BugPatternTestExtractorTest {
 
   @Test
   void minimalBugPatternTest(@TempDir Path outputDirectory) throws IOException {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
-        "IdentityConversionTest.java",
+        "TestCheckerTest.java",
         "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "import com.google.errorprone.CompilationTestHelper;",
         "",
-        "final class IdentityConversionTest {",
-        "  private static class IdentityConversion extends BugChecker {}",
+        "final class TestCheckerTest {",
+        "  private static class TestChecker extends BugChecker {}",
         "",
-        "  CompilationTestHelper compilationTestHelper = CompilationTestHelper.newInstance(IdentityConversion.class, getClass());",
+        "  CompilationTestHelper compilationTestHelper = CompilationTestHelper.newInstance(TestChecker.class, getClass());",
         "}");
 
     verifyFileMatchesResource(
         outputDirectory,
-        "bugpattern-test-IdentityConversionTest.json",
+        "bugpattern-test-TestCheckerTest.json",
         "bugpattern-test-documentation-minimal.json");
   }
 
   @Test
-  void differentBugPatternTest(@TempDir Path outputDirectory) {
-    JavacTaskCompilation.compile(
+  void differentBugPatternAsClassVariableTest(@TempDir Path outputDirectory) {
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
-        "IdentityConversionTest.java",
+        "TestCheckerTest.java",
         "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "import com.google.errorprone.CompilationTestHelper;",
         "",
-        "final class IdentityConversionTest {",
-        "  private static class DifferentBugPattern extends BugChecker {}",
+        "final class TestCheckerTest {",
+        "  private static class DifferentChecker extends BugChecker {}",
         "",
-        "  CompilationTestHelper compilationTestHelper = CompilationTestHelper.newInstance(DifferentBugPattern.class, getClass());",
+        "  CompilationTestHelper compilationTestHelper = CompilationTestHelper.newInstance(DifferentChecker.class, getClass());",
         "}");
 
     assertThat(outputDirectory.toAbsolutePath()).isEmptyDirectory();
   }
 
   @Test
-  void differentBugPatternWithTest(@TempDir Path outputDirectory) {
-    JavacTaskCompilation.compile(
+  void differentBugPatternAsLocalVariable(@TempDir Path outputDirectory) {
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
-        "IdentityConversionTest.java",
-        "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
+        "TestCheckerTest.java",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "import com.google.errorprone.CompilationTestHelper;",
         "import org.junit.jupiter.api.Test;",
         "",
-        "final class IdentityConversionTest {",
-        "  private static class TestChecker extends BugChecker {}",
+        "final class TestCheckerTest {",
+        "  private static class DifferentChecker extends BugChecker {}",
         "",
         "  @Test",
         "  void identification() {",
-        "    CompilationTestHelper.newInstance(TestChecker.class, getClass())",
+        "    CompilationTestHelper.newInstance(DifferentChecker.class, getClass())",
         "        .addSourceLines(\"A.java\", \"class A {}\")",
         "        .doTest();",
         "  }",
@@ -88,363 +87,237 @@ final class BugPatternTestExtractorTest {
 
   @Test
   void bugPatternTestSingleIdentification(@TempDir Path outputDirectory) throws IOException {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
-        "IdentityConversionTest.java",
-        "package pkg;",
-        "",
-        "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
+        "TestCheckerTest.java",
         "import com.google.errorprone.bugpatterns.BugChecker;",
-        "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
         "import com.google.errorprone.CompilationTestHelper;",
         "import org.junit.jupiter.api.Test;",
         "",
-        "final class IdentityConversionTest {",
-        "  private static class IdentityConversion extends BugChecker {}",
+        "final class TestCheckerTest {",
+        "  private static class TestChecker extends BugChecker {}",
         "",
         "  @Test",
         "  void identification() {",
-        "    CompilationTestHelper.newInstance(IdentityConversion.class, getClass())",
-        "        .addSourceLines(",
-        "            \"A.java\",",
-        "            \"public final class A {\",",
-        "            \"  public void m() {\",",
-        "            \"    // BUG: Diagnostic contains:\",",
-        "            \"    Boolean b = Boolean.valueOf(Boolean.FALSE);\",",
-        "            \"  }\",",
-        "            \"}\")",
+        "    CompilationTestHelper.newInstance(TestChecker.class, getClass())",
+        "        .addSourceLines(\"A.java\", \"class A {}\")",
         "        .doTest();",
         "  }",
         "}");
 
     verifyFileMatchesResource(
         outputDirectory,
-        "bugpattern-test-IdentityConversionTest.json",
+        "bugpattern-test-TestCheckerTest.json",
         "bugpattern-test-documentation-identification.json");
   }
 
   @Test
   void bugPatternTestIdentificationMultipleSourceLines(@TempDir Path outputDirectory)
       throws IOException {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
-        "IdentityConversionTest.java",
+        "TestCheckerTest.java",
         "package pkg;",
         "",
-        "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
-        "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
         "import com.google.errorprone.CompilationTestHelper;",
         "import org.junit.jupiter.api.Test;",
         "",
-        "final class IdentityConversionTest {",
-        "  private static class IdentityConversion extends BugChecker {}",
+        "final class TestCheckerTest {",
+        "  private static class TestChecker extends BugChecker {}",
         "",
         "  @Test",
         "  void identification() {",
-        "    CompilationTestHelper.newInstance(IdentityConversion.class, getClass())",
-        "        .addSourceLines(",
-        "            \"A.java\",",
-        "            \"public final class A {}\")",
-        "        .addSourceLines(",
-        "            \"B.java\",",
-        "            \"public final class B {}\")",
+        "    CompilationTestHelper.newInstance(TestChecker.class, getClass())",
+        "        .addSourceLines(\"A.java\", \"class A {}\")",
+        "        .addSourceLines(\"B.java\", \"class B {}\")",
         "        .doTest();",
         "  }",
         "}");
 
     verifyFileMatchesResource(
         outputDirectory,
-        "bugpattern-test-IdentityConversionTest.json",
+        "bugpattern-test-TestCheckerTest.json",
         "bugpattern-test-documentation-identification-two-sources.json");
   }
 
   @Test
   void bugPatternTestSingleReplacement(@TempDir Path outputDirectory) throws IOException {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
-        "IdentityConversionTest.java",
-        "package pkg;",
-        "",
-        "import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;",
-        "",
+        "TestCheckerTest.java",
         "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
+        "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
-        "import com.google.errorprone.CompilationTestHelper;",
         "import org.junit.jupiter.api.Test;",
         "",
-        "final class IdentityConversionTest {",
-        "  private static class IdentityConversion extends BugChecker {}",
+        "final class TestCheckerTest {",
+        "  private static class TestChecker extends BugChecker {}",
         "",
         "  @Test",
         "  void replacement() {",
-        "    BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass())",
-        "            .addInputLines(",
-        "                    \"A.java\",",
-        "                    \"import com.google.common.collect.ImmutableSet;\",",
-        "                    \"\",",
-        "                    \"public final class A {\",",
-        "                    \"  public void m() {\",",
-        "                    \"    ImmutableSet<Object> set = ImmutableSet.copyOf(ImmutableSet.of());\",",
-        "                    \"  }\",",
-        "                    \"}\")",
-        "            .addOutputLines(",
-        "                    \"A.java\",",
-        "                    \"import com.google.common.collect.ImmutableSet;\",",
-        "                    \"\",",
-        "                    \"public final class A {\",",
-        "                    \"  public void m() {\",",
-        "                    \"    ImmutableSet<Object> set = ImmutableSet.of();\",",
-        "                    \"  }\",",
-        "                    \"}\")",
-        "            .doTest(TEXT_MATCH);",
+        "    BugCheckerRefactoringTestHelper.newInstance(TestChecker.class, getClass())",
+        "        .addInputLines(\"A.java\", \"class A {}\")",
+        "        .addOutputLines(\"A.java\", \"class A {}\")",
+        "        .doTest(TestMode.TEXT_MATCH);",
         "  }",
         "}");
 
     verifyFileMatchesResource(
         outputDirectory,
-        "bugpattern-test-IdentityConversionTest.json",
+        "bugpattern-test-TestCheckerTest.json",
         "bugpattern-test-documentation-replacement.json");
   }
 
   @Test
   void bugPatternTestMultipleReplacementSources(@TempDir Path outputDirectory) throws IOException {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
-        "IdentityConversionTest.java",
-        "package pkg;",
-        "",
-        "import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;",
-        "",
+        "TestCheckerTest.java",
         "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
+        "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
-        "import com.google.errorprone.CompilationTestHelper;",
         "import org.junit.jupiter.api.Test;",
         "",
-        "final class IdentityConversionTest {",
-        "  private static class IdentityConversion extends BugChecker {}",
+        "final class TestCheckerTest {",
+        "  private static class TestChecker extends BugChecker {}",
         "",
         "  @Test",
         "  void replacement() {",
-        "    BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass())",
-        "        .addInputLines(",
-        "            \"A.java\",",
-        "            \"public final class A {}\")",
-        "        .addOutputLines(",
-        "            \"A.java\",",
-        "            \"public final class A {}\")",
-        "        .addInputLines(",
-        "            \"B.java\",",
-        "            \"public final class B {}\")",
-        "        .addOutputLines(",
-        "            \"B.java\",",
-        "            \"public final class B {}\")",
-        "        .doTest(TEXT_MATCH);",
+        "    BugCheckerRefactoringTestHelper.newInstance(TestChecker.class, getClass())",
+        "        .addInputLines(\"A.java\", \"class A {}\")",
+        "        .addOutputLines(\"A.java\", \"class A {}\")",
+        "        .addInputLines(\"B.java\", \"class B {}\")",
+        "        .addOutputLines(\"B.java\", \"class B {}\")",
+        "        .doTest(TestMode.TEXT_MATCH);",
         "  }",
         "}");
 
     verifyFileMatchesResource(
         outputDirectory,
-        "bugpattern-test-IdentityConversionTest.json",
+        "bugpattern-test-TestCheckerTest.json",
         "bugpattern-test-documentation-replacement-two-sources.json");
   }
 
   @Test
   void bugPatternReplacementExpectUnchanged(@TempDir Path outputDirectory) throws IOException {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
-        "IdentityConversionTest.java",
-        "package pkg;",
-        "",
-        "import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;",
-        "",
+        "TestCheckerTest.java",
         "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
+        "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "import org.junit.jupiter.api.Test;",
         "",
-        "final class IdentityConversionTest {",
-        "  private static class IdentityConversion extends BugChecker {}",
+        "final class TestCheckerTest {",
+        "  private static class TestChecker extends BugChecker {}",
         "",
         "  @Test",
         "  void replacement() {",
-        "    BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass())",
-        "        .addInputLines(",
-        "            \"A.java\",",
-        "            \"public final class A {}\")",
+        "    BugCheckerRefactoringTestHelper.newInstance(TestChecker.class, getClass())",
+        "        .addInputLines(\"A.java\", \"class A {}\")",
         "        .expectUnchanged()",
-        "        .doTest(TEXT_MATCH);",
+        "        .doTest(TestMode.TEXT_MATCH);",
         "  }",
         "}");
 
     verifyFileMatchesResource(
         outputDirectory,
-        "bugpattern-test-IdentityConversionTest.json",
+        "bugpattern-test-TestCheckerTest.json",
         "bugpattern-test-documentation-replacement-expect-unchanged.json");
   }
 
   @Test
   void bugPatternTestIdentificationAndReplacement(@TempDir Path outputDirectory)
       throws IOException {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
-        "IdentityConversionTest.java",
-        "package pkg;",
-        "",
-        "import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;",
-        "",
+        "TestCheckerTest.java",
         "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
+        "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "import com.google.errorprone.CompilationTestHelper;",
         "import org.junit.jupiter.api.Test;",
         "",
-        "final class IdentityConversionTest {",
-        "  private static class IdentityConversion extends BugChecker {}",
+        "final class TestCheckerTest {",
+        "  private static class TestChecker extends BugChecker {}",
         "",
         "  @Test",
         "  void identification() {",
-        "    CompilationTestHelper.newInstance(IdentityConversion.class, getClass())",
-        "        .addSourceLines(",
-        "            \"A.java\",",
-        "            \"public final class A {\",",
-        "            \"  public void m() {\",",
-        "            \"    // BUG: Diagnostic contains:\",",
-        "            \"    Boolean b = Boolean.valueOf(Boolean.FALSE);\",",
-        "            \"  }\",",
-        "            \"}\")",
+        "    CompilationTestHelper.newInstance(TestChecker.class, getClass())",
+        "        .addSourceLines(\"A.java\", \"class A {}\")",
         "        .doTest();",
         "  }",
         "",
         "  @Test",
         "  void replacement() {",
-        "    BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass())",
-        "        .addInputLines(",
-        "            \"A.java\",",
-        "            \"import com.google.common.collect.ImmutableSet;\",",
-        "            \"\",",
-        "            \"public final class A {\",",
-        "            \"  public void m() {\",",
-        "            \"    ImmutableSet<Object> set = ImmutableSet.copyOf(ImmutableSet.of());\",",
-        "            \"  }\",",
-        "            \"}\")",
-        "        .addOutputLines(",
-        "            \"A.java\",",
-        "            \"import com.google.common.collect.ImmutableSet;\",",
-        "            \"\",",
-        "            \"public final class A {\",",
-        "            \"  public void m() {\",",
-        "            \"    ImmutableSet<Object> set = ImmutableSet.of();\",",
-        "            \"  }\",",
-        "            \"}\")",
-        "        .doTest(TEXT_MATCH);",
+        "    BugCheckerRefactoringTestHelper.newInstance(TestChecker.class, getClass())",
+        "        .addInputLines(\"A.java\", \"class A {}\")",
+        "        .addOutputLines(\"A.java\", \"class A {}\")",
+        "        .doTest(TestMode.TEXT_MATCH);",
         "  }",
         "}");
 
     verifyFileMatchesResource(
         outputDirectory,
-        "bugpattern-test-IdentityConversionTest.json",
+        "bugpattern-test-TestCheckerTest.json",
         "bugpattern-test-documentation-identification-and-replacement.json");
   }
 
   @Test
   void bugPatternTestMultipleIdentificationAndReplacement(@TempDir Path outputDirectory)
       throws IOException {
-    JavacTaskCompilation.compile(
+    Compilation.compileWithDocumentationGenerator(
         outputDirectory,
-        "IdentityConversionTest.java",
+        "TestCheckerTest.java",
         "package pkg;",
         "",
         "import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.SECOND;",
-        "import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;",
         "",
         "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
+        "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "import com.google.errorprone.CompilationTestHelper;",
         "import org.junit.jupiter.api.Test;",
         "",
-        "final class IdentityConversionTest {",
-        "  private static class IdentityConversion extends BugChecker {}",
+        "final class TestCheckerTest {",
+        "  private static class TestChecker extends BugChecker {}",
         "",
         "  @Test",
         "  void identification() {",
-        "    CompilationTestHelper.newInstance(IdentityConversion.class, getClass())",
-        "        .addSourceLines(",
-        "            \"A.java\",",
-        "            \"public final class A {\",",
-        "            \"  public void m() {\",",
-        "            \"    // BUG: Diagnostic contains:\",",
-        "            \"    Boolean b = Boolean.valueOf(Boolean.FALSE);\",",
-        "            \"  }\",",
-        "            \"}\")",
+        "    CompilationTestHelper.newInstance(TestChecker.class, getClass())",
+        "        .addSourceLines(\"A.java\", \"class A {}\")",
         "        .doTest();",
         "  }",
         "",
         "  @Test",
         "  void identification2() {",
-        "    CompilationTestHelper.newInstance(IdentityConversion.class, getClass())",
-        "        .addSourceLines(",
-        "            \"B.java\",",
-        "            \"public final class B {\",",
-        "            \"  public void m() {\",",
-        "            \"    // BUG: Diagnostic contains:\",",
-        "            \"    Boolean b = Boolean.valueOf(Boolean.FALSE);\",",
-        "            \"  }\",",
-        "            \"}\")",
+        "    CompilationTestHelper.newInstance(TestChecker.class, getClass())",
+        "        .addSourceLines(\"B.java\", \"class B {}\")",
         "        .doTest();",
         "  }",
         "",
         "  @Test",
         "  void replacementFirstSuggestedFix() {",
-        "    BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass())",
-        "        .addInputLines(",
-        "            \"A.java\",",
-        "            \"import com.google.common.collect.ImmutableSet;\",",
-        "            \"\",",
-        "            \"public final class A {\",",
-        "            \"  public void m() {\",",
-        "            \"    ImmutableSet<Object> set = ImmutableSet.copyOf(ImmutableSet.of());\",",
-        "            \"  }\",",
-        "            \"}\")",
-        "        .addOutputLines(",
-        "            \"A.java\",",
-        "            \"import com.google.common.collect.ImmutableSet;\",",
-        "            \"\",",
-        "            \"public final class A {\",",
-        "            \"  public void m() {\",",
-        "            \"    ImmutableSet<Object> set = ImmutableSet.of();\",",
-        "            \"  }\",",
-        "            \"}\")",
-        "        .doTest(TEXT_MATCH);",
+        "    BugCheckerRefactoringTestHelper.newInstance(TestChecker.class, getClass())",
+        "        .addInputLines(\"A.java\", \"class A {}\")",
+        "        .addOutputLines(\"A.java\", \"class A {}\")",
+        "        .doTest(TestMode.TEXT_MATCH);",
         "  }",
         "",
         "  @Test",
         "  void replacementSecondSuggestedFix() {",
-        "    BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass())",
+        "    BugCheckerRefactoringTestHelper.newInstance(TestChecker.class, getClass())",
         "        .setFixChooser(SECOND)",
-        "        .addInputLines(",
-        "            \"B.java\",",
-        "            \"import com.google.common.collect.ImmutableSet;\",",
-        "            \"\",",
-        "            \"public final class B {\",",
-        "            \"  public void m() {\",",
-        "            \"    ImmutableSet<Object> set = ImmutableSet.copyOf(ImmutableSet.of());\",",
-        "            \"  }\",",
-        "            \"}\")",
-        "        .addOutputLines(",
-        "            \"B.java\",",
-        "            \"import com.google.common.collect.ImmutableSet;\",",
-        "            \"\",",
-        "            \"public final class B {\",",
-        "            \"  public void m() {\",",
-        "            \"    ImmutableSet<Object> set = ImmutableSet.of();\",",
-        "            \"  }\",",
-        "            \"}\")",
-        "        .doTest(TEXT_MATCH);",
+        "        .addInputLines(\"B.java\", \"class B {}\")",
+        "        .addOutputLines(\"B.java\", \"class B {}\")",
+        "        .doTest(TestMode.TEXT_MATCH);",
         "  }",
         "}");
 
     verifyFileMatchesResource(
         outputDirectory,
-        "bugpattern-test-IdentityConversionTest.json",
+        "bugpattern-test-TestCheckerTest.json",
         "bugpattern-test-documentation-multiple-identification-and-replacement.json");
   }
 

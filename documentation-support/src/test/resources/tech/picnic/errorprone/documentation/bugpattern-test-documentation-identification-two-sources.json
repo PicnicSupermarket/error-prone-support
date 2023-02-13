@@ -1,8 +1,8 @@
 {
-  "name": "IdentityConversion",
+  "name": "TestChecker",
   "identificationTests": [
-    "public final class B {}\n",
-    "public final class A {}\n"
+    "class B {}\n",
+    "class A {}\n"
   ],
   "replacementTests": []
 }
