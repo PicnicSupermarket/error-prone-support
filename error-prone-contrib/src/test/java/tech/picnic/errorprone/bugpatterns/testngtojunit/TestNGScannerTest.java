@@ -21,7 +21,6 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 final class TestNGScannerTest {
   // XXX: We are missing some tests here.
-  // - Nested class.
   // - JUnit class that is already migrated.
   // - Normal class that shouldn't trigger? Or a negative example at least.
   // - Some not supported things as well.
@@ -30,8 +29,6 @@ final class TestNGScannerTest {
     CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "import java.util.stream.Stream;",
-            "import org.testng.annotations.DataProvider;",
             "import org.testng.annotations.Test;",
             "",
             "// BUG: Diagnostic contains: class: A arguments: {  }",
@@ -56,16 +53,6 @@ final class TestNGScannerTest {
             "  @Test(dataProvider = \"dataProviderTestCases\")",
             "  void dataProvider() {}",
             "",
-            "  @DataProvider",
-            "  // BUG: Diagnostic contains: class: A dataProvider: dataProviderTestCases",
-            "  private static Object[][] dataProviderTestCases() {",
-            "    return new Object[][] {{1}, {2}};",
-            "  }",
-            "",
-            "  private static Object[][] notMigratableDataProviderTestCases() {",
-            "    return Stream.of(1, 2, 3).map(i -> new Object[] {i}).toArray(Object[][]::new);",
-            "  }",
-            "",
             "  // BUG: Diagnostic contains: class: B arguments: { description: \"nested\" }",
             "  @Test(description = \"nested\")",
             "  class B {",
@@ -79,9 +66,43 @@ final class TestNGScannerTest {
         .doTest();
   }
 
+  @Test
+  void dataProvider() {
+    CompilationTestHelper.newInstance(TestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "import java.util.stream.Stream;",
+            "import org.testng.annotations.DataProvider;",
+            "",
+            "class A {",
+            "  @DataProvider",
+            "  // BUG: Diagnostic contains: class: A dataProvider: dataProviderTestCases",
+            "  private static Object[][] dataProviderTestCases() {",
+            "    return new Object[][] {{1}, {2}};",
+            "  }",
+            "",
+            "  private static Object[][] notMigratableDataProviderTestCases() {",
+            "    return Stream.of(1, 2, 3).map(i -> new Object[] {i}).toArray(Object[][]::new);",
+            "  }",
+            "}");
+  }
+
+  @Test
+  void junitTestClass() {
+    CompilationTestHelper.newInstance(TestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "import org.junit.jupiter.api.Test;",
+            "",
+            "class A {",
+            "  @Test",
+            "  private void foo() {}",
+            "}");
+  }
+
   /**
-   * Flags classes with a diagnostics message that indicates, whether a TestNG element was
-   * collected.
+   * A {@link BugChecker} that flags classes with a diagnostics message that indicates, whether a
+   * TestNG element was collected.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `TestNGScanner` for testing purposes")
   public static final class TestChecker extends BugChecker implements CompilationUnitTreeMatcher {
