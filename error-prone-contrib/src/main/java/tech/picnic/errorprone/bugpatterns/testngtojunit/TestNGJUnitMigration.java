@@ -23,7 +23,7 @@ import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.testng.annotations.Test;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.AnnotationMigrator;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.DataProviderMigrator;
 
 /**
  * A {@link BugChecker} that migrates TestNG unit tests to JUnit 5.
@@ -86,24 +86,33 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
 
       @Override
       public @Nullable Void visitMethod(MethodTree tree, TestNGMetadata metaData) {
-        TestNGMigrationContext context =
-            TestNGMigrationContext.create(conservativeMode, metaData.getClassTree());
-
         /* Make sure ALL tests in the class can be migrated. */
-        if (context.isConservativeMode()
+        if (conservativeMode
             && !metaData.getAnnotations().stream()
-                .allMatch(
-                    annotation ->
-                        canMigrateTest(
-                            metaData.getClassTree(), tree, metaData, annotation, state))) {
+                .allMatch(annotation -> canMigrateTest(tree, metaData, annotation, state))) {
           return super.visitMethod(tree, metaData);
         }
 
+        final DataProviderMigrator dataProviderMigrator = new DataProviderMigrator();
+        metaData
+            .getDataProvidersInUse()
+            .forEach(
+                dataProviderMetadata -> {
+                  dataProviderMigrator
+                      .createFix(
+                          metaData.getClassTree(),
+                          dataProviderMetadata.getMethodTree(),
+                          null,
+                          state)
+                      .ifPresent(
+                          fix ->
+                              state.reportMatch(
+                                  describeMatch(dataProviderMetadata.getMethodTree(), fix)));
+                });
+
         metaData
             .getAnnotation(tree)
-            .filter(
-                annotation ->
-                    canMigrateTest(metaData.getClassTree(), tree, metaData, annotation, state))
+            .filter(annotation -> canMigrateTest(tree, metaData, annotation, state))
             .ifPresent(
                 annotation -> {
                   SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
@@ -111,12 +120,6 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
                   // migrate arguments
                   buildArgumentFixes(metaData.getClassTree(), annotation, tree, state)
                       .forEach(fixBuilder::merge);
-
-                  // @Test annotation fix
-                  //                  fixBuilder.merge(buildAnnotationFixes(annotation, tree));
-                  new AnnotationMigrator()
-                      .createFix(metaData.getClassTree(), tree, annotation, state)
-                      .ifPresent(fixBuilder::merge);
 
                   state.reportMatch(
                       describeMatch(annotation.getAnnotationTree(), fixBuilder.build()));
@@ -166,7 +169,6 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   }
 
   private static boolean canMigrateTest(
-      ClassTree classTree,
       MethodTree methodTree,
       TestNGMetadata metadata,
       TestNGMetadata.AnnotationMetadata annotationMetadata,

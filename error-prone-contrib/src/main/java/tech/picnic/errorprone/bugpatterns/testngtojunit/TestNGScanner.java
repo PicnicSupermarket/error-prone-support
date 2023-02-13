@@ -15,6 +15,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.DataProviderMigrator;
 
 /**
  * A {@link TreeScanner} which will scan a {@link com.sun.source.tree.CompilationUnitTree} and
@@ -34,7 +35,7 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
   public @Nullable Void visitClass(ClassTree tree, TestNGMetadata.Builder _builder) {
     TestNGMetadata.Builder builder = TestNGMetadata.builder();
     builder.setClassTree(tree);
-    getTestNGAnnotation(tree, state).ifPresent(builder::setClassLevelAnnotationMetadata);
+    builder.setClassLevelAnnotationMetadata(getTestNGAnnotation(tree, state));
     super.visitClass(tree, builder);
     metadataBuilder.put(tree, builder.build());
 
@@ -47,7 +48,8 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
       return super.visitMethod(tree, builder);
     }
 
-    if (TESTNG_VALUE_FACTORY_METHOD.matches(tree, state)) {
+    final DataProviderMigrator migrator = new DataProviderMigrator();
+    if (TESTNG_VALUE_FACTORY_METHOD.matches(tree, state) && migrator.canFix(tree)) {
       builder
           .dataProviderMetadataBuilder()
           .put(tree.getName().toString(), TestNGMetadata.DataProviderMetadata.create(tree));
@@ -55,7 +57,7 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
     }
 
     getTestNGAnnotation(tree, state)
-        .or(builder::getOptClassLevelAnnotationMetadata)
+        .or(builder::getClassLevelAnnotationMetadata)
         .ifPresent(annotation -> builder.methodAnnotationsBuilder().put(tree, annotation));
 
     return super.visitMethod(tree, builder);

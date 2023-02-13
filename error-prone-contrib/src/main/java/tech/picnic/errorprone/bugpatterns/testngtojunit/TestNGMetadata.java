@@ -1,13 +1,19 @@
 package tech.picnic.errorprone.bugpatterns.testngtojunit;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodTree;
+import java.util.Map;
 import java.util.Optional;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.DataProviderMigrator;
 
 /**
  * POJO containing data collected using {@link TestNGScanner} for use in {@link
@@ -17,17 +23,38 @@ import java.util.Optional;
 public abstract class TestNGMetadata {
   abstract ClassTree getClassTree();
 
-  abstract AnnotationMetadata getClassLevelAnnotationMetadata();
+  abstract Optional<AnnotationMetadata> getClassLevelAnnotationMetadata();
 
   abstract ImmutableMap<MethodTree, AnnotationMetadata> getMethodAnnotations();
 
   /**
    * Get the {@link org.testng.annotations.DataProvider}s that are able to migratable.
    *
-   * @return an {@link ImmutableMap} mapping the name of the data provider to it's respective
+   * @return an {@link ImmutableMap} mapping the name of the data provider to its respective
    *     metadata.
    */
   public abstract ImmutableMap<String, DataProviderMetadata> getDataProviderMetadata();
+
+  public ImmutableList<DataProviderMetadata> getDataProvidersInUse() {
+    return getDataProviderMetadata().entrySet().stream()
+        .filter(
+            entry ->
+                getAnnotations().stream()
+                    .anyMatch(
+                        annotation -> {
+                          ExpressionTree dataProviderNameExpression =
+                              annotation.getArguments().get("dataProvider");
+                          if (dataProviderNameExpression == null) {
+                            return false;
+                          }
+
+                          return ((LiteralTree) dataProviderNameExpression)
+                              .getValue()
+                              .equals(entry.getKey());
+                        }))
+        .map(Map.Entry::getValue)
+        .collect(toImmutableList());
+  }
 
   static Builder builder() {
     return new AutoValue_TestNGMetadata.Builder();
@@ -43,17 +70,9 @@ public abstract class TestNGMetadata {
 
     abstract Builder setClassTree(ClassTree value);
 
-    abstract AnnotationMetadata getClassLevelAnnotationMetadata();
+    abstract Optional<AnnotationMetadata> getClassLevelAnnotationMetadata();
 
-    Optional<AnnotationMetadata> getOptClassLevelAnnotationMetadata() {
-      try {
-        return Optional.of(getClassLevelAnnotationMetadata());
-      } catch (IllegalStateException ignored) {
-        return Optional.empty();
-      }
-    }
-
-    abstract Builder setClassLevelAnnotationMetadata(AnnotationMetadata value);
+    abstract Builder setClassLevelAnnotationMetadata(Optional<AnnotationMetadata> value);
 
     abstract Builder setMethodAnnotations(ImmutableMap<MethodTree, AnnotationMetadata> value);
 
