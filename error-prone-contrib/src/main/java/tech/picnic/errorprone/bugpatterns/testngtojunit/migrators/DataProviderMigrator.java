@@ -1,5 +1,9 @@
 package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators;
 
+import static com.sun.source.tree.Tree.Kind.NEW_ARRAY;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
+
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.fixes.SuggestedFix;
@@ -8,24 +12,16 @@ import com.google.errorprone.util.ErrorProneToken;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.tools.javac.parser.Tokens;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMetadata;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMigrationContext;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import static com.sun.source.tree.Tree.Kind.NEW_ARRAY;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toMap;
+import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
+import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 public class DataProviderMigrator implements Migrator<Void> {
   @Override
@@ -37,10 +33,8 @@ public class DataProviderMigrator implements Migrator<Void> {
 
   public boolean canFix(MethodTree methodTree) {
     Optional<ReturnTree> returnTree = getReturnTree(methodTree);
-    boolean res = returnTree.isPresent()
-            && returnTree.flatMap(DataProviderMigrator::getDataProviderReturnTree).isPresent();
-
-    return res;
+    return returnTree.isPresent()
+        && returnTree.flatMap(DataProviderMigrator::getDataProviderReturnTree).isPresent();
   }
 
   private static Optional<SuggestedFix> migrateDataProvider(
@@ -70,15 +64,6 @@ public class DataProviderMigrator implements Migrator<Void> {
                                 dataProviderReturnTree,
                                 state)))
                     .build());
-  }
-
-  private static Optional<MethodTree> getDataProviderMethodTree(
-      ClassTree classTree, String methodName) {
-    return classTree.getMembers().stream()
-        .filter(MethodTree.class::isInstance)
-        .map(MethodTree.class::cast)
-        .filter(tree -> tree.getName().contentEquals(methodName))
-        .findFirst();
   }
 
   private static Optional<ReturnTree> getReturnTree(MethodTree methodTree) {

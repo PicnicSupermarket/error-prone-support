@@ -4,7 +4,6 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
 
@@ -40,6 +39,4 @@ public interface Migrator<T> {
    */
   Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, T dataValue, VisitorState state);
-
-
 }

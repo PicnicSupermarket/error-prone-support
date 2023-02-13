@@ -18,7 +18,6 @@ import org.testng.annotations.Test;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.ArgumentMigrator;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMetadata;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMigrationContext;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** An {@link Migrator} that migrates the {@link Test#expectedExceptions()} argument. */
