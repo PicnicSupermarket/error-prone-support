@@ -10,6 +10,7 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
@@ -26,6 +27,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
 
 /** Refaster rules related to expressions dealing with {@link Stream}s. */
 @OnlineDocumentation
@@ -383,10 +385,11 @@ final class StreamRules {
     }
   }
 
-  // XXX: Introduce a `@Matches(IsLambdaExpressionOrMethodReference.class)` guard for the `mapper`.
   static final class StreamMapToIntSum<T> {
     @BeforeTemplate
-    int before(Stream<T> stream, Function<? super T, Integer> mapper) {
+    int before(
+        Stream<T> stream,
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Integer> mapper) {
       return stream.map(mapper).reduce(0, Integer::sum);
     }
 
@@ -396,10 +399,11 @@ final class StreamRules {
     }
   }
 
-  // XXX: Introduce a `@Matches(IsLambdaExpressionOrMethodReference.class)` guard for the `mapper`.
   static final class StreamMapToDoubleSum<T> {
     @BeforeTemplate
-    double before(Stream<T> stream, Function<? super T, Double> mapper) {
+    double before(
+        Stream<T> stream,
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Double> mapper) {
       return stream.map(mapper).reduce(0.0, Double::sum);
     }
 
@@ -409,10 +413,11 @@ final class StreamRules {
     }
   }
 
-  // XXX: Introduce a `@Matches(IsLambdaExpressionOrMethodReference.class)` guard for the `mapper`.
   static final class StreamMapToLongSum<T> {
     @BeforeTemplate
-    long before(Stream<T> stream, Function<? super T, Long> mapper) {
+    long before(
+        Stream<T> stream,
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Long> mapper) {
       return stream.map(mapper).reduce(0L, Long::sum);
     }
 
