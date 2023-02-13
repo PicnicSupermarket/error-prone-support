@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument;
+package tech.picnic.errorprone.testngjunit.migrators.argument;
 
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
@@ -8,10 +8,10 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
 import org.testng.annotations.Test;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.ArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMetadata;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.testngjunit.ArgumentMigrator;
+import tech.picnic.errorprone.testngjunit.Migrator;
+import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
 /** An {@link Migrator} that migrates the {@link Test#priority()} argument. */
 @Immutable

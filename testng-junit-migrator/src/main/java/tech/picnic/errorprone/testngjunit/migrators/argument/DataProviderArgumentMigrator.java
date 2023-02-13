@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument;
+package tech.picnic.errorprone.testngjunit.migrators.argument;
 
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
@@ -10,10 +10,10 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.util.Optional;
 import org.testng.annotations.Test;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.ArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMetadata;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.testngjunit.ArgumentMigrator;
+import tech.picnic.errorprone.testngjunit.Migrator;
+import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
 /** An {@link Migrator} that migrates the {@link Test#dataProvider()} argument. */
 @Immutable
@@ -27,7 +27,7 @@ public class DataProviderArgumentMigrator implements ArgumentMigrator {
     return Optional.of(
         SuggestedFix.builder()
             .addImport("org.junit.jupiter.params.ParameterizedTest")
-            .addImport("org.junit.jupiter.params.MethodSource")
+            .addImport("org.junit.jupiter.params.provider.MethodSource")
             .merge(SuggestedFix.prefixWith(methodTree, "@ParameterizedTest\n"))
             .merge(
                 SuggestedFix.prefixWith(

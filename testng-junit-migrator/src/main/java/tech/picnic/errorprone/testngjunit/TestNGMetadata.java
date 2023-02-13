@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit;
+package tech.picnic.errorprone.testngjunit;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -108,7 +108,12 @@ public abstract class TestNGMetadata {
    */
   @AutoValue
   public abstract static class AnnotationMetadata {
-    abstract AnnotationTree getAnnotationTree();
+    /**
+     * Get the {@link AnnotationTree} of this metadata instance.
+     *
+     * @return the annotation tree this metadata contains information on.
+     */
+    public abstract AnnotationTree getAnnotationTree();
 
     /**
      * A mapping for all arguments in the annotation to their value.

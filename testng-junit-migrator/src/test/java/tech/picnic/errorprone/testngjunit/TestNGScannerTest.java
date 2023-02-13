@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit;
+package tech.picnic.errorprone.testngjunit;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.util.function.Predicate.isEqual;

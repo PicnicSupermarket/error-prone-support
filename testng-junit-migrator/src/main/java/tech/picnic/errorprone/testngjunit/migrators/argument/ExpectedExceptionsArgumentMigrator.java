@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument;
+package tech.picnic.errorprone.testngjunit.migrators.argument;
 
 import static com.google.auto.common.MoreStreams.toImmutableList;
 import static com.sun.source.tree.Tree.Kind.MEMBER_SELECT;
@@ -15,10 +15,10 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import java.util.Optional;
 import org.testng.annotations.Test;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.ArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMetadata;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.testngjunit.ArgumentMigrator;
+import tech.picnic.errorprone.testngjunit.Migrator;
+import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
 /** An {@link Migrator} that migrates the {@link Test#expectedExceptions()} argument. */
 @Immutable

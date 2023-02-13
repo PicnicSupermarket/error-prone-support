@@ -1,12 +1,12 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit;
+package tech.picnic.errorprone.testngjunit;
 
 import static java.util.Arrays.stream;
 
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument.DataProviderArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument.DescriptionArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument.ExpectedExceptionsArgumentMigrator;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument.PriorityArgumentMigrator;
+import tech.picnic.errorprone.testngjunit.migrators.argument.DataProviderArgumentMigrator;
+import tech.picnic.errorprone.testngjunit.migrators.argument.DescriptionArgumentMigrator;
+import tech.picnic.errorprone.testngjunit.migrators.argument.ExpectedExceptionsArgumentMigrator;
+import tech.picnic.errorprone.testngjunit.migrators.argument.PriorityArgumentMigrator;
 
 /** The annotation argument kinds that are supported by the TestNG -> JUnit migration. */
 enum SupportedArgumentKind {
