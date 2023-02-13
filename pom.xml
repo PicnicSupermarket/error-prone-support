@@ -369,6 +369,11 @@
                 <version>2.9.3</version>
             </dependency>
             <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq</artifactId>
+                <version>3.16.14</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jspecify</groupId>
                 <artifactId>jspecify</artifactId>
                 <version>0.3.0</version>
@@ -1178,6 +1183,8 @@
                                 | BSD 3-clause
                                 | BSD License 3
                                 | Eclipse Distribution License (New BSD License)
+                                | Eclipse Distribution License - v 1.0
+                                | EDL 1.0
                                 | New BSD License
                             </licenseMerge>
                             <licenseMerge>
