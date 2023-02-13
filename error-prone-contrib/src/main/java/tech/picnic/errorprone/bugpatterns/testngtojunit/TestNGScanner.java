@@ -48,7 +48,7 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
       return super.visitMethod(tree, builder);
     }
 
-    final DataProviderMigrator migrator = new DataProviderMigrator();
+    DataProviderMigrator migrator = new DataProviderMigrator();
     if (TESTNG_VALUE_FACTORY_METHOD.matches(tree, state) && migrator.canFix(tree)) {
       builder
           .dataProviderMetadataBuilder()

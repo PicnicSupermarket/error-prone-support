@@ -62,10 +62,10 @@ public abstract class TestNGMetadata {
   @AutoValue.Builder
   abstract static class Builder {
     private final ImmutableMap.Builder<MethodTree, AnnotationMetadata> methodAnnotationsBuilder =
-        new ImmutableMap.Builder<>();
+        ImmutableMap.builder();
 
     private final ImmutableMap.Builder<String, DataProviderMetadata> dataProviderMetadataBuilder =
-        new ImmutableMap.Builder<>();
+        ImmutableMap.builder();
 
     abstract Builder setClassTree(ClassTree value);
 

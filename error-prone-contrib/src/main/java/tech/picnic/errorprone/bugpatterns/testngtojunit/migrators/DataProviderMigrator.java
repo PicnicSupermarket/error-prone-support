@@ -20,13 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.nullness.Nullable;
 import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
-public class DataProviderMigrator implements Migrator<Void> {
+public class DataProviderMigrator implements Migrator<@Nullable Void> {
   @Override
   public Optional<SuggestedFix> createFix(
-      ClassTree classTree, MethodTree methodTree, Void dataValue, VisitorState state) {
+      ClassTree classTree, MethodTree methodTree, @Nullable Void dataValue, VisitorState state) {
 
     return migrateDataProvider(methodTree, classTree, state);
   }
