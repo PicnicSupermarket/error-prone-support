@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit;
+package tech.picnic.errorprone.testngjunit;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
@@ -23,7 +23,8 @@ import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.testng.annotations.Test;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.DataProviderMigrator;
+import tech.picnic.errorprone.testngjunit.migrators.AnnotationMigrator;
+import tech.picnic.errorprone.testngjunit.migrators.DataProviderMigrator;
 
 /**
  * A {@link BugChecker} that migrates TestNG unit tests to JUnit 5.
@@ -48,7 +49,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   private static final String CONSERVATIVE_MIGRATION_MODE_FLAG =
       "TestNGJUnitMigration:ConservativeMode";
   private final boolean conservativeMode;
-
+  private static final AnnotationMigrator ANNOTATION_MIGRATOR = new AnnotationMigrator();
   /**
    * Instantiates a new {@link TestNGJUnitMigration} instance. This will default to aggressive
    * migration mode.
@@ -120,6 +121,10 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
                   // migrate arguments
                   buildArgumentFixes(metaData.getClassTree(), annotation, tree, state)
                       .forEach(fixBuilder::merge);
+
+                  ANNOTATION_MIGRATOR
+                      .createFix(metaData.getClassTree(), tree, annotation, state)
+                      .ifPresent(fixBuilder::merge);
 
                   state.reportMatch(
                       describeMatch(annotation.getAnnotationTree(), fixBuilder.build()));

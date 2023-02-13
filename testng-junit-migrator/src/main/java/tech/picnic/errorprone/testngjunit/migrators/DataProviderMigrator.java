@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators;
+package tech.picnic.errorprone.testngjunit.migrators;
 
 import static com.sun.source.tree.Tree.Kind.NEW_ARRAY;
 import static java.util.stream.Collectors.joining;
@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.Migrator;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.testngjunit.Migrator;
 
 public class DataProviderMigrator implements Migrator<@Nullable Void> {
   @Override

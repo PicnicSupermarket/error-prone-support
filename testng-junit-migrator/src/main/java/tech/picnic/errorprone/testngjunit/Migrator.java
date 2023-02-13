@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit;
+package tech.picnic.errorprone.testngjunit;
 
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;

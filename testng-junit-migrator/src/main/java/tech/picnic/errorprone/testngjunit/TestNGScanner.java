@@ -1,8 +1,8 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit;
+package tech.picnic.errorprone.testngjunit;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMatchers.TESTNG_TEST_ANNOTATION;
-import static tech.picnic.errorprone.bugpatterns.testngtojunit.TestNGMatchers.TESTNG_VALUE_FACTORY_METHOD;
+import static tech.picnic.errorprone.testngjunit.TestNGMatchers.TESTNG_TEST_ANNOTATION;
+import static tech.picnic.errorprone.testngjunit.TestNGMatchers.TESTNG_VALUE_FACTORY_METHOD;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.VisitorState;
@@ -15,7 +15,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.DataProviderMigrator;
+import tech.picnic.errorprone.testngjunit.migrators.DataProviderMigrator;
 
 /**
  * A {@link TreeScanner} which will scan a {@link com.sun.source.tree.CompilationUnitTree} and

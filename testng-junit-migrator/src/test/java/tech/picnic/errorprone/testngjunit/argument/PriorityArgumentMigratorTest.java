@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.argument;
+package tech.picnic.errorprone.testngjunit.argument;
 
 import org.junit.jupiter.api.Test;
 
