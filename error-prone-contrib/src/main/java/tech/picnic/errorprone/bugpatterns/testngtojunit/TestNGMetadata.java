@@ -13,7 +13,6 @@ import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Map;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.testngtojunit.migrators.DataProviderMigrator;
 
 /**
  * POJO containing data collected using {@link TestNGScanner} for use in {@link
