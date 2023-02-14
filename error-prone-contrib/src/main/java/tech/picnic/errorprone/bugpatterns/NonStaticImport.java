@@ -29,9 +29,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 /** A {@link BugChecker} that flags methods and constants that should not be statically imported. */
 // XXX: Also introduce checks that disallows the following candidates:
 // - `ZoneOffset.ofHours` and other `ofXXX`-style methods.
-// - `java.time.Clock`.
 // - Several other `java.time` classes.
-// - Likely any of `*.{ZERO, ONE, MIX, MAX, MIN_VALUE, MAX_VALUE}`.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Identifier should not be statically imported",
@@ -109,7 +107,10 @@ public final class NonStaticImport extends BugChecker implements IdentifierTreeM
           "newBuilder",
           "newInstance",
           "of",
-          "valueOf");
+          "ONE",
+          "parse",
+          "valueOf",
+          "ZERO");
 
   /** Instantiates a new {@link NonStaticImport} instance. */
   public NonStaticImport() {}
