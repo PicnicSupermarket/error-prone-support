@@ -138,8 +138,8 @@ public final class NonStaticImport extends BugChecker implements IdentifierTreeM
   }
 
   private static boolean isMatch(Symbol symbol, VisitorState state) {
-    Symbol enclosingSymbol = symbol.owner;
-    if (enclosingSymbol == null || enclosingSymbol.kind != TYP) {
+    Symbol owner = symbol.owner;
+    if (owner == null || owner.kind != TYP) {
       return false;
     }
 
@@ -151,7 +151,7 @@ public final class NonStaticImport extends BugChecker implements IdentifierTreeM
       return false;
     }
 
-    String qualifiedTypeName = enclosingSymbol.getQualifiedName().toString();
+    String qualifiedTypeName = owner.getQualifiedName().toString();
     return !isExempted(qualifiedTypeName, identifierName)
         && isCandidate(qualifiedTypeName, identifierName);
   }
