@@ -47,11 +47,13 @@ final class NonStaticImportTest {
             "",
             "  public static class INSTANCE {}",
             "}")
+        .addSourceLines("MAX_VALUE.java", "", "public final class MAX_VALUE {}")
         .addSourceLines(
             "pkg/A.java",
             "package pkg;",
             "",
             "import static com.google.common.collect.ImmutableList.copyOf;",
+            "import static java.lang.Integer.MAX_VALUE;",
             "import static java.lang.Integer.MIN_VALUE;",
             "import static java.time.Clock.systemUTC;",
             "import static java.time.Instant.MAX;",
@@ -123,9 +125,20 @@ final class NonStaticImportTest {
             "",
             "    // Not flagged because identifier is not statically imported.",
             "    Object inst = new INSTANCE();",
+            "",
+            "    Integer from = 12;",
+            "    // Not flagged because identifier is not statically imported.",
+            "    Integer i3 = from;",
+            "",
+            "    // Not flagged because identifier does not belong to a type.",
+            "    MAX_VALUE maxValue = new MAX_VALUE();",
             "  }",
             "",
-            "  void create() {}",
+            "  void create() {",
+            "    Integer MIN_VALUE = 12;",
+            "    // Not flagged because identifier is not statically imported.",
+            "    Integer i1 = MIN_VALUE;",
+            "  }",
             "}")
         .doTest();
   }
