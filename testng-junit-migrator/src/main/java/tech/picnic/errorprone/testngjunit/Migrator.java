@@ -4,8 +4,10 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
+import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 
 // XXX: General feedback not specific to this class.
 // Make sure to:
@@ -28,7 +30,7 @@ import java.util.Optional;
  * {@link org.testng.annotations.Test} annotation to JUnit.
  */
 @Immutable
-public interface Migrator<T> {
+public interface Migrator {
   /**
    * Attempt to create a {@link SuggestedFix}.
    *
@@ -38,5 +40,17 @@ public interface Migrator<T> {
    * @return an {@link Optional} containing the created fix.
    */
   Optional<SuggestedFix> createFix(
-      ClassTree classTree, MethodTree methodTree, T dataValue, VisitorState state);
+      ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state);
+
+  /**
+   * Get whether the specified annotation can be migrated.
+   *
+   * @param state the visitor state
+   * @return {@code true} if the annotation argument can be migrated or else {@code false}
+   */
+  boolean canFix(
+      TestNGMetadata metadata,
+      AnnotationMetadata annotation,
+      MethodTree methodTree,
+      VisitorState state);
 }

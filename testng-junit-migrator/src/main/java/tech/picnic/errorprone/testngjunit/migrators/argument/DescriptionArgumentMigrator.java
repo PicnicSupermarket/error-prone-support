@@ -9,13 +9,12 @@ import com.sun.source.tree.MethodTree;
 import java.util.Optional;
 import org.testng.annotations.Test;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
-import tech.picnic.errorprone.testngjunit.ArgumentMigrator;
 import tech.picnic.errorprone.testngjunit.Migrator;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
 /** An {@link Migrator} that migrates the {@link Test#description()} argument. */
 @Immutable
-public class DescriptionArgumentMigrator implements ArgumentMigrator {
+public class DescriptionArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
