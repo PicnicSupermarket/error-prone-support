@@ -22,7 +22,6 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import org.testng.annotations.Test;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.testngjunit.migrators.DataProviderMigrator;
 
@@ -32,10 +31,10 @@ import tech.picnic.errorprone.testngjunit.migrators.DataProviderMigrator;
  * <p>Supported TestNG annotation arguments are:
  *
  * <ul>
- *   <li>{@link Test#dataProvider()}
- *   <li>{@link Test#description()}
- *   <li>{@link Test#expectedExceptions()}
- *   <li>{@link Test#priority()}
+ *   <li>{@code dataProvider}
+ *   <li>{@code description}
+ *   <li>{@code expectedExceptions}
+ *   <li>{@code priority}
  * </ul>
  */
 @AutoService(BugChecker.class)

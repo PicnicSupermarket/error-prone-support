@@ -18,14 +18,14 @@ import com.sun.source.tree.MethodTree;
  */
 public final class TestNGMatchers {
   /**
-   * Matches the {@link org.testng.annotations.Test} annotation specifically. As {@link
+   * Matches the TestNG {@code Test} annotation specifically. As {@link
    * com.google.errorprone.matchers.TestNgMatchers#hasTestNgAnnotation(ClassTree)} also other TestNG
    * annotations.
    */
   public static final Matcher<AnnotationTree> TESTNG_TEST_ANNOTATION =
       isType("org.testng.annotations.Test");
 
-  /** Matches the {@link org.testng.annotations.DataProvider} annotation specifically. */
+  /** Matches the TestNG {@code DataProvider} annotation specifically. */
   public static final Matcher<MethodTree> TESTNG_VALUE_FACTORY_METHOD =
       hasAnnotation("org.testng.annotations.DataProvider");
 
