@@ -93,17 +93,13 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
           return super.visitMethod(tree, metaData);
         }
 
-        DataProviderMigrator dataProviderMigrator = new DataProviderMigrator();
         metaData
             .getDataProvidersInUse()
             .forEach(
                 dataProviderMetadata -> {
-                  dataProviderMigrator
+                  new DataProviderMigrator()
                       .createFix(
-                          metaData.getClassTree(),
-                          dataProviderMetadata.getMethodTree(),
-                          null,
-                          state)
+                          metaData.getClassTree(), dataProviderMetadata.getMethodTree(), state)
                       .ifPresent(
                           fix ->
                               state.reportMatch(

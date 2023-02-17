@@ -16,13 +16,12 @@ import com.sun.source.tree.NewArrayTree;
 import java.util.Optional;
 import org.testng.annotations.Test;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
-import tech.picnic.errorprone.testngjunit.ArgumentMigrator;
 import tech.picnic.errorprone.testngjunit.Migrator;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
 /** An {@link Migrator} that migrates the {@link Test#expectedExceptions()} argument. */
 @Immutable
-public class ExpectedExceptionsArgumentMigrator implements ArgumentMigrator {
+public class ExpectedExceptionsArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {

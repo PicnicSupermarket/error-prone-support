@@ -17,14 +17,14 @@ enum SupportedArgumentKind {
 
   private final String name;
 
-  private final ArgumentMigrator argumentMigrator;
+  private final Migrator argumentMigrator;
 
-  SupportedArgumentKind(String name, ArgumentMigrator argumentMigrator) {
+  SupportedArgumentKind(String name, Migrator argumentMigrator) {
     this.name = name;
     this.argumentMigrator = argumentMigrator;
   }
 
-  ArgumentMigrator getArgumentMigrator() {
+  Migrator getArgumentMigrator() {
     return argumentMigrator;
   }
 

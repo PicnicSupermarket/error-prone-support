@@ -20,15 +20,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
-import tech.picnic.errorprone.testngjunit.Migrator;
 
-public class DataProviderMigrator implements Migrator<@Nullable Void> {
-  @Override
+public class DataProviderMigrator {
   public Optional<SuggestedFix> createFix(
-      ClassTree classTree, MethodTree methodTree, @Nullable Void dataValue, VisitorState state) {
-
+      ClassTree classTree, MethodTree methodTree, VisitorState state) {
     return migrateDataProvider(methodTree, classTree, state);
   }
 
