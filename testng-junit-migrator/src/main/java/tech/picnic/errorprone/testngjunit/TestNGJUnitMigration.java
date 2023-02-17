@@ -23,7 +23,7 @@ import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.testng.annotations.Test;
-import tech.picnic.errorprone.testngjunit.migrators.AnnotationMigrator;
+import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.testngjunit.migrators.DataProviderMigrator;
 
 /**
@@ -49,7 +49,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   private static final String CONSERVATIVE_MIGRATION_MODE_FLAG =
       "TestNGJUnitMigration:ConservativeMode";
   private final boolean conservativeMode;
-  private static final AnnotationMigrator ANNOTATION_MIGRATOR = new AnnotationMigrator();
+
   /**
    * Instantiates a new {@link TestNGJUnitMigration} instance. This will default to aggressive
    * migration mode.
@@ -70,8 +70,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     TestNGScanner scanner = new TestNGScanner(state);
-    scanner.scan(tree, null);
-    ImmutableMap<ClassTree, TestNGMetadata> classMetaData = scanner.buildMetaDataForEachClassTree();
+    ImmutableMap<ClassTree, TestNGMetadata> classMetaData = scanner.collectMetadaForEachClass(tree);
 
     new TreeScanner<@Nullable Void, TestNGMetadata>() {
       @Override
@@ -122,9 +121,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
                   buildArgumentFixes(metaData.getClassTree(), annotation, tree, state)
                       .forEach(fixBuilder::merge);
 
-                  ANNOTATION_MIGRATOR
-                      .createFix(metaData.getClassTree(), tree, annotation, state)
-                      .ifPresent(fixBuilder::merge);
+                  fixBuilder.merge(migrateAnnotation(annotation, tree));
 
                   state.reportMatch(
                       describeMatch(annotation.getAnnotationTree(), fixBuilder.build()));
@@ -139,7 +136,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
 
   private static ImmutableList<SuggestedFix> buildArgumentFixes(
       ClassTree classTree,
-      TestNGMetadata.AnnotationMetadata annotationMetadata,
+      AnnotationMetadata annotationMetadata,
       MethodTree methodTree,
       VisitorState state) {
     return annotationMetadata.getArguments().entrySet().stream()
@@ -153,7 +150,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   private static boolean canMigrateTest(
       MethodTree methodTree,
       TestNGMetadata metadata,
-      TestNGMetadata.AnnotationMetadata annotationMetadata,
+      AnnotationMetadata annotationMetadata,
       VisitorState state) {
     return annotationMetadata.getArguments().keySet().stream()
         .map(SupportedArgumentKind::fromString)
@@ -172,5 +169,19 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
     return SupportedArgumentKind.fromString(argumentName)
         .map(SupportedArgumentKind::getArgumentMigrator)
         .flatMap(fixer -> fixer.createFix(classTree, methodTree, argumentContent, state));
+  }
+
+  private static SuggestedFix migrateAnnotation(
+      AnnotationMetadata annotationMetadata, MethodTree methodTree) {
+    SuggestedFix.Builder fixBuilder =
+        SuggestedFix.builder()
+            .addImport("org.junit.jupiter.api.Test")
+            .removeImport("org.testng.annotations.Test")
+            .merge(SuggestedFix.delete(annotationMetadata.getAnnotationTree()));
+    if (!annotationMetadata.getArguments().containsKey("dataProvider")) {
+      fixBuilder.merge(SuggestedFix.prefixWith(methodTree, "@Test\n"));
+    }
+
+    return fixBuilder.build();
   }
 }
