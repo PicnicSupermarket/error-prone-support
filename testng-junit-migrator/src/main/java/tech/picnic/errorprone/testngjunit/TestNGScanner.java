@@ -9,6 +9,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
@@ -20,7 +21,7 @@ import tech.picnic.errorprone.testngjunit.migrators.DataProviderMigrator;
 /**
  * A {@link TreeScanner} which will scan a {@link com.sun.source.tree.CompilationUnitTree} and
  * collect data required for the migration from each class in the compilation unit. <br>
- * This data can be retrieved using {@link #buildMetaDataForEachClassTree()}.
+ * This data can be retrieved using {@link #collectMetadaForEachClass(CompilationUnitTree)}
  */
 final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Builder> {
   private final VisitorState state;
@@ -63,7 +64,9 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
     return super.visitMethod(tree, builder);
   }
 
-  public ImmutableMap<ClassTree, TestNGMetadata> buildMetaDataForEachClassTree() {
+  public ImmutableMap<ClassTree, TestNGMetadata> collectMetadaForEachClass(
+      CompilationUnitTree tree) {
+    scan(tree, null);
     return metadataBuilder.build();
   }
 

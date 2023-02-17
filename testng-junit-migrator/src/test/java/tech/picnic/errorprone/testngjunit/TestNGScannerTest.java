@@ -111,9 +111,8 @@ final class TestNGScannerTest {
     @Override
     public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
       TestNGScanner scanner = new TestNGScanner(state);
-      scanner.scan(tree, null);
       ImmutableMap<ClassTree, TestNGMetadata> classMetaData =
-          scanner.buildMetaDataForEachClassTree();
+          scanner.collectMetadaForEachClass(tree);
 
       classMetaData.forEach(
           (classTree, metaData) -> {
