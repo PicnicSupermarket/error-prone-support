@@ -7,12 +7,11 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
-import org.testng.annotations.Test;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 import tech.picnic.errorprone.testngjunit.Migrator;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
-/** An {@link Migrator} that migrates the {@link Test#priority()} argument. */
+/** An {@link Migrator} that migrates the {@code priority} argument. */
 @Immutable
 public class PriorityArgumentMigrator implements Migrator {
   @Override

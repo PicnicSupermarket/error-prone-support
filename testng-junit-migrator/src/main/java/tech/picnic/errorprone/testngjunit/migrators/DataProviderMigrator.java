@@ -22,12 +22,28 @@ import java.util.Map;
 import java.util.Optional;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
+/** A helper class that migrates a TestNG {@code DataProvider} to a JUnit {@code MethodSource}. */
 public class DataProviderMigrator {
+  /**
+   * Create the {@link SuggestedFix} required to migrate a TestNG {@code DataProvider} to a JUnit
+   * {@code MethodSource}.
+   *
+   * @param classTree The class containing the data provider.
+   * @param methodTree The data provider method.
+   * @param state The {@link VisitorState}.
+   * @return An {@link Optional} containing the created fix.
+   */
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, VisitorState state) {
     return migrateDataProvider(methodTree, classTree, state);
   }
 
+  /**
+   * Get whether the specified {@code DataProvider} can be migrated.
+   *
+   * @param methodTree The dataprovider methode tree.
+   * @return {@code true} if the data provider can be migrated or else {@code false}.
+   */
   public boolean canFix(MethodTree methodTree) {
     Optional<ReturnTree> returnTree = getReturnTree(methodTree);
     return returnTree.isPresent()

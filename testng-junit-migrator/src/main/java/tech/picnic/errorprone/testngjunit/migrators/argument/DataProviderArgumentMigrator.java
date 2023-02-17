@@ -9,12 +9,11 @@ import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.util.Optional;
-import org.testng.annotations.Test;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 import tech.picnic.errorprone.testngjunit.Migrator;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
-/** An {@link Migrator} that migrates the {@link Test#dataProvider()} argument. */
+/** An {@link Migrator} that migrates the {@code dataProvider} argument. */
 @Immutable
 public class DataProviderArgumentMigrator implements Migrator {
 

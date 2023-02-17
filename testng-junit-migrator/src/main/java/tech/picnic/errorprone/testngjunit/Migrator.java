@@ -27,16 +27,17 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 
 /**
  * Interface implemented by classes that define how to migrate a specific argument from a TestNG
- * {@link org.testng.annotations.Test} annotation to JUnit.
+ * {@code Test} annotation to JUnit.
  */
 @Immutable
 public interface Migrator {
   /**
    * Attempt to create a {@link SuggestedFix}.
    *
-   * @param methodTree the method tree the annotation is on
-   * @param dataValue the value of annotation argument
-   * @param state the visitor state
+   * @param classTree The class tree containing the test.
+   * @param methodTree The method tree the annotation is on.
+   * @param dataValue The value of annotation argument.
+   * @param state The visitor state.
    * @return an {@link Optional} containing the created fix.
    */
   Optional<SuggestedFix> createFix(
@@ -45,7 +46,10 @@ public interface Migrator {
   /**
    * Get whether the specified annotation can be migrated.
    *
-   * @param state the visitor state
+   * @param metadata The metadata that will be fixed.
+   * @param annotation The metadata for the annotation that will be fixed.
+   * @param methodTree The test {@link MethodTree}.
+   * @param state The visitor state.
    * @return {@code true} if the annotation argument can be migrated or else {@code false}
    */
   boolean canFix(

@@ -27,14 +27,14 @@ public abstract class TestNGMetadata {
   abstract ImmutableMap<MethodTree, AnnotationMetadata> getMethodAnnotations();
 
   /**
-   * Get the {@link org.testng.annotations.DataProvider}s that are able to migratable.
+   * Get the {@code Test}s that are able to migratable.
    *
    * @return an {@link ImmutableMap} mapping the name of the data provider to its respective
    *     metadata.
    */
   public abstract ImmutableMap<String, DataProviderMetadata> getDataProviderMetadata();
 
-  public ImmutableList<DataProviderMetadata> getDataProvidersInUse() {
+  ImmutableList<DataProviderMetadata> getDataProvidersInUse() {
     return getDataProviderMetadata().entrySet().stream()
         .filter(
             entry ->
@@ -103,8 +103,8 @@ public abstract class TestNGMetadata {
   }
 
   /**
-   * POJO containing data for a specific {@link org.testng.annotations.Test} annotation for use in
-   * {@link TestNGJUnitMigration}.
+   * POJO containing data for a specific {@code Test} annotation for use in {@link
+   * TestNGJUnitMigration}.
    */
   @AutoValue
   public abstract static class AnnotationMetadata {
@@ -136,8 +136,8 @@ public abstract class TestNGMetadata {
   }
 
   /**
-   * POJO containing data for a specific {@link org.testng.annotations.DataProvider} annotation for
-   * use in {@link TestNGJUnitMigration}.
+   * POJO containing data for a specific {@code DataProvider} annotation for use in {@link
+   * TestNGJUnitMigration}.
    */
   @AutoValue
   public abstract static class DataProviderMetadata {
