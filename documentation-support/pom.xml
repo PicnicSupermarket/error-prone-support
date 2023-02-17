@@ -12,6 +12,7 @@
 
     <name>Picnic :: Error Prone Support :: Documentation Support</name>
     <description>Data extraction support for the purpose of documentation generation.</description>
+    <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
         <dependency>
