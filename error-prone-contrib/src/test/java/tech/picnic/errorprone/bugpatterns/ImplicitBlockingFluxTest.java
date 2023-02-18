@@ -17,6 +17,7 @@ final class ImplicitBlockingFluxTest {
   @Test
   void identification() {
     CompilationTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
+        .expectErrorMessage("X", containsPattern("SuppressWarnings.*toImmutableList.*toList"))
         .addSourceLines(
             "A.java",
             "import com.google.common.collect.ImmutableList;",
@@ -25,24 +26,26 @@ final class ImplicitBlockingFluxTest {
             "",
             "class A {",
             "  void m() {",
-            "    // BUG: Diagnostic contains:",
+            "    // BUG: Diagnostic matches: X",
             "    Flux.just(1).toIterable();",
-            "    // BUG: Diagnostic contains:",
+            "    // BUG: Diagnostic matches: X",
             "    Flux.just(2).toStream();",
-            "    // BUG: Diagnostic contains:",
+            "    // BUG: Diagnostic matches: X",
             "    long count = Flux.just(3).toStream().count();",
             "",
-            "    Flux.just(3).toStream(16);",
+            "    Flux.just(4).toIterable(1);",
+            "    Flux.just(5).toIterable(2, null);",
+            "    Flux.just(6).toStream(3);",
             "    new Foo().toIterable();",
             "    new Foo().toStream();",
             "  }",
             "",
-            "  public final class Foo<T> {",
-            "    public Iterable<T> toIterable() {",
+            "  class Foo<T> {",
+            "    Iterable<T> toIterable() {",
             "      return ImmutableList.of();",
             "    }",
             "",
-            "    public Stream<T> toStream() {",
+            "    Stream<T> toStream() {",
             "      return Stream.empty();",
             "    }",
             "  }",
@@ -108,7 +111,11 @@ final class ImplicitBlockingFluxTest {
             "class A {",
             "  void m() {",
             "    Flux.just(1).toIterable();",
-            "    Flux.just(2).toStream().count();",
+            "    Flux.just(2).toStream();",
+            "    Flux.just(3).toIterable().iterator();",
+            "    Flux.just(4).toStream().count();",
+            "    Flux.just(5) /* a */./* b */ toIterable /* c */(/* d */ ) /* e */;",
+            "    Flux.just(6) /* a */./* b */ toStream /* c */(/* d */ ) /* e */;",
             "  }",
             "}")
         .addOutputLines(
@@ -120,7 +127,11 @@ final class ImplicitBlockingFluxTest {
             "class A {",
             "  void m() {",
             "    Flux.just(1).collect(toImmutableList()).block();",
-            "    Flux.just(2).collect(toImmutableList()).block().stream().count();",
+            "    Flux.just(2).collect(toImmutableList()).block().stream();",
+            "    Flux.just(3).collect(toImmutableList()).block().iterator();",
+            "    Flux.just(4).collect(toImmutableList()).block().stream().count();",
+            "    Flux.just(5).collect(toImmutableList()).block() /* e */;",
+            "    Flux.just(6).collect(toImmutableList()).block().stream() /* e */;",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
@@ -138,7 +149,10 @@ final class ImplicitBlockingFluxTest {
             "  void m() {",
             "    Flux.just(1).toIterable();",
             "    Flux.just(2).toStream();",
-            "    Flux.just(3).toStream().findAny();",
+            "    Flux.just(3).toIterable().iterator();",
+            "    Flux.just(4).toStream().count();",
+            "    Flux.just(5) /* a */./* b */ toIterable /* c */(/* d */ ) /* e */;",
+            "    Flux.just(6) /* a */./* b */ toStream /* c */(/* d */ ) /* e */;",
             "  }",
             "}")
         .addOutputLines(
@@ -151,7 +165,10 @@ final class ImplicitBlockingFluxTest {
             "  void m() {",
             "    Flux.just(1).collect(toList()).block();",
             "    Flux.just(2).collect(toList()).block().stream();",
-            "    Flux.just(3).collect(toList()).block().stream().findAny();",
+            "    Flux.just(3).collect(toList()).block().iterator();",
+            "    Flux.just(4).collect(toList()).block().stream().count();",
+            "    Flux.just(5).collect(toList()).block() /* e */;",
+            "    Flux.just(6).collect(toList()).block().stream() /* e */;",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);

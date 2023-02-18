@@ -2,8 +2,9 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
-import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
-import static com.google.errorprone.BugPattern.StandardTags.STYLE;
+import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
+import static com.google.errorprone.BugPattern.StandardTags.CONCURRENCY;
+import static com.google.errorprone.BugPattern.StandardTags.PERFORMANCE;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -22,8 +23,8 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.util.Position;
+import java.util.stream.Stream;
 import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
 /**
@@ -35,16 +36,16 @@ import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
     summary = "Avoid using `Flux` operators that implicitly block",
     link = BUG_PATTERNS_BASE_URL + "ImplicitBlockingFlux",
     linkType = CUSTOM,
-    severity = SUGGESTION,
-    tags = STYLE)
+    severity = WARNING,
+    tags = {CONCURRENCY, PERFORMANCE})
 public final class ImplicitBlockingFlux extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> FLUX_WITH_IMPLICIT_BLOCK =
       instanceMethod()
-          .onDescendantOf(Suppliers.typeFromString("reactor.core.publisher.Flux"))
+          .onDescendantOf("reactor.core.publisher.Flux")
           .namedAnyOf("toIterable", "toStream")
           .withNoParameters();
-  private static final Supplier<Type> STREAM = Suppliers.typeFromString("java.util.stream.Stream");
+  private static final Supplier<Type> STREAM = Suppliers.typeFromString(Stream.class.getName());
 
   /** Instantiates a new {@link ImplicitBlockingFlux} instance. */
   public ImplicitBlockingFlux() {}
@@ -55,51 +56,41 @@ public final class ImplicitBlockingFlux extends BugChecker implements MethodInvo
       return Description.NO_MATCH;
     }
 
-    Description.Builder description = buildDescription(tree);
-
-    description.addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()));
+    Description.Builder description =
+        buildDescription(tree).addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()));
     if (ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)) {
       description.addFix(
-          trySuggestFix("com.google.common.collect.ImmutableList.toImmutableList", tree, state));
+          suggestBlockingElementCollection(
+              tree, "com.google.common.collect.ImmutableList.toImmutableList", state));
     }
-    description.addFix(trySuggestFix("java.util.stream.Collectors.toList", tree, state));
+    description.addFix(
+        suggestBlockingElementCollection(tree, "java.util.stream.Collectors.toList", state));
 
     return description.build();
   }
 
-  private static SuggestedFix trySuggestFix(
-      String fullyQualifiedMethodInvocation, MethodInvocationTree tree, VisitorState state) {
-    SuggestedFix.Builder importFix = SuggestedFix.builder();
+  private static SuggestedFix suggestBlockingElementCollection(
+      MethodInvocationTree tree, String fullyQualifiedCollectorMethod, VisitorState state) {
+    SuggestedFix.Builder importSuggestion = SuggestedFix.builder();
+    String replacementMethodInvocation =
+        SuggestedFixes.qualifyStaticImport(fullyQualifiedCollectorMethod, importSuggestion, state);
+
+    boolean isStream =
+        ASTHelpers.isSubtype(ASTHelpers.getResultType(tree), STREAM.get(state), state);
     String replacement =
-        SuggestedFixes.qualifyStaticImport(fullyQualifiedMethodInvocation, importFix, state);
-
-    return replaceWithExplicitBlock(tree, replacement + "()", importFix.build(), state);
-  }
-
-  private static SuggestedFix replaceWithExplicitBlock(
-      MethodInvocationTree tree,
-      String collectArgument,
-      SuggestedFix importFix,
-      VisitorState state) {
-    String collect = String.format("collect(%s)", collectArgument);
-    Types types = state.getTypes();
-    String explicitBlock =
-        types.isSubtype(ASTHelpers.getResultType(tree), types.erasure(STREAM.get(state)))
-            ? ".block().stream()"
-            : ".block()";
-    return replaceMethodInvocation(tree, collect, state)
-        .merge(importFix)
-        .postfixWith(tree, explicitBlock)
-        .build();
+        String.format(
+            ".collect(%s()).block()%s", replacementMethodInvocation, isStream ? ".stream()" : "");
+    return importSuggestion.merge(replaceMethodInvocation(tree, replacement, state)).build();
   }
 
   private static SuggestedFix.Builder replaceMethodInvocation(
       MethodInvocationTree tree, String replacement, VisitorState state) {
-    String methodName = ASTHelpers.getSymbol(tree).getQualifiedName().toString();
-
+    int startPosition = state.getEndPosition(ASTHelpers.getReceiver(tree));
     int endPosition = state.getEndPosition(tree);
-    checkState(endPosition != Position.NOPOS, "Cannot determine location of method in source code");
-    int startPosition = endPosition - methodName.length() - 2;
+
+    checkState(
+        startPosition != Position.NOPOS && endPosition != Position.NOPOS,
+        "Cannot locate method to be replaced in source code");
 
     return SuggestedFix.builder().replace(startPosition, endPosition, replacement);
   }
