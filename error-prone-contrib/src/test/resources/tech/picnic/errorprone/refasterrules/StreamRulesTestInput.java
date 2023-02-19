@@ -141,7 +141,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Integer> testStreamMapToIntSum() {
-    Function<String, Integer> parseIntFunction = (String s) -> Integer.parseInt(s);
+    Function<String, Integer> parseIntFunction = Integer::parseInt;
     return ImmutableSet.of(
         Stream.of(1).map(i -> i * 2).reduce(0, Integer::sum),
         Stream.of("1").map(Integer::parseInt).reduce(0, Integer::sum),
@@ -149,7 +149,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Double> testStreamMapToDoubleSum() {
-    Function<String, Double> parseDoubleFunction = (String s) -> Double.parseDouble(s);
+    Function<String, Double> parseDoubleFunction = Double::parseDouble;
     return ImmutableSet.of(
         Stream.of(1).map(i -> i * 2.0).reduce(0.0, Double::sum),
         Stream.of("1").map(Double::parseDouble).reduce(0.0, Double::sum),
@@ -157,7 +157,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Long> testStreamMapToLongSum() {
-    Function<String, Long> parseLongFunction = (String s) -> Long.parseLong(s);
+    Function<String, Long> parseLongFunction = Long::parseLong;
     return ImmutableSet.of(
         Stream.of(1).map(i -> i * 2L).reduce(0L, Long::sum),
         Stream.of("1").map(Long::parseLong).reduce(0L, Long::sum),
