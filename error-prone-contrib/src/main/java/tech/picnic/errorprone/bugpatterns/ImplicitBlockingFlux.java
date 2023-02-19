@@ -28,12 +28,15 @@ import java.util.stream.Stream;
 import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
 /**
- * A {@link BugChecker} that flags {@link reactor.core.publisher.Flux} operators that are implicitly
- * blocking.
+ * A {@link BugChecker} that flags {@link reactor.core.publisher.Flux} operator usages that may
+ * implicitly cause the calling thread to be blocked.
+ *
+ * <p>Note that the methods flagged here are not themselves blocking, but iterating over the
+ * resulting {@link Iterable} or {@link Stream} may be.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Avoid using `Flux` operators that implicitly block",
+    summary = "Avoid iterating over `Flux`es in an implicitly blocking manner",
     link = BUG_PATTERNS_BASE_URL + "ImplicitBlockingFlux",
     linkType = CUSTOM,
     severity = WARNING,
