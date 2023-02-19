@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.base.Predicates.and;
 import static com.google.common.base.Predicates.containsPattern;
 import static com.google.common.base.Predicates.not;
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.SECOND;
@@ -17,7 +18,12 @@ final class ImplicitBlockingFluxTest {
   @Test
   void identification() {
     CompilationTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
-        .expectErrorMessage("X", containsPattern("SuppressWarnings.*toImmutableList.*toList"))
+        .expectErrorMessage(
+            "X",
+            and(
+                containsPattern("SuppressWarnings"),
+                containsPattern("toImmutableList"),
+                containsPattern("toList")))
         .addSourceLines(
             "A.java",
             "import com.google.common.collect.ImmutableList;",
