@@ -24,11 +24,27 @@ final class BugPatternTestExtractorTest {
   }
 
   @Test
+  void bugPatternTestFileWithoutTestSuffix(@TempDir Path outputDirectory) {
+    Compilation.compileWithDocumentationGenerator(
+        outputDirectory,
+        "TestCheckerWithWrongSuffix.java",
+        "import com.google.errorprone.bugpatterns.BugChecker;",
+        "import com.google.errorprone.CompilationTestHelper;",
+        "",
+        "final class TestCheckerWithWrongSuffix {",
+        "  private static class TestChecker extends BugChecker {}",
+        "",
+        "  CompilationTestHelper compilationTestHelper = CompilationTestHelper.newInstance(TestChecker.class, getClass());",
+        "}");
+
+    assertThat(outputDirectory.toAbsolutePath()).isEmptyDirectory();
+  }
+
+  @Test
   void minimalBugPatternTest(@TempDir Path outputDirectory) throws IOException {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "TestCheckerTest.java",
-        "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "import com.google.errorprone.CompilationTestHelper;",
         "",
@@ -49,7 +65,6 @@ final class BugPatternTestExtractorTest {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "TestCheckerTest.java",
-        "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "import com.google.errorprone.CompilationTestHelper;",
         "",
