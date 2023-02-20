@@ -14,10 +14,10 @@ import org.reactivestreams.Publisher;
 import reactor.core.CorePublisher;
 import reactor.core.publisher.Flux;
 
-final class ImplicitBlockingFluxTest {
+final class FluxImplicitBlockTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
+    CompilationTestHelper.newInstance(FluxImplicitBlock.class, getClass())
         .expectErrorMessage(
             "X",
             and(
@@ -61,7 +61,7 @@ final class ImplicitBlockingFluxTest {
 
   @Test
   void identificationWithoutGuavaOnClasspath() {
-    CompilationTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
+    CompilationTestHelper.newInstance(FluxImplicitBlock.class, getClass())
         .withClasspath(CorePublisher.class, Flux.class, Publisher.class)
         .expectErrorMessage("X", not(containsPattern("toImmutableList")))
         .addSourceLines(
@@ -81,7 +81,7 @@ final class ImplicitBlockingFluxTest {
 
   @Test
   void replacementFirstSuggestedFix() {
-    BugCheckerRefactoringTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(FluxImplicitBlock.class, getClass())
         .addInputLines(
             "A.java",
             "import reactor.core.publisher.Flux;",
@@ -97,7 +97,7 @@ final class ImplicitBlockingFluxTest {
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
-            "  @SuppressWarnings(\"ImplicitBlockingFlux\")",
+            "  @SuppressWarnings(\"FluxImplicitBlock\")",
             "  void m() {",
             "    Flux.just(1).toIterable();",
             "    Flux.just(2).toStream();",
@@ -108,7 +108,7 @@ final class ImplicitBlockingFluxTest {
 
   @Test
   void replacementSecondSuggestedFix() {
-    BugCheckerRefactoringTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(FluxImplicitBlock.class, getClass())
         .setFixChooser(SECOND)
         .addInputLines(
             "A.java",
@@ -145,7 +145,7 @@ final class ImplicitBlockingFluxTest {
 
   @Test
   void replacementThirdSuggestedFix() {
-    BugCheckerRefactoringTestHelper.newInstance(ImplicitBlockingFlux.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(FluxImplicitBlock.class, getClass())
         .setFixChooser(THIRD)
         .addInputLines(
             "A.java",

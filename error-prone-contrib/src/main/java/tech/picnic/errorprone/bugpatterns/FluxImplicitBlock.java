@@ -37,11 +37,11 @@ import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid iterating over `Flux`es in an implicitly blocking manner",
-    link = BUG_PATTERNS_BASE_URL + "ImplicitBlockingFlux",
+    link = BUG_PATTERNS_BASE_URL + "FluxImplicitBlock",
     linkType = CUSTOM,
     severity = WARNING,
     tags = {CONCURRENCY, PERFORMANCE})
-public final class ImplicitBlockingFlux extends BugChecker implements MethodInvocationTreeMatcher {
+public final class FluxImplicitBlock extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> FLUX_WITH_IMPLICIT_BLOCK =
       instanceMethod()
@@ -50,8 +50,8 @@ public final class ImplicitBlockingFlux extends BugChecker implements MethodInvo
           .withNoParameters();
   private static final Supplier<Type> STREAM = Suppliers.typeFromString(Stream.class.getName());
 
-  /** Instantiates a new {@link ImplicitBlockingFlux} instance. */
-  public ImplicitBlockingFlux() {}
+  /** Instantiates a new {@link FluxImplicitBlock} instance. */
+  public FluxImplicitBlock() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
