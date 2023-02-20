@@ -230,7 +230,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.just("foo").flux().then();
   }
 
-  ImmutableSet<Mono<Optional<String>>> testMonoCollectToOptional() {
+  ImmutableSet<Mono<Optional<String>>> testMonoSingleOptional() {
     return ImmutableSet.of(
         Mono.just("foo").map(Optional::of).defaultIfEmpty(Optional.empty()),
         Mono.just("bar").flux().collect(toOptional()));

@@ -701,12 +701,12 @@ final class ReactorRules {
   /** Prefer {@link Mono#singleOptional()} over more contrived alternatives. */
   // XXX: Consider creating a plugin that flags/discourages `Mono<Optional<T>>` method return
   // types, just as we discourage nullable `Boolean`s and `Optional`s.
-  static final class MonoCollectToOptional<T> {
+  static final class MonoSingleOptional<T> {
     @BeforeTemplate
     Mono<Optional<T>> before(Mono<T> mono) {
       return Refaster.anyOf(
-          mono.map(Optional::of).defaultIfEmpty(Optional.empty()),
-          mono.flux().collect(toOptional()));
+          mono.flux().collect(toOptional()),
+          mono.map(Optional::of).defaultIfEmpty(Optional.empty()));
     }
 
     @AfterTemplate
