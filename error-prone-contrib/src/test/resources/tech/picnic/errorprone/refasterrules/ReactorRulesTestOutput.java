@@ -26,7 +26,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(assertThat(0), HashMap.class, ImmutableMap.class);
+    return ImmutableSet.of(assertThat(0), HashMap.class, ImmutableMap.class, toOptional());
   }
 
   ImmutableSet<Mono<?>> testMonoFromSupplier() {
@@ -224,8 +224,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.just("foo").then();
   }
 
-  Mono<Optional<String>> testMonoCollectToOptional() {
-    return Mono.just("foo").flux().collect(toOptional());
+  ImmutableSet<Mono<Optional<String>>> testMonoSingleOptional() {
+    return ImmutableSet.of(Mono.just("foo").singleOptional(), Mono.just("bar").singleOptional());
   }
 
   Mono<Number> testMonoCast() {

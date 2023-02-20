@@ -8,7 +8,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static reactor.function.TupleUtils.function;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.MoreCollectors;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -699,21 +698,21 @@ final class ReactorRules {
     }
   }
 
-  /**
-   * Prefer a collection using {@link MoreCollectors#toOptional()} over more contrived alternatives.
-   */
+  /** Prefer {@link Mono#singleOptional()} over more contrived alternatives. */
   // XXX: Consider creating a plugin that flags/discourages `Mono<Optional<T>>` method return
   // types, just as we discourage nullable `Boolean`s and `Optional`s.
-  static final class MonoCollectToOptional<T> {
+  static final class MonoSingleOptional<T> {
     @BeforeTemplate
     Mono<Optional<T>> before(Mono<T> mono) {
-      return mono.map(Optional::of).defaultIfEmpty(Optional.empty());
+      return Refaster.anyOf(
+          mono.flux().collect(toOptional()),
+          mono.map(Optional::of).defaultIfEmpty(Optional.empty()));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Mono<Optional<T>> after(Mono<T> mono) {
-      return mono.flux().collect(toOptional());
+      return mono.singleOptional();
     }
   }
 

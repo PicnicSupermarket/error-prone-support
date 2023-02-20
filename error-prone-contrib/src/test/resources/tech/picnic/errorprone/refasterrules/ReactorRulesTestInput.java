@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.MoreCollectors.toOptional;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +24,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(assertThat(0), HashMap.class, ImmutableMap.class);
+    return ImmutableSet.of(assertThat(0), HashMap.class, ImmutableMap.class, toOptional());
   }
 
   ImmutableSet<Mono<?>> testMonoFromSupplier() {
@@ -229,8 +230,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.just("foo").flux().then();
   }
 
-  Mono<Optional<String>> testMonoCollectToOptional() {
-    return Mono.just("foo").map(Optional::of).defaultIfEmpty(Optional.empty());
+  ImmutableSet<Mono<Optional<String>>> testMonoSingleOptional() {
+    return ImmutableSet.of(
+        Mono.just("foo").flux().collect(toOptional()),
+        Mono.just("bar").map(Optional::of).defaultIfEmpty(Optional.empty()));
   }
 
   Mono<Number> testMonoCast() {
