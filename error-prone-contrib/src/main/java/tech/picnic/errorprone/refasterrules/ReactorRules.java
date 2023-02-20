@@ -717,6 +717,19 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Mono#singleOptional()} over more contrived alternatives. */
+  static final class MonoSingleOptional<T> {
+    @BeforeTemplate
+    Mono<Optional<T>> before(Mono<T> mono) {
+      return mono.flux().collect(toOptional());
+    }
+
+    @AfterTemplate
+    Mono<Optional<T>> after(Mono<T> mono) {
+      return mono.singleOptional();
+    }
+  }
+
   /** Prefer {@link Mono#cast(Class)} over {@link Mono#map(Function)} with a cast. */
   static final class MonoCast<T, S> {
     @BeforeTemplate
