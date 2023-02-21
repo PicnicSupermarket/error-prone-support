@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
@@ -137,5 +138,29 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   boolean testStreamAllMatch2() {
     return Stream.of("foo").noneMatch(s -> !s.isBlank());
+  }
+
+  ImmutableSet<Integer> testStreamMapToIntSum() {
+    Function<String, Integer> parseIntFunction = Integer::parseInt;
+    return ImmutableSet.of(
+        Stream.of(1).map(i -> i * 2).reduce(0, Integer::sum),
+        Stream.of("2").map(Integer::parseInt).reduce(0, Integer::sum),
+        Stream.of("3").map(parseIntFunction).reduce(0, Integer::sum));
+  }
+
+  ImmutableSet<Double> testStreamMapToDoubleSum() {
+    Function<String, Double> parseDoubleFunction = Double::parseDouble;
+    return ImmutableSet.of(
+        Stream.of(1).map(i -> i * 2.0).reduce(0.0, Double::sum),
+        Stream.of("2").map(Double::parseDouble).reduce(0.0, Double::sum),
+        Stream.of("3").map(parseDoubleFunction).reduce(0.0, Double::sum));
+  }
+
+  ImmutableSet<Long> testStreamMapToLongSum() {
+    Function<String, Long> parseLongFunction = Long::parseLong;
+    return ImmutableSet.of(
+        Stream.of(1).map(i -> i * 2L).reduce(0L, Long::sum),
+        Stream.of("2").map(Long::parseLong).reduce(0L, Long::sum),
+        Stream.of("3").map(parseLongFunction).reduce(0L, Long::sum));
   }
 }

@@ -10,6 +10,7 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
@@ -19,10 +20,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
 
 /** Refaster rules related to expressions dealing with {@link Stream}s. */
 @OnlineDocumentation
@@ -377,6 +382,48 @@ final class StreamRules {
     @AfterTemplate
     boolean after(Stream<T> stream) {
       return stream.allMatch(e -> test(e));
+    }
+  }
+
+  static final class StreamMapToIntSum<T> {
+    @BeforeTemplate
+    int before(
+        Stream<T> stream,
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Integer> mapper) {
+      return stream.map(mapper).reduce(0, Integer::sum);
+    }
+
+    @AfterTemplate
+    int after(Stream<T> stream, ToIntFunction<T> mapper) {
+      return stream.mapToInt(mapper).sum();
+    }
+  }
+
+  static final class StreamMapToDoubleSum<T> {
+    @BeforeTemplate
+    double before(
+        Stream<T> stream,
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Double> mapper) {
+      return stream.map(mapper).reduce(0.0, Double::sum);
+    }
+
+    @AfterTemplate
+    double after(Stream<T> stream, ToDoubleFunction<T> mapper) {
+      return stream.mapToDouble(mapper).sum();
+    }
+  }
+
+  static final class StreamMapToLongSum<T> {
+    @BeforeTemplate
+    long before(
+        Stream<T> stream,
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Long> mapper) {
+      return stream.map(mapper).reduce(0L, Long::sum);
+    }
+
+    @AfterTemplate
+    long after(Stream<T> stream, ToLongFunction<T> mapper) {
+      return stream.mapToLong(mapper).sum();
     }
   }
 }
