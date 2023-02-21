@@ -31,10 +31,10 @@ final class BugPatternTestExtractorTest {
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "import com.google.errorprone.CompilationTestHelper;",
         "",
-        "final class TestCheckerWithWrongSuffix {",
-        "  private static class TestChecker extends BugChecker {}",
+        "final class TestCheckerWithoutTestSuffix {",
+        "  private static class TestCheckerWithout extends BugChecker {}",
         "",
-        "  CompilationTestHelper compilationTestHelper = CompilationTestHelper.newInstance(TestChecker.class, getClass());",
+        "  CompilationTestHelper compilationTestHelper = CompilationTestHelper.newInstance(TestCheckerWithout.class, getClass());",
         "}");
 
     assertThat(outputDirectory.toAbsolutePath()).isEmptyDirectory();
