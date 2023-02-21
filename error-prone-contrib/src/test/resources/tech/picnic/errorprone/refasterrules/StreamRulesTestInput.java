@@ -144,23 +144,23 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     Function<String, Integer> parseIntFunction = Integer::parseInt;
     return ImmutableSet.of(
         Stream.of(1).map(i -> i * 2).reduce(0, Integer::sum),
-        Stream.of("1").map(Integer::parseInt).reduce(0, Integer::sum),
-        Stream.of("1").map(parseIntFunction).reduce(0, Integer::sum));
+        Stream.of("2").map(Integer::parseInt).reduce(0, Integer::sum),
+        Stream.of("3").map(parseIntFunction).reduce(0, Integer::sum));
   }
 
   ImmutableSet<Double> testStreamMapToDoubleSum() {
     Function<String, Double> parseDoubleFunction = Double::parseDouble;
     return ImmutableSet.of(
         Stream.of(1).map(i -> i * 2.0).reduce(0.0, Double::sum),
-        Stream.of("1").map(Double::parseDouble).reduce(0.0, Double::sum),
-        Stream.of("1").map(parseDoubleFunction).reduce(0.0, Double::sum));
+        Stream.of("2").map(Double::parseDouble).reduce(0.0, Double::sum),
+        Stream.of("3").map(parseDoubleFunction).reduce(0.0, Double::sum));
   }
 
   ImmutableSet<Long> testStreamMapToLongSum() {
     Function<String, Long> parseLongFunction = Long::parseLong;
     return ImmutableSet.of(
         Stream.of(1).map(i -> i * 2L).reduce(0L, Long::sum),
-        Stream.of("1").map(Long::parseLong).reduce(0L, Long::sum),
-        Stream.of("1").map(parseLongFunction).reduce(0L, Long::sum));
+        Stream.of("2").map(Long::parseLong).reduce(0L, Long::sum),
+        Stream.of("3").map(parseLongFunction).reduce(0L, Long::sum));
   }
 }
