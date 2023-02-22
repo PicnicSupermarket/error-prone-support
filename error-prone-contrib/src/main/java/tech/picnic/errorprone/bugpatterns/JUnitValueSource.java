@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.ALL;
+import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.argument;
@@ -101,6 +102,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
                       "com.google.common.collect.ImmutableList",
                       "com.google.common.collect.ImmutableSet")
                   .named("of"),
+              hasArguments(AT_LEAST_ONE, (tree, state) -> true),
               hasArguments(ALL, SUPPORTED_VALUE_FACTORY_VALUES)));
   private static final Matcher<MethodTree> IS_UNARY_METHOD_WITH_SUPPORTED_PARAMETER =
       methodHasParameters(
@@ -241,6 +243,10 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
       return Optional.empty();
     }
 
+    /*
+     * Join the values into a comma-separated string, unwrapping `Arguments` factory method
+     * invocations if applicable.
+     */
     return Optional.of(
             arguments.stream()
                 .map(

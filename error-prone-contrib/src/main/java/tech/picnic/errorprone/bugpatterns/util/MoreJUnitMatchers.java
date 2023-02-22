@@ -55,26 +55,54 @@ public final class MoreJUnitMatchers {
    * Returns the names of the JUnit value factory methods specified by the given {@link
    * org.junit.jupiter.params.provider.MethodSource} annotation.
    *
+   * <p>This method differs from {@link #getMethodSourceFactoryDescriptors(AnnotationTree,
+   * MethodTree)} in that it drops any parenthesized method parameter type enumerations. That is,
+   * method descriptors such as {@code factoryMethod()} and {@code factoryMethod(java.lang.String)}
+   * are both simplified to just {@code factoryMethod}.
+   *
    * @param methodSourceAnnotation The annotation from which to extract value factory method names.
    * @param method The method on which the annotation is located.
    * @return One or more value factory names.
+   * @see #getMethodSourceFactoryDescriptors(AnnotationTree, MethodTree)
    */
+  // XXX: Test this method.
   public static ImmutableSet<String> getMethodSourceFactoryNames(
+      AnnotationTree methodSourceAnnotation, MethodTree method) {
+    return getMethodSourceFactoryDescriptors(methodSourceAnnotation, method).stream()
+        .map(
+            descriptor -> {
+              int index = descriptor.indexOf('(');
+              return index < 0 ? descriptor : descriptor.substring(0, index);
+            })
+        .collect(toImmutableSet());
+  }
+
+  /**
+   * Returns the descriptors of the JUnit value factory methods specified by the given {@link
+   * org.junit.jupiter.params.provider.MethodSource} annotation.
+   *
+   * @param methodSourceAnnotation The annotation from which to extract value factory method
+   *     descriptors.
+   * @param method The method on which the annotation is located.
+   * @return One or more value factory descriptors.
+   * @see #getMethodSourceFactoryNames(AnnotationTree, MethodTree)
+   */
+  public static ImmutableSet<String> getMethodSourceFactoryDescriptors(
       AnnotationTree methodSourceAnnotation, MethodTree method) {
     String methodName = method.getName().toString();
     ExpressionTree value = AnnotationMatcherUtils.getArgument(methodSourceAnnotation, "value");
 
     if (!(value instanceof NewArrayTree)) {
-      return ImmutableSet.of(toMethodSourceFactoryName(value, methodName));
+      return ImmutableSet.of(toMethodSourceFactoryDescriptor(value, methodName));
     }
 
     return ((NewArrayTree) value)
         .getInitializers().stream()
-            .map(name -> toMethodSourceFactoryName(name, methodName))
+            .map(name -> toMethodSourceFactoryDescriptor(name, methodName))
             .collect(toImmutableSet());
   }
 
-  private static String toMethodSourceFactoryName(
+  private static String toMethodSourceFactoryDescriptor(
       @Nullable ExpressionTree tree, String annotatedMethodName) {
     return requireNonNullElse(
         Strings.emptyToNull(ASTHelpers.constValue(tree, String.class)), annotatedMethodName);

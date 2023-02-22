@@ -82,7 +82,7 @@ final class MoreJUnitMatchersTest {
 
   @Test
   void getMethodSourceFactoryNames() {
-    CompilationTestHelper.newInstance(MethodSourceFactoryNamesTestChecker.class, getClass())
+    CompilationTestHelper.newInstance(MethodSourceFactoryDescriptorsTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
             "import org.junit.jupiter.params.provider.MethodSource;",
@@ -153,10 +153,10 @@ final class MoreJUnitMatchersTest {
 
   /**
    * A {@link BugChecker} that flags methods with a JUnit {@code @MethodSource} annotation by
-   * enumerating the associated value factory method names.
+   * enumerating the associated value factory method descriptors.
    */
   @BugPattern(summary = "Interacts with `MoreJUnitMatchers` for testing purposes", severity = ERROR)
-  public static final class MethodSourceFactoryNamesTestChecker extends BugChecker
+  public static final class MethodSourceFactoryDescriptorsTestChecker extends BugChecker
       implements MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -166,7 +166,8 @@ final class MoreJUnitMatchersTest {
           Iterables.getOnlyElement(HAS_METHOD_SOURCE.multiMatchResult(tree, state).matchingNodes());
 
       return buildDescription(tree)
-          .setMessage(MoreJUnitMatchers.getMethodSourceFactoryNames(annotation, tree).toString())
+          .setMessage(
+              MoreJUnitMatchers.getMethodSourceFactoryDescriptors(annotation, tree).toString())
           .build();
     }
   }
