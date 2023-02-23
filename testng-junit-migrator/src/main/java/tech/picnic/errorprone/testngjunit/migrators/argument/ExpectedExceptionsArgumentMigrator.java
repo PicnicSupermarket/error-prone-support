@@ -37,7 +37,7 @@ public class ExpectedExceptionsArgumentMigrator implements Migrator {
       fix.prefixWith(
           methodTree,
           String.format(
-              "// XXX: Removed handling of `%s` because this migration doesn't support it.\n",
+              "// XXX: Removed handling of `%s` because this migration doesn't support\n// XXX: multiple expected exceptions.\n",
               String.join(", ", removedExceptions)));
     }
 
