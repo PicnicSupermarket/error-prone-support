@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -22,11 +20,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>tech.picnic.error-prone-support</groupId>
-            <artifactId>error-prone-contrib</artifactId>
-            <version>0.8.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_annotation</artifactId>
         </dependency>
@@ -43,6 +36,11 @@
             <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_test_helpers</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>error-prone-contrib</artifactId>
+            <version>0.8.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.google.auto</groupId>
