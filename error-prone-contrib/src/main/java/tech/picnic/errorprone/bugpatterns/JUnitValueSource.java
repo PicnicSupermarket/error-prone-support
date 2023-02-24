@@ -62,9 +62,14 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
  * equivalent {@link org.junit.jupiter.params.provider.ValueSource} annotation.
  */
 // XXX: Where applicable, also flag `@MethodSource` annotations that reference multiple value
-// factory methods.
+// factory methods (or that repeat the same value factory method multiple times).
+// XXX: Support inlining of overloaded value factory methods .
+// XXX: Support inlining of value factory methods referenced by multiple `@MethodSource`
+// annotations.
 // XXX: Support value factory return expressions of the form `Stream.of(a, b,
 // c).map(Arguments::argument)`.
+// XXX: Support simplification of test methods that accept additional injected parameters such as
+// `TestInfo`; such parameters should be ignored for the purpose of this check.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `@ValueSource` over a `@MethodSource` where possible and reasonable",
@@ -127,7 +132,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
             methodSourceAnnotation ->
                 getSoleLocalFactoryName(methodSourceAnnotation, tree)
                     .filter(factory -> !hasSiblingReferencingValueFactory(tree, factory, state))
-                    .flatMap(factory -> findNullaryFactorySibling(tree, factory, state))
+                    .flatMap(factory -> findSiblingWithName(tree, factory, state))
                     .flatMap(
                         factoryMethod ->
                             tryConstructValueSourceFix(
@@ -144,7 +149,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   private static Optional<String> getSoleLocalFactoryName(
       AnnotationTree methodSourceAnnotation, MethodTree method) {
     return getElementIfSingleton(getMethodSourceFactoryNames(methodSourceAnnotation, method))
-        .filter(name -> !name.contains("#"));
+        .filter(name -> name.indexOf('#') < 0);
   }
 
   /**
@@ -153,14 +158,13 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
    */
   private static boolean hasSiblingReferencingValueFactory(
       MethodTree tree, String valueFactory, VisitorState state) {
-    return findMatchingSibling(tree, m -> hasMethodSource(m, valueFactory, state), state)
+    return findMatchingSibling(tree, m -> hasValueFactory(m, valueFactory, state), state)
         .isPresent();
   }
 
-  private static Optional<MethodTree> findNullaryFactorySibling(
+  private static Optional<MethodTree> findSiblingWithName(
       MethodTree tree, String methodName, VisitorState state) {
-    return findMatchingSibling(
-        tree, m -> m.getParameters().isEmpty() && m.getName().contentEquals(methodName), state);
+    return findMatchingSibling(tree, m -> m.getName().contentEquals(methodName), state);
   }
 
   private static Optional<MethodTree> findMatchingSibling(
@@ -173,11 +177,12 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
         .findFirst();
   }
 
-  private static boolean hasMethodSource(
+  private static boolean hasValueFactory(
       MethodTree tree, String valueFactoryMethodName, VisitorState state) {
-    return findMethodSourceAnnotation(tree, state)
-        .filter(a -> getMethodSourceFactoryNames(a, tree).contains(valueFactoryMethodName))
-        .isPresent();
+    return findMethodSourceAnnotation(tree, state).stream()
+        .anyMatch(
+            annotation ->
+                getMethodSourceFactoryNames(annotation, tree).contains(valueFactoryMethodName));
   }
 
   private static Optional<AnnotationTree> findMethodSourceAnnotation(
@@ -256,7 +261,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
                             : arg)
                 .map(argument -> SourceCode.treeToString(argument, state))
                 .collect(joining(", ")))
-        .map(value -> String.format(arguments.size() > 1 ? "{%s}" : "%s", value));
+        .map(value -> arguments.size() > 1 ? String.format("{%s}", value) : value);
   }
 
   private static String toValueSourceAttributeName(Type type) {

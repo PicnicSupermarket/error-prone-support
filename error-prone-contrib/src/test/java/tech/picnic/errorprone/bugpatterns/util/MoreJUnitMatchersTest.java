@@ -82,6 +82,40 @@ final class MoreJUnitMatchersTest {
 
   @Test
   void getMethodSourceFactoryNames() {
+    CompilationTestHelper.newInstance(MethodSourceFactoryNamesTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "import org.junit.jupiter.params.provider.MethodSource;",
+            "",
+            "class A {",
+            "  @MethodSource",
+            "  // BUG: Diagnostic contains: [matchingMethodSource]",
+            "  void matchingMethodSource(boolean b) {}",
+            "",
+            "  @MethodSource(\"myValueFactory\")",
+            "  // BUG: Diagnostic contains: [myValueFactory]",
+            "  void singleCustomMethodSource(boolean b) {}",
+            "",
+            "  @MethodSource({",
+            "    \"nullary()\",",
+            "    \"nullary()\",",
+            "    \"\",",
+            "    \"withStringParam(java.lang.String)\",",
+            "    \"paramsUnspecified\"",
+            "  })",
+            "  // BUG: Diagnostic contains: [nullary, nullary, multipleMethodSources, withStringParam,",
+            "  // paramsUnspecified]",
+            "  void multipleMethodSources(boolean b) {}",
+            "",
+            "  @MethodSource({\"foo\", \"()\", \"bar\"})",
+            "  // BUG: Diagnostic contains: [foo, , bar]",
+            "  void methodSourceWithoutName(boolean b) {}",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void getMethodSourceFactoryDescriptors() {
     CompilationTestHelper.newInstance(MethodSourceFactoryDescriptorsTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
@@ -119,6 +153,14 @@ final class MoreJUnitMatchersTest {
             "  @MethodSource({\"myValueFactory\", \"\"})",
             "  // BUG: Diagnostic contains: [myValueFactory, customAndMatchingMethodSources]",
             "  void customAndMatchingMethodSources(boolean b) {}",
+            "",
+            "  @MethodSource({\"factory\", \"\", \"factory\", \"\"})",
+            "  // BUG: Diagnostic contains: [factory, repeatedMethodSources, factory, repeatedMethodSources]",
+            "  void repeatedMethodSources(boolean b) {}",
+            "",
+            "  @MethodSource({\"nullary()\", \"withStringParam(java.lang.String)\"})",
+            "  // BUG: Diagnostic contains: [nullary(), withStringParam(java.lang.String)]",
+            "  void methodSourcesWithParameterSpecification(boolean b) {}",
             "}")
         .doTest();
   }
@@ -148,6 +190,26 @@ final class MoreJUnitMatchersTest {
       return matches.isEmpty()
           ? Description.NO_MATCH
           : buildDescription(tree).setMessage(String.join(", ", matches)).build();
+    }
+  }
+
+  /**
+   * A {@link BugChecker} that flags methods with a JUnit {@code @MethodSource} annotation by
+   * enumerating the associated value factory method names.
+   */
+  @BugPattern(summary = "Interacts with `MoreJUnitMatchers` for testing purposes", severity = ERROR)
+  public static final class MethodSourceFactoryNamesTestChecker extends BugChecker
+      implements MethodTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchMethod(MethodTree tree, VisitorState state) {
+      AnnotationTree annotation =
+          Iterables.getOnlyElement(HAS_METHOD_SOURCE.multiMatchResult(tree, state).matchingNodes());
+
+      return buildDescription(tree)
+          .setMessage(MoreJUnitMatchers.getMethodSourceFactoryNames(annotation, tree).toString())
+          .build();
     }
   }
 
