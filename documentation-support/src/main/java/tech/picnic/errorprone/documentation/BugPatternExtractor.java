@@ -16,7 +16,6 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import com.sun.tools.javac.util.Context;
 import javax.lang.model.element.AnnotationValue;
 import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocumentation;
 
@@ -26,7 +25,7 @@ import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocume
 @Immutable
 final class BugPatternExtractor implements Extractor<BugPatternDocumentation> {
   @Override
-  public BugPatternDocumentation extract(ClassTree tree, Context context) {
+  public BugPatternDocumentation extract(ClassTree tree, VisitorState state) {
     ClassSymbol symbol = ASTHelpers.getSymbol(tree);
     BugPattern annotation = symbol.getAnnotation(BugPattern.class);
     requireNonNull(annotation, "BugPattern annotation must be present");

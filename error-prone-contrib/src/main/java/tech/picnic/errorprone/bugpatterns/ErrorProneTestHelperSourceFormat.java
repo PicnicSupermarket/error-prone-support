@@ -154,7 +154,7 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
     StringBuilder source = new StringBuilder();
 
     for (ExpressionTree sourceLine : sourceLines) {
-      Object value = ASTHelpers.constValue(sourceLine);
+      String value = ASTHelpers.constValue(sourceLine, String.class);
       if (value == null) {
         return Optional.empty();
       }

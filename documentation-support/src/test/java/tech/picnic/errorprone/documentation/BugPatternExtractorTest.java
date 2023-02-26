@@ -141,7 +141,7 @@ final class BugPatternExtractorTest {
     public Description matchClass(ClassTree tree, VisitorState state) {
       BugPatternExtractor extractor = new BugPatternExtractor();
 
-      assertThatThrownBy(() -> extractor.extract(tree, state.context))
+      assertThatThrownBy(() -> extractor.extract(tree, state))
           .isInstanceOf(NullPointerException.class)
           .hasMessage("BugPattern annotation must be present");
 
