@@ -1,14 +1,18 @@
 package tech.picnic.errorprone.documentation;
 
+import static com.google.errorprone.matchers.Matchers.allOf;
+import static com.google.errorprone.matchers.Matchers.anything;
+import static com.google.errorprone.matchers.Matchers.argument;
+import static com.google.errorprone.matchers.Matchers.classLiteral;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
+import static com.google.errorprone.matchers.Matchers.toType;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
-import com.google.errorprone.annotations.Var;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
@@ -16,10 +20,11 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
-import com.sun.tools.javac.util.Context;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestDocumentation;
 
@@ -29,21 +34,20 @@ import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTe
  */
 @Immutable
 final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumentation> {
-  private static final Matcher<MethodTree> JUNIT_TEST_METHOD =
-      hasAnnotation("org.junit.jupiter.api.Test");
+  private static final Matcher<Tree> JUNIT_TEST_METHOD =
+      toType(MethodTree.class, hasAnnotation("org.junit.jupiter.api.Test"));
 
   // XXX: Improve support for correctly extracting multiple sources from a single
   // `{BugCheckerRefactoring,Compilation}TestHelper` test.
   @Override
-  public BugPatternTestDocumentation extract(ClassTree tree, Context context) {
-    VisitorState state = VisitorState.createForUtilityPurposes(context);
-    CollectBugPatternTests scanner = new CollectBugPatternTests(state);
+  public BugPatternTestDocumentation extract(ClassTree tree, VisitorState state) {
+    CollectBugPatternTests scanner = new CollectBugPatternTests();
 
-    tree.getMembers().stream()
-        .filter(MethodTree.class::isInstance)
-        .map(MethodTree.class::cast)
-        .filter(m -> JUNIT_TEST_METHOD.matches(m, state))
-        .forEach(m -> scanner.scan(m, null));
+    for (Tree m : tree.getMembers()) {
+      if (JUNIT_TEST_METHOD.matches(m, state)) {
+        scanner.scan(m, state);
+      }
+    }
 
     String className = tree.getSimpleName().toString();
     return new AutoValue_BugPatternTestExtractor_BugPatternTestDocumentation(
@@ -66,13 +70,16 @@ final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumenta
     return scanBugPatternTest.hasTestUsingClassInstance(bugPatternName);
   }
 
+  // XXX: Consider replacing this type with an anonymous class in a method. Possibly also below.
   private static final class ScanBugPatternTest extends TreeScanner<@Nullable Void, VisitorState> {
-    private static final Matcher<ExpressionTree> BUG_PATTERN_TEST_METHOD =
-        staticMethod()
-            .onDescendantOfAny(
-                "com.google.errorprone.CompilationTestHelper",
-                "com.google.errorprone.BugCheckerRefactoringTestHelper")
-            .named("newInstance");
+    private static final Matcher<MethodInvocationTree> BUG_PATTERN_TEST_METHOD =
+        allOf(
+            staticMethod()
+                .onDescendantOfAny(
+                    "com.google.errorprone.CompilationTestHelper",
+                    "com.google.errorprone.BugCheckerRefactoringTestHelper")
+                .named("newInstance"),
+            argument(0, classLiteral(anything())));
 
     private final List<String> encounteredClasses = new ArrayList<>();
 
@@ -86,12 +93,13 @@ final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumenta
         MemberSelectTree firstArgumentTree = (MemberSelectTree) node.getArguments().get(0);
         encounteredClasses.add(firstArgumentTree.getExpression().toString());
       }
+
       return super.visitMethodInvocation(node, state);
     }
   }
 
   private static final class CollectBugPatternTests
-      extends TreeScanner<@Nullable Void, @Nullable Void> {
+      extends TreeScanner<@Nullable Void, VisitorState> {
     private static final Matcher<ExpressionTree> IDENTIFICATION_SOURCE_LINES =
         instanceMethod()
             .onDescendantOf("com.google.errorprone.CompilationTestHelper")
@@ -105,15 +113,8 @@ final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumenta
             .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper.ExpectOutput")
             .named("addOutputLines");
 
-    private final VisitorState state;
     private final List<String> identificationTests = new ArrayList<>();
     private final List<BugPatternReplacementTestDocumentation> replacementTests = new ArrayList<>();
-
-    @Var private String replacementOutputLines = "";
-
-    CollectBugPatternTests(VisitorState state) {
-      this.state = state;
-    }
 
     public ImmutableList<String> getIdentificationTests() {
       return ImmutableList.copyOf(identificationTests);
@@ -123,39 +124,55 @@ final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumenta
       return ImmutableList.copyOf(replacementTests);
     }
 
+    // XXX: Consider:
+    // - Whether to omit or handle differently identification tests without `// BUG: Diagnostic
+    //   (contains|matches)` markers.
+    // - Whether to omit or handle differently replacement tests with identical input and output.
+    //   (Though arguably we should have a separate checker which replaces such cases with
+    //   `.expectUnchanged()`.)
+    // - Whether to track `.expectUnchanged()` test cases.
     @Override
-    public @Nullable Void visitMethodInvocation(MethodInvocationTree node, @Nullable Void unused) {
+    public @Nullable Void visitMethodInvocation(MethodInvocationTree node, VisitorState state) {
       if (IDENTIFICATION_SOURCE_LINES.matches(node, state)) {
-        identificationTests.add(getSourceLines(node));
-      } else if (REPLACEMENT_INPUT.matches(node, state)) {
-        /* The visitor starts with `addOutputLines` and in the next visit it will go over the `addInputLines`. */
-        replacementTests.add(
-            BugPatternReplacementTestDocumentation.create(
-                getSourceLines(node), replacementOutputLines));
+        getSourceCode(node).ifPresent(identificationTests::add);
       } else if (REPLACEMENT_OUTPUT.matches(node, state)) {
-        replacementOutputLines = getSourceLines(node);
+        ExpressionTree receiver = ASTHelpers.getReceiver(node);
+        // XXX: Make this code nicer.
+        if (REPLACEMENT_INPUT.matches(receiver, state)) {
+          getSourceCode(node)
+              .ifPresent(
+                  output ->
+                      getSourceCode((MethodInvocationTree) receiver)
+                          .ifPresent(
+                              input ->
+                                  replacementTests.add(
+                                      new AutoValue_BugPatternTestExtractor_BugPatternReplacementTestDocumentation(
+                                          input, output))));
+        }
       }
-      return super.visitMethodInvocation(node, unused);
+
+      return super.visitMethodInvocation(node, state);
     }
 
-    // XXX: Duplicate from `ErrorProneTestSourceFormat`, should we move this to `SourceCode` util?
-    private static String getSourceLines(MethodInvocationTree tree) {
+    // XXX: Duplicated from `ErrorProneTestSourceFormat`. Can we do better?
+    private static Optional<String> getSourceCode(MethodInvocationTree tree) {
       List<? extends ExpressionTree> sourceLines =
           tree.getArguments().subList(1, tree.getArguments().size());
       StringBuilder source = new StringBuilder();
 
       for (ExpressionTree sourceLine : sourceLines) {
-        Object value = ASTHelpers.constValue(sourceLine);
+        String value = ASTHelpers.constValue(sourceLine, String.class);
         if (value == null) {
-          return "";
+          return Optional.empty();
         }
         source.append(value).append('\n');
       }
 
-      return source.toString();
+      return Optional.of(source.toString());
     }
   }
 
+  // XXX: Rename?
   @AutoValue
   abstract static class BugPatternTestDocumentation {
     abstract String name();
@@ -165,13 +182,9 @@ final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumenta
     abstract ImmutableList<BugPatternReplacementTestDocumentation> replacementTests();
   }
 
+  // XXX: Rename?
   @AutoValue
   abstract static class BugPatternReplacementTestDocumentation {
-    static BugPatternReplacementTestDocumentation create(String sourceLines, String outputLines) {
-      return new AutoValue_BugPatternTestExtractor_BugPatternReplacementTestDocumentation(
-          sourceLines, outputLines);
-    }
-
     abstract String inputLines();
 
     abstract String outputLines();

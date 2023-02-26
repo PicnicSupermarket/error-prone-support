@@ -7,9 +7,11 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskEvent.Kind;
 import com.sun.source.util.TaskListener;
+import com.sun.source.util.TreePath;
 import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.util.Context;
 import java.io.File;
@@ -52,19 +54,24 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
       return;
     }
 
-    ClassTree classTree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
     JavaFileObject sourceFile = taskEvent.getSourceFile();
-    if (classTree == null || sourceFile == null) {
+    CompilationUnitTree compilationUnit = taskEvent.getCompilationUnit();
+    ClassTree classTree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
+    if (sourceFile == null || compilationUnit == null || classTree == null) {
       return;
     }
 
-    ExtractorType.findMatchingType(classTree, VisitorState.createForUtilityPurposes(context))
+    VisitorState state =
+        VisitorState.createForUtilityPurposes(context)
+            .withPath(new TreePath(new TreePath(compilationUnit), classTree));
+
+    ExtractorType.findMatchingType(classTree, state)
         .ifPresent(
             extractorType ->
                 writeToFile(
                     extractorType.getIdentifier(),
                     getSimpleClassName(sourceFile.toUri()),
-                    extractorType.getExtractor().extract(classTree, context)));
+                    extractorType.getExtractor().extract(classTree, state)));
   }
 
   private void createDocsDirectory() {
