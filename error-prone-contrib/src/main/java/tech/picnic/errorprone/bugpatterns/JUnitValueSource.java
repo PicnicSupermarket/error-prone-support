@@ -64,7 +64,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
  */
 // XXX: Where applicable, also flag `@MethodSource` annotations that reference multiple value
 // factory methods (or that repeat the same value factory method multiple times).
-// XXX: Support inlining of overloaded value factory methods .
+// XXX: Support inlining of overloaded value factory methods.
 // XXX: Support inlining of value factory methods referenced by multiple `@MethodSource`
 // annotations.
 // XXX: Support value factory return expressions of the form `Stream.of(a, b,
