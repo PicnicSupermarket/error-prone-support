@@ -45,19 +45,14 @@ public class DataProviderMigrator {
    * @return {@code true} if the data provider can be migrated or else {@code false}.
    */
   public boolean canFix(MethodTree methodTree) {
-    Optional<ReturnTree> returnTree = getReturnTree(methodTree);
-    return returnTree.isPresent()
-        && returnTree.flatMap(DataProviderMigrator::getDataProviderReturnTree).isPresent();
+    return getDataProviderReturnTree(getReturnTree(methodTree)).isPresent();
   }
 
   private static Optional<SuggestedFix> migrateDataProvider(
       MethodTree methodTree, ClassTree classTree, VisitorState state) {
-    Optional<ReturnTree> returnTree = getReturnTree(methodTree);
-    if (returnTree.isEmpty()) {
-      return Optional.empty();
-    }
+    ReturnTree returnTree = getReturnTree(methodTree);
 
-    return getDataProviderReturnTree(returnTree.orElseThrow())
+    return getDataProviderReturnTree(returnTree)
         .map(
             dataProviderReturnTree ->
                 SuggestedFix.builder()
@@ -73,17 +68,18 @@ public class DataProviderMigrator {
                                 classTree.getSimpleName().toString(),
                                 methodTree.getName().toString(),
                                 methodTree,
-                                returnTree.orElseThrow(),
+                                returnTree,
                                 dataProviderReturnTree,
                                 state)))
                     .build());
   }
 
-  private static Optional<ReturnTree> getReturnTree(MethodTree methodTree) {
+  private static ReturnTree getReturnTree(MethodTree methodTree) {
     return methodTree.getBody().getStatements().stream()
         .filter(ReturnTree.class::isInstance)
         .findFirst()
-        .map(ReturnTree.class::cast);
+        .map(ReturnTree.class::cast)
+        .orElseThrow();
   }
 
   private static Optional<NewArrayTree> getDataProviderReturnTree(ReturnTree returnTree) {
