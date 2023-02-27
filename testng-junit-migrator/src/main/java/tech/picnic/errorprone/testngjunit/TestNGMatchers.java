@@ -16,7 +16,7 @@ import com.sun.source.tree.MethodTree;
  * <p>These constants and methods are additions to the ones found in {@link
  * com.google.errorprone.matchers.TestNgMatchers}.
  */
-public final class TestNGMatchers {
+final class TestNGMatchers {
   /**
    * Matches the TestNG {@code Test} annotation specifically. As {@link
    * com.google.errorprone.matchers.TestNgMatchers#hasTestNgAnnotation(ClassTree)} also other TestNG

@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.testngjunit.migrators.argument;
+package tech.picnic.errorprone.testngjunit;
 
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
@@ -10,12 +10,10 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.util.Optional;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
-import tech.picnic.errorprone.testngjunit.Migrator;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
 /** An {@link Migrator} that migrates the {@code dataProvider} argument. */
 @Immutable
-public final class DataProviderArgumentMigrator implements Migrator {
+final class DataProviderArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
