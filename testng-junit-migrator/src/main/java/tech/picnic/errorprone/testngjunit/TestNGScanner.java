@@ -72,8 +72,6 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
 
   private static Optional<TestNGMetadata.AnnotationMetadata> getTestNGAnnotation(
       Tree tree, VisitorState state) {
-    // XXX: I think there is a method to get a specific annotation from a tree. Not sure if that is
-    // usable here though.
     return ASTHelpers.getAnnotations(tree).stream()
         .filter(annotation -> TESTNG_TEST_ANNOTATION.matches(annotation, state))
         .findFirst()
