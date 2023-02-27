@@ -99,7 +99,6 @@ done
 
 echo "Running migration..."
 "${MVN}" \
-  -T 1.0C \
   -Perror-prone \
   -Ptestng-migrator \
   -Ppatch \
