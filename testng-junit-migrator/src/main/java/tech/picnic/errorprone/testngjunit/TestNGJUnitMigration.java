@@ -60,7 +60,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   /**
    * Instantiates a new {@link TestNGJUnitMigration} with the specified {@link ErrorProneFlags}.
    *
-   * @param flags the error-prone flags used to set the migration mode
+   * @param flags the error-prone flags used to set the migration mode.
    */
   public TestNGJUnitMigration(ErrorProneFlags flags) {
     this.conservativeMode = flags.getBoolean(CONSERVATIVE_MIGRATION_MODE_FLAG).orElse(false);
