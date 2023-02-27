@@ -13,11 +13,6 @@
     <name>Picnic :: Error Prone Support :: TestNG JUnit Migrator</name>
     <description>A TestNG to JUnit migration tool built on Error Prone Support</description>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>

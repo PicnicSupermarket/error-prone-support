@@ -21,8 +21,6 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 final class TestNGScannerTest {
   // XXX: We are missing some tests here.
-  // - JUnit class that is already migrated.
-  // - Normal class that shouldn't trigger? Or a negative example at least.
   // - Some not supported things as well.
   @Test
   void classLevelAndMethodLevel() {
@@ -98,6 +96,12 @@ final class TestNGScannerTest {
             "  @Test",
             "  private void foo() {}",
             "}");
+  }
+
+  @Test
+  void normalClass() {
+    CompilationTestHelper.newInstance(TestChecker.class, getClass())
+        .addSourceLines("A.java", "class A {", "  private void foo() {}", "}");
   }
 
   /**

@@ -111,8 +111,6 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
             .ifPresent(
                 annotation -> {
                   SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
-
-                  // migrate arguments
                   buildArgumentFixes(metaData.getClassTree(), annotation, tree, state)
                       .forEach(fixBuilder::merge);
 
@@ -169,12 +167,9 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   private static SuggestedFix migrateAnnotation(
       AnnotationMetadata annotationMetadata, MethodTree methodTree) {
     SuggestedFix.Builder fixBuilder =
-        SuggestedFix.builder()
-            .addImport("org.junit.jupiter.api.Test")
-            .removeImport("org.testng.annotations.Test")
-            .merge(SuggestedFix.delete(annotationMetadata.getAnnotationTree()));
+        SuggestedFix.builder().merge(SuggestedFix.delete(annotationMetadata.getAnnotationTree()));
     if (!annotationMetadata.getArguments().containsKey("dataProvider")) {
-      fixBuilder.merge(SuggestedFix.prefixWith(methodTree, "@Test\n"));
+      fixBuilder.merge(SuggestedFix.prefixWith(methodTree, "@org.junit.jupiter.api.Test\n"));
     }
 
     return fixBuilder.build();
