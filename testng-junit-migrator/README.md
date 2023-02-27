@@ -1,10 +1,10 @@
-# TestNG to JUnit migrator
+# TestNG to JUnit Jupiter migrator
 
-An automated TestNG to JUnit 5 migration tool built on top of EPS
+A tool to automatically migrate TestNG tests to JUnit Jupiter.
 
 ### Example
 
-Consider the following TestNG test:
+Consider the following TestNG test class:
 
 ```java
 // TestNG code:
@@ -30,32 +30,32 @@ public class A {
 This migration tool will turn this into the following:
 
 ```java
-// JUnit 5 code:
+// JUnit Jupiter code:
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class A {
-    @Test
-    void simpleTest() {}
+  @Test
+  void simpleTest() {}
 
-    @Test
-    @Order(2)
-    public void priorityTest() {}
+  @Test
+  @Order(2)
+  public void priorityTest() {}
 
-    private static Stream<Argument> dataProviderTestCases() {
-        return Stream.of(arguments(1), arguments(2), arguments(3));
-    }
+  private static Stream<Argument> dataProviderTestCases() {
+      return Stream.of(arguments(1), arguments(2), arguments(3));
+  }
 
-    @ParameterizedTest
-    @MethodSource("dataProviderTestCases")
-    public void dataProviderTest(int number) {}
+  @ParameterizedTest
+  @MethodSource("dataProviderTestCases")
+  public void dataProviderTest(int number) {}
 }
 ```
 
 ### Installation
 
-First edit your `pom.xml` and add `testng-junit-migrator` to the `annotationPath` of the `maven-compiler` plugin:
+First edit your `pom.xml` and add `testng-junit-migrator` to the
+`annotationProcessorPaths` of the `maven-compiler` plugin:
 
 ```xml
-
 <profiles>
     <profile>
         <id>testng-migator</id>
@@ -92,11 +92,10 @@ mvn \
   -Ppatch \
   clean test-compile fmt:format \
   -Derror-prone.patch-checks="TestNGJUnitMigration" \
-  -Dfrontend.skip \
   -Dverification.skip
 ```
 
-There's script to make invocating this command easier: `run-testng-junit-migrator.sh`.
+There's script to make invoking this command easier: `run-testng-junit-migrator.sh`.
 This script will:
 
 1. Run your TestNG tests and count the number of completed tests
