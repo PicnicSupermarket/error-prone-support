@@ -4,7 +4,7 @@ import static java.util.Arrays.stream;
 
 import java.util.Optional;
 
-/** The annotation argument kinds that are supported by the TestNG -> JUnit migration. */
+/** The annotation argument kinds that are supported by the TestNG to JUnit Jupiter migration. */
 enum SupportedArgumentKind {
   PRIORITY("priority", new PriorityArgumentMigrator()),
   DESCRIPTION("description", new DescriptionArgumentMigrator()),
