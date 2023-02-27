@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.testngjunit.migrators;
+package tech.picnic.errorprone.testngjunit;
 
 import static com.sun.source.tree.Tree.Kind.NEW_ARRAY;
 import static java.util.stream.Collectors.joining;
@@ -23,7 +23,7 @@ import java.util.Optional;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A helper class that migrates a TestNG {@code DataProvider} to a JUnit {@code MethodSource}. */
-public final class DataProviderMigrator {
+final class DataProviderMigrator {
   /**
    * Create the {@link SuggestedFix} required to migrate a TestNG {@code DataProvider} to a JUnit
    * {@code MethodSource}.

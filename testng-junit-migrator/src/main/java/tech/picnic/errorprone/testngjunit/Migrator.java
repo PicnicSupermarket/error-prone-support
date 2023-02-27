@@ -30,7 +30,7 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
  * {@code Test} annotation to JUnit.
  */
 @Immutable
-public interface Migrator {
+interface Migrator {
   /**
    * Attempt to create a {@link SuggestedFix}.
    *

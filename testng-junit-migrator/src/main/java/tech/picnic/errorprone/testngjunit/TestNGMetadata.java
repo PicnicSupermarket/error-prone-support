@@ -19,7 +19,7 @@ import java.util.Optional;
  * TestNGJUnitMigration}.
  */
 @AutoValue
-public abstract class TestNGMetadata {
+abstract class TestNGMetadata {
   abstract ClassTree getClassTree();
 
   abstract Optional<AnnotationMetadata> getClassLevelAnnotationMetadata();

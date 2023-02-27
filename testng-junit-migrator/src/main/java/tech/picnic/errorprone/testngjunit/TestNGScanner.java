@@ -16,7 +16,6 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.testngjunit.migrators.DataProviderMigrator;
 
 /**
  * A {@link TreeScanner} which will scan a {@link com.sun.source.tree.CompilationUnitTree} and

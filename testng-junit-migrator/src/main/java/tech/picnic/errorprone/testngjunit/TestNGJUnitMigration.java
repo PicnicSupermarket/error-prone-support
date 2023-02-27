@@ -23,7 +23,6 @@ import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
-import tech.picnic.errorprone.testngjunit.migrators.DataProviderMigrator;
 
 /**
  * A {@link BugChecker} that migrates TestNG unit tests to JUnit 5.

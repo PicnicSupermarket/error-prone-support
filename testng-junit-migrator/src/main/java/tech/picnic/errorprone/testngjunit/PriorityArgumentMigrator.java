@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.testngjunit.migrators.argument;
+package tech.picnic.errorprone.testngjunit;
 
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
@@ -8,12 +8,10 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
-import tech.picnic.errorprone.testngjunit.Migrator;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
 /** An {@link Migrator} that migrates the {@code priority} argument. */
 @Immutable
-public final class PriorityArgumentMigrator implements Migrator {
+final class PriorityArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
