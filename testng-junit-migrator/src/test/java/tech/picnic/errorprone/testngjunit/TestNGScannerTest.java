@@ -82,7 +82,8 @@ final class TestNGScannerTest {
             "  private static Object[][] notMigratableDataProviderTestCases() {",
             "    return Stream.of(1, 2, 3).map(i -> new Object[] {i}).toArray(Object[][]::new);",
             "  }",
-            "}");
+            "}")
+        .doTest();
   }
 
   @Test
@@ -95,13 +96,15 @@ final class TestNGScannerTest {
             "class A {",
             "  @Test",
             "  private void foo() {}",
-            "}");
+            "}")
+        .doTest();
   }
 
   @Test
   void normalClass() {
     CompilationTestHelper.newInstance(TestChecker.class, getClass())
-        .addSourceLines("A.java", "class A {", "  private void foo() {}", "}");
+        .addSourceLines("A.java", "class A {", "  private void foo() {}", "}")
+        .doTest();
   }
 
   /**
@@ -116,7 +119,7 @@ final class TestNGScannerTest {
     public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
       TestNGScanner scanner = new TestNGScanner(state);
       ImmutableMap<ClassTree, TestNGMetadata> classMetaData =
-          scanner.collectMetadaForEachClass(tree);
+          scanner.collectMetadataForEachClass(tree);
 
       classMetaData.forEach(
           (classTree, metaData) -> {

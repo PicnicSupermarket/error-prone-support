@@ -21,7 +21,7 @@ import tech.picnic.errorprone.testngjunit.migrators.DataProviderMigrator;
 /**
  * A {@link TreeScanner} which will scan a {@link com.sun.source.tree.CompilationUnitTree} and
  * collect data required for the migration from each class in the compilation unit. <br>
- * This data can be retrieved using {@link #collectMetadaForEachClass(CompilationUnitTree)}
+ * This data can be retrieved using {@link #collectMetadataForEachClass(CompilationUnitTree)}
  */
 final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Builder> {
   private final VisitorState state;
@@ -33,7 +33,7 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
   }
 
   @Override
-  public @Nullable Void visitClass(ClassTree tree, TestNGMetadata.Builder _builder) {
+  public @Nullable Void visitClass(ClassTree tree, TestNGMetadata.Builder unused) {
     TestNGMetadata.Builder builder = TestNGMetadata.builder();
     builder.setClassTree(tree);
     builder.setClassLevelAnnotationMetadata(getTestNGAnnotation(tree, state));
@@ -64,7 +64,7 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
     return super.visitMethod(tree, builder);
   }
 
-  public ImmutableMap<ClassTree, TestNGMetadata> collectMetadaForEachClass(
+  public ImmutableMap<ClassTree, TestNGMetadata> collectMetadataForEachClass(
       CompilationUnitTree tree) {
     scan(tree, null);
     return metadataBuilder.build();

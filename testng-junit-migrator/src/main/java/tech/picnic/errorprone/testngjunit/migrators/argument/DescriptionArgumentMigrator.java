@@ -13,7 +13,7 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
 /** An {@link Migrator} that migrates the {@code description} argument. */
 @Immutable
-public class DescriptionArgumentMigrator implements Migrator {
+public final class DescriptionArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
