@@ -23,7 +23,7 @@ import java.util.Optional;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** A helper class that migrates a TestNG {@code DataProvider} to a JUnit {@code MethodSource}. */
-public class DataProviderMigrator {
+public final class DataProviderMigrator {
   /**
    * Create the {@link SuggestedFix} required to migrate a TestNG {@code DataProvider} to a JUnit
    * {@code MethodSource}.

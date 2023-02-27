@@ -15,8 +15,7 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
 /** An {@link Migrator} that migrates the {@code dataProvider} argument. */
 @Immutable
-public class DataProviderArgumentMigrator implements Migrator {
-
+public final class DataProviderArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {

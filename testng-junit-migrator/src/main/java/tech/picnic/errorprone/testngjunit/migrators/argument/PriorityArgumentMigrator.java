@@ -13,7 +13,7 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
 /** An {@link Migrator} that migrates the {@code priority} argument. */
 @Immutable
-public class PriorityArgumentMigrator implements Migrator {
+public final class PriorityArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {

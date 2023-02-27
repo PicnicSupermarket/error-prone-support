@@ -20,11 +20,10 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata;
 
 /** An {@link Migrator} that migrates the {@code expectedExceptions} argument. */
 @Immutable
-public class ExpectedExceptionsArgumentMigrator implements Migrator {
+public final class ExpectedExceptionsArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
-
     String expectedException = getExpectedException(dataValue, state).orElseThrow();
     SuggestedFix.Builder fix =
         SuggestedFix.builder()

@@ -34,7 +34,7 @@ public abstract class TestNGMetadata {
    */
   public abstract ImmutableMap<String, DataProviderMetadata> getDataProviderMetadata();
 
-  ImmutableList<DataProviderMetadata> getDataProvidersInUse() {
+  final ImmutableList<DataProviderMetadata> getDataProvidersInUse() {
     return getDataProviderMetadata().entrySet().stream()
         .filter(
             entry ->
@@ -94,11 +94,11 @@ public abstract class TestNGMetadata {
     }
   }
 
-  ImmutableSet<AnnotationMetadata> getAnnotations() {
+  final ImmutableSet<AnnotationMetadata> getAnnotations() {
     return ImmutableSet.copyOf(getMethodAnnotations().values());
   }
 
-  Optional<AnnotationMetadata> getAnnotation(MethodTree methodTree) {
+  final Optional<AnnotationMetadata> getAnnotation(MethodTree methodTree) {
     return Optional.ofNullable(getMethodAnnotations().get(methodTree));
   }
 
@@ -141,7 +141,6 @@ public abstract class TestNGMetadata {
    */
   @AutoValue
   public abstract static class DataProviderMetadata {
-
     abstract MethodTree getMethodTree();
 
     abstract String getName();
