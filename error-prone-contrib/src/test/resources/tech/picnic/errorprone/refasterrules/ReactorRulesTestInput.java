@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
@@ -9,7 +10,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
@@ -24,7 +27,14 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(assertThat(0), HashMap.class, ImmutableMap.class, toOptional());
+    return ImmutableSet.of(
+        assertThat(0),
+        Collection.class,
+        HashMap.class,
+        List.class,
+        ImmutableMap.class,
+        toImmutableList(),
+        toOptional());
   }
 
   ImmutableSet<Mono<?>> testMonoFromSupplier() {
@@ -262,6 +272,13 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Flux.just(ImmutableList.of("foo")).concatMap(list -> Flux.fromIterable(list), 1),
         Flux.just(ImmutableList.of("bar")).concatMap(Flux::fromIterable, 2));
+  }
+
+  ImmutableSet<Mono<Integer>> testFluxCount() {
+    return ImmutableSet.of(
+        Flux.just(1, 2).collect(toImmutableList()).map(Collection::size),
+        Flux.just(1, 2).collect(toImmutableList()).map(ImmutableList::size),
+        Flux.just(1, 2).collect(toImmutableList()).map(List::size));
   }
 
   Mono<Integer> testMonoDoOnError() {

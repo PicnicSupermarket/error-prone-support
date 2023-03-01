@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
@@ -7,6 +8,7 @@ import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static reactor.function.TupleUtils.function;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -16,8 +18,10 @@ import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
@@ -802,6 +806,20 @@ final class ReactorRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Flux<T> after(Flux<? extends Iterable<T>> flux, int prefetch) {
       return flux.concatMapIterable(identity(), prefetch);
+    }
+  }
+
+  /** Prefer {@link Flux#count()} over collecting into a list and counting its elements. */
+  static final class FluxCount<T> {
+    @BeforeTemplate
+    Mono<Integer> before(Flux<T> flux) {
+      return flux.collect(toImmutableList())
+          .map(Refaster.anyOf(Collection::size, ImmutableList::size, List::size));
+    }
+
+    @AfterTemplate
+    Mono<Integer> after(Flux<T> flux) {
+      return flux.count().map(Math::toIntExact);
     }
   }
 
