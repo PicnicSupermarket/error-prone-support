@@ -4,13 +4,16 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static reactor.function.TupleUtils.function;
 
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +33,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        assertThat(0),
+        ArrayList.class,
         Collection.class,
         HashMap.class,
         List.class,
+        ImmutableCollection.class,
         ImmutableMap.class,
+        assertThat(0),
+        toCollection(null),
         toImmutableList(),
         toOptional());
   }
@@ -266,11 +272,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just(ImmutableList.of("bar")).concatMapIterable(identity(), 2));
   }
 
-  ImmutableSet<Mono<Integer>> testFluxCount() {
+  ImmutableSet<Mono<Integer>> testFluxCountMapMathToIntExact() {
     return ImmutableSet.of(
-        Flux.just(1, 2).count().map(Math::toIntExact),
-        Flux.just(1, 2).count().map(Math::toIntExact),
-        Flux.just(1, 2).count().map(Math::toIntExact));
+        Flux.just(1).count().map(Math::toIntExact),
+        Flux.just(2).count().map(Math::toIntExact),
+        Flux.just(3).count().map(Math::toIntExact),
+        Flux.just(4).count().map(Math::toIntExact),
+        Flux.just(5).count().map(Math::toIntExact),
+        Flux.just(6).count().map(Math::toIntExact));
   }
 
   Mono<Integer> testMonoDoOnError() {

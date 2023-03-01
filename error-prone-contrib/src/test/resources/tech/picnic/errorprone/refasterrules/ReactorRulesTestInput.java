@@ -4,12 +4,15 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -28,11 +31,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        assertThat(0),
+        ArrayList.class,
         Collection.class,
         HashMap.class,
         List.class,
+        ImmutableCollection.class,
         ImmutableMap.class,
+        assertThat(0),
+        toCollection(null),
         toImmutableList(),
         toOptional());
   }
@@ -274,11 +280,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just(ImmutableList.of("bar")).concatMap(Flux::fromIterable, 2));
   }
 
-  ImmutableSet<Mono<Integer>> testFluxCount() {
+  ImmutableSet<Mono<Integer>> testFluxCountMapMathToIntExact() {
     return ImmutableSet.of(
-        Flux.just(1, 2).collect(toImmutableList()).map(Collection::size),
-        Flux.just(1, 2).collect(toImmutableList()).map(ImmutableList::size),
-        Flux.just(1, 2).collect(toImmutableList()).map(List::size));
+        Flux.just(1).collect(toImmutableList()).map(Collection::size),
+        Flux.just(2).collect(toImmutableList()).map(List::size),
+        Flux.just(3).collect(toImmutableList()).map(ImmutableCollection::size),
+        Flux.just(4).collect(toImmutableList()).map(ImmutableList::size),
+        Flux.just(5).collect(toCollection(ArrayList::new)).map(Collection::size),
+        Flux.just(6).collect(toCollection(ArrayList::new)).map(List::size));
   }
 
   Mono<Integer> testMonoDoOnError() {
