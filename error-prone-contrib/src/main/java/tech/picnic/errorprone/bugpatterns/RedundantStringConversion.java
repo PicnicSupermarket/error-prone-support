@@ -7,6 +7,7 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyMethod;
 import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.anything;
 import static com.google.errorprone.matchers.Matchers.argumentCount;
 import static com.google.errorprone.matchers.Matchers.isNonNullUsingDataflow;
 import static com.google.errorprone.matchers.Matchers.isSameType;
@@ -67,9 +68,7 @@ public final class RedundantStringConversion extends BugChecker
   private static final String EXTRA_STRING_CONVERSION_METHODS_FLAG =
       "RedundantStringConversion:ExtraConversionMethods";
 
-  @SuppressWarnings("UnnecessaryLambda")
-  private static final Matcher<ExpressionTree> ANY_EXPR = (t, s) -> true;
-
+  private static final Matcher<ExpressionTree> ANY_EXPR = anything();
   private static final Matcher<ExpressionTree> LOCALE = isSameType(Locale.class);
   private static final Matcher<ExpressionTree> MARKER = isSubtypeOf("org.slf4j.Marker");
   private static final Matcher<ExpressionTree> STRING = isSameType(String.class);
