@@ -317,44 +317,44 @@ final class ImmutableMapRules {
   }
 
   /**
-   * Prefer {@link Maps#filterKeys(Map, Predicate)} over streaming entries of a map and filtering
-   * the keys.
+   * Prefer creation of an immutable submap using {@link Maps#filterKeys(Map, Predicate)} over more
+   * contrived alternatives.
    */
-  abstract static class ImmutableMapFilterKeys<K, V> {
+  abstract static class ImmutableMapCopyOfMapsFilterKeys<K, V> {
     @Placeholder(allowsIdentity = true)
-    abstract boolean keyFilter(@MayOptionallyUse K element);
+    abstract boolean keyFilter(@MayOptionallyUse K key);
 
     @BeforeTemplate
-    ImmutableMap<K, V> before(ImmutableMap<K, V> input) {
-      return input.entrySet().stream()
-          .filter(entry -> keyFilter(entry.getKey()))
+    ImmutableMap<K, V> before(ImmutableMap<K, V> map) {
+      return map.entrySet().stream()
+          .filter(e -> keyFilter(e.getKey()))
           .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @AfterTemplate
-    ImmutableMap<K, V> after(ImmutableMap<K, V> input) {
-      return ImmutableMap.copyOf(Maps.filterKeys(input, k -> keyFilter(k)));
+    ImmutableMap<K, V> after(ImmutableMap<K, V> map) {
+      return ImmutableMap.copyOf(Maps.filterKeys(map, k -> keyFilter(k)));
     }
   }
 
   /**
-   * Prefer {@link Maps#filterValues(Map, Predicate)} over streaming entries of a map and filtering
-   * the values.
+   * Prefer creation of an immutable submap using {@link Maps#filterValues(Map, Predicate)} over
+   * more contrived alternatives.
    */
-  abstract static class ImmutableMapFilterValues<K, V> {
+  abstract static class ImmutableMapCopyOfMapsFilterValues<K, V> {
     @Placeholder(allowsIdentity = true)
-    abstract boolean valueFilter(@MayOptionallyUse V element);
+    abstract boolean valueFilter(@MayOptionallyUse V value);
 
     @BeforeTemplate
-    ImmutableMap<K, V> before(ImmutableMap<K, V> input) {
-      return input.entrySet().stream()
-          .filter(entry -> valueFilter(entry.getValue()))
+    ImmutableMap<K, V> before(ImmutableMap<K, V> map) {
+      return map.entrySet().stream()
+          .filter(e -> valueFilter(e.getValue()))
           .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @AfterTemplate
-    ImmutableMap<K, V> after(ImmutableMap<K, V> input) {
-      return ImmutableMap.copyOf(Maps.filterValues(input, v -> valueFilter(v)));
+    ImmutableMap<K, V> after(ImmutableMap<K, V> map) {
+      return ImmutableMap.copyOf(Maps.filterValues(map, v -> valueFilter(v)));
     }
   }
 
