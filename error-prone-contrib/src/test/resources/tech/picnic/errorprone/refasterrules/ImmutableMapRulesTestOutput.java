@@ -90,4 +90,14 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
   Map<String, String> testImmutableMapOf5() {
     return ImmutableMap.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4", "k5", "v5");
   }
+
+  ImmutableMap<String, String> testImmutableMapFilterKeys() {
+    return ImmutableMap.copyOf(
+        Maps.filterKeys(ImmutableMap.of("k1", "v1", "k2", "v2"), k -> k.equals("k1")));
+  }
+
+  ImmutableMap<String, String> testImmutableMapFilterValues() {
+    return ImmutableMap.copyOf(
+        Maps.filterValues(ImmutableMap.of("k1", "v1", "k2", "v2"), v -> v.equals("v1")));
+  }
 }

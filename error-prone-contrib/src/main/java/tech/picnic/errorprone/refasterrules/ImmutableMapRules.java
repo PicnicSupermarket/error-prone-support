@@ -6,6 +6,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.function.Function.identity;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Streams;
@@ -312,6 +313,48 @@ final class ImmutableMapRules {
     @AfterTemplate
     ImmutableMap<K, V> after(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
       return ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
+    }
+  }
+
+  /**
+   * Prefer {@link Maps#filterKeys(Map, Predicate)} over streaming entries of a map and filtering
+   * the keys.
+   */
+  abstract static class ImmutableMapFilterKeys<K, V> {
+    @Placeholder(allowsIdentity = true)
+    abstract boolean keyFilter(@MayOptionallyUse K element);
+
+    @BeforeTemplate
+    ImmutableMap<K, V> before(ImmutableMap<K, V> input) {
+      return input.entrySet().stream()
+          .filter(entry -> keyFilter(entry.getKey()))
+          .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after(ImmutableMap<K, V> input) {
+      return ImmutableMap.copyOf(Maps.filterKeys(input, k -> keyFilter(k)));
+    }
+  }
+
+  /**
+   * Prefer {@link Maps#filterValues(Map, Predicate)} over streaming entries of a map and filtering
+   * the values.
+   */
+  abstract static class ImmutableMapFilterValues<K, V> {
+    @Placeholder(allowsIdentity = true)
+    abstract boolean valueFilter(@MayOptionallyUse V element);
+
+    @BeforeTemplate
+    ImmutableMap<K, V> before(ImmutableMap<K, V> input) {
+      return input.entrySet().stream()
+          .filter(entry -> valueFilter(entry.getValue()))
+          .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after(ImmutableMap<K, V> input) {
+      return ImmutableMap.copyOf(Maps.filterValues(input, v -> valueFilter(v)));
     }
   }
 
