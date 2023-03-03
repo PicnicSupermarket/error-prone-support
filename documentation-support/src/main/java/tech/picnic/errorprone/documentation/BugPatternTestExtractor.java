@@ -25,6 +25,8 @@ import com.sun.source.util.TreeScanner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestDocumentation;
 
@@ -34,8 +36,17 @@ import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTe
  */
 @Immutable
 final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumentation> {
+  private static final Pattern TEST_CLASS_NAME_PATTERN = Pattern.compile("(.*)Test");
   private static final Matcher<Tree> JUNIT_TEST_METHOD =
       toType(MethodTree.class, hasAnnotation("org.junit.jupiter.api.Test"));
+  private static final Matcher<MethodInvocationTree> BUG_PATTERN_TEST_METHOD =
+      allOf(
+          staticMethod()
+              .onDescendantOfAny(
+                  "com.google.errorprone.CompilationTestHelper",
+                  "com.google.errorprone.BugCheckerRefactoringTestHelper")
+              .named("newInstance"),
+          argument(0, classLiteral(anything())));
 
   // XXX: Improve support for correctly extracting multiple sources from a single
   // `{BugCheckerRefactoring,Compilation}TestHelper` test.
@@ -49,53 +60,49 @@ final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumenta
       }
     }
 
-    String className = tree.getSimpleName().toString();
+    String bugPatternName =
+        getClassUnderTest(tree)
+            .orElseThrow(
+                () ->
+                    new IllegalArgumentException(
+                        String.format(
+                            "Name of given class does not match '%s'", TEST_CLASS_NAME_PATTERN)));
     return new AutoValue_BugPatternTestExtractor_BugPatternTestDocumentation(
-        className.substring(0, className.lastIndexOf("Test")),
-        scanner.getIdentificationTests(),
-        scanner.getReplacementTests());
+        bugPatternName, scanner.getIdentificationTests(), scanner.getReplacementTests());
   }
 
   @Override
   public boolean canExtract(ClassTree tree, VisitorState state) {
-    String className = tree.getSimpleName().toString();
-    if (!className.endsWith("Test")) {
-      return false;
-    }
-
-    ScanBugPatternTest scanBugPatternTest = new ScanBugPatternTest();
-    scanBugPatternTest.scan(tree, state);
-
-    String bugPatternName = className.substring(0, className.lastIndexOf("Test"));
-    return scanBugPatternTest.hasTestUsingClassInstance(bugPatternName);
+    return getClassUnderTest(tree)
+        .filter(bugPatternName -> testsBugPattern(bugPatternName, tree, state))
+        .isPresent();
   }
 
-  // XXX: Consider replacing this type with an anonymous class in a method. Possibly also below.
-  private static final class ScanBugPatternTest extends TreeScanner<@Nullable Void, VisitorState> {
-    private static final Matcher<MethodInvocationTree> BUG_PATTERN_TEST_METHOD =
-        allOf(
-            staticMethod()
-                .onDescendantOfAny(
-                    "com.google.errorprone.CompilationTestHelper",
-                    "com.google.errorprone.BugCheckerRefactoringTestHelper")
-                .named("newInstance"),
-            argument(0, classLiteral(anything())));
+  private static boolean testsBugPattern(
+      String bugPatternName, ClassTree tree, VisitorState state) {
+    AtomicBoolean result = new AtomicBoolean(false);
 
-    private final List<String> encounteredClasses = new ArrayList<>();
+    new TreeScanner<@Nullable Void, @Nullable Void>() {
+      @Override
+      public @Nullable Void visitMethodInvocation(MethodInvocationTree node, @Nullable Void v) {
+        if (BUG_PATTERN_TEST_METHOD.matches(node, state)) {
+          MemberSelectTree firstArgumentTree = (MemberSelectTree) node.getArguments().get(0);
+          result.compareAndSet(
+              /* expectedValue= */ false,
+              bugPatternName.equals(firstArgumentTree.getExpression().toString()));
+        }
 
-    boolean hasTestUsingClassInstance(String clazz) {
-      return encounteredClasses.contains(clazz);
-    }
-
-    @Override
-    public @Nullable Void visitMethodInvocation(MethodInvocationTree node, VisitorState state) {
-      if (BUG_PATTERN_TEST_METHOD.matches(node, state)) {
-        MemberSelectTree firstArgumentTree = (MemberSelectTree) node.getArguments().get(0);
-        encounteredClasses.add(firstArgumentTree.getExpression().toString());
+        return super.visitMethodInvocation(node, v);
       }
+    }.scan(tree, null);
 
-      return super.visitMethodInvocation(node, state);
-    }
+    return result.get();
+  }
+
+  private static Optional<String> getClassUnderTest(ClassTree tree) {
+    return Optional.of(TEST_CLASS_NAME_PATTERN.matcher(tree.getSimpleName().toString()))
+        .filter(java.util.regex.Matcher::matches)
+        .map(m -> m.group(1));
   }
 
   private static final class CollectBugPatternTests
