@@ -10,6 +10,9 @@ import com.sun.source.tree.ClassTree;
  *
  * @param <T> The type of data that is extracted.
  */
+// XXX: Here and in the implementations, either:
+// 1. Swap `canExtract` and `extract`.
+// 2. Combine the methods into a single `Optional<T> tryExtract`.
 @Immutable
 interface Extractor<T> {
   /**
