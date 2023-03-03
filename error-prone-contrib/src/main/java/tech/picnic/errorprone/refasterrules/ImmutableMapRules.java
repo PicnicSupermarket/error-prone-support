@@ -366,9 +366,4 @@ final class ImmutableMapRules {
   // map.entrySet().stream().filter(keyPred).forEach(mapBuilder::put)
   // ->
   // mapBuilder.putAll(Maps.filterKeys(map, pred))
-  //
-  // map.entrySet().stream().filter(entry ->
-  // pred(entry.getKey())).collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue))
-  // ->
-  // ImmutableMap.copyOf(Maps.filterKeys(map, pred))
 }
