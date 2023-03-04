@@ -18,7 +18,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3.8.0
         with:
-          java-version: 17.0.4
+          java-version: 17.0.6
           distribution: temurin
           cache: maven
       - name: Run Pitest
