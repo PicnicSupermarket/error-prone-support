@@ -40,9 +40,9 @@ import tech.picnic.errorprone.refaster.annotation.Severity;
 // through `RefasterTest`, but ideally it is covered by tests in this class, closer to the code that
 // implements the relevant logic.) See the comment in `#context()` below.
 final class AnnotatedCompositeCodeTransformerTest {
-  private static final DiagnosticPosition DUMMY_POSITION = mock(DiagnosticPosition.class);
-  private static final Fix DUMMY_FIX = mock(Fix.class);
-  private static final TreePath DUMMY_PATH = mock(TreePath.class);
+  private static final DiagnosticPosition DUMMY_POSITION = mock();
+  private static final Fix DUMMY_FIX = mock();
+  private static final TreePath DUMMY_PATH = mock();
   private static final String DEFAULT_PACKAGE = "";
   private static final String CUSTOM_PACKAGE = "com.example";
   private static final String SIMPLE_CLASS_NAME = "MyRefasterRule";
@@ -149,7 +149,7 @@ final class AnnotatedCompositeCodeTransformerTest {
       ImmutableSet<? extends Annotation> annotations,
       Context expectedContext,
       Description returnedDescription) {
-    CodeTransformer codeTransformer = mock(CodeTransformer.class);
+    CodeTransformer codeTransformer = mock();
 
     when(codeTransformer.annotations()).thenReturn(indexAnnotations(annotations));
     doAnswer(
@@ -182,7 +182,7 @@ final class AnnotatedCompositeCodeTransformerTest {
   private static Context context() {
     // XXX: Use `ErrorProneOptions#processArgs` to test the
     // `AnnotatedCompositeCodeTransformer#overrideSeverity` logic.
-    Context context = mock(Context.class);
+    Context context = mock();
     when(context.get(ErrorProneOptions.class)).thenReturn(ErrorProneOptions.empty());
     return context;
   }
