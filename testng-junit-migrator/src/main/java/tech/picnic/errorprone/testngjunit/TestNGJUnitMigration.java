@@ -106,6 +106,15 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
                 });
 
         metaData
+            .getSetupMethods()
+            .forEach(
+                (method, type) -> {
+                  new SetupTeardownMethodMigrator()
+                      .createFix(method, type, state)
+                      .ifPresent(fix -> state.reportMatch(describeMatch(method, fix)));
+                });
+
+        metaData
             .getAnnotation(tree)
             .filter(annotation -> canMigrateTest(tree, metaData, annotation, state))
             .ifPresent(

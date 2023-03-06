@@ -97,11 +97,15 @@ final class TestNGJUnitMigrationTest {
     BugCheckerRefactoringTestHelper.newInstance(TestNGJUnitMigration.class, getClass())
         .addInputLines(
             "A.java",
+            "import org.testng.annotations.BeforeMethod;",
             "import org.testng.annotations.DataProvider;",
             "import org.testng.annotations.Test;",
             "",
             "@Test",
             "class A {",
+            "  @BeforeMethod",
+            "  private void setup() {}",
+            "",
             "  public void foo() {}",
             "",
             "  @Test(priority = 1, description = \"unit\")",
@@ -141,14 +145,14 @@ final class TestNGJUnitMigrationTest {
             "import org.junit.jupiter.params.ParameterizedTest;",
             "import org.junit.jupiter.params.provider.Arguments;",
             "import org.junit.jupiter.params.provider.MethodSource;",
+            "import org.testng.annotations.BeforeMethod;",
             "import org.testng.annotations.Test;",
-            // XXX: Running `mvn clean install` (in this case still with `-Dverification.warn`) will
-            // show that the `org.testng.annotation.Test` import is still here. I think that makes
-            // sense, we indeed agreed on not deleting that and letting other checks take care of
-            // that. So we should probably fully qualify the Jupiter
             "",
             "@TestMethodOrder(MethodOrderer.OrderAnnotation.class)",
             "class A {",
+            "  @org.junit.jupiter.api.BeforeEach",
+            "  private void setup() {}",
+            "",
             "  @org.junit.jupiter.api.Test",
             "  public void foo() {}",
             "",

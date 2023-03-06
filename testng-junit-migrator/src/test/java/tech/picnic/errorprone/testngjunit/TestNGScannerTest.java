@@ -107,6 +107,36 @@ final class TestNGScannerTest {
         .doTest();
   }
 
+  @Test
+  void teardownAndSetupMethods() {
+    CompilationTestHelper.newInstance(TestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "import org.testng.annotations.AfterClass;",
+            "import org.testng.annotations.AfterMethod;",
+            "import org.testng.annotations.BeforeClass;",
+            "import org.testng.annotations.BeforeMethod;",
+            "",
+            "class A {",
+            "  @BeforeClass",
+            "  // BUG: Diagnostic contains: class: A setupMethod: BEFORE_CLASS",
+            "  private static void beforeClass() {}",
+            "",
+            "  @BeforeMethod",
+            "  // BUG: Diagnostic contains: class: A setupMethod: BEFORE_METHOD",
+            "  private void beforeMethod() {}",
+            "",
+            "  @AfterClass",
+            "  // BUG: Diagnostic contains: class: A setupMethod: AFTER_CLASS",
+            "  private static void afterClass() {}",
+            "",
+            "  @AfterMethod",
+            "  // BUG: Diagnostic contains: class: A setupMethod: AFTER_METHOD",
+            "  private void afterMethod() {}",
+            "}")
+        .doTest();
+  }
+
   /**
    * A {@link BugChecker} that flags classes with a diagnostics message that indicates, whether a
    * TestNG element was collected.
@@ -144,6 +174,19 @@ final class TestNGScannerTest {
                                   String.format(
                                       "class: %s dataProvider: %s",
                                       classTree.getSimpleName(), dataProvider.getName()))
+                              .build());
+                    });
+
+            metaData
+                .getSetupMethods()
+                .forEach(
+                    (method, setupMethodType) -> {
+                      state.reportMatch(
+                          buildDescription(method)
+                              .setMessage(
+                                  String.format(
+                                      "class: %s setupMethod: %s",
+                                      classTree.getSimpleName(), setupMethodType))
                               .build());
                     });
 
