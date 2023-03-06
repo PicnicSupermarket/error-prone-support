@@ -37,6 +37,8 @@ import java.util.List;
 // this, consider that in some cases the type to be mocked or spied must be specified explicitly so
 // as to disambiguate between method overloads.
 // XXX: This check currently does not flag (implicit or explicit) lambda return expressions.
+// XXX: This check currently does not drop suppressions that become obsolete after the
+// suggested fix is applied, consider adding support for this.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Don't unnecessarily pass a type to Mockito's `mock(Class)` and `spy(Class)` methods",
