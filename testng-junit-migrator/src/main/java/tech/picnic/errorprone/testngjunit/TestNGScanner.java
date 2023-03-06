@@ -56,6 +56,13 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
       return super.visitMethod(tree, builder);
     }
 
+    Optional<TestNGMetadata.SetupTeardownType> setupTeardownType =
+        TestNGMetadata.SetupTeardownType.matchType(tree, state);
+    if (setupTeardownType.isPresent()) {
+      builder.setupMethodsBuilder().put(tree, setupTeardownType.orElseThrow());
+      return super.visitMethod(tree, builder);
+    }
+
     getTestNGAnnotation(tree, state)
         .or(builder::getClassLevelAnnotationMetadata)
         .ifPresent(annotation -> builder.methodAnnotationsBuilder().put(tree, annotation));
