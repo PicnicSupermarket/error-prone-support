@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Objects.requireNonNull;
 
