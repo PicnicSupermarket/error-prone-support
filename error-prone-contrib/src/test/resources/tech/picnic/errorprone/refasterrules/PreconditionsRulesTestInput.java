@@ -34,24 +34,24 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     if ("foo" == null) {
       throw new NullPointerException();
     }
-    if (null == "foo") {
+    if (null == "bar") {
       throw new NullPointerException();
     }
-    checkNotNull("foo");
-    checkArgument("foo" != null);
-    checkArgument(null != "foo");
+    checkNotNull("baz");
+    checkArgument("qux" != null);
+    checkArgument(null != "quux");
   }
 
   void testRequireNonNullWithMessage() {
     if ("foo" == null) {
       throw new NullPointerException("The string is null");
     }
-    if (null == "foo") {
+    if (null == "bar") {
       throw new NullPointerException("The string is null");
     }
-    checkNotNull("foo", "The string is null");
-    checkArgument("foo" != null, "The string is null");
-    checkArgument(null != "foo", "The string is null");
+    checkNotNull("baz", "The string is null");
+    checkArgument("qux" != null, "The string is null");
+    checkArgument(null != "quux", "The string is null");
   }
 
   void testCheckPositionIndex() {

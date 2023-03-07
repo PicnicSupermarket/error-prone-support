@@ -30,18 +30,18 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
 
   void testRequireNonNull() {
     requireNonNull("foo");
-    requireNonNull("foo");
-    requireNonNull("foo");
-    requireNonNull("foo");
-    requireNonNull("foo");
+    requireNonNull("bar");
+    requireNonNull("baz");
+    requireNonNull("qux");
+    requireNonNull("quux");
   }
 
   void testRequireNonNullWithMessage() {
     requireNonNull("foo", "The string is null");
-    requireNonNull("foo", "The string is null");
-    requireNonNull("foo", "The string is null");
-    requireNonNull("foo", "The string is null");
-    requireNonNull("foo", "The string is null");
+    requireNonNull("bar", "The string is null");
+    requireNonNull("baz", "The string is null");
+    requireNonNull("qux", "The string is null");
+    requireNonNull("quux", "The string is null");
   }
 
   void testCheckPositionIndex() {
