@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
@@ -27,7 +28,7 @@ public final class MoreASTHelpers {
    */
   public static ImmutableList<MethodTree> findMethods(CharSequence methodName, VisitorState state) {
     ClassTree clazz = state.findEnclosing(ClassTree.class);
-    checkArgument(clazz != null, "Visited node is not enclosed by a class");
+    requireNonNull(clazz, "Visited node is not enclosed by a class");
     return clazz.getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
