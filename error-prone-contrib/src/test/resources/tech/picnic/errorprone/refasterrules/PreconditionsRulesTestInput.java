@@ -1,8 +1,16 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.collect.ImmutableSet;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
+  @Override
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(checkNotNull(null));
+  }
+
   void testCheckArgument() {
     if ("foo".isEmpty()) {
       throw new IllegalArgumentException();
@@ -21,16 +29,18 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     }
   }
 
-  void testCheckNotNull() {
+  void testRequireNonNull() {
     if ("foo" == null) {
       throw new NullPointerException();
     }
+    checkNotNull("foo");
   }
 
-  void testCheckNotNullWithMessage() {
+  void testRequireNonNullWithMessage() {
     if ("foo" == null) {
       throw new NullPointerException("The string is null");
     }
+    checkNotNull("foo", "The string is null");
   }
 
   void testCheckPositionIndex() {

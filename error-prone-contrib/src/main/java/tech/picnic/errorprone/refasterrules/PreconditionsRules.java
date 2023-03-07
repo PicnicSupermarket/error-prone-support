@@ -6,11 +6,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkPositionIndex;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Preconditions;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import java.util.Objects;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster templates related to statements dealing with {@link Preconditions}. */
@@ -72,8 +74,8 @@ final class PreconditionsRules {
     }
   }
 
-  /** Prefer {@link Preconditions#checkNotNull(Object)} over more verbose alternatives. */
-  static final class CheckNotNull<T> {
+  /** Prefer {@link Objects#requireNonNull(Object)} over more verbose alternatives. */
+  static final class RequireNonNull<T> {
     @BeforeTemplate
     void before(T object) {
       if (object == null) {
@@ -81,15 +83,20 @@ final class PreconditionsRules {
       }
     }
 
+    @BeforeTemplate
+    void before2(T object) {
+      checkNotNull(object);
+    }
+
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(T object) {
-      checkNotNull(object);
+      requireNonNull(object);
     }
   }
 
-  /** Prefer {@link Preconditions#checkNotNull(Object, Object)} over more verbose alternatives. */
-  static final class CheckNotNullWithMessage<T> {
+  /** Prefer {@link Objects#requireNonNull(Object, String)} over more verbose alternatives. */
+  static final class RequireNonNullWithMessage<T> {
     @BeforeTemplate
     void before(T object, String message) {
       if (object == null) {
@@ -97,10 +104,15 @@ final class PreconditionsRules {
       }
     }
 
+    @BeforeTemplate
+    void before2(T object, String message) {
+      checkNotNull(object, message);
+    }
+
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(T object, String message) {
-      checkNotNull(object, message);
+      requireNonNull(object, message);
     }
   }
 
