@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
@@ -33,14 +34,24 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     if ("foo" == null) {
       throw new NullPointerException();
     }
+    if (null == "foo") {
+      throw new NullPointerException();
+    }
     checkNotNull("foo");
+    checkArgument("foo" != null);
+    checkArgument(null != "foo");
   }
 
   void testRequireNonNullWithMessage() {
     if ("foo" == null) {
       throw new NullPointerException("The string is null");
     }
+    if (null == "foo") {
+      throw new NullPointerException("The string is null");
+    }
     checkNotNull("foo", "The string is null");
+    checkArgument("foo" != null, "The string is null");
+    checkArgument(null != "foo", "The string is null");
   }
 
   void testCheckPositionIndex() {
