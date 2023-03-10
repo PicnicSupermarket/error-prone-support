@@ -67,7 +67,6 @@ final class FluxFlatMapUsageTest {
   @Test
   void replacementFirstSuggestedFix() {
     BugCheckerRefactoringTestHelper.newInstance(FluxFlatMapUsage.class, getClass())
-        .setFixChooser(FixChoosers.FIRST)
         .addInputLines(
             "A.java",
             "import reactor.core.publisher.Flux;",
