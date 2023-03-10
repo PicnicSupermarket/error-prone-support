@@ -4,10 +4,12 @@ import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 
 import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.matchers.CompileTimeConstantExpressionMatcher;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Comparator;
@@ -221,6 +223,22 @@ final class OptionalRules {
     @SuppressWarnings("NullAway")
     T after(Optional<T> o1, Optional<T> o2) {
       return o1.or(() -> o2).orElseThrow();
+    }
+  }
+
+  /**
+   * Prefer {@link Optional#orElseGet(Supplier)} over {@link Optional#orElse(Object)} if the given
+   * value is not a compile-time constant.
+   */
+  abstract static class OrElseToOrElseGet<T> {
+    @BeforeTemplate
+    T before(Optional<T> o, @NotMatches(CompileTimeConstantExpressionMatcher.class) T value) {
+      return o.orElse(value);
+    }
+
+    @AfterTemplate
+    T after(Optional<T> o, T value) {
+      return o.orElseGet(() -> value);
     }
   }
 
