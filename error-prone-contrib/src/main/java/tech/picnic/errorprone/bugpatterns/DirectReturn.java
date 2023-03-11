@@ -3,8 +3,14 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.matchers.Matchers.allOf;
+import static com.google.errorprone.matchers.Matchers.argument;
+import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.isVariable;
+import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.returnStatement;
+import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static com.google.errorprone.matchers.Matchers.toType;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -20,6 +26,7 @@ import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
@@ -27,6 +34,7 @@ import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
 import java.util.List;
 import java.util.Optional;
+import tech.picnic.errorprone.bugpatterns.util.MoreASTHelpers;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
@@ -43,6 +51,10 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<StatementTree> VARIABLE_RETURN = returnStatement(isVariable());
+  private static final Matcher<ExpressionTree> MOCKITO_MOCK_OR_SPY_WITH_IMPLICIT_TYPE =
+      allOf(
+          not(toType(MethodInvocationTree.class, argument(0, isSameType(Class.class.getName())))),
+          staticMethod().onClass("org.mockito.Mockito").namedAnyOf("mock", "spy"));
 
   /** Instantiates a new {@link DirectReturn} instance. */
   public DirectReturn() {}
@@ -63,6 +75,7 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
     StatementTree precedingStatement = statements.get(statements.size() - 2);
 
     return tryMatchAssignment(variableSymbol, precedingStatement)
+        .filter(resultExpr -> canInlineToReturnStatement(resultExpr, state))
         .map(
             resultExpr ->
                 describeMatch(
@@ -97,5 +110,22 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
     }
 
     return Optional.empty();
+  }
+
+  /**
+   * Tells whether inlining the given expression to the associated return statement can be done
+   * safely.
+   *
+   * <p>Inlining is generally safe, but in rare cases the operation may have a functional impact.
+   * The sole case considered here is the inlining of a Mockito mock or spy construction without an
+   * explicit type. In such a case the type created depends on context, such as the method's return
+   * type.
+   */
+  private static boolean canInlineToReturnStatement(
+      ExpressionTree expressionTree, VisitorState state) {
+    return !MOCKITO_MOCK_OR_SPY_WITH_IMPLICIT_TYPE.matches(expressionTree, state)
+        || MoreASTHelpers.findMethodExitedOnReturn(state)
+            .filter(m -> MoreASTHelpers.areSameType(expressionTree, m.getReturnType(), state))
+            .isPresent();
   }
 }
