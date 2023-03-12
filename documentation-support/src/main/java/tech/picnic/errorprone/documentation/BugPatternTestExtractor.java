@@ -50,6 +50,9 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestDo
               .named("newInstance"),
           argument(0, classLiteral(anything())));
 
+  /** Instantiates a new {@link BugPatternTestExtractor} instance. */
+  public BugPatternTestExtractor() {}
+
   @Override
   public String identifier() {
     return "bugpattern-test";
