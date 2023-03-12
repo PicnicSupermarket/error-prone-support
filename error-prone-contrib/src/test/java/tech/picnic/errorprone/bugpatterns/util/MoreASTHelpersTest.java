@@ -86,21 +86,33 @@ final class MoreASTHelpersTest {
             "    toString();",
             "  }",
             "",
-            "  String m() {",
-            "    // BUG: Diagnostic contains:",
+            "  String topLevelMethod() {",
+            "    // BUG: Diagnostic contains: topLevelMethod",
             "    toString();",
-            "    // BUG: Diagnostic contains:",
+            "    // BUG: Diagnostic contains: topLevelMethod",
             "    return toString();",
             "  }",
             "",
-            "  Stream<String> m2() {",
-            "    // BUG: Diagnostic contains:",
+            "  Stream<String> anotherMethod() {",
+            "    // BUG: Diagnostic contains: anotherMethod",
             "    return Stream.of(1)",
             "        .map(",
             "            n -> {",
             "              toString();",
             "              return toString();",
             "            });",
+            "  }",
+            "",
+            "  void recursiveMethod(Runnable r) {",
+            "    // BUG: Diagnostic contains: recursiveMethod",
+            "    recursiveMethod(",
+            "        new Runnable() {",
+            "          @Override",
+            "          public void run() {",
+            "            // BUG: Diagnostic contains: run",
+            "            toString();",
+            "          }",
+            "        });",
             "  }",
             "}")
         .doTest();
@@ -187,7 +199,7 @@ final class MoreASTHelpersTest {
 
     private Description flagMethodReturnLocation(Tree tree, VisitorState state) {
       return MoreASTHelpers.findMethodExitedOnReturn(state)
-          .map(m -> buildDescription(tree).setMessage(state.getSourceForNode(m)).build())
+          .map(m -> buildDescription(tree).setMessage(m.getName().toString()).build())
           .orElse(Description.NO_MATCH);
     }
   }
