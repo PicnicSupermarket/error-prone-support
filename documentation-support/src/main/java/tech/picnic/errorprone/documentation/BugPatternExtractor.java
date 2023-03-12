@@ -5,6 +5,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Objects.requireNonNull;
 
 import com.google.auto.common.AnnotationMirrors;
+import com.google.auto.service.AutoService;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
@@ -16,6 +17,7 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
+import java.util.Optional;
 import javax.lang.model.element.AnnotationValue;
 import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocumentation;
 
@@ -23,29 +25,35 @@ import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocume
  * An {@link Extractor} that describes how to extract data from a {@code @BugPattern} annotation.
  */
 @Immutable
-final class BugPatternExtractor implements Extractor<BugPatternDocumentation> {
+@AutoService(Extractor.class)
+public final class BugPatternExtractor implements Extractor<BugPatternDocumentation> {
   @Override
-  public BugPatternDocumentation extract(ClassTree tree, VisitorState state) {
-    ClassSymbol symbol = ASTHelpers.getSymbol(tree);
-    BugPattern annotation = symbol.getAnnotation(BugPattern.class);
-    requireNonNull(annotation, "BugPattern annotation must be present");
-
-    return new AutoValue_BugPatternExtractor_BugPatternDocumentation(
-        symbol.getQualifiedName().toString(),
-        annotation.name().isEmpty() ? tree.getSimpleName().toString() : annotation.name(),
-        ImmutableList.copyOf(annotation.altNames()),
-        annotation.link(),
-        ImmutableList.copyOf(annotation.tags()),
-        annotation.summary(),
-        annotation.explanation(),
-        annotation.severity(),
-        annotation.disableable(),
-        annotation.documentSuppression() ? getSuppressionAnnotations(tree) : ImmutableList.of());
+  public String identifier() {
+    return "bugpattern";
   }
 
   @Override
-  public boolean canExtract(ClassTree tree, VisitorState state) {
-    return ASTHelpers.hasDirectAnnotationWithSimpleName(tree, BugPattern.class.getSimpleName());
+  public Optional<BugPatternDocumentation> tryExtract(ClassTree tree, VisitorState state) {
+    ClassSymbol symbol = ASTHelpers.getSymbol(tree);
+    BugPattern annotation = symbol.getAnnotation(BugPattern.class);
+    if (annotation == null) {
+      return Optional.empty();
+    }
+
+    return Optional.of(
+        new AutoValue_BugPatternExtractor_BugPatternDocumentation(
+            symbol.getQualifiedName().toString(),
+            annotation.name().isEmpty() ? tree.getSimpleName().toString() : annotation.name(),
+            ImmutableList.copyOf(annotation.altNames()),
+            annotation.link(),
+            ImmutableList.copyOf(annotation.tags()),
+            annotation.summary(),
+            annotation.explanation(),
+            annotation.severity(),
+            annotation.disableable(),
+            annotation.documentSuppression()
+                ? getSuppressionAnnotations(tree)
+                : ImmutableList.of()));
   }
 
   /**

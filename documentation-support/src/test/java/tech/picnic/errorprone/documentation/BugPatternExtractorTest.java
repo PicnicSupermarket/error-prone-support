@@ -3,7 +3,6 @@ package tech.picnic.errorprone.documentation;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.io.Resources;
 import com.google.errorprone.BugPattern;
@@ -139,14 +138,10 @@ final class BugPatternExtractorTest {
 
     @Override
     public Description matchClass(ClassTree tree, VisitorState state) {
-      BugPatternExtractor extractor = new BugPatternExtractor();
-
-      assertThatThrownBy(() -> extractor.extract(tree, state))
-          .isInstanceOf(NullPointerException.class)
-          .hasMessage("BugPattern annotation must be present");
-
       return buildDescription(tree)
-          .setMessage(String.format("Can extract: %s", extractor.canExtract(tree, state)))
+          .setMessage(
+              String.format(
+                  "Can extract: %s", new BugPatternExtractor().tryExtract(tree, state).isPresent()))
           .build();
     }
   }

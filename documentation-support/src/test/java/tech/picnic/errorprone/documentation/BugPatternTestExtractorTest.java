@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.io.Resources;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -338,7 +337,8 @@ final class BugPatternTestExtractorTest {
 
   private static void verifyFileMatchesResource(
       Path outputDirectory, String fileName, String resourceName) throws IOException {
-    assertThat(Files.readString(outputDirectory.resolve(fileName)))
+    assertThat(outputDirectory.resolve(fileName))
+        .content(UTF_8)
         .isEqualToIgnoringWhitespace(getResource(resourceName));
   }
 

@@ -9,6 +9,7 @@ import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 
+import com.google.auto.service.AutoService;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
@@ -31,11 +32,12 @@ import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestDocumentation;
 
 /**
- * An {@link Extractor} that describes how to extract data from a test that tests a {@code
+ * An {@link Extractor} that describes how to extract data from classes that test a {@code
  * BugChecker}.
  */
 @Immutable
-final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumentation> {
+@AutoService(Extractor.class)
+public final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumentation> {
   private static final Pattern TEST_CLASS_NAME_PATTERN = Pattern.compile("(.*)Test");
   private static final Matcher<Tree> JUNIT_TEST_METHOD =
       toType(MethodTree.class, hasAnnotation("org.junit.jupiter.api.Test"));
@@ -48,34 +50,30 @@ final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumenta
               .named("newInstance"),
           argument(0, classLiteral(anything())));
 
+  @Override
+  public String identifier() {
+    return "bugpattern-test";
+  }
+
   // XXX: Improve support for correctly extracting multiple sources from a single
   // `{BugCheckerRefactoring,Compilation}TestHelper` test.
   @Override
-  public BugPatternTestDocumentation extract(ClassTree tree, VisitorState state) {
-    CollectBugPatternTests scanner = new CollectBugPatternTests();
-
-    for (Tree m : tree.getMembers()) {
-      if (JUNIT_TEST_METHOD.matches(m, state)) {
-        scanner.scan(m, state);
-      }
-    }
-
-    String bugPatternName =
-        getClassUnderTest(tree)
-            .orElseThrow(
-                () ->
-                    new IllegalArgumentException(
-                        String.format(
-                            "Name of given class does not match '%s'", TEST_CLASS_NAME_PATTERN)));
-    return new AutoValue_BugPatternTestExtractor_BugPatternTestDocumentation(
-        bugPatternName, scanner.getIdentificationTests(), scanner.getReplacementTests());
-  }
-
-  @Override
-  public boolean canExtract(ClassTree tree, VisitorState state) {
+  public Optional<BugPatternTestDocumentation> tryExtract(ClassTree tree, VisitorState state) {
     return getClassUnderTest(tree)
         .filter(bugPatternName -> testsBugPattern(bugPatternName, tree, state))
-        .isPresent();
+        .map(
+            bugPatternName -> {
+              CollectBugPatternTests scanner = new CollectBugPatternTests();
+
+              for (Tree m : tree.getMembers()) {
+                if (JUNIT_TEST_METHOD.matches(m, state)) {
+                  scanner.scan(m, state);
+                }
+              }
+
+              return new AutoValue_BugPatternTestExtractor_BugPatternTestDocumentation(
+                  bugPatternName, scanner.getIdentificationTests(), scanner.getReplacementTests());
+            });
   }
 
   private static boolean testsBugPattern(
