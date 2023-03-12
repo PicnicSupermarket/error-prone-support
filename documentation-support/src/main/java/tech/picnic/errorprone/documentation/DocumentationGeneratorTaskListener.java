@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
@@ -22,6 +23,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ServiceLoader;
 import javax.tools.JavaFileObject;
 
 /**
@@ -30,6 +32,10 @@ import javax.tools.JavaFileObject;
  */
 // XXX: Find a better name for this class; it doesn't generate documentation per se.
 final class DocumentationGeneratorTaskListener implements TaskListener {
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  private static final ImmutableList<Extractor<?>> EXTRACTORS =
+      (ImmutableList) ImmutableList.copyOf(ServiceLoader.load(Extractor.class));
+
   private static final ObjectMapper OBJECT_MAPPER =
       new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 
@@ -65,13 +71,14 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
         VisitorState.createForUtilityPurposes(context)
             .withPath(new TreePath(new TreePath(compilationUnit), classTree));
 
-    ExtractorType.findMatchingType(classTree, state)
-        .ifPresent(
-            extractorType ->
-                writeToFile(
-                    extractorType.getIdentifier(),
-                    getSimpleClassName(sourceFile.toUri()),
-                    extractorType.getExtractor().extract(classTree, state)));
+    for (Extractor<?> extractor : EXTRACTORS) {
+      extractor
+          .tryExtract(classTree, state)
+          .ifPresent(
+              data ->
+                  writeToFile(
+                      extractor.identifier(), getSimpleClassName(sourceFile.toUri()), data));
+    }
   }
 
   private void createDocsDirectory() {
