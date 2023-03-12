@@ -230,7 +230,7 @@ final class OptionalRules {
    * Prefer {@link Optional#orElseGet(Supplier)} over {@link Optional#orElse(Object)} if the given
    * value is not a compile-time constant.
    */
-  abstract static class OrElseToOrElseGet<T> {
+  static final class OrElseToOrElseGet<T> {
     @BeforeTemplate
     T before(Optional<T> o, @NotMatches(CompileTimeConstantExpressionMatcher.class) T value) {
       return o.orElse(value);
