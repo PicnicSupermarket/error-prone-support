@@ -10,7 +10,8 @@ enum SupportedArgumentKind {
   DESCRIPTION("description", new DescriptionArgumentMigrator()),
   DATAPROVIDER("dataProvider", new DataProviderArgumentMigrator()),
   EXPECTED_EXCEPTIONS("expectedExceptions", new ExpectedExceptionsArgumentMigrator()),
-  ENABLED("enabled", new EnabledArgumentMigrator());
+  ENABLED("enabled", new EnabledArgumentMigrator()),
+  GROUPS("groups", new GroupsArgumentMigrator());
   private final String name;
 
   private final Migrator argumentMigrator;
