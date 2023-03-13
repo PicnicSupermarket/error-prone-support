@@ -17,15 +17,15 @@ final class EnabledArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
-    if ((boolean) ((LiteralTree) dataValue).getValue()) {
-      return Optional.of(SuggestedFix.builder().build());
-    } else {
+    if (!(boolean) ((LiteralTree) dataValue).getValue()) {
       return Optional.of(
           SuggestedFix.builder()
               .addImport("org.junit.jupiter.api.Disabled")
               .merge(SuggestedFix.prefixWith(methodTree, "@Disabled\n"))
               .build());
     }
+
+    return Optional.empty();
   }
 
   @Override
