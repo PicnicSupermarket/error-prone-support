@@ -7,7 +7,6 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** An {@link Migrator} that migrates the {@code priority} argument. */
 @Immutable

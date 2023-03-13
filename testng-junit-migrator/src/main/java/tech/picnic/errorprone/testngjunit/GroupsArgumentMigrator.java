@@ -12,7 +12,6 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.Tree;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
  * A {@link tech.picnic.errorprone.testngjunit.Migrator} that migrates the {@code group} argument.
