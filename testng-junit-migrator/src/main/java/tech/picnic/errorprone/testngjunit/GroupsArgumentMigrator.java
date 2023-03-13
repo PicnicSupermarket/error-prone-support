@@ -24,7 +24,7 @@ final class GroupsArgumentMigrator implements Migrator {
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
     SuggestedFix.Builder fix = SuggestedFix.builder().addImport("org.junit.jupiter.api.Tag");
     extractGroups(dataValue, state)
-        .forEach(group -> fix.prefixWith(methodTree, String.format("@Tag(%s)", group)));
+        .forEach(group -> fix.prefixWith(methodTree, String.format("@Tag(\"%s\")\n", group)));
     return Optional.of(fix.build());
   }
 
@@ -40,21 +40,21 @@ final class GroupsArgumentMigrator implements Migrator {
   }
 
   private static boolean isValidTagName(String tagName) {
-    return tagName.trim().length() > 2 && tagName.trim().chars().noneMatch(Character::isISOControl);
+    return !tagName.isEmpty() && tagName.chars().noneMatch(Character::isISOControl);
   }
 
   private static ImmutableList<String> extractGroups(ExpressionTree dataValue, VisitorState state) {
     if (dataValue.getKind() == Tree.Kind.STRING_LITERAL) {
-      return ImmutableList.of(SourceCode.treeToString(dataValue, state));
-    }
-
-    if (dataValue.getKind() != Tree.Kind.NEW_ARRAY) {
-      return ImmutableList.of();
+      return ImmutableList.of(trimTagName(SourceCode.treeToString(dataValue, state)));
     }
 
     NewArrayTree groupsTree = (NewArrayTree) dataValue;
     return groupsTree.getInitializers().stream()
-        .map(initializer -> SourceCode.treeToString(initializer, state))
+        .map(initializer -> trimTagName(SourceCode.treeToString(initializer, state)))
         .collect(toImmutableList());
+  }
+
+  private static String trimTagName(String tagName) {
+    return tagName.replaceAll("^\"|\"$", "").trim();
   }
 }
