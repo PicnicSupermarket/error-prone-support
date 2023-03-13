@@ -132,12 +132,19 @@ final class TestNGJUnitMigrationTest {
             "  public void multipleExpectedExceptions() {",
             "    throw new RuntimeException(\"foo\");",
             "  }",
+            "",
+            "  @Test(enabled = false)",
+            "  public void disabledTest() {}",
+            "",
+            "  @Test(enabled = true)",
+            "  public void enabledTest() {}",
             "}")
         .addOutputLines(
             "A.java",
             "import static org.junit.jupiter.params.provider.Arguments.arguments;",
             "",
             "import java.util.stream.Stream;",
+            "import org.junit.jupiter.api.Disabled;",
             "import org.junit.jupiter.api.DisplayName;",
             "import org.junit.jupiter.api.MethodOrderer;",
             "import org.junit.jupiter.api.Order;",
@@ -189,6 +196,13 @@ final class TestNGJUnitMigrationTest {
             "          throw new RuntimeException(\"foo\");",
             "        });",
             "  }",
+            "",
+            "  @Disabled",
+            "  @org.junit.jupiter.api.Test",
+            "  public void disabledTest() {}",
+            "",
+            "  @org.junit.jupiter.api.Test",
+            "  public void enabledTest() {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
