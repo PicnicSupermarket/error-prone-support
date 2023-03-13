@@ -22,23 +22,25 @@ final class ExpectedExceptionsArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
-    String expectedException = getExpectedException(dataValue, state).orElseThrow();
-    SuggestedFix.Builder fix =
-        SuggestedFix.builder()
-            .replace(
-                methodTree.getBody(),
-                buildWrappedBody(methodTree.getBody(), expectedException, state));
+    return getExpectedException(dataValue, state)
+        .map(
+            expectedException -> {
+              SuggestedFix.Builder fix =
+                  SuggestedFix.builder()
+                      .replace(
+                          methodTree.getBody(),
+                          buildWrappedBody(methodTree.getBody(), expectedException, state));
+              ImmutableList<String> removedExceptions = getRemovedExceptions(dataValue, state);
+              if (!removedExceptions.isEmpty()) {
+                fix.prefixWith(
+                    methodTree,
+                    String.format(
+                        "// XXX: Removed handling of `%s` because this migration doesn't support\n// XXX: multiple expected exceptions.\n",
+                        String.join(", ", removedExceptions)));
+              }
 
-    ImmutableList<String> removedExceptions = getRemovedExceptions(dataValue, state);
-    if (!removedExceptions.isEmpty()) {
-      fix.prefixWith(
-          methodTree,
-          String.format(
-              "// XXX: Removed handling of `%s` because this migration doesn't support\n// XXX: multiple expected exceptions.\n",
-              String.join(", ", removedExceptions)));
-    }
-
-    return Optional.of(fix.build());
+              return fix.build();
+            });
   }
 
   @Override
