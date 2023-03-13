@@ -9,8 +9,8 @@ enum SupportedArgumentKind {
   PRIORITY("priority", new PriorityArgumentMigrator()),
   DESCRIPTION("description", new DescriptionArgumentMigrator()),
   DATAPROVIDER("dataProvider", new DataProviderArgumentMigrator()),
-  EXPECTED_EXCEPTIONS("expectedExceptions", new ExpectedExceptionsArgumentMigrator());
-
+  EXPECTED_EXCEPTIONS("expectedExceptions", new ExpectedExceptionsArgumentMigrator()),
+  ENABLED("enabled", new EnabledArgumentMigrator());
   private final String name;
 
   private final Migrator argumentMigrator;
