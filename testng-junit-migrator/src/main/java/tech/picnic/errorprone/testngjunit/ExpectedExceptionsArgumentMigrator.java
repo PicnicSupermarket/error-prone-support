@@ -14,7 +14,6 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /** An {@link Migrator} that migrates the {@code expectedExceptions} argument. */
 @Immutable

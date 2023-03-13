@@ -17,7 +17,6 @@ import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 final class TestNGScannerTest {
   // XXX: We are missing some tests here.
@@ -39,9 +38,9 @@ final class TestNGScannerTest {
             "",
             "  private void privateNotATest() {}",
             "",
-            "  static void staticNotATest() {}",
+            "  static void notATest() {}",
             "",
-            "  public static void publicStaticNotATest() {}",
+            "  public static void staticNotATest() {}",
             "",
             "  // BUG: Diagnostic contains: class: A arguments: {  }",
             "  @Test",
