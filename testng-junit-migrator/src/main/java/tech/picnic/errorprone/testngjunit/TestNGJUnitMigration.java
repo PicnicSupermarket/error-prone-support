@@ -125,8 +125,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
 
                   fixBuilder.merge(migrateAnnotation(annotation, tree));
 
-                  state.reportMatch(
-                      describeMatch(annotation.getAnnotationTree(), fixBuilder.build()));
+                  state.reportMatch(describeMatch(tree, fixBuilder.build()));
                 });
         return super.visitMethod(tree, metaData);
       }

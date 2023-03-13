@@ -13,7 +13,7 @@ import java.util.Optional;
  * A {@link tech.picnic.errorprone.testngjunit.Migrator} that migrates the {@code enabled} argument.
  */
 @Immutable
-public class EnabledArgumentMigrator implements Migrator {
+final class EnabledArgumentMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
