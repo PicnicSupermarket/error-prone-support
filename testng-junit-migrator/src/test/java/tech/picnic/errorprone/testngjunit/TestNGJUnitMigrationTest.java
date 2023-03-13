@@ -155,6 +155,9 @@ final class TestNGJUnitMigrationTest {
             "",
             "  @Test(groups = \"\")",
             "  public void invalidGroupsNameTest() {}",
+            "",
+            "  @Test(groups = \"   whitespace  \")",
+            "  public void whitespaceGroupsNameTest() {}",
             "}")
         .addOutputLines(
             "A.java",
@@ -239,6 +242,10 @@ final class TestNGJUnitMigrationTest {
             "",
             "  @Test(groups = \"\")",
             "  public void invalidGroupsNameTest() {}",
+            "",
+            "  @Tag(\"whitespace\")",
+            "  @org.junit.jupiter.api.Test",
+            "  public void whitespaceGroupsNameTest() {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
