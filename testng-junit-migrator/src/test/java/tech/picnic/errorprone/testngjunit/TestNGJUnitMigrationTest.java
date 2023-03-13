@@ -152,6 +152,9 @@ final class TestNGJUnitMigrationTest {
             "",
             "  @Test(groups = {})",
             "  public void emptyGroupsTest() {}",
+            "",
+            "  @Test(groups = \"\")",
+            "  public void invalidGroupsNameTest() {}",
             "}")
         .addOutputLines(
             "A.java",
@@ -233,6 +236,9 @@ final class TestNGJUnitMigrationTest {
             "",
             "  @org.junit.jupiter.api.Test",
             "  public void emptyGroupsTest() {}",
+            "",
+            "  @Test(groups = \"\")",
+            "  public void invalidGroupsNameTest() {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }

@@ -19,7 +19,6 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
  */
 @Immutable
 final class GroupsArgumentMigrator implements Migrator {
-
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
@@ -35,7 +34,13 @@ final class GroupsArgumentMigrator implements Migrator {
       TestNGMetadata.AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {
-    return annotation.getArguments().containsKey("groups");
+    return annotation.getArguments().containsKey("groups")
+        && extractGroups(annotation.getArguments().get("groups"), state).stream()
+            .allMatch(GroupsArgumentMigrator::isValidTagName);
+  }
+
+  private static boolean isValidTagName(String tagName) {
+    return tagName.trim().length() > 2 && tagName.trim().chars().noneMatch(Character::isISOControl);
   }
 
   private static ImmutableList<String> extractGroups(ExpressionTree dataValue, VisitorState state) {
