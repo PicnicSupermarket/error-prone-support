@@ -79,7 +79,7 @@ final class TestNGJUnitMigrationTest {
             "",
             "  @Test",
             "  public static class B {",
-            "  // BUG: Diagnostic contains:",
+            "    // BUG: Diagnostic contains:",
             "    public void nestedClass() {}",
             "  }",
             "",
