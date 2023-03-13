@@ -1,11 +1,17 @@
 package tech.picnic.errorprone.testngjunit;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.errorprone.matchers.Matchers.allOf;
+import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.hasAnnotation;
+import static com.google.errorprone.matchers.Matchers.hasModifier;
+import static com.google.errorprone.matchers.Matchers.not;
 import static tech.picnic.errorprone.testngjunit.TestNGMatchers.TESTNG_TEST_ANNOTATION;
 import static tech.picnic.errorprone.testngjunit.TestNGMatchers.TESTNG_VALUE_FACTORY_METHOD;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ClassTree;
@@ -15,6 +21,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
+import javax.lang.model.element.Modifier;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -24,6 +31,10 @@ import org.jspecify.annotations.Nullable;
  */
 final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Builder> {
   private final VisitorState state;
+  private static final Matcher<MethodTree> TESTNG_TEST_METHOD =
+      anyOf(
+          hasAnnotation("org.testng.annotations.Test"),
+          allOf(hasModifier(Modifier.PUBLIC), not(hasModifier(Modifier.STATIC))));
   private final ImmutableMap.Builder<ClassTree, TestNGMetadata> metadataBuilder =
       ImmutableMap.builder();
 
@@ -63,9 +74,11 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
       return super.visitMethod(tree, builder);
     }
 
-    getTestNGAnnotation(tree, state)
-        .or(builder::getClassLevelAnnotationMetadata)
-        .ifPresent(annotation -> builder.methodAnnotationsBuilder().put(tree, annotation));
+    if (TESTNG_TEST_METHOD.matches(tree, state)) {
+      getTestNGAnnotation(tree, state)
+          .or(builder::getClassLevelAnnotationMetadata)
+          .ifPresent(annotation -> builder.methodAnnotationsBuilder().put(tree, annotation));
+    }
 
     return super.visitMethod(tree, builder);
   }
