@@ -154,19 +154,34 @@ abstract class TestNGMetadata {
 
   @SuppressWarnings("ImmutableEnumChecker" /* Matcher instances are final. */)
   public enum SetupTeardownType {
-    BEFORE_CLASS("org.testng.annotations.BeforeClass", "org.junit.jupiter.api.BeforeAll"),
-    BEFORE_METHOD("org.testng.annotations.BeforeMethod", "org.junit.jupiter.api.BeforeEach"),
-    AFTER_CLASS("org.testng.annotations.AfterClass", "org.junit.jupiter.api.AfterAll"),
-    AFTER_METHOD("org.testng.annotations.AfterMethod", "org.junit.jupiter.api.AfterEach");
+    BEFORE_CLASS(
+        "org.testng.annotations.BeforeClass",
+        "org.junit.jupiter.api.BeforeAll",
+        /* requiresStaticMethod= */ true),
+    BEFORE_METHOD(
+        "org.testng.annotations.BeforeMethod",
+        "org.junit.jupiter.api.BeforeEach",
+        /* requiresStaticMethod= */ false),
+    AFTER_CLASS(
+        "org.testng.annotations.AfterClass",
+        "org.junit.jupiter.api.AfterAll",
+        /* requiresStaticMethod= */ true),
+    AFTER_METHOD(
+        "org.testng.annotations.AfterMethod",
+        "org.junit.jupiter.api.AfterEach",
+        /* requiresStaticMethod= */ false);
 
     private final Matcher<AnnotationTree> annotationMatcher;
     private final Matcher<MethodTree> methodTreeMatcher;
     private final String junitAnnotationClass;
+    private final boolean requiresStaticMethod;
 
-    SetupTeardownType(String testNGAnnotationClass, String junitAnnotationClass) {
+    SetupTeardownType(
+        String testNGAnnotationClass, String junitAnnotationClass, boolean requiresStaticMethod) {
       this.annotationMatcher = isType(testNGAnnotationClass);
       this.methodTreeMatcher = hasAnnotation(testNGAnnotationClass);
       this.junitAnnotationClass = junitAnnotationClass;
+      this.requiresStaticMethod = requiresStaticMethod;
     }
 
     static Optional<SetupTeardownType> matchType(MethodTree methodTree, VisitorState state) {
@@ -181,6 +196,10 @@ abstract class TestNGMetadata {
 
     String getJunitAnnotationClass() {
       return junitAnnotationClass;
+    }
+
+    boolean requiresStaticMethod() {
+      return requiresStaticMethod;
     }
   }
 
