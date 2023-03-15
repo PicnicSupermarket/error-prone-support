@@ -1109,24 +1109,11 @@
                             <include>**/*Test.java</include>
                         </includes>
                         <properties>
-                            <configurationParameters>junit.jupiter.execution.parallel.config.strategy=dynamic
-                                junit.jupiter.execution.parallel.enabled=true
-                                junit.jupiter.execution.parallel.mode.default = concurrent</configurationParameters>
+                            <configurationParameters>junit.jupiter.execution.parallel.enabled=true
+                                junit.jupiter.execution.parallel.mode.default=concurrent</configurationParameters>
                         </properties>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                        <trimStackTrace>false</trimStackTrace>
                     </configuration>
-                    <dependencies>
-                        <!-- Some dependencies pull in JUnit 4; having it on
-                        the classpath confuses Surefire. By declaring this
-                        dependency we ensure that the JUnit 5 test runner is
-                        used. -->
-                        <dependency>
-                            <groupId>org.apache.maven.surefire</groupId>
-                            <artifactId>surefire-junit-platform</artifactId>
-                            <version>${version.surefire}</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
