@@ -31,7 +31,6 @@ final class SourceCodeTest {
         .expectUnchanged()
         .addInputLines(
             "AnnotationDeletions.java",
-            "",
             "interface AnnotationDeletions {",
             "  class SoleAnnotation {",
             "    @AnnotationToBeDeleted",
@@ -66,7 +65,6 @@ final class SourceCodeTest {
             "}")
         .addOutputLines(
             "AnnotationDeletions.java",
-            "",
             "interface AnnotationDeletions {",
             "  class SoleAnnotation {",
             "    void m() {}",
@@ -101,7 +99,6 @@ final class SourceCodeTest {
     refactoringTestHelper
         .addInputLines(
             "MethodDeletions.java",
-            "",
             "interface MethodDeletions {",
             "  class SoleMethod {",
             "    void methodToBeDeleted() {}",
@@ -141,7 +138,6 @@ final class SourceCodeTest {
             "}")
         .addOutputLines(
             "MethodDeletions.java",
-            "",
             "interface MethodDeletions {",
             "  class SoleMethod {}",
             "",
