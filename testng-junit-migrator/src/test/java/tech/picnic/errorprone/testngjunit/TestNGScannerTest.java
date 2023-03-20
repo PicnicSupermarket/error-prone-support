@@ -19,8 +19,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 final class TestNGScannerTest {
-  // XXX: We are missing some tests here.
-  // - Some not supported things as well.
   @Test
   void classLevelAndMethodLevel() {
     CompilationTestHelper.newInstance(TestChecker.class, getClass())
@@ -187,15 +185,14 @@ final class TestNGScannerTest {
             metaData
                 .getSetupMethods()
                 .forEach(
-                    (method, setupMethodType) -> {
-                      state.reportMatch(
-                          buildDescription(method)
-                              .setMessage(
-                                  String.format(
-                                      "class: %s setupMethod: %s",
-                                      classTree.getSimpleName(), setupMethodType))
-                              .build());
-                    });
+                    (method, setupMethodType) ->
+                        state.reportMatch(
+                            buildDescription(method)
+                                .setMessage(
+                                    String.format(
+                                        "class: %s setupMethod: %s",
+                                        classTree.getSimpleName(), setupMethodType))
+                                .build()));
 
             classTree.getMembers().stream()
                 .filter(MethodTree.class::isInstance)

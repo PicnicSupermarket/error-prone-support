@@ -10,20 +10,18 @@ Consider the following TestNG test class:
 // TestNG code:
 @Test
 public class A {
-    public void simpleTest() {
-    }
+  public void simpleTest() {}
 
-    @Test(priority = 2)
-    public void priorityTest() {
-    }
+  @Test(priority = 2)
+  public void priorityTest() {}
 
-    @DataProvider
-    private static Object[][] dataProviderTestCases() {
-        return new Object[]{{1}, {2}, {3}};
-    }
+  @DataProvider
+  private static Object[][] dataProviderTestCases() {
+    return new Object[]{{1}, {2}, {3}};
+  }
 
-    @Test(dataProvider = "dataProviderTestCases")
-    public void dataProviderTest(int number) {}
+  @Test(dataProvider = "dataProviderTestCases")
+  public void dataProviderTest(int number) {}
 }
 ```
 
@@ -41,7 +39,7 @@ public class A {
   public void priorityTest() {}
 
   private static Stream<Argument> dataProviderTestCases() {
-      return Stream.of(arguments(1), arguments(2), arguments(3));
+    return Stream.of(arguments(1), arguments(2), arguments(3));
   }
 
   @ParameterizedTest
@@ -58,7 +56,7 @@ First edit your `pom.xml` and add `testng-junit-migrator` to the
 ```xml
 <profiles>
     <profile>
-        <id>testng-migator</id>
+        <id>testng-migrator</id>
         <build>
             <plugins>
                 <plugin>
@@ -80,8 +78,9 @@ First edit your `pom.xml` and add `testng-junit-migrator` to the
 </profiles> 
 ```
 
-The `testng-migrator` profile isn't required, but it will allow the `run-testng-junit-migrator.sh` script to count the
-amount of tests that are run before and after the migration.
+The `testng-migrator` profile isn't required, but it will allow the
+`run-testng-junit-migrator.sh` script to count the amount of tests that are run
+before and after the migration.
 
 Next, to run the migrator use the following command:
 
@@ -95,11 +94,11 @@ mvn \
   -Dverification.skip
 ```
 
-There's script to make invoking this command easier: `run-testng-junit-migrator.sh`.
+There's a script to easily invoke this command `run-testng-junit-migrator.sh`.
 This script will:
 
-1. Run your TestNG tests and count the number of completed tests
-2. Add the required `JUnit` dependencies to your `pom.xml`
-3. Run the `testng-to-junit` migration
-4. Run the migrated JUnit tests and count the number of completed tests
+1. Run the TestNG tests and count the number of completed tests.
+2. Add the required `JUnit` dependencies to your `pom.xml`.
+3. Run the `testng-to-junit` migration.
+4. Run the migrated JUnit tests and count the number of completed tests.
 5. Display the difference in the amount of completed tests.

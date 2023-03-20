@@ -15,27 +15,7 @@ import org.junit.jupiter.api.Test;
 
 final class TestNGMatchersTest {
   @Test
-  void nGAnnotation() {
-    CompilationTestHelper.newInstance(TestNGMatchersTestChecker.class, getClass())
-        .addSourceLines(
-            "A.java",
-            "import org.testng.annotations.Test;",
-            "",
-            "// BUG: Diagnostic contains: TestNG annotation",
-            "@Test",
-            "class A {",
-            "  // BUG: Diagnostic contains: TestNG annotation",
-            "  @Test",
-            "  void basic() {}",
-            "",
-            "  @org.junit.jupiter.api.Test",
-            "  void junitTest() {}",
-            "}")
-        .doTest();
-  }
-
-  @Test
-  void nGValueFactory() {
+  void matches() {
     CompilationTestHelper.newInstance(TestNGMatchersTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
@@ -46,14 +26,21 @@ final class TestNGMatchersTest {
             "@Test",
             "class A {",
             "  // BUG: Diagnostic contains: TestNG annotation",
-            "  @Test(dataProvider = \"dataProviderTestCases\")",
+            "  @Test",
             "  void basic() {}",
+            "",
+            "  // BUG: Diagnostic contains: TestNG annotation",
+            "  @Test(dataProvider = \"dataProviderTestCases\")",
+            "  void withDataProvider() {}",
             "",
             "  @DataProvider",
             "  // BUG: Diagnostic contains: TestNG value factory method",
             "  private static Object[][] dataProviderTestCases() {",
             "    return new Object[][] {};",
             "  }",
+            "",
+            "  @org.junit.jupiter.api.Test",
+            "  void junitTest() {}",
             "}")
         .doTest();
   }
@@ -69,20 +56,16 @@ final class TestNGMatchersTest {
 
     @Override
     public Description matchAnnotation(AnnotationTree annotationTree, VisitorState visitorState) {
-      if (TestNGMatchers.TESTNG_TEST_ANNOTATION.matches(annotationTree, visitorState)) {
-        return buildDescription(annotationTree).setMessage("TestNG annotation").build();
-      }
-
-      return Description.NO_MATCH;
+      return TestNGMatchers.TESTNG_TEST_ANNOTATION.matches(annotationTree, visitorState)
+          ? buildDescription(annotationTree).setMessage("TestNG annotation").build()
+          : Description.NO_MATCH;
     }
 
     @Override
     public Description matchMethod(MethodTree methodTree, VisitorState visitorState) {
-      if (TestNGMatchers.TESTNG_VALUE_FACTORY_METHOD.matches(methodTree, visitorState)) {
-        return buildDescription(methodTree).setMessage("TestNG value factory method").build();
-      }
-
-      return Description.NO_MATCH;
+      return TestNGMatchers.TESTNG_VALUE_FACTORY_METHOD.matches(methodTree, visitorState)
+          ? buildDescription(methodTree).setMessage("TestNG value factory method").build()
+          : Description.NO_MATCH;
     }
   }
 }

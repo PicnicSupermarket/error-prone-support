@@ -8,8 +8,6 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 
-// XXX: It would be awesome to have a test for this class as well. It should be very similar to
-// `MoreJUnitMatchersTest`.
 /**
  * A collection of TestNG-specific helper methods and {@link Matcher}s.
  *

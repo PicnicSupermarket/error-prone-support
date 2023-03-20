@@ -4,13 +4,8 @@ set -e -u -o pipefail
 
 # If this is not a Maven build, exit here to skip Maven-specific steps.
 if [ ! -f pom.xml ]; then
+  echo "Not a Maven build, exiting."
   exit 0
-fi
-
-# Use the Maven Wrapper executable if present.
-MVN='mvn'
-if [ -x ./mvnw ]; then
-  MVN='./mvnw'
 fi
 
 function insert_dependency() {
@@ -41,7 +36,8 @@ function insert_dependency() {
 
     # Generate a placeholder that will be inserted at the place where the new
     # dependency declaration should reside. We need to jump through this hoop
-    # because `xmlstarlet` does not support insertion of complex XML subdocuments.
+    # because `xmlstarlet` does not support insertion of complex XML
+    # sub-documents.
     placeholder="$(head -c 30 /dev/urandom | base64 | sed 's,[^a-zA-Z0-9],,g')"
 
     # Insert the placeholder. (Note that only one case will match.)
@@ -65,13 +61,12 @@ function insert_dependency() {
         sed '/></d' |
         sed ':a;N;$!ba;s/\n/\\n/g')"
 
-    # Replace the placeholder with the actual dependeny declaration.
+    # Replace the placeholder with the actual dependency declaration.
     sed -i "s,${placeholder},${decl}," "${pomFile}"
 }
 
 echo "Counting number of TestNG tests..."
-# count testng tests
-testng_results=$(${MVN} test | grep -n "Results:" -A 3 | grep -oP "Tests run: \K\d+(?=,)" | awk '{s+=$1} END {print s}')
+testng_results=$(mvn test | grep -n "Results:" -A 3 | grep -oP "Tests run: \K\d+(?=,)" | awk '{s+=$1} END {print s}')
 echo "Number of TestNG tests run: $testng_results"
 
 
@@ -79,38 +74,37 @@ echo "Migrating to JUnit 5..."
 echo "Adding required dependencies..."
 for module in $(grep -rl "org.testng.annotations.Test" $(pwd) | awk -F "$(pwd)" '{print $2}' | awk -F '/' '{print $2}' | uniq); do
     (
-        cd $module
+        cd "$module"
         insert_dependency "org.junit.jupiter" "junit-jupiter-api" "" "test"
     )
     echo "[$module] Added org.junit.jupiter:junit-jupiter-api"
     (
-        cd $module
+        cd "$module"
         insert_dependency "org.junit.jupiter" "junit-jupiter-engine" "" "test"
     )
     echo "[$module] Added org.junit.jupiter:junit-jupiter-engine"
 done
 for module in $(grep -rl "@DataProvider" $(pwd) | awk -F "$(pwd)" '{print $2}' | awk -F '/' '{print $2}' | uniq); do
     (
-        cd $module
+        cd "$module"
         insert_dependency "org.junit.jupiter" "junit-jupiter-params" "" "test"
     )
     echo "[$module] Added org.junit.jupiter:junit-jupiter-params"
 done
 
 echo "Running migration..."
-"${MVN}" \
+mvn \
   -Perror-prone \
   -Ptestng-migrator \
   -Ppatch \
   clean test-compile fmt:format \
   -Derror-prone.patch-checks="TestNGJUnitMigration" \
-  -Dfrontend.skip \
   -Dverification.skip
 
 echo "Counting JUnit tests run..."
-junit_results=$(${MVN} test | grep -n "Results:" -A 3 | grep -oP "Tests run: \K\d+(?=,)" | awk '{s+=$1} END {print s}')
+junit_results=$(mvn test | grep -n "Results:" -A 3 | grep -oP "Tests run: \K\d+(?=,)" | awk '{s+=$1} END {print s}')
 echo "Number of TestNG tests run: $testng_results"
 echo "Number of JUnit tests run: $junit_results"
-echo "Difference: $(expr ${testng_results} - ${junit_results})"
+echo "Difference: $(expr "${testng_results}" - "${junit_results}")"
 
-echo "Finished migration steps!"
+echo "Finished executing migration!"
