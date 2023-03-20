@@ -102,3 +102,7 @@ This script will:
 3. Run the `testng-to-junit` migration.
 4. Run the migrated JUnit tests and count the number of completed tests.
 5. Display the difference in the amount of completed tests.
+
+### Picnic specific
+`picnic-scratch` contains a small helper script `java-platform/testng-junit-migration.sh` that migrates some
+more Picnic-specific code.
