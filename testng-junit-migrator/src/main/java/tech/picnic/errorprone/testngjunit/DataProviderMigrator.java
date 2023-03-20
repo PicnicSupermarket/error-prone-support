@@ -58,7 +58,6 @@ final class DataProviderMigrator {
                     .addStaticImport("org.junit.jupiter.params.provider.Arguments.arguments")
                     .addImport("java.util.stream.Stream")
                     .addImport("org.junit.jupiter.params.provider.Arguments")
-                    .removeImport("org.testng.annotations.DataProvider")
                     .merge(SuggestedFix.delete(methodTree))
                     .merge(
                         SuggestedFix.postfixWith(
