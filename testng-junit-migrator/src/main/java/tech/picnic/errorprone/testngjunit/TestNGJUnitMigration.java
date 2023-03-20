@@ -69,7 +69,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     TestNGScanner scanner = new TestNGScanner(state);
     ImmutableMap<ClassTree, TestNGMetadata> classMetaData =
-        scanner.collectMetadataForEachClass(tree);
+        scanner.collectMetadataForClasses(tree);
 
     new TreeScanner<@Nullable Void, TestNGMetadata>() {
       @Override
