@@ -14,7 +14,6 @@ import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.ClassTree;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -120,7 +119,8 @@ final class BugPatternExtractorTest {
 
   private static void verifyFileMatchesResource(
       Path outputDirectory, String fileName, String resourceName) throws IOException {
-    assertThat(Files.readString(outputDirectory.resolve(fileName)))
+    assertThat(outputDirectory.resolve(fileName))
+        .content(UTF_8)
         .isEqualToIgnoringWhitespace(getResource(resourceName));
   }
 
