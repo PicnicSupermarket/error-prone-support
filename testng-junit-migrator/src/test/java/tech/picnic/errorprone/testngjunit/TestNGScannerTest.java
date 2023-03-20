@@ -178,7 +178,7 @@ final class TestNGScannerTest {
                             state));
 
             metaData
-                .getSetupMethods()
+                .getSetupTeardown()
                 .forEach(
                     (method, setupTearDownType) ->
                         reportMethodMessage(
