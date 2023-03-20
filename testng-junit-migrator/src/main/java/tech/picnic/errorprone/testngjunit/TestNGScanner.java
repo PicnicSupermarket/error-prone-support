@@ -11,6 +11,7 @@ import static tech.picnic.errorprone.testngjunit.TestNGMatchers.TESTNG_VALUE_FAC
 
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AssignmentTree;
@@ -50,7 +51,7 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
   public @Nullable Void visitClass(ClassTree tree, TestNGMetadata.Builder unused) {
     TestNGMetadata.Builder builder = TestNGMetadata.builder();
     builder.setClassTree(tree);
-    getTestNGAnnotation(tree, state).map(builder::setClassLevelAnnotationMetadata);
+    getTestNGAnnotation(tree, state).ifPresent(builder::setClassLevelAnnotationMetadata);
     super.visitClass(tree, builder);
     metadataBuilder.put(tree, builder.build());
 
@@ -63,7 +64,8 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
       return super.visitMethod(tree, builder);
     }
 
-    if (TESTNG_VALUE_FACTORY_METHOD.matches(tree, state) && new DataProviderMigrator().canFix(tree)) {
+    if (TESTNG_VALUE_FACTORY_METHOD.matches(tree, state)
+        && new DataProviderMigrator().canFix(tree)) {
       builder
           .dataProviderMetadataBuilder()
           .put(tree.getName().toString(), DataProviderMetadata.create(tree));
@@ -79,7 +81,10 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
     if (TESTNG_TEST_METHOD.matches(tree, state)) {
       getTestNGAnnotation(tree, state)
           .or(builder::getClassLevelAnnotationMetadata)
-          .map(annotation -> builder.methodAnnotationsBuilder().put(tree, annotation));
+          // XXX: Here we should also change the method of the builder to use it like a builder.
+          // Now we are retrieving something that we are building and adding it there. Create a
+          // method that we can just pass an item.
+          .ifPresent(annotation -> builder.methodAnnotationsBuilder().put(tree, annotation));
     }
 
     return super.visitMethod(tree, builder);
@@ -91,6 +96,7 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
     return metadataBuilder.build();
   }
 
+  @CanIgnoreReturnValue
   private static Optional<AnnotationMetadata> getTestNGAnnotation(Tree tree, VisitorState state) {
     return ASTHelpers.getAnnotations(tree).stream()
         .filter(annotation -> TESTNG_TEST_ANNOTATION.matches(annotation, state))

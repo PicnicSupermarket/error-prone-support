@@ -180,11 +180,11 @@ final class TestNGScannerTest {
             metaData
                 .getSetupMethods()
                 .forEach(
-                    (method, SetupTearDownType) ->
+                    (method, setupTearDownType) ->
                         reportMethodMessage(
                             classTree.getSimpleName(),
                             "SetupTearDown",
-                            SetupTearDownType.name(),
+                            setupTearDownType.name(),
                             method,
                             state));
 
@@ -219,8 +219,7 @@ final class TestNGScannerTest {
     private static String createMetaDataMessage(
         ClassTree classTree, AnnotationMetadata annotationMetadata) {
       return String.format(
-          "Class: %s arguments: %s",
-          classTree.getSimpleName(), annotationMetadata.getArguments().toString());
+          "Class: %s arguments: %s", classTree.getSimpleName(), annotationMetadata.getArguments());
     }
   }
 }
