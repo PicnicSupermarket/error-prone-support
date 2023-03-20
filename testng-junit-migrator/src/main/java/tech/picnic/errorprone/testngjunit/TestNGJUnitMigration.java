@@ -105,7 +105,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
                 });
 
         metaData
-            .getSetupMethods()
+            .getSetupTeardown()
             .forEach(
                 (method, type) -> {
                   new SetupTeardownMethodMigrator()

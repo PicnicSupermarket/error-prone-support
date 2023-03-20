@@ -66,25 +66,20 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
 
     if (TESTNG_VALUE_FACTORY_METHOD.matches(tree, state)
         && new DataProviderMigrator().canFix(tree)) {
-      builder
-          .dataProviderMetadataBuilder()
-          .put(tree.getName().toString(), DataProviderMetadata.create(tree));
+      builder.addDataProviderMetadata(tree.getName().toString(), DataProviderMetadata.create(tree));
       return super.visitMethod(tree, builder);
     }
 
     Optional<SetupTeardownType> setupTeardownType = SetupTeardownType.matchType(tree, state);
     if (setupTeardownType.isPresent()) {
-      builder.setupMethodsBuilder().put(tree, setupTeardownType.orElseThrow());
+      builder.setupTeardownBuilder().put(tree, setupTeardownType.orElseThrow());
       return super.visitMethod(tree, builder);
     }
 
     if (TESTNG_TEST_METHOD.matches(tree, state)) {
       getTestNGAnnotation(tree, state)
           .or(builder::getClassLevelAnnotationMetadata)
-          // XXX: Here we should also change the method of the builder to use it like a builder.
-          // Now we are retrieving something that we are building and adding it there. Create a
-          // method that we can just pass an item.
-          .ifPresent(annotation -> builder.methodAnnotationsBuilder().put(tree, annotation));
+          .ifPresent(annotation -> builder.addMethodAnnotation(tree, annotation));
     }
 
     return super.visitMethod(tree, builder);

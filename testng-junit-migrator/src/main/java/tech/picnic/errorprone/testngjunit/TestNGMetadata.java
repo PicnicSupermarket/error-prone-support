@@ -31,7 +31,7 @@ abstract class TestNGMetadata {
 
   abstract ImmutableMap<MethodTree, AnnotationMetadata> getMethodAnnotations();
 
-  abstract ImmutableMap<MethodTree, SetupTeardownType> getSetupMethods();
+  abstract ImmutableMap<MethodTree, SetupTeardownType> getSetupTeardown();
 
   /**
    * Retrieve the tests that can be migrated.
@@ -71,7 +71,7 @@ abstract class TestNGMetadata {
     private final ImmutableMap.Builder<MethodTree, AnnotationMetadata> methodAnnotationsBuilder =
         ImmutableMap.builder();
 
-    private final ImmutableMap.Builder<MethodTree, SetupTeardownType> setupMethodsBuilder =
+    private final ImmutableMap.Builder<MethodTree, SetupTeardownType> setupTeardownBuilder =
         ImmutableMap.builder();
 
     private final ImmutableMap.Builder<String, DataProviderMetadata> dataProviderMetadataBuilder =
@@ -85,27 +85,27 @@ abstract class TestNGMetadata {
 
     abstract Builder setMethodAnnotations(ImmutableMap<MethodTree, AnnotationMetadata> value);
 
-    ImmutableMap.Builder<MethodTree, AnnotationMetadata> methodAnnotationsBuilder() {
-      return methodAnnotationsBuilder;
+    void addMethodAnnotation(MethodTree tree, AnnotationMetadata metaData) {
+      methodAnnotationsBuilder.put(tree, metaData);
     }
 
-    abstract Builder setSetupMethods(ImmutableMap<MethodTree, SetupTeardownType> value);
+    abstract Builder setSetupTeardown(ImmutableMap<MethodTree, SetupTeardownType> value);
 
-    ImmutableMap.Builder<MethodTree, SetupTeardownType> setupMethodsBuilder() {
-      return setupMethodsBuilder;
+    ImmutableMap.Builder<MethodTree, SetupTeardownType> setupTeardownBuilder() {
+      return setupTeardownBuilder;
     }
 
     abstract Builder setDataProviderMetadata(ImmutableMap<String, DataProviderMetadata> value);
 
-    ImmutableMap.Builder<String, DataProviderMetadata> dataProviderMetadataBuilder() {
-      return dataProviderMetadataBuilder;
+    void addDataProviderMetadata(String methodName, DataProviderMetadata value) {
+      dataProviderMetadataBuilder.put(methodName, value);
     }
 
     abstract TestNGMetadata autoBuild();
 
     TestNGMetadata build() {
       setMethodAnnotations(methodAnnotationsBuilder.build());
-      setSetupMethods(setupMethodsBuilder.build());
+      setSetupTeardown(setupTeardownBuilder.build());
       setDataProviderMetadata(dataProviderMetadataBuilder.build());
       return autoBuild();
     }
