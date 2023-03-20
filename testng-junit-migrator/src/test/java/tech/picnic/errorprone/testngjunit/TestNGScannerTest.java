@@ -3,7 +3,6 @@ package tech.picnic.errorprone.testngjunit;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
-import static java.util.stream.Collectors.joining;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.BugPattern;
@@ -15,8 +14,11 @@ import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.Tree;
 import java.util.Optional;
+import javax.lang.model.element.Name;
 import org.junit.jupiter.api.Test;
+import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 
 final class TestNGScannerTest {
   @Test
@@ -26,7 +28,7 @@ final class TestNGScannerTest {
             "A.java",
             "import org.testng.annotations.Test;",
             "",
-            "// BUG: Diagnostic contains: class: A arguments: {  }",
+            "// BUG: Diagnostic contains: Class: A arguments: {}",
             "@Test",
             "class A {",
             "",
@@ -40,28 +42,28 @@ final class TestNGScannerTest {
             "",
             "  public static void staticNotATest() {}",
             "",
-            "  // BUG: Diagnostic contains: class: A arguments: {  }",
+            "  // BUG: Diagnostic contains: Class: A arguments: {}",
             "  @Test",
             "  public void localAnnotation() {}",
             "",
-            "  // BUG: Diagnostic contains: class: A arguments: { description: \"foo\" }",
+            "  // BUG: Diagnostic contains: Class: A arguments: {description=\"foo\"}",
             "  @Test(description = \"foo\")",
             "  public void singleArgument() {}",
             "",
-            "  // BUG: Diagnostic contains: class: A arguments: { priority: 1, description: \"foo\" }",
+            "  // BUG: Diagnostic contains: Class: A arguments: {priority=1, description=\"foo\"}",
             "  @Test(priority = 1, description = \"foo\")",
             "  public void multipleArguments() {}",
             "",
-            "  // BUG: Diagnostic contains: class: A arguments: { dataProvider: \"dataProviderTestCases\" }",
+            "  // BUG: Diagnostic contains: Class: A arguments: {dataProvider=\"dataProviderTestCases\"}",
             "  @Test(dataProvider = \"dataProviderTestCases\")",
             "  public void dataProvider() {}",
             "",
-            "  // BUG: Diagnostic contains: class: B arguments: { description: \"nested\" }",
+            "  // BUG: Diagnostic contains: Class: B arguments: {description=\"nested\"}",
             "  @Test(description = \"nested\")",
             "  class B {",
             "    public void nestedTest() {}",
             "",
-            "    // BUG: Diagnostic contains: class: B arguments: { priority: 1 }",
+            "    // BUG: Diagnostic contains: Class: B arguments: {priority=1}",
             "    @Test(priority = 1)",
             "    public void nestedTestWithArguments() {}",
             "  }",
@@ -69,6 +71,7 @@ final class TestNGScannerTest {
         .doTest();
   }
 
+  // XXX: Here we need to add some edge cases for the DataProvider probably?
   @Test
   void dataProvider() {
     CompilationTestHelper.newInstance(TestChecker.class, getClass())
@@ -79,7 +82,7 @@ final class TestNGScannerTest {
             "",
             "class A {",
             "  @DataProvider",
-            "  // BUG: Diagnostic contains: class: A dataProvider: dataProviderTestCases",
+            "  // BUG: Diagnostic contains: Class: A DataProvider: dataProviderTestCases",
             "  private static Object[][] dataProviderTestCases() {",
             "    return new Object[][] {{1}, {2}};",
             "  }",
@@ -124,19 +127,19 @@ final class TestNGScannerTest {
             "",
             "class A {",
             "  @BeforeClass",
-            "  // BUG: Diagnostic contains: class: A setupMethod: BEFORE_CLASS",
+            "  // BUG: Diagnostic contains: Class: A SetupTearDown: BEFORE_CLASS",
             "  private static void beforeClass() {}",
             "",
             "  @BeforeMethod",
-            "  // BUG: Diagnostic contains: class: A setupMethod: BEFORE_METHOD",
+            "  // BUG: Diagnostic contains: Class: A SetupTearDown: BEFORE_METHOD",
             "  private void beforeMethod() {}",
             "",
             "  @AfterClass",
-            "  // BUG: Diagnostic contains: class: A setupMethod: AFTER_CLASS",
+            "  // BUG: Diagnostic contains: Class: A SetupTearDown: AFTER_CLASS",
             "  private static void afterClass() {}",
             "",
             "  @AfterMethod",
-            "  // BUG: Diagnostic contains: class: A setupMethod: AFTER_METHOD",
+            "  // BUG: Diagnostic contains: Class: A SetupTearDown: AFTER_METHOD",
             "  private void afterMethod() {}",
             "}")
         .doTest();
@@ -154,45 +157,36 @@ final class TestNGScannerTest {
     public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
       TestNGScanner scanner = new TestNGScanner(state);
       ImmutableMap<ClassTree, TestNGMetadata> classMetaData =
-          scanner.collectMetadataForEachClass(tree);
+          scanner.collectMetadataForClasses(tree);
 
       classMetaData.forEach(
           (classTree, metaData) -> {
             metaData
                 .getClassLevelAnnotationMetadata()
-                .ifPresent(
-                    annotation ->
-                        state.reportMatch(
-                            buildDescription(annotation.getAnnotationTree())
-                                .setMessage(
-                                    createAnnotationDiagnosticMessage(classTree, annotation, state))
-                                .build()));
+                .ifPresent(annotation -> reportAnnotationMessage(state, classTree, annotation));
 
             metaData
                 .getDataProviderMetadata()
                 .values()
                 .forEach(
-                    dataProvider -> {
-                      state.reportMatch(
-                          buildDescription(dataProvider.getMethodTree())
-                              .setMessage(
-                                  String.format(
-                                      "class: %s dataProvider: %s",
-                                      classTree.getSimpleName(), dataProvider.getName()))
-                              .build());
-                    });
+                    dataProvider ->
+                        reportMethodMessage(
+                            classTree.getSimpleName(),
+                            "DataProvider",
+                            dataProvider.getName(),
+                            dataProvider.getMethodTree(),
+                            state));
 
             metaData
                 .getSetupMethods()
                 .forEach(
-                    (method, setupMethodType) ->
-                        state.reportMatch(
-                            buildDescription(method)
-                                .setMessage(
-                                    String.format(
-                                        "class: %s setupMethod: %s",
-                                        classTree.getSimpleName(), setupMethodType))
-                                .build()));
+                    (method, SetupTearDownType) ->
+                        reportMethodMessage(
+                            classTree.getSimpleName(),
+                            "SetupTearDown",
+                            SetupTearDownType.name(),
+                            method,
+                            state));
 
             classTree.getMembers().stream()
                 .filter(MethodTree.class::isInstance)
@@ -200,32 +194,33 @@ final class TestNGScannerTest {
                 .map(metaData::getAnnotation)
                 .flatMap(Optional::stream)
                 .filter(not(isEqual(metaData.getClassLevelAnnotationMetadata().orElse(null))))
-                .forEach(
-                    annotation -> {
-                      state.reportMatch(
-                          buildDescription(annotation.getAnnotationTree())
-                              .setMessage(
-                                  createAnnotationDiagnosticMessage(classTree, annotation, state))
-                              .build());
-                    });
+                .forEach(annotation -> reportAnnotationMessage(state, classTree, annotation));
           });
 
       return Description.NO_MATCH;
     }
 
-    private static String createAnnotationDiagnosticMessage(
-        ClassTree classTree,
-        TestNGMetadata.AnnotationMetadata annotationMetadata,
-        VisitorState state) {
+    private void reportAnnotationMessage(
+        VisitorState state, ClassTree classTree, AnnotationMetadata annotation) {
+      state.reportMatch(
+          buildDescription(annotation.getAnnotationTree())
+              .setMessage(createMetaDataMessage(classTree, annotation))
+              .build());
+    }
+
+    private void reportMethodMessage(
+        Name className, String message, String name, Tree tree, VisitorState state) {
+      state.reportMatch(
+          buildDescription(tree)
+              .setMessage(String.format("Class: %s %s: %s", className, message, name))
+              .build());
+    }
+
+    private static String createMetaDataMessage(
+        ClassTree classTree, AnnotationMetadata annotationMetadata) {
       return String.format(
-          "class: %s arguments: { %s }",
-          classTree.getSimpleName(),
-          annotationMetadata.getArguments().entrySet().stream()
-              .map(
-                  entry ->
-                      String.join(
-                          ": ", entry.getKey(), SourceCode.treeToString(entry.getValue(), state)))
-              .collect(joining(", ")));
+          "Class: %s arguments: %s",
+          classTree.getSimpleName(), annotationMetadata.getArguments().toString());
     }
   }
 }

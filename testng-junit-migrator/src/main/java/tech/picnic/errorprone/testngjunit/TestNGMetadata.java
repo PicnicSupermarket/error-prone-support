@@ -34,9 +34,9 @@ abstract class TestNGMetadata {
   abstract ImmutableMap<MethodTree, SetupTeardownType> getSetupMethods();
 
   /**
-   * Get the {@code Test}s that are able to migratable.
+   * Retrieve the tests that can be migrated.
    *
-   * @return an {@link ImmutableMap} mapping the name of the data provider to its respective
+   * @return An {@link ImmutableMap} with mapping {@code DataProvider}'s name to its respective
    *     metadata.
    */
   public abstract ImmutableMap<String, DataProviderMetadata> getDataProviderMetadata();
@@ -81,7 +81,7 @@ abstract class TestNGMetadata {
 
     abstract Optional<AnnotationMetadata> getClassLevelAnnotationMetadata();
 
-    abstract Builder setClassLevelAnnotationMetadata(Optional<AnnotationMetadata> value);
+    abstract Builder setClassLevelAnnotationMetadata(AnnotationMetadata value);
 
     abstract Builder setMethodAnnotations(ImmutableMap<MethodTree, AnnotationMetadata> value);
 
@@ -186,7 +186,7 @@ abstract class TestNGMetadata {
 
     static Optional<SetupTeardownType> matchType(MethodTree methodTree, VisitorState state) {
       return Arrays.stream(values())
-          .filter(value -> value.methodTreeMatcher.matches(methodTree, state))
+          .filter(v -> v.methodTreeMatcher.matches(methodTree, state))
           .findFirst();
     }
 
