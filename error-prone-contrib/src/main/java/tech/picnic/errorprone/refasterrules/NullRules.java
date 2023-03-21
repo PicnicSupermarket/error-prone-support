@@ -25,6 +25,11 @@ final class NullRules {
   static final class IsNull {
     @BeforeTemplate
     boolean before(@Nullable Object object) {
+      return null == object;
+    }
+
+    @BeforeTemplate
+    boolean before2(@Nullable Object object) {
       return Objects.isNull(object);
     }
 
@@ -38,6 +43,11 @@ final class NullRules {
   static final class IsNotNull {
     @BeforeTemplate
     boolean before(@Nullable Object object) {
+      return null != object;
+    }
+
+    @BeforeTemplate
+    boolean before2(@Nullable Object object) {
       return Objects.nonNull(object);
     }
 

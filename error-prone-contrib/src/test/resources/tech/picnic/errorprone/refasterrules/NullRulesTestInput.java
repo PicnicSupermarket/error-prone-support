@@ -13,12 +13,12 @@ final class NullRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(MoreObjects.class, Optional.class);
   }
 
-  boolean testIsNull() {
-    return Objects.isNull("foo");
+  ImmutableSet<Boolean> testIsNull() {
+    return ImmutableSet.of(null == "foo", Objects.isNull("bar"));
   }
 
-  boolean testIsNotNull() {
-    return Objects.nonNull("foo");
+  ImmutableSet<Boolean> testIsNotNull() {
+    return ImmutableSet.of(null != "foo", Objects.nonNull("bar"));
   }
 
   ImmutableSet<String> testRequireNonNullElse() {

@@ -9,7 +9,6 @@ import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Preconditions;
-import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
@@ -79,7 +78,7 @@ final class PreconditionsRules {
   static final class RequireNonNull<T> {
     @BeforeTemplate
     void before(T object) {
-      if (Refaster.anyOf(object == null, null == object)) {
+      if (object == null) {
         throw new NullPointerException();
       }
     }
@@ -91,7 +90,7 @@ final class PreconditionsRules {
 
     @BeforeTemplate
     void before3(T object) {
-      checkArgument(Refaster.anyOf(object != null, null != object));
+      checkArgument(object != null);
     }
 
     @AfterTemplate
@@ -105,7 +104,7 @@ final class PreconditionsRules {
   static final class RequireNonNullWithMessage<T> {
     @BeforeTemplate
     void before(T object, String message) {
-      if (Refaster.anyOf(object == null, null == object)) {
+      if (object == null) {
         throw new NullPointerException(message);
       }
     }
@@ -117,7 +116,7 @@ final class PreconditionsRules {
 
     @BeforeTemplate
     void before3(T object, String message) {
-      checkArgument(Refaster.anyOf(object != null, null != object), message);
+      checkArgument(object != null, message);
     }
 
     @AfterTemplate
