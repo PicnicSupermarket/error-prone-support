@@ -1204,12 +1204,15 @@ final class ReactorRules {
     }
   }
 
-  /** Don't unnecessarily call {@link StepVerifier.Step#expectNext(Object[])}. */
+  /**
+   * Don't unnecessarily call {@link StepVerifier.Step#expectNext(Object[])} or {@code
+   * StepVerifier.Step#expectNextCount(0L)}.
+   */
   static final class StepVerifierStepExpectNextEmpty<T> {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
     StepVerifier.Step<T> before(StepVerifier.Step<T> step) {
-      return step.expectNext();
+      return Refaster.anyOf(step.expectNext(), step.expectNextCount(0L));
     }
 
     @AfterTemplate
@@ -1229,19 +1232,6 @@ final class ReactorRules {
     @AfterTemplate
     StepVerifier.Step<T> after(StepVerifier.Step<T> step, T object) {
       return step.expectNext(object);
-    }
-  }
-
-  /** Remove redundant {@code StepVerifier.Step#expectNextCount(0)} checks. */
-  static final class StepVerifierStepExpectNextCountZero<T> {
-    @BeforeTemplate
-    StepVerifier.Step<T> before(StepVerifier.Step<T> step) {
-      return step.expectNextCount(0L);
-    }
-
-    @AfterTemplate
-    StepVerifier.Step<T> after(StepVerifier.Step<T> step) {
-      return step;
     }
   }
 
