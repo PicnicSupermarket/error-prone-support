@@ -1232,6 +1232,24 @@ final class ReactorRules {
     }
   }
 
+  /**
+   * Prefer {@link StepVerifier.LastStep#verifyComplete()} over {@code
+   * StepVerifier.Step#expectNextCount(0).verifyComplete()} or its alternatives.
+   */
+  static final class StepVerifierStepExpectNextCountZeroVerifyComplete<T> {
+    @BeforeTemplate
+    Duration before(StepVerifier.Step<T> step) {
+      return Refaster.anyOf(
+          step.expectNextCount(0L).expectComplete().verify(),
+          step.expectNextCount(0L).verifyComplete());
+    }
+
+    @AfterTemplate
+    Duration after(StepVerifier.LastStep step) {
+      return step.verifyComplete();
+    }
+  }
+
   /** Prefer {@link StepVerifier.LastStep#verifyComplete()} over more verbose alternatives. */
   static final class StepVerifierLastStepVerifyComplete {
     @BeforeTemplate
