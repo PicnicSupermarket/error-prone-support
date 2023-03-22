@@ -14,8 +14,8 @@ final class BugCheckerRules {
   private BugCheckerRules() {}
 
   /**
-   * Avoid calling {@link BugCheckerRefactoringTestHelper#setFixChooser(FixChooser)} with the
-   * default value of {@link FixChoosers#FIRST}.
+   * Avoid calling {@link BugCheckerRefactoringTestHelper#setFixChooser(FixChooser)} or {@link
+   * BugCheckerRefactoringTestHelper#setImportOrder(String)} with their respective default values.
    */
   static final class BugCheckerRefactoringTestHelperIdentity {
     @BeforeTemplate
