@@ -399,10 +399,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         StepVerifier.create(Mono.just("baz")).expectNextMatches("qux"::equals));
   }
 
-  ImmutableSet<Duration> testStepVerifierStepExpectNextCountZeroVerifyComplete() {
-    return ImmutableSet.of(
-        StepVerifier.create(Mono.empty()).expectNextCount(0).expectComplete().verify(),
-        StepVerifier.create(Mono.empty()).expectNextCount(0).verifyComplete());
+  StepVerifier.Step<Object> testStepVerifierStepExpectNextCountZero() {
+    return StepVerifier.create(Mono.empty()).expectNextCount(0L);
   }
 
   Duration testStepVerifierLastStepVerifyComplete() {
