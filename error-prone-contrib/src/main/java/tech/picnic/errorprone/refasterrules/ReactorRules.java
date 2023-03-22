@@ -1208,7 +1208,7 @@ final class ReactorRules {
    * Don't unnecessarily call {@link StepVerifier.Step#expectNext(Object[])} or {@code
    * StepVerifier.Step#expectNextCount(0L)}.
    */
-  static final class StepVerifierStepExpectNextEmpty<T> {
+  static final class StepVerifierStepIdentity<T> {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
     StepVerifier.Step<T> before(StepVerifier.Step<T> step) {
