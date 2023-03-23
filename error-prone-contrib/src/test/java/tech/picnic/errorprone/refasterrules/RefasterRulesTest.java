@@ -35,6 +35,7 @@ final class RefasterRulesTest {
           AssertJThrowingCallableRules.class,
           AssortedRules.class,
           BigDecimalRules.class,
+          BugCheckerRules.class,
           CollectionRules.class,
           ComparatorRules.class,
           DoubleStreamRules.class,

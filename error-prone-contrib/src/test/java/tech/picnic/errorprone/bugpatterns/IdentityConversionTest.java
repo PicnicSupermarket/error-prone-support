@@ -180,7 +180,6 @@ final class IdentityConversionTest {
   @Test
   void replacementFirstSuggestedFix() {
     BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass())
-        .setFixChooser(FixChoosers.FIRST)
         .addInputLines(
             "A.java",
             "import static com.google.errorprone.matchers.Matchers.staticMethod;",

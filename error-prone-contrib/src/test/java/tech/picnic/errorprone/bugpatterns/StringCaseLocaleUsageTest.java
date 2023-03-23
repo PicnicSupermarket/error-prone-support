@@ -48,7 +48,6 @@ final class StringCaseLocaleUsageTest {
   @Test
   void replacementFirstSuggestedFix() {
     BugCheckerRefactoringTestHelper.newInstance(StringCaseLocaleUsage.class, getClass())
-        .setFixChooser(FixChoosers.FIRST)
         .addInputLines(
             "A.java",
             "class A {",
