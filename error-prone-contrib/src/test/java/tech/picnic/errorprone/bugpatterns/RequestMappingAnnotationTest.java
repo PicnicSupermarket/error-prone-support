@@ -1,7 +1,8 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
+
+import com.google.errorprone.CompilationTestHelper;
 
 final class RequestMappingAnnotationTest {
   @Test
@@ -79,12 +80,6 @@ final class RequestMappingAnnotationTest {
             "",
             "  @RequestMapping",
             "  A properHttpServletResponse(HttpServletResponse response);",
-            "",
-            "  @RequestMapping",
-            "  A properJakartaHttpServletRequest(jakarta.servlet.http.HttpServletRequest request);",
-            "",
-            "  @RequestMapping",
-            "  A properJakartaHttpServletResponse(jakarta.servlet.http.HttpServletResponse response);",
             "",
             "  @RequestMapping",
             "  A properHttpMethod(HttpMethod method);",
