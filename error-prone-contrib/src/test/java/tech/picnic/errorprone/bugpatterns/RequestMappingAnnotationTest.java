@@ -1,8 +1,8 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import org.junit.jupiter.api.Test;
-
 import com.google.errorprone.CompilationTestHelper;
+
+import org.junit.jupiter.api.Test;
 
 final class RequestMappingAnnotationTest {
   @Test
