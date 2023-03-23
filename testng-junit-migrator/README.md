@@ -9,7 +9,12 @@ use it, read the installation guide below.
 1. First, follow Error Prone's [installation
    guide][error-prone-installation-guide]. For extra information, see this
    [README][eps-readme].
-2. Next, edit your `pom.xml` and add the following `testng-migrator` profile:
+2. Clone the Error Prone Support repository and checkout the branch
+   `gdejong/testng-migrator`. Next, run `mvn clean install`. This will create a
+   snapshot version similar to `0.8.1-SNAPSHOT` of the `testng-junit-migrator`
+   module. The snapshot will now be available in your local Maven repository.
+3. Next, edit your project's `pom.xml` and add the following `testng-migrator`
+   profile:
 
 ```xml
 <profiles>
@@ -41,6 +46,10 @@ the result by making sure the same amount of tests are executed.
 
 ## Run the migration
 
+> **Note**
+> For Picnic repositories there is an extra step required _before_ running the
+> migration, see [here](#picnic-specific).
+
 Now that the migration is set up, one can start the migration by executing the
 [run-testng-junit-migrator.sh][migration-script] script.
 
@@ -48,18 +57,20 @@ This script will:
 
 1. Run the TestNG tests and count the number of completed tests.
 2. Add the required `JUnit` dependencies to your `pom.xml`.
-3. Run the `testng-to-junit` migration by invoking the script.
+3. Run the `testng-to-junit` migration.
 4. Run the migrated JUnit tests and count the number of completed tests.
 5. Display the difference in the amount of completed tests.
 
-### Picnic Specific
+### Picnic specific
 The `PicnicSupermarket/picnic-scratch` repository contains a helper script
 `java-platform/testng-junit-migration.sh` that migrates some more
 Picnic-specific code. This should be executed _before_ starting the actual
 migration.
 
-When the migration is done, make sure to run the `picnic-shared-tools/patch.sh`
-script.
+Continue with performing the actual migration [here](#run-the-migration).
+Afterwards, run the `./picnic-shared-tools/patch.sh` script.
+
+Now you are done! 🤘🚀
 
 ### Migration code example
 
@@ -107,6 +118,7 @@ public class A {
 }
 ```
 
+[error-prone-installation-guide]: https://errorprone.info/docs/installation#maven
 [error-prone-orig-repo]: https://github.com/google/error-prone
-[eps-readme]: error-prone-support/README.md
-[migration-script]: error-prone-support/testng-junit-migrator/run-testng-junit-migration.sh
+[eps-readme]: ../README.md
+[migration-script]: run-testng-junit-migration.sh
