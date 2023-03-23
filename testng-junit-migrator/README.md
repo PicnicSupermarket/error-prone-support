@@ -1,8 +1,67 @@
 # TestNG to JUnit Jupiter migrator
 
-A tool to automatically migrate TestNG tests to JUnit Jupiter.
+This module contains a tool to automatically migrate TestNG tests to JUnit
+Jupiter. The tool is built on top of [Error Prone][error-prone-orig-repo]. To
+use it, read the installation guide below.
 
-### Example
+### Installation
+
+1. First, follow Error Prone's [installation
+   guide][error-prone-installation-guide]. For extra information, see this
+   [README][eps-readme].
+2. Next, edit your `pom.xml` and add the following `testng-migrator` profile:
+
+```xml
+<profiles>
+    <profile>
+        <id>testng-migrator</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <annotationProcessorPaths combine.children="append">
+                            <path>
+                                <groupId>tech.picnic.error-prone-support</groupId>
+                                <artifactId>testng-junit-migrator</artifactId>
+                                <version>${version.error-prone-support}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+</profiles>
+```
+
+Having this profile allows the migration script to verify the correctness of
+the result by making sure the same amount of tests are executed.
+
+## Run the migration
+
+Now that the migration is set up, one can start the migration by executing the
+[run-testng-junit-migrator.sh][migration-script] script.
+
+This script will:
+
+1. Run the TestNG tests and count the number of completed tests.
+2. Add the required `JUnit` dependencies to your `pom.xml`.
+3. Run the `testng-to-junit` migration by invoking the script.
+4. Run the migrated JUnit tests and count the number of completed tests.
+5. Display the difference in the amount of completed tests.
+
+### Picnic Specific
+The `PicnicSupermarket/picnic-scratch` repository contains a helper script
+`java-platform/testng-junit-migration.sh` that migrates some more
+Picnic-specific code. This should be executed _before_ starting the actual
+migration.
+
+When the migration is done, make sure to run the `picnic-shared-tools/patch.sh`
+script.
+
+### Migration code example
 
 Consider the following TestNG test class:
 
@@ -48,61 +107,6 @@ public class A {
 }
 ```
 
-### Installation
-
-First edit your `pom.xml` and add `testng-junit-migrator` to the
-`annotationProcessorPaths` of the `maven-compiler` plugin:
-
-```xml
-<profiles>
-    <profile>
-        <id>testng-migrator</id>
-        <build>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <annotationProcessorPaths combine.children="append">
-                            <path>
-                                <groupId>tech.picnic.error-prone-support</groupId>
-                                <artifactId>testng-junit-migrator</artifactId>
-                                <version>${version.error-prone-support}</version>
-                            </path>
-                        </annotationProcessorPaths>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </build>
-    </profile>
-</profiles> 
-```
-
-The `testng-migrator` profile isn't required, but it will allow the
-`run-testng-junit-migrator.sh` script to count the amount of tests that are run
-before and after the migration.
-
-Next, to run the migrator use the following command:
-
-```sh
-mvn \
-  -Perror-prone \
-  -Ptestng-migrator \
-  -Ppatch \
-  clean test-compile fmt:format \
-  -Derror-prone.patch-checks="TestNGJUnitMigration" \
-  -Dverification.skip
-```
-
-There's a script to easily invoke this command `run-testng-junit-migrator.sh`.
-This script will:
-
-1. Run the TestNG tests and count the number of completed tests.
-2. Add the required `JUnit` dependencies to your `pom.xml`.
-3. Run the `testng-to-junit` migration.
-4. Run the migrated JUnit tests and count the number of completed tests.
-5. Display the difference in the amount of completed tests.
-
-### Picnic specific
-`picnic-scratch` contains a small helper script `java-platform/testng-junit-migration.sh` that migrates some
-more Picnic-specific code.
+[error-prone-orig-repo]: https://github.com/google/error-prone
+[eps-readme]: error-prone-support/README.md
+[migration-script]: error-prone-support/testng-junit-migrator/run-testng-junit-migration.sh
