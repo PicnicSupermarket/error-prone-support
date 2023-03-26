@@ -21,16 +21,14 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class NullRules {
   private NullRules() {}
 
-  /** Prefer the {@code ==} operator over {@link Objects#isNull(Object)}. */
+  /**
+   * Prefer the {@code ==} operator (with {@code null} as the second operand) over {@link
+   * Objects#isNull(Object)}.
+   */
   static final class IsNull {
     @BeforeTemplate
     boolean before(@Nullable Object object) {
-      return null == object;
-    }
-
-    @BeforeTemplate
-    boolean before2(@Nullable Object object) {
-      return Objects.isNull(object);
+      return Refaster.anyOf(null == object, Objects.isNull(object));
     }
 
     @AfterTemplate
@@ -39,16 +37,14 @@ final class NullRules {
     }
   }
 
-  /** Prefer the {@code !=} operator over {@link Objects#nonNull(Object)}. */
+  /**
+   * Prefer the {@code !=} operator (with {@code null} as the second operand) over {@link
+   * Objects#nonNull(Object)}.
+   */
   static final class IsNotNull {
     @BeforeTemplate
     boolean before(@Nullable Object object) {
-      return null != object;
-    }
-
-    @BeforeTemplate
-    boolean before2(@Nullable Object object) {
-      return Objects.nonNull(object);
+      return Refaster.anyOf(null != object, Objects.nonNull(object));
     }
 
     @AfterTemplate

@@ -8,6 +8,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
   @Override
+  @SuppressWarnings("RequireNonNull")
   public ImmutableSet<?> elidedTypesAndStaticImports() {
     return ImmutableSet.of(checkNotNull(null));
   }
@@ -30,20 +31,26 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     }
   }
 
-  void testRequireNonNull() {
+  String testRequireNonNull() {
+    return checkNotNull("foo");
+  }
+
+  void testRequireNonNullStatement() {
     if ("foo" == null) {
       throw new NullPointerException();
     }
-    checkNotNull("bar");
-    checkArgument("baz" != null);
+    checkArgument("bar" != null);
   }
 
-  void testRequireNonNullWithMessage() {
+  String testRequireNonNullWithMessage() {
+    return checkNotNull("foo", "The string is null");
+  }
+
+  void testRequireNonNullWithMessageStatement() {
     if ("foo" == null) {
       throw new NullPointerException("The string is null");
     }
-    checkNotNull("bar", "The string is null");
-    checkArgument("baz" != null, "The string is null");
+    checkArgument("bar" != null, "The string is null");
   }
 
   void testCheckPositionIndex() {

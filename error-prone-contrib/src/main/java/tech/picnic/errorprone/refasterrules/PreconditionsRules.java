@@ -74,18 +74,27 @@ final class PreconditionsRules {
     }
   }
 
-  /** Prefer {@link Objects#requireNonNull(Object)} over more verbose alternatives. */
+  /** Prefer {@link Objects#requireNonNull(Object)} over non-JDK alternatives. */
   static final class RequireNonNull<T> {
+    @BeforeTemplate
+    T before(T object) {
+      return checkNotNull(object);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    T after(T object) {
+      return requireNonNull(object);
+    }
+  }
+
+  /** Prefer {@link Objects#requireNonNull(Object)} over more verbose alternatives. */
+  static final class RequireNonNullStatement<T> {
     @BeforeTemplate
     void before(T object) {
       if (object == null) {
         throw new NullPointerException();
       }
-    }
-
-    @BeforeTemplate
-    void before2(T object) {
-      checkNotNull(object);
     }
 
     @BeforeTemplate
@@ -100,18 +109,27 @@ final class PreconditionsRules {
     }
   }
 
-  /** Prefer {@link Objects#requireNonNull(Object, String)} over more verbose alternatives. */
+  /** Prefer {@link Objects#requireNonNull(Object, String)} over non-JDK alternatives. */
   static final class RequireNonNullWithMessage<T> {
+    @BeforeTemplate
+    T before2(T object, String message) {
+      return checkNotNull(object, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    T after(T object, String message) {
+      return requireNonNull(object, message);
+    }
+  }
+
+  /** Prefer {@link Objects#requireNonNull(Object, String)} over more verbose alternatives. */
+  static final class RequireNonNullWithMessageStatement<T> {
     @BeforeTemplate
     void before(T object, String message) {
       if (object == null) {
         throw new NullPointerException(message);
       }
-    }
-
-    @BeforeTemplate
-    void before2(T object, String message) {
-      checkNotNull(object, message);
     }
 
     @BeforeTemplate
