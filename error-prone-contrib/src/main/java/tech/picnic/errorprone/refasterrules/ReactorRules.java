@@ -1204,12 +1204,14 @@ final class ReactorRules {
     }
   }
 
-  /** Don't unnecessarily call {@link StepVerifier.Step#expectNext(Object[])}. */
-  static final class StepVerifierStepExpectNextEmpty<T> {
+  /** Don't unnecessarily have {@link StepVerifier.Step} expect no elements. */
+  // XXX: Given an `IsEmpty` matcher that identifies a wide range of guaranteed-empty `Iterable`
+  // expressions, consider also simplifying `step.expectNextSequence(someEmptyIterable)`.
+  static final class StepVerifierStepIdentity<T> {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
     StepVerifier.Step<T> before(StepVerifier.Step<T> step) {
-      return step.expectNext();
+      return Refaster.anyOf(step.expectNext(), step.expectNextCount(0));
     }
 
     @AfterTemplate

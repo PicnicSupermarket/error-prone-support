@@ -377,8 +377,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).as(StepVerifier::create);
   }
 
-  StepVerifier.Step<Integer> testStepVerifierStepExpectNextEmpty() {
-    return StepVerifier.create(Mono.just(0));
+  ImmutableSet<StepVerifier.Step<Integer>> testStepVerifierStepIdentity() {
+    return ImmutableSet.of(StepVerifier.create(Mono.just(1)), StepVerifier.create(Mono.just(2)));
   }
 
   ImmutableSet<StepVerifier.Step<String>> testStepVerifierStepExpectNext() {
