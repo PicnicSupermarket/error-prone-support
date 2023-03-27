@@ -35,7 +35,6 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
 
   void testRequireNonNullStatement() {
     requireNonNull("foo");
-    requireNonNull("bar");
   }
 
   String testRequireNonNullWithMessage() {
@@ -44,7 +43,6 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
 
   void testRequireNonNullWithMessageStatement() {
     requireNonNull("foo", "The string is null");
-    requireNonNull("bar", "The string is null");
   }
 
   void testCheckPositionIndex() {
