@@ -88,7 +88,7 @@ final class PreconditionsRules {
     }
   }
 
-  /** Prefer {@link Objects#requireNonNull(Object)} over more verbose alternatives. */
+  /** Prefer {@link Objects#requireNonNull(Object)} over non-JDK alternatives. */
   static final class RequireNonNullStatement<T> {
     @BeforeTemplate
     void before(T object) {
@@ -98,7 +98,7 @@ final class PreconditionsRules {
     }
 
     @BeforeTemplate
-    void before3(T object) {
+    void before2(T object) {
       checkArgument(object != null);
     }
 
@@ -112,7 +112,7 @@ final class PreconditionsRules {
   /** Prefer {@link Objects#requireNonNull(Object, String)} over non-JDK alternatives. */
   static final class RequireNonNullWithMessage<T> {
     @BeforeTemplate
-    T before2(T object, String message) {
+    T before(T object, String message) {
       return checkNotNull(object, message);
     }
 
@@ -133,7 +133,7 @@ final class PreconditionsRules {
     }
 
     @BeforeTemplate
-    void before3(T object, String message) {
+    void before2(T object, String message) {
       checkArgument(object != null, message);
     }
 
