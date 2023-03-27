@@ -5,10 +5,18 @@ import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkPositionIndex;
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableSet;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
+  @Override
+  @SuppressWarnings("RequireNonNull")
+  public ImmutableSet<?> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(checkNotNull(null));
+  }
+
   void testCheckArgument() {
     checkArgument(!"foo".isEmpty());
   }
@@ -21,12 +29,20 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     checkElementIndex(1, 2, "My index");
   }
 
-  void testCheckNotNull() {
-    checkNotNull("foo");
+  String testRequireNonNull() {
+    return requireNonNull("foo");
   }
 
-  void testCheckNotNullWithMessage() {
-    checkNotNull("foo", "The string is null");
+  void testRequireNonNullStatement() {
+    requireNonNull("foo");
+  }
+
+  String testRequireNonNullWithMessage() {
+    return requireNonNull("foo", "The string is null");
+  }
+
+  void testRequireNonNullWithMessageStatement() {
+    requireNonNull("foo", "The string is null");
   }
 
   void testCheckPositionIndex() {
