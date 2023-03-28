@@ -15,8 +15,8 @@ use it, read the installation guide below.
    This will update set the version to `0.8.1-testng-migration`. 
 4. Next, run `mvn clean install`. This will create a `0.8.1-testng-migrator` version
    of the `testng-junit-migrator` module. The version will now be available in your local Maven repository.
-5. Next, edit the root `pom.xml` of the target module and add the following `testng-migrator`
-   profile:
+5. Finally, add the following profile to your `pom.xml`. This should be the `pom.xml` in the root of your module. 
+   Usually this is the parent `pom.xml`, but single module projects are also supported.
 
 ```xml
 <profiles>
@@ -53,16 +53,20 @@ the result by making sure the same amount of tests are executed.
 > migration, see [here](#picnic-specific).
 
 Now that the migration is set up, one can start the migration by executing the
-[run-testng-junit-migrator.sh][migration-script] script in root of the target module.
+[run-testng-junit-migrator.sh][migration-script] script in the same directory as the `pom.xml` file we changed earlier.
 
 This script will:
 
-1. Run the TestNG tests and count the number of completed tests.
-2. Add the required `JUnit` dependencies to your `pom.xml`.
-3. Run the `testng-to-junit` migration.
-4. Run the migrated JUnit tests and count the number of completed tests.
-5. Display the difference in the amount of completed tests.
+1. Add the required `JUnit` dependencies to your `pom.xml`.
+2. Run the `testng-to-junit` migration.
 
+### Counting tests
+The amount of tests executed before the migration can be counted using the `--count` flag:
+```bash
+./run-testng-junit-migrator.sh --count
+```
+This will count the amount of tests that are executed. This is recommended before running the migration
+to allow for comparison.
 ### Picnic specific
 The `PicnicSupermarket/picnic-scratch` repository contains a helper script
 `java-platform/testng-junit-migration.sh` that migrates some more
