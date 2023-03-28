@@ -65,33 +65,55 @@ function insert_dependency() {
     sed -i "s,${placeholder},${decl}," "${pomFile}"
 }
 
-echo "Counting number of TestNG tests..."
-testng_results=$(mvn test | grep -n "Results:" -A 3 | grep -oP "Tests run: \K\d+(?=,)" | awk '{s+=$1} END {print s}')
-echo "Number of TestNG tests run: $testng_results"
+if [[ -n "${1-}" ]] && [[ "${1}" == "--count" ]]; then
+  echo "Counting number of tests..."
+  test_results=$(mvn test | grep -n "Results:" -A 3 | grep -oP "Tests run: \K\d+(?=,)" | awk '{s+=$1} END {print s}')
+  echo "Number of tests run: $test_results"
+  exit
+fi
 
+function handle_file() {
+    module=${1:?module not specified or empty}
+    groupId=${2:?groupId not specified or empty}
+    artifactId=${3:?artifactId not specified or empty}
+    classifier=${4?classifier not specified}
+    scope=${5?scope not specified}
+    pomFile=${6:-pom.xml}
+
+    if [[ -d $module ]] && [[ -f "$module/pom.xml" ]]; then
+      cd "$module"
+      insert_dependency "$groupId" "$artifactId" "$classifier" "$scope"
+      echo "[$module] Added $groupId:$artifactId"
+    fi
+}
 
 echo "Migrating to JUnit 5..."
 echo "Adding required dependencies..."
-for module in $(grep -rl "org.testng.annotations.Test" $(pwd) | awk -F "$(pwd)" '{print $2}' | awk -F '/' '{print $2}' | uniq); do
-    (
-        cd "$module"
-        insert_dependency "org.junit.jupiter" "junit-jupiter-api" "" "test"
-    )
-    echo "[$module] Added org.junit.jupiter:junit-jupiter-api"
-    (
-        cd "$module"
-        insert_dependency "org.junit.jupiter" "junit-jupiter-engine" "" "test"
-    )
-    echo "[$module] Added org.junit.jupiter:junit-jupiter-engine"
-done
-for module in $(grep -rl "@DataProvider" $(pwd) | awk -F "$(pwd)" '{print $2}' | awk -F '/' '{print $2}' | uniq); do
-    (
-        cd "$module"
-        insert_dependency "org.junit.jupiter" "junit-jupiter-params" "" "test"
-    )
-    echo "[$module] Added org.junit.jupiter:junit-jupiter-params"
-done
 
+if grep -q "<packaging>pom</packaging>" "pom.xml"; then
+
+  for module in $(grep -rl "org.testng.annotations.Test" $(pwd) | awk -F "$(pwd)" '{print $2}' | awk -F '/' '{print $2}' | uniq); do
+    (
+      handle_file "$module" "org.junit.jupiter" "junit-jupiter-api" "" "test"
+    )
+    (
+      handle_file "$module" "org.junit.jupiter" "junit-jupiter-engine" "" "test"
+    )
+  done
+  for module in $(grep -rl "org.testng.annotations.DataProvider" $(pwd) | awk -F "$(pwd)" '{print $2}' | awk -F '/' '{print $2}' | uniq); do
+    (
+      handle_file "$module" "org.junit.jupiter" "junit-jupiter-params" "" "test"
+    )
+  done
+else
+  if grep -rq "org.testng.annotations.Test" "src/"; then
+    handle_file "./" "org.junit.jupiter" "junit-jupiter-api" "" "test"
+    handle_file "./" "org.junit.jupiter" "junit-jupiter-engine" "" "test"
+  fi
+  if grep -rq "org.testng.annotations.DataProvider" "src/"; then
+      handle_file "./" "org.junit.jupiter" "junit-jupiter-params" "" "test"
+  fi
+fi
 echo "Running migration..."
 mvn \
   -Perror-prone \
@@ -100,11 +122,5 @@ mvn \
   clean test-compile fmt:format \
   -Derror-prone.patch-checks="TestNGJUnitMigration" \
   -Dverification.skip
-
-echo "Counting JUnit tests run..."
-junit_results=$(mvn test | grep -n "Results:" -A 3 | grep -oP "Tests run: \K\d+(?=,)" | awk '{s+=$1} END {print s}')
-echo "Number of TestNG tests run: $testng_results"
-echo "Number of JUnit tests run: $junit_results"
-echo "Difference: $(expr "${testng_results}" - "${junit_results}")"
 
 echo "Finished executing migration!"
