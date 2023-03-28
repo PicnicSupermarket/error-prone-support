@@ -53,7 +53,7 @@ the result by making sure the same amount of tests are executed.
 > migration, see [here](#picnic-specific).
 
 Now that the migration is set up, one can start the migration by executing the
-[run-testng-junit-migrator.sh][migration-script] script.
+[run-testng-junit-migrator.sh][migration-script] script in root of the target module.
 
 This script will:
 
