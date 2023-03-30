@@ -129,7 +129,7 @@ final class DirectReturnTest {
             "    }",
             "  }",
             "",
-            "  Supplier<String> redundantAssignmentInLambda() {",
+            "  Supplier<String> redundantAssignmentInsideLambda() {",
             "    return () -> {",
             "      // BUG: Diagnostic contains:",
             "      String variable = toString();",
