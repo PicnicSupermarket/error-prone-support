@@ -21,12 +21,11 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import java.util.List;
+import tech.picnic.errorprone.bugpatterns.util.MoreASTHelpers;
 
 /**
  * A {@link BugChecker} that flags the use of {@link org.mockito.Mockito#mock(Class)} and {@link
@@ -49,7 +48,7 @@ import java.util.List;
 public final class MockitoMockClassReference extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<MethodInvocationTree> MOCKITO_MOCK_OR_SPY =
+  private static final Matcher<MethodInvocationTree> MOCKITO_MOCK_OR_SPY_WITH_HARDCODED_TYPE =
       allOf(
           argument(0, allOf(isSameType(Class.class.getName()), not(isVariable()))),
           staticMethod().onClass("org.mockito.Mockito").namedAnyOf("mock", "spy"));
@@ -59,7 +58,8 @@ public final class MockitoMockClassReference extends BugChecker
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!MOCKITO_MOCK_OR_SPY.matches(tree, state) || !isTypeDerivableFromContext(tree, state)) {
+    if (!MOCKITO_MOCK_OR_SPY_WITH_HARDCODED_TYPE.matches(tree, state)
+        || !isTypeDerivableFromContext(tree, state)) {
       return Description.NO_MATCH;
     }
 
@@ -72,19 +72,15 @@ public final class MockitoMockClassReference extends BugChecker
     switch (parent.getKind()) {
       case VARIABLE:
         return !ASTHelpers.hasNoExplicitType((VariableTree) parent, state)
-            && areSameType(tree, parent, state);
+            && MoreASTHelpers.areSameType(tree, parent, state);
       case ASSIGNMENT:
-        return areSameType(tree, parent, state);
+        return MoreASTHelpers.areSameType(tree, parent, state);
       case RETURN:
-        Tree context = state.findEnclosing(LambdaExpressionTree.class, MethodTree.class);
-        return context instanceof MethodTree
-            && areSameType(tree, ((MethodTree) context).getReturnType(), state);
+        return MoreASTHelpers.findMethodExitedOnReturn(state)
+            .filter(m -> MoreASTHelpers.areSameType(tree, m.getReturnType(), state))
+            .isPresent();
       default:
         return false;
     }
-  }
-
-  private static boolean areSameType(Tree treeA, Tree treeB, VisitorState state) {
-    return ASTHelpers.isSameType(ASTHelpers.getType(treeA), ASTHelpers.getType(treeB), state);
   }
 }
