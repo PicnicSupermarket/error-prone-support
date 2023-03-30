@@ -126,6 +126,8 @@ final class MoreASTHelpersTest {
             "class A {",
             "  void negative1(String a, Integer b) {}",
             "",
+            "  void negative2(Integer a, Number b) {}",
+            "",
             "  // BUG: Diagnostic contains:",
             "  void positive1(String a, String b) {}",
             "",

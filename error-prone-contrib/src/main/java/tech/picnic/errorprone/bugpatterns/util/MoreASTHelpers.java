@@ -52,9 +52,9 @@ public final class MoreASTHelpers {
   }
 
   /**
-   * Returns the {@link MethodTree} from which control flow would exit if there would be a {@code
-   * return} statement at the given {@link VisitorState}'s current {@link VisitorState#getPath()
-   * path}.
+   * Returns the {@link MethodTree} from which the control flow would exit if there would be a
+   * {@code return} statement at the given {@link VisitorState}'s current {@link
+   * VisitorState#getPath() path}.
    *
    * @param state The {@link VisitorState} from which to derive the AST location of interest.
    * @return A {@link MethodTree}, unless the {@link VisitorState}'s path does not point to an AST
