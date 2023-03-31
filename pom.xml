@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.9.0</version>
+    <version>0.9.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -49,7 +49,7 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:PicnicSupermarket/error-prone-support.git</developerConnection>
-        <tag>v0.9.0</tag>
+        <tag>HEAD</tag>
         <url>https://github.com/PicnicSupermarket/error-prone-support</url>
     </scm>
     <issueManagement>
@@ -141,7 +141,7 @@
         <groupId.error-prone>com.google.errorprone</groupId.error-prone>
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2023-03-31T07:29:10Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2023-03-31T07:31:01Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Dependency and plugin versions that are referenced in more than
         one place. We use these to keep dependencies in sync. Version numbers
