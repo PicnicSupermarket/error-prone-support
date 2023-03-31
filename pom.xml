@@ -158,7 +158,7 @@
         <version.mockito>5.2.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.10.10</version.nullaway>
-        <version.pitest-git>1.0.6</version.pitest-git>
+        <version.pitest-git>1.0.7</version.pitest-git>
         <version.surefire>3.0.0</version.surefire>
     </properties>
 
