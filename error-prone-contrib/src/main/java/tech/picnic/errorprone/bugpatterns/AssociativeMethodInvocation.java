@@ -59,6 +59,9 @@ public final class AssociativeMethodInvocation extends BugChecker
               toType(MethodInvocationTree.class, not(hasArgumentOfType(ITERABLE)))),
           staticMethod().onClass(Suppliers.typeFromClass(Refaster.class)).named("anyOf"));
 
+  /** Instantiates a new {@link AssociativeMethodInvocation} instance. */
+  public AssociativeMethodInvocation() {}
+
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     for (Matcher<ExpressionTree> matcher : ASSOCIATIVE_OPERATIONS) {
