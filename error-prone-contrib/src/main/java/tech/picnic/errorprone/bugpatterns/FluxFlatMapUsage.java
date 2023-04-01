@@ -82,10 +82,8 @@ public final class FluxFlatMapUsage extends BugChecker
 
     SuggestedFix serializationFix = SuggestedFixes.renameMethodInvocation(tree, "concatMap", state);
     SuggestedFix concurrencyCapFix =
-        SuggestedFix.builder()
-            .postfixWith(
-                Iterables.getOnlyElement(tree.getArguments()), ", " + MAX_CONCURRENCY_ARG_NAME)
-            .build();
+        SuggestedFix.postfixWith(
+            Iterables.getOnlyElement(tree.getArguments()), ", " + MAX_CONCURRENCY_ARG_NAME);
 
     Description.Builder description = buildDescription(tree);
 
