@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -408,8 +407,7 @@ final class RedundantStringConversionTest {
   void identificationOfCustomConversionMethod() {
     CompilationTestHelper.newInstance(RedundantStringConversion.class, getClass())
         .setArgs(
-            ImmutableList.of(
-                "-XepOpt:RedundantStringConversion:ExtraConversionMethods=java.lang.Enum#name(),A#name(),A.B#toString(int)"))
+            "-XepOpt:RedundantStringConversion:ExtraConversionMethods=java.lang.Enum#name(),A#name(),A.B#toString(int)")
         .addSourceLines(
             "A.java",
             "import java.math.RoundingMode;",
