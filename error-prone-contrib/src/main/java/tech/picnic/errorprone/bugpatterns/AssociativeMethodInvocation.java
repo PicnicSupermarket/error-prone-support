@@ -7,7 +7,6 @@ import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
-import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -73,7 +72,7 @@ public final class AssociativeMethodInvocation extends BugChecker
             fix.merge(
                 invocation.getArguments().isEmpty()
                     ? SuggestedFixes.removeElement(arg, tree.getArguments(), state)
-                    : unwrapMethodInvocation(invocation, state));
+                    : SourceCode.unwrapMethodInvocation(invocation, state));
           }
         }
 
@@ -82,16 +81,6 @@ public final class AssociativeMethodInvocation extends BugChecker
     }
 
     return Description.NO_MATCH;
-  }
-
-  // XXX: Test this code with comments.
-  private static SuggestedFix unwrapMethodInvocation(
-      MethodInvocationTree tree, VisitorState state) {
-    return SuggestedFix.replace(
-        tree,
-        tree.getArguments().stream()
-            .map(arg -> SourceCode.treeToString(arg, state))
-            .collect(joining(", ")));
   }
 
   private static Matcher<MethodInvocationTree> hasArgumentOfType(Supplier<Type> type) {
