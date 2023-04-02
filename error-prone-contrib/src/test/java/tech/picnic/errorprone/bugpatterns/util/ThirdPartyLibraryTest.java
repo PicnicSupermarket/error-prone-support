@@ -18,12 +18,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import reactor.core.publisher.Flux;
 
 final class ThirdPartyLibraryTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(TestChecker.class, getClass());
-
   @Test
   void isIntroductionAllowed() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .addSourceLines(
             "A.java",
             "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, NEW_RELIC_AGENT_API: true, REACTOR: true",
@@ -33,7 +30,7 @@ final class ThirdPartyLibraryTest {
 
   @Test
   void isIntroductionAllowedWitnessClassesInSymtab() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.google.common.collect.ImmutableList;",
@@ -55,7 +52,7 @@ final class ThirdPartyLibraryTest {
 
   @Test
   void isIntroductionAllowedWitnessClassesPartiallyOnClassPath() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .withClasspath(ImmutableList.class, Flux.class)
         .addSourceLines(
             "A.java",
@@ -66,7 +63,7 @@ final class ThirdPartyLibraryTest {
 
   @Test
   void isIntroductionAllowedWitnessClassesNotOnClassPath() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .withClasspath()
         .addSourceLines(
             "A.java",
@@ -79,7 +76,7 @@ final class ThirdPartyLibraryTest {
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
   void isIntroductionAllowedIgnoreClasspathCompat(boolean ignoreClassPath) {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .setArgs("-XepOpt:ErrorProneSupport:IgnoreClasspathCompat=" + ignoreClassPath)
         .withClasspath(ImmutableList.class, Flux.class)
         .addSourceLines(

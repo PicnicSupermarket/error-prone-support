@@ -16,22 +16,6 @@ import com.sun.source.tree.MethodInvocationTree;
 import org.junit.jupiter.api.Test;
 
 final class MethodMatcherFactoryTest {
-  /** A {@link BugChecker} that flags method invocations matched by {@link #TEST_MATCHER}. */
-  @BugPattern(severity = SUGGESTION, summary = "Flags methods matched by the test matcher.")
-  public static final class MatchedMethodsFlagger extends BugChecker
-      implements MethodInvocationTreeMatcher {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-      if (TEST_MATCHER.matches(tree, state)) {
-        return buildDescription(tree).build();
-      }
-
-      return Description.NO_MATCH;
-    }
-  }
-
   private static final Matcher<ExpressionTree> TEST_MATCHER =
       new MethodMatcherFactory()
           .create(
@@ -206,5 +190,21 @@ final class MethodMatcherFactoryTest {
             "  }",
             "}")
         .doTest();
+  }
+
+  /** A {@link BugChecker} that flags method invocations matched by {@link #TEST_MATCHER}. */
+  @BugPattern(severity = SUGGESTION, summary = "Flags methods matched by the test matcher.")
+  public static final class MatchedMethodsFlagger extends BugChecker
+      implements MethodInvocationTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+      if (TEST_MATCHER.matches(tree, state)) {
+        return buildDescription(tree).build();
+      }
+
+      return Description.NO_MATCH;
+    }
   }
 }

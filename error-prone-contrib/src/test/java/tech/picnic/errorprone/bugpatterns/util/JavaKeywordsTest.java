@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 final class JavaKeywordsTest {
   private static Stream<Arguments> isValidIdentifierTestCases() {
-    /* { str, expected } */
+    /* { string, expected } */
     return Stream.of(
         arguments("", false),
         arguments("public", false),
@@ -28,7 +28,7 @@ final class JavaKeywordsTest {
 
   @MethodSource("isValidIdentifierTestCases")
   @ParameterizedTest
-  void isValidIdentifier(String str, boolean expected) {
-    assertThat(JavaKeywords.isValidIdentifier(str)).isEqualTo(expected);
+  void isValidIdentifier(String string, boolean expected) {
+    assertThat(JavaKeywords.isValidIdentifier(string)).isEqualTo(expected);
   }
 }
