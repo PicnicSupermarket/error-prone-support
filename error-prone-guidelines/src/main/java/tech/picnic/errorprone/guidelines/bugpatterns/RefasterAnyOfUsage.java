@@ -25,6 +25,12 @@ import tech.picnic.errorprone.utils.SourceCode;
  * <p>Note that this logic can't be implemented as a Refaster rule, as the {@link Refaster} class is
  * treated specially.
  */
+// XXX: The single-argument case is also covered by the `IdentityConversion` check. Consider
+// replacing this check with an `VacuousZeroArgMethodInvocation` check that flags a wider range of
+// vargars method invocations without arguments. Examples of other methods to include
+// `ImmutableList.Builder#add` and `CompilationTestHelper#setArgs`. This check should suggest
+// dropping the method invocation if (a) it's contained in an `ExpressionStatementTree` or (b) it's
+// return type matches the receiver type.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "`Refaster#anyOf` should be passed at least two parameters",

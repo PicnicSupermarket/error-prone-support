@@ -32,6 +32,7 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.Matchers;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ASTHelpers.TargetType;
 import com.sun.source.tree.ExpressionTree;
@@ -84,6 +85,7 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
                   ImmutableTable.class.getCanonicalName())
               .named("copyOf"),
           staticMethod().onClass(Matchers.class.getCanonicalName()).namedAnyOf("allOf", "anyOf"),
+          staticMethod().onClass(Refaster.class.getCanonicalName()).namedAnyOf("anyOf"),
           staticMethod().onClass("reactor.adapter.rxjava.RxJava2Adapter"),
           staticMethod()
               .onClass("reactor.core.publisher.Flux")
