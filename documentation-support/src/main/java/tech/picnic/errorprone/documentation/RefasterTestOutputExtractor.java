@@ -2,8 +2,10 @@ package tech.picnic.errorprone.documentation;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.annotations.Immutable;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
@@ -11,6 +13,8 @@ import java.util.regex.Pattern;
 import tech.picnic.errorprone.documentation.models.RefasterTemplateCollectionTestData;
 import tech.picnic.errorprone.documentation.models.RefasterTemplateTestData;
 
+@Immutable
+@AutoService(Extractor.class)
 public final class RefasterTestOutputExtractor
     implements Extractor<RefasterTemplateCollectionTestData> {
   private static final Pattern TEST_INPUT_CLASS_NAME_PATTERN = Pattern.compile("(.*)TestOutput");
@@ -27,7 +31,6 @@ public final class RefasterTestOutputExtractor
     if (className.isEmpty()) {
       return Optional.empty();
     }
-    String templateCollectionName = className.orElseThrow().replace("Test", "");
 
     ImmutableList<RefasterTemplateTestData> templateTests =
         tree.getMembers().stream()
@@ -41,7 +44,7 @@ public final class RefasterTestOutputExtractor
             .collect(toImmutableList());
 
     return Optional.of(
-        RefasterTemplateCollectionTestData.create(templateCollectionName, true, templateTests));
+        RefasterTemplateCollectionTestData.create(className.orElseThrow(), true, templateTests));
   }
 
   private static Optional<String> getClassUnderTest(ClassTree tree) {

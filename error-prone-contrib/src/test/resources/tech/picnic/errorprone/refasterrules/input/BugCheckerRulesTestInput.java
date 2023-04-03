@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refasterrules;
+package tech.picnic.errorprone.refasterrules.input;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
@@ -14,14 +14,16 @@ final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<BugCheckerRefactoringTestHelper> testBugCheckerRefactoringTestHelperIdentity() {
     return ImmutableSet.of(
-        BugCheckerRefactoringTestHelper.newInstance(BugChecker.class, getClass()),
-        BugCheckerRefactoringTestHelper.newInstance(BugChecker.class, getClass()));
+        BugCheckerRefactoringTestHelper.newInstance(BugChecker.class, getClass())
+            .setFixChooser(FixChoosers.FIRST),
+        BugCheckerRefactoringTestHelper.newInstance(BugChecker.class, getClass())
+            .setImportOrder("static-first"));
   }
 
   BugCheckerRefactoringTestHelper
       testBugCheckerRefactoringTestHelperAddInputLinesExpectUnchanged() {
     return BugCheckerRefactoringTestHelper.newInstance(BugChecker.class, getClass())
         .addInputLines("A.java", "class A {}")
-        .expectUnchanged();
+        .addOutputLines("A.java", "class A {}");
   }
 }
