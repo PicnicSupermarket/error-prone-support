@@ -196,11 +196,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>error-prone-contrib</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>refaster-compiler</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1369,7 +1364,7 @@
                                     </path>
                                 </annotationProcessorPaths>
                                 <compilerArgs combine.children="append">
-                                    <arg>-Xplugin:Docgen -XdocsOutputDirectory=${project.build.directory}</arg>
+                                    <arg>-Xplugin:DocumentationGenerator -XoutputDirectory==${project.build.directory}</arg>
                                 </compilerArgs>
                             </configuration>
                         </plugin>

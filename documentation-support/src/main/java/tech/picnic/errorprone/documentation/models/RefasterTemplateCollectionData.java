@@ -1,7 +1,8 @@
-package tech.picnic.errorprone.plugin.models;
+package tech.picnic.errorprone.documentation.models;
 
 import com.google.auto.value.AutoValue;
 import java.util.List;
+import tech.picnic.errorprone.documentation.models.AutoValue_RefasterTemplateCollectionData;
 
 /**
  * Object containing all data related to a Refaster template collection. This is solely used for

@@ -1,7 +1,8 @@
-package tech.picnic.errorprone.plugin.models;
+package tech.picnic.errorprone.documentation.models;
 
 import com.google.auto.value.AutoValue;
 import com.google.errorprone.BugPattern.SeverityLevel;
+import tech.picnic.errorprone.documentation.models.AutoValue_RefasterTemplateData;
 
 @AutoValue
 public abstract class RefasterTemplateData {

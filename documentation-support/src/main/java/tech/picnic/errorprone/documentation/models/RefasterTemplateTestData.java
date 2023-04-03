@@ -1,6 +1,7 @@
-package tech.picnic.errorprone.plugin.models;
+package tech.picnic.errorprone.documentation.models;
 
 import com.google.auto.value.AutoValue;
+import tech.picnic.errorprone.documentation.models.AutoValue_RefasterTemplateTestData;
 
 @AutoValue
 public abstract class RefasterTemplateTestData {
