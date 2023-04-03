@@ -34,7 +34,10 @@ import javax.tools.JavaFileObject;
 final class DocumentationGeneratorTaskListener implements TaskListener {
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static final ImmutableList<Extractor<?>> EXTRACTORS =
-      (ImmutableList) ImmutableList.copyOf(ServiceLoader.load(Extractor.class));
+      (ImmutableList)
+          ImmutableList.copyOf(
+              ServiceLoader.load(
+                  Extractor.class, DocumentationGeneratorTaskListener.class.getClassLoader()));
 
   private static final ObjectMapper OBJECT_MAPPER =
       new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
