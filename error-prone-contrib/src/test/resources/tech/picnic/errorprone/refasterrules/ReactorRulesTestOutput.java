@@ -72,6 +72,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.defer(() -> Mono.justOrEmpty(Optional.of(2))));
   }
 
+  Mono<Integer> testMonoJustOptional() {
+    return Mono.justOrEmpty(Optional.of(1));
+  }
+
   Optional<Mono<String>> testOptionalMapMonoJust() {
     return Optional.of("foo").map(Mono::just);
   }

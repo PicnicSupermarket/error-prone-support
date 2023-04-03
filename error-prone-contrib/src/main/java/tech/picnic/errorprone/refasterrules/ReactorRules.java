@@ -106,7 +106,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#justOrEmpty(Optional)} over more verbose alternatives. */
+  /** Prefer {@code () -> Mono#justOrEmpty(Optional)} over more verbose alternatives. */
   // XXX: If `optional` is a constant and effectively-final expression then the `Mono.defer` can be
   // dropped. Should look into Refaster support for identifying this.
   static final class MonoFromOptional<T> {
@@ -122,6 +122,19 @@ final class ReactorRules {
     @AfterTemplate
     Mono<T> after(Optional<T> optional) {
       return Mono.defer(() -> Mono.justOrEmpty(optional));
+    }
+  }
+
+  /** Prefer {@link Mono#justOrEmpty(Optional)} over more verbose alternatives. */
+  static final class MonoJustOptional<T> {
+    @BeforeTemplate
+    Mono<T> before(Optional<T> optional) {
+      return Mono.just(optional).filter(Optional::isPresent).map(Optional::orElseThrow);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Optional<T> optional) {
+      return Mono.justOrEmpty(optional);
     }
   }
 
