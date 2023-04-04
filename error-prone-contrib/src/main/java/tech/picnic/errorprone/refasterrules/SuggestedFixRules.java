@@ -90,4 +90,17 @@ final class SuggestedFixRules {
       return SuggestedFix.postfixWith(tree, postfix);
     }
   }
+
+  /** Prefer {@link SuggestedFix#delete(Tree)} over more contrived alternatives. */
+  static final class SuggestedFixDelete {
+    @BeforeTemplate
+    SuggestedFix before(Tree tree) {
+      return SuggestedFix.builder().delete(tree).build();
+    }
+
+    @AfterTemplate
+    SuggestedFix after(Tree tree) {
+      return SuggestedFix.delete(tree);
+    }
+  }
 }

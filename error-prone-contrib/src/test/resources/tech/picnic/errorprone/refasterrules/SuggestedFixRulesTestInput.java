@@ -28,4 +28,8 @@ final class SuggestFixRulesTest implements RefasterRuleCollectionTestCase {
   SuggestedFix testSuggestedFixPostfixWith() {
     return SuggestedFix.builder().postfixWith(null, "foo").build();
   }
+
+  SuggestedFix testSuggestedFixDelete() {
+    return SuggestedFix.builder().delete((Tree) null).build();
+  }
 }
