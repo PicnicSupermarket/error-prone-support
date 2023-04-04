@@ -8,8 +8,8 @@ import com.google.errorprone.matchers.CompileTimeConstantExpressionMatcher;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
-import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Comparator;
@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsMethodInvocationWithTwoOrMoreArgs;
 
 /** Refaster rules related to expressions dealing with {@link Optional}s. */
 @OnlineDocumentation
@@ -164,7 +165,8 @@ final class OptionalRules {
   static final class MapOptionalToBoolean<T> {
     @BeforeTemplate
     boolean before(Optional<T> optional, Function<? super T, Boolean> predicate) {
-      return optional.map(predicate).orElse(Refaster.anyOf(false, Boolean.FALSE));
+      return Refaster.anyOf(
+          optional.map(predicate).orElse(false), optional.map(predicate).orElse(Boolean.FALSE));
     }
 
     @AfterTemplate
@@ -232,7 +234,7 @@ final class OptionalRules {
    */
   static final class OrElseToOrElseGet<T> {
     @BeforeTemplate
-    T before(Optional<T> o, @NotMatches(CompileTimeConstantExpressionMatcher.class) T value) {
+    T before(Optional<T> o, @Matches(IsMethodInvocationWithTwoOrMoreArgs.class) T value) {
       return o.orElse(value);
     }
 

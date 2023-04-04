@@ -115,6 +115,9 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<String> testOrElseToOrElseGet() {
     return ImmutableSet.of(
-        Optional.of("foo").orElse("bar"), Optional.of("foo").orElseGet(() -> toString()));
+        Optional.of("foo").orElse("bar"),
+        Optional.of("foo").orElse(toString()),
+        Optional.of("foo").orElse(String.valueOf(true)),
+        Optional.of("foo").orElseGet(() -> String.format("%s", "bar")));
   }
 }
