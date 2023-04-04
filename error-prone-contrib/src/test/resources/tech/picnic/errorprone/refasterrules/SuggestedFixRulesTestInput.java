@@ -5,6 +5,10 @@ import com.sun.source.tree.Tree;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class SuggestFixRulesTest implements RefasterRuleCollectionTestCase {
+  SuggestedFix testSuggestedFixDelete() {
+    return SuggestedFix.builder().delete(null).build();
+  }
+
   SuggestedFix testSuggestedFixReplaceTree() {
     return SuggestedFix.builder().replace(null, "foo").build();
   }
@@ -27,9 +31,5 @@ final class SuggestFixRulesTest implements RefasterRuleCollectionTestCase {
 
   SuggestedFix testSuggestedFixPostfixWith() {
     return SuggestedFix.builder().postfixWith(null, "foo").build();
-  }
-
-  SuggestedFix testSuggestedFixDelete() {
-    return SuggestedFix.builder().delete((Tree) null).build();
   }
 }

@@ -11,6 +11,19 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class SuggestedFixRules {
   private SuggestedFixRules() {}
 
+  /** Prefer {@link SuggestedFix#delete(Tree)} over more contrived alternatives. */
+  static final class SuggestedFixDelete {
+    @BeforeTemplate
+    SuggestedFix before(Tree tree) {
+      return SuggestedFix.builder().delete(tree).build();
+    }
+
+    @AfterTemplate
+    SuggestedFix after(Tree tree) {
+      return SuggestedFix.delete(tree);
+    }
+  }
+
   /** Prefer {@link SuggestedFix#replace(Tree, String)}} over more contrived alternatives. */
   static final class SuggestedFixReplaceTree {
     @BeforeTemplate
@@ -88,19 +101,6 @@ final class SuggestedFixRules {
     @AfterTemplate
     SuggestedFix after(Tree tree, String postfix) {
       return SuggestedFix.postfixWith(tree, postfix);
-    }
-  }
-
-  /** Prefer {@link SuggestedFix#delete(Tree)} over more contrived alternatives. */
-  static final class SuggestedFixDelete {
-    @BeforeTemplate
-    SuggestedFix before(Tree tree) {
-      return SuggestedFix.builder().delete(tree).build();
-    }
-
-    @AfterTemplate
-    SuggestedFix after(Tree tree) {
-      return SuggestedFix.delete(tree);
     }
   }
 }
