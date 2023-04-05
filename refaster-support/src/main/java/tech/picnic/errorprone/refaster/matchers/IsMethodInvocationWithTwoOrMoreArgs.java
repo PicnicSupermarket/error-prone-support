@@ -12,6 +12,9 @@ import com.sun.source.tree.MethodInvocationTree;
 public final class IsMethodInvocationWithTwoOrMoreArgs implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
 
+  /** Instantiates a new {@link IsMethodInvocationWithTwoOrMoreArgs} instance. */
+  public IsMethodInvocationWithTwoOrMoreArgs() {}
+
   @Override
   public boolean matches(ExpressionTree expressionTree, VisitorState state) {
     if (expressionTree.getKind() == METHOD_INVOCATION) {
