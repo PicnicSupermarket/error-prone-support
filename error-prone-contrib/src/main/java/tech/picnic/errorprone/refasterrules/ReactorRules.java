@@ -94,7 +94,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#justOrEmpty(Object)} over more contrived alternatives. */
-  static final class MonoJustOrEmpty<@Nullable T> {
+  static final class MonoJustOrEmptyObject<@Nullable T> {
     @BeforeTemplate
     Mono<T> before(T value) {
       return Mono.justOrEmpty(Optional.ofNullable(value));
@@ -107,9 +107,25 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#justOrEmpty(Optional)} over more verbose alternatives. */
+  static final class MonoJustOrEmptyOptional<T> {
+    @BeforeTemplate
+    Mono<T> before(Optional<T> optional) {
+      return Mono.just(optional).filter(Optional::isPresent).map(Optional::orElseThrow);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Optional<T> optional) {
+      return Mono.justOrEmpty(optional);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#defer(Supplier) deferring} {@link Mono#justOrEmpty(Optional)} over more
+   * verbose alternatives.
+   */
   // XXX: If `optional` is a constant and effectively-final expression then the `Mono.defer` can be
   // dropped. Should look into Refaster support for identifying this.
-  static final class MonoFromOptional<T> {
+  static final class MonoDeferMonoJustOrEmpty<T> {
     @BeforeTemplate
     @SuppressWarnings(
         "MonoFromSupplier" /* `optional` may match a checked exception-throwing expression. */)
