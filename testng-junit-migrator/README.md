@@ -76,10 +76,8 @@ migration.
 > :warning: **macOS users**
 > 
 > Make sure gnu-grep and gnu-sed are installed!
-> 
-> gnu-grep: ```brew install grep```
-> 
-> gnu-sed: ```brew install gnu-sed```
+>
+> ```brew install grep gnu-sed```
 
 Continue with performing the actual migration [here](#run-the-migration).
 Afterwards, run the `./picnic-shared-tools/patch.sh` script.
