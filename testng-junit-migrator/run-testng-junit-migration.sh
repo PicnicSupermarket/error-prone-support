@@ -22,7 +22,7 @@ function insert_dependency() {
                 x:groupId/text() = '${groupId}' and
                 x:artifactId/text() = '${artifactId}' and
                 (x:classifier/text() = '${classifier}' or '${classifier}' = '')
-            ]" -nl "${pomFile}" && exit
+            ]" -nl "${pomFile}" && return 0
 
     # Determine the index at which to insert the dependency declaration.
     insertionIndex="$(
