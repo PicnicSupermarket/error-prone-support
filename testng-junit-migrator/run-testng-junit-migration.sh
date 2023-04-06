@@ -84,6 +84,7 @@ function handle_file() {
       cd "$module"
       insert_dependency "$groupId" "$artifactId" "$classifier" "$scope"
       echo "[$module] Added $groupId:$artifactId"
+      cd -
     fi
 }
 
