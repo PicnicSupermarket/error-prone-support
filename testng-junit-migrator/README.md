@@ -73,7 +73,13 @@ The `PicnicSupermarket/picnic-scratch` repository contains a helper script
 Picnic-specific code. This should be executed _before_ starting the actual
 migration.
 
-> :warning: **macOS users**: make sure gnu-grep and gnu-sed are installed!
+> :warning: **macOS users**
+> 
+> Make sure gnu-grep and gnu-sed are installed!
+> 
+> gnu-grep: ```brew install grep```
+> 
+> gnu-sed: ```brew install gnu-sed```
 
 Continue with performing the actual migration [here](#run-the-migration).
 Afterwards, run the `./picnic-shared-tools/patch.sh` script.
