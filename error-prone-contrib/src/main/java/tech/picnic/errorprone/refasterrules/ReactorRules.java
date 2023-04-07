@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
@@ -12,6 +13,7 @@ import static reactor.function.TupleUtils.function;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -33,6 +35,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collector;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -1163,6 +1166,23 @@ final class ReactorRules {
     @AfterTemplate
     Flux<T> after(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
       return flux.filter(predicate).sort(comparator);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#collect(Collector)} with {@link ImmutableSet#toImmutableSet()} over
+   * contrived alternatives.
+   */
+  static final class FluxCollectToImmutableSet<T> {
+    @BeforeTemplate
+    Mono<ImmutableSet<T>> before(Flux<T> flux) {
+      return flux.collect(toImmutableList()).map(ImmutableSet::copyOf);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Mono<ImmutableSet<T>> after(Flux<T> flux) {
+      return flux.collect(toImmutableSet());
     }
   }
 
