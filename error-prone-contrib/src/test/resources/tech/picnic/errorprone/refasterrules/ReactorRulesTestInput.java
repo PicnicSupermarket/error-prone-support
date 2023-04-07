@@ -377,8 +377,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1, 4, 3, 2).sort(reverseOrder()).filter(i -> i % 2 == 0);
   }
 
-  Mono<List<Integer>> testFluxCollectListToCollectImmutableList() {
-    return Flux.just(1, 4, 3, 2).collectList();
+  ImmutableSet<Mono<List<Integer>>> testFluxCollectToImmutableList() {
+    return ImmutableSet.of(
+        Flux.just(1).collectList(),
+        Flux.just(2).collect(toImmutableList()).map(ImmutableList::copyOf));
   }
 
   Mono<ImmutableSet<Integer>> testFluxCollectToImmutableSet() {

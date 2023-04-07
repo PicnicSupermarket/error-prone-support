@@ -1170,13 +1170,18 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#collect(Collector)} with {@link ImmutableList#toImmutableList} over {@link
-   * Flux#collectList()}.
+   * Prefer {@link Flux#collect(Collector)} with {@link ImmutableList#toImmutableList} over
+   * alternatives.
    */
-  static final class FluxCollectListToCollectImmutableList<T> {
+  static final class FluxCollectToImmutableList<T> {
     @BeforeTemplate
     Mono<List<T>> before(Flux<T> flux) {
       return flux.collectList();
+    }
+
+    @BeforeTemplate
+    Mono<List<T>> before2(Flux<T> flux) {
+      return flux.collect(toImmutableList()).map(ImmutableList::copyOf);
     }
 
     @AfterTemplate
