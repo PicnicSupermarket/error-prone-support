@@ -1176,12 +1176,8 @@ final class ReactorRules {
   static final class FluxCollectToImmutableList<T> {
     @BeforeTemplate
     Mono<List<T>> before(Flux<T> flux) {
-      return flux.collectList();
-    }
-
-    @BeforeTemplate
-    Mono<List<T>> before2(Flux<T> flux) {
-      return flux.collect(toImmutableList()).map(ImmutableList::copyOf);
+      return Refaster.anyOf(
+          flux.collectList(), flux.collect(toImmutableList()).map(ImmutableList::copyOf));
     }
 
     @AfterTemplate
