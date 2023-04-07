@@ -230,8 +230,9 @@ final class OptionalRules {
 
   /**
    * Prefer {@link Optional#orElseGet(Supplier)} over {@link Optional#orElse(Object)} if the given
-   * value is not a compile-time constant.
+   * value is a method invocation with two or more arguments.
    */
+  // XXX: Extend rule to all method invocations (with less than 2 arguments).
   static final class OrElseToOrElseGet<T> {
     @BeforeTemplate
     T before(Optional<T> o, @Matches(IsMethodInvocationWithTwoOrMoreArgs.class) T value) {

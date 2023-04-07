@@ -56,7 +56,7 @@ final class IsMethodInvocationWithTwoOrMoreArgsTest {
         .doTest();
   }
 
-  /** A {@link BugChecker} that simply delegates to {@link IsCharacter}. */
+  /** A {@link BugChecker} that simply delegates to {@link IsMethodInvocationWithTwoOrMoreArgs}. */
   @BugPattern(
       summary = "Flags expressions matched by `IsMethodInvocationWithTwoOrMoreArgs`",
       severity = ERROR)
