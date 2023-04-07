@@ -11,7 +11,6 @@ import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.returnStatement;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
-import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -138,19 +137,28 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
             .isPresent();
   }
 
+  /**
+   * Tells whether the given {@link Symbol} is referenced in a {@code finally} block that is
+   * executed <em>after</em> control flow returns from the {@link VisitorState#getPath() current
+   * location}.
+   */
   private static boolean isSymbolReferencedInAssociatedFinallyBlock(
       Symbol symbol, VisitorState state) {
-    BlockTree currentBlock =
-        requireNonNull(state.findEnclosing(BlockTree.class), "Current path not inside block");
-    return Streams.stream(state.getPath())
-        .filter(TryTree.class::isInstance)
-        .map(TryTree.class::cast)
-        .map(TryTree::getFinallyBlock)
-        .filter(finallyBlock -> !currentBlock.equals(finallyBlock))
+    return Streams.zip(
+            Streams.stream(state.getPath()).skip(1),
+            Streams.stream(state.getPath()),
+            (tree, child) -> {
+              if (!(tree instanceof TryTree)) {
+                return null;
+              }
+
+              BlockTree finallyBlock = ((TryTree) tree).getFinallyBlock();
+              return !child.equals(finallyBlock) ? finallyBlock : null;
+            })
         .anyMatch(finallyBlock -> referencesIdentifierSymbol(symbol, finallyBlock));
   }
 
-  private static boolean referencesIdentifierSymbol(Symbol symbol, BlockTree tree) {
+  private static boolean referencesIdentifierSymbol(Symbol symbol, @Nullable BlockTree tree) {
     return Boolean.TRUE.equals(
         new TreeScanner<Boolean, @Nullable Void>() {
           @Override
