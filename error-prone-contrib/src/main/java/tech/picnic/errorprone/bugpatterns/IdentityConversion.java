@@ -35,6 +35,8 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 // XXX: Consider detecting cases where a flagged expression is passed to a method, and where removal
 // of the identity conversion would cause a different method overload to be selected. Depending on
 // the target method such a modification may change the code's semantics or performance.
+// XXX: Also flag `Stream#map`, `Mono#map` and `Flux#map` invocations where the given transformation
+// is effectively the identity operation.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid or clarify identity conversions",

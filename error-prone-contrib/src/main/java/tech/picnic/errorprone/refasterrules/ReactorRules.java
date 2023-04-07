@@ -403,6 +403,13 @@ final class ReactorRules {
       return mono.then();
     }
 
+    // XXX: Replace this rule with an extension of the `IdentityConversion` rule, supporting
+    // `Stream#map`, `Mono#map` and `Flux#map`.
+    @BeforeTemplate
+    Mono<ImmutableList<T>> before3(Mono<ImmutableList<T>> mono) {
+      return mono.map(ImmutableList::copyOf);
+    }
+
     @AfterTemplate
     Mono<T> after(Mono<T> mono) {
       return mono;
@@ -1170,19 +1177,18 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#collect(Collector)} with {@link ImmutableList#toImmutableList} over
-   * alternatives.
+   * Prefer {@link Flux#collect(Collector)} with {@link ImmutableList#toImmutableList()} over
+   * alternatives that do not explicitly return an immutable collection.
    */
   static final class FluxCollectToImmutableList<T> {
     @BeforeTemplate
     Mono<List<T>> before(Flux<T> flux) {
-      return Refaster.anyOf(
-          flux.collectList(), flux.collect(toImmutableList()).map(ImmutableList::copyOf));
+      return flux.collectList();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Mono<List<T>> after(Flux<T> flux) {
+    Mono<ImmutableList<T>> after(Flux<T> flux) {
       return flux.collect(toImmutableList());
     }
   }
