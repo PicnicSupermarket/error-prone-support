@@ -233,7 +233,7 @@ final class OptionalRules {
    * value is a method invocation with two or more arguments.
    */
   // XXX: Extend rule to all method invocations (with less than 2 arguments).
-  static final class OrElseToOrElseGet<T> {
+  static final class OptionalOrElseGet<T> {
     @BeforeTemplate
     T before(Optional<T> o, @Matches(IsMethodInvocationWithTwoOrMoreArgs.class) T value) {
       return o.orElse(value);
