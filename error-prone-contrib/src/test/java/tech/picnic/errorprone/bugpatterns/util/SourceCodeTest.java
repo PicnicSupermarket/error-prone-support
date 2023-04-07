@@ -8,22 +8,22 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import javax.lang.model.element.Name;
 import org.junit.jupiter.api.Test;
 
 final class SourceCodeTest {
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(TestChecker.class, getClass());
-
   @Test
   void deleteWithTrailingWhitespaceAnnotations() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(
+            DeleteWithTrailingWhitespaceTestChecker.class, getClass())
         .addInputLines("AnnotationToBeDeleted.java", "@interface AnnotationToBeDeleted {}")
         .expectUnchanged()
         .addInputLines(
@@ -96,7 +96,8 @@ final class SourceCodeTest {
 
   @Test
   void deleteWithTrailingWhitespaceMethods() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(
+            DeleteWithTrailingWhitespaceTestChecker.class, getClass())
         .addInputLines(
             "MethodDeletions.java",
             "interface MethodDeletions {",
@@ -162,13 +163,78 @@ final class SourceCodeTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
+  @Test
+  void unwrapMethodInvocation() {
+    BugCheckerRefactoringTestHelper.newInstance(UnwrapMethodInvocationTestChecker.class, getClass())
+        .addInputLines(
+            "A.java",
+            "import com.google.common.collect.ImmutableList;",
+            "",
+            "class A {",
+            "  Object[] m() {",
+            "    return new Object[][] {",
+            "      {ImmutableList.of()},",
+            "      {ImmutableList.of(1)},",
+            "      {com.google.common.collect.ImmutableList.of(1, 2)},",
+            "      {",
+            "        0, /*a*/",
+            "        ImmutableList /*b*/./*c*/ <Integer> /*d*/of /*e*/(/*f*/ 1 /*g*/, /*h*/ 2 /*i*/) /*j*/",
+            "      }",
+            "    };",
+            "  }",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "import com.google.common.collect.ImmutableList;",
+            "",
+            "class A {",
+            "  Object[] m() {",
+            "    return new Object[][] {{}, {1}, {1, 2}, {0, /*a*/ /*f*/ 1 /*g*/, /*h*/ 2 /*i*/ /*j*/}};",
+            "  }",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void unwrapMethodInvocationDroppingWhitespaceAndComments() {
+    BugCheckerRefactoringTestHelper.newInstance(
+            UnwrapMethodInvocationDroppingWhitespaceAndCommentsTestChecker.class, getClass())
+        .addInputLines(
+            "A.java",
+            "import com.google.common.collect.ImmutableList;",
+            "",
+            "class A {",
+            "  Object[] m() {",
+            "    return new Object[][] {",
+            "      {ImmutableList.of()},",
+            "      {ImmutableList.of(1)},",
+            "      {com.google.common.collect.ImmutableList.of(1, 2)},",
+            "      {",
+            "        0, /*a*/",
+            "        ImmutableList /*b*/./*c*/ <Integer> /*d*/of /*e*/(/*f*/ 1 /*g*/, /*h*/ 2 /*i*/) /*j*/",
+            "      }",
+            "    };",
+            "  }",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "import com.google.common.collect.ImmutableList;",
+            "",
+            "class A {",
+            "  Object[] m() {",
+            "    return new Object[][] {{}, {1}, {1, 2}, {0, /*a*/ 1, 2 /*j*/}};",
+            "  }",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
   /**
    * A {@link BugChecker} that uses {@link SourceCode#deleteWithTrailingWhitespace(Tree,
    * VisitorState)} to suggest the deletion of annotations and methods with a name containing
    * {@value DELETION_MARKER}.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
-  public static final class TestChecker extends BugChecker
+  public static final class DeleteWithTrailingWhitespaceTestChecker extends BugChecker
       implements AnnotationTreeMatcher, MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
     private static final String DELETION_MARKER = "ToBeDeleted";
@@ -190,6 +256,39 @@ final class SourceCodeTest {
       return name.toString().contains(DELETION_MARKER)
           ? describeMatch(tree, SourceCode.deleteWithTrailingWhitespace(tree, state))
           : Description.NO_MATCH;
+    }
+  }
+
+  /**
+   * A {@link BugChecker} that applies {@link
+   * SourceCode#unwrapMethodInvocation(MethodInvocationTree, VisitorState)} to all method
+   * invocations.
+   */
+  @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
+  public static final class UnwrapMethodInvocationTestChecker extends BugChecker
+      implements MethodInvocationTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+      return describeMatch(tree, SourceCode.unwrapMethodInvocation(tree, state));
+    }
+  }
+
+  /**
+   * A {@link BugChecker} that applies {@link
+   * SourceCode#unwrapMethodInvocationDroppingWhitespaceAndComments(MethodInvocationTree,
+   * VisitorState)} to all method invocations.
+   */
+  @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
+  public static final class UnwrapMethodInvocationDroppingWhitespaceAndCommentsTestChecker
+      extends BugChecker implements MethodInvocationTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+      return describeMatch(
+          tree, SourceCode.unwrapMethodInvocationDroppingWhitespaceAndComments(tree, state));
     }
   }
 }
