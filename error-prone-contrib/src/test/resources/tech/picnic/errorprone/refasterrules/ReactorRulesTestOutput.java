@@ -367,7 +367,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Mono<ImmutableSet<Integer>> testFluxCollectToImmutableSet() {
-    return Flux.just(1, 2).collect(toImmutableSet());
+    return Flux.just(1).collect(toImmutableSet());
   }
 
   ImmutableSet<Context> testContextEmpty() {

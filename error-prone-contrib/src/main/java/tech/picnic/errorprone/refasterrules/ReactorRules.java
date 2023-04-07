@@ -1170,7 +1170,7 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#collect(Collector)} with {@link ImmutableSet#toImmutableSet()} over
+   * Prefer {@link Flux#collect(Collector)} with {@link ImmutableSet#toImmutableSet()} over more
    * contrived alternatives.
    */
   static final class FluxCollectToImmutableSet<T> {
