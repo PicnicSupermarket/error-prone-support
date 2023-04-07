@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
@@ -363,6 +364,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Flux<Integer> testFluxFilterSortWithComparator() {
     return Flux.just(1, 4, 3, 2).filter(i -> i % 2 == 0).sort(reverseOrder());
+  }
+
+  Mono<ImmutableSet<Integer>> testFluxCollectToImmutableSet() {
+    return Flux.just(1).collect(toImmutableSet());
   }
 
   ImmutableSet<Context> testContextEmpty() {
