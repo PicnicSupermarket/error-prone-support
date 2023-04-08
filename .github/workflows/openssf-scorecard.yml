@@ -6,12 +6,10 @@ on:
     branches: [ master ]
   schedule:
     - cron: '0 4 * * 1'
-permissions:
-  contents: read
-  id-token: write
-  security-events: write
 jobs:
   analyze:
+    permissions:
+      contents: read
     runs-on: ubuntu-22.04
     steps:
       - name: Check out code
@@ -25,6 +23,11 @@ jobs:
           results_file: results.sarif
           results_format: sarif
           publish_results: true
+  submit:
+    permissions:
+      security-events: write
+    runs-on: ubuntu-22.04
+    steps:
       - name: Update GitHub's code scanning dashboard
         uses: github/codeql-action/upload-sarif@v2.2.11
         with:
