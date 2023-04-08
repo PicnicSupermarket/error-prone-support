@@ -32,11 +32,9 @@ jobs:
           debug: true
           languages: ${{ matrix.language }}
       - name: Perform minimal build
+        if: ${{ matrix.language }} == java
         run: mvn -T1C clean install -DskipTests -Dverification.skip 
-      # XXX: Drop
-      #- name: Perform autobuild
-      #  uses: github/codeql-action/autobuild@v2.2.11
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v2.2.11
         with:
-          category: "/language:${{matrix.language}}"
+          category: /language:${{ matrix.language }}
