@@ -228,6 +228,11 @@ Want to report or fix a bug, suggest or add a new feature, or improve the
 documentation? That's awesome! Please read our [contribution
 guidelines][contributing].
 
+### Security
+
+If you want to report a security vulnerablity, please do so through a private
+channel; please see our [security policy][security] for details.
+
 [bug-checks]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
 [bug-checks-identity-conversion]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/IdentityConversion.java
 [contributing]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md
@@ -257,3 +262,4 @@ guidelines][contributing].
 [refaster-rules]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/
 [reproducible-builds-badge]: https://img.shields.io/badge/Reproducible_Builds-ok-success?labelColor=1e5b96
 [reproducible-builds-report]: https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/tech/picnic/error-prone-support/error-prone-support/README.md
+[security]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/SECURITY.md

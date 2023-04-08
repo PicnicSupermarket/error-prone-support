@@ -48,6 +48,10 @@ be accepted. When in doubt, make sure to first raise an
 
 To the extent possible, the pull request process guards our coding guidelines.
 Some pointers:
+- Make sure that the `mvn clean install` build fully passes, ideally before
+  opening a pull request. See the [development
+  instructions][error-prone-support-developing] for details on how to
+  efficiently resolve many of the errors and warnings that may be reported.
 - Checks should be _topical_: ideally they address a single concern.
 - Where possible checks should provide _fixes_, and ideally these are
   completely behavior-preserving. In order for a check to be adopted by users
@@ -66,6 +70,7 @@ Some pointers:
   sneak in unrelated changes; instead just open more than one pull request 😉.
 
 [error-prone-criteria]: https://errorprone.info/docs/criteria
+[error-prone-support-developing]: https://github.com/PicnicSupermarket/error-prone-support/tree/master#-developing-error-prone-support
 [error-prone-support-issues]: https://github.com/PicnicSupermarket/error-prone-support/issues
 [error-prone-support-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-mutation-tests.sh
 [error-prone-support-pulls]: https://github.com/PicnicSupermarket/error-prone-support/pulls
