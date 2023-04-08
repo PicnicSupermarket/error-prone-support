@@ -29,10 +29,9 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2.2.11
         with:
-          debug: true
           languages: ${{ matrix.language }}
       - name: Perform minimal build
-        if: ${{ matrix.language }} == java
+        if: ${{ matrix.language == 'java' }}
         run: mvn -T1C clean install -DskipTests -Dverification.skip 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v2.2.11
