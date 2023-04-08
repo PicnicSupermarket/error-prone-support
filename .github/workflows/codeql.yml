@@ -26,13 +26,13 @@ jobs:
           java-version: 17.0.6
           distribution: temurin
           cache: maven
-      - name: Perform minimal build
-        run: mvn -T1C clean install -DskipTests -Dverification.skip 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2.2.11
         with:
           debug: true
           languages: ${{ matrix.language }}
+      - name: Perform minimal build
+        run: mvn -T1C clean install -DskipTests -Dverification.skip 
       # XXX: Drop
       #- name: Perform autobuild
       #  uses: github/codeql-action/autobuild@v2.2.11
