@@ -23,7 +23,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3.8.0
         with:
-          java-version: 11.0.18
+          java-version: 17.0.6
           distribution: temurin
           cache: maven
       - name: Perform minimal build
@@ -31,6 +31,7 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2.2.11
         with:
+          debug: true
           languages: ${{ matrix.language }}
       # XXX: Drop
       #- name: Perform autobuild
