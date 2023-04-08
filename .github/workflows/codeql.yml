@@ -7,13 +7,14 @@ on:
     - cron: '0 4 * * 1'
 permissions:
   contents: read
-  security-events: write
 jobs:
   analyze:
     strategy:
-      fail-fast: false
       matrix:
         language: [ java, ruby ]
+    permissions:
+      contents: read
+      security-events: write
     runs-on: ubuntu-22.04
     steps:
       - name: Check out code
@@ -29,7 +30,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
       - name: Perform minimal build
-        if: ${{ matrix.language == 'java' }}
+        if: matrix.language == 'java'
         run: mvn -T1C clean install -DskipTests -Dverification.skip
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v2.2.11
