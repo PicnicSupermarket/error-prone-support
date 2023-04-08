@@ -18,7 +18,6 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3.1.0
-        # XXX: Also apply elsewhere?
         with:
           persist-credentials: false
       - name: Run OpenSSF Scorecard analysis

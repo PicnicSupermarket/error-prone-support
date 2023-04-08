@@ -36,6 +36,8 @@ jobs:
         # Error Prone checks available only from other artifact repositories.
       - name: Check out code
         uses: actions/checkout@v3.1.0
+        with:
+          persist-credentials: false
       - name: Set up JDK
         uses: actions/setup-java@v3.8.0
         with:
