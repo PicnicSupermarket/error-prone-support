@@ -1,0 +1,41 @@
+name: CodeQL
+on:
+  pull_request:
+    branches: [ master ]
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: '0 4 * * 1'
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+jobs:
+  analyze:
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ java, ruby ]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3.1.0
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2.2.11
+        with:
+          languages: ${{ matrix.language }}
+      # XXX: Check whether we should do this instead.
+      #- name: Set up JDK
+      #  uses: actions/setup-java@v3.8.0
+      #  with:
+      #    java-version: 17.0.6
+      #    distribution: temurin
+      #    cache: maven
+      #- name: Perform minimal build
+      #  run: mvn -T1C clean install -DskipTests -Dverification.skip 
+      - name: Perform autobuild
+        uses: github/codeql-action/autobuild@v2.2.11
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v2.2.11
+        with:
+          category: "/language:${{matrix.language}}"
