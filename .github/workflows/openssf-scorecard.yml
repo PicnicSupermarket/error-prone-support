@@ -1,6 +1,5 @@
 name: OpenSSF Scorecard update
 on:
-  # XXX: Drop PR builds after testing.
   pull_request:
   push:
     branches: [ master ]
@@ -25,7 +24,7 @@ jobs:
         with:
           results_file: results.sarif
           results_format: sarif
-          publish_results: true
+          publish_results: ${{ github.ref == 'refs/heads/master' }}
       - name: Update GitHub's code scanning dashboard
         uses: github/codeql-action/upload-sarif@v2.2.11
         with:
