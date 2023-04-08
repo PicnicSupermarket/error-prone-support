@@ -1,11 +1,8 @@
-name: CodeQL
+name: CodeQL analysis
 on:
   pull_request:
-    branches: [ master ]
   push:
     branches: [ master ]
-  schedule:
-    - cron: '0 4 * * 1'
 permissions:
   contents: read
   security-events: write
