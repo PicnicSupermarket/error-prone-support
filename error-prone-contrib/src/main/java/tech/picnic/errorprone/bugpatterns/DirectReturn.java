@@ -36,6 +36,9 @@ import com.sun.source.tree.TryTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symbol;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -95,6 +98,11 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
                         .delete(finalStatement)
                         .build()))
         .orElse(Description.NO_MATCH);
+  }
+
+  private static byte[] md5Hash(String s) throws NoSuchAlgorithmException {
+    MessageDigest md = MessageDigest.getInstance("MD5");
+    return md.digest(s.getBytes(StandardCharsets.UTF_8));
   }
 
   private static Optional<ExpressionTree> tryMatchAssignment(Symbol targetSymbol, Tree tree) {
