@@ -13,15 +13,13 @@ jobs:
   analyze:
     permissions:
       contents: read
-      # XXX: Check whether this is necessary.
-      security-events: write
     runs-on: ubuntu-22.04
     steps:
       - name: Check out code
         uses: actions/checkout@v3.1.0
-        # XXX: Does this impact analysis?
-        #with:
-        #  persist-credentials: false
+        with:
+          fetch-depth: 2
+          persist-credentials: false
       - name: Set up JDK
         uses: actions/setup-java@v3.8.0
         with:
