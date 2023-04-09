@@ -24,7 +24,7 @@ project:
 
 - Document how to apply patches.
 - Document each of the checks.
-- Add [SonarQube][sonarcloud] and [Codecov][codecov] integrations.
+- Add [Codecov][codecov] integration.
 - Add non-Java file formatting support, like we have internally at Picnic.
   (I.e., somehow open-source that stuff.)
 - Auto-generate a website listing each of the checks, just like the Error Prone
@@ -283,4 +283,3 @@ Refaster's expressiveness:
 [main-contributing]: ../CONTRIBUTING.md
 [main-readme]: ../README.md
 [modernizer-maven-plugin]: https://github.com/gaul/modernizer-maven-plugin
-[sonarcloud]: https://sonarcloud.io

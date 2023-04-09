@@ -143,6 +143,20 @@
         timestamp in support of reproducible builds. -->
         <project.build.outputTimestamp>2023-03-31T07:31:01Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- SonarCloud analysis settings. Refaster rules are excluded from
+        coverage computation, because they are tested using a custom method
+        that does not cause code coverage to be registered. -->
+        <sonar.coverage.exclusions>**/tech/picnic/errorprone/refasterrules/**</sonar.coverage.exclusions>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.issue.ignore.multicriteria>java-resource</sonar.issue.ignore.multicriteria>
+        <sonar.issue.ignore.multicriteria.java-resource.resourceKey>**/src/test/resources/**/*.java</sonar.issue.ignore.multicriteria.java-resource.resourceKey>
+        <sonar.issue.ignore.multicriteria.java-resource.ruleKey>java:*</sonar.issue.ignore.multicriteria.java-resource.ruleKey>
+        <sonar.organization>picnic-technologies</sonar.organization>
+        <!-- SonarCloud analysis source and test directories are specified
+        explicitly, because SonarCloud will otherwise only analyze `pom.xml`
+        and `src/{main,test}/java/**`. -->
+        <sonar.sources>pom.xml,src/main</sonar.sources>
+        <sonar.tests>src/test</sonar.tests>
         <!-- Dependency and plugin versions that are referenced in more than
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
@@ -1267,6 +1281,13 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>0.8.9</version>
+                    <configuration>
+                        <excludes>
+                            <!-- Refaster rules are tested using a custom method
+                            that does not cause code coverage to be registered. -->
+                            <exclude>tech/picnic/errorprone/refasterrules/**</exclude>
+                        </excludes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.pitest</groupId>
