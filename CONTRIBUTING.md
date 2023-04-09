@@ -48,10 +48,14 @@ be accepted. When in doubt, make sure to first raise an
 
 To the extent possible, the pull request process guards our coding guidelines.
 Some pointers:
-- Make sure that the `mvn clean install` build fully passes, ideally before
-  opening a pull request. See the [development
+- Try to make sure that the `mvn clean install` build fully passes, ideally
+  before opening a pull request. See the [development
   instructions][error-prone-support-developing] for details on how to
   efficiently resolve many of the errors and warnings that may be reported.
+  That said, if you feel that the build fails for invalid or debatable reasons,
+  or if you're unsure how to best resolve an issue, don't let that discourage
+  you from opening a PR with a failing build; we can have a look at the issue
+  together.
 - Checks should be _topical_: ideally they address a single concern.
 - Where possible checks should provide _fixes_, and ideally these are
   completely behavior-preserving. In order for a check to be adopted by users
