@@ -27,6 +27,9 @@ jobs:
           java-version: 17.0.6
           distribution: temurin
           cache: maven
+      - name: Create missing `test` directory
+        # XXX: Drop this step in favour of actually having a test.
+        run: mkdir refaster-compiler/src/test
       - name: Perform SonarCloud analysis
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
