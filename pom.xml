@@ -143,14 +143,48 @@
         timestamp in support of reproducible builds. -->
         <project.build.outputTimestamp>2023-03-31T07:31:01Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Glob pattern identifying Refaster rule definition files. These
+        Java classes don't contain "regular" code, and thus require special
+        handling by various code analysis tools. -->
+        <refaster-rules.path-pattern>**/tech/picnic/errorprone/refasterrules/*.java</refaster-rules.path-pattern>
         <!-- SonarCloud analysis settings. Refaster rules are excluded from
         coverage computation, because they are tested using a custom method
         that does not cause code coverage to be registered. -->
-        <sonar.coverage.exclusions>**/tech/picnic/errorprone/refasterrules/**</sonar.coverage.exclusions>
+        <sonar.coverage.exclusions>${refaster-rules.path-pattern}</sonar.coverage.exclusions>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.issue.ignore.multicriteria>java-resource</sonar.issue.ignore.multicriteria>
+        <!-- SonarCloud partial rule suppressions. These fall in two
+        categories:
+        - "Java test resources", i.e. test resource files that are valid Java
+          source code files. These resources serve as input or expected output
+          for tests, and often contain non-idiomatic or non-production code on
+          purpose.
+        - Refaster rules. These are valid Java files, but they should not be
+          thought of as "executable code" in the traditional sense. Due to
+          their nature, Refaster rule definitions contain some code that would
+          be considered non-idiomatic or incorrect in other contexts. -->
+        <sonar.issue.ignore.multicriteria>java-resource,refaster-rules-1,refaster-rules-2,refaster-rules-3,refaster-rules-4,,refaster-rules-5</sonar.issue.ignore.multicriteria>
         <sonar.issue.ignore.multicriteria.java-resource.resourceKey>**/src/test/resources/**/*.java</sonar.issue.ignore.multicriteria.java-resource.resourceKey>
         <sonar.issue.ignore.multicriteria.java-resource.ruleKey>java:*</sonar.issue.ignore.multicriteria.java-resource.ruleKey>
+        <!-- `@PlaceHolder` methods must be defined in an abstract class. -->
+        <sonar.issue.ignore.multicriteria.refaster-rules-1.resourceKey>${refaster-rules.path-pattern}</sonar.issue.ignore.multicriteria.refaster-rules-1.resourceKey>
+        <sonar.issue.ignore.multicriteria.refaster-rules-1.ruleKey>java:S1610</sonar.issue.ignore.multicriteria.refaster-rules-1.ruleKey>
+        <!-- Template parameters stand in for arbitrarily complex expressions;
+        lambda expression referencing such a parameter cannot be replaced with
+        a method reference. -->
+        <sonar.issue.ignore.multicriteria.refaster-rules-2.resourceKey>${refaster-rules.path-pattern}</sonar.issue.ignore.multicriteria.refaster-rules-2.resourceKey>
+        <sonar.issue.ignore.multicriteria.refaster-rules-2.ruleKey>java:S1612</sonar.issue.ignore.multicriteria.refaster-rules-2.ruleKey>
+        <!-- Refaster rules are named after their `@AfterTemplate` code, and
+        may end in `Exception`. -->
+        <sonar.issue.ignore.multicriteria.refaster-rules-3.resourceKey>${refaster-rules.path-pattern}</sonar.issue.ignore.multicriteria.refaster-rules-3.resourceKey>
+        <sonar.issue.ignore.multicriteria.refaster-rules-3.ruleKey>java:S2166</sonar.issue.ignore.multicriteria.refaster-rules-3.ruleKey>
+        <!-- Usage of `Refaster#anyOf` may incorrectly give the impression
+        that a stream is consumed more than once. -->
+        <sonar.issue.ignore.multicriteria.refaster-rules-4.resourceKey>${refaster-rules.path-pattern}</sonar.issue.ignore.multicriteria.refaster-rules-4.resourceKey>
+        <sonar.issue.ignore.multicriteria.refaster-rules-4.ruleKey>java:S3959</sonar.issue.ignore.multicriteria.refaster-rules-4.ruleKey>
+        <!-- Although not test code themselves, many Refaster rules contain
+        assertion expressions. -->
+        <sonar.issue.ignore.multicriteria.refaster-rules-5.resourceKey>${refaster-rules.path-pattern}</sonar.issue.ignore.multicriteria.refaster-rules-5.resourceKey>
+        <sonar.issue.ignore.multicriteria.refaster-rules-5.ruleKey>java:S5960</sonar.issue.ignore.multicriteria.refaster-rules-5.ruleKey>
         <sonar.organization>picnic-technologies</sonar.organization>
         <!-- SonarCloud analysis source and test directories are specified
         explicitly, because SonarCloud will otherwise only analyze `pom.xml`
@@ -1285,7 +1319,7 @@
                         <excludes>
                             <!-- Refaster rules are tested using a custom method
                             that does not cause code coverage to be registered. -->
-                            <exclude>tech/picnic/errorprone/refasterrules/**</exclude>
+                            <exclude>${refaster-rules.path-pattern}</exclude>
                         </excludes>
                     </configuration>
                 </plugin>

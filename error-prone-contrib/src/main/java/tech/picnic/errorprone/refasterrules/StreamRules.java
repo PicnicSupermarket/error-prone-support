@@ -316,6 +316,7 @@ final class StreamRules {
   /** Prefer {@link Stream#noneMatch(Predicate)} over more contrived alternatives. */
   static final class StreamNoneMatch<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S4034" /* This violation will be rewritten. */)
     boolean before(Stream<T> stream, Predicate<? super T> predicate) {
       return Refaster.anyOf(
           !stream.anyMatch(predicate),
@@ -347,6 +348,7 @@ final class StreamRules {
   /** Prefer {@link Stream#anyMatch(Predicate)} over more contrived alternatives. */
   static final class StreamAnyMatch<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S4034" /* This violation will be rewritten. */)
     boolean before(Stream<T> stream, Predicate<? super T> predicate) {
       return Refaster.anyOf(
           !stream.noneMatch(predicate), stream.filter(predicate).findAny().isPresent());

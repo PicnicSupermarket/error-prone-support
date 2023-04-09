@@ -62,6 +62,7 @@ import tech.picnic.errorprone.refaster.runner.Refaster;
 // `@BeforeTemplate` method is covered by a test. Review how we can make sure that _all_
 // `@BeforeTemplate` methods and `Refaster.anyOf` branches are covered.
 @BugPattern(summary = "Exercises a Refaster rule collection", severity = ERROR)
+@SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
 public final class RefasterRuleCollection extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String RULE_COLLECTION_FLAG = "RefasterRuleCollection:RuleCollection";

@@ -68,7 +68,10 @@ final class OptionalRules {
   /** Prefer {@link Optional#orElseThrow()} over the less explicit {@link Optional#get()}. */
   static final class OptionalOrElseThrow<T> {
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings({
+      "java:S3655" /* Matched expressions are in practice embedded in a larger context. */,
+      "NullAway"
+    })
     T before(Optional<T> optional) {
       return optional.get();
     }

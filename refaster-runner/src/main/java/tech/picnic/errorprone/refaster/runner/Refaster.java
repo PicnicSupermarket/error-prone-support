@@ -55,6 +55,7 @@ import java.util.stream.Stream;
     linkType = NONE,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
+@SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
 public final class Refaster extends BugChecker implements CompilationUnitTreeMatcher {
   /** Flag to pass a pattern that restricts which Refaster rules are loaded. */
   public static final String INCLUDED_RULES_PATTERN_FLAG = "Refaster:NamePattern";

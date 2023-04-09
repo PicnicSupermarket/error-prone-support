@@ -23,6 +23,8 @@ final class AssertJPrimitiveRules {
     }
 
     @BeforeTemplate
+    @SuppressWarnings(
+        "java:S1244" /* The (in)equality checks are fragile, but may be seen in the wild. */)
     AbstractBooleanAssert<?> before(double actual, double expected) {
       return Refaster.anyOf(
           assertThat(actual == expected).isTrue(), assertThat(actual != expected).isFalse());
@@ -43,6 +45,8 @@ final class AssertJPrimitiveRules {
     }
 
     @BeforeTemplate
+    @SuppressWarnings(
+        "java:S1244" /* The (in)equality checks are fragile, but may be seen in the wild. */)
     AbstractBooleanAssert<?> before(double actual, double expected) {
       return Refaster.anyOf(
           assertThat(actual != expected).isTrue(), assertThat(actual == expected).isFalse());

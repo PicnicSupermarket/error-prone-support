@@ -13,6 +13,7 @@ final class PrimitiveRules {
   /** Avoid contrived ways of expressing the "less than" relationship. */
   static final class LessThan {
     @BeforeTemplate
+    @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
     boolean before(double a, double b) {
       return !(a >= b);
     }
@@ -26,6 +27,7 @@ final class PrimitiveRules {
   /** Avoid contrived ways of expressing the "less than or equal to" relationship. */
   static final class LessThanOrEqualTo {
     @BeforeTemplate
+    @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
     boolean before(double a, double b) {
       return !(a > b);
     }
@@ -39,6 +41,7 @@ final class PrimitiveRules {
   /** Avoid contrived ways of expressing the "greater than" relationship. */
   static final class GreaterThan {
     @BeforeTemplate
+    @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
     boolean before(double a, double b) {
       return !(a <= b);
     }
@@ -52,6 +55,7 @@ final class PrimitiveRules {
   /** Avoid contrived ways of expressing the "greater than or equal to" relationship. */
   static final class GreaterThanOrEqualTo {
     @BeforeTemplate
+    @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
     boolean before(double a, double b) {
       return !(a < b);
     }

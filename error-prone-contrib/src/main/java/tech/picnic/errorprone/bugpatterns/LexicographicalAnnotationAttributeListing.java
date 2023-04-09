@@ -58,6 +58,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)
+@SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
 public final class LexicographicalAnnotationAttributeListing extends BugChecker
     implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;

@@ -48,7 +48,9 @@ public final class ThrowsCheckedException implements Matcher<ExpressionTree> {
 
     try {
       return state.getTypes().findDescriptorType(type).getThrownTypes();
-    } catch (FunctionDescriptorLookupError e) {
+    } catch (
+        @SuppressWarnings("java:S1166" /* Not exceptional. */)
+        FunctionDescriptorLookupError e) {
       return ImmutableSet.of();
     }
   }

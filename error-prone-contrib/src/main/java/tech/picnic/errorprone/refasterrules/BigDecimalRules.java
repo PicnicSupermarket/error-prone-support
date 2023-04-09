@@ -56,6 +56,7 @@ final class BigDecimalRules {
   // `BugChecker`.
   static final class BigDecimalValueOf {
     @BeforeTemplate
+    @SuppressWarnings("java:S2111" /* This violation will be rewritten. */)
     BigDecimal before(double value) {
       return new BigDecimal(value);
     }
