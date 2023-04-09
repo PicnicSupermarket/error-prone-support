@@ -29,11 +29,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     steps:
-        # We run the build twice for each supported JDK: once against the
-        # original Error Prone release, using only Error Prone checks available
-        # on Maven Central, and once against the Picnic Error Prone fork,
-        # additionally enabling all checks defined in this project and any
-        # Error Prone checks available only from other artifact repositories.
+      # We run the build twice for each supported JDK: once against the
+      # original Error Prone release, using only Error Prone checks available
+      # on Maven Central, and once against the Picnic Error Prone fork,
+      # additionally enabling all checks defined in this project and any Error
+      # Prone checks available only from other artifact repositories.
       - name: Check out code
         uses: actions/checkout@v3.1.0
         with:

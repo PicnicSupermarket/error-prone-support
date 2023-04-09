@@ -1,3 +1,8 @@
+# Analyzes the code base and GitHub project configuration for adherence to
+# security best practices for open source software. Identified issues are
+# registered with GitHub's code scanning dashboard. When a pull request is
+# analyzed, any offending lines are annotated. See
+# https://securityscorecards.dev for details.
 name: OpenSSF Scorecard update
 on:
   pull_request:
