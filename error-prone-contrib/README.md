@@ -199,9 +199,6 @@ be fully closed, there are some ways in which Refaster's scope of utility could
 be extended. The following is a non-exhaustive list of ideas on how to extend
 Refaster's expressiveness:
 
-- Allow more control over _which_ methods are statically imported by
-  `@UseImportPolicy`. Sometimes the `@AfterTemplate` contains more than one
-  static method invocation, and only a subset should be statically imported.
 - Provide a way to express that a lambda expression should also match an
   equivalent method reference and/or vice versa.
 - Provide a way to express that certain method invocations should also be

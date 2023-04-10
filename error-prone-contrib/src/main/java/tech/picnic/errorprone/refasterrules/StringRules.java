@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -28,6 +29,7 @@ final class StringRules {
   private StringRules() {}
 
   /** Prefer {@link String#isEmpty()} over alternatives that consult the string's length. */
+  // XXX: Once we target JDK 15+, generalize this rule to cover all `CharSequence` subtypes.
   static final class StringIsEmpty {
     @BeforeTemplate
     boolean before(String str) {
@@ -38,6 +40,37 @@ final class StringRules {
     @AlsoNegation
     boolean after(String str) {
       return str.isEmpty();
+    }
+  }
+
+  /** Prefer a method reference to {@link String#isEmpty()} over the equivalent lambda function. */
+  // XXX: Once we target JDK 15+, generalize this rule to cover all `CharSequence` subtypes.
+  // XXX: As it stands, this rule is a special case of what `MethodReferenceUsage` tries to achieve.
+  // If/when `MethodReferenceUsage` becomes production ready, we should simply drop this check.
+  static final class StringIsEmptyPredicate {
+    @BeforeTemplate
+    Predicate<String> before() {
+      return s -> s.isEmpty();
+    }
+
+    @AfterTemplate
+    Predicate<String> after() {
+      return String::isEmpty;
+    }
+  }
+
+  /** Prefer a method reference to {@link String#isEmpty()} over the equivalent lambda function. */
+  // XXX: Once we target JDK 15+, generalize this rule to cover all `CharSequence` subtypes.
+  static final class StringIsNotEmptyPredicate {
+    @BeforeTemplate
+    Predicate<String> before() {
+      return s -> !s.isEmpty();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Predicate<String> after() {
+      return not(String::isEmpty);
     }
   }
 
@@ -74,7 +107,7 @@ final class StringRules {
   static final class FilterEmptyString {
     @BeforeTemplate
     Optional<String> before(Optional<String> optional) {
-      return Refaster.anyOf(optional.map(Strings::emptyToNull), optional.filter(s -> !s.isEmpty()));
+      return optional.map(Strings::emptyToNull);
     }
 
     @AfterTemplate

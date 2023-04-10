@@ -36,13 +36,19 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         !"baz".isEmpty());
   }
 
+  boolean testStringIsEmptyPredicate() {
+    return Stream.of("foo").anyMatch(String::isEmpty);
+  }
+
+  boolean testStringIsNotEmptyPredicate() {
+    return Stream.of("foo").anyMatch(not(String::isEmpty));
+  }
+
   ImmutableSet<Boolean> testStringIsNullOrEmpty() {
     return ImmutableSet.of(
         Strings.isNullOrEmpty(getClass().getName()), !Strings.isNullOrEmpty(getClass().getName()));
   }
 
-  // XXX: Consider updating qualifier `Predicate#not` if/when conditional `ImportPolicy` is
-  // introduced.
   ImmutableSet<Optional<String>> testOptionalNonEmptyString() {
     return ImmutableSet.of(
         Optional.ofNullable(toString()).filter(Predicate.not(String::isEmpty)),
@@ -51,10 +57,8 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         Optional.ofNullable(toString()).filter(Predicate.not(String::isEmpty)));
   }
 
-  ImmutableSet<Optional<String>> testFilterEmptyString() {
-    return ImmutableSet.of(
-        Optional.of("foo").filter(not(String::isEmpty)),
-        Optional.of("foo").filter(not(String::isEmpty)));
+  Optional<String> testFilterEmptyString() {
+    return Optional.of("foo").filter(not(String::isEmpty));
   }
 
   ImmutableSet<String> testJoinStrings() {
