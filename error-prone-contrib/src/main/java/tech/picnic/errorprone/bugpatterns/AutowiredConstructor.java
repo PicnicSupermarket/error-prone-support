@@ -58,8 +58,8 @@ public final class AutowiredConstructor extends BugChecker implements ClassTreeM
 
     /*
      * This is the only `@Autowired` constructor: suggest that it be removed. Note that this likely
-     * means that the associated import can be removed as well. Rather than adding code for this case we
-     * leave flagging the unused import to Error Prone's `RemoveUnusedImports` check.
+     * means that the associated import can be removed as well. Rather than adding code for this
+     * case we leave flagging the unused import to Error Prone's `RemoveUnusedImports` check.
      */
     AnnotationTree annotation = Iterables.getOnlyElement(annotations);
     return describeMatch(annotation, SourceCode.deleteWithTrailingWhitespace(annotation, state));

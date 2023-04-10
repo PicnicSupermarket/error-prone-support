@@ -80,7 +80,7 @@ public final class CodeTransformers {
   @SuppressWarnings({
     "java:S1166" /* The caught exception's stack traces are not relevant. */,
     "java:S2147" /* The `catch` clauses have distinct comments. */,
-    "TrailingComment"
+    "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
   })
   private static Optional<CodeTransformer> loadCodeTransformer(ResourceInfo resource) {
     try (InputStream in = resource.url().openStream();

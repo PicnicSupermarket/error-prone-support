@@ -30,7 +30,7 @@ import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Avoid `Collectors.to{List,Map,Set}` in favour of alternatives that emphasize (im)mutability",
+        "Avoid `Collectors.to{List,Map,Set}` in favor of collectors that emphasize (im)mutability",
     link = BUG_PATTERNS_BASE_URL + "CollectorMutability",
     linkType = CUSTOM,
     severity = WARNING,

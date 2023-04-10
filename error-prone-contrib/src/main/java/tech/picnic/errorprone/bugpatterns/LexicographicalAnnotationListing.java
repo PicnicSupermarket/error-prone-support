@@ -48,7 +48,9 @@ public final class LexicographicalAnnotationListing extends BugChecker
   private static final long serialVersionUID = 1L;
   private static final Comparator<@Nullable AnnotationType> BY_ANNOTATION_TYPE =
       (a, b) ->
-          (a == null || a == DECLARATION) && b == TYPE ? -1 : a == TYPE && b == DECLARATION ? 1 : 0;
+          (a == null || a == DECLARATION) && b == TYPE
+              ? -1
+              : (a == TYPE && b == DECLARATION ? 1 : 0);
 
   /** Instantiates a new {@link LexicographicalAnnotationListing} instance. */
   public LexicographicalAnnotationListing() {}
