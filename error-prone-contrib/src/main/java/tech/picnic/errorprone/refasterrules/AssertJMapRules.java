@@ -16,6 +16,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -26,6 +27,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractBooleanAssert;
+import org.assertj.core.api.AbstractCollectionAssert;
 import org.assertj.core.api.AbstractMapAssert;
 import org.assertj.core.api.MapAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -223,13 +225,13 @@ final class AssertJMapRules {
 
   static final class AssertThatMapContainsOnlyKeys<K, V> {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(Map<K, V> map, Set<K> keys) {
+    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before(Map<K, V> map, Set<K> keys) {
       return assertThat(map.keySet()).hasSameElementsAs(keys);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(Map<K, V> map, Set<K> keys) {
+    MapAssert<K, V> after(Map<K, V> map, Set<K> keys) {
       return assertThat(map).containsOnlyKeys(keys);
     }
   }
