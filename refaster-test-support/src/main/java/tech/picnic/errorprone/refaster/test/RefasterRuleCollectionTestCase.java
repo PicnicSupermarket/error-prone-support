@@ -19,7 +19,7 @@ public interface RefasterRuleCollectionTestCase {
    *     *Input.java} import statements are also required to be present in the associated {@code
    *     *Output.java} file.
    */
-  default ImmutableSet<?> elidedTypesAndStaticImports() {
+  default ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of();
   }
 }

@@ -44,7 +44,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class JUnitToAssertJRules {
   private JUnitToAssertJRules() {}
 
-  public ImmutableSet<?> elidedTypesAndStaticImports() {
+  public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         Assertions.class,
         assertDoesNotThrow(() -> null),

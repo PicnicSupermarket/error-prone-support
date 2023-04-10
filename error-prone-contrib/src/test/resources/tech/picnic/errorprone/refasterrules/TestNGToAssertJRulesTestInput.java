@@ -21,7 +21,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   @Override
-  public ImmutableSet<?> elidedTypesAndStaticImports() {
+  public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         (Runnable) () -> assertEquals(new byte[0], null),
         (Runnable) () -> assertEqualsNoOrder((Object[]) null, null),
