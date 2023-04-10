@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.assertj.core.api.AbstractAssert;
@@ -217,6 +218,19 @@ final class AssertJMapRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     MapAssert<K, V> after(Map<K, V> map, K key) {
       return assertThat(map).doesNotContainKey(key);
+    }
+  }
+
+  static final class AssertThatMapContainsOnlyKeys<K, V> {
+    @BeforeTemplate
+    AbstractAssert<?, ?> before(Map<K, V> map, Set<K> keys) {
+      return assertThat(map.keySet()).hasSameElementsAs(keys);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractAssert<?, ?> after(Map<K, V> map, Set<K> keys) {
+      return assertThat(map).containsOnlyKeys(keys);
     }
   }
 
