@@ -67,10 +67,11 @@ final class DocumentationGeneratorTaskListenerTest {
 
   @Test
   void excessArguments(@TempDir Path outputDirectory) {
+    String actualOutputDirectory = outputDirectory.toAbsolutePath() + " extra-arg";
     assertThatThrownBy(
             () ->
                 Compilation.compileWithDocumentationGenerator(
-                    outputDirectory.toAbsolutePath() + " extra-arg", "A.java", "package pkg;"))
+                    actualOutputDirectory, "A.java", "package pkg;"))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("Precisely one path must be provided");
   }

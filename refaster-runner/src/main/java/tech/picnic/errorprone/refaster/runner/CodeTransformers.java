@@ -72,11 +72,16 @@ public final class CodeTransformers {
     }
 
     int lastPathSeparator = resourceName.lastIndexOf('/');
-    int beginIndex = lastPathSeparator < 0 ? 0 : lastPathSeparator + 1;
+    int beginIndex = lastPathSeparator < 0 ? 0 : (lastPathSeparator + 1);
     int endIndex = resourceName.length() - REFASTER_RULE_SUFFIX.length();
     return Optional.of(resourceName.substring(beginIndex, endIndex));
   }
 
+  @SuppressWarnings({
+    "java:S1166" /* The caught exception's stack traces are not relevant. */,
+    "java:S2147" /* The `catch` clauses have distinct comments. */,
+    "TrailingComment"
+  })
   private static Optional<CodeTransformer> loadCodeTransformer(ResourceInfo resource) {
     try (InputStream in = resource.url().openStream();
         ObjectInputStream ois = new ObjectInputStream(in)) {
@@ -84,7 +89,13 @@ public final class CodeTransformers {
       CodeTransformer codeTransformer = (CodeTransformer) ois.readObject();
       return Optional.of(codeTransformer);
     } catch (NoSuchElementException e) {
-      /* For some reason we can't load the resource. Skip it. */
+      /*
+       * For some reason we can't load the resource; skip it. This issue has been observed when
+       * executing the code using Maven Surefire, in which case `ResourceInfo` may reference a path
+       * relative to the current working directory, even though the current working directory is not
+       */
+      // XXX: This appears to be a bug in Guava's ClassPath implementation. Consider migrating to
+      // ClassGraph.
       // XXX: Should we log this?
       return Optional.empty();
     } catch (ClassCastException e) {

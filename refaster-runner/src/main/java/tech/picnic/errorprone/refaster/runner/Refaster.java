@@ -62,7 +62,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
 
   private static final long serialVersionUID = 1L;
 
-  @SuppressWarnings("serial" /* Concrete instance will be `Serializable`. */)
+  @SuppressWarnings({"java:S1948", "serial"} /* Concrete instance will be `Serializable`. */)
   private final CodeTransformer codeTransformer;
 
   /** Instantiates a default {@link Refaster} instance. */

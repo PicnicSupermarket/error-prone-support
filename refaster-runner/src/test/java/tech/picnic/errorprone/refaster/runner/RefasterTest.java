@@ -161,23 +161,22 @@ final class RefasterTest {
   @ParameterizedTest
   void severityAssignment(
       ImmutableList<String> arguments, ImmutableList<SeverityLevel> expectedSeverities) {
-    assertThatThrownBy(
-            () ->
-                compilationHelper
-                    .setArgs(arguments)
-                    .addSourceLines(
-                        "A.java",
-                        "class A {",
-                        "  void m() {",
-                        "    boolean[] bs = {",
-                        "      \"foo\".toCharArray().length == 0,",
-                        "      \"bar\".toCharArray().length == 1,",
-                        "      \"baz\".toCharArray().length == 2,",
-                        "      \"qux\".toCharArray().length == 3",
-                        "    };",
-                        "  }",
-                        "}")
-                    .doTest())
+    CompilationTestHelper compilationTestHelper =
+        compilationHelper
+            .setArgs(arguments)
+            .addSourceLines(
+                "A.java",
+                "class A {",
+                "  void m() {",
+                "    boolean[] bs = {",
+                "      \"foo\".toCharArray().length == 0,",
+                "      \"bar\".toCharArray().length == 1,",
+                "      \"baz\".toCharArray().length == 2,",
+                "      \"qux\".toCharArray().length == 3",
+                "    };",
+                "  }",
+                "}");
+    assertThatThrownBy(compilationTestHelper::doTest)
         .isInstanceOf(AssertionError.class)
         .message()
         .satisfies(

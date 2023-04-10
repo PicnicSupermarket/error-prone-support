@@ -307,14 +307,12 @@ final class OptionalRules {
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    Optional<R> before(
-        Optional<T> optional, Function<? super S, ? extends Optional<? extends R>> function) {
+    Optional<R> before(Optional<T> optional, Function<? super S, Optional<? extends R>> function) {
       return optional.flatMap(v -> toOptionalFunction(v).flatMap(function));
     }
 
     @AfterTemplate
-    Optional<R> after(
-        Optional<T> optional, Function<? super S, ? extends Optional<? extends R>> function) {
+    Optional<R> after(Optional<T> optional, Function<? super S, Optional<? extends R>> function) {
       return optional.flatMap(v -> toOptionalFunction(v)).flatMap(function);
     }
   }
