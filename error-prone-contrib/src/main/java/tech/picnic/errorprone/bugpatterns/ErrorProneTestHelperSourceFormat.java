@@ -133,7 +133,7 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
         SuggestedFix.replace(
             startPos,
             endPos,
-            Splitter.on('\n')
+            Splitter.on(System.lineSeparator())
                 .splitToStream(formatted)
                 .map(state::getConstantExpression)
                 .collect(joining(", "))));
@@ -159,7 +159,7 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
         return Optional.empty();
       }
 
-      source.append(value).append('\n');
+      source.append(value).append(System.lineSeparator());
     }
 
     return Optional.of(source.toString());

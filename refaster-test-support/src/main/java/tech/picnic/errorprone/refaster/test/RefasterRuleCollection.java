@@ -218,13 +218,13 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
 
   private void reportViolations(
       Tree tree, String message, ImmutableSet<String> violations, VisitorState state) {
-    String violationEnumeration = String.join("\n*  - ", violations);
+    String violationEnumeration = String.join(String.format("%n*  - "), violations);
     String comment =
-        String.format("/*\n*  ERROR: %s:\n*  - %s\n*/\n", message, violationEnumeration);
+        String.format("/*%n*  ERROR: %s:%n*  - %s%n*/%n", message, violationEnumeration);
     SuggestedFix fixWithComment =
         tree instanceof MethodTree
             ? SuggestedFix.prefixWith(tree, comment)
-            : SuggestedFix.postfixWith(tree, '\n' + comment);
+            : SuggestedFix.postfixWith(tree, String.format("%n%s", comment));
     state.reportMatch(describeMatch(tree, fixWithComment));
   }
 
@@ -297,7 +297,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
             describeMatch(
                 tree,
                 SuggestedFix.prefixWith(
-                    tree, "/* ERROR: Method names should start with `test`. */\n")));
+                    tree, String.format("/* ERROR: Method names should start with `test`. */%n"))));
       }
 
       return Optional.empty();
