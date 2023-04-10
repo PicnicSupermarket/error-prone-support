@@ -250,7 +250,8 @@ final class ImmutableMapRules {
    * Prefer {@link ImmutableMap#of(Object, Object, Object, Object)} over alternatives that don't
    * communicate the immutability of the resulting map at the type level.
    */
-  // XXX: Also rewrite the `ImmutableMap.builder()` variant?
+  // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
+  // also make it easier to rewrite various `ImmutableMap.builder()` variants.
   static final class ImmutableMapOf2<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2) {
@@ -267,7 +268,8 @@ final class ImmutableMapRules {
    * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object)} over
    * alternatives that don't communicate the immutability of the resulting map at the type level.
    */
-  // XXX: Also rewrite the `ImmutableMap.builder()` variant?
+  // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
+  // also make it easier to rewrite various `ImmutableMap.builder()` variants.
   static final class ImmutableMapOf3<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3) {
@@ -285,7 +287,9 @@ final class ImmutableMapRules {
    * over alternatives that don't communicate the immutability of the resulting map at the type
    * level.
    */
-  // XXX: Also rewrite the `ImmutableMap.builder()` variant?
+  // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
+  // also make it easier to rewrite various `ImmutableMap.builder()` variants.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
   static final class ImmutableMapOf4<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
@@ -303,7 +307,9 @@ final class ImmutableMapRules {
    * Object, Object)} over alternatives that don't communicate the immutability of the resulting map
    * at the type level.
    */
-  // XXX: Also rewrite the `ImmutableMap.builder()` variant?
+  // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
+  // also make it easier to rewrite various `ImmutableMap.builder()` variants.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
   static final class ImmutableMapOf5<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {

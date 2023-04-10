@@ -118,6 +118,8 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
         .flatMap(expectedInstance -> constructMethodRef(lambdaExpr, subTree, expectedInstance));
   }
 
+  @SuppressWarnings(
+      "java:S1151" /* Extracting `IDENTIFIER` case block to separate method does not improve readability. */)
   private static Optional<SuggestedFix.Builder> constructMethodRef(
       LambdaExpressionTree lambdaExpr,
       MethodInvocationTree subTree,
@@ -130,10 +132,9 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
           return Optional.empty();
         }
         Symbol sym = ASTHelpers.getSymbol(methodSelect);
-        if (!ASTHelpers.isStatic(sym)) {
-          return constructFix(lambdaExpr, "this", methodSelect);
-        }
-        return constructFix(lambdaExpr, sym.owner, methodSelect);
+        return ASTHelpers.isStatic(sym)
+            ? constructFix(lambdaExpr, sym.owner, methodSelect)
+            : constructFix(lambdaExpr, "this", methodSelect);
       case MEMBER_SELECT:
         return constructMethodRef(lambdaExpr, (MemberSelectTree) methodSelect, expectedInstance);
       default:
