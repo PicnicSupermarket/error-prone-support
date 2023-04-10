@@ -1,6 +1,8 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 
 import com.google.common.base.Joiner;
@@ -11,6 +13,7 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
@@ -20,7 +23,6 @@ import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link String}s. */
-// XXX: Should we prefer `s -> !s.isEmpty()` or `not(String::isEmpty)`?
 @OnlineDocumentation
 final class StringRules {
   private StringRules() {}
@@ -65,19 +67,20 @@ final class StringRules {
 
     @AfterTemplate
     Optional<String> after(String str) {
-      return Optional.ofNullable(str).filter(s -> !s.isEmpty());
+      return Optional.ofNullable(str).filter(not(String::isEmpty));
     }
   }
 
   static final class FilterEmptyString {
     @BeforeTemplate
     Optional<String> before(Optional<String> optional) {
-      return optional.map(Strings::emptyToNull);
+      return Refaster.anyOf(optional.map(Strings::emptyToNull), optional.filter(s -> !s.isEmpty()));
     }
 
     @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Optional<String> after(Optional<String> optional) {
-      return optional.filter(s -> !s.isEmpty());
+      return optional.filter(not(String::isEmpty));
     }
   }
 
