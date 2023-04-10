@@ -160,13 +160,14 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
                   SuggestedFix.prefixWith(
                       typeDeclaration,
                       String.format(
-                          "/* ERROR: Class should be named `%s`. */\n", expectedClassName))));
+                          "/* ERROR: Class should be named `%s`. */%n", expectedClassName))));
         }
       } else {
         state.reportMatch(
             describeMatch(
                 typeDeclaration,
-                SuggestedFix.prefixWith(typeDeclaration, "/* ERROR: Unexpected token. */\n")));
+                SuggestedFix.prefixWith(
+                    typeDeclaration, String.format("/* ERROR: Unexpected token. */%n"))));
       }
     }
   }

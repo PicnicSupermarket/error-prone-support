@@ -30,6 +30,7 @@ final class EqualityRules {
 
     @AfterTemplate
     @AlsoNegation
+    @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
     boolean after(T a, T b) {
       return a == b;
     }
