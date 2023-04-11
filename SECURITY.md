@@ -15,9 +15,9 @@ use the latest release where feasible.
 ## Reporting a vulnerability
 
 To report a vulnerability, please visit the [security
-advisories][security-advisories] page an click _Report a vulnerability_. We
+advisories][security-advisories] page and click _Report a vulnerability_. We
 will take such reports seriously and work with you to resolve the issue in a
 timely manner.
 
 [security-advisories]: https://github.com/PicnicSupermarket/error-prone-support/security/advisories
-[semantic-versioning]: https://semver.org/
+[semantic-versioning]: https://semver.org

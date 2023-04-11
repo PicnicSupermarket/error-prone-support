@@ -66,6 +66,10 @@ Some pointers:
   checks][error-prone-criteria]. Most guidelines described there apply to this
   project as well, except that this project _does_ focus quite heavy on style
   enforcement. But that just makes the previous point doubly important.
+- Make sure that there are no violations of the newly introduced checks in the
+  codebase itself by running the [self check][error-prone-support-self-check].
+  See the [development instructions][error-prone-support-developing] for extra
+  context.
 - Make sure that a check's [(mutation) test
   coverage][error-prone-support-mutation-tests] is or remains about as high as
   it can be. Not only does this lead to better tests, it also points out
@@ -78,3 +82,4 @@ Some pointers:
 [error-prone-support-issues]: https://github.com/PicnicSupermarket/error-prone-support/issues
 [error-prone-support-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-mutation-tests.sh
 [error-prone-support-pulls]: https://github.com/PicnicSupermarket/error-prone-support/pulls
+[error-prone-support-self-check]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/apply-error-prone-suggestions.sh
