@@ -4,6 +4,8 @@
 # `Sonar way` profile. While the web UI also provides such functionality, this
 # script also compares the configuration parameters of each rule.
 
+set -e -u -o pipefail
+
 if [ -z "${SONAR_TOKEN}" ]; then
   echo 'Environment variable `SONAR_TOKEN` is not set.'
   exit 1
