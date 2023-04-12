@@ -427,12 +427,12 @@ final class OptionalRules {
   // dropped in favour of `StreamMapFirst` and `OptionalIdentity`.
   static final class OptionalMap<S, T> {
     @BeforeTemplate
-    Optional<? extends T> before(Optional<S> optional, Function<? super S, ? extends T> function) {
+    Optional<? extends T> before(Optional<S> optional, Function<? super S, T> function) {
       return optional.stream().map(function).findAny();
     }
 
     @AfterTemplate
-    Optional<? extends T> after(Optional<S> optional, Function<? super S, ? extends T> function) {
+    Optional<? extends T> after(Optional<S> optional, Function<? super S, T> function) {
       return optional.map(function);
     }
   }

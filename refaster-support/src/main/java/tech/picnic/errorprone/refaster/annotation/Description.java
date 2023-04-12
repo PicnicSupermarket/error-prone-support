@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
  *
  * <p>Annotations on nested classes override the description associated with any enclosing class.
  */
+// XXX: This becomes easier to use once we can use text blocks.
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface Description {
