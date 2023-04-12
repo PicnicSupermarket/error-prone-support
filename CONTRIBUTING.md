@@ -48,14 +48,17 @@ be accepted. When in doubt, make sure to first raise an
 
 To the extent possible, the pull request process guards our coding guidelines.
 Some pointers:
-- Try to make sure that the `mvn clean install` build fully passes, ideally
-  before opening a pull request. See the [development
+- Try to make sure that the
+  [`./run-full-build.sh`][error-prone-support-full-build] script completes
+  successfully, ideally before opening a pull request. See the [development
   instructions][error-prone-support-developing] for details on how to
-  efficiently resolve many of the errors and warnings that may be reported.
-  That said, if you feel that the build fails for invalid or debatable reasons,
-  or if you're unsure how to best resolve an issue, don't let that discourage
-  you from opening a PR with a failing build; we can have a look at the issue
-  together.
+  efficiently resolve many of the errors and warnings that may be reported. (In
+  particular, make sure to run `mvn fmt:format` and
+  [`./apply-error-prone-suggestions.sh`][error-prone-support-patch].) That
+  said, if you feel that the build fails for invalid or debatable reasons, or
+  if you're unsure how to best resolve an issue, don't let that discourage you
+  from opening a PR with a failing build; we can have a look at the issue
+  together!
 - Checks should be _topical_: ideally they address a single concern.
 - Where possible checks should provide _fixes_, and ideally these are
   completely behavior-preserving. In order for a check to be adopted by users
@@ -66,10 +69,6 @@ Some pointers:
   checks][error-prone-criteria]. Most guidelines described there apply to this
   project as well, except that this project _does_ focus quite heavy on style
   enforcement. But that just makes the previous point doubly important.
-- Make sure that there are no violations of the newly introduced checks in the
-  codebase itself by running the [self check][error-prone-support-self-check].
-  See the [development instructions][error-prone-support-developing] for extra
-  context.
 - Make sure that a check's [(mutation) test
   coverage][error-prone-support-mutation-tests] is or remains about as high as
   it can be. Not only does this lead to better tests, it also points out
@@ -79,7 +78,8 @@ Some pointers:
 
 [error-prone-criteria]: https://errorprone.info/docs/criteria
 [error-prone-support-developing]: https://github.com/PicnicSupermarket/error-prone-support/tree/master#-developing-error-prone-support
+[error-prone-support-full-build]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-full-build.sh
 [error-prone-support-issues]: https://github.com/PicnicSupermarket/error-prone-support/issues
 [error-prone-support-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-mutation-tests.sh
+[error-prone-support-patch]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/apply-error-prone-suggestions.sh
 [error-prone-support-pulls]: https://github.com/PicnicSupermarket/error-prone-support/pulls
-[error-prone-support-self-check]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/apply-error-prone-suggestions.sh
