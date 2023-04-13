@@ -1,0 +1,118 @@
+diff --git a/config/archunit-store/slices-should-be-free-of-cycles-suppressions b/config/archunit-store/slices-should-be-free-of-cycles-suppressions
+index 476efc1b9..4eab67306 100644
+--- a/config/archunit-store/slices-should-be-free-of-cycles-suppressions
++++ b/config/archunit-store/slices-should-be-free-of-cycles-suppressions
+@@ -1351,8 +1351,8 @@ Cycle detected: Slice checks.javadoc -> \
+     - Constructor <com.puppycrawl.tools.checkstyle.checks.javadoc.AtclauseOrderCheck.<init>()> calls method <com.puppycrawl.tools.checkstyle.utils.TokenUtil.asBitSet([I)> in (AtclauseOrderCheck.java:177)\
+     - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTagContinuationIndentationCheck.visitJavadocToken(com.puppycrawl.tools.checkstyle.api.DetailNode)> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getNextSibling(com.puppycrawl.tools.checkstyle.api.DetailNode)> in (JavadocTagContinuationIndentationCheck.java:177)\
+     - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.RequireEmptyLineBeforeBlockTagGroupCheck.isAnotherTagBefore(com.puppycrawl.tools.checkstyle.api.DetailNode)> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getPreviousSibling(com.puppycrawl.tools.checkstyle.api.DetailNode)> in (RequireEmptyLineBeforeBlockTagGroupCheck.java:177)\
++    - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocNodeImpl.toString()> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getTokenName(int)> in (JavadocNodeImpl.java:178)\
+     - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTagInfo$8.isValidOn(com.puppycrawl.tools.checkstyle.api.DetailAST)> calls method <com.puppycrawl.tools.checkstyle.utils.ScopeUtil.isLocalVariableDef(com.puppycrawl.tools.checkstyle.api.DetailAST)> in (JavadocTagInfo.java:178)\
+-    - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocNodeImpl.toString()> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getTokenName(int)> in (JavadocNodeImpl.java:179)\
+     - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.AbstractJavadocCheck.setJavadocTokens([Ljava.lang.String;)> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getTokenId(java.lang.String)> in (AbstractJavadocCheck.java:181)\
+     - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.RequireEmptyLineBeforeBlockTagGroupCheck.isAnotherTagBefore(com.puppycrawl.tools.checkstyle.api.DetailNode)> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getPreviousSibling(com.puppycrawl.tools.checkstyle.api.DetailNode)> in (RequireEmptyLineBeforeBlockTagGroupCheck.java:183)\
+     - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.NonEmptyAtclauseDescriptionCheck.hasOnlyEmptyText(com.puppycrawl.tools.checkstyle.api.DetailNode)> calls method <com.puppycrawl.tools.checkstyle.utils.CommonUtil.isBlank(java.lang.String)> in (NonEmptyAtclauseDescriptionCheck.java:185)\
+diff --git a/pom.xml b/pom.xml
+index e47bd227e..31bb3d59e 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -233,7 +233,8 @@
+     <junit.version>5.9.2</junit.version>
+     <forbiddenapis.version>3.4</forbiddenapis.version>
+     <json-schema-validator.version>1.2.0</json-schema-validator.version>
+-    <error-prone.version>2.18.0</error-prone.version>
++    <error-prone.version>2.18.0-picnic-1</error-prone.version>
++    <error-prone-support.version>0.9.0</error-prone-support.version>
+     <checkerframework.version>3.27.0</checkerframework.version>
+   </properties>
+
+@@ -2308,15 +2309,25 @@
+                     <arg>-Xpkginfo:always</arg>
+                     <arg>-XDcompilePolicy=simple</arg>
+                     <arg>
+-                      -Xplugin:ErrorProne
++                      -Xplugin:ErrorProne ${error-prone.flags}
+                     </arg>
+                   </compilerArgs>
+                   <annotationProcessorPaths>
+                     <path>
+-                      <groupId>com.google.errorprone</groupId>
++                      <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+                       <artifactId>error_prone_core</artifactId>
+                       <version>${error-prone.version}</version>
+                     </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>error-prone-contrib</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>refaster-runner</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
+                   </annotationProcessorPaths>
+                 </configuration>
+               </execution>
+@@ -2361,15 +2372,26 @@
+                     <arg>-XDcompilePolicy=simple</arg>
+                     <arg>
+                       -Xplugin:ErrorProne \
+-                      -XepExcludedPaths:.*[\\/]resources[\\/].*
++                      -XepExcludedPaths:.*[\\/]resources[\\/].* \
++                      ${error-prone.flags}
+                     </arg>
+                   </compilerArgs>
+                   <annotationProcessorPaths>
+                     <path>
+-                      <groupId>com.google.errorprone</groupId>
++                      <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+                       <artifactId>error_prone_core</artifactId>
+                       <version>${error-prone.version}</version>
+                     </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>error-prone-contrib</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>refaster-runner</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
+                   </annotationProcessorPaths>
+                 </configuration>
+               </execution>
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
+index 61c59b613..77b8ba8ba 100644
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
+@@ -63,6 +63,7 @@ public final class DetailNodeTreeStringPrinter {
+      * @return DetailNode tree
+      * @throws IllegalArgumentException if there is an error parsing the Javadoc.
+      */
++    @SuppressWarnings("CheckArgumentWithMessage")
+     public static DetailNode parseJavadocAsDetailNode(DetailAST blockComment) {
+         final JavadocDetailNodeParser parser = new JavadocDetailNodeParser();
+         final ParseStatus status = parser.parseJavadocAsDetailNode(blockComment);
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocNodeImpl.java b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocNodeImpl.java
+index fd90c4259..0c1b4f141 100644
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocNodeImpl.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocNodeImpl.java
+@@ -20,7 +20,6 @@
+ package com.puppycrawl.tools.checkstyle.checks.javadoc;
+
+ import java.util.Arrays;
+-import java.util.Objects;
+ import java.util.Optional;
+
+ import com.puppycrawl.tools.checkstyle.api.DetailNode;
+@@ -180,7 +179,7 @@ public class JavadocNodeImpl implements DetailNode {
+                 + ", text='" + text + '\''
+                 + ", lineNumber=" + lineNumber
+                 + ", columnNumber=" + columnNumber
+-                + ", children=" + Objects.hashCode(children)
++                + ", children=" + Arrays.hashCode(children)
+                 + ", parent=" + parent + ']';
+     }
+

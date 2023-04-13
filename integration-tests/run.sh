@@ -3,7 +3,7 @@
 set -e -u -o pipefail
 
 project=checkstyle
-revision=checkstyle-10.5.0
+revision=checkstyle-10.9.3
 
 if [ "${#}" -gt 1 ] || [[ ${1:---sync} != '--sync' ]]; then
   echo "Usage: ${0} [--sync]"
