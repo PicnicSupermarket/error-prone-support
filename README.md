@@ -171,8 +171,15 @@ rules][refaster-rules].
 ## 👷 Developing Error Prone Support
 
 This is a [Maven][maven] project, so running `mvn clean install` performs a
-full clean build and installs the library to your local Maven repository. Some
-relevant flags:
+full clean build and installs the library to your local Maven repository.
+
+Once you've made changes, the build may fail due to a warning or error emitted
+by static code analysis. The flags and commands listed below allow you to
+suppress or (in a large subset of cases) automatically fix such cases. Make
+sure to carefully check the available options, as this can save you significant
+amounts of development time!
+
+Relevant Maven build parameters:
 
 - `-Dverification.warn` makes the warnings and errors emitted by various
   plugins and the Java compiler non-fatal, where possible.
@@ -189,19 +196,25 @@ relevant flags:
   Pending a release of [google/error-prone#3301][error-prone-pull-3301], this
   flag must currently be used in combination with `-Perror-prone-fork`.
 
-Some other commands one may find relevant:
+Other highly relevant commands:
 
 - `mvn fmt:format` formats the code using
   [`google-java-format`][google-java-format].
-- `./run-mutation-tests.sh` runs mutation tests using [Pitest][pitest]. The
-  results can be reviewed by opening the respective
+- [`./run-full-build.sh`][script-run-full-build] builds the project twice,
+  where the second pass validates compatbility with Picnic's [Error Prone
+  fork][error-prone-fork-repo] and compliance of the code with any rules
+  defined within this project. (Consider running this before [opening a pull
+  request][contributing-pull-request], as the PR checks also perform this
+  validation.)
+- [`./apply-error-prone-suggestions.sh`][script-apply-error-prone-suggestions]
+  applies Error Prone and Error Prone Support code suggestions to this project.
+  Before running this command, make sure to have installed the project (`mvn
+  clean install`) and make sure that the current working directory does not
+  contain unstaged or uncommited changes.
+- [`./run-mutation-tests.sh`][script-run-mutation-tests] runs mutation tests
+  using [Pitest][pitest]. The results can be reviewed by opening the respective
   `target/pit-reports/index.html` files. For more information check the [PIT
   Maven plugin][pitest-maven].
-- `./apply-error-prone-suggestions.sh` applies Error Prone and Error Prone
-  Support code suggestions to this project. Before running this command, make
-  sure to have installed the project (`mvn clean install`) and make sure that
-  the current working directory does not contain unstaged or uncommited
-  changes.
 
 When running the project's tests in IntelliJ IDEA, you might see the following
 error:
@@ -228,9 +241,15 @@ Want to report or fix a bug, suggest or add a new feature, or improve the
 documentation? That's awesome! Please read our [contribution
 guidelines][contributing].
 
+### Security
+
+If you want to report a security vulnerablity, please do so through a private
+channel; please see our [security policy][security] for details.
+
 [bug-checks]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
 [bug-checks-identity-conversion]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/IdentityConversion.java
 [contributing]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md
+[contributing-pull-request]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md#-opening-a-pull-request
 [error-prone-bugchecker]: https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
 [error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
 [error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
@@ -247,8 +266,8 @@ guidelines][contributing].
 [maven-central-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
 [maven-central-search]: https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
 [maven]: https://maven.apache.org
-[picnic-blog]: https://blog.picnic.nl
 [picnic-blog-ep-post]: https://blog.picnic.nl/picnic-loves-error-prone-producing-high-quality-and-consistent-java-code-b8a566be6886
+[picnic-blog]: https://blog.picnic.nl
 [pitest]: https://pitest.org
 [pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
@@ -257,3 +276,7 @@ guidelines][contributing].
 [refaster-rules]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/
 [reproducible-builds-badge]: https://img.shields.io/badge/Reproducible_Builds-ok-success?labelColor=1e5b96
 [reproducible-builds-report]: https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/tech/picnic/error-prone-support/error-prone-support/README.md
+[script-apply-error-prone-suggestions]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/apply-error-prone-suggestions.sh
+[script-run-full-build]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-full-build.sh
+[script-run-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-mutation-tests.sh
+[security]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/SECURITY.md
