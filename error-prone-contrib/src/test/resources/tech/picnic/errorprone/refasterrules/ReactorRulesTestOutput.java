@@ -142,7 +142,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Mono<?>> testMonoIdentity() {
-    return ImmutableSet.of(Mono.just(1), Mono.just(2), Mono.just(3), Mono.<Void>empty());
+    return ImmutableSet.of(
+        Mono.just(1),
+        Mono.just(2),
+        Mono.just(3),
+        Mono.<Void>empty(),
+        Mono.<ImmutableList<String>>empty());
   }
 
   ImmutableSet<Flux<Integer>> testFluxSwitchIfEmptyOfEmptyPublisher() {
@@ -364,6 +369,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Flux<Integer> testFluxFilterSortWithComparator() {
     return Flux.just(1, 4, 3, 2).filter(i -> i % 2 == 0).sort(reverseOrder());
+  }
+
+  Mono<List<Integer>> testFluxCollectToImmutableList() {
+    return Flux.just(1).collect(toImmutableList());
   }
 
   Mono<ImmutableSet<Integer>> testFluxCollectToImmutableSet() {
