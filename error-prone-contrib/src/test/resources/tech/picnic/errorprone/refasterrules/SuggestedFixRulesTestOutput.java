@@ -5,7 +5,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class SuggestFixRulesTest implements RefasterRuleCollectionTestCase {
+final class SuggestedFixRulesTest implements RefasterRuleCollectionTestCase {
   SuggestedFix testSuggestedFixDelete() {
     return SuggestedFix.delete(null);
   }

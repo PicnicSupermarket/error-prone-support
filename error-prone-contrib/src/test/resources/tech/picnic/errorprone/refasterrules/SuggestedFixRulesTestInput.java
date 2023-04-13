@@ -1,10 +1,11 @@
 package tech.picnic.errorprone.refasterrules;
 
+import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
-final class SuggestFixRulesTest implements RefasterRuleCollectionTestCase {
+final class SuggestedFixRulesTest implements RefasterRuleCollectionTestCase {
   SuggestedFix testSuggestedFixDelete() {
     return SuggestedFix.builder().delete(null).build();
   }
