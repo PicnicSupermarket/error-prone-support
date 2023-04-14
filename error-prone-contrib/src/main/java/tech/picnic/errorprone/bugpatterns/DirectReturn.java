@@ -14,6 +14,7 @@ import static com.google.errorprone.matchers.Matchers.toType;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -26,14 +27,18 @@ import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.TryTree;
 import com.sun.source.tree.VariableTree;
+import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symbol;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.MoreASTHelpers;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
@@ -75,7 +80,10 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
     StatementTree precedingStatement = statements.get(statements.size() - 2);
 
     return tryMatchAssignment(variableSymbol, precedingStatement)
-        .filter(resultExpr -> canInlineToReturnStatement(resultExpr, state))
+        .filter(
+            resultExpr ->
+                canInlineToReturnStatement(resultExpr, state)
+                    && !isIdentifierSymbolReferencedInAssociatedFinallyBlock(variableSymbol, state))
         .map(
             resultExpr ->
                 describeMatch(
@@ -113,13 +121,13 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
   }
 
   /**
-   * Tells whether inlining the given expression to the associated return statement can be done
-   * safely.
+   * Tells whether inlining the given expression to the associated return statement can likely be
+   * done without changing the expression's return type.
    *
-   * <p>Inlining is generally safe, but in rare cases the operation may have a functional impact.
-   * The sole case considered here is the inlining of a Mockito mock or spy construction without an
-   * explicit type. In such a case the type created depends on context, such as the method's return
-   * type.
+   * <p>Inlining an expression generally does not change its return type, but in rare cases the
+   * operation may have a functional impact. The sole case considered here is the inlining of a
+   * Mockito mock or spy construction without an explicit type. In such a case the type created
+   * depends on context, such as the method's return type.
    */
   private static boolean canInlineToReturnStatement(
       ExpressionTree expressionTree, VisitorState state) {
@@ -127,5 +135,41 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
         || MoreASTHelpers.findMethodExitedOnReturn(state)
             .filter(m -> MoreASTHelpers.areSameType(expressionTree, m.getReturnType(), state))
             .isPresent();
+  }
+
+  /**
+   * Tells whether the given identifier {@link Symbol} is referenced in a {@code finally} block that
+   * is executed <em>after</em> control flow returns from the {@link VisitorState#getPath() current
+   * location}.
+   */
+  private static boolean isIdentifierSymbolReferencedInAssociatedFinallyBlock(
+      Symbol symbol, VisitorState state) {
+    return Streams.zip(
+            Streams.stream(state.getPath()).skip(1),
+            Streams.stream(state.getPath()),
+            (tree, child) -> {
+              if (!(tree instanceof TryTree)) {
+                return null;
+              }
+
+              BlockTree finallyBlock = ((TryTree) tree).getFinallyBlock();
+              return !child.equals(finallyBlock) ? finallyBlock : null;
+            })
+        .anyMatch(finallyBlock -> referencesIdentifierSymbol(symbol, finallyBlock));
+  }
+
+  private static boolean referencesIdentifierSymbol(Symbol symbol, @Nullable BlockTree tree) {
+    return Boolean.TRUE.equals(
+        new TreeScanner<Boolean, @Nullable Void>() {
+          @Override
+          public Boolean visitIdentifier(IdentifierTree node, @Nullable Void unused) {
+            return symbol.equals(ASTHelpers.getSymbol(node));
+          }
+
+          @Override
+          public Boolean reduce(Boolean r1, Boolean r2) {
+            return Boolean.TRUE.equals(r1) || Boolean.TRUE.equals(r2);
+          }
+        }.scan(tree, null));
   }
 }
