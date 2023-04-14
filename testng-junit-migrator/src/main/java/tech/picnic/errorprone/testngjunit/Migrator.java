@@ -40,7 +40,7 @@ interface Migrator {
    * @param annotation The metadata for the annotation that will be fixed.
    * @param methodTree The test {@link MethodTree}.
    * @param state The visitor state.
-   * @return {@code true} if the annotation argument can be migrated or else {@code false}
+   * @return {@code true} if the annotation argument can be migrated or else {@code false}.
    */
   boolean canFix(
       TestNGMetadata metadata,

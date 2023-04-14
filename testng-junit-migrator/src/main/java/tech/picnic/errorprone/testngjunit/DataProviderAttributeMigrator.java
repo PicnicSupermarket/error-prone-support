@@ -9,6 +9,7 @@ import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.util.Optional;
+import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.util.SourceCode;
 
 /** A {@link Migrator} that migrates the {@code dataProvider} argument. */
@@ -33,10 +34,10 @@ final class DataProviderAttributeMigrator implements Migrator {
   @Override
   public boolean canFix(
       TestNGMetadata metadata,
-      TestNGMetadata.AnnotationMetadata annotation,
+      AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {
-    ExpressionTree dataProviderNameExpression = annotation.getArguments().get("dataProvider");
+    ExpressionTree dataProviderNameExpression = annotation.getAttributes().get("dataProvider");
     if (dataProviderNameExpression == null) {
       return false;
     }

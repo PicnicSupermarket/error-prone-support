@@ -8,32 +8,30 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
+import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 
-/**
- * A {@link tech.picnic.errorprone.testngjunit.Migrator} that migrates the {@code enabled} argument.
- */
+/** A {@link Migrator} that migrates the {@code enabled} attribute. */
 @Immutable
 final class EnabledAttributeMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
-    if (!(boolean) ((LiteralTree) dataValue).getValue()) {
-      return Optional.of(
-          SuggestedFix.builder()
-              .addImport("org.junit.jupiter.api.Disabled")
-              .merge(SuggestedFix.prefixWith(methodTree, "@Disabled\n"))
-              .build());
-    }
-
-    return Optional.empty();
+    return Optional.ofNullable(((LiteralTree) dataValue).getValue())
+        .filter(Boolean.FALSE::equals)
+        .map(
+            unused ->
+                SuggestedFix.builder()
+                    .addImport("org.junit.jupiter.api.Disabled")
+                    .merge(SuggestedFix.prefixWith(methodTree, "@Disabled\n"))
+                    .build());
   }
 
   @Override
   public boolean canFix(
       TestNGMetadata metadata,
-      TestNGMetadata.AnnotationMetadata annotation,
+      AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {
-    return annotation.getArguments().containsKey("enabled");
+    return annotation.getAttributes().containsKey("enabled");
   }
 }
