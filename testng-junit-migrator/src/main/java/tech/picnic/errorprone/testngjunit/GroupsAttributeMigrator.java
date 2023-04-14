@@ -12,6 +12,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.Tree;
 import java.util.Optional;
+import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.util.SourceCode;
 
 /**
@@ -31,11 +32,11 @@ final class GroupsAttributeMigrator implements Migrator {
   @Override
   public boolean canFix(
       TestNGMetadata metadata,
-      TestNGMetadata.AnnotationMetadata annotation,
+      AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {
-    return annotation.getArguments().containsKey("groups")
-        && extractGroups(annotation.getArguments().get("groups"), state).stream()
+    return annotation.getAttributes().containsKey("groups")
+        && extractGroups(annotation.getAttributes().get("groups"), state).stream()
             .allMatch(GroupsAttributeMigrator::isValidTagName);
   }
 

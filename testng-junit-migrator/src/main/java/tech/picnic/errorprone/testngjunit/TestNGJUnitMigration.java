@@ -27,14 +27,18 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 /**
  * A {@link BugChecker} that migrates TestNG unit tests to JUnit 5.
  *
- * <p>Supported TestNG annotation arguments are:
+ * <p>Supported TestNG annotation attributes are:
  *
  * <ul>
  *   <li>{@code dataProvider}
  *   <li>{@code description}
+ *   <li>{@code isEnabled}
  *   <li>{@code expectedExceptions}
  *   <li>{@code priority}
+ *   <li>{@code groups}
  * </ul>
+ *
+ * // XXX: Mention the setup teardown methods?
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -117,7 +121,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
             .ifPresent(
                 annotation -> {
                   SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
-                  buildArgumentFixes(metaData.getClassTree(), annotation, tree, state)
+                  buildAttributeFixes(metaData.getClassTree(), annotation, tree, state)
                       .forEach(fixBuilder::merge);
 
                   fixBuilder.merge(migrateAnnotation(annotation, tree));
@@ -132,12 +136,12 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
     return Description.NO_MATCH;
   }
 
-  private static ImmutableList<SuggestedFix> buildArgumentFixes(
+  private static ImmutableList<SuggestedFix> buildAttributeFixes(
       ClassTree classTree,
       AnnotationMetadata annotationMetadata,
       MethodTree methodTree,
       VisitorState state) {
-    return annotationMetadata.getArguments().entrySet().stream()
+    return annotationMetadata.getAttributes().entrySet().stream()
         .flatMap(
             entry ->
                 trySuggestFix(classTree, methodTree, entry.getKey(), entry.getValue(), state)
@@ -150,12 +154,13 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       TestNGMetadata metadata,
       AnnotationMetadata annotationMetadata,
       VisitorState state) {
-    return annotationMetadata.getArguments().keySet().stream()
+    return annotationMetadata.getAttributes().keySet().stream()
         .map(TestAnnotationAttribute::fromString)
         .flatMap(Optional::stream)
         .allMatch(
             kind ->
-                kind.getAttributeMigrator().canFix(metadata, annotationMetadata, methodTree, state));
+                kind.getAttributeMigrator()
+                    .canFix(metadata, annotationMetadata, methodTree, state));
   }
 
   private static Optional<SuggestedFix> trySuggestFix(
@@ -173,7 +178,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       AnnotationMetadata annotationMetadata, MethodTree methodTree) {
     SuggestedFix.Builder fixBuilder =
         SuggestedFix.builder().merge(SuggestedFix.delete(annotationMetadata.getAnnotationTree()));
-    if (!annotationMetadata.getArguments().containsKey("dataProvider")) {
+    if (!annotationMetadata.getAttributes().containsKey("dataProvider")) {
       fixBuilder.merge(SuggestedFix.prefixWith(methodTree, "@org.junit.jupiter.api.Test\n"));
     }
 

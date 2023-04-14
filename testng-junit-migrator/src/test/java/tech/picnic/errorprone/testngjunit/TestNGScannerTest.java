@@ -219,7 +219,7 @@ final class TestNGScannerTest {
     private static String createMetaDataMessage(
         ClassTree classTree, AnnotationMetadata annotationMetadata) {
       return String.format(
-          "Class: %s arguments: %s", classTree.getSimpleName(), annotationMetadata.getArguments());
+          "Class: %s arguments: %s", classTree.getSimpleName(), annotationMetadata.getAttributes());
     }
   }
 }

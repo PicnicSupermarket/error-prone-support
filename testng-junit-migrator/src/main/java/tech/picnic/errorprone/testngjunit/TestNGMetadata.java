@@ -49,7 +49,7 @@ abstract class TestNGMetadata {
                     .anyMatch(
                         annotation -> {
                           ExpressionTree dataProviderNameExpression =
-                              annotation.getArguments().get("dataProvider");
+                              annotation.getAttributes().get("dataProvider");
                           if (dataProviderNameExpression == null) {
                             return false;
                           }
@@ -133,18 +133,18 @@ abstract class TestNGMetadata {
     public abstract AnnotationTree getAnnotationTree();
 
     /**
-     * A mapping for all arguments in the annotation to their value.
+     * A mapping for all attributes in the annotation to their value.
      *
-     * @return an {@link ImmutableMap} mapping each annotation argument to their respective value.
+     * @return an {@link ImmutableMap} mapping each annotation attribute to their respective value.
      */
-    public abstract ImmutableMap<String, ExpressionTree> getArguments();
+    public abstract ImmutableMap<String, ExpressionTree> getAttributes();
 
     /**
      * Instantiate a new {@link AnnotationMetadata}.
      *
-     * @param annotationTree the annotation tree
-     * @param arguments the arguments in that annotation tree
-     * @return the new {@link AnnotationMetadata} instance
+     * @param annotationTree The annotation tree.
+     * @param arguments The arguments in that annotation tree.
+     * @return The new {@link AnnotationMetadata} instance.
      */
     public static AnnotationMetadata create(
         AnnotationTree annotationTree, ImmutableMap<String, ExpressionTree> arguments) {
@@ -154,7 +154,8 @@ abstract class TestNGMetadata {
 
   @SuppressWarnings("ImmutableEnumChecker" /* Matcher instances are final. */)
   public enum SetupTeardownType {
-    // XXX: Consider using @BeforeAll for better behavior preservation, but note that it requires a
+    // XXX: Consider using `@BeforeAll` for better behavior preservation, but note that it requires
+    // a
     // static method and may cause breaking changes.
     BEFORE_TEST(
         "org.testng.annotations.BeforeTest",
@@ -168,7 +169,7 @@ abstract class TestNGMetadata {
         "org.testng.annotations.BeforeMethod",
         "org.junit.jupiter.api.BeforeEach",
         /* requiresStaticMethod= */ false),
-    // XXX: Consider using @AfterAll for better behavior preservation, but note that it requires a
+    // XXX: Consider using `@AfterAll` for better behavior preservation, but note that it requires a
     // static method and may cause breaking changes.
     AFTER_TEST(
         "org.testng.annotations.AfterTest",
@@ -190,8 +191,8 @@ abstract class TestNGMetadata {
 
     SetupTeardownType(
         String testNGAnnotationClass, String junitAnnotationClass, boolean requiresStaticMethod) {
-      this.annotationMatcher = isType(testNGAnnotationClass);
-      this.methodTreeMatcher = hasAnnotation(testNGAnnotationClass);
+      annotationMatcher = isType(testNGAnnotationClass);
+      methodTreeMatcher = hasAnnotation(testNGAnnotationClass);
       this.junitAnnotationClass = junitAnnotationClass;
       this.requiresStaticMethod = requiresStaticMethod;
     }
@@ -228,8 +229,8 @@ abstract class TestNGMetadata {
     /**
      * Instantiate a new {@link DataProviderMetadata} instance.
      *
-     * @param methodTree the value factory method tree
-     * @return a new {@link DataProviderMetadata} instance
+     * @param methodTree The value factory method tree.
+     * @return A new {@link DataProviderMetadata} instance.
      */
     public static DataProviderMetadata create(MethodTree methodTree) {
       return new AutoValue_TestNGMetadata_DataProviderMetadata(

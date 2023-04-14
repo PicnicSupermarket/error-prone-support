@@ -7,6 +7,7 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
+import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.util.SourceCode;
 
 /** A {@link Migrator} that migrates the {@code description} attribute. */
@@ -28,9 +29,9 @@ final class DescriptionAttributeMigrator implements Migrator {
   @Override
   public boolean canFix(
       TestNGMetadata metadata,
-      TestNGMetadata.AnnotationMetadata annotation,
+      AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {
-    return annotation.getArguments().containsKey("description");
+    return annotation.getAttributes().containsKey("description");
   }
 }

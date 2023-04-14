@@ -35,11 +35,11 @@ final class DataProviderMigrator {
    */
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, VisitorState state) {
-    return migrateDataProvider(methodTree, classTree, state);
+    return tryMigrateDataProvider(methodTree, classTree, state);
   }
 
   /**
-   * Get whether the specified {@code DataProvider} can be migrated.
+   * Tells whether the specified {@code DataProvider} can be migrated.
    *
    * @param methodTree The dataprovider methode tree.
    * @return {@code true} if the data provider can be migrated or else {@code false}.
@@ -48,7 +48,7 @@ final class DataProviderMigrator {
     return getDataProviderReturnTree(getReturnTree(methodTree)).isPresent();
   }
 
-  private static Optional<SuggestedFix> migrateDataProvider(
+  private static Optional<SuggestedFix> tryMigrateDataProvider(
       MethodTree methodTree, ClassTree classTree, VisitorState state) {
     ReturnTree returnTree = getReturnTree(methodTree);
 
