@@ -7,10 +7,11 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
+import tech.picnic.errorprone.util.SourceCode;
 
-/** An {@link Migrator} that migrates the {@code priority} argument. */
+/** A {@link Migrator} that migrates the {@code priority} argument. */
 @Immutable
-final class PriorityArgumentMigrator implements Migrator {
+final class PriorityAttributeMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {

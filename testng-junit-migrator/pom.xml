@@ -11,7 +11,7 @@
     <artifactId>testng-junit-migrator</artifactId>
 
     <name>Picnic :: Error Prone Support :: TestNG JUnit Migrator</name>
-    <description>A TestNG to JUnit migration tool built on Error Prone Support</description>
+    <description>A tool to migrate TestNG tests to JUnit</description>
 
     <dependencies>
         <dependency>

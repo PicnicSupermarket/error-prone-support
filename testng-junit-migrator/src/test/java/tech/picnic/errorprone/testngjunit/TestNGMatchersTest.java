@@ -45,10 +45,7 @@ final class TestNGMatchersTest {
         .doTest();
   }
 
-  /**
-   * A {@link com.google.errorprone.BugPattern} used to report TestNG annotations as errors for
-   * testing purposes.
-   */
+  /** A {@link BugChecker} used to report TestNG annotations as errors for testing purposes. */
   @BugPattern(summary = "Interacts with `TestNGMatchers` for testing purposes", severity = ERROR)
   public static final class TestNGMatchersTestChecker extends BugChecker
       implements MethodTreeMatcher, AnnotationTreeMatcher {
