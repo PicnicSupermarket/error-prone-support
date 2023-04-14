@@ -22,7 +22,7 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 @Immutable
 interface Migrator {
   /**
-   * Attempt to create a {@link SuggestedFix}.
+   * Attempts to create a {@link SuggestedFix}.
    *
    * @param classTree The class tree containing the test.
    * @param methodTree The method tree the annotation is on.
@@ -34,7 +34,7 @@ interface Migrator {
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state);
 
   /**
-   * Get whether the specified annotation can be migrated.
+   * Tells whether the specified annotation can be migrated.
    *
    * @param metadata The metadata that will be fixed.
    * @param annotation The metadata for the annotation that will be fixed.

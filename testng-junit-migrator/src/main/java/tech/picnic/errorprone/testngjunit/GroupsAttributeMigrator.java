@@ -12,12 +12,13 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.Tree;
 import java.util.Optional;
+import tech.picnic.errorprone.util.SourceCode;
 
 /**
  * A {@link tech.picnic.errorprone.testngjunit.Migrator} that migrates the {@code group} argument.
  */
 @Immutable
-final class GroupsArgumentMigrator implements Migrator {
+final class GroupsAttributeMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
@@ -35,7 +36,7 @@ final class GroupsArgumentMigrator implements Migrator {
       VisitorState state) {
     return annotation.getArguments().containsKey("groups")
         && extractGroups(annotation.getArguments().get("groups"), state).stream()
-            .allMatch(GroupsArgumentMigrator::isValidTagName);
+            .allMatch(GroupsAttributeMigrator::isValidTagName);
   }
 
   private static boolean isValidTagName(String tagName) {

@@ -14,10 +14,11 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import java.util.Optional;
+import tech.picnic.errorprone.util.SourceCode;
 
-/** An {@link Migrator} that migrates the {@code expectedExceptions} argument. */
+/** A {@link Migrator} that migrates the {@code expectedExceptions} argument. */
 @Immutable
-final class ExpectedExceptionsArgumentMigrator implements Migrator {
+final class ExpectedExceptionsAttributeMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {

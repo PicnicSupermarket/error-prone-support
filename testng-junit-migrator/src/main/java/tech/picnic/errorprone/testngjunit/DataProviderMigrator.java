@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import tech.picnic.errorprone.util.SourceCode;
 
 /** A helper class that migrates a TestNG {@code DataProvider} to a JUnit {@code MethodSource}. */
 final class DataProviderMigrator {

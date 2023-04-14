@@ -62,7 +62,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
    * @param flags the error-prone flags used to set the migration mode.
    */
   public TestNGJUnitMigration(ErrorProneFlags flags) {
-    this.conservativeMode = flags.getBoolean(CONSERVATIVE_MIGRATION_MODE_FLAG).orElse(false);
+    conservativeMode = flags.getBoolean(CONSERVATIVE_MIGRATION_MODE_FLAG).orElse(false);
   }
 
   @Override
@@ -94,24 +94,22 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
         metaData
             .getDataProvidersInUse()
             .forEach(
-                dataProviderMetadata -> {
-                  new DataProviderMigrator()
-                      .createFix(
-                          metaData.getClassTree(), dataProviderMetadata.getMethodTree(), state)
-                      .ifPresent(
-                          fix ->
-                              state.reportMatch(
-                                  describeMatch(dataProviderMetadata.getMethodTree(), fix)));
-                });
+                dataProviderMetadata ->
+                    new DataProviderMigrator()
+                        .createFix(
+                            metaData.getClassTree(), dataProviderMetadata.getMethodTree(), state)
+                        .ifPresent(
+                            fix ->
+                                state.reportMatch(
+                                    describeMatch(dataProviderMetadata.getMethodTree(), fix))));
 
         metaData
             .getSetupTeardown()
             .forEach(
-                (method, type) -> {
-                  new SetupTeardownMethodMigrator()
-                      .createFix(method, type, state)
-                      .ifPresent(fix -> state.reportMatch(describeMatch(method, fix)));
-                });
+                (method, type) ->
+                    new SetupTeardownMethodMigrator()
+                        .createFix(method, type, state)
+                        .ifPresent(fix -> state.reportMatch(describeMatch(method, fix))));
 
         metaData
             .getAnnotation(tree)
@@ -130,7 +128,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       }
     }.scan(tree, null);
 
-    /* All suggested fixes are directly reported to the visitor state already! */
+    /* All suggested fixes are directly reported to the visitor state already. */
     return Description.NO_MATCH;
   }
 
@@ -153,11 +151,11 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       AnnotationMetadata annotationMetadata,
       VisitorState state) {
     return annotationMetadata.getArguments().keySet().stream()
-        .map(SupportedArgumentKind::fromString)
+        .map(TestAnnotationAttribute::fromString)
         .flatMap(Optional::stream)
         .allMatch(
             kind ->
-                kind.getArgumentMigrator().canFix(metadata, annotationMetadata, methodTree, state));
+                kind.getAttributeMigrator().canFix(metadata, annotationMetadata, methodTree, state));
   }
 
   private static Optional<SuggestedFix> trySuggestFix(
@@ -166,8 +164,8 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       String argumentName,
       ExpressionTree argumentContent,
       VisitorState state) {
-    return SupportedArgumentKind.fromString(argumentName)
-        .map(SupportedArgumentKind::getArgumentMigrator)
+    return TestAnnotationAttribute.fromString(argumentName)
+        .map(TestAnnotationAttribute::getAttributeMigrator)
         .flatMap(fixer -> fixer.createFix(classTree, methodTree, argumentContent, state));
   }
 

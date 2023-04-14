@@ -30,8 +30,9 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.SetupTeardownType;
 
 /**
  * A {@link TreeScanner} which will scan a {@link com.sun.source.tree.CompilationUnitTree} and
- * collect data required for the migration from each class in the compilation unit. <br>
- * This data can be retrieved using {@link #collectMetadataForClasses(CompilationUnitTree)}
+ * collect data required for the migration from each class in the compilation unit.
+ *
+ * <p>This data can be retrieved using {@link #collectMetadataForClasses(CompilationUnitTree)}.
  */
 final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Builder> {
   private static final Matcher<MethodTree> TESTNG_TEST_METHOD =

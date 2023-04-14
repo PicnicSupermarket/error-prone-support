@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.testngjunit;
+package tech.picnic.errorprone.util;
 
 import com.google.errorprone.VisitorState;
 import com.sun.source.tree.Tree;

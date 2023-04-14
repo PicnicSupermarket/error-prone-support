@@ -9,10 +9,11 @@ import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.util.Optional;
+import tech.picnic.errorprone.util.SourceCode;
 
-/** An {@link Migrator} that migrates the {@code dataProvider} argument. */
+/** A {@link Migrator} that migrates the {@code dataProvider} argument. */
 @Immutable
-final class DataProviderArgumentMigrator implements Migrator {
+final class DataProviderAttributeMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {

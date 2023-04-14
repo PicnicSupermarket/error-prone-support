@@ -5,27 +5,24 @@ import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
+import tech.picnic.errorprone.util.SourceCode;
 
-/**
- * A {@link tech.picnic.errorprone.testngjunit.Migrator} that migrates the {@code enabled} argument.
- */
+/** A {@link Migrator} that migrates the {@code description} attribute. */
 @Immutable
-final class EnabledArgumentMigrator implements Migrator {
+final class DescriptionAttributeMigrator implements Migrator {
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
-    if (!(boolean) ((LiteralTree) dataValue).getValue()) {
-      return Optional.of(
-          SuggestedFix.builder()
-              .addImport("org.junit.jupiter.api.Disabled")
-              .merge(SuggestedFix.prefixWith(methodTree, "@Disabled\n"))
-              .build());
-    }
-
-    return Optional.empty();
+    return Optional.of(
+        SuggestedFix.builder()
+            .addImport("org.junit.jupiter.api.DisplayName")
+            .merge(
+                SuggestedFix.prefixWith(
+                    methodTree,
+                    String.format("@DisplayName(%s)\n", SourceCode.treeToString(dataValue, state))))
+            .build());
   }
 
   @Override
@@ -34,6 +31,6 @@ final class EnabledArgumentMigrator implements Migrator {
       TestNGMetadata.AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {
-    return annotation.getArguments().containsKey("enabled");
+    return annotation.getArguments().containsKey("description");
   }
 }
