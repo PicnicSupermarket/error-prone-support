@@ -83,7 +83,7 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
         .filter(
             resultExpr ->
                 canInlineToReturnStatement(resultExpr, state)
-                    && !isSymbolReferencedInAssociatedFinallyBlock(variableSymbol, state))
+                    && !isIdentifierSymbolReferencedInAssociatedFinallyBlock(variableSymbol, state))
         .map(
             resultExpr ->
                 describeMatch(
@@ -138,11 +138,11 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
   }
 
   /**
-   * Tells whether the given {@link Symbol} is referenced in a {@code finally} block that is
-   * executed <em>after</em> control flow returns from the {@link VisitorState#getPath() current
+   * Tells whether the given identifier {@link Symbol} is referenced in a {@code finally} block that
+   * is executed <em>after</em> control flow returns from the {@link VisitorState#getPath() current
    * location}.
    */
-  private static boolean isSymbolReferencedInAssociatedFinallyBlock(
+  private static boolean isIdentifierSymbolReferencedInAssociatedFinallyBlock(
       Symbol symbol, VisitorState state) {
     return Streams.zip(
             Streams.stream(state.getPath()).skip(1),
