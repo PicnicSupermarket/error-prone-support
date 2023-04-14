@@ -13,10 +13,14 @@ index 476efc1b9..4eab67306 100644
      - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.RequireEmptyLineBeforeBlockTagGroupCheck.isAnotherTagBefore(com.puppycrawl.tools.checkstyle.api.DetailNode)> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getPreviousSibling(com.puppycrawl.tools.checkstyle.api.DetailNode)> in (RequireEmptyLineBeforeBlockTagGroupCheck.java:183)\
      - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.NonEmptyAtclauseDescriptionCheck.hasOnlyEmptyText(com.puppycrawl.tools.checkstyle.api.DetailNode)> calls method <com.puppycrawl.tools.checkstyle.utils.CommonUtil.isBlank(java.lang.String)> in (NonEmptyAtclauseDescriptionCheck.java:185)\
 diff --git a/pom.xml b/pom.xml
-index e47bd227e..31bb3d59e 100644
+index e47bd227e..304b565ed 100644
 --- a/pom.xml
 +++ b/pom.xml
-@@ -233,7 +233,8 @@
+@@ -230,10 +230,12 @@
+     <pitest.junit5.plugin.version>1.1.2</pitest.junit5.plugin.version>
+     <pitest.accelerator.junit5.plugin.version>1.0.4</pitest.accelerator.junit5.plugin.version>
+     <sonar.test.exclusions>**/test/resources/**/*,**/it/resources/**/*</sonar.test.exclusions>
++    <assertj.version>3.24.2</assertj.version>
      <junit.version>5.9.2</junit.version>
      <forbiddenapis.version>3.4</forbiddenapis.version>
      <json-schema-validator.version>1.2.0</json-schema-validator.version>
@@ -26,7 +30,20 @@ index e47bd227e..31bb3d59e 100644
      <checkerframework.version>3.27.0</checkerframework.version>
    </properties>
 
-@@ -2308,15 +2309,25 @@
+@@ -277,6 +279,12 @@
+     </dependency>
+
+     <!-- test scope stuff -->
++    <dependency>
++      <groupId>org.assertj</groupId>
++      <artifactId>assertj-core</artifactId>
++      <version>${assertj.version}</version>
++      <scope>test</scope>
++    </dependency>
+     <dependency>
+       <groupId>org.junit.jupiter</groupId>
+       <artifactId>junit-jupiter-api</artifactId>
+@@ -2308,15 +2316,25 @@
                      <arg>-Xpkginfo:always</arg>
                      <arg>-XDcompilePolicy=simple</arg>
                      <arg>
@@ -54,7 +71,7 @@ index e47bd227e..31bb3d59e 100644
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
-@@ -2361,15 +2372,26 @@
+@@ -2361,15 +2379,26 @@
                      <arg>-XDcompilePolicy=simple</arg>
                      <arg>
                        -Xplugin:ErrorProne \
@@ -84,7 +101,7 @@ index e47bd227e..31bb3d59e 100644
                  </configuration>
                </execution>
 diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
-index 61c59b613..77b8ba8ba 100644
+index 61c59b613..9019964ad 100644
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
 @@ -63,6 +63,7 @@ public final class DetailNodeTreeStringPrinter {
@@ -115,4 +132,5 @@ index fd90c4259..0c1b4f141 100644
 +                + ", children=" + Arrays.hashCode(children)
                  + ", parent=" + parent + ']';
      }
+
 

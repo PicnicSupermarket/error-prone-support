@@ -90,10 +90,6 @@ mvn clean package \
     -Derror-prone.flags="${error_prone_validation_flags}" \
     -Derror-prone-support.version="${error_prone_support_version}" \
     -Dmaven.compiler.showWarnings \
-    -Dtest='
-      !CliOptionsXdocsSyncTest#validateCliDocSections,
-      !MetadataGeneratorUtilTest#metadataFilesGenerationAllFiles,
-      !XdocsJavaDocsTest#allCheckSectionJavaDocs' \
   | tee "${validation_log_file}"
 
 baseline_warnings="../${project}-${revision}-expected-warnings.txt"
