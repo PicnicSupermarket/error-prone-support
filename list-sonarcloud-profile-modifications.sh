@@ -39,4 +39,4 @@ tabulate() {
 
 vimdiff \
   <(export_profile 'Sonar%20way' | tabulate) \
-  <(export_profile 'Picnic' | tabulate)
+  <(export_profile 'Picnic%20Public' | tabulate)
