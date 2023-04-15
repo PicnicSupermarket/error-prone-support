@@ -5,9 +5,16 @@ import static com.google.common.collect.ImmutableListMultimap.toImmutableListMul
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Comparator.naturalOrder;
+import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_RULES_PATTERN_FLAG;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.UnifiedDiffUtils;
+import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.patch.Patch;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableRangeMap;
@@ -16,6 +23,8 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ResourceInfo;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern;
@@ -37,9 +46,18 @@ import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.util.Position;
+import com.theokanning.openai.completion.CompletionRequest;
+import com.theokanning.openai.edit.EditRequest;
+import com.theokanning.openai.service.OpenAiService;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
@@ -121,13 +139,96 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
   public static void validate(Class<?> clazz) {
     String className = clazz.getSimpleName();
 
-    BugCheckerRefactoringTestHelper.newInstance(RefasterRuleCollection.class, clazz)
-        .setArgs(
-            "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
-            "-XepOpt:" + RULE_COLLECTION_FLAG + '=' + className)
-        .addInput(className + "TestInput.java")
-        .addOutput(className + "TestOutput.java")
-        .doTest(TestMode.TEXT_MATCH);
+    try {
+
+      BugCheckerRefactoringTestHelper.newInstance(RefasterRuleCollection.class, clazz)
+          .setArgs(
+              "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+              "-XepOpt:" + RULE_COLLECTION_FLAG + '=' + className)
+          .addInput(className + "TestInput.java")
+          .addOutput(className + "TestOutput.java")
+          .doTest(TEXT_MATCH);
+    } catch (AssertionError failure) {
+      trySuggestFix(className, failure);
+    }
+  }
+
+  private static void trySuggestFix(String className, AssertionError failure) {
+    String prefix = "compilation failed unexpectedly: ";
+    if (!failure.getMessage().startsWith(prefix)) {
+      throw failure;
+    }
+
+    Optional<ResourceInfo> testResource = tryGetTestResource(className);
+    if (testResource.isEmpty()) {
+      throw failure;
+    }
+
+    String errorMessage = failure.getMessage(); // .substring(prefix.length());
+
+    String code;
+    try {
+      code = testResource.orElseThrow().asCharSource(UTF_8).read();
+    } catch (IOException e) {
+      failure.addSuppressed(e);
+      throw failure;
+    }
+
+    //    if (true) {
+    //      throw failure;
+    //    }
+
+    OpenAiService service = new OpenAiService(System.getenv("openapi_token"));
+    EditRequest editRequest =
+        EditRequest.builder()
+            .input(code)
+            .model("code-davinci-edit-001")
+            .instruction("Resolve the following compilation error:\n\n" + errorMessage)
+            .temperature(0.0)
+            .n(1)
+            .build();
+    String result = service.createEdit(editRequest).getChoices().get(0).getText();
+
+    // create unified diff between input and output
+    Patch<String> diff = null;
+    try {
+      diff =
+          DiffUtils.diff(
+              Splitter.on('\n').splitToList(code), Splitter.on('\n').splitToList(result));
+    } catch (DiffException e) {
+      failure.addSuppressed(e);
+      throw failure;
+    }
+
+    String path;
+    try {
+      path = Paths.get(testResource.orElseThrow().url().toURI()).toAbsolutePath().toString();
+    } catch (URISyntaxException e) {
+      failure.addSuppressed(e);
+      throw failure;
+    }
+
+    String patch =
+        UnifiedDiffUtils.generateUnifiedDiff(
+                path, path, Splitter.on('\n').splitToList(code), diff, 3)
+            .stream()
+            .collect(joining("\n"));
+
+    throw new AssertionError(
+        "Compilation failure; consider applying the following patch\n" + patch, failure);
+  }
+
+  private static Optional<ResourceInfo> tryGetTestResource(String className) {
+    try {
+      return Optional.of(
+          ClassPath.from(RefasterRuleCollection.class.getClassLoader()).getResources().stream()
+              .filter(r -> r.getResourceName().endsWith(className + "TestInput.java"))
+              .filter(r -> "file".equals(r.url().getProtocol()))
+              .findFirst()
+              .orElseThrow());
+    } catch (IOException | NoSuchElementException e) {
+      return Optional.empty();
+    }
   }
 
   @Override
@@ -326,5 +427,25 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
               toImmutableListMultimap(
                   e -> lineMap.getLineNumber(e.getKey().lowerEndpoint()), Map.Entry::getValue));
     }
+  }
+
+  static void TEST() throws UnknownHostException, DiffException {
+    //    if (true){return;}
+
+    //     completion();
+    //    edit();
+  }
+
+  private static void completion() throws UnknownHostException {
+    OpenAiService service = new OpenAiService(System.getenv("openapi_token"));
+    CompletionRequest completionRequest =
+        CompletionRequest.builder()
+            .prompt("Somebody once told me the world is gonna roll me")
+            .model("ada")
+            .echo(true)
+            .user(InetAddress.getLocalHost().getHostName())
+            .temperature(0.0)
+            .build();
+    service.createCompletion(completionRequest).getChoices().forEach(System.out::println);
   }
 }

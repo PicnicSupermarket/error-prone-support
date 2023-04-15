@@ -338,6 +338,25 @@
                 <artifactId>nopen-checker</artifactId>
                 <version>${version.nopen-checker}</version>
             </dependency>
+<<<<<<< HEAD
+||||||| parent of cd9fd6b2 (WIP)
+            <dependency>
+                <groupId>com.newrelic.agent.java</groupId>
+                <artifactId>newrelic-api</artifactId>
+                <version>8.0.1</version>
+            </dependency>
+=======
+            <dependency>
+                <groupId>com.newrelic.agent.java</groupId>
+                <artifactId>newrelic-api</artifactId>
+                <version>8.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.theokanning.openai-gpt3-java</groupId>
+                <artifactId>service</artifactId>
+                <version>0.12.0</version>
+            </dependency>
+>>>>>>> cd9fd6b2 (WIP)
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>

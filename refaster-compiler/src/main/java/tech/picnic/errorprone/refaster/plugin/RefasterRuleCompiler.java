@@ -10,8 +10,11 @@ import com.sun.tools.javac.api.BasicJavacTask;
  * fully/qualified/Class.refaster} file for each compiled {@code fully.qualified.Class} that
  * contains a Refaster rule.
  */
-@AutoService(Plugin.class)
+@AutoService({
+  Plugin.class,
+})
 public final class RefasterRuleCompiler implements Plugin {
+
   /** Instantiates a new {@link RefasterRuleCompiler} instance. */
   public RefasterRuleCompiler() {}
 

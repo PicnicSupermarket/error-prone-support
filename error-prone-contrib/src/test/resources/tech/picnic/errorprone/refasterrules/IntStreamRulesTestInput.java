@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import java.util.OptionalInt;
 import java.util.function.IntPredicate;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
