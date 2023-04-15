@@ -1,4 +1,4 @@
-# Analyzes the code base using Github's default CodeQL query database.
+# Analyzes the code using GitHub's default CodeQL query database.
 # Identified issues are registered with GitHub's code scanning dashboard. When
 # a pull request is analyzed, any offending lines are annotated. See
 # https://codeql.github.com for details.
