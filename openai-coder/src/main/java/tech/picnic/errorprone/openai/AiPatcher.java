@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refaster.test;
+package tech.picnic.errorprone.openai;
 
 import static com.google.common.base.Verify.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
