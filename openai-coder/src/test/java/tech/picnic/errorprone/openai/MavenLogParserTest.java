@@ -25,8 +25,7 @@ final class MavenLogParserTest {
   private final FileSystem fileSystem =
       Jimfs.newFileSystem(
           Configuration.unix().toBuilder().setWorkingDirectory(WORK_DIRECTORY).build());
-  private final MavenLogParser parser =
-      new MavenLogParser(fileSystem, fileSystem.getPath(WORK_DIRECTORY));
+  private final MavenLogParser parser = new MavenLogParser(fileSystem, fileSystem.getPath(""));
 
   private static Stream<Arguments> extractIssuesTestCases() {
     return Stream.of(
@@ -93,6 +92,7 @@ final class MavenLogParserTest {
         arguments(ImmutableSet.of("/foo.txt"), "foo.txt", Optional.empty()),
         arguments(ImmutableSet.of("/foo.txt"), "/foo.txt", Optional.of("/foo.txt")),
         arguments(ImmutableSet.of("foo.txt"), "foo.txt", Optional.of(WORK_DIRECTORY + "/foo.txt")),
+        arguments(ImmutableSet.of("bar.txt"), "foo.txt", Optional.empty()),
         arguments(
             ImmutableSet.of("foo.txt", "bar.txt"),
             "foo.txt",

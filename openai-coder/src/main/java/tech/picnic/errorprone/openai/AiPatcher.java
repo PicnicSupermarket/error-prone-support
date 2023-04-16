@@ -1,18 +1,12 @@
 package tech.picnic.errorprone.openai;
 
 import static com.google.common.base.Verify.verify;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +20,6 @@ import org.jspecify.annotations.Nullable;
 // CLI.
 public final class AiPatcher {
   private static final Pattern LOG_LINE_START_MARKER = Pattern.compile("^\\[([A-Z]+)\\] ");
-  private static final ImmutableSet<String> ISSUE_LOG_LEVELS = ImmutableSet.of("ERROR", "WARNING");
   private static final Pattern FILE_LOCATION_MARKER =
       Pattern.compile("^(.*?\\.java):\\[(\\d+)(?:,(\\d+))?\\] ");
   // XXX: Rename
@@ -43,7 +36,7 @@ public final class AiPatcher {
     }
 
     try {
-      suggestFixes(getIssuesByFile(getWarningAndErrorMessages(System.in)));
+      suggestFixes(getIssuesByFile(MavenLogParser.extractIssues(System.in)));
     } catch (IOException e) {
       // XXX: Fix
       throw new RuntimeException(e);
@@ -121,43 +114,5 @@ public final class AiPatcher {
                                     : String.format(
                                         "- Line %s, column %s: %s",
                                         m.group(2), m.group(3), message.substring(m.end())))));
-  }
-
-  private static List<String> getWarningAndErrorMessages(InputStream inputStream)
-      throws IOException {
-    List<String> messages = new ArrayList<>();
-
-    boolean shouldRead = false;
-    StringBuilder nextMessage = new StringBuilder();
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, UTF_8))) {
-      for (String line = br.readLine(); line != null; line = br.readLine()) {
-        Optional<String> logLevel = getLogLevel(line);
-
-        if (logLevel.isPresent()) {
-          if (!nextMessage.isEmpty()) {
-            messages.add(nextMessage.toString());
-            nextMessage.setLength(0);
-          }
-
-          shouldRead = ISSUE_LOG_LEVELS.contains(logLevel.orElseThrow());
-        }
-
-        if (shouldRead) {
-          nextMessage.append(line).append(System.lineSeparator());
-        }
-      }
-    }
-
-    if (shouldRead && !nextMessage.isEmpty()) {
-      messages.add(nextMessage.toString());
-    }
-
-    return messages;
-  }
-
-  private static Optional<String> getLogLevel(String line) {
-    return Optional.of(LOG_LINE_START_MARKER.matcher(line))
-        .filter(Matcher::find)
-        .map(m -> m.group(1));
   }
 }

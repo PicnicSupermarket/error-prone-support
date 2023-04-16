@@ -94,7 +94,7 @@ final class MavenLogParser {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
               if (matcher.matches(file)) {
-                inexactMatches.add(file.toAbsolutePath());
+                inexactMatches.add(file);
               }
               return FileVisitResult.CONTINUE;
             }
