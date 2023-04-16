@@ -2,7 +2,6 @@ package tech.picnic.errorprone.openai;
 
 import static com.google.common.base.Verify.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.function.Predicate.not;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -11,12 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -114,7 +109,8 @@ public final class AiPatcher {
         .filter(Matcher::find)
         .ifPresent(
             m ->
-                findPath(m.group(1))
+                new MavenLogParser(FileSystems.getDefault(), Path.of(""))
+                    .findPath(m.group(1))
                     .ifPresent(
                         path ->
                             sink.accept(
@@ -126,42 +122,6 @@ public final class AiPatcher {
                                         "- Line %s, column %s: %s",
                                         m.group(2), m.group(3), message.substring(m.end())))));
   }
-
-  // XXX: name
-  private static Optional<Path> findPath(String pathDescription) {
-    Path path = Path.of(pathDescription).toAbsolutePath();
-    if (Files.exists(path)) {
-      return Optional.of(path);
-    }
-
-    PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**" + pathDescription);
-
-    List<Path> inexactMatches = new ArrayList<>();
-    try {
-      Files.walkFileTree(
-          Path.of("."),
-          new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-              if (matcher.matches(file)) {
-                inexactMatches.add(file.toAbsolutePath());
-              }
-              return FileVisitResult.CONTINUE;
-            }
-          });
-    } catch (IOException e) {
-      // XXX: Log.
-      return Optional.empty();
-    }
-
-    // XXX: Log if not exactly one match.
-    return Optional.of(inexactMatches).filter(not(List::isEmpty)).map(matches -> matches.get(0));
-  }
-
-  //  [ERROR]
-  // /home/sschroevers/workspace/picnic/error-prone-support/refaster-runner/src/main/java/tech/picnic/errorprone/refaster/runner/CodeTransformers.java:[36,12] cannot find symbol
-  //  symbol:   variable ALL_CODE_TRANSFORMERx
-  //  location: class tech.picnic.errorprone.refaster.runner.CodeTransformers
 
   private static List<String> getWarningAndErrorMessages(InputStream inputStream)
       throws IOException {

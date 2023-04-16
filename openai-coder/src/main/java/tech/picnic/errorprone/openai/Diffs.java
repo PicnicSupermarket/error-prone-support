@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.openai;
 
-
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.algorithm.DiffException;
