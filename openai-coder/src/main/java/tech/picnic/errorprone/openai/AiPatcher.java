@@ -3,17 +3,9 @@ package tech.picnic.errorprone.openai;
 import static com.google.common.base.Verify.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.function.Predicate.not;
-import static java.util.stream.Collectors.joining;
 
-import com.github.difflib.DiffUtils;
-import com.github.difflib.UnifiedDiffUtils;
-import com.github.difflib.algorithm.DiffException;
-import com.github.difflib.patch.Patch;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.theokanning.openai.edit.EditRequest;
-import com.theokanning.openai.service.OpenAiService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +27,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 
-// XXX: Move to separate module.
+// XXX: Consider using https://picocli.info/quick-guide.html. Can also be used for an interactive
+// CLI.
 public final class AiPatcher {
   private static final Pattern LOG_LINE_START_MARKER = Pattern.compile("^\\[([A-Z]+)\\] ");
   private static final ImmutableSet<String> ISSUE_LOG_LEVELS = ImmutableSet.of("ERROR", "WARNING");
@@ -66,33 +59,20 @@ public final class AiPatcher {
   }
 
   private static void suggestFixes(ImmutableMap<Path, String> issuesByFile) throws IOException {
-    OpenAiService openAiService = new OpenAiService(OPENAI_TOKEN);
-
-    try {
+    try (OpenAi openAi = OpenAi.create(OPENAI_TOKEN)) {
       for (Map.Entry<Path, String> e : issuesByFile.entrySet()) {
-        suggestFixes(e.getKey(), e.getValue(), openAiService);
+        suggestFixes(e.getKey(), e.getValue(), openAi);
       }
-    } finally {
-      openAiService.shutdownExecutor();
     }
   }
 
-  private static void suggestFixes(Path file, String issueDescriptions, OpenAiService openAiService)
+  private static void suggestFixes(Path file, String issueDescriptions, OpenAi openAi)
       throws IOException {
     //  XXX: Cleanup
 
     String originalCode = Files.readString(file);
-    EditRequest editRequest =
-        EditRequest.builder()
-            .input(originalCode)
-            .model("code-davinci-edit-001")
-            .instruction("Resolve the following Java compilation errors:\n\n" + issueDescriptions)
-            .temperature(0.0)
-            .n(1)
-            .build();
 
     if (file.toString().contains("RefasterRuleCollection")) {
-      System.out.println(editRequest);
       return;
     }
 
@@ -105,32 +85,12 @@ public final class AiPatcher {
     // XXX: Handle case with too much input/output (tokens).
     // XXX: Handle error messages.
 
-    String result = openAiService.createEdit(editRequest).getChoices().get(0).getText();
+    String result =
+        openAi.requestEdit(
+            originalCode, "Resolve the following Java compilation errors:\n\n" + issueDescriptions);
 
     // XXX: !!! Don't create diff in patch mode; just apply the patch.
-
-    // create unified diff between input and output
-    Patch<String> diff = null;
-    try {
-      diff =
-          DiffUtils.diff(
-              Splitter.on('\n').splitToList(originalCode), Splitter.on('\n').splitToList(result));
-    } catch (DiffException e) {
-      // XXX: Handle better
-      System.err.println("Failed to create diff: " + e.getMessage());
-    }
-
-    String patch =
-        UnifiedDiffUtils.generateUnifiedDiff(
-                file.toString(),
-                file.toString(),
-                Splitter.on('\n').splitToList(originalCode),
-                diff,
-                3)
-            .stream()
-            .collect(joining("\n"));
-    System.out.printf("Fix for %s:%n", file);
-    System.out.println(patch);
+    System.out.printf("Fix for %s:%n", Diffs.unifiedDiff(originalCode, result, file.toString()));
   }
 
   private static ImmutableMap<Path, String> getIssuesByFile(List<String> logMessages) {
