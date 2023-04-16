@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.openai;
 
-import static com.google.common.base.Verify.verify;
-
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -19,7 +17,6 @@ import org.jspecify.annotations.Nullable;
 // XXX: Consider using https://picocli.info/quick-guide.html. Can also be used for an interactive
 // CLI.
 public final class AiPatcher {
-  private static final Pattern LOG_LINE_START_MARKER = Pattern.compile("^\\[([A-Z]+)\\] ");
   private static final Pattern FILE_LOCATION_MARKER =
       Pattern.compile("^(.*?\\.java):\\[(\\d+)(?:,(\\d+))?\\] ");
   // XXX: Rename
@@ -36,7 +33,8 @@ public final class AiPatcher {
     }
 
     try {
-      suggestFixes(getIssuesByFile(MavenLogParser.extractIssues(System.in)));
+      suggestFixes(
+          getIssuesByFile(LogLineExtractor.mavenErrorAndWarningExtractor().extract(System.in)));
     } catch (IOException e) {
       // XXX: Fix
       throw new RuntimeException(e);
@@ -93,16 +91,11 @@ public final class AiPatcher {
 
   // XXX: Clean this up.
   private static void extractPathAndMessage(String logLine, BiConsumer<Path, String> sink) {
-    // XXX: Move this to the caller and drop the prefix.
-    Matcher logLineStartMarker = LOG_LINE_START_MARKER.matcher(logLine);
-    verify(logLineStartMarker.find(), "XXX: message");
-
-    String message = logLine.substring(logLineStartMarker.end());
-    Optional.of(FILE_LOCATION_MARKER.matcher(message))
+    Optional.of(FILE_LOCATION_MARKER.matcher(logLine))
         .filter(Matcher::find)
         .ifPresent(
             m ->
-                new MavenLogParser(FileSystems.getDefault(), Path.of(""))
+                new PathFinder(FileSystems.getDefault(), Path.of(""))
                     .findPath(m.group(1))
                     .ifPresent(
                         path ->
@@ -110,9 +103,9 @@ public final class AiPatcher {
                                 path,
                                 m.group(3) == null
                                     ? String.format(
-                                        "- Line %s: %s", m.group(2), message.substring(m.end()))
+                                        "- Line %s: %s", m.group(2), logLine.substring(m.end()))
                                     : String.format(
                                         "- Line %s, column %s: %s",
-                                        m.group(2), m.group(3), message.substring(m.end())))));
+                                        m.group(2), m.group(3), logLine.substring(m.end())))));
   }
 }

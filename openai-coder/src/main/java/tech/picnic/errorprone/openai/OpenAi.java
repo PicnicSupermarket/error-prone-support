@@ -6,6 +6,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.theokanning.openai.edit.EditRequest;
 import com.theokanning.openai.service.OpenAiService;
 
+// XXX: Make final.
 public class OpenAi implements AutoCloseable {
   // XXX: Rename.
   @VisibleForTesting static final String OPENAI_TOKEN_VARIABLE = "openapi_token";

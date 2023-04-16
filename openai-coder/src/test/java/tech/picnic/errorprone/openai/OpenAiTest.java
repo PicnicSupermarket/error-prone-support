@@ -13,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+// XXX: Configure `OPENAI_TOKEN_VARIABLE` as a (secret!) Github Actions token.
 @TestInstance(Lifecycle.PER_CLASS)
 @EnabledIfSystemProperty(named = OPENAI_TOKEN_VARIABLE, matches = ".*")
 final class OpenAiTest {
@@ -24,6 +25,7 @@ final class OpenAiTest {
   }
 
   private static Stream<Arguments> requestEditTestCases() {
+    /* { input, instruction, expected } */
     return Stream.of(
         arguments(
             """

@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 final class DiffsTest {
   private static Stream<Arguments> unifiedDiffTestCases() {
+    /* { before, after, path, expected } */
     return Stream.of(
         arguments("", "", "EmptyFile.java", ""),
         arguments("foo", "foo", "NoLineTerminatorFile.java", ""),
