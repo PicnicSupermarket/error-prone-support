@@ -5,7 +5,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.algorithm.DiffException;
@@ -13,7 +12,6 @@ import com.github.difflib.patch.Patch;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.edit.EditRequest;
 import com.theokanning.openai.service.OpenAiService;
 import java.io.BufferedReader;
@@ -27,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,9 +33,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import okhttp3.OkHttpClient;
 import org.jspecify.annotations.Nullable;
-import retrofit2.Retrofit;
 
 // XXX: Move to separate module.
 public final class AiPatcher {
@@ -65,27 +60,24 @@ public final class AiPatcher {
       // XXX: Fix
       throw new RuntimeException(e);
     }
+
+    // Explicitly exit to prevent `mvn exec:java` from handing due to long-lived OkHTTP threads.
+    System.exit(0);
   }
 
   private static void suggestFixes(ImmutableMap<Path, String> issuesByFile) throws IOException {
-    ObjectMapper mapper = OpenAiService.defaultObjectMapper();
-    OkHttpClient client = OpenAiService.defaultClient(OPENAI_TOKEN, Duration.ofSeconds(10));
-    client.connectionPool().evictAll();
-    Retrofit retrofit = OpenAiService.defaultRetrofit(client, mapper);
-    OpenAiApi openAiApi = retrofit.create(OpenAiApi.class);
+    OpenAiService openAiService = new OpenAiService(OPENAI_TOKEN);
 
     try {
       for (Map.Entry<Path, String> e : issuesByFile.entrySet()) {
-        suggestFixes(e.getKey(), e.getValue(), openAiApi);
+        suggestFixes(e.getKey(), e.getValue(), openAiService);
       }
     } finally {
-      // XXX: This still doesn't prevent `mvn exec:java` from hanging.
-      client.connectionPool().evictAll();
-      client.dispatcher().executorService().shutdownNow();
+      openAiService.shutdownExecutor();
     }
   }
 
-  private static void suggestFixes(Path file, String issueDescriptions, OpenAiApi openAiApi)
+  private static void suggestFixes(Path file, String issueDescriptions, OpenAiService openAiService)
       throws IOException {
     //  XXX: Cleanup
 
@@ -113,8 +105,7 @@ public final class AiPatcher {
     // XXX: Handle case with too much input/output (tokens).
     // XXX: Handle error messages.
 
-    String result =
-        OpenAiService.execute(openAiApi.createEdit(editRequest)).getChoices().get(0).getText();
+    String result = openAiService.createEdit(editRequest).getChoices().get(0).getText();
 
     // XXX: !!! Don't create diff in patch mode; just apply the patch.
 
