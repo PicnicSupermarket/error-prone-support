@@ -8,11 +8,11 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
+import tech.picnic.errorprone.openai.MavenLogParser.JavacAndCheckstyleLogLineAnalyzer;
+import tech.picnic.errorprone.openai.MavenLogParser.LogLineAnalyzer;
 
 // XXX: Consider using https://picocli.info/quick-guide.html. Can also be used for an interactive
 // CLI.
@@ -91,21 +91,21 @@ public final class AiPatcher {
 
   // XXX: Clean this up.
   private static void extractPathAndMessage(String logLine, BiConsumer<Path, String> sink) {
-    Optional.of(FILE_LOCATION_MARKER.matcher(logLine))
-        .filter(Matcher::find)
+    LogLineAnalyzer analyzer =
+        new JavacAndCheckstyleLogLineAnalyzer(
+            new PathFinder(FileSystems.getDefault(), Path.of("")));
+
+    analyzer
+        .analyze(logLine)
+        .findFirst()
         .ifPresent(
-            m ->
-                new PathFinder(FileSystems.getDefault(), Path.of(""))
-                    .findPath(m.group(1))
-                    .ifPresent(
-                        path ->
-                            sink.accept(
-                                path,
-                                m.group(3) == null
-                                    ? String.format(
-                                        "- Line %s: %s", m.group(2), logLine.substring(m.end()))
-                                    : String.format(
-                                        "- Line %s, column %s: %s",
-                                        m.group(2), m.group(3), logLine.substring(m.end())))));
+            issue ->
+                sink.accept(
+                    issue.file(),
+                    issue.column().isEmpty()
+                        ? String.format("- Line %s: %s", issue.line(), issue.message())
+                        : String.format(
+                            "- Line %s, column %s: %s",
+                            issue.line(), issue.column(), issue.message())));
   }
 }
