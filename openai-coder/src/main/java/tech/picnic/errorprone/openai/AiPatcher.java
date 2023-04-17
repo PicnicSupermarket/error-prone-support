@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.openai;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -11,11 +12,13 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.openai.MavenLogParser.JavacAndCheckstyleLogLineAnalyzer;
-import tech.picnic.errorprone.openai.MavenLogParser.LogLineAnalyzer;
 
 // XXX: Consider using https://picocli.info/quick-guide.html. Can also be used for an interactive
 // CLI.
+// XXX: Introduce README.
+// XXX: Consider creating a binary executable using GraalVM.
+// XXX: Add support for sending a suitable subset of the code to OpenAI, so as (a) to better deal
+// with the token limit and (b) potentially reduce cost.
 public final class AiPatcher {
   private static final Pattern FILE_LOCATION_MARKER =
       Pattern.compile("^(.*?\\.java):\\[(\\d+)(?:,(\\d+))?\\] ");
@@ -91,17 +94,20 @@ public final class AiPatcher {
 
   // XXX: Clean this up.
   private static void extractPathAndMessage(String logLine, BiConsumer<Path, String> sink) {
-    LogLineAnalyzer analyzer =
-        new JavacAndCheckstyleLogLineAnalyzer(
-            new PathFinder(FileSystems.getDefault(), Path.of("")));
+    IssueExtractor analyzer =
+        new AggregatingIssueExtractor(
+            ImmutableSet.of(new JavacIssueExtractor(), new CheckstyleIssueExtractor()));
 
     analyzer
-        .analyze(logLine)
+        .extract(logLine)
         .findFirst()
         .ifPresent(
             issue ->
                 sink.accept(
-                    issue.file(),
+                    // XXX: Fix.
+                    new PathFinder(FileSystems.getDefault(), Path.of(""))
+                        .findPath(issue.file())
+                        .orElseThrow(),
                     issue.column().isEmpty()
                         ? String.format("- Line %s: %s", issue.line(), issue.message())
                         : String.format(
