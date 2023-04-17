@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 // XXX: Create another `LogLineAnalyzer` for Error Prone test compiler output.
 // XXX: Also replace "Did you mean to remove" with "Remove"?
-final class JavacIssueExtractor implements IssueExtractor {
+final class JavacIssueExtractor implements IssueExtractor<String> {
   private static final Pattern LOG_LINE_FORMAT =
       Pattern.compile(
           "^(?<file>/.+?\\.java):\\[(?<line>\\d+)(?:,(?<column>\\d+))?\\] (?<message>.+)$",
@@ -23,10 +23,10 @@ final class JavacIssueExtractor implements IssueExtractor {
   private static final Pattern ERROR_PRONE_DOCUMENTATION_REFERENCE =
       Pattern.compile("^\\s*\\(see .+\\)\\s+$");
 
-  private final IssueExtractor delegate = new RegexIssueExtractor(LOG_LINE_FORMAT);
+  private final IssueExtractor<String> delegate = new RegexIssueExtractor(LOG_LINE_FORMAT);
 
   @Override
-  public Stream<Issue> extract(String str) {
+  public Stream<Issue<String>> extract(String str) {
     return delegate
         .extract(str)
         .map(issue -> issue.withMessage(removeErrorProneDocumentationReference(issue.message())));

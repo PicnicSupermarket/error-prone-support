@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import tech.picnic.errorprone.openai.IssueExtractor.Issue;
 
 // XXX: Document contract
-final class RegexIssueExtractor implements IssueExtractor {
+final class RegexIssueExtractor implements IssueExtractor<String> {
   private final Pattern pattern;
 
   RegexIssueExtractor(Pattern pattern) {
@@ -15,12 +15,12 @@ final class RegexIssueExtractor implements IssueExtractor {
   }
 
   @Override
-  public Stream<Issue> extract(String str) {
+  public Stream<Issue<String>> extract(String str) {
     return Stream.of(pattern.matcher(str))
         .filter(Matcher::matches)
         .map(
             matcher ->
-                new Issue(
+                new Issue<>(
                     matcher.group("message"),
                     matcher.group("file"),
                     Integer.parseInt(matcher.group("line")),

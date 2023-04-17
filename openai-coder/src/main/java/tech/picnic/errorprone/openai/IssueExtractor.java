@@ -4,18 +4,24 @@ import java.util.OptionalInt;
 import java.util.stream.Stream;
 
 // XXX: Document
-interface IssueExtractor {
-  Stream<Issue> extract(String str);
+interface IssueExtractor<F> {
+  Stream<Issue<F>> extract(String str);
 
-  // XXX: Make `Path` a `String` and do path lookup post collection? (This would simplify things,
-  // but may close off some future possibilities.)
-  // ^ Not really. Where it matters we can double-resolve.
-  // XXX: ^ Also simplifies testing.
-  // XXX: Or move to separate file?
-  record Issue(String message, String file, int line, OptionalInt column) {
+  // XXX: Move to separate file?
+  // XXX: `file` as first argument? (If so, also swap method order.)
+  record Issue<F>(String message, F file, int line, OptionalInt column) {
+    Issue<F> withMessage(String message) {
+      return new Issue<>(message, file, line, column);
+    }
 
-    Issue withMessage(String message) {
-      return new Issue(message, file, line, column);
+    <T> Issue<T> withFile(T file) {
+      return new Issue<>(message, file, line, column);
+    }
+
+    String description() {
+      return column().isEmpty()
+          ? String.format("Line %s: %s", line(), message())
+          : String.format("Line %s, column %s: %s", line(), column().getAsInt(), message());
     }
   }
 }

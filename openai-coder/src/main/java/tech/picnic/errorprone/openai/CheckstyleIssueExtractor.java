@@ -10,16 +10,16 @@ import java.util.stream.Stream;
 // [ERROR] src/main/java/tech/picnic/errorprone/refaster/plugin/RefasterRuleCompiler.java:[16]
 // (regexp) RegexpMultiline: Avoid blank lines at the start of a block.
 
-final class CheckstyleIssueExtractor implements IssueExtractor {
+final class CheckstyleIssueExtractor implements IssueExtractor<String> {
   private static final Pattern LOG_LINE_FORMAT =
       Pattern.compile(
           "^(?<file>.+?\\.java):\\[(?<line>\\d+)(?:,(?<column>\\d+))?\\] \\(.+?\\) .+: (?<message>.+)$",
           Pattern.DOTALL);
 
-  private final IssueExtractor delegate = new RegexIssueExtractor(LOG_LINE_FORMAT);
+  private final IssueExtractor<String> delegate = new RegexIssueExtractor(LOG_LINE_FORMAT);
 
   @Override
-  public Stream<Issue> extract(String str) {
+  public Stream<Issue<String>> extract(String str) {
     return delegate.extract(str);
   }
 }

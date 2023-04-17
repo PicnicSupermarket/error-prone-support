@@ -1,12 +1,11 @@
 package tech.picnic.errorprone.openai;
 
+import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static java.util.stream.Collectors.joining;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Multimaps;
-import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Streams;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -15,9 +14,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
+import tech.picnic.errorprone.openai.IssueExtractor.Issue;
 
 // XXX: Consider using https://picocli.info/quick-guide.html. Can also be used for an interactive
 // CLI.
@@ -76,11 +75,7 @@ public final class AiPatcher {
         Streams.mapWithIndex(
                 issueDescriptions.stream(),
                 (description, index) -> String.format("%s. %s", index + 1, description))
-            .collect(
-                joining(
-                    "\n",
-                    "Resolve the following issues. Apply the changes one by one. If an instruction is unclear, skip it.\n",
-                    "\n"));
+            .collect(joining("\n", "Resolve the following issues:\n", "\n"));
 
     System.out.println("Instruction: " + instruction);
 
@@ -98,35 +93,15 @@ public final class AiPatcher {
   }
 
   private static ImmutableSetMultimap<Path, String> getIssuesByFile(List<String> logMessages) {
-    SetMultimap<Path, String> messages = HashMultimap.create();
+    // XXX: Allow the path to be specified.
+    IssueExtractor<Path> issueExtractor =
+        new PathResolvingIssueExtractor(
+            new PathFinder(FileSystems.getDefault(), Path.of("")),
+            new AggregatingIssueExtractor<>(
+                ImmutableSet.of(new JavacIssueExtractor(), new CheckstyleIssueExtractor())));
 
-    for (String message : logMessages) {
-      extractPathAndMessage(message, messages::put);
-    }
-
-    return ImmutableSetMultimap.copyOf(messages);
-  }
-
-  // XXX: Clean this up.
-  private static void extractPathAndMessage(String logLine, BiConsumer<Path, String> sink) {
-    IssueExtractor analyzer =
-        new AggregatingIssueExtractor(
-            ImmutableSet.of(new JavacIssueExtractor(), new CheckstyleIssueExtractor()));
-
-    analyzer
-        .extract(logLine)
-        .findFirst()
-        .ifPresent(
-            issue ->
-                sink.accept(
-                    // XXX: Fix.
-                    new PathFinder(FileSystems.getDefault(), Path.of(""))
-                        .findPath(issue.file())
-                        .orElseThrow(),
-                    issue.column().isEmpty()
-                        ? String.format("Line %s: %s", issue.line(), issue.message())
-                        : String.format(
-                            "Line %s, column %s: %s",
-                            issue.line(), issue.column().getAsInt(), issue.message())));
+    return logMessages.stream()
+        .flatMap(issueExtractor::extract)
+        .collect(toImmutableSetMultimap(Issue::file, Issue::description));
   }
 }
