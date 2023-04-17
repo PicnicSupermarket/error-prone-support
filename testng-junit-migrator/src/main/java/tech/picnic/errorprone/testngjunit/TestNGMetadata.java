@@ -155,8 +155,7 @@ abstract class TestNGMetadata {
   @SuppressWarnings("ImmutableEnumChecker" /* Matcher instances are final. */)
   public enum SetupTeardownType {
     // XXX: Consider using `@BeforeAll` for better behavior preservation, but note that it requires
-    // a
-    // static method and may cause breaking changes.
+    // a static method and may cause breaking changes.
     BEFORE_TEST(
         "org.testng.annotations.BeforeTest",
         "org.junit.jupiter.api.BeforeEach",
