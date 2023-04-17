@@ -38,7 +38,10 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
  *   <li>{@code groups}
  * </ul>
  *
- * // XXX: Mention the setup teardown methods?
+ * This migration will also take care of any setup/teardown methods.
+ *
+ * <p>Note: As the {@code @BeforeAll} and {@code @AfterAll} methods in JUnit are required to be
+ * static, this <em>might</em> make breaking changes.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
