@@ -1,10 +1,11 @@
 package tech.picnic.errorprone.testngjunit;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.sun.source.tree.Tree.Kind.NEW_ARRAY;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toMap;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.util.ASTHelpers;
@@ -17,7 +18,6 @@ import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.tools.javac.parser.Tokens;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import tech.picnic.errorprone.util.SourceCode;
 
@@ -134,9 +134,9 @@ final class DataProviderMigrator {
 
     int startPos = ASTHelpers.getStartPosition(newArrayTree);
     int endPos = state.getEndPosition(newArrayTree);
-    Map<Integer, List<Tokens.Comment>> comments =
+    ImmutableMap<Integer, List<Tokens.Comment>> comments =
         state.getOffsetTokens(startPos, endPos).stream()
-            .collect(toMap(ErrorProneToken::pos, ErrorProneToken::comments));
+            .collect(toImmutableMap(ErrorProneToken::pos, ErrorProneToken::comments));
     argumentsBuilder.append(
         newArrayTree.getInitializers().stream()
             .map(
