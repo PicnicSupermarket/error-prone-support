@@ -1,14 +1,20 @@
 package tech.picnic.errorprone.openai;
 
-import com.google.common.collect.ImmutableMap;
+import static java.util.stream.Collectors.joining;
+
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Streams;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
@@ -47,15 +53,16 @@ public final class AiPatcher {
     System.exit(0);
   }
 
-  private static void suggestFixes(ImmutableMap<Path, String> issuesByFile) throws IOException {
+  private static void suggestFixes(ImmutableSetMultimap<Path, String> issuesByFile)
+      throws IOException {
     try (OpenAi openAi = OpenAi.create(OPENAI_TOKEN)) {
-      for (Map.Entry<Path, String> e : issuesByFile.entrySet()) {
+      for (Map.Entry<Path, Set<String>> e : Multimaps.asMap(issuesByFile).entrySet()) {
         suggestFixes(e.getKey(), e.getValue(), openAi);
       }
     }
   }
 
-  private static void suggestFixes(Path file, String issueDescriptions, OpenAi openAi)
+  private static void suggestFixes(Path file, Set<String> issueDescriptions, OpenAi openAi)
       throws IOException {
     //  XXX: Cleanup
 
@@ -65,7 +72,17 @@ public final class AiPatcher {
       return;
     }
 
-    System.out.println("Instruction: " + issueDescriptions);
+    String instruction =
+        Streams.mapWithIndex(
+                issueDescriptions.stream(),
+                (description, index) -> String.format("%s. %s", index + 1, description))
+            .collect(
+                joining(
+                    "\n",
+                    "Resolve the following issues. Apply the changes one by one. If an instruction is unclear, skip it.\n",
+                    "\n"));
+
+    System.out.println("Instruction: " + instruction);
 
     if (true) {
       //      return;
@@ -74,22 +91,20 @@ public final class AiPatcher {
     // XXX: Handle case with too much input/output (tokens).
     // XXX: Handle error messages.
 
-    String result =
-        openAi.requestEdit(
-            originalCode, "Resolve the following Java compilation errors:\n\n" + issueDescriptions);
+    String result = openAi.requestEdit(originalCode, instruction);
 
     // XXX: !!! Don't create diff in patch mode; just apply the patch.
     System.out.printf("Fix for %s:%n", Diffs.unifiedDiff(originalCode, result, file.toString()));
   }
 
-  private static ImmutableMap<Path, String> getIssuesByFile(List<String> logMessages) {
-    Map<Path, String> messages = new HashMap<>();
+  private static ImmutableSetMultimap<Path, String> getIssuesByFile(List<String> logMessages) {
+    SetMultimap<Path, String> messages = HashMultimap.create();
 
     for (String message : logMessages) {
-      extractPathAndMessage(message, (path, m) -> messages.merge(path, m, String::concat));
+      extractPathAndMessage(message, messages::put);
     }
 
-    return ImmutableMap.copyOf(messages);
+    return ImmutableSetMultimap.copyOf(messages);
   }
 
   // XXX: Clean this up.
@@ -109,9 +124,9 @@ public final class AiPatcher {
                         .findPath(issue.file())
                         .orElseThrow(),
                     issue.column().isEmpty()
-                        ? String.format("- Line %s: %s", issue.line(), issue.message())
+                        ? String.format("Line %s: %s", issue.line(), issue.message())
                         : String.format(
-                            "- Line %s, column %s: %s",
-                            issue.line(), issue.column(), issue.message())));
+                            "Line %s, column %s: %s",
+                            issue.line(), issue.column().getAsInt(), issue.message())));
   }
 }

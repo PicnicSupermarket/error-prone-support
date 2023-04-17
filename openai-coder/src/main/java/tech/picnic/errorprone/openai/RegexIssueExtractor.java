@@ -4,6 +4,7 @@ import java.util.OptionalInt;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.openai.IssueExtractor.Issue;
 
 // XXX: Document contract
 final class RegexIssueExtractor implements IssueExtractor {
@@ -19,7 +20,7 @@ final class RegexIssueExtractor implements IssueExtractor {
         .filter(Matcher::matches)
         .map(
             matcher ->
-                new IssueExtractor.Issue(
+                new Issue(
                     matcher.group("message"),
                     matcher.group("file"),
                     Integer.parseInt(matcher.group("line")),

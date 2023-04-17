@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 final class JavacIssueExtractor implements IssueExtractor {
   private static final Pattern LOG_LINE_FORMAT =
       Pattern.compile(
-          "^(?<file>.+?\\.java):\\[(?<line>\\d+)(?:,(?<column>\\d+))?\\] (?<message>.+)$",
+          "^(?<file>/.+?\\.java):\\[(?<line>\\d+)(?:,(?<column>\\d+))?\\] (?<message>.+)$",
           Pattern.DOTALL);
   private static final Pattern ERROR_PRONE_DOCUMENTATION_REFERENCE =
       Pattern.compile("^\\s*\\(see .+\\)\\s+$");
