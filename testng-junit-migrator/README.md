@@ -77,7 +77,7 @@ Picnic-specific code. This should be executed _before_ starting the actual
 migration.
 
 > **Warning**
-> This is a warning for `MacOS` users.
+> This is a warning for `macOs` users.
 > Make sure gnu-grep and gnu-sed are installed!
 >
 > ```brew install grep gnu-sed```
