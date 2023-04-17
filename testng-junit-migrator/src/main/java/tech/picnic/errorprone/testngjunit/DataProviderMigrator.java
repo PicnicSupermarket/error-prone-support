@@ -16,7 +16,6 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.tools.javac.parser.Tokens;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
