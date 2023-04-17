@@ -137,8 +137,7 @@ final class DataProviderMigrator {
     int endPos = state.getEndPosition(newArrayTree);
     Map<Integer, List<Tokens.Comment>> comments =
         state.getOffsetTokens(startPos, endPos).stream()
-            .collect(
-                toMap(ErrorProneToken::pos, ErrorProneToken::comments, (a, b) -> b, HashMap::new));
+            .collect(toMap(ErrorProneToken::pos, ErrorProneToken::comments));
     argumentsBuilder.append(
         newArrayTree.getInitializers().stream()
             .map(
