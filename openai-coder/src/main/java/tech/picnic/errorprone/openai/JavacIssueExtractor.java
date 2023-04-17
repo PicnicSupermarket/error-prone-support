@@ -15,6 +15,9 @@ import java.util.stream.Stream;
 
 // XXX: Create another `LogLineAnalyzer` for Error Prone test compiler output.
 // XXX: Also replace "Did you mean to remove" with "Remove"?
+// XXX: Also replace "Did you mean '" with "Instead use '"?
+// ^ For debuggability it could make sense to keep the original message, and _separately_ generate
+// the OpenAI prompt.
 final class JavacIssueExtractor implements IssueExtractor<String> {
   private static final Pattern LOG_LINE_FORMAT =
       Pattern.compile(
@@ -32,6 +35,7 @@ final class JavacIssueExtractor implements IssueExtractor<String> {
         .map(issue -> issue.withMessage(removeErrorProneDocumentationReference(issue.message())));
   }
 
+  // XXX: This doesn't work.
   private static String removeErrorProneDocumentationReference(String message) {
     return message
         .lines()
