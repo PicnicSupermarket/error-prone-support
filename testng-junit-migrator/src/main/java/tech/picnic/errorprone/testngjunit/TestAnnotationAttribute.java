@@ -11,9 +11,8 @@ enum TestAnnotationAttribute {
   ENABLED("enabled", new EnabledAttributeMigrator()),
   EXPECTED_EXCEPTIONS("expectedExceptions", new ExpectedExceptionsAttributeMigrator()),
   GROUPS("groups", new GroupsAttributeMigrator()),
-  PRIORITY("priority", new PriorityAttributeMigrator());
-
-  // XXX: Add support for `Test#timeOut`.
+  PRIORITY("priority", new PriorityAttributeMigrator()),
+  TIMEOUT("timeOut", new TimeOutAttributeMigrator());
 
   private final String name;
   private final Migrator attributeMigrator;
