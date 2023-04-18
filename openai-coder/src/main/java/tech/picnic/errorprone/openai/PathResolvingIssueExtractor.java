@@ -3,7 +3,13 @@ package tech.picnic.errorprone.openai;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-// XXX: Use this class, or drop it.
+/**
+ * An {@link IssueExtractor} that resolves delegates to another {@link IssueExtractor} and resolves
+ * the extracted file paths.
+ *
+ * <p>For example, if the delegate extracts issues with relative file paths, this extractor will
+ * resolve those paths to absolute paths.
+ */
 final class PathResolvingIssueExtractor implements IssueExtractor<Path> {
   // XXX: Do we then need `PathFinder` to be a separate class?
   private final PathFinder pathFinder;

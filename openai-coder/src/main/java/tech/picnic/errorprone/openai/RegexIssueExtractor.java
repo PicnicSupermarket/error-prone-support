@@ -4,9 +4,19 @@ import java.util.OptionalInt;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import tech.picnic.errorprone.openai.IssueExtractor.Issue;
 
-// XXX: Document contract
+/**
+ * An {@link IssueExtractor} that delegates issue property extraction to a {@link Pattern}.
+ *
+ * <p>The pattern must have the following named groups:
+ *
+ * <ul>
+ *   <li>{@code message}: The issue message.
+ *   <li>{@code file}: The file to which the issue applies.
+ *   <li>{@code line}: The line at which the issue occurs, if known.
+ *   <li>{@code column}: The column at which the issue occurs, if known.
+ * </ul>
+ */
 final class RegexIssueExtractor implements IssueExtractor<String> {
   private final Pattern pattern;
 

@@ -24,6 +24,10 @@ import tech.picnic.errorprone.openai.IssueExtractor.Issue;
 // XXX: Consider creating a binary executable using GraalVM.
 // XXX: Add support for sending a suitable subset of the code to OpenAI, so as (a) to better deal
 // with the token limit and (b) potentially reduce cost.
+// XXX: Add support for the Sarif output format.
+// XXX: Add support for an interactive mode. Support multiple rounds.
+// XXX: Add support for filtering by message and file pattern.
+// XXX: Add support for a "run until unchanged" mode.
 public final class AiPatcher {
   private static final Pattern FILE_LOCATION_MARKER =
       Pattern.compile("^(.*?\\.java):\\[(\\d+)(?:,(\\d+))?\\] ");
@@ -98,7 +102,8 @@ public final class AiPatcher {
         new PathResolvingIssueExtractor(
             new PathFinder(FileSystems.getDefault(), Path.of("")),
             new AggregatingIssueExtractor<>(
-                ImmutableSet.of(new JavacIssueExtractor(), new CheckstyleIssueExtractor())));
+                ImmutableSet.of(
+                    new PlexusCompilerIssueExtractor(), new CheckstyleIssueExtractor())));
 
     return logMessages.stream()
         .flatMap(issueExtractor::extract)

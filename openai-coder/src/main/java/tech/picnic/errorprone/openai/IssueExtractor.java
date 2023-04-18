@@ -42,11 +42,12 @@ import java.util.stream.Stream;
 // level, which is not extracted by the `LogLineExtractor`.
 
 // XXX: Document
+// XXX: Create another `LogLineAnalyzer` for Error Prone test compiler output.
 interface IssueExtractor<F> {
   Stream<Issue<F>> extract(String str);
 
   // XXX: Move to separate file?
-  // XXX: `file` as first argument? (If so, also swap method order.)
+  // XXX: Make `message` the last parameter (If so, also swap method order.)
   record Issue<F>(String message, F file, OptionalInt line, OptionalInt column) {
     Issue<F> withMessage(String message) {
       return new Issue<>(message, file, line, column);
@@ -60,7 +61,7 @@ interface IssueExtractor<F> {
       return line().isEmpty()
           ? message()
           : column().isEmpty()
-              ? String.format("Line %s: %s", line(), message())
+              ? String.format("Line %s: %s", line().getAsInt(), message())
               : String.format("Line %s, column %s: %s", line(), column().getAsInt(), message());
     }
   }

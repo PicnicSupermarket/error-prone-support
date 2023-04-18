@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import com.google.common.collect.ImmutableSet;
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,8 +11,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import tech.picnic.errorprone.openai.IssueExtractor.Issue;
 
-final class JavacIssueExtractorTest {
-  private final IssueExtractor<String> issueExtractor = new JavacIssueExtractor();
+final class PlexusCompilerIssueExtractorTest {
+  private final IssueExtractor<String> issueExtractor = new PlexusCompilerIssueExtractor();
 
   // XXX: Add column absent test case.
   // XXX: Add line absent test case (and update the code to cover this case; see the Plexus code).

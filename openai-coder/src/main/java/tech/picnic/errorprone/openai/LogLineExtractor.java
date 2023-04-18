@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
 import javax.annotation.WillClose;
 
 // XXX: Document that this is about extracting multi-line log messages.
+// XXX: Some Maven plugins emit an `INFO` message before printing a sequence of WARN/ERROR messages.
+// As-is this class will drop the leading message and chop up the rest. We should fix this.
 final class LogLineExtractor {
   // XXX: document that this much match an issue log level as well.
   private final Pattern logLineStartMarker;
@@ -26,6 +28,7 @@ final class LogLineExtractor {
   }
 
   static LogLineExtractor mavenErrorAndWarningExtractor() {
+    // XXX: Move the pattern to a constant.
     return new LogLineExtractor(
         Pattern.compile("^\\[([A-Z]+)\\] "), ImmutableSet.of("ERROR", "WARNING"));
   }

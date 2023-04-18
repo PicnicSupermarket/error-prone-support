@@ -6,6 +6,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.theokanning.openai.edit.EditRequest;
 import com.theokanning.openai.service.OpenAiService;
 
+/** A class that exposes a number of high-level OpenAI-based operations. */
 // XXX: Make final.
 public class OpenAi implements AutoCloseable {
   // XXX: Rename.
