@@ -21,11 +21,15 @@ final class RegexIssueExtractor implements IssueExtractor<String> {
         .map(
             matcher ->
                 new Issue<>(
-                    matcher.group("message"),
+                    matcher.group("message").strip(),
                     matcher.group("file"),
-                    Integer.parseInt(matcher.group("line")),
-                    matcher.group("column") == null
-                        ? OptionalInt.empty()
-                        : OptionalInt.of(Integer.parseInt(matcher.group("column")))));
+                    parseIntGroup(matcher, "line"),
+                    parseIntGroup(matcher, "column")));
+  }
+
+  private static OptionalInt parseIntGroup(Matcher matcher, String group) {
+    return matcher.group(group) == null
+        ? OptionalInt.empty()
+        : OptionalInt.of(Integer.parseInt(matcher.group(group)));
   }
 }

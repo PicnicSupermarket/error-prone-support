@@ -47,7 +47,7 @@ interface IssueExtractor<F> {
 
   // XXX: Move to separate file?
   // XXX: `file` as first argument? (If so, also swap method order.)
-  record Issue<F>(String message, F file, int line, OptionalInt column) {
+  record Issue<F>(String message, F file, OptionalInt line, OptionalInt column) {
     Issue<F> withMessage(String message) {
       return new Issue<>(message, file, line, column);
     }
@@ -57,9 +57,11 @@ interface IssueExtractor<F> {
     }
 
     String description() {
-      return column().isEmpty()
-          ? String.format("Line %s: %s", line(), message())
-          : String.format("Line %s, column %s: %s", line(), column().getAsInt(), message());
+      return line().isEmpty()
+          ? message()
+          : column().isEmpty()
+              ? String.format("Line %s: %s", line(), message())
+              : String.format("Line %s, column %s: %s", line(), column().getAsInt(), message());
     }
   }
 }
