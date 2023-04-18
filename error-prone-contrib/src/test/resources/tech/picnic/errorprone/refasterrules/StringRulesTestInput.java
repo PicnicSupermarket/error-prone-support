@@ -33,6 +33,14 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         "baz".length() >= 1);
   }
 
+  boolean testStringIsEmptyPredicate() {
+    return Stream.of("foo").anyMatch(s -> s.isEmpty());
+  }
+
+  boolean testStringIsNotEmptyPredicate() {
+    return Stream.of("foo").anyMatch(s -> !s.isEmpty());
+  }
+
   ImmutableSet<Boolean> testStringIsNullOrEmpty() {
     return ImmutableSet.of(
         getClass().getName() == null || getClass().getName().isEmpty(),

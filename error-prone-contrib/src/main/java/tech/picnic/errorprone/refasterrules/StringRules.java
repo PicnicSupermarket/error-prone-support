@@ -1,6 +1,8 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 
 import com.google.common.base.Joiner;
@@ -11,21 +13,23 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link String}s. */
-// XXX: Should we prefer `s -> !s.isEmpty()` or `not(String::isEmpty)`?
 @OnlineDocumentation
 final class StringRules {
   private StringRules() {}
 
   /** Prefer {@link String#isEmpty()} over alternatives that consult the string's length. */
+  // XXX: Once we target JDK 15+, generalize this rule to cover all `CharSequence` subtypes.
   static final class StringIsEmpty {
     @BeforeTemplate
     boolean before(String str) {
@@ -36,6 +40,37 @@ final class StringRules {
     @AlsoNegation
     boolean after(String str) {
       return str.isEmpty();
+    }
+  }
+
+  /** Prefer a method reference to {@link String#isEmpty()} over the equivalent lambda function. */
+  // XXX: Once we target JDK 15+, generalize this rule to cover all `CharSequence` subtypes.
+  // XXX: As it stands, this rule is a special case of what `MethodReferenceUsage` tries to achieve.
+  // If/when `MethodReferenceUsage` becomes production ready, we should simply drop this check.
+  static final class StringIsEmptyPredicate {
+    @BeforeTemplate
+    Predicate<String> before() {
+      return s -> s.isEmpty();
+    }
+
+    @AfterTemplate
+    Predicate<String> after() {
+      return String::isEmpty;
+    }
+  }
+
+  /** Prefer a method reference to {@link String#isEmpty()} over the equivalent lambda function. */
+  // XXX: Once we target JDK 15+, generalize this rule to cover all `CharSequence` subtypes.
+  static final class StringIsNotEmptyPredicate {
+    @BeforeTemplate
+    Predicate<String> before() {
+      return s -> !s.isEmpty();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Predicate<String> after() {
+      return not(String::isEmpty);
     }
   }
 
@@ -65,7 +100,7 @@ final class StringRules {
 
     @AfterTemplate
     Optional<String> after(String str) {
-      return Optional.ofNullable(str).filter(s -> !s.isEmpty());
+      return Optional.ofNullable(str).filter(not(String::isEmpty));
     }
   }
 
@@ -76,8 +111,9 @@ final class StringRules {
     }
 
     @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Optional<String> after(Optional<String> optional) {
-      return optional.filter(s -> !s.isEmpty());
+      return optional.filter(not(String::isEmpty));
     }
   }
 

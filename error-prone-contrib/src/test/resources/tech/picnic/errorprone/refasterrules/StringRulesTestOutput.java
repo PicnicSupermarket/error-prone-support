@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 
 import com.google.common.base.Joiner;
@@ -14,6 +15,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -34,6 +36,14 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         !"baz".isEmpty());
   }
 
+  boolean testStringIsEmptyPredicate() {
+    return Stream.of("foo").anyMatch(String::isEmpty);
+  }
+
+  boolean testStringIsNotEmptyPredicate() {
+    return Stream.of("foo").anyMatch(not(String::isEmpty));
+  }
+
   ImmutableSet<Boolean> testStringIsNullOrEmpty() {
     return ImmutableSet.of(
         Strings.isNullOrEmpty(getClass().getName()), !Strings.isNullOrEmpty(getClass().getName()));
@@ -41,14 +51,14 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Optional<String>> testOptionalNonEmptyString() {
     return ImmutableSet.of(
-        Optional.ofNullable(toString()).filter(s -> !s.isEmpty()),
-        Optional.ofNullable(toString()).filter(s -> !s.isEmpty()),
-        Optional.ofNullable(toString()).filter(s -> !s.isEmpty()),
-        Optional.ofNullable(toString()).filter(s -> !s.isEmpty()));
+        Optional.ofNullable(toString()).filter(Predicate.not(String::isEmpty)),
+        Optional.ofNullable(toString()).filter(Predicate.not(String::isEmpty)),
+        Optional.ofNullable(toString()).filter(Predicate.not(String::isEmpty)),
+        Optional.ofNullable(toString()).filter(Predicate.not(String::isEmpty)));
   }
 
   Optional<String> testFilterEmptyString() {
-    return Optional.of("foo").filter(s -> !s.isEmpty());
+    return Optional.of("foo").filter(not(String::isEmpty));
   }
 
   ImmutableSet<String> testJoinStrings() {
