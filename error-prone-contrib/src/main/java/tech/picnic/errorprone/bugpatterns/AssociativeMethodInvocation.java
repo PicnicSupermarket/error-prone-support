@@ -10,7 +10,7 @@ import static com.google.errorprone.matchers.Matchers.toType;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -39,7 +39,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "These methods implement an associative operation, so you can flatten the list of operands",
+        "These methods implement an associative operation, so the list of operands can be flattened",
     link = BUG_PATTERNS_BASE_URL + "AssociativeMethodInvocation",
     linkType = CUSTOM,
     severity = SUGGESTION,
@@ -48,8 +48,8 @@ public final class AssociativeMethodInvocation extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Supplier<Type> ITERABLE = Suppliers.typeFromClass(Iterable.class);
-  private static final ImmutableList<Matcher<ExpressionTree>> ASSOCIATIVE_OPERATIONS =
-      ImmutableList.of(
+  private static final ImmutableSet<Matcher<ExpressionTree>> ASSOCIATIVE_OPERATIONS =
+      ImmutableSet.of(
           allOf(
               staticMethod().onClass(Suppliers.typeFromClass(Matchers.class)).named("allOf"),
               toType(MethodInvocationTree.class, not(hasArgumentOfType(ITERABLE)))),
@@ -63,6 +63,11 @@ public final class AssociativeMethodInvocation extends BugChecker
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+    if (tree.getArguments().isEmpty()) {
+      /* Absent any arguments, there is nothing to simplify. */
+      return Description.NO_MATCH;
+    }
+
     for (Matcher<ExpressionTree> matcher : ASSOCIATIVE_OPERATIONS) {
       if (matcher.matches(tree, state)) {
         SuggestedFix.Builder fix = SuggestedFix.builder();
