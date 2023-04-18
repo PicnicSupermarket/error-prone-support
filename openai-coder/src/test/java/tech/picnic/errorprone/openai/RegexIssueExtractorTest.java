@@ -22,15 +22,15 @@ final class RegexIssueExtractorTest {
             "(?<file>.*?)(:(?<line>\\d+))?(:(?<column>\\d+))?:(?<message>.*?)",
             "my-file:my-message",
             ImmutableSet.of(
-                new Issue<>("my-message", "my-file", OptionalInt.empty(), OptionalInt.empty()))),
+                new Issue<>("my-file", OptionalInt.empty(), OptionalInt.empty(), "my-message"))),
         arguments(
             "(?<file>.*?)(:(?<line>\\d+))?(:(?<column>\\d+))?:(?<message>.*?)",
             "foo:1:bar",
-            ImmutableSet.of(new Issue<>("bar", "foo", OptionalInt.of(1), OptionalInt.empty()))),
+            ImmutableSet.of(new Issue<>("foo", OptionalInt.of(1), OptionalInt.empty(), "bar"))),
         arguments(
             "(?<file>.*?)(:(?<line>\\d+))?(:(?<column>\\d+))?:(?<message>.*?)",
             "x:1:2:y",
-            ImmutableSet.of(new Issue<>("y", "x", OptionalInt.of(1), OptionalInt.of(2)))));
+            ImmutableSet.of(new Issue<>("x", OptionalInt.of(1), OptionalInt.of(2), "y"))));
   }
 
   @ParameterizedTest

@@ -24,7 +24,8 @@ final class DiffsTest {
             @@ -1,1 +1,1 @@
             -foo
             +bar
-            """.stripTrailing()),
+            """
+                .stripTrailing()),
         arguments(
             """
             Line 0

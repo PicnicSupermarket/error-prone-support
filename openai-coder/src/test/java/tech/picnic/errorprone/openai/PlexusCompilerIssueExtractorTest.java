@@ -32,10 +32,10 @@ final class PlexusCompilerIssueExtractorTest {
             """,
             ImmutableSet.of(
                 new Issue(
-                    "no comment",
                     "/absolute/path/to/MyClass.java",
                     OptionalInt.of(30),
-                    OptionalInt.of(22)))),
+                    OptionalInt.of(22),
+                    "no comment"))),
         arguments(
             """
             /absolute/path/to/another/Class.java:[10,17] cannot find symbol
@@ -44,13 +44,13 @@ final class PlexusCompilerIssueExtractorTest {
             """,
             ImmutableSet.of(
                 new Issue(
+                    "/absolute/path/to/another/Class.java",
+                    OptionalInt.of(10),
+                    OptionalInt.of(17),
                     """
                     cannot find symbol
                       symbol:   class MySymbol
-                      location: class another.Class""",
-                    "/absolute/path/to/another/Class.java",
-                    OptionalInt.of(10),
-                    OptionalInt.of(17)))),
+                      location: class another.Class"""))),
         arguments(
             """
             /file/with/errorprone/violation/Foo.java:[2,4] [UnusedVariable] The field 'X' is never read.
@@ -59,12 +59,12 @@ final class PlexusCompilerIssueExtractorTest {
             """,
             ImmutableSet.of(
                 new Issue(
-                    """
-                    [UnusedVariable] The field 'X' is never read.
-                      Did you mean to remove this line?""",
                     "/file/with/errorprone/violation/Foo.java",
                     OptionalInt.of(2),
-                    OptionalInt.of(4)))));
+                    OptionalInt.of(4),
+                    """
+                    [UnusedVariable] The field 'X' is never read.
+                      Did you mean to remove this line?"""))));
   }
 
   @ParameterizedTest

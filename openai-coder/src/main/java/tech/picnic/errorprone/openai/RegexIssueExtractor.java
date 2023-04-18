@@ -31,10 +31,10 @@ final class RegexIssueExtractor implements IssueExtractor<String> {
         .map(
             matcher ->
                 new Issue<>(
-                    matcher.group("message").strip(),
                     matcher.group("file"),
                     parseIntGroup(matcher, "line"),
-                    parseIntGroup(matcher, "column")));
+                    parseIntGroup(matcher, "column"),
+                    matcher.group("message").strip()));
   }
 
   private static OptionalInt parseIntGroup(Matcher matcher, String group) {
