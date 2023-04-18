@@ -40,7 +40,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @BugPattern(
     summary =
         "These methods implement an associative operation, so you can flatten the list of operands",
-    link = BUG_PATTERNS_BASE_URL + "AssociativeOperatorUsage",
+    link = BUG_PATTERNS_BASE_URL + "AssociativeMethodInvocation",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
