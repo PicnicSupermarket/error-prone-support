@@ -42,6 +42,9 @@ warning messages extracted from Maven build output.
   placeholders are replaced with the original code.
 * Add support for parsing other formats (next to Maven build output). E.g.
   Sarif.
+* Add support for a mode in which a file (or if we can pull it off: a group of
+  files) is explicitly specified to be processed using instructions entered
+  interactively or non-interactively.
 * Introduce an `IssueExtractor` for Error Prone test compiler output.
 * Write an `IssueExtractor` for the output of the `dependency:analyze` Maven
   goal:
