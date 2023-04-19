@@ -3,6 +3,10 @@ package tech.picnic.errorprone.openai;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatCompletionResult;
+import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.edit.EditRequest;
 import com.theokanning.openai.service.OpenAiService;
 import java.time.Duration;
@@ -42,11 +46,28 @@ public class OpenAi implements AutoCloseable {
                 .model("code-davinci-edit-001")
                 .instruction(instruction)
                 .temperature(0.0)
-                .n(1)
                 .build())
         .getChoices()
         .get(0)
         .getText();
+  }
+
+  // XXX: Improve error handling, including checking the finish reason.
+  String requestChatCompletion(String instruction) {
+    return openAiService
+        .createChatCompletion(
+            ChatCompletionRequest.builder()
+                .messages(
+                    ImmutableList.of(
+                        new ChatMessage("system", "You are an expert Java developer"),
+                        new ChatMessage("user", instruction)))
+                .model("gpt-3.5-turbo")
+                .temperature(0.0)
+                .build())
+        .getChoices()
+        .get(0)
+        .getMessage()
+        .getContent();
   }
 
   @Override

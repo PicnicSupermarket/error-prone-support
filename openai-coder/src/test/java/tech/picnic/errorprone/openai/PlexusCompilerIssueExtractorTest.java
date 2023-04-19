@@ -14,8 +14,6 @@ import tech.picnic.errorprone.openai.IssueExtractor.Issue;
 final class PlexusCompilerIssueExtractorTest {
   private final IssueExtractor<String> issueExtractor = new PlexusCompilerIssueExtractor();
 
-  // XXX: Add column absent test case.
-  // XXX: Add line absent test case (and update the code to cover this case; see the Plexus code).
   private static Stream<Arguments> extractTestCases() {
     /* { input, expected } */
     return Stream.of(
@@ -36,6 +34,26 @@ final class PlexusCompilerIssueExtractorTest {
                     OptionalInt.of(30),
                     OptionalInt.of(22),
                     "no comment"))),
+        arguments(
+            """
+            /absolute/path/to/MyClass2.java:[123] error message without column specification
+            """,
+            ImmutableSet.of(
+                new Issue(
+                    "/absolute/path/to/MyClass2.java",
+                    OptionalInt.of(123),
+                    OptionalInt.empty(),
+                    "error message without column specification"))),
+        arguments(
+            """
+            /absolute/path/to/MyClass3.java: error message without location specification
+            """,
+            ImmutableSet.of(
+                new Issue(
+                    "/absolute/path/to/MyClass3.java",
+                    OptionalInt.empty(),
+                    OptionalInt.empty(),
+                    "error message without location specification"))),
         arguments(
             """
             /absolute/path/to/another/Class.java:[10,17] cannot find symbol
