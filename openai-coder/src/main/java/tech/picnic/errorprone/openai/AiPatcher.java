@@ -91,9 +91,9 @@ public final class AiPatcher {
     IssueExtractor<Path> issueExtractor =
         new PathResolvingIssueExtractor(
             new PathFinder(FileSystems.getDefault(), Path.of("")),
-            new AggregatingIssueExtractor<>(
+            new SelectFirstIssueExtractor<>(
                 ImmutableSet.of(
-                    new PlexusCompilerIssueExtractor(), new MavenCheckstyleIssueExtractor())));
+                    new MavenCheckstyleIssueExtractor(), new PlexusCompilerIssueExtractor())));
 
     return logMessages.stream()
         .flatMap(issueExtractor::extract)

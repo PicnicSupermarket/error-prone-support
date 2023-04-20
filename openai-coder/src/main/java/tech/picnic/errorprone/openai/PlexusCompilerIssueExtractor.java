@@ -13,9 +13,6 @@ import java.util.stream.Stream;
  *     href="https://github.com/codehaus-plexus/plexus-compiler/blob/a5775b2258349b7c0d7c7759f162c80672328a0e/plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/CompilerMessage.java#L271-L296">Plexus
  *     Compiler message format</a>
  */
-// XXX: Can path be relative? If so, that'd clash with `CheckStyleIssueExtractor`.
-// ^ I think we should allow this, and then introduce a way to _chain_ extractors using short
-// circuiting.
 // XXX: Also replace "Did you mean to remove" with "Remove"?
 // XXX: Also replace "Did you mean '" with "Instead use '"?
 // XXX: Concat "Did you mean" message to the preceding line?
@@ -27,7 +24,7 @@ final class PlexusCompilerIssueExtractor implements IssueExtractor<String> {
   // https://github.com/codehaus-plexus/plexus-compiler/blob/a5775b2258349b7c0d7c7759f162c80672328a0e/plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/CompilerMessage.java#L271-L296.
   private static final Pattern LOG_LINE_FORMAT =
       Pattern.compile(
-          "^(?<file>/.+?\\.java):(?:\\[(?<line>\\d+)(?:,(?<column>\\d+))?\\])? (?<message>.+)$",
+          "^(?<file>.+?\\.java):(?:\\[(?<line>\\d+)(?:,(?<column>\\d+))?\\])? (?<message>.+)$",
           Pattern.DOTALL);
   private static final Pattern ERROR_PRONE_DOCUMENTATION_REFERENCE =
       Pattern.compile("^\\s*\\(see .+\\)\\s*$");

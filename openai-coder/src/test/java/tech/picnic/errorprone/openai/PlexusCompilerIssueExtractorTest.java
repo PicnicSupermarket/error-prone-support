@@ -19,38 +19,34 @@ final class PlexusCompilerIssueExtractorTest {
     return Stream.of(
         arguments("", ImmutableSet.of()),
         arguments("foo", ImmutableSet.of()),
+        arguments("NotAJavaFile.txt:[30,22] no comment", ImmutableSet.of()),
         arguments(
             """
             relative/path/to/MyClass.java:[30,22] no comment
             """,
-            ImmutableSet.of()),
-        arguments(
-            """
-            /absolute/path/to/MyClass.java:[30,22] no comment
-            """,
             ImmutableSet.of(
                 new Issue(
-                    "/absolute/path/to/MyClass.java",
+                    "relative/path/to/MyClass.java",
                     OptionalInt.of(30),
                     OptionalInt.of(22),
                     "no comment"))),
         arguments(
             """
-            /absolute/path/to/MyClass2.java:[123] error message without column specification
+            /absolute/path/to/MyClass.java:[123] error message without column specification
             """,
             ImmutableSet.of(
                 new Issue(
-                    "/absolute/path/to/MyClass2.java",
+                    "/absolute/path/to/MyClass.java",
                     OptionalInt.of(123),
                     OptionalInt.empty(),
                     "error message without column specification"))),
         arguments(
             """
-            /absolute/path/to/MyClass3.java: error message without location specification
+            /absolute/path/to/MyClass2.java: error message without location specification
             """,
             ImmutableSet.of(
                 new Issue(
-                    "/absolute/path/to/MyClass3.java",
+                    "/absolute/path/to/MyClass2.java",
                     OptionalInt.empty(),
                     OptionalInt.empty(),
                     "error message without location specification"))),
