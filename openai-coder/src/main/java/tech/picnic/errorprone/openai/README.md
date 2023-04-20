@@ -32,12 +32,15 @@ warning messages extracted from Maven build output.
     * Add a `--help` flag that prints a help message.
     * Add a `--run-to-fix <command>` (name TBD) flag that repeatedly runs the
       given command in a sub-process and processes the output until either no
-      further issues are reported, or no further fixes are found.
+      further issues are reported, or no further fixes are found. (For this we
+      could use `ProcessBuilder`.)
     * Add a `--git-safe` (name TBD) flag that only processes files that are
       tracked by Git and that have not been modified.
     * Add a `--format <format>` flag that allows the user to specify the
       format of the input. E.g. `--format maven` (default), `--format
       errorprone`, `--format sarif`, etc.
+    * Add a `--patch-context <lines>` flag that allows the user to specify the
+      number of lines of context to include in presented unified patches.
 * Create a binary image using [GraalVM](https://www.graalvm.org/).
 * Add support for sending a suitable subset of the code to OpenAI, so as (a) to
   better deal with the token limit and (b) potentially reduce cost. This might
