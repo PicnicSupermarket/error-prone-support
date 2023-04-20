@@ -33,6 +33,11 @@ warning messages extracted from Maven build output.
     * Add a `--run-to-fix <command>` (name TBD) flag that repeatedly runs the
       given command in a sub-process and processes the output until either no
       further issues are reported, or no further fixes are found.
+    * Add a `--git-safe` (name TBD) flag that only processes files that are
+      tracked by Git and that have not been modified.
+    * Add a `--format <format>` flag that allows the user to specify the
+      format of the input. E.g. `--format maven` (default), `--format
+      errorprone`, `--format sarif`, etc.
 * Create a binary image using [GraalVM](https://www.graalvm.org/).
 * Add support for sending a suitable subset of the code to OpenAI, so as (a) to
   better deal with the token limit and (b) potentially reduce cost. This might
@@ -85,3 +90,45 @@ warning messages extracted from Maven build output.
   output. It could be inferred from the preceding `dependency:analyze` line,
   but that line is logged at the `INFO` level, which is not extracted by
   the `LogLineExtractor`.
+
+# Interactive mode API ideation
+
+For each file, the user is presented with a list of issues:
+
+```
+Issues in `/path/to/File.java`:
+1. Issue 1.
+2. Issue 2.
+3. Issue 3.
+
+Action [submit]: <prompt>
+```
+
+Upon submitting the issues to OpenAI, the user is presented with a unified
+patch of the suggested changes:
+
+```
+Suggested changes:
+<diff>
+ 
+Action [apply]: <prompt>
+```
+
+Commands:
+
+- If empty, then apply the appropriate default, depending on context:
+    - If the most recent prompt listed the issues, then submit all issues to
+      OpenAI (`submit`).
+    - If the most recent prompt listed the suggested fixes, then apply the
+      suggested fixes (`apply`).
+- `h`/`help`: Print help message.
+- `i`/`issues`: Print list of issues.
+- `s`/`submit [<issue>, ...]`: Submit all or the given issues to OpenAI.
+- `a`/`apply`: Apply the suggested changes:
+    - If no changes have yet been suggested, then print a message and prompt
+      again.
+    - If changes have been suggested, then apply them, print a message and move
+      on to the next file.
+- `q`/`quit`: Quit the program.
+- `n`/`next`: Skip the current file.
+- `p`/`prev`/`previous`: Go back to the previous file.
