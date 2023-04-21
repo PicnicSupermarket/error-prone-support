@@ -1305,7 +1305,7 @@
                         <dependency>
                             <groupId>com.groupcdg.pitest</groupId>
                             <artifactId>pitest-accelerator-junit5</artifactId>
-                            <version>1.0.4</version>
+                            <version>1.0.5</version>
                         </dependency>
                         <dependency>
                             <groupId>org.pitest</groupId>
