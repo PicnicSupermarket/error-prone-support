@@ -10,23 +10,10 @@ import org.junit.jupiter.api.Test;
 final class IsMethodInvocationWithTwoOrMoreArgsTest {
   @Test
   void matches() {
-    CompilationTestHelper.newInstance(
-            IsMethodInvocationWithTwoOrMoreArgsTest.MatcherTestChecker.class, getClass())
+    CompilationTestHelper.newInstance(MatcherTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
             "class A {",
-            "  String foo(String foo, String bar) {",
-            "    return foo + bar;",
-            "  }",
-            "",
-            "  String foo(String foo) {",
-            "    return foo;",
-            "  }",
-            "",
-            "  String foo() {",
-            "    return \"foo\";",
-            "  }",
-            "",
             "  Boolean negative1() {",
             "    return Boolean.TRUE;",
             "  }",
@@ -36,21 +23,30 @@ final class IsMethodInvocationWithTwoOrMoreArgsTest {
             "  }",
             "",
             "  String negative3() {",
-            "    return foo(\"foo\");",
+            "    return toString();",
             "  }",
             "",
             "  String negative4() {",
-            "    return foo();",
+            "    return String.valueOf(1);",
             "  }",
             "",
             "  String positive1() {",
             "    // BUG: Diagnostic contains:",
-            "    return foo(\"foo\", \"bar\");",
+            "    return m1(\"foo\", \"bar\");",
             "  }",
             "",
             "  String positive2() {",
             "    // BUG: Diagnostic contains:",
             "    return String.format(\"%s\", \"foo\");",
+            "  }",
+            "",
+            "  String positive3() {",
+            "    // BUG: Diagnostic contains:",
+            "    return String.format(\"%s-%s\", \"foo\", \"bar\");",
+            "  }",
+            "",
+            "  private static String m1(String foo, String bar) {",
+            "    return foo + bar;",
             "  }",
             "}")
         .doTest();

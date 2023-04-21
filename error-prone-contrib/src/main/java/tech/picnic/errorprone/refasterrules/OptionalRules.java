@@ -235,13 +235,13 @@ final class OptionalRules {
   // XXX: Extend rule to all method invocations (with less than 2 arguments).
   static final class OptionalOrElseGet<T> {
     @BeforeTemplate
-    T before(Optional<T> o, @Matches(IsMethodInvocationWithTwoOrMoreArgs.class) T value) {
-      return o.orElse(value);
+    T before(Optional<T> optional, @Matches(IsMethodInvocationWithTwoOrMoreArgs.class) T value) {
+      return optional.orElse(value);
     }
 
     @AfterTemplate
-    T after(Optional<T> o, T value) {
-      return o.orElseGet(() -> value);
+    T after(Optional<T> optional, T value) {
+      return optional.orElseGet(() -> value);
     }
   }
 

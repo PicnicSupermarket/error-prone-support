@@ -1,8 +1,5 @@
 package tech.picnic.errorprone.refaster.matchers;
 
-import static com.google.errorprone.matchers.Matchers.anyMethod;
-import static com.sun.source.tree.Tree.Kind.METHOD_INVOCATION;
-
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
@@ -17,11 +14,7 @@ public final class IsMethodInvocationWithTwoOrMoreArgs implements Matcher<Expres
 
   @Override
   public boolean matches(ExpressionTree expressionTree, VisitorState state) {
-    if (expressionTree.getKind() == METHOD_INVOCATION) {
-      MethodInvocationTree methodInvocationTree = (MethodInvocationTree) expressionTree;
-      return anyMethod().matches(methodInvocationTree.getMethodSelect(), state)
-          && methodInvocationTree.getArguments().size() > 1;
-    }
-    return false;
+    return expressionTree instanceof MethodInvocationTree
+        && ((MethodInvocationTree) expressionTree).getArguments().size() > 1;
   }
 }
