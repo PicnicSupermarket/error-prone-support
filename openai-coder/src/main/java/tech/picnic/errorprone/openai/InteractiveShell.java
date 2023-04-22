@@ -6,7 +6,6 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Comparator.comparingInt;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -171,6 +170,7 @@ public final class InteractiveShell {
     }
 
     // XXX: Review `throws` clause.
+    // XXX: Allow to submit a custom instruction.
     @Command(
         aliases = "s",
         subcommands = HelpCommand.class,
@@ -214,9 +214,7 @@ public final class InteractiveShell {
 
       // XXX: Here, store the result.
 
-      // XXX: Colorize the diff.
-      out.println(
-          "Result: \n" + Diffs.unifiedDiff(originalCode, result, fileIssues.file().toString()));
+      Diffs.printUnifiedDiff(originalCode, result, fileIssues.relativeFile(), out);
     }
 
     @Command(
@@ -226,6 +224,8 @@ public final class InteractiveShell {
     void apply() {
       // XXX: Implement.
       // Verify that there's a proposal.
+
+      // XXX: Apply the result only if it applies cleanly.
     }
 
     @Command(
@@ -312,12 +312,12 @@ public final class InteractiveShell {
                   + (ranges.contains(i + 1) ? 1 : 0);
           if (salience > 1) {
             String line = lines.get(i - 1);
-            out.print(ansi().fgBlue().a(String.format(Locale.ROOT, "%4d: ", i)).reset());
+            out.print(ansi().fgYellow().a(String.format(Locale.ROOT, "%4d: ", i)).reset());
             out.println(
                 issueLines.containsKey(i) ? highlightIssueLine(line, issueLines.get(i)) : line);
             printedCode = true;
           } else if (salience > 0 && printedCode) {
-            out.println(ansi().fgBlue().a("....: ").reset());
+            out.println(ansi().fgBlue().a(".....").reset());
             printedCode = false;
           }
         }
@@ -346,9 +346,8 @@ public final class InteractiveShell {
         out.println(
             ansi()
                 .fgBlue()
-                .format(String.format(Locale.ROOT, "%2d. ", i + 1))
+                .format(String.format(Locale.ROOT, "%4d. ", i + 1))
                 .reset()
-                .a(' ')
                 .a(issues.get(i).description()));
       }
     }
@@ -367,7 +366,10 @@ public final class InteractiveShell {
       FileIssues(Path file, ImmutableList<Issue<Path>> issues) {
         this.file = file;
         this.issues =
-            ImmutableList.sortedCopyOf(comparingInt(issue -> issue.line().orElse(-1)), issues);
+            ImmutableList.sortedCopyOf(
+                comparingInt((Issue<Path> issue) -> issue.line().orElse(-1))
+                    .thenComparingInt(issue -> issue.column().orElse(-1)),
+                issues);
 
         checkArgument(!issues.isEmpty(), "No issues provided");
         checkArgument(
