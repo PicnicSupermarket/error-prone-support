@@ -5,13 +5,16 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.joining;
 import static org.fusesource.jansi.Ansi.ansi;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Streams;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.IntStream;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.fusesource.jansi.Ansi;
@@ -39,6 +43,7 @@ import org.jline.reader.impl.DefaultParser;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.widget.TailTipWidgets;
+import org.jspecify.annotations.Nullable;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.HelpCommand;
@@ -49,8 +54,14 @@ import tech.picnic.errorprone.openai.IssueExtractor.Issue;
 
 // XXX: Review whether to enable a *subset* of JLine's built-ins. See
 // https://github.com/remkop/picocli/tree/main/picocli-shell-jline3#jline-316-and-picocli-44-example.
-// XXX: Consider utilizing `less` for paging. See https://github.com/jline/jline3/wiki/Nano-and-Less-Customization.
-public final class Cli {
+// XXX: Consider utilizing `less` for paging. See
+// https://github.com/jline/jline3/wiki/Nano-and-Less-Customization.
+public final class InteractiveShell {
+  // XXX: Rename. Better: drop this, as the caller should likely provide an `OpenAi` instance.
+  // XXX: Gracefully handle absence of a token.
+  private static final String OPENAI_TOKEN_VARIABLE = "openapi_token";
+  @Nullable private static final String OPENAI_TOKEN = System.getenv(OPENAI_TOKEN_VARIABLE);
+
   // XXX: Drop the `IOException` and properly handle it.
   public static void main(String... args) throws IOException {
     // XXX: Allow the path to be specified.
@@ -64,7 +75,7 @@ public final class Cli {
     // XXX: Force a file or command to be passed. Can be stdin in non-interactive mode.
     ImmutableSet<Issue<Path>> issues =
         LogLineExtractor.mavenErrorAndWarningExtractor()
-            .extract(new FileInputStream("/tmp/g"))
+            .extract(new FileInputStream("/tmp/h"))
             .stream()
             .flatMap(issueExtractor::extract)
             .collect(toImmutableSet());
@@ -75,9 +86,10 @@ public final class Cli {
     // new Issue<>(Path.of("xxx"), OptionalInt.of(3), OptionalInt.empty(), "msg")
 
     AnsiConsole.systemInstall();
-    try (Terminal terminal = TerminalBuilder.terminal()) {
+    try (OpenAi openAi = OpenAi.create(OPENAI_TOKEN);
+        Terminal terminal = TerminalBuilder.terminal()) {
       IssueResolutionController issueResolutionController =
-          new IssueResolutionController(terminal.writer(), issues);
+          new IssueResolutionController(openAi, terminal.writer(), issues);
 
       PicocliCommandsFactory factory = new PicocliCommandsFactory();
       factory.setTerminal(terminal);
@@ -134,45 +146,77 @@ public final class Cli {
   @Command(name = "")
   @NotThreadSafe
   static final class IssueResolutionController {
+    private final OpenAi openAi;
     private final PrintWriter out;
     private final ImmutableList<FileIssues> files;
     private int currentIndex = 0;
 
-    IssueResolutionController(PrintWriter output, ImmutableSet<Issue<Path>> issues) {
+    IssueResolutionController(OpenAi openAi, PrintWriter output, ImmutableSet<Issue<Path>> issues) {
+      this.openAi = openAi;
       this.out = output;
       this.files =
-          issues.stream()
-              .collect(
-                  collectingAndThen(
-                      groupingBy(Issue::file),
-                      m ->
-                          m.entrySet().stream()
-                              .map(
-                                  e ->
-                                      new FileIssues(
-                                          e.getKey(), ImmutableList.copyOf(e.getValue())))
-                              .collect(toImmutableList())));
+          Multimaps.asMap(Multimaps.index(issues, Issue::file)).values().stream()
+              .map(fileIssues -> new FileIssues(ImmutableList.copyOf(fileIssues)))
+              .collect(toImmutableList());
     }
 
     @Command(aliases = "i", subcommands = HelpCommand.class, description = "List issues.")
     void issues() {
       if (files.isEmpty()) {
-        out.println(ansi().fgRed().a("No issues."));
+        out.println(ansi().fgRed().a("No issues.").reset());
         return;
       }
 
       renderIssueDetails(files.get(currentIndex));
     }
 
+    // XXX: Review `throws` clause.
     @Command(
         aliases = "s",
         subcommands = HelpCommand.class,
         description = "Submit issues to OpenAI.")
     void submit(
         @Parameters(arity = "0..*", description = "The subset of issues to submit (default: all)")
-            List<Integer> issues) {
-      // XXX: Validate indices.
-      // XXX: Implement.
+            @Nullable
+            Set<Integer> issueNumbers)
+        throws IOException {
+      if (files.isEmpty()) {
+        out.println(ansi().fgRed().a("No issues.").reset());
+        return;
+      }
+
+      FileIssues fileIssues = files.get(currentIndex);
+      if (issueNumbers != null) {
+        for (int i : issueNumbers) {
+          if (i <= 0 || i > fileIssues.issues().size()) {
+            out.println(ansi().fgRed().a("Invalid issue number: " + i).reset());
+            return;
+          }
+        }
+      }
+
+      ImmutableList<Issue<Path>> allIssues = fileIssues.issues();
+      ImmutableList<Issue<Path>> selectedIssues =
+          issueNumbers == null
+              ? allIssues
+              : issueNumbers.stream().map(n -> allIssues.get(n - 1)).collect(toImmutableList());
+
+      // XXX: Use `ansi()` and a separate thread to show a spinner.
+      out.println("Submitting issue(s) OpenAI...");
+
+      String originalCode = Files.readString(fileIssues.file());
+      String instruction =
+          Streams.mapWithIndex(
+                  selectedIssues.stream(),
+                  (description, index) -> String.format("%s. %s", index + 1, description))
+              .collect(joining("\n", "Resolve the following issues:\n", "\n"));
+      String result = openAi.requestEdit(originalCode, instruction);
+
+      // XXX: Here, store the result.
+
+      // XXX: Colorize the diff.
+      out.println(
+          "Result: \n" + Diffs.unifiedDiff(originalCode, result, fileIssues.file().toString()));
     }
 
     @Command(
@@ -181,6 +225,7 @@ public final class Cli {
         description = "Apply the changes suggested by OpenAI")
     void apply() {
       // XXX: Implement.
+      // Verify that there's a proposal.
     }
 
     @Command(
@@ -232,6 +277,8 @@ public final class Cli {
       out.println(ansi().a("Issues for ").fgCyan().a(fileIssues.relativeFile()).reset().a(':'));
       renderIssueContext(fileIssues);
       renderIssues(fileIssues);
+      // XXX: Here, also list the currently suggested patch, if already generated.
+      // (...and not yet submitted?)
     }
 
     private void renderIssueContext(FileIssues fileIssues) {
@@ -306,8 +353,27 @@ public final class Cli {
       }
     }
 
+    // XXX: Expose an `ImmutableSet` instead?
     record FileIssues(Path file, ImmutableList<Issue<Path>> issues) {
-      // XXX: Validate that issues are non-empty, and perhaps derive `file`.
+      FileIssues(ImmutableList<Issue<Path>> issues) {
+        this(
+            issues.stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No issues provided"))
+                .file(),
+            issues);
+      }
+
+      FileIssues(Path file, ImmutableList<Issue<Path>> issues) {
+        this.file = file;
+        this.issues =
+            ImmutableList.sortedCopyOf(comparingInt(issue -> issue.line().orElse(-1)), issues);
+
+        checkArgument(!issues.isEmpty(), "No issues provided");
+        checkArgument(
+            issues.stream().allMatch(issue -> issue.file().equals(file)),
+            "Issues must all reference the same file");
+      }
 
       Path relativeFile() {
         return file.getFileSystem().getPath("").toAbsolutePath().relativize(file);
