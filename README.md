@@ -254,7 +254,7 @@ guidelines][contributing].
 
 ### Security
 
-If you want to report a security vulnerablity, please do so through a private
+If you want to report a security vulnerability, please do so through a private
 channel; please see our [security policy][security] for details.
 
 [bug-checks]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
