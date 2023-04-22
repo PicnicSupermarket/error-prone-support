@@ -3,6 +3,8 @@
 # Compares the `Picnic` SonarCloud quality profile for Java against the default
 # `Sonar way` profile. While the web UI also provides such functionality, this
 # script also compares the configuration parameters of each rule.
+#
+# This script uses `faq`, see https://github.com/jzelinskie/faq.
 
 set -e -u -o pipefail
 
@@ -14,12 +16,12 @@ fi
 export_profile() {
   local profile="${1}"
 
-  curl -f -s -u "${SONAR_TOKEN}:" \
+  curl --fail --silent --user "${SONAR_TOKEN}:" \
       "https://sonarcloud.io/api/qualityprofiles/export?qualityProfile=${profile}&language=java&organization=picnic-technologies"
 }
 
 tabulate() {
-  faq -r '
+  faq --raw-output '
     def enumerate_params:
       if .parameters == "" then
         []
@@ -34,7 +36,7 @@ tabulate() {
       | sort
       | .[]
       | @tsv
-  ' -o json
+  ' --output-format json
 }
 
 vimdiff \

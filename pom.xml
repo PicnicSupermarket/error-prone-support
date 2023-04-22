@@ -168,7 +168,7 @@
         <!-- Many Refaster rules are simpler thanks to generic return types. -->
         <sonar.issue.ignore.multicriteria.refaster-rules-1.resourceKey>${refaster-rules.path-pattern}</sonar.issue.ignore.multicriteria.refaster-rules-1.resourceKey>
         <sonar.issue.ignore.multicriteria.refaster-rules-1.ruleKey>java:S1452</sonar.issue.ignore.multicriteria.refaster-rules-1.ruleKey>
-        <!-- `@PlaceHolder` methods must be defined in an abstract class. -->
+        <!-- `@Placeholder` methods must be defined in an abstract class. -->
         <sonar.issue.ignore.multicriteria.refaster-rules-2.resourceKey>${refaster-rules.path-pattern}</sonar.issue.ignore.multicriteria.refaster-rules-2.resourceKey>
         <sonar.issue.ignore.multicriteria.refaster-rules-2.ruleKey>java:S1610</sonar.issue.ignore.multicriteria.refaster-rules-2.ruleKey>
         <!-- Template parameters stand in for arbitrarily complex expressions;
