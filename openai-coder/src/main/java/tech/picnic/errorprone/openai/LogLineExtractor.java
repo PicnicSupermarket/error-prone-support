@@ -2,6 +2,7 @@ package tech.picnic.errorprone.openai;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,7 +34,7 @@ final class LogLineExtractor {
         Pattern.compile("^\\[([A-Z]+)\\] "), ImmutableSet.of("ERROR", "WARNING"));
   }
 
-  List<String> extract(@WillClose InputStream logs) throws IOException {
+  ImmutableList<String> extract(@WillClose InputStream logs) throws IOException {
     List<String> messages = new ArrayList<>();
 
     boolean shouldRead = false;
@@ -67,7 +68,7 @@ final class LogLineExtractor {
       messages.add(nextMessage.toString());
     }
 
-    return messages;
+    return ImmutableList.copyOf(messages);
   }
 
   private Optional<String> getLogLevel(String logLine) {

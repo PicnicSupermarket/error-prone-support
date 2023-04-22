@@ -1,16 +1,28 @@
 package tech.picnic.errorprone.openai;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
+import static org.fusesource.jansi.Ansi.ansi;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UncheckedIOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
-import java.util.OptionalInt;
+import java.util.stream.IntStream;
+import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import org.jline.console.SystemRegistry;
 import org.jline.console.impl.SystemRegistryImpl;
@@ -26,6 +38,7 @@ import org.jline.reader.impl.DefaultParser;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.widget.TailTipWidgets;
+import org.jspecify.annotations.Nullable;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.HelpCommand;
@@ -38,16 +51,33 @@ import tech.picnic.errorprone.openai.IssueExtractor.Issue;
 // https://github.com/remkop/picocli/tree/main/picocli-shell-jline3#jline-316-and-picocli-44-example.
 
 public final class Cli {
-  public static void main(String... args) {
+  // XXX: Drop the `IOException` and properly handle it.
+  public static void main(String... args) throws IOException {
+    // XXX: Allow the path to be specified.
+    IssueExtractor<Path> issueExtractor =
+        new PathResolvingIssueExtractor(
+            new PathFinder(FileSystems.getDefault(), Path.of("")),
+            new SelectFirstIssueExtractor<>(
+                ImmutableSet.of(
+                    new MavenCheckstyleIssueExtractor(), new PlexusCompilerIssueExtractor())));
+
+    // XXX: Force a file or command to be passed. Can be stdin in non-interactive mode.
+    ImmutableSet<Issue<Path>> issues =
+        LogLineExtractor.mavenErrorAndWarningExtractor()
+            .extract(new FileInputStream("/tmp/g"))
+            .stream()
+            .flatMap(issueExtractor::extract)
+            .collect(toImmutableSet());
+    ;
+
+    // new Issue<>(Path.of("xxx"), OptionalInt.of(1), OptionalInt.empty(), "msg"),
+    // new Issue<>(Path.of("yyy"), OptionalInt.of(2), OptionalInt.empty(), "msg"),
+    // new Issue<>(Path.of("xxx"), OptionalInt.of(3), OptionalInt.empty(), "msg")
+
     AnsiConsole.systemInstall();
     try (Terminal terminal = TerminalBuilder.terminal()) {
       IssueResolutionController issueResolutionController =
-          new IssueResolutionController(
-              terminal.writer(),
-              ImmutableSet.of(
-                  new Issue<>(Path.of("xxx"), OptionalInt.of(1), OptionalInt.empty(), "msg"),
-                  new Issue<>(Path.of("yyy"), OptionalInt.of(2), OptionalInt.empty(), "msg"),
-                  new Issue<>(Path.of("xxx"), OptionalInt.of(3), OptionalInt.empty(), "msg")));
+          new IssueResolutionController(terminal.writer(), issues);
 
       PicocliCommandsFactory factory = new PicocliCommandsFactory();
       factory.setTerminal(terminal);
@@ -73,6 +103,7 @@ public final class Cli {
           .enable();
       reader.getKeyMaps().get("main").bind(new Reference("tailtip-toggle"), KeyMap.ctrl('t'));
 
+      issueResolutionController.issues();
       while (true) {
         try {
           systemRegistry.cleanUp();
@@ -80,16 +111,16 @@ public final class Cli {
               reader.readLine(
                   issueResolutionController.prompt(), null, (MaskingCallback) null, null));
         } catch (UserInterruptException e) {
-          // XXX: Review whether indeed to ignore this.
+          /* User pressed Ctrl+C. */
         } catch (EndOfFileException e) {
+          /* User pressed Ctrl+D. */
           return;
         } catch (Exception e) {
           systemRegistry.trace(e);
         }
       }
-    } catch (Throwable t) {
-      // XXX: Review!
-      t.printStackTrace();
+    } catch (IOException e) {
+      throw new UncheckedIOException("Failed to create terminal", e);
     } finally {
       AnsiConsole.systemUninstall();
     }
@@ -124,16 +155,85 @@ public final class Cli {
     @Command(aliases = "i", subcommands = HelpCommand.class, description = "List issues.")
     void issues() {
       if (files.isEmpty()) {
-        out.println("No issues.");
+        out.println(ansi().fgRed().a("No issues."));
         return;
       }
 
       FileIssues fileIssues = files.get(currentIndex);
-      out.printf("Issues for %s:%n", fileIssues.file());
+      out.println(ansi().a("Issues for ").fgCyan().a(fileIssues.relativeFile()).reset().a(':'));
+      renderContext(fileIssues);
+
+      // XXX: Move to a separate method.
       ImmutableList<Issue<Path>> issues = fileIssues.issues();
       for (int i = 0; i < issues.size(); i++) {
-        out.printf(Locale.ROOT, "%2d. %s%n", i, issues.get(i).description());
+        out.println(
+            ansi()
+                .fgBlue()
+                .format(String.format(Locale.ROOT, "%2d. ", i + 1))
+                .reset()
+                .a(' ')
+                .a(issues.get(i).description()));
       }
+    }
+
+    // XXX: Move down?
+    private void renderContext(FileIssues fileIssues) {
+      ImmutableMap<Integer, ImmutableSet<Integer>> issueLines =
+          fileIssues.issues().stream()
+              .filter(issue -> issue.line().isPresent())
+              .collect(
+                  toImmutableMap(
+                      issue -> issue.line().getAsInt(),
+                      issue ->
+                          issue.column().isPresent()
+                              ? ImmutableSet.of(issue.column().getAsInt())
+                              : ImmutableSet.of(),
+                      (a, b) -> ImmutableSet.<Integer>builder().addAll(a).addAll(b).build()));
+
+      // XXX: Make context configurable.
+      // XXX: This would be nicer with a `RangeSet`, but then we'd hit
+      // https://github.com/google/guava/issues/3033.
+      ImmutableSet<Integer> ranges =
+          issueLines.keySet().stream()
+              .flatMap(line -> IntStream.range(line - 3, line + 4).boxed())
+              .collect(toImmutableSet());
+
+      boolean printedCode = false;
+      try {
+        List<String> lines = Files.readAllLines(fileIssues.file(), UTF_8);
+        for (int i = 1; i <= lines.size(); i++) {
+          int salience =
+              (ranges.contains(i - 1) ? 1 : 0)
+                  + (ranges.contains(i) ? 1 : 0)
+                  + (ranges.contains(i + 1) ? 1 : 0);
+          if (salience > 1) {
+            String line = lines.get(i - 1);
+            out.print(ansi().fgBlue().a(String.format(Locale.ROOT, "%4d: ", i)).reset());
+            out.println(
+                issueLines.containsKey(i) ? highlightIssueLine(line, issueLines.get(i)) : line);
+            printedCode = true;
+          } else if (salience > 0 && printedCode) {
+            out.println(ansi().fgBlue().a("....: ").reset());
+            printedCode = false;
+          }
+        }
+
+      } catch (IOException e) {
+        // XXX: Review.
+        throw new UncheckedIOException("Failed to read file", e);
+      }
+    }
+
+    private static Ansi highlightIssueLine(String line, ImmutableSet<Integer> positions) {
+      Ansi ansi = ansi().fgRed();
+      for (int i = 0; i < line.length(); i++) {
+        if (positions.contains(i + 1)) {
+          ansi.bold().a(line.charAt(i)).boldOff();
+        } else {
+          ansi.a(line.charAt(i));
+        }
+      }
+      return ansi.reset();
     }
 
     @Command(
@@ -164,7 +264,7 @@ public final class Cli {
         currentIndex++;
         issues();
       } else {
-        out.println("No next issues.");
+        out.println("No next issue.");
       }
     }
 
@@ -177,17 +277,35 @@ public final class Cli {
         currentIndex--;
         issues();
       } else {
-        out.println("No previous issues.");
+        out.println("No previous issue.");
       }
     }
 
     String prompt() {
-      return files.isEmpty()
-          ? "No issues>"
-          : String.format(
-              "File %s (%s/%s)>", files.get(currentIndex).file(), currentIndex + 1, files.size());
+      if (files.isEmpty()) {
+        return ansi().fgRed().a("No issues").reset().a('>').toString();
+      }
+
+      return ansi()
+          .fgCyan()
+          .a(files.get(currentIndex).relativeFile())
+          .reset()
+          .a(" (")
+          .bold()
+          .a(currentIndex + 1)
+          .a('/')
+          .a(files.size())
+          .boldOff()
+          .a(")>")
+          .toString();
     }
 
-    record FileIssues(Path file, ImmutableList<Issue<Path>> issues) {}
+    record FileIssues(Path file, ImmutableList<Issue<Path>> issues) {
+      // XXX: Validate that issues are non-empty, and perhaps derive `file`.
+
+      Path relativeFile() {
+        return file.getFileSystem().getPath("").toAbsolutePath().relativize(file);
+      }
+    }
   }
 }
