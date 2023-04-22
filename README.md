@@ -32,7 +32,7 @@ code_][picnic-blog-ep-post].
 [![Security Rating][sonarcloud-security-badge]][sonarcloud-security-master]
 [![Coverage][sonarcloud-coverage-badge]][sonarcloud-coverage-master]
 [![Duplicated Lines (%)][sonarcloud-duplication-badge]][sonarcloud-duplication-master]
-[![Technical Debt][sonarcloud-tech-debt-badge]][sonarcloud-tech-debt-master]
+[![Technical Debt][sonarcloud-technical-debt-badge]][sonarcloud-technical-debt-master]
 [![License][license-badge]][license]
 [![PRs Welcome][pr-badge]][contributing]
 
@@ -310,5 +310,5 @@ channel; please see our [security policy][security] for details.
 [sonarcloud-reliability-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=reliability_rating
 [sonarcloud-security-badge]: https://sonarcloud.io/api/project_badges/measure?project=PicnicSupermarket_error-prone-support&metric=security_rating
 [sonarcloud-security-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=security_rating
-[sonarcloud-tech-debt-badge]: https://sonarcloud.io/api/project_badges/measure?project=PicnicSupermarket_error-prone-support&metric=sqale_index
-[sonarcloud-tech-debt-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=sqale_index
+[sonarcloud-technical-debt-badge]: https://sonarcloud.io/api/project_badges/measure?project=PicnicSupermarket_error-prone-support&metric=sqale_index
+[sonarcloud-technical-debt-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=sqale_index
