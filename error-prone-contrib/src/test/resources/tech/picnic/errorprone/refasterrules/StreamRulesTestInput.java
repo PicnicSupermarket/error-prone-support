@@ -4,15 +4,7 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.not;
-import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.maxBy;
-import static java.util.stream.Collectors.minBy;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.summingDouble;
-import static java.util.stream.Collectors.summingInt;
-import static java.util.stream.Collectors.summingLong;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
@@ -100,7 +92,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Stream.of("foo").max(comparingInt(String::length).reversed()),
         Stream.of("bar").sorted(comparingInt(String::length)).findFirst(),
-        Stream.of("baz").collect(minBy(comparingInt(String::length))));
+        Stream.of("baz").collect(java.util.stream.Collectors.minBy(comparingInt(String::length))));
   }
 
   ImmutableSet<Optional<String>> testStreamMinNaturalOrder() {
@@ -112,7 +104,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Stream.of("foo").min(comparingInt(String::length).reversed()),
         Streams.findLast(Stream.of("bar").sorted(comparingInt(String::length))),
-        Stream.of("baz").collect(maxBy(comparingInt(String::length))));
+        Stream.of("baz").collect(java.util.stream.Collectors.maxBy(comparingInt(String::length))));
   }
 
   ImmutableSet<Optional<String>> testStreamMaxNaturalOrder() {
@@ -160,7 +152,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Integer testStreamCollectSummingInt() {
-    return Stream.of("1").collect(summingInt(Integer::parseInt));
+    return Stream.of("1").collect(java.util.stream.Collectors.summingInt(Integer::parseInt));
   }
 
   ImmutableSet<Double> testStreamMapToDoubleSum() {
@@ -172,7 +164,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Double testStreamCollectSummingDouble() {
-    return Stream.of("1").collect(summingDouble(Double::parseDouble));
+    return Stream.of("1").collect(java.util.stream.Collectors.summingDouble(Double::parseDouble));
   }
 
   ImmutableSet<Long> testStreamMapToLongSum() {
@@ -184,22 +176,23 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Long testStreamCollectSummingLong() {
-    return Stream.of("1").collect(summingLong(Long::parseLong));
+    return Stream.of("1").collect(java.util.stream.Collectors.summingLong(Long::parseLong));
   }
 
   Long testStreamCount() {
-    return Stream.of(1).collect(counting());
+    return Stream.of(1).collect(java.util.stream.Collectors.counting());
   }
 
   Integer testStreamReduce() {
-    return Stream.of(1).collect(reducing(0, Integer::sum));
+    return Stream.of(1).collect(java.util.stream.Collectors.reducing(0, Integer::sum));
   }
 
   Optional<Integer> testStreamReduceOptional() {
-    return Stream.of(1).collect(reducing(Integer::sum));
+    return Stream.of(1).collect(java.util.stream.Collectors.reducing(Integer::sum));
   }
 
   ImmutableSet<Integer> testStreamMap() {
-    return Stream.of("1").collect(mapping(Integer::parseInt, toImmutableSet()));
+    return Stream.of("1")
+        .collect(java.util.stream.Collectors.mapping(Integer::parseInt, toImmutableSet()));
   }
 }
