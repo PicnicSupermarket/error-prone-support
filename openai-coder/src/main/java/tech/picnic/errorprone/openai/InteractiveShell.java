@@ -176,8 +176,7 @@ public final class InteractiveShell {
         subcommands = HelpCommand.class,
         description = "Submit issues to OpenAI.")
     void submit(
-        @Parameters(arity = "0..*", description = "The subset of issues to submit (default: all)")
-            @Nullable
+        @Parameters(description = "The subset of issues to submit (default: all)") @Nullable
             Set<Integer> issueNumbers)
         throws IOException {
       if (files.isEmpty()) {
