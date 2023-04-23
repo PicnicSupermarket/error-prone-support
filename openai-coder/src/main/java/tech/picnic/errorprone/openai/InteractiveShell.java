@@ -14,7 +14,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Streams;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
@@ -27,7 +26,6 @@ import java.util.Set;
 import java.util.stream.IntStream;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
 import org.jline.console.SystemRegistry;
 import org.jline.console.impl.SystemRegistryImpl;
 import org.jline.keymap.KeyMap;
@@ -56,13 +54,8 @@ import tech.picnic.errorprone.openai.IssueExtractor.Issue;
 // XXX: Consider utilizing `less` for paging. See
 // https://github.com/jline/jline3/wiki/Nano-and-Less-Customization.
 public final class InteractiveShell {
-  // XXX: Rename. Better: drop this, as the caller should likely provide an `OpenAi` instance.
-  // XXX: Gracefully handle absence of a token.
-  private static final String OPENAI_TOKEN_VARIABLE = "openapi_token";
-  @Nullable private static final String OPENAI_TOKEN = System.getenv(OPENAI_TOKEN_VARIABLE);
-
   // XXX: Drop the `IOException` and properly handle it.
-  public static void main(String... args) throws IOException {
+  public static void run(OpenAi openAi, Path buildOutputFile) throws IOException {
     // XXX: Allow the path to be specified.
     IssueExtractor<Path> issueExtractor =
         new PathResolvingIssueExtractor(
@@ -74,19 +67,12 @@ public final class InteractiveShell {
     // XXX: Force a file or command to be passed. Can be stdin in non-interactive mode.
     ImmutableSet<Issue<Path>> issues =
         LogLineExtractor.mavenErrorAndWarningExtractor()
-            .extract(new FileInputStream("/tmp/h"))
+            .extract(Files.newInputStream(buildOutputFile))
             .stream()
             .flatMap(issueExtractor::extract)
             .collect(toImmutableSet());
-    ;
 
-    // new Issue<>(Path.of("xxx"), OptionalInt.of(1), OptionalInt.empty(), "msg"),
-    // new Issue<>(Path.of("yyy"), OptionalInt.of(2), OptionalInt.empty(), "msg"),
-    // new Issue<>(Path.of("xxx"), OptionalInt.of(3), OptionalInt.empty(), "msg")
-
-    AnsiConsole.systemInstall();
-    try (OpenAi openAi = OpenAi.create(OPENAI_TOKEN);
-        Terminal terminal = TerminalBuilder.terminal()) {
+    try (Terminal terminal = TerminalBuilder.terminal()) {
       IssueResolutionController issueResolutionController =
           new IssueResolutionController(openAi, terminal.writer(), issues);
 
@@ -132,8 +118,6 @@ public final class InteractiveShell {
       }
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to create terminal", e);
-    } finally {
-      AnsiConsole.systemUninstall();
     }
   }
 
@@ -142,6 +126,7 @@ public final class InteractiveShell {
   // XXX: Mark files modified/track modification count?
   // XXX: List full diff over multiple rounds?
   // XXX: Allow submission of a custom instruction.
+  // XXX: Merge with top-level class.
   @Command(name = "")
   @NotThreadSafe
   static final class IssueResolutionController {
