@@ -13,7 +13,7 @@ import java.time.Duration;
 /** A class that exposes a number of high-level OpenAI-based operations. */
 // XXX: Make final.
 // XXX: Implement exponential backoff.
-public class OpenAi implements AutoCloseable {
+public final class OpenAi implements AutoCloseable {
   // XXX: Rename.
   @VisibleForTesting static final String OPENAI_TOKEN_VARIABLE = "openapi_token";
   // XXX: Make configurable?
@@ -36,7 +36,8 @@ public class OpenAi implements AutoCloseable {
   }
 
   // XXX: Support multiple alternatives?
-  // XXX: Improve error handling.
+  // XXX: Improve error handling (catch `OpenAiHttpException`, expose its message and the backing
+  // HTTP error code).
   String requestEdit(String input, String instruction) {
     return openAiService
         .createEdit(

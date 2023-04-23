@@ -25,7 +25,7 @@ final class PlexusCompilerIssueExtractorTest {
             relative/path/to/MyClass.java:[30,22] no comment
             """,
             ImmutableSet.of(
-                new Issue(
+                new Issue<>(
                     "relative/path/to/MyClass.java",
                     OptionalInt.of(30),
                     OptionalInt.of(22),
@@ -35,7 +35,7 @@ final class PlexusCompilerIssueExtractorTest {
             /absolute/path/to/MyClass.java:[123] error message without column specification
             """,
             ImmutableSet.of(
-                new Issue(
+                new Issue<>(
                     "/absolute/path/to/MyClass.java",
                     OptionalInt.of(123),
                     OptionalInt.empty(),
@@ -45,7 +45,7 @@ final class PlexusCompilerIssueExtractorTest {
             /absolute/path/to/MyClass2.java: error message without location specification
             """,
             ImmutableSet.of(
-                new Issue(
+                new Issue<>(
                     "/absolute/path/to/MyClass2.java",
                     OptionalInt.empty(),
                     OptionalInt.empty(),
@@ -57,7 +57,7 @@ final class PlexusCompilerIssueExtractorTest {
               location: class another.Class
             """,
             ImmutableSet.of(
-                new Issue(
+                new Issue<>(
                     "/absolute/path/to/another/Class.java",
                     OptionalInt.of(10),
                     OptionalInt.of(17),
@@ -72,7 +72,7 @@ final class PlexusCompilerIssueExtractorTest {
               Did you mean to remove this line?
             """,
             ImmutableSet.of(
-                new Issue(
+                new Issue<>(
                     "/file/with/errorprone/violation/Foo.java",
                     OptionalInt.of(2),
                     OptionalInt.of(4),

@@ -218,6 +218,7 @@ final class InteractiveBuildOutputProcessor {
             () ->
                 out.println(
                     ansi().fgRed().a("No changes generated yet; run `submit` first.").reset()));
+    next();
   }
 
   @Command(aliases = "n", subcommands = HelpCommand.class, description = "Move to the next issue.")
