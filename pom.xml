@@ -1787,6 +1787,17 @@
             </properties>
         </profile>
         <profile>
+            <id>github-actions-build-number</id>
+            <activation>
+                <property>
+                    <name>env.GITHUB_RUN_ID</name>
+                </property>
+            </activation>
+            <properties>
+                <build.number>${env.GITHUB_RUN_ID}</build.number>
+            </properties>
+        </profile>
+        <profile>
             <id>third-party-license-tsv-export</id>
             <activation>
                 <file>
