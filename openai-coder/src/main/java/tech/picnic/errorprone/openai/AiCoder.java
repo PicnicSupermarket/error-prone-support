@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.openai;
 
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -30,10 +29,10 @@ public final class AiCoder {
 
   // XXX: Drop the `IOException` and properly handle it.
   @Command(
-      name = "analyze-build-output",
+      name = "process-build-output",
       mixinStandardHelpOptions = true,
       description = "Attempts to resolve issues extracted from build output.")
-  void analyzeBuildOutput(
+  void processBuildOutput(
       @Option(
               names = {"-a", "--auto-fix"},
               description = "Submit all issues to OpenAI and accept the results.")
@@ -56,7 +55,7 @@ public final class AiCoder {
               + buildOutputSource.buildOutputFile);
     }
 
-    InteractiveShell.run(openAi, buildOutputSource.buildOutputFile.orElseThrow());
+    InteractiveBuildOutputProcessor.run(openAi, buildOutputSource.buildOutputFile.orElseThrow());
   }
 
   public static void main(String... args) {
