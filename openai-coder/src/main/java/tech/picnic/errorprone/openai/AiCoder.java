@@ -85,6 +85,8 @@ public final class AiCoder {
   private static ImmutableSet<Issue<Path>> extractIssues(
       ImmutableList<String> command, PrintStream out, PrintStream err) {
     try {
+      // XXX: If `ctrl-c` is pressed while the command is running, then seemingly JLine does't
+      // intercept it. Investigate.
       Process process = new ProcessBuilder(command).start();
 
       StringBuilder collectedOutput = new StringBuilder();

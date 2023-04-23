@@ -17,7 +17,6 @@ import com.google.common.collect.Streams;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -64,27 +63,23 @@ import tech.picnic.errorprone.openai.IssueExtractor.Issue;
 final class InteractiveBuildOutputProcessor {
   private final OpenAi openAi;
   private final PrintWriter out;
-  private final ImmutableList<FileIssues> files;
+  private final Supplier<ImmutableSet<Issue<Path>>> issueSupplier;
+  private ImmutableList<FileIssues> files = ImmutableList.of();
   private int currentIndex = 0;
 
   InteractiveBuildOutputProcessor(
-      OpenAi openAi, PrintWriter output, ImmutableSet<Issue<Path>> issues) {
+      OpenAi openAi, PrintWriter output, Supplier<ImmutableSet<Issue<Path>>> issueSupplier) {
     this.openAi = openAi;
     this.out = output;
-    this.files =
-        Multimaps.asMap(Multimaps.index(issues, Issue::file)).values().stream()
-            .map(fileIssues -> new FileIssues(ImmutableList.copyOf(fileIssues)))
-            .collect(toImmutableList());
+    this.issueSupplier = issueSupplier;
   }
 
   // XXX: Replace `Supplier<ImmutableSet<Issue<Path>>>` with a custom type that exposes the issue
   // source and can be configured?
   public static void run(OpenAi openAi, Supplier<ImmutableSet<Issue<Path>>> issueSupplier) {
-    ImmutableSet<Issue<Path>> issues = issueSupplier.get();
-
     try (Terminal terminal = TerminalBuilder.terminal()) {
       InteractiveBuildOutputProcessor processor =
-          new InteractiveBuildOutputProcessor(openAi, terminal.writer(), issues);
+          new InteractiveBuildOutputProcessor(openAi, terminal.writer(), issueSupplier);
 
       PicocliCommandsFactory factory = new PicocliCommandsFactory();
       factory.setTerminal(terminal);
@@ -110,7 +105,7 @@ final class InteractiveBuildOutputProcessor {
           .enable();
       reader.getKeyMaps().get("main").bind(new Reference("tailtip-toggle"), KeyMap.ctrl('t'));
 
-      processor.issues();
+      processor.restart();
       while (true) {
         try {
           systemRegistry.cleanUp();
@@ -128,6 +123,16 @@ final class InteractiveBuildOutputProcessor {
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to create terminal", e);
     }
+  }
+
+  @Command(aliases = "r", subcommands = HelpCommand.class, description = "Restarts issue analysis.")
+  void restart() {
+    files =
+        Multimaps.asMap(Multimaps.index(issueSupplier.get(), Issue::file)).values().stream()
+            .map(fileIssues -> new FileIssues(ImmutableList.copyOf(fileIssues)))
+            .collect(toImmutableList());
+    currentIndex = 0;
+    issues();
   }
 
   @Command(aliases = "i", subcommands = HelpCommand.class, description = "List issues.")
