@@ -12,19 +12,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 import javax.annotation.WillClose;
 import javax.annotation.WillNotClose;
 import org.fusesource.jansi.AnsiConsole;
 import picocli.CommandLine;
-import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -36,7 +32,6 @@ public final class AiCoder {
   private static final String OPENAI_TOKEN_VARIABLE = "OPENAI_TOKEN";
 
   private final OpenAi openAi;
-  // XXX: Drop these fields if unused.
   private final PrintStream out;
   private final PrintStream err;
 
@@ -46,7 +41,6 @@ public final class AiCoder {
     this.err = err;
   }
 
-  // XXX: Drop the `IOException` and properly handle it.
   @Command(
       name = "process-build-output",
       mixinStandardHelpOptions = true,
@@ -59,11 +53,11 @@ public final class AiCoder {
           boolean autoFix,
       @Option(
               names = {"-c", "--command"},
-              description = "Submit all issues to OpenAI and accept the results.")
+              description =
+                  "Interpret the positional arguments as a command to be executed, rather than output files.")
           boolean command,
       @Parameters(description = "The files containing the build output or the command to run.")
-          List<String> filesOrCommand)
-      throws IOException {
+          List<String> filesOrCommand) {
     // XXX: Replace this code.
     if (autoFix) {
       // XXX: Implement auto-fixing.
@@ -76,8 +70,10 @@ public final class AiCoder {
     Supplier<ImmutableSet<Issue<Path>>> issueSupplier =
         command
             ? () -> extractIssues(ImmutableList.copyOf(filesOrCommand), out, err)
-            // XXX: Support multiple files. (Process independently, then merge the results.)
-            : () -> extractIssues(Path.of(filesOrCommand.get(0)));
+            : () ->
+                filesOrCommand.stream()
+                    .flatMap(f -> extractIssues(Path.of(f)).stream())
+                    .collect(toImmutableSet());
 
     InteractiveBuildOutputProcessor.run(openAi, issueSupplier);
   }

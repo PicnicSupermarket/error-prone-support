@@ -49,6 +49,8 @@ final class PathFinder {
     }
 
     // XXX: Log if not exactly one match? Could use SLF4J + SimpleLogger on the exec:java classpath.
+    // XXX: Alternatively, if this code is absorbed int `PathResolvingIssueExtractor`, then perhaps
+    // this issue could be reflected in the returned `Issue`. (How is TBD.)
     return Optional.of(inexactMatches)
         .filter(matches -> matches.size() == 1)
         .map(Iterables::getOnlyElement);

@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -129,7 +130,7 @@ final class InteractiveBuildOutputProcessor {
   void restart() {
     files =
         Multimaps.asMap(Multimaps.index(issueSupplier.get(), Issue::file)).values().stream()
-            .map(fileIssues -> new FileIssues(ImmutableList.copyOf(fileIssues)))
+            .map(fileIssues -> FileIssues.of(ImmutableList.copyOf(fileIssues)))
             .collect(toImmutableList());
     currentIndex = 0;
     issues();
@@ -184,7 +185,7 @@ final class InteractiveBuildOutputProcessor {
             .collect(joining("\n", "Resolve the following issues:\n", "\n"));
     String result = openAi.requestEdit(originalCode, instruction);
 
-    // XXX: Here, store the result.
+    fileIssues.setProposal(result);
 
     Diffs.printUnifiedDiff(originalCode, result, fileIssues.relativeFile(), out);
   }
@@ -194,10 +195,29 @@ final class InteractiveBuildOutputProcessor {
       subcommands = HelpCommand.class,
       description = "Apply the changes suggested by OpenAI")
   void apply() {
-    // XXX: Implement.
-    // Verify that there's a proposal.
+    if (files.isEmpty()) {
+      out.println(ansi().fgRed().a("No issues.").reset());
+      return;
+    }
 
-    // XXX: Apply the result only if it applies cleanly.
+    FileIssues fileIssues = files.get(currentIndex);
+    fileIssues
+        .proposal()
+        .ifPresentOrElse(
+            proposal -> {
+              try {
+                // XXX: Apply the result only if it applies cleanly! Consider using the diff.
+                Files.writeString(fileIssues.file(), proposal);
+                out.println(ansi().fgGreen().a("Applied changes.").reset());
+              } catch (IOException e) {
+                out.println(ansi().fgRed().a("Failed to apply changes"));
+                e.printStackTrace(out);
+                out.print(ansi().reset());
+              }
+            },
+            () ->
+                out.println(
+                    ansi().fgRed().a("No changes generated yet; run `submit` first.").reset()));
   }
 
   @Command(aliases = "n", subcommands = HelpCommand.class, description = "Move to the next issue.")
@@ -321,33 +341,49 @@ final class InteractiveBuildOutputProcessor {
     }
   }
 
-  // XXX: Expose an `ImmutableSet` instead?
-  record FileIssues(Path file, ImmutableList<Issue<Path>> issues) {
-    FileIssues(ImmutableList<Issue<Path>> issues) {
-      this(
-          issues.stream()
-              .findFirst()
-              .orElseThrow(() -> new IllegalArgumentException("No issues provided"))
-              .file(),
-          issues);
-    }
+  private static final class FileIssues {
+    private final Path file;
+    private final ImmutableList<Issue<Path>> issues;
+    private Optional<String> proposal = Optional.empty();
 
     FileIssues(Path file, ImmutableList<Issue<Path>> issues) {
       this.file = file;
-      this.issues =
-          ImmutableList.sortedCopyOf(
-              comparingInt((Issue<Path> issue) -> issue.line().orElse(-1))
-                  .thenComparingInt(issue -> issue.column().orElse(-1)),
-              issues);
-
-      checkArgument(!issues.isEmpty(), "No issues provided");
+      this.issues = issues;
       checkArgument(
           issues.stream().allMatch(issue -> issue.file().equals(file)),
           "Issues must all reference the same file");
     }
 
+    static FileIssues of(ImmutableList<Issue<Path>> issues) {
+      return new FileIssues(
+          issues.stream()
+              .findFirst()
+              .orElseThrow(() -> new IllegalArgumentException("No issues provided"))
+              .file(),
+          ImmutableList.sortedCopyOf(
+              comparingInt((Issue<Path> issue) -> issue.line().orElse(-1))
+                  .thenComparingInt(issue -> issue.column().orElse(-1)),
+              issues));
+    }
+
+    Path file() {
+      return file;
+    }
+
     Path relativeFile() {
       return file.getFileSystem().getPath("").toAbsolutePath().relativize(file);
+    }
+
+    ImmutableList<Issue<Path>> issues() {
+      return issues;
+    }
+
+    void setProposal(String proposal) {
+      this.proposal = Optional.of(proposal);
+    }
+
+    Optional<String> proposal() {
+      return proposal;
     }
   }
 }
