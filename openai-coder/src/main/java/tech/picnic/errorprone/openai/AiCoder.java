@@ -1,15 +1,34 @@
 package tech.picnic.errorprone.openai;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+import javax.annotation.WillClose;
 import javax.annotation.WillNotClose;
 import org.fusesource.jansi.AnsiConsole;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
+import tech.picnic.errorprone.openai.IssueExtractor.Issue;
 
 @Command(name = "", mixinStandardHelpOptions = true, description = "OpenAI Coder CLI.")
 public final class AiCoder {
@@ -31,31 +50,90 @@ public final class AiCoder {
   @Command(
       name = "process-build-output",
       mixinStandardHelpOptions = true,
+      showEndOfOptionsDelimiterInUsageHelp = true,
       description = "Attempts to resolve issues extracted from build output.")
   void processBuildOutput(
       @Option(
               names = {"-a", "--auto-fix"},
               description = "Submit all issues to OpenAI and accept the results.")
           boolean autoFix,
-      @ArgGroup(multiplicity = "1") BuildOutputSource buildOutputSource)
+      @Option(
+              names = {"-c", "--command"},
+              description = "Submit all issues to OpenAI and accept the results.")
+          boolean command,
+      @Parameters(description = "The files containing the build output or the command to run.")
+          List<String> filesOrCommand)
       throws IOException {
+    // XXX: Replace this code.
     if (autoFix) {
       // XXX: Implement auto-fixing.
-      System.out.println(
-          "Auto-fixing issues in "
-              + buildOutputSource.buildCommand
-              + " / "
-              + buildOutputSource.buildOutputFile);
+      System.out.println("Auto-fixing issues in " + filesOrCommand);
     } else {
       // XXX: Implement analyzing.
-      System.out.println(
-          "Analyzing issues in "
-              + buildOutputSource.buildCommand
-              + " / "
-              + buildOutputSource.buildOutputFile);
+      System.out.println("Analyzing issues in " + filesOrCommand);
     }
 
-    InteractiveBuildOutputProcessor.run(openAi, buildOutputSource.buildOutputFile.orElseThrow());
+    Supplier<ImmutableSet<Issue<Path>>> issueSupplier =
+        command
+            ? () -> extractIssues(ImmutableList.copyOf(filesOrCommand), out, err)
+            // XXX: Support multiple files. (Process independently, then merge the results.)
+            : () -> extractIssues(Path.of(filesOrCommand.get(0)));
+
+    InteractiveBuildOutputProcessor.run(openAi, issueSupplier);
+  }
+
+  private static ImmutableSet<Issue<Path>> extractIssues(
+      ImmutableList<String> command, PrintStream out, PrintStream err) {
+    try {
+      Process process = new ProcessBuilder(command).start();
+
+      StringBuilder collectedOutput = new StringBuilder();
+      try (InputStream processOutput = process.getInputStream();
+          BufferedReader output = new BufferedReader(new InputStreamReader(processOutput, UTF_8))) {
+        String line = null;
+        for (line = output.readLine(); line != null; line = output.readLine()) {
+          out.println(line);
+          collectedOutput.append(line).append('\n');
+        }
+        process.waitFor();
+        // XXX: Report the exit code?
+        // XXX: Process the output.
+      } catch (InterruptedException e) {
+        err.println("Interrupted while waiting for process to finish.");
+        Thread.currentThread().interrupt();
+      }
+
+      // XXX: This `ByteArrayInputStream` usage is dodgy. Review.
+      return extractIssues(new ByteArrayInputStream(collectedOutput.toString().getBytes(UTF_8)));
+    } catch (IOException e) {
+      throw new UncheckedIOException(
+          String.format(
+              "Failed to execute or parse result of command '%s'", String.join(" ", command)),
+          e);
+    }
+  }
+
+  private static ImmutableSet<Issue<Path>> extractIssues(Path file) {
+    try (InputStream is = Files.newInputStream(file)) {
+      return extractIssues(is);
+    } catch (IOException e) {
+      throw new UncheckedIOException(String.format("Failed to parse file '%s'", file), e);
+    }
+  }
+
+  private static ImmutableSet<Issue<Path>> extractIssues(@WillClose InputStream inputStream)
+      throws IOException {
+    // XXX: Here and elsewhere: should we allow the cwd to be changed?
+    IssueExtractor<Path> issueExtractor =
+        new PathResolvingIssueExtractor(
+            new PathFinder(FileSystems.getDefault(), Path.of("")),
+            new SelectFirstIssueExtractor<>(
+                ImmutableSet.of(
+                    new MavenCheckstyleIssueExtractor(), new PlexusCompilerIssueExtractor())));
+
+    return LogLineExtractor.mavenErrorAndWarningExtractor().extract(inputStream).stream()
+        .flatMap(issueExtractor::extract)
+        .collect(toImmutableSet());
   }
 
   public static void main(String... args) {
@@ -80,19 +158,5 @@ public final class AiCoder {
         new CommandLine(new AiCoder(openAi, AnsiConsole.out(), AnsiConsole.err()));
     commandLine.getCommandSpec().version(AiCoder.class.getPackage().getImplementationVersion());
     return commandLine;
-  }
-
-  // XXX: Update this class if PicoCLI ever supports (record) constructor injection. See
-  // https://github.com/remkop/picocli/issues/1358.
-  static final class BuildOutputSource {
-    @Option(
-        names = {"-f", "--file"},
-        description = "The path to the file containing the build output to analyze.")
-    private Optional<Path> buildOutputFile;
-
-    @Option(
-        names = {"-c", "--command"},
-        description = "The command to run to produce the build output to analyze.")
-    private Optional<String> buildCommand;
   }
 }

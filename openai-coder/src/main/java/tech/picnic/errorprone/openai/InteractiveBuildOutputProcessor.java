@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.fusesource.jansi.Ansi;
@@ -76,23 +77,10 @@ final class InteractiveBuildOutputProcessor {
             .collect(toImmutableList());
   }
 
-  // XXX: Drop the `IOException` and properly handle it.
-  public static void run(OpenAi openAi, Path buildOutputFile) throws IOException {
-    // XXX: Allow the path to be specified.
-    IssueExtractor<Path> issueExtractor =
-        new PathResolvingIssueExtractor(
-            new PathFinder(FileSystems.getDefault(), Path.of("")),
-            new SelectFirstIssueExtractor<>(
-                ImmutableSet.of(
-                    new MavenCheckstyleIssueExtractor(), new PlexusCompilerIssueExtractor())));
-
-    // XXX: Force a file or command to be passed. Can be stdin in non-interactive mode.
-    ImmutableSet<Issue<Path>> issues =
-        LogLineExtractor.mavenErrorAndWarningExtractor()
-            .extract(Files.newInputStream(buildOutputFile))
-            .stream()
-            .flatMap(issueExtractor::extract)
-            .collect(toImmutableSet());
+  // XXX: Replace `Supplier<ImmutableSet<Issue<Path>>>` with a custom type that exposes the issue
+  // source and can be configured?
+  public static void run(OpenAi openAi, Supplier<ImmutableSet<Issue<Path>>> issueSupplier) {
+    ImmutableSet<Issue<Path>> issues = issueSupplier.get();
 
     try (Terminal terminal = TerminalBuilder.terminal()) {
       InteractiveBuildOutputProcessor processor =
