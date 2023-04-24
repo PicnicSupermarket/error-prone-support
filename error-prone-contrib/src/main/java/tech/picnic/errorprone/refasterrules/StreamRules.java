@@ -5,11 +5,16 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.filtering;
+import static java.util.stream.Collectors.flatMapping;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.maxBy;
 import static java.util.stream.Collectors.minBy;
 import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.summarizingDouble;
+import static java.util.stream.Collectors.summarizingInt;
+import static java.util.stream.Collectors.summarizingLong;
 import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
@@ -24,6 +29,9 @@ import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
+import java.util.IntSummaryStatistics;
+import java.util.LongSummaryStatistics;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
@@ -402,7 +410,12 @@ final class StreamRules {
 
   static final class StreamMapToIntSum<T> {
     @BeforeTemplate
-    int before(
+    long before(Stream<T> stream, ToIntFunction<T> mapper) {
+      return stream.collect(summingInt(mapper));
+    }
+
+    @BeforeTemplate
+    int before2(
         Stream<T> stream,
         @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Integer> mapper) {
       return stream.map(mapper).reduce(0, Integer::sum);
@@ -414,23 +427,14 @@ final class StreamRules {
     }
   }
 
-  static final class StreamCollectSummingInt<T> {
-    @BeforeTemplate
-    long before(
-        Stream<T> stream,
-        @Matches(IsLambdaExpressionOrMethodReference.class) ToIntFunction<T> mapper) {
-      return stream.collect(summingInt(mapper));
-    }
-
-    @AfterTemplate
-    long after(Stream<T> stream, ToIntFunction<T> mapper) {
-      return stream.mapToInt(mapper).sum();
-    }
-  }
-
   static final class StreamMapToDoubleSum<T> {
     @BeforeTemplate
-    double before(
+    double before(Stream<T> stream, ToDoubleFunction<T> mapper) {
+      return stream.collect(summingDouble(mapper));
+    }
+
+    @BeforeTemplate
+    double before2(
         Stream<T> stream,
         @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Double> mapper) {
       return stream.map(mapper).reduce(0.0, Double::sum);
@@ -442,23 +446,14 @@ final class StreamRules {
     }
   }
 
-  static final class StreamCollectSummingDouble<T> {
-    @BeforeTemplate
-    double before(
-        Stream<T> stream,
-        @Matches(IsLambdaExpressionOrMethodReference.class) ToDoubleFunction<T> mapper) {
-      return stream.collect(summingDouble(mapper));
-    }
-
-    @AfterTemplate
-    double after(Stream<T> stream, ToDoubleFunction<T> mapper) {
-      return stream.mapToDouble(mapper).sum();
-    }
-  }
-
   static final class StreamMapToLongSum<T> {
     @BeforeTemplate
-    long before(
+    long before(Stream<T> stream, ToLongFunction<T> mapper) {
+      return stream.collect(summingLong(mapper));
+    }
+
+    @BeforeTemplate
+    long before2(
         Stream<T> stream,
         @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Long> mapper) {
       return stream.map(mapper).reduce(0L, Long::sum);
@@ -470,17 +465,39 @@ final class StreamRules {
     }
   }
 
-  static final class StreamCollectSummingLong<T> {
+  static final class StreamMapToIntSummaryStatistics<T> {
     @BeforeTemplate
-    long before(
-        Stream<T> stream,
-        @Matches(IsLambdaExpressionOrMethodReference.class) ToLongFunction<T> mapper) {
-      return stream.collect(summingLong(mapper));
+    IntSummaryStatistics before(Stream<T> stream, ToIntFunction<T> mapper) {
+      return stream.collect(summarizingInt(mapper));
     }
 
     @AfterTemplate
-    long after(Stream<T> stream, ToLongFunction<T> mapper) {
-      return stream.mapToLong(mapper).sum();
+    IntSummaryStatistics after(Stream<T> stream, ToIntFunction<T> mapper) {
+      return stream.mapToInt(mapper).summaryStatistics();
+    }
+  }
+
+  static final class StreamMapToDoubleSummaryStatistics<T> {
+    @BeforeTemplate
+    DoubleSummaryStatistics before(Stream<T> stream, ToDoubleFunction<T> mapper) {
+      return stream.collect(summarizingDouble(mapper));
+    }
+
+    @AfterTemplate
+    DoubleSummaryStatistics after(Stream<T> stream, ToDoubleFunction<T> mapper) {
+      return stream.mapToDouble(mapper).summaryStatistics();
+    }
+  }
+
+  static final class StreamMapToLongSummaryStatistics<T> {
+    @BeforeTemplate
+    LongSummaryStatistics before(Stream<T> stream, ToLongFunction<T> mapper) {
+      return stream.collect(summarizingLong(mapper));
+    }
+
+    @AfterTemplate
+    LongSummaryStatistics after(Stream<T> stream, ToLongFunction<T> mapper) {
+      return stream.mapToLong(mapper).summaryStatistics();
     }
   }
 
@@ -498,18 +515,6 @@ final class StreamRules {
 
   static final class StreamReduce<T> {
     @BeforeTemplate
-    T before(Stream<T> stream, T identity, BinaryOperator<T> accumulator) {
-      return stream.collect(reducing(identity, accumulator));
-    }
-
-    @AfterTemplate
-    T after(Stream<T> stream, T identity, BinaryOperator<T> accumulator) {
-      return stream.reduce(identity, accumulator);
-    }
-  }
-
-  static final class StreamReduceOptional<T> {
-    @BeforeTemplate
     Optional<T> before(Stream<T> stream, BinaryOperator<T> accumulator) {
       return stream.collect(reducing(accumulator));
     }
@@ -520,12 +525,38 @@ final class StreamRules {
     }
   }
 
-  static final class StreamMap<T, U, A, R> {
+  static final class StreamReduceWithIdentity<T> {
+    @BeforeTemplate
+    T before(Stream<T> stream, T identity, BinaryOperator<T> accumulator) {
+      return stream.collect(reducing(identity, accumulator));
+    }
+
+    @AfterTemplate
+    T after(Stream<T> stream, T identity, BinaryOperator<T> accumulator) {
+      return stream.reduce(identity, accumulator);
+    }
+  }
+
+  static final class StreamFilterCollect<T, R> {
+    @BeforeTemplate
+    R before(
+        Stream<T> stream, Predicate<? super T> predicate, Collector<? super T, ?, R> collector) {
+      return stream.collect(filtering(predicate, collector));
+    }
+
+    @AfterTemplate
+    R after(
+        Stream<T> stream, Predicate<? super T> predicate, Collector<? super T, ?, R> collector) {
+      return stream.filter(predicate).collect(collector);
+    }
+  }
+
+  static final class StreamMapCollect<T, U, R> {
     @BeforeTemplate
     R before(
         Stream<T> stream,
-        @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, ? extends U> mapper,
-        Collector<? super U, A, R> collector) {
+        Function<? super T, ? extends U> mapper,
+        Collector<? super U, ?, R> collector) {
       return stream.collect(mapping(mapper, collector));
     }
 
@@ -533,8 +564,26 @@ final class StreamRules {
     R after(
         Stream<T> stream,
         Function<? super T, ? extends U> mapper,
-        Collector<? super U, A, R> collector) {
+        Collector<? super U, ?, R> collector) {
       return stream.map(mapper).collect(collector);
+    }
+  }
+
+  static final class StreamFlatMapCollect<T, U, R> {
+    @BeforeTemplate
+    R before(
+        Stream<T> stream,
+        Function<? super T, ? extends Stream<? extends U>> mapper,
+        Collector<? super U, ?, R> collector) {
+      return stream.collect(flatMapping(mapper, collector));
+    }
+
+    @AfterTemplate
+    R after(
+        Stream<T> stream,
+        Function<? super T, ? extends Stream<? extends U>> mapper,
+        Collector<? super U, ?, R> collector) {
+      return stream.flatMap(mapper).collect(collector);
     }
   }
 }
