@@ -1,0 +1,51 @@
+version: 1.0
+linter: jetbrains/qodana-jvm-community:2023.3
+profile:
+  # XXX: Review which additional inspections to enable.
+  name: qodana.recommended
+exclude:
+  # Refaster rules are not analyzed, as this would yield many false positives:
+  # - Template methods are not meant to be executed; applying data flow
+  #   analysis to them yields incorrect conclusions.
+  # - Template parameters present arbitrary expressions; treating them as plain
+  #   parameters yields incorrect conclusions.
+  # - By their nature, `@BeforeTemplate` methods contain non-idiomatic or
+  #   inefficient expressions; pointing that out is generally redundant.
+  - name: All
+    paths:
+      - error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules
+  # XXX: Enable if/when it is possible to customize the set of permissible
+  # method name prefixes.
+  - name: BooleanMethodNameMustStartWithQuestion
+  # XXX: Enable if/when it is possible to exclude Google AutoValue constructs.
+  - name: ClassReferencesSubclass
+  # This inspection makes little sense, given that types are generally not
+  # fully qualified, outside import statements.
+  - name: ClassNamePrefixedWithPackageName
+  # XXX: Enable if/when it is possible to disable the name length constraint.
+  - name: FieldNamingConvention
+  # XXX: Enable this inspection once it doesn't report so many false-positives.
+  - name: HardcodedFileSeparators
+  # XXX: Enable if/when it is possible to disable the name length constraint.
+  - name: LocalVariableNamingConvention
+  # XXX: Enable if/when it is possible to disable the name length constraint.
+  - name: NewClassNamingConvention
+  # XXX: Enable if/when it is possible to exclude selected non-boolean types,
+  # such as `Matcher`, `Predicate` and `TypePredicate`.
+  - name: NonBooleanMethodNameMayNotStartWithQuestion
+  # XXX: Enable if/when it is possible to disable the name length constraint.
+  - name: ParameterNamingConvention
+  # Not all APIs benefit from an interface abstraction.
+  - name: PublicMethodNotExposedInInterface
+  # XXX: Enable if/when it is possible to customize the set of types for which
+  # not to fire. For example, we prefer consistent use of Guava's immutable
+  # collection types.
+  - name: TypeMayBeWeakened
+  # The nullary constructor of bug checkers is always defined explicitly,
+  # because we require all public members to be documented.
+  # XXX: Enable this inspection if/when it is possible to exclude constructors
+  # with Javadoc.
+  - name: UnnecessaryConstructor
+  # XXX: Review whether to enable this. See also `-Xep:BetaApi:OFF` in
+  # `pom.xml`.
+  - name: UnstableApiUsage

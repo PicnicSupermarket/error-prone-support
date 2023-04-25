@@ -1,0 +1,32 @@
+# Analyzes the code using JetBrains' Qodana.
+# XXX: Expand this text.
+name: Qodana analysis
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+permissions:
+  contents: read
+jobs:
+  analyze:
+    runs-on: ubuntu-22.04
+    # XXX: Validate which of these is necessary.
+    #permissions:
+    #  checks: write
+    #  contents: write
+    #  pull-requests: write
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Perform Qodana analysis
+        uses: JetBrains/qodana-action@a8363b702c2d2d49a77620bcd10541686df21307 # v2023.3.0
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+      # XXX: Review whether this step is still necessary.
+      - name: Update "Code scanning" dashboard
+        uses: github/codeql-action/upload-sarif@v2.2.11
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json

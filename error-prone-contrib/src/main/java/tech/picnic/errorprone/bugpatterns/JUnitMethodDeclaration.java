@@ -73,13 +73,13 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
         .ifPresent(fixBuilder::merge);
 
     if (isTestMethod) {
-      suggestTestMethodRenameIfApplicable(tree, fixBuilder, state);
+      trySuggestTestMethodRename(tree, fixBuilder, state);
     }
 
     return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
   }
 
-  private void suggestTestMethodRenameIfApplicable(
+  private void trySuggestTestMethodRename(
       MethodTree tree, SuggestedFix.Builder fixBuilder, VisitorState state) {
     MethodSymbol symbol = ASTHelpers.getSymbol(tree);
     tryCanonicalizeMethodName(symbol)

@@ -100,7 +100,7 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
        * This `String#format` invocation performs a straightforward string conversion; use
        * `String#valueOf` instead.
        */
-      return trySuggestExplicitStringConversion(tree, state);
+      return trySuggestExplicitConversion(tree, state);
     }
 
     String separator = Iterables.getOnlyElement(innerSeparators);
@@ -121,8 +121,7 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
    * <p>If {@code arg} is already a string then the resultant conversion is vacuous. The {@link
    * IdentityConversion} check will subsequently drop it.
    */
-  private Description trySuggestExplicitStringConversion(
-      MethodInvocationTree tree, VisitorState state) {
+  private Description trySuggestExplicitConversion(MethodInvocationTree tree, VisitorState state) {
     ExpressionTree argument = tree.getArguments().get(1);
     if (isSubtype(ASTHelpers.getType(argument), FORMATTABLE_TYPE, state)) {
       /*

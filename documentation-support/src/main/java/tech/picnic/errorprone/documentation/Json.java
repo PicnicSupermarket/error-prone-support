@@ -25,7 +25,9 @@ final class Json {
   static <T> T read(Path path, Class<T> clazz) {
     try {
       return OBJECT_MAPPER.readValue(path.toFile(), clazz);
-    } catch (IOException e) {
+    } catch (
+        @SuppressWarnings("OverlyBroadCatchBlock" /* No need to further disambiguate errors. */)
+        IOException e) {
       throw failure(e, "Failure reading from '%s'", path);
     }
   }
@@ -33,7 +35,9 @@ final class Json {
   static <T> void write(Path path, T object) {
     try {
       OBJECT_MAPPER.writeValue(path.toFile(), object);
-    } catch (IOException e) {
+    } catch (
+        @SuppressWarnings("OverlyBroadCatchBlock" /* No need to further disambiguate errors. */)
+        IOException e) {
       throw failure(e, "Failure writing to '%s'", path);
     }
   }

@@ -83,7 +83,7 @@ final class StringRules {
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(String str) {
+    boolean after(@Nullable String str) {
       return Strings.isNullOrEmpty(str);
     }
   }
@@ -92,14 +92,14 @@ final class StringRules {
   // XXX: This is a special case of `TernaryOperatorOptionalNegativeFiltering`.
   static final class OptionalNonEmptyString {
     @BeforeTemplate
-    Optional<String> before(String str) {
+    Optional<String> before(@Nullable String str) {
       return Strings.isNullOrEmpty(str)
           ? Optional.empty()
           : Refaster.anyOf(Optional.of(str), Optional.ofNullable(str));
     }
 
     @AfterTemplate
-    Optional<String> after(String str) {
+    Optional<String> after(@Nullable String str) {
       return Optional.ofNullable(str).filter(not(String::isEmpty));
     }
   }

@@ -2,6 +2,7 @@ package tech.picnic.errorprone.documentation;
 
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -165,9 +166,13 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
         /*
          * Retrieve the method invocation that contains the input source code. Note that this cast
          * is safe, because this code is guarded by an earlier call to `#getClassUnderTest(..)`,
-         * which ensures that `tree` is part of a longer method invocation chain.
+         * which ensures that `tree` is part of a longer method invocation chain. Additionally, as
+         * the invoked method is non-static and defined on a third-party class, a receiver must
+         * exist.
          */
-        MethodInvocationTree inputTree = (MethodInvocationTree) ASTHelpers.getReceiver(tree);
+        MethodInvocationTree inputTree =
+            (MethodInvocationTree)
+                requireNonNull(ASTHelpers.getReceiver(tree), "Input tree definition");
 
         String path = ASTHelpers.constValue(inputTree.getArguments().get(0), String.class);
         Optional<String> inputCode = getSourceCode(inputTree);
@@ -200,7 +205,7 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
         if (value == null) {
           return Optional.empty();
         }
-        source.append(value).append('\n');
+        source.append(value).append(System.lineSeparator());
       }
 
       return Optional.of(source.toString());

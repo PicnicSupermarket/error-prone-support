@@ -123,6 +123,8 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
   }
 
   /** Merges two annotation mappings, preferring the second over the first in case of conflicts. */
+  @SuppressWarnings(
+      "MethodOnlyUsedFromInnerClass" /* Expanding the anonymous class is undesirable. */)
   private static ImmutableClassToInstanceMap<Annotation> merge(
       ImmutableClassToInstanceMap<Annotation> first,
       ImmutableClassToInstanceMap<Annotation> second) {

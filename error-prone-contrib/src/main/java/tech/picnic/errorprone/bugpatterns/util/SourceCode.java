@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
 import static com.sun.tools.javac.parser.Tokens.TokenKind.RPAREN;
-import static com.sun.tools.javac.util.Position.NOPOS;
 import static java.util.stream.Collectors.joining;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -58,7 +57,7 @@ public final class SourceCode {
   public static SuggestedFix deleteWithTrailingWhitespace(Tree tree, VisitorState state) {
     CharSequence sourceCode = state.getSourceCode();
     int endPos = state.getEndPosition(tree);
-    if (sourceCode == null || endPos == NOPOS) {
+    if (sourceCode == null || endPos == Position.NOPOS) {
       /* We can't identify the trailing whitespace; delete just the tree. */
       return SuggestedFix.delete(tree);
     }
