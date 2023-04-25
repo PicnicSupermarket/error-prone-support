@@ -6,6 +6,8 @@ warning messages extracted from Maven build output.
 ## Open topics and ideas.
 
 * Apply suggstions from https://clig.dev/.
+* Review ideas from
+  http://catb.org/~esr/writings/taoup/html/ch10s05.html#id2948149 (e.g. `-b`).
 * Add support for an interactive mode, in which the user is prompted to
   confirm an identified issue before sending it to OpenAI.
     * In case multiple issues are reported against a single file, the user
