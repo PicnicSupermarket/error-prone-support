@@ -15,7 +15,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class WebClientRulesTest implements RefasterRuleCollectionTestCase {
   @Override
-  public ImmutableSet<?> elidedTypesAndStaticImports() {
+  public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(fromValue(""), GET, HEAD, OPTIONS, PATCH, POST, PUT);
   }
 

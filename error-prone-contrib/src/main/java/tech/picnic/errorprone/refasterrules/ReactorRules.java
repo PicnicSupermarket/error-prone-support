@@ -620,6 +620,7 @@ final class ReactorRules {
     abstract S transformation(@MayOptionallyUse T value);
 
     @BeforeTemplate
+    @SuppressWarnings("java:S138" /* Method is long, but not complex. */)
     Publisher<S> before(Flux<T> flux, boolean delayUntilEnd, int maxConcurrency, int prefetch) {
       return Refaster.anyOf(
           flux.concatMap(

@@ -55,13 +55,14 @@ import java.util.stream.Stream;
     linkType = NONE,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
+@SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
 public final class Refaster extends BugChecker implements CompilationUnitTreeMatcher {
   /** Flag to pass a pattern that restricts which Refaster rules are loaded. */
   public static final String INCLUDED_RULES_PATTERN_FLAG = "Refaster:NamePattern";
 
   private static final long serialVersionUID = 1L;
 
-  @SuppressWarnings("serial" /* Concrete instance will be `Serializable`. */)
+  @SuppressWarnings({"java:S1948", "serial"} /* Concrete instance will be `Serializable`. */)
   private final CodeTransformer codeTransformer;
 
   /** Instantiates a default {@link Refaster} instance. */
@@ -123,7 +124,10 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     for (Description description : byReplacementSize) {
       ImmutableRangeSet<Integer> ranges = getReplacementRanges(description, endPositions);
       if (ranges.asRanges().stream().noneMatch(replacedSections::intersects)) {
-        /* This suggested fix does not overlap with any ("larger") replacement seen until now. Apply it. */
+        /*
+         * This suggested fix does not overlap with any ("larger") replacement seen until now, so
+         * apply it.
+         */
         state.reportMatch(augmentDescription(description, getSeverityOverride(state)));
         replacedSections.addAll(ranges);
       }

@@ -17,7 +17,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
   @Override
-  public ImmutableSet<?> elidedTypesAndStaticImports() {
+  public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         HashSet.class,
         Iterables.class,

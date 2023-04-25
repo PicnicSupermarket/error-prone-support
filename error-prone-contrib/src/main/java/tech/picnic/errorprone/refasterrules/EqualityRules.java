@@ -30,6 +30,7 @@ final class EqualityRules {
 
     @AfterTemplate
     @AlsoNegation
+    @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
     boolean after(T a, T b) {
       return a == b;
     }
@@ -56,6 +57,7 @@ final class EqualityRules {
   /** Avoid double negations; this is not Javascript. */
   static final class DoubleNegation {
     @BeforeTemplate
+    @SuppressWarnings("java:S2761" /* This violation will be rewritten. */)
     boolean before(boolean b) {
       return !!b;
     }
@@ -72,6 +74,7 @@ final class EqualityRules {
    */
   // XXX: Replacing `a ? !b : b` with `a != b` changes semantics if both `a` and `b` are boxed
   // booleans.
+  @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
   static final class Negation {
     @BeforeTemplate
     boolean before(boolean a, boolean b) {
@@ -79,6 +82,8 @@ final class EqualityRules {
     }
 
     @BeforeTemplate
+    @SuppressWarnings(
+        "java:S1244" /* The equality check is fragile, but may be seen in the wild. */)
     boolean before(double a, double b) {
       return !(a == b);
     }
@@ -100,6 +105,7 @@ final class EqualityRules {
    */
   // XXX: Replacing `a ? b : !b` with `a == b` changes semantics if both `a` and `b` are boxed
   // booleans.
+  @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
   static final class IndirectDoubleNegation {
     @BeforeTemplate
     boolean before(boolean a, boolean b) {
@@ -107,6 +113,8 @@ final class EqualityRules {
     }
 
     @BeforeTemplate
+    @SuppressWarnings(
+        "java:S1244" /* The inequality check is fragile, but may be seen in the wild. */)
     boolean before(double a, double b) {
       return !(a != b);
     }

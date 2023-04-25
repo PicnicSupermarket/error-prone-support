@@ -11,7 +11,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJBigDecimalRulesTest implements RefasterRuleCollectionTestCase {
   @Override
-  public ImmutableSet<?> elidedTypesAndStaticImports() {
+  public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(offset(0), withPercentage(0));
   }
 

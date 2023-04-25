@@ -14,7 +14,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCase {
   @Override
-  public ImmutableSet<?> elidedTypesAndStaticImports() {
+  public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         Stream.class, Streams.class, naturalOrder(), toImmutableSortedMap(null, null, null));
   }

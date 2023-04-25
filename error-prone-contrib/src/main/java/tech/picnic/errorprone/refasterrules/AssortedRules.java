@@ -115,6 +115,7 @@ final class AssortedRules {
   // intelligently.
   static final class LogicalImplication {
     @BeforeTemplate
+    @SuppressWarnings("java:S2589" /* This violation will be rewritten. */)
     boolean before(boolean firstTest, boolean secondTest) {
       return firstTest || (!firstTest && secondTest);
     }

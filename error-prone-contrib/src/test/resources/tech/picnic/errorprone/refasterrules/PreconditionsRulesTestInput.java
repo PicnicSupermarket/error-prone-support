@@ -8,7 +8,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   @SuppressWarnings("RequireNonNull")
-  public ImmutableSet<?> elidedTypesAndStaticImports() {
+  public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(checkNotNull(null));
   }
 

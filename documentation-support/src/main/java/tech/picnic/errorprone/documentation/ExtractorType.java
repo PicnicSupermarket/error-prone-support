@@ -25,6 +25,7 @@ enum ExtractorType {
     return identifier;
   }
 
+  @SuppressWarnings("java:S1452" /* The extractor returns data of an unspecified type. */)
   Extractor<?> getExtractor() {
     return extractor;
   }

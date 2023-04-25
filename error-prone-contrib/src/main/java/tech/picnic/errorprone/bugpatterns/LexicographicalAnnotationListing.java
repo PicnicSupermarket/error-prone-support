@@ -46,9 +46,19 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class LexicographicalAnnotationListing extends BugChecker
     implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
+  /**
+   * A comparator that minimally reorders {@link AnnotationType}s, such that declaration annotations
+   * are placed before type annotations.
+   */
+  @SuppressWarnings({
+    "java:S1067",
+    "java:S3358"
+  } /* Avoiding the nested ternary operator hurts readability. */)
   private static final Comparator<@Nullable AnnotationType> BY_ANNOTATION_TYPE =
       (a, b) ->
-          (a == null || a == DECLARATION) && b == TYPE ? -1 : a == TYPE && b == DECLARATION ? 1 : 0;
+          (a == null || a == DECLARATION) && b == TYPE
+              ? -1
+              : (a == TYPE && b == DECLARATION ? 1 : 0);
 
   /** Instantiates a new {@link LexicographicalAnnotationListing} instance. */
   public LexicographicalAnnotationListing() {}

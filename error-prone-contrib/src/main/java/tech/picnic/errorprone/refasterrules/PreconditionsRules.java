@@ -91,6 +91,7 @@ final class PreconditionsRules {
   /** Prefer {@link Objects#requireNonNull(Object)} over more verbose alternatives. */
   static final class RequireNonNullStatement<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1695" /* This violation will be rewritten. */)
     void before(T object) {
       if (object == null) {
         throw new NullPointerException();
@@ -121,6 +122,7 @@ final class PreconditionsRules {
   /** Prefer {@link Objects#requireNonNull(Object, String)} over more verbose alternatives. */
   static final class RequireNonNullWithMessageStatement<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1695" /* This violation will be rewritten. */)
     void before(T object, String message) {
       if (object == null) {
         throw new NullPointerException(message);

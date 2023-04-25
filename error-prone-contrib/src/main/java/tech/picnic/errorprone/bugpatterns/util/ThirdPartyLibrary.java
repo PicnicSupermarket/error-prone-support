@@ -90,7 +90,9 @@ public enum ThirdPartyLibrary {
     try {
       classFinder.loadClass(state.getSymtab().unnamedModule, binaryName);
       return true;
-    } catch (CompletionFailure e) {
+    } catch (
+        @SuppressWarnings("java:S1166" /* Not exceptional. */)
+        CompletionFailure e) {
       return false;
     }
   }

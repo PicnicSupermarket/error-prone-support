@@ -237,6 +237,7 @@ final class DoubleStreamRules {
   /** Prefer {@link DoubleStream#anyMatch(DoublePredicate)} over more contrived alternatives. */
   static final class DoubleStreamAnyMatch {
     @BeforeTemplate
+    @SuppressWarnings("java:S4034" /* This violation will be rewritten. */)
     boolean before(DoubleStream stream, DoublePredicate predicate) {
       return Refaster.anyOf(
           !stream.noneMatch(predicate), stream.filter(predicate).findAny().isPresent());

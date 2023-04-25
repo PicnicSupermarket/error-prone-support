@@ -54,4 +54,3 @@ jobs:
         run: mvn build-helper:remove-project-artifact
 
 # XXX: Enable Codecov once we "go public".
-# XXX: Enable SonarCloud once we "go public".

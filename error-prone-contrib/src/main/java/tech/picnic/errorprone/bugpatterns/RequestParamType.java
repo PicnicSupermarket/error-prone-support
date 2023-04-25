@@ -38,6 +38,7 @@ import tech.picnic.errorprone.bugpatterns.util.Flags;
     linkType = CUSTOM,
     severity = ERROR,
     tags = LIKELY_ERROR)
+@SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
 public final class RequestParamType extends BugChecker implements VariableTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String SUPPORTED_CUSTOM_TYPES_FLAG = "RequestParamType:SupportedCustomTypes";

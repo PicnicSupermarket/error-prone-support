@@ -10,7 +10,7 @@ import java.util.Set;
 /** Code to test the Refaster rules from {@link ValidRules}. */
 final class ValidRulesTest implements RefasterRuleCollectionTestCase {
   @Override
-  public ImmutableSet<?> elidedTypesAndStaticImports() {
+  public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Strings.class);
   }
 

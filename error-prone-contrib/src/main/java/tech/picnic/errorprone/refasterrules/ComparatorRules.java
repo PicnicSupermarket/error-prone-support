@@ -233,6 +233,7 @@ final class ComparatorRules {
   /** Prefer {@link Comparators#min(Comparable, Comparable)}} over more verbose alternatives. */
   static final class MinOfPairNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
     T before(T value1, T value2) {
       return Refaster.anyOf(
           value1.compareTo(value2) <= 0 ? value1 : value2,
@@ -259,6 +260,7 @@ final class ComparatorRules {
    */
   static final class MinOfPairCustomOrder<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
     T before(T value1, T value2, Comparator<T> cmp) {
       return Refaster.anyOf(
           cmp.compare(value1, value2) <= 0 ? value1 : value2,
@@ -299,6 +301,7 @@ final class ComparatorRules {
   /** Prefer {@link Comparators#max(Comparable, Comparable)}} over more verbose alternatives. */
   static final class MaxOfPairNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
     T before(T value1, T value2) {
       return Refaster.anyOf(
           value1.compareTo(value2) >= 0 ? value1 : value2,
@@ -325,6 +328,7 @@ final class ComparatorRules {
    */
   static final class MaxOfPairCustomOrder<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
     T before(T value1, T value2, Comparator<T> cmp) {
       return Refaster.anyOf(
           cmp.compare(value1, value2) >= 0 ? value1 : value2,

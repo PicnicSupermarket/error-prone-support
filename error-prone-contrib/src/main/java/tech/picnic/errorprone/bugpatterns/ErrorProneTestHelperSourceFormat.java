@@ -104,7 +104,9 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
     String formatted;
     try {
       formatted = formatSourceCode(source, retainUnusedImports).trim();
-    } catch (FormatterException e) {
+    } catch (
+        @SuppressWarnings("java:S1166" /* Stack trace not relevant. */)
+        FormatterException e) {
       return buildDescription(methodInvocation)
           .setMessage(String.format("Source code is malformed: %s", e.getMessage()))
           .build();
@@ -131,7 +133,7 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
         SuggestedFix.replace(
             startPos,
             endPos,
-            Splitter.on('\n')
+            Splitter.on(System.lineSeparator())
                 .splitToStream(formatted)
                 .map(state::getConstantExpression)
                 .collect(joining(", "))));
@@ -157,7 +159,7 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
         return Optional.empty();
       }
 
-      source.append(value).append('\n');
+      source.append(value).append(System.lineSeparator());
     }
 
     return Optional.of(source.toString());

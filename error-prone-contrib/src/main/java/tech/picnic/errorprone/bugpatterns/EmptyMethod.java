@@ -42,6 +42,7 @@ public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {
   public EmptyMethod() {}
 
   @Override
+  @SuppressWarnings("java:S1067" /* Chaining disjunctions like this does not impact readability. */)
   public Description matchMethod(MethodTree tree, VisitorState state) {
     if (tree.getBody() == null
         || !tree.getBody().getStatements().isEmpty()

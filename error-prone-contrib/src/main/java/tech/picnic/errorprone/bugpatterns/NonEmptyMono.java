@@ -43,6 +43,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 // emitting a value (e.g. `Mono.empty()`, `someFlux.then()`, ...), or known not to complete normally
 // (`Mono.never()`, `someFlux.repeat()`, `Mono.error(...)`, ...). The latter category could
 // potentially be split out further.
+@SuppressWarnings("java:S1192" /* Factoring out repeated method names impacts readability. */)
 public final class NonEmptyMono extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> MONO_SIZE_CHECK =

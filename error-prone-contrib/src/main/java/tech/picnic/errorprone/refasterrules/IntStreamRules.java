@@ -250,6 +250,7 @@ final class IntStreamRules {
   /** Prefer {@link IntStream#anyMatch(IntPredicate)} over more contrived alternatives. */
   static final class IntStreamAnyMatch {
     @BeforeTemplate
+    @SuppressWarnings("java:S4034" /* This violation will be rewritten. */)
     boolean before(IntStream stream, IntPredicate predicate) {
       return Refaster.anyOf(
           !stream.noneMatch(predicate), stream.filter(predicate).findAny().isPresent());

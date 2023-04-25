@@ -49,6 +49,7 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
   abstract ImmutableList<CodeTransformer> transformers();
 
   @Override
+  @SuppressWarnings("java:S3038" /* All AutoValue properties must be specified explicitly. */)
   public abstract ImmutableClassToInstanceMap<Annotation> annotations();
 
   /**
@@ -92,16 +93,17 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
   }
 
   private String getShortCheckName(String fullCheckName) {
-    if (packageName().isEmpty()) {
+    String packageName = packageName();
+    if (packageName.isEmpty()) {
       return fullCheckName;
     }
 
-    String prefix = packageName() + '.';
+    String prefix = packageName + '.';
     checkState(
         fullCheckName.startsWith(prefix),
         "Refaster rule class '%s' is not located in package '%s'",
         fullCheckName,
-        packageName());
+        packageName);
 
     return fullCheckName.substring(prefix.length());
   }

@@ -34,8 +34,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
  * <p>Note that, while both libraries throw an {@link AssertionError} in case of an assertion
  * failure, the exact subtype used generally differs.
  */
-// XXX: Not all `org.assertj.core.api.Assertions` methods have an associated Refaster rule yet;
-// expand this class.
+// XXX: Not all JUnit `Assertions` methods have an associated Refaster rule yet; expand this class.
 // XXX: Introduce a `@Matcher` on `Executable` and `ThrowingSupplier` expressions, such that they
 // are only matched if they are also compatible with the `ThrowingCallable` functional interface.
 // When implementing such a matcher, note that expressions with a non-void return type such as
@@ -45,7 +44,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class JUnitToAssertJRules {
   private JUnitToAssertJRules() {}
 
-  public ImmutableSet<?> elidedTypesAndStaticImports() {
+  public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         Assertions.class,
         assertDoesNotThrow(() -> null),

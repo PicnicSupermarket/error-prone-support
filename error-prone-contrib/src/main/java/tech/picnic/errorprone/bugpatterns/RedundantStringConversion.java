@@ -62,6 +62,11 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
+@SuppressWarnings({
+  "java:S1192" /* Factoring out repeated method names impacts readability. */,
+  "java:S2160" /* Super class equality definition suffices. */,
+  "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+})
 public final class RedundantStringConversion extends BugChecker
     implements BinaryTreeMatcher, CompoundAssignmentTreeMatcher, MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
@@ -163,7 +168,7 @@ public final class RedundantStringConversion extends BugChecker
     ExpressionTree lhs = tree.getLeftOperand();
     ExpressionTree rhs = tree.getRightOperand();
     if (!STRING.matches(lhs, state)) {
-      return finalize(tree, tryFix(rhs, state, STRING));
+      return createDescription(tree, tryFix(rhs, state, STRING));
     }
 
     List<SuggestedFix.Builder> fixes = new ArrayList<>();
@@ -177,7 +182,7 @@ public final class RedundantStringConversion extends BugChecker
     }
     tryFix(rhs, state, ANY_EXPR).ifPresent(fixes::add);
 
-    return finalize(tree, fixes.stream().reduce(SuggestedFix.Builder::merge));
+    return createDescription(tree, fixes.stream().reduce(SuggestedFix.Builder::merge));
   }
 
   @Override
@@ -186,36 +191,36 @@ public final class RedundantStringConversion extends BugChecker
       return Description.NO_MATCH;
     }
 
-    return finalize(tree, tryFix(tree.getExpression(), state, ANY_EXPR));
+    return createDescription(tree, tryFix(tree.getExpression(), state, ANY_EXPR));
   }
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     if (STRINGBUILDER_APPEND_INVOCATION.matches(tree, state)) {
-      return finalize(tree, tryFixPositionalConverter(tree.getArguments(), state, 0));
+      return createDescription(tree, tryFixPositionalConverter(tree.getArguments(), state, 0));
     }
 
     if (STRINGBUILDER_INSERT_INVOCATION.matches(tree, state)) {
-      return finalize(tree, tryFixPositionalConverter(tree.getArguments(), state, 1));
+      return createDescription(tree, tryFixPositionalConverter(tree.getArguments(), state, 1));
     }
 
     if (FORMATTER_INVOCATION.matches(tree, state)) {
-      return finalize(tree, tryFixFormatter(tree.getArguments(), state));
+      return createDescription(tree, tryFixFormatter(tree.getArguments(), state));
     }
 
     if (GUAVA_GUARD_INVOCATION.matches(tree, state)) {
-      return finalize(tree, tryFixGuavaGuard(tree.getArguments(), state));
+      return createDescription(tree, tryFixGuavaGuard(tree.getArguments(), state));
     }
 
     if (SLF4J_LOGGER_INVOCATION.matches(tree, state)) {
-      return finalize(tree, tryFixSlf4jLogger(tree.getArguments(), state));
+      return createDescription(tree, tryFixSlf4jLogger(tree.getArguments(), state));
     }
 
     if (instanceMethod().matches(tree, state)) {
-      return finalize(tree, tryFix(tree, state, STRING));
+      return createDescription(tree, tryFix(tree, state, STRING));
     }
 
-    return finalize(tree, tryFix(tree, state, NON_NULL_STRING));
+    return createDescription(tree, tryFix(tree, state, NON_NULL_STRING));
   }
 
   private Optional<SuggestedFix.Builder> tryFixPositionalConverter(
@@ -298,7 +303,7 @@ public final class RedundantStringConversion extends BugChecker
 
     /* Simplify the values to be plugged into the format pattern, if possible. */
     return arguments.stream()
-        .skip(patternIndex + 1)
+        .skip(patternIndex + 1L)
         .map(arg -> tryFix(arg, state, remainingArgFilter))
         .flatMap(Optional::stream)
         .reduce(SuggestedFix.Builder::merge);
@@ -362,7 +367,7 @@ public final class RedundantStringConversion extends BugChecker
     return Optional.of(Iterables.getOnlyElement(methodInvocation.getArguments()));
   }
 
-  private Description finalize(Tree tree, Optional<SuggestedFix.Builder> fixes) {
+  private Description createDescription(Tree tree, Optional<SuggestedFix.Builder> fixes) {
     return fixes
         .map(SuggestedFix.Builder::build)
         .map(fix -> describeMatch(tree, fix))

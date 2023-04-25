@@ -103,7 +103,7 @@ public final class AnnotationAttributeMatcher implements Serializable {
    * @param tree The annotation AST node to be inspected.
    * @return Any matching annotation arguments.
    */
-  public Stream<? extends ExpressionTree> extractMatchingArguments(AnnotationTree tree) {
+  public Stream<ExpressionTree> extractMatchingArguments(AnnotationTree tree) {
     Type type = ASTHelpers.getType(tree.getAnnotationType());
     if (type == null) {
       return Stream.empty();
@@ -111,6 +111,7 @@ public final class AnnotationAttributeMatcher implements Serializable {
 
     String annotationType = type.toString();
     return tree.getArguments().stream()
+        .map(ExpressionTree.class::cast)
         .filter(a -> matches(annotationType, extractAttributeName(a)));
   }
 

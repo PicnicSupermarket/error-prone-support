@@ -49,6 +49,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     linkType = CUSTOM,
     severity = WARNING,
     tags = PERFORMANCE)
+@SuppressWarnings("java:S1192" /* Factoring out repeated method names impacts readability. */)
 public final class PrimitiveComparison extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> STATIC_COMPARISON_METHOD =

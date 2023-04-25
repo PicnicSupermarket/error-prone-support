@@ -114,6 +114,7 @@ public final class JavaKeywords {
    * @see <a href="https://docs.oracle.com/javase/specs/jls/se17/html/jls-3.html#jls-3.8">JDK 17 JLS
    *     section 3.8: Identifiers</a>
    */
+  @SuppressWarnings("java:S1067" /* Chaining conjunctions like this does not impact readability. */)
   public static boolean isValidIdentifier(String str) {
     return !str.isEmpty()
         && !isReservedKeyword(str)

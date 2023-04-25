@@ -35,6 +35,7 @@ final class CollectionRules {
    */
   static final class CollectionIsEmpty<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1155" /* This violation will be rewritten. */)
     boolean before(Collection<T> collection) {
       return Refaster.anyOf(
           collection.size() == 0,

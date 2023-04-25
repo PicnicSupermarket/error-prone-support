@@ -62,6 +62,7 @@ import tech.picnic.errorprone.refaster.runner.Refaster;
 // `@BeforeTemplate` method is covered by a test. Review how we can make sure that _all_
 // `@BeforeTemplate` methods and `Refaster.anyOf` branches are covered.
 @BugPattern(summary = "Exercises a Refaster rule collection", severity = ERROR)
+@SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
 public final class RefasterRuleCollection extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String RULE_COLLECTION_FLAG = "RefasterRuleCollection:RuleCollection";
@@ -159,13 +160,14 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
                   SuggestedFix.prefixWith(
                       typeDeclaration,
                       String.format(
-                          "/* ERROR: Class should be named `%s`. */\n", expectedClassName))));
+                          "/* ERROR: Class should be named `%s`. */%n", expectedClassName))));
         }
       } else {
         state.reportMatch(
             describeMatch(
                 typeDeclaration,
-                SuggestedFix.prefixWith(typeDeclaration, "/* ERROR: Unexpected token. */\n")));
+                SuggestedFix.prefixWith(
+                    typeDeclaration, String.format("/* ERROR: Unexpected token. */%n"))));
       }
     }
   }
@@ -216,13 +218,13 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
 
   private void reportViolations(
       Tree tree, String message, ImmutableSet<String> violations, VisitorState state) {
-    String violationEnumeration = String.join("\n*  - ", violations);
+    String violationEnumeration = String.join(String.format("%n*  - "), violations);
     String comment =
-        String.format("/*\n*  ERROR: %s:\n*  - %s\n*/\n", message, violationEnumeration);
+        String.format("/*%n*  ERROR: %s:%n*  - %s%n*/%n", message, violationEnumeration);
     SuggestedFix fixWithComment =
         tree instanceof MethodTree
             ? SuggestedFix.prefixWith(tree, comment)
-            : SuggestedFix.postfixWith(tree, '\n' + comment);
+            : SuggestedFix.postfixWith(tree, String.format("%n%s", comment));
     state.reportMatch(describeMatch(tree, fixWithComment));
   }
 
@@ -295,7 +297,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
             describeMatch(
                 tree,
                 SuggestedFix.prefixWith(
-                    tree, "/* ERROR: Method names should start with `test`. */\n")));
+                    tree, String.format("/* ERROR: Method names should start with `test`. */%n"))));
       }
 
       return Optional.empty();
