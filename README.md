@@ -21,7 +21,18 @@ code_][picnic-blog-ep-post].
 
 [![Maven Central][maven-central-badge]][maven-central-search]
 [![Reproducible Builds][reproducible-builds-badge]][reproducible-builds-report]
+[![OpenSSF Best Practices][openssf-best-practices-badge]][openssf-best-practices-checklist]
+[![OpenSSF Scorecard][openssf-scorecard-badge]][openssf-scorecard-report]
+[![CodeQL Analysis][codeql-badge]][codeql-master]
 [![GitHub Actions][github-actions-build-badge]][github-actions-build-master]
+[![Mutation tested with PIT][pitest-badge]][pitest]
+[![Quality Gate Status][sonarcloud-quality-badge]][sonarcloud-quality-master]
+[![Maintainability Rating][sonarcloud-maintainability-badge]][sonarcloud-maintainability-master]
+[![Reliability Rating][sonarcloud-reliability-badge]][sonarcloud-reliability-master]
+[![Security Rating][sonarcloud-security-badge]][sonarcloud-security-master]
+[![Coverage][sonarcloud-coverage-badge]][sonarcloud-coverage-master]
+[![Duplicated Lines (%)][sonarcloud-duplication-badge]][sonarcloud-duplication-master]
+[![Technical Debt][sonarcloud-technical-debt-badge]][sonarcloud-technical-debt-master]
 [![License][license-badge]][license]
 [![PRs Welcome][pr-badge]][contributing]
 
@@ -243,11 +254,13 @@ guidelines][contributing].
 
 ### Security
 
-If you want to report a security vulnerablity, please do so through a private
+If you want to report a security vulnerability, please do so through a private
 channel; please see our [security policy][security] for details.
 
 [bug-checks]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
 [bug-checks-identity-conversion]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/IdentityConversion.java
+[codeql-badge]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/codeql.yml/badge.svg?branch=master&event=push
+[codeql-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/codeql.yml?query=branch:master+event:push
 [contributing]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md
 [contributing-pull-request]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md#-opening-a-pull-request
 [error-prone-bugchecker]: https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
@@ -258,7 +271,7 @@ channel; please see our [security policy][security] for details.
 [error-prone-orig-repo]: https://github.com/google/error-prone
 [error-prone-pull-3301]: https://github.com/google/error-prone/pull/3301
 [github-actions-build-badge]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml/badge.svg
-[github-actions-build-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml?query=branch%3Amaster
+[github-actions-build-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml?query=branch:master&event=push
 [google-java-format]: https://github.com/google/google-java-format
 [idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
 [license-badge]: https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
@@ -266,8 +279,13 @@ channel; please see our [security policy][security] for details.
 [maven-central-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
 [maven-central-search]: https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
 [maven]: https://maven.apache.org
+[openssf-best-practices-badge]: https://bestpractices.coreinfrastructure.org/projects/7199/badge
+[openssf-best-practices-checklist]: https://bestpractices.coreinfrastructure.org/projects/7199
+[openssf-scorecard-badge]: https://img.shields.io/ossf-scorecard/github.com/PicnicSupermarket/error-prone-support?label=openssf%20scorecard
+[openssf-scorecard-report]: https://api.securityscorecards.dev/projects/github.com/PicnicSupermarket/error-prone-support
 [picnic-blog-ep-post]: https://blog.picnic.nl/picnic-loves-error-prone-producing-high-quality-and-consistent-java-code-b8a566be6886
 [picnic-blog]: https://blog.picnic.nl
+[pitest-badge]: https://img.shields.io/badge/-Mutation%20tested%20with%20PIT-blue.svg
 [pitest]: https://pitest.org
 [pitest-maven]: https://pitest.org/quickstart/maven
 [pr-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
@@ -280,3 +298,17 @@ channel; please see our [security policy][security] for details.
 [script-run-full-build]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-full-build.sh
 [script-run-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-mutation-tests.sh
 [security]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/SECURITY.md
+[sonarcloud-coverage-badge]: https://sonarcloud.io/api/project_badges/measure?project=PicnicSupermarket_error-prone-support&metric=coverage
+[sonarcloud-coverage-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=coverage
+[sonarcloud-duplication-badge]: https://sonarcloud.io/api/project_badges/measure?project=PicnicSupermarket_error-prone-support&metric=duplicated_lines_density
+[sonarcloud-duplication-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=duplicated_lines_density
+[sonarcloud-maintainability-badge]: https://sonarcloud.io/api/project_badges/measure?project=PicnicSupermarket_error-prone-support&metric=sqale_rating
+[sonarcloud-maintainability-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=sqale_rating
+[sonarcloud-quality-badge]: https://sonarcloud.io/api/project_badges/measure?project=PicnicSupermarket_error-prone-support&metric=alert_status
+[sonarcloud-quality-master]: https://sonarcloud.io/summary/new_code?id=PicnicSupermarket_error-prone-support
+[sonarcloud-reliability-badge]: https://sonarcloud.io/api/project_badges/measure?project=PicnicSupermarket_error-prone-support&metric=reliability_rating
+[sonarcloud-reliability-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=reliability_rating
+[sonarcloud-security-badge]: https://sonarcloud.io/api/project_badges/measure?project=PicnicSupermarket_error-prone-support&metric=security_rating
+[sonarcloud-security-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=security_rating
+[sonarcloud-technical-debt-badge]: https://sonarcloud.io/api/project_badges/measure?project=PicnicSupermarket_error-prone-support&metric=sqale_index
+[sonarcloud-technical-debt-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=sqale_index
