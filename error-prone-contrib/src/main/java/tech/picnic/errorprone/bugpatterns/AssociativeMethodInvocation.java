@@ -39,7 +39,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "These methods implement an associative operation, so the list of operands can be flattened",
+        "This method implements an associative operation, so the list of operands can be flattened",
     link = BUG_PATTERNS_BASE_URL + "AssociativeMethodInvocation",
     linkType = CUSTOM,
     severity = SUGGESTION,
@@ -70,22 +70,29 @@ public final class AssociativeMethodInvocation extends BugChecker
 
     for (Matcher<ExpressionTree> matcher : ASSOCIATIVE_OPERATIONS) {
       if (matcher.matches(tree, state)) {
-        SuggestedFix.Builder fix = SuggestedFix.builder();
-        for (ExpressionTree arg : tree.getArguments()) {
-          if (matcher.matches(arg, state)) {
-            MethodInvocationTree invocation = (MethodInvocationTree) arg;
-            fix.merge(
-                invocation.getArguments().isEmpty()
-                    ? SuggestedFixes.removeElement(arg, tree.getArguments(), state)
-                    : SourceCode.unwrapMethodInvocation(invocation, state));
-          }
-        }
-
-        return fix.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fix.build());
+        SuggestedFix fix = processMatchingArguments(tree, matcher, state);
+        return fix.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fix);
       }
     }
 
     return Description.NO_MATCH;
+  }
+
+  private static SuggestedFix processMatchingArguments(
+      MethodInvocationTree tree, Matcher<ExpressionTree> matcher, VisitorState state) {
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+
+    for (ExpressionTree arg : tree.getArguments()) {
+      if (matcher.matches(arg, state)) {
+        MethodInvocationTree invocation = (MethodInvocationTree) arg;
+        fix.merge(
+            invocation.getArguments().isEmpty()
+                ? SuggestedFixes.removeElement(invocation, tree.getArguments(), state)
+                : SourceCode.unwrapMethodInvocation(invocation, state));
+      }
+    }
+
+    return fix.build();
   }
 
   private static Matcher<MethodInvocationTree> hasArgumentOfType(Supplier<Type> type) {
