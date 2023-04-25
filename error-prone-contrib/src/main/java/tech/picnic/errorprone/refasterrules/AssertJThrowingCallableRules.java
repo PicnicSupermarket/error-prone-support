@@ -47,7 +47,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalArgumentException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalArgumentException().isThrownBy(throwingCallable).withMessage(message);
     }
@@ -64,7 +64,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalArgumentException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(
         ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
       return assertThatIllegalArgumentException()
@@ -85,7 +85,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalArgumentException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalArgumentException()
           .isThrownBy(throwingCallable)
@@ -104,7 +104,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessageContaining {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalArgumentException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalArgumentException()
           .isThrownBy(throwingCallable)
@@ -123,7 +123,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessageNotContainingAny {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalArgumentException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(
         ThrowingCallable throwingCallable, @Repeated CharSequence values) {
       return assertThatIllegalArgumentException()
@@ -157,7 +157,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByIllegalStateExceptionHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalStateException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalStateException().isThrownBy(throwingCallable).withMessage(message);
     }
@@ -174,7 +174,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByIllegalStateExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalStateException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(
         ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
       return assertThatIllegalStateException()
@@ -195,7 +195,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByIllegalStateExceptionHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalStateException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalStateException()
           .isThrownBy(throwingCallable)
@@ -214,7 +214,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByIllegalStateExceptionHasMessageContaining {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalStateException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalStateException()
           .isThrownBy(throwingCallable)
@@ -233,7 +233,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByIllegalStateExceptionHasMessageNotContaining {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalStateException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalStateException()
           .isThrownBy(throwingCallable)
@@ -265,7 +265,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByNullPointerExceptionHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByNullPointerException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatNullPointerException().isThrownBy(throwingCallable).withMessage(message);
     }
@@ -282,7 +282,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByNullPointerExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByNullPointerException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(
         ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
       return assertThatNullPointerException()
@@ -303,7 +303,7 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownByNullPointerExceptionHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByNullPointerException" /* Matches strictly more specific expressions. */)
+        "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatNullPointerException()
           .isThrownBy(throwingCallable)
@@ -334,8 +334,7 @@ final class AssertJThrowingCallableRules {
 
   static final class AssertThatThrownByIOExceptionHasMessage {
     @BeforeTemplate
-    @SuppressWarnings(
-        "AssertThatThrownByIOException" /* Matches strictly more specific expressions. */)
+    @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatIOException().isThrownBy(throwingCallable).withMessage(message);
     }
@@ -351,8 +350,7 @@ final class AssertJThrowingCallableRules {
 
   static final class AssertThatThrownByIOExceptionHasMessageParameters {
     @BeforeTemplate
-    @SuppressWarnings(
-        "AssertThatThrownByIOException" /* Matches strictly more specific expressions. */)
+    @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(
         ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
       return assertThatIOException().isThrownBy(throwingCallable).withMessage(message, parameters);
@@ -385,7 +383,7 @@ final class AssertJThrowingCallableRules {
 
   static final class AssertThatThrownByHasMessage {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatThrownBy" /* Matches strictly more specific expressions. */)
+    @SuppressWarnings("AssertThatThrownBy" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(
         Class<? extends Throwable> exceptionType,
         ThrowingCallable throwingCallable,
@@ -407,7 +405,7 @@ final class AssertJThrowingCallableRules {
 
   static final class AssertThatThrownByHasMessageParameters {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatThrownBy" /* Matches strictly more specific expressions. */)
+    @SuppressWarnings("AssertThatThrownBy" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(
         Class<? extends Throwable> exceptionType,
         ThrowingCallable throwingCallable,
