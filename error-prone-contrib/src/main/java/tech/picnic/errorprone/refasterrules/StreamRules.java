@@ -280,6 +280,7 @@ final class StreamRules {
 
   static final class StreamMin<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1155" /* This violation will be rewritten. */)
     Optional<T> before(Stream<T> stream, Comparator<? super T> comparator) {
       return Refaster.anyOf(
           stream.max(comparator.reversed()),
