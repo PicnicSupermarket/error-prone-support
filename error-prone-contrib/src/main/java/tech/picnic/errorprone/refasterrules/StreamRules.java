@@ -308,6 +308,7 @@ final class StreamRules {
 
   static final class StreamMax<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1155" /* This violation will be rewritten. */)
     Optional<T> before(Stream<T> stream, Comparator<? super T> comparator) {
       return Refaster.anyOf(
           stream.min(comparator.reversed()),
@@ -410,6 +411,7 @@ final class StreamRules {
 
   static final class StreamMapToIntSum<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1155" /* This violation will be rewritten. */)
     long before(Stream<T> stream, ToIntFunction<T> mapper) {
       return stream.collect(summingInt(mapper));
     }
@@ -429,6 +431,7 @@ final class StreamRules {
 
   static final class StreamMapToDoubleSum<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1155" /* This violation will be rewritten. */)
     double before(Stream<T> stream, ToDoubleFunction<T> mapper) {
       return stream.collect(summingDouble(mapper));
     }
@@ -448,6 +451,7 @@ final class StreamRules {
 
   static final class StreamMapToLongSum<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1155" /* This violation will be rewritten. */)
     long before(Stream<T> stream, ToLongFunction<T> mapper) {
       return stream.collect(summingLong(mapper));
     }
@@ -503,6 +507,7 @@ final class StreamRules {
 
   static final class StreamCount<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1155" /* This violation will be rewritten. */)
     long before(Stream<T> stream) {
       return stream.collect(counting());
     }
@@ -515,6 +520,7 @@ final class StreamRules {
 
   static final class StreamReduce<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1155" /* This violation will be rewritten. */)
     Optional<T> before(Stream<T> stream, BinaryOperator<T> accumulator) {
       return stream.collect(reducing(accumulator));
     }
@@ -527,6 +533,7 @@ final class StreamRules {
 
   static final class StreamReduceWithIdentity<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1155" /* This violation will be rewritten. */)
     T before(Stream<T> stream, T identity, BinaryOperator<T> accumulator) {
       return stream.collect(reducing(identity, accumulator));
     }
@@ -553,6 +560,7 @@ final class StreamRules {
 
   static final class StreamMapCollect<T, U, R> {
     @BeforeTemplate
+    @SuppressWarnings("java:S1155" /* This violation will be rewritten. */)
     R before(
         Stream<T> stream,
         Function<? super T, ? extends U> mapper,
