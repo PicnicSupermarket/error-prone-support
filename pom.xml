@@ -208,7 +208,11 @@
         <version.error-prone-orig>2.23.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.21</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
-        <version.jdk>11</version.jdk>
+        <version.jabel>1.0.0</version.jabel>
+        <!-- Though the project targets JDK 11, the code base does use more
+        recent language constructs, thanks to the Jabel compiler plugin. -->
+        <version.jdk.source>17</version.jdk.source>
+        <version.jdk.target>11</version.jdk.target>
         <version.maven>3.8.7</version.maven>
         <version.mockito>5.8.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
@@ -275,6 +279,13 @@
                 <version>2.16.0</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- Specified as a workaround for
+            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
+            <dependency>
+                <groupId>com.github.bsideup.jabel</groupId>
+                <artifactId>jabel-javac-plugin</artifactId>
+                <version>${version.jabel}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.auto</groupId>
@@ -577,7 +588,7 @@
                         `provided`, but we'd rather not do that.) -->
                         <failOnMissingClasses>false</failOnMissingClasses>
                         <failOnViolation>false</failOnViolation>
-                        <targetVersion>${version.jdk}</targetVersion>
+                        <targetVersion>${version.jdk.target}</targetVersion>
                     </configuration>
                     <executions>
                         <execution>
@@ -901,6 +912,11 @@
                                 <version>${version.error-prone}</version>
                             </path>
                             <path>
+                                <groupId>com.github.bsideup.jabel</groupId>
+                                <artifactId>jabel-javac-plugin</artifactId>
+                                <version>${version.jabel}</version>
+                            </path>
+                            <path>
                                 <groupId>com.google.auto.value</groupId>
                                 <artifactId>auto-value</artifactId>
                                 <version>${version.auto-value}</version>
@@ -950,8 +966,8 @@
                             <arg>10000</arg>
                         </compilerArgs>
                         <parameters>true</parameters>
-                        <source>${version.jdk}</source>
-                        <target>${version.jdk}</target>
+                        <source>${version.jdk.target}</source>
+                        <target>${version.jdk.target}</target>
                         <!-- Erroneously inverted logic... for details, see
                         https://issues.apache.org/jira/browse/MCOMPILER-209. -->
                         <useIncrementalCompilation>false</useIncrementalCompilation>
@@ -1028,7 +1044,7 @@
                             </banDynamicVersions>
                             <dependencyConvergence />
                             <enforceBytecodeVersion>
-                                <maxJdkVersion>${version.jdk}</maxJdkVersion>
+                                <maxJdkVersion>${version.jdk.target}</maxJdkVersion>
                             </enforceBytecodeVersion>
                             <requireEncoding>
                                 <acceptAsciiSubset>true</acceptAsciiSubset>
@@ -1036,7 +1052,7 @@
                                 <includes>src/main/resources/**/*.properties,src/test/resources/**/*.properties</includes>
                             </requireEncoding>
                             <requireJavaVersion>
-                                <version>${version.jdk}</version>
+                                <version>${version.jdk.source}</version>
                             </requireJavaVersion>
                             <requireMavenVersion>
                                 <version>${version.maven}</version>
@@ -1125,7 +1141,7 @@
                         the compilation phase; no need to recheck during
                         Javadoc generation. -->
                         <doclint>none</doclint>
-                        <source>${version.jdk}</source>
+                        <source>${version.jdk.source}</source>
                     </configuration>
                     <executions>
                         <execution>
@@ -1337,7 +1353,7 @@
                             patterns in their `@BeforeTemplate` methods. -->
                             <ignorePackage>tech.picnic.errorprone.refasterrules</ignorePackage>
                         </ignorePackages>
-                        <javaVersion>${version.jdk}</javaVersion>
+                        <javaVersion>${version.jdk.target}</javaVersion>
                     </configuration>
                     <executions>
                         <execution>
@@ -1893,8 +1909,19 @@
         </profile>
         <profile>
             <id>sonar</id>
+            <activation>
+                <property>
+                    <name>sonar.projectKey</name>
+                </property>
+            </activation>
             <properties>
                 <maven.test.failure.ignore>true</maven.test.failure.ignore>
+                <!-- Normal builds use Jabel to target an older JDK version
+                than would normally supported given the language features used,
+                but this causes Sonar to report parse errors. So for Sonar
+                builds we target a JDK version that is properly compatible with
+                the source code.-->
+                <version.jdk.target>${version.jdk.source}</version.jdk.target>
             </properties>
         </profile>
         <profile>
@@ -1959,6 +1986,57 @@
                     </plugin>
                     <?SORTPOM RESUME?>
                 </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- This profile is active when the project is loaded into
+            IntelliJ IDEA. It tricks the IDE into allowing more recent Java
+            language constructs. The regular Maven build supports some of those
+            constructs while targeting an older version of Java, thanks to the
+            Jabel compiler plugin. Note that this configuration comes with
+            downsides: it may cause IDEA to suggest language constructs and JDK
+            API usages that are not supported by the targeted JDK. -->
+            <id>idea</id>
+            <activation>
+                <property>
+                    <name>idea.maven.embedder.version</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <release>${version.jdk.source}</release>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>custom-test-runtime-version</id>
+            <activation>
+                <property>
+                    <name>surefire.jdk-toolchain-version</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <configuration>
+                                <jdkToolchain>
+                                    <version>${surefire.jdk-toolchain-version}</version>
+                                </jdkToolchain>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
     </profiles>
