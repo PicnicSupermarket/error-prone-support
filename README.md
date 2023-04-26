@@ -233,18 +233,6 @@ Other highly relevant commands:
   against _all_ code in the current working directory. For more information
   check the [PIT Maven plugin][pitest-maven].
 
-When running the project's tests in IntelliJ IDEA, you might see the following
-error:
-
-```
-java: exporting a package from system module jdk.compiler is not allowed with --release
-```
-
-If this happens, go to _Settings -> Build, Execution, Deployment -> Compiler ->
-Java Compiler_ and deselect the option _Use '--release' option for
-cross-compilation (Java 9 and later)_. See [IDEA-288052][idea-288052] for
-details.
-
 ## 💡 How it works
 
 This project provides additional [`BugChecker`][error-prone-bugchecker]
@@ -280,7 +268,6 @@ channel; please see our [security policy][security] for details.
 [github-actions-build-badge]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yml/badge.svg
 [github-actions-build-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yml?query=branch:master&event=push
 [google-java-format]: https://github.com/google/google-java-format
-[idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
 [license-badge]: https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
 [license]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/LICENSE.md
 [maven-central-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
