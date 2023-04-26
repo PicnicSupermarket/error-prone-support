@@ -1,12 +1,29 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.filtering;
+import static java.util.stream.Collectors.flatMapping;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.maxBy;
+import static java.util.stream.Collectors.minBy;
+import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.summarizingDouble;
+import static java.util.stream.Collectors.summarizingInt;
+import static java.util.stream.Collectors.summarizingLong;
+import static java.util.stream.Collectors.summingDouble;
+import static java.util.stream.Collectors.summingInt;
+import static java.util.stream.Collectors.summingLong;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import java.util.DoubleSummaryStatistics;
+import java.util.IntSummaryStatistics;
+import java.util.LongSummaryStatistics;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -17,7 +34,23 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Objects.class, Streams.class, not(null));
+    return ImmutableSet.of(
+        Objects.class,
+        Streams.class,
+        counting(),
+        filtering(null, null),
+        flatMapping(null, null),
+        mapping(null, null),
+        maxBy(null),
+        minBy(null),
+        not(null),
+        reducing(null),
+        summarizingDouble(null),
+        summarizingInt(null),
+        summarizingLong(null),
+        summingDouble(null),
+        summingInt(null),
+        summingLong(null));
   }
 
   String testJoining() {
@@ -90,7 +123,8 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Optional<String>> testStreamMin() {
     return ImmutableSet.of(
         Stream.of("foo").max(comparingInt(String::length).reversed()),
-        Stream.of("bar").sorted(comparingInt(String::length)).findFirst());
+        Stream.of("bar").sorted(comparingInt(String::length)).findFirst(),
+        Stream.of("baz").collect(minBy(comparingInt(String::length))));
   }
 
   ImmutableSet<Optional<String>> testStreamMinNaturalOrder() {
@@ -101,7 +135,8 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Optional<String>> testStreamMax() {
     return ImmutableSet.of(
         Stream.of("foo").min(comparingInt(String::length).reversed()),
-        Streams.findLast(Stream.of("bar").sorted(comparingInt(String::length))));
+        Streams.findLast(Stream.of("bar").sorted(comparingInt(String::length))),
+        Stream.of("baz").collect(maxBy(comparingInt(String::length))));
   }
 
   ImmutableSet<Optional<String>> testStreamMaxNaturalOrder() {
@@ -143,24 +178,63 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Integer> testStreamMapToIntSum() {
     Function<String, Integer> parseIntFunction = Integer::parseInt;
     return ImmutableSet.of(
-        Stream.of(1).map(i -> i * 2).reduce(0, Integer::sum),
-        Stream.of("2").map(Integer::parseInt).reduce(0, Integer::sum),
-        Stream.of("3").map(parseIntFunction).reduce(0, Integer::sum));
+        Stream.of("1").collect(summingInt(Integer::parseInt)),
+        Stream.of(2).map(i -> i * 2).reduce(0, Integer::sum),
+        Stream.of("3").map(Integer::parseInt).reduce(0, Integer::sum),
+        Stream.of("4").map(parseIntFunction).reduce(0, Integer::sum));
   }
 
   ImmutableSet<Double> testStreamMapToDoubleSum() {
     Function<String, Double> parseDoubleFunction = Double::parseDouble;
     return ImmutableSet.of(
-        Stream.of(1).map(i -> i * 2.0).reduce(0.0, Double::sum),
-        Stream.of("2").map(Double::parseDouble).reduce(0.0, Double::sum),
-        Stream.of("3").map(parseDoubleFunction).reduce(0.0, Double::sum));
+        Stream.of("1").collect(summingDouble(Double::parseDouble)),
+        Stream.of(2).map(i -> i * 2.0).reduce(0.0, Double::sum),
+        Stream.of("3").map(Double::parseDouble).reduce(0.0, Double::sum),
+        Stream.of("4").map(parseDoubleFunction).reduce(0.0, Double::sum));
   }
 
   ImmutableSet<Long> testStreamMapToLongSum() {
     Function<String, Long> parseLongFunction = Long::parseLong;
     return ImmutableSet.of(
-        Stream.of(1).map(i -> i * 2L).reduce(0L, Long::sum),
-        Stream.of("2").map(Long::parseLong).reduce(0L, Long::sum),
-        Stream.of("3").map(parseLongFunction).reduce(0L, Long::sum));
+        Stream.of("1").collect(summingLong(Long::parseLong)),
+        Stream.of(2).map(i -> i * 2L).reduce(0L, Long::sum),
+        Stream.of("3").map(Long::parseLong).reduce(0L, Long::sum),
+        Stream.of("4").map(parseLongFunction).reduce(0L, Long::sum));
+  }
+
+  IntSummaryStatistics testStreamMapToIntSummaryStatistics() {
+    return Stream.of("1").collect(summarizingInt(Integer::parseInt));
+  }
+
+  DoubleSummaryStatistics testStreamMapToDoubleSummaryStatistics() {
+    return Stream.of("1").collect(summarizingDouble(Double::parseDouble));
+  }
+
+  LongSummaryStatistics testStreamMapToLongSummaryStatistics() {
+    return Stream.of("1").collect(summarizingLong(Long::parseLong));
+  }
+
+  Long testStreamCount() {
+    return Stream.of(1).collect(counting());
+  }
+
+  Optional<Integer> testStreamReduce() {
+    return Stream.of(1).collect(reducing(Integer::sum));
+  }
+
+  Integer testStreamReduceWithIdentity() {
+    return Stream.of(1).collect(reducing(0, Integer::sum));
+  }
+
+  ImmutableSet<String> testStreamFilterCollect() {
+    return Stream.of("1").collect(filtering(String::isEmpty, toImmutableSet()));
+  }
+
+  ImmutableSet<Integer> testStreamMapCollect() {
+    return Stream.of("1").collect(mapping(Integer::parseInt, toImmutableSet()));
+  }
+
+  ImmutableSet<Integer> testStreamFlatMapCollect() {
+    return Stream.of(1).collect(flatMapping(n -> Stream.of(n, n), toImmutableSet()));
   }
 }

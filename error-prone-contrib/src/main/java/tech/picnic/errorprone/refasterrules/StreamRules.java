@@ -4,7 +4,20 @@ import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.filtering;
+import static java.util.stream.Collectors.flatMapping;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.maxBy;
+import static java.util.stream.Collectors.minBy;
+import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.summarizingDouble;
+import static java.util.stream.Collectors.summarizingInt;
+import static java.util.stream.Collectors.summarizingLong;
+import static java.util.stream.Collectors.summingDouble;
+import static java.util.stream.Collectors.summingInt;
+import static java.util.stream.Collectors.summingLong;
 
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
@@ -16,8 +29,12 @@ import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
+import java.util.IntSummaryStatistics;
+import java.util.LongSummaryStatistics;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
@@ -263,9 +280,12 @@ final class StreamRules {
 
   static final class StreamMin<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
     Optional<T> before(Stream<T> stream, Comparator<? super T> comparator) {
       return Refaster.anyOf(
-          stream.max(comparator.reversed()), stream.sorted(comparator).findFirst());
+          stream.max(comparator.reversed()),
+          stream.sorted(comparator).findFirst(),
+          stream.collect(minBy(comparator)));
     }
 
     @AfterTemplate
@@ -289,9 +309,12 @@ final class StreamRules {
 
   static final class StreamMax<T> {
     @BeforeTemplate
+    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
     Optional<T> before(Stream<T> stream, Comparator<? super T> comparator) {
       return Refaster.anyOf(
-          stream.min(comparator.reversed()), Streams.findLast(stream.sorted(comparator)));
+          stream.min(comparator.reversed()),
+          Streams.findLast(stream.sorted(comparator)),
+          stream.collect(maxBy(comparator)));
     }
 
     @AfterTemplate
@@ -389,7 +412,13 @@ final class StreamRules {
 
   static final class StreamMapToIntSum<T> {
     @BeforeTemplate
-    int before(
+    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
+    long before(Stream<T> stream, ToIntFunction<T> mapper) {
+      return stream.collect(summingInt(mapper));
+    }
+
+    @BeforeTemplate
+    int before2(
         Stream<T> stream,
         @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Integer> mapper) {
       return stream.map(mapper).reduce(0, Integer::sum);
@@ -403,7 +432,13 @@ final class StreamRules {
 
   static final class StreamMapToDoubleSum<T> {
     @BeforeTemplate
-    double before(
+    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
+    double before(Stream<T> stream, ToDoubleFunction<T> mapper) {
+      return stream.collect(summingDouble(mapper));
+    }
+
+    @BeforeTemplate
+    double before2(
         Stream<T> stream,
         @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Double> mapper) {
       return stream.map(mapper).reduce(0.0, Double::sum);
@@ -417,7 +452,13 @@ final class StreamRules {
 
   static final class StreamMapToLongSum<T> {
     @BeforeTemplate
-    long before(
+    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
+    long before(Stream<T> stream, ToLongFunction<T> mapper) {
+      return stream.collect(summingLong(mapper));
+    }
+
+    @BeforeTemplate
+    long before2(
         Stream<T> stream,
         @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Long> mapper) {
       return stream.map(mapper).reduce(0L, Long::sum);
@@ -426,6 +467,132 @@ final class StreamRules {
     @AfterTemplate
     long after(Stream<T> stream, ToLongFunction<T> mapper) {
       return stream.mapToLong(mapper).sum();
+    }
+  }
+
+  static final class StreamMapToIntSummaryStatistics<T> {
+    @BeforeTemplate
+    IntSummaryStatistics before(Stream<T> stream, ToIntFunction<T> mapper) {
+      return stream.collect(summarizingInt(mapper));
+    }
+
+    @AfterTemplate
+    IntSummaryStatistics after(Stream<T> stream, ToIntFunction<T> mapper) {
+      return stream.mapToInt(mapper).summaryStatistics();
+    }
+  }
+
+  static final class StreamMapToDoubleSummaryStatistics<T> {
+    @BeforeTemplate
+    DoubleSummaryStatistics before(Stream<T> stream, ToDoubleFunction<T> mapper) {
+      return stream.collect(summarizingDouble(mapper));
+    }
+
+    @AfterTemplate
+    DoubleSummaryStatistics after(Stream<T> stream, ToDoubleFunction<T> mapper) {
+      return stream.mapToDouble(mapper).summaryStatistics();
+    }
+  }
+
+  static final class StreamMapToLongSummaryStatistics<T> {
+    @BeforeTemplate
+    LongSummaryStatistics before(Stream<T> stream, ToLongFunction<T> mapper) {
+      return stream.collect(summarizingLong(mapper));
+    }
+
+    @AfterTemplate
+    LongSummaryStatistics after(Stream<T> stream, ToLongFunction<T> mapper) {
+      return stream.mapToLong(mapper).summaryStatistics();
+    }
+  }
+
+  static final class StreamCount<T> {
+    @BeforeTemplate
+    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
+    long before(Stream<T> stream) {
+      return stream.collect(counting());
+    }
+
+    @AfterTemplate
+    long after(Stream<T> stream) {
+      return stream.count();
+    }
+  }
+
+  static final class StreamReduce<T> {
+    @BeforeTemplate
+    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
+    Optional<T> before(Stream<T> stream, BinaryOperator<T> accumulator) {
+      return stream.collect(reducing(accumulator));
+    }
+
+    @AfterTemplate
+    Optional<T> after(Stream<T> stream, BinaryOperator<T> accumulator) {
+      return stream.reduce(accumulator);
+    }
+  }
+
+  static final class StreamReduceWithIdentity<T> {
+    @BeforeTemplate
+    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
+    T before(Stream<T> stream, T identity, BinaryOperator<T> accumulator) {
+      return stream.collect(reducing(identity, accumulator));
+    }
+
+    @AfterTemplate
+    T after(Stream<T> stream, T identity, BinaryOperator<T> accumulator) {
+      return stream.reduce(identity, accumulator);
+    }
+  }
+
+  static final class StreamFilterCollect<T, R> {
+    @BeforeTemplate
+    R before(
+        Stream<T> stream, Predicate<? super T> predicate, Collector<? super T, ?, R> collector) {
+      return stream.collect(filtering(predicate, collector));
+    }
+
+    @AfterTemplate
+    R after(
+        Stream<T> stream, Predicate<? super T> predicate, Collector<? super T, ?, R> collector) {
+      return stream.filter(predicate).collect(collector);
+    }
+  }
+
+  static final class StreamMapCollect<T, U, R> {
+    @BeforeTemplate
+    @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
+    R before(
+        Stream<T> stream,
+        Function<? super T, ? extends U> mapper,
+        Collector<? super U, ?, R> collector) {
+      return stream.collect(mapping(mapper, collector));
+    }
+
+    @AfterTemplate
+    R after(
+        Stream<T> stream,
+        Function<? super T, ? extends U> mapper,
+        Collector<? super U, ?, R> collector) {
+      return stream.map(mapper).collect(collector);
+    }
+  }
+
+  static final class StreamFlatMapCollect<T, U, R> {
+    @BeforeTemplate
+    R before(
+        Stream<T> stream,
+        Function<? super T, ? extends Stream<? extends U>> mapper,
+        Collector<? super U, ?, R> collector) {
+      return stream.collect(flatMapping(mapper, collector));
+    }
+
+    @AfterTemplate
+    R after(
+        Stream<T> stream,
+        Function<? super T, ? extends Stream<? extends U>> mapper,
+        Collector<? super U, ?, R> collector) {
+      return stream.flatMap(mapper).collect(collector);
     }
   }
 }
