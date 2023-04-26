@@ -1,0 +1,35 @@
+name: Build with JDK 17 and test against JDK 11
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      # We run the build twice: once against the original Error Prone
+      # release, and once against the Picnic Error Prone fork. In both cases
+      # the code is compiled using JDK 17, while the tests are executed
+      # using JDK 11.
+      - name: Check out code
+        uses: actions/checkout@v3.1.0
+        with:
+          persist-credentials: false
+      - name: Set up JDK
+        uses: actions/setup-java@v3.8.0
+        with:
+          java-version: |
+            11.0.19
+            17.0.7
+          distribution: temurin
+          cache: maven
+      - name: Display build environment details
+        run: mvn --version
+      - name: Build project against vanilla Error Prone
+        run: mvn -T1C install -Dsurefire.jdk-toolchain-version=11.0.19
+      - name: Build project with self-check against Error Prone fork
+        run: mvn -T1C clean verify -Perror-prone-fork -Dsurefire.jdk-toolchain-version=11.0.19 -s settings.xml
+      - name: Remove installed project artifacts
+        run: mvn build-helper:remove-project-artifact
