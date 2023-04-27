@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Verify.verify;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
@@ -25,7 +24,6 @@ import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.NewArrayTree;
-import com.sun.source.tree.Tree.Kind;
 import java.util.Optional;
 import tech.picnic.errorprone.utils.AnnotationAttributeMatcher;
 import tech.picnic.errorprone.utils.SourceCode;
@@ -80,22 +78,19 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
   }
 
   private static Optional<String> extractUniqueMethod(ExpressionTree arg, VisitorState state) {
-    verify(
-        arg.getKind() == Kind.ASSIGNMENT,
-        "Annotation attribute is not an assignment: %s",
-        arg.getKind());
-
-    ExpressionTree expr = ((AssignmentTree) arg).getExpression();
-    if (expr.getKind() != Kind.NEW_ARRAY) {
-      return Optional.of(extractMethod(expr, state));
+    if (!(arg instanceof AssignmentTree assignment)) {
+      throw new VerifyException("Annotation attribute is not an assignment:" + arg.getKind());
     }
 
-    NewArrayTree newArray = (NewArrayTree) expr;
-    return Optional.of(newArray.getInitializers())
-        .filter(args -> args.size() == 1)
-        .map(args -> extractMethod(args.get(0), state));
+    ExpressionTree expr = assignment.getExpression();
+    return expr instanceof NewArrayTree newArray
+        ? Optional.of(newArray.getInitializers())
+            .filter(args -> args.size() == 1)
+            .map(args -> extractMethod(args.get(0), state))
+        : Optional.of(extractMethod(expr, state));
   }
 
+  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static String extractMethod(ExpressionTree expr, VisitorState state) {
     return switch (expr.getKind()) {
       case IDENTIFIER -> SourceCode.treeToString(expr, state);

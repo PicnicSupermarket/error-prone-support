@@ -331,11 +331,10 @@ public final class RedundantStringConversion extends BugChecker
   }
 
   private Optional<ExpressionTree> trySimplify(ExpressionTree tree, VisitorState state) {
-    if (tree.getKind() != Kind.METHOD_INVOCATION) {
+    if (!(tree instanceof MethodInvocationTree methodInvocation)) {
       return Optional.empty();
     }
 
-    MethodInvocationTree methodInvocation = (MethodInvocationTree) tree;
     if (!conversionMethodMatcher.matches(methodInvocation, state)) {
       return Optional.empty();
     }
@@ -351,13 +350,12 @@ public final class RedundantStringConversion extends BugChecker
 
   private static Optional<ExpressionTree> trySimplifyNullaryMethod(
       MethodInvocationTree methodInvocation, VisitorState state) {
-    if (!instanceMethod().matches(methodInvocation, state)) {
+    if (!instanceMethod().matches(methodInvocation, state)
+        || !(methodInvocation.getMethodSelect() instanceof MemberSelectTree memberSelect)) {
       return Optional.empty();
     }
 
-    return Optional.of(methodInvocation.getMethodSelect())
-        .filter(methodSelect -> methodSelect.getKind() == Kind.MEMBER_SELECT)
-        .map(methodSelect -> ((MemberSelectTree) methodSelect).getExpression())
+    return Optional.of(memberSelect.getExpression())
         .filter(expr -> !"super".equals(SourceCode.treeToString(expr, state)));
   }
 

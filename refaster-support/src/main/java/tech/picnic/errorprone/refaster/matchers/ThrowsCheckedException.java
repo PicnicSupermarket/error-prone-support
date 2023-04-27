@@ -23,12 +23,12 @@ public final class ThrowsCheckedException implements Matcher<ExpressionTree> {
 
   @Override
   public boolean matches(ExpressionTree tree, VisitorState state) {
-    if (tree instanceof LambdaExpressionTree) {
-      return throwsCheckedException((LambdaExpressionTree) tree, state);
+    if (tree instanceof LambdaExpressionTree lambdaExpression) {
+      return throwsCheckedException(lambdaExpression, state);
     }
 
-    if (tree instanceof MemberReferenceTree) {
-      return throwsCheckedException((MemberReferenceTree) tree, state);
+    if (tree instanceof MemberReferenceTree memberReference) {
+      return throwsCheckedException(memberReference, state);
     }
 
     Type type = ASTHelpers.getType(tree);

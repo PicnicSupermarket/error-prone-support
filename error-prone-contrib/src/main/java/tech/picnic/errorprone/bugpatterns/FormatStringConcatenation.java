@@ -245,8 +245,8 @@ public final class FormatStringConcatenation extends BugChecker
     }
 
     private void appendExpression(Tree tree) {
-      if (tree instanceof LiteralTree) {
-        formatString.append(((LiteralTree) tree).getValue());
+      if (tree instanceof LiteralTree literal) {
+        formatString.append(literal.getValue());
       } else {
         formatString.append(formatSpecifier);
         formatArguments.add(tree);

@@ -18,7 +18,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.tools.javac.code.Symbol;
 import java.util.Map;
 import javax.lang.model.element.AnnotationValue;
@@ -46,7 +46,7 @@ public final class AmbiguousJsonCreator extends BugChecker implements Annotation
     }
 
     ClassTree clazz = state.findEnclosing(ClassTree.class);
-    if (clazz == null || clazz.getKind() != Tree.Kind.ENUM) {
+    if (clazz == null || clazz.getKind() != Kind.ENUM) {
       return Description.NO_MATCH;
     }
 
