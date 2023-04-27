@@ -276,16 +276,12 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   private static String toValueSourceAttributeName(Type type) {
     String typeString = type.tsym.name.toString();
 
-    switch (typeString) {
-      case "Class":
-        return "classes";
-      case "Character":
-        return "chars";
-      case "Integer":
-        return "ints";
-      default:
-        return typeString.toLowerCase(Locale.ROOT) + 's';
-    }
+    return switch (typeString) {
+      case "Class" -> "classes";
+      case "Character" -> "chars";
+      case "Integer" -> "ints";
+      default -> typeString.toLowerCase(Locale.ROOT) + 's';
+    };
   }
 
   private static <T> Optional<T> getElementIfSingleton(Collection<T> collection) {

@@ -209,15 +209,11 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
     Tree parentTree =
         requireNonNull(state.getPath().getParentPath(), "MemberSelectTree lacks enclosing node")
             .getLeaf();
-    switch (parentTree.getKind()) {
-      case IMPORT:
-      case MEMBER_SELECT:
-        return false;
-      case METHOD_INVOCATION:
-        return ((MethodInvocationTree) parentTree).getTypeArguments().isEmpty();
-      default:
-        return true;
-    }
+    return switch (parentTree.getKind()) {
+      case IMPORT, MEMBER_SELECT -> false;
+      case METHOD_INVOCATION -> ((MethodInvocationTree) parentTree).getTypeArguments().isEmpty();
+      default -> true;
+    };
   }
 
   private static boolean isCandidate(MemberSelectTree tree) {

@@ -97,14 +97,11 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
   }
 
   private static String extractMethod(ExpressionTree expr, VisitorState state) {
-    switch (expr.getKind()) {
-      case IDENTIFIER:
-        return SourceCode.treeToString(expr, state);
-      case MEMBER_SELECT:
-        return ((MemberSelectTree) expr).getIdentifier().toString();
-      default:
-        throw new VerifyException("Unexpected type of expression: " + expr.getKind());
-    }
+    return switch (expr.getKind()) {
+      case IDENTIFIER -> SourceCode.treeToString(expr, state);
+      case MEMBER_SELECT -> ((MemberSelectTree) expr).getIdentifier().toString();
+      default -> throw new VerifyException("Unexpected type of expression: " + expr.getKind());
+    };
   }
 
   private static Fix replaceAnnotation(
