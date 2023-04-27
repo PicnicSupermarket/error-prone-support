@@ -29,8 +29,8 @@ public final class ThrowsCheckedException implements Matcher<ExpressionTree> {
   }
 
   private static Collection<Type> getThrownTypes(ExpressionTree tree, VisitorState state) {
-    if (tree instanceof LambdaExpressionTree) {
-      return ASTHelpers.getThrownExceptions(((LambdaExpressionTree) tree).getBody(), state);
+    if (tree instanceof LambdaExpressionTree lambdaExpression) {
+      return ASTHelpers.getThrownExceptions(lambdaExpression.getBody(), state);
     }
 
     if (tree instanceof MemberReferenceTree) {

@@ -257,8 +257,8 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
             arguments.stream()
                 .map(
                     arg ->
-                        arg instanceof MethodInvocationTree
-                            ? Iterables.getOnlyElement(((MethodInvocationTree) arg).getArguments())
+                        arg instanceof MethodInvocationTree methodInvocation
+                            ? Iterables.getOnlyElement(methodInvocation.getArguments())
                             : arg)
                 .map(argument -> SourceCode.treeToString(argument, state))
                 .collect(joining(", ")))
@@ -285,11 +285,10 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   private static Matcher<ExpressionTree> isSingleDimensionArrayCreationWithAllElementsMatching(
       Matcher<? super ExpressionTree> elementMatcher) {
     return (tree, state) -> {
-      if (!(tree instanceof NewArrayTree)) {
+      if (!(tree instanceof NewArrayTree newArray)) {
         return false;
       }
 
-      NewArrayTree newArray = (NewArrayTree) tree;
       return newArray.getDimensions().isEmpty()
           && !newArray.getInitializers().isEmpty()
           && newArray.getInitializers().stream()
