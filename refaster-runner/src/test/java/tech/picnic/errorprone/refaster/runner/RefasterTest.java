@@ -198,17 +198,13 @@ final class RefasterTest {
   }
 
   private static SeverityLevel toSeverityLevel(String compilerDiagnosticsPrefix) {
-    switch (compilerDiagnosticsPrefix) {
-      case "Note":
-        return SUGGESTION;
-      case "warning":
-        return WARNING;
-      case "error":
-        return ERROR;
-      default:
-        throw new IllegalStateException(
-            String.format("Unrecognized diagnostics prefix '%s'", compilerDiagnosticsPrefix));
-    }
+    return switch (compilerDiagnosticsPrefix) {
+      case "Note" -> SUGGESTION;
+      case "warning" -> WARNING;
+      case "error" -> ERROR;
+      default -> throw new IllegalStateException(
+          String.format("Unrecognized diagnostics prefix '%s'", compilerDiagnosticsPrefix));
+    };
   }
 
   @Test

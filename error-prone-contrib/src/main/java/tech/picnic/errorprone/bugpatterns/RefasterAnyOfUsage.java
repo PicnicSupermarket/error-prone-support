@@ -42,21 +42,18 @@ public final class RefasterAnyOfUsage extends BugChecker implements MethodInvoca
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (REFASTER_ANY_OF.matches(tree, state)) {
-      switch (tree.getArguments().size()) {
-        case 0:
-          // We can't safely fix this case; dropping the expression may produce non-compilable code.
-          return describeMatch(tree);
-        case 1:
-          return describeMatch(
-              tree,
-              SuggestedFix.replace(
-                  tree, SourceCode.treeToString(tree.getArguments().get(0), state)));
-        default:
-          /* Handled below. */
-      }
+    int argumentCount = tree.getArguments().size();
+    if (argumentCount > 1 || !REFASTER_ANY_OF.matches(tree, state)) {
+      return Description.NO_MATCH;
     }
 
-    return Description.NO_MATCH;
+    if (argumentCount == 0) {
+      /* We can't safely fix this case; dropping the expression may produce non-compilable code. */
+      return describeMatch(tree);
+    }
+
+    return describeMatch(
+        tree,
+        SuggestedFix.replace(tree, SourceCode.treeToString(tree.getArguments().get(0), state)));
   }
 }

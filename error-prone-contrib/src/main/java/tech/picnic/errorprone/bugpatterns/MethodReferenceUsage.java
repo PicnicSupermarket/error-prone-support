@@ -87,20 +87,16 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
 
   private static Optional<SuggestedFix.Builder> constructMethodRef(
       LambdaExpressionTree lambdaExpr, Tree subTree) {
-    switch (subTree.getKind()) {
-      case BLOCK:
-        return constructMethodRef(lambdaExpr, (BlockTree) subTree);
-      case EXPRESSION_STATEMENT:
-        return constructMethodRef(lambdaExpr, ((ExpressionStatementTree) subTree).getExpression());
-      case METHOD_INVOCATION:
-        return constructMethodRef(lambdaExpr, (MethodInvocationTree) subTree);
-      case PARENTHESIZED:
-        return constructMethodRef(lambdaExpr, ((ParenthesizedTree) subTree).getExpression());
-      case RETURN:
-        return constructMethodRef(lambdaExpr, ((ReturnTree) subTree).getExpression());
-      default:
-        return Optional.empty();
-    }
+    return switch (subTree.getKind()) {
+      case BLOCK -> constructMethodRef(lambdaExpr, (BlockTree) subTree);
+      case EXPRESSION_STATEMENT -> constructMethodRef(
+          lambdaExpr, ((ExpressionStatementTree) subTree).getExpression());
+      case METHOD_INVOCATION -> constructMethodRef(lambdaExpr, (MethodInvocationTree) subTree);
+      case PARENTHESIZED -> constructMethodRef(
+          lambdaExpr, ((ParenthesizedTree) subTree).getExpression());
+      case RETURN -> constructMethodRef(lambdaExpr, ((ReturnTree) subTree).getExpression());
+      default -> Optional.empty();
+    };
   }
 
   private static Optional<SuggestedFix.Builder> constructMethodRef(
@@ -125,21 +121,22 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
       MethodInvocationTree subTree,
       Optional<Name> expectedInstance) {
     ExpressionTree methodSelect = subTree.getMethodSelect();
-    switch (methodSelect.getKind()) {
-      case IDENTIFIER:
+    return switch (methodSelect.getKind()) {
+      case IDENTIFIER -> {
         if (expectedInstance.isPresent()) {
           /* Direct method call; there is no matching "implicit parameter". */
-          return Optional.empty();
+          yield Optional.empty();
         }
         Symbol sym = ASTHelpers.getSymbol(methodSelect);
-        return ASTHelpers.isStatic(sym)
+        yield ASTHelpers.isStatic(sym)
             ? constructFix(lambdaExpr, sym.owner, methodSelect)
             : constructFix(lambdaExpr, "this", methodSelect);
-      case MEMBER_SELECT:
-        return constructMethodRef(lambdaExpr, (MemberSelectTree) methodSelect, expectedInstance);
-      default:
-        throw new VerifyException("Unexpected type of expression: " + methodSelect.getKind());
-    }
+      }
+      case MEMBER_SELECT -> constructMethodRef(
+          lambdaExpr, (MemberSelectTree) methodSelect, expectedInstance);
+      default -> throw new VerifyException(
+          "Unexpected type of expression: " + methodSelect.getKind());
+    };
   }
 
   private static Optional<SuggestedFix.Builder> constructMethodRef(

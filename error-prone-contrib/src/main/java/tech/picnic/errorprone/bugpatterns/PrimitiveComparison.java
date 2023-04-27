@@ -147,36 +147,38 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
   }
 
   private static Optional<Type> getPotentiallyBoxedReturnType(ExpressionTree tree) {
-    switch (tree.getKind()) {
-      case LAMBDA_EXPRESSION:
+    return switch (tree.getKind()) {
+      case LAMBDA_EXPRESSION -> {
         /* Return the lambda expression's actual return type. */
-        return Optional.ofNullable(ASTHelpers.getType(((LambdaExpressionTree) tree).getBody()));
-      case MEMBER_REFERENCE:
+        yield Optional.ofNullable(ASTHelpers.getType(((LambdaExpressionTree) tree).getBody()));
+      }
+      case MEMBER_REFERENCE -> {
         /* Return the method's declared return type. */
         // XXX: Very fragile. Do better.
         Type subType2 = ((JCMemberReference) tree).referentType;
-        return Optional.of(subType2.getReturnType());
-      default:
+        yield Optional.of(subType2.getReturnType());
+      }
+      default -> {
         /* This appears to be a genuine `{,ToInt,ToLong,ToDouble}Function`. */
-        return Optional.empty();
-    }
+        yield Optional.empty();
+      }
+    };
   }
 
   private static Fix suggestFix(
       MethodInvocationTree tree, String preferredMethodName, VisitorState state) {
     ExpressionTree expr = tree.getMethodSelect();
-    switch (expr.getKind()) {
-      case IDENTIFIER:
-        return SuggestedFix.builder()
-            .addStaticImport(Comparator.class.getName() + '.' + preferredMethodName)
-            .replace(expr, preferredMethodName)
-            .build();
-      case MEMBER_SELECT:
+    return switch (expr.getKind()) {
+      case IDENTIFIER -> SuggestedFix.builder()
+          .addStaticImport(Comparator.class.getName() + '.' + preferredMethodName)
+          .replace(expr, preferredMethodName)
+          .build();
+      case MEMBER_SELECT -> {
         MemberSelectTree ms = (MemberSelectTree) tree.getMethodSelect();
-        return SuggestedFix.replace(
+        yield SuggestedFix.replace(
             ms, SourceCode.treeToString(ms.getExpression(), state) + '.' + preferredMethodName);
-      default:
-        throw new VerifyException("Unexpected type of expression: " + expr.getKind());
-    }
+      }
+      default -> throw new VerifyException("Unexpected type of expression: " + expr.getKind());
+    };
   }
 }
