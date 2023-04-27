@@ -124,8 +124,9 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
 
     return buildDescription(tree)
         .setMessage(
-            "This method invocation appears redundant; remove it or suppress this warning and "
-                + "add a comment explaining its purpose")
+            """
+            This method invocation appears redundant; remove it or suppress this warning and add a \
+            comment explaining its purpose""")
         .addFix(SuggestedFix.replace(tree, SourceCode.treeToString(sourceTree, state)))
         .addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()))
         .build();

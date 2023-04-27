@@ -50,8 +50,9 @@ import reactor.core.publisher.Flux;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "`Flux#flatMap` and `Flux#flatMapSequential` have subtle semantics; "
-            + "please use `Flux#concatMap` or explicitly specify the desired amount of concurrency",
+        """
+        `Flux#flatMap` and `Flux#flatMapSequential` have subtle semantics; please use \
+        `Flux#concatMap` or explicitly specify the desired amount of concurrency""",
     link = BUG_PATTERNS_BASE_URL + "FluxFlatMapUsage",
     linkType = CUSTOM,
     severity = ERROR,
