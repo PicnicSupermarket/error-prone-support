@@ -152,8 +152,8 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     String expectedClassName = ruleCollectionUnderTest + "Test";
 
     for (Tree typeDeclaration : tree.getTypeDecls()) {
-      if (typeDeclaration instanceof ClassTree) {
-        if (!((ClassTree) typeDeclaration).getSimpleName().contentEquals(expectedClassName)) {
+      if (typeDeclaration instanceof ClassTree classTree) {
+        if (!classTree.getSimpleName().contentEquals(expectedClassName)) {
           state.reportMatch(
               describeMatch(
                   typeDeclaration,

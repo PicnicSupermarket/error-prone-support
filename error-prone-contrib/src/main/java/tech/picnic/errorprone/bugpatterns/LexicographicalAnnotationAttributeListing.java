@@ -31,7 +31,6 @@ import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.PrimitiveTypeTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
@@ -119,13 +118,9 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
   }
 
   private static Optional<NewArrayTree> extractArray(ExpressionTree expr) {
-    if (expr.getKind() == Kind.ASSIGNMENT) {
-      return extractArray(((AssignmentTree) expr).getExpression());
-    }
-
-    return Optional.of(expr)
-        .filter(e -> e.getKind() == Kind.NEW_ARRAY)
-        .map(NewArrayTree.class::cast);
+    return expr instanceof AssignmentTree assignment
+        ? extractArray(assignment.getExpression())
+        : Optional.of(expr).filter(NewArrayTree.class::isInstance).map(NewArrayTree.class::cast);
   }
 
   private static Optional<SuggestedFix.Builder> suggestSorting(
@@ -197,8 +192,8 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
       public @Nullable Void visitLiteral(LiteralTree node, @Nullable Void unused) {
         Object value = ASTHelpers.constValue(node);
         nodes.add(
-            value instanceof String
-                ? STRING_ARGUMENT_SPLITTER.splitToStream((String) value).collect(toImmutableList())
+            value instanceof String str
+                ? STRING_ARGUMENT_SPLITTER.splitToStream(str).collect(toImmutableList())
                 : ImmutableList.of(String.valueOf(value)));
 
         return super.visitLiteral(node, unused);

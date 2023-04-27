@@ -67,6 +67,7 @@ public final class MockitoMockClassReference extends BugChecker
     return describeMatch(tree, SuggestedFixes.removeElement(arguments.get(0), arguments, state));
   }
 
+  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static boolean isTypeDerivableFromContext(MethodInvocationTree tree, VisitorState state) {
     Tree parent = state.getPath().getParentPath().getLeaf();
     return switch (parent.getKind()) {

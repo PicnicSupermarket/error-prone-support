@@ -97,14 +97,13 @@ public final class MoreJUnitMatchers {
     String methodName = method.getName().toString();
     ExpressionTree value = AnnotationMatcherUtils.getArgument(methodSourceAnnotation, "value");
 
-    if (!(value instanceof NewArrayTree)) {
+    if (!(value instanceof NewArrayTree newArray)) {
       return ImmutableList.of(toMethodSourceFactoryDescriptor(value, methodName));
     }
 
-    return ((NewArrayTree) value)
-        .getInitializers().stream()
-            .map(name -> toMethodSourceFactoryDescriptor(name, methodName))
-            .collect(toImmutableList());
+    return newArray.getInitializers().stream()
+        .map(name -> toMethodSourceFactoryDescriptor(name, methodName))
+        .collect(toImmutableList());
   }
 
   private static String toMethodSourceFactoryDescriptor(

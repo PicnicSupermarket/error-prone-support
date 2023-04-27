@@ -9,7 +9,6 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.tools.javac.code.Type;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -116,8 +115,8 @@ public final class AnnotationAttributeMatcher implements Serializable {
   }
 
   private static String extractAttributeName(ExpressionTree expr) {
-    return (expr.getKind() == Kind.ASSIGNMENT)
-        ? ASTHelpers.getSymbol(((AssignmentTree) expr).getVariable()).getSimpleName().toString()
+    return (expr instanceof AssignmentTree assignment)
+        ? ASTHelpers.getSymbol(assignment.getVariable()).getSimpleName().toString()
         : "value";
   }
 

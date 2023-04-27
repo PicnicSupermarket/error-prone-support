@@ -34,7 +34,7 @@ abstract class AbstractMatcherTestChecker extends BugChecker implements Compilat
     new TreeScanner<@Nullable Void, @Nullable Void>() {
       @Override
       public @Nullable Void scan(Tree tree, @Nullable Void unused) {
-        if (tree instanceof ExpressionTree && delegate.matches((ExpressionTree) tree, state)) {
+        if (tree instanceof ExpressionTree expression && delegate.matches(expression, state)) {
           state.reportMatch(describeMatch(tree));
         }
 
