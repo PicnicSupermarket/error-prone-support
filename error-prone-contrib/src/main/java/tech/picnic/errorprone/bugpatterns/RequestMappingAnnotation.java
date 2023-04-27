@@ -99,9 +99,10 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
             && LACKS_PARAMETER_ANNOTATION.matches(tree, state)
         ? buildDescription(tree)
             .setMessage(
-                "Not all parameters of this request mapping method are annotated; this may be a "
-                    + "mistake. If the unannotated parameters represent query string parameters, "
-                    + "annotate them with `@RequestParam`.")
+                """
+                Not all parameters of this request mapping method are annotated; this may be a \
+                mistake. If the unannotated parameters represent query string parameters, annotate \
+                them with `@RequestParam`.""")
             .build()
         : Description.NO_MATCH;
   }
