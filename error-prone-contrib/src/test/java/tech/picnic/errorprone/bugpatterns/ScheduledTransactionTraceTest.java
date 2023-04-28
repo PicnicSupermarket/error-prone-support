@@ -4,8 +4,11 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 import org.springframework.scheduling.annotation.Scheduled;
 
+@DisabledForJreRange(max = JRE.JAVA_16 /* Spring targets JDK 17. */)
 final class ScheduledTransactionTraceTest {
   @Test
   void identification() {

@@ -4,6 +4,8 @@ import static java.util.function.Predicate.not;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.condition.DisabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -69,6 +71,10 @@ final class RefasterRulesTest {
           TestNGToAssertJRules.class,
           TimeRules.class,
           WebClientRules.class);
+  // XXX: Drop all logic related to this collection once we drop support for
+  // JDKs prior to version 17.
+  private static final ImmutableSet<Class<?>> JDK_17_PLUS_RULE_COLLECTIONS =
+      ImmutableSet.of(WebClientRules.class);
 
   // XXX: Create a JUnit extension to automatically discover the rule collections in a given context
   // to make sure the list is exhaustive.
@@ -77,12 +83,24 @@ final class RefasterRulesTest {
     // method with `@ValueSource(classes = {...})`.
     return RULE_COLLECTIONS.stream()
         .filter(not(AssertJRules.class::equals))
+        .filter(not(WebClientRules.class::equals))
         .map(Arguments::arguments);
   }
 
   @MethodSource("validateRuleCollectionTestCases")
   @ParameterizedTest
   void validateRuleCollection(Class<?> clazz) {
-    RefasterRuleCollection.validate(clazz);
+    if (!JDK_17_PLUS_RULE_COLLECTIONS.contains(clazz)) {
+      RefasterRuleCollection.validate(clazz);
+    }
+  }
+
+  @DisabledForJreRange(max = JRE.JAVA_16 /* Spring targets JDK 17. */)
+  @MethodSource("validateRuleCollectionTestCases")
+  @ParameterizedTest
+  void validateRuleCollectionWithJdk17AndAbove(Class<?> clazz) {
+    if (JDK_17_PLUS_RULE_COLLECTIONS.contains(clazz)) {
+      RefasterRuleCollection.validate(clazz);
+    }
   }
 }

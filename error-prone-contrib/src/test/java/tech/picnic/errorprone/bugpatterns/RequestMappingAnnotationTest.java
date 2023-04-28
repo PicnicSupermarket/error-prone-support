@@ -2,7 +2,10 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
+@DisabledForJreRange(max = JRE.JAVA_16 /* Spring targets JDK 17. */)
 final class RequestMappingAnnotationTest {
   @Test
   void identification() {

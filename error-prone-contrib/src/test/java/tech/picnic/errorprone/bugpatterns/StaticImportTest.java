@@ -6,6 +6,8 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 final class StaticImportTest {
   @Test
@@ -26,6 +28,7 @@ final class StaticImportTest {
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_EXEMPTED_IDENTIFIERS);
   }
 
+  @DisabledForJreRange(max = JRE.JAVA_16 /* Spring targets JDK 17. */)
   @Test
   void identification() {
     CompilationTestHelper.newInstance(StaticImport.class, getClass())
@@ -111,6 +114,7 @@ final class StaticImportTest {
         .doTest();
   }
 
+  @DisabledForJreRange(max = JRE.JAVA_16 /* Spring targets JDK 17. */)
   @Test
   void replacement() {
     BugCheckerRefactoringTestHelper.newInstance(StaticImport.class, getClass())
