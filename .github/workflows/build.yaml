@@ -10,22 +10,18 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-22.04 ]
-        jdk: [ 11.0.18, 17.0.6, 19.0.2 ]
+        jdk: [ 11.0.19, 17.0.7, 20.0.1 ]
         distribution: [ temurin ]
         experimental: [ false ]
         include:
           - os: macos-12
-            jdk: 17.0.6
+            jdk: 17.0.7
             distribution: temurin
             experimental: false
           - os: windows-2022
-            jdk: 17.0.6
+            jdk: 17.0.7
             distribution: temurin
             experimental: false
-          - os: ubuntu-22.04
-            jdk: 20-ea
-            distribution: zulu
-            experimental: true
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     steps:
