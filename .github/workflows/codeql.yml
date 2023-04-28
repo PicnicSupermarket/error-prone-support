@@ -28,7 +28,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3.8.0
         with:
-          java-version: 17.0.6
+          java-version: 17.0.7
           distribution: temurin
           cache: maven
       - name: Initialize CodeQL
