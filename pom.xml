@@ -985,10 +985,21 @@
                                 <findAllDuplicates>true</findAllDuplicates>
                             </banDuplicateClasses>
                             <banDuplicatePomDependencyVersions />
-                            <!-- XXX: Enable this rule once it no longer
-                            "downloads the internet". See
-                            https://issues.apache.org/jira/browse/MENFORCER-467.
-                            <banDynamicVersions />-->
+                            <banDynamicVersions>
+                                <!-- XXX: Drop this once the `ignores` section
+                                below works as expected. -->
+                                <allowSnapshots>true</allowSnapshots>
+                                <!-- XXX: It shouldn't be necessary to specify
+                                an empty `excludedScopes` parameter, but
+                                without this an NPE results. See
+                                https://issues.apache.org/jira/browse/MENFORCER-481. -->
+                                <excludedScopes />
+                                <!-- XXX: This doesn't work. See
+                                https://issues.apache.org/jira/browse/MENFORCER-480.
+                                <ignores>
+                                    <ignore>${project.groupId}</ignore>
+                                </ignores> -->
+                            </banDynamicVersions>
                             <dependencyConvergence />
                             <enforceBytecodeVersion>
                                 <maxJdkVersion>${version.jdk}</maxJdkVersion>
