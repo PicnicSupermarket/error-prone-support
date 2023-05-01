@@ -3,7 +3,9 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
@@ -71,5 +73,22 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
 
   Set<Integer> testImmutableSetOf5() {
     return Set.of(1, 2, 3, 4, 5);
+  }
+
+  ImmutableSet<Integer> testSetsIntersection() {
+    ImmutableSet<Integer> set = ImmutableSet.of(1);
+    return ImmutableSet.of(1, 2, 3).stream().filter(set::contains).collect(toImmutableSet());
+  }
+
+  ImmutableSet<Integer> testMapKeySetIntersection() {
+    ImmutableMap<Integer, Integer> map = ImmutableMap.of(1, 4);
+    return ImmutableSet.of(1, 2, 3).stream().filter(map::containsKey).collect(toImmutableSet());
+  }
+
+  ImmutableSet<Integer> testSetMultimapKeySetIntersection() {
+    ImmutableSetMultimap<Integer, Integer> setMultiMap = ImmutableSetMultimap.of(1, 4);
+    return ImmutableSet.of(1, 2, 3).stream()
+        .filter(setMultiMap::containsKey)
+        .collect(toImmutableSet());
   }
 }
