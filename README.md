@@ -109,8 +109,9 @@ definition. -->
 
 #### Gradle
 
-1. First, follow the [installation guide]
-   [error-prone-gradle-installation-guide] of the `gradle-errorprone-plugin`.
+1. First, follow the [installation
+   guide][error-prone-gradle-installation-guide] of the
+   `gradle-errorprone-plugin`.
 2. Next, edit your `build.gradle` file to add one or more Error Prone Support
    modules:
 
