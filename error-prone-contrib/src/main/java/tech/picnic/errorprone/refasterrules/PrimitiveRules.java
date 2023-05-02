@@ -76,13 +76,13 @@ final class PrimitiveRules {
   /** Prefer {@link Math#toIntExact(long)} over the Guava alternative. */
   static final class LongToIntExact {
     @BeforeTemplate
-    int before(long a) {
-      return Ints.checkedCast(a);
+    int before(long l) {
+      return Ints.checkedCast(l);
     }
 
     @AfterTemplate
-    int after(long a) {
-      return Math.toIntExact(a);
+    int after(long l) {
+      return Math.toIntExact(l);
     }
   }
 
