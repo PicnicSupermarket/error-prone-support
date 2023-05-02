@@ -6,7 +6,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import com.google.common.collect.Streams;
@@ -215,7 +215,7 @@ final class ImmutableSetRules {
     }
   }
 
-  /** Prefer {@link Sets#intersection(Set, Set)} ()} over more contrived alternatives. */
+  /** Prefer {@link Sets#intersection(Set, Set)} over more contrived alternatives. */
   static final class SetsIntersection<T> {
     @BeforeTemplate
     ImmutableSet<T> before(Set<T> set1, Set<T> set2) {
@@ -228,8 +228,8 @@ final class ImmutableSetRules {
     }
   }
 
-  /** Prefer {@link Sets#intersection(Set, Set)} ()} over more contrived alternatives. */
-  static final class MapKeySetIntersection<K, V> {
+  /** Prefer {@link Sets#intersection(Set, Set)} over more contrived alternatives. */
+  static final class SetsIntersectionMap<K, V> {
     @BeforeTemplate
     ImmutableSet<K> before(Set<K> set, Map<K, V> map) {
       return set.stream().filter(map::containsKey).collect(toImmutableSet());
@@ -241,16 +241,16 @@ final class ImmutableSetRules {
     }
   }
 
-  /** Prefer {@link Sets#intersection(Set, Set)} ()} over more contrived alternatives. */
-  static final class SetMultimapKeySetIntersection<K, V> {
+  /** Prefer {@link Sets#intersection(Set, Set)} over more contrived alternatives. */
+  static final class SetsIntersectionMultimap<K, V> {
     @BeforeTemplate
-    ImmutableSet<K> before(Set<K> set, SetMultimap<K, V> setMultimap) {
-      return set.stream().filter(setMultimap::containsKey).collect(toImmutableSet());
+    ImmutableSet<K> before(Set<K> set, Multimap<K, V> multimap) {
+      return set.stream().filter(multimap::containsKey).collect(toImmutableSet());
     }
 
     @AfterTemplate
-    ImmutableSet<K> after(Set<K> set, SetMultimap<K, V> setMultimap) {
-      return Sets.intersection(set, setMultimap.keySet()).immutableCopy();
+    ImmutableSet<K> after(Set<K> set, Multimap<K, V> multimap) {
+      return Sets.intersection(set, multimap.keySet()).immutableCopy();
     }
   }
 }

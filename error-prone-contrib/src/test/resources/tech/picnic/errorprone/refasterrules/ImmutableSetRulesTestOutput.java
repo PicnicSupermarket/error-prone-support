@@ -4,8 +4,8 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
@@ -72,16 +72,16 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Integer> testSetsIntersection() {
     ImmutableSet<Integer> set = ImmutableSet.of(1);
-    return Sets.intersection(ImmutableSet.of(1, 2, 3), set).immutableCopy();
+    return Sets.intersection(ImmutableSet.of(2), set).immutableCopy();
   }
 
-  ImmutableSet<Integer> testMapKeySetIntersection() {
-    ImmutableMap<Integer, Integer> map = ImmutableMap.of(1, 4);
-    return Sets.intersection(ImmutableSet.of(1, 2, 3), map.keySet()).immutableCopy();
+  ImmutableSet<Integer> testSetsIntersectionMap() {
+    ImmutableMap<Integer, Integer> map = ImmutableMap.of(1, 2);
+    return Sets.intersection(ImmutableSet.of(3), map.keySet()).immutableCopy();
   }
 
-  ImmutableSet<Integer> testSetMultimapKeySetIntersection() {
-    ImmutableSetMultimap<Integer, Integer> setMultiMap = ImmutableSetMultimap.of(1, 4);
-    return Sets.intersection(ImmutableSet.of(1, 2, 3), setMultiMap.keySet()).immutableCopy();
+  ImmutableSet<Integer> testSetsIntersectionMultimap() {
+    ImmutableMultimap<Integer, Integer> multimap = ImmutableMultimap.of(1, 2);
+    return Sets.intersection(ImmutableSet.of(3), multimap.keySet()).immutableCopy();
   }
 }
