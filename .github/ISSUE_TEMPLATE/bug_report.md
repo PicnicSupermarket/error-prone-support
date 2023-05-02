@@ -42,9 +42,9 @@ Please replace this sentence with log output, if applicable.
 <!-- Please complete the following information: -->
 
 - Operating system (e.g. MacOS Monterey).
-- Java version (i.e. `java --version`, e.g. `17.0.6`).
+- Java version (i.e. `java --version`, e.g. `17.0.7`).
 - Error Prone version (e.g. `2.18.0`).
-- Error Prone Support version (e.g. `0.8.0`).
+- Error Prone Support version (e.g. `0.9.0`).
 
 ### Additional context
 
