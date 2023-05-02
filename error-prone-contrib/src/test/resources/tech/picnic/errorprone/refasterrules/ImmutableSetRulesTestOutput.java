@@ -1,11 +1,12 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.util.function.Predicate.not;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
@@ -17,7 +18,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Arrays.class, Collections.class, Streams.class);
+    return ImmutableSet.of(Arrays.class, Collections.class, Streams.class, not(null));
   }
 
   ImmutableSet.Builder<String> testImmutableSetBuilder() {
@@ -70,18 +71,35 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(1, 2, 3, 4, 5);
   }
 
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifference() {
+    return ImmutableSet.of(
+        Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)).immutableCopy(),
+        Sets.difference(ImmutableSet.of(3), ImmutableSet.of(4)).immutableCopy());
+  }
+
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceMap() {
+    return ImmutableSet.of(
+        Sets.difference(ImmutableSet.of(1), ImmutableMap.of(2, 3).keySet()).immutableCopy(),
+        Sets.difference(ImmutableSet.of(4), ImmutableMap.of(5, 6).keySet()).immutableCopy());
+  }
+
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceMultimap() {
+    return ImmutableSet.of(
+        Sets.difference(ImmutableSet.of(1), ImmutableSetMultimap.of(2, 3).keySet()).immutableCopy(),
+        Sets.difference(ImmutableSet.of(4), ImmutableSetMultimap.of(5, 6).keySet())
+            .immutableCopy());
+  }
+
   ImmutableSet<Integer> testSetsIntersection() {
-    ImmutableSet<Integer> set = ImmutableSet.of(1);
-    return Sets.intersection(ImmutableSet.of(2), set).immutableCopy();
+    return Sets.intersection(ImmutableSet.of(1), ImmutableSet.of(2)).immutableCopy();
   }
 
   ImmutableSet<Integer> testSetsIntersectionMap() {
-    ImmutableMap<Integer, Integer> map = ImmutableMap.of(1, 2);
-    return Sets.intersection(ImmutableSet.of(3), map.keySet()).immutableCopy();
+    return Sets.intersection(ImmutableSet.of(1), ImmutableMap.of(2, 3).keySet()).immutableCopy();
   }
 
   ImmutableSet<Integer> testSetsIntersectionMultimap() {
-    ImmutableMultimap<Integer, Integer> multimap = ImmutableMultimap.of(1, 2);
-    return Sets.intersection(ImmutableSet.of(3), multimap.keySet()).immutableCopy();
+    return Sets.intersection(ImmutableSet.of(1), ImmutableSetMultimap.of(2, 3).keySet())
+        .immutableCopy();
   }
 }

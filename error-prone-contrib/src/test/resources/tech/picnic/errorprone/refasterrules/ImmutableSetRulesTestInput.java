@@ -1,11 +1,12 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.util.function.Predicate.not;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
@@ -17,7 +18,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Arrays.class, Collections.class, Streams.class);
+    return ImmutableSet.of(Arrays.class, Collections.class, Streams.class, not(null));
   }
 
   ImmutableSet.Builder<String> testImmutableSetBuilder() {
@@ -75,18 +76,51 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
     return Set.of(1, 2, 3, 4, 5);
   }
 
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifference() {
+    return ImmutableSet.of(
+        ImmutableSet.of(1).stream()
+            .filter(not(ImmutableSet.of(2)::contains))
+            .collect(toImmutableSet()),
+        ImmutableSet.of(3).stream()
+            .filter(v -> !ImmutableSet.of(4).contains(v))
+            .collect(toImmutableSet()));
+  }
+
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceMap() {
+    return ImmutableSet.of(
+        ImmutableSet.of(1).stream()
+            .filter(not(ImmutableMap.of(2, 3)::containsKey))
+            .collect(toImmutableSet()),
+        ImmutableSet.of(4).stream()
+            .filter(v -> !ImmutableMap.of(5, 6).containsKey(v))
+            .collect(toImmutableSet()));
+  }
+
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceMultimap() {
+    return ImmutableSet.of(
+        ImmutableSet.of(1).stream()
+            .filter(not(ImmutableSetMultimap.of(2, 3)::containsKey))
+            .collect(toImmutableSet()),
+        ImmutableSet.of(4).stream()
+            .filter(v -> !ImmutableSetMultimap.of(5, 6).containsKey(v))
+            .collect(toImmutableSet()));
+  }
+
   ImmutableSet<Integer> testSetsIntersection() {
-    ImmutableSet<Integer> set = ImmutableSet.of(1);
-    return ImmutableSet.of(2).stream().filter(set::contains).collect(toImmutableSet());
+    return ImmutableSet.of(1).stream()
+        .filter(ImmutableSet.of(2)::contains)
+        .collect(toImmutableSet());
   }
 
   ImmutableSet<Integer> testSetsIntersectionMap() {
-    ImmutableMap<Integer, Integer> map = ImmutableMap.of(1, 2);
-    return ImmutableSet.of(3).stream().filter(map::containsKey).collect(toImmutableSet());
+    return ImmutableSet.of(1).stream()
+        .filter(ImmutableMap.of(2, 3)::containsKey)
+        .collect(toImmutableSet());
   }
 
   ImmutableSet<Integer> testSetsIntersectionMultimap() {
-    ImmutableMultimap<Integer, Integer> multimap = ImmutableMultimap.of(1, 2);
-    return ImmutableSet.of(3).stream().filter(multimap::containsKey).collect(toImmutableSet());
+    return ImmutableSet.of(1).stream()
+        .filter(ImmutableSetMultimap.of(2, 3)::containsKey)
+        .collect(toImmutableSet());
   }
 }
