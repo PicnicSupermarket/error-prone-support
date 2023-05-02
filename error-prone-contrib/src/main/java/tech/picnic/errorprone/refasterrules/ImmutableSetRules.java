@@ -314,4 +314,17 @@ final class ImmutableSetRules {
       return Sets.intersection(set, multimap.keySet()).immutableCopy();
     }
   }
+
+  /** Prefer an immutable copy of {@link Sets#union(Set, Set)} over more contrived alternatives. */
+  static final class SetsUnion<S, T extends S, U extends S> {
+    @BeforeTemplate
+    ImmutableSet<S> before(Set<T> set1, Set<U> set2) {
+      return Stream.concat(set1.stream(), set2.stream()).collect(toImmutableSet());
+    }
+
+    @AfterTemplate
+    ImmutableSet<S> after(Set<T> set1, Set<U> set2) {
+      return Sets.union(set1, set2).immutableCopy();
+    }
+  }
 }

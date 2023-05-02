@@ -102,4 +102,8 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
     return Sets.intersection(ImmutableSet.of(1), ImmutableSetMultimap.of(2, 3).keySet())
         .immutableCopy();
   }
+
+  ImmutableSet<Integer> testSetsUnion() {
+    return Sets.union(ImmutableSet.of(1), ImmutableSet.of(2)).immutableCopy();
+  }
 }

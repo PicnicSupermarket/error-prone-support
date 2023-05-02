@@ -123,4 +123,9 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
         .filter(ImmutableSetMultimap.of(2, 3)::containsKey)
         .collect(toImmutableSet());
   }
+
+  ImmutableSet<Integer> testSetsUnion() {
+    return Stream.concat(ImmutableSet.of(1).stream(), ImmutableSet.of(2).stream())
+        .collect(toImmutableSet());
+  }
 }
