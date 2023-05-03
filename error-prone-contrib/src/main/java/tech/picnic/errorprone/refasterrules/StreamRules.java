@@ -247,6 +247,8 @@ final class StreamRules {
 
   /** In order to test whether a stream has any element, simply try to find one. */
   // XXX: This this rule assumes that any matched `Collector` does not perform any filtering.
+  // (Perhaps we could add a `@Matches` guard that validates that the collector expression does not
+  // contain a `Collectors#filtering` call. That'd still not be 100% accurate, though.)
   static final class StreamIsEmpty<T> {
     @BeforeTemplate
     boolean before(Stream<T> stream, Collector<? super T, ?, ? extends Collection<?>> collector) {
