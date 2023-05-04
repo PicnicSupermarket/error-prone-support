@@ -110,7 +110,8 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of(1).findAny().isEmpty(),
         Stream.of(2).findAny().isEmpty(),
         Stream.of(3).findAny().isEmpty(),
-        Stream.of(4).findAny().isEmpty());
+        Stream.of(4).findAny().isEmpty(),
+        Stream.of(5).findAny().isEmpty());
   }
 
   ImmutableSet<Boolean> testStreamIsNotEmpty() {
@@ -147,11 +148,15 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Boolean> testStreamNoneMatch() {
     Predicate<String> pred = String::isBlank;
+    Function<String, Boolean> toBooleanFunction = Boolean::valueOf;
     return ImmutableSet.of(
         Stream.of("foo").noneMatch(s -> s.length() > 1),
         Stream.of("bar").noneMatch(String::isBlank),
         Stream.of("baz").noneMatch(pred),
-        Stream.of("qux").noneMatch(String::isEmpty));
+        Stream.of("qux").noneMatch(String::isEmpty),
+        Stream.of("quux").noneMatch(s -> s.isBlank()),
+        Stream.of("quuz").noneMatch(Boolean::valueOf),
+        Stream.of("corge").map(toBooleanFunction).noneMatch(Boolean::booleanValue));
   }
 
   ImmutableSet<Boolean> testStreamNoneMatch2() {
@@ -160,14 +165,24 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Boolean> testStreamAnyMatch() {
+    Function<String, Boolean> toBooleanFunction = Boolean::valueOf;
     return ImmutableSet.of(
-        Stream.of("foo").anyMatch(s -> s.length() > 1), Stream.of("bar").anyMatch(String::isEmpty));
+        Stream.of("foo").anyMatch(s -> s.length() > 1),
+        Stream.of("bar").anyMatch(String::isEmpty),
+        Stream.of("baz").anyMatch(s -> s.isBlank()),
+        Stream.of("qux").anyMatch(Boolean::valueOf),
+        Stream.of("quux").map(toBooleanFunction).anyMatch(Boolean::booleanValue));
   }
 
   ImmutableSet<Boolean> testStreamAllMatch() {
     Predicate<String> pred = String::isBlank;
+    Function<String, Boolean> toBooleanFunction = Boolean::valueOf;
     return ImmutableSet.of(
-        Stream.of("foo").allMatch(String::isBlank), Stream.of("bar").allMatch(pred));
+        Stream.of("foo").allMatch(String::isBlank),
+        Stream.of("bar").allMatch(pred),
+        Stream.of("baz").allMatch(s -> s.isBlank()),
+        Stream.of("qux").allMatch(Boolean::valueOf),
+        Stream.of("quux").map(toBooleanFunction).anyMatch(Boolean::booleanValue));
   }
 
   boolean testStreamAllMatch2() {

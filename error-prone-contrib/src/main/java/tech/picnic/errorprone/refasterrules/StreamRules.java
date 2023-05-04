@@ -28,6 +28,7 @@ import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
@@ -245,14 +246,18 @@ final class StreamRules {
   }
 
   /** In order to test whether a stream has any element, simply try to find one. */
+  // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
+  // (Perhaps we could add a `@Matches` guard that validates that the collector expression does not
+  // contain a `Collectors#filtering` call. That'd still not be 100% accurate, though.)
   static final class StreamIsEmpty<T> {
     @BeforeTemplate
-    boolean before(Stream<T> stream) {
+    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends Collection<?>> collector) {
       return Refaster.anyOf(
           stream.count() == 0,
           stream.count() <= 0,
           stream.count() < 1,
-          stream.findFirst().isEmpty());
+          stream.findFirst().isEmpty(),
+          stream.collect(collector).isEmpty());
     }
 
     @AfterTemplate
@@ -347,6 +352,14 @@ final class StreamRules {
           stream.filter(predicate).findAny().isEmpty());
     }
 
+    @BeforeTemplate
+    boolean before2(
+        Stream<T> stream,
+        @Matches(IsLambdaExpressionOrMethodReference.class)
+            Function<? super T, Boolean> predicate) {
+      return stream.map(predicate).noneMatch(Refaster.anyOf(Boolean::booleanValue, b -> b));
+    }
+
     @AfterTemplate
     boolean after(Stream<T> stream, Predicate<? super T> predicate) {
       return stream.noneMatch(predicate);
@@ -377,6 +390,14 @@ final class StreamRules {
           !stream.noneMatch(predicate), stream.filter(predicate).findAny().isPresent());
     }
 
+    @BeforeTemplate
+    boolean before2(
+        Stream<T> stream,
+        @Matches(IsLambdaExpressionOrMethodReference.class)
+            Function<? super T, Boolean> predicate) {
+      return stream.map(predicate).anyMatch(Refaster.anyOf(Boolean::booleanValue, b -> b));
+    }
+
     @AfterTemplate
     boolean after(Stream<T> stream, Predicate<? super T> predicate) {
       return stream.anyMatch(predicate);
@@ -387,6 +408,14 @@ final class StreamRules {
     @BeforeTemplate
     boolean before(Stream<T> stream, Predicate<? super T> predicate) {
       return stream.noneMatch(Refaster.anyOf(not(predicate), predicate.negate()));
+    }
+
+    @BeforeTemplate
+    boolean before2(
+        Stream<T> stream,
+        @Matches(IsLambdaExpressionOrMethodReference.class)
+            Function<? super T, Boolean> predicate) {
+      return stream.map(predicate).allMatch(Refaster.anyOf(Boolean::booleanValue, b -> b));
     }
 
     @AfterTemplate

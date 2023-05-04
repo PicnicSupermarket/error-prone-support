@@ -109,7 +109,8 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of(1).count() == 0,
         Stream.of(2).count() <= 0,
         Stream.of(3).count() < 1,
-        Stream.of(4).findFirst().isEmpty());
+        Stream.of(4).findFirst().isEmpty(),
+        Stream.of(5).collect(toImmutableSet()).isEmpty());
   }
 
   ImmutableSet<Boolean> testStreamIsNotEmpty() {
@@ -146,11 +147,15 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Boolean> testStreamNoneMatch() {
     Predicate<String> pred = String::isBlank;
+    Function<String, Boolean> toBooleanFunction = Boolean::valueOf;
     return ImmutableSet.of(
         !Stream.of("foo").anyMatch(s -> s.length() > 1),
         Stream.of("bar").allMatch(not(String::isBlank)),
         Stream.of("baz").allMatch(pred.negate()),
-        Stream.of("qux").filter(String::isEmpty).findAny().isEmpty());
+        Stream.of("qux").filter(String::isEmpty).findAny().isEmpty(),
+        Stream.of("quux").map(s -> s.isBlank()).noneMatch(Boolean::booleanValue),
+        Stream.of("quuz").map(Boolean::valueOf).noneMatch(r -> r),
+        Stream.of("corge").map(toBooleanFunction).noneMatch(Boolean::booleanValue));
   }
 
   ImmutableSet<Boolean> testStreamNoneMatch2() {
@@ -159,16 +164,24 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Boolean> testStreamAnyMatch() {
+    Function<String, Boolean> toBooleanFunction = Boolean::valueOf;
     return ImmutableSet.of(
         !Stream.of("foo").noneMatch(s -> s.length() > 1),
-        Stream.of("bar").filter(String::isEmpty).findAny().isPresent());
+        Stream.of("bar").filter(String::isEmpty).findAny().isPresent(),
+        Stream.of("baz").map(s -> s.isBlank()).anyMatch(Boolean::booleanValue),
+        Stream.of("qux").map(Boolean::valueOf).anyMatch(r -> r),
+        Stream.of("quux").map(toBooleanFunction).anyMatch(Boolean::booleanValue));
   }
 
   ImmutableSet<Boolean> testStreamAllMatch() {
     Predicate<String> pred = String::isBlank;
+    Function<String, Boolean> toBooleanFunction = Boolean::valueOf;
     return ImmutableSet.of(
         Stream.of("foo").noneMatch(not(String::isBlank)),
-        Stream.of("bar").noneMatch(pred.negate()));
+        Stream.of("bar").noneMatch(pred.negate()),
+        Stream.of("baz").map(s -> s.isBlank()).allMatch(Boolean::booleanValue),
+        Stream.of("qux").map(Boolean::valueOf).allMatch(r -> r),
+        Stream.of("quux").map(toBooleanFunction).anyMatch(Boolean::booleanValue));
   }
 
   boolean testStreamAllMatch2() {
