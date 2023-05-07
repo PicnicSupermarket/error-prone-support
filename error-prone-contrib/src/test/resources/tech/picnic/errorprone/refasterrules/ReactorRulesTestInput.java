@@ -454,4 +454,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   Duration testStepVerifierLastStepVerifyTimeout() {
     return StepVerifier.create(Mono.empty()).expectTimeout(Duration.ZERO).verify();
   }
+
+  Duration testVerifyOnlyElementInFlux() {
+    return Flux.just(1)
+        .collect(toImmutableList())
+        .as(StepVerifier::create)
+        .assertNext(list -> assertThat(list).containsExactly(1))
+        .verifyComplete();
+  }
 }

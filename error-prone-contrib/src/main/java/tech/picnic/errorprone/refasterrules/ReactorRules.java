@@ -1434,4 +1434,20 @@ final class ReactorRules {
       return step.verifyTimeout(duration);
     }
   }
+
+  /** Avoid collecting when verifying only the given element is in the given {@link Flux}. */
+  static final class VerifyOnlyElementInFlux<T> {
+    @BeforeTemplate
+    Duration before(Flux<T> flux, T object) {
+      return flux.collect(toImmutableList())
+          .as(StepVerifier::create)
+          .assertNext(list -> assertThat(list).containsExactly(object))
+          .verifyComplete();
+    }
+
+    @AfterTemplate
+    Duration after(Flux<T> flux, T object) {
+      return flux.as(StepVerifier::create).expectNext(object).verifyComplete();
+    }
+  }
 }
