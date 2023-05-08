@@ -210,7 +210,7 @@
         <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.10.10</version.nullaway>
         <version.pitest-git>1.0.10</version.pitest-git>
-        <version.surefire>3.0.0</version.surefire>
+        <version.surefire>3.1.0</version.surefire>
     </properties>
 
     <dependencyManagement>
