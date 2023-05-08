@@ -19,10 +19,13 @@ import com.sun.source.tree.ReturnTree;
 import com.sun.tools.javac.parser.Tokens;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import tech.picnic.errorprone.util.SourceCode;
 
 /** A helper class that migrates a TestNG {@code DataProvider} to a JUnit {@code MethodSource}. */
 final class DataProviderMigrator {
+  private static final Pattern CLASS_INSTANCE_REPLACEMENT_PATTERN =
+      Pattern.compile("((?<!\\b\\.)|(\\bthis\\.))(getClass\\(\\))");
   /**
    * Create the {@link SuggestedFix} required to migrate a TestNG {@code DataProvider} to a JUnit
    * {@code MethodSource}.
@@ -150,8 +153,9 @@ final class DataProviderMigrator {
 
     // This regex expression replaces all instances of "this.getClass()" or "getClass()"
     // with the fully qualified class name to retain functionality in static context.
-    return String.format("Stream.of(%s\n  )", argumentsBuilder)
-        .replaceAll("((?<!\\b\\.)|(\\bthis\\.))(getClass\\(\\))", className + ".class");
+    return CLASS_INSTANCE_REPLACEMENT_PATTERN
+        .matcher(String.format("Stream.of(%s%n)", argumentsBuilder))
+        .replaceAll(className + ".class");
   }
 
   private static String buildArguments(
