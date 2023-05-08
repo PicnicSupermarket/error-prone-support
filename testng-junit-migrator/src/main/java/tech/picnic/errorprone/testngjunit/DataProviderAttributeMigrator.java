@@ -27,7 +27,7 @@ final class DataProviderAttributeMigrator implements Migrator {
             .merge(SuggestedFix.prefixWith(methodTree, "@ParameterizedTest\n"))
             .merge(
                 SuggestedFix.prefixWith(
-                    methodTree, String.format("@MethodSource(\"%s\")\n", dataProviderName)))
+                    methodTree, String.format("@MethodSource(\"%s\")%n", dataProviderName)))
             .build());
   }
 
