@@ -35,8 +35,9 @@ final class GroupsAttributeMigrator implements Migrator {
       AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {
-    return annotation.getAttributes().containsKey("groups")
-        && extractGroups(annotation.getAttributes().get("groups"), state).stream()
+    ExpressionTree groupsExpression = annotation.getAttributes().get("groups");
+    return groupsExpression != null
+        && extractGroups(groupsExpression, state).stream()
             .allMatch(GroupsAttributeMigrator::isValidTagName);
   }
 
@@ -56,6 +57,6 @@ final class GroupsAttributeMigrator implements Migrator {
   }
 
   private static String trimTagName(String tagName) {
-    return tagName.replaceAll("^\"|\"$", "").trim();
+    return tagName.replaceAll("(^\")|(\"$)", "").trim();
   }
 }
