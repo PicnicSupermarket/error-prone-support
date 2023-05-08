@@ -11,9 +11,9 @@ use it, read the installation guide below.
    [README][eps-readme]. (This step can be skipped for Picnic repositories!)
 2. Clone the Error Prone Support repository and checkout the branch
    `gdejong/testng-migrator`.
-3. Next, run `mvn versions:set -DnewVersion=0.9.1-testng-migration -DgenerateBackupPoms=false`.
-   This will update set the version to `0.9.1-testng-migration`.
-4. Next, run `mvn clean install`. This will create a `0.9.1-testng-migrator` version
+3. Next, run `mvn versions:set -DnewVersion=0.10.1-testng-migration -DgenerateBackupPoms=false`.
+   This will update set the version to `0.10.1-testng-migration`.
+4. Next, run `mvn clean install`. This will create a `0.10.1-testng-migrator` version
    of the `testng-junit-migrator` module. The version will now be available in your local Maven repository.
 5. Finally, add the following profile to your `pom.xml`. This should be the `pom.xml` in the root of your module. 
    Usually this is the parent `pom.xml`, but single module projects are also supported.
@@ -32,7 +32,7 @@ use it, read the installation guide below.
                             <path>
                                 <groupId>tech.picnic.error-prone-support</groupId>
                                 <artifactId>testng-junit-migrator</artifactId>
-                                <version>0.9.1-testng-migration</version>
+                                <version>0.10.1-testng-migration</version>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>
