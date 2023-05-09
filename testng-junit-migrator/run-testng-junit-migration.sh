@@ -38,7 +38,7 @@ function insert_dependency() {
   # dependency declaration should reside. We need to jump through this hoop
   # because `xmlstarlet` does not support insertion of complex XML
   # sub-documents.
-  placeholder="$(head -c 30 /dev/urandom | base64 | sed 's,[^a-zA-Z0-9],,g')"
+  placeholder="$(head -c 30 /dev/urandom | base64 | $sed_command 's,[^a-zA-Z0-9],,g')"
 
   # Insert the placeholder. (Note that only one case will match.)
   xmlstarlet ed -L -P -N 'x=http://maven.apache.org/POM/4.0.0' \
@@ -58,16 +58,16 @@ function insert_dependency() {
                 <classifier>${classifier}</classifier>
                 <scope>${scope}</scope>
             </dependency>" |
-    sed '/></d' |
-    sed ':a;N;$!ba;s/\n/\\n/g')"
+    $sed_command '/></d' |
+    $sed_command ':a;N;$!ba;s/\n/\\n/g')"
 
   # Replace the placeholder with the actual dependency declaration.
-  sed -i "s,${placeholder},${decl}," "${pomFile}"
+  $sed_command -i "s,${placeholder},${decl}," "${pomFile}"
 }
 
 if [[ -n "${1-}" ]] && [[ "${1}" == "--count" ]]; then
   echo "Counting number of tests..."
-  test_results=$(mvn test | grep_command -n "Results:" -A 3 | grep_command -oP "Tests run: \K\d+(?=,)" | awk '{s+=$1} END {print s}')
+  test_results=$(mvn test | $grep_command -n "Results:" -A 3 | $grep_command -oP "Tests run: \K\d+(?=,)" | awk '{s+=$1} END {print s}')
   echo "Number of tests run: $test_results"
   exit
 fi
@@ -91,9 +91,11 @@ function handle_file() {
 case "$(uname -s)" in
 Linux*)
   grep_command="grep"
+  sed_command="sed"
   ;;
 Darwin*)
   grep_command="ggrep"
+  sed_command="gsed"
   ;;
 *)
   echo "Unsupported distribution $(uname -s) for this script."
@@ -104,9 +106,9 @@ esac
 echo "Migrating to JUnit 5..."
 echo "Adding required dependencies..."
 
-if grep_command -q "<packaging>pom</packaging>" "pom.xml"; then
+if $grep_command -q "<packaging>pom</packaging>" "pom.xml"; then
 
-  for module in $(grep_command -rl "org.testng.annotations.Test" $(pwd) | awk -F "$(pwd)" '{print $2}' | awk -F '/' '{print $2}' | uniq); do
+  for module in $($grep_command -rl "org.testng.annotations.Test" $(pwd) | awk -F "$(pwd)" '{print $2}' | awk -F '/' '{print $2}' | uniq); do
     (
       handle_file "$module" "org.junit.jupiter" "junit-jupiter-api" "" "test"
     )
@@ -114,17 +116,17 @@ if grep_command -q "<packaging>pom</packaging>" "pom.xml"; then
       handle_file "$module" "org.junit.jupiter" "junit-jupiter-engine" "" "test"
     )
   done
-  for module in $(grep_command -rl "org.testng.annotations.DataProvider" $(pwd) | awk -F "$(pwd)" '{print $2}' | awk -F '/' '{print $2}' | uniq); do
+  for module in $($grep_command -rl "org.testng.annotations.DataProvider" $(pwd) | awk -F "$(pwd)" '{print $2}' | awk -F '/' '{print $2}' | uniq); do
     (
       handle_file "$module" "org.junit.jupiter" "junit-jupiter-params" "" "test"
     )
   done
 else
-  if grep_command -rq "org.testng.annotations.Test" "src/"; then
+  if $grep_command -rq "org.testng.annotations.Test" "src/"; then
     handle_file "./" "org.junit.jupiter" "junit-jupiter-api" "" "test"
     handle_file "./" "org.junit.jupiter" "junit-jupiter-engine" "" "test"
   fi
-  if grep_command -rq "org.testng.annotations.DataProvider" "src/"; then
+  if $grep_command -rq "org.testng.annotations.DataProvider" "src/"; then
     handle_file "./" "org.junit.jupiter" "junit-jupiter-params" "" "test"
   fi
 fi
