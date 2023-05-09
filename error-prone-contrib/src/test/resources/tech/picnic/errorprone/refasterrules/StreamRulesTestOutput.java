@@ -255,4 +255,8 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   Stream<Integer> testStreamConcat() {
     return Stream.concat(Stream.of(1), Stream.of(2));
   }
+
+  Stream<Integer> testStreamsConcat() {
+    return Streams.concat(Stream.of(1), Stream.of(2), Stream.of(3), Stream.of(4));
+  }
 }

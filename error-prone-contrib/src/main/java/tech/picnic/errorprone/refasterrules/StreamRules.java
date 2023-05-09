@@ -27,6 +27,7 @@ import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
@@ -633,6 +634,18 @@ final class StreamRules {
     @AfterTemplate
     Stream<T> after(Stream<T> s1, Stream<T> s2) {
       return Stream.concat(s1, s2);
+    }
+  }
+
+  static final class StreamsConcat<T> {
+    @BeforeTemplate
+    Stream<T> before(@Repeated Stream<T> stream) {
+      return Stream.of(Refaster.asVarargs(stream)).flatMap(Function.identity());
+    }
+
+    @AfterTemplate
+    Stream<T> after(@Repeated Stream<T> stream) {
+      return Streams.concat(Refaster.asVarargs(stream));
     }
   }
 }
