@@ -219,7 +219,6 @@ final class ComparatorRules {
    */
   static final class MinOfVarargs<T> {
     @BeforeTemplate
-    @SuppressWarnings("StreamOfArray" /* In practice individual values are provided. */)
     T before(@Repeated T value, Comparator<T> cmp) {
       return Stream.of(Refaster.asVarargs(value)).min(cmp).orElseThrow();
     }
@@ -287,7 +286,6 @@ final class ComparatorRules {
    */
   static final class MaxOfVarargs<T> {
     @BeforeTemplate
-    @SuppressWarnings("StreamOfArray" /* In practice individual values are provided. */)
     T before(@Repeated T value, Comparator<T> cmp) {
       return Stream.of(Refaster.asVarargs(value)).max(cmp).orElseThrow();
     }

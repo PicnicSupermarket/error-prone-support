@@ -25,6 +25,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
@@ -46,6 +47,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
+import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
 
 /** Refaster rules related to expressions dealing with {@link Stream}s. */
 @OnlineDocumentation
@@ -100,12 +102,9 @@ final class StreamRules {
    * Prefer {@link Arrays#stream(Object[])} over {@link Stream#of(Object[])}, as the former is
    * clearer.
    */
-  // XXX: Introduce a `Matcher` that identifies `Refaster.asVarargs(...)` invocations and annotate
-  // the `array` parameter as `@NotMatches(IsRefasterAsVarargs.class)`. Then elsewhere
-  // `@SuppressWarnings("StreamOfArray")` annotations can be dropped.
   static final class StreamOfArray<T> {
     @BeforeTemplate
-    Stream<T> before(T[] array) {
+    Stream<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
       return Stream.of(array);
     }
 
