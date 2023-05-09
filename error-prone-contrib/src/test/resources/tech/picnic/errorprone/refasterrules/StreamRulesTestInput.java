@@ -251,10 +251,6 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1).collect(flatMapping(n -> Stream.of(n, n), toImmutableSet()));
   }
 
-  Stream<Integer> testStreamConcat() {
-    return Stream.of(Stream.of(1), Stream.of(2)).flatMap(Function.identity());
-  }
-
   Stream<Integer> testStreamsConcat() {
     return Stream.of(Stream.of(1), Stream.of(2), Stream.of(3), Stream.of(4))
         .flatMap(Function.identity());

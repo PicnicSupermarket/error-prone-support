@@ -625,20 +625,9 @@ final class StreamRules {
     }
   }
 
-  static final class StreamConcat<T> {
-    @BeforeTemplate
-    Stream<T> before(Stream<T> s1, Stream<T> s2) {
-      return Stream.of(s1, s2).flatMap(Function.identity());
-    }
-
-    @AfterTemplate
-    Stream<T> after(Stream<T> s1, Stream<T> s2) {
-      return Stream.concat(s1, s2);
-    }
-  }
-
   static final class StreamsConcat<T> {
     @BeforeTemplate
+    @SuppressWarnings("StreamOfArray")
     Stream<T> before(@Repeated Stream<T> stream) {
       return Stream.of(Refaster.asVarargs(stream)).flatMap(Function.identity());
     }
