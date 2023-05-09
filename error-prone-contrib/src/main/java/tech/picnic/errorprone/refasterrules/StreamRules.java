@@ -623,4 +623,16 @@ final class StreamRules {
       return stream.flatMap(mapper).collect(collector);
     }
   }
+
+  static final class StreamConcat<T> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> s1, Stream<T> s2) {
+      return Stream.of(s1, s2).flatMap(Function.identity());
+    }
+
+    @AfterTemplate
+    Stream<T> after(Stream<T> s1, Stream<T> s2) {
+      return Stream.concat(s1, s2);
+    }
+  }
 }
