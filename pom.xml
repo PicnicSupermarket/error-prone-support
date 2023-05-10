@@ -201,7 +201,7 @@
         <version.auto-value>1.10.1</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.18.0</version.error-prone-orig>
+        <version.error-prone-orig>2.19.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.18</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
