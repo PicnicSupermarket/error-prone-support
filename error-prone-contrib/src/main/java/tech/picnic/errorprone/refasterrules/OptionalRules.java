@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -351,6 +352,7 @@ final class OptionalRules {
     }
 
     @AfterTemplate
+    @CanIgnoreReturnValue
     Optional<T> after(Optional<T> optional) {
       return optional;
     }

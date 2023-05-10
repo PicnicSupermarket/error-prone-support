@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -27,6 +28,7 @@ final class DoubleStreamRules {
     }
 
     @AfterTemplate
+    @CanIgnoreReturnValue
     DoubleStream after(DoubleStream stream) {
       return stream;
     }

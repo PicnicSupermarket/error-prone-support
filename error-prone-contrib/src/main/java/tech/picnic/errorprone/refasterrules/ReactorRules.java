@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -411,6 +412,7 @@ final class ReactorRules {
     }
 
     @AfterTemplate
+    @CanIgnoreReturnValue
     Mono<T> after(Mono<T> mono) {
       return mono;
     }
@@ -424,6 +426,7 @@ final class ReactorRules {
     }
 
     @AfterTemplate
+    @CanIgnoreReturnValue
     Flux<T> after(Flux<T> flux) {
       return flux;
     }
@@ -1276,6 +1279,7 @@ final class ReactorRules {
     }
 
     @AfterTemplate
+    @CanIgnoreReturnValue
     StepVerifier.Step<T> after(StepVerifier.Step<T> step) {
       return step;
     }

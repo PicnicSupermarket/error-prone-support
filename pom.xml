@@ -981,6 +981,17 @@
                                             <ignoreClass>org.checkerframework.dataflow.qual.*</ignoreClass>
                                         </ignoreClasses>
                                     </dependency>
+                                    <dependency>
+                                        <groupId>org.springframework</groupId>
+                                        <artifactId>spring-aop</artifactId>
+                                        <!-- Spring AOP redistributes the AOP
+                                        Alliance interfaces of the
+                                        `aopalliance:aopalliance` artifact. See
+                                        https://jira.spring.io/browse/SPR-13984. -->
+                                        <ignoreClasses>
+                                            <ignoreClass>org.aopalliance.*</ignoreClass>
+                                        </ignoreClasses>
+                                    </dependency>
                                 </dependencies>
                                 <findAllDuplicates>true</findAllDuplicates>
                             </banDuplicateClasses>

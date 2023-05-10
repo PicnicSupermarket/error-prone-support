@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChooser;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -25,6 +26,7 @@ final class BugCheckerRules {
     }
 
     @AfterTemplate
+    @CanIgnoreReturnValue
     BugCheckerRefactoringTestHelper after(BugCheckerRefactoringTestHelper helper) {
       return helper;
     }

@@ -21,6 +21,7 @@ import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -124,6 +125,7 @@ final class StreamRules {
     }
 
     @AfterTemplate
+    @CanIgnoreReturnValue
     Stream<T> after(Stream<T> stream) {
       return stream;
     }
