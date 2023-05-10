@@ -1736,6 +1736,8 @@
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
                                     -XepOpt:Nullness:Conservative=false
+                                    -XepOpt:StatementSwitchToExpressionSwitch:EnableAssignmentSwitchConversion=true
+                                    -XepOpt:StatementSwitchToExpressionSwitch:EnableReturnSwitchConversion=true
                                     <!-- XXX: Enable once this check respects
                                     the compilation source version. See
                                     https://github.com/google/error-prone/pull/3646.
