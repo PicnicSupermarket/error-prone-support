@@ -1716,6 +1716,9 @@
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF
+                                    <!-- XXX: Not compatible with JDK 11. See
+                                    google/error-prone#3895. -->
+                                    -Xep:HidingField:OFF
                                     <!-- We don't target JDK 7. -->
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->
