@@ -27,6 +27,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.suppliers.Suppliers;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
+import javax.inject.Inject;
 import tech.picnic.errorprone.bugpatterns.util.Flags;
 
 /** A {@link BugChecker} that flags {@code @RequestParam} parameters with an unsupported type. */
@@ -55,7 +56,8 @@ public final class RequestParamType extends BugChecker implements VariableTreeMa
    *
    * @param flags Any provided command line flags.
    */
-  public RequestParamType(ErrorProneFlags flags) {
+  @Inject
+  RequestParamType(ErrorProneFlags flags) {
     hasUnsupportedRequestParamType = hasUnsupportedRequestParamType(flags);
   }
 

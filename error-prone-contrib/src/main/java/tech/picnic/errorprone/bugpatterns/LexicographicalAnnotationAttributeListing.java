@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.AnnotationAttributeMatcher;
 import tech.picnic.errorprone.bugpatterns.util.Flags;
@@ -94,7 +95,8 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
    *
    * @param flags Any provided command line flags.
    */
-  public LexicographicalAnnotationAttributeListing(ErrorProneFlags flags) {
+  @Inject
+  LexicographicalAnnotationAttributeListing(ErrorProneFlags flags) {
     matcher = createAnnotationAttributeMatcher(flags);
   }
 

@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.runner.CodeTransformers;
 import tech.picnic.errorprone.refaster.runner.Refaster;
@@ -77,7 +78,8 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
    *
    * @param flags Any provided command line flags.
    */
-  public RefasterRuleCollection(ErrorProneFlags flags) {
+  @Inject
+  RefasterRuleCollection(ErrorProneFlags flags) {
     ruleCollectionUnderTest = getRuleCollectionUnderTest(flags);
     delegate = createRefasterChecker(ruleCollectionUnderTest);
     rulesUnderTest = getRulesUnderTest(ruleCollectionUnderTest);

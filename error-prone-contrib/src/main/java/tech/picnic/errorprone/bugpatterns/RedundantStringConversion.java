@@ -50,6 +50,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+import javax.inject.Inject;
 import tech.picnic.errorprone.bugpatterns.util.Flags;
 import tech.picnic.errorprone.bugpatterns.util.MethodMatcherFactory;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
@@ -155,7 +156,8 @@ public final class RedundantStringConversion extends BugChecker
    *
    * @param flags Any provided command line flags.
    */
-  public RedundantStringConversion(ErrorProneFlags flags) {
+  @Inject
+  RedundantStringConversion(ErrorProneFlags flags) {
     conversionMethodMatcher = createConversionMethodMatcher(flags);
   }
 
