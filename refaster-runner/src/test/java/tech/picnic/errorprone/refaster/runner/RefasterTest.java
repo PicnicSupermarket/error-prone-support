@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.refaster.runner;
 
-import static com.google.common.base.Predicates.containsPattern;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
@@ -24,35 +23,33 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 final class RefasterTest {
-  private final CompilationTestHelper compilationHelper =
-      CompilationTestHelper.newInstance(Refaster.class, getClass())
-          .matchAllDiagnostics()
-          .expectErrorMessage(
-              "StringOfSizeZeroRule",
-              containsPattern(
-                  "\\[Refaster Rule\\] FooRules\\.StringOfSizeZeroRule: Refactoring opportunity\\s+.+\\s+"))
-          .expectErrorMessage(
-              "StringOfSizeOneRule",
-              containsPattern(
-                  "\\[Refaster Rule\\] FooRules\\.StringOfSizeOneRule: "
-                      + "A custom description about matching single-char strings\\s+.+\\s+"
-                      + "\\(see https://error-prone.picnic.tech/refasterrules/FooRules#StringOfSizeOneRule\\)"))
-          .expectErrorMessage(
-              "StringOfSizeTwoRule",
-              containsPattern(
-                  "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeTwoRule: "
-                      + "A custom subgroup description\\s+.+\\s+"
-                      + "\\(see https://example.com/rule/FooRules#ExtraGrouping.StringOfSizeTwoRule\\)"))
-          .expectErrorMessage(
-              "StringOfSizeThreeRule",
-              containsPattern(
-                  "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeThreeRule: "
-                      + "A custom description about matching three-char strings\\s+.+\\s+"
-                      + "\\(see https://example.com/custom\\)"));
+  private static final Pattern DIAGNOSTIC_STRING_OF_SIZE_ZERO =
+      Pattern.compile(
+          "\\[Refaster Rule\\] FooRules\\.StringOfSizeZeroRule: Refactoring opportunity\\s+.+\\s+");
+  private static final Pattern DIAGNOSTIC_STRING_OF_SIZE_ONE =
+      Pattern.compile(
+          "\\[Refaster Rule\\] FooRules\\.StringOfSizeOneRule: "
+              + "A custom description about matching single-char strings\\s+.+\\s+"
+              + "\\(see https://error-prone.picnic.tech/refasterrules/FooRules#StringOfSizeOneRule\\)");
+  private static final Pattern DIAGNOSTIC_STRING_OF_SIZE_TWO =
+      Pattern.compile(
+          "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeTwoRule: "
+              + "A custom subgroup description\\s+.+\\s+"
+              + "\\(see https://example.com/rule/FooRules#ExtraGrouping.StringOfSizeTwoRule\\)");
+  private static final Pattern DIAGNOSTIC_STRING_OF_SIZE_THREE =
+      Pattern.compile(
+          "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeThreeRule: "
+              + "A custom description about matching three-char strings\\s+.+\\s+"
+              + "\\(see https://example.com/custom\\)");
 
   @Test
   void identification() {
-    compilationHelper
+    CompilationTestHelper.newInstance(Refaster.class, getClass())
+        .matchAllDiagnostics()
+        .expectErrorMessage("StringOfSizeZeroRule", DIAGNOSTIC_STRING_OF_SIZE_ZERO.asPredicate())
+        .expectErrorMessage("StringOfSizeOneRule", DIAGNOSTIC_STRING_OF_SIZE_ONE.asPredicate())
+        .expectErrorMessage("StringOfSizeTwoRule", DIAGNOSTIC_STRING_OF_SIZE_TWO.asPredicate())
+        .expectErrorMessage("StringOfSizeThreeRule", DIAGNOSTIC_STRING_OF_SIZE_THREE.asPredicate())
         .addSourceLines(
             "A.java",
             "class A {",
@@ -153,7 +150,7 @@ final class RefasterTest {
   void severityAssignment(
       ImmutableList<String> arguments, ImmutableList<SeverityLevel> expectedSeverities) {
     CompilationTestHelper compilationTestHelper =
-        compilationHelper
+        CompilationTestHelper.newInstance(Refaster.class, getClass())
             .setArgs(arguments)
             .addSourceLines(
                 "A.java",
@@ -167,13 +164,18 @@ final class RefasterTest {
                 "    };",
                 "  }",
                 "}");
-    assertThatThrownBy(compilationTestHelper::doTest)
-        .isInstanceOf(AssertionError.class)
-        .message()
-        .satisfies(
-            message ->
-                assertThat(extractRefasterSeverities("A.java", message))
-                    .containsExactlyElementsOf(expectedSeverities));
+
+    if (expectedSeverities.isEmpty()) {
+      compilationTestHelper.doTest();
+    } else {
+      assertThatThrownBy(compilationTestHelper::doTest)
+          .isInstanceOf(AssertionError.class)
+          .message()
+          .satisfies(
+              message ->
+                  assertThat(extractRefasterSeverities("A.java", message))
+                      .containsExactlyElementsOf(expectedSeverities));
+    }
   }
 
   private static ImmutableList<SeverityLevel> extractRefasterSeverities(

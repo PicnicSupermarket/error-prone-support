@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Predicates.containsPattern;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -12,7 +10,7 @@ final class AmbiguousJsonCreatorTest {
   void identification() {
     CompilationTestHelper.newInstance(AmbiguousJsonCreator.class, getClass())
         .expectErrorMessage(
-            "X", containsPattern("`JsonCreator.Mode` should be set for single-argument creators"))
+            "X", m -> m.contains("`JsonCreator.Mode` should be set for single-argument creators"))
         .addSourceLines(
             "Container.java",
             "import com.fasterxml.jackson.annotation.JsonCreator;",
