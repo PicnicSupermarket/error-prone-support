@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
+import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.filtering;
@@ -627,9 +628,8 @@ final class StreamRules {
 
   static final class StreamsConcat<T> {
     @BeforeTemplate
-    @SuppressWarnings("StreamOfArray")
     Stream<T> before(@Repeated Stream<T> stream) {
-      return Stream.of(Refaster.asVarargs(stream)).flatMap(Function.identity());
+      return Stream.of(Refaster.asVarargs(stream)).flatMap(Refaster.anyOf(identity(), s -> s));
     }
 
     @AfterTemplate
