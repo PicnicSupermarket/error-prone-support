@@ -9,12 +9,12 @@ final class RequestMappingAnnotationTest {
     CompilationTestHelper.newInstance(RequestMappingAnnotation.class, getClass())
         .addSourceLines(
             "A.java",
+            "import jakarta.servlet.http.HttpServletRequest;",
+            "import jakarta.servlet.http.HttpServletResponse;",
             "import java.io.InputStream;",
             "import java.time.ZoneId;",
             "import java.util.Locale;",
             "import java.util.TimeZone;",
-            "import javax.servlet.http.HttpServletRequest;",
-            "import javax.servlet.http.HttpServletResponse;",
             "import org.springframework.http.HttpMethod;",
             "import org.springframework.ui.Model;",
             "import org.springframework.validation.BindingResult;",
