@@ -12,6 +12,7 @@ import static java.util.function.Function.identity;
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -78,6 +79,7 @@ final class ComparatorRules {
     }
 
     @AfterTemplate
+    @CanIgnoreReturnValue
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<T> after(Comparator<T> cmp) {
       return cmp;

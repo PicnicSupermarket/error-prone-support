@@ -10,6 +10,7 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -40,6 +41,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import javax.inject.Inject;
 
 /**
  * A {@link BugChecker} that flags code that can be simplified using Refaster rules located on the
@@ -75,6 +77,8 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
    *
    * @param flags Any provided command line flags.
    */
+  @Inject
+  @VisibleForTesting
   public Refaster(ErrorProneFlags flags) {
     codeTransformer = createCompositeCodeTransformer(flags);
   }
@@ -165,15 +169,15 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
    * that could cause {@link VisitorState#reportMatch(Description)}} to override the reported
    * severity).
    */
-  @SuppressWarnings("RestrictedApiChecker" /* We create a heavily customized `Description` here. */)
+  @SuppressWarnings("RestrictedApi" /* We create a heavily customized `Description` here. */)
   private static Description augmentDescription(
       Description description, Optional<SeverityLevel> severityOverride) {
     return Description.builder(
             description.position,
             "Refaster Rule",
             description.getLink(),
-            severityOverride.orElse(description.severity),
             String.join(": ", description.checkName, description.getRawMessage()))
+        .overrideSeverity(severityOverride.orElse(description.severity()))
         .addAllFixes(description.fixes)
         .build();
   }

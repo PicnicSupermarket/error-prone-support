@@ -78,7 +78,7 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
     }
   }
 
-  @SuppressWarnings("RestrictedApiChecker" /* We create a heavily customized `Description` here. */)
+  @SuppressWarnings("RestrictedApi" /* We create a heavily customized `Description` here. */)
   private Description augmentDescription(
       Description description, CodeTransformer delegate, Context context) {
     String shortCheckName = getShortCheckName(description.checkName);
@@ -86,8 +86,8 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
             description.position,
             shortCheckName,
             getLinkPattern(delegate, shortCheckName).orElse(null),
-            overrideSeverity(getSeverity(delegate), context),
             getDescription(delegate))
+        .overrideSeverity(overrideSeverity(getSeverity(delegate), context))
         .addAllFixes(description.fixes)
         .build();
   }

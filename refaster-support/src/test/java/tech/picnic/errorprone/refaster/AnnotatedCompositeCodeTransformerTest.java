@@ -171,10 +171,11 @@ final class AnnotatedCompositeCodeTransformerTest {
     return description(name, Optional.of(""), WARNING, "");
   }
 
-  @SuppressWarnings("RestrictedApiChecker" /* We create a heavily customized `Description` here. */)
+  @SuppressWarnings("RestrictedApi" /* We create a heavily customized `Description` here. */)
   private static Description description(
       String name, Optional<String> link, SeverityLevel severityLevel, String message) {
-    return Description.builder(DUMMY_POSITION, name, link.orElse(null), severityLevel, message)
+    return Description.builder(DUMMY_POSITION, name, link.orElse(null), message)
+        .overrideSeverity(severityLevel)
         .addFix(DUMMY_FIX)
         .build();
   }

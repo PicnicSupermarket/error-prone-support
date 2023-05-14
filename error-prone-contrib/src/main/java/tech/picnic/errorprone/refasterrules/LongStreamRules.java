@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -40,6 +41,7 @@ final class LongStreamRules {
     }
 
     @AfterTemplate
+    @CanIgnoreReturnValue
     LongStream after(LongStream stream) {
       return stream;
     }

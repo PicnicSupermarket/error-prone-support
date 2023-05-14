@@ -201,7 +201,7 @@
         <version.auto-value>1.10.1</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.18.0</version.error-prone-orig>
+        <version.error-prone-orig>2.19.1</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.18</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
@@ -361,6 +361,11 @@
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
                 <version>6.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>
             </dependency>
             <dependency>
                 <groupId>javax.xml.bind</groupId>
@@ -979,6 +984,17 @@
                                         practice. -->
                                         <ignoreClasses>
                                             <ignoreClass>org.checkerframework.dataflow.qual.*</ignoreClass>
+                                        </ignoreClasses>
+                                    </dependency>
+                                    <dependency>
+                                        <groupId>org.springframework</groupId>
+                                        <artifactId>spring-aop</artifactId>
+                                        <!-- Spring AOP redistributes the AOP
+                                        Alliance interfaces of the
+                                        `aopalliance:aopalliance` artifact. See
+                                        https://jira.spring.io/browse/SPR-13984. -->
+                                        <ignoreClasses>
+                                            <ignoreClass>org.aopalliance.*</ignoreClass>
                                         </ignoreClasses>
                                     </dependency>
                                 </dependencies>
@@ -1700,10 +1716,6 @@
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF
-                                    <!-- XXX: Enable once compatible with
-                                    `UnnecessarilyVisible`. See
-                                    https://github.com/google/error-prone/issues/3706. -->
-                                    -Xep:InjectOnBugCheckers:OFF
                                     <!-- We don't target JDK 7. -->
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->
@@ -1724,6 +1736,8 @@
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
                                     -XepOpt:Nullness:Conservative=false
+                                    -XepOpt:StatementSwitchToExpressionSwitch:EnableAssignmentSwitchConversion=true
+                                    -XepOpt:StatementSwitchToExpressionSwitch:EnableReturnSwitchConversion=true
                                     <!-- XXX: Enable once this check respects
                                     the compilation source version. See
                                     https://github.com/google/error-prone/pull/3646.

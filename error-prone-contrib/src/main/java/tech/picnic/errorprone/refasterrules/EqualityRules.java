@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
@@ -63,6 +64,7 @@ final class EqualityRules {
     }
 
     @AfterTemplate
+    @CanIgnoreReturnValue
     boolean after(boolean b) {
       return b;
     }
