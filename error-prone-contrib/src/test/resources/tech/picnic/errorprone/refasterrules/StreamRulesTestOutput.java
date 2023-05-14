@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
+import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.filtering;
@@ -42,6 +43,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         counting(),
         filtering(null, null),
         flatMapping(null, null),
+        identity(),
         mapping(null, null),
         maxBy(null),
         minBy(null),
@@ -250,5 +252,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Integer> testStreamFlatMapCollect() {
     return Stream.of(1).flatMap(n -> Stream.of(n, n)).collect(toImmutableSet());
+  }
+
+  ImmutableSet<Stream<Integer>> testStreamsConcat() {
+    return ImmutableSet.of(
+        Streams.concat(Stream.of(1), Stream.of(2)), Streams.concat(Stream.of(3), Stream.of(4)));
   }
 }

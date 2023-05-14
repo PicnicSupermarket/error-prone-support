@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
+import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.filtering;
@@ -27,6 +28,7 @@ import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
@@ -621,6 +623,18 @@ final class StreamRules {
         Function<? super T, ? extends Stream<? extends U>> mapper,
         Collector<? super U, ?, R> collector) {
       return stream.flatMap(mapper).collect(collector);
+    }
+  }
+
+  static final class StreamsConcat<T> {
+    @BeforeTemplate
+    Stream<T> before(@Repeated Stream<T> stream) {
+      return Stream.of(Refaster.asVarargs(stream)).flatMap(Refaster.anyOf(identity(), s -> s));
+    }
+
+    @AfterTemplate
+    Stream<T> after(@Repeated Stream<T> stream) {
+      return Streams.concat(Refaster.asVarargs(stream));
     }
   }
 }
