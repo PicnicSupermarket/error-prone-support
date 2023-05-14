@@ -33,9 +33,9 @@ final class IsRefasterAsVarargsTest {
             "    return Refaster.asVarargs(\"o\");",
             "  }",
             "",
-            " private static String[] asVarArgs(String s) {",
-            "   return s.split(\"a\");",
-            " }",
+            "  private static String[] asVarArgs(String s) {",
+            "    return s.split(\"a\");",
+            "  }",
             "}")
         .doTest();
   }
