@@ -24,10 +24,18 @@ final class IsRefasterAsVarargsTest {
             "    return \"foo\".split(\"o\");",
             "  }",
             "",
+            "  String[] negative3() {",
+            "    return asVarArgs(\"bar\");",
+            "  }",
+            "",
             "  String[] positive1() {",
             "    // BUG: Diagnostic contains:",
             "    return Refaster.asVarargs(\"o\");",
             "  }",
+            "",
+            " private static String[] asVarArgs(String s) {",
+            "   return s.split(\"a\");",
+            " }",
             "}")
         .doTest();
   }

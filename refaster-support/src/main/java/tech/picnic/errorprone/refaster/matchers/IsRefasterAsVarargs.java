@@ -11,7 +11,7 @@ import com.sun.source.tree.ExpressionTree;
 public final class IsRefasterAsVarargs implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> DELEGATE =
-      staticMethod().onClass(Refaster.class.getName()).namedAnyOf("asVarargs");
+      staticMethod().onClass(Refaster.class.getName()).named("asVarargs");
 
   /** Instantiates a new {@link IsRefasterAsVarargs} instance. */
   public IsRefasterAsVarargs() {}
