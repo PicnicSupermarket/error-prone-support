@@ -1,3 +1,6 @@
 [submodule "integration-tests/checkstyle"]
 	path = integration-tests/checkstyle
 	url = git@github.com:checkstyle/checkstyle.git
+[submodule "integration-tests/guava"]
+	path = integration-tests/guava
+	url = https://github.com/google/guava
