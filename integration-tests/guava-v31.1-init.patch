@@ -1,23 +1,66 @@
 diff --git a/pom.xml b/pom.xml
-index 13dd0985d3..ef7e65bf9a 100644
+index 13dd0985d3..b50449f60d 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -22,6 +22,9 @@
      <maven-javadoc-plugin.additionalJOptions></maven-javadoc-plugin.additionalJOptions>
      <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-+    <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
 +    <error-prone.version>v2.19.1-picnic-1</error-prone.version>
 +    <error-prone-support.version>0.11.0</error-prone-support.version>
++    <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
    </properties>
    <issueManagement>
      <system>GitHub Issues</system>
-@@ -346,6 +349,69 @@
-     </dependencies>
+@@ -347,50 +350,100 @@
    </dependencyManagement>
    <profiles>
-+    <profile>
-+      <id>error-prone-test-compile</id>
+     <profile>
+-        <id>sonatype-oss-release</id>
+-        <build>
+-          <plugins>
+-            <plugin>
+-              <groupId>org.apache.maven.plugins</groupId>
+-              <artifactId>maven-source-plugin</artifactId>
+-              <version>${maven-source-plugin.version}</version>
+-              <executions>
+-                <execution>
+-                  <id>attach-sources</id>
+-                  <goals>
+-                    <goal>jar-no-fork</goal>
+-                  </goals>
+-                </execution>
+-              </executions>
+-            </plugin>
+-            <plugin>
+-              <groupId>org.apache.maven.plugins</groupId>
+-              <artifactId>maven-javadoc-plugin</artifactId>
+-              <version>${maven-javadoc-plugin.version}</version>
+-                <executions>
+-                  <execution>
+-                    <id>attach-javadocs</id>
+-                    <goals>
+-                      <goal>jar</goal>
+-                    </goals>
+-                </execution>
+-              </executions>
+-            </plugin>
+-            <plugin>
+-              <groupId>org.apache.maven.plugins</groupId>
+-              <artifactId>maven-gpg-plugin</artifactId>
+-              <version>1.6</version>
+-              <executions>
+-                <execution>
+-                  <id>sign-artifacts</id>
+-                  <phase>verify</phase>
+-                  <goals>
+-                    <goal>sign</goal>
+-                  </goals>
+-                </execution>
+-              </executions>
+-            </plugin>
+-          </plugins>
++      <id>error-prone-compile</id>
 +      <build>
 +        <plugins>
 +          <plugin>
@@ -25,22 +68,11 @@ index 13dd0985d3..ef7e65bf9a 100644
 +            <artifactId>maven-compiler-plugin</artifactId>
 +            <version>${maven.compiler.plugin.version}</version>
 +            <executions>
-+              <!-- Skip the default-testCompile execution as we don't want to execute the testCompile goal twice -->
 +              <execution>
-+                <id>default-testCompile</id>
-+                <phase>test-compile</phase>
++                <id>error-prone-compile</id>
++                <phase>compile</phase>
 +                <goals>
-+                  <goal>testCompile</goal>
-+                </goals>
-+                <configuration>
-+                  <skip>true</skip>
-+                </configuration>
-+              </execution>
-+              <execution>
-+                <id>error-prone-test-compile</id>
-+                <phase>test-compile</phase>
-+                <goals>
-+                  <goal>testCompile</goal>
++                  <goal>compile</goal>
 +                </goals>
 +                <configuration>
 +                  <failOnError>false</failOnError>
@@ -50,9 +82,7 @@ index 13dd0985d3..ef7e65bf9a 100644
 +                    <arg>-Xpkginfo:always</arg>
 +                    <arg>-XDcompilePolicy=simple</arg>
 +                    <arg>
-+                      -Xplugin:ErrorProne \
-+                      -XepExcludedPaths:.*[\\/]resources[\\/].* \
-+                      ${error-prone.flags}
++                      -Xplugin:ErrorProne ${error-prone.flags} -Xep:CollectorMutability:OFF -Xep:FluxImplicitBlock:OFF -Xep:ScheduledTransactionTrace:OFF
 +                    </arg>
 +                  </compilerArgs>
 +                  <annotationProcessorPaths>
@@ -79,6 +109,51 @@ index 13dd0985d3..ef7e65bf9a 100644
 +        </plugins>
 +      </build>
 +    </profile>
++    <profile>
++      <id>sonatype-oss-release</id>
++      <build>
++        <plugins>
++          <plugin>
++            <groupId>org.apache.maven.plugins</groupId>
++            <artifactId>maven-source-plugin</artifactId>
++            <version>${maven-source-plugin.version}</version>
++            <executions>
++              <execution>
++                <id>attach-sources</id>
++                <goals>
++                  <goal>jar-no-fork</goal>
++                </goals>
++              </execution>
++            </executions>
++          </plugin>
++          <plugin>
++            <groupId>org.apache.maven.plugins</groupId>
++            <artifactId>maven-javadoc-plugin</artifactId>
++            <version>${maven-javadoc-plugin.version}</version>
++            <executions>
++              <execution>
++                <id>attach-javadocs</id>
++                <goals>
++                  <goal>jar</goal>
++                </goals>
++              </execution>
++            </executions>
++          </plugin>
++          <plugin>
++            <groupId>org.apache.maven.plugins</groupId>
++            <artifactId>maven-gpg-plugin</artifactId>
++            <version>1.6</version>
++            <executions>
++              <execution>
++                <id>sign-artifacts</id>
++                <phase>verify</phase>
++                <goals>
++                  <goal>sign</goal>
++                </goals>
++              </execution>
++            </executions>
++          </plugin>
++        </plugins>
+       </build>
+     </profile>
      <profile>
-         <id>sonatype-oss-release</id>
-         <build>
