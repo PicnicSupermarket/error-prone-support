@@ -4,7 +4,10 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.suppliers.Supplier;
 import com.sun.tools.javac.code.ClassFinder;
+import com.sun.tools.javac.code.Source;
 import com.sun.tools.javac.code.Symbol.CompletionFailure;
+import com.sun.tools.javac.code.Symbol.ModuleSymbol;
+import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.util.Name;
 
 /**
@@ -86,9 +89,15 @@ public enum ThirdPartyLibrary {
 
   private static boolean canLoadClass(String className, VisitorState state) {
     ClassFinder classFinder = ClassFinder.instance(state.context);
+    Symtab symtab = state.getSymtab();
+    // XXX: Drop support for targeting Java 8 once the oldest supported JDK drops such support.
+    ModuleSymbol module =
+        Source.instance(state.context).compareTo(Source.JDK9) < 0
+            ? symtab.noModule
+            : symtab.unnamedModule;
     Name binaryName = state.binaryNameFromClassname(className);
     try {
-      classFinder.loadClass(state.getSymtab().unnamedModule, binaryName);
+      classFinder.loadClass(module, binaryName);
       return true;
     } catch (
         @SuppressWarnings("java:S1166" /* Not exceptional. */)
