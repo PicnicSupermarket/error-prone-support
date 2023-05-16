@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.11.1-SNAPSHOT</version>
+    <version>0.11.1</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -49,7 +49,7 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:PicnicSupermarket/error-prone-support.git</developerConnection>
-        <tag>v0.10.0</tag>
+        <tag>v0.11.1</tag>
         <url>https://github.com/PicnicSupermarket/error-prone-support</url>
     </scm>
     <issueManagement>
@@ -141,7 +141,7 @@
         <groupId.error-prone>com.google.errorprone</groupId.error-prone>
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2023-05-14T15:09:08Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2023-05-16T15:37:41Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Glob pattern identifying Refaster rule definition files. These
         Java classes don't contain "regular" code, and thus require special
