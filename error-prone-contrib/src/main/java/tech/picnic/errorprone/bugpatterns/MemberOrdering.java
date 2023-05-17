@@ -6,20 +6,23 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.fixes.SuggestedFixes.addSuppressWarnings;
 import static com.google.errorprone.util.ASTHelpers.getStartPosition;
+import static com.google.errorprone.util.ASTHelpers.getSymbol;
+import static com.google.errorprone.util.ASTHelpers.isGeneratedConstructor;
 import static com.sun.source.tree.Tree.Kind.METHOD;
 import static com.sun.source.tree.Tree.Kind.VARIABLE;
+import static com.sun.tools.javac.parser.Tokens.TokenKind.LBRACE;
 import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.annotations.Var;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
-import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ErrorProneToken;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
@@ -32,7 +35,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.lang.model.element.Modifier;
 
@@ -120,8 +122,7 @@ public class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMa
 
   private static boolean isHandled(Tree tree) {
     return tree instanceof JCVariableDecl
-        || (tree instanceof JCMethodDecl
-            && !ASTHelpers.isGeneratedConstructor((JCMethodDecl) tree));
+        || (tree instanceof JCMethodDecl && !isGeneratedConstructor((JCMethodDecl) tree));
   }
 
   private static SuggestedFix swapMembersIncludingComments(
@@ -136,14 +137,25 @@ public class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMa
       // XXX: Technically not necessary, but avoids redundant replacements.
       if (!original.equals(correct)) {
         var replacement =
-            Streams.concat(
-                    getComments(classTree, correct, state),
+            Stream.concat(
+                    getComments(classTree, correct, state).map(Tokens.Comment::getText),
                     Stream.of(state.getSourceForNode(correct)))
-                .collect(Collectors.joining("\n"));
+                .collect(joining("\n"));
         fix.merge(replaceIncludingComments(classTree, original, replacement, state));
       }
     }
     return fix.build();
+  }
+
+  // xxx: From this point the code is just a fancy copy of `SuggestFixes.replaceIncludingComments` -
+  // if we cannot use existing solutions for this functionality, this one needs a big refactor.
+
+  private static Stream<Tokens.Comment> getComments(
+      ClassTree classTree, Tree member, VisitorState state) {
+    return getTokensBeforeMember(classTree, member, state).findFirst().stream()
+        .map(ErrorProneToken::comments)
+        // xxx: Original impl sorts comments, but that seems unnecessary.
+        .flatMap(List::stream);
   }
 
   private static boolean isStatic(JCVariableDecl memberTree) {
@@ -152,61 +164,15 @@ public class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMa
   }
 
   private static boolean isConstructor(JCMethodDecl methodDecl) {
-    // XXX: Using state.getName(...) would be better, but than we'd need to introduce `state` as a
-    // parameter and that would mean we have to instantiate a COMPARATOR for every matchClass(...)
-    // call, which seems excessive for a simple check like this.
-    // That may also violate some kind of contract about comparators being stateless.
-    return methodDecl.getName().toString().equals("<init>");
-  }
-
-  private static Stream<String> getComments(ClassTree classTree, Tree member, VisitorState state) {
-    var previousMember = getPreviousMember(member, classTree).orElse(null);
-    int startTokenization;
-    if (previousMember != null) {
-      startTokenization = state.getEndPosition(previousMember);
-    } else if (state.getEndPosition(classTree.getModifiers()) == Position.NOPOS) {
-      startTokenization = getStartPosition(classTree);
-    } else {
-      startTokenization = state.getEndPosition(classTree.getModifiers());
-    }
-    List<ErrorProneToken> tokens =
-        state.getOffsetTokens(startTokenization, state.getEndPosition(member));
-    if (previousMember == null) {
-      // todo: check if this is redundant.
-      tokens = getTokensAfterOpeningBrace(tokens);
-    }
-    if (tokens.isEmpty()) {
-      return Stream.empty();
-    }
-    return tokens.get(0).comments().stream().map(c -> c.getText());
-  }
-
-  private static List<ErrorProneToken> getTokensAfterOpeningBrace(List<ErrorProneToken> tokens) {
-    for (int i = 0; i < tokens.size() - 1; ++i) {
-      if (tokens.get(i).kind() == Tokens.TokenKind.LBRACE) {
-        return tokens.subList(i + 1, tokens.size());
-      }
-    }
-    return ImmutableList.of();
+    return getSymbol(methodDecl).isConstructor();
   }
 
   public static SuggestedFix replaceIncludingComments(
       ClassTree classTree, Tree member, String replacement, VisitorState state) {
-    Tree previousMember = getPreviousMember(member, classTree).orElse(null);
-    int startTokenization;
-    // from here copy of `SuggestedFixes#replaceIncludingComments`.
-    if (previousMember != null) {
-      startTokenization = state.getEndPosition(previousMember);
-    } else if (state.getEndPosition(classTree.getModifiers()) == Position.NOPOS) {
-      startTokenization = getStartPosition(classTree);
-    } else {
-      startTokenization = state.getEndPosition(classTree.getModifiers());
-    }
-    List<ErrorProneToken> tokens =
-        state.getOffsetTokens(startTokenization, state.getEndPosition(member));
-    if (previousMember == null) {
-      tokens = getTokensAfterOpeningBrace(tokens);
-    }
+    Optional<Tree> previousMember = getPreviousMember(member, classTree);
+    ImmutableList<ErrorProneToken> tokens =
+        getTokensBeforeMember(classTree, member, state).collect(toImmutableList());
+
     if (tokens.isEmpty()) {
       return SuggestedFix.replace(member, replacement);
     }
@@ -217,9 +183,9 @@ public class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMa
         ImmutableList.sortedCopyOf(
             Comparator.<Tokens.Comment>comparingInt(c -> c.getSourcePos(0)).reversed(),
             tokens.get(0).comments());
-    int startPos = getStartPosition(member);
+    @Var int startPos = getStartPosition(member);
     // This can happen for desugared expressions like `int a, b;`.
-    if (startPos < startTokenization) {
+    if (startPos < getStartTokenization(classTree, state, previousMember)) {
       return SuggestedFix.emptyFix();
     }
     // Delete backwards for comments which are not separated from our target by a blank line.
@@ -236,9 +202,9 @@ public class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMa
   }
 
   private static Optional<Tree> getPreviousMember(Tree tree, ClassTree classTree) {
-    Tree previousMember = null;
+    @Var Tree previousMember = null;
     for (Tree member : classTree.getMembers()) {
-      if (member instanceof MethodTree && ASTHelpers.isGeneratedConstructor((MethodTree) member)) {
+      if (member instanceof MethodTree && isGeneratedConstructor((MethodTree) member)) {
         continue;
       }
       if (member.equals(tree)) {
@@ -247,5 +213,39 @@ public class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMa
       previousMember = member;
     }
     return Optional.ofNullable(previousMember);
+  }
+
+  private static Stream<ErrorProneToken> getTokensBeforeMember(
+      ClassTree classTree, Tree member, VisitorState state) {
+    Optional<Tree> previousMember = getPreviousMember(member, classTree);
+    var startTokenization = getStartTokenization(classTree, state, previousMember);
+
+    Stream<ErrorProneToken> tokens =
+        state.getOffsetTokens(startTokenization, state.getEndPosition(member)).stream();
+
+    if (previousMember.isEmpty()) {
+      return tokens.dropWhile(token -> token.kind() != LBRACE).skip(1);
+    } else {
+      return tokens;
+    }
+  }
+
+  // xxx: rename / remove method - it gets the start position of tokens that *might* be related to
+  // member.
+  // - afaik it includes a Class declaration if the member is the first member in the
+  // class and does not have comments.
+  private static Integer getStartTokenization(
+      ClassTree classTree, VisitorState state, Optional<Tree> previousMember) {
+    return previousMember
+        .map(state::getEndPosition)
+        .orElseGet(
+            () ->
+                // xxx: could return the position of the character next to the opening brace of the
+                // class - `... Clazz ... {`
+                // this could make this method more defined, worthy of existence, but it may also
+                // require additional parameters and changes in `replaceIncludingComments` method.
+                state.getEndPosition(classTree.getModifiers()) == Position.NOPOS
+                    ? getStartPosition(classTree)
+                    : state.getEndPosition(classTree.getModifiers()));
   }
 }
