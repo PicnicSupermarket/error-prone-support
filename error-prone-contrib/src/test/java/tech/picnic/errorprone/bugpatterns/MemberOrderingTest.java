@@ -233,4 +233,8 @@ final class MemberOrderingTest {
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
+
+  // todo: Test if second replacement considers annotations.
+  // todo: Chose between with, handles, considers, respects and regards for
+  // replacementSecondSuggestedFixXxxSomething
 }
