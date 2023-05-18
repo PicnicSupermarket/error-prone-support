@@ -129,14 +129,12 @@ final class MemberOrderingTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
-  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
   void replacementSecondSuggestedFix() {
     BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
         .setFixChooser(SECOND)
         .addInputLines(
             "A.java",
-            "",
             "class A {",
             "  private static final int X = 1;",
             "  char a = 'a';",
@@ -145,7 +143,7 @@ final class MemberOrderingTest {
             "",
             "  void m2() {}",
             "",
-            "  public A () {}",
+            "  public A() {}",
             "",
             "  private static String BAR = \"bar\";",
             "  char b = 'b';",
@@ -153,9 +151,11 @@ final class MemberOrderingTest {
             "  void m1() {",
             "    System.out.println(\"foo\");",
             "  }",
+            "",
             "  static int TWO = 2;",
             "",
             "  class Inner {}",
+            "",
             "  static class StaticInner {}",
             "}")
         .addOutputLines(
@@ -171,73 +171,164 @@ final class MemberOrderingTest {
             "  char a = 'a';",
             "",
             "  char b = 'b';",
-            "  public A () {}",
+            "",
+            "  public A() {}",
             "",
             "  void m2() {}",
+            "",
             "  void m1() {",
             "    System.out.println(\"foo\");",
             "  }",
             "",
             "  class Inner {}",
+            "",
             "  static class StaticInner {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
 
-  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
-  void replacementSecondSuggestedFixWithDefaultConstructor() {
+  void replacementSecondSuggestedFixConsidersDefaultConstructor() {
     BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
         .setFixChooser(SECOND)
         .addInputLines(
             "A.java",
-            "",
             "class A {",
-            "  void m1 () {}",
+            "  void m1() {}",
+            "",
             "  char c = 'c';",
             "  private static final String foo = \"foo\";",
             "  static int one = 1;",
             "}")
         .addOutputLines(
             "A.java",
-            "",
             "class A {",
             "  private static final String foo = \"foo\";",
             "  static int one = 1;",
             "  char c = 'c';",
-            "  void m1 () {}",
+            "",
+            "  void m1() {}",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void replacementSecondSuggestedFixConsidersComments() {
+    BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
+        .setFixChooser(SECOND)
+        .addInputLines(
+            "A.java",
+            "class A {",
+            "  // `m1()` comment.",
+            "  void m1() {",
+            "    // Print line 'foo' to stdout.",
+            "    System.out.println(\"foo\");",
+            "  }",
+            "",
+            "  // foo",
+            "  /** Instantiates a new {@link A} instance. */",
+            "  public A() {}",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "class A {",
+            "  // foo",
+            "  /** Instantiates a new {@link A} instance. */",
+            "  public A() {}",
+            "",
+            "  // `m1()` comment.",
+            "  void m1() {",
+            "    // Print line 'foo' to stdout.",
+            "    System.out.println(\"foo\");",
+            "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
 
   @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
-  void replacementSecondSuggestedFixWithComments() {
+  void replacementSecondSuggestedFixDoesNotModifyWhitespace() {
     BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
         .setFixChooser(SECOND)
         .addInputLines(
             "A.java",
+            "",
+            "",
             "class A {",
+            "",
+            "",
             "  // `m1()` comment.",
             "  void m1() {",
             "    // Print line 'foo' to stdout.",
             "    System.out.println(\"foo\");",
             "  }",
-            "  // foo",
-            "  /** Instantiates a new {@link A} instance. */",
-            "  public A () {}",
+            "  public  A  ()  {  }",
+            "",
+            "",
             "}")
         .addOutputLines(
             "A.java",
+            "",
+            "",
             "class A {",
-            "  // foo",
-            "  /** Instantiates a new {@link A} instance. */",
-            "  public A () {}",
+            "",
+            "",
+            "",
+            "  public  A  ()  {  }",
             "  // `m1()` comment.",
             "  void m1() {",
             "    // Print line 'foo' to stdout.",
             "    System.out.println(\"foo\");",
             "  }",
+            "",
+            "",
+            "}")
+        .doTest();
+  }
+
+  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
+  @Test
+  void xxx() { // todo: Actually test that the whitespace is preserved.
+    BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
+        .setFixChooser(SECOND)
+        .addInputLines(
+            "A.java",
+            "",
+            "",
+            "class A {",
+            "",
+            "",
+            "  // `m1()` comment.",
+            "  void m1() {",
+            "    // Print line 'foo' to stdout.",
+            "    System.out.println(\"foo\");",
+            "  }",
+            "  public  A  ()  {  }",
+            "",
+            "",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "",
+            "",
+            "class A {",
+            "",
+            "  ",
+            "     ",
+            "  \t  \t",
+            "     ",
+            "  ",
+            "",
+            "  public  A                    ()  {  }",
+            "  // `m1()` comment.",
+            "  void m1",
+            "         ()",
+            "  {",
+            "    // Print line 'foo' to stdout.",
+            "    System.out.println(\"foo\");",
+            "  }",
+            "",
+            "",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
