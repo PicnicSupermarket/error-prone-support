@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.base.Predicates.and;
+import static com.google.common.base.Predicates.containsPattern;
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.SECOND;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
@@ -11,10 +13,16 @@ final class MemberOrderingTest {
   @Test
   void identification() {
     CompilationTestHelper.newInstance(MemberOrdering.class, getClass())
+        .expectErrorMessage(
+            "MemberOrdering",
+            and(
+                containsPattern("SuppressWarnings"),
+                containsPattern(
+                    "Members, constructors and methods should follow standard ordering.")))
         .addSourceLines(
             "A.java",
             "",
-            "// BUG: Diagnostic contains:",
+            "// BUG: Diagnostic matches: MemberOrdering",
             "class A {",
             "  char a = 'a';",
             "  private static String FOO = \"foo\";",
@@ -57,7 +65,8 @@ final class MemberOrderingTest {
             "",
             "  class Inner {}",
             "  static class StaticInner {}",
-            "}");
+            "}")
+        .doTest();
   }
 
   @Test
