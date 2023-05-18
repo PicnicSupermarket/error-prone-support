@@ -8,8 +8,6 @@ import static com.google.errorprone.fixes.SuggestedFixes.addSuppressWarnings;
 import static com.google.errorprone.util.ASTHelpers.getStartPosition;
 import static com.google.errorprone.util.ASTHelpers.getSymbol;
 import static com.google.errorprone.util.ASTHelpers.isGeneratedConstructor;
-import static com.sun.source.tree.Tree.Kind.METHOD;
-import static com.sun.source.tree.Tree.Kind.VARIABLE;
 import static com.sun.tools.javac.parser.Tokens.TokenKind.LBRACE;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
@@ -44,63 +42,25 @@ import javax.lang.model.element.Modifier;
     summary = "Members should be ordered in a standard way.",
     explanation =
         "Members should be ordered in a standard way, which is: "
-            + "static member variables, non-static member variables, constructors, methods.",
+            + "static member variables, non-static member variables, constructors and methods.",
     link = BUG_PATTERNS_BASE_URL + "MemberOrdering",
     linkType = CUSTOM,
     severity = WARNING,
     tags = STYLE)
 public final class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
-  /** A comparator that sorts members, constructors and methods in a standard order. */
+  /** A comparator that sorts variable and method (incl. constructors) in a standard order. */
   private static final Comparator<Tree> COMPARATOR =
       comparing(
-              (Tree memberTree) -> {
-                switch (memberTree.getKind()) {
-                  case VARIABLE:
-                    return 0;
-                  case METHOD:
-                    return 1;
-                  default:
-                    throw new IllegalStateException("Unexpected kind: " + memberTree.getKind());
-                }
-              })
-          .thenComparing(
-              (Tree memberTree) -> {
-                switch (memberTree.getKind()) {
-                  case VARIABLE:
-                    return isStatic((JCVariableDecl) memberTree) ? 0 : 1;
-                  case METHOD:
-                    return isConstructor((JCMethodDecl) memberTree) ? 0 : 1;
-                  default:
-                    throw new IllegalStateException("Unexpected kind: " + memberTree.getKind());
-                }
-              });
-
-  // todo: Evaluate alternative implementation.
-  /** A comparator that sorts members, constructors and methods in a standard order. */
-  @SuppressWarnings("unused")
-  private static final Comparator<Tree> SQUASHED_COMPARATOR =
-      comparing(
           (Tree memberTree) -> {
-            if (memberTree.getKind() == VARIABLE) {
-              if (isStatic((JCVariableDecl) memberTree)) {
-                // 1. static variables.
-                return 1;
-              } else {
-                // 2. non-static variables.
-                return 2;
-              }
+            switch (memberTree.getKind()) {
+              case VARIABLE:
+                return isStatic((JCVariableDecl) memberTree) ? 1 : 2;
+              case METHOD:
+                return isConstructor((JCMethodDecl) memberTree) ? 3 : 4;
+              default:
+                throw new IllegalStateException("Unexpected kind: " + memberTree.getKind());
             }
-            if (memberTree.getKind() == METHOD) {
-              if (isConstructor((JCMethodDecl) memberTree)) {
-                // 3. constructors.
-                return 3;
-              } else {
-                // 4. methods.
-                return 4;
-              }
-            }
-            throw new IllegalStateException("Unexpected kind: " + memberTree.getKind());
           });
 
   /** Instantiates a new {@link MemberOrdering} instance. */
