@@ -197,14 +197,18 @@ final class MemberOrderingTest {
             "  void m1() {}",
             "",
             "  char c = 'c';",
+            "",
             "  private static final String foo = \"foo\";",
+            "",
             "  static int one = 1;",
             "}")
         .addOutputLines(
             "A.java",
             "class A {",
             "  private static final String foo = \"foo\";",
+            "",
             "  static int one = 1;",
+            "",
             "  char c = 'c';",
             "",
             "  void m1() {}",
@@ -286,9 +290,10 @@ final class MemberOrderingTest {
         .doTest();
   }
 
+  // todo: Actually verify that whitespace is preserved.
   @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
-  void xxx() { // todo: Actually test that the whitespace is preserved.
+  void xxx() {
     BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
         .setFixChooser(SECOND)
         .addInputLines(
@@ -334,6 +339,4 @@ final class MemberOrderingTest {
   }
 
   // todo: Test if second replacement considers annotations.
-  // todo: Chose between with, handles, considers, respects and regards for
-  // replacementSecondSuggestedFixXxxSomething
 }
