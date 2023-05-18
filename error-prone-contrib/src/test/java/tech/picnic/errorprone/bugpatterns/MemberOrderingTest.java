@@ -21,7 +21,6 @@ final class MemberOrderingTest {
                     "Members, constructors and methods should follow standard ordering.")))
         .addSourceLines(
             "A.java",
-            "",
             "// BUG: Diagnostic matches: MemberOrdering",
             "class A {",
             "  char a = 'a';",
@@ -30,7 +29,7 @@ final class MemberOrderingTest {
             "",
             "  void m2() {}",
             "",
-            "  public A () {}",
+            "  public A() {}",
             "",
             "  private static String BAR = \"bar\";",
             "  char b = 'b';",
@@ -38,14 +37,15 @@ final class MemberOrderingTest {
             "  void m1() {",
             "    System.out.println(\"foo\");",
             "  }",
+            "",
             "  static int TWO = 2;",
             "",
             "  class Inner {}",
+            "",
             "  static class StaticInner {}",
             "}")
         .addSourceLines(
             "B.java",
-            "",
             "class B {",
             "  private static String FOO = \"foo\";",
             "  static int ONE = 1;",
@@ -56,14 +56,17 @@ final class MemberOrderingTest {
             "  char a = 'a';",
             "",
             "  char b = 'b';",
-            "  public B () {}",
+            "",
+            "  public B() {}",
             "",
             "  void m1() {",
             "    System.out.println(\"foo\");",
             "  }",
+            "",
             "  void m2() {}",
             "",
             "  class Inner {}",
+            "",
             "  static class StaticInner {}",
             "}")
         .doTest();
@@ -74,7 +77,6 @@ final class MemberOrderingTest {
     BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
-            "",
             "class A {",
             "  private static final int X = 1;",
             "  char a = 'a';",
@@ -83,7 +85,7 @@ final class MemberOrderingTest {
             "",
             "  void m2() {}",
             "",
-            "  public A () {}",
+            "  public A() {}",
             "",
             "  private static String BAR = \"bar\";",
             "  char b = 'b';",
@@ -91,6 +93,7 @@ final class MemberOrderingTest {
             "  void m1() {",
             "    System.out.println(\"foo\");",
             "  }",
+            "",
             "  static int TWO = 2;",
             "",
             "  class Inner {}",
@@ -99,7 +102,6 @@ final class MemberOrderingTest {
             "}")
         .addOutputLines(
             "A.java",
-            "",
             "@SuppressWarnings(\"MemberOrdering\")",
             "class A {",
             "  private static final int X = 1;",
@@ -109,7 +111,7 @@ final class MemberOrderingTest {
             "",
             "  void m2() {}",
             "",
-            "  public A () {}",
+            "  public A() {}",
             "",
             "  private static String BAR = \"bar\";",
             "  char b = 'b';",
@@ -117,6 +119,7 @@ final class MemberOrderingTest {
             "  void m1() {",
             "    System.out.println(\"foo\");",
             "  }",
+            "",
             "  static int TWO = 2;",
             "",
             "  class Inner {}",
@@ -126,6 +129,7 @@ final class MemberOrderingTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
+  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
   void replacementSecondSuggestedFix() {
     BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
@@ -152,12 +156,10 @@ final class MemberOrderingTest {
             "  static int TWO = 2;",
             "",
             "  class Inner {}",
-            "",
             "  static class StaticInner {}",
             "}")
         .addOutputLines(
             "A.java",
-            "",
             "class A {",
             "  private static final int X = 1;",
             "  private static String FOO = \"foo\";",
@@ -177,12 +179,12 @@ final class MemberOrderingTest {
             "  }",
             "",
             "  class Inner {}",
-            "",
             "  static class StaticInner {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
 
+  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
   void replacementSecondSuggestedFixWithDefaultConstructor() {
     BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
@@ -208,32 +210,29 @@ final class MemberOrderingTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
+  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
   void replacementSecondSuggestedFixWithComments() {
     BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
         .setFixChooser(SECOND)
         .addInputLines(
             "A.java",
-            "",
             "class A {",
             "  // `m1()` comment.",
             "  void m1() {",
             "    // Print line 'foo' to stdout.",
             "    System.out.println(\"foo\");",
             "  }",
-            "",
             "  // foo",
             "  /** Instantiates a new {@link A} instance. */",
             "  public A () {}",
             "}")
         .addOutputLines(
             "A.java",
-            "",
             "class A {",
             "  // foo",
             "  /** Instantiates a new {@link A} instance. */",
             "  public A () {}",
-            "",
             "  // `m1()` comment.",
             "  void m1() {",
             "    // Print line 'foo' to stdout.",
