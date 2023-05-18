@@ -38,14 +38,18 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.lang.model.element.Modifier;
 
+/** A {@link BugChecker} that flags classes with non-standard member ordering. */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Members should be ordered in a standard way.",
+    explanation =
+        "Members should be ordered in a standard way, which is: "
+            + "static member variables, non-static member variables, constructors, methods.",
     link = BUG_PATTERNS_BASE_URL + "MemberOrdering",
     linkType = CUSTOM,
     severity = WARNING,
     tags = STYLE)
-public class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMatcher {
+public final class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
   /** A comparator that sorts members, constructors and methods in a standard order. */
   private static final Comparator<Tree> COMPARATOR =
@@ -56,8 +60,9 @@ public class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMa
                     return 0;
                   case METHOD:
                     return 1;
+                  default:
+                    throw new IllegalStateException("Unexpected kind: " + memberTree.getKind());
                 }
-                throw new IllegalStateException("Unexpected kind: " + memberTree.getKind());
               })
           .thenComparing(
               (Tree memberTree) -> {
@@ -66,13 +71,16 @@ public class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMa
                     return isStatic((JCVariableDecl) memberTree) ? 0 : 1;
                   case METHOD:
                     return isConstructor((JCMethodDecl) memberTree) ? 0 : 1;
+                  default:
+                    throw new IllegalStateException("Unexpected kind: " + memberTree.getKind());
                 }
-                throw new IllegalStateException("Unexpected kind: " + memberTree.getKind());
               });
-  // XXX: Evaluate alternative implementation.
+
+  // todo: Evaluate alternative implementation.
   /** A comparator that sorts members, constructors and methods in a standard order. */
+  @SuppressWarnings("unused")
   private static final Comparator<Tree> SQUASHED_COMPARATOR =
-      Comparator.comparing(
+      comparing(
           (Tree memberTree) -> {
             if (memberTree.getKind() == VARIABLE) {
               if (isStatic((JCVariableDecl) memberTree)) {
@@ -96,9 +104,7 @@ public class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMa
           });
 
   /** Instantiates a new {@link MemberOrdering} instance. */
-  public MemberOrdering() {
-    super();
-  }
+  public MemberOrdering() {}
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
@@ -134,7 +140,7 @@ public class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMa
     for (int i = 0; i < members.size(); i++) {
       Tree original = members.get(i);
       Tree correct = sortedMembers.get(i);
-      // XXX: Technically not necessary, but avoids redundant replacements.
+      // xxx: Technically not necessary, but avoids redundant replacements.
       if (!original.equals(correct)) {
         var replacement =
             Stream.concat(
@@ -167,7 +173,7 @@ public class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMa
     return getSymbol(methodDecl).isConstructor();
   }
 
-  public static SuggestedFix replaceIncludingComments(
+  private static SuggestedFix replaceIncludingComments(
       ClassTree classTree, Tree member, String replacement, VisitorState state) {
     Optional<Tree> previousMember = getPreviousMember(member, classTree);
     ImmutableList<ErrorProneToken> tokens =
