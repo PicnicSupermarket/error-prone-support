@@ -795,6 +795,7 @@ final class ReactorRules {
   /** Prefer {@link Mono#flatMap(Function)} over more contrived alternatives. */
   static final class MonoFlatMap<S, T> {
     @BeforeTemplate
+    @SuppressWarnings("MonoOfPublishers")
     Mono<T> before(Mono<S> mono, Function<? super S, ? extends Mono<? extends T>> function) {
       return mono.map(function).flatMap(identity());
     }
@@ -808,6 +809,7 @@ final class ReactorRules {
   /** Prefer {@link Mono#flatMapMany(Function)} over more contrived alternatives. */
   static final class MonoFlatMapMany<S, T> {
     @BeforeTemplate
+    @SuppressWarnings("MonoOfPublishers")
     Flux<T> before(Mono<S> mono, Function<? super S, ? extends Publisher<? extends T>> function) {
       return mono.map(function).flatMapMany(identity());
     }
