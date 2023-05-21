@@ -14,6 +14,7 @@ final class MonoFilterThenTest {
             "class A {",
             "  void m() {",
             "    Mono.just(1).then(Mono.just(2));",
+            "    Mono.just(1).filter(i -> i != 1).when(Mono.just(2));",
             "    // BUG: Diagnostic contains:",
             "    Mono.just(1).filter(i -> i != 1).then();",
             "    // BUG: Diagnostic contains:",
