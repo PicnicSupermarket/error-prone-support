@@ -42,7 +42,7 @@ public final class MoreMatchers {
    * arguments.
    *
    * @param <T> The type of tree to match against.
-   * @return A {@link Matcher} that matches trees with type annotations.
+   * @return A {@link Matcher} that matches trees with type arguments.
    */
   public static <T extends ExpressionTree> Matcher<T> hasTypeArguments() {
     return (tree, state) -> {
