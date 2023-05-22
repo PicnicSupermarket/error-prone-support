@@ -60,6 +60,9 @@ This script will:
 1. Add the required `JUnit` dependencies to your `pom.xml`.
 2. Run the `testng-to-junit` migration.
 
+> **Note**
+> Please verify that the migrated code still compiles after each step of the compilation.
+
 ### Counting tests
 
 The amount of tests executed before the migration can be counted using the `--count` flag:
@@ -134,8 +137,7 @@ public class A {
 ```
 
 ### Known limitations
-
-// # XXX: Add known limitations. 
+// XXX: Add known limitations. 
 
 [eps-readme]: ../README.md
 [error-prone-installation-guide]: https://errorprone.info/docs/installation#maven
