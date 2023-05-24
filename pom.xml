@@ -197,7 +197,7 @@
         <!-- Dependency and plugin versions that are referenced in more than
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
-        <version.auto-service>1.0.1</version.auto-service>
+        <version.auto-service>1.1.0</version.auto-service>
         <version.auto-value>1.10.1</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
