@@ -108,7 +108,7 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
                     getComments(classTree, correct, state).map(Tokens.Comment::getText),
                     Stream.of(state.getSourceForNode(correct)))
                 .collect(joining("\n"));
-        fix.merge(SuggestedFixes.replaceIncludingComments(state.getPath(), replacement, state));
+        fix.merge(replaceIncludingComments(classTree, original, replacement, state));
       }
     }
     return fix.build();
@@ -129,6 +129,43 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
         .map(ErrorProneToken::comments)
         // xxx: Original impl sorts comments, but that seems unnecessary.
         .flatMap(List::stream);
+  }
+
+  // XXX: From this point the code is just a fancy copy of `SuggestFixes.replaceIncludingComments` -
+  // if we cannot use existing solutions for this functionality, this one needs a big refactor.
+
+  private static SuggestedFix replaceIncludingComments(
+      ClassTree classTree, Tree member, String replacement, VisitorState state) {
+    Optional<Tree> previousMember = getPreviousMember(member, classTree);
+    ImmutableList<ErrorProneToken> tokens =
+        getTokensBeforeMember(classTree, member, state).collect(toImmutableList());
+
+    if (tokens.isEmpty()) {
+      return SuggestedFix.replace(member, replacement);
+    }
+    if (tokens.get(0).comments().isEmpty()) {
+      return SuggestedFix.replace(tokens.get(0).pos(), state.getEndPosition(member), replacement);
+    }
+    ImmutableList<Tokens.Comment> comments =
+        ImmutableList.sortedCopyOf(
+            Comparator.<Tokens.Comment>comparingInt(c -> c.getSourcePos(0)).reversed(),
+            tokens.get(0).comments());
+    @Var int startPos = ASTHelpers.getStartPosition(member);
+    // This can happen for desugared expressions like `int a, b;`.
+    if (startPos < getStartTokenization(classTree, state, previousMember)) {
+      return SuggestedFix.emptyFix();
+    }
+    // Delete backwards for comments which are not separated from our target by a blank line.
+    CharSequence sourceCode = state.getSourceCode();
+    for (Tokens.Comment comment : comments) {
+      int endOfCommentPos = comment.getSourcePos(comment.getText().length() - 1);
+      CharSequence stringBetweenComments = sourceCode.subSequence(endOfCommentPos, startPos);
+      if (stringBetweenComments.chars().filter(c -> c == '\n').count() > 1) {
+        break;
+      }
+      startPos = comment.getSourcePos(0);
+    }
+    return SuggestedFix.replace(startPos, state.getEndPosition(member), replacement);
   }
 
   private static Optional<Tree> getPreviousMember(Tree tree, ClassTree classTree) {
