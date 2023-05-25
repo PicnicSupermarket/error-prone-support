@@ -4,10 +4,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
-import static com.google.errorprone.fixes.SuggestedFixes.addSuppressWarnings;
-import static com.google.errorprone.util.ASTHelpers.getStartPosition;
-import static com.google.errorprone.util.ASTHelpers.getSymbol;
-import static com.google.errorprone.util.ASTHelpers.isGeneratedConstructor;
 import static com.sun.tools.javac.parser.Tokens.TokenKind.LBRACE;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
@@ -20,14 +16,15 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Var;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ErrorProneToken;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.parser.Tokens;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Position;
 import java.util.Comparator;
 import java.util.List;
@@ -49,15 +46,16 @@ import javax.lang.model.element.Modifier;
     tags = STYLE)
 public final class MemberOrdering extends BugChecker implements BugChecker.ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
+
   /** A comparator that sorts variable and method (incl. constructors) in a standard order. */
-  private static final Comparator<Tree> COMPARATOR =
+  private static final Comparator<Tree> MEMBER_SORTING =
       comparing(
           (Tree memberTree) -> {
             switch (memberTree.getKind()) {
               case VARIABLE:
-                return isStatic((JCVariableDecl) memberTree) ? 1 : 2;
+                return isStatic((VariableTree) memberTree) ? 1 : 2;
               case METHOD:
-                return isConstructor((JCMethodDecl) memberTree) ? 3 : 4;
+                return isConstructor((MethodTree) memberTree) ? 3 : 4;
               default:
                 throw new IllegalStateException("Unexpected kind: " + memberTree.getKind());
             }
@@ -68,16 +66,19 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    var members =
-        tree.getMembers().stream().filter(MemberOrdering::isHandled).collect(toImmutableList());
-    var sortedMembers = members.stream().sorted(COMPARATOR).collect(toImmutableList());
+    ImmutableList<? extends Tree> members =
+        tree.getMembers().stream()
+            .filter(MemberOrdering::shouldBeSorted)
+            .collect(toImmutableList());
+    ImmutableList<? extends Tree> sortedMembers =
+        members.stream().sorted(MEMBER_SORTING).collect(toImmutableList());
 
     if (members.equals(sortedMembers)) {
       return Description.NO_MATCH;
     }
 
     return buildDescription(tree)
-        .addFix(addSuppressWarnings(state, canonicalName()))
+        .addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()))
         .addFix(swapMembersIncludingComments(members, sortedMembers, tree, state))
         .setMessage(
             "Members, constructors and methods should follow standard ordering. "
@@ -86,9 +87,9 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
         .build();
   }
 
-  private static boolean isHandled(Tree tree) {
-    return tree instanceof JCVariableDecl
-        || (tree instanceof JCMethodDecl && !isGeneratedConstructor((JCMethodDecl) tree));
+  private static boolean shouldBeSorted(Tree tree) {
+    return tree instanceof VariableTree
+        || (tree instanceof MethodTree && !ASTHelpers.isGeneratedConstructor((MethodTree) tree));
   }
 
   private static SuggestedFix swapMembersIncludingComments(
@@ -96,13 +97,13 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
       ImmutableList<? extends Tree> sortedMembers,
       ClassTree classTree,
       VisitorState state) {
-    var fix = SuggestedFix.builder();
+    SuggestedFix.Builder fix = SuggestedFix.builder();
     for (int i = 0; i < members.size(); i++) {
       Tree original = members.get(i);
       Tree correct = sortedMembers.get(i);
-      // xxx: Technically not necessary, but avoids redundant replacements.
+      /* Technically not necessary, but avoids redundant replacements. */
       if (!original.equals(correct)) {
-        var replacement =
+        String replacement =
             Stream.concat(
                     getComments(classTree, correct, state).map(Tokens.Comment::getText),
                     Stream.of(state.getSourceForNode(correct)))
@@ -113,8 +114,14 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
     return fix.build();
   }
 
-  // xxx: From this point the code is just a fancy copy of `SuggestFixes.replaceIncludingComments` -
-  // if we cannot use existing solutions for this functionality, this one needs a big refactor.
+  private static boolean isStatic(VariableTree memberTree) {
+    Set<Modifier> modifiers = memberTree.getModifiers().getFlags();
+    return modifiers.contains(Modifier.STATIC);
+  }
+
+  private static boolean isConstructor(MethodTree methodDecl) {
+    return ASTHelpers.getSymbol(methodDecl).isConstructor();
+  }
 
   private static Stream<Tokens.Comment> getComments(
       ClassTree classTree, Tree member, VisitorState state) {
@@ -124,14 +131,8 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
         .flatMap(List::stream);
   }
 
-  private static boolean isStatic(JCVariableDecl memberTree) {
-    Set<Modifier> modifiers = memberTree.getModifiers().getFlags();
-    return modifiers.contains(Modifier.STATIC);
-  }
-
-  private static boolean isConstructor(JCMethodDecl methodDecl) {
-    return getSymbol(methodDecl).isConstructor();
-  }
+  // XXX: From this point the code is just a fancy copy of `SuggestFixes.replaceIncludingComments` -
+  // if we cannot use existing solutions for this functionality, this one needs a big refactor.
 
   private static SuggestedFix replaceIncludingComments(
       ClassTree classTree, Tree member, String replacement, VisitorState state) {
@@ -149,7 +150,7 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
         ImmutableList.sortedCopyOf(
             Comparator.<Tokens.Comment>comparingInt(c -> c.getSourcePos(0)).reversed(),
             tokens.get(0).comments());
-    @Var int startPos = getStartPosition(member);
+    @Var int startPos = ASTHelpers.getStartPosition(member);
     // This can happen for desugared expressions like `int a, b;`.
     if (startPos < getStartTokenization(classTree, state, previousMember)) {
       return SuggestedFix.emptyFix();
@@ -170,7 +171,7 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
   private static Optional<Tree> getPreviousMember(Tree tree, ClassTree classTree) {
     @Var Tree previousMember = null;
     for (Tree member : classTree.getMembers()) {
-      if (member instanceof MethodTree && isGeneratedConstructor((MethodTree) member)) {
+      if (member instanceof MethodTree && ASTHelpers.isGeneratedConstructor((MethodTree) member)) {
         continue;
       }
       if (member.equals(tree)) {
@@ -184,19 +185,18 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
   private static Stream<ErrorProneToken> getTokensBeforeMember(
       ClassTree classTree, Tree member, VisitorState state) {
     Optional<Tree> previousMember = getPreviousMember(member, classTree);
-    var startTokenization = getStartTokenization(classTree, state, previousMember);
+    Integer startTokenization = getStartTokenization(classTree, state, previousMember);
 
     Stream<ErrorProneToken> tokens =
         state.getOffsetTokens(startTokenization, state.getEndPosition(member)).stream();
 
     if (previousMember.isEmpty()) {
       return tokens.dropWhile(token -> token.kind() != LBRACE).skip(1);
-    } else {
-      return tokens;
     }
+    return tokens;
   }
 
-  // xxx: rename / remove method - it gets the start position of tokens that *might* be related to
+  // XXX: rename / remove method - it gets the start position of tokens that *might* be related to
   // member.
   // - afaik it includes a Class declaration if the member is the first member in the
   // class and does not have comments.
@@ -206,12 +206,12 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
         .map(state::getEndPosition)
         .orElseGet(
             () ->
-                // xxx: could return the position of the character next to the opening brace of the
+                // XXX: Could return the position of the character next to the opening brace of the
                 // class - `... Clazz ... {`
                 // this could make this method more defined, worthy of existence, but it may also
                 // require additional parameters and changes in `replaceIncludingComments` method.
                 state.getEndPosition(classTree.getModifiers()) == Position.NOPOS
-                    ? getStartPosition(classTree)
+                    ? ASTHelpers.getStartPosition(classTree)
                     : state.getEndPosition(classTree.getModifiers()));
   }
 }
