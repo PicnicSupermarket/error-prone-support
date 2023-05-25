@@ -6,7 +6,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ParameterizedTypeTree;
-import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 
 /** A matcher of expressions with type arguments. */
 public final class HasTypeArguments implements Matcher<ExpressionTree> {
@@ -26,11 +26,12 @@ public final class HasTypeArguments implements Matcher<ExpressionTree> {
           return true;
         }
 
-        if (classTree.getIdentifier().getKind() != Tree.Kind.PARAMETERIZED_TYPE) {
+        ExpressionTree identifier = classTree.getIdentifier();
+        if (identifier.getKind() != Kind.PARAMETERIZED_TYPE) {
           return false;
         }
 
-        return !((ParameterizedTypeTree) classTree.getIdentifier()).getTypeArguments().isEmpty();
+        return !((ParameterizedTypeTree) identifier).getTypeArguments().isEmpty();
       default:
         return false;
     }
