@@ -447,6 +447,16 @@
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-core</artifactId>
                 <version>4.9.1</version>
+                <!-- XXX: Drop this when we forgo enforcement of
+                JDK 11 bytecode version compatibility. See follow-ups from:
+                https://github.com/PicnicSupermarket/error-prone-support/pull/603
+                https://github.com/PicnicSupermarket/error-prone-support/pull/198. -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mongodb</groupId>
+                        <artifactId>bson-record-codec</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -1024,13 +1034,6 @@
                             <dependencyConvergence />
                             <enforceBytecodeVersion>
                                 <maxJdkVersion>${version.jdk}</maxJdkVersion>
-                                <!-- XXX: Drop this when we forgo enforcement of
-                                JDK 11 bytecode version compatibility. See
-                                https://github.com/PicnicSupermarket/error-prone-support/pull/603
-                                https://github.com/PicnicSupermarket/error-prone-support/pull/198. -->
-                                <ignoreClasses>
-                                    <ignoreClass>org.bson.codecs.record.*</ignoreClass>
-                                </ignoreClasses>
                             </enforceBytecodeVersion>
                             <requireEncoding>
                                 <acceptAsciiSubset>true</acceptAsciiSubset>
