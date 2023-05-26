@@ -34,16 +34,6 @@ public enum ThirdPartyLibrary {
   GUAVA("com.google.common.collect.ImmutableList"),
 
   /**
-   * Mongo's Java driver Filters API.
-   *
-   * @see <a
-   *     href="https://github.com/mongodb/mongo-java-driver/blob/master/driver-core/src/main/com/mongodb/client/model/Filters.java">MongoDB
-   *     Filters API</a>
-   * @see <a href="https://mongodb.github.io/mongo-java-driver/">MongoDB Java drvier</a>
-   */
-  MONGO("com.mongodb.client.model.Filters"),
-
-  /**
    * New Relic's Java agent API.
    *
    * @see <a href="https://github.com/newrelic/newrelic-java-agent/tree/main/newrelic-api">New Relic

@@ -15,7 +15,6 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
-import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
 /**
  * A {@link BugChecker} that flags usages of Mongo $text filters used for full text searches.
@@ -41,8 +40,7 @@ public final class MongoFullTextSearchQueryUsage extends BugChecker
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!ThirdPartyLibrary.MONGO.isIntroductionAllowed(state)
-        || !TEXT_FILTER_INVOCATION.matches(tree, state)) {
+    if (!TEXT_FILTER_INVOCATION.matches(tree, state)) {
       return Description.NO_MATCH;
     }
     return describeMatch(tree);

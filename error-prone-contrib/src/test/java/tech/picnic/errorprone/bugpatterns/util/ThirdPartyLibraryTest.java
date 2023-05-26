@@ -23,7 +23,7 @@ final class ThirdPartyLibraryTest {
     CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, MONGO: true, NEW_RELIC_AGENT_API: true,",
+            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, NEW_RELIC_AGENT_API: true,",
             "// REACTOR: true",
             "class A {}")
         .doTest();
@@ -35,18 +35,16 @@ final class ThirdPartyLibraryTest {
         .addSourceLines(
             "A.java",
             "import com.google.common.collect.ImmutableList;",
-            "import com.mongodb.client.model.Filters;",
             "import com.newrelic.api.agent.Agent;",
             "import org.assertj.core.api.Assertions;",
             "import reactor.core.publisher.Flux;",
             "",
-            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, MONGO: true, NEW_RELIC_AGENT_API: true,",
+            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, NEW_RELIC_AGENT_API: true,",
             "// REACTOR: true",
             "class A {",
             "  void m(Class<?> clazz) {",
             "    m(Assertions.class);",
             "    m(ImmutableList.class);",
-            "    m(Filters.class);",
             "    m(Agent.class);",
             "    m(Flux.class);",
             "  }",
@@ -60,7 +58,7 @@ final class ThirdPartyLibraryTest {
         .withClasspath(ImmutableList.class, Flux.class)
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: true, MONGO: false, NEW_RELIC_AGENT_API: false,",
+            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: true, NEW_RELIC_AGENT_API: false,",
             "// REACTOR: true",
             "class A {}")
         .doTest();
@@ -72,7 +70,7 @@ final class ThirdPartyLibraryTest {
         .withClasspath()
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: false, MONGO: false, NEW_RELIC_AGENT_API: false,",
+            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: false, NEW_RELIC_AGENT_API: false,",
             "// REACTOR:",
             "// false",
             "class A {}")
@@ -88,8 +86,8 @@ final class ThirdPartyLibraryTest {
         .addSourceLines(
             "A.java",
             String.format(
-                "// BUG: Diagnostic contains: ASSERTJ: %s, GUAVA: true, MONGO: %s, NEW_RELIC_AGENT_API: %s, REACTOR: true",
-                ignoreClassPath, ignoreClassPath, ignoreClassPath),
+                "// BUG: Diagnostic contains: ASSERTJ: %s, GUAVA: true, NEW_RELIC_AGENT_API: %s, REACTOR: true",
+                ignoreClassPath, ignoreClassPath),
             "class A {}")
         .doTest();
   }
