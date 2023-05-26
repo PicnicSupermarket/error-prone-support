@@ -24,7 +24,8 @@ import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Usage of the Mongo FTS ($text) queries is discouraged",
+    summary =
+        "Usage of Mongo for full-text search queries via the `$text` operator is discouraged.",
     link = BUG_PATTERNS_BASE_URL + "MongoFullTextSearchQueryUsage",
     linkType = CUSTOM,
     severity = WARNING,
