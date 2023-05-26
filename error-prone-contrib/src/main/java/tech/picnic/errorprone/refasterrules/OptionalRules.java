@@ -8,6 +8,7 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Comparator;
@@ -19,6 +20,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsLikelyTrivialComputation;
 
 /** Refaster rules related to expressions dealing with {@link Optional}s. */
 @OnlineDocumentation
@@ -118,7 +120,7 @@ final class OptionalRules {
   /** Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator. */
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
-  // Maybe our `Refaster` checker should test `compilesWithFix`?
+  // Review whether a `@Matcher` can be used to avoid this.
   abstract static class TernaryOperatorOptionalPositiveFiltering<T> {
     @Placeholder
     abstract boolean test(T value);
@@ -138,7 +140,7 @@ final class OptionalRules {
   /** Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator. */
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
-  // Maybe our `Refaster` checker should test `compilesWithFix`?
+  // Review whether a `@Matcher` can be used to avoid this.
   abstract static class TernaryOperatorOptionalNegativeFiltering<T> {
     @Placeholder
     abstract boolean test(T value);
@@ -161,6 +163,7 @@ final class OptionalRules {
    */
   static final class MapOptionalToBoolean<T> {
     @BeforeTemplate
+    @SuppressWarnings("OptionalOrElseGet" /* Rule is confused by `Refaster#anyOf` usage. */)
     boolean before(Optional<T> optional, Function<? super T, Boolean> predicate) {
       return optional.map(predicate).orElse(Refaster.anyOf(false, Boolean.FALSE));
     }
@@ -221,6 +224,28 @@ final class OptionalRules {
     @SuppressWarnings("NullAway")
     T after(Optional<T> o1, Optional<T> o2) {
       return o1.or(() -> o2).orElseThrow();
+    }
+  }
+
+  /**
+   * Prefer {@link Optional#orElseGet(Supplier)} over {@link Optional#orElse(Object)} if the
+   * fallback value is not the result of a trivial computation.
+   */
+  // XXX: This rule may introduce a compilation error: the `value` expression may reference a
+  // non-effectively final variable, which is not allowed in the replacement lambda expression.
+  // Review whether a `@Matcher` can be used to avoid this.
+  // XXX: Once `MethodReferenceUsage` is "production ready", replace
+  // `@NotMatches(IsLikelyTrivialComputation.class)` with `@Matches(RequiresComputation.class)` (and
+  // reimplement the matcher accordingly).
+  static final class OptionalOrElseGet<T> {
+    @BeforeTemplate
+    T before(Optional<T> optional, @NotMatches(IsLikelyTrivialComputation.class) T value) {
+      return optional.orElse(value);
+    }
+
+    @AfterTemplate
+    T after(Optional<T> optional, T value) {
+      return optional.orElseGet(() -> value);
     }
   }
 
@@ -325,6 +350,9 @@ final class OptionalRules {
     Optional<T> before(Optional<T> optional1, Optional<T> optional2) {
       // XXX: Note that rewriting the first and third variant will change the code's behavior if
       // `optional2` has side-effects.
+      // XXX: Note that rewriting the first and third variant will introduce a compilation error if
+      // `optional2` is not effectively final. Review whether a `@Matcher` can be used to avoid
+      // this.
       return Refaster.anyOf(
           optional1.map(Optional::of).orElse(optional2),
           optional1.map(Optional::of).orElseGet(() -> optional2),
