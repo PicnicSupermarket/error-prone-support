@@ -37,6 +37,7 @@ import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTe
  */
 @Immutable
 @AutoService(Extractor.class)
+@SuppressWarnings("rawtypes")
 public final class BugPatternTestExtractor implements Extractor<BugPatternTestDocumentation> {
   private static final Pattern TEST_CLASS_NAME_PATTERN = Pattern.compile("(.*)Test");
   private static final Matcher<Tree> JUNIT_TEST_METHOD =

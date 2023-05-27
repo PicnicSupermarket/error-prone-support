@@ -26,6 +26,7 @@ import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocume
  */
 @Immutable
 @AutoService(Extractor.class)
+@SuppressWarnings("rawtypes")
 public final class BugPatternExtractor implements Extractor<BugPatternDocumentation> {
   /** Instantiates a new {@link BugPatternExtractor} instance. */
   public BugPatternExtractor() {}

@@ -104,6 +104,7 @@ final class DocumentationGeneratorTaskListenerTest {
 
   @Immutable
   @AutoService(Extractor.class)
+  @SuppressWarnings("rawtypes")
   public static final class TestExtractor implements Extractor<ExtractionParameters> {
     @Override
     public String identifier() {
