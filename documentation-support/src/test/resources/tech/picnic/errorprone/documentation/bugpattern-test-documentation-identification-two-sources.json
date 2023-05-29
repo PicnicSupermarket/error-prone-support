@@ -1,8 +1,19 @@
 {
-  "name": "TestChecker",
-  "identificationTests": [
-    "class B {}\n",
-    "class A {}\n"
-  ],
-  "replacementTests": []
+  "testClass": "TestChecker",
+  "testCases": [
+    {
+      "classUnderTest": "TestChecker",
+      "input": [
+        {
+          "fileName": "B.java",
+          "code": "class B {}\n"
+        },
+        {
+          "fileName": "A.java",
+          "code": "class A {}\n"
+        }
+      ],
+      "output": []
+    }
+  ]
 }

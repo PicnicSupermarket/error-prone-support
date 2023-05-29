@@ -1,5 +1,4 @@
 {
-  "name": "TestChecker",
-  "identificationTests": [],
-  "replacementTests": []
+  "testClass": "TestChecker",
+  "testCases": []
 }

@@ -40,7 +40,7 @@ final class BugPatternTestExtractorTest {
   }
 
   @Test
-  void minimalBugPatternTest(@TempDir Path outputDirectory) throws IOException {
+  void minimalBugPatternTest(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "TestCheckerTest.java",
@@ -53,10 +53,7 @@ final class BugPatternTestExtractorTest {
         "  CompilationTestHelper compilationTestHelper = CompilationTestHelper.newInstance(TestChecker.class, getClass());",
         "}");
 
-    verifyFileMatchesResource(
-        outputDirectory,
-        "bugpattern-test-TestCheckerTest.json",
-        "bugpattern-test-documentation-minimal.json");
+    assertThat(outputDirectory.toAbsolutePath()).isEmptyDirectory();
   }
 
   @Test
@@ -77,7 +74,7 @@ final class BugPatternTestExtractorTest {
   }
 
   @Test
-  void differentBugPatternAsLocalVariable(@TempDir Path outputDirectory) {
+  void differentBugPatternAsLocalVariable(@TempDir Path outputDirectory) throws IOException {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "TestCheckerTest.java",
@@ -96,7 +93,10 @@ final class BugPatternTestExtractorTest {
         "  }",
         "}");
 
-    assertThat(outputDirectory.toAbsolutePath()).isEmptyDirectory();
+    verifyFileMatchesResource(
+        outputDirectory,
+        "bugpattern-test-TestCheckerTest.json",
+        "bugpattern-test-documentation-as-local-variable.json");
   }
 
   @Test
@@ -301,13 +301,14 @@ final class BugPatternTestExtractorTest {
         "  void identification() {",
         "    CompilationTestHelper.newInstance(TestChecker.class, getClass())",
         "        .addSourceLines(\"A.java\", \"class A {}\")",
+        "        .addSourceLines(\"B.java\", \"class B {}\")",
         "        .doTest();",
         "  }",
         "",
         "  @Test",
         "  void identification2() {",
         "    CompilationTestHelper.newInstance(TestChecker.class, getClass())",
-        "        .addSourceLines(\"B.java\", \"class B {}\")",
+        "        .addSourceLines(\"C.java\", \"class C {}\")",
         "        .doTest();",
         "  }",
         "",

@@ -1,10 +1,20 @@
 {
-  "name": "TestChecker",
-  "identificationTests": [],
-  "replacementTests": [
+  "testClass": "TestChecker",
+  "testCases": [
     {
-      "inputLines": "class A {}\n",
-      "outputLines": "class A {}\n"
+      "classUnderTest": "TestChecker",
+      "input": [
+        {
+          "fileName": "A.java",
+          "code": "class A {}\n"
+        }
+      ],
+      "output": [
+        {
+          "fileName": "A.java",
+          "code": "class A {}\n"
+        }
+      ]
     }
   ]
 }

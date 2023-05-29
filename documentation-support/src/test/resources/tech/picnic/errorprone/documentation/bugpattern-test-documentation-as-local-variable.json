@@ -2,19 +2,14 @@
   "testClass": "TestChecker",
   "testCases": [
     {
-      "classUnderTest": "TestChecker",
+      "classUnderTest": "DifferentChecker",
       "input": [
         {
           "fileName": "A.java",
           "code": "class A {}\n"
         }
       ],
-      "output": [
-        {
-          "fileName": "",
-          "code": ""
-        }
-      ]
+      "output": []
     }
   ]
 }

@@ -1,17 +1,59 @@
 {
-  "name": "TestChecker",
-  "identificationTests": [
-    "class A {}\n",
-    "class B {}\n"
-  ],
-  "replacementTests": [
+  "testClass": "TestChecker",
+  "testCases": [
     {
-      "inputLines": "class A {}\n",
-      "outputLines": "class A {}\n"
+      "classUnderTest": "TestChecker",
+      "input": [
+        {
+          "fileName": "B.java",
+          "code": "class B {}\n"
+        },
+        {
+          "fileName": "A.java",
+          "code": "class A {}\n"
+        }
+      ],
+      "output": []
     },
     {
-      "inputLines": "class B {}\n",
-      "outputLines": "class B {}\n"
+      "classUnderTest": "TestChecker",
+      "input": [
+        {
+          "fileName": "C.java",
+          "code": "class C {}\n"
+        }
+      ],
+      "output": []
+    },
+    {
+      "classUnderTest": "TestChecker",
+      "input": [
+        {
+          "fileName": "A.java",
+          "code": "class A {}\n"
+        }
+      ],
+      "output": [
+        {
+          "fileName": "A.java",
+          "code": "class A {}\n"
+        }
+      ]
+    },
+    {
+      "classUnderTest": "TestChecker",
+      "input": [
+        {
+          "fileName": "B.java",
+          "code": "class B {}\n"
+        }
+      ],
+      "output": [
+        {
+          "fileName": "B.java",
+          "code": "class B {}\n"
+        }
+      ]
     }
   ]
 }
