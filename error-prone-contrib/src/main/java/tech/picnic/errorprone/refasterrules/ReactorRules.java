@@ -448,6 +448,7 @@ final class ReactorRules {
   /** Prefer {@link Flux#concatMap(Function)} over more contrived alternatives. */
   static final class FluxConcatMap<T, S> {
     @BeforeTemplate
+    @SuppressWarnings("NestedPublishers")
     Flux<S> before(Flux<T> flux, Function<? super T, ? extends Publisher<? extends S>> function) {
       return Refaster.anyOf(
           flux.flatMap(function, 1),
@@ -464,6 +465,7 @@ final class ReactorRules {
   /** Prefer {@link Flux#concatMap(Function, int)} over more contrived alternatives. */
   static final class FluxConcatMapWithPrefetch<T, S> {
     @BeforeTemplate
+    @SuppressWarnings("NestedPublishers")
     Flux<S> before(
         Flux<T> flux,
         Function<? super T, ? extends Publisher<? extends S>> function,
@@ -795,7 +797,7 @@ final class ReactorRules {
   /** Prefer {@link Mono#flatMap(Function)} over more contrived alternatives. */
   static final class MonoFlatMap<S, T> {
     @BeforeTemplate
-    @SuppressWarnings("MonoOfPublishers")
+    @SuppressWarnings("NestedPublishers")
     Mono<T> before(Mono<S> mono, Function<? super S, ? extends Mono<? extends T>> function) {
       return mono.map(function).flatMap(identity());
     }
@@ -809,7 +811,7 @@ final class ReactorRules {
   /** Prefer {@link Mono#flatMapMany(Function)} over more contrived alternatives. */
   static final class MonoFlatMapMany<S, T> {
     @BeforeTemplate
-    @SuppressWarnings("MonoOfPublishers")
+    @SuppressWarnings("NestedPublishers")
     Flux<T> before(Mono<S> mono, Function<? super S, ? extends Publisher<? extends T>> function) {
       return mono.map(function).flatMapMany(identity());
     }

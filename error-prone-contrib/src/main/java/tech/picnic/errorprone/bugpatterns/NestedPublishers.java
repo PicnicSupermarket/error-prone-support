@@ -30,29 +30,45 @@ import reactor.core.publisher.Mono;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Avoid nesting `Publisher`s inside `Mono`s; the resultant code is hard to reason about",
-    link = BUG_PATTERNS_BASE_URL + "MonoOfPublishers",
+        "Avoid nesting `Publisher`s inside `Publishers`s; the resultant code is hard to reason about",
+    link = BUG_PATTERNS_BASE_URL + "NestedPublishers",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)
-public final class MonoOfPublishers extends BugChecker implements MethodInvocationTreeMatcher {
+public final class NestedPublishers extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Supplier<Type> MONO =
-      Suppliers.typeFromString("reactor.core.publisher.Mono");
-  private static final Supplier<Type> MONO_OF_PUBLISHERS =
+  private static final Supplier<Type> PUBLISHER = type("org.reactivestreams.Publisher");
+  private static final Supplier<Type> PUBLISHER_OF_PUBLISHERS =
       VisitorState.memoize(
-          generic(MONO, subOf(generic(type("org.reactivestreams.Publisher"), unbound()))));
+          generic(PUBLISHER, subOf(generic(type("org.reactivestreams.Publisher"), unbound()))));
+  private static final Supplier<Type> GROUPED_FLUX =
+      VisitorState.memoize(
+          generic(
+              Suppliers.typeFromString("reactor.core.publisher.GroupedFlux"),
+              unbound(),
+              unbound()));
 
-  /** Instantiates a new {@link MonoOfPublishers} instance. */
-  public MonoOfPublishers() {}
+  /** Instantiates a new {@link NestedPublishers} instance. */
+  public NestedPublishers() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    Type type = MONO_OF_PUBLISHERS.get(state);
-    if (type == null || !state.getTypes().isSubtype(ASTHelpers.getType(tree), type)) {
+    Type publisherOfPublisherType = PUBLISHER_OF_PUBLISHERS.get(state);
+    Type groupedFluxType = GROUPED_FLUX.get(state);
+    Type treeType = ASTHelpers.getType(tree);
+    if ((publisherOfPublisherType == null
+            || !state.getTypes().isSubtype(treeType, publisherOfPublisherType))
+        || (groupedFluxType != null
+            && isTypeArgumentGroupedFlux(state, groupedFluxType, treeType))) {
       return Description.NO_MATCH;
     }
 
     return describeMatch(tree);
+  }
+
+  private static boolean isTypeArgumentGroupedFlux(
+      VisitorState state, Type groupedFluxType, Type treeType) {
+    return treeType.getTypeArguments().stream()
+        .anyMatch(typez -> ASTHelpers.isSameType(typez, groupedFluxType, state));
   }
 }
