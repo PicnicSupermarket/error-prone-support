@@ -3,24 +3,16 @@
   "testCases": [
     {
       "classUnderTest": "TestChecker",
-      "input": [
+      "entries": [
         {
           "fileName": "B.java",
-          "code": "class B {}\n"
+          "input": "class B {}\n",
+          "output": "class B {}\n"
         },
         {
           "fileName": "A.java",
-          "code": "class A {}\n"
-        }
-      ],
-      "output": [
-        {
-          "fileName": "B.java",
-          "code": "class B {}\n"
-        },
-        {
-          "fileName": "A.java",
-          "code": "class A {}\n"
+          "input": "class A {}\n",
+          "output": "class A {}\n"
         }
       ]
     }

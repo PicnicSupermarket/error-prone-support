@@ -30,6 +30,7 @@ import org.jspecify.annotations.Nullable;
  */
 @Immutable
 @AutoService(Extractor.class)
+// XXX: Fix this suppression.
 @SuppressWarnings("rawtypes")
 public final class BugPatternTestExtractor implements Extractor<BugPatternTestExtractor.TestCases> {
   private static final Pattern TEST_CLASS_NAME_PATTERN = Pattern.compile("(.*)Test");
@@ -93,10 +94,10 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestEx
         instanceMethod()
             .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper")
             .named("doTest");
-    private static final Matcher<ExpressionTree> REPLACEMENT_INPUT_SOURCE_LINES =
+    private static final Matcher<ExpressionTree> REPLACEMENT_EXPECT_UNCHANGED =
         instanceMethod()
-            .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper")
-            .named("addInputLines");
+            .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper.ExpectOutput")
+            .named("expectUnchanged");
     private static final Matcher<ExpressionTree> REPLACEMENT_OUTPUT_SOURCE_LINES =
         instanceMethod()
             .onDescendantOfAny(
@@ -115,23 +116,21 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestEx
     //   (contains|matches)` markers.
     @Override
     public @Nullable Void visitMethodInvocation(MethodInvocationTree node, VisitorState state) {
-      List<TestEntry> inputEntries = new ArrayList<>();
-      List<TestEntry> outputEntries = new ArrayList<>();
+      List<TestEntry> entries = new ArrayList<>();
 
       if (TEST_HELPER_DO_TEST.matches(node, state)) {
         String classTestForMethod = getClassTestForMethod(node, state);
 
         if (REPLACEMENT_DO_TEST.matches(node, state)) {
-          extractReplacementTestCases(inputEntries, outputEntries, node, state);
+          extractReplacementTestCases(entries, node, state);
         } else {
-          extractIdentificationTestCases(inputEntries, node, state);
+          extractIdentificationTestCases(entries, node, state);
         }
 
         testCases.add(
             new AutoValue_BugPatternTestExtractor_TestCase(
-                classTestForMethod,
-                ImmutableList.copyOf(inputEntries),
-                ImmutableList.copyOf(outputEntries)));
+                // .reverse()?
+                classTestForMethod, ImmutableList.copyOf(entries)));
       }
 
       return super.visitMethodInvocation(node, state);
@@ -156,7 +155,8 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestEx
         result.add(
             new AutoValue_BugPatternTestExtractor_TestEntry(
                 ASTHelpers.constValue(receiver.getArguments().get(0), String.class),
-                getSourceCode(receiver).orElseThrow()));
+                getSourceCode(receiver).orElseThrow(),
+                ""));
       }
 
       if (!TEST_HELPER_NEW_INSTANCE.matches(receiver, state)) {
@@ -165,30 +165,38 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestEx
     }
 
     private static void extractReplacementTestCases(
-        List<TestEntry> inputEntries,
-        List<TestEntry> outputEntries,
-        MethodInvocationTree node,
-        VisitorState state) {
+        List<TestEntry> entries, MethodInvocationTree node, VisitorState state) {
       MethodInvocationTree receiver = (MethodInvocationTree) ASTHelpers.getReceiver(node);
-      if (REPLACEMENT_INPUT_SOURCE_LINES.matches(receiver, state)) {
-        inputEntries.add(
+
+      if (REPLACEMENT_OUTPUT_SOURCE_LINES.matches(receiver, state)) {
+        MethodInvocationTree inputTree = (MethodInvocationTree) ASTHelpers.getReceiver(receiver);
+        String input = getSourceCode(inputTree).orElseThrow();
+
+        String output =
+            REPLACEMENT_EXPECT_UNCHANGED.matches(receiver, state)
+                ? input
+                : getSourceCode(receiver).orElseThrow();
+
+        //        if (REPLACEMENT_INPUT_SOURCE_LINES.matches(receiver, state)) {
+        entries.add(
             new AutoValue_BugPatternTestExtractor_TestEntry(
-                ASTHelpers.constValue(receiver.getArguments().get(0), String.class),
-                getSourceCode(receiver).orElseThrow()));
-      } else if (REPLACEMENT_OUTPUT_SOURCE_LINES.matches(receiver, state)) {
+                ASTHelpers.constValue(inputTree.getArguments().get(0), String.class),
+                input,
+                output));
+        //        } else
         // This is the `expectUnchanged` case, we should do something special here.
-        if (receiver.getArguments().isEmpty()) {
-          outputEntries.add(new AutoValue_BugPatternTestExtractor_TestEntry("", ""));
-        } else {
-          outputEntries.add(
-              new AutoValue_BugPatternTestExtractor_TestEntry(
-                  ASTHelpers.constValue(receiver.getArguments().get(0), String.class),
-                  getSourceCode(receiver).orElseThrow()));
-        }
+        //        if (receiver.getArguments().isEmpty()) {
+        //          outputEntries.add(new AutoValue_BugPatternTestExtractor_TestEntry("", ""));
+        //        } else {
+        //          outputEntries.add(
+        //              new AutoValue_BugPatternTestExtractor_TestEntry(
+        //                  ASTHelpers.constValue(receiver.getArguments().get(0), String.class),
+        //                  getSourceCode(receiver).orElseThrow()));
+        //        }
       }
 
       if (!TEST_HELPER_NEW_INSTANCE.matches(receiver, state)) {
-        extractReplacementTestCases(inputEntries, outputEntries, receiver, state);
+        extractReplacementTestCases(entries, receiver, state);
       }
     }
 
@@ -214,16 +222,16 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestEx
   abstract static class TestEntry {
     abstract String fileName();
 
-    abstract String code();
+    abstract String input();
+
+    abstract String output();
   }
 
   @AutoValue
   abstract static class TestCase {
     abstract String classUnderTest();
 
-    abstract ImmutableList<TestEntry> input();
-
-    abstract ImmutableList<TestEntry> output();
+    abstract ImmutableList<TestEntry> entries();
   }
 
   @AutoValue

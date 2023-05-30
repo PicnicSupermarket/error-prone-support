@@ -156,7 +156,7 @@ final class BugPatternTestExtractorTest {
   }
 
   @Test
-  void bugPatternTestSingleReplacement(@TempDir Path outputDirectory) throws IOException {
+  void bugPatternTestSingleReplacementWithChange(@TempDir Path outputDirectory) throws IOException {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "TestCheckerTest.java",
@@ -172,7 +172,7 @@ final class BugPatternTestExtractorTest {
         "  void replacement() {",
         "    BugCheckerRefactoringTestHelper.newInstance(TestChecker.class, getClass())",
         "        .addInputLines(\"A.java\", \"class A {}\")",
-        "        .addOutputLines(\"A.java\", \"class A {}\")",
+        "        .addOutputLines(\"A.java\", \"class A { /* This is a change. */ }\")",
         "        .doTest(TestMode.TEXT_MATCH);",
         "  }",
         "}");

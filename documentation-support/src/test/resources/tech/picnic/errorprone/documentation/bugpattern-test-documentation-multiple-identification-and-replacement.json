@@ -3,55 +3,46 @@
   "testCases": [
     {
       "classUnderTest": "TestChecker",
-      "input": [
+      "entries": [
         {
           "fileName": "B.java",
-          "code": "class B {}\n"
+          "input": "class B {}\n",
+          "output": ""
         },
         {
           "fileName": "A.java",
-          "code": "class A {}\n"
-        }
-      ],
-      "output": []
-    },
-    {
-      "classUnderTest": "TestChecker",
-      "input": [
-        {
-          "fileName": "C.java",
-          "code": "class C {}\n"
-        }
-      ],
-      "output": []
-    },
-    {
-      "classUnderTest": "TestChecker",
-      "input": [
-        {
-          "fileName": "A.java",
-          "code": "class A {}\n"
-        }
-      ],
-      "output": [
-        {
-          "fileName": "A.java",
-          "code": "class A {}\n"
+          "input": "class A {}\n",
+          "output": ""
         }
       ]
     },
     {
       "classUnderTest": "TestChecker",
-      "input": [
+      "entries": [
         {
-          "fileName": "B.java",
-          "code": "class B {}\n"
+          "fileName": "C.java",
+          "input": "class C {}\n",
+          "output": ""
         }
-      ],
-      "output": [
+      ]
+    },
+    {
+      "classUnderTest": "TestChecker",
+      "entries": [
+        {
+          "fileName": "A.java",
+          "input": "class A {}\n",
+          "output": "class A {}\n"
+        }
+      ]
+    },
+    {
+      "classUnderTest": "TestChecker",
+      "entries": [
         {
           "fileName": "B.java",
-          "code": "class B {}\n"
+          "input": "class B {}\n",
+          "output": "class B {}\n"
         }
       ]
     }

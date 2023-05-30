@@ -3,13 +3,13 @@
   "testCases": [
     {
       "classUnderTest": "DifferentChecker",
-      "input": [
+      "entries": [
         {
           "fileName": "A.java",
-          "code": "class A {}\n"
+          "input": "class A {}\n",
+          "output": ""
         }
-      ],
-      "output": []
+      ]
     }
   ]
 }
