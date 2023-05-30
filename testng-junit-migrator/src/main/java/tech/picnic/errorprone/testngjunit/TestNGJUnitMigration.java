@@ -21,6 +21,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.util.TreeScanner;
 import java.util.Optional;
+import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 
@@ -68,6 +69,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
    *
    * @param flags the error-prone flags used to set the migration mode.
    */
+  @Inject
   public TestNGJUnitMigration(ErrorProneFlags flags) {
     conservativeMode = flags.getBoolean(CONSERVATIVE_MIGRATION_MODE_FLAG).orElse(false);
   }
