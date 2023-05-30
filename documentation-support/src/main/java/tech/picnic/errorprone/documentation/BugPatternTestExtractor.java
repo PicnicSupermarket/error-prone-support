@@ -115,8 +115,8 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestEx
     //   (contains|matches)` markers.
     @Override
     public @Nullable Void visitMethodInvocation(MethodInvocationTree node, VisitorState state) {
-      ArrayList<TestEntry> inputEntries = new ArrayList<>();
-      ArrayList<TestEntry> outputEntries = new ArrayList<>();
+      List<TestEntry> inputEntries = new ArrayList<>();
+      List<TestEntry> outputEntries = new ArrayList<>();
 
       if (TEST_HELPER_DO_TEST.matches(node, state)) {
         String classTestForMethod = getClassTestForMethod(node, state);
@@ -166,7 +166,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestEx
 
     private static void extractReplacementTestCases(
         List<TestEntry> inputEntries,
-        ArrayList<TestEntry> outputEntries,
+        List<TestEntry> outputEntries,
         MethodInvocationTree node,
         VisitorState state) {
       MethodInvocationTree receiver = (MethodInvocationTree) ASTHelpers.getReceiver(node);
