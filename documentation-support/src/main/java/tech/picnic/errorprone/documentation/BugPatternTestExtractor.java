@@ -30,8 +30,7 @@ import org.jspecify.annotations.Nullable;
  */
 @Immutable
 @AutoService(Extractor.class)
-// XXX: Fix this suppression.
-@SuppressWarnings("rawtypes")
+@SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
 public final class BugPatternTestExtractor implements Extractor<BugPatternTestExtractor.TestCases> {
   private static final Pattern TEST_CLASS_NAME_PATTERN = Pattern.compile("(.*)Test");
   private static final Matcher<Tree> JUNIT_TEST_METHOD =

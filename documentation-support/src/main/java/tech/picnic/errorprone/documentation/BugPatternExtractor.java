@@ -26,7 +26,7 @@ import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocume
  */
 @Immutable
 @AutoService(Extractor.class)
-@SuppressWarnings("rawtypes")
+@SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
 public final class BugPatternExtractor implements Extractor<BugPatternDocumentation> {
   /** Instantiates a new {@link BugPatternExtractor} instance. */
   public BugPatternExtractor() {}
