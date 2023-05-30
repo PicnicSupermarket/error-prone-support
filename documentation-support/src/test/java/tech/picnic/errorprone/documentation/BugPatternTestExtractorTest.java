@@ -126,6 +126,33 @@ final class BugPatternTestExtractorTest {
   }
 
   @Test
+  void bugPatternTestIdentificationWithSetArgs(@TempDir Path outputDirectory) throws IOException {
+    Compilation.compileWithDocumentationGenerator(
+        outputDirectory,
+        "TestCheckerTest.java",
+        "import com.google.errorprone.bugpatterns.BugChecker;",
+        "import com.google.errorprone.CompilationTestHelper;",
+        "import org.junit.jupiter.api.Test;",
+        "",
+        "final class TestCheckerTest {",
+        "  private static class TestChecker extends BugChecker {}",
+        "",
+        "  @Test",
+        "  void identification() {",
+        "    CompilationTestHelper.newInstance(TestChecker.class, getClass())",
+        "        .setArgs(\"-XepAllSuggestionsAsWarnings\")",
+        "        .addSourceLines(\"A.java\", \"class A {}\")",
+        "        .doTest();",
+        "  }",
+        "}");
+
+    verifyFileMatchesResource(
+        outputDirectory,
+        "bugpattern-test-TestCheckerTest.json",
+        "bugpattern-test-documentation-identification.json");
+  }
+
+  @Test
   void bugPatternTestIdentificationMultipleSourceLines(@TempDir Path outputDirectory)
       throws IOException {
     Compilation.compileWithDocumentationGenerator(

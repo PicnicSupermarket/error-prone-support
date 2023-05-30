@@ -28,6 +28,9 @@ import org.jspecify.annotations.Nullable;
  * An {@link Extractor} that describes how to extract data from classes that test a {@code
  * BugChecker}.
  */
+// XXX: Consider whether to omit or handle differently identification tests without `// BUG:
+// Diagnostic (contains|matches)` markers.
+// XXX: Handle other methods from `{BugCheckerRefactoring,Compilation}TestHelper`.
 @Immutable
 @AutoService(Extractor.class)
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
@@ -110,15 +113,12 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestEx
       return ImmutableList.copyOf(testCases);
     }
 
-    // XXX: Consider:
-    // - Whether to omit or handle differently identification tests without `// BUG: Diagnostic
-    //   (contains|matches)` markers.
     @Override
     public @Nullable Void visitMethodInvocation(MethodInvocationTree node, VisitorState state) {
       List<TestEntry> entries = new ArrayList<>();
 
       if (TEST_HELPER_DO_TEST.matches(node, state)) {
-        String classTestForMethod = getClassTestForMethod(node, state);
+        String classTestForMethod = getClassUnderTestForMethod(node, state);
 
         if (REPLACEMENT_DO_TEST.matches(node, state)) {
           extractReplacementTestCases(entries, node, state);
@@ -134,21 +134,18 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestEx
       return super.visitMethodInvocation(node, state);
     }
 
-    private static String getClassTestForMethod(MethodInvocationTree node, VisitorState state) {
-      ExpressionTree receiver = ASTHelpers.getReceiver(node);
+    private static String getClassUnderTestForMethod(
+        MethodInvocationTree tree, VisitorState state) {
+      MethodInvocationTree receiver = (MethodInvocationTree) ASTHelpers.getReceiver(tree);
       if (TEST_HELPER_NEW_INSTANCE.matches(receiver, state)) {
-        return ((MethodInvocationTree) receiver)
-            .getArguments()
-            .get(0)
-            .toString()
-            .replace(".class", "");
+        return receiver.getArguments().get(0).toString().replace(".class", "");
       }
-      return getClassTestForMethod((MethodInvocationTree) receiver, state);
+      return getClassUnderTestForMethod(receiver, state);
     }
 
     private static void extractIdentificationTestCases(
-        List<TestEntry> result, MethodInvocationTree node, VisitorState state) {
-      MethodInvocationTree receiver = (MethodInvocationTree) ASTHelpers.getReceiver(node);
+        List<TestEntry> result, MethodInvocationTree tree, VisitorState state) {
+      MethodInvocationTree receiver = (MethodInvocationTree) ASTHelpers.getReceiver(tree);
       if (IDENTIFICATION_SOURCE_LINES.matches(receiver, state)) {
         result.add(
             new AutoValue_BugPatternTestExtractor_TestEntry(
@@ -168,29 +165,18 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestEx
 
       if (REPLACEMENT_OUTPUT_SOURCE_LINES.matches(receiver, state)) {
         MethodInvocationTree inputTree = (MethodInvocationTree) ASTHelpers.getReceiver(receiver);
-        String input = getSourceCode(inputTree).orElseThrow();
+        String inputLines = getSourceCode(inputTree).orElseThrow();
 
-        String output =
+        String outputLines =
             REPLACEMENT_EXPECT_UNCHANGED.matches(receiver, state)
-                ? input
+                ? inputLines
                 : getSourceCode(receiver).orElseThrow();
 
-        //        if (REPLACEMENT_INPUT_SOURCE_LINES.matches(receiver, state)) {
         entries.add(
             new AutoValue_BugPatternTestExtractor_TestEntry(
                 ASTHelpers.constValue(inputTree.getArguments().get(0), String.class),
-                input,
-                output));
-        //        } else
-        // This is the `expectUnchanged` case, we should do something special here.
-        //        if (receiver.getArguments().isEmpty()) {
-        //          outputEntries.add(new AutoValue_BugPatternTestExtractor_TestEntry("", ""));
-        //        } else {
-        //          outputEntries.add(
-        //              new AutoValue_BugPatternTestExtractor_TestEntry(
-        //                  ASTHelpers.constValue(receiver.getArguments().get(0), String.class),
-        //                  getSourceCode(receiver).orElseThrow()));
-        //        }
+                inputLines,
+                outputLines));
       }
 
       if (!TEST_HELPER_NEW_INSTANCE.matches(receiver, state)) {
