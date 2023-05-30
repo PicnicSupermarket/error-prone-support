@@ -129,8 +129,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestEx
 
         testCases.add(
             new AutoValue_BugPatternTestExtractor_TestCase(
-                // .reverse()?
-                classTestForMethod, ImmutableList.copyOf(entries)));
+                classTestForMethod, ImmutableList.copyOf(entries).reverse()));
       }
 
       return super.visitMethodInvocation(node, state);

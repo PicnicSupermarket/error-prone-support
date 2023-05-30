@@ -5,14 +5,14 @@
       "classUnderTest": "TestChecker",
       "entries": [
         {
-          "fileName": "B.java",
-          "input": "class B {}\n",
-          "output": "class B {}\n"
-        },
-        {
           "fileName": "A.java",
           "input": "class A {}\n",
           "output": "class A {}\n"
+        },
+        {
+          "fileName": "B.java",
+          "input": "class B {}\n",
+          "output": "class B {}\n"
         }
       ]
     }
