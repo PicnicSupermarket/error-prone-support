@@ -21,6 +21,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
@@ -62,7 +63,7 @@ public final class NestedPublishers extends BugChecker implements MethodInvocati
   }
 
   private static boolean isNestedPublisher(
-      VisitorState state, Type publisherOfPublisherType, Type treeType) {
+      VisitorState state, @Nullable Type publisherOfPublisherType, Type treeType) {
     return publisherOfPublisherType != null
         && state.getTypes().isSubtype(treeType, publisherOfPublisherType);
   }
@@ -72,7 +73,7 @@ public final class NestedPublishers extends BugChecker implements MethodInvocati
    * Flux#groupBy(Function)}.
    */
   private static boolean isTypeArgumentGroupedFlux(
-      VisitorState state, Type groupedFluxType, Type treeType) {
+      VisitorState state, @Nullable Type groupedFluxType, Type treeType) {
     return groupedFluxType != null
         && treeType.getTypeArguments().stream()
             .anyMatch(typez -> ASTHelpers.isSameType(typez, groupedFluxType, state));
