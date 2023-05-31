@@ -16,7 +16,7 @@ import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.ReturnTree;
-import com.sun.tools.javac.parser.Tokens;
+import com.sun.tools.javac.parser.Tokens.Comment;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -24,8 +24,10 @@ import tech.picnic.errorprone.util.SourceCode;
 
 /** A helper class that migrates a TestNG {@code DataProvider} to a JUnit {@code MethodSource}. */
 final class DataProviderMigrator {
-  private static final Pattern CLASS_INSTANCE_REPLACEMENT_PATTERN =
+  /** This regular expression replaces matches instances of `this.getClass()` and `getClass()`. */
+  private static final Pattern GET_CLASS =
       Pattern.compile("((?<!\\b\\.)|(\\bthis\\.))(getClass\\(\\))");
+
   /**
    * Create the {@link SuggestedFix} required to migrate a TestNG {@code DataProvider} to a JUnit
    * {@code MethodSource}.
@@ -137,50 +139,42 @@ final class DataProviderMigrator {
 
     int startPos = ASTHelpers.getStartPosition(newArrayTree);
     int endPos = state.getEndPosition(newArrayTree);
-    ImmutableMap<Integer, List<Tokens.Comment>> comments =
+    ImmutableMap<Integer, List<Comment>> comments =
         state.getOffsetTokens(startPos, endPos).stream()
             .collect(toImmutableMap(ErrorProneToken::pos, ErrorProneToken::comments));
     argumentsBuilder.append(
         newArrayTree.getInitializers().stream()
             .map(
                 expression ->
-                    buildArguments(
+                    getTestArgumentForValue(
                         expression,
                         comments.getOrDefault(
                             ASTHelpers.getStartPosition(expression), ImmutableList.of()),
                         state))
             .collect(joining(",")));
 
-    // This regex expression replaces all instances of "this.getClass()" or "getClass()"
-    // with the fully qualified class name to retain functionality in static context.
-    return CLASS_INSTANCE_REPLACEMENT_PATTERN
+    /*
+     * This replaces all instances of `{,this.}getClass()` with the fully qualified class name to
+     * retain functionality in static context.
+     */
+    return GET_CLASS
         .matcher(String.format("Stream.of(%s%n)", argumentsBuilder))
         .replaceAll(className + ".class");
   }
 
-  private static String buildArguments(
-      ExpressionTree expressionTree, List<Tokens.Comment> comments, VisitorState state) {
-    if (expressionTree.getKind() == NEW_ARRAY) {
-      return buildArgumentsFromArray(((NewArrayTree) expressionTree), comments, state);
-    } else {
-      return buildArgumentsFromExpression(expressionTree, comments, state);
-    }
-  }
+  // XXX: Improve method name and the variable names.
+  /** The method wraps a value in `Argument linky thing arguments(). */
+  private static String getTestArgumentForValue(
+      ExpressionTree expressionTree, List<Comment> comments, VisitorState state) {
+    String treeSource = SourceCode.treeToString(expressionTree, state);
 
-  private static String buildArgumentsFromExpression(
-      ExpressionTree expressionTree, List<Tokens.Comment> comments, VisitorState state) {
-    return String.format(
-        "\t\t%s\n\t\targuments(%s)",
-        comments.stream().map(Tokens.Comment::getText).collect(joining("\n")),
-        SourceCode.treeToString(expressionTree, state));
-  }
+    String argumentValue =
+        expressionTree.getKind() == NEW_ARRAY
+            ? treeSource.substring(1, treeSource.length() - 1)
+            : treeSource;
 
-  private static String buildArgumentsFromArray(
-      NewArrayTree argumentArray, List<Tokens.Comment> comments, VisitorState state) {
-    String argSource = SourceCode.treeToString(argumentArray, state);
     return String.format(
-        "\t\t%s\n\t\targuments(%s)",
-        comments.stream().map(Tokens.Comment::getText).collect(joining("\n")),
-        argSource.substring(1, argSource.length() - 1));
+        "\t\t%s%n\t\targuments(%s)",
+        comments.stream().map(Comment::getText).collect(joining("\n")), argumentValue);
   }
 }

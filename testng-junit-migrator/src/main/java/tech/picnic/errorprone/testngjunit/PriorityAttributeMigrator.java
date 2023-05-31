@@ -24,7 +24,7 @@ final class PriorityAttributeMigrator implements Migrator {
             .merge(
                 SuggestedFix.prefixWith(
                     methodTree,
-                    String.format("@Order(%s)\n", SourceCode.treeToString(dataValue, state))))
+                    String.format("@Order(%s)%n", SourceCode.treeToString(dataValue, state))))
             .merge(
                 SuggestedFix.prefixWith(
                     classTree, "@TestMethodOrder(MethodOrderer.OrderAnnotation.class)\n"))

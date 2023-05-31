@@ -25,7 +25,7 @@ final class GroupsAttributeMigrator implements Migrator {
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
     SuggestedFix.Builder fix = SuggestedFix.builder().addImport("org.junit.jupiter.api.Tag");
     extractGroups(dataValue, state)
-        .forEach(group -> fix.prefixWith(methodTree, String.format("@Tag(\"%s\")\n", group)));
+        .forEach(group -> fix.prefixWith(methodTree, String.format("@Tag(\"%s\")%n", group)));
     return Optional.of(fix.build());
   }
 

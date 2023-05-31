@@ -19,10 +19,9 @@ final class DescriptionAttributeMigrator implements Migrator {
     return Optional.of(
         SuggestedFix.builder()
             .addImport("org.junit.jupiter.api.DisplayName")
-            .merge(
-                SuggestedFix.prefixWith(
-                    methodTree,
-                    String.format("@DisplayName(%s)\n", SourceCode.treeToString(dataValue, state))))
+            .prefixWith(
+                methodTree,
+                String.format("@DisplayName(%s)%n", SourceCode.treeToString(dataValue, state)))
             .build());
   }
 
