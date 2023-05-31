@@ -9,12 +9,6 @@ import com.sun.source.tree.MethodTree;
 import java.util.Optional;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 
-// XXX: General feedback not specific to this class.
-// Make sure to:
-// - We have kind of "integration tests" for the `TestNGScanner` which indirectly tests the
-// `ArgumentMigrator`s, so we should probably add tests for the separate `ArgumentMigrator`s as
-// well.
-
 /**
  * Interface implemented by classes that define how to migrate a specific argument from a TestNG
  * {@code Test} annotation to JUnit.

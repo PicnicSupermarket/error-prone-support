@@ -3,11 +3,11 @@ package tech.picnic.errorprone.testngjunit;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import java.util.Optional;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.util.SourceCode;
@@ -24,7 +24,7 @@ final class DataProviderAttributeMigrator implements Migrator {
         SuggestedFix.builder()
             .addImport("org.junit.jupiter.params.ParameterizedTest")
             .addImport("org.junit.jupiter.params.provider.MethodSource")
-            .merge(SuggestedFix.prefixWith(methodTree, "@ParameterizedTest\n"))
+            .prefixWith(methodTree, "@ParameterizedTest\n")
             .merge(
                 SuggestedFix.prefixWith(
                     methodTree, String.format("@MethodSource(\"%s\")%n", dataProviderName)))
@@ -47,8 +47,8 @@ final class DataProviderAttributeMigrator implements Migrator {
   }
 
   private static String getDataProviderName(ExpressionTree tree, VisitorState state) {
-    return tree.getKind() == Tree.Kind.STRING_LITERAL
-        ? (String) ((LiteralTree) tree).getValue()
+    return tree.getKind() == Kind.STRING_LITERAL
+        ? ASTHelpers.constValue(tree, String.class)
         : SourceCode.treeToString(tree, state);
   }
 }

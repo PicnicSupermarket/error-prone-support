@@ -30,9 +30,7 @@ final class SetupTeardownMethodMigrator {
             annotation -> {
               SuggestedFix.Builder fix =
                   SuggestedFix.builder()
-                      .merge(
-                          SuggestedFix.replace(
-                              annotation, String.format("@%s", type.getJunitAnnotationClass())));
+                      .replace(annotation, String.format("@%s", type.getJunitAnnotationClass()));
               if (type.requiresStaticMethod()
                   && !tree.getModifiers().getFlags().contains(Modifier.STATIC)) {
                 SuggestedFixes.addModifiers(tree, state, Modifier.STATIC).ifPresent(fix::merge);

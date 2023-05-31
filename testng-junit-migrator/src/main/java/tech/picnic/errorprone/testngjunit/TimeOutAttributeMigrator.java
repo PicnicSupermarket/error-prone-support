@@ -27,7 +27,7 @@ final class TimeOutAttributeMigrator implements Migrator {
                 SuggestedFix.prefixWith(
                     methodTree,
                     String.format(
-                        "@Timeout(value = %s, unit = MILLISECONDS)\n",
+                        "@Timeout(value = %s, unit = MILLISECONDS)%n",
                         SourceCode.treeToString(dataValue, state))))
             .build());
   }
