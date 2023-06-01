@@ -10,10 +10,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Arrays;
 import java.util.Map;
@@ -54,8 +54,7 @@ abstract class TestNGMetadata {
                             return false;
                           }
 
-                          return ((LiteralTree) dataProviderNameExpression)
-                              .getValue()
+                          return ASTHelpers.constValue(dataProviderNameExpression, String.class)
                               .equals(entry.getKey());
                         }))
         .map(Map.Entry::getValue)
@@ -66,6 +65,7 @@ abstract class TestNGMetadata {
     return new AutoValue_TestNGMetadata.Builder();
   }
 
+  // XXX: Look into this builder and best practices for `@AutoValue.Builder`.
   @AutoValue.Builder
   abstract static class Builder {
     private final ImmutableMap.Builder<MethodTree, AnnotationMetadata> methodAnnotationsBuilder =
@@ -154,8 +154,8 @@ abstract class TestNGMetadata {
 
   @SuppressWarnings("ImmutableEnumChecker" /* Matcher instances are final. */)
   public enum SetupTeardownType {
-    // XXX: Consider using `@BeforeAll` for better behavior preservation, but note that it requires
-    // a static method and may cause breaking changes.
+    // XXX: Consider using `@BeforeAll` to more accurately preserve behavior. However, note that it
+    // requires a static method and therefore may introduce breaking changes.
     BEFORE_TEST(
         "org.testng.annotations.BeforeTest",
         "org.junit.jupiter.api.BeforeEach",
@@ -168,8 +168,8 @@ abstract class TestNGMetadata {
         "org.testng.annotations.BeforeMethod",
         "org.junit.jupiter.api.BeforeEach",
         /* requiresStaticMethod= */ false),
-    // XXX: Consider using `@AfterAll` for better behavior preservation, but note that it requires a
-    // static method and may cause breaking changes.
+    // XXX: Consider using `@AfterAll` to more accurately preserve behavior. However, note that it
+    // requires a static method and therefore may introduce breaking changes.
     AFTER_TEST(
         "org.testng.annotations.AfterTest",
         "org.junit.jupiter.api.AfterEach",
@@ -210,14 +210,14 @@ abstract class TestNGMetadata {
       return junitAnnotationClass;
     }
 
+    // XXX: Improve method name.
     boolean requiresStaticMethod() {
       return requiresStaticMethod;
     }
   }
 
   /**
-   * POJO containing data for a specific {@code DataProvider} annotation for use in {@link
-   * TestNGJUnitMigration}.
+   * Contains data for a {@code DataProvider} annotation for use in {@link TestNGJUnitMigration}.
    */
   @AutoValue
   public abstract static class DataProviderMetadata {

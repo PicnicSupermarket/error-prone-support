@@ -14,6 +14,15 @@ import tech.picnic.errorprone.util.SourceCode;
 @Immutable
 final class DescriptionAttributeMigrator implements Migrator {
   @Override
+  public boolean canFix(
+      TestNGMetadata metadata,
+      AnnotationMetadata annotation,
+      MethodTree methodTree,
+      VisitorState state) {
+    return annotation.getAttributes().containsKey("description");
+  }
+
+  @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
     return Optional.of(
@@ -23,14 +32,5 @@ final class DescriptionAttributeMigrator implements Migrator {
                 methodTree,
                 String.format("@DisplayName(%s)%n", SourceCode.treeToString(dataValue, state)))
             .build());
-  }
-
-  @Override
-  public boolean canFix(
-      TestNGMetadata metadata,
-      AnnotationMetadata annotation,
-      MethodTree methodTree,
-      VisitorState state) {
-    return annotation.getAttributes().containsKey("description");
   }
 }

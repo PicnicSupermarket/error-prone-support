@@ -16,6 +16,21 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 @Immutable
 interface Migrator {
   /**
+   * Tells whether the specified annotation can be migrated.
+   *
+   * @param metadata The metadata that will be fixed.
+   * @param annotation The metadata for the annotation that will be fixed.
+   * @param methodTree The test {@link MethodTree}.
+   * @param state The visitor state.
+   * @return {@code true} if the annotation or an annotation attribute can be migrated.
+   */
+  boolean canFix(
+      TestNGMetadata metadata,
+      AnnotationMetadata annotation,
+      MethodTree methodTree,
+      VisitorState state);
+
+  /**
    * Attempts to create a {@link SuggestedFix}.
    *
    * @param classTree The class tree containing the test.
@@ -26,19 +41,4 @@ interface Migrator {
    */
   Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state);
-
-  /**
-   * Tells whether the specified annotation can be migrated.
-   *
-   * @param metadata The metadata that will be fixed.
-   * @param annotation The metadata for the annotation that will be fixed.
-   * @param methodTree The test {@link MethodTree}.
-   * @param state The visitor state.
-   * @return {@code true} if the annotation argument can be migrated or else {@code false}.
-   */
-  boolean canFix(
-      TestNGMetadata metadata,
-      AnnotationMetadata annotation,
-      MethodTree methodTree,
-      VisitorState state);
 }

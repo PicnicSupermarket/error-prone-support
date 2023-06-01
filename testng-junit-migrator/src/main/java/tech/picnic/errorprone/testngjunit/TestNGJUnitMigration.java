@@ -54,10 +54,11 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   private static final long serialVersionUID = 1L;
   private static final String CONSERVATIVE_MIGRATION_MODE_FLAG =
       "TestNGJUnitMigration:ConservativeMode";
+
   private final boolean conservativeMode;
 
   /**
-   * Instantiates a new {@link TestNGJUnitMigration} instance. This will default to aggressive
+   * Instantiates a new {@link TestNGJUnitMigration} instance. This will default to the aggressive
    * migration mode.
    */
   public TestNGJUnitMigration() {
@@ -67,7 +68,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   /**
    * Instantiates a new {@link TestNGJUnitMigration} with the specified {@link ErrorProneFlags}.
    *
-   * @param flags the error-prone flags used to set the migration mode.
+   * @param flags The Error Prone flags used to set the migration mode.
    */
   @Inject
   TestNGJUnitMigration(ErrorProneFlags flags) {
@@ -137,7 +138,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       }
     }.scan(tree, null);
 
-    /* All suggested fixes are directly reported to the visitor state already. */
+    /* All suggested fixes are already directly reported to the `VisitorState`. */
     return Description.NO_MATCH;
   }
 
@@ -182,9 +183,9 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   private static SuggestedFix migrateAnnotation(
       AnnotationMetadata annotationMetadata, MethodTree methodTree) {
     SuggestedFix.Builder fixBuilder =
-        SuggestedFix.builder().merge(SuggestedFix.delete(annotationMetadata.getAnnotationTree()));
+        SuggestedFix.builder().delete(annotationMetadata.getAnnotationTree());
     if (!annotationMetadata.getAttributes().containsKey("dataProvider")) {
-      fixBuilder.merge(SuggestedFix.prefixWith(methodTree, "@org.junit.jupiter.api.Test\n"));
+      fixBuilder.prefixWith(methodTree, "@org.junit.jupiter.api.Test\n");
     }
 
     return fixBuilder.build();

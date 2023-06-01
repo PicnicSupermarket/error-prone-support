@@ -22,11 +22,22 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import tech.picnic.errorprone.util.SourceCode;
 
+// XXX: Can this one also implement a `Migrator`?
 /** A helper class that migrates a TestNG {@code DataProvider} to a JUnit {@code MethodSource}. */
 final class DataProviderMigrator {
   /** This regular expression replaces matches instances of `this.getClass()` and `getClass()`. */
   private static final Pattern GET_CLASS =
       Pattern.compile("((?<!\\b\\.)|(\\bthis\\.))(getClass\\(\\))");
+
+  /**
+   * Tells whether the specified {@code DataProvider} can be migrated.
+   *
+   * @param methodTree The dataprovider methode tree.
+   * @return {@code true} if the data provider can be migrated or else {@code false}.
+   */
+  public boolean canFix(MethodTree methodTree) {
+    return getDataProviderReturnTree(getReturnTree(methodTree)).isPresent();
+  }
 
   /**
    * Create the {@link SuggestedFix} required to migrate a TestNG {@code DataProvider} to a JUnit
@@ -42,16 +53,6 @@ final class DataProviderMigrator {
     return tryMigrateDataProvider(methodTree, classTree, state);
   }
 
-  /**
-   * Tells whether the specified {@code DataProvider} can be migrated.
-   *
-   * @param methodTree The dataprovider methode tree.
-   * @return {@code true} if the data provider can be migrated or else {@code false}.
-   */
-  public boolean canFix(MethodTree methodTree) {
-    return getDataProviderReturnTree(getReturnTree(methodTree)).isPresent();
-  }
-
   private static Optional<SuggestedFix> tryMigrateDataProvider(
       MethodTree methodTree, ClassTree classTree, VisitorState state) {
     ReturnTree returnTree = getReturnTree(methodTree);
@@ -63,17 +64,16 @@ final class DataProviderMigrator {
                     .addStaticImport("org.junit.jupiter.params.provider.Arguments.arguments")
                     .addImport("java.util.stream.Stream")
                     .addImport("org.junit.jupiter.params.provider.Arguments")
-                    .merge(SuggestedFix.delete(methodTree))
-                    .merge(
-                        SuggestedFix.postfixWith(
+                    .delete(methodTree)
+                    .postfixWith(
+                        methodTree,
+                        buildMethodSource(
+                            classTree.getSimpleName().toString(),
+                            methodTree.getName().toString(),
                             methodTree,
-                            buildMethodSource(
-                                classTree.getSimpleName().toString(),
-                                methodTree.getName().toString(),
-                                methodTree,
-                                returnTree,
-                                dataProviderReturnTree,
-                                state)))
+                            returnTree,
+                            dataProviderReturnTree,
+                            state))
                     .build());
   }
 
@@ -135,18 +135,18 @@ final class DataProviderMigrator {
 
   private static String buildArgumentStream(
       String className, NewArrayTree newArrayTree, VisitorState state) {
-    StringBuilder argumentsBuilder = new StringBuilder();
-
     int startPos = ASTHelpers.getStartPosition(newArrayTree);
     int endPos = state.getEndPosition(newArrayTree);
     ImmutableMap<Integer, List<Comment>> comments =
         state.getOffsetTokens(startPos, endPos).stream()
             .collect(toImmutableMap(ErrorProneToken::pos, ErrorProneToken::comments));
+
+    StringBuilder argumentsBuilder = new StringBuilder();
     argumentsBuilder.append(
         newArrayTree.getInitializers().stream()
             .map(
                 expression ->
-                    getTestArgumentForValue(
+                    wrapTestValueWithArguments(
                         expression,
                         comments.getOrDefault(
                             ASTHelpers.getStartPosition(expression), ImmutableList.of()),
@@ -162,16 +162,17 @@ final class DataProviderMigrator {
         .replaceAll(className + ".class");
   }
 
-  // XXX: Improve method name and the variable names.
-  /** The method wraps a value in `Argument linky thing arguments(). */
-  private static String getTestArgumentForValue(
-      ExpressionTree expressionTree, List<Comment> comments, VisitorState state) {
-    String treeSource = SourceCode.treeToString(expressionTree, state);
+  /**
+   * Wraps a value in {@code org.junit.jupiter.params.provider#arguments()}.
+   *
+   * <p>Drops curly braces from array initialisation values.
+   */
+  private static String wrapTestValueWithArguments(
+      ExpressionTree tree, List<Comment> comments, VisitorState state) {
+    String source = SourceCode.treeToString(tree, state);
 
     String argumentValue =
-        expressionTree.getKind() == NEW_ARRAY
-            ? treeSource.substring(1, treeSource.length() - 1)
-            : treeSource;
+        tree.getKind() == NEW_ARRAY ? source.substring(1, source.length() - 1) : source;
 
     return String.format(
         "\t\t%s%n\t\targuments(%s)",

@@ -21,15 +21,6 @@ import tech.picnic.errorprone.util.SourceCode;
 @Immutable
 final class GroupsAttributeMigrator implements Migrator {
   @Override
-  public Optional<SuggestedFix> createFix(
-      ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
-    SuggestedFix.Builder fix = SuggestedFix.builder().addImport("org.junit.jupiter.api.Tag");
-    extractGroups(dataValue, state)
-        .forEach(group -> fix.prefixWith(methodTree, String.format("@Tag(\"%s\")%n", group)));
-    return Optional.of(fix.build());
-  }
-
-  @Override
   public boolean canFix(
       TestNGMetadata metadata,
       AnnotationMetadata annotation,
@@ -39,6 +30,15 @@ final class GroupsAttributeMigrator implements Migrator {
     return groupsExpression != null
         && extractGroups(groupsExpression, state).stream()
             .allMatch(GroupsAttributeMigrator::isValidTagName);
+  }
+
+  @Override
+  public Optional<SuggestedFix> createFix(
+      ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
+    SuggestedFix.Builder fix = SuggestedFix.builder().addImport("org.junit.jupiter.api.Tag");
+    extractGroups(dataValue, state)
+        .forEach(group -> fix.prefixWith(methodTree, String.format("@Tag(\"%s\")%n", group)));
+    return Optional.of(fix.build());
   }
 
   private static boolean isValidTagName(String tagName) {

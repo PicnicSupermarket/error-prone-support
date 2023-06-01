@@ -14,6 +14,15 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 @Immutable
 final class EnabledAttributeMigrator implements Migrator {
   @Override
+  public boolean canFix(
+      TestNGMetadata metadata,
+      AnnotationMetadata annotation,
+      MethodTree methodTree,
+      VisitorState state) {
+    return annotation.getAttributes().containsKey("enabled");
+  }
+
+  @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
     return Optional.ofNullable(((LiteralTree) dataValue).getValue())
@@ -24,14 +33,5 @@ final class EnabledAttributeMigrator implements Migrator {
                     .addImport("org.junit.jupiter.api.Disabled")
                     .prefixWith(methodTree, "@Disabled\n")
                     .build());
-  }
-
-  @Override
-  public boolean canFix(
-      TestNGMetadata metadata,
-      AnnotationMetadata annotation,
-      MethodTree methodTree,
-      VisitorState state) {
-    return annotation.getAttributes().containsKey("enabled");
   }
 }

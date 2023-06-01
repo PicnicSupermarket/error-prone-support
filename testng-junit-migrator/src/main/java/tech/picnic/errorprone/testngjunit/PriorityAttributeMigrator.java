@@ -10,9 +10,18 @@ import java.util.Optional;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.util.SourceCode;
 
-/** A {@link Migrator} that migrates the {@code priority} argument. */
+/** A {@link Migrator} that migrates the {@code org.testng.annotations.Test#priority} attribute. */
 @Immutable
 final class PriorityAttributeMigrator implements Migrator {
+  @Override
+  public boolean canFix(
+      TestNGMetadata metadata,
+      AnnotationMetadata annotation,
+      MethodTree methodTree,
+      VisitorState state) {
+    return annotation.getAttributes().containsKey("priority");
+  }
+
   @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
@@ -21,22 +30,10 @@ final class PriorityAttributeMigrator implements Migrator {
             .addImport("org.junit.jupiter.api.Order")
             .addImport("org.junit.jupiter.api.TestMethodOrder")
             .addImport("org.junit.jupiter.api.MethodOrderer")
-            .merge(
-                SuggestedFix.prefixWith(
-                    methodTree,
-                    String.format("@Order(%s)%n", SourceCode.treeToString(dataValue, state))))
-            .merge(
-                SuggestedFix.prefixWith(
-                    classTree, "@TestMethodOrder(MethodOrderer.OrderAnnotation.class)\n"))
+            .prefixWith(
+                methodTree,
+                String.format("@Order(%s)%n", SourceCode.treeToString(dataValue, state)))
+            .prefixWith(classTree, "@TestMethodOrder(MethodOrderer.OrderAnnotation.class)\n")
             .build());
-  }
-
-  @Override
-  public boolean canFix(
-      TestNGMetadata metadata,
-      AnnotationMetadata annotation,
-      MethodTree methodTree,
-      VisitorState state) {
-    return annotation.getAttributes().containsKey("priority");
   }
 }
