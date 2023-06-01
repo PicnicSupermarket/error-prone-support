@@ -21,6 +21,15 @@ import tech.picnic.errorprone.util.SourceCode;
 @Immutable
 final class ExpectedExceptionsAttributeMigrator implements Migrator {
   @Override
+  public boolean canFix(
+      TestNGMetadata metadata,
+      AnnotationMetadata annotation,
+      MethodTree methodTree,
+      VisitorState state) {
+    return annotation.getAttributes().containsKey("expectedExceptions");
+  }
+
+  @Override
   public Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
     return getExpectedException(dataValue, state)
@@ -42,15 +51,6 @@ final class ExpectedExceptionsAttributeMigrator implements Migrator {
 
               return fix.build();
             });
-  }
-
-  @Override
-  public boolean canFix(
-      TestNGMetadata metadata,
-      AnnotationMetadata annotation,
-      MethodTree methodTree,
-      VisitorState state) {
-    return annotation.getAttributes().containsKey("expectedExceptions");
   }
 
   private static Optional<String> getExpectedException(
@@ -87,7 +87,7 @@ final class ExpectedExceptionsAttributeMigrator implements Migrator {
 
   private static String buildWrappedBody(BlockTree tree, String exception, VisitorState state) {
     return String.format(
-        "{\norg.junit.jupiter.api.Assertions.assertThrows(%s, () -> %s);\n}",
+        "{%norg.junit.jupiter.api.Assertions.assertThrows(%s, () -> %s);%n}",
         exception, SourceCode.treeToString(tree, state));
   }
 }

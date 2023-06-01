@@ -26,7 +26,7 @@ enum TestAnnotationAttribute {
     return attributeMigrator;
   }
 
-  static Optional<TestAnnotationAttribute> fromString(String argument) {
-    return stream(values()).filter(value -> value.name.equals(argument)).findFirst();
+  static Optional<TestAnnotationAttribute> fromString(String attribute) {
+    return stream(values()).filter(v -> v.name.equals(attribute)).findFirst();
   }
 }
