@@ -10,7 +10,7 @@ import java.util.Optional;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 
 /**
- * Interface implemented by classes that define how to migrate a specific argument from a TestNG
+ * Interface implemented by classes that define how to migrate a specific attribute from a TestNG
  * {@code Test} annotation to JUnit.
  */
 @Immutable
@@ -35,7 +35,7 @@ interface Migrator {
    *
    * @param classTree The class tree containing the test.
    * @param methodTree The method tree the annotation is on.
-   * @param dataValue The value of annotation argument.
+   * @param dataValue The value of annotation attribute.
    * @param state The visitor state.
    * @return an {@link Optional} containing the created fix.
    */

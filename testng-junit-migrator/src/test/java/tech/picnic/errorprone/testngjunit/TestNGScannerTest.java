@@ -28,7 +28,7 @@ final class TestNGScannerTest {
             "A.java",
             "import org.testng.annotations.Test;",
             "",
-            "// BUG: Diagnostic contains: Class: A arguments: {}",
+            "// BUG: Diagnostic contains: Class: A attributes: {}",
             "@Test",
             "class A {",
             "",
@@ -42,28 +42,28 @@ final class TestNGScannerTest {
             "",
             "  public static void staticNotATest() {}",
             "",
-            "  // BUG: Diagnostic contains: Class: A arguments: {}",
+            "  // BUG: Diagnostic contains: Class: A attributes: {}",
             "  @Test",
             "  public void localAnnotation() {}",
             "",
-            "  // BUG: Diagnostic contains: Class: A arguments: {description=\"foo\"}",
+            "  // BUG: Diagnostic contains: Class: A attributes: {description=\"foo\"}",
             "  @Test(description = \"foo\")",
             "  public void singleArgument() {}",
             "",
-            "  // BUG: Diagnostic contains: Class: A arguments: {priority=1, description=\"foo\"}",
+            "  // BUG: Diagnostic contains: Class: A attributes: {priority=1, description=\"foo\"}",
             "  @Test(priority = 1, description = \"foo\")",
             "  public void multipleArguments() {}",
             "",
-            "  // BUG: Diagnostic contains: Class: A arguments: {dataProvider=\"dataProviderTestCases\"}",
+            "  // BUG: Diagnostic contains: Class: A attributes: {dataProvider=\"dataProviderTestCases\"}",
             "  @Test(dataProvider = \"dataProviderTestCases\")",
             "  public void dataProvider() {}",
             "",
-            "  // BUG: Diagnostic contains: Class: B arguments: {description=\"nested\"}",
+            "  // BUG: Diagnostic contains: Class: B attributes: {description=\"nested\"}",
             "  @Test(description = \"nested\")",
             "  class B {",
             "    public void nestedTest() {}",
             "",
-            "    // BUG: Diagnostic contains: Class: B arguments: {priority=1}",
+            "    // BUG: Diagnostic contains: Class: B attributes: {priority=1}",
             "    @Test(priority = 1)",
             "    public void nestedTestWithArguments() {}",
             "  }",
@@ -219,7 +219,8 @@ final class TestNGScannerTest {
     private static String createMetaDataMessage(
         ClassTree classTree, AnnotationMetadata annotationMetadata) {
       return String.format(
-          "Class: %s arguments: %s", classTree.getSimpleName(), annotationMetadata.getAttributes());
+          "Class: %s attributes: %s",
+          classTree.getSimpleName(), annotationMetadata.getAttributes());
     }
   }
 }

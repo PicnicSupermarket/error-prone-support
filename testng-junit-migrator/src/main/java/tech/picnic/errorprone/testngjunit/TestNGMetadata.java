@@ -121,12 +121,12 @@ abstract class TestNGMetadata {
      * Instantiate a new {@link AnnotationMetadata}.
      *
      * @param annotationTree The annotation tree.
-     * @param arguments The arguments in that annotation tree.
+     * @param attributes The attributes in that annotation tree.
      * @return The new {@link AnnotationMetadata} instance.
      */
     public static AnnotationMetadata create(
-        AnnotationTree annotationTree, ImmutableMap<String, ExpressionTree> arguments) {
-      return new AutoValue_TestNGMetadata_AnnotationMetadata(annotationTree, arguments);
+        AnnotationTree annotationTree, ImmutableMap<String, ExpressionTree> attributes) {
+      return new AutoValue_TestNGMetadata_AnnotationMetadata(annotationTree, attributes);
     }
   }
 

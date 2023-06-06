@@ -17,7 +17,7 @@ import java.util.Optional;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.util.SourceCode;
 
-/** A {@link Migrator} that migrates the {@code expectedExceptions} argument. */
+/** A {@link Migrator} that migrates the {@code expectedExceptions} attribute. */
 @Immutable
 final class ExpectedExceptionsAttributeMigrator implements Migrator {
   @Override

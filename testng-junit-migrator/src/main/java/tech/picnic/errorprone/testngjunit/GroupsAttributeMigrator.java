@@ -16,7 +16,7 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.util.SourceCode;
 
 /**
- * A {@link tech.picnic.errorprone.testngjunit.Migrator} that migrates the {@code group} argument.
+ * A {@link tech.picnic.errorprone.testngjunit.Migrator} that migrates the {@code group} attribute.
  */
 @Immutable
 final class GroupsAttributeMigrator implements Migrator {
