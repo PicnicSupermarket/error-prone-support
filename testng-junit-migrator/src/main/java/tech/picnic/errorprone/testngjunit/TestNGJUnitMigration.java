@@ -172,12 +172,19 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   private static Optional<SuggestedFix> trySuggestFix(
       ClassTree classTree,
       MethodTree methodTree,
-      String argumentName,
-      ExpressionTree argumentContent,
+      String attributeName,
+      ExpressionTree attributeContent,
       VisitorState state) {
-    return TestAnnotationAttribute.fromString(argumentName)
-        .map(TestAnnotationAttribute::getAttributeMigrator)
-        .flatMap(fixer -> fixer.createFix(classTree, methodTree, argumentContent, state));
+    Optional<TestAnnotationAttribute> attribute = TestAnnotationAttribute.fromString(attributeName);
+    if (attribute.isPresent()) {
+      return attribute
+          .map(TestAnnotationAttribute::getAttributeMigrator)
+          .flatMap(migrator -> migrator.createFix(classTree, methodTree, attributeContent, state));
+    }
+
+    return Optional.of(
+        new UnsupportedAttributeMigrator()
+            .createFix(attributeName, methodTree, attributeContent, state));
   }
 
   private static SuggestedFix migrateAnnotation(
