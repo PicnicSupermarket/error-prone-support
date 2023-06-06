@@ -68,14 +68,11 @@ abstract class TestNGMetadata {
   // XXX: Look into this builder and best practices for `@AutoValue.Builder`.
   @AutoValue.Builder
   abstract static class Builder {
-    private final ImmutableMap.Builder<MethodTree, AnnotationMetadata> methodAnnotationsBuilder =
-        ImmutableMap.builder();
+    abstract ImmutableMap.Builder<MethodTree, AnnotationMetadata> methodAnnotationsBuilder();
 
-    private final ImmutableMap.Builder<MethodTree, SetupTeardownType> setupTeardownBuilder =
-        ImmutableMap.builder();
+    abstract ImmutableMap.Builder<MethodTree, SetupTeardownType> setupTeardownBuilder();
 
-    private final ImmutableMap.Builder<String, DataProviderMetadata> dataProviderMetadataBuilder =
-        ImmutableMap.builder();
+    abstract ImmutableMap.Builder<String, DataProviderMetadata> dataProviderMetadataBuilder();
 
     abstract Builder setClassTree(ClassTree value);
 
@@ -85,30 +82,11 @@ abstract class TestNGMetadata {
 
     abstract Builder setMethodAnnotations(ImmutableMap<MethodTree, AnnotationMetadata> value);
 
-    void addMethodAnnotation(MethodTree tree, AnnotationMetadata metaData) {
-      methodAnnotationsBuilder.put(tree, metaData);
-    }
-
     abstract Builder setSetupTeardown(ImmutableMap<MethodTree, SetupTeardownType> value);
-
-    ImmutableMap.Builder<MethodTree, SetupTeardownType> setupTeardownBuilder() {
-      return setupTeardownBuilder;
-    }
 
     abstract Builder setDataProviderMetadata(ImmutableMap<String, DataProviderMetadata> value);
 
-    void addDataProviderMetadata(String methodName, DataProviderMetadata value) {
-      dataProviderMetadataBuilder.put(methodName, value);
-    }
-
-    abstract TestNGMetadata autoBuild();
-
-    TestNGMetadata build() {
-      setMethodAnnotations(methodAnnotationsBuilder.build());
-      setSetupTeardown(setupTeardownBuilder.build());
-      setDataProviderMetadata(dataProviderMetadataBuilder.build());
-      return autoBuild();
-    }
+    abstract TestNGMetadata build();
   }
 
   final ImmutableSet<AnnotationMetadata> getAnnotations() {
