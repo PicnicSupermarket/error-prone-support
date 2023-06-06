@@ -10,7 +10,7 @@ import java.util.Optional;
 import tech.picnic.errorprone.util.SourceCode;
 
 /**
- * A {@link Migrator} that migrates the {@code org.testng.annotations.Test#timeOut} argument. The
+ * A {@link Migrator} that migrates the {@code org.testng.annotations.Test#timeOut} attribute. The
  * TestNG {@code org.testng.annotations.Test#timeOut} attribute is always in milliseconds, the JUnit
  * variant {@code @Timeout} takes a value in seconds by default, hence we add the {@link
  * java.util.concurrent.TimeUnit#MILLISECONDS} attribute.
