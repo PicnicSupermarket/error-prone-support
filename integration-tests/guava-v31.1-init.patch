@@ -1,5 +1,81 @@
+diff --git a/guava/src/com/google/common/base/Strings.java b/guava/src/com/google/common/base/Strings.java
+index e56bf1c481..459acbca1a 100644
+--- a/guava/src/com/google/common/base/Strings.java
++++ b/guava/src/com/google/common/base/Strings.java
+@@ -265,6 +265,7 @@ public final class Strings {
+    * @since 25.1
+    */
+   // TODO(diamondm) consider using Arrays.toString() for array parameters
++  @SuppressWarnings("IdentityConversion")
+   public static String lenientFormat(
+       @CheckForNull String template, @CheckForNull @Nullable Object... args) {
+     template = String.valueOf(template); // null -> "null"
+diff --git a/guava/src/com/google/common/graph/UndirectedNetworkConnections.java b/guava/src/com/google/common/graph/UndirectedNetworkConnections.java
+index 190897f882..f11f98867c 100644
+--- a/guava/src/com/google/common/graph/UndirectedNetworkConnections.java
++++ b/guava/src/com/google/common/graph/UndirectedNetworkConnections.java
+@@ -43,6 +43,7 @@ final class UndirectedNetworkConnections<N, E> extends AbstractUndirectedNetwork
+     return new UndirectedNetworkConnections<>(HashBiMap.<E, N>create(EXPECTED_DEGREE));
+   }
+
++  @SuppressWarnings("IdentityConversion")
+   static <N, E> UndirectedNetworkConnections<N, E> ofImmutable(Map<E, N> incidentEdges) {
+     return new UndirectedNetworkConnections<>(ImmutableBiMap.copyOf(incidentEdges));
+   }
+diff --git a/guava/src/com/google/common/graph/DirectedNetworkConnections.java b/guava/src/com/google/common/graph/DirectedNetworkConnections.java
+index e1db65708e..9d70c790ee 100644
+--- a/guava/src/com/google/common/graph/DirectedNetworkConnections.java
++++ b/guava/src/com/google/common/graph/DirectedNetworkConnections.java
+@@ -44,6 +44,7 @@ final class DirectedNetworkConnections<N, E> extends AbstractDirectedNetworkConn
+         HashBiMap.<E, N>create(EXPECTED_DEGREE), HashBiMap.<E, N>create(EXPECTED_DEGREE), 0);
+   }
+
++  @SuppressWarnings("IdentityConversion")
+   static <N, E> DirectedNetworkConnections<N, E> ofImmutable(
+       Map<E, N> inEdges, Map<E, N> outEdges, int selfLoopCount) {
+     return new DirectedNetworkConnections<>(
+diff --git a/guava-testlib/src/com/google/common/collect/testing/google/MapGenerators.java b/guava-testlib/src/com/google/common/collect/testing/google/MapGenerators.java
+index 35063e815d..3f445ca116 100644
+--- a/guava-testlib/src/com/google/common/collect/testing/google/MapGenerators.java
++++ b/guava-testlib/src/com/google/common/collect/testing/google/MapGenerators.java
+@@ -60,6 +60,7 @@ public class MapGenerators {
+
+   public static class ImmutableMapCopyOfGenerator extends TestStringMapGenerator {
+     @Override
++    @SuppressWarnings("IdentityConversion")
+     protected Map<String, String> create(Entry<String, String>[] entries) {
+       Map<String, String> builder = Maps.newLinkedHashMap();
+       for (Entry<String, String> entry : entries) {
+@@ -71,6 +72,7 @@ public class MapGenerators {
+
+   public static class ImmutableMapCopyOfEntriesGenerator extends TestStringMapGenerator {
+     @Override
++    @SuppressWarnings("IdentityConversion")
+     protected Map<String, String> create(Entry<String, String>[] entries) {
+       return ImmutableMap.copyOf(Arrays.asList(entries));
+     }
+@@ -162,6 +164,7 @@ public class MapGenerators {
+
+   public static class ImmutableMapCopyOfEnumMapGenerator extends TestEnumMapGenerator {
+     @Override
++    @SuppressWarnings("IdentityConversion")
+     protected Map<AnEnum, String> create(Entry<AnEnum, String>[] entries) {
+       EnumMap<AnEnum, String> map = new EnumMap<>(AnEnum.class);
+       for (Entry<AnEnum, String> entry : entries) {
+diff --git a/guava/src/com/google/common/collect/RegularImmutableSortedSet.java b/guava/src/com/google/common/collect/RegularImmutableSortedSet.java
+index 572e0acbf5..fa17e67916 100644
+--- a/guava/src/com/google/common/collect/RegularImmutableSortedSet.java
++++ b/guava/src/com/google/common/collect/RegularImmutableSortedSet.java
+@@ -324,6 +324,7 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
+ 
+   @Override
+   ImmutableSortedSet<E> createDescendingSet() {
++    @SuppressWarnings("StaticImport")
+     Comparator<? super E> reversedOrder = Collections.reverseOrder(comparator);
+     return isEmpty()
+         ? emptySet(reversedOrder)
 diff --git a/pom.xml b/pom.xml
-index 13dd0985d3..b50449f60d 100644
+index 13dd0985d3..3fa0827e02 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -22,6 +22,9 @@
@@ -12,54 +88,11 @@ index 13dd0985d3..b50449f60d 100644
    </properties>
    <issueManagement>
      <system>GitHub Issues</system>
-@@ -347,50 +350,100 @@
+@@ -346,6 +349,56 @@
+     </dependencies>
    </dependencyManagement>
    <profiles>
-     <profile>
--        <id>sonatype-oss-release</id>
--        <build>
--          <plugins>
--            <plugin>
--              <groupId>org.apache.maven.plugins</groupId>
--              <artifactId>maven-source-plugin</artifactId>
--              <version>${maven-source-plugin.version}</version>
--              <executions>
--                <execution>
--                  <id>attach-sources</id>
--                  <goals>
--                    <goal>jar-no-fork</goal>
--                  </goals>
--                </execution>
--              </executions>
--            </plugin>
--            <plugin>
--              <groupId>org.apache.maven.plugins</groupId>
--              <artifactId>maven-javadoc-plugin</artifactId>
--              <version>${maven-javadoc-plugin.version}</version>
--                <executions>
--                  <execution>
--                    <id>attach-javadocs</id>
--                    <goals>
--                      <goal>jar</goal>
--                    </goals>
--                </execution>
--              </executions>
--            </plugin>
--            <plugin>
--              <groupId>org.apache.maven.plugins</groupId>
--              <artifactId>maven-gpg-plugin</artifactId>
--              <version>1.6</version>
--              <executions>
--                <execution>
--                  <id>sign-artifacts</id>
--                  <phase>verify</phase>
--                  <goals>
--                    <goal>sign</goal>
--                  </goals>
--                </execution>
--              </executions>
--            </plugin>
--          </plugins>
++    <profile>
 +      <id>error-prone-compile</id>
 +      <build>
 +        <plugins>
@@ -82,7 +115,7 @@ index 13dd0985d3..b50449f60d 100644
 +                    <arg>-Xpkginfo:always</arg>
 +                    <arg>-XDcompilePolicy=simple</arg>
 +                    <arg>
-+                      -Xplugin:ErrorProne ${error-prone.flags} -Xep:CollectorMutability:OFF -Xep:FluxImplicitBlock:OFF -Xep:ScheduledTransactionTrace:OFF
++                      -Xplugin:ErrorProne ${error-prone.flags} -Xep:CollectorMutability:OFF -Xep:FluxImplicitBlock:OFF -Xep:ScheduledTransactionTrace:OFF -XepOpt:Refaster:NamePattern=^(?!Immutable).*
 +                    </arg>
 +                  </compilerArgs>
 +                  <annotationProcessorPaths>
@@ -109,51 +142,6 @@ index 13dd0985d3..b50449f60d 100644
 +        </plugins>
 +      </build>
 +    </profile>
-+    <profile>
-+      <id>sonatype-oss-release</id>
-+      <build>
-+        <plugins>
-+          <plugin>
-+            <groupId>org.apache.maven.plugins</groupId>
-+            <artifactId>maven-source-plugin</artifactId>
-+            <version>${maven-source-plugin.version}</version>
-+            <executions>
-+              <execution>
-+                <id>attach-sources</id>
-+                <goals>
-+                  <goal>jar-no-fork</goal>
-+                </goals>
-+              </execution>
-+            </executions>
-+          </plugin>
-+          <plugin>
-+            <groupId>org.apache.maven.plugins</groupId>
-+            <artifactId>maven-javadoc-plugin</artifactId>
-+            <version>${maven-javadoc-plugin.version}</version>
-+            <executions>
-+              <execution>
-+                <id>attach-javadocs</id>
-+                <goals>
-+                  <goal>jar</goal>
-+                </goals>
-+              </execution>
-+            </executions>
-+          </plugin>
-+          <plugin>
-+            <groupId>org.apache.maven.plugins</groupId>
-+            <artifactId>maven-gpg-plugin</artifactId>
-+            <version>1.6</version>
-+            <executions>
-+              <execution>
-+                <id>sign-artifacts</id>
-+                <phase>verify</phase>
-+                <goals>
-+                  <goal>sign</goal>
-+                </goals>
-+              </execution>
-+            </executions>
-+          </plugin>
-+        </plugins>
-       </build>
-     </profile>
      <profile>
+         <id>sonatype-oss-release</id>
+         <build>
