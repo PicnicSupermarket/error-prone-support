@@ -137,7 +137,9 @@ public class A {
 ```
 
 ### Known limitations
-// XXX: Add known limitations. 
+- Certain `@DataProvider` methods cannot be automatically migrated (e.g., `return Stream.of(...).toArray(Object[][]::new)`).
+- Some uncommon `@Test` attributes are not supported, such as `ignoreMissingDependencies` and `dependsOnMethods`.
+- Test setup and teardown methods `@{Before, After}Test` are migrated to `@{Before, After}Each` to avoid introducing breaking changes. `@{Before, After}All` require a static method, while `@{Before, After}Test` are instance methods.
 
 [eps-readme]: ../README.md
 [error-prone-installation-guide]: https://errorprone.info/docs/installation#maven
