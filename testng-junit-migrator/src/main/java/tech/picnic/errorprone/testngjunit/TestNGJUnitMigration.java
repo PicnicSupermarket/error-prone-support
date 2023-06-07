@@ -42,11 +42,11 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
  * This migration will also take care of any setup/teardown methods.
  *
  * <p>Note: As the {@code @BeforeAll} and {@code @AfterAll} methods in JUnit are required to be
- * static, this <em>might</em> make breaking changes.
+ * static, this <em>might</em> introduce breaking changes.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Migrate TestNG tests to JUnit",
+    summary = "Migrate TestNG tests to their JUnit equivalent",
     linkType = NONE,
     tags = REFACTORING,
     severity = ERROR)

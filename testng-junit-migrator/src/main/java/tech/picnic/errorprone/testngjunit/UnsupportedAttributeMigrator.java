@@ -12,7 +12,9 @@ import com.sun.source.tree.MethodTree;
 import java.util.Optional;
 import tech.picnic.errorprone.util.SourceCode;
 
-/** A migrator that leaves a comment for attributes that aren't supported in the migration. */
+/**
+ * A {@link Migrator} that leaves a comment for attributes that aren't supported in the migration.
+ */
 @Immutable
 final class UnsupportedAttributeMigrator implements Migrator {
   @Override

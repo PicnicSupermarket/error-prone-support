@@ -65,7 +65,6 @@ abstract class TestNGMetadata {
     return new AutoValue_TestNGMetadata.Builder();
   }
 
-  // XXX: Look into this builder and best practices for `@AutoValue.Builder`.
   @AutoValue.Builder
   abstract static class Builder {
     abstract ImmutableMap.Builder<MethodTree, AnnotationMetadata> methodAnnotationsBuilder();
