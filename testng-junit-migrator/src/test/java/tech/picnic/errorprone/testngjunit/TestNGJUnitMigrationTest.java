@@ -94,6 +94,23 @@ final class TestNGJUnitMigrationTest {
             "    return Stream.of(1, 2, 3).map(i -> new Object[] {i}).toArray(Object[][]::new);",
             "  }",
             "}")
+        .addSourceLines(
+            "B.java",
+            "import org.testng.annotations.Test;",
+            "",
+            "@Test",
+            "public class B {",
+            "  public void classLevelAnnotation() {}",
+            "",
+            "  @Test(description = \"bar\")",
+            "  public void methodAnnotation() {}",
+            "",
+            "  @Test(testName = \"unsupportedAttribute\")",
+            "  public void unsupportedAttribute() {}",
+            "",
+            "  @Test(testName = \"unsupportedAttribute\", suiteName = \"unsupportedAttribute\")",
+            "  public void multipleUnsupportedAttributes() {}",
+            "}")
         .doTest();
   }
 

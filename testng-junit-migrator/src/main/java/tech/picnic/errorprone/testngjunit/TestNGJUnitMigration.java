@@ -97,7 +97,9 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
         /* Make sure ALL tests in the class can be migrated. */
         if (conservativeMode
             && !metaData.getAnnotations().stream()
-                .allMatch(annotation -> canMigrateTest(tree, metaData, annotation, state))) {
+                .allMatch(
+                    annotation ->
+                        canMigrateTest(tree, metaData, annotation, conservativeMode, state))) {
           return super.visitMethod(tree, metaData);
         }
 
@@ -123,7 +125,8 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
 
         metaData
             .getAnnotation(tree)
-            .filter(annotation -> canMigrateTest(tree, metaData, annotation, state))
+            .filter(
+                annotation -> canMigrateTest(tree, metaData, annotation, conservativeMode, state))
             .ifPresent(
                 annotation -> {
                   SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
@@ -159,14 +162,14 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       MethodTree methodTree,
       TestNGMetadata metadata,
       AnnotationMetadata annotationMetadata,
+      boolean conservativeMode,
       VisitorState state) {
     return annotationMetadata.getAttributes().keySet().stream()
         .map(TestAnnotationAttribute::fromString)
-        .flatMap(Optional::stream)
         .allMatch(
             kind ->
-                kind.getAttributeMigrator()
-                    .canFix(metadata, annotationMetadata, methodTree, state));
+                kind.getAttributeMigrator().canFix(metadata, annotationMetadata, methodTree, state)
+                    && (!conservativeMode || kind != TestAnnotationAttribute.UNSUPPORTED));
   }
 
   private static Optional<SuggestedFix> trySuggestFix(
@@ -175,16 +178,9 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       String attributeName,
       ExpressionTree attributeContent,
       VisitorState state) {
-    Optional<TestAnnotationAttribute> attribute = TestAnnotationAttribute.fromString(attributeName);
-    if (attribute.isPresent()) {
-      return attribute
-          .map(TestAnnotationAttribute::getAttributeMigrator)
-          .flatMap(migrator -> migrator.createFix(classTree, methodTree, attributeContent, state));
-    }
-
-    return Optional.of(
-        new UnsupportedAttributeMigrator()
-            .createFix(attributeName, methodTree, attributeContent, state));
+    return TestAnnotationAttribute.fromString(attributeName)
+        .getAttributeMigrator()
+        .createFix(classTree, methodTree, attributeContent, state);
   }
 
   private static SuggestedFix migrateAnnotation(
