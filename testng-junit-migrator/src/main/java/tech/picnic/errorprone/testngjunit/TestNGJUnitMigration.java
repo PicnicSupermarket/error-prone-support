@@ -20,10 +20,13 @@ import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.util.TreeScanner;
+import java.util.Map.Entry;
 import java.util.Optional;
 import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
+import tech.picnic.errorprone.testngjunit.TestNGMetadata.DataProviderMetadata;
+import tech.picnic.errorprone.testngjunit.TestNGMetadata.SetupTeardownType;
 
 /**
  * A {@link BugChecker} that migrates TestNG unit tests to JUnit 5.
@@ -103,25 +106,18 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
           return super.visitMethod(tree, metaData);
         }
 
-        metaData
-            .getDataProvidersInUse()
-            .forEach(
-                dataProviderMetadata ->
-                    new DataProviderMigrator()
-                        .createFix(
-                            metaData.getClassTree(), dataProviderMetadata.getMethodTree(), state)
-                        .ifPresent(
-                            fix ->
-                                state.reportMatch(
-                                    describeMatch(dataProviderMetadata.getMethodTree(), fix))));
+        for (DataProviderMetadata dataProviderMetadata : metaData.getDataProvidersInUse()) {
+          DataProviderMigrator.createFix(
+                  metaData.getClassTree(), dataProviderMetadata.getMethodTree(), state)
+              .ifPresent(
+                  fix ->
+                      state.reportMatch(describeMatch(dataProviderMetadata.getMethodTree(), fix)));
+        }
 
-        metaData
-            .getSetupTeardown()
-            .forEach(
-                (method, type) ->
-                    new SetupTeardownMethodMigrator()
-                        .createFix(method, type, state)
-                        .ifPresent(fix -> state.reportMatch(describeMatch(method, fix))));
+        for (Entry<MethodTree, SetupTeardownType> entry : metaData.getSetupTeardown().entrySet()) {
+          SetupTeardownMethodMigrator.createFix(entry.getKey(), entry.getValue(), state)
+              .ifPresent(fix -> state.reportMatch(describeMatch(entry.getKey(), fix)));
+        }
 
         metaData
             .getAnnotation(tree)

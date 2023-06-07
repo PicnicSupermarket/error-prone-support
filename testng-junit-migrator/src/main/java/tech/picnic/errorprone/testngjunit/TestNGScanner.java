@@ -65,8 +65,7 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
       return super.visitMethod(tree, builder);
     }
 
-    if (TESTNG_VALUE_FACTORY_METHOD.matches(tree, state)
-        && new DataProviderMigrator().canFix(tree)) {
+    if (TESTNG_VALUE_FACTORY_METHOD.matches(tree, state) && DataProviderMigrator.canFix(tree)) {
       builder
           .dataProviderMetadataBuilder()
           .put(tree.getName().toString(), DataProviderMetadata.create(tree));

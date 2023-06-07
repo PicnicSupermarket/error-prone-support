@@ -9,12 +9,15 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import java.util.Map;
 import java.util.Optional;
 import javax.lang.model.element.Name;
 import org.junit.jupiter.api.Test;
@@ -150,54 +153,91 @@ final class TestNGScannerTest {
    * TestNG element was collected.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `TestNGScanner` for testing purposes")
-  public static final class TestChecker extends BugChecker implements CompilationUnitTreeMatcher {
+  public static final class TestChecker extends BugChecker
+      implements CompilationUnitTreeMatcher, ClassTreeMatcher, MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
+    // XXX: find better way to do this
+    private ImmutableMap<ClassTree, TestNGMetadata> classMetaData = ImmutableMap.of();
 
     @Override
     public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
       TestNGScanner scanner = new TestNGScanner(state);
-      ImmutableMap<ClassTree, TestNGMetadata> classMetaData =
-          scanner.collectMetadataForClasses(tree);
-
-      classMetaData.forEach(
-          (classTree, metaData) -> {
-            metaData
-                .getClassLevelAnnotationMetadata()
-                .ifPresent(annotation -> reportAnnotationMessage(state, classTree, annotation));
-
-            metaData
-                .getDataProviderMetadata()
-                .values()
-                .forEach(
-                    dataProvider ->
-                        reportMethodMessage(
-                            classTree.getSimpleName(),
-                            "DataProvider",
-                            dataProvider.getName(),
-                            dataProvider.getMethodTree(),
-                            state));
-
-            metaData
-                .getSetupTeardown()
-                .forEach(
-                    (method, setupTearDownType) ->
-                        reportMethodMessage(
-                            classTree.getSimpleName(),
-                            "SetupTearDown",
-                            setupTearDownType.name(),
-                            method,
-                            state));
-
-            classTree.getMembers().stream()
-                .filter(MethodTree.class::isInstance)
-                .map(MethodTree.class::cast)
-                .map(metaData::getAnnotation)
-                .flatMap(Optional::stream)
-                .filter(not(isEqual(metaData.getClassLevelAnnotationMetadata().orElse(null))))
-                .forEach(annotation -> reportAnnotationMessage(state, classTree, annotation));
-          });
+      classMetaData = scanner.collectMetadataForClasses(tree);
 
       return Description.NO_MATCH;
+    }
+
+    @Override
+    public Description matchClass(ClassTree tree, VisitorState state) {
+      Optional.ofNullable(classMetaData.get(tree))
+          .flatMap(TestNGMetadata::getClassLevelAnnotationMetadata)
+          .ifPresent(annotation -> reportAnnotationMessage(state, tree, annotation));
+      return Description.NO_MATCH;
+    }
+
+    @Override
+    public Description matchMethod(MethodTree tree, VisitorState state) {
+      ClassTree classTree = state.findEnclosing(ClassTree.class);
+      Optional<TestNGMetadata> metadata = Optional.ofNullable(classTree).map(classMetaData::get);
+
+      if (metadata.isEmpty()) {
+        return Description.NO_MATCH;
+      }
+
+      reportClassLevelAnnotation(state, classTree, metadata.orElseThrow());
+      reportTestMethods(tree, state, classTree, metadata.orElseThrow());
+      reportDataProviderMethods(tree, state, classTree, metadata.orElseThrow());
+      reportSetupTeardownMethods(tree, state, classTree, metadata.orElseThrow());
+
+      return Description.NO_MATCH;
+    }
+
+    private void reportClassLevelAnnotation(
+        VisitorState state, ClassTree classTree, TestNGMetadata metadata) {
+      metadata
+          .getClassLevelAnnotationMetadata()
+          .ifPresent(annotation -> reportAnnotationMessage(state, classTree, annotation));
+    }
+
+    private void reportTestMethods(
+        MethodTree tree, VisitorState state, ClassTree classTree, TestNGMetadata metadata) {
+      metadata
+          .getClassLevelAnnotationMetadata()
+          .filter(not(isEqual(metadata.getMethodAnnotations().get(tree))))
+          .map(unused -> metadata.getMethodAnnotations().get(tree))
+          .ifPresent(annotation -> reportAnnotationMessage(state, classTree, annotation));
+    }
+
+    private void reportSetupTeardownMethods(
+        MethodTree tree, VisitorState state, ClassTree classTree, TestNGMetadata metadata) {
+      metadata.getSetupTeardown().entrySet().stream()
+          .filter(entry -> entry.getKey().equals(tree))
+          .findFirst()
+          .ifPresent(
+              entry ->
+                  reportMethodMessage(
+                      classTree.getSimpleName(),
+                      "SetupTearDown",
+                      entry.getValue().name(),
+                      entry.getKey(),
+                      state));
+    }
+
+    private void reportDataProviderMethods(
+        MethodTree tree, VisitorState state, ClassTree classTree, TestNGMetadata metadata) {
+      metadata.getDataProviderMetadata().entrySet().stream()
+          .filter(entry -> entry.getValue().getMethodTree().equals(tree))
+          .findFirst()
+          .map(Map.Entry::getValue)
+          .ifPresent(
+              dataProvider -> {
+                reportMethodMessage(
+                    classTree.getSimpleName(),
+                    "DataProvider",
+                    dataProvider.getName(),
+                    dataProvider.getMethodTree(),
+                    state);
+              });
     }
 
     private void reportAnnotationMessage(

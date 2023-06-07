@@ -14,6 +14,7 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.SetupTeardownType;
  * A helper class that migrates TestNG setup and teardown methods to their JUnit Jupiter equivalent.
  */
 final class SetupTeardownMethodMigrator {
+  private SetupTeardownMethodMigrator() {}
   /**
    * Create the {@link SuggestedFix} required to migrate a TestNG setup/teardown methods to the
    * JUnit Jupiter variant.
@@ -23,7 +24,7 @@ final class SetupTeardownMethodMigrator {
    * @param state The visitor state.
    * @return An {@link Optional} containing the created fix.
    */
-  public Optional<SuggestedFix> createFix(
+  static Optional<SuggestedFix> createFix(
       MethodTree tree, SetupTeardownType type, VisitorState state) {
     return getSetupTeardownAnnotationTree(tree, type, state)
         .map(
