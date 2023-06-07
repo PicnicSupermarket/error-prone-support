@@ -25,6 +25,7 @@ import tech.picnic.errorprone.util.SourceCode;
 // XXX: Can this one also implement a `Migrator`?
 /** A helper class that migrates a TestNG {@code DataProvider} to a JUnit {@code MethodSource}. */
 final class DataProviderMigrator {
+  private DataProviderMigrator() {}
   /** This regular expression replaces matches instances of `this.getClass()` and `getClass()`. */
   private static final Pattern GET_CLASS =
       Pattern.compile("((?<!\\b\\.)|(\\bthis\\.))(getClass\\(\\))");
@@ -35,7 +36,7 @@ final class DataProviderMigrator {
    * @param methodTree The dataprovider methode tree.
    * @return {@code true} if the data provider can be migrated or else {@code false}.
    */
-  public boolean canFix(MethodTree methodTree) {
+  static boolean canFix(MethodTree methodTree) {
     return getDataProviderReturnTree(getReturnTree(methodTree)).isPresent();
   }
 
@@ -48,7 +49,7 @@ final class DataProviderMigrator {
    * @param state The {@link VisitorState}.
    * @return An {@link Optional} containing the created fix.
    */
-  public Optional<SuggestedFix> createFix(
+  static Optional<SuggestedFix> createFix(
       ClassTree classTree, MethodTree methodTree, VisitorState state) {
     return tryMigrateDataProvider(methodTree, classTree, state);
   }
