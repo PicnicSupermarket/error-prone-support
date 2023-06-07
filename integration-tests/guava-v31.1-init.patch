@@ -1,3 +1,575 @@
+diff --git a/guava/src/com/google/common/base/Preconditions.java b/guava/src/com/google/common/base/Preconditions.java
+index 13ff77b7f7..1d9729951c 100644
+--- a/guava/src/com/google/common/base/Preconditions.java
++++ b/guava/src/com/google/common/base/Preconditions.java
+@@ -126,6 +126,7 @@ public final class Preconditions {
+    * @param expression a boolean expression
+    * @throws IllegalArgumentException if {@code expression} is false
+    */
++  @SuppressWarnings("CheckArgument")
+   public static void checkArgument(boolean expression) {
+     if (!expression) {
+       throw new IllegalArgumentException();
+@@ -140,6 +141,7 @@ public final class Preconditions {
+    *     string using {@link String#valueOf(Object)}
+    * @throws IllegalArgumentException if {@code expression} is false
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(boolean expression, @CheckForNull Object errorMessage) {
+     if (!expression) {
+       throw new IllegalArgumentException(String.valueOf(errorMessage));
+@@ -159,6 +161,7 @@ public final class Preconditions {
+    *     are converted to strings using {@link String#valueOf(Object)}.
+    * @throws IllegalArgumentException if {@code expression} is false
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(
+       boolean expression,
+       String errorMessageTemplate,
+@@ -175,6 +178,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(boolean b, String errorMessageTemplate, char p1) {
+     if (!b) {
+       throw new IllegalArgumentException(lenientFormat(errorMessageTemplate, p1));
+@@ -267,6 +271,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(
+       boolean b, String errorMessageTemplate, char p1, @CheckForNull Object p2) {
+     if (!b) {
+@@ -281,6 +286,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(boolean b, String errorMessageTemplate, int p1, char p2) {
+     if (!b) {
+       throw new IllegalArgumentException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -294,6 +300,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(boolean b, String errorMessageTemplate, int p1, int p2) {
+     if (!b) {
+       throw new IllegalArgumentException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -307,6 +314,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(boolean b, String errorMessageTemplate, int p1, long p2) {
+     if (!b) {
+       throw new IllegalArgumentException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -320,6 +328,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(
+       boolean b, String errorMessageTemplate, int p1, @CheckForNull Object p2) {
+     if (!b) {
+@@ -334,6 +343,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(boolean b, String errorMessageTemplate, long p1, char p2) {
+     if (!b) {
+       throw new IllegalArgumentException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -347,6 +357,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(boolean b, String errorMessageTemplate, long p1, int p2) {
+     if (!b) {
+       throw new IllegalArgumentException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -360,6 +371,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(boolean b, String errorMessageTemplate, long p1, long p2) {
+     if (!b) {
+       throw new IllegalArgumentException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -373,6 +385,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(
+       boolean b, String errorMessageTemplate, long p1, @CheckForNull Object p2) {
+     if (!b) {
+@@ -387,6 +400,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(
+       boolean b, String errorMessageTemplate, @CheckForNull Object p1, char p2) {
+     if (!b) {
+@@ -401,6 +415,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(
+       boolean b, String errorMessageTemplate, @CheckForNull Object p1, int p2) {
+     if (!b) {
+@@ -415,6 +430,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(
+       boolean b, String errorMessageTemplate, @CheckForNull Object p1, long p2) {
+     if (!b) {
+@@ -429,6 +445,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(
+       boolean b, String errorMessageTemplate, @CheckForNull Object p1, @CheckForNull Object p2) {
+     if (!b) {
+@@ -443,6 +460,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(
+       boolean b,
+       String errorMessageTemplate,
+@@ -461,6 +479,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckArgumentWithMessage")
+   public static void checkArgument(
+       boolean b,
+       String errorMessageTemplate,
+@@ -481,6 +500,7 @@ public final class Preconditions {
+    * @throws IllegalStateException if {@code expression} is false
+    * @see Verify#verify Verify.verify()
+    */
++  @SuppressWarnings("CheckState")
+   public static void checkState(boolean expression) {
+     if (!expression) {
+       throw new IllegalStateException();
+@@ -497,6 +517,7 @@ public final class Preconditions {
+    * @throws IllegalStateException if {@code expression} is false
+    * @see Verify#verify Verify.verify()
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean expression, @CheckForNull Object errorMessage) {
+     if (!expression) {
+       throw new IllegalStateException(String.valueOf(errorMessage));
+@@ -518,6 +539,7 @@ public final class Preconditions {
+    * @throws IllegalStateException if {@code expression} is false
+    * @see Verify#verify Verify.verify()
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(
+       boolean expression,
+       /*
+@@ -543,6 +565,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, char p1) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1));
+@@ -557,6 +580,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, int p1) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1));
+@@ -571,6 +595,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, long p1) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1));
+@@ -585,6 +610,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, @CheckForNull Object p1) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1));
+@@ -599,6 +625,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, char p1, char p2) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -613,6 +640,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, char p1, int p2) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -627,6 +655,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, char p1, long p2) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -641,6 +670,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(
+       boolean b, String errorMessageTemplate, char p1, @CheckForNull Object p2) {
+     if (!b) {
+@@ -656,6 +686,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, int p1, char p2) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -670,6 +701,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, int p1, int p2) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -684,6 +716,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, int p1, long p2) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -698,6 +731,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(
+       boolean b, String errorMessageTemplate, int p1, @CheckForNull Object p2) {
+     if (!b) {
+@@ -713,6 +747,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, long p1, char p2) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -727,6 +762,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, long p1, int p2) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -741,6 +777,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(boolean b, String errorMessageTemplate, long p1, long p2) {
+     if (!b) {
+       throw new IllegalStateException(lenientFormat(errorMessageTemplate, p1, p2));
+@@ -755,6 +792,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(
+       boolean b, String errorMessageTemplate, long p1, @CheckForNull Object p2) {
+     if (!b) {
+@@ -770,6 +808,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(
+       boolean b, String errorMessageTemplate, @CheckForNull Object p1, char p2) {
+     if (!b) {
+@@ -785,6 +824,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(
+       boolean b, String errorMessageTemplate, @CheckForNull Object p1, int p2) {
+     if (!b) {
+@@ -800,6 +840,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(
+       boolean b, String errorMessageTemplate, @CheckForNull Object p1, long p2) {
+     if (!b) {
+@@ -815,6 +856,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(
+       boolean b, String errorMessageTemplate, @CheckForNull Object p1, @CheckForNull Object p2) {
+     if (!b) {
+@@ -830,6 +872,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(
+       boolean b,
+       String errorMessageTemplate,
+@@ -849,6 +892,7 @@ public final class Preconditions {
+    *
+    * @since 20.0 (varargs overload since 2.0)
+    */
++  @SuppressWarnings("CheckStateWithMessage")
+   public static void checkState(
+       boolean b,
+       String errorMessageTemplate,
+@@ -884,6 +928,7 @@ public final class Preconditions {
+    * @see Verify#verifyNotNull Verify.verifyNotNull()
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullStatement")
+   public static <T> T checkNotNull(@CheckForNull T reference) {
+     if (reference == null) {
+       throw new NullPointerException();
+@@ -902,6 +947,7 @@ public final class Preconditions {
+    * @see Verify#verifyNotNull Verify.verifyNotNull()
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(@CheckForNull T reference, @CheckForNull Object errorMessage) {
+     if (reference == null) {
+       throw new NullPointerException(String.valueOf(errorMessage));
+@@ -925,6 +971,7 @@ public final class Preconditions {
+    * @see Verify#verifyNotNull Verify.verifyNotNull()
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T reference,
+       String errorMessageTemplate,
+@@ -943,6 +990,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(@CheckForNull T obj, String errorMessageTemplate, char p1) {
+     if (obj == null) {
+       throw new NullPointerException(lenientFormat(errorMessageTemplate, p1));
+@@ -958,6 +1006,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(@CheckForNull T obj, String errorMessageTemplate, int p1) {
+     if (obj == null) {
+       throw new NullPointerException(lenientFormat(errorMessageTemplate, p1));
+@@ -973,6 +1022,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(@CheckForNull T obj, String errorMessageTemplate, long p1) {
+     if (obj == null) {
+       throw new NullPointerException(lenientFormat(errorMessageTemplate, p1));
+@@ -988,6 +1038,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, @CheckForNull Object p1) {
+     if (obj == null) {
+@@ -1004,6 +1055,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, char p1, char p2) {
+     if (obj == null) {
+@@ -1020,6 +1072,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, char p1, int p2) {
+     if (obj == null) {
+@@ -1036,6 +1089,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, char p1, long p2) {
+     if (obj == null) {
+@@ -1052,6 +1106,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, char p1, @CheckForNull Object p2) {
+     if (obj == null) {
+@@ -1068,6 +1123,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, int p1, char p2) {
+     if (obj == null) {
+@@ -1084,6 +1140,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, int p1, int p2) {
+     if (obj == null) {
+@@ -1100,6 +1157,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, int p1, long p2) {
+     if (obj == null) {
+@@ -1116,6 +1174,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, int p1, @CheckForNull Object p2) {
+     if (obj == null) {
+@@ -1132,6 +1191,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, long p1, char p2) {
+     if (obj == null) {
+@@ -1148,6 +1208,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, long p1, int p2) {
+     if (obj == null) {
+@@ -1164,6 +1225,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, long p1, long p2) {
+     if (obj == null) {
+@@ -1180,6 +1242,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, long p1, @CheckForNull Object p2) {
+     if (obj == null) {
+@@ -1196,6 +1259,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, @CheckForNull Object p1, char p2) {
+     if (obj == null) {
+@@ -1212,6 +1276,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, @CheckForNull Object p1, int p2) {
+     if (obj == null) {
+@@ -1228,6 +1293,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj, String errorMessageTemplate, @CheckForNull Object p1, long p2) {
+     if (obj == null) {
+@@ -1244,6 +1310,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj,
+       String errorMessageTemplate,
+@@ -1263,6 +1330,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj,
+       String errorMessageTemplate,
+@@ -1283,6 +1351,7 @@ public final class Preconditions {
+    * @since 20.0 (varargs overload since 2.0)
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("RequireNonNullWithMessageStatement")
+   public static <T> T checkNotNull(
+       @CheckForNull T obj,
+       String errorMessageTemplate,
+@@ -1349,6 +1418,7 @@ public final class Preconditions {
+    * @throws IllegalArgumentException if {@code size} is negative
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("CheckElementIndexWithMessage")
+   public static int checkElementIndex(int index, int size, String desc) {
+     // Carefully optimized for execution by hotspot (explanatory comment above)
+     if (index < 0 || index >= size) {
+@@ -1394,6 +1464,7 @@ public final class Preconditions {
+    * @throws IllegalArgumentException if {@code size} is negative
+    */
+   @CanIgnoreReturnValue
++  @SuppressWarnings("CheckPositionIndexWithMessage")
+   public static int checkPositionIndex(int index, int size, String desc) {
+     // Carefully optimized for execution by hotspot (explanatory comment above)
+     if (index < 0 || index > size) {
 diff --git a/guava/src/com/google/common/base/Strings.java b/guava/src/com/google/common/base/Strings.java
 index e56bf1c481..459acbca1a 100644
 --- a/guava/src/com/google/common/base/Strings.java
