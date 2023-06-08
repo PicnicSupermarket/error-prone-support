@@ -15,6 +15,7 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.SetupTeardownType;
  */
 final class SetupTeardownMethodMigrator {
   private SetupTeardownMethodMigrator() {}
+
   /**
    * Create the {@link SuggestedFix} required to migrate a TestNG setup/teardown methods to the
    * JUnit Jupiter variant.
