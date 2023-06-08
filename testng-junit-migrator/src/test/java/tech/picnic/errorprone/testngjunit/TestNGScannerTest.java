@@ -61,6 +61,7 @@ final class TestNGScannerTest {
             "  @Test(dataProvider = \"dataProviderTestCases\")",
             "  public void dataProvider() {}",
             "",
+            "  @SuppressWarnings(\"onlyMatchTestNGAnnotations\")",
             "  // BUG: Diagnostic contains: Class: B attributes: {description=\"nested\"}",
             "  @Test(description = \"nested\")",
             "  class B {",
