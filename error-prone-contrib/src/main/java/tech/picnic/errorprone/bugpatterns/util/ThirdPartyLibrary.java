@@ -32,7 +32,6 @@ public enum ThirdPartyLibrary {
    * @see <a href="https://github.com/google/guava">Guava on GitHub</a>
    */
   GUAVA("com.google.common.collect.ImmutableList"),
-
   /**
    * New Relic's Java agent API.
    *

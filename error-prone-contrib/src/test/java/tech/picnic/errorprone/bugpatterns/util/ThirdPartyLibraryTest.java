@@ -23,8 +23,7 @@ final class ThirdPartyLibraryTest {
     CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, NEW_RELIC_AGENT_API: true,",
-            "// REACTOR: true",
+            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, NEW_RELIC_AGENT_API: true, REACTOR: true",
             "class A {}")
         .doTest();
   }
@@ -39,8 +38,7 @@ final class ThirdPartyLibraryTest {
             "import org.assertj.core.api.Assertions;",
             "import reactor.core.publisher.Flux;",
             "",
-            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, NEW_RELIC_AGENT_API: true,",
-            "// REACTOR: true",
+            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, NEW_RELIC_AGENT_API: true, REACTOR: true",
             "class A {",
             "  void m(Class<?> clazz) {",
             "    m(Assertions.class);",
@@ -58,8 +56,7 @@ final class ThirdPartyLibraryTest {
         .withClasspath(ImmutableList.class, Flux.class)
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: true, NEW_RELIC_AGENT_API: false,",
-            "// REACTOR: true",
+            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: true, NEW_RELIC_AGENT_API: false, REACTOR: true",
             "class A {}")
         .doTest();
   }
@@ -70,8 +67,7 @@ final class ThirdPartyLibraryTest {
         .withClasspath()
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: false, NEW_RELIC_AGENT_API: false,",
-            "// REACTOR:",
+            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: false, NEW_RELIC_AGENT_API: false, REACTOR:",
             "// false",
             "class A {}")
         .doTest();
