@@ -61,6 +61,14 @@ abstract class TestNGMetadata {
         .collect(toImmutableList());
   }
 
+  final ImmutableSet<AnnotationMetadata> getAnnotations() {
+    return ImmutableSet.copyOf(getMethodAnnotations().values());
+  }
+
+  final Optional<AnnotationMetadata> getAnnotation(MethodTree methodTree) {
+    return Optional.ofNullable(getMethodAnnotations().get(methodTree));
+  }
+
   static Builder builder() {
     return new AutoValue_TestNGMetadata.Builder();
   }
@@ -86,14 +94,6 @@ abstract class TestNGMetadata {
     abstract Builder setDataProviderMetadata(ImmutableMap<String, DataProviderMetadata> value);
 
     abstract TestNGMetadata build();
-  }
-
-  final ImmutableSet<AnnotationMetadata> getAnnotations() {
-    return ImmutableSet.copyOf(getMethodAnnotations().values());
-  }
-
-  final Optional<AnnotationMetadata> getAnnotation(MethodTree methodTree) {
-    return Optional.ofNullable(getMethodAnnotations().get(methodTree));
   }
 
   /**

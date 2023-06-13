@@ -4,36 +4,32 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.util.ASTHelpers;
-import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 
 /**
- * A {@link Migrator} that migrates the {@code org.testng.annotations.Test#dataProvider} attributes.
+ * A {@link AttributeMigrator} that migrates the {@code org.testng.annotations.Test#dataProvider}
+ * attributes.
  */
 @Immutable
-final class DataProviderAttributeMigrator implements Migrator {
+final class DataProviderAttributeMigrator implements AttributeMigrator {
   @Override
-  public boolean canFix(
+  public Optional<SuggestedFix> migrate(
       TestNGMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {
     ExpressionTree dataProviderNameExpressionTree = annotation.getAttributes().get("dataProvider");
     if (dataProviderNameExpressionTree == null) {
-      return false;
+      return Optional.empty();
     }
 
     String dataProviderName = ASTHelpers.constValue(dataProviderNameExpressionTree, String.class);
-    return metadata.getDataProviderMetadata().containsKey(dataProviderName);
-  }
-
-  @Override
-  public Optional<SuggestedFix> createFix(
-      ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
-    String dataProviderName = ASTHelpers.constValue(dataValue, String.class);
+    if (!metadata.getDataProviderMetadata().containsKey(dataProviderName)) {
+      return Optional.empty();
+    }
 
     return Optional.of(
         SuggestedFix.builder()

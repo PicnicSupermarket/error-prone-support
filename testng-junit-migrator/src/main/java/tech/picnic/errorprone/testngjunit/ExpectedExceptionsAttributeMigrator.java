@@ -9,7 +9,6 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.BlockTree;
-import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
@@ -17,40 +16,40 @@ import java.util.Optional;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.util.SourceCode;
 
-/** A {@link Migrator} that migrates the {@code expectedExceptions} attribute. */
+/** A {@link AttributeMigrator} that migrates the {@code expectedExceptions} attribute. */
 @Immutable
-final class ExpectedExceptionsAttributeMigrator implements Migrator {
+final class ExpectedExceptionsAttributeMigrator implements AttributeMigrator {
   @Override
-  public boolean canFix(
+  public Optional<SuggestedFix> migrate(
       TestNGMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {
-    return annotation.getAttributes().containsKey("expectedExceptions");
-  }
-
-  @Override
-  public Optional<SuggestedFix> createFix(
-      ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
-    return getExpectedException(dataValue, state)
+    return Optional.ofNullable(annotation.getAttributes().get("expectedExceptions"))
         .map(
-            expectedException -> {
-              SuggestedFix.Builder fix =
-                  SuggestedFix.builder()
-                      .replace(
-                          methodTree.getBody(),
-                          buildWrappedBody(methodTree.getBody(), expectedException, state));
-              ImmutableList<String> removedExceptions = getRemovedExceptions(dataValue, state);
-              if (!removedExceptions.isEmpty()) {
-                fix.prefixWith(
-                    methodTree,
-                    String.format(
-                        "// XXX: Removed handling of `%s` because this migration doesn't support%n// XXX: multiple expected exceptions.%n",
-                        String.join(", ", removedExceptions)));
-              }
+            expectedExceptions ->
+                getExpectedException(expectedExceptions, state)
+                    .map(
+                        expectedException -> {
+                          SuggestedFix.Builder fix =
+                              SuggestedFix.builder()
+                                  .replace(
+                                      methodTree.getBody(),
+                                      buildWrappedBody(
+                                          methodTree.getBody(), expectedException, state));
+                          ImmutableList<String> removedExceptions =
+                              getRemovedExceptions(expectedExceptions, state);
+                          if (!removedExceptions.isEmpty()) {
+                            fix.prefixWith(
+                                methodTree,
+                                String.format(
+                                    "// XXX: Removed handling of `%s` because this migration doesn't support%n// XXX: multiple expected exceptions.%n",
+                                    String.join(", ", removedExceptions)));
+                          }
 
-              return fix.build();
-            });
+                          return fix.build();
+                        })
+                    .orElse(SuggestedFix.emptyFix()));
   }
 
   private static Optional<String> getExpectedException(
