@@ -15,7 +15,6 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
-import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.MethodTree;
@@ -110,10 +109,6 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
 
       @Override
       public @Nullable Void visitMethod(MethodTree tree, TestNGMetadata metadata) {
-        if (ASTHelpers.isGeneratedConstructor(tree)) {
-          return super.visitMethod(tree, metadata);
-        }
-
         /* Make sure ALL Tests in the class can be migrated. */
         if (conservativeMode && !canMigrateAllTestsInClass(metadata, state)) {
           return super.visitMethod(tree, metadata);
@@ -124,8 +119,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
             .ifPresent(
                 annotation -> {
                   SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
-                  buildAttributeFixes(metadata, annotation, tree, conservativeMode, state)
-                      .forEach(fixBuilder::merge);
+                  buildAttributeFixes(metadata, annotation, tree, state).forEach(fixBuilder::merge);
 
                   fixBuilder.merge(migrateAnnotation(annotation, tree));
                   state.reportMatch(describeMatch(tree, fixBuilder.build()));
@@ -142,18 +136,11 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       TestNGMetadata metadata,
       AnnotationMetadata annotationMetadata,
       MethodTree methodTree,
-      boolean conservativeMode,
       VisitorState state) {
     return annotationMetadata.getAttributes().entrySet().stream()
         .flatMap(
             entry ->
-                trySuggestFix(
-                    metadata,
-                    annotationMetadata,
-                    entry.getKey(),
-                    methodTree,
-                    conservativeMode,
-                    state)
+                trySuggestFix(metadata, annotationMetadata, entry.getKey(), methodTree, state)
                     .stream())
         .collect(toImmutableList());
   }
@@ -162,7 +149,6 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       MethodTree methodTree,
       TestNGMetadata metadata,
       AnnotationMetadata annotationMetadata,
-      boolean conservativeMode,
       VisitorState state) {
     ImmutableList<TestAnnotationAttribute> attributes =
         annotationMetadata.getAttributes().keySet().stream()
@@ -173,22 +159,14 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
         && attributes.stream()
             .allMatch(
                 kind ->
-                    !conservativeMode
-                        || kind.getAttributeMigrator()
-                            .migrate(metadata, annotationMetadata, methodTree, state)
-                            .isPresent());
+                    kind.getAttributeMigrator()
+                        .migrate(metadata, annotationMetadata, methodTree, state)
+                        .isPresent());
   }
 
   private static boolean canMigrateAllTestsInClass(TestNGMetadata metadata, VisitorState state) {
     return metadata.getMethodAnnotations().entrySet().stream()
-        .allMatch(
-            entry ->
-                canMigrateTest(
-                    entry.getKey(),
-                    metadata,
-                    entry.getValue(),
-                    /* conservativeMode= */ true,
-                    state));
+        .allMatch(entry -> canMigrateTest(entry.getKey(), metadata, entry.getValue(), state));
   }
 
   private static Optional<SuggestedFix> trySuggestFix(
@@ -196,20 +174,13 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       AnnotationMetadata annotation,
       String attributeName,
       MethodTree methodTree,
-      boolean conservativeMode,
       VisitorState state) {
     return TestAnnotationAttribute.fromString(attributeName)
         .map(TestAnnotationAttribute::getAttributeMigrator)
         .flatMap(migrator -> migrator.migrate(metadata, annotation, methodTree, state))
         .or(
-            () -> {
-              if (conservativeMode) {
-                return Optional.empty();
-              }
-
-              return UnsupportedAttributeMigrator.migrate(
-                  annotation, methodTree, attributeName, state);
-            });
+            () ->
+                UnsupportedAttributeMigrator.migrate(annotation, methodTree, attributeName, state));
   }
 
   private static SuggestedFix migrateAnnotation(

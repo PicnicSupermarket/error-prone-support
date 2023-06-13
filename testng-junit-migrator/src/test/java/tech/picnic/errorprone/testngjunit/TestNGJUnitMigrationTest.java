@@ -113,6 +113,19 @@ final class TestNGJUnitMigrationTest {
             "  @Test(testName = \"unsupportedAttribute\", suiteName = \"unsupportedAttribute\")",
             "  public void multipleUnsupportedAttributes() {}",
             "}")
+        .addSourceLines(
+            "C.java",
+            "import org.testng.annotations.Test;",
+            "",
+            "@Test",
+            "public class C {",
+            "  // BUG: Diagnostic contains:",
+            "  public void classLevelAnnotation() {}",
+            "",
+            "  @Test(description = \"bar\")",
+            "  // BUG: Diagnostic contains:",
+            "  public void methodAnnotation() {}",
+            "}")
         .doTest();
   }
 
