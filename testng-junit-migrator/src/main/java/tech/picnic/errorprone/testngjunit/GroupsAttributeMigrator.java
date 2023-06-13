@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
-import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
@@ -15,29 +14,28 @@ import java.util.Optional;
 import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.util.SourceCode;
 
-/**
- * A {@link tech.picnic.errorprone.testngjunit.Migrator} that migrates the {@code group} attribute.
- */
+/** A {@link AttributeMigrator} that migrates the {@code group} attribute. */
 @Immutable
-final class GroupsAttributeMigrator implements Migrator {
+final class GroupsAttributeMigrator implements AttributeMigrator {
   @Override
-  public boolean canFix(
+  public Optional<SuggestedFix> migrate(
       TestNGMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {
     ExpressionTree groupsExpression = annotation.getAttributes().get("groups");
-    return groupsExpression != null
-        && extractGroups(groupsExpression, state).stream()
-            .allMatch(GroupsAttributeMigrator::isValidTagName);
-  }
+    if (groupsExpression == null) {
+      return Optional.empty();
+    }
 
-  @Override
-  public Optional<SuggestedFix> createFix(
-      ClassTree classTree, MethodTree methodTree, ExpressionTree dataValue, VisitorState state) {
+    ImmutableList<String> groups = extractGroups(groupsExpression, state);
+    if (!groups.stream().allMatch(GroupsAttributeMigrator::isValidTagName)) {
+      return Optional.empty();
+    }
+
     SuggestedFix.Builder fix = SuggestedFix.builder().addImport("org.junit.jupiter.api.Tag");
-    extractGroups(dataValue, state)
-        .forEach(group -> fix.prefixWith(methodTree, String.format("@Tag(\"%s\")%n", group)));
+    groups.forEach(group -> fix.prefixWith(methodTree, String.format("@Tag(\"%s\")%n", group)));
+
     return Optional.of(fix.build());
   }
 
