@@ -31,7 +31,7 @@ jobs:
       # additionally enabling all checks defined in this project and any Error
       # Prone checks available only from other artifact repositories.
       - name: Check out code
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
         with:
           persist-credentials: false
       - name: Set up JDK
