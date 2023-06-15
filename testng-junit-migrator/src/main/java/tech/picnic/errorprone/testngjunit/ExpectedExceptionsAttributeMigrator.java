@@ -75,10 +75,6 @@ final class ExpectedExceptionsAttributeMigrator implements AttributeMigrator {
     }
 
     NewArrayTree arrayTree = (NewArrayTree) expectedExceptions;
-    if (arrayTree.getInitializers().size() <= 1) {
-      return ImmutableList.of();
-    }
-
     return arrayTree.getInitializers().subList(1, arrayTree.getInitializers().size()).stream()
         .map(initializer -> SourceCode.treeToString(initializer, state))
         .collect(toImmutableList());
