@@ -1,3 +1,15 @@
+diff --git a/guava/src/com/google/common/base/Platform.java b/guava/src/com/google/common/base/Platform.java
+index 644e89cbfa..137f879603 100644
+--- a/guava/src/com/google/common/base/Platform.java
++++ b/guava/src/com/google/common/base/Platform.java
+@@ -55,6 +55,7 @@ final class Platform {
+     return String.format(Locale.ROOT, "%.4g", value);
+   }
+
++  @SuppressWarnings("StringIsNullOrEmpty")
+   static boolean stringIsNullOrEmpty(@CheckForNull String string) {
+     return string == null || string.isEmpty();
+   }
 diff --git a/guava/src/com/google/common/base/Preconditions.java b/guava/src/com/google/common/base/Preconditions.java
 index 13ff77b7f7..1d9729951c 100644
 --- a/guava/src/com/google/common/base/Preconditions.java
@@ -647,24 +659,67 @@ index 572e0acbf5..fa17e67916 100644
      return isEmpty()
          ? emptySet(reversedOrder)
 diff --git a/pom.xml b/pom.xml
-index 13dd0985d3..3fa0827e02 100644
+index 13dd0985d3..30c1060d1c 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -22,6 +22,9 @@
      <maven-javadoc-plugin.additionalJOptions></maven-javadoc-plugin.additionalJOptions>
      <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-+    <error-prone.version>v2.19.1-picnic-1</error-prone.version>
-+    <error-prone-support.version>0.11.0</error-prone-support.version>
++    <error-prone.version>v2.19.1-picnic-1</error-prone.version> <java.version>11</java.version>
++    <error-prone-support.version>0.11.2-SNAPSHOT</error-prone-support.version>
 +    <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
    </properties>
    <issueManagement>
      <system>GitHub Issues</system>
-@@ -346,6 +349,56 @@
-     </dependencies>
+@@ -347,50 +350,163 @@
    </dependencyManagement>
    <profiles>
-+    <profile>
+     <profile>
+-        <id>sonatype-oss-release</id>
+-        <build>
+-          <plugins>
+-            <plugin>
+-              <groupId>org.apache.maven.plugins</groupId>
+-              <artifactId>maven-source-plugin</artifactId>
+-              <version>${maven-source-plugin.version}</version>
+-              <executions>
+-                <execution>
+-                  <id>attach-sources</id>
+-                  <goals>
+-                    <goal>jar-no-fork</goal>
+-                  </goals>
+-                </execution>
+-              </executions>
+-            </plugin>
+-            <plugin>
+-              <groupId>org.apache.maven.plugins</groupId>
+-              <artifactId>maven-javadoc-plugin</artifactId>
+-              <version>${maven-javadoc-plugin.version}</version>
+-                <executions>
+-                  <execution>
+-                    <id>attach-javadocs</id>
+-                    <goals>
+-                      <goal>jar</goal>
+-                    </goals>
+-                </execution>
+-              </executions>
+-            </plugin>
+-            <plugin>
+-              <groupId>org.apache.maven.plugins</groupId>
+-              <artifactId>maven-gpg-plugin</artifactId>
+-              <version>1.6</version>
+-              <executions>
+-                <execution>
+-                  <id>sign-artifacts</id>
+-                  <phase>verify</phase>
+-                  <goals>
+-                    <goal>sign</goal>
+-                  </goals>
+-                </execution>
+-              </executions>
+-            </plugin>
+-          </plugins>
 +      <id>error-prone-compile</id>
 +      <build>
 +        <plugins>
@@ -687,7 +742,7 @@ index 13dd0985d3..3fa0827e02 100644
 +                    <arg>-Xpkginfo:always</arg>
 +                    <arg>-XDcompilePolicy=simple</arg>
 +                    <arg>
-+                      -Xplugin:ErrorProne ${error-prone.flags} -Xep:CollectorMutability:OFF -Xep:FluxImplicitBlock:OFF -Xep:ScheduledTransactionTrace:OFF -XepOpt:Refaster:NamePattern=^(?!Immutable).*
++                      -Xplugin:ErrorProne ${error-prone.flags} -Xep:CollectorMutability:OFF -Xep:FluxImplicitBlock:OFF -Xep:ScheduledTransactionTrace:OFF -XepOpt:Refaster:NamePattern=^((?!(Immutable|PrimitiveRules)).*)
 +                    </arg>
 +                  </compilerArgs>
 +                  <annotationProcessorPaths>
@@ -714,6 +769,114 @@ index 13dd0985d3..3fa0827e02 100644
 +        </plugins>
 +      </build>
 +    </profile>
++    <profile>
++      <id>error-prone-test-compile</id>
++      <build>
++        <plugins>
++          <plugin>
++            <groupId>org.apache.maven.plugins</groupId>
++            <artifactId>maven-compiler-plugin</artifactId>
++            <version>${maven.compiler.plugin.version}</version>
++            <executions>
++              <!-- Skip the default-testCompile execution as we don't want to execute the testCompile goal twice -->
++              <execution>
++                <id>default-testCompile</id>
++                <phase>test-compile</phase>
++                <goals>
++                  <goal>testCompile</goal>
++                </goals>
++                <configuration>
++                  <skip>true</skip>
++                </configuration>
++              </execution>
++              <execution>
++                <id>error-prone-test-compile</id>
++                <phase>test-compile</phase>
++                <goals>
++                  <goal>testCompile</goal>
++                </goals>
++                <configuration>
++                  <failOnError>false</failOnError>
++                  <source>${java.version}</source>
++                  <target>${java.version}</target>
++                  <compilerArgs>
++                    <arg>-Xpkginfo:always</arg>
++                    <arg>-XDcompilePolicy=simple</arg>
++                    <arg>
++                      -Xplugin:ErrorProne \
++
++                      ${error-prone.flags}
++                    </arg>
++                  </compilerArgs>
++                  <annotationProcessorPaths>
++                    <path>
++                      <groupId>com.github.PicnicSupermarket.error-prone</groupId>
++                      <artifactId>error_prone_core</artifactId>
++                      <version>${error-prone.version}</version>
++                    </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>error-prone-contrib</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>refaster-runner</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
++                  </annotationProcessorPaths>
++                </configuration>
++              </execution>
++            </executions>
++          </plugin>
++        </plugins>
++      </build>
++    </profile>
++    <profile>
++      <id>sonatype-oss-release</id>
++      <build>
++        <plugins>
++          <plugin>
++            <groupId>org.apache.maven.plugins</groupId>
++            <artifactId>maven-source-plugin</artifactId>
++            <version>${maven-source-plugin.version}</version>
++            <executions>
++              <execution>
++                <id>attach-sources</id>
++                <goals>
++                  <goal>jar-no-fork</goal>
++                </goals>
++              </execution>
++            </executions>
++          </plugin>
++          <plugin>
++            <groupId>org.apache.maven.plugins</groupId>
++            <artifactId>maven-javadoc-plugin</artifactId>
++            <version>${maven-javadoc-plugin.version}</version>
++            <executions>
++              <execution>
++                <id>attach-javadocs</id>
++                <goals>
++                  <goal>jar</goal>
++                </goals>
++              </execution>
++            </executions>
++          </plugin>
++          <plugin>
++            <groupId>org.apache.maven.plugins</groupId>
++            <artifactId>maven-gpg-plugin</artifactId>
++            <version>1.6</version>
++            <executions>
++              <execution>
++                <id>sign-artifacts</id>
++                <phase>verify</phase>
++                <goals>
++                  <goal>sign</goal>
++                </goals>
++              </execution>
++            </executions>
++          </plugin>
++        </plugins>
+       </build>
+     </profile>
      <profile>
-         <id>sonatype-oss-release</id>
-         <build>
