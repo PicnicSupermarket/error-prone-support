@@ -94,6 +94,15 @@ final class TestNGScannerTest {
             "  private static Object[][] notMigratableDataProviderTestCases() {",
             "    return Stream.of(1, 2, 3).map(i -> new Object[] {i}).toArray(Object[][]::new);",
             "  }",
+            "",
+            "  private static Object[][] notMigratableDataProvider2TestCases() {",
+            "    Object[][] testCases = new Object[][] {{1}, {2}};",
+            "    return testCases;",
+            "  }",
+            "",
+            "  private static Object[] notMigratableDataProvider3TestCases() {",
+            "    return new Object[] {new Object[] {1}, new Object[] {2}};",
+            "  }",
             "}")
         .doTest();
   }
