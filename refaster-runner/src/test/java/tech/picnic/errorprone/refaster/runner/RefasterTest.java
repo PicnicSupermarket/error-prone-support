@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import tech.picnic.errorprone.refaster.ErrorProneFork;
 
 final class RefasterTest {
   private final CompilationTestHelper compilationHelper =
@@ -80,74 +79,66 @@ final class RefasterTest {
     SeverityLevel defaultSeverity = BugCheckerInfo.create(Refaster.class).defaultSeverity();
 
     /* { arguments, expectedSeverities } */
-    return Stream.concat(
-        Stream.of(
-            arguments(
-                ImmutableList.of(), ImmutableList.of(defaultSeverity, WARNING, ERROR, SUGGESTION)),
-            arguments(ImmutableList.of("-Xep:Refaster:OFF"), ImmutableList.of()),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:DEFAULT"),
-                ImmutableList.of(defaultSeverity, WARNING, ERROR, SUGGESTION)),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:WARN"),
-                ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:ERROR"),
-                ImmutableList.of(ERROR, ERROR, ERROR, ERROR)),
-            arguments(
-                ImmutableList.of("-XepAllErrorsAsWarnings"),
-                ImmutableList.of(defaultSeverity, WARNING, WARNING, SUGGESTION)),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:OFF", "-XepAllErrorsAsWarnings"),
-                ImmutableList.of()),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllErrorsAsWarnings"),
-                ImmutableList.of(defaultSeverity, WARNING, WARNING, SUGGESTION)),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:WARN", "-XepAllErrorsAsWarnings"),
-                ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllErrorsAsWarnings"),
-                ImmutableList.of(WARNING, WARNING, WARNING, WARNING))),
-        ErrorProneFork.isErrorProneForkAvailable()
-            ? Stream.of(
-                arguments(
-                    ImmutableList.of("-Xep:Refaster:OFF", "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of()),
-                arguments(
-                    ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of(WARNING, WARNING, ERROR, WARNING)),
-                arguments(
-                    ImmutableList.of("-Xep:Refaster:WARN", "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
-                arguments(
-                    ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of(ERROR, ERROR, ERROR, ERROR)),
-                arguments(
-                    ImmutableList.of(
-                        "-Xep:Refaster:OFF",
-                        "-XepAllErrorsAsWarnings",
-                        "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of()),
-                arguments(
-                    ImmutableList.of(
-                        "-Xep:Refaster:DEFAULT",
-                        "-XepAllErrorsAsWarnings",
-                        "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
-                arguments(
-                    ImmutableList.of(
-                        "-Xep:Refaster:WARN",
-                        "-XepAllErrorsAsWarnings",
-                        "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
-                arguments(
-                    ImmutableList.of(
-                        "-Xep:Refaster:ERROR",
-                        "-XepAllErrorsAsWarnings",
-                        "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of(WARNING, WARNING, WARNING, WARNING)))
-            : Stream.empty());
+    return Stream.of(
+        arguments(
+            ImmutableList.of(), ImmutableList.of(defaultSeverity, WARNING, ERROR, SUGGESTION)),
+        arguments(ImmutableList.of("-Xep:Refaster:OFF"), ImmutableList.of()),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:DEFAULT"),
+            ImmutableList.of(defaultSeverity, WARNING, ERROR, SUGGESTION)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:WARN"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:ERROR"), ImmutableList.of(ERROR, ERROR, ERROR, ERROR)),
+        arguments(
+            ImmutableList.of("-XepAllErrorsAsWarnings"),
+            ImmutableList.of(defaultSeverity, WARNING, WARNING, SUGGESTION)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:OFF", "-XepAllErrorsAsWarnings"), ImmutableList.of()),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllErrorsAsWarnings"),
+            ImmutableList.of(defaultSeverity, WARNING, WARNING, SUGGESTION)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:WARN", "-XepAllErrorsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllErrorsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of("-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, ERROR, WARNING)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:OFF", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of()),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, ERROR, WARNING)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:WARN", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(ERROR, ERROR, ERROR, ERROR)),
+        arguments(
+            ImmutableList.of("-XepAllErrorsAsWarnings", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of(
+                "-Xep:Refaster:OFF", "-XepAllErrorsAsWarnings", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of()),
+        arguments(
+            ImmutableList.of(
+                "-Xep:Refaster:DEFAULT", "-XepAllErrorsAsWarnings", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of(
+                "-Xep:Refaster:WARN", "-XepAllErrorsAsWarnings", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of(
+                "-Xep:Refaster:ERROR", "-XepAllErrorsAsWarnings", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)));
   }
 
   /**
