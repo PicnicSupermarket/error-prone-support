@@ -1,25 +1,25 @@
-//package tech.picnic.errorprone.bugpatterns;
+// package tech.picnic.errorprone.bugpatterns;
 //
-//import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
-//import static java.util.function.Function.identity;
-//import static java.util.function.Predicate.not;
-//import static org.assertj.core.api.Assertions.assertThat;
-//import static org.assertj.core.api.Assertions.assertThatCode;
-//import static org.junit.jupiter.params.provider.Arguments.arguments;
+// import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
+// import static java.util.function.Function.identity;
+// import static java.util.function.Predicate.not;
+// import static org.assertj.core.api.Assertions.assertThat;
+// import static org.assertj.core.api.Assertions.assertThatCode;
+// import static org.junit.jupiter.params.provider.Arguments.arguments;
 //
-//import com.google.common.collect.ImmutableSet;
-//import com.google.common.collect.ImmutableSetMultimap;
-//import com.google.errorprone.BugCheckerRefactoringTestHelper;
-//import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
-//import java.util.regex.Pattern;
-//import java.util.stream.Stream;
-//import org.junit.jupiter.api.Disabled;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.params.ParameterizedTest;
-//import org.junit.jupiter.params.provider.Arguments;
-//import org.junit.jupiter.params.provider.MethodSource;
+// import com.google.common.collect.ImmutableSet;
+// import com.google.common.collect.ImmutableSetMultimap;
+// import com.google.errorprone.BugCheckerRefactoringTestHelper;
+// import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
+// import java.util.regex.Pattern;
+// import java.util.stream.Stream;
+// import org.junit.jupiter.api.Disabled;
+// import org.junit.jupiter.api.Test;
+// import org.junit.jupiter.params.ParameterizedTest;
+// import org.junit.jupiter.params.provider.Arguments;
+// import org.junit.jupiter.params.provider.MethodSource;
 //
-//public final class RefasterCheckTest {
+// public final class RefasterCheckTest {
 //  /** The names of all Refaster template groups defined in this module. */
 //  private static final ImmutableSet<String> TEMPLATE_GROUPS =
 //      ImmutableSet.of(
@@ -105,7 +105,8 @@
 //  }
 //
 //  /**
-//   * Returns every known (template group name, template name) pair as a parameterized test argument.
+//   * Returns every known (template group name, template name) pair as a parameterized test
+// argument.
 //   */
 //  @SuppressWarnings("UnusedMethod" /* Used as a `@MethodSource`. */)
 //  private static Stream<Arguments> templatesUnderTest() {
@@ -119,7 +120,8 @@
 //  }
 //
 //  /**
-//   * Verifies that {@link RefasterCheck#loadAllCodeTransformers} finds at least one code transformer
+//   * Verifies that {@link RefasterCheck#loadAllCodeTransformers} finds at least one code
+// transformer
 //   * for all of the {@link #TEMPLATE_GROUPS}.
 //   *
 //   * <p>This test is just as much about ensuring that {@link #TEMPLATE_GROUPS} is exhaustive, so
@@ -145,7 +147,8 @@
 //   *
 //   * <p>Note that this doesn't guarantee full coverage: this test cannot ascertain that all {@link
 //   * com.google.errorprone.refaster.Refaster#anyOf} branches are tested. Idem for {@link
-//   * com.google.errorprone.refaster.annotation.BeforeTemplate} methods in case there are multiple .
+//   * com.google.errorprone.refaster.annotation.BeforeTemplate} methods in case there are multiple
+// .
 //   */
 //  @Disabled
 //  @MethodSource("templatesUnderTest")
@@ -186,4 +189,4 @@
 //    return BugCheckerRefactoringTestHelper.newInstance(RefasterCheck.class, getClass())
 //        .setArgs("-XepOpt:Refaster:NamePattern=" + namePattern);
 //  }
-//}
+// }
