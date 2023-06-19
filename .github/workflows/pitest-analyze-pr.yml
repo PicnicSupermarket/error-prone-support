@@ -32,7 +32,7 @@ jobs:
       - name: Aggregate Pitest reports
         run: mvn pitest-git:aggregate -DkilledEmoji=":tada:" -DmutantEmoji=":zombie:" -DtrailingText="Mutation testing report by [Pitest](https://pitest.org/). Review any surviving mutants by inspecting the line comments under [_Files changed_](${{ github.event.number }}/files)."
       - name: Upload Pitest reports as artifact
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         with:
           name: pitest-reports
           path: ./target/pit-reports-ci
