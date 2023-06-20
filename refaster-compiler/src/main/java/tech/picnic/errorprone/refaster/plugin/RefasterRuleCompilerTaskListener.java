@@ -139,7 +139,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
 
   private static CharSequence toSimpleFlatName(ClassSymbol symbol) {
     Name flatName = symbol.flatName();
-    int lastDot = flatName.lastIndexOf((byte) '.');
+    int lastDot = flatName.lastIndexOf('.');
     return lastDot < 0 ? flatName : flatName.subSequence(lastDot + 1, flatName.length());
   }
 
