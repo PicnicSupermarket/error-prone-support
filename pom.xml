@@ -201,7 +201,7 @@
         <version.auto-value>1.10.1</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.19.1</version.error-prone-orig>
+        <version.error-prone-orig>2.20.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.18</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
@@ -972,7 +972,7 @@
                             <banDuplicateClasses>
                                 <dependencies>
                                     <dependency>
-                                        <groupId>org.checkerframework</groupId>
+                                        <groupId>io.github.eisop</groupId>
                                         <artifactId>dataflow-errorprone</artifactId>
                                         <!-- This package is contained in
                                         Checker Framework's `checker-qual` and
@@ -1720,6 +1720,9 @@
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->
                                     -Xep:Java8ApiChecker:OFF
+                                    <!-- XXX: Triggers an IOOBE. See
+                                    https://github.com/google/error-prone/pull/3976. -->
+                                    -Xep:MemberName:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
                                     <!-- We generally discourage `var` use. -->
