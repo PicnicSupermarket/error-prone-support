@@ -1721,7 +1721,7 @@
                                     <!-- We don't target JDK 8. -->
                                     -Xep:Java8ApiChecker:OFF
                                     <!-- XXX: Triggers an IOOBE. See
-                                    https://github.com/google/error-prone/pull/3976.-->
+                                    https://github.com/google/error-prone/pull/3976. -->
                                     -Xep:MemberName:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
