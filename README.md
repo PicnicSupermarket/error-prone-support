@@ -283,7 +283,7 @@ channel; please see our [security policy][security] for details.
 [openssf-best-practices-badge]: https://bestpractices.coreinfrastructure.org/projects/7199/badge
 [openssf-best-practices-checklist]: https://bestpractices.coreinfrastructure.org/projects/7199
 [openssf-scorecard-badge]: https://img.shields.io/ossf-scorecard/github.com/PicnicSupermarket/error-prone-support?label=openssf%20scorecard
-[openssf-scorecard-report]: https://api.securityscorecards.dev/projects/github.com/PicnicSupermarket/error-prone-support
+[openssf-scorecard-report]: https://securityscorecards.dev/viewer/?uri=github.com/PicnicSupermarket/error-prone-support
 [picnic-blog-ep-post]: https://blog.picnic.nl/picnic-loves-error-prone-producing-high-quality-and-consistent-java-code-b8a566be6886
 [picnic-blog]: https://blog.picnic.nl
 [pitest-badge]: https://img.shields.io/badge/-Mutation%20tested%20with%20PIT-blue.svg
