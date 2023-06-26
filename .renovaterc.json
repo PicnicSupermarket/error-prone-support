@@ -6,6 +6,7 @@
   "packageRules": [
     {
       "matchPackagePatterns": [
+        "Maven API",
         "^org\\.springframework:spring-framework-bom$",
         "^org\\.springframework\\.boot:spring-boot[a-z-]*$"
       ],
