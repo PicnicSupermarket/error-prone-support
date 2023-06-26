@@ -208,7 +208,7 @@
         <version.maven>3.8.7</version.maven>
         <version.mockito>5.4.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
-        <version.nullaway>0.10.10</version.nullaway>
+        <version.nullaway>0.10.11</version.nullaway>
         <version.pitest-git>1.0.11</version.pitest-git>
         <version.surefire>3.1.2</version.surefire>
     </properties>
