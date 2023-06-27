@@ -742,7 +742,7 @@ index 13dd0985d3..30c1060d1c 100644
 +                    <arg>-Xpkginfo:always</arg>
 +                    <arg>-XDcompilePolicy=simple</arg>
 +                    <arg>
-+                      -Xplugin:ErrorProne ${error-prone.flags} -Xep:CollectorMutability:OFF -Xep:FluxImplicitBlock:OFF -Xep:ScheduledTransactionTrace:OFF -XepOpt:Refaster:NamePattern=^((?!(Immutable|PrimitiveRules)).*)
++                      -Xplugin:ErrorProne ${error-prone.flags}  -Xep:StaticImport:OFF -Xep:CollectorMutability:OFF -Xep:FluxImplicitBlock:OFF -Xep:ScheduledTransactionTrace:OFF -XepOpt:Refaster:NamePattern=^((?!(Immutable|PrimitiveRules|AssortedRules\$CheckIndex|NullRules\$RequireNonNullElse|MapEntryRules\$MapEntry|OptionalRules\$OptionalOrElseThrow|OptionalRules\$OptionalIsEmpty)).*)
 +                    </arg>
 +                  </compilerArgs>
 +                  <annotationProcessorPaths>
