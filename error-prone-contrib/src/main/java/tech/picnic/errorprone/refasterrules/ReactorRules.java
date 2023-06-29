@@ -418,6 +418,22 @@ final class ReactorRules {
     }
   }
 
+  /**
+   * Don't unnecessarily transform a {@link Mono} to a {@link Flux} before calling {@link
+   * Mono#single()}.
+   */
+  static final class MonoSingle<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono) {
+      return mono.flux().single();
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono) {
+      return mono.single();
+    }
+  }
+
   /** Don't unnecessarily pass an empty publisher to {@link Flux#switchIfEmpty(Publisher)}. */
   static final class FluxSwitchIfEmptyOfEmptyPublisher<T> {
     @BeforeTemplate
