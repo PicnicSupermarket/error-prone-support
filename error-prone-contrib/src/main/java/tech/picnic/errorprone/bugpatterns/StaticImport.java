@@ -4,8 +4,8 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.Objects.requireNonNull;
-import static tech.picnic.errorprone.bugpatterns.NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS;
-import static tech.picnic.errorprone.bugpatterns.NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS;
+import static tech.picnic.errorprone.bugpatterns.NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS;
+import static tech.picnic.errorprone.bugpatterns.NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -48,11 +48,11 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
 
   /**
    * Types whose members should be statically imported, unless exempted by {@link
-   * NonStaticImport#BAD_STATIC_IMPORT_CANDIDATE_MEMBERS} or {@link
-   * NonStaticImport#BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS}.
+   * NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_MEMBERS} or {@link
+   * NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS}.
    *
    * <p>Types listed here should be mutually exclusive with {@link
-   * NonStaticImport#BAD_STATIC_IMPORT_CANDIDATE_TYPES}.
+   * NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_TYPES}.
    */
   static final ImmutableSet<String> STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of(
@@ -104,9 +104,9 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
    * Type members that should be statically imported.
    *
    * <p>This should be mutually exclusive with {@link
-   * NonStaticImport#BAD_STATIC_IMPORT_CANDIDATE_MEMBERS}.
+   * NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_MEMBERS}.
    *
-   * <p>Identifiers listed by {@link NonStaticImport#BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS} should
+   * <p>Identifiers listed by {@link NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS} should
    * be mutually exclusive with identifiers listed here.
    */
   static final ImmutableSetMultimap<String, String> STATIC_IMPORT_CANDIDATE_MEMBERS =
@@ -183,13 +183,13 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
 
   private static boolean isCandidate(MemberSelectTree tree) {
     String identifier = tree.getIdentifier().toString();
-    if (BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(identifier)) {
+    if (NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(identifier)) {
       return false;
     }
 
     Type type = ASTHelpers.getType(tree.getExpression());
     return type != null
-        && !BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type.toString(), identifier);
+        && !NON_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type.toString(), identifier);
   }
 
   private static Optional<String> getCandidateSimpleName(StaticImportInfo importInfo) {

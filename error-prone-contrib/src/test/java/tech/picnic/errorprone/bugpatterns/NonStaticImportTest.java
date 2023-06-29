@@ -10,28 +10,28 @@ import org.junit.jupiter.api.Test;
 final class NonStaticImportTest {
   @Test
   void candidateMembersAreNotRedundant() {
-    assertThat(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
-        .doesNotContainAnyElementsOf(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_TYPES);
+    assertThat(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
+        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_TYPES);
 
-    assertThat(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.values())
-        .doesNotContainAnyElementsOf(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS);
+    assertThat(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS.values())
+        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS);
   }
 
   @Test
   void badTypesDontClashWithStaticImportCandidates() {
-    assertThat(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_TYPES)
+    assertThat(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_TYPES)
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
   }
 
   @Test
   void badMembersDontClashWithStaticImportCandidates() {
-    assertThat(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_MEMBERS.entries())
+    assertThat(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS.entries())
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.entries());
   }
 
   @Test
   void badIdentifiersDontClashWithStaticImportCandidates() {
-    assertThat(NonStaticImport.BAD_STATIC_IMPORT_CANDIDATE_IDENTIFIERS)
+    assertThat(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS)
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.values());
   }
 
@@ -56,7 +56,6 @@ final class NonStaticImportTest {
             "import static java.lang.Integer.MAX_VALUE;",
             "import static java.lang.Integer.MIN_VALUE;",
             "import static java.time.Clock.systemUTC;",
-            "import static java.time.Instant.MAX;",
             "import static java.time.Instant.MIN;",
             "import static java.time.ZoneOffset.UTC;",
             "import static java.util.Collections.min;",
@@ -80,6 +79,7 @@ final class NonStaticImportTest {
             "    // BUG: Diagnostic contains:",
             "    systemUTC();",
             "    Clock.systemUTC();",
+            "    ZoneOffset utcIsExempted = UTC;",
             "",
             "    // BUG: Diagnostic contains:",
             "    Optional<Integer> optional1 = empty();",
@@ -92,46 +92,27 @@ final class NonStaticImportTest {
             "    // BUG: Diagnostic contains:",
             "    Locale locale1 = ROOT;",
             "    Locale locale2 = Locale.ROOT;",
+            "    Locale isNotACandidate = ENGLISH;",
             "",
             "    // BUG: Diagnostic contains:",
             "    Instant instant1 = MIN;",
             "    Instant instant2 = Instant.MIN;",
-            "    // BUG: Diagnostic contains:",
-            "    Instant instant3 = MAX;",
-            "    Instant instant4 = Instant.MAX;",
             "",
             "    // BUG: Diagnostic contains:",
             "    ImmutableSet.of(min(ImmutableSet.of()));",
             "",
             "    Object builder = null;",
-            "    // Not flagged because identifier is variable",
-            "    Object lBuilder = ImmutableList.of(builder);",
+            "    ImmutableList<Object> list = ImmutableList.of(builder);",
             "",
-            "    // Not flagged because member of type is not a candidate.",
-            "    Locale lo3 = ENGLISH;",
-            "",
-            "    // Not flagged because member of type is exempted.",
-            "    ZoneOffset utc = UTC;",
-            "",
-            "    // Not flagged because method is not statically imported.",
-            "    create();",
-            "",
-            "    // Not flagged because identifier is not statically imported.",
-            "    // A member variable did overwrite the statically imported identifier.",
-            "    Integer i1 = MIN_VALUE;",
-            "",
-            "    // Not flagged because identifier is not statically imported.",
-            "    Integer i2 = new B().MIN;",
-            "",
-            "    // Not flagged because identifier is not statically imported.",
-            "    Object inst = new INSTANCE();",
+            "    Integer refersToMemberVariable = MIN_VALUE;",
+            "    Integer minIsNotStatic = new B().MIN;",
+            "    Object regularImport = new INSTANCE();",
+            "    MAX_VALUE maxValue = new MAX_VALUE();",
             "",
             "    Integer from = 12;",
-            "    // Not flagged because identifier is not statically imported.",
-            "    Integer i3 = from;",
+            "    Integer i1 = from;",
             "",
-            "    // Not flagged because identifier does not belong to a type.",
-            "    MAX_VALUE maxValue = new MAX_VALUE();",
+            "    create();",
             "  }",
             "",
             "  void create() {",
@@ -149,6 +130,7 @@ final class NonStaticImportTest {
         .addInputLines(
             "A.java",
             "import static com.google.common.collect.ImmutableList.copyOf;",
+            "import static com.google.common.collect.ImmutableSet.of;",
             "import static java.time.Clock.systemUTC;",
             "import static java.time.Instant.MAX;",
             "import static java.time.Instant.MIN;",
@@ -180,11 +162,20 @@ final class NonStaticImportTest {
             "    Instant i1 = MIN;",
             "    Instant i2 = MAX;",
             "",
-            "    ImmutableSet.of(min(ImmutableSet.of()));",
+            "    ImmutableSet.of(min(of()));",
             "  }",
             "}")
         .addOutputLines(
             "A.java",
+            "import static com.google.common.collect.ImmutableList.copyOf;",
+            "import static com.google.common.collect.ImmutableSet.of;",
+            "import static java.time.Clock.systemUTC;",
+            "import static java.time.Instant.MAX;",
+            "import static java.time.Instant.MIN;",
+            "import static java.util.Collections.min;",
+            "import static java.util.Locale.ROOT;",
+            "import static java.util.Optional.empty;",
+            "",
             "import com.google.common.collect.ImmutableList;",
             "import com.google.common.collect.ImmutableSet;",
             "import java.time.Clock;",
