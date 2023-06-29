@@ -418,10 +418,7 @@ final class ReactorRules {
     }
   }
 
-  /**
-   * Don't unnecessarily transform a {@link Mono} to a {@link Flux} before calling {@link
-   * Mono#single()}.
-   */
+  /** Don't unnecessarily transform a {@link Mono} to a {@link Flux} to expect exactly one item. */
   static final class MonoSingle<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono) {
