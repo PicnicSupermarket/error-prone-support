@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
         with:
           persist-credentials: false
-      - uses: ruby/setup-ruby@v1.126.0
+      - uses: ruby/setup-ruby@c7079efafd956afb5d823e8999c2506e1053aefa # v1.126.0
         with:
           working-directory: ./website
           bundler-cache: true
