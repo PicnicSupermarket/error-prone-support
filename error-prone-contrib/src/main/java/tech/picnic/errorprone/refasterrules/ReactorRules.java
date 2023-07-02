@@ -1180,6 +1180,19 @@ final class ReactorRules {
     }
   }
 
+  /* Don't unnecessarily invoke {@link Mono#single()} as {@link Flux#collect(Collector)} always yields one item. */
+  static final class FluxCollect<T, R> {
+    @BeforeTemplate
+    Mono<R> before(Flux<T> flux, Collector<T, ?, R> collector) {
+      return flux.collect(collector).single();
+    }
+
+    @AfterTemplate
+    Mono<R> after(Flux<T> flux, Collector<? super T, ?, R> collector) {
+      return flux.collect(collector);
+    }
+  }
+
   /**
    * Prefer {@link Flux#collect(Collector)} with {@link ImmutableList#toImmutableList()} over
    * alternatives that do not explicitly return an immutable collection.
