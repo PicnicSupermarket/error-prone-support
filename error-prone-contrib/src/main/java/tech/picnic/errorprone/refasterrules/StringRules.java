@@ -406,4 +406,6 @@ final class StringRules {
       return string.startsWith(prefix, fromIndex);
     }
   }
+
+  // Rewrite `String#copyValueOf(char[])` to `new String(char[])`.
 }
