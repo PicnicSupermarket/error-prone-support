@@ -244,4 +244,7 @@ final class StringRules {
       return Utf8.encodedLength(str);
     }
   }
+
+  // Rewrite `String#copyValueOf(char[])` to `new String(char[])`.
+  
 }
