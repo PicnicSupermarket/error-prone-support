@@ -47,8 +47,8 @@ final class StringRules {
 
   /** Prefer a method reference to {@link String#isEmpty()} over the equivalent lambda function. */
   // XXX: Now that we build with JDK 15+, this rule can be generalized to cover all `CharSequence`
-  // subtypes. But `CharSequence::isEmpty` isn't as nice as `String::isEmpty`, so we might want to
-  // introduce a rule that suggests `String::isEmpty` where possible.
+  // subtypes. However, `CharSequence::isEmpty` isn't as nice as `String::isEmpty`, so we might want
+  // to introduce a rule that suggests `String::isEmpty` where possible.
   // XXX: As it stands, this rule is a special case of what `MethodReferenceUsage` tries to achieve.
   // If/when `MethodReferenceUsage` becomes production ready, we should simply drop this check.
   static final class StringIsEmptyPredicate {
@@ -65,8 +65,8 @@ final class StringRules {
 
   /** Prefer a method reference to {@link String#isEmpty()} over the equivalent lambda function. */
   // XXX: Now that we build with JDK 15+, this rule can be generalized to cover all `CharSequence`
-  // subtypes. But `CharSequence::isEmpty` isn't as nice as `String::isEmpty`, so we might want to
-  // introduce a rule that suggests `String::isEmpty` where possible.
+  // subtypes. However, `CharSequence::isEmpty` isn't as nice as `String::isEmpty`, so we might want
+  // to introduce a rule that suggests `String::isEmpty` where possible.
   static final class StringIsNotEmptyPredicate {
     @BeforeTemplate
     Predicate<String> before() {
