@@ -1,8 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Predicates.and;
 import static com.google.common.base.Predicates.containsPattern;
-import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.SECOND;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
@@ -15,10 +13,7 @@ final class MemberOrderingTest {
     CompilationTestHelper.newInstance(MemberOrdering.class, getClass())
         .expectErrorMessage(
             "MemberOrdering",
-            and(
-                containsPattern("SuppressWarnings"),
-                containsPattern(
-                    "Members, constructors and methods should follow standard ordering.")))
+            containsPattern("Members, constructors and methods should follow standard ordering."))
         .addSourceLines(
             "A.java",
             "// BUG: Diagnostic matches: MemberOrdering",
@@ -102,64 +97,6 @@ final class MemberOrderingTest {
             "}")
         .addOutputLines(
             "A.java",
-            "@SuppressWarnings(\"MemberOrdering\")",
-            "class A {",
-            "  private static final int X = 1;",
-            "  char a = 'a';",
-            "  private static String FOO = \"foo\";",
-            "  static int ONE = 1;",
-            "",
-            "  void m2() {}",
-            "",
-            "  public A() {}",
-            "",
-            "  private static String BAR = \"bar\";",
-            "  char b = 'b';",
-            "",
-            "  void m1() {",
-            "    System.out.println(\"foo\");",
-            "  }",
-            "",
-            "  static int TWO = 2;",
-            "",
-            "  class Inner {}",
-            "",
-            "  static class StaticInner {}",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
-  }
-
-  @Test
-  void replacementSecondSuggestedFix() {
-    BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
-        .setFixChooser(SECOND)
-        .addInputLines(
-            "A.java",
-            "class A {",
-            "  private static final int X = 1;",
-            "  char a = 'a';",
-            "  private static String FOO = \"foo\";",
-            "  static int ONE = 1;",
-            "",
-            "  void m2() {}",
-            "",
-            "  public A() {}",
-            "",
-            "  private static String BAR = \"bar\";",
-            "  char b = 'b';",
-            "",
-            "  void m1() {",
-            "    System.out.println(\"foo\");",
-            "  }",
-            "",
-            "  static int TWO = 2;",
-            "",
-            "  class Inner {}",
-            "",
-            "  static class StaticInner {}",
-            "}")
-        .addOutputLines(
-            "A.java",
             "class A {",
             "  private static final int X = 1;",
             "  private static String FOO = \"foo\";",
@@ -188,9 +125,8 @@ final class MemberOrderingTest {
   }
 
   @Test
-  void replacementSecondSuggestedFixConsidersDefaultConstructor() {
+  void replacementFirstSuggestedFixConsidersDefaultConstructor() {
     BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
-        .setFixChooser(SECOND)
         .addInputLines(
             "A.java",
             "class A {",
@@ -217,13 +153,13 @@ final class MemberOrderingTest {
   }
 
   @Test
-  void replacementSecondSuggestedFixConsidersComments() {
+  void replacementFirstSuggestedFixConsidersComments() {
     BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
-        .setFixChooser(SECOND)
         .addInputLines(
             "A.java",
             "class A {",
             "  // `m1()` comment.",
+            "  // `m1()` second comment.",
             "  void m1() {",
             "    // Print line 'foo' to stdout.",
             "    System.out.println(\"foo\");",
@@ -241,19 +177,43 @@ final class MemberOrderingTest {
             "  public A() {}",
             "",
             "  // `m1()` comment.",
+            "  // `m1()` second comment.",
             "  void m1() {",
             "    // Print line 'foo' to stdout.",
             "    System.out.println(\"foo\");",
             "  }",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void replacementFirstSuggestedFixConsidersAnnotations() {
+    BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
+        .addInputLines(
+            "A.java",
+            "class A {",
+            "  @SuppressWarnings(\"foo\")",
+            "  void m1() {}",
+            "",
+            "  @SuppressWarnings(\"bar\")",
+            "  A() {}",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "class A {",
+            "  @SuppressWarnings(\"bar\")",
+            "  A() {}",
+            "",
+            "  @SuppressWarnings(\"foo\")",
+            "  void m1() {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
 
   @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
-  void replacementSecondSuggestedFixDoesNotModifyWhitespace() {
+  void replacementFirstSuggestedFixDoesNotModifyWhitespace() {
     BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
-        .setFixChooser(SECOND)
         .addInputLines(
             "A.java",
             "",
@@ -290,12 +250,10 @@ final class MemberOrderingTest {
         .doTest();
   }
 
-  // todo: Actually verify that whitespace is preserved.
+  // XXX: This test should fail, if we verify that whitespace is preserved.
   @SuppressWarnings("ErrorProneTestHelperSourceFormat")
-  @Test
   void xxx() {
     BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
-        .setFixChooser(SECOND)
         .addInputLines(
             "A.java",
             "",
@@ -337,6 +295,4 @@ final class MemberOrderingTest {
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
-
-  // todo: Test if second replacement considers annotations.
 }
