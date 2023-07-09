@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
-import static com.sun.tools.javac.parser.Tokens.TokenKind.LBRACE;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
@@ -20,15 +19,16 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ErrorProneToken;
+import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
+import com.sun.source.util.TreePath;
 import com.sun.tools.javac.parser.Tokens;
-import com.sun.tools.javac.util.Position;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.lang.model.element.Modifier;
@@ -66,52 +66,26 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    ImmutableList<? extends Tree> members =
-        tree.getMembers().stream()
-            .filter(MemberOrdering::shouldBeSorted)
+    ImmutableList<MemberWithComments> membersWithComments =
+        getMembersWithComments(tree, state).stream()
+            .filter(memberWithComments -> shouldBeSorted(memberWithComments.member()))
             .collect(toImmutableList());
-    ImmutableList<? extends Tree> sortedMembers =
-        members.stream().sorted(MEMBER_SORTING).collect(toImmutableList());
 
-    if (members.equals(sortedMembers)) {
+    ImmutableList<MemberWithComments> sortedMembersWithComments =
+        ImmutableList.sortedCopyOf(
+            (a, b) -> MEMBER_SORTING.compare(a.member(), b.member()), membersWithComments);
+
+    if (membersWithComments.equals(sortedMembersWithComments)) {
       return Description.NO_MATCH;
     }
 
     return buildDescription(tree)
-        .addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()))
-        .addFix(swapMembersIncludingComments(members, sortedMembers, tree, state))
+        .addFix(swapMembersWithComments(membersWithComments, sortedMembersWithComments, state))
         .setMessage(
             "Members, constructors and methods should follow standard ordering. "
                 + "The standard ordering is: static variables, non-static variables, "
                 + "constructors and methods.")
         .build();
-  }
-
-  private static boolean shouldBeSorted(Tree tree) {
-    return tree instanceof VariableTree
-        || (tree instanceof MethodTree && !ASTHelpers.isGeneratedConstructor((MethodTree) tree));
-  }
-
-  private static SuggestedFix swapMembersIncludingComments(
-      ImmutableList<? extends Tree> members,
-      ImmutableList<? extends Tree> sortedMembers,
-      ClassTree classTree,
-      VisitorState state) {
-    SuggestedFix.Builder fix = SuggestedFix.builder();
-    for (int i = 0; i < members.size(); i++) {
-      Tree original = members.get(i);
-      Tree correct = sortedMembers.get(i);
-      /* Technically not necessary, but avoids redundant replacements. */
-      if (!original.equals(correct)) {
-        String replacement =
-            Stream.concat(
-                    getComments(classTree, correct, state).map(Tokens.Comment::getText),
-                    Stream.of(state.getSourceForNode(correct)))
-                .collect(joining("\n"));
-        fix.merge(replaceIncludingComments(classTree, original, replacement, state));
-      }
-    }
-    return fix.build();
   }
 
   private static boolean isStatic(VariableTree memberTree) {
@@ -123,95 +97,100 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
     return ASTHelpers.getSymbol(methodDecl).isConstructor();
   }
 
-  private static Stream<Tokens.Comment> getComments(
-      ClassTree classTree, Tree member, VisitorState state) {
-    return getTokensBeforeMember(classTree, member, state).findFirst().stream()
-        .map(ErrorProneToken::comments)
-        // xxx: Original impl sorts comments, but that seems unnecessary.
-        .flatMap(List::stream);
+  private static boolean shouldBeSorted(Tree tree) {
+    return tree instanceof VariableTree
+        || (tree instanceof MethodTree && !ASTHelpers.isGeneratedConstructor((MethodTree) tree));
   }
 
-  // XXX: From this point the code is just a fancy copy of `SuggestFixes.replaceIncludingComments` -
-  // if we cannot use existing solutions for this functionality, this one needs a big refactor.
-
-  private static SuggestedFix replaceIncludingComments(
-      ClassTree classTree, Tree member, String replacement, VisitorState state) {
-    Optional<Tree> previousMember = getPreviousMember(member, classTree);
-    ImmutableList<ErrorProneToken> tokens =
-        getTokensBeforeMember(classTree, member, state).collect(toImmutableList());
-
-    if (tokens.isEmpty()) {
-      return SuggestedFix.replace(member, replacement);
-    }
-    if (tokens.get(0).comments().isEmpty()) {
-      return SuggestedFix.replace(tokens.get(0).pos(), state.getEndPosition(member), replacement);
-    }
-    ImmutableList<Tokens.Comment> comments =
-        ImmutableList.sortedCopyOf(
-            Comparator.<Tokens.Comment>comparingInt(c -> c.getSourcePos(0)).reversed(),
-            tokens.get(0).comments());
-    @Var int startPos = ASTHelpers.getStartPosition(member);
-    // This can happen for desugared expressions like `int a, b;`.
-    if (startPos < getStartTokenization(classTree, state, previousMember)) {
-      return SuggestedFix.emptyFix();
-    }
-    // Delete backwards for comments which are not separated from our target by a blank line.
-    CharSequence sourceCode = state.getSourceCode();
-    for (Tokens.Comment comment : comments) {
-      int endOfCommentPos = comment.getSourcePos(comment.getText().length() - 1);
-      CharSequence stringBetweenComments = sourceCode.subSequence(endOfCommentPos, startPos);
-      if (stringBetweenComments.chars().filter(c -> c == '\n').count() > 1) {
-        break;
+  private static SuggestedFix swapMembersWithComments(
+      ImmutableList<MemberWithComments> memberWithComments,
+      ImmutableList<MemberWithComments> sortedMembersWithComments,
+      VisitorState state) {
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+    for (int i = 0; i < memberWithComments.size(); i++) {
+      Tree originalMember = memberWithComments.get(i).member();
+      MemberWithComments correct = sortedMembersWithComments.get(i);
+      /* Technically this check is not necessary, but it avoids redundant replacements. */
+      if (!originalMember.equals(correct.member())) {
+        String replacement =
+            Stream.concat(
+                    correct.comments().stream().map(Tokens.Comment::getText),
+                    Stream.of(state.getSourceForNode(correct.member())))
+                .collect(joining("\n"));
+        fix.merge(
+            SuggestedFixes.replaceIncludingComments(
+                TreePath.getPath(state.getPath(), originalMember), replacement, state));
       }
-      startPos = comment.getSourcePos(0);
     }
-    return SuggestedFix.replace(startPos, state.getEndPosition(member), replacement);
+    return fix.build();
   }
 
-  private static Optional<Tree> getPreviousMember(Tree tree, ClassTree classTree) {
-    @Var Tree previousMember = null;
+  // XXX: Work around that `ErrorProneTokens.getTokens(memberSrc, ctx)` returns tokens not
+  //  containing the member's comments.
+  /** Returns the class' members with their comments. */
+  private static ImmutableList<MemberWithComments> getMembersWithComments(
+      ClassTree classTree, VisitorState state) {
+    List<ErrorProneToken> tokens =
+        new ArrayList<>(
+            ErrorProneTokens.getTokens(state.getSourceForNode(classTree), state.context));
+
+    ImmutableList.Builder<MemberWithComments> membersWithComments = ImmutableList.builder();
     for (Tree member : classTree.getMembers()) {
-      if (member instanceof MethodTree && ASTHelpers.isGeneratedConstructor((MethodTree) member)) {
+      ImmutableList<ErrorProneToken> memberTokens =
+          ErrorProneTokens.getTokens(state.getSourceForNode(member), state.context);
+      if (memberTokens.isEmpty() || memberTokens.get(0).kind() == Tokens.TokenKind.EOF) {
         continue;
       }
-      if (member.equals(tree)) {
-        break;
+
+      @Var
+      ImmutableList<ErrorProneToken> maybeCommentedMemberTokens =
+          ImmutableList.copyOf(tokens.subList(0, memberTokens.size()));
+      while (!areTokenListsMatching(memberTokens, maybeCommentedMemberTokens)) {
+        tokens.remove(0);
+        maybeCommentedMemberTokens = ImmutableList.copyOf(tokens.subList(0, memberTokens.size()));
       }
-      previousMember = member;
+
+      membersWithComments.add(
+          new MemberWithComments(
+              member, ImmutableList.copyOf(maybeCommentedMemberTokens.get(0).comments())));
     }
-    return Optional.ofNullable(previousMember);
+    return membersWithComments.build();
   }
 
-  private static Stream<ErrorProneToken> getTokensBeforeMember(
-      ClassTree classTree, Tree member, VisitorState state) {
-    Optional<Tree> previousMember = getPreviousMember(member, classTree);
-    Integer startTokenization = getStartTokenization(classTree, state, previousMember);
-
-    Stream<ErrorProneToken> tokens =
-        state.getOffsetTokens(startTokenization, state.getEndPosition(member)).stream();
-
-    if (previousMember.isEmpty()) {
-      return tokens.dropWhile(token -> token.kind() != LBRACE).skip(1);
+  /**
+   * Checks whether two lists of error-prone tokens are 'equal' without considering their comments.
+   */
+  private static boolean areTokenListsMatching(
+      ImmutableList<ErrorProneToken> tokens, ImmutableList<ErrorProneToken> memberTokens) {
+    if (tokens.size() != memberTokens.size()) {
+      return false;
     }
-    return tokens;
+    for (int i = 0; i < tokens.size() - 1 /* EOF */; i++) {
+      if (tokens.get(i).kind() != memberTokens.get(i).kind()
+          || tokens.get(i).hasName() != memberTokens.get(i).hasName()
+          || (tokens.get(i).hasName()
+              && !tokens.get(i).name().equals(memberTokens.get(i).name()))) {
+        return false;
+      }
+    }
+    return true;
   }
 
-  // XXX: rename / remove method - it gets the start position of tokens that *might* be related to
-  // member.
-  // - afaik it includes a Class declaration if the member is the first member in the
-  // class and does not have comments.
-  private static Integer getStartTokenization(
-      ClassTree classTree, VisitorState state, Optional<Tree> previousMember) {
-    return previousMember
-        .map(state::getEndPosition)
-        .orElseGet(
-            () ->
-                // XXX: Could return the position of the character next to the opening brace of the
-                // class - `... Clazz ... {`
-                // this could make this method more defined, worthy of existence, but it may also
-                // require additional parameters and changes in `replaceIncludingComments` method.
-                state.getEndPosition(classTree.getModifiers()) == Position.NOPOS
-                    ? ASTHelpers.getStartPosition(classTree)
-                    : state.getEndPosition(classTree.getModifiers()));
+  private static final class MemberWithComments {
+    final Tree member;
+    final ImmutableList<Tokens.Comment> comments;
+
+    MemberWithComments(Tree member, ImmutableList<Tokens.Comment> comments) {
+      this.member = member;
+      this.comments = comments;
+    }
+
+    public Tree member() {
+      return member;
+    }
+
+    public ImmutableList<Tokens.Comment> comments() {
+      return comments;
+    }
   }
 }
