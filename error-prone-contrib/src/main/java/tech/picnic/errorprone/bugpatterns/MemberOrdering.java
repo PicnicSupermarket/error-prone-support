@@ -177,8 +177,8 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
   }
 
   private static final class MemberWithComments {
-    final Tree member;
-    final ImmutableList<Tokens.Comment> comments;
+    private final Tree member;
+    private final ImmutableList<Tokens.Comment> comments;
 
     MemberWithComments(Tree member, ImmutableList<Tokens.Comment> comments) {
       this.member = member;
