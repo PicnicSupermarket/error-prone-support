@@ -4,7 +4,6 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
 
 final class MonoZipOfMonoVoidUsageTest {
   @Test
@@ -17,6 +16,7 @@ final class MonoZipOfMonoVoidUsageTest {
             "class A {",
             "  void m() {",
             "    Mono<Void> a = Mono.empty();",
+            "    Mono.empty().zipWith(a);",
             "    Mono<Void> b = Mono.empty();",
             "    Mono<Integer> c = Mono.just(1);",
             "    // BUG: Diagnostic contains:",
@@ -29,6 +29,7 @@ final class MonoZipOfMonoVoidUsageTest {
             "    Mono.zip(Mono.empty(), Mono.empty());",
             "    // BUG: Diagnostic contains:",
             "    Mono.zip(a, c, b);",
+            "",
             "  }",
             "}")
         .doTest();
