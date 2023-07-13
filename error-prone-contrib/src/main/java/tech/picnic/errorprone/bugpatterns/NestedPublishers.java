@@ -29,7 +29,8 @@ import reactor.core.publisher.Flux;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Avoid nesting `Publisher`s inside `Publishers`s; the resultant code is hard to reason about",
+        "Avoid nesting `Publisher`s inside `Publishers`s; "
+            + "the resultant code is hard to reason about",
     link = BUG_PATTERNS_BASE_URL + "NestedPublishers",
     linkType = CUSTOM,
     severity = WARNING,
