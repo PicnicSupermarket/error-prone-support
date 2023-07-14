@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
@@ -423,18 +422,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         StepVerifier.create(Mono.just("baz")).expectNextMatches("qux"::equals));
   }
 
-  ImmutableSet<Duration> testFluxAsStepVerifierExpectNext() {
-    return ImmutableSet.of(
-        Flux.just(1)
-            .collect(toImmutableList())
-            .as(StepVerifier::create)
-            .assertNext(list -> assertThat(list).containsExactly(2))
-            .verifyComplete(),
-        Flux.just(3)
-            .collect(toImmutableSet())
-            .as(StepVerifier::create)
-            .assertNext(set -> assertThat(set).containsExactly(4))
-            .verifyComplete());
+  Duration testFluxAsStepVerifierExpectNext() {
+    return Flux.just(1)
+        .collect(toImmutableList())
+        .as(StepVerifier::create)
+        .assertNext(list -> assertThat(list).containsExactly(2))
+        .verifyComplete();
   }
 
   Duration testStepVerifierLastStepVerifyComplete() {

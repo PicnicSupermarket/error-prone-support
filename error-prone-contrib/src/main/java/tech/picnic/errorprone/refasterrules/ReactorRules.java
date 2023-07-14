@@ -1332,20 +1332,13 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid collecting when verifying only the given element is in the given {@link Flux}. */
+  /** Avoid value collection when verifying that a {@link Flux} emits exactly one value. */
   static final class FluxAsStepVerifierExpectNext<T> {
     @BeforeTemplate
     StepVerifier.Step<ImmutableList<T>> before(Flux<T> flux, T object) {
       return flux.collect(toImmutableList())
           .as(StepVerifier::create)
           .assertNext(list -> assertThat(list).containsExactly(object));
-    }
-
-    @BeforeTemplate
-    StepVerifier.Step<ImmutableSet<T>> before2(Flux<T> flux, T object) {
-      return flux.collect(toImmutableSet())
-          .as(StepVerifier::create)
-          .assertNext(set -> assertThat(set).containsExactly(object));
     }
 
     @AfterTemplate
