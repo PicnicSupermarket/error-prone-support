@@ -10,6 +10,7 @@ import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.type;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.unbound;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -20,10 +21,8 @@ import com.google.errorprone.suppliers.Suppliers;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
-import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
 
 /** A {@link BugChecker} that flags nesting of {@link Publisher Publishers}. */
 @AutoService(BugChecker.class)
@@ -52,31 +51,18 @@ public final class NestedPublishers extends BugChecker implements MethodInvocati
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    Type publisherOfPublisherType = PUBLISHER_OF_PUBLISHERS.get(state);
-    Type groupedFluxType = GROUPED_FLUX.get(state);
-    Type treeType = ASTHelpers.getType(tree);
-    if (!isNestedPublisher(state, publisherOfPublisherType, treeType)
-        || isTypeArgumentGroupedFlux(state, groupedFluxType, treeType)) {
+    Type type = ASTHelpers.getType(tree);
+
+    if (!isSubType(type, PUBLISHER_OF_PUBLISHERS.get(state), state)
+        || isSubType(
+            Iterables.getOnlyElement(type.getTypeArguments()), GROUPED_FLUX.get(state), state)) {
       return Description.NO_MATCH;
     }
 
     return describeMatch(tree);
   }
 
-  private static boolean isNestedPublisher(
-      VisitorState state, @Nullable Type publisherOfPublisherType, Type treeType) {
-    return publisherOfPublisherType != null
-        && state.getTypes().isSubtype(treeType, publisherOfPublisherType);
-  }
-
-  /**
-   * Excluding the type when it matches {@code Flux<GroupedFlux<K, V>>} to not flag usages of {@link
-   * Flux#groupBy(Function)}.
-   */
-  private static boolean isTypeArgumentGroupedFlux(
-      VisitorState state, @Nullable Type groupedFluxType, Type treeType) {
-    return groupedFluxType != null
-        && treeType.getTypeArguments().stream()
-            .anyMatch(typez -> ASTHelpers.isSameType(typez, groupedFluxType, state));
+  private static boolean isSubType(Type subType, @Nullable Type type, VisitorState state) {
+    return type != null && state.getTypes().isSubtype(subType, type);
   }
 }
