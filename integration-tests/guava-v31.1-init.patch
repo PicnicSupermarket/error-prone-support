@@ -1,3 +1,50 @@
+diff --git a/guava/src/com/google/common/collect/Iterables.java b/guava/src/com/google/common/collect/Iterables.java
+index 7928b15d67..f86ac443ba 100644
+--- a/guava/src/com/google/common/collect/Iterables.java
++++ b/guava/src/com/google/common/collect/Iterables.java
+@@ -1041,6 +1041,7 @@ public final class Iterables {
+    *
+    * @return {@code true} if the iterable contains no elements
+    */
++  @SuppressWarnings("IterableIsEmpty")
+   public static boolean isEmpty(Iterable<?> iterable) {
+     if (iterable instanceof Collection) {
+       return ((Collection<?>) iterable).isEmpty();
+
+diff --git a/guava-testlib/test/com/google/common/testing/NullPointerTesterTest.java b/guava-testlib/test/com/google/common/testing/NullPointerTesterTest.java
+index a5a20ec3ad..9bad916fe3 100644
+--- a/guava-testlib/test/com/google/common/testing/NullPointerTesterTest.java
++++ b/guava-testlib/test/com/google/common/testing/NullPointerTesterTest.java
+@@ -839,6 +839,7 @@ public class NullPointerTesterTest extends TestCase {
+ 
+   @SuppressWarnings("unused") // for NullPointerTester
+   private static class ClassThatFailsToThrowForStatic {
++    @SuppressWarnings("EmptyMethod")
+     static void staticOneArg(String s) {}
+   }
+ 
+@@ -854,6 +855,7 @@ public class NullPointerTesterTest extends TestCase {
+ 
+   private static class SubclassThatTriesToOverrideBadStaticMethod
+       extends ClassThatFailsToThrowForStatic {
++    @SuppressWarnings("EmptyMethod")
+     static void staticOneArg(@Nullable String s) {}
+   }
+ 
+
+diff --git a/guava-testlib/test/com/google/common/testing/ClassSanityTesterTest.java b/guava-testlib/test/com/google/common/testing/ClassSanityTesterTest.java
+index c5db2d575c..4aa3d60ff0 100644
+--- a/guava-testlib/test/com/google/common/testing/ClassSanityTesterTest.java
++++ b/guava-testlib/test/com/google/common/testing/ClassSanityTesterTest.java
+@@ -1338,7 +1338,7 @@ public class ClassSanityTesterTest extends TestCase {
+   private enum EnumFailsToCheckNull {
+     A;
+ 
+-    @SuppressWarnings("unused")
++    @SuppressWarnings({"unused", "EmptyMethod"})
+     public void failToCheckNull(String s) {}
+   }
+
 diff --git a/guava/src/com/google/common/base/Platform.java b/guava/src/com/google/common/base/Platform.java
 index 644e89cbfa..137f879603 100644
 --- a/guava/src/com/google/common/base/Platform.java
@@ -742,7 +789,7 @@ index 13dd0985d3..30c1060d1c 100644
 +                    <arg>-Xpkginfo:always</arg>
 +                    <arg>-XDcompilePolicy=simple</arg>
 +                    <arg>
-+                      -Xplugin:ErrorProne ${error-prone.flags}  -Xep:StaticImport:OFF -Xep:CollectorMutability:OFF -Xep:FluxImplicitBlock:OFF -Xep:ScheduledTransactionTrace:OFF -XepOpt:Refaster:NamePattern=^((?!(Immutable|PrimitiveRules|AssortedRules\$CheckIndex|NullRules\$RequireNonNullElse|MapEntryRules\$MapEntry|OptionalRules\$OptionalOrElseThrow|OptionalRules\$OptionalIsEmpty)).*)
++                      -Xplugin:ErrorProne ${error-prone.flags} -Xep:CollectorMutability:OFF -Xep:FluxImplicitBlock:OFF -Xep:ScheduledTransactionTrace:OFF -XepOpt:Refaster:NamePattern=^((?!(Immutable|PrimitiveRules|AssortedRules\$CheckIndex|NullRules\$RequireNonNullElse|MapEntryRules\$MapEntry|OptionalRules\$OptionalOrElseThrow|OptionalRules\$OptionalIsEmpty)).*)
 +                    </arg>
 +                  </compilerArgs>
 +                  <annotationProcessorPaths>

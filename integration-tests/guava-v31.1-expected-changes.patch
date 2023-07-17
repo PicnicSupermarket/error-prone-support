@@ -7584,7 +7584,7 @@ index dfd26a0c73..58d6bbea17 100644
      assertEquals(ImmutableTable.of(), ArbitraryInstances.get(Table.class));
      assertEquals(ImmutableTable.of(), ArbitraryInstances.get(ImmutableTable.class));
 diff --git a/guava-testlib/test/com/google/common/testing/ClassSanityTesterTest.java b/guava-testlib/test/com/google/common/testing/ClassSanityTesterTest.java
-index c5db2d575c..1f71ab7bd3 100644
+index 4aa3d60ff0..f456832048 100644
 --- a/guava-testlib/test/com/google/common/testing/ClassSanityTesterTest.java
 +++ b/guava-testlib/test/com/google/common/testing/ClassSanityTesterTest.java
 @@ -16,8 +16,9 @@
@@ -7853,16 +7853,15 @@ index c5db2d575c..1f71ab7bd3 100644
      }
  
      @Override
-@@ -1337,9 +1337,6 @@ public class ClassSanityTesterTest extends TestCase {
- 
+@@ -1338,7 +1338,7 @@ public class ClassSanityTesterTest extends TestCase {
    private enum EnumFailsToCheckNull {
      A;
--
--    @SuppressWarnings("unused")
--    public void failToCheckNull(String s) {}
+ 
+-    @SuppressWarnings({"unused", "EmptyMethod"})
++    @SuppressWarnings({"EmptyMethod", "unused"})
+     public void failToCheckNull(String s) {}
    }
  
-   private interface AnInterface {}
 diff --git a/guava-testlib/test/com/google/common/testing/EqualsTesterTest.java b/guava-testlib/test/com/google/common/testing/EqualsTesterTest.java
 index d615af6633..07d5a17a05 100644
 --- a/guava-testlib/test/com/google/common/testing/EqualsTesterTest.java
@@ -7908,7 +7907,7 @@ index d615af6633..07d5a17a05 100644
  
      NamedObject addPeers(String... names) {
 diff --git a/guava-testlib/test/com/google/common/testing/NullPointerTesterTest.java b/guava-testlib/test/com/google/common/testing/NullPointerTesterTest.java
-index a5a20ec3ad..6424816c15 100644
+index 9bad916fe3..3880c7d94c 100644
 --- a/guava-testlib/test/com/google/common/testing/NullPointerTesterTest.java
 +++ b/guava-testlib/test/com/google/common/testing/NullPointerTesterTest.java
 @@ -17,13 +17,14 @@
@@ -8140,29 +8139,7 @@ index a5a20ec3ad..6424816c15 100644
      }
    }
  
-@@ -838,9 +837,7 @@ public class NullPointerTesterTest extends TestCase {
-   }
- 
-   @SuppressWarnings("unused") // for NullPointerTester
--  private static class ClassThatFailsToThrowForStatic {
--    static void staticOneArg(String s) {}
--  }
-+  private static class ClassThatFailsToThrowForStatic {}
- 
-   public void testClassThatFailsToThrowForStatic() {
-     shouldFail(ClassThatFailsToThrowForStatic.class);
-@@ -853,9 +850,7 @@ public class NullPointerTesterTest extends TestCase {
-   }
- 
-   private static class SubclassThatTriesToOverrideBadStaticMethod
--      extends ClassThatFailsToThrowForStatic {
--    static void staticOneArg(@Nullable String s) {}
--  }
-+      extends ClassThatFailsToThrowForStatic {}
- 
-   public void testSubclassThatTriesToOverrideBadStaticMethod() {
-     shouldFail(SubclassThatTriesToOverrideBadStaticMethod.class);
-@@ -868,7 +863,7 @@ public class NullPointerTesterTest extends TestCase {
+@@ -870,7 +869,7 @@ public class NullPointerTesterTest extends TestCase {
    @SuppressWarnings("unused") // used by reflection
    private static class CanCreateDefault {
      public void foo(@Nullable HardToCreate ignored, String required) {
@@ -8171,7 +8148,7 @@ index a5a20ec3ad..6424816c15 100644
      }
    }
  
-@@ -879,8 +874,8 @@ public class NullPointerTesterTest extends TestCase {
+@@ -881,8 +880,8 @@ public class NullPointerTesterTest extends TestCase {
    @SuppressWarnings("unused") // used by reflection
    private static class CannotCreateDefault {
      public void foo(HardToCreate ignored, String required) {
@@ -8182,7 +8159,7 @@ index a5a20ec3ad..6424816c15 100644
      }
    }
  
-@@ -949,8 +944,8 @@ public class NullPointerTesterTest extends TestCase {
+@@ -951,8 +950,8 @@ public class NullPointerTesterTest extends TestCase {
  
      @Override
      public void doSomething(String bar, Integer baz) {
@@ -8193,7 +8170,7 @@ index a5a20ec3ad..6424816c15 100644
      }
    }
  
-@@ -985,7 +980,7 @@ public class NullPointerTesterTest extends TestCase {
+@@ -987,7 +986,7 @@ public class NullPointerTesterTest extends TestCase {
          }
        }
        for (Object arg : args) {
@@ -8202,7 +8179,7 @@ index a5a20ec3ad..6424816c15 100644
        }
      }
    }
-@@ -1058,8 +1053,8 @@ public class NullPointerTesterTest extends TestCase {
+@@ -1060,8 +1059,8 @@ public class NullPointerTesterTest extends TestCase {
                ImmutableSortedSet.of(),
                ImmutableMultiset.of(),
                ImmutableMultiset.of(),
@@ -8213,7 +8190,7 @@ index a5a20ec3ad..6424816c15 100644
                ImmutableTable.of(),
                ImmutableTable.of());
      }
-@@ -1424,7 +1419,7 @@ public class NullPointerTesterTest extends TestCase {
+@@ -1426,7 +1425,7 @@ public class NullPointerTesterTest extends TestCase {
  
    private class Inner {
      public Inner(String s) {
@@ -8222,7 +8199,7 @@ index a5a20ec3ad..6424816c15 100644
      }
    }
  
-@@ -1442,8 +1437,8 @@ public class NullPointerTesterTest extends TestCase {
+@@ -1444,8 +1443,8 @@ public class NullPointerTesterTest extends TestCase {
    }
  
    static class OverridesEquals {
@@ -8232,7 +8209,7 @@ index a5a20ec3ad..6424816c15 100644
      public boolean equals(Object o) {
        return true;
      }
-@@ -1466,7 +1461,7 @@ public class NullPointerTesterTest extends TestCase {
+@@ -1468,7 +1467,7 @@ public class NullPointerTesterTest extends TestCase {
  
      @SuppressWarnings("unused") // Called by reflection
      public FailOnOneOfTwoConstructors(Object o) {
@@ -8241,7 +8218,7 @@ index a5a20ec3ad..6424816c15 100644
      }
    }
  
-@@ -1491,7 +1486,7 @@ public class NullPointerTesterTest extends TestCase {
+@@ -1493,7 +1492,7 @@ public class NullPointerTesterTest extends TestCase {
      @SuppressWarnings("unused") // Called by reflection
      public void x(X x) {
        xWasCalled = true;
@@ -16459,7 +16436,7 @@ index 10ae274633..4987662a70 100644
  
    private static class InternerFunction<E> implements Function<E, E> {
 diff --git a/guava/src/com/google/common/collect/Iterables.java b/guava/src/com/google/common/collect/Iterables.java
-index 7928b15d67..4706d49d43 100644
+index f86ac443ba..8d2f13f5ee 100644
 --- a/guava/src/com/google/common/collect/Iterables.java
 +++ b/guava/src/com/google/common/collect/Iterables.java
 @@ -17,8 +17,9 @@
@@ -16685,16 +16662,7 @@ index 7928b15d67..4706d49d43 100644
  
      return new FluentIterable<T>() {
        @Override
-@@ -1045,7 +1045,7 @@ public final class Iterables {
-     if (iterable instanceof Collection) {
-       return ((Collection<?>) iterable).isEmpty();
-     }
--    return !iterable.iterator().hasNext();
-+    return Iterables.isEmpty(iterable);
-   }
- 
-   /**
-@@ -1064,8 +1064,8 @@ public final class Iterables {
+@@ -1065,8 +1065,8 @@ public final class Iterables {
    public static <T extends @Nullable Object> Iterable<T> mergeSorted(
        final Iterable<? extends Iterable<? extends T>> iterables,
        final Comparator<? super T> comparator) {
