@@ -4,3 +4,6 @@
 [submodule "integration-tests/guava"]
 	path = integration-tests/guava
 	url = https://github.com/google/guava
+[submodule "integration-tests/metrics"]
+	path = integration-tests/metrics
+	url = https://github.com/dropwizard/metrics

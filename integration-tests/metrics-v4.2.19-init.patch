@@ -1,0 +1,214 @@
+diff --git a/pom.xml b/pom.xml
+index 6192b52f..a5ff3cc0 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -66,7 +66,9 @@
+         <junit.version>4.13.1</junit.version>
+         <hamcrest.version>1.3</hamcrest.version>
+         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+-        <errorprone.version>2.19.1</errorprone.version>
++        <maven.compiler.release>8</maven.compiler.release>
++        <errorprone.version>v2.19.1-picnic-1</errorprone.version>
++        <error-prone-support.version>0.11.2-SNAPSHOT</error-prone-support.version>
+         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
+ 
+         <sonar.projectKey>dropwizard_metrics</sonar.projectKey>
+@@ -137,60 +139,116 @@
+ 
+     <profiles>
+         <profile>
+-            <id>jdk8</id>
+-            <activation>
+-                <jdk>1.8</jdk>
+-            </activation>
++            <id>error-prone-compile</id>
+             <build>
+                 <plugins>
+-                    <plugin>
+-                        <groupId>org.apache.maven.plugins</groupId>
+-                        <artifactId>maven-compiler-plugin</artifactId>
++                  <plugin>
++                    <groupId>org.apache.maven.plugins</groupId>
++                    <artifactId>maven-compiler-plugin</artifactId>
++                    <version>${maven-compiler-plugin.version}</version>
++                    <executions>
++                      <execution>
++                        <id>error-prone-compile</id>
++                        <phase>compile</phase>
++                        <goals>
++                          <goal>compile</goal>
++                        </goals>
+                         <configuration>
+-                            <compilerArgs combine.children="append">
+-                                <arg>-J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${errorprone.javac.version}/javac-${errorprone.javac.version}.jar</arg>
+-                            </compilerArgs>
++                          <failOnError>true</failOnError>
++                          <source>1.8</source>
++                          <target>1.8</target>
++                          <compilerArgs combine.children="append">
++                            <arg>-Xpkginfo:always</arg>
++                            <arg>-XDcompilePolicy=simple</arg>
++                            <arg>
++                              -Xplugin:ErrorProne ${error-prone.flags}
++                            </arg>
++                     
++                          </compilerArgs>
++                          <annotationProcessorPaths combine.children="append">
++                            <path>
++                              <groupId>com.github.PicnicSupermarket.error-prone</groupId>
++                              <artifactId>error_prone_core</artifactId>
++                              <version>${errorprone.version}</version>
++                            </path>
++                            <path>
++                              <groupId>tech.picnic.error-prone-support</groupId>
++                              <artifactId>error-prone-contrib</artifactId>
++                              <version>${error-prone-support.version}</version>
++                            </path>
++                            <path>
++                              <groupId>tech.picnic.error-prone-support</groupId>
++                              <artifactId>refaster-runner</artifactId>
++                              <version>${error-prone-support.version}</version>
++                            </path>
++                          </annotationProcessorPaths>
+                         </configuration>
+-                    </plugin>
++                      </execution>
++                    </executions>
++                  </plugin>
+                 </plugins>
+-            </build>
++              </build>
+         </profile>
+         <profile>
+-            <id>jdk17</id>
+-            <activation>
+-                <jdk>[17,)</jdk>
+-            </activation>
++            <id>error-prone-test-compile</id>
+             <build>
+-                <plugins>
+-                    <plugin>
+-                        <groupId>org.apache.maven.plugins</groupId>
+-                        <artifactId>maven-compiler-plugin</artifactId>
+-                        <configuration>
+-                            <compilerArgs>
+-                                <arg>-Xlint:all</arg>
+-                                <arg>-XDcompilePolicy=simple</arg>
+-                                <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.*</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+-                                <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+-                                <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+-                            </compilerArgs>
+-                            <annotationProcessorPaths>
+-                                <path>
+-                                    <groupId>com.google.errorprone</groupId>
+-                                    <artifactId>error_prone_core</artifactId>
+-                                    <version>${errorprone.version}</version>
+-                                </path>
+-                            </annotationProcessorPaths>
+-                        </configuration>
+-                    </plugin>
+-                </plugins>
++              <plugins>
++                <plugin>
++                  <groupId>org.apache.maven.plugins</groupId>
++                  <artifactId>maven-compiler-plugin</artifactId>
++                  <version>${maven-compiler-plugin.version}</version>
++                  <executions>
++                    <!-- Skip the default-testCompile execution as we don't want to execute the testCompile goal twice -->
++                    <execution>
++                      <id>default-testCompile</id>
++                      <phase>test-compile</phase>
++                      <goals>
++                        <goal>testCompile</goal>
++                      </goals>
++                      <configuration>
++                        <skip>true</skip>
++                      </configuration>
++                    </execution>
++                    <execution>
++                      <id>error-prone-test-compile</id>
++                      <phase>test-compile</phase>
++                      <goals>
++                        <goal>testCompile</goal>
++                      </goals>
++                      <configuration>
++                        <failOnError>false</failOnError>
++                        <source>1.8</source>
++                        <target>1.8</target>
++                        <compilerArgs combine.children="append">
++                          <arg>-Xpkginfo:always</arg>
++                          <arg>-XDcompilePolicy=simple</arg>
++                          <arg>
++                            -Xplugin:ErrorProne \
++                            ${error-prone.flags}
++                          </arg>
++                        </compilerArgs>
++                        <annotationProcessorPaths>
++                          <path>
++                            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
++                            <artifactId>error_prone_core</artifactId>
++                            <version>${errorprone.version}</version>
++                          </path>
++                          <path>
++                            <groupId>tech.picnic.error-prone-support</groupId>
++                            <artifactId>error-prone-contrib</artifactId>
++                            <version>${error-prone-support.version}</version>
++                          </path>
++                          <path>
++                            <groupId>tech.picnic.error-prone-support</groupId>
++                            <artifactId>refaster-runner</artifactId>
++                            <version>${error-prone-support.version}</version>
++                          </path>
++                        </annotationProcessorPaths>
++                      </configuration>
++                    </execution>
++                  </executions>
++                </plugin>
++              </plugins>
+             </build>
+         </profile>
+         <profile>
+@@ -224,7 +282,8 @@
+                         <artifactId>maven-javadoc-plugin</artifactId>
+                         <version>3.5.0</version>
+                         <configuration>
+-                            <source>8</source>
++                            <source>1.8</source>
++                            <target>1.8</target>
+                             <doclint>none</doclint>
+                             <quiet>true</quiet>
+                             <notimestamp>true</notimestamp>
+@@ -317,21 +376,15 @@
+                 <configuration>
+                     <source>1.8</source>
+                     <target>1.8</target>
+-                    <fork>true</fork>
++                    <!-- need to disable fork, as the jvm.config params aren't passed properly -->
++                    <!-- causing the build to fail on java 17 -->
++                    <fork>false</fork>
+                     <parameters>true</parameters>
+                     <showWarnings>true</showWarnings>
+-                    <compilerArgs>
++                    <compilerArgs combine.children="append">
+                         <arg>-Xlint:all</arg>
+                         <arg>-XDcompilePolicy=simple</arg>
+-                        <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.*</arg>
+                     </compilerArgs>
+-                    <annotationProcessorPaths>
+-                        <path>
+-                            <groupId>com.google.errorprone</groupId>
+-                            <artifactId>error_prone_core</artifactId>
+-                            <version>${errorprone.version}</version>
+-                        </path>
+-                    </annotationProcessorPaths>
+                 </configuration>
+             </plugin>
+             <plugin>

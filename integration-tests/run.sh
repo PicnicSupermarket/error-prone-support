@@ -2,8 +2,8 @@
 
 set -e -u -o pipefail
 
-project=guava
-revision=v31.1
+project=metrics
+revision=v4.2.19
 
 if [ "${#}" -gt 1 ] || [[ ${1:---sync} != '--sync' ]]; then
   echo "Usage: ${0} [--sync]"
