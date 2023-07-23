@@ -375,7 +375,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1, 4, 3, 2).filter(i -> i % 2 == 0).sort(reverseOrder());
   }
 
-  Flux<Integer> testFluxTakeWhileFilter() {
+  Flux<Integer> testFluxTakeWhile() {
     return Flux.just(1, 2, 3).takeWhile(i -> i % 2 == 0);
   }
 

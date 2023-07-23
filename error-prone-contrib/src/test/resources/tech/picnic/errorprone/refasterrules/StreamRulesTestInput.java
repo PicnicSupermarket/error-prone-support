@@ -259,7 +259,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of(Stream.of(3), Stream.of(4)).flatMap(v -> v));
   }
 
-  Stream<Integer> testStreamsTakeWhileFilter() {
+  Stream<Integer> testStreamTakeWhile() {
     return Stream.of(1, 2, 3).takeWhile(i -> i < 2).filter(i -> i < 2);
   }
 }

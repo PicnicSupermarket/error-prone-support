@@ -1194,10 +1194,10 @@ final class ReactorRules {
   }
 
   /**
-   * Do not unnecessarily {@link Flux#filter(Predicate)} using the same {@link Predicate} that is
-   * used to {@link Flux#takeWhile(Predicate)}.
+   * Do not unnecessarily {@link Flux#filter(Predicate) filter} the result of {@link
+   * Flux#takeWhile(Predicate)} using the same {@link Predicate}.
    */
-  static final class FluxTakeWhileFilter<T> {
+  static final class FluxTakeWhile<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, Predicate<? super T> predicate) {
       return flux.takeWhile(predicate).filter(predicate);

@@ -640,7 +640,7 @@ final class StreamRules {
     }
   }
 
-  static final class StreamsTakeWhileFilter<T> {
+  static final class StreamTakeWhile<T> {
     @BeforeTemplate
     Stream<T> before(Stream<T> stream, Predicate<? super T> predicate) {
       return stream.takeWhile(predicate).filter(predicate);
