@@ -17,26 +17,26 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 
 /**
- * A {@link BugChecker} that flags usages of Mongo {@code $text} filters used for full text
- * searches.
+ * A {@link BugChecker} that flags usages of MongoDB {@code $text} filter usages.
  *
- * @see <a href="https://www.mongodb.com/docs/manual/text-search/">Mongo Text Search</a>
+ * @see <a href="https://www.mongodb.com/docs/manual/text-search/">MongoDB Text Search</a>
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Avoid the `$text` operator in Mongo's full-text search queries",
-    link = BUG_PATTERNS_BASE_URL + "MongoFullTextSearchQueryUsage",
+    summary =
+        "Avoid MongoDB's `$text` filter operator, as it can trigger heavy queries and even cause the server to run out of memory",
+    link = BUG_PATTERNS_BASE_URL + "MongoDBTextFilterUsage",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = PERFORMANCE)
-public final class MongoFullTextSearchQueryUsage extends BugChecker
+public final class MongoDBTextFilterUsage extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> MONGO_FILTERS_TEXT_METHOD =
       staticMethod().onClass("com.mongodb.client.model.Filters").named("text");
 
-  /** Instantiates a new {@link MongoFullTextSearchQueryUsage} instance. */
-  public MongoFullTextSearchQueryUsage() {}
+  /** Instantiates a new {@link MongoDBTextFilterUsage} instance. */
+  public MongoDBTextFilterUsage() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {

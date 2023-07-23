@@ -446,11 +446,9 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-core</artifactId>
-                <version>4.9.1</version>
-                <!-- XXX: Drop this when we forgo enforcement of
-                JDK 11 bytecode version compatibility. See follow-ups from:
-                https://github.com/PicnicSupermarket/error-prone-support/pull/603
-                https://github.com/PicnicSupermarket/error-prone-support/pull/198. -->
+                <version>4.10.2</version>
+                <!-- XXX: Drop this exclusion once we forgo enforcement of JDK
+                11 bytecode version compatibility. -->
                 <exclusions>
                     <exclusion>
                         <groupId>org.mongodb</groupId>

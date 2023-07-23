@@ -3,10 +3,10 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class MongoFullTextSearchQueryUsageTest {
+final class MongoDBTextFilterUsageTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(MongoFullTextSearchQueryUsage.class, getClass())
+    CompilationTestHelper.newInstance(MongoDBTextFilterUsage.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.mongodb.client.model.Filters;",
@@ -19,8 +19,6 @@ final class MongoFullTextSearchQueryUsageTest {
             "    Filters.text(\"foo\");",
             "    // BUG: Diagnostic contains:",
             "    Filters.text(\"foo\", new TextSearchOptions());",
-            "    // BUG: Diagnostic contains:",
-            "    Filters.text(\"foo\", new TextSearchOptions().caseSensitive(true));",
             "  }",
             "}")
         .doTest();
