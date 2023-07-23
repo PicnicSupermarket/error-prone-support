@@ -1,8 +1,8 @@
 {
-  "testClass": "TestChecker",
+  "testClass": "TestCheckerTest",
   "testCases": [
     {
-      "classUnderTest": "TestChecker",
+      "classUnderTest": "TestCheckerTest.TestChecker",
       "entries": [
         {
           "fileName": "A.java",

@@ -5,7 +5,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
@@ -41,9 +40,7 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
                   Extractor.class, DocumentationGeneratorTaskListener.class.getClassLoader()));
 
   private static final ObjectMapper OBJECT_MAPPER =
-      new ObjectMapper()
-          .setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
-          .registerModule(new Jdk8Module());
+      new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 
   private final Context context;
   private final Path docsPath;

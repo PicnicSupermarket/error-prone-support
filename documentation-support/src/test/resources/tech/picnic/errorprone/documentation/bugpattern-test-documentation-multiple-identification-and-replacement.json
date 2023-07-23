@@ -1,33 +1,30 @@
 {
-  "testClass": "TestChecker",
+  "testClass": "pkg.TestCheckerTest",
   "testCases": [
     {
-      "classUnderTest": "TestChecker",
+      "classUnderTest": "pkg.TestCheckerTest.TestChecker",
       "entries": [
         {
           "fileName": "A.java",
-          "input": "class A {}\n",
-          "output": ""
+          "code": "class A {}\n"
         },
         {
           "fileName": "B.java",
-          "input": "class B {}\n",
-          "output": ""
+          "code": "class B {}\n"
         }
       ]
     },
     {
-      "classUnderTest": "TestChecker",
+      "classUnderTest": "pkg.TestCheckerTest.TestChecker",
       "entries": [
         {
           "fileName": "C.java",
-          "input": "class C {}\n",
-          "output": ""
+          "code": "class C {}\n"
         }
       ]
     },
     {
-      "classUnderTest": "TestChecker",
+      "classUnderTest": "pkg.TestCheckerTest.TestChecker",
       "entries": [
         {
           "fileName": "A.java",
@@ -37,7 +34,7 @@
       ]
     },
     {
-      "classUnderTest": "TestChecker",
+      "classUnderTest": "pkg.TestCheckerTest.TestChecker",
       "entries": [
         {
           "fileName": "B.java",

@@ -1,18 +1,16 @@
 {
-  "testClass": "TestChecker",
+  "testClass": "pkg.TestCheckerTest",
   "testCases": [
     {
-      "classUnderTest": "TestChecker",
+      "classUnderTest": "pkg.TestCheckerTest.TestChecker",
       "entries": [
         {
           "fileName": "A.java",
-          "input": "class A {}\n",
-          "output": ""
+          "code": "class A {}\n"
         },
         {
           "fileName": "B.java",
-          "input": "class B {}\n",
-          "output": ""
+          "code": "class B {}\n"
         }
       ]
     }
