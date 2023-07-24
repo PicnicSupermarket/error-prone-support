@@ -12,21 +12,20 @@ import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
-import com.google.errorprone.annotations.Var;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ErrorProneToken;
-import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.parser.Tokens;
-import java.util.ArrayList;
+import com.sun.tools.javac.parser.Tokens.TokenKind;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +35,7 @@ import javax.lang.model.element.Modifier;
 /** A {@link BugChecker} that flags classes with non-standard member ordering. */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Members should be ordered in a standard way.",
+    summary = "Members should be ordered in a standard way",
     explanation =
         "Members should be ordered in a standard way, which is: "
             + "static member variables, non-static member variables, constructors and methods.",
@@ -50,14 +49,14 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
   /** A comparator that sorts variable and method (incl. constructors) in a standard order. */
   private static final Comparator<Tree> MEMBER_SORTING =
       comparing(
-          (Tree memberTree) -> {
-            switch (memberTree.getKind()) {
+          (Tree tree) -> {
+            switch (tree.getKind()) {
               case VARIABLE:
-                return isStatic((VariableTree) memberTree) ? 1 : 2;
+                return isStatic((VariableTree) tree) ? 1 : 2;
               case METHOD:
-                return isConstructor((MethodTree) memberTree) ? 3 : 4;
+                return isConstructor((MethodTree) tree) ? 3 : 4;
               default:
-                throw new IllegalStateException("Unexpected kind: " + memberTree.getKind());
+                throw new IllegalStateException("Unexpected kind: " + tree.getKind());
             }
           });
 
@@ -66,12 +65,12 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    ImmutableList<MemberWithComments> membersWithComments =
+    ImmutableList<ClassMemberWithComments> membersWithComments =
         getMembersWithComments(tree, state).stream()
-            .filter(memberWithComments -> shouldBeSorted(memberWithComments.member()))
+            .filter(classMemberWithComments -> shouldBeSorted(classMemberWithComments.member()))
             .collect(toImmutableList());
 
-    ImmutableList<MemberWithComments> sortedMembersWithComments =
+    ImmutableList<ClassMemberWithComments> sortedMembersWithComments =
         ImmutableList.sortedCopyOf(
             (a, b) -> MEMBER_SORTING.compare(a.member(), b.member()), membersWithComments);
 
@@ -103,13 +102,13 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
   }
 
   private static SuggestedFix swapMembersWithComments(
-      ImmutableList<MemberWithComments> memberWithComments,
-      ImmutableList<MemberWithComments> sortedMembersWithComments,
+      ImmutableList<ClassMemberWithComments> memberWithComments,
+      ImmutableList<ClassMemberWithComments> sortedMembersWithComments,
       VisitorState state) {
     SuggestedFix.Builder fix = SuggestedFix.builder();
     for (int i = 0; i < memberWithComments.size(); i++) {
       Tree originalMember = memberWithComments.get(i).member();
-      MemberWithComments correct = sortedMembersWithComments.get(i);
+      ClassMemberWithComments correct = sortedMembersWithComments.get(i);
       /* Technically this check is not necessary, but it avoids redundant replacements. */
       if (!originalMember.equals(correct.member())) {
         String replacement =
@@ -125,62 +124,46 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
     return fix.build();
   }
 
-  // XXX: Work around that `ErrorProneTokens.getTokens(memberSrc, ctx)` returns tokens not
-  //  containing the member's comments.
   /** Returns the class' members with their comments. */
-  private static ImmutableList<MemberWithComments> getMembersWithComments(
+  private static ImmutableList<ClassMemberWithComments> getMembersWithComments(
       ClassTree classTree, VisitorState state) {
     List<ErrorProneToken> tokens =
-        new ArrayList<>(
-            ErrorProneTokens.getTokens(state.getSourceForNode(classTree), state.context));
+        state.getOffsetTokens(
+            ASTHelpers.getStartPosition(classTree), state.getEndPosition(classTree));
 
-    ImmutableList.Builder<MemberWithComments> membersWithComments = ImmutableList.builder();
+    ImmutableList.Builder<ClassMemberWithComments> membersWithComments = ImmutableList.builder();
     for (Tree member : classTree.getMembers()) {
-      ImmutableList<ErrorProneToken> memberTokens =
-          ErrorProneTokens.getTokens(state.getSourceForNode(member), state.context);
-      if (memberTokens.isEmpty() || memberTokens.get(0).kind() == Tokens.TokenKind.EOF) {
+      if (!shouldBeSorted(member)) {
         continue;
       }
 
-      @Var
-      ImmutableList<ErrorProneToken> maybeCommentedMemberTokens =
-          ImmutableList.copyOf(tokens.subList(0, memberTokens.size()));
-      while (!areTokenListsMatching(memberTokens, maybeCommentedMemberTokens)) {
-        tokens.remove(0);
-        maybeCommentedMemberTokens = ImmutableList.copyOf(tokens.subList(0, memberTokens.size()));
+      /* We start at the previous token's end position to cover any possible comments. */
+      int memberStartPos = ASTHelpers.getStartPosition(member);
+      int startPos =
+          tokens.stream()
+              .map(ErrorProneToken::endPos)
+              .filter(i -> i < memberStartPos)
+              .reduce((first, second) -> second)
+              .orElse(memberStartPos);
+
+      ImmutableList<ErrorProneToken> memberTokens =
+          ImmutableList.copyOf(state.getOffsetTokens(startPos, state.getEndPosition(member)));
+      if (memberTokens.isEmpty() || memberTokens.get(0).kind() == TokenKind.EOF) {
+        continue;
       }
 
       membersWithComments.add(
-          new MemberWithComments(
-              member, ImmutableList.copyOf(maybeCommentedMemberTokens.get(0).comments())));
+          new ClassMemberWithComments(
+              member, ImmutableList.copyOf(memberTokens.get(0).comments())));
     }
     return membersWithComments.build();
   }
 
-  /**
-   * Checks whether two lists of error-prone tokens are 'equal' without considering their comments.
-   */
-  private static boolean areTokenListsMatching(
-      ImmutableList<ErrorProneToken> tokens, ImmutableList<ErrorProneToken> memberTokens) {
-    if (tokens.size() != memberTokens.size()) {
-      return false;
-    }
-    for (int i = 0; i < tokens.size() - 1 /* EOF */; i++) {
-      if (tokens.get(i).kind() != memberTokens.get(i).kind()
-          || tokens.get(i).hasName() != memberTokens.get(i).hasName()
-          || (tokens.get(i).hasName()
-              && !tokens.get(i).name().equals(memberTokens.get(i).name()))) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private static final class MemberWithComments {
+  private static final class ClassMemberWithComments {
     private final Tree member;
     private final ImmutableList<Tokens.Comment> comments;
 
-    MemberWithComments(Tree member, ImmutableList<Tokens.Comment> comments) {
+    ClassMemberWithComments(Tree member, ImmutableList<Tokens.Comment> comments) {
       this.member = member;
       this.comments = comments;
     }
