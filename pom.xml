@@ -1202,7 +1202,8 @@
                         </includes>
                         <properties>
                             <configurationParameters>junit.jupiter.execution.parallel.enabled=true
-                                junit.jupiter.execution.parallel.mode.default=concurrent</configurationParameters>
+                                junit.jupiter.execution.parallel.mode.default=concurrent
+                                junit.platform.stacktrace.pruning.enabled=false</configurationParameters>
                         </properties>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     </configuration>
