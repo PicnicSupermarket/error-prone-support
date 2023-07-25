@@ -1,10 +1,12 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static java.util.Comparator.comparing;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -24,9 +26,8 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.parser.Tokens;
-import com.sun.tools.javac.parser.Tokens.TokenKind;
 import java.util.Comparator;
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.lang.model.element.Modifier;
@@ -126,45 +127,53 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
   /** Returns the class' members with their comments. */
   private static ImmutableList<ClassMemberWithComments> getMembersWithComments(
       ClassTree classTree, VisitorState state) {
-    List<ErrorProneToken> tokens =
-        state.getOffsetTokens(
-            ASTHelpers.getStartPosition(classTree), state.getEndPosition(classTree));
-
-    ImmutableList.Builder<ClassMemberWithComments> membersWithComments = ImmutableList.builder();
-    for (Tree member : classTree.getMembers()) {
-      if (!shouldBeSorted(member)) {
-        continue;
-      }
-
-      /* We start at the previous token's end position to cover any possible comments. */
-      int memberStartPos = ASTHelpers.getStartPosition(member);
-      int startPos =
-          tokens.stream()
-              .map(ErrorProneToken::endPos)
-              .filter(i -> i < memberStartPos)
-              .reduce((first, second) -> second)
-              .orElse(memberStartPos);
-
-      ImmutableList<ErrorProneToken> memberTokens =
-          ImmutableList.copyOf(state.getOffsetTokens(startPos, state.getEndPosition(member)));
-      if (memberTokens.isEmpty() || memberTokens.get(0).kind() == TokenKind.EOF) {
-        continue;
-      }
-
-      membersWithComments.add(
-          new ClassMemberWithComments(
-              member, ImmutableList.copyOf(memberTokens.get(0).comments())));
-    }
-    return membersWithComments.build();
+    return classTree.getMembers().stream()
+        .map(
+            member ->
+                new ClassMemberWithComments(member, getMemberComments(state, classTree, member)))
+        .collect(toImmutableList());
   }
 
-  private static final class ClassMemberWithComments {
+  private static ImmutableList<Tokens.Comment> getMemberComments(
+      VisitorState state, ClassTree classTree, Tree member) {
+    if (member.getKind() == Tree.Kind.METHOD
+        && ASTHelpers.isGeneratedConstructor((MethodTree) member)) {
+      return ImmutableList.of();
+    }
+
+    checkState(
+        state.getEndPosition(member) != -1,
+        "Member's end position is not available (-1).\n - member=[%s]\n - source=[%s]",
+        member,
+        state.getSourceForNode(member));
+
+    ImmutableList<ErrorProneToken> tokens =
+        ImmutableList.copyOf(
+            state.getOffsetTokens(
+                ASTHelpers.getStartPosition(classTree), state.getEndPosition(classTree)));
+
+    int memberStartPos = ASTHelpers.getStartPosition(member);
+    Optional<Integer> previousMemberEndPos =
+        tokens.stream()
+            .map(ErrorProneToken::endPos)
+            .takeWhile(endPos -> endPos <= memberStartPos)
+            .reduce((earlierPos, laterPos) -> laterPos);
+
+    ImmutableList<ErrorProneToken> memberTokens =
+        ImmutableList.copyOf(
+            state.getOffsetTokens(
+                previousMemberEndPos.orElse(memberStartPos), state.getEndPosition(member)));
+
+    return ImmutableList.copyOf(memberTokens.get(0).comments());
+  }
+
+  static final class ClassMemberWithComments {
     private final Tree member;
     private final ImmutableList<Tokens.Comment> comments;
 
     ClassMemberWithComments(Tree member, ImmutableList<Tokens.Comment> comments) {
-      this.member = member;
-      this.comments = comments;
+      this.member = requireNonNull(member);
+      this.comments = requireNonNull(comments);
     }
 
     public Tree member() {
