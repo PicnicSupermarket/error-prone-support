@@ -16,21 +16,31 @@ final class MonoZipOfMonoVoidUsageTest {
             "class A {",
             "  void m() {",
             "    Mono<Void> a = Mono.empty();",
-            "    Mono.empty().zipWith(a);",
-            "    Mono<Void> b = Mono.empty();",
+            "    Mono<Integer> b = Mono.empty();",
             "    Mono<Integer> c = Mono.just(1);",
+            "    Mono<Integer> d = this.publisher();",
             "    // BUG: Diagnostic contains:",
-            "    Mono.zip(a, b);",
+            "    Mono.zip(a, a);",
             "    // BUG: Diagnostic contains:",
-            "    b.zipWith(c);",
-            "    // BUG: Diagnostic contains:",
-            "    Mono.zip(a, Mono.empty());",
+            "    Mono.zip(Mono.empty(), a);",
             "    // BUG: Diagnostic contains:",
             "    Mono.zip(Mono.empty(), Mono.empty());",
             "    // BUG: Diagnostic contains:",
-            "    Mono.zip(a, c, b);",
-            "",
+            "    Mono.empty().zipWith(a);",
+            "    // BUG: Diagnostic contains:",
+            "    Mono.empty().zipWith(Mono.empty());",
+            "    // BUG: Diagnostic contains:",
+            "    b.zipWith(b).zipWith(c).map(entry -> entry);",
+            "    // BUG: Diagnostic contains:",
+            "    c.zipWith(Mono.empty());",
+            "    // BUG: Diagnostic contains:",
+            "    c.zipWith(b);",
+            "    c.zipWith(d);",
+            "    Mono.just(1).zipWith(Mono.just(1));",
+            "    c.zipWith(c);",
             "  }",
+            "",
+            "  private Mono<Integer> publisher() {return Mono.empty();}",
             "}")
         .doTest();
   }
@@ -47,6 +57,7 @@ final class MonoZipOfMonoVoidUsageTest {
             "    Mono<Void> a = Mono.empty();",
             "    Mono<Integer> b = Mono.empty();",
             "    Mono<Integer> c = Mono.just(1);",
+            "    Mono<Integer> d = this.publisher();",
             "    Mono.zip(a, a);",
             "    Mono.zip(Mono.empty(), a);",
             "    Mono.zip(Mono.empty(), Mono.empty());",
@@ -56,8 +67,12 @@ final class MonoZipOfMonoVoidUsageTest {
             "    b.zipWith(b).zipWith(c).map(entry -> entry);",
             "    c.zipWith(Mono.empty());",
             "    c.zipWith(b);",
+            "    c.zipWith(d);",
+            "    Mono.just(1).zipWith(Mono.just(1));",
             "    c.zipWith(c);",
             "  }",
+            "",
+            "  private Mono<Integer> publisher() {return Mono.empty();}",
             "}")
         .addOutputLines(
             "A.java",
@@ -68,6 +83,7 @@ final class MonoZipOfMonoVoidUsageTest {
             "    Mono<Void> a = Mono.empty();",
             "    Mono<Integer> b = Mono.empty();",
             "    Mono<Integer> c = Mono.just(1);",
+            "    Mono<Integer> d = this.publisher();",
             "    a.then(a);",
             "    Mono.empty().then(a);",
             "    Mono.empty().then(Mono.empty());",
@@ -77,9 +93,44 @@ final class MonoZipOfMonoVoidUsageTest {
             "    b.concatWith(b).concatWith(c).map(entry -> entry);",
             "    c.concatWith(Mono.empty());",
             "    c.concatWith(b);",
-            "    c.concatWith(c);",
+            "    c.zipWith(d);",
+            "    Mono.just(1).zipWith(Mono.just(1));",
+            "    c.zipWith(c);",
+            "  }",
+            "",
+            "  private Mono<Integer> publisher() {return Mono.empty();}",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void replacementFirstSuggestedFixWithCompilationErrors() {
+    BugCheckerRefactoringTestHelper.newInstance(MonoZipOfMonoVoidUsage.class, getClass())
+        .addInputLines(
+            "A.java",
+            "import reactor.core.publisher.Mono;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    Mono<Void> a = Mono.empty();",
+            "    Mono<Integer> b = Mono.empty();",
+            "    Mono.zip(a, b);",
+            "    a.zipWith(b);",
             "  }",
             "}")
+        .addOutputLines(
+            "A.java",
+            "import reactor.core.publisher.Mono;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    Mono<Void> a = Mono.empty();",
+            "    Mono<Integer> b = Mono.empty();",
+            "    a.then(b);",
+            "    a.concatWith(b);",
+            "  }",
+            "}")
+        .allowBreakingChanges()
         .doTest(TestMode.TEXT_MATCH);
   }
 }

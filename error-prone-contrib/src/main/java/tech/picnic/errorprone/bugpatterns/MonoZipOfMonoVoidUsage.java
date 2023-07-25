@@ -5,9 +5,8 @@ import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyMethod;
-import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
-import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
@@ -26,18 +25,35 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.suppliers.Supplier;
-import com.google.errorprone.suppliers.Suppliers;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import java.util.stream.Stream;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
-/** Bla. */
+/**
+ * A {@link BugChecker} that flags usages of {@link Mono#zip(Mono, Mono)}} and {@link
+ * Mono#zipWith(Mono)}} with {@link Mono#empty()} parameters.
+ *
+ * <p>{@link Mono#zip(Mono, Mono)} and {@link Mono#zipWith(Mono)} perform incorrectly upon retrieval
+ * of the empty publisher and prematurely terminates the reactive chain from the execution. In most
+ * cases this is not the desired behaviour and {@link Mono#concatWith(Publisher)} or {@link
+ * Mono#then(Mono)} should be preferred, as it produces consistent results and performs in the
+ * predictable manner.
+ *
+ * <p>NB: Mono&lt;?>#zipWith(Mono&lt;Void>) is allowed be the Reactor API, but it is an incorrect
+ * usage of the API. It will be replaced with Mono&lt;?>#concatWith(Mono&lt;Void>) but it will lead
+ * to the compilation errors, indicating that the logic under the hood should be revisited and
+ * fixed.
+ */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "XXX: Write this.",
+    summary =
+        "`Mono#zip` and `Mono#zipWith` should not be executed against `Mono#empty` parameter; "
+            + "please use `Mono#then` or `Mono#concatWith` instead",
     link = BUG_PATTERNS_BASE_URL + "MonoZipOfMonoVoidUsage",
     linkType = CUSTOM,
     severity = ERROR,
@@ -45,42 +61,21 @@ import java.util.stream.Stream;
 public final class MonoZipOfMonoVoidUsage extends BugChecker
     implements MethodInvocationTreeMatcher, MemberReferenceTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Supplier<Type> MONO =
-      Suppliers.typeFromString("reactor.core.publisher.Mono");
-  private static final Supplier<Type> EMPTY_MONO =
-      Suppliers.typeFromString("reactor.core.publisher.MonoEmpty");
-  private static final Supplier<Type> MONO_VOID =
-      VisitorState.memoize(generic(type("reactor.core.publisher.Mono"), type("java.lang.Void")));
+  private static final String MONO = "reactor.core.publisher.Mono";
+  private static final Supplier<Type> MONO_VOID_TYPE =
+      VisitorState.memoize(generic(type(MONO), type("java.lang.Void")));
 
   // On Mono.zip, at least one element should match empty in order to proceed.
   private static final Matcher<ExpressionTree> MONO_ZIP_AND_WITH =
-      anyOf(
-          anyMethod().onClass("reactor.core.publisher.Mono").namedAnyOf("zip", "zipWith"),
-          toType(MethodInvocationTree.class, hasArgumentOfType(MONO_VOID)));
-  // On mono.zipWith, argument should match empty in order to proceed.
-  private static final Matcher<ExpressionTree> DYNAMIC_MONO_ZIP =
       allOf(
-          instanceMethod().onDescendantOf(MONO).named("zipWith"),
-          toType(MethodInvocationTree.class, hasArgumentOfType(EMPTY_MONO)));
+          anyMethod().onDescendantOf(MONO).namedAnyOf("zip", "zipWith"),
+          toType(MethodInvocationTree.class, hasArgumentOfType(MONO_VOID_TYPE)));
 
-  // On emptyMono.zipWith, argument should match non-empty in order to proceed.
-  private static final Matcher<ExpressionTree> DYNAMIC_EMPTY_MONO_WITH_NON_EMPTY_PARAM_ZIP =
+  // On Mono.zip, at least one element should match empty in order to proceed.
+  private static final Matcher<ExpressionTree> STATIC_MONO_ZIP =
       allOf(
-          instanceMethod().onDescendantOf(EMPTY_MONO).named("zipWith"),
-          toType(MethodInvocationTree.class, hasArgumentOfType(MONO)));
-
-  // On emptyMono.zipWith, argument should match empty in order to proceed.
-  private static final Matcher<ExpressionTree> DYNAMIC_EMPTY_MONO_WITH_EMPTY_PARAM_ZIP =
-      allOf(
-          instanceMethod().onDescendantOf(EMPTY_MONO).named("zipWith"),
-          toType(MethodInvocationTree.class, hasArgumentOfType(EMPTY_MONO)));
-
-  //  private static final Matcher<ExpressionTree> MONO_ZIP =
-  //      anyOf(
-  //          DYNAMIC_MONO_ZIP,
-  //          DYNAMIC_EMPTY_MONO_WITH_NON_EMPTY_PARAM_ZIP,
-  //          DYNAMIC_EMPTY_MONO_WITH_EMPTY_PARAM_ZIP,
-  //              MONO_ZIP_AND_WITH);
+          staticMethod().onClass(MONO).named("zip"),
+          toType(MethodInvocationTree.class, hasArgumentOfType(MONO_VOID_TYPE)));
 
   /** Instantiates a new {@link MonoZipOfMonoVoidUsage} instance. */
   public MonoZipOfMonoVoidUsage() {}
@@ -93,10 +88,7 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
 
     Description.Builder description = buildDescription(tree);
 
-    // ASTHelpers.getType(tree.getArguments().get(0))
-    //    MoreTypes.generic(MoreTypes.type("reactor.core.publisher.Mono"),
-    // MoreTypes.type("java.lang.Void")).get(state)
-    if (MONO_ZIP_AND_WITH.matches(tree, state)) {
+    if (STATIC_MONO_ZIP.matches(tree, state)) {
       ImmutableList<? extends ExpressionTree> arguments = ImmutableList.copyOf(tree.getArguments());
 
       String replacement =
