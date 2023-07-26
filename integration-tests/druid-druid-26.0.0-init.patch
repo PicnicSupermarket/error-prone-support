@@ -1,0 +1,414 @@
+diff --git a/extensions-contrib/tdigestsketch/pom.xml b/extensions-contrib/tdigestsketch/pom.xml
+index 77987dd4e7..f0609c55fb 100644
+--- a/extensions-contrib/tdigestsketch/pom.xml
++++ b/extensions-contrib/tdigestsketch/pom.xml
+@@ -106,7 +106,7 @@
+       <scope>provided</scope>
+     </dependency>
+     <dependency>
+-      <groupId>com.google.errorprone</groupId>
++      <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+       <artifactId>error_prone_annotations</artifactId>
+       <scope>provided</scope>
+     </dependency>
+diff --git a/extensions-core/druid-catalog/pom.xml b/extensions-core/druid-catalog/pom.xml
+index 318d399a9a..09fa61e223 100644
+--- a/extensions-core/druid-catalog/pom.xml
++++ b/extensions-core/druid-catalog/pom.xml
+@@ -177,7 +177,7 @@
+             <scope>provided</scope>
+         </dependency>
+         <dependency>
+-            <groupId>com.google.errorprone</groupId>
++            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+             <artifactId>error_prone_annotations</artifactId>
+             <scope>provided</scope>
+         </dependency>
+diff --git a/extensions-core/multi-stage-query/pom.xml b/extensions-core/multi-stage-query/pom.xml
+index b1398b9ac6..f800a435a1 100644
+--- a/extensions-core/multi-stage-query/pom.xml
++++ b/extensions-core/multi-stage-query/pom.xml
+@@ -166,7 +166,7 @@
+             <scope>provided</scope>
+         </dependency>
+         <dependency>
+-            <groupId>com.google.errorprone</groupId>
++            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+             <artifactId>error_prone_annotations</artifactId>
+             <scope>provided</scope>
+         </dependency>
+diff --git a/indexing-service/pom.xml b/indexing-service/pom.xml
+index a26428997e..85baec832d 100644
+--- a/indexing-service/pom.xml
++++ b/indexing-service/pom.xml
+@@ -161,7 +161,7 @@
+             <artifactId>jackson-jaxrs-smile-provider</artifactId>
+         </dependency>
+         <dependency>
+-            <groupId>com.google.errorprone</groupId>
++            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+             <artifactId>error_prone_annotations</artifactId>
+         </dependency>
+         <dependency>
+diff --git a/pom.xml b/pom.xml
+index c0f06547f8..c0ae78dfdc 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -91,7 +91,9 @@
+         <datasketches.memory.version>2.0.0</datasketches.memory.version>
+         <derby.version>10.14.2.0</derby.version>
+         <dropwizard.metrics.version>4.0.0</dropwizard.metrics.version>
+-        <errorprone.version>2.11.0</errorprone.version>
++        <errorprone.version>v2.19.1-picnic-1</errorprone.version>
++        <error-prone-support.version>0.11.2-SNAPSHOT</error-prone-support.version>
++        <error-prone-support.flags>-Xplugin:ErrorProne ${error-prone.flags} -Xep:MethodReferenceUsage:OFF</error-prone-support.flags>
+         <fastutil.version>8.5.4</fastutil.version>
+         <guava.version>16.0.1</guava.version>
+         <guice.version>4.1.0</guice.version>
+@@ -473,7 +475,7 @@
+               <version>${guice.version}</version>
+               </dependency>
+             <dependency>
+-                <groupId>com.google.errorprone</groupId>
++                <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+                 <artifactId>error_prone_annotations</artifactId>
+                 <version>${errorprone.version}</version>
+             </dependency>
+@@ -1769,45 +1771,161 @@
+             </build>
+           </profile>
+           <profile>
+-            <id>strict</id>
+-            <activation>
+-              <property>
+-                <name>strictCompile</name>
+-              </property>
+-            </activation>
++            <id>error-prone-compile</id>
+             <build>
+                 <plugins>
+                     <plugin>
+                         <groupId>org.apache.maven.plugins</groupId>
+                         <artifactId>maven-compiler-plugin</artifactId>
++                        <executions>
++                            <execution>
++                                <id>error-prone-compile</id>
++                                <phase>compile</phase>
++                                <goals>
++                                    <goal>compile</goal>
++                                </goals>
++                                <configuration>
++                                    <fork>false</fork>
++                                    <meminitial>1024m</meminitial>
++                                    <maxmem>3000m</maxmem>
++                                    <release>${java.version}</release>
++                                    <showWarnings>true</showWarnings>
++                                    <compilerArgs>
++                                        <arg>-XDcompilePolicy=simple</arg>
++                                        <arg>${error-prone-support.flags}</arg>
++                                        <!-- Error Prone requires exemptions for Java >= 16, see https://errorprone.info/docs/installation#maven -->
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
++                                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
++                                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
++                                      </compilerArgs>
++                                      <annotationProcessorPaths>
++                                        <path>
++                                          <groupId>com.github.PicnicSupermarket.error-prone</groupId>
++                                          <artifactId>error_prone_core</artifactId>
++                                          <version>${errorprone.version}</version>
++                                        </path>
++                                        <path>
++                                            <groupId>tech.picnic.error-prone-support</groupId>
++                                            <artifactId>error-prone-contrib</artifactId>
++                                            <version>${error-prone-support.version}</version>
++                                        </path>
++                                        <path>
++                                            <groupId>tech.picnic.error-prone-support</groupId>
++                                            <artifactId>refaster-runner</artifactId>
++                                            <version>${error-prone-support.version}</version>
++                                        </path>
++                                      </annotationProcessorPaths>
++                                </configuration>
++                            </execution>
++                        </executions>
++                    </plugin>
++                    <plugin>
++                        <groupId>org.apache.maven.plugins</groupId>
++                        <artifactId>maven-checkstyle-plugin</artifactId>
+                         <configuration>
+-                            <fork>true</fork>
+-                            <meminitial>1024m</meminitial>
+-                            <maxmem>3000m</maxmem>
+-                            <release>${java.version}</release>
+-                            <showWarnings>false</showWarnings>
+-                            <compilerArgs>
+-                                <arg>-XDcompilePolicy=simple</arg>
+-                                <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-(test-)?sources/.* -XepDisableWarningsInGeneratedCode -Xep:ClassCanBeStatic:ERROR -Xep:PreconditionsInvalidPlaceholder:ERROR -Xep:MissingOverride:ERROR -Xep:DefaultCharset:ERROR -Xep:QualifierOrScopeOnInjectMethod:ERROR -Xep:AssistedInjectAndInjectOnSameConstructor -Xep:AutoFactoryAtInject -Xep:ClassName -Xep:ComparisonContractViolated -Xep:DepAnn -Xep:DivZero -Xep:EmptyIf -Xep:InjectInvalidTargetingOnScopingAnnotation  -Xep:InjectMoreThanOneQualifier -Xep:InjectScopeAnnotationOnInterfaceOrAbstractClass -Xep:InjectScopeOrQualifierAnnotationRetention -Xep:InjectedConstructorAnnotations -Xep:InsecureCryptoUsage -Xep:JMockTestWithoutRunWithOrRuleAnnotation -Xep:JavaxInjectOnFinalField -Xep:LockMethodChecker -Xep:LongLiteralLowerCaseSuffix -Xep:NoAllocation -Xep:NonRuntimeAnnotation -Xep:NumericEquality -Xep:ProtoStringFieldReferenceEquality -Xep:UnlockMethod</arg>
+-                                <!-- Error Prone requires exemptions for Java >= 16, see https://errorprone.info/docs/installation#maven -->
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+-                                <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+-                                <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+-                              </compilerArgs>
+-                              <annotationProcessorPaths>
+-                                <path>
+-                                  <groupId>com.google.errorprone</groupId>
+-                                  <artifactId>error_prone_core</artifactId>
+-                                  <version>${errorprone.version}</version>
+-                                </path>
+-                              </annotationProcessorPaths>
++                            <!-- Disable checkstyle as we force google-java-format -->
++                            <skip>true</skip>
++                        </configuration>
++                    </plugin>
++                    <plugin>
++                        <groupId>org.apache.maven.plugins</groupId>
++                        <artifactId>maven-pmd-plugin</artifactId>
++                        <configuration>
++                            <!-- Disable pmd, we just want to run eps -->
++                            <skip>true</skip>
++                        </configuration>
++                    </plugin>
++                </plugins>
++            </build>
++        </profile>
++        <profile>
++            <id>error-prone-test-compile</id>
++            <build>
++                <plugins>
++                    <plugin>
++                        <groupId>org.apache.maven.plugins</groupId>
++                        <artifactId>maven-compiler-plugin</artifactId>
++                        <executions>
++                            <execution>
++                                <!-- Skip the default-testCompile execution as we don't want to execute the testCompile goal twice -->
++                                <id>default-testCompile</id>
++                                <phase>test-compile</phase>
++                                <goals>
++                                    <goal>testCompile</goal>
++                                </goals>
++                                <configuration>
++                                    <skip>true</skip>
++                                </configuration>
++                            </execution>
++                            <execution>
++                                <id>error-prone-test-compile</id>
++                                <phase>test-compile</phase>
++                                <goals>
++                                    <goal>testCompile</goal>
++                                </goals>
++                                <configuration>
++                                    <fork>false</fork>
++                                    <meminitial>1024m</meminitial>
++                                    <maxmem>3000m</maxmem>
++                                    <release>${java.version}</release>
++                                    <showWarnings>true</showWarnings>
++                                    <compilerArgs>
++                                        <arg>-XDcompilePolicy=simple</arg>
++                                        <arg>${error-prone-support.flags}</arg>
++                                        <!-- Error Prone requires exemptions for Java >= 16, see https://errorprone.info/docs/installation#maven -->
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
++                                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
++                                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
++                                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
++                                      </compilerArgs>
++                                      <annotationProcessorPaths>
++                                        <path>
++                                          <groupId>com.github.PicnicSupermarket.error-prone</groupId>
++                                          <artifactId>error_prone_core</artifactId>
++                                          <version>${errorprone.version}</version>
++                                        </path>
++                                        <path>
++                                            <groupId>tech.picnic.error-prone-support</groupId>
++                                            <artifactId>error-prone-contrib</artifactId>
++                                            <version>${error-prone-support.version}</version>
++                                        </path>
++                                        <path>
++                                            <groupId>tech.picnic.error-prone-support</groupId>
++                                            <artifactId>refaster-runner</artifactId>
++                                            <version>${error-prone-support.version}</version>
++                                        </path>
++                                      </annotationProcessorPaths>
++                                </configuration>
++                            </execution>
++                        </executions>
++                    </plugin>
++                    <plugin>
++                        <groupId>org.apache.maven.plugins</groupId>
++                        <artifactId>maven-checkstyle-plugin</artifactId>
++                        <configuration>
++                            <!-- Disable checkstyle as we force google-java-format -->
++                            <skip>true</skip>
++                        </configuration>
++                    </plugin>
++                    <plugin>
++                        <groupId>org.apache.maven.plugins</groupId>
++                        <artifactId>maven-pmd-plugin</artifactId>
++                        <configuration>
++                            <!-- Disable pmd, we just want to run eps -->
++                            <skip>true</skip>
+                         </configuration>
+                     </plugin>
+                 </plugins>
+diff --git a/processing/pom.xml b/processing/pom.xml
+index 35704e15e7..d6edee7683 100644
+--- a/processing/pom.xml
++++ b/processing/pom.xml
+@@ -104,7 +104,7 @@
+       <artifactId>jsr305</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>com.google.errorprone</groupId>
++      <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+       <artifactId>error_prone_annotations</artifactId>
+     </dependency>
+     <dependency>
+diff --git a/processing/src/test/java/org/apache/druid/common/guava/CombiningSequenceTest.java b/processing/src/test/java/org/apache/druid/common/guava/CombiningSequenceTest.java
+index 7c97e36482..437c382517 100644
+--- a/processing/src/test/java/org/apache/druid/common/guava/CombiningSequenceTest.java
++++ b/processing/src/test/java/org/apache/druid/common/guava/CombiningSequenceTest.java
+@@ -294,7 +294,7 @@ public class CombiningSequenceTest
+           {
+             count++;
+             if (count % yieldEvery == 0) {
+-              yield();
++              this.yield();
+             }
+             return rhs;
+           }
+diff --git a/processing/src/test/java/org/apache/druid/common/guava/ComplexSequenceTest.java b/processing/src/test/java/org/apache/druid/common/guava/ComplexSequenceTest.java
+index ba5504f25c..bf1099ccc0 100644
+--- a/processing/src/test/java/org/apache/druid/common/guava/ComplexSequenceTest.java
++++ b/processing/src/test/java/org/apache/druid/common/guava/ComplexSequenceTest.java
+@@ -71,7 +71,7 @@ public class ComplexSequenceTest
+           @Override
+           public Integer accumulate(Integer accumulated, Integer in)
+           {
+-            yield();
++            this.yield();
+             return in;
+           }
+         }
+diff --git a/processing/src/test/java/org/apache/druid/java/util/common/guava/ConcatSequenceTest.java b/processing/src/test/java/org/apache/druid/java/util/common/guava/ConcatSequenceTest.java
+index cf5cabe99a..477357e079 100644
+--- a/processing/src/test/java/org/apache/druid/java/util/common/guava/ConcatSequenceTest.java
++++ b/processing/src/test/java/org/apache/druid/java/util/common/guava/ConcatSequenceTest.java
+@@ -263,7 +263,7 @@ public class ConcatSequenceTest
+           @Override
+           public Integer accumulate(Integer accumulated, Integer in)
+           {
+-            yield();
++            this.yield();
+             return in;
+           }
+         }
+diff --git a/processing/src/test/java/org/apache/druid/java/util/common/guava/LimitedSequenceTest.java b/processing/src/test/java/org/apache/druid/java/util/common/guava/LimitedSequenceTest.java
+index 9ea8b75aa3..d26a950bdd 100644
+--- a/processing/src/test/java/org/apache/druid/java/util/common/guava/LimitedSequenceTest.java
++++ b/processing/src/test/java/org/apache/druid/java/util/common/guava/LimitedSequenceTest.java
+@@ -104,7 +104,7 @@ public class LimitedSequenceTest
+               public OutType accumulate(OutType accumulated, Integer in)
+               {
+                 final OutType retVal = super.accumulate(accumulated, in);
+-                yield();
++                this.yield();
+                 return retVal;
+               }
+             }
+diff --git a/processing/src/test/java/org/apache/druid/java/util/common/guava/SequenceTestHelper.java b/processing/src/test/java/org/apache/druid/java/util/common/guava/SequenceTestHelper.java
+index f8a3798954..afbb960e00 100644
+--- a/processing/src/test/java/org/apache/druid/java/util/common/guava/SequenceTestHelper.java
++++ b/processing/src/test/java/org/apache/druid/java/util/common/guava/SequenceTestHelper.java
+@@ -65,7 +65,7 @@ public class SequenceTestHelper
+           {
+             if (++count >= numToTake) {
+               count = 0;
+-              yield();
++              this.yield();
+             }
+ 
+             Assert.assertEquals(prefix, valsIter.next(), in);
+diff --git a/processing/src/test/java/org/apache/druid/java/util/common/guava/SkippingSequenceTest.java b/processing/src/test/java/org/apache/druid/java/util/common/guava/SkippingSequenceTest.java
+index 0253794fd0..2b299d0b79 100644
+--- a/processing/src/test/java/org/apache/druid/java/util/common/guava/SkippingSequenceTest.java
++++ b/processing/src/test/java/org/apache/druid/java/util/common/guava/SkippingSequenceTest.java
+@@ -110,7 +110,7 @@ public class SkippingSequenceTest
+               public OutType accumulate(OutType accumulated, Integer in)
+               {
+                 final OutType retVal = super.accumulate(accumulated, in);
+-                yield();
++                this.yield();
+                 return retVal;
+               }
+             }
+diff --git a/processing/src/test/java/org/apache/druid/query/aggregation/AggregationTestHelper.java b/processing/src/test/java/org/apache/druid/query/aggregation/AggregationTestHelper.java
+index 564ff92198..3f26002c91 100644
+--- a/processing/src/test/java/org/apache/druid/query/aggregation/AggregationTestHelper.java
++++ b/processing/src/test/java/org/apache/druid/query/aggregation/AggregationTestHelper.java
+@@ -781,7 +781,7 @@ public class AggregationTestHelper implements Closeable
+                 @Override
+                 public Object accumulate(Object accumulated, Object in)
+                 {
+-                  yield();
++                  this.yield();
+                   return in;
+                 }
+               }
+diff --git a/server/pom.xml b/server/pom.xml
+index 0869837810..ccfcb50c5f 100644
+--- a/server/pom.xml
++++ b/server/pom.xml
+@@ -284,7 +284,7 @@
+             <artifactId>validation-api</artifactId>
+         </dependency>
+         <dependency>
+-            <groupId>com.google.errorprone</groupId>
++            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+             <artifactId>error_prone_annotations</artifactId>
+         </dependency>
+         <dependency>
+diff --git a/services/pom.xml b/services/pom.xml
+index 2913dd0c71..49e960b085 100644
+--- a/services/pom.xml
++++ b/services/pom.xml
+@@ -132,7 +132,7 @@
+             <artifactId>validation-api</artifactId>
+         </dependency>
+         <dependency>
+-            <groupId>com.google.errorprone</groupId>
++            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+             <artifactId>error_prone_annotations</artifactId>
+         </dependency>
+         <dependency>
+diff --git a/sql/pom.xml b/sql/pom.xml
+index bdd29f3f91..9a7891da84 100644
+--- a/sql/pom.xml
++++ b/sql/pom.xml
+@@ -152,7 +152,7 @@
+       <artifactId>guava</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>com.google.errorprone</groupId>
++      <groupId>com.github.PicnicSupermarket.error-prone</groupId>
+       <artifactId>error_prone_annotations</artifactId>
+     </dependency>
+     <dependency>

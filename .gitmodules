@@ -7,3 +7,6 @@
 [submodule "integration-tests/metrics"]
 	path = integration-tests/metrics
 	url = https://github.com/dropwizard/metrics
+[submodule "integration-tests/druid"]
+	path = integration-tests/druid
+	url = https://github.com/apache/druid

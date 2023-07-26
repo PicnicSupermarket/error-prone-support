@@ -2,8 +2,8 @@
 
 set -e -u -o pipefail
 
-project=metrics
-revision=v4.2.19
+project=druid
+revision=druid-26.0.0
 
 if [ "${#}" -gt 1 ] || [[ ${1:---sync} != '--sync' ]]; then
   echo "Usage: ${0} [--sync]"
