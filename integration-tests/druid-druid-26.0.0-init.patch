@@ -1,57 +1,5 @@
-diff --git a/extensions-contrib/tdigestsketch/pom.xml b/extensions-contrib/tdigestsketch/pom.xml
-index 77987dd4e7..f0609c55fb 100644
---- a/extensions-contrib/tdigestsketch/pom.xml
-+++ b/extensions-contrib/tdigestsketch/pom.xml
-@@ -106,7 +106,7 @@
-       <scope>provided</scope>
-     </dependency>
-     <dependency>
--      <groupId>com.google.errorprone</groupId>
-+      <groupId>com.github.PicnicSupermarket.error-prone</groupId>
-       <artifactId>error_prone_annotations</artifactId>
-       <scope>provided</scope>
-     </dependency>
-diff --git a/extensions-core/druid-catalog/pom.xml b/extensions-core/druid-catalog/pom.xml
-index 318d399a9a..09fa61e223 100644
---- a/extensions-core/druid-catalog/pom.xml
-+++ b/extensions-core/druid-catalog/pom.xml
-@@ -177,7 +177,7 @@
-             <scope>provided</scope>
-         </dependency>
-         <dependency>
--            <groupId>com.google.errorprone</groupId>
-+            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
-             <artifactId>error_prone_annotations</artifactId>
-             <scope>provided</scope>
-         </dependency>
-diff --git a/extensions-core/multi-stage-query/pom.xml b/extensions-core/multi-stage-query/pom.xml
-index b1398b9ac6..f800a435a1 100644
---- a/extensions-core/multi-stage-query/pom.xml
-+++ b/extensions-core/multi-stage-query/pom.xml
-@@ -166,7 +166,7 @@
-             <scope>provided</scope>
-         </dependency>
-         <dependency>
--            <groupId>com.google.errorprone</groupId>
-+            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
-             <artifactId>error_prone_annotations</artifactId>
-             <scope>provided</scope>
-         </dependency>
-diff --git a/indexing-service/pom.xml b/indexing-service/pom.xml
-index a26428997e..85baec832d 100644
---- a/indexing-service/pom.xml
-+++ b/indexing-service/pom.xml
-@@ -161,7 +161,7 @@
-             <artifactId>jackson-jaxrs-smile-provider</artifactId>
-         </dependency>
-         <dependency>
--            <groupId>com.google.errorprone</groupId>
-+            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
-             <artifactId>error_prone_annotations</artifactId>
-         </dependency>
-         <dependency>
 diff --git a/pom.xml b/pom.xml
-index c0f06547f8..c0ae78dfdc 100644
+index c0f06547f8..cbbf7d8e1b 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -91,7 +91,9 @@
@@ -59,21 +7,12 @@ index c0f06547f8..c0ae78dfdc 100644
          <derby.version>10.14.2.0</derby.version>
          <dropwizard.metrics.version>4.0.0</dropwizard.metrics.version>
 -        <errorprone.version>2.11.0</errorprone.version>
-+        <errorprone.version>v2.19.1-picnic-1</errorprone.version>
++        <errorprone.version>HEAD-SNAPSHOT</errorprone.version>
 +        <error-prone-support.version>0.11.2-SNAPSHOT</error-prone-support.version>
-+        <error-prone-support.flags>-Xplugin:ErrorProne ${error-prone.flags} -Xep:MethodReferenceUsage:OFF</error-prone-support.flags>
++        <error-prone-support.flags>-Xplugin:ErrorProne ${error-prone.flags} -Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern=^((?!(Immutable|Preconditions|StringRules\$StringIsNullOrEmpty)).*)</error-prone-support.flags>
          <fastutil.version>8.5.4</fastutil.version>
          <guava.version>16.0.1</guava.version>
          <guice.version>4.1.0</guice.version>
-@@ -473,7 +475,7 @@
-               <version>${guice.version}</version>
-               </dependency>
-             <dependency>
--                <groupId>com.google.errorprone</groupId>
-+                <groupId>com.github.PicnicSupermarket.error-prone</groupId>
-                 <artifactId>error_prone_annotations</artifactId>
-                 <version>${errorprone.version}</version>
-             </dependency>
 @@ -1769,45 +1771,161 @@
              </build>
            </profile>
@@ -120,7 +59,7 @@ index c0f06547f8..c0ae78dfdc 100644
 +                                      </compilerArgs>
 +                                      <annotationProcessorPaths>
 +                                        <path>
-+                                          <groupId>com.github.PicnicSupermarket.error-prone</groupId>
++                                          <groupId>com.google.errorprone</groupId>
 +                                          <artifactId>error_prone_core</artifactId>
 +                                          <version>${errorprone.version}</version>
 +                                        </path>
@@ -233,7 +172,7 @@ index c0f06547f8..c0ae78dfdc 100644
 +                                      </compilerArgs>
 +                                      <annotationProcessorPaths>
 +                                        <path>
-+                                          <groupId>com.github.PicnicSupermarket.error-prone</groupId>
++                                          <groupId>com.google.errorprone</groupId>
 +                                          <artifactId>error_prone_core</artifactId>
 +                                          <version>${errorprone.version}</version>
 +                                        </path>
@@ -269,19 +208,6 @@ index c0f06547f8..c0ae78dfdc 100644
                          </configuration>
                      </plugin>
                  </plugins>
-diff --git a/processing/pom.xml b/processing/pom.xml
-index 35704e15e7..d6edee7683 100644
---- a/processing/pom.xml
-+++ b/processing/pom.xml
-@@ -104,7 +104,7 @@
-       <artifactId>jsr305</artifactId>
-     </dependency>
-     <dependency>
--      <groupId>com.google.errorprone</groupId>
-+      <groupId>com.github.PicnicSupermarket.error-prone</groupId>
-       <artifactId>error_prone_annotations</artifactId>
-     </dependency>
-     <dependency>
 diff --git a/processing/src/test/java/org/apache/druid/common/guava/CombiningSequenceTest.java b/processing/src/test/java/org/apache/druid/common/guava/CombiningSequenceTest.java
 index 7c97e36482..437c382517 100644
 --- a/processing/src/test/java/org/apache/druid/common/guava/CombiningSequenceTest.java
@@ -373,42 +299,15 @@ index 564ff92198..3f26002c91 100644
                    return in;
                  }
                }
-diff --git a/server/pom.xml b/server/pom.xml
-index 0869837810..ccfcb50c5f 100644
---- a/server/pom.xml
-+++ b/server/pom.xml
-@@ -284,7 +284,7 @@
-             <artifactId>validation-api</artifactId>
-         </dependency>
-         <dependency>
--            <groupId>com.google.errorprone</groupId>
-+            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
-             <artifactId>error_prone_annotations</artifactId>
-         </dependency>
-         <dependency>
-diff --git a/services/pom.xml b/services/pom.xml
-index 2913dd0c71..49e960b085 100644
---- a/services/pom.xml
-+++ b/services/pom.xml
-@@ -132,7 +132,7 @@
-             <artifactId>validation-api</artifactId>
-         </dependency>
-         <dependency>
--            <groupId>com.google.errorprone</groupId>
-+            <groupId>com.github.PicnicSupermarket.error-prone</groupId>
-             <artifactId>error_prone_annotations</artifactId>
-         </dependency>
-         <dependency>
-diff --git a/sql/pom.xml b/sql/pom.xml
-index bdd29f3f91..9a7891da84 100644
---- a/sql/pom.xml
-+++ b/sql/pom.xml
-@@ -152,7 +152,7 @@
-       <artifactId>guava</artifactId>
-     </dependency>
-     <dependency>
--      <groupId>com.google.errorprone</groupId>
-+      <groupId>com.github.PicnicSupermarket.error-prone</groupId>
-       <artifactId>error_prone_annotations</artifactId>
-     </dependency>
-     <dependency>
+diff --git a/processing/src/test/java/org/apache/druid/query/groupby/GroupByQueryRunnerTest.java b/processing/src/test/java/org/apache/druid/query/groupby/GroupByQueryRunnerTest.java
+index 6d898e725f..9917ab62b2 100644
+--- a/processing/src/test/java/org/apache/druid/query/groupby/GroupByQueryRunnerTest.java
++++ b/processing/src/test/java/org/apache/druid/query/groupby/GroupByQueryRunnerTest.java
+@@ -12119,6 +12119,7 @@ public class GroupByQueryRunnerTest extends InitializedNullHandlingTest
+   }
+ 
+   @Test
++  @SuppressWarnings("MethodReferenceUsage")
+   public void testTypeConversionWithMergingChainedExecutionRunner()
+   {
+     // Cannot vectorize due to extraction dimension spec.
