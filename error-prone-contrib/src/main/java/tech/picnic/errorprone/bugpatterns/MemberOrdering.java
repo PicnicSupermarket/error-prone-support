@@ -156,7 +156,7 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
     Optional<Integer> previousMemberEndPos =
         tokens.stream()
             .map(ErrorProneToken::endPos)
-            .takeWhile(endPos -> endPos <= memberStartPos)
+            .takeWhile(endPos -> endPos < memberStartPos)
             .reduce((earlierPos, laterPos) -> laterPos);
 
     ImmutableList<ErrorProneToken> memberTokens =
