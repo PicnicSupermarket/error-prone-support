@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
@@ -136,16 +135,11 @@ public final class MemberOrdering extends BugChecker implements BugChecker.Class
 
   private static ImmutableList<Tokens.Comment> getMemberComments(
       VisitorState state, ClassTree classTree, Tree member) {
-    if (member.getKind() == Tree.Kind.METHOD
-        && ASTHelpers.isGeneratedConstructor((MethodTree) member)) {
+    if (state.getEndPosition(member) == -1) {
+      // Member is probably generated, according to `VisitorState` its end position is "not
+      // available".
       return ImmutableList.of();
     }
-
-    checkState(
-        state.getEndPosition(member) != -1,
-        "Member's end position is not available (-1).\n - member=[%s]\n - source=[%s]",
-        member,
-        state.getSourceForNode(member));
 
     ImmutableList<ErrorProneToken> tokens =
         ImmutableList.copyOf(
