@@ -7,16 +7,16 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class MemberOrderingTest {
+final class ClassMemberOrderingTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(MemberOrdering.class, getClass())
+    CompilationTestHelper.newInstance(ClassMemberOrdering.class, getClass())
         .expectErrorMessage(
-            "MemberOrdering",
-            containsPattern("Members, constructors and methods should follow standard ordering."))
+            "ClassMemberOrdering",
+            containsPattern("Fields, constructors and methods should follow standard ordering."))
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic matches: MemberOrdering",
+            "// BUG: Diagnostic matches: ClassMemberOrdering",
             "class A {",
             "  char a = 'a';",
             "  private static String FOO = \"foo\";",
@@ -69,7 +69,7 @@ final class MemberOrderingTest {
 
   @Test
   void replacementFirstSuggestedFix() {
-    BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
@@ -126,7 +126,7 @@ final class MemberOrderingTest {
 
   @Test
   void replacementFirstSuggestedFixConsidersDefaultConstructor() {
-    BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
@@ -154,7 +154,7 @@ final class MemberOrderingTest {
 
   @Test
   void replacementFirstSuggestedFixConsidersComments() {
-    BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
@@ -188,7 +188,7 @@ final class MemberOrderingTest {
 
   @Test
   void replacementFirstSuggestedFixConsidersAnnotations() {
-    BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
@@ -213,7 +213,7 @@ final class MemberOrderingTest {
   @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
   void replacementFirstSuggestedFixDoesNotModifyWhitespace() {
-    BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
             "",
@@ -253,7 +253,7 @@ final class MemberOrderingTest {
   // XXX: This test should fail, if we verify that whitespace is preserved.
   @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   void xxx() {
-    BugCheckerRefactoringTestHelper.newInstance(MemberOrdering.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
             "",
