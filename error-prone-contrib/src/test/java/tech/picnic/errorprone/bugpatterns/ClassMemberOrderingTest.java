@@ -152,15 +152,19 @@ final class ClassMemberOrderingTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
+  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
   void replacementFirstSuggestedFixConsidersComments() {
     BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
-            "  // `m1()` comment.",
-            "  // `m1()` second comment.",
-            "  void m1() {",
+            "  // detached comment from method",
+            "  ;void method1() {}",
+            "",
+            "  // first comment prior to method",
+            "  // second comment prior to method",
+            "  void method2() {",
             "    // Print line 'foo' to stdout.",
             "    System.out.println(\"foo\");",
             "  }",
@@ -176,9 +180,12 @@ final class ClassMemberOrderingTest {
             "  /** Instantiates a new {@link A} instance. */",
             "  public A() {}",
             "",
-            "  // `m1()` comment.",
-            "  // `m1()` second comment.",
-            "  void m1() {",
+            "  // detached comment from method",
+            "  void method1() {}",
+            "",
+            "  // first comment prior to method",
+            "  // second comment prior to method",
+            "  void method2() {",
             "    // Print line 'foo' to stdout.",
             "    System.out.println(\"foo\");",
             "  }",
