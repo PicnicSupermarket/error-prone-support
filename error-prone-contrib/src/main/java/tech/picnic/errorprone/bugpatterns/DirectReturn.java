@@ -12,6 +12,7 @@ import static com.google.errorprone.matchers.Matchers.returnStatement;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.bugpatterns.util.MoreMatchers.isClassAnnotatedWithLombokData;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Streams;
@@ -25,6 +26,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BlockTree;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
@@ -60,6 +62,8 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
       allOf(
           not(toType(MethodInvocationTree.class, argument(0, isSameType(Class.class.getName())))),
           staticMethod().onClass("org.mockito.Mockito").namedAnyOf("mock", "spy"));
+  private static final Matcher<ClassTree> IS_CLASS_ANNOTATED_WITH_LOMBOK_DATA =
+      isClassAnnotatedWithLombokData();
 
   /** Instantiates a new {@link DirectReturn} instance. */
   public DirectReturn() {}
@@ -67,7 +71,9 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
   @Override
   public Description matchBlock(BlockTree tree, VisitorState state) {
     List<? extends StatementTree> statements = tree.getStatements();
-    if (statements.size() < 2) {
+    ClassTree enclosingNode = ASTHelpers.findEnclosingNode(state.getPath(), ClassTree.class);
+    if (statements.size() < 2
+        || IS_CLASS_ANNOTATED_WITH_LOMBOK_DATA.matches(enclosingNode, state)) {
       return Description.NO_MATCH;
     }
 
