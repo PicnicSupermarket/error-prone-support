@@ -25,9 +25,10 @@ import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestCases;
  * An {@link Extractor} that describes how to extract data from classes that test a {@code
  * BugChecker}.
  */
-// XXX: Consider whether to omit or handle differently identification tests without `// BUG:
-// Diagnostic (contains|matches)` markers.
-// XXX: Handle other methods from `{BugCheckerRefactoring,Compilation}TestHelper`.
+// XXX: Handle other methods from `{BugCheckerRefactoring,Compilation}TestHelper`:
+// - Indicate which custom arguments are specified, if any.
+// - For replacement tests, indicate which `FixChooser` is used.
+// - ... (We don't use all optional features; TBD what else to support.)
 @Immutable
 @AutoService(Extractor.class)
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
@@ -42,11 +43,11 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
 
   @Override
   public Optional<TestCases> tryExtract(ClassTree tree, VisitorState state) {
-    CollectBugPatternTests scanner = new CollectBugPatternTests();
+    BugPatternTestCollector collector = new BugPatternTestCollector();
 
-    scanner.scan(tree, state);
+    collector.scan(tree, state);
 
-    return Optional.of(scanner.getCollectedTests())
+    return Optional.of(collector.getCollectedTests())
         .filter(not(ImmutableList::isEmpty))
         .map(
             tests ->
@@ -54,7 +55,7 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
                     ASTHelpers.getSymbol(tree).className(), tests));
   }
 
-  private static final class CollectBugPatternTests
+  private static final class BugPatternTestCollector
       extends TreeScanner<@Nullable Void, VisitorState> {
     private static final Matcher<ExpressionTree> COMPILATION_HELPER_DO_TEST =
         instanceMethod()
@@ -104,9 +105,11 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
                     extractIdentificationTestCases(node, entries, state);
                   }
 
-                  collectedTestCases.add(
-                      new AutoValue_BugPatternTestExtractor_TestCase(
-                          classUnderTest, ImmutableList.copyOf(entries).reverse()));
+                  if (!entries.isEmpty()) {
+                    collectedTestCases.add(
+                        new AutoValue_BugPatternTestExtractor_TestCase(
+                            classUnderTest, ImmutableList.copyOf(entries).reverse()));
+                  }
                 });
       }
 
@@ -130,16 +133,13 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
     private static void extractIdentificationTestCases(
         MethodInvocationTree tree, List<TestEntry> sink, VisitorState state) {
       if (IDENTIFICATION_SOURCE_LINES.matches(tree, state)) {
-        // XXX: Test the case where this code isn't a constant.
         String fileName = ASTHelpers.constValue(tree.getArguments().get(0), String.class);
-        // XXX: Test the case where this code isn't a constant.
-        Optional<String> sourceCode = getSourceCode(tree);
+        Optional<String> sourceCode =
+            getSourceCode(tree).filter(s -> s.contains("// BUG: Diagnostic"));
         if (fileName != null && sourceCode.isPresent()) {
           sink.add(
               new AutoValue_BugPatternTestExtractor_IdentificationTestEntry(
-                  // XXX: Handle the case where this isn't a constant.
-                  ASTHelpers.constValue(tree.getArguments().get(0), String.class),
-                  sourceCode.orElseThrow()));
+                  fileName, sourceCode.orElseThrow()));
         }
       }
 
@@ -152,21 +152,20 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
     private static void extractReplacementTestCases(
         MethodInvocationTree tree, List<TestEntry> sink, VisitorState state) {
       if (REPLACEMENT_OUTPUT_SOURCE_LINES.matches(tree, state)) {
-        // XXX: Add test case for when this isn't a `MethodInvocationTree`?
-        // Answer: yes, because then the `.getArguments().get(0)` call below is also safe. So test
-        // against `addInputLines`.
+        /*
+         * Retrieve the method invocation that contains the input source code. Note that this cast
+         * is safe, because this code is guarded by an earlier call to `#getClassUnderTest(..)`,
+         * which ensures that `tree` is part of a longer method invocation chain.
+         */
         MethodInvocationTree inputTree = (MethodInvocationTree) ASTHelpers.getReceiver(tree);
 
-        // XXX: Test the case where this isn't a constant.
         String fileName = ASTHelpers.constValue(inputTree.getArguments().get(0), String.class);
-        // XXX: Test the case where this isn't a constant.
         Optional<String> inputCode = getSourceCode(inputTree);
         if (fileName != null && inputCode.isPresent()) {
-          // XXX: Test the case where this isn't a constant.
           Optional<String> outputCode =
               REPLACEMENT_EXPECT_UNCHANGED.matches(tree, state) ? inputCode : getSourceCode(tree);
 
-          if (outputCode.isPresent()) {
+          if (outputCode.isPresent() && !inputCode.equals(outputCode)) {
             sink.add(
                 new AutoValue_BugPatternTestExtractor_ReplacementTestEntry(
                     fileName, inputCode.orElseThrow(), outputCode.orElseThrow()));
@@ -180,7 +179,7 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
       }
     }
 
-    // XXX: Duplicated from `ErrorProneTestSourceFormat`. Can we do better?
+    // XXX: This logic is duplicated in `ErrorProneTestSourceFormat`. Can we do better?
     private static Optional<String> getSourceCode(MethodInvocationTree tree) {
       List<? extends ExpressionTree> sourceLines =
           tree.getArguments().subList(1, tree.getArguments().size());

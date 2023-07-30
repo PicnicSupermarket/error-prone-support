@@ -6,11 +6,11 @@
       "entries": [
         {
           "fileName": "A.java",
-          "code": "class A {}\n"
+          "code": "// BUG: Diagnostic contains:\nclass A {}\n"
         },
         {
           "fileName": "B.java",
-          "code": "class B {}\n"
+          "code": "// BUG: Diagnostic contains:\nclass B {}\n"
         }
       ]
     },
@@ -19,7 +19,7 @@
       "entries": [
         {
           "fileName": "C.java",
-          "code": "class C {}\n"
+          "code": "// BUG: Diagnostic contains:\nclass C {}\n"
         }
       ]
     },
@@ -29,7 +29,7 @@
         {
           "fileName": "A.java",
           "input": "class A {}\n",
-          "output": "class A {}\n"
+          "output": "class A { /* This is a change. */ }\n"
         }
       ]
     },
@@ -39,7 +39,7 @@
         {
           "fileName": "B.java",
           "input": "class B {}\n",
-          "output": "class B {}\n"
+          "output": "class B { /* This is a change. */ }\n"
         }
       ]
     }

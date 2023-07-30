@@ -7,12 +7,12 @@
         {
           "fileName": "A.java",
           "input": "class A {}\n",
-          "output": "class A {}\n"
+          "output": "class A { /* This is a change. */ }\n"
         },
         {
           "fileName": "B.java",
           "input": "class B {}\n",
-          "output": "class B {}\n"
+          "output": "class B { /* This is a change. */ }\n"
         }
       ]
     }

@@ -6,11 +6,11 @@
       "entries": [
         {
           "fileName": "A.java",
-          "code": "class A {}\n"
+          "code": "// BUG: Diagnostic contains:\nclass A {}\n"
         },
         {
           "fileName": "B.java",
-          "code": "class B {}\n"
+          "code": "// BUG: Diagnostic contains:\nclass B {}\n"
         }
       ]
     }
