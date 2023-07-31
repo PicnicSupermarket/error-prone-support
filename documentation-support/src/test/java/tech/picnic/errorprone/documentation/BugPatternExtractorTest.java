@@ -1,17 +1,9 @@
 package tech.picnic.errorprone.documentation;
 
-import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.io.Resources;
-import com.google.errorprone.BugPattern;
-import com.google.errorprone.CompilationTestHelper;
-import com.google.errorprone.VisitorState;
-import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
-import com.google.errorprone.matchers.Description;
-import com.sun.source.tree.ClassTree;
 import java.io.IOException;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
@@ -44,10 +36,7 @@ final class BugPatternExtractorTest {
         "@BugPattern(summary = \"MinimalBugChecker summary\", severity = SeverityLevel.ERROR)",
         "public final class MinimalBugChecker extends BugChecker {}");
 
-    verifyFileMatchesResource(
-        outputDirectory,
-        "bugpattern-MinimalBugChecker.json",
-        "bugpattern-documentation-minimal.json");
+    verifyGeneratedFileContent(outputDirectory, "MinimalBugChecker");
   }
 
   @Test
@@ -75,10 +64,7 @@ final class BugPatternExtractorTest {
         "    suppressionAnnotations = {BugPattern.class, Test.class})",
         "public final class CompleteBugChecker extends BugChecker {}");
 
-    verifyFileMatchesResource(
-        outputDirectory,
-        "bugpattern-CompleteBugChecker.json",
-        "bugpattern-documentation-complete.json");
+    verifyGeneratedFileContent(outputDirectory, "CompleteBugChecker");
   }
 
   @Test
@@ -98,51 +84,23 @@ final class BugPatternExtractorTest {
         "    documentSuppression = false)",
         "public final class UndocumentedSuppressionBugPattern extends BugChecker {}");
 
-    verifyFileMatchesResource(
-        outputDirectory,
-        "bugpattern-UndocumentedSuppressionBugPattern.json",
-        "bugpattern-documentation-undocumented-suppression.json");
+    verifyGeneratedFileContent(outputDirectory, "UndocumentedSuppressionBugPattern");
   }
 
-  @Test
-  void bugPatternAnnotationIsAbsent() {
-    CompilationTestHelper.newInstance(TestChecker.class, getClass())
-        .addSourceLines(
-            "TestChecker.java",
-            "import com.google.errorprone.bugpatterns.BugChecker;",
-            "",
-            "// BUG: Diagnostic contains: Can extract: false",
-            "public final class TestChecker extends BugChecker {}")
-        .doTest();
-  }
-
-  private static void verifyFileMatchesResource(
-      Path outputDirectory, String fileName, String resourceName) throws IOException {
-    assertThat(outputDirectory.resolve(fileName))
+  private static void verifyGeneratedFileContent(Path outputDirectory, String testClass)
+      throws IOException {
+    String resourceName = String.format("bugpattern-%s.json", testClass);
+    assertThat(outputDirectory.resolve(resourceName))
         .content(UTF_8)
-        .isEqualToIgnoringWhitespace(getResource(resourceName));
+        .isEqualToIgnoringWhitespace(
+            getResource(
+                String.join("-", BugPatternExtractorTest.class.getSimpleName(), resourceName)));
   }
 
   // XXX: Once we support only JDK 15+, drop this method in favour of including the resources as
-  // text blocks in this class. (This also requires renaming the `verifyFileMatchesResource`
-  // method.)
+  // text blocks in this class.
   private static String getResource(String resourceName) throws IOException {
     return Resources.toString(
         Resources.getResource(BugPatternExtractorTest.class, resourceName), UTF_8);
-  }
-
-  /** A {@link BugChecker} that validates the {@link BugPatternExtractor}. */
-  @BugPattern(summary = "Validates `BugPatternExtractor` extraction", severity = ERROR)
-  public static final class TestChecker extends BugChecker implements ClassTreeMatcher {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public Description matchClass(ClassTree tree, VisitorState state) {
-      return buildDescription(tree)
-          .setMessage(
-              String.format(
-                  "Can extract: %s", new BugPatternExtractor().tryExtract(tree, state).isPresent()))
-          .build();
-    }
   }
 }

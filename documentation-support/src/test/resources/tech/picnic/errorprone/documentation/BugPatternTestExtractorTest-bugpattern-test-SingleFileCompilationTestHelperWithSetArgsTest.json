@@ -1,8 +1,8 @@
 {
-  "testClass": "TestCheckerTest",
+  "testClass": "SingleFileCompilationTestHelperWithSetArgsTest",
   "testCases": [
     {
-      "classUnderTest": "TestCheckerTest.DifferentChecker",
+      "classUnderTest": "SingleFileCompilationTestHelperWithSetArgsTest.TestChecker",
       "entries": [
         {
           "fileName": "A.java",

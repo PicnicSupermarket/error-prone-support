@@ -1,8 +1,8 @@
 {
-  "testClass": "pkg.TestCheckerTest",
+  "testClass": "MultiFileCompilationTestHelperTest",
   "testCases": [
     {
-      "classUnderTest": "pkg.TestCheckerTest.TestChecker",
+      "classUnderTest": "MultiFileCompilationTestHelperTest.TestChecker",
       "entries": [
         {
           "fileName": "A.java",

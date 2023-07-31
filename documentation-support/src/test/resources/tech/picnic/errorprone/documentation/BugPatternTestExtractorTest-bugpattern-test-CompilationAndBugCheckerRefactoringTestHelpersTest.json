@@ -1,8 +1,8 @@
 {
-  "testClass": "TestCheckerTest",
+  "testClass": "CompilationAndBugCheckerRefactoringTestHelpersTest",
   "testCases": [
     {
-      "classUnderTest": "TestCheckerTest.TestChecker",
+      "classUnderTest": "CompilationAndBugCheckerRefactoringTestHelpersTest.TestChecker",
       "entries": [
         {
           "fileName": "A.java",
@@ -11,7 +11,7 @@
       ]
     },
     {
-      "classUnderTest": "TestCheckerTest.TestChecker",
+      "classUnderTest": "CompilationAndBugCheckerRefactoringTestHelpersTest.TestChecker",
       "entries": [
         {
           "fileName": "A.java",
