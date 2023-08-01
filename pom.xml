@@ -432,7 +432,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.9.3</version>
+                <version>5.10.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -1202,7 +1202,8 @@
                         </includes>
                         <properties>
                             <configurationParameters>junit.jupiter.execution.parallel.enabled=true
-                                junit.jupiter.execution.parallel.mode.default=concurrent</configurationParameters>
+                                junit.jupiter.execution.parallel.mode.default=concurrent
+                                junit.platform.stacktrace.pruning.enabled=false</configurationParameters>
                         </properties>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     </configuration>
