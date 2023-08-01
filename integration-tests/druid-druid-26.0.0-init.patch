@@ -1,19 +1,57 @@
+diff --git a/codestyle/guava16-forbidden-apis.txt b/codestyle/guava16-forbidden-apis.txt
+index 274a12696f..e80eb8c676 100644
+--- a/codestyle/guava16-forbidden-apis.txt
++++ b/codestyle/guava16-forbidden-apis.txt
+@@ -1,3 +1,3 @@
+ # Those signatures are only available in Guava 16:
+-com.google.common.util.concurrent.MoreExecutors#sameThreadExecutor() @ Use org.apache.druid.java.util.common.concurrent.Execs#directExecutor()
+-com.google.common.base.Objects#firstNonNull(java.lang.Object, java.lang.Object) @ Use org.apache.druid.common.guava.GuavaUtils#firstNonNull(java.lang.Object, java.lang.Object) instead (probably... the GuavaUtils method return object is nullable)
++# com.google.common.util.concurrent.MoreExecutors#sameThreadExecutor() @ Use org.apache.druid.java.util.common.concurrent.Execs#directExecutor()
++# com.google.common.base.Objects#firstNonNull(java.lang.Object, java.lang.Object) @ Use org.apache.druid.common.guava.GuavaUtils#firstNonNull(java.lang.Object, java.lang.Object) instead (probably... the GuavaUtils method return object is nullable)
+diff --git a/extensions-core/multi-stage-query/src/main/java/org/apache/druid/msq/exec/ControllerImpl.java b/extensions-core/multi-stage-query/src/main/java/org/apache/druid/msq/exec/ControllerImpl.java
+index b967b29cc7..e677e67fb5 100644
+--- a/extensions-core/multi-stage-query/src/main/java/org/apache/druid/msq/exec/ControllerImpl.java
++++ b/extensions-core/multi-stage-query/src/main/java/org/apache/druid/msq/exec/ControllerImpl.java
+@@ -1164,7 +1164,7 @@ public class ControllerImpl implements Controller
+             settableFuture.setException(t);
+           }
+         }
+-      });
++      }, Execs.directExecutor());
+ 
+       taskFutures.add(settableFuture);
+     }
 diff --git a/pom.xml b/pom.xml
-index c0f06547f8..cbbf7d8e1b 100644
+index c0f06547f8..b665dac710 100644
 --- a/pom.xml
 +++ b/pom.xml
-@@ -91,7 +91,9 @@
+@@ -91,9 +91,11 @@
          <datasketches.memory.version>2.0.0</datasketches.memory.version>
          <derby.version>10.14.2.0</derby.version>
          <dropwizard.metrics.version>4.0.0</dropwizard.metrics.version>
 -        <errorprone.version>2.11.0</errorprone.version>
 +        <errorprone.version>HEAD-SNAPSHOT</errorprone.version>
-+        <error-prone-support.version>0.11.2-SNAPSHOT</error-prone-support.version>
-+        <error-prone-support.flags>-Xplugin:ErrorProne ${error-prone.flags} -Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern=^((?!(Immutable|Preconditions|StringRules\$StringIsNullOrEmpty)).*)</error-prone-support.flags>
++        <error-prone-support.version>0.12.1-SNAPSHOT</error-prone-support.version>
++        <error-prone-support.flags>-Xplugin:ErrorProne ${error-prone.flags} -Xep:CollectorMutability:OFF -Xep:MockitoMockClassReference:OFF -XepOpt:Refaster:NamePattern=^((?!(ComparatorRules\$NaturalOrder|ComparatorRules\$M(ax|in)OfPair(Custom|Natural)Order|ComparatorRules\$ComparatorsM|NullRules\$RequireNonNullElse|OptionalRules\$OptionalOrElseThrow|OptionalRules\$OptionalIsEmpty|AssortedRules\$CheckIndex|Immutable|StringRules\$StringIsNullOrEmpty)).*)</error-prone-support.flags>
          <fastutil.version>8.5.4</fastutil.version>
-         <guava.version>16.0.1</guava.version>
+-        <guava.version>16.0.1</guava.version>
++        <guava.version>32.1.1-jre</guava.version>
          <guice.version>4.1.0</guice.version>
-@@ -1769,45 +1771,161 @@
+         <hamcrest.version>1.3</hamcrest.version>
+         <jetty.version>9.4.48.v20220622</jetty.version>
+@@ -1731,9 +1733,11 @@
+     <profiles>
+         <profile>
+             <id>java-9+</id>
++            <!-- disable default profile
+             <activation>
+                 <jdk>[9,)</jdk>
+             </activation>
++            -->
+             <properties>
+                 <jdk.surefire.argLine>
+                     <!-- required for DataSketches Memory on Java 11+ -->
+@@ -1769,45 +1773,167 @@
              </build>
            </profile>
            <profile>
@@ -24,6 +62,9 @@ index c0f06547f8..cbbf7d8e1b 100644
 -              </property>
 -            </activation>
 +            <id>error-prone-compile</id>
++            <modules>
++              <module>processing</module>
++            </modules>
              <build>
                  <plugins>
                      <plugin>
@@ -126,6 +167,9 @@ index c0f06547f8..cbbf7d8e1b 100644
 +        </profile>
 +        <profile>
 +            <id>error-prone-test-compile</id>
++            <modules>
++              <module>processing</module>
++            </modules>
 +            <build>
 +                <plugins>
 +                    <plugin>
@@ -208,6 +252,231 @@ index c0f06547f8..cbbf7d8e1b 100644
                          </configuration>
                      </plugin>
                  </plugins>
+diff --git a/processing/src/main/java/org/apache/druid/common/guava/FutureUtils.java b/processing/src/main/java/org/apache/druid/common/guava/FutureUtils.java
+index cf9a7f0ef7..2bd3b4ee82 100644
+--- a/processing/src/main/java/org/apache/druid/common/guava/FutureUtils.java
++++ b/processing/src/main/java/org/apache/druid/common/guava/FutureUtils.java
+@@ -19,11 +19,7 @@
+ 
+ package org.apache.druid.common.guava;
+ 
+-import com.google.common.util.concurrent.AsyncFunction;
+-import com.google.common.util.concurrent.FutureCallback;
+-import com.google.common.util.concurrent.Futures;
+-import com.google.common.util.concurrent.ListenableFuture;
+-import com.google.common.util.concurrent.SettableFuture;
++import com.google.common.util.concurrent.*;
+ import org.apache.druid.java.util.common.Either;
+ import org.apache.druid.java.util.common.ISE;
+ 
+@@ -107,11 +103,11 @@ public class FutureUtils
+    */
+   public static <T, R> ListenableFuture<R> transform(final ListenableFuture<T> future, final Function<T, R> fn)
+   {
+-    return Futures.transform(future, fn::apply);
++    return Futures.transform(future, fn::apply, MoreExecutors.directExecutor());
+   }
+ 
+   /**
+-   * Like {@link Futures#transform(ListenableFuture, AsyncFunction)}, but works better with lambdas due to not having
++   * Like {@link Futures#transformAsync(ListenableFuture, AsyncFunction, java.util.concurrent.Executor)}, but works better with lambdas due to not having
+    * overloads.
+    *
+    * One can write {@code FutureUtils.transformAsync(future, v -> ...)} instead of
+@@ -119,7 +115,7 @@ public class FutureUtils
+    */
+   public static <T, R> ListenableFuture<R> transformAsync(final ListenableFuture<T> future, final AsyncFunction<T, R> fn)
+   {
+-    return Futures.transform(future, fn);
++    return Futures.transformAsync(future, fn, MoreExecutors.directExecutor());
+   }
+ 
+   /**
+@@ -200,7 +196,8 @@ public class FutureUtils
+ 
+             retVal.setException(e);
+           }
+-        }
++        },
++        MoreExecutors.directExecutor()
+     );
+ 
+     return retVal;
+diff --git a/processing/src/main/java/org/apache/druid/frame/processor/FrameProcessorExecutor.java b/processing/src/main/java/org/apache/druid/frame/processor/FrameProcessorExecutor.java
+index 43221de36a..e9cc32457d 100644
+--- a/processing/src/main/java/org/apache/druid/frame/processor/FrameProcessorExecutor.java
++++ b/processing/src/main/java/org/apache/druid/frame/processor/FrameProcessorExecutor.java
+@@ -24,11 +24,7 @@ import com.google.common.base.Preconditions;
+ import com.google.common.collect.Multimaps;
+ import com.google.common.collect.SetMultimap;
+ import com.google.common.collect.Sets;
+-import com.google.common.util.concurrent.FutureCallback;
+-import com.google.common.util.concurrent.Futures;
+-import com.google.common.util.concurrent.ListenableFuture;
+-import com.google.common.util.concurrent.ListeningExecutorService;
+-import com.google.common.util.concurrent.SettableFuture;
++import com.google.common.util.concurrent.*;
+ import com.google.errorprone.annotations.concurrent.GuardedBy;
+ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+ import it.unimi.dsi.fastutil.ints.IntSet;
+@@ -42,14 +38,7 @@ import org.apache.druid.java.util.common.logger.Logger;
+ 
+ import javax.annotation.Nullable;
+ import java.io.IOException;
+-import java.util.ArrayList;
+-import java.util.Collections;
+-import java.util.HashMap;
+-import java.util.IdentityHashMap;
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Optional;
+-import java.util.Set;
++import java.util.*;
+ import java.util.concurrent.CancellationException;
+ import java.util.concurrent.ExecutorService;
+ import java.util.function.BiFunction;
+@@ -286,7 +275,8 @@ public class FrameProcessorExecutor
+                   fail(t);
+                 }
+               }
+-            }
++            },
++            exec
+         );
+       }
+ 
+diff --git a/processing/src/main/java/org/apache/druid/frame/processor/RunAllFullyWidget.java b/processing/src/main/java/org/apache/druid/frame/processor/RunAllFullyWidget.java
+index dfc1dde9bd..69347dfee5 100644
+--- a/processing/src/main/java/org/apache/druid/frame/processor/RunAllFullyWidget.java
++++ b/processing/src/main/java/org/apache/druid/frame/processor/RunAllFullyWidget.java
+@@ -296,7 +296,8 @@ public class RunAllFullyWidget<T, ResultType>
+                   cleanupIfNoMoreProcessors();
+                 }
+               }
+-            }
++            },
++            Execs.directExecutor()
+         );
+       }
+     }
+diff --git a/processing/src/main/java/org/apache/druid/indexer/TaskStatus.java b/processing/src/main/java/org/apache/druid/indexer/TaskStatus.java
+index 714c08be65..897caa6b9b 100644
+--- a/processing/src/main/java/org/apache/druid/indexer/TaskStatus.java
++++ b/processing/src/main/java/org/apache/druid/indexer/TaskStatus.java
+@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
+ import com.fasterxml.jackson.annotation.JsonIgnore;
+ import com.fasterxml.jackson.annotation.JsonProperty;
+ import com.google.common.annotations.VisibleForTesting;
+-import com.google.common.base.Objects;
++import com.google.common.base.MoreObjects;
+ import com.google.common.base.Preconditions;
+ 
+ import javax.annotation.Nullable;
+@@ -220,7 +220,7 @@ public class TaskStatus
+   @Override
+   public String toString()
+   {
+-    return Objects.toStringHelper(this)
++    return MoreObjects.toStringHelper(this)
+                   .add("id", id)
+                   .add("status", status)
+                   .add("duration", duration)
+diff --git a/processing/src/main/java/org/apache/druid/java/util/common/parsers/ObjectFlatteners.java b/processing/src/main/java/org/apache/druid/java/util/common/parsers/ObjectFlatteners.java
+index 2c76c14c7b..31c4a76295 100644
+--- a/processing/src/main/java/org/apache/druid/java/util/common/parsers/ObjectFlatteners.java
++++ b/processing/src/main/java/org/apache/druid/java/util/common/parsers/ObjectFlatteners.java
+@@ -86,18 +86,21 @@ public class ObjectFlatteners
+         return new AbstractMap<String, Object>()
+         {
+           @Override
++          @SuppressWarnings("MapSize")
+           public int size()
+           {
+             return keySet().size();
+           }
+ 
+           @Override
++          @SuppressWarnings("MapIsEmpty")
+           public boolean isEmpty()
+           {
+             return keySet().isEmpty();
+           }
+ 
+           @Override
++          @SuppressWarnings("MapContainsKey")
+           public boolean containsKey(final Object key)
+           {
+             if (key == null) {
+diff --git a/processing/src/main/java/org/apache/druid/math/expr/vector/VectorStringProcessors.java b/processing/src/main/java/org/apache/druid/math/expr/vector/VectorStringProcessors.java
+index 3326474f42..01b4c91304 100644
+--- a/processing/src/main/java/org/apache/druid/math/expr/vector/VectorStringProcessors.java
++++ b/processing/src/main/java/org/apache/druid/math/expr/vector/VectorStringProcessors.java
+@@ -68,6 +68,7 @@ public class VectorStringProcessors
+     return processor;
+   }
+ 
++  @SuppressWarnings("DirectReturn" /* Causes the type coercion to fail */)
+   public static <T> ExprVectorProcessor<T> concat(Expr.VectorInputBindingInspector inspector, List<Expr> inputs)
+   {
+     final ExprVectorProcessor<Object[]>[] inputProcessors = new ExprVectorProcessor[inputs.size()];
+diff --git a/processing/src/main/java/org/apache/druid/query/aggregation/SerializablePairLongStringColumnHeader.java b/processing/src/main/java/org/apache/druid/query/aggregation/SerializablePairLongStringColumnHeader.java
+index e0aa21af03..6a6358d55b 100644
+--- a/processing/src/main/java/org/apache/druid/query/aggregation/SerializablePairLongStringColumnHeader.java
++++ b/processing/src/main/java/org/apache/druid/query/aggregation/SerializablePairLongStringColumnHeader.java
+@@ -19,7 +19,7 @@
+ 
+ package org.apache.druid.query.aggregation;
+ 
+-import com.google.common.base.Objects;
++import com.google.common.base.MoreObjects;
+ import com.google.common.base.Preconditions;
+ import org.apache.druid.segment.serde.cell.LongSerializer;
+ 
+@@ -103,7 +103,7 @@ public class SerializablePairLongStringColumnHeader
+   @Override
+   public String toString()
+   {
+-    return Objects.toStringHelper(this)
++    return MoreObjects.toStringHelper(this)
+                   .add("bytes", bytes)
+                   .add("minValue", minValue)
+                   .toString();
+diff --git a/processing/src/main/java/org/apache/druid/query/scan/ScanQueryOffsetSequence.java b/processing/src/main/java/org/apache/druid/query/scan/ScanQueryOffsetSequence.java
+index 6685a40d97..a306429b34 100644
+--- a/processing/src/main/java/org/apache/druid/query/scan/ScanQueryOffsetSequence.java
++++ b/processing/src/main/java/org/apache/druid/query/scan/ScanQueryOffsetSequence.java
+@@ -102,6 +102,7 @@ public class ScanQueryOffsetSequence extends YieldingSequenceBase<ScanResultValu
+     }
+ 
+     @Override
++    @SuppressWarnings("StaticImport" /* Prevents generic type inference */)
+     public OutType accumulate(OutType accumulated, ScanResultValue result)
+     {
+       if (skipped < skip) {
+diff --git a/processing/src/main/java/org/apache/druid/query/scan/ScanQueryRunnerFactory.java b/processing/src/main/java/org/apache/druid/query/scan/ScanQueryRunnerFactory.java
+index 0013c4f84f..4e4a490a6f 100644
+--- a/processing/src/main/java/org/apache/druid/query/scan/ScanQueryRunnerFactory.java
++++ b/processing/src/main/java/org/apache/druid/query/scan/ScanQueryRunnerFactory.java
+@@ -152,6 +152,7 @@ public class ScanQueryRunnerFactory implements QueryRunnerFactory<ScanResultValu
+ 
+           // Group the list of pairs by interval.  The LinkedHashMap will have an interval paired with a list of all the
+           // query runners for that segment
++          @SuppressWarnings("CollectorMutability")
+           LinkedHashMap<Interval, List<Pair<Interval, QueryRunner<ScanResultValue>>>> partitionsGroupedByInterval =
+               intervalsAndRunnersOrdered.stream()
+                                         .collect(Collectors.groupingBy(
+diff --git a/processing/src/main/java/org/apache/druid/utils/JvmUtils.java b/processing/src/main/java/org/apache/druid/utils/JvmUtils.java
+index 7a8b68d96f..d7843c36e1 100644
+--- a/processing/src/main/java/org/apache/druid/utils/JvmUtils.java
++++ b/processing/src/main/java/org/apache/druid/utils/JvmUtils.java
+@@ -124,6 +124,7 @@ public class JvmUtils
+     }
+   }
+ 
++  @SuppressWarnings("StreamOfArray")
+   public static List<URL> systemClassPath()
+   {
+     List<URL> jobURLs;
 diff --git a/processing/src/test/java/org/apache/druid/common/guava/CombiningSequenceTest.java b/processing/src/test/java/org/apache/druid/common/guava/CombiningSequenceTest.java
 index 7c97e36482..437c382517 100644
 --- a/processing/src/test/java/org/apache/druid/common/guava/CombiningSequenceTest.java
@@ -286,6 +555,38 @@ index 0253794fd0..2b299d0b79 100644
                  return retVal;
                }
              }
+diff --git a/processing/src/test/java/org/apache/druid/java/util/common/parsers/CloseableIteratorTest.java b/processing/src/test/java/org/apache/druid/java/util/common/parsers/CloseableIteratorTest.java
+index be2d1d58bd..2a90bb629c 100644
+--- a/processing/src/test/java/org/apache/druid/java/util/common/parsers/CloseableIteratorTest.java
++++ b/processing/src/test/java/org/apache/druid/java/util/common/parsers/CloseableIteratorTest.java
+@@ -19,6 +19,7 @@
+ 
+ package org.apache.druid.java.util.common.parsers;
+ 
++import com.google.common.collect.ImmutableList;
+ import org.apache.druid.java.util.common.CloseableIterators;
+ import org.junit.Assert;
+ import org.junit.Test;
+@@ -31,6 +32,8 @@ import java.util.NoSuchElementException;
+ import java.util.stream.Collectors;
+ import java.util.stream.IntStream;
+ 
++import static com.google.common.collect.ImmutableList.toImmutableList;
++
+ public class CloseableIteratorTest
+ {
+   @Test
+@@ -44,8 +47,8 @@ public class CloseableIteratorTest
+           }
+           return newList;
+         });
+-    final Iterator<List<Integer>> expected = IntStream.range(0, 8)
+-        .mapToObj(i -> IntStream.range(0, i).map(j -> j * 10).boxed().collect(Collectors.toList()))
++    final Iterator<ImmutableList<Integer>> expected = IntStream.range(0, 8)
++        .mapToObj(i -> IntStream.range(0, i).map(j -> j * 10).boxed().collect(toImmutableList()))
+         .iterator();
+     while (expected.hasNext() && actual.hasNext()) {
+       Assert.assertEquals(expected.next(), actual.next());
 diff --git a/processing/src/test/java/org/apache/druid/query/aggregation/AggregationTestHelper.java b/processing/src/test/java/org/apache/druid/query/aggregation/AggregationTestHelper.java
 index 564ff92198..3f26002c91 100644
 --- a/processing/src/test/java/org/apache/druid/query/aggregation/AggregationTestHelper.java
@@ -311,3 +612,414 @@ index 6d898e725f..9917ab62b2 100644
    public void testTypeConversionWithMergingChainedExecutionRunner()
    {
      // Cannot vectorize due to extraction dimension spec.
+diff --git a/server/src/main/java/org/apache/druid/client/HttpServerInventoryView.java b/server/src/main/java/org/apache/druid/client/HttpServerInventoryView.java
+index 2f86c46064..d00a7f5481 100644
+--- a/server/src/main/java/org/apache/druid/client/HttpServerInventoryView.java
++++ b/server/src/main/java/org/apache/druid/client/HttpServerInventoryView.java
+@@ -527,7 +527,7 @@ public class HttpServerInventoryView implements ServerInventoryView, FilteredSer
+             smileMapper,
+             httpClient,
+             executor,
+-            new URL(druidServer.getScheme(), hostAndPort.getHostText(), hostAndPort.getPort(), "/"),
++            new URL(druidServer.getScheme(), hostAndPort.getHost(), hostAndPort.getPort(), "/"),
+             "/druid-internal/v1/segments",
+             SEGMENT_LIST_RESP_TYPE_REF,
+             config.getServerTimeout(),
+diff --git a/server/src/main/java/org/apache/druid/client/indexing/QueryStatus.java b/server/src/main/java/org/apache/druid/client/indexing/QueryStatus.java
+index b9348731bd..799f39b4e4 100644
+--- a/server/src/main/java/org/apache/druid/client/indexing/QueryStatus.java
++++ b/server/src/main/java/org/apache/druid/client/indexing/QueryStatus.java
+@@ -22,6 +22,7 @@ package org.apache.druid.client.indexing;
+ import com.fasterxml.jackson.annotation.JsonCreator;
+ import com.fasterxml.jackson.annotation.JsonIgnore;
+ import com.fasterxml.jackson.annotation.JsonProperty;
++import com.google.common.base.MoreObjects;
+ import com.google.common.base.Objects;
+ import com.google.common.base.Preconditions;
+ 
+@@ -80,7 +81,7 @@ public class QueryStatus
+   @Override
+   public String toString()
+   {
+-    return Objects.toStringHelper(this)
++    return MoreObjects.toStringHelper(this)
+                   .add("id", id)
+                   .add("status", status)
+                   .add("duration", duration)
+diff --git a/server/src/main/java/org/apache/druid/query/lookup/LookupReferencesManager.java b/server/src/main/java/org/apache/druid/query/lookup/LookupReferencesManager.java
+index 792c52f003..05e55cad57 100644
+--- a/server/src/main/java/org/apache/druid/query/lookup/LookupReferencesManager.java
++++ b/server/src/main/java/org/apache/druid/query/lookup/LookupReferencesManager.java
+@@ -553,6 +553,7 @@ public class LookupReferencesManager implements LookupExtractorFactoryContainerP
+   }
+ 
+   @Nullable
++  @SuppressWarnings("MapEntry")
+   private Map.Entry<String, LookupExtractorFactoryContainer> startLookup(LookupBean lookupBean)
+   {
+     LookupExtractorFactoryContainer container = lookupBean.getContainer();
+diff --git a/server/src/main/java/org/apache/druid/rpc/indexing/SpecificTaskServiceLocator.java b/server/src/main/java/org/apache/druid/rpc/indexing/SpecificTaskServiceLocator.java
+index 88f02e4309..fa5f538630 100644
+--- a/server/src/main/java/org/apache/druid/rpc/indexing/SpecificTaskServiceLocator.java
++++ b/server/src/main/java/org/apache/druid/rpc/indexing/SpecificTaskServiceLocator.java
+@@ -165,7 +165,8 @@ public class SpecificTaskServiceLocator implements ServiceLocator
+                   }
+                 }
+               }
+-            }
++            },
++                Execs.directExecutor()
+         );
+ 
+         return Futures.nonCancellationPropagating(retVal);
+diff --git a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/AppenderatorImpl.java b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/AppenderatorImpl.java
+index 1003467c6e..d132fda696 100644
+--- a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/AppenderatorImpl.java
++++ b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/AppenderatorImpl.java
+@@ -430,7 +430,8 @@ public class AppenderatorImpl implements Appenderator
+               {
+                 persistError = t;
+               }
+-            }
++            },
++                persistExecutor
+         );
+       } else {
+         isPersistRequired = true;
+diff --git a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/AppenderatorPlumber.java b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/AppenderatorPlumber.java
+index bea2890fcf..d825abcc14 100644
+--- a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/AppenderatorPlumber.java
++++ b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/AppenderatorPlumber.java
+@@ -330,7 +330,8 @@ public class AppenderatorPlumber implements Plumber
+             // TODO: Retry?
+             log.warn(e, "Failed to drop segment: %s", identifier);
+           }
+-        }
++        },
++            scheduledExecutor
+     );
+   }
+ 
+@@ -483,7 +484,8 @@ public class AppenderatorPlumber implements Plumber
+             log.warn(e, "Failed to push [%,d] segments.", segmentsToPush.size());
+             errorHandler.apply(e);
+           }
+-        }
++        },
++            scheduledExecutor
+     );
+   }
+ }
+diff --git a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/BaseAppenderatorDriver.java b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/BaseAppenderatorDriver.java
+index 65a8a676d3..5a77b22093 100644
+--- a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/BaseAppenderatorDriver.java
++++ b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/BaseAppenderatorDriver.java
+@@ -545,7 +545,8 @@ public abstract class BaseAppenderatorDriver implements Closeable
+               segmentsAndCommitMetadata.getSegments(),
+               metadata == null ? null : ((AppenderatorDriverMetadata) metadata).getCallerMetadata()
+           );
+-        }
++        },
++            executor
+     );
+   }
+ 
+diff --git a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/BatchAppenderator.java b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/BatchAppenderator.java
+index 66cc9b87c5..4b1d384d0f 100644
+--- a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/BatchAppenderator.java
++++ b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/BatchAppenderator.java
+@@ -398,7 +398,8 @@ public class BatchAppenderator implements Appenderator
+             {
+               persistError = t;
+             }
+-          }
++          },
++          MoreExecutors.directExecutor()
+       );
+     }
+     return new AppenderatorAddResult(identifier, sinksMetadata.get(identifier).numRowsInSegment, false);
+diff --git a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/BatchAppenderatorDriver.java b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/BatchAppenderatorDriver.java
+index 7a99f200be..3bea76ca58 100644
+--- a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/BatchAppenderatorDriver.java
++++ b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/BatchAppenderatorDriver.java
+@@ -140,9 +140,10 @@ public class BatchAppenderatorDriver extends BaseAppenderatorDriver
+   {
+     final Set<SegmentIdWithShardSpec> requestedSegmentIdsForSequences = getAppendingSegments(sequenceNames);
+ 
+-    final ListenableFuture<SegmentsAndCommitMetadata> future = Futures.transform(
++    final ListenableFuture<SegmentsAndCommitMetadata> future = Futures.transformAsync(
+         pushInBackground(null, requestedSegmentIdsForSequences, false),
+-        (AsyncFunction<SegmentsAndCommitMetadata, SegmentsAndCommitMetadata>) this::dropInBackground
++        this::dropInBackground,
++        executor
+     );
+ 
+     final SegmentsAndCommitMetadata segmentsAndCommitMetadata =
+diff --git a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/StreamAppenderator.java b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/StreamAppenderator.java
+index 70a60a77d8..a74a489909 100644
+--- a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/StreamAppenderator.java
++++ b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/StreamAppenderator.java
+@@ -397,7 +397,8 @@ public class StreamAppenderator implements Appenderator
+               {
+                 persistError = t;
+               }
+-            }
++            },
++                persistExecutor
+         );
+       } else {
+         isPersistRequired = true;
+diff --git a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/StreamAppenderatorDriver.java b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/StreamAppenderatorDriver.java
+index 8c7ec417f8..d56c6854a4 100644
+--- a/server/src/main/java/org/apache/druid/segment/realtime/appenderator/StreamAppenderatorDriver.java
++++ b/server/src/main/java/org/apache/druid/segment/realtime/appenderator/StreamAppenderatorDriver.java
+@@ -277,18 +277,19 @@ public class StreamAppenderatorDriver extends BaseAppenderatorDriver
+   {
+     final List<SegmentIdWithShardSpec> theSegments = getSegmentIdsWithShardSpecs(sequenceNames);
+ 
+-    final ListenableFuture<SegmentsAndCommitMetadata> publishFuture = Futures.transform(
++    final ListenableFuture<SegmentsAndCommitMetadata> publishFuture = Futures.transformAsync(
+         // useUniquePath=true prevents inconsistencies in segment data when task failures or replicas leads to a second
+         // version of a segment with the same identifier containing different data; see DataSegmentPusher.push() docs
+         pushInBackground(wrapCommitter(committer), theSegments, true),
+-        (AsyncFunction<SegmentsAndCommitMetadata, SegmentsAndCommitMetadata>) sam -> publishInBackground(
+-            null,
+-            null,
+-            null,
+-            sam,
+-            publisher,
+-            java.util.function.Function.identity()
+-        )
++            sam -> publishInBackground(
++                null,
++                null,
++                null,
++                sam,
++                publisher,
++                java.util.function.Function.identity()
++            ),
++            executor
+     );
+     return Futures.transform(
+         publishFuture,
+@@ -297,7 +298,8 @@ public class StreamAppenderatorDriver extends BaseAppenderatorDriver
+             sequenceNames.forEach(segments::remove);
+           }
+           return sam;
+-        }
++        },
++            executor
+     );
+   }
+ 
+@@ -384,7 +386,8 @@ public class StreamAppenderatorDriver extends BaseAppenderatorDriver
+                       numRemainingHandoffSegments.decrementAndGet();
+                       resultFuture.setException(e);
+                     }
+-                  }
++                  },
++                      executor
+               );
+             }
+         );
+@@ -400,9 +403,10 @@ public class StreamAppenderatorDriver extends BaseAppenderatorDriver
+       final Collection<String> sequenceNames
+   )
+   {
+-    return Futures.transform(
++    return Futures.transformAsync(
+         publish(publisher, committer, sequenceNames),
+-        (AsyncFunction<SegmentsAndCommitMetadata, SegmentsAndCommitMetadata>) this::registerHandoff
++        this::registerHandoff,
++        executor
+     );
+   }
+ 
+diff --git a/server/src/main/java/org/apache/druid/server/DruidNode.java b/server/src/main/java/org/apache/druid/server/DruidNode.java
+index 1a36039364..1c077d0cd7 100644
+--- a/server/src/main/java/org/apache/druid/server/DruidNode.java
++++ b/server/src/main/java/org/apache/druid/server/DruidNode.java
+@@ -156,7 +156,7 @@ public class DruidNode
+     Integer portFromHostConfig;
+     if (host != null) {
+       hostAndPort = HostAndPort.fromString(host);
+-      host = hostAndPort.getHostText();
++      host = hostAndPort.getHost();
+       portFromHostConfig = hostAndPort.hasPort() ? hostAndPort.getPort() : null;
+       if (plainTextPort != null && portFromHostConfig != null && !plainTextPort.equals(portFromHostConfig)) {
+         throw new IAE("Conflicting host:port [%s] and port [%d] settings", host, plainTextPort);
+diff --git a/server/src/main/java/org/apache/druid/server/coordinator/DruidCluster.java b/server/src/main/java/org/apache/druid/server/coordinator/DruidCluster.java
+index 8fb4ccb056..ffb814503f 100644
+--- a/server/src/main/java/org/apache/druid/server/coordinator/DruidCluster.java
++++ b/server/src/main/java/org/apache/druid/server/coordinator/DruidCluster.java
+@@ -65,6 +65,7 @@ public class DruidCluster
+     this.brokers = new HashSet<>();
+   }
+ 
++  @SuppressWarnings("StaticImport")
+   private DruidCluster(
+       @Nullable Set<ServerHolder> realtimes,
+       Map<String, Iterable<ServerHolder>> historicals,
+diff --git a/server/src/main/java/org/apache/druid/server/http/HostAndPortWithScheme.java b/server/src/main/java/org/apache/druid/server/http/HostAndPortWithScheme.java
+index 0c584aab8d..297e86f389 100644
+--- a/server/src/main/java/org/apache/druid/server/http/HostAndPortWithScheme.java
++++ b/server/src/main/java/org/apache/druid/server/http/HostAndPortWithScheme.java
+@@ -74,7 +74,7 @@ public class HostAndPortWithScheme
+ 
+   public String getHostText()
+   {
+-    return hostAndPort.getHostText();
++    return hostAndPort.getHost();
+   }
+ 
+   public int getPort()
+diff --git a/server/src/main/java/org/apache/druid/server/http/SegmentListerResource.java b/server/src/main/java/org/apache/druid/server/http/SegmentListerResource.java
+index 45dae0af0a..d259aecc53 100644
+--- a/server/src/main/java/org/apache/druid/server/http/SegmentListerResource.java
++++ b/server/src/main/java/org/apache/druid/server/http/SegmentListerResource.java
+@@ -29,6 +29,7 @@ import com.sun.jersey.spi.container.ResourceFilters;
+ import org.apache.druid.client.HttpServerInventoryView;
+ import org.apache.druid.guice.annotations.Json;
+ import org.apache.druid.guice.annotations.Smile;
++import org.apache.druid.java.util.common.concurrent.Execs;
+ import org.apache.druid.java.util.emitter.EmittingLogger;
+ import org.apache.druid.server.coordination.BatchDataSegmentAnnouncer;
+ import org.apache.druid.server.coordination.ChangeRequestHistory;
+@@ -205,7 +206,8 @@ public class SegmentListerResource
+               log.debug(ex, "Request timed out or closed already.");
+             }
+           }
+-        }
++        },
++            Execs.directExecutor()
+     );
+ 
+     asyncContext.setTimeout(timeout);
+@@ -317,7 +319,8 @@ public class SegmentListerResource
+               log.debug(ex, "Request timed out or closed already.");
+             }
+           }
+-        }
++        },
++            Execs.directExecutor()
+     );
+ 
+     asyncContext.setTimeout(timeout);
+diff --git a/server/src/main/java/org/apache/druid/server/http/ServersResource.java b/server/src/main/java/org/apache/druid/server/http/ServersResource.java
+index c6b105ad16..42092a01ba 100644
+--- a/server/src/main/java/org/apache/druid/server/http/ServersResource.java
++++ b/server/src/main/java/org/apache/druid/server/http/ServersResource.java
+@@ -83,6 +83,7 @@ public class ServersResource
+    * segments returned from {@link DruidServer#iterateAllSegments()} are unique. This is not a part of the {@link
+    * DruidServer} API to not let abuse this map (like trying to get() from it).
+    */
++  @SuppressWarnings("MapEntry")
+   private static Map<SegmentId, DataSegment> createLazySegmentsMap(DruidServer server)
+   {
+     return new AbstractMap<SegmentId, DataSegment>()
+diff --git a/server/src/main/java/org/apache/druid/server/lookup/cache/LookupCoordinatorManager.java b/server/src/main/java/org/apache/druid/server/lookup/cache/LookupCoordinatorManager.java
+index 7526ecbcc1..edba7c2657 100644
+--- a/server/src/main/java/org/apache/druid/server/lookup/cache/LookupCoordinatorManager.java
++++ b/server/src/main/java/org/apache/druid/server/lookup/cache/LookupCoordinatorManager.java
+@@ -276,6 +276,7 @@ public class LookupCoordinatorManager
+     }
+   }
+ 
++
+   public boolean deleteLookup(final String tier, final String lookup, AuditInfo auditInfo)
+   {
+     Preconditions.checkState(lifecycleLock.awaitStarted(5, TimeUnit.SECONDS), "not started");
+@@ -435,7 +436,8 @@ public class LookupCoordinatorManager
+                   LOG.makeAlert(t, "Background lookup manager exited with error!").emit();
+                 }
+               }
+-            }
++            },
++                executorService
+         );
+ 
+         LOG.debug("Started");
+@@ -538,6 +540,7 @@ public class LookupCoordinatorManager
+   }
+ 
+   @VisibleForTesting
++  @SuppressWarnings("MapEntry")
+   void lookupManagementLoop()
+   {
+     // Sanity check for if we are shutting down
+@@ -555,6 +558,7 @@ public class LookupCoordinatorManager
+ 
+     LOG.debug("Starting lookup sync for on all nodes.");
+ 
++
+     try {
+       List<ListenableFuture<Map.Entry>> futures = new ArrayList<>();
+ 
+diff --git a/server/src/test/java/org/apache/druid/client/CachingClusteredClientTest.java b/server/src/test/java/org/apache/druid/client/CachingClusteredClientTest.java
+index ca45478589..e15c873c93 100644
+--- a/server/src/test/java/org/apache/druid/client/CachingClusteredClientTest.java
++++ b/server/src/test/java/org/apache/druid/client/CachingClusteredClientTest.java
+@@ -376,7 +376,8 @@ public class CachingClusteredClientTest
+                   {
+                     pair.lhs.setException(t);
+                   }
+-                }
++                },
++                    delegate
+             );
+           }
+         }
+diff --git a/server/src/test/java/org/apache/druid/segment/realtime/appenderator/StreamAppenderatorDriverFailTest.java b/server/src/test/java/org/apache/druid/segment/realtime/appenderator/StreamAppenderatorDriverFailTest.java
+index 1e2aa7d73e..bb96aa8f35 100644
+--- a/server/src/test/java/org/apache/druid/segment/realtime/appenderator/StreamAppenderatorDriverFailTest.java
++++ b/server/src/test/java/org/apache/druid/segment/realtime/appenderator/StreamAppenderatorDriverFailTest.java
+@@ -35,6 +35,7 @@ import org.apache.druid.jackson.DefaultObjectMapper;
+ import org.apache.druid.java.util.common.DateTimes;
+ import org.apache.druid.java.util.common.ISE;
+ import org.apache.druid.java.util.common.Intervals;
++import org.apache.druid.java.util.common.concurrent.Execs;
+ import org.apache.druid.java.util.common.granularity.Granularities;
+ import org.apache.druid.query.Query;
+ import org.apache.druid.query.QueryRunner;
+@@ -497,7 +498,8 @@ public class StreamAppenderatorDriverFailTest extends EasyMockSupport
+                                                       .collect(Collectors.toList());
+         return Futures.transform(
+             persistAll(committer),
+-            (Function<Object, SegmentsAndCommitMetadata>) commitMetadata -> new SegmentsAndCommitMetadata(segments, commitMetadata)
++            commitMetadata -> new SegmentsAndCommitMetadata(segments, commitMetadata),
++            Execs.directExecutor()
+         );
+       } else {
+         if (interruptPush) {
+diff --git a/server/src/test/java/org/apache/druid/server/coordination/ChangeRequestHistoryTest.java b/server/src/test/java/org/apache/druid/server/coordination/ChangeRequestHistoryTest.java
+index 62dcad86af..dc80f7319c 100644
+--- a/server/src/test/java/org/apache/druid/server/coordination/ChangeRequestHistoryTest.java
++++ b/server/src/test/java/org/apache/druid/server/coordination/ChangeRequestHistoryTest.java
+@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
+ import com.google.common.util.concurrent.FutureCallback;
+ import com.google.common.util.concurrent.Futures;
+ import com.google.common.util.concurrent.ListenableFuture;
++import org.apache.druid.java.util.common.concurrent.Execs;
+ import org.junit.Assert;
+ import org.junit.Test;
+ 
+@@ -148,7 +149,8 @@ public class ChangeRequestHistoryTest
+           {
+             callbackExcecuted.set(true);
+           }
+-        }
++        },
++            Execs.directExecutor()
+     );
+ 
+     future.cancel(true);
+@@ -205,7 +207,8 @@ public class ChangeRequestHistoryTest
+           {
+             callbackExcecuted.set(true);
+           }
+-        }
++        },
++            Execs.directExecutor()
+     );
+ 
+     history.stop();
