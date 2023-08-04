@@ -91,8 +91,8 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
     ExpressionTree arg = args.get(0);
     if (state.getSourceForNode(arg) == null) {
       /*
-       * The annotation argument doesn't have a source representation, e.g. because `value`
-       * isn't assigned explicitly.
+       * The annotation argument doesn't have a source representation, e.g. because `value` isn't
+       * assigned explicitly.
        */
       return Optional.empty();
     }
