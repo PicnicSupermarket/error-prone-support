@@ -1399,7 +1399,7 @@
                         <dependency>
                             <groupId>com.groupcdg.arcmutate</groupId>
                             <artifactId>base</artifactId>
-                            <version>1.1.2</version>
+                            <version>1.1.3</version>
                         </dependency>
                         <dependency>
                             <groupId>com.groupcdg.pitest</groupId>
