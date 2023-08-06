@@ -89,6 +89,9 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
                           .onDescendantOf("reactor.core.publisher.Flux")
                           .named("just")))));
 
+  /** Instantiates a new {@link IsEmpty} instance. */
+  public IsEmpty() {}
+
   @Override
   public boolean matches(ExpressionTree tree, VisitorState state) {
     return isEmptyArrayCreation(tree)
