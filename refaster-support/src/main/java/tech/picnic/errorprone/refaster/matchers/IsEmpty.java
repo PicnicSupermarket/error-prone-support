@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refaster.matchers;
 
+import static com.google.common.base.Verify.verify;
 import static com.google.errorprone.matchers.FieldMatchers.staticField;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyOf;
@@ -47,6 +48,7 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
   private static final Pattern EMPTY_INSTANCE_FACTORY_METHOD_PATTERN = Pattern.compile("empty.*");
   private static final Matcher<Tree> PRIMITIVE_TYPE = isPrimitiveType();
+  // XXX: Extend this list to include additional JDK collection types with a public constructor.
   private static final Matcher<ExpressionTree> MUTABLE_COLLECTION_TYPE =
       anyOf(
           isSameType(ArrayList.class),
@@ -117,7 +119,8 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
      * This looks like a copy constructor, in which case the resultant collection is empty if its
      * argument is.
      */
-    return arguments.size() == 1 && matches(arguments.get(0), state);
+    verify(arguments.size() == 1, "Unexpected %s-ary constructor", arguments.size());
+    return matches(arguments.get(0), state);
   }
 
   private static boolean isEmptyArrayCreation(ExpressionTree tree) {
