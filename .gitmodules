@@ -10,3 +10,6 @@
 [submodule "integration-tests/druid"]
 	path = integration-tests/druid
 	url = https://github.com/apache/druid
+[submodule "integration-tests/calcite"]
+	path = integration-tests/calcite
+	url = https://github.com/apache/calcite

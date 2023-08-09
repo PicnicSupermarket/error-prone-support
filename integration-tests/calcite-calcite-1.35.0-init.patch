@@ -1,0 +1,180 @@
+diff --git a/build.gradle.kts b/build.gradle.kts
+index a9a6c0692..7801a50af 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -91,7 +91,8 @@ fun reportsForHumans() = !(System.getenv()["CI"]?.toBoolean() ?: false)
+ val skipJavadoc by props()
+ val enableMavenLocal by props()
+ val enableGradleMetadata by props()
+-val werror by props(true) // treat javac warnings as errors
++// disable, as error prone will be producing lots of warnings
++val werror by props(false) // treat javac warnings as errors
+ // Inherited from stage-vote-release-plugin: skipSign, useGpgCmd
+ // Inherited from gradle-extensions-plugin: slowSuiteLogThreshold=0L, slowTestLogThreshold=2000L
+ 
+@@ -510,8 +511,8 @@ fun com.github.autostyle.gradle.BaseFormatExtension.license() {
+ 
+     plugins.withType<JavaPlugin> {
+         configure<JavaPluginConvention> {
+-            sourceCompatibility = JavaVersion.VERSION_1_8
+-            targetCompatibility = JavaVersion.VERSION_1_8
++            sourceCompatibility = JavaVersion.VERSION_17
++            targetCompatibility = JavaVersion.VERSION_17
+         }
+         configure<JavaPluginExtension> {
+             consistentResolution {
+@@ -548,6 +549,7 @@ fun com.github.autostyle.gradle.BaseFormatExtension.license() {
+         if (!skipAutostyle) {
+             autostyle {
+                 java {
++                    googleJavaFormat()
+                     filter.exclude(*javaccGeneratedPatterns +
+                             "**/test/java/*.java" +
+                             "**/RelRule.java" /** remove as part of CALCITE-4831 **/)
+@@ -640,7 +642,7 @@ fun com.github.autostyle.gradle.BaseFormatExtension.license() {
+                     replace("hamcrest: nullValue", "org.hamcrest.Matchers.nullValue", "org.hamcrest.CoreMatchers.nullValue")
+                     replace("hamcrest: sameInstance", "org.hamcrest.core.IsSame.sameInstance", "org.hamcrest.CoreMatchers.sameInstance")
+                     replace("hamcrest: startsWith", "org.hamcrest.core.StringStartsWith.startsWith", "org.hamcrest.CoreMatchers.startsWith")
+-                    replaceRegex("hamcrest: size", "\\.size\\(\\), (is|equalTo)\\(", ", hasSize\\(")
++                    // replaceRegex("hamcrest: size", "\\.size\\(\\), (is|equalTo)\\(", ", hasSize\\(")
+                     custom("((() preventer", 1) { contents: String ->
+                         ParenthesisBalancer.apply(contents)
+                     }
+@@ -685,17 +687,26 @@ fun com.github.autostyle.gradle.BaseFormatExtension.license() {
+ 
+         if (enableErrorprone) {
+             apply(plugin = "net.ltgt.errorprone")
++            repositories {
++                mavenLocal()
++            }
++
++            val errorProneFlags = System.getProperty("error-prone.flags")
++            val errorProneSupportVersion = System.getProperty("error-prone-support.version")
++
+             dependencies {
+                 "errorprone"("com.google.errorprone:error_prone_core:${"errorprone".v}")
++                "annotationProcessor"("tech.picnic.error-prone-support:error-prone-contrib:$errorProneSupportVersion")
++                "annotationProcessor"("tech.picnic.error-prone-support:refaster-runner:$errorProneSupportVersion")
+                 "annotationProcessor"("com.google.guava:guava-beta-checker:1.0")
+             }
+             tasks.withType<JavaCompile>().configureEach {
+                 options.errorprone {
++                    allErrorsAsWarnings.set(true)
+                     disableWarningsInGeneratedCode.set(true)
+                     errorproneArgs.add("-XepExcludedPaths:.*/javacc/.*")
+-                    enable(
+-                        "MethodCanBeStatic"
+-                    )
++                    errorproneArgs.addAll(errorProneFlags.toString().split(" "))
++                    errorproneArgs.add("-XepOpt:Refaster:NamePattern=^((?!((JUnitTo)?AssertJ)).*)")
+                     disable(
+                         "ComplexBooleanConstant",
+                         "EqualsGetClass",
+@@ -704,7 +715,9 @@ fun com.github.autostyle.gradle.BaseFormatExtension.license() {
+                         "MutableConstantField",
+                         "ReferenceEquality",
+                         "SameNameButDifferent",
+-                        "TypeParameterUnusedInFormals"
++                        "TypeParameterUnusedInFormals",
++                        "CollectorMutability",
++                        "MethodCanBeStatic"
+                     )
+                     // Analyze issues, and enable the check
+                     disable(
+diff --git a/core/src/main/java/org/apache/calcite/plan/SubstitutionVisitor.java b/core/src/main/java/org/apache/calcite/plan/SubstitutionVisitor.java
+index 3cd45f455..1887d0a54 100644
+--- a/core/src/main/java/org/apache/calcite/plan/SubstitutionVisitor.java
++++ b/core/src/main/java/org/apache/calcite/plan/SubstitutionVisitor.java
+@@ -1463,6 +1463,8 @@ private AggregateOnCalcToAggregateUnifyRule() {
+           operand(MutableAggregate.class, target(0)), 1);
+     }
+ 
++
++    @SuppressWarnings("MapEntryComparingByKey")
+     @Override protected @Nullable UnifyResult apply(UnifyRuleCall call) {
+       final MutableAggregate query = (MutableAggregate) call.query;
+       final MutableCalc qInput = (MutableCalc) query.getInput();
+diff --git a/core/src/main/java/org/apache/calcite/plan/volcano/RelSubset.java b/core/src/main/java/org/apache/calcite/plan/volcano/RelSubset.java
+index 29b26adb3..5de5d25cd 100644
+--- a/core/src/main/java/org/apache/calcite/plan/volcano/RelSubset.java
++++ b/core/src/main/java/org/apache/calcite/plan/volcano/RelSubset.java
+@@ -621,6 +621,7 @@ private static String traitDiff(RelTraitSet original, RelTraitSet desired) {
+           .collect(Collectors.joining(", ", "[", "]"));
+     }
+ 
++    @SuppressWarnings("MapEntryComparingByValue")
+     public RelNode visit(
+         RelNode p,
+         int ordinal,
+diff --git a/core/src/main/java/org/apache/calcite/util/ImmutableIntList.java b/core/src/main/java/org/apache/calcite/util/ImmutableIntList.java
+index cb34fe3d5..5dbae21f5 100644
+--- a/core/src/main/java/org/apache/calcite/util/ImmutableIntList.java
++++ b/core/src/main/java/org/apache/calcite/util/ImmutableIntList.java
+@@ -324,10 +324,12 @@ private static class EmptyImmutableIntList extends ImmutableIntList {
+       return a;
+     }
+ 
++    @SuppressWarnings("ImmutableListOf")
+     @Override public Iterator<Integer> iterator() {
+       return Collections.<Integer>emptyList().iterator();
+     }
+ 
++    @SuppressWarnings("ImmutableListOf")
+     @Override public ListIterator<Integer> listIterator() {
+       return Collections.<Integer>emptyList().listIterator();
+     }
+diff --git a/gradle.properties b/gradle.properties
+index 3b0776230..42cfa56f3 100644
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -53,7 +53,7 @@ com.google.protobuf.version=0.8.10
+ de.thetaphi.forbiddenapis.version=3.5.1
+ jacoco.version=0.8.10
+ kotlin.version=1.7.10
+-net.ltgt.errorprone.version=1.3.0
++net.ltgt.errorprone.version=3.1.0
+ me.champeau.gradle.jmh.version=0.5.3
+ org.jetbrains.gradle.plugin.idea-ext.version=0.5
+ org.nosphere.apache.rat.version=0.7.0
+@@ -75,7 +75,7 @@ kotlin.stdlib.default.dependency=false
+ checkerframework.version=3.10.0
+ checkstyle.version=8.28
+ spotbugs.version=3.1.11
+-errorprone.version=2.5.1
++errorprone.version=HEAD-SNAPSHOT
+ # The property is used in https://github.com/wildfly/jandex regression testing, so avoid renaming
+ jandex.version=2.2.3.Final
+ 
+@@ -109,7 +109,7 @@ foodmart-data-hsqldb.version=0.5
+ foodmart-data-json.version=0.4
+ foodmart-queries.version=0.4.1
+ geode-core.version=1.15.1
+-guava.version=19.0
++guava.version=31.1-jre
+ h2.version=2.1.210
+ hadoop.version=2.7.5
+ hamcrest-date.version=2.0.4
+diff --git a/linq4j/src/main/java/org/apache/calcite/linq4j/Linq4j.java b/linq4j/src/main/java/org/apache/calcite/linq4j/Linq4j.java
+index 482a30757..1b22df621 100644
+--- a/linq4j/src/main/java/org/apache/calcite/linq4j/Linq4j.java
++++ b/linq4j/src/main/java/org/apache/calcite/linq4j/Linq4j.java
+@@ -417,6 +417,7 @@ public static <T> boolean equals(T t0, T t1) {
+    * above.
+    */
+   @Deprecated // to be removed before 2.0
++  @SuppressWarnings("RequireNonNullStatement")
+   public static <T> T requireNonNull(T o) {
+     if (o == null) {
+       throw new NullPointerException();
+diff --git a/testkit/src/main/java/org/apache/calcite/sql/parser/SqlParserTest.java b/testkit/src/main/java/org/apache/calcite/sql/parser/SqlParserTest.java
+index d78fab432..449c2ebdd 100644
+--- a/testkit/src/main/java/org/apache/calcite/sql/parser/SqlParserTest.java
++++ b/testkit/src/main/java/org/apache/calcite/sql/parser/SqlParserTest.java
+@@ -98,6 +98,7 @@
+  * @see SqlParserFixture
+  * @see SqlParserListFixture
+  */
++@SuppressWarnings("JUnitClassModifiers")
+ public class SqlParserTest {
+   /**
+    * List of reserved keywords.
