@@ -1,5 +1,5 @@
 diff --git a/build.gradle.kts b/build.gradle.kts
-index a9a6c0692..7801a50af 100644
+index a9a6c0692..3695e9d9f 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -91,7 +91,8 @@ fun reportsForHumans() = !(System.getenv()["CI"]?.toBoolean() ?: false)
@@ -70,14 +70,17 @@ index a9a6c0692..7801a50af 100644
                      disable(
                          "ComplexBooleanConstant",
                          "EqualsGetClass",
-@@ -704,7 +715,9 @@ fun com.github.autostyle.gradle.BaseFormatExtension.license() {
+@@ -704,7 +715,12 @@ fun com.github.autostyle.gradle.BaseFormatExtension.license() {
                          "MutableConstantField",
                          "ReferenceEquality",
                          "SameNameButDifferent",
 -                        "TypeParameterUnusedInFormals"
 +                        "TypeParameterUnusedInFormals",
 +                        "CollectorMutability",
-+                        "MethodCanBeStatic"
++                        "MethodCanBeStatic",
++                        "StaticImport",
++                        "LexicographicalAnnotationListing",
++                        "LexicographicalAnnotationAttributeListing"
                      )
                      // Analyze issues, and enable the check
                      disable(
