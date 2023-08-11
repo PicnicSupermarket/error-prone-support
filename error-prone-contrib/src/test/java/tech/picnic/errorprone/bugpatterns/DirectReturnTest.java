@@ -227,7 +227,7 @@ final class DirectReturnTest {
   @Test
   void ignoreClassesAnnotatedWithLombokData() {
     BugCheckerRefactoringTestHelper.newInstance(DirectReturn.class, getClass())
-        .addInputLines("Data.java", "package lombok;", "public @interface Data {}")
+        .addInputLines("Data.java", "package lombok;", "", "public @interface Data {}")
         .expectUnchanged()
         .addInputLines(
             "A.java",

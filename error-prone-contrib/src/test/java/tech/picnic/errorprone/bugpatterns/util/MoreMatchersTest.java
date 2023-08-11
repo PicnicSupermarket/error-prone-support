@@ -110,7 +110,7 @@ final class MoreMatchersTest {
 @Test
   void hasLombokDataAnnotation() {
     CompilationTestHelper.newInstance(LombokDataAnnotationMatcher.class, getClass())
-        .addSourceLines("Data.java", "package lombok;", "public @interface Data {}")
+        .addSourceLines("Data.java", "package lombok;", "", "public @interface Data {}")
         .addSourceLines(
             "A.java",
             "import lombok.Data;",
@@ -120,13 +120,13 @@ final class MoreMatchersTest {
             "public class A {",
             "  private String field;",
             "",
-            "  static class B { }",
+            "  static class B {}",
             "",
             "  @Data",
             "  // BUG: Diagnostic contains:",
-            "  static class C { }",
+            "  static class C {}",
             "}")
-        .addSourceLines("D.java", "import lombok.Data;", "", "public class D { }")
+        .addSourceLines("D.java", "public class D {}")
         .doTest();
   }
 
@@ -159,7 +159,7 @@ final class MoreMatchersTest {
 }
 }
 
-  /** A {@link BugChecker} that delegates to {@link MoreMatchers#HAS_LOMBOK_DATA} . */
+  /** A {@link BugChecker} that delegates to {@link MoreMatchers#HAS_LOMBOK_DATA}. */
   @BugPattern(summary = "Interacts with `MoreMatchers` for testing purposes", severity = ERROR)
   public static final class LombokDataAnnotationMatcher extends BugChecker
       implements ClassTreeMatcher {
