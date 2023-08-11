@@ -69,8 +69,8 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
   @Override
   public Description matchBlock(BlockTree tree, VisitorState state) {
     List<? extends StatementTree> statements = tree.getStatements();
-    ClassTree enclosingNode = ASTHelpers.findEnclosingNode(state.getPath(), ClassTree.class);
-    if (statements.size() < 2 || HAS_LOMBOK_DATA.matches(enclosingNode, state)) {
+    ClassTree enclosingClass = ASTHelpers.findEnclosingNode(state.getPath(), ClassTree.class);
+    if (statements.size() < 2 || HAS_LOMBOK_DATA.matches(enclosingClass, state)) {
       return Description.NO_MATCH;
     }
 
