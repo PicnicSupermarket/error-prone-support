@@ -9,6 +9,7 @@ import com.google.errorprone.suppliers.Supplier;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Type;
+import com.sun.source.tree.ClassTree;
 
 /**
  * A collection of general-purpose {@link Matcher}s.
@@ -16,6 +17,9 @@ import com.sun.tools.javac.code.Type;
  * <p>These methods are additions to the ones found in {@link Matchers}.
  */
 public final class MoreMatchers {
+  /** Matches classes annotated with Lombok's `@Data` annotation. */
+  public static final Matcher<ClassTree> HAS_LOMBOK_DATA = Matchers.hasAnnotation("lombok.Data");
+
   private MoreMatchers() {}
 
   /**

@@ -225,14 +225,16 @@ final class DirectReturnTest {
   }
 
   @Test
-  void excludeClassesAnnotatedWithLombokData() {
+  void ignoreClassesAnnotatedWithLombokData() {
     BugCheckerRefactoringTestHelper.newInstance(DirectReturn.class, getClass())
+        .addInputLines("Data.java", "package lombok;", "public @interface Data {}")
+        .expectUnchanged()
         .addInputLines(
             "A.java",
             "import lombok.Data;",
             "",
             "@Data",
-            "public class A {",
+            "class A {",
             "  private String field;",
             "}")
         .addOutputLines(
@@ -240,7 +242,7 @@ final class DirectReturnTest {
             "import lombok.Data;",
             "",
             "@Data",
-            "public class A {",
+            "class A {",
             "  private String field;",
             "}")
         .doTest(TestMode.TEXT_MATCH);
