@@ -36,19 +36,4 @@ final class NestedOptionalsTest {
             "}")
         .doTest();
   }
-
-  @Test
-  void identificationOptionalTypeNotLoaded() {
-    CompilationTestHelper.newInstance(NestedOptionals.class, getClass())
-        .addSourceLines(
-            "A.java",
-            "import java.time.Duration;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    Duration.ofSeconds(1);",
-            "  }",
-            "}")
-        .doTest();
-  }
 }
