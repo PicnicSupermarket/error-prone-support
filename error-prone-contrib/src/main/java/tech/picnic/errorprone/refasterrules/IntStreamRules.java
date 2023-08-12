@@ -290,4 +290,16 @@ final class IntStreamRules {
       return stream.allMatch(e -> test(e));
     }
   }
+
+  static final class IntStreamTakeWhile {
+    @BeforeTemplate
+    IntStream before(IntStream stream, IntPredicate predicate) {
+      return stream.takeWhile(predicate).filter(predicate);
+    }
+
+    @AfterTemplate
+    IntStream after(IntStream stream, IntPredicate predicate) {
+      return stream.takeWhile(predicate);
+    }
+  }
 }

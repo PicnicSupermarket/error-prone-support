@@ -639,4 +639,16 @@ final class StreamRules {
       return Streams.concat(Refaster.asVarargs(stream));
     }
   }
+
+  static final class StreamTakeWhile<T> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream, Predicate<? super T> predicate) {
+      return stream.takeWhile(predicate).filter(predicate);
+    }
+
+    @AfterTemplate
+    Stream<T> after(Stream<T> stream, Predicate<? super T> predicate) {
+      return stream.takeWhile(predicate);
+    }
+  }
 }

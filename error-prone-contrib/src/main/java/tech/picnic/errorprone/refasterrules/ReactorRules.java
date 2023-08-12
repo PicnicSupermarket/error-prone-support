@@ -1194,6 +1194,22 @@ final class ReactorRules {
   }
 
   /**
+   * Do not unnecessarily {@link Flux#filter(Predicate) filter} the result of {@link
+   * Flux#takeWhile(Predicate)} using the same {@link Predicate}.
+   */
+  static final class FluxTakeWhile<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate) {
+      return flux.takeWhile(predicate).filter(predicate);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate) {
+      return flux.takeWhile(predicate);
+    }
+  }
+
+  /**
    * Prefer {@link Flux#collect(Collector)} with {@link ImmutableList#toImmutableList()} over
    * alternatives that do not explicitly return an immutable collection.
    */

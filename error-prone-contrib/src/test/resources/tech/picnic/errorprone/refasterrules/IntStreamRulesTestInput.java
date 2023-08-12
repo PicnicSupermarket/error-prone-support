@@ -100,4 +100,8 @@ final class IntStreamRulesTest implements RefasterRuleCollectionTestCase {
   boolean testIntStreamAllMatch2() {
     return IntStream.of(1).noneMatch(n -> !(n > 1));
   }
+
+  IntStream testIntStreamTakeWhile() {
+    return IntStream.of(1, 2, 3).takeWhile(i -> i < 2).filter(i -> i < 2);
+  }
 }
