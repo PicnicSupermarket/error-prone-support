@@ -10,7 +10,6 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.LambdaExpressionTree.BodyKind;
-import com.sun.source.tree.Tree.Kind;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
@@ -49,7 +48,6 @@ public final class IsIdentityOperation implements Matcher<ExpressionTree> {
         (tree, state) ->
             tree.getBodyKind() == BodyKind.EXPRESSION
                 && tree.getParameters().size() == 1
-                && tree.getBody().getKind() == Kind.IDENTIFIER
                 && ASTHelpers.getSymbol(tree.getParameters().get(0))
                     .equals(ASTHelpers.getSymbol(tree.getBody())));
   }
