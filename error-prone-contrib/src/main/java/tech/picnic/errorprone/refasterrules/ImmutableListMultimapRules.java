@@ -3,7 +3,6 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.common.collect.ImmutableListMultimap.flatteningToImmutableListMultimap;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
-import static java.util.function.Function.identity;
 
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMultimap;
@@ -16,6 +15,7 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableListMultimap}s. */
 @OnlineDocumentation
@@ -173,27 +174,29 @@ final class ImmutableListMultimapRules {
    * Prefer {@link Multimaps#index(Iterable, com.google.common.base.Function)} over the stream-based
    * alternative.
    */
-  // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
   static final class IndexIterableToImmutableListMultimap<K, V> {
     @BeforeTemplate
     ImmutableListMultimap<K, V> before(
-        Iterator<V> iterable, Function<? super V, ? extends K> keyFunction) {
-      return Streams.stream(iterable)
-          .collect(toImmutableListMultimap(keyFunction, Refaster.anyOf(identity(), v -> v)));
+        Iterator<V> iterable,
+        Function<? super V, ? extends K> keyFunction,
+        @Matches(IsIdentityOperation.class) Function<? super V, ? extends V> valueFunction) {
+      return Streams.stream(iterable).collect(toImmutableListMultimap(keyFunction, valueFunction));
     }
 
     @BeforeTemplate
     ImmutableListMultimap<K, V> before(
-        Iterable<V> iterable, Function<? super V, ? extends K> keyFunction) {
-      return Streams.stream(iterable)
-          .collect(toImmutableListMultimap(keyFunction, Refaster.anyOf(identity(), v -> v)));
+        Iterable<V> iterable,
+        Function<? super V, ? extends K> keyFunction,
+        @Matches(IsIdentityOperation.class) Function<? super V, ? extends V> valueFunction) {
+      return Streams.stream(iterable).collect(toImmutableListMultimap(keyFunction, valueFunction));
     }
 
     @BeforeTemplate
     ImmutableListMultimap<K, V> before(
-        Collection<V> iterable, Function<? super V, ? extends K> keyFunction) {
-      return iterable.stream()
-          .collect(toImmutableListMultimap(keyFunction, Refaster.anyOf(identity(), v -> v)));
+        Collection<V> iterable,
+        Function<? super V, ? extends K> keyFunction,
+        @Matches(IsIdentityOperation.class) Function<? super V, ? extends V> valueFunction) {
+      return iterable.stream().collect(toImmutableListMultimap(keyFunction, valueFunction));
     }
 
     @AfterTemplate

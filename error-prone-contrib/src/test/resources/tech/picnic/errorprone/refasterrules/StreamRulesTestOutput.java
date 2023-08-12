@@ -258,7 +258,9 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Stream<Integer>> testStreamsConcat() {
     return ImmutableSet.of(
-        Streams.concat(Stream.of(1), Stream.of(2)), Streams.concat(Stream.of(3), Stream.of(4)));
+        Streams.concat(Stream.of(1), Stream.of(2)),
+        Streams.concat(Stream.of(3), Stream.of(4)),
+        Stream.of(Stream.of(5), Stream.of(6)).flatMap(v -> Stream.empty()));
   }
 
   Stream<Integer> testStreamTakeWhile() {

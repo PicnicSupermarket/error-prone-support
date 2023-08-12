@@ -31,6 +31,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         String::compareTo,
         Comparator.comparing(identity()),
         Comparator.comparing(s -> s),
+        Comparator.comparing(s -> 0),
         Collections.<String>reverseOrder(reverseOrder()),
         Comparator.<String>reverseOrder().reversed());
   }
@@ -45,7 +46,8 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Comparator<String>> testCustomComparator() {
     return ImmutableSet.of(
         Comparator.comparing(identity(), Comparator.comparingInt(String::length)),
-        Comparator.comparing(s -> s, Comparator.comparingInt(String::length)));
+        Comparator.comparing(s -> s, Comparator.comparingInt(String::length)),
+        Comparator.comparing(s -> "foo", Comparator.comparingInt(String::length)));
   }
 
   Comparator<String> testThenComparing() {
@@ -86,7 +88,8 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Comparator<String>> testThenComparingNaturalOrder() {
     return ImmutableSet.of(
         Comparator.<String>naturalOrder().thenComparing(identity()),
-        Comparator.<String>naturalOrder().thenComparing(s -> s));
+        Comparator.<String>naturalOrder().thenComparing(s -> s),
+        Comparator.<String>naturalOrder().thenComparing(s -> 0));
   }
 
   ImmutableSet<Integer> testCompareTo() {

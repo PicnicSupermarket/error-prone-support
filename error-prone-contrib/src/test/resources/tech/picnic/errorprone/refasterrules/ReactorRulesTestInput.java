@@ -202,14 +202,18 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Flux.just(1).flatMap(Mono::just, 1),
         Flux.just(2).flatMapSequential(Mono::just, 1),
-        Flux.just(3).map(Mono::just).concatMap(identity()));
+        Flux.just(3).map(Mono::just).concatMap(identity()),
+        Flux.just(4).map(Mono::just).concatMap(v -> v),
+        Flux.just(5).map(Mono::just).concatMap(v -> Mono.empty()));
   }
 
   ImmutableSet<Flux<Integer>> testFluxConcatMapWithPrefetch() {
     return ImmutableSet.of(
         Flux.just(1).flatMap(Mono::just, 1, 3),
         Flux.just(2).flatMapSequential(Mono::just, 1, 4),
-        Flux.just(3).map(Mono::just).concatMap(identity(), 5));
+        Flux.just(3).map(Mono::just).concatMap(identity(), 5),
+        Flux.just(4).map(Mono::just).concatMap(v -> v, 6),
+        Flux.just(5).map(Mono::just).concatMap(v -> Mono.empty(), 7));
   }
 
   ImmutableSet<Flux<Integer>> testMonoFlatMapIterable() {
@@ -372,25 +376,30 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).filter(Number.class::isInstance).cast(Number.class);
   }
 
-  Mono<String> testMonoFlatMap() {
-    return Mono.just("foo").map(Mono::just).flatMap(identity());
+  ImmutableSet<Mono<String>> testMonoFlatMap() {
+    return ImmutableSet.of(
+        Mono.just("foo").map(Mono::just).flatMap(identity()),
+        Mono.just("bar").map(Mono::just).flatMap(v -> v),
+        Mono.just("baz").map(Mono::just).flatMap(v -> Mono.empty()));
   }
 
   ImmutableSet<Flux<Integer>> testMonoFlatMapMany() {
     return ImmutableSet.of(
         Mono.just(1).map(Mono::just).flatMapMany(identity()),
-        Mono.just(2).flux().concatMap(Mono::just),
-        Mono.just(3).flux().concatMap(Mono::just, 2),
-        Mono.just(4).flux().concatMapDelayError(Mono::just),
-        Mono.just(5).flux().concatMapDelayError(Mono::just, 2),
-        Mono.just(6).flux().concatMapDelayError(Mono::just, false, 2),
-        Mono.just(7).flux().flatMap(Mono::just, 2),
-        Mono.just(8).flux().flatMap(Mono::just, 2, 3),
-        Mono.just(9).flux().flatMapDelayError(Mono::just, 2, 3),
-        Mono.just(10).flux().flatMapSequential(Mono::just, 2),
-        Mono.just(11).flux().flatMapSequential(Mono::just, 2, 3),
-        Mono.just(12).flux().flatMapSequentialDelayError(Mono::just, 2, 3),
-        Mono.just(13).flux().switchMap(Mono::just));
+        Mono.just(2).map(Mono::just).flatMapMany(v -> v),
+        Mono.just(3).map(Mono::just).flatMapMany(v -> Flux.empty()),
+        Mono.just(4).flux().concatMap(Mono::just),
+        Mono.just(5).flux().concatMap(Mono::just, 2),
+        Mono.just(6).flux().concatMapDelayError(Mono::just),
+        Mono.just(7).flux().concatMapDelayError(Mono::just, 2),
+        Mono.just(8).flux().concatMapDelayError(Mono::just, false, 2),
+        Mono.just(9).flux().flatMap(Mono::just, 2),
+        Mono.just(10).flux().flatMap(Mono::just, 2, 3),
+        Mono.just(11).flux().flatMapDelayError(Mono::just, 2, 3),
+        Mono.just(12).flux().flatMapSequential(Mono::just, 2),
+        Mono.just(13).flux().flatMapSequential(Mono::just, 2, 3),
+        Mono.just(14).flux().flatMapSequentialDelayError(Mono::just, 2, 3),
+        Mono.just(15).flux().switchMap(Mono::just));
   }
 
   ImmutableSet<Flux<String>> testConcatMapIterableIdentity() {

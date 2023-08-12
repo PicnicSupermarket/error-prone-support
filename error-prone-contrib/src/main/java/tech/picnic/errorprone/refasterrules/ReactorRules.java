@@ -49,6 +49,7 @@ import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
+import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster rules related to Reactor expressions and statements. */
@@ -509,7 +510,8 @@ final class ReactorRules {
     }
 
     // XXX: Replace this rule with an extension of the `IdentityConversion` rule, supporting
-    // `Stream#map`, `Mono#map` and `Flux#map`.
+    // `Stream#map`, `Mono#map` and `Flux#map`. Alternatively, extend the `IsIdentityOperation`
+    // matcher and use it to constrain the matched `map` argument.
     @BeforeTemplate
     Mono<ImmutableList<T>> before3(Mono<ImmutableList<T>> mono) {
       return mono.map(ImmutableList::copyOf);
@@ -550,41 +552,44 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#concatMap(Function)} over more contrived alternatives. */
-  static final class FluxConcatMap<T, S> {
+  static final class FluxConcatMap<T, S, P extends Publisher<? extends S>> {
     @BeforeTemplate
     @SuppressWarnings("NestedPublishers")
-    Flux<S> before(Flux<T> flux, Function<? super T, ? extends Publisher<? extends S>> function) {
+    Flux<S> before(
+        Flux<T> flux,
+        Function<? super T, ? extends P> function,
+        @Matches(IsIdentityOperation.class)
+            Function<? super P, ? extends Publisher<? extends S>> identityOperation) {
       return Refaster.anyOf(
           flux.flatMap(function, 1),
           flux.flatMapSequential(function, 1),
-          flux.map(function).concatMap(identity()));
+          flux.map(function).concatMap(identityOperation));
     }
 
     @AfterTemplate
-    Flux<S> after(Flux<T> flux, Function<? super T, ? extends Publisher<? extends S>> function) {
+    Flux<S> after(Flux<T> flux, Function<? super T, ? extends P> function) {
       return flux.concatMap(function);
     }
   }
 
   /** Prefer {@link Flux#concatMap(Function, int)} over more contrived alternatives. */
-  static final class FluxConcatMapWithPrefetch<T, S> {
+  static final class FluxConcatMapWithPrefetch<T, S, P extends Publisher<? extends S>> {
     @BeforeTemplate
     @SuppressWarnings("NestedPublishers")
     Flux<S> before(
         Flux<T> flux,
-        Function<? super T, ? extends Publisher<? extends S>> function,
-        int prefetch) {
+        Function<? super T, ? extends P> function,
+        int prefetch,
+        @Matches(IsIdentityOperation.class)
+            Function<? super P, ? extends Publisher<? extends S>> identityOperation) {
       return Refaster.anyOf(
           flux.flatMap(function, 1, prefetch),
           flux.flatMapSequential(function, 1, prefetch),
-          flux.map(function).concatMap(identity(), prefetch));
+          flux.map(function).concatMap(identityOperation, prefetch));
     }
 
     @AfterTemplate
-    Flux<S> after(
-        Flux<T> flux,
-        Function<? super T, ? extends Publisher<? extends S>> function,
-        int prefetch) {
+    Flux<S> after(Flux<T> flux, Function<? super T, ? extends P> function, int prefetch) {
       return flux.concatMap(function, prefetch);
     }
   }
@@ -1081,31 +1086,37 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#flatMap(Function)} over more contrived alternatives. */
-  static final class MonoFlatMap<S, T> {
+  static final class MonoFlatMap<S, T, P extends Mono<? extends T>> {
     @BeforeTemplate
     @SuppressWarnings("NestedPublishers")
-    Mono<T> before(Mono<S> mono, Function<? super S, ? extends Mono<? extends T>> function) {
-      return mono.map(function).flatMap(identity());
+    Mono<T> before(
+        Mono<S> mono,
+        Function<? super S, ? extends P> function,
+        @Matches(IsIdentityOperation.class)
+            Function<? super P, ? extends Mono<? extends T>> identityOperation) {
+      return mono.map(function).flatMap(identityOperation);
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<S> mono, Function<? super S, ? extends Mono<? extends T>> function) {
+    Mono<T> after(Mono<S> mono, Function<? super S, ? extends P> function) {
       return mono.flatMap(function);
     }
   }
 
   /** Prefer {@link Mono#flatMapMany(Function)} over more contrived alternatives. */
-  static final class MonoFlatMapMany<S, T> {
+  static final class MonoFlatMapMany<S, T, P extends Publisher<? extends T>> {
     @BeforeTemplate
     @SuppressWarnings("NestedPublishers")
     Flux<T> before(
         Mono<S> mono,
-        Function<? super S, ? extends Publisher<? extends T>> function,
+        Function<? super S, P> function,
+        @Matches(IsIdentityOperation.class)
+            Function<? super P, ? extends Publisher<? extends T>> identityOperation,
         boolean delayUntilEnd,
         int maxConcurrency,
         int prefetch) {
       return Refaster.anyOf(
-          mono.map(function).flatMapMany(identity()),
+          mono.map(function).flatMapMany(identityOperation),
           mono.flux().concatMap(function),
           mono.flux().concatMap(function, prefetch),
           mono.flux().concatMapDelayError(function),
@@ -1125,7 +1136,7 @@ final class ReactorRules {
     }
 
     @AfterTemplate
-    Flux<T> after(Mono<S> mono, Function<? super S, ? extends Publisher<? extends T>> function) {
+    Flux<T> after(Mono<S> mono, Function<? super S, ? extends P> function) {
       return mono.flatMapMany(function);
     }
   }
