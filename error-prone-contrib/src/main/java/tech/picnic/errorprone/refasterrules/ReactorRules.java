@@ -1332,6 +1332,23 @@ final class ReactorRules {
     }
   }
 
+  /** Avoid list collection when verifying that a {@link Flux} emits exactly one value. */
+  // XXX: This rule assumes that the matched collector does not drop elements. Consider introducing
+  // a `@Matches(DoesNotDropElements.class)` or `@NotMatches(MayDropElements.class)` guard.
+  static final class FluxAsStepVerifierExpectNext<T, L extends List<T>> {
+    @BeforeTemplate
+    StepVerifier.Step<L> before(Flux<T> flux, Collector<? super T, ?, L> listCollector, T object) {
+      return flux.collect(listCollector)
+          .as(StepVerifier::create)
+          .assertNext(list -> assertThat(list).containsExactly(object));
+    }
+
+    @AfterTemplate
+    StepVerifier.Step<T> after(Flux<T> flux, T object) {
+      return flux.as(StepVerifier::create).expectNext(object);
+    }
+  }
+
   /** Prefer {@link StepVerifier.LastStep#verifyComplete()} over more verbose alternatives. */
   static final class StepVerifierLastStepVerifyComplete {
     @BeforeTemplate
