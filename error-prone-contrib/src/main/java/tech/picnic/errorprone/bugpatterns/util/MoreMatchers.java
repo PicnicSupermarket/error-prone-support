@@ -33,7 +33,7 @@ public final class MoreMatchers {
 
   /**
    * Returns a {@link Matcher} that determines whether the type of a given {@link Tree} is a subtype
-   * of the type return by the specified {@link Supplier}.
+   * of the type returned by the specified {@link Supplier}.
    *
    * <p>This method differs from {@link Matchers#isSubtypeOf(Supplier)} in that it does not perform
    * type erasure.
