@@ -12,10 +12,11 @@
       "separateMinorPatch": true
     },
     {
-      "matchPackagePatterns": [
-        "^ruby\\/setup-ruby$"
+      "matchDepNames": [
+        "github/codeql-action",
+        "ruby/setup-ruby"
       ],
-      "schedule": "* * 1 * *"
+      "schedule": "every 4 weeks on Monday"
     }
   ],
   "reviewers": [
