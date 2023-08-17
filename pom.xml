@@ -198,7 +198,7 @@
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.1.1</version.auto-service>
-        <version.auto-value>1.10.2</version.auto-value>
+        <version.auto-value>1.10.3</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.21.1</version.error-prone-orig>
