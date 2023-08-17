@@ -1,8 +1,6 @@
 package tech.picnic.errorprone.refaster;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.CompilationTestHelper;
@@ -16,12 +14,6 @@ import org.junit.jupiter.api.Test;
 
 final class ErrorProneForkTest {
   @Test
-  void isErrorProneForkAvailable() {
-    assertThat(ErrorProneFork.isErrorProneForkAvailable())
-        .isEqualTo(Boolean.TRUE.toString().equals(System.getProperty("error-prone-fork-in-use")));
-  }
-
-  @Test
   void isSuggestionsAsWarningsEnabledWithoutFlag() {
     CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .addSourceLines(
@@ -33,8 +25,6 @@ final class ErrorProneForkTest {
 
   @Test
   void isSuggestionsAsWarningsEnabledWithFlag() {
-    assumeTrue(ErrorProneFork.isErrorProneForkAvailable());
-
     CompilationTestHelper.newInstance(TestChecker.class, getClass())
         .setArgs("-XepAllSuggestionsAsWarnings")
         .addSourceLines(

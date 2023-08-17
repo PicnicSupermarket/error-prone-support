@@ -50,7 +50,7 @@ abstract class NodeTestCase<V> {
   abstract ImmutableSetMultimap<V, ImmutableSet<String>> input();
 
   final Node<V> buildTree() {
-    return Node.create(input().keySet().asList(), input()::get);
+    return Node.create(input().keySet(), input()::get);
   }
 
   final Stream<NodeTestCaseEntry<V>> generateTestCaseEntries(Random random) {

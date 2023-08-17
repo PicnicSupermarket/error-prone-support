@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.12.1-SNAPSHOT</version>
+    <version>1.12.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -205,17 +205,15 @@
         <version.error-prone-slf4j>0.1.20</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
+        <version.jmh>1.35</version.jmh>
         <version.maven>3.8.7</version.maven>
         <version.mockito>5.4.0</version.mockito>
-        <version.nopen-checker>1.0.1</version.nopen-checker>
-        <version.nullaway>0.10.12</version.nullaway>
-        <version.pitest-git>1.1.1</version.pitest-git>
-        <version.surefire>3.1.2</version.surefire>
-        <version.jmh>1.35</version.jmh>
         <!-- XXX: Consider providing our own implementation with similar
         functionality, and designing it such that JMH classes would not need to
         be annotated `@Open`. -->
         <version.nopen>1.0.1</version.nopen>
+        <version.nopen-checker>1.0.1</version.nopen-checker>
+        <version.nullaway>0.10.12</version.nullaway>
         <!-- XXX: Two other dependencies are potentially of interest:
         `com.palantir.assertj-automation:assertj-refaster-rules` and
         `com.palantir.baseline:baseline-refaster-rules` contain Refaster rules
@@ -225,6 +223,8 @@
         perhaps we can simply incorporate all of them.) -->
         <version.palantir-assertj-automation>0.6.0</version.palantir-assertj-automation>
         <version.palantir-baseline>4.145.0</version.palantir-baseline>
+        <version.pitest-git>1.1.1</version.pitest-git>
+        <version.surefire>3.1.2</version.surefire>
     </properties>
 
     <dependencyManagement>
@@ -305,6 +305,11 @@
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value-annotations</artifactId>
                 <version>${version.auto-value}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.2</version>
             </dependency>
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>

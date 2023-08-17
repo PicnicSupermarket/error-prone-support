@@ -23,21 +23,10 @@ public final class ErrorProneFork {
   private ErrorProneFork() {}
 
   /**
-   * Tells whether Picnic's fork of Error Prone is available.
-   *
-   * @return {@code true} iff classpath introspection indicates the presence of Error Prone
-   *     modifications that are assumed to be present only in Picnic's fork.
-   */
-  public static boolean isErrorProneForkAvailable() {
-    return ERROR_PRONE_OPTIONS_IS_SUGGESTIONS_AS_WARNINGS_METHOD.isPresent();
-  }
-
-  /**
    * Tells whether the custom {@code -XepAllSuggestionsAsWarnings} flag is set.
    *
    * @param options The currently active Error Prone options.
-   * @return {@code true} iff {@link #isErrorProneForkAvailable() the Error Prone fork is available}
-   *     and the aforementioned flag is set.
+   * @return {@code true} iff the Error Prone fork is available and the aforementioned flag is set.
    * @see <a href="https://github.com/google/error-prone/pull/3301">google/error-prone#3301</a>
    */
   public static boolean isSuggestionsAsWarningsEnabled(ErrorProneOptions options) {

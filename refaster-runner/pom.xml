@@ -5,7 +5,7 @@
     <parent>
         <groupId>tech.picnic.error-prone-support</groupId>
         <artifactId>error-prone-support</artifactId>
-        <version>0.12.1-SNAPSHOT</version>
+        <version>1.12.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>refaster-runner</artifactId>
@@ -31,12 +31,13 @@
         </dependency>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_test_helpers</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <artifactId>error_prone_core</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${groupId.error-prone}</groupId>
+            <artifactId>error_prone_test_helpers</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -51,11 +52,6 @@
             <artifactId>refaster-support</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>refaster-support</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
             <groupId>com.google.auto</groupId>
             <artifactId>auto-common</artifactId>
             <scope>provided</scope>
@@ -66,9 +62,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
             <groupId>com.google.auto.value</groupId>
             <artifactId>auto-value-annotations</artifactId>
         </dependency>
@@ -78,13 +71,17 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <scope>provided</scope>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
         <dependency>
             <groupId>com.jakewharton.nopen</groupId>
             <artifactId>nopen-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
