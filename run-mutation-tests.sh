@@ -13,9 +13,7 @@ fi
 
 targetTests="${1:-*}"
 
-mvn clean test pitest:mutationCoverage \
+mvn clean test-compile pitest:mutationCoverage \
   -DargLine.xmx=2048m \
   -Dverification.skip \
-  -Dsurefire.failIfNoSpecifiedTests=false \
-  -Dtest="${targetTests}" \
   -DtargetTests="${targetTests}"

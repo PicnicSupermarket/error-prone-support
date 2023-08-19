@@ -80,6 +80,6 @@ Some pointers:
 [error-prone-support-developing]: https://github.com/PicnicSupermarket/error-prone-support/tree/master#-developing-error-prone-support
 [error-prone-support-full-build]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-full-build.sh
 [error-prone-support-issues]: https://github.com/PicnicSupermarket/error-prone-support/issues
-[error-prone-support-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-mutation-tests.sh
+[error-prone-support-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-branch-mutation-tests.sh
 [error-prone-support-patch]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/apply-error-prone-suggestions.sh
 [error-prone-support-pulls]: https://github.com/PicnicSupermarket/error-prone-support/pulls
