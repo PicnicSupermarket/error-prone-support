@@ -262,4 +262,8 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   Stream<Integer> testStreamTakeWhile() {
     return Stream.of(1, 2, 3).takeWhile(i -> i < 2);
   }
+
+  Stream<Integer> testStreamIterate() {
+    return Stream.iterate(0, i -> i < 10, i -> i + 1);
+  }
 }
