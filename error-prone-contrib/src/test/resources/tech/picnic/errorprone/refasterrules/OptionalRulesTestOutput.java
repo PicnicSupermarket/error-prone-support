@@ -35,6 +35,12 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional::orElseThrow;
   }
 
+  ImmutableSet<Boolean> testOptionalHasValue() {
+    return ImmutableSet.of(
+        Optional.of("foo").equals(Optional.of("bar")),
+        Optional.of("baz").equals(Optional.of("qux")));
+  }
+
   ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
     return ImmutableSet.of(
         stream(ImmutableSet.of("foo").iterator()).findFirst(),
@@ -70,6 +76,13 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.of("foo").or(() -> Optional.of("bar")).orElseThrow();
   }
 
+  ImmutableSet<String> testOptionalOrElseGet() {
+    return ImmutableSet.of(
+        Optional.of("foo").orElse("bar"),
+        Optional.of("baz").orElse(toString()),
+        Optional.of("qux").orElseGet(() -> String.valueOf(true)));
+  }
+
   ImmutableSet<Object> testStreamFlatMapOptional() {
     return ImmutableSet.of(
         Stream.of(Optional.empty()).flatMap(Optional::stream),
@@ -96,7 +109,8 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Optional.of("foo").or(() -> Optional.of("bar")),
         Optional.of("baz").or(() -> Optional.of("qux")),
-        Optional.of("quux").or(() -> Optional.of("quuz")));
+        Optional.of("quux").or(() -> Optional.of("quuz")),
+        Optional.of("corge").or(() -> Optional.of("grault")));
   }
 
   ImmutableSet<Optional<String>> testOptionalIdentity() {
@@ -113,10 +127,7 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.of(1).map(String::valueOf);
   }
 
-  ImmutableSet<String> testOptionalOrElseGet() {
-    return ImmutableSet.of(
-        Optional.of("foo").orElse("bar"),
-        Optional.of("baz").orElse(toString()),
-        Optional.of("qux").orElseGet(() -> String.valueOf(true)));
+  ImmutableSet<Stream<String>> testOptionalStream() {
+    return ImmutableSet.of(Optional.of("foo").stream(), Optional.of("bar").stream());
   }
 }

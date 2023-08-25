@@ -35,6 +35,12 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional::get;
   }
 
+  ImmutableSet<Boolean> testOptionalHasValue() {
+    return ImmutableSet.of(
+        Optional.of("foo").filter("bar"::equals).isPresent(),
+        Optional.of("baz").stream().anyMatch("qux"::equals));
+  }
+
   ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
     return ImmutableSet.of(
         ImmutableSet.of("foo").iterator().hasNext()
@@ -73,6 +79,13 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.of("foo").orElseGet(() -> Optional.of("bar").orElseThrow());
   }
 
+  ImmutableSet<String> testOptionalOrElseGet() {
+    return ImmutableSet.of(
+        Optional.of("foo").orElse("bar"),
+        Optional.of("baz").orElse(toString()),
+        Optional.of("qux").orElse(String.valueOf(true)));
+  }
+
   ImmutableSet<Object> testStreamFlatMapOptional() {
     return ImmutableSet.of(
         Stream.of(Optional.empty()).filter(Optional::isPresent).map(Optional::orElseThrow),
@@ -99,7 +112,8 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Optional.of("foo").map(Optional::of).orElse(Optional.of("bar")),
         Optional.of("baz").map(Optional::of).orElseGet(() -> Optional.of("qux")),
-        Stream.of(Optional.of("quux"), Optional.of("quuz")).flatMap(Optional::stream).findFirst());
+        Stream.of(Optional.of("quux"), Optional.of("quuz")).flatMap(Optional::stream).findFirst(),
+        Optional.of("corge").isPresent() ? Optional.of("corge") : Optional.of("grault"));
   }
 
   ImmutableSet<Optional<String>> testOptionalIdentity() {
@@ -120,10 +134,9 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.of(1).stream().map(String::valueOf).findAny();
   }
 
-  ImmutableSet<String> testOptionalOrElseGet() {
+  ImmutableSet<Stream<String>> testOptionalStream() {
     return ImmutableSet.of(
-        Optional.of("foo").orElse("bar"),
-        Optional.of("baz").orElse(toString()),
-        Optional.of("qux").orElse(String.valueOf(true)));
+        Optional.of("foo").map(Stream::of).orElse(Stream.empty()),
+        Optional.of("bar").map(Stream::of).orElseGet(Stream::empty));
   }
 }
