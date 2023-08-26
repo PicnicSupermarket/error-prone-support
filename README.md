@@ -223,10 +223,13 @@ Other highly relevant commands:
   Before running this command, make sure to have installed the project (`mvn
   clean install`) and make sure that the current working directory does not
   contain unstaged or uncommited changes.
-- [`./run-mutation-tests.sh`][script-run-mutation-tests] runs mutation tests
-  using [Pitest][pitest]. The results can be reviewed by opening the respective
-  `target/pit-reports/index.html` files. For more information check the [PIT
-  Maven plugin][pitest-maven].
+- [`./run-branch-mutation-tests.sh`][script-run-branch-mutation-tests] uses
+  [Pitest][pitest] to run mutation tests against code that is modified relative
+  to the upstream default branch. The results can be reviewed by opening the
+  respective `target/pit-reports/index.html` files. One can use
+  [`./run-mutation-tests.sh`][script-run-mutation-tests] to run mutation tests
+  against _all_ code in the current working directory. For more information
+  check the [PIT Maven plugin][pitest-maven].
 
 When running the project's tests in IntelliJ IDEA, you might see the following
 error:
@@ -296,6 +299,7 @@ channel; please see our [security policy][security] for details.
 [reproducible-builds-badge]: https://img.shields.io/badge/Reproducible_Builds-ok-success?labelColor=1e5b96
 [reproducible-builds-report]: https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/tech/picnic/error-prone-support/error-prone-support/README.md
 [script-apply-error-prone-suggestions]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/apply-error-prone-suggestions.sh
+[script-run-branch-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-branch-mutation-tests.sh
 [script-run-full-build]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-full-build.sh
 [script-run-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-mutation-tests.sh
 [security]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/SECURITY.md
