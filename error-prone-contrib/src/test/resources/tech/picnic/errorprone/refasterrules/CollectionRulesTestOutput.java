@@ -36,6 +36,10 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(ImmutableSet.of(1).size(), ImmutableSet.of(2).size());
   }
 
+  boolean testCollectionContains() {
+    return ImmutableSet.of("foo").contains("bar");
+  }
+
   boolean testCollectionAddAllToCollectionExpression() {
     return new ArrayList<>().addAll(ImmutableSet.of("foo"));
   }
