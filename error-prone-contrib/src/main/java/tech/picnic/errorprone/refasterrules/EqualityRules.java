@@ -1,11 +1,16 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.function.Predicate.not;
+
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.Placeholder;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -129,6 +134,64 @@ final class EqualityRules {
     @AfterTemplate
     boolean after(boolean a, boolean b) {
       return a == b;
+    }
+  }
+
+  /**
+   * Don't pass a lambda expression to {@link Predicate#not(Predicate)}; instead push the negation
+   * into the lambda expression.
+   */
+  abstract static class PredicateLambda<T> {
+    @Placeholder(allowsIdentity = true)
+    abstract boolean predicate(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Predicate<T> before() {
+      return not(v -> predicate(v));
+    }
+
+    @AfterTemplate
+    Predicate<T> after() {
+      return v -> !predicate(v);
+    }
+  }
+
+  /** Avoid contrived ways of handling {@code null} values during equality testing. */
+  static final class EqualsLhsNullable<T, S> {
+    @BeforeTemplate
+    boolean before(T value1, S value2) {
+      return Optional.ofNullable(value1).equals(Optional.of(value2));
+    }
+
+    @AfterTemplate
+    boolean after(T value1, S value2) {
+      return value2.equals(value1);
+    }
+  }
+
+  /** Avoid contrived ways of handling {@code null} values during equality testing. */
+  static final class EqualsRhsNullable<T, S> {
+    @BeforeTemplate
+    boolean before(T value1, S value2) {
+      return Optional.of(value1).equals(Optional.ofNullable(value2));
+    }
+
+    @AfterTemplate
+    boolean after(T value1, S value2) {
+      return value1.equals(value2);
+    }
+  }
+
+  /** Avoid contrived ways of handling {@code null} values during equality testing. */
+  static final class EqualsLhsAndRhsNullable<T, S> {
+    @BeforeTemplate
+    boolean before(T value1, S value2) {
+      return Optional.ofNullable(value1).equals(Optional.ofNullable(value2));
+    }
+
+    @AfterTemplate
+    boolean after(T value1, S value2) {
+      return Objects.equals(value1, value2);
     }
   }
 }

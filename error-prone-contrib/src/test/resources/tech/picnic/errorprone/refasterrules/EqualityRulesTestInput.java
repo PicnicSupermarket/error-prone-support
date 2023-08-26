@@ -1,16 +1,20 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.function.Predicate.not;
+
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableSet;
 import java.math.RoundingMode;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Objects.class);
+    return ImmutableSet.of(Objects.class, Optional.class, not(null));
   }
 
   ImmutableSet<Boolean> testPrimitiveOrReferenceEquality() {
@@ -59,5 +63,21 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
         !(3F != 4F),
         !(3.0 != 4.0),
         !(BoundType.OPEN != BoundType.CLOSED));
+  }
+
+  Predicate<String> testPredicateLambda() {
+    return not(v -> v.isEmpty());
+  }
+
+  boolean testEqualsLhsNullable() {
+    return Optional.ofNullable("foo").equals(Optional.of("bar"));
+  }
+
+  boolean testEqualsRhsNullable() {
+    return Optional.of("foo").equals(Optional.ofNullable("bar"));
+  }
+
+  boolean testEqualsLhsAndRhsNullable() {
+    return Optional.ofNullable("foo").equals(Optional.ofNullable("bar"));
   }
 }
