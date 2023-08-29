@@ -96,31 +96,80 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertEqual() {
-    assertEquals(true, true);
-    assertEquals((byte) 0, (byte) 0);
-    assertEquals((char) 0, (char) 0);
-    assertEquals((short) 0, (short) 0);
-    assertEquals(0, 0);
-    assertEquals(0L, 0L);
-    assertEquals(0.0F, 0.0F);
-    assertEquals(0.0, 0.0);
-    assertEquals(new Object(), new Object());
+    assertEquals(true, false);
+    assertEquals(true, Boolean.FALSE);
+    assertEquals(Boolean.TRUE, false);
+    assertEquals(Boolean.TRUE, Boolean.FALSE);
+    assertEquals((byte) 0, (byte) 1);
+    assertEquals((byte) 0, Byte.decode("1"));
+    assertEquals(Byte.decode("0"), (byte) 1);
+    assertEquals(Byte.decode("0"), Byte.decode("1"));
+    assertEquals('a', 'b');
+    assertEquals('a', Character.valueOf('b'));
+    assertEquals(Character.valueOf('a'), 'b');
+    assertEquals(Character.valueOf('a'), Character.valueOf('b'));
+    assertEquals((short) 0, (short) 1);
+    assertEquals((short) 0, Short.decode("1"));
+    assertEquals(Short.decode("0"), (short) 1);
+    assertEquals(Short.decode("0"), Short.decode("1"));
+    assertEquals(0, 1);
+    assertEquals(0, Integer.valueOf(1));
+    assertEquals(Integer.valueOf(0), 1);
+    assertEquals(Integer.valueOf(0), Integer.valueOf(1));
+    assertEquals(0L, 1L);
+    assertEquals(0L, Long.valueOf(1));
+    assertEquals(Long.valueOf(0), 1L);
+    assertEquals(Long.valueOf(0), Long.valueOf(1));
+    assertEquals(0.0F, 1.0F);
+    assertEquals(0.0F, Float.valueOf(1.0F));
+    assertEquals(Float.valueOf(0.0F), 1.0F);
+    assertEquals(Float.valueOf(0.0F), Float.valueOf(1.0F));
+    assertEquals(0.0, 1.0);
+    assertEquals(0.0, Double.valueOf(1.0));
+    assertEquals(Double.valueOf(0.0), 1.0);
+    assertEquals(Double.valueOf(0.0), Double.valueOf(1.0));
+    assertEquals(new Object(), new StringBuilder());
     assertEquals("actual", "expected");
-    assertEquals(ImmutableMap.of(), ImmutableMap.of());
+    assertEquals(ImmutableMap.of(), ImmutableMap.of(1, 2));
   }
 
   void testAssertEqualWithMessage() {
-    assertEquals(true, true, "foo");
-    assertEquals((byte) 0, (byte) 0, "bar");
-    assertEquals((char) 0, (char) 0, "baz");
-    assertEquals((short) 0, (short) 0, "qux");
-    assertEquals(0, 0, "quux");
-    assertEquals(0L, 0L, "quuz");
-    assertEquals(0.0F, 0.0F, "corge");
-    assertEquals(0.0, 0.0, "grault");
-    assertEquals(new Object(), new Object(), "garply");
-    assertEquals("actual", "expected", "waldo");
-    assertEquals(ImmutableMap.of(), ImmutableMap.of(), "plugh");
+    assertEquals(true, false, "foo");
+    assertEquals(true, Boolean.FALSE, "bar");
+    assertEquals(Boolean.TRUE, false, "baz");
+    assertEquals(Boolean.TRUE, Boolean.FALSE, "qux");
+    assertEquals((byte) 0, (byte) 1, "quux");
+    assertEquals((byte) 0, Byte.decode("1"), "corge");
+    assertEquals(Byte.decode("0"), (byte) 1, "grault");
+    assertEquals(Byte.decode("0"), Byte.decode("1"), "garply");
+    assertEquals('a', 'b', "waldo");
+    assertEquals('a', Character.valueOf('b'), "fred");
+    assertEquals(Character.valueOf('a'), 'b', "plugh");
+    assertEquals(Character.valueOf('a'), Character.valueOf('b'), "xyzzy");
+    assertEquals((short) 0, (short) 1, "thud");
+    assertEquals((short) 0, Short.decode("1"), "foo");
+    assertEquals(Short.decode("0"), (short) 1, "bar");
+    assertEquals(Short.decode("0"), Short.decode("1"), "baz");
+    assertEquals(0, 1, "qux");
+    assertEquals(0, Integer.valueOf(1), "quux");
+    assertEquals(Integer.valueOf(0), 1, "corge");
+    assertEquals(Integer.valueOf(0), Integer.valueOf(1), "grault");
+    assertEquals(0L, 1L, "garply");
+    // XXX: Ambiguous method call, as the relevant overload is missing. See testng-team/testng#3199.
+    // assertEquals(0L, Long.valueOf(1), "waldo");
+    assertEquals(Long.valueOf(0), 1L, "fred");
+    assertEquals(Long.valueOf(0), Long.valueOf(1), "plugh");
+    assertEquals(0.0F, 1.0F, "xyzzy");
+    assertEquals(0.0F, Float.valueOf(1.0F), "thud");
+    assertEquals(Float.valueOf(0.0F), 1.0F, "foo");
+    assertEquals(Float.valueOf(0.0F), Float.valueOf(1.0F), "bar");
+    assertEquals(0.0, 1.0, "baz");
+    assertEquals(0.0, Double.valueOf(1.0), "qux");
+    assertEquals(Double.valueOf(0.0), 1.0, "quux");
+    assertEquals(Double.valueOf(0.0), Double.valueOf(1.0), "corge");
+    assertEquals(new Object(), new StringBuilder(), "grault");
+    assertEquals("actual", "expected", "garply");
+    assertEquals(ImmutableMap.of(), ImmutableMap.of(1, 2), "waldo");
   }
 
   void testAssertEqualFloatsWithDelta() {
@@ -161,6 +210,22 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertEquals(new float[0], new float[0], "corge");
     assertEquals(new double[0], new double[0], "grault");
     assertEquals(new Object[0], new Object[0], "garply");
+  }
+
+  void testAssertEqualFloatArraysWithDelta() {
+    assertEquals(new float[0], new float[0], 0.0F);
+  }
+
+  void testAssertEqualFloatArraysWithDeltaWithMessage() {
+    assertEquals(new float[0], new float[0], 0.0F, "foo");
+  }
+
+  void testAssertEqualDoubleArraysWithDelta() {
+    assertEquals(new double[0], new double[0], 0.0);
+  }
+
+  void testAssertEqualDoubleArraysWithDeltaWithMessage() {
+    assertEquals(new double[0], new double[0], 0.0, "foo");
   }
 
   void testAssertEqualArraysIrrespectiveOfOrder() {
