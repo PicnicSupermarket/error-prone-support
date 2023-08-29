@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Modifier;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -154,12 +155,17 @@ public final class ExhaustiveRefasterTypeMigration extends BugChecker implements
         .getValue().stream().map(a -> a.getValue().toString()).collect(toImmutableList());
   }
 
+  // XXX: Once only JDK 14 and above are supported, change the
+  // `m.getModifiers().contains(Modifier.PUBLIC)` check to just `m.isPublic()`.
   private static ImmutableList<String> getMethodsDefinitelyUnmigrated(
       ClassTree tree, ClassSymbol migratedType, Comparator<String> comparator, VisitorState state) {
     Set<MethodSymbol> publicMethods =
         Streams.stream(
                 ASTHelpers.scope(migratedType.members())
-                    .getSymbols(m -> m.isPublic() && m instanceof MethodSymbol))
+                    .getSymbols(
+                        m ->
+                            m.getModifiers().contains(Modifier.PUBLIC)
+                                && m instanceof MethodSymbol))
             .map(MethodSymbol.class::cast)
             .collect(toCollection(HashSet::new));
 
