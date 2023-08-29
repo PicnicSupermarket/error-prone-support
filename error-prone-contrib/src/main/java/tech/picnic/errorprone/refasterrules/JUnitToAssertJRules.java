@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.offset;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -34,7 +36,8 @@ import tech.picnic.errorprone.refaster.annotation.TypeMigration;
  * <p>Note that, while both libraries throw an {@link AssertionError} in case of an assertion
  * failure, the exact subtype used generally differs.
  */
-// XXX: Not all JUnit `Assertions` methods have an associated Refaster rule yet; expand this class.
+// XXX: The `AssertThat*Array*ContainsExactly*` rules assume that `expected` and `actual` are not
+// both `null`.
 // XXX: Introduce a `@Matcher` on `Executable` and `ThrowingSupplier` expressions, such that they
 // are only matched if they are also compatible with the `ThrowingCallable` functional interface.
 // When implementing such a matcher, note that expressions with a non-void return type such as
@@ -50,39 +53,6 @@ import tech.picnic.errorprone.refaster.annotation.TypeMigration;
       "assertAll(String, Collection<Executable>)",
       "assertAll(String, Executable[])",
       "assertAll(String, Stream<Executable>)",
-      "assertArrayEquals(boolean[], boolean[])",
-      "assertArrayEquals(boolean[], boolean[], String)",
-      "assertArrayEquals(boolean[], boolean[], Supplier<String>)",
-      "assertArrayEquals(byte[], byte[])",
-      "assertArrayEquals(byte[], byte[], String)",
-      "assertArrayEquals(byte[], byte[], Supplier<String>)",
-      "assertArrayEquals(char[], char[])",
-      "assertArrayEquals(char[], char[], String)",
-      "assertArrayEquals(char[], char[], Supplier<String>)",
-      "assertArrayEquals(double[], double[])",
-      "assertArrayEquals(double[], double[], double)",
-      "assertArrayEquals(double[], double[], double, String)",
-      "assertArrayEquals(double[], double[], double, Supplier<String>)",
-      "assertArrayEquals(double[], double[], String)",
-      "assertArrayEquals(double[], double[], Supplier<String>)",
-      "assertArrayEquals(float[], float[])",
-      "assertArrayEquals(float[], float[], float)",
-      "assertArrayEquals(float[], float[], float, String)",
-      "assertArrayEquals(float[], float[], float, Supplier<String>)",
-      "assertArrayEquals(float[], float[], String)",
-      "assertArrayEquals(float[], float[], Supplier<String>)",
-      "assertArrayEquals(int[], int[])",
-      "assertArrayEquals(int[], int[], String)",
-      "assertArrayEquals(int[], int[], Supplier<String>)",
-      "assertArrayEquals(long[], long[])",
-      "assertArrayEquals(long[], long[], String)",
-      "assertArrayEquals(long[], long[], Supplier<String>)",
-      "assertArrayEquals(Object[], Object[])",
-      "assertArrayEquals(Object[], Object[], String)",
-      "assertArrayEquals(Object[], Object[], Supplier<String>)",
-      "assertArrayEquals(short[], short[])",
-      "assertArrayEquals(short[], short[], String)",
-      "assertArrayEquals(short[], short[], Supplier<String>)",
       "assertEquals(Byte, Byte)",
       "assertEquals(Byte, byte)",
       "assertEquals(byte, Byte)",
@@ -301,6 +271,436 @@ import tech.picnic.errorprone.refaster.annotation.TypeMigration;
     })
 final class JUnitToAssertJRules {
   private JUnitToAssertJRules() {}
+
+  static final class AssertThatBooleanArrayContainsExactly {
+    @BeforeTemplate
+    void before(boolean[] actual, boolean[] expected) {
+      assertArrayEquals(expected, actual);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(boolean[] actual, boolean[] expected) {
+      assertThat(actual).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatBooleanArrayWithFailMessageContainsExactly {
+    @BeforeTemplate
+    void before(boolean[] actual, String message, boolean[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(boolean[] actual, String message, boolean[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatBooleanArrayWithFailMessageSupplierContainsExactly {
+    @BeforeTemplate
+    void before(boolean[] actual, Supplier<String> message, boolean[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(boolean[] actual, Supplier<String> message, boolean[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatByteArrayContainsExactly {
+    @BeforeTemplate
+    void before(byte[] actual, byte[] expected) {
+      assertArrayEquals(expected, actual);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(byte[] actual, byte[] expected) {
+      assertThat(actual).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatByteArrayWithFailMessageContainsExactly {
+    @BeforeTemplate
+    void before(byte[] actual, String message, byte[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(byte[] actual, String message, byte[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatByteArrayWithFailMessageSupplierContainsExactly {
+    @BeforeTemplate
+    void before(byte[] actual, Supplier<String> message, byte[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(byte[] actual, Supplier<String> message, byte[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatCharArrayContainsExactly {
+    @BeforeTemplate
+    void before(char[] actual, char[] expected) {
+      assertArrayEquals(expected, actual);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(char[] actual, char[] expected) {
+      assertThat(actual).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatCharArrayWithFailMessageContainsExactly {
+    @BeforeTemplate
+    void before(char[] actual, String message, char[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(char[] actual, String message, char[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatCharArrayWithFailMessageSupplierContainsExactly {
+    @BeforeTemplate
+    void before(char[] actual, Supplier<String> message, char[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(char[] actual, Supplier<String> message, char[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatShortArrayContainsExactly {
+    @BeforeTemplate
+    void before(short[] actual, short[] expected) {
+      assertArrayEquals(expected, actual);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(short[] actual, short[] expected) {
+      assertThat(actual).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatShortArrayWithFailMessageContainsExactly {
+    @BeforeTemplate
+    void before(short[] actual, String message, short[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(short[] actual, String message, short[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatShortArrayWithFailMessageSupplierContainsExactly {
+    @BeforeTemplate
+    void before(short[] actual, Supplier<String> message, short[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(short[] actual, Supplier<String> message, short[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatIntArrayContainsExactly {
+    @BeforeTemplate
+    void before(int[] actual, int[] expected) {
+      assertArrayEquals(expected, actual);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(int[] actual, int[] expected) {
+      assertThat(actual).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatIntArrayWithFailMessageContainsExactly {
+    @BeforeTemplate
+    void before(int[] actual, String message, int[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(int[] actual, String message, int[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatIntArrayWithFailMessageSupplierContainsExactly {
+    @BeforeTemplate
+    void before(int[] actual, Supplier<String> message, int[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(int[] actual, Supplier<String> message, int[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatLongArrayContainsExactly {
+    @BeforeTemplate
+    void before(long[] actual, long[] expected) {
+      assertArrayEquals(expected, actual);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(long[] actual, long[] expected) {
+      assertThat(actual).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatLongArrayWithFailMessageContainsExactly {
+    @BeforeTemplate
+    void before(long[] actual, String message, long[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(long[] actual, String message, long[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatLongArrayWithFailMessageSupplierContainsExactly {
+    @BeforeTemplate
+    void before(long[] actual, Supplier<String> message, long[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(long[] actual, Supplier<String> message, long[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatFloatArrayContainsExactly {
+    @BeforeTemplate
+    void before(float[] actual, float[] expected) {
+      assertArrayEquals(expected, actual);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(float[] actual, float[] expected) {
+      assertThat(actual).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatFloatArrayWithFailMessageContainsExactly {
+    @BeforeTemplate
+    void before(float[] actual, String message, float[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(float[] actual, String message, float[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatFloatArrayWithFailMessageSupplierContainsExactly {
+    @BeforeTemplate
+    void before(float[] actual, Supplier<String> message, float[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(float[] actual, Supplier<String> message, float[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatFloatArrayContainsExactlyWithOffset {
+    @BeforeTemplate
+    void before(float[] actual, float[] expected, float delta) {
+      assertArrayEquals(expected, actual, delta);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(float[] actual, float[] expected, float delta) {
+      assertThat(actual).containsExactly(expected, offset(delta));
+    }
+  }
+
+  static final class AssertThatFloatArrayWithFailMessageContainsExactlyWithOffset {
+    @BeforeTemplate
+    void before(float[] actual, String message, float[] expected, float delta) {
+      assertArrayEquals(expected, actual, delta, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(float[] actual, String message, float[] expected, float delta) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected, offset(delta));
+    }
+  }
+
+  static final class AssertThatFloatArrayWithFailMessageSupplierContainsExactlyWithOffset {
+    @BeforeTemplate
+    void before(float[] actual, Supplier<String> message, float[] expected, float delta) {
+      assertArrayEquals(expected, actual, delta, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(float[] actual, Supplier<String> message, float[] expected, float delta) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected, offset(delta));
+    }
+  }
+
+  static final class AssertThatDoubleArrayContainsExactly {
+    @BeforeTemplate
+    void before(double[] actual, double[] expected) {
+      assertArrayEquals(expected, actual);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(double[] actual, double[] expected) {
+      assertThat(actual).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatDoubleArrayWithFailMessageContainsExactly {
+    @BeforeTemplate
+    void before(double[] actual, String message, double[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(double[] actual, String message, double[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatDoubleArrayWithFailMessageSupplierContainsExactly {
+    @BeforeTemplate
+    void before(double[] actual, Supplier<String> message, double[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(double[] actual, Supplier<String> message, double[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatDoubleArrayContainsExactlyWithOffset {
+    @BeforeTemplate
+    void before(double[] actual, double[] expected, double delta) {
+      assertArrayEquals(expected, actual, delta);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(double[] actual, double[] expected, double delta) {
+      assertThat(actual).containsExactly(expected, offset(delta));
+    }
+  }
+
+  static final class AssertThatDoubleArrayWithFailMessageContainsExactlyWithOffset {
+    @BeforeTemplate
+    void before(double[] actual, String message, double[] expected, double delta) {
+      assertArrayEquals(expected, actual, delta, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(double[] actual, String message, double[] expected, double delta) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected, offset(delta));
+    }
+  }
+
+  static final class AssertThatDoubleArrayWithFailMessageSupplierContainsExactlyWithOffset {
+    @BeforeTemplate
+    void before(
+        double[] actual, Supplier<String> messageSupplier, double[] expected, double delta) {
+      assertArrayEquals(expected, actual, delta, messageSupplier);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(double[] actual, Supplier<String> messageSupplier, double[] expected, double delta) {
+      assertThat(actual).withFailMessage(messageSupplier).containsExactly(expected, offset(delta));
+    }
+  }
+
+  static final class AssertThatObjectArrayContainsExactly {
+    @BeforeTemplate
+    void before(Object[] actual, Object[] expected) {
+      assertArrayEquals(expected, actual);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(Object[] actual, Object[] expected) {
+      assertThat(actual).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatObjectArrayWithFailMessageContainsExactly {
+    @BeforeTemplate
+    void before(Object[] actual, String message, Object[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(Object[] actual, String message, Object[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertThatObjectArrayWithFailMessageSupplierContainsExactly {
+    @BeforeTemplate
+    void before(Object[] actual, Supplier<String> message, Object[] expected) {
+      assertArrayEquals(expected, actual, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(Object[] actual, Supplier<String> message, Object[] expected) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
 
   static final class Fail<T> {
     @BeforeTemplate
