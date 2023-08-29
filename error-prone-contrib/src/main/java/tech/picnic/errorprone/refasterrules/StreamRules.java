@@ -45,6 +45,7 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -649,6 +650,22 @@ final class StreamRules {
     @AfterTemplate
     Stream<T> after(Stream<T> stream, Predicate<? super T> predicate) {
       return stream.takeWhile(predicate);
+    }
+  }
+
+  /**
+   * Prefer {@link Stream#iterate(Object, Predicate, UnaryOperator)} over more contrived
+   * alternatives.
+   */
+  static final class StreamIterate<T> {
+    @BeforeTemplate
+    Stream<T> before(T seed, Predicate<? super T> hasNext, UnaryOperator<T> next) {
+      return Stream.iterate(seed, next).takeWhile(hasNext);
+    }
+
+    @AfterTemplate
+    Stream<T> after(T seed, Predicate<? super T> hasNext, UnaryOperator<T> next) {
+      return Stream.iterate(seed, hasNext, next);
     }
   }
 }
