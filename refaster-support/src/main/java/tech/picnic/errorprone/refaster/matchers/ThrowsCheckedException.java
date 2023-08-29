@@ -7,7 +7,6 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MemberReferenceTree;
-import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types.FunctionDescriptorLookupError;
 import java.util.Collection;
@@ -33,13 +32,8 @@ public final class ThrowsCheckedException implements Matcher<ExpressionTree> {
       return ASTHelpers.getThrownExceptions(lambdaExpression.getBody(), state);
     }
 
-    if (tree instanceof MemberReferenceTree) {
-      Symbol symbol = ASTHelpers.getSymbol(tree);
-      if (symbol == null) {
-        return ImmutableSet.of();
-      }
-
-      return symbol.type.getThrownTypes();
+    if (tree instanceof MemberReferenceTree memberReference) {
+      return ASTHelpers.getSymbol(memberReference).type.getThrownTypes();
     }
 
     Type type = ASTHelpers.getType(tree);

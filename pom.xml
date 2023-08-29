@@ -1917,9 +1917,9 @@
             <properties>
                 <maven.test.failure.ignore>true</maven.test.failure.ignore>
                 <!-- Normal builds use Jabel to target an older JDK version
-                than what would normally be supported given the language
-                features used, but this causes Sonar to report parse errors.
-                So for Sonar builds we target a JDK version that is properly
+                than any that would normally be supported given the language
+                features used, but this causes Sonar to report parse errors. So
+                for Sonar builds we target a JDK version that is properly
                 compatible with the source code. -->
                 <version.jdk.target>${version.jdk.source}</version.jdk.target>
             </properties>

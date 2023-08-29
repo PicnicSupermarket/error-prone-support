@@ -34,8 +34,9 @@ import com.sun.tools.javac.code.Type;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Avoid `Publisher`s that emit other `Publishers`s; "
-            + "the resultant code is hard to reason about",
+        """
+        Avoid `Publisher`s that emit other `Publishers`s; the resultant code is hard to reason \
+        about""",
     link = BUG_PATTERNS_BASE_URL + "NestedPublishers",
     linkType = CUSTOM,
     severity = WARNING,

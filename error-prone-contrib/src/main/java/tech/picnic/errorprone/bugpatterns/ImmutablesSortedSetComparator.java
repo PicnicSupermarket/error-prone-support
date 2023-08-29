@@ -43,8 +43,9 @@ import javax.lang.model.element.Modifier;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "`SortedSet` properties of a `@Value.Immutable` or `@Value.Modifiable` type must be "
-            + "annotated with `@Value.NaturalOrder` or `@Value.ReverseOrder`",
+        """
+        `SortedSet` properties of a `@Value.Immutable` or `@Value.Modifiable` type must be \
+        annotated with `@Value.NaturalOrder` or `@Value.ReverseOrder`""",
     link = BUG_PATTERNS_BASE_URL + "ImmutablesSortedSetComparator",
     linkType = CUSTOM,
     severity = ERROR,
