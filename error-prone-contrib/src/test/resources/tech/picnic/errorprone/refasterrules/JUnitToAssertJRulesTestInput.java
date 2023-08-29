@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static org.assertj.core.api.Assertions.offset;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -24,12 +26,146 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
         assertInstanceOf(null, null),
         assertThrows(null, null),
         assertThrowsExactly(null, null),
+        offset(0.0),
+        (Runnable) () -> assertArrayEquals((int[]) null, null),
         (Runnable) () -> assertFalse(true),
         (Runnable) () -> assertNotNull(null),
         (Runnable) () -> assertNotSame(null, null),
         (Runnable) () -> assertNull(null),
         (Runnable) () -> assertSame(null, null),
         (Runnable) () -> assertTrue(true));
+  }
+
+  void testAssertThatBooleanArrayContainsExactly() {
+    assertArrayEquals(new boolean[] {true}, new boolean[] {false});
+  }
+
+  void testAssertThatBooleanArrayWithFailMessageContainsExactly() {
+    assertArrayEquals(new boolean[] {true}, new boolean[] {false}, "foo");
+  }
+
+  void testAssertThatBooleanArrayWithFailMessageSupplierContainsExactly() {
+    assertArrayEquals(new boolean[] {true}, new boolean[] {false}, () -> "foo");
+  }
+
+  void testAssertThatByteArrayContainsExactly() {
+    assertArrayEquals(new byte[] {1}, new byte[] {2});
+  }
+
+  void testAssertThatByteArrayWithFailMessageContainsExactly() {
+    assertArrayEquals(new byte[] {1}, new byte[] {2}, "foo");
+  }
+
+  void testAssertThatByteArrayWithFailMessageSupplierContainsExactly() {
+    assertArrayEquals(new byte[] {1}, new byte[] {2}, () -> "foo");
+  }
+
+  void testAssertThatCharArrayContainsExactly() {
+    assertArrayEquals(new char[] {'a'}, new char[] {'b'});
+  }
+
+  void testAssertThatCharArrayWithFailMessageContainsExactly() {
+    assertArrayEquals(new char[] {'a'}, new char[] {'b'}, "foo");
+  }
+
+  void testAssertThatCharArrayWithFailMessageSupplierContainsExactly() {
+    assertArrayEquals(new char[] {'a'}, new char[] {'b'}, () -> "foo");
+  }
+
+  void testAssertThatShortArrayContainsExactly() {
+    assertArrayEquals(new short[] {1}, new short[] {2});
+  }
+
+  void testAssertThatShortArrayWithFailMessageContainsExactly() {
+    assertArrayEquals(new short[] {1}, new short[] {2}, "foo");
+  }
+
+  void testAssertThatShortArrayWithFailMessageSupplierContainsExactly() {
+    assertArrayEquals(new short[] {1}, new short[] {2}, () -> "foo");
+  }
+
+  void testAssertThatIntArrayContainsExactly() {
+    assertArrayEquals(new int[] {1}, new int[] {2});
+  }
+
+  void testAssertThatIntArrayWithFailMessageContainsExactly() {
+    assertArrayEquals(new int[] {1}, new int[] {2}, "foo");
+  }
+
+  void testAssertThatIntArrayWithFailMessageSupplierContainsExactly() {
+    assertArrayEquals(new int[] {1}, new int[] {2}, () -> "foo");
+  }
+
+  void testAssertThatLongArrayContainsExactly() {
+    assertArrayEquals(new long[] {1L}, new long[] {2L});
+  }
+
+  void testAssertThatLongArrayWithFailMessageContainsExactly() {
+    assertArrayEquals(new long[] {1L}, new long[] {2L}, "foo");
+  }
+
+  void testAssertThatLongArrayWithFailMessageSupplierContainsExactly() {
+    assertArrayEquals(new long[] {1L}, new long[] {2L}, () -> "foo");
+  }
+
+  void testAssertThatFloatArrayContainsExactly() {
+    assertArrayEquals(new float[] {1.0F}, new float[] {2.0F});
+  }
+
+  void testAssertThatFloatArrayWithFailMessageContainsExactly() {
+    assertArrayEquals(new float[] {1.0F}, new float[] {2.0F}, "foo");
+  }
+
+  void testAssertThatFloatArrayWithFailMessageSupplierContainsExactly() {
+    assertArrayEquals(new float[] {1.0F}, new float[] {2.0F}, () -> "foo");
+  }
+
+  void testAssertThatFloatArrayContainsExactlyWithOffset() {
+    assertArrayEquals(new float[] {1.0F}, new float[] {2.0F}, 0.1f);
+  }
+
+  void testAssertThatFloatArrayWithFailMessageContainsExactlyWithOffset() {
+    assertArrayEquals(new float[] {1.0F}, new float[] {2.0F}, 0.1f, "foo");
+  }
+
+  void testAssertThatFloatArrayWithFailMessageSupplierContainsExactlyWithOffset() {
+    assertArrayEquals(new float[] {1.0F}, new float[] {2.0F}, 0.1f, () -> "foo");
+  }
+
+  void testAssertThatDoubleArrayContainsExactly() {
+    assertArrayEquals(new double[] {1.0}, new double[] {2.0});
+  }
+
+  void testAssertThatDoubleArrayWithFailMessageContainsExactly() {
+    assertArrayEquals(new double[] {1.0}, new double[] {2.0}, "foo");
+  }
+
+  void testAssertThatDoubleArrayWithFailMessageSupplierContainsExactly() {
+    assertArrayEquals(new double[] {1.0}, new double[] {2.0}, () -> "foo");
+  }
+
+  void testAssertThatDoubleArrayContainsExactlyWithOffset() {
+    assertArrayEquals(new double[] {1.0}, new double[] {2.0}, 0.1);
+  }
+
+  void testAssertThatDoubleArrayWithFailMessageContainsExactlyWithOffset() {
+    assertArrayEquals(new double[] {1.0}, new double[] {2.0}, 0.1, "foo");
+  }
+
+  void testAssertThatDoubleArrayWithFailMessageSupplierContainsExactlyWithOffset() {
+    assertArrayEquals(new double[] {1.0}, new double[] {2.0}, 0.1, () -> "foo");
+  }
+
+  void testAssertThatObjectArrayContainsExactly() {
+    assertArrayEquals(new Object[] {"foo"}, new Object[] {"bar"});
+  }
+
+  void testAssertThatObjectArrayWithFailMessageContainsExactly() {
+    assertArrayEquals(new Object[] {"foo"}, new Object[] {"bar"}, "foo");
+  }
+
+  void testAssertThatObjectArrayWithFailMessageSupplierContainsExactly() {
+    assertArrayEquals(new Object[] {"foo"}, new Object[] {"bar"}, () -> "foo");
   }
 
   Object testFail() {
