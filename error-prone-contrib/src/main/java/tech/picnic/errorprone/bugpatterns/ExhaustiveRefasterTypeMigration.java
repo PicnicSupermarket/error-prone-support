@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Modifier;
@@ -71,7 +72,8 @@ import org.jspecify.annotations.Nullable;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "The set of unmigrated methods listed by the `@TypeMigration` annotation must be minimal yet exhaustive",
+        "The set of unmigrated methods listed by the `@TypeMigration` annotation must be minimal "
+            + "yet exhaustive",
     link = BUG_PATTERNS_BASE_URL + "ExhaustiveRefasterTypeMigration",
     linkType = CUSTOM,
     severity = WARNING,
@@ -201,30 +203,26 @@ public final class ExhaustiveRefasterTypeMigration extends BugChecker implements
    */
   private static void removeMethodsInvokedInBeforeTemplateMethods(
       ClassTree tree, Set<MethodSymbol> candidates, VisitorState state) {
-    new TreeScanner<@Nullable Void, Boolean>() {
+    new TreeScanner<@Nullable Void, Consumer<MethodSymbol>>() {
       @Override
-      public @Nullable Void visitMethod(MethodTree tree, Boolean inBeforeTemplate) {
-        return HAS_BEFORE_TEMPLATE.matches(tree, state) ? super.visitMethod(tree, true) : null;
+      public @Nullable Void visitMethod(MethodTree tree, Consumer<MethodSymbol> sink) {
+        return HAS_BEFORE_TEMPLATE.matches(tree, state)
+            ? super.visitMethod(tree, candidates::remove)
+            : null;
       }
 
       @Override
-      public @Nullable Void visitNewClass(NewClassTree tree, Boolean inBeforeTemplate) {
-        if (inBeforeTemplate) {
-          candidates.remove(ASTHelpers.getSymbol(tree));
-        }
-
-        return super.visitNewClass(tree, inBeforeTemplate);
+      public @Nullable Void visitNewClass(NewClassTree tree, Consumer<MethodSymbol> sink) {
+        sink.accept(ASTHelpers.getSymbol(tree));
+        return super.visitNewClass(tree, sink);
       }
 
       @Override
       public @Nullable Void visitMethodInvocation(
-          MethodInvocationTree tree, Boolean inBeforeTemplate) {
-        if (inBeforeTemplate) {
-          candidates.remove(ASTHelpers.getSymbol(tree));
-        }
-
-        return super.visitMethodInvocation(tree, inBeforeTemplate);
+          MethodInvocationTree tree, Consumer<MethodSymbol> sink) {
+        sink.accept(ASTHelpers.getSymbol(tree));
+        return super.visitMethodInvocation(tree, sink);
       }
-    }.scan(tree, false);
+    }.scan(tree, s -> {});
   }
 }
