@@ -45,8 +45,9 @@ import tech.picnic.errorprone.utils.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Ensure invocations of `Comparator#comparing{,Double,Int,Long}` match the return type"
-            + " of the provided function",
+        """
+        Ensure invocations of `Comparator#comparing{,Double,Int,Long}` match the return type of \
+        the provided function""",
     link = BUG_PATTERNS_BASE_URL + "PrimitiveComparison",
     linkType = CUSTOM,
     severity = WARNING,
