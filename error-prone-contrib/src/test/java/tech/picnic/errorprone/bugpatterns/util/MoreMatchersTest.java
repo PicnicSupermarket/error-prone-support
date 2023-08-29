@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
-import static tech.picnic.errorprone.bugpatterns.util.MoreMatchers.HAS_LOMBOK_DATA;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.subOf;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.type;
@@ -24,6 +23,29 @@ import com.sun.source.tree.Tree;
 import org.junit.jupiter.api.Test;
 
 final class MoreMatchersTest {
+  @Test
+  void hasLombokDataAnnotation() {
+    CompilationTestHelper.newInstance(HasLombokDataTestChecker.class, getClass())
+        .addSourceLines("Data.java", "package lombok;", "", "public @interface Data {}")
+        .addSourceLines(
+            "A.java",
+            "import lombok.Data;",
+            "",
+            "@Data",
+            "// BUG: Diagnostic contains:",
+            "public class A {",
+            "  private String field;",
+            "",
+            "  static class B {}",
+            "",
+            "  @Data",
+            "  // BUG: Diagnostic contains:",
+            "  static class C {}",
+            "}")
+        .addSourceLines("D.java", "public class D {}")
+        .doTest();
+  }
+
   @Test
   void hasMetaAnnotation() {
     CompilationTestHelper.newInstance(HasMetaAnnotationTestChecker.class, getClass())
@@ -107,27 +129,17 @@ final class MoreMatchersTest {
         .doTest();
   }
 
-@Test
-  void hasLombokDataAnnotation() {
-    CompilationTestHelper.newInstance(LombokDataAnnotationMatcher.class, getClass())
-        .addSourceLines("Data.java", "package lombok;", "", "public @interface Data {}")
-        .addSourceLines(
-            "A.java",
-            "import lombok.Data;",
-            "",
-            "@Data",
-            "// BUG: Diagnostic contains:",
-            "public class A {",
-            "  private String field;",
-            "",
-            "  static class B {}",
-            "",
-            "  @Data",
-            "  // BUG: Diagnostic contains:",
-            "  static class C {}",
-            "}")
-        .addSourceLines("D.java", "public class D {}")
-        .doTest();
+  /** A {@link BugChecker} that delegates to {@link MoreMatchers#HAS_LOMBOK_DATA}. */
+  @BugPattern(summary = "Interacts with `MoreMatchers` for testing purposes", severity = ERROR)
+  public static final class HasLombokDataTestChecker extends BugChecker
+      implements ClassTreeMatcher {
+    private static final long serialVersionUID = 1L;
+    private static final Matcher<ClassTree> DELEGATE = MoreMatchers.HAS_LOMBOK_DATA;
+
+    @Override
+    public Description matchClass(ClassTree tree, VisitorState state) {
+      return DELEGATE.matches(tree, state) ? describeMatch(tree) : Description.NO_MATCH;
+    }
   }
 
   /** A {@link BugChecker} that delegates to {@link MoreMatchers#hasMetaAnnotation(String)}. */
@@ -156,18 +168,6 @@ final class MoreMatchersTest {
     @Override
     public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
       return DELEGATE.matches(tree, state) ? describeMatch(tree) : Description.NO_MATCH;
-}
-}
-
-  /** A {@link BugChecker} that delegates to {@link MoreMatchers#HAS_LOMBOK_DATA}. */
-  @BugPattern(summary = "Interacts with `MoreMatchers` for testing purposes", severity = ERROR)
-  public static final class LombokDataAnnotationMatcher extends BugChecker
-      implements ClassTreeMatcher {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public Description matchClass(ClassTree tree, VisitorState state) {
-      return HAS_LOMBOK_DATA.matches(tree, state) ? describeMatch(tree) : Description.NO_MATCH;
     }
   }
 }
