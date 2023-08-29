@@ -7,9 +7,9 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.suppliers.Supplier;
 import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Type;
-import com.sun.source.tree.ClassTree;
 
 /**
  * A collection of general-purpose {@link Matcher}s.
