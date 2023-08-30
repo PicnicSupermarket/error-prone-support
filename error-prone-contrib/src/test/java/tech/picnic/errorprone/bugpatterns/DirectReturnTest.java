@@ -235,7 +235,6 @@ final class DirectReturnTest {
             "class A {",
             "  private String field;",
             "}")
-        .expectNoDiagnostics()
         .doTest();
   }
 }
