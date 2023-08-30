@@ -26,7 +26,6 @@ final class MoreMatchersTest {
   @Test
   void hasLombokDataAnnotation() {
     CompilationTestHelper.newInstance(HasLombokDataTestChecker.class, getClass())
-        .addSourceLines("Data.java", "package lombok;", "", "public @interface Data {}")
         .addSourceLines(
             "A.java",
             "import lombok.Data;",
