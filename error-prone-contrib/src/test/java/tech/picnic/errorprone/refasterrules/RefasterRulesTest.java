@@ -40,6 +40,7 @@ final class RefasterRulesTest {
           ComparatorRules.class,
           DoubleStreamRules.class,
           EqualityRules.class,
+          FileRules.class,
           ImmutableListRules.class,
           ImmutableListMultimapRules.class,
           ImmutableMapRules.class,
