@@ -35,7 +35,7 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional::get;
   }
 
-  ImmutableSet<Boolean> testOptionalHasValue() {
+  ImmutableSet<Boolean> testOptionalEqualsOptional() {
     return ImmutableSet.of(
         Optional.of("foo").filter("bar"::equals).isPresent(),
         Optional.of("baz").stream().anyMatch("qux"::equals));

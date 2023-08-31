@@ -101,7 +101,7 @@ final class OptionalRules {
   }
 
   /** Prefer {@link Optional#equals(Object)} over more contrived alternatives. */
-  static final class OptionalHasValue<T, S> {
+  static final class OptionalEqualsOptional<T, S> {
     @BeforeTemplate
     boolean before(Optional<T> optional, S value) {
       return Refaster.anyOf(
@@ -454,5 +454,5 @@ final class OptionalRules {
 
   // XXX: Add a rule for:
   // `optional.flatMap(x -> pred(x) ? Optional.empty() : Optional.of(x))` and variants.
-  // (Maybe canonicalize the inner expression. Maybe we rewrite already.)
+  // (Maybe canonicalize the inner expression. Maybe we rewrite it already.)
 }
