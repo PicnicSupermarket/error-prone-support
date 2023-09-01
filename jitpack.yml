@@ -5,4 +5,4 @@ before_install:
   - mvn -v
 install:
   - echo "Building with fork!"
-  - mvn clean install -DskipTests -Perror-prone-fork
+  - mvn clean install -DskipTests -Perror-prone-fork -s settings.xml
