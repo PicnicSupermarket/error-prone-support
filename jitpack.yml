@@ -3,3 +3,6 @@ jdk:
 before_install:
   - sdk install maven 3.8.7
   - mvn -v
+install:
+  - echo "Building with fork!"
+  - mvn clean install -DskipTests -Perror-prone-fork

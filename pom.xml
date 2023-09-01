@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>1.12.2-SNAPSHOT</version>
+    <version>0.13.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -200,7 +200,7 @@
         <version.auto-service>1.1.1</version.auto-service>
         <version.auto-value>1.10.2</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
-        <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
+        <version.error-prone-fork>gdejong~refaster-tree-tweaks-v2.3.4-g09ec60b-2072</version.error-prone-fork>
         <version.error-prone-orig>2.21.1</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.20</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
