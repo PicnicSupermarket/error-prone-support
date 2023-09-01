@@ -100,6 +100,20 @@ final class OptionalRules {
     }
   }
 
+  /** Prefer {@link Optional#equals(Object)} over more contrived alternatives. */
+  static final class OptionalEqualsOptional<T, S> {
+    @BeforeTemplate
+    boolean before(Optional<T> optional, S value) {
+      return Refaster.anyOf(
+          optional.filter(value::equals).isPresent(), optional.stream().anyMatch(value::equals));
+    }
+
+    @AfterTemplate
+    boolean after(Optional<T> optional, S value) {
+      return optional.equals(Optional.of(value));
+    }
+  }
+
   /**
    * Don't use the ternary operator to extract the first element of a possibly-empty {@link
    * Iterator} as an {@link Optional}.
@@ -350,13 +364,14 @@ final class OptionalRules {
     Optional<T> before(Optional<T> optional1, Optional<T> optional2) {
       // XXX: Note that rewriting the first and third variant will change the code's behavior if
       // `optional2` has side-effects.
-      // XXX: Note that rewriting the first and third variant will introduce a compilation error if
-      // `optional2` is not effectively final. Review whether a `@Matcher` can be used to avoid
-      // this.
+      // XXX: Note that rewriting the first, third and fourth variant will introduce a compilation
+      // error if `optional2` is not effectively final. Review whether a `@Matcher` can be used to
+      // avoid this.
       return Refaster.anyOf(
           optional1.map(Optional::of).orElse(optional2),
           optional1.map(Optional::of).orElseGet(() -> optional2),
-          Stream.of(optional1, optional2).flatMap(Optional::stream).findFirst());
+          Stream.of(optional1, optional2).flatMap(Optional::stream).findFirst(),
+          optional1.isPresent() ? optional1 : optional2);
     }
 
     @AfterTemplate
@@ -422,12 +437,22 @@ final class OptionalRules {
     }
   }
 
-  // XXX: Add a rule for:
-  // `optional.flatMap(x -> pred(x) ? Optional.empty() : Optional.of(x))` and variants.
-  // (Maybe canonicalize the inner expression. Maybe we rewrite already.)
+  /** Prefer {@link Optional#stream()} over more contrived alternatives. */
+  static final class OptionalStream<T> {
+    @BeforeTemplate
+    Stream<T> before(Optional<T> optional) {
+      return Refaster.anyOf(
+          optional.map(Stream::of).orElse(Stream.empty()),
+          optional.map(Stream::of).orElseGet(Stream::empty));
+    }
+
+    @AfterTemplate
+    Stream<T> after(Optional<T> optional) {
+      return optional.stream();
+    }
+  }
 
   // XXX: Add a rule for:
-  // `optional.map(Stream::of).orElse(Stream.empty())`
-  // `optional.map(Stream::of).orElseGet(Stream::empty)`
-  // -> `optional.stream()`
+  // `optional.flatMap(x -> pred(x) ? Optional.empty() : Optional.of(x))` and variants.
+  // (Maybe canonicalize the inner expression. Maybe we rewrite it already.)
 }
