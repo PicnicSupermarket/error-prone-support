@@ -276,26 +276,26 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatWithFailMessageStringIsSameAs {
     @BeforeTemplate
-    void before(Object actual, Object expected, String message) {
+    void before(Object actual, String message, Object expected) {
       assertSame(expected, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected, String message) {
+    void after(Object actual, String message, Object expected) {
       assertThat(actual).withFailMessage(message).isSameAs(expected);
     }
   }
 
   static final class AssertThatWithFailMessageSupplierIsSameAs {
     @BeforeTemplate
-    void before(Object actual, Object expected, Supplier<String> supplier) {
+    void before(Object actual, Supplier<String> supplier, Object expected) {
       assertSame(expected, actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected, Supplier<String> supplier) {
+    void after(Object actual, Supplier<String> supplier, Object expected) {
       assertThat(actual).withFailMessage(supplier).isSameAs(expected);
     }
   }
@@ -315,26 +315,26 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatWithFailMessageStringIsNotSameAs {
     @BeforeTemplate
-    void before(Object actual, Object expected, String message) {
+    void before(Object actual, String message, Object expected) {
       assertNotSame(expected, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected, String message) {
+    void after(Object actual, String message, Object expected) {
       assertThat(actual).withFailMessage(message).isNotSameAs(expected);
     }
   }
 
   static final class AssertThatWithFailMessageSupplierIsNotSameAs {
     @BeforeTemplate
-    void before(Object actual, Object expected, Supplier<String> supplier) {
+    void before(Object actual, Supplier<String> supplier, Object expected) {
       assertNotSame(expected, actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected, Supplier<String> supplier) {
+    void after(Object actual, Supplier<String> supplier, Object expected) {
       assertThat(actual).withFailMessage(supplier).isNotSameAs(expected);
     }
   }
@@ -355,13 +355,13 @@ final class JUnitToAssertJRules {
   static final class AssertThatThrownByWithFailMessageStringIsExactlyInstanceOf<
       T extends Throwable> {
     @BeforeTemplate
-    void before(Executable throwingCallable, Class<T> clazz, String message) {
+    void before(Executable throwingCallable, String message, Class<T> clazz) {
       assertThrowsExactly(clazz, throwingCallable, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable throwingCallable, Class<T> clazz, String message) {
+    void after(ThrowingCallable throwingCallable, String message, Class<T> clazz) {
       assertThatThrownBy(throwingCallable).withFailMessage(message).isExactlyInstanceOf(clazz);
     }
   }
@@ -369,13 +369,13 @@ final class JUnitToAssertJRules {
   static final class AssertThatThrownByWithFailMessageSupplierIsExactlyInstanceOf<
       T extends Throwable> {
     @BeforeTemplate
-    void before(Executable throwingCallable, Class<T> clazz, Supplier<String> supplier) {
+    void before(Executable throwingCallable, Supplier<String> supplier, Class<T> clazz) {
       assertThrowsExactly(clazz, throwingCallable, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable throwingCallable, Class<T> clazz, Supplier<String> supplier) {
+    void after(ThrowingCallable throwingCallable, Supplier<String> supplier, Class<T> clazz) {
       assertThatThrownBy(throwingCallable).withFailMessage(supplier).isExactlyInstanceOf(clazz);
     }
   }
@@ -395,26 +395,26 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatThrownByWithFailMessageStringIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
-    void before(Executable throwingCallable, Class<T> clazz, String message) {
+    void before(Executable throwingCallable, String message, Class<T> clazz) {
       assertThrows(clazz, throwingCallable, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable throwingCallable, Class<T> clazz, String message) {
+    void after(ThrowingCallable throwingCallable, String message, Class<T> clazz) {
       assertThatThrownBy(throwingCallable).withFailMessage(message).isInstanceOf(clazz);
     }
   }
 
   static final class AssertThatThrownByWithFailMessageSupplierIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
-    void before(Executable throwingCallable, Class<T> clazz, Supplier<String> supplier) {
+    void before(Executable throwingCallable, Supplier<String> supplier, Class<T> clazz) {
       assertThrows(clazz, throwingCallable, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable throwingCallable, Class<T> clazz, Supplier<String> supplier) {
+    void after(ThrowingCallable throwingCallable, Supplier<String> supplier, Class<T> clazz) {
       assertThatThrownBy(throwingCallable).withFailMessage(supplier).isInstanceOf(clazz);
     }
   }
@@ -488,26 +488,26 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatWithFailMessageStringIsInstanceOf<T> {
     @BeforeTemplate
-    void before(Object actual, Class<T> clazz, String message) {
+    void before(Object actual, String message, Class<T> clazz) {
       assertInstanceOf(clazz, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Class<T> clazz, String message) {
+    void after(Object actual, String message, Class<T> clazz) {
       assertThat(actual).withFailMessage(message).isInstanceOf(clazz);
     }
   }
 
   static final class AssertThatWithFailMessageSupplierIsInstanceOf<T> {
     @BeforeTemplate
-    void before(Object actual, Class<T> clazz, Supplier<String> supplier) {
+    void before(Object actual, Supplier<String> supplier, Class<T> clazz) {
       assertInstanceOf(clazz, actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Class<T> clazz, Supplier<String> supplier) {
+    void after(Object actual, Supplier<String> supplier, Class<T> clazz) {
       assertThat(actual).withFailMessage(supplier).isInstanceOf(clazz);
     }
   }

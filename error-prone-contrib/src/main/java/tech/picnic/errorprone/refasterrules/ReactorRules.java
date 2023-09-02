@@ -727,7 +727,7 @@ final class ReactorRules {
     abstract S transformation(@MayOptionallyUse T value);
 
     @BeforeTemplate
-    Flux<S> before(Flux<T> flux, boolean delayUntilEnd, int maxConcurrency, int prefetch) {
+    Flux<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int maxConcurrency) {
       return Refaster.anyOf(
           flux.concatMap(x -> Mono.just(transformation(x))),
           flux.concatMap(x -> Flux.just(transformation(x))),
@@ -795,7 +795,7 @@ final class ReactorRules {
 
     @BeforeTemplate
     @SuppressWarnings("java:S138" /* Method is long, but not complex. */)
-    Publisher<S> before(Flux<T> flux, boolean delayUntilEnd, int maxConcurrency, int prefetch) {
+    Publisher<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int maxConcurrency) {
       return Refaster.anyOf(
           flux.concatMap(
               x ->
@@ -1669,7 +1669,7 @@ final class ReactorRules {
   // a `@Matches(DoesNotDropElements.class)` or `@NotMatches(MayDropElements.class)` guard.
   static final class FluxAsStepVerifierExpectNext<T, L extends List<T>> {
     @BeforeTemplate
-    StepVerifier.Step<L> before(Flux<T> flux, Collector<? super T, ?, L> listCollector, T object) {
+    StepVerifier.Step<L> before(Flux<T> flux, T object, Collector<? super T, ?, L> listCollector) {
       return flux.collect(listCollector)
           .as(StepVerifier::create)
           .assertNext(list -> assertThat(list).containsExactly(object));

@@ -159,12 +159,12 @@ final class EqualityRules {
   /** Avoid contrived ways of handling {@code null} values during equality testing. */
   static final class EqualsLhsNullable<T, S> {
     @BeforeTemplate
-    boolean before(T value1, S value2) {
+    boolean before(S value2, T value1) {
       return Optional.ofNullable(value1).equals(Optional.of(value2));
     }
 
     @AfterTemplate
-    boolean after(T value1, S value2) {
+    boolean after(S value2, T value1) {
       return value2.equals(value1);
     }
   }
