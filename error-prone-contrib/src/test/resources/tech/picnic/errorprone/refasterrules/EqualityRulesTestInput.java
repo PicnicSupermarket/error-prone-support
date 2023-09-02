@@ -69,15 +69,14 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return not(v -> v.isEmpty());
   }
 
-  boolean testEqualsLhsNullable() {
-    return Optional.ofNullable("foo").equals(Optional.of("bar"));
+  ImmutableSet<Boolean> testEquals() {
+    return ImmutableSet.of(
+        Optional.of("foo").equals(Optional.of("bar")),
+        Optional.of("baz").equals(Optional.ofNullable("qux")),
+        Optional.ofNullable("quux").equals(Optional.of("quuz")));
   }
 
-  boolean testEqualsRhsNullable() {
-    return Optional.of("foo").equals(Optional.ofNullable("bar"));
-  }
-
-  boolean testEqualsLhsAndRhsNullable() {
+  boolean testObjectsEquals() {
     return Optional.ofNullable("foo").equals(Optional.ofNullable("bar"));
   }
 }

@@ -60,6 +60,9 @@ public final class RefasterParameterOrder extends BugChecker implements ClassTre
   private static final Matcher<Tree> BEFORE_OR_AFTER_TEMPLATE_METHOD =
       anyOf(BEFORE_TEMPLATE_METHOD, hasAnnotation(AfterTemplate.class));
 
+  /** Instantiates a new {@link RefasterParameterOrder} instance. */
+  public RefasterParameterOrder() {}
+
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
     ImmutableList<MethodTree> methods = getMethodsByPriority(tree, state);
