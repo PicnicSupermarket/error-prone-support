@@ -5,10 +5,10 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class RefasterParameterOrderTest {
+final class RefasterMethodParameterOrderTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(RefasterParameterOrder.class, getClass())
+    CompilationTestHelper.newInstance(RefasterMethodParameterOrder.class, getClass())
         .addSourceLines(
             "A.java",
             "import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;",
@@ -45,7 +45,7 @@ final class RefasterParameterOrderTest {
 
   @Test
   void replacement() {
-    BugCheckerRefactoringTestHelper.newInstance(RefasterParameterOrder.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(RefasterMethodParameterOrder.class, getClass())
         .addInputLines(
             "A.java",
             "import com.google.errorprone.refaster.annotation.AfterTemplate;",

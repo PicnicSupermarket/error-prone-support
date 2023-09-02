@@ -50,18 +50,18 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Refaster template parameters should be listed in a canonical order",
-    link = BUG_PATTERNS_BASE_URL + "RefasterParameterOrder",
+    link = BUG_PATTERNS_BASE_URL + "RefasterMethodParameterOrder",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)
-public final class RefasterParameterOrder extends BugChecker implements ClassTreeMatcher {
+public final class RefasterMethodParameterOrder extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> BEFORE_TEMPLATE_METHOD = hasAnnotation(BeforeTemplate.class);
   private static final Matcher<Tree> BEFORE_OR_AFTER_TEMPLATE_METHOD =
       anyOf(BEFORE_TEMPLATE_METHOD, hasAnnotation(AfterTemplate.class));
 
-  /** Instantiates a new {@link RefasterParameterOrder} instance. */
-  public RefasterParameterOrder() {}
+  /** Instantiates a new {@link RefasterMethodParameterOrder} instance. */
+  public RefasterMethodParameterOrder() {}
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
