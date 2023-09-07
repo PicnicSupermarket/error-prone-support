@@ -227,6 +227,7 @@ final class DirectReturnTest {
   @Test
   void ignoreClassesAnnotatedWithLombokData() {
     CompilationTestHelper.newInstance(DirectReturn.class, getClass())
+        .setArgs("-processor", "lombok.launch.AnnotationProcessorHider$AnnotationProcessor")
         .addSourceLines(
             "A.java",
             "import lombok.Data;",
