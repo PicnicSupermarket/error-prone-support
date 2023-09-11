@@ -323,11 +323,6 @@
                 <artifactId>nopen-checker</artifactId>
                 <version>${version.nopen-checker}</version>
             </dependency>
-            <dependency>
-                <groupId>com.newrelic.agent.java</groupId>
-                <artifactId>newrelic-api</artifactId>
-                <version>8.6.0</version>
-            </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
@@ -728,7 +723,6 @@
                                         <property name="illegalPkgs" value="com.google.common.cache">
                                             <!-- Instead, please use Caffeine. -->
                                         </property>
-                                        <property name="illegalPkgs" value="com.newrelic.agent.deps" />
                                         <property name="illegalPkgs" value="com.tngtech.archunit.thirdparty" />
                                         <property name="illegalPkgs" value="jdk" />
                                         <property name="illegalPkgs" value="jersey.repackaged" />
