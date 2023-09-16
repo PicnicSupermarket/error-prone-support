@@ -5,6 +5,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern;
+import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
@@ -20,6 +21,31 @@ import javax.lang.model.element.Name;
 import org.junit.jupiter.api.Test;
 
 final class SourceCodeTest {
+  @Test
+  void isLikelyAccurateSourceAvailable() {
+    CompilationTestHelper.newInstance(IsLikelyAccurateSourceAvailableTestChecker.class, getClass())
+        .setArgs("-processor", "lombok.launch.AnnotationProcessorHider$AnnotationProcessor")
+        .addSourceLines(
+            "A.java",
+            "import lombok.Data;",
+            "import com.fasterxml.jackson.annotation.JsonProperty;",
+            "",
+            "class A {",
+            "class WithoutLombok {",
+            "  // BUG: Diagnostic contains:",
+            "  @JsonProperty(\"custom_field_name\")",
+            "  private String field;",
+            "}",
+            "",
+            "@Data",
+            "class WithLombok {",
+            "  // BUG: Diagnostic contains:",
+            "  @JsonProperty(\"custom_field_name\")",
+            "  private String field;",
+            "}}")
+        .doTest();
+  }
+
   @Test
   void deleteWithTrailingWhitespaceAnnotations() {
     BugCheckerRefactoringTestHelper.newInstance(
@@ -226,6 +252,25 @@ final class SourceCodeTest {
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
+  }
+
+  /**
+   * A {@link BugChecker} that uses {@link SourceCode#isLikelyAccurateSourceAvailable(VisitorState)}
+   * to flag annotations, fields and types for which accurate source code does not appear to be
+   * available.
+   */
+  // XXX: Update set of matches Tree types.
+  @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
+  public static final class IsLikelyAccurateSourceAvailableTestChecker extends BugChecker
+      implements AnnotationTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
+      return SourceCode.isLikelyAccurateSourceAvailable(state)
+          ? Description.NO_MATCH
+          : describeMatch(tree);
+    }
   }
 
   /**

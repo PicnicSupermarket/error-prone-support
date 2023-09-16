@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.joining;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.VisitorState;
@@ -14,9 +15,12 @@ import com.google.errorprone.util.ErrorProneToken;
 import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.util.TreePath;
 import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import com.sun.tools.javac.util.Position;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * A collection of Error Prone utility methods for dealing with the source code representation of
@@ -27,6 +31,15 @@ public final class SourceCode {
   private static final CharMatcher NON_WHITESPACE_MATCHER = CharMatcher.whitespace().negate();
 
   private SourceCode() {}
+
+  // XXX: Explain.
+  public static boolean isLikelyAccurateSourceAvailable(VisitorState state) {
+    return !Strings.isNullOrEmpty(
+        Stream.iterate(state.getPath(), Objects::nonNull, TreePath::getParentPath)
+            .map(p -> state.getSourceForNode(p.getLeaf()))
+//            .filter(Objects::nonNull)
+            .reduce("", (prev, next) -> prev != null && next.contains(prev) ? next : null));
+  }
 
   /**
    * Returns a string representation of the given {@link Tree}, preferring the original source code
