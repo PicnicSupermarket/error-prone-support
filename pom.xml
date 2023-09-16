@@ -1983,6 +1983,7 @@
                                     readable than the alternative. -->
                                     -Xep:YodaCondition:OFF
                                     -XepOpt:CheckReturnValue:CheckAllConstructors=true
+                                    -XepOpt:CanonicalConstantFieldName:ExcludedConstantFliedNames=serialVersionUID
                                     <!-- XXX: Enable once there are fewer
                                     false-positives.
                                     -XepOpt:CheckReturnValue:CheckAllMethods=true -->
