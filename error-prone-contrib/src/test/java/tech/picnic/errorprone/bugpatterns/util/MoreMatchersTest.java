@@ -11,40 +11,16 @@ import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
-import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.suppliers.Supplier;
 import com.sun.source.tree.AnnotationTree;
-import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import org.junit.jupiter.api.Test;
 
 final class MoreMatchersTest {
-  @Test
-  void hasLombokDataAnnotation() {
-    CompilationTestHelper.newInstance(HasLombokDataTestChecker.class, getClass())
-        .addSourceLines(
-            "A.java",
-            "import lombok.Data;",
-            "",
-            "@Data",
-            "// BUG: Diagnostic contains:",
-            "public class A {",
-            "  private String field;",
-            "",
-            "  static class B {}",
-            "",
-            "  @Data",
-            "  // BUG: Diagnostic contains:",
-            "  static class C {}",
-            "}")
-        .addSourceLines("D.java", "public class D {}")
-        .doTest();
-  }
-
   @Test
   void hasMetaAnnotation() {
     CompilationTestHelper.newInstance(HasMetaAnnotationTestChecker.class, getClass())
@@ -126,19 +102,6 @@ final class MoreMatchersTest {
             "  }",
             "}")
         .doTest();
-  }
-
-  /** A {@link BugChecker} that delegates to {@link MoreMatchers#HAS_LOMBOK_DATA}. */
-  @BugPattern(summary = "Interacts with `MoreMatchers` for testing purposes", severity = ERROR)
-  public static final class HasLombokDataTestChecker extends BugChecker
-      implements ClassTreeMatcher {
-    private static final long serialVersionUID = 1L;
-    private static final Matcher<ClassTree> DELEGATE = MoreMatchers.HAS_LOMBOK_DATA;
-
-    @Override
-    public Description matchClass(ClassTree tree, VisitorState state) {
-      return DELEGATE.matches(tree, state) ? describeMatch(tree) : Description.NO_MATCH;
-    }
   }
 
   /** A {@link BugChecker} that delegates to {@link MoreMatchers#hasMetaAnnotation(String)}. */

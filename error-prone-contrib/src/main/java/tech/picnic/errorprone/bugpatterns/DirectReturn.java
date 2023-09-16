@@ -12,7 +12,6 @@ import static com.google.errorprone.matchers.Matchers.returnStatement;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.bugpatterns.util.MoreMatchers.HAS_LOMBOK_DATA;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Streams;
@@ -26,7 +25,6 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BlockTree;
-import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
@@ -69,8 +67,7 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
   @Override
   public Description matchBlock(BlockTree tree, VisitorState state) {
     List<? extends StatementTree> statements = tree.getStatements();
-    ClassTree enclosingClass = ASTHelpers.findEnclosingNode(state.getPath(), ClassTree.class);
-    if (statements.size() < 2 || HAS_LOMBOK_DATA.matches(enclosingClass, state)) {
+    if (statements.size() < 2) {
       return Description.NO_MATCH;
     }
 
