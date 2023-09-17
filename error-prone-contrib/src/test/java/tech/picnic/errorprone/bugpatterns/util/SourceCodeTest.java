@@ -9,16 +9,27 @@ import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.util.TreePath;
+import com.sun.source.util.TreeScanner;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.lang.model.element.Name;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 final class SourceCodeTest {
   @Test
@@ -27,22 +38,23 @@ final class SourceCodeTest {
         .setArgs("-processor", "lombok.launch.AnnotationProcessorHider$AnnotationProcessor")
         .addSourceLines(
             "A.java",
-            "import lombok.Data;",
             "import com.fasterxml.jackson.annotation.JsonProperty;",
+            "import lombok.Data;",
             "",
             "class A {",
-            "class WithoutLombok {",
-            "  // BUG: Diagnostic contains:",
-            "  @JsonProperty(\"custom_field_name\")",
-            "  private String field;",
-            "}",
+                        "  class WithoutLombok {",
+                        "    @JsonProperty(\"custom_field_name\")",
+                        "    private String field;",
+                        "  }",
             "",
-            "@Data",
-            "class WithLombok {",
             "  // BUG: Diagnostic contains:",
-            "  @JsonProperty(\"custom_field_name\")",
-            "  private String field;",
-            "}}")
+            "  @Data",
+            "  class WithLombok {",
+            "    // BUG: Diagnostic contains:",
+            "    @JsonProperty(\"custom_field_name\")",
+            "    private String field2;",
+            "  }",
+            "}")
         .doTest();
   }
 
@@ -256,20 +268,44 @@ final class SourceCodeTest {
 
   /**
    * A {@link BugChecker} that uses {@link SourceCode#isLikelyAccurateSourceAvailable(VisitorState)}
-   * to flag annotations, fields and types for which accurate source code does not appear to be
-   * available.
+   * to flag AST nodes for which accurate source code does not appear to be available.
    */
-  // XXX: Update set of matches Tree types.
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
   public static final class IsLikelyAccurateSourceAvailableTestChecker extends BugChecker
-      implements AnnotationTreeMatcher {
+      implements CompilationUnitTreeMatcher {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
-      return SourceCode.isLikelyAccurateSourceAvailable(state)
-          ? Description.NO_MATCH
-          : describeMatch(tree);
+    public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
+      Deque<Boolean> seenAccurateSource = new ArrayDeque<>();
+      Set<Tree> maximalAccurateSubtrees = new LinkedHashSet<>();
+      new TreeScanner<@Nullable Void, TreePath>() {
+        @Override
+        public @Nullable Void scan(Tree tree, TreePath treePath) {
+          if (tree == null) {
+            return null;
+          }
+
+          TreePath path = new TreePath(treePath, tree);
+          boolean isAccurate = SourceCode.isLikelyAccurateSourceAvailable(state.withPath(path));
+          if (!isAccurate) {
+            assertThat(seenAccurateSource.peek()).isNotIn(Boolean.TRUE);
+          } else if (!Boolean.TRUE.equals(seenAccurateSource.peek())) {
+            maximalAccurateSubtrees.add(tree);
+          }
+
+          seenAccurateSource.push(isAccurate || Boolean.TRUE.equals(seenAccurateSource.peek()));
+          try {
+            return super.scan(tree, path);
+          } finally {
+            seenAccurateSource.pop();
+          }
+        }
+      }.scan(tree, state.getPath());
+
+      maximalAccurateSubtrees.stream().map(state::getSourceForNode).collect(Collectors.toList());
+
+      return Description.NO_MATCH;
     }
   }
 

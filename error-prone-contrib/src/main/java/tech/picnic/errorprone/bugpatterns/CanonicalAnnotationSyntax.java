@@ -51,10 +51,10 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
 
   @Override
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
-//    if (!isSourceAccurateCodeAvailable(tree, state)) {
-//      /* Without the source code there's not much we can do. */
-//      return Description.NO_MATCH;
-//    }
+    //    if (!isSourceAccurateCodeAvailable(tree, state)) {
+    //      /* Without the source code there's not much we can do. */
+    //      return Description.NO_MATCH;
+    //    }
 
     return FIX_FACTORIES.stream()
         .map(op -> op.apply(tree, state))
@@ -65,11 +65,12 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
   }
 
   // XXX: Explain, link to Lombok issue.
-//  private static boolean isSourceAccurateCodeAvailable(AnnotationTree tree, VisitorState state) {
-//    String source = state.getSourceForNode(tree);
-//    String parentSource = state.getSourceForNode(state.getPath().getParentPath().getLeaf());
-//    return source != null && parentSource != null && parentSource.contains(source);
-//  }
+  //  private static boolean isSourceAccurateCodeAvailable(AnnotationTree tree, VisitorState state)
+  // {
+  //    String source = state.getSourceForNode(tree);
+  //    String parentSource = state.getSourceForNode(state.getPath().getParentPath().getLeaf());
+  //    return source != null && parentSource != null && parentSource.contains(source);
+  //  }
 
   private static Optional<Fix> dropRedundantParentheses(AnnotationTree tree, VisitorState state) {
     if (!tree.getArguments().isEmpty()) {

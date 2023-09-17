@@ -283,17 +283,17 @@ final class CanonicalAnnotationSyntaxTest {
         .setArgs("-processor", "lombok.launch.AnnotationProcessorHider$AnnotationProcessor")
         .addSourceLines(
             "A.java",
-            "import lombok.Data;",
             "import com.fasterxml.jackson.annotation.JsonProperty;",
+            "import lombok.Data;",
             "",
             "@Data",
             "class A {",
             "  @JsonProperty(\"custom_field_name\")",
             "  private String field;",
             "",
-            "  // Should be flagged because of the redundant parentheses, but Lombok doesn't properly link the annotation to its source code.",
-            "  @JsonProperty()",
-            "  private String field2;",
+            "  // Should be flagged because of the redundant parentheses, but Lombok doesn't properly link the",
+            "  // annotation to its source code.",
+            "  @JsonProperty() private String field2;",
             "}")
         .doTest();
   }
