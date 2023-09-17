@@ -1,17 +1,19 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static java.util.stream.Collectors.joining;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
+import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
@@ -29,23 +31,24 @@ import java.util.stream.Collectors;
 import javax.lang.model.element.Name;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.Assertions.assertThat;
 
 final class SourceCodeTest {
   @Test
   void isLikelyAccurateSourceAvailable() {
-    CompilationTestHelper.newInstance(IsLikelyAccurateSourceAvailableTestChecker.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(
+            IsLikelyAccurateSourceAvailableTestChecker.class, getClass())
         .setArgs("-processor", "lombok.launch.AnnotationProcessorHider$AnnotationProcessor")
-        .addSourceLines(
+        .allowBreakingChanges()
+        .addInputLines(
             "A.java",
             "import com.fasterxml.jackson.annotation.JsonProperty;",
             "import lombok.Data;",
             "",
             "class A {",
-                        "  class WithoutLombok {",
-                        "    @JsonProperty(\"custom_field_name\")",
-                        "    private String field;",
-                        "  }",
+            "  class WithoutLombok {",
+            "    @JsonProperty(\"custom_field_name\")",
+            "    private String field;",
+            "  }",
             "",
             "  // BUG: Diagnostic contains:",
             "  @Data",
@@ -55,7 +58,34 @@ final class SourceCodeTest {
             "    private String field2;",
             "  }",
             "}")
-        .doTest();
+        .addOutputLines(
+            "A.java",
+            "Maximally accurate subtrees found:",
+            "",
+            "IMPORT tree at position 0:",
+            "import com.fasterxml.jackson.annotation.JsonProperty;",
+            "",
+            "IMPORT tree at position 54:",
+            "import lombok.Data;",
+            "",
+            "MODIFIERS tree at position -1:",
+            "null",
+            "",
+            "METHOD tree at position 75:",
+            "null",
+            "",
+            "CLASS tree at position 87:",
+            "class WithoutLombok {",
+            "    @JsonProperty(\"custom_field_name\")",
+            "    private String field;",
+            "  }",
+            "",
+            "MODIFIERS tree at position 212:",
+            "@Data",
+            "",
+            "IDENTIFIER tree at position 323:",
+            "String")
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
@@ -305,7 +335,16 @@ final class SourceCodeTest {
 
       maximalAccurateSubtrees.stream().map(state::getSourceForNode).collect(Collectors.toList());
 
-      return Description.NO_MATCH;
+      String result =
+          maximalAccurateSubtrees.stream()
+              .map(
+                  t ->
+                      String.format(
+                          "%s tree at position %s:\n%s",
+                          t.getKind(), ASTHelpers.getStartPosition(t), state.getSourceForNode(t)))
+              .collect(joining("\n\n", "Maximally accurate subtrees found:\n\n", ""));
+
+      return describeMatch(tree, SuggestedFix.replace(tree, result));
     }
   }
 

@@ -16,9 +16,12 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ErrorProneToken;
 import com.google.errorprone.util.ErrorProneTokens;
+import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
+import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ModifiersTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
@@ -28,7 +31,7 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import com.sun.tools.javac.util.Position;
 import java.util.Optional;
-import java.util.function.BiPredicate;
+import java.util.function.BiFunction;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -50,35 +53,43 @@ public final class SourceCode {
 
   public static boolean isLikelyAccurateSourceAvailable(VisitorState state) {
     Tree tree = state.getPath().getLeaf();
-    return (state.getSourceForNode(tree) != null || mayBeImplicit(tree))
+    return (state.getSourceForNode(tree) != null || mayBeImplicit(tree, state))
         && isValidAncestorSourceContainment(state)
         && isValidDescendantSourceContainment(state);
   }
 
   public static boolean isValidDescendantSourceContainment(VisitorState state) {
     return !Boolean.FALSE.equals(
-        new TreeScanner<@Nullable Boolean, BiPredicate<Tree, Range<Integer>>>() {
+        new TreeScanner<@Nullable Boolean, BiFunction<Tree, Range<Integer>, VisitorState>>() {
           @Override
           public @Nullable Boolean scan(
-              Tree tree, BiPredicate<Tree, Range<Integer>> parentConstraint) {
+             @Nullable Tree tree, BiFunction<Tree, Range<Integer>, VisitorState> parentConstraint) {
             if (tree == null) {
               return Boolean.TRUE;
             }
 
             Range<Integer> sourceRange = getSourceRange(tree, state);
-            if (!parentConstraint.test(tree, sourceRange)) {
+            VisitorState localState = parentConstraint.apply(tree, sourceRange);
+            if (localState == null) {
               return Boolean.FALSE;
             }
 
             return super.scan(
-                tree, (child, range) -> isValidSourceContainment(tree, sourceRange, child, range));
+                tree,
+                (child, range) -> {
+                  VisitorState childState =
+                      localState.withPath(new TreePath(localState.getPath(), child));
+                  return isValidSourceContainment(tree, sourceRange, child, range, childState)
+                      ? childState
+                      : null;
+                });
           }
 
           @Override
           public @Nullable Boolean reduce(@Nullable Boolean a, @Nullable Boolean b) {
             return !(Boolean.FALSE.equals(a) || Boolean.FALSE.equals(b));
           }
-        }.scan(state.getPath().getLeaf(), (tree, range) -> true));
+        }.scan(state.getPath().getLeaf(), (tree, range) -> state));
   }
 
   private static boolean isValidAncestorSourceContainment(VisitorState state) {
@@ -94,7 +105,8 @@ public final class SourceCode {
           parentPath.getLeaf(),
           getSourceRange(parentPath.getLeaf(), state),
           node,
-          getSourceRange(node, state))) {
+          getSourceRange(node, state),
+          state.withPath(path))) {
         return false;
       }
     }
@@ -106,13 +118,14 @@ public final class SourceCode {
       Tree enclosingTree,
       @Nullable Range<Integer> enclosingSourceRange,
       Tree tree,
-      @Nullable Range<Integer> sourceRange) {
+      @Nullable Range<Integer> sourceRange,
+      VisitorState state) {
     if (enclosingSourceRange == null) {
-      return sourceRange == null || mayBeImplicit(enclosingTree);
+      return sourceRange == null || mayBeImplicit(enclosingTree, state);
     }
 
     if (sourceRange == null) {
-      return mayBeImplicit(tree);
+      return mayBeImplicit(tree, state);
     }
 
     return enclosingSourceRange.encloses(sourceRange)
@@ -120,21 +133,47 @@ public final class SourceCode {
             || !enclosingSourceRange.equals(sourceRange));
   }
 
-  private static boolean mayBeImplicit(Tree tree) {
+  private static boolean mayBeImplicit(Tree tree, VisitorState state) {
     if (tree instanceof ModifiersTree) {
       ModifiersTree modifiers = (ModifiersTree) tree;
       return modifiers.getAnnotations().isEmpty() && modifiers.getFlags().isEmpty();
     }
 
-    // XXX: Any node inside a generated constructor is implicit.
+    if (ASTHelpers.isGeneratedConstructor(state.findEnclosing(MethodTree.class))) {
+      return true;
+    }
 
-    // XXX: Only inside single-arg annotations should we be okay with implicit `value` identifiers.
-    Symbol symbol =
-        tree instanceof AssignmentTree
-            ? ASTHelpers.getSymbol(((AssignmentTree) tree).getVariable())
-            : tree instanceof IdentifierTree ? ASTHelpers.getSymbol(tree) : null;
+    AnnotationTree annotation = state.findEnclosing(AnnotationTree.class);
+    if (annotation != null && annotation.getArguments().size() == 1) {
+      Symbol symbol =
+          tree instanceof AssignmentTree
+              ? ASTHelpers.getSymbol(((AssignmentTree) tree).getVariable())
+              : tree instanceof IdentifierTree ? ASTHelpers.getSymbol(tree) : null;
 
-    return symbol != null && symbol.kind == Kinds.Kind.MTH && symbol.name.contentEquals("value");
+      /* The `value` attribute may be omitted from single-argument annotation declarations. */
+      return symbol != null && symbol.kind == Kinds.Kind.MTH && symbol.name.contentEquals("value");
+    }
+
+    if (isSuperInvocation(tree)
+        || (tree instanceof IdentifierTree
+            && isSuperInvocation(state.getPath().getParentPath().getLeaf()))) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private static boolean isSuperInvocation(Tree tree) {
+    if (tree instanceof ExpressionStatementTree) {
+      return isSuperInvocation(((ExpressionStatementTree) tree).getExpression());
+    }
+
+    if (!(tree instanceof MethodInvocationTree)) {
+      return false;
+    }
+
+    MethodInvocationTree invocation = (MethodInvocationTree) tree;
+    return invocation.getArguments().isEmpty() && ASTHelpers.isSuper(invocation.getMethodSelect());
   }
 
   private static @Nullable Range<Integer> getSourceRange(Tree tree, VisitorState state) {
