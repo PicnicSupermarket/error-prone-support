@@ -111,8 +111,8 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
     }
 
     ExpressionTree expr = AnnotationMatcherUtils.getArgument(tree, "value");
-    if (expr == null || !SourceCode.isLikelyAccurateSourceAvailable(state)) {
-      /* This is not an explicit assignment to the `value` attribute. */
+    if (expr == null || !SourceCode.isAccurateSourceLikelyAvailable(state)) {
+      /* This is (probably) not an explicit assignment to the `value` attribute. */
       return Optional.empty();
     }
 

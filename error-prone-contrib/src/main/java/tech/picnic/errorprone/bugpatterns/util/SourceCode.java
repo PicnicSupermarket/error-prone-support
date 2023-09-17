@@ -51,9 +51,9 @@ public final class SourceCode {
 
   private SourceCode() {}
 
-  public static boolean isLikelyAccurateSourceAvailable(VisitorState state) {
+  public static boolean isAccurateSourceLikelyAvailable(VisitorState state) {
     Tree tree = state.getPath().getLeaf();
-    return (state.getSourceForNode(tree) != null || mayBeImplicit(tree, state))
+    return (getSourceRange(tree, state) != null || mayBeImplicit(tree, state))
         && isValidAncestorSourceContainment(state)
         && isValidDescendantSourceContainment(state);
   }
@@ -63,7 +63,8 @@ public final class SourceCode {
         new TreeScanner<@Nullable Boolean, BiFunction<Tree, Range<Integer>, VisitorState>>() {
           @Override
           public @Nullable Boolean scan(
-             @Nullable Tree tree, BiFunction<Tree, Range<Integer>, VisitorState> parentConstraint) {
+              @Nullable Tree tree,
+              BiFunction<Tree, Range<Integer>, VisitorState> parentConstraint) {
             if (tree == null) {
               return Boolean.TRUE;
             }

@@ -27,16 +27,15 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.lang.model.element.Name;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 final class SourceCodeTest {
   @Test
-  void isLikelyAccurateSourceAvailable() {
+  void isAccurateSourceLikelyAvailable() {
     BugCheckerRefactoringTestHelper.newInstance(
-            IsLikelyAccurateSourceAvailableTestChecker.class, getClass())
+            IsAccurateSourceLikelyAvailableTestChecker.class, getClass())
         .setArgs("-processor", "lombok.launch.AnnotationProcessorHider$AnnotationProcessor")
         .allowBreakingChanges()
         .addInputLines(
@@ -55,7 +54,7 @@ final class SourceCodeTest {
             "  class WithLombok {",
             "    // BUG: Diagnostic contains:",
             "    @JsonProperty(\"custom_field_name\")",
-            "    private String field2;",
+            "    private String field;",
             "  }",
             "}")
         .addOutputLines(
@@ -297,11 +296,11 @@ final class SourceCodeTest {
   }
 
   /**
-   * A {@link BugChecker} that uses {@link SourceCode#isLikelyAccurateSourceAvailable(VisitorState)}
+   * A {@link BugChecker} that uses {@link SourceCode#isAccurateSourceLikelyAvailable(VisitorState)}
    * to flag AST nodes for which accurate source code does not appear to be available.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
-  public static final class IsLikelyAccurateSourceAvailableTestChecker extends BugChecker
+  public static final class IsAccurateSourceLikelyAvailableTestChecker extends BugChecker
       implements CompilationUnitTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -311,31 +310,29 @@ final class SourceCodeTest {
       Set<Tree> maximalAccurateSubtrees = new LinkedHashSet<>();
       new TreeScanner<@Nullable Void, TreePath>() {
         @Override
-        public @Nullable Void scan(Tree tree, TreePath treePath) {
-          if (tree == null) {
+        public @Nullable Void scan(Tree node, TreePath treePath) {
+          if (node == null) {
             return null;
           }
 
-          TreePath path = new TreePath(treePath, tree);
-          boolean isAccurate = SourceCode.isLikelyAccurateSourceAvailable(state.withPath(path));
+          TreePath path = new TreePath(treePath, node);
+          boolean isAccurate = SourceCode.isAccurateSourceLikelyAvailable(state.withPath(path));
           if (!isAccurate) {
             assertThat(seenAccurateSource.peek()).isNotIn(Boolean.TRUE);
           } else if (!Boolean.TRUE.equals(seenAccurateSource.peek())) {
-            maximalAccurateSubtrees.add(tree);
+            maximalAccurateSubtrees.add(node);
           }
 
-          seenAccurateSource.push(isAccurate || Boolean.TRUE.equals(seenAccurateSource.peek()));
+          seenAccurateSource.push(isAccurate);
           try {
-            return super.scan(tree, path);
+            return super.scan(node, path);
           } finally {
             seenAccurateSource.pop();
           }
         }
       }.scan(tree, state.getPath());
 
-      maximalAccurateSubtrees.stream().map(state::getSourceForNode).collect(Collectors.toList());
-
-      String result =
+      String accurateSubtrees =
           maximalAccurateSubtrees.stream()
               .map(
                   t ->
@@ -344,7 +341,7 @@ final class SourceCodeTest {
                           t.getKind(), ASTHelpers.getStartPosition(t), state.getSourceForNode(t)))
               .collect(joining("\n\n", "Maximally accurate subtrees found:\n\n", ""));
 
-      return describeMatch(tree, SuggestedFix.replace(tree, result));
+      return describeMatch(tree, SuggestedFix.replace(tree, accurateSubtrees));
     }
   }
 
