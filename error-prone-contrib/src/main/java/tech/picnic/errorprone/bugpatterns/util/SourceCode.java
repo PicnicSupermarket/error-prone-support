@@ -137,6 +137,7 @@ public final class SourceCode {
             && symbol.name.contentEquals("value");
       }
 
+      // XXX: Many branches aren't covered yet.
       return isSuperInvocation(tree)
           || (tree instanceof IdentifierTree
               && isSuperInvocation(state.getPath().getParentPath().getLeaf()));
