@@ -31,7 +31,7 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import com.sun.tools.javac.util.Position;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -52,35 +52,32 @@ public final class SourceCode {
   private SourceCode() {}
 
   // XXX: Cache data in `VisitorState.config`.
+  // XXX: IIUC The current tree is checked twice. Deduplicate.
   public static boolean isAccurateSourceLikelyAvailable(VisitorState state) {
     return isValidAncestorSourceContainment(state) && isValidDescendantSourceContainment(state);
   }
 
   public static boolean isValidDescendantSourceContainment(VisitorState state) {
     return !Boolean.FALSE.equals(
-        new TreeScanner<@Nullable Boolean, BiFunction<Tree, Range<Integer>, VisitorState>>() {
+        new TreeScanner<@Nullable Boolean, Function<Tree, VisitorState>>() {
           @Override
           public @Nullable Boolean scan(
-              @Nullable Tree tree,
-              BiFunction<Tree, Range<Integer>, VisitorState> parentConstraint) {
+              @Nullable Tree tree, Function<Tree, VisitorState> parentConstraint) {
             if (tree == null) {
               return Boolean.TRUE;
             }
 
-            Range<Integer> sourceRange = getSourceRange(tree, state);
-            VisitorState localState = parentConstraint.apply(tree, sourceRange);
+            VisitorState localState = parentConstraint.apply(tree);
             if (localState == null) {
               return Boolean.FALSE;
             }
 
             return super.scan(
                 tree,
-                (child, range) -> {
+                child -> {
                   VisitorState childState =
                       localState.withPath(new TreePath(localState.getPath(), child));
-                  return isValidSourceContainment(tree, sourceRange, child, range, childState)
-                      ? childState
-                      : null;
+                  return isValidSourceContainment(tree, child, childState) ? childState : null;
                 });
           }
 
@@ -88,7 +85,7 @@ public final class SourceCode {
           public @Nullable Boolean reduce(@Nullable Boolean a, @Nullable Boolean b) {
             return !(Boolean.FALSE.equals(a) || Boolean.FALSE.equals(b));
           }
-        }.scan(state.getPath().getLeaf(), (tree, range) -> state));
+        }.scan(state.getPath().getLeaf(), tree -> state));
   }
 
   private static boolean isValidAncestorSourceContainment(VisitorState state) {
@@ -100,12 +97,7 @@ public final class SourceCode {
         return getSourceRange(node, state) != null;
       }
 
-      if (!isValidSourceContainment(
-          parentPath.getLeaf(),
-          getSourceRange(parentPath.getLeaf(), state),
-          node,
-          getSourceRange(node, state),
-          state.withPath(path))) {
+      if (!isValidSourceContainment(parentPath.getLeaf(), node, state.withPath(path))) {
         return false;
       }
     }
@@ -114,11 +106,9 @@ public final class SourceCode {
   }
 
   private static boolean isValidSourceContainment(
-      Tree enclosingTree,
-      @Nullable Range<Integer> enclosingSourceRange,
-      Tree tree,
-      @Nullable Range<Integer> sourceRange,
-      VisitorState state) {
+      Tree enclosingTree, Tree tree, VisitorState state) {
+    @Nullable Range<Integer> enclosingSourceRange = getSourceRange(enclosingTree, state);
+    @Nullable Range<Integer> sourceRange = getSourceRange(tree, state);
     if (enclosingSourceRange == null) {
       return sourceRange == null || mayBeImplicit(enclosingTree, state);
     }
