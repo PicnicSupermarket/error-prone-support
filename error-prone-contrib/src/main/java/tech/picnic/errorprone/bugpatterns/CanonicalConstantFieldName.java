@@ -9,6 +9,7 @@ import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
@@ -61,10 +62,12 @@ public final class CanonicalConstantFieldName extends BugChecker implements Vari
   private static final Matcher<Tree> IS_CONSTANT =
       allOf(hasModifier(Modifier.STATIC), hasModifier(Modifier.FINAL));
   private static final Pattern TO_SNAKE_CASE = Pattern.compile("([a-z])([A-Z])");
+  private static final ImmutableSet<String> DEFAULT_EXCLUDED_CONSTANT_FIELD_NAMES =
+      ImmutableSet.of("serialVersionUID");
   private static final String EXCLUDED_CONSTANT_FIELD_NAMES =
       "CanonicalConstantFieldName:ExcludedConstantFliedNames";
 
-  private final ImmutableList<String> excludedConstantFliedNames;
+  private final ImmutableList<String> optionalExcludedConstantFliedNames;
 
   /** Instantiates a default {@link CanonicalConstantFieldName} instance. */
   public CanonicalConstantFieldName() {
@@ -78,7 +81,7 @@ public final class CanonicalConstantFieldName extends BugChecker implements Vari
    */
   @Inject
   CanonicalConstantFieldName(ErrorProneFlags flags) {
-    excludedConstantFliedNames = getCanonicalizedLoggerName(flags);
+    optionalExcludedConstantFliedNames = getCanonicalizedLoggerName(flags);
   }
 
   @Override
@@ -103,7 +106,8 @@ public final class CanonicalConstantFieldName extends BugChecker implements Vari
   }
 
   private boolean isVariableNameExcluded(String variableName) {
-    return excludedConstantFliedNames.contains(variableName);
+    return optionalExcludedConstantFliedNames.contains(variableName)
+        || DEFAULT_EXCLUDED_CONSTANT_FIELD_NAMES.contains(variableName);
   }
 
   private static String toUpperSnakeCase(String variableName) {
