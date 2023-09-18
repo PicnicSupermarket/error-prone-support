@@ -30,8 +30,10 @@ import com.sun.tools.javac.code.Kinds;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import com.sun.tools.javac.util.Position;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -52,61 +54,80 @@ public final class SourceCode {
   private SourceCode() {}
 
   // XXX: Cache data in `VisitorState.config`.
-  // XXX: IIUC The current tree is checked twice. Deduplicate.
   public static boolean isAccurateSourceLikelyAvailable(VisitorState state) {
     return isValidAncestorSourceContainment(state) && isValidDescendantSourceContainment(state);
   }
 
-  public static boolean isValidDescendantSourceContainment(VisitorState state) {
-    return !Boolean.FALSE.equals(
-        new TreeScanner<@Nullable Boolean, Function<Tree, VisitorState>>() {
-          @Override
-          public @Nullable Boolean scan(
-              @Nullable Tree tree, Function<Tree, VisitorState> parentConstraint) {
-            if (tree == null) {
-              return Boolean.TRUE;
+    private static boolean isValidDescendantSourceContainment(VisitorState state) {
+      return !Boolean.FALSE.equals(
+          new TreeScanner<@Nullable Boolean, Function<Tree, VisitorState>>() {
+            @Override
+            public @Nullable Boolean scan(
+                @Nullable Tree tree, Function<Tree, VisitorState> parentConstraint) {
+              if (tree == null) {
+                return Boolean.TRUE;
+              }
+
+              VisitorState localState = parentConstraint.apply(tree);
+              if (localState == null) {
+                return Boolean.FALSE;
+              }
+
+              return super.scan(
+                  tree,
+                  child -> {
+                    VisitorState childState =
+                        localState.withPath(new TreePath(localState.getPath(), child));
+                    return isValidSourceContainment(null, child, childState) ? childState : null;
+                  });
             }
 
-            VisitorState localState = parentConstraint.apply(tree);
-            if (localState == null) {
-              return Boolean.FALSE;
+            @Override
+            public @Nullable Boolean reduce(@Nullable Boolean a, @Nullable Boolean b) {
+              return !(Boolean.FALSE.equals(a) || Boolean.FALSE.equals(b));
             }
-
-            return super.scan(
-                tree,
-                child -> {
-                  VisitorState childState =
-                      localState.withPath(new TreePath(localState.getPath(), child));
-                  return isValidSourceContainment(tree, child, childState) ? childState : null;
-                });
-          }
-
-          @Override
-          public @Nullable Boolean reduce(@Nullable Boolean a, @Nullable Boolean b) {
-            return !(Boolean.FALSE.equals(a) || Boolean.FALSE.equals(b));
-          }
-        }.scan(state.getPath().getLeaf(), tree -> state));
-  }
-
-  private static boolean isValidAncestorSourceContainment(VisitorState state) {
-    for (TreePath path = state.getPath(); path != null; path = path.getParentPath()) {
-      Tree node = path.getLeaf();
-
-      TreePath parentPath = path.getParentPath();
-      if (parentPath == null) {
-        return getSourceRange(node, state) != null;
-      }
-
-      if (!isValidSourceContainment(parentPath.getLeaf(), node, state.withPath(path))) {
-        return false;
-      }
+          }.scan(state.getPath().getLeaf(), tree -> state));
     }
 
-    return true;
+// XXX: Why doesn't this work?
+// XXX: Simplify inner expression.
+//  private static boolean isValidDescendantSourceContainment(VisitorState state) {
+//    return !Boolean.FALSE.equals(
+//        new TreeScanner<@Nullable Boolean, VisitorState>() {
+//          @Override
+//          public @Nullable Boolean scan(@Nullable Tree tree, VisitorState childState) {
+//            if (tree == null) {
+//              return Boolean.TRUE;
+//            }
+//
+//            if (!isValidSourceContainment(null, tree, childState)) {
+//              return Boolean.FALSE;
+//            }
+//
+//            return super.scan(tree, childState.withPath(new TreePath(childState.getPath(), tree)));
+//          }
+//
+//          @Override
+//          public @Nullable Boolean reduce(@Nullable Boolean a, @Nullable Boolean b) {
+//            return !(Boolean.FALSE.equals(a) || Boolean.FALSE.equals(b));
+//          }
+//        }.scan(state.getPath().getLeaf(), state));
+//  }
+
+  private static boolean isValidAncestorSourceContainment(VisitorState state) {
+    return Stream.iterate(state.getPath(), Objects::nonNull, TreePath::getParentPath)
+        .allMatch(path -> isValidSourceContainment(null, path.getLeaf(), state.withPath(path)));
   }
 
+  // XXX: Tree can also be derived.
   private static boolean isValidSourceContainment(
-      Tree enclosingTree, Tree tree, VisitorState state) {
+      Tree enclosingTreeX, Tree tree, VisitorState state) {
+    TreePath parentPath = state.getPath().getParentPath();
+    if (parentPath == null) {
+      return getSourceRange(tree, state) != null;
+    }
+
+    Tree enclosingTree = parentPath.getLeaf();
     @Nullable Range<Integer> enclosingSourceRange = getSourceRange(enclosingTree, state);
     @Nullable Range<Integer> sourceRange = getSourceRange(tree, state);
     if (enclosingSourceRange == null) {
