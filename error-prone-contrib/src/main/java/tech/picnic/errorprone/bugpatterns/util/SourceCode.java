@@ -32,7 +32,7 @@ import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import com.sun.tools.javac.util.Position;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 
@@ -53,145 +53,116 @@ public final class SourceCode {
 
   private SourceCode() {}
 
-  // XXX: Cache data in `VisitorState.config`.
+  // XXX: Document that that the test is relative to the state's current path.
   public static boolean isAccurateSourceLikelyAvailable(VisitorState state) {
-    return isValidAncestorSourceContainment(state) && isValidDescendantSourceContainment(state);
+    return new IsAccurateSourceLikelyAvailable().test(state);
   }
 
-    private static boolean isValidDescendantSourceContainment(VisitorState state) {
-      return !Boolean.FALSE.equals(
-          new TreeScanner<@Nullable Boolean, Function<Tree, VisitorState>>() {
-            @Override
-            public @Nullable Boolean scan(
-                @Nullable Tree tree, Function<Tree, VisitorState> parentConstraint) {
-              if (tree == null) {
-                return Boolean.TRUE;
-              }
-
-              VisitorState localState = parentConstraint.apply(tree);
-              if (localState == null) {
-                return Boolean.FALSE;
-              }
-
-              return super.scan(
-                  tree,
-                  child -> {
-                    VisitorState childState =
-                        localState.withPath(new TreePath(localState.getPath(), child));
-                    return isValidSourceContainment(null, child, childState) ? childState : null;
-                  });
-            }
-
-            @Override
-            public @Nullable Boolean reduce(@Nullable Boolean a, @Nullable Boolean b) {
-              return !(Boolean.FALSE.equals(a) || Boolean.FALSE.equals(b));
-            }
-          }.scan(state.getPath().getLeaf(), tree -> state));
+  // XXX: Move this class down or to a separate file.
+  // XXX: Cache data in `VisitorState.config`.
+  private static final class IsAccurateSourceLikelyAvailable
+      extends TreeScanner<@Nullable Boolean, VisitorState> implements Predicate<VisitorState> {
+    @Override
+    public boolean test(VisitorState state) {
+      return isValidAncestorSourceContainment(state) && isValidDescendantSourceContainment(state);
     }
 
-// XXX: Why doesn't this work?
-// XXX: Simplify inner expression.
-//  private static boolean isValidDescendantSourceContainment(VisitorState state) {
-//    return !Boolean.FALSE.equals(
-//        new TreeScanner<@Nullable Boolean, VisitorState>() {
-//          @Override
-//          public @Nullable Boolean scan(@Nullable Tree tree, VisitorState childState) {
-//            if (tree == null) {
-//              return Boolean.TRUE;
-//            }
-//
-//            if (!isValidSourceContainment(null, tree, childState)) {
-//              return Boolean.FALSE;
-//            }
-//
-//            return super.scan(tree, childState.withPath(new TreePath(childState.getPath(), tree)));
-//          }
-//
-//          @Override
-//          public @Nullable Boolean reduce(@Nullable Boolean a, @Nullable Boolean b) {
-//            return !(Boolean.FALSE.equals(a) || Boolean.FALSE.equals(b));
-//          }
-//        }.scan(state.getPath().getLeaf(), state));
-//  }
+    @Override
+    public @Nullable Boolean scan(@Nullable Tree tree, VisitorState parentState) {
+      if (tree == null) {
+        return Boolean.TRUE;
+      }
 
-  private static boolean isValidAncestorSourceContainment(VisitorState state) {
-    return Stream.iterate(state.getPath(), Objects::nonNull, TreePath::getParentPath)
-        .allMatch(path -> isValidSourceContainment(null, path.getLeaf(), state.withPath(path)));
-  }
-
-  // XXX: Tree can also be derived.
-  private static boolean isValidSourceContainment(
-      Tree enclosingTreeX, Tree tree, VisitorState state) {
-    TreePath parentPath = state.getPath().getParentPath();
-    if (parentPath == null) {
-      return getSourceRange(tree, state) != null;
+      VisitorState childState = parentState.withPath(new TreePath(parentState.getPath(), tree));
+      return isValidSourceContainment(childState) ? super.scan(tree, childState) : Boolean.FALSE;
     }
 
-    Tree enclosingTree = parentPath.getLeaf();
-    @Nullable Range<Integer> enclosingSourceRange = getSourceRange(enclosingTree, state);
-    @Nullable Range<Integer> sourceRange = getSourceRange(tree, state);
-    if (enclosingSourceRange == null) {
-      return sourceRange == null || mayBeImplicit(enclosingTree, state);
+    @Override
+    public @Nullable Boolean reduce(@Nullable Boolean a, @Nullable Boolean b) {
+      return !(Boolean.FALSE.equals(a) || Boolean.FALSE.equals(b));
     }
 
-    if (sourceRange == null) {
-      return mayBeImplicit(tree, state);
+    private boolean isValidDescendantSourceContainment(VisitorState state) {
+      return !Boolean.FALSE.equals(super.scan(state.getPath().getLeaf(), state));
     }
 
-    return enclosingSourceRange.encloses(sourceRange)
-        && (TREE_KINDS_WITHOUT_EXPLICIT_SYNTAX.contains(enclosingTree.getKind())
-            || !enclosingSourceRange.equals(sourceRange));
-  }
-
-  private static boolean mayBeImplicit(Tree tree, VisitorState state) {
-    if (tree instanceof ModifiersTree) {
-      ModifiersTree modifiers = (ModifiersTree) tree;
-      return modifiers.getAnnotations().isEmpty() && modifiers.getFlags().isEmpty();
+    private static boolean isValidAncestorSourceContainment(VisitorState state) {
+      return Stream.iterate(state.getPath(), Objects::nonNull, TreePath::getParentPath)
+          .allMatch(path -> isValidSourceContainment(state.withPath(path)));
     }
 
-    if (ASTHelpers.isGeneratedConstructor(state.findEnclosing(MethodTree.class))) {
-      return true;
+    private static boolean isValidSourceContainment(VisitorState state) {
+      Tree tree = state.getPath().getLeaf();
+      TreePath parentPath = state.getPath().getParentPath();
+      if (parentPath == null) {
+        return getSourceRange(tree, state) != null;
+      }
+
+      Tree enclosingTree = parentPath.getLeaf();
+      @Nullable Range<Integer> enclosingSourceRange = getSourceRange(enclosingTree, state);
+      @Nullable Range<Integer> sourceRange = getSourceRange(tree, state);
+      if (enclosingSourceRange == null) {
+        return sourceRange == null || mayBeImplicit(enclosingTree, state);
+      }
+
+      if (sourceRange == null) {
+        return mayBeImplicit(tree, state);
+      }
+
+      return enclosingSourceRange.encloses(sourceRange)
+          && (TREE_KINDS_WITHOUT_EXPLICIT_SYNTAX.contains(enclosingTree.getKind())
+              || !enclosingSourceRange.equals(sourceRange));
     }
 
-    AnnotationTree annotation = state.findEnclosing(AnnotationTree.class);
-    if (annotation != null && annotation.getArguments().size() == 1) {
-      Symbol symbol =
-          tree instanceof AssignmentTree
-              ? ASTHelpers.getSymbol(((AssignmentTree) tree).getVariable())
-              : tree instanceof IdentifierTree ? ASTHelpers.getSymbol(tree) : null;
+    private static boolean mayBeImplicit(Tree tree, VisitorState state) {
+      if (tree instanceof ModifiersTree) {
+        ModifiersTree modifiers = (ModifiersTree) tree;
+        return modifiers.getAnnotations().isEmpty() && modifiers.getFlags().isEmpty();
+      }
 
-      /* The `value` attribute may be omitted from single-argument annotation declarations. */
-      return symbol != null && symbol.kind == Kinds.Kind.MTH && symbol.name.contentEquals("value");
+      if (ASTHelpers.isGeneratedConstructor(state.findEnclosing(MethodTree.class))) {
+        return true;
+      }
+
+      AnnotationTree annotation = state.findEnclosing(AnnotationTree.class);
+      if (annotation != null && annotation.getArguments().size() == 1) {
+        Symbol symbol =
+            tree instanceof AssignmentTree
+                ? ASTHelpers.getSymbol(((AssignmentTree) tree).getVariable())
+                : tree instanceof IdentifierTree ? ASTHelpers.getSymbol(tree) : null;
+
+        /* The `value` attribute may be omitted from single-argument annotation declarations. */
+        return symbol != null
+            && symbol.kind == Kinds.Kind.MTH
+            && symbol.name.contentEquals("value");
+      }
+
+      return isSuperInvocation(tree)
+          || (tree instanceof IdentifierTree
+              && isSuperInvocation(state.getPath().getParentPath().getLeaf()));
     }
 
-    if (isSuperInvocation(tree)
-        || (tree instanceof IdentifierTree
-            && isSuperInvocation(state.getPath().getParentPath().getLeaf()))) {
-      return true;
+    private static boolean isSuperInvocation(Tree tree) {
+      if (tree instanceof ExpressionStatementTree) {
+        return isSuperInvocation(((ExpressionStatementTree) tree).getExpression());
+      }
+
+      if (!(tree instanceof MethodInvocationTree)) {
+        return false;
+      }
+
+      MethodInvocationTree invocation = (MethodInvocationTree) tree;
+      return invocation.getArguments().isEmpty()
+          && ASTHelpers.isSuper(invocation.getMethodSelect());
     }
 
-    return false;
-  }
-
-  private static boolean isSuperInvocation(Tree tree) {
-    if (tree instanceof ExpressionStatementTree) {
-      return isSuperInvocation(((ExpressionStatementTree) tree).getExpression());
+    private static @Nullable Range<Integer> getSourceRange(Tree tree, VisitorState state) {
+      int startPosition = ASTHelpers.getStartPosition(tree);
+      int endPosition = state.getEndPosition(tree);
+      return startPosition == Position.NOPOS || endPosition == Position.NOPOS
+          ? null
+          : Range.closedOpen(startPosition, endPosition);
     }
-
-    if (!(tree instanceof MethodInvocationTree)) {
-      return false;
-    }
-
-    MethodInvocationTree invocation = (MethodInvocationTree) tree;
-    return invocation.getArguments().isEmpty() && ASTHelpers.isSuper(invocation.getMethodSelect());
-  }
-
-  private static @Nullable Range<Integer> getSourceRange(Tree tree, VisitorState state) {
-    int startPosition = ASTHelpers.getStartPosition(tree);
-    int endPosition = state.getEndPosition(tree);
-    return startPosition == Position.NOPOS || endPosition == Position.NOPOS
-        ? null
-        : Range.closedOpen(startPosition, endPosition);
   }
 
   /**
