@@ -51,11 +51,9 @@ public final class SourceCode {
 
   private SourceCode() {}
 
+  // XXX: Cache data in `VisitorState.config`.
   public static boolean isAccurateSourceLikelyAvailable(VisitorState state) {
-    Tree tree = state.getPath().getLeaf();
-    return (getSourceRange(tree, state) != null || mayBeImplicit(tree, state))
-        && isValidAncestorSourceContainment(state)
-        && isValidDescendantSourceContainment(state);
+    return isValidAncestorSourceContainment(state) && isValidDescendantSourceContainment(state);
   }
 
   public static boolean isValidDescendantSourceContainment(VisitorState state) {
