@@ -23,6 +23,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import java.util.Locale;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.lang.model.element.Modifier;
 import tech.picnic.errorprone.bugpatterns.util.Flags;
@@ -59,6 +60,7 @@ public final class CanonicalConstantFieldName extends BugChecker implements Vari
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> IS_CONSTANT =
       allOf(hasModifier(Modifier.STATIC), hasModifier(Modifier.FINAL));
+  private static final Pattern TO_SNAKE_CASE = Pattern.compile("([a-z])([A-Z])");
   private static final String EXCLUDED_CONSTANT_FIELD_NAMES =
       "CanonicalConstantFieldName:ExcludedConstantFliedNames";
 
@@ -105,7 +107,7 @@ public final class CanonicalConstantFieldName extends BugChecker implements Vari
   }
 
   private static String toUpperSnakeCase(String variableName) {
-    return variableName.replaceAll("([a-z])([A-Z])", "$1_$2").toUpperCase(Locale.ROOT);
+    return TO_SNAKE_CASE.matcher(variableName).replaceAll("$1_$2").toUpperCase(Locale.ROOT);
   }
 
   private static ImmutableList<String> getCanonicalizedLoggerName(ErrorProneFlags flags) {
