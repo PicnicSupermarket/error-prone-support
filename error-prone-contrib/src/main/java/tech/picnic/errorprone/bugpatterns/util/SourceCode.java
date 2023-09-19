@@ -103,6 +103,10 @@ public final class SourceCode {
       @Nullable Range<Integer> sourceRange = getSourceRange(tree, state);
       if (enclosingSourceRange == null) {
         return sourceRange == null || mayBeImplicit(enclosingTree, state);
+        // XXX: Test code; drop.
+        //        return  sourceRange == null && mayBeImplicit(enclosingTree, state);
+        //        (sourceRange == null || mayBeImplicit(enclosingTree, state)) != (sourceRange ==
+        // null && mayBeImplicit(enclosingTree, state))
       }
 
       if (sourceRange == null) {
@@ -120,12 +124,16 @@ public final class SourceCode {
         return modifiers.getAnnotations().isEmpty() && modifiers.getFlags().isEmpty();
       }
 
+      // XXX: We could even *require* the generated constructor subtree to not have any associated
+      // source.
       if (ASTHelpers.isGeneratedConstructor(state.findEnclosing(MethodTree.class))) {
         return true;
       }
 
       AnnotationTree annotation = state.findEnclosing(AnnotationTree.class);
       if (annotation != null && annotation.getArguments().size() == 1) {
+        // XXX: The `IdentifierTree` check here has no impact because its parent will in practice be
+        // `null`, which prevents `mayBeImplicit` being called review how we can be stricter.
         Symbol symbol =
             tree instanceof AssignmentTree
                 ? ASTHelpers.getSymbol(((AssignmentTree) tree).getVariable())
