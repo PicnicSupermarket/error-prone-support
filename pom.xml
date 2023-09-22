@@ -1739,8 +1739,6 @@
                                     false-positives.
                                     -XepOpt:CheckReturnValue:CheckAllMethods=true -->
                                     -XepOpt:InlineMe:SkipInliningsWithComments=false
-                                    -XepOpt:NamedLikeContextualKeyword:EnableClassNames=true
-                                    -XepOpt:NamedLikeContextualKeyword:EnableMethodNames=true
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
