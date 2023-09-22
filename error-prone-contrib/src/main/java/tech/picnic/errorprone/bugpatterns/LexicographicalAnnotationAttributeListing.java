@@ -220,7 +220,10 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
   private static AnnotationAttributeMatcher createAnnotationAttributeMatcher(
       ErrorProneFlags flags) {
     return AnnotationAttributeMatcher.create(
-        flags.getList(INCLUDED_ANNOTATIONS_FLAG), excludedAnnotations(flags));
+        flags.get(INCLUDED_ANNOTATIONS_FLAG).isPresent()
+            ? Optional.of(flags.getListOrEmpty(INCLUDED_ANNOTATIONS_FLAG))
+            : Optional.empty(),
+        excludedAnnotations(flags));
   }
 
   private static ImmutableList<String> excludedAnnotations(ErrorProneFlags flags) {
