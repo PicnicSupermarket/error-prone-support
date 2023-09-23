@@ -59,6 +59,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class FormatStringConcatenation extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
+
   /**
    * AssertJ exposes varargs {@code fail} methods with a {@link Throwable}-accepting overload, the
    * latter of which should not be flagged.
@@ -68,6 +69,7 @@ public final class FormatStringConcatenation extends BugChecker
           .anyClass()
           .withAnyName()
           .withParameters(String.class.getName(), Throwable.class.getName());
+
   // XXX: Drop some of these methods if we use Refaster to replace some with others.
   private static final Matcher<ExpressionTree> ASSERTJ_FORMAT_METHOD =
       anyOf(

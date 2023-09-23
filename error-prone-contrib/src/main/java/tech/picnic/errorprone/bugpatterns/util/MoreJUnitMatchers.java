@@ -34,6 +34,7 @@ public final class MoreJUnitMatchers {
           anyOf(
               isType("org.junit.jupiter.api.Test"),
               hasMetaAnnotation("org.junit.jupiter.api.TestTemplate")));
+
   /** Matches JUnit Jupiter setup and teardown methods. */
   public static final MultiMatcher<MethodTree, AnnotationTree> SETUP_OR_TEARDOWN_METHOD =
       annotations(
@@ -43,6 +44,7 @@ public final class MoreJUnitMatchers {
               isType("org.junit.jupiter.api.AfterEach"),
               isType("org.junit.jupiter.api.BeforeAll"),
               isType("org.junit.jupiter.api.BeforeEach")));
+
   /**
    * Matches methods that have a {@link org.junit.jupiter.params.provider.MethodSource} annotation.
    */

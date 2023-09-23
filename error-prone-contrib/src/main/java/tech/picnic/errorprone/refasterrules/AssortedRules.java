@@ -103,8 +103,7 @@ final class AssortedRules {
     }
 
     @AfterTemplate
-    @Nullable
-    T after(Iterator<T> iterator, T defaultValue) {
+    @Nullable T after(Iterator<T> iterator, T defaultValue) {
       return Iterators.getNext(iterator, defaultValue);
     }
   }

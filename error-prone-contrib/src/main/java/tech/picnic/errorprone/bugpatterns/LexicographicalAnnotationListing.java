@@ -46,6 +46,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class LexicographicalAnnotationListing extends BugChecker
     implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
+
   /**
    * A comparator that minimally reorders {@link AnnotationType}s, such that declaration annotations
    * are placed before type annotations.

@@ -17,6 +17,7 @@ public final class JavaKeywords {
    */
   private static final ImmutableSet<String> BOOLEAN_AND_NULL_LITERALS =
       ImmutableSet.of("true", "false", "null");
+
   /**
    * List of all reserved keywords in the Java language.
    *
@@ -76,6 +77,7 @@ public final class JavaKeywords {
           "void",
           "volatile",
           "while");
+
   /**
    * List of all contextual keywords in the Java language.
    *
@@ -100,6 +102,7 @@ public final class JavaKeywords {
           "var",
           "with",
           "yield");
+
   /** List of all keywords in the Java language. */
   private static final ImmutableSet<String> ALL_KEYWORDS =
       Sets.union(RESERVED_KEYWORDS, CONTEXTUAL_KEYWORDS).immutableCopy();

@@ -76,6 +76,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
   private static final String FLAG_PREFIX = "LexicographicalAnnotationAttributeListing:";
   private static final String INCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Includes";
   private static final String EXCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Excludes";
+
   /**
    * The splitter applied to string-typed annotation arguments prior to lexicographical sorting. By
    * splitting on {@code =}, strings that represent e.g. inline Spring property declarations are
