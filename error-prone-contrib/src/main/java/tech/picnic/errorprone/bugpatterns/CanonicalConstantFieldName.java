@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
@@ -14,19 +15,22 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.bugpatterns.BugChecker.VariableTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import java.util.Locale;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 import tech.picnic.errorprone.bugpatterns.util.Flags;
 
 /**
@@ -62,7 +66,7 @@ import tech.picnic.errorprone.bugpatterns.util.Flags;
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)
-public final class CanonicalConstantFieldName extends BugChecker implements VariableTreeMatcher {
+public final class CanonicalConstantFieldName extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> IS_CONSTANT =
       allOf(hasModifier(Modifier.STATIC), hasModifier(Modifier.FINAL));
@@ -90,24 +94,63 @@ public final class CanonicalConstantFieldName extends BugChecker implements Vari
   @Inject
   CanonicalConstantFieldName(ErrorProneFlags flags) {
     optionalExcludedConstantFliedNames = getCanonicalizedLoggerName(flags);
-    includePublicConstantFieldNames = getIncludePrivateConstantFieldNames(flags);
+    includePublicConstantFieldNames = isIncludePrivateConstantFieldNames(flags);
   }
 
   @Override
-  public Description matchVariable(VariableTree tree, VisitorState state) {
-    if (!(IS_CONSTANT.matches(tree, state) && isFieldAccessModifierApplicable(tree, state))) {
+  public Description matchClass(ClassTree tree, VisitorState state) {
+    ImmutableList<String> classVariables =
+        tree.getMembers().stream()
+            .filter(member -> member.getKind() == Kind.VARIABLE)
+            .map(VariableTree.class::cast)
+            .map(ASTHelpers::getSymbol)
+            .map(VarSymbol::getSimpleName)
+            .map(Name::toString)
+            .collect(toImmutableList());
+
+    if (classVariables.isEmpty()) {
       return Description.NO_MATCH;
     }
+
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
+    for (Tree member : tree.getMembers()) {
+      if (member.getKind() == Kind.VARIABLE) {
+        VariableTree variableTree = (VariableTree) member;
+        if (!(IS_CONSTANT.matches(variableTree, state)
+            && isFieldAccessModifierApplicable(variableTree, state))) {
+          return Description.NO_MATCH;
+        }
 
-    VarSymbol variableSymbol = ASTHelpers.getSymbol(tree);
-    String variableName = variableSymbol.getSimpleName().toString();
+        VarSymbol variableSymbol = ASTHelpers.getSymbol(variableTree);
+        if (variableSymbol == null) {
+          return Description.NO_MATCH;
+        }
 
-    if (!isVariableUpperSnakeCase(variableName) && !isVariableNameExcluded(variableName)) {
-      fixBuilder.merge(SuggestedFixes.renameVariable(tree, toUpperSnakeCase(variableName), state));
+        String variableName = variableSymbol.getSimpleName().toString();
+        if (!isVariableUpperSnakeCase(variableName) && !isVariableNameExcluded(variableName)) {
+          String replacement = toUpperSnakeCase(variableName);
+
+          if (!classVariables.contains(replacement)) {
+            fixBuilder.merge(SuggestedFixes.renameVariable(variableTree, replacement, state));
+          } else {
+            reportConstantRenameBlocker(variableTree, replacement, state);
+          }
+        }
+      }
     }
 
     return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
+  }
+
+  private void reportConstantRenameBlocker(
+      VariableTree tree, String replacement, VisitorState state) {
+    state.reportMatch(
+        buildDescription(tree)
+            .setMessage(
+                String.format(
+                    "Suggested fix for constant name conflicts with an already defined variable `%s`.",
+                    replacement))
+            .build());
   }
 
   private boolean isFieldAccessModifierApplicable(VariableTree tree, VisitorState state) {
@@ -131,7 +174,7 @@ public final class CanonicalConstantFieldName extends BugChecker implements Vari
     return Flags.getList(flags, EXCLUDED_CONSTANT_FIELD_NAMES);
   }
 
-  private static boolean getIncludePrivateConstantFieldNames(ErrorProneFlags flags) {
+  private static boolean isIncludePrivateConstantFieldNames(ErrorProneFlags flags) {
     return flags.getBoolean(IS_INCLUDE_PUBLIC_CONSTANT_FIELDS).orElse(false);
   }
 }
