@@ -23,6 +23,7 @@ public @interface OnlineDocumentation {
    * the annotated Refaster rule is located.
    */
   String TOP_LEVEL_CLASS_URL_PLACEHOLDER = "${topLevelClassName}";
+
   /**
    * The URL placeholder value that will be replaced with the name of the nested class in which the
    * annotated Refaster rule is located, if applicable.
