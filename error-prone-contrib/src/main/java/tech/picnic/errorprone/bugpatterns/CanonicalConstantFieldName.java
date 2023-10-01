@@ -15,22 +15,24 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
+import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import java.util.Locale;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.Flags;
 
 /**
@@ -66,7 +68,8 @@ import tech.picnic.errorprone.bugpatterns.util.Flags;
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)
-public final class CanonicalConstantFieldName extends BugChecker implements ClassTreeMatcher {
+public final class CanonicalConstantFieldName extends BugChecker
+    implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> IS_CONSTANT =
       allOf(hasModifier(Modifier.STATIC), hasModifier(Modifier.FINAL));
@@ -98,46 +101,51 @@ public final class CanonicalConstantFieldName extends BugChecker implements Clas
   }
 
   @Override
-  public Description matchClass(ClassTree tree, VisitorState state) {
-    ImmutableList<String> classVariables =
-        tree.getMembers().stream()
-            .filter(member -> member.getKind() == Kind.VARIABLE)
-            .map(VariableTree.class::cast)
-            .map(ASTHelpers::getSymbol)
-            .map(VarSymbol::getSimpleName)
-            .map(Name::toString)
-            .collect(toImmutableList());
+  public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
+    ImmutableList.Builder<VariableTree> variablesInCompilationUnitBuilder = ImmutableList.builder();
+    new TreeScanner<@Nullable Void, @Nullable Void>() {
+      @Override
+      public @Nullable Void visitClass(ClassTree classTree, @Nullable Void unused) {
+        for (Tree member : classTree.getMembers()) {
+          if (member.getKind() == Kind.VARIABLE) {
+            variablesInCompilationUnitBuilder.add((VariableTree) member);
+          }
+        }
+        return super.visitClass(classTree, unused);
+      }
+    }.scan(tree, null);
 
-    if (classVariables.isEmpty()) {
+    ImmutableList<VariableTree> variables = variablesInCompilationUnitBuilder.build();
+    if (variables.isEmpty()) {
       return Description.NO_MATCH;
     }
 
+    ImmutableList<VarSymbol> variableSymbols =
+        variables.stream().map(ASTHelpers::getSymbol).collect(toImmutableList());
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
-    for (Tree member : tree.getMembers()) {
-      if (member.getKind() == Kind.VARIABLE) {
-        VariableTree variableTree = (VariableTree) member;
-        if (!(IS_CONSTANT.matches(variableTree, state)
-            && isFieldAccessModifierApplicable(variableTree, state))) {
-          return Description.NO_MATCH;
-        }
+    variables.forEach(
+        variableTree -> {
+          if (IS_CONSTANT.matches(variableTree, state)
+              && isFieldAccessModifierApplicable(variableTree, state)) {
+            VarSymbol variableSymbol = ASTHelpers.getSymbol(variableTree);
 
-        VarSymbol variableSymbol = ASTHelpers.getSymbol(variableTree);
-        if (variableSymbol == null) {
-          return Description.NO_MATCH;
-        }
+            if (variableSymbol != null) {
+              String variableName = variableSymbol.getSimpleName().toString();
 
-        String variableName = variableSymbol.getSimpleName().toString();
-        if (!isVariableUpperSnakeCase(variableName) && !isVariableNameExcluded(variableName)) {
-          String replacement = toUpperSnakeCase(variableName);
+              if (!isVariableUpperSnakeCase(variableName)
+                  && !isVariableNameExcluded(variableName)) {
+                String replacement = toUpperSnakeCase(variableName);
 
-          if (!classVariables.contains(replacement)) {
-            fixBuilder.merge(SuggestedFixes.renameVariable(variableTree, replacement, state));
-          } else {
-            reportConstantRenameBlocker(variableTree, replacement, state);
+                if (variableSymbols.stream()
+                    .noneMatch(s -> s.getSimpleName().toString().equals(replacement))) {
+                  fixBuilder.merge(SuggestedFixes.renameVariable(variableTree, replacement, state));
+                } else {
+                  reportConstantRenameBlocker(variableTree, replacement, state);
+                }
+              }
+            }
           }
-        }
-      }
-    }
+        });
 
     return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
   }
