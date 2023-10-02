@@ -719,6 +719,7 @@
                                             <!-- Instead, please use
                                             `org.jspecify.annotations.Nullable`. -->
                                         </property>
+                                        <property name="illegalPkgs" value="autovalue.shaded" />
                                         <property name="illegalPkgs" value="com.amazonaws.annotation" />
                                         <property name="illegalPkgs" value="com.beust.jcommander.internal" />
                                         <property name="illegalPkgs" value="com.google.api.client.repackaged" />
