@@ -128,20 +128,16 @@ public final class CanonicalConstantFieldName extends BugChecker
           if (IS_CONSTANT.matches(variableTree, state)
               && isFieldAccessModifierApplicable(variableTree, state)) {
             VarSymbol variableSymbol = ASTHelpers.getSymbol(variableTree);
+            String variableName = variableSymbol.getSimpleName().toString();
 
-            if (variableSymbol != null) {
-              String variableName = variableSymbol.getSimpleName().toString();
+            if (!isVariableUpperSnakeCase(variableName) && !isVariableNameExcluded(variableName)) {
+              String replacement = toUpperSnakeCase(variableName);
 
-              if (!isVariableUpperSnakeCase(variableName)
-                  && !isVariableNameExcluded(variableName)) {
-                String replacement = toUpperSnakeCase(variableName);
-
-                if (variableSymbols.stream()
-                    .noneMatch(s -> s.getSimpleName().toString().equals(replacement))) {
-                  fixBuilder.merge(SuggestedFixes.renameVariable(variableTree, replacement, state));
-                } else {
-                  reportConstantRenameBlocker(variableTree, replacement, state);
-                }
+              if (variableSymbols.stream()
+                  .noneMatch(s -> s.getSimpleName().toString().equals(replacement))) {
+                fixBuilder.merge(SuggestedFixes.renameVariable(variableTree, replacement, state));
+              } else {
+                reportConstantRenameBlocker(variableTree, replacement, state);
               }
             }
           }

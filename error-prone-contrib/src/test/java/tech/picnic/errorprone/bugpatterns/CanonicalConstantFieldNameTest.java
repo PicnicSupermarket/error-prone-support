@@ -125,7 +125,7 @@ final class CanonicalConstantFieldNameTest {
   }
 
   @Test
-  void IncludePublicConstants() {
+  void includePublicConstants() {
     BugCheckerRefactoringTestHelper.newInstance(CanonicalConstantFieldName.class, getClass())
         .setArgs("-XepOpt:CanonicalConstantFieldName:IncludePublicConstantFields=true")
         .addInputLines(
