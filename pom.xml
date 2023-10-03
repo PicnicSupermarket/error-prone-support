@@ -326,7 +326,7 @@
             <dependency>
                 <groupId>com.newrelic.agent.java</groupId>
                 <artifactId>newrelic-api</artifactId>
-                <version>8.5.0</version>
+                <version>8.6.0</version>
             </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
