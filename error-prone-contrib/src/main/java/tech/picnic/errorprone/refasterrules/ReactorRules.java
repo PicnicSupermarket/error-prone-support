@@ -1053,6 +1053,40 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Mono#ofType(Class)} over more contrived alternatives. */
+  static final class MonoOfType<T, S> {
+    @BeforeTemplate
+    Mono<S> before(Mono<T> mono) {
+      return mono.filter(
+              Refaster.anyOf(
+                  Refaster.<S>clazz()::isInstance,
+                  x -> Refaster.<S>clazz().isAssignableFrom(x.getClass())))
+          .cast(Refaster.<S>clazz());
+    }
+
+    @AfterTemplate
+    Mono<S> after(Mono<T> mono) {
+      return mono.ofType(Refaster.<S>clazz());
+    }
+  }
+
+  /** Prefer {@link Flux#ofType(Class)} over more contrived alternatives. */
+  static final class FluxOfType<T, S> {
+    @BeforeTemplate
+    Flux<S> before(Flux<T> flux) {
+      return flux.filter(
+              Refaster.anyOf(
+                  Refaster.<S>clazz()::isInstance,
+                  x -> Refaster.<S>clazz().isAssignableFrom(x.getClass())))
+          .cast(Refaster.<S>clazz());
+    }
+
+    @AfterTemplate
+    Flux<S> after(Flux<T> flux) {
+      return flux.ofType(Refaster.<S>clazz());
+    }
+  }
+
   /** Prefer {@link Mono#flatMap(Function)} over more contrived alternatives. */
   static final class MonoFlatMap<S, T> {
     @BeforeTemplate
