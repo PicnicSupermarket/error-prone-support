@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
@@ -180,7 +179,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
 
     for (Description description : matches) {
       String ruleName = extractRefasterRuleName(description);
-      Set<Replacement> replacements =
+      ImmutableSet<Replacement> replacements =
           Iterables.getOnlyElement(description.fixes).getReplacements(endPositions);
       for (Replacement replacement : replacements) {
         ruleMatches.put(replacement.range(), ruleName);

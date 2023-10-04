@@ -16,10 +16,7 @@ public final class Flags {
    *     provided, or if the flag's value is the empty string.
    */
   public static ImmutableList<String> getList(ErrorProneFlags errorProneFlags, String name) {
-    return errorProneFlags
-        .getList(name)
-        .map(ImmutableList::copyOf)
-        .filter(flags -> !flags.equals(ImmutableList.of("")))
-        .orElseGet(ImmutableList::of);
+    ImmutableList<String> list = errorProneFlags.getListOrEmpty(name);
+    return list.equals(ImmutableList.of("")) ? ImmutableList.of() : list;
   }
 }
