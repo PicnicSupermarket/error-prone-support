@@ -552,8 +552,8 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#concatMapIterable(Function)} over {@link Flux#flatMapIterable(Function)}, as
-   * the former has equivalent semantics but a clearer name.
+   * Prefer {@link Flux#concatMapIterable(Function)} over alternatives with less clear syntax or
+   * semantics.
    */
   static final class FluxConcatMapIterable<T, S> {
     @BeforeTemplate
@@ -569,8 +569,8 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#concatMapIterable(Function, int)} over {@link Flux#flatMapIterable(Function,
-   * int)}, as the former has equivalent semantics but a clearer name.
+   * Prefer {@link Flux#concatMapIterable(Function, int)} over alternatives with less clear syntax
+   * or semantics.
    */
   static final class FluxConcatMapIterableWithPrefetch<T, S> {
     @BeforeTemplate
