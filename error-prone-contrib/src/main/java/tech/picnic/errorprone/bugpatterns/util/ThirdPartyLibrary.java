@@ -33,13 +33,6 @@ public enum ThirdPartyLibrary {
    */
   GUAVA("com.google.common.collect.ImmutableList"),
   /**
-   * New Relic's Java agent API.
-   *
-   * @see <a href="https://github.com/newrelic/newrelic-java-agent/tree/main/newrelic-api">New Relic
-   *     Java agent API on GitHub</a>
-   */
-  NEW_RELIC_AGENT_API("com.newrelic.api.agent.Agent"),
-  /**
    * VMWare's Project Reactor.
    *
    * @see <a href="https://projectreactor.io">Home page</a>
