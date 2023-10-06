@@ -2,7 +2,6 @@ package tech.picnic.errorprone.bugpatterns.util;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
@@ -17,7 +16,6 @@ import com.sun.source.tree.MethodInvocationTree;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 final class MethodMatcherFactoryTest {
@@ -29,13 +27,13 @@ final class MethodMatcherFactoryTest {
                   "com.example.A#m2(java.lang.String)",
                   "com.example.sub.B#m3(int,int)"));
 
-  private static Stream<Arguments> createWithMalformedSignaturesTestCases() {
+  private static Stream<ImmutableList<String>> createWithMalformedSignaturesTestCases() {
     /* { signatures } */
     return Stream.of(
-        arguments(ImmutableList.of("foo.bar")),
-        arguments(ImmutableList.of("foo.bar#baz")),
-        arguments(ImmutableList.of("a", "foo.bar#baz()")),
-        arguments(ImmutableList.of("foo.bar#baz()", "a")));
+        ImmutableList.of("foo.bar"),
+        ImmutableList.of("foo.bar#baz"),
+        ImmutableList.of("a", "foo.bar#baz()"),
+        ImmutableList.of("foo.bar#baz()", "a"));
   }
 
   @MethodSource("createWithMalformedSignaturesTestCases")

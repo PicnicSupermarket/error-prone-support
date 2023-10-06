@@ -9,8 +9,8 @@ final class JUnitSingleArgumentsTest {
     CompilationTestHelper.newInstance(JUnitSingleArguments.class, getClass())
         .addSourceLines(
             "A.java",
-            "import static java.util.function.Function.identity;",
             "import static java.util.Objects.requireNonNull;",
+            "import static java.util.function.Function.identity;",
             "import static org.junit.jupiter.params.provider.Arguments.arguments;",
             "",
             "class A {",
@@ -20,7 +20,7 @@ final class JUnitSingleArgumentsTest {
             "    // BUG: Diagnostic contains:",
             "    arguments(1);",
             "    arguments(1,2);",
-            "    ",
+            "",
             "    identity();",
             "    requireNonNull(null);",
             "  }",
