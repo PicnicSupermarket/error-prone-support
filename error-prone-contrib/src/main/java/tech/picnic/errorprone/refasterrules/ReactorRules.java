@@ -247,11 +247,43 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Flux#zipWithIterable(Iterable)} over more contrived alternatives. */
+  static final class FluxZipWithIterable<T, S> {
+    @BeforeTemplate
+    Flux<Tuple2<T, S>> before(Flux<T> flux, Iterable<S> iterable) {
+      return Flux.zip(flux, Flux.fromIterable(iterable));
+    }
+
+    @AfterTemplate
+    Flux<Tuple2<T, S>> after(Flux<T> flux, Iterable<S> iterable) {
+      return flux.zipWithIterable(iterable);
+    }
+  }
+
+  /** Prefer {@link Flux#zipWithIterable(Iterable, BiFunction)} over more contrived alternatives. */
+  static final class FluxZipWithIterableBiFunction<T, S, R> {
+    @BeforeTemplate
+    Flux<R> before(
+        Flux<T> flux,
+        Iterable<S> iterable,
+        BiFunction<? super T, ? super S, ? extends R> function) {
+      return flux.zipWith(Flux.fromIterable(iterable), function);
+    }
+
+    @AfterTemplate
+    Flux<R> after(
+        Flux<T> flux,
+        Iterable<S> iterable,
+        BiFunction<? super T, ? super S, ? extends R> function) {
+      return flux.zipWithIterable(iterable, function);
+    }
+  }
+
   /**
    * Prefer {@link Flux#zipWithIterable(Iterable)} with a chained combinator over {@link
    * Flux#zipWithIterable(Iterable, BiFunction)}, as the former generally yields more readable code.
    */
-  static final class FluxZipWithIterable<T, S, R> {
+  static final class FluxZipWithIterableMapFunction<T, S, R> {
     @BeforeTemplate
     Flux<R> before(Flux<T> flux, Iterable<S> iterable, BiFunction<T, S, R> combinator) {
       return flux.zipWithIterable(iterable, combinator);
@@ -328,7 +360,10 @@ final class ReactorRules {
   static final class MonoThenReturn<T, S> {
     @BeforeTemplate
     Mono<S> before(Mono<T> mono, S object) {
-      return mono.then(Mono.just(object));
+      return Refaster.anyOf(
+          mono.ignoreElement().thenReturn(object),
+          mono.then().thenReturn(object),
+          mono.then(Mono.just(object)));
     }
 
     @AfterTemplate
@@ -401,7 +436,7 @@ final class ReactorRules {
 
     @BeforeTemplate
     Mono<@Nullable Void> before2(Mono<@Nullable Void> mono) {
-      return mono.then();
+      return Refaster.anyOf(mono.ignoreElement(), mono.then());
     }
 
     // XXX: Replace this rule with an extension of the `IdentityConversion` rule, supporting
@@ -485,14 +520,46 @@ final class ReactorRules {
     }
   }
 
+  /** Avoid contrived alternatives to {@link Mono#flatMapIterable(Function)}. */
+  static final class MonoFlatMapIterable<T, S> {
+    @BeforeTemplate
+    Flux<S> before(Mono<T> mono, Function<? super T, ? extends Iterable<? extends S>> function) {
+      return Refaster.anyOf(
+          mono.map(function).flatMapIterable(identity()), mono.flux().concatMapIterable(function));
+    }
+
+    @AfterTemplate
+    Flux<S> after(Mono<T> mono, Function<? super T, ? extends Iterable<? extends S>> function) {
+      return mono.flatMapIterable(function);
+    }
+  }
+
   /**
-   * Prefer {@link Flux#concatMapIterable(Function)} over {@link Flux#flatMapIterable(Function)}, as
-   * the former has equivalent semantics but a clearer name.
+   * Prefer {@link Mono#flatMapIterable(Function)} to flatten a {@link Mono} of some {@link
+   * Iterable} over less efficient alternatives.
+   */
+  static final class MonoFlatMapIterableIdentity<T, S extends Iterable<T>> {
+    @BeforeTemplate
+    Flux<T> before(Mono<S> mono) {
+      return mono.flatMapMany(Flux::fromIterable);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Flux<T> after(Mono<S> mono) {
+      return mono.flatMapIterable(identity());
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#concatMapIterable(Function)} over alternatives with less clear syntax or
+   * semantics.
    */
   static final class FluxConcatMapIterable<T, S> {
     @BeforeTemplate
     Flux<S> before(Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function) {
-      return flux.flatMapIterable(function);
+      return Refaster.anyOf(
+          flux.flatMapIterable(function), flux.map(function).concatMapIterable(identity()));
     }
 
     @AfterTemplate
@@ -502,14 +569,16 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#concatMapIterable(Function, int)} over {@link Flux#flatMapIterable(Function,
-   * int)}, as the former has equivalent semantics but a clearer name.
+   * Prefer {@link Flux#concatMapIterable(Function, int)} over alternatives with less clear syntax
+   * or semantics.
    */
   static final class FluxConcatMapIterableWithPrefetch<T, S> {
     @BeforeTemplate
     Flux<S> before(
         Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function, int prefetch) {
-      return flux.flatMapIterable(function, prefetch);
+      return Refaster.anyOf(
+          flux.flatMapIterable(function, prefetch),
+          flux.map(function).concatMapIterable(identity(), prefetch));
     }
 
     @AfterTemplate
@@ -741,12 +810,134 @@ final class ReactorRules {
   static final class MonoThen<T> {
     @BeforeTemplate
     Mono<@Nullable Void> before(Mono<T> mono) {
-      return mono.flux().then();
+      return Refaster.anyOf(mono.ignoreElement().then(), mono.flux().then());
     }
 
     @AfterTemplate
     Mono<@Nullable Void> after(Mono<T> mono) {
       return mono.then();
+    }
+  }
+
+  /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
+  static final class FluxThen<T> {
+    @BeforeTemplate
+    Mono<@Nullable Void> before(Flux<T> flux) {
+      return flux.ignoreElements().then();
+    }
+
+    @BeforeTemplate
+    Mono<@Nullable Void> before2(Flux<@Nullable Void> flux) {
+      return flux.ignoreElements();
+    }
+
+    @AfterTemplate
+    Mono<@Nullable Void> after(Flux<T> flux) {
+      return flux.then();
+    }
+  }
+
+  /** Avoid vacuous invocations of {@link Mono#ignoreElement()}. */
+  static final class MonoThenEmpty<T> {
+    @BeforeTemplate
+    Mono<@Nullable Void> before(Mono<T> mono, Publisher<@Nullable Void> publisher) {
+      return mono.ignoreElement().thenEmpty(publisher);
+    }
+
+    @AfterTemplate
+    Mono<@Nullable Void> after(Mono<T> mono, Publisher<@Nullable Void> publisher) {
+      return mono.thenEmpty(publisher);
+    }
+  }
+
+  /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
+  static final class FluxThenEmpty<T> {
+    @BeforeTemplate
+    Mono<@Nullable Void> before(Flux<T> flux, Publisher<@Nullable Void> publisher) {
+      return flux.ignoreElements().thenEmpty(publisher);
+    }
+
+    @AfterTemplate
+    Mono<@Nullable Void> after(Flux<T> flux, Publisher<@Nullable Void> publisher) {
+      return flux.thenEmpty(publisher);
+    }
+  }
+
+  /** Avoid vacuous invocations of {@link Mono#ignoreElement()}. */
+  static final class MonoThenMany<T, S> {
+    @BeforeTemplate
+    Flux<S> before(Mono<T> mono, Publisher<S> publisher) {
+      return mono.ignoreElement().thenMany(publisher);
+    }
+
+    @AfterTemplate
+    Flux<S> after(Mono<T> mono, Publisher<S> publisher) {
+      return mono.thenMany(publisher);
+    }
+  }
+
+  /**
+   * Prefer explicit invocation of {@link Mono#flux()} over implicit conversions from {@link Mono}
+   * to {@link Flux}.
+   */
+  static final class MonoThenMonoFlux<T, S> {
+    @BeforeTemplate
+    Flux<S> before(Mono<T> mono1, Mono<S> mono2) {
+      return mono1.thenMany(mono2);
+    }
+
+    @AfterTemplate
+    Flux<S> after(Mono<T> mono1, Mono<S> mono2) {
+      return mono1.then(mono2).flux();
+    }
+  }
+
+  /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
+  static final class FluxThenMany<T, S> {
+    @BeforeTemplate
+    Flux<S> before(Flux<T> flux, Publisher<S> publisher) {
+      return flux.ignoreElements().thenMany(publisher);
+    }
+
+    @AfterTemplate
+    Flux<S> after(Flux<T> flux, Publisher<S> publisher) {
+      return flux.thenMany(publisher);
+    }
+  }
+
+  /** Avoid vacuous invocations of {@link Mono#ignoreElement()}. */
+  static final class MonoThenMono<T, S> {
+    @BeforeTemplate
+    Mono<S> before(Mono<T> mono1, Mono<S> mono2) {
+      return mono1.ignoreElement().then(mono2);
+    }
+
+    @BeforeTemplate
+    Mono<@Nullable Void> before2(Mono<T> mono1, Mono<@Nullable Void> mono2) {
+      return mono1.thenEmpty(mono2);
+    }
+
+    @AfterTemplate
+    Mono<S> after(Mono<T> mono1, Mono<S> mono2) {
+      return mono1.then(mono2);
+    }
+  }
+
+  /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
+  static final class FluxThenMono<T, S> {
+    @BeforeTemplate
+    Mono<S> before(Flux<T> flux, Mono<S> mono) {
+      return flux.ignoreElements().then(mono);
+    }
+
+    @BeforeTemplate
+    Mono<@Nullable Void> before2(Flux<T> flux, Mono<@Nullable Void> mono) {
+      return flux.thenEmpty(mono);
+    }
+
+    @AfterTemplate
+    Mono<S> after(Flux<T> flux, Mono<S> mono) {
+      return flux.then(mono);
     }
   }
 
@@ -812,8 +1003,30 @@ final class ReactorRules {
   static final class MonoFlatMapMany<S, T> {
     @BeforeTemplate
     @SuppressWarnings("NestedPublishers")
-    Flux<T> before(Mono<S> mono, Function<? super S, ? extends Publisher<? extends T>> function) {
-      return mono.map(function).flatMapMany(identity());
+    Flux<T> before(
+        Mono<S> mono,
+        Function<? super S, ? extends Publisher<? extends T>> function,
+        boolean delayUntilEnd,
+        int maxConcurrency,
+        int prefetch) {
+      return Refaster.anyOf(
+          mono.map(function).flatMapMany(identity()),
+          mono.flux().concatMap(function),
+          mono.flux().concatMap(function, prefetch),
+          mono.flux().concatMapDelayError(function),
+          mono.flux().concatMapDelayError(function, prefetch),
+          mono.flux().concatMapDelayError(function, delayUntilEnd, prefetch),
+          mono.flux().flatMap(function, maxConcurrency),
+          mono.flux().flatMap(function, maxConcurrency, prefetch),
+          mono.flux().flatMapDelayError(function, maxConcurrency, prefetch),
+          mono.flux().flatMapSequential(function, maxConcurrency),
+          mono.flux().flatMapSequential(function, maxConcurrency, prefetch),
+          mono.flux().flatMapSequentialDelayError(function, maxConcurrency, prefetch));
+    }
+
+    @BeforeTemplate
+    Flux<T> before(Mono<S> mono, Function<? super S, Publisher<? extends T>> function) {
+      return mono.flux().switchMap(function);
     }
 
     @AfterTemplate
