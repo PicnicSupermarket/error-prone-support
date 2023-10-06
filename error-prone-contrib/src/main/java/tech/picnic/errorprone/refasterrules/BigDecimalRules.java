@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refasterrules;
 
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.math.BigDecimal;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -76,31 +77,22 @@ final class BigDecimalRules {
     }
 
     @AfterTemplate
+    @AlsoNegation
     boolean after(BigDecimal value) {
       return value.signum() == 0;
     }
   }
 
-  /** Prefer using {@link BigDecimal#signum()} over comparing to {@link BigDecimal#ZERO}. */
-  static final class BigDecimalCompareToNonZero {
-    @BeforeTemplate
-    boolean before(BigDecimal value) {
-      return Refaster.anyOf(
-          value.compareTo(BigDecimal.ZERO) != 0, BigDecimal.ZERO.compareTo(value) != 0);
-    }
-
-    @AfterTemplate
-    boolean after(BigDecimal value) {
-      return value.signum() != 0;
-    }
-  }
-
-  /** Prefer using {@link BigDecimal#signum()} over comparing to {@link BigDecimal#ZERO}. */
+  /** Prefer using {@link BigDecimal#signum()} over more contrived alternatives. */
   static final class BigDecimalCompareToZeroPositive {
     @BeforeTemplate
     boolean before(BigDecimal value) {
       return Refaster.anyOf(
-          value.compareTo(BigDecimal.ZERO) > 0, BigDecimal.ZERO.compareTo(value) < 0);
+          value.compareTo(BigDecimal.ZERO) > 0,
+          BigDecimal.ZERO.compareTo(value) < 0,
+          value.signum() > 0,
+          value.signum() >= 1,
+          value.signum() != -1);
     }
 
     @AfterTemplate
@@ -148,19 +140,6 @@ final class BigDecimalRules {
     @AfterTemplate
     boolean after(BigDecimal value) {
       return value.signum() <= 0;
-    }
-  }
-
-  /** {@link BigDecimal#signum()} does not produce values higher than {@code 1}. */
-  static final class BigDecimalPositiveSignum {
-    @BeforeTemplate
-    boolean before(BigDecimal value) {
-      return Refaster.anyOf(value.signum() > 0, value.signum() >= 1, value.signum() != -1);
-    }
-
-    @AfterTemplate
-    boolean after(BigDecimal value) {
-      return value.signum() == 1;
     }
   }
 
