@@ -66,4 +66,114 @@ final class BigDecimalRules {
       return BigDecimal.valueOf(value);
     }
   }
+
+  /** Prefer using {@link BigDecimal#signum()} over comparing to {@link BigDecimal#ZERO}. */
+  static final class BigDecimalCompareToZero {
+    @BeforeTemplate
+    boolean before(BigDecimal value) {
+      return Refaster.anyOf(
+          value.compareTo(BigDecimal.ZERO) == 0, BigDecimal.ZERO.compareTo(value) == 0);
+    }
+
+    @AfterTemplate
+    boolean after(BigDecimal value) {
+      return value.signum() == 0;
+    }
+  }
+
+  /** Prefer using {@link BigDecimal#signum()} over comparing to {@link BigDecimal#ZERO}. */
+  static final class BigDecimalCompareToNonZero {
+    @BeforeTemplate
+    boolean before(BigDecimal value) {
+      return Refaster.anyOf(
+          value.compareTo(BigDecimal.ZERO) != 0, BigDecimal.ZERO.compareTo(value) != 0);
+    }
+
+    @AfterTemplate
+    boolean after(BigDecimal value) {
+      return value.signum() != 0;
+    }
+  }
+
+  /** Prefer using {@link BigDecimal#signum()} over comparing to {@link BigDecimal#ZERO}. */
+  static final class BigDecimalCompareToZeroPositive {
+    @BeforeTemplate
+    boolean before(BigDecimal value) {
+      return Refaster.anyOf(
+          value.compareTo(BigDecimal.ZERO) > 0, BigDecimal.ZERO.compareTo(value) < 0);
+    }
+
+    @AfterTemplate
+    boolean after(BigDecimal value) {
+      return value.signum() == 1;
+    }
+  }
+
+  /** Prefer using {@link BigDecimal#signum()} over comparing to {@link BigDecimal#ZERO}. */
+  static final class BigDecimalCompareToZeroPositiveInclusive {
+    @BeforeTemplate
+    boolean before(BigDecimal value) {
+      return Refaster.anyOf(
+          value.compareTo(BigDecimal.ZERO) >= 0, BigDecimal.ZERO.compareTo(value) <= 0);
+    }
+
+    @AfterTemplate
+    boolean after(BigDecimal value) {
+      return value.signum() >= 0;
+    }
+  }
+
+  /** Prefer using {@link BigDecimal#signum()} over comparing to {@link BigDecimal#ZERO}. */
+  static final class BigDecimalCompareToZeroNegative {
+    @BeforeTemplate
+    boolean before(BigDecimal value) {
+      return Refaster.anyOf(
+          value.compareTo(BigDecimal.ZERO) < 0, BigDecimal.ZERO.compareTo(value) > 0);
+    }
+
+    @AfterTemplate
+    boolean after(BigDecimal value) {
+      return value.signum() == -1;
+    }
+  }
+
+  /** Prefer using {@link BigDecimal#signum()} over comparing to {@link BigDecimal#ZERO}. */
+  static final class BigDecimalCompareToZeroNegativeInclusive {
+    @BeforeTemplate
+    boolean before(BigDecimal value) {
+      return Refaster.anyOf(
+          value.compareTo(BigDecimal.ZERO) <= 0, BigDecimal.ZERO.compareTo(value) >= 0);
+    }
+
+    @AfterTemplate
+    boolean after(BigDecimal value) {
+      return value.signum() <= 0;
+    }
+  }
+
+  /** {@link BigDecimal#signum()} does not produce values higher than {@code 1}. */
+  static final class BigDecimalPositiveSignum {
+    @BeforeTemplate
+    boolean before(BigDecimal value) {
+      return Refaster.anyOf(value.signum() > 0, value.signum() >= 1, value.signum() != -1);
+    }
+
+    @AfterTemplate
+    boolean after(BigDecimal value) {
+      return value.signum() == 1;
+    }
+  }
+
+  /** {@link BigDecimal#signum()} does not produce values lower than {@code -1}. */
+  static final class BigDecimalNegativeSignum {
+    @BeforeTemplate
+    boolean before(BigDecimal value) {
+      return Refaster.anyOf(value.signum() < 0, value.signum() <= -1, value.signum() != 1);
+    }
+
+    @AfterTemplate
+    boolean after(BigDecimal value) {
+      return value.signum() == -1;
+    }
+  }
 }
