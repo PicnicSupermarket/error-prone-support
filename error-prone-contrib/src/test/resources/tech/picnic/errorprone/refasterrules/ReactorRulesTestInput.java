@@ -148,14 +148,35 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just("baz").switchIfEmpty(Flux.just("qux")));
   }
 
-  ImmutableSet<Flux<Void>> testFluxEmpty() {
+  ImmutableSet<Flux<?>> testFluxEmpty() {
     return ImmutableSet.of(
         Flux.concat(),
         Flux.concatDelayError(),
         Flux.firstWithSignal(),
         Flux.just(),
         Flux.merge(),
-        Flux.mergeSequential());
+        Flux.merge(1),
+        Flux.mergeComparing((a, b) -> 0),
+        Flux.mergeComparing(1, (a, b) -> 0),
+        Flux.mergeComparingDelayError(1, (a, b) -> 0),
+        Flux.mergeDelayError(1),
+        Flux.mergePriority((a, b) -> 0),
+        Flux.mergePriority(1, (a, b) -> 0),
+        Flux.mergePriorityDelayError(1, (a, b) -> 0),
+        Flux.mergeSequential(),
+        Flux.mergeSequential(1),
+        Flux.mergeSequentialDelayError(1),
+        Flux.zip(v -> v),
+        Flux.zip(v -> v, 1),
+        Flux.combineLatest(v -> v),
+        Flux.combineLatest(v -> v, 1),
+        Flux.mergeComparing(),
+        Flux.mergePriority(),
+        Flux.range(0, 0));
+  }
+
+  Flux<Integer> testFluxJust() {
+    return Flux.range(0, 1);
   }
 
   ImmutableSet<Mono<?>> testMonoIdentity() {
