@@ -426,6 +426,25 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Flux#empty()} over more contrived ways of creating an empty flux. */
+  static final class FluxEmpty<T> {
+    @BeforeTemplate
+    Flux<T> before() {
+      return Refaster.anyOf(
+          Flux.just(),
+          Flux.concat(),
+          Flux.concatDelayError(),
+          Flux.firstWithSignal(),
+          Flux.merge(),
+          Flux.mergeSequential());
+    }
+
+    @AfterTemplate
+    Flux<T> after() {
+      return Flux.empty();
+    }
+  }
+
   /** Don't unnecessarily transform a {@link Mono} to an equivalent instance. */
   static final class MonoIdentity<T> {
     @BeforeTemplate
