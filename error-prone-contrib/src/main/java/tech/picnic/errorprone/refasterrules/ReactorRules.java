@@ -426,15 +426,15 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#empty()} over more contrived ways of creating an empty flux. */
+  /** Prefer {@link Flux#empty()} over more contrived alternatives. */
   static final class FluxEmpty<T> {
     @BeforeTemplate
     Flux<T> before() {
       return Refaster.anyOf(
-          Flux.just(),
           Flux.concat(),
           Flux.concatDelayError(),
           Flux.firstWithSignal(),
+          Flux.just(),
           Flux.merge(),
           Flux.mergeSequential());
     }

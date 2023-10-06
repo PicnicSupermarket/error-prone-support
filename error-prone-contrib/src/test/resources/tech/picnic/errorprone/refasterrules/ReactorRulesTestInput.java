@@ -150,10 +150,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Flux<Void>> testFluxEmpty() {
     return ImmutableSet.of(
-        Flux.just(),
         Flux.concat(),
         Flux.concatDelayError(),
         Flux.firstWithSignal(),
+        Flux.just(),
         Flux.merge(),
         Flux.mergeSequential());
   }
