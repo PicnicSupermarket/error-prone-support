@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
@@ -666,6 +667,76 @@ final class StreamRules {
     @AfterTemplate
     Stream<T> after(T seed, Predicate<? super T> hasNext, UnaryOperator<T> next) {
       return Stream.iterate(seed, hasNext, next);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object)} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  static final class StreamOf1<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1) {
+      return ImmutableList.of(e1).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1) {
+      return Stream.of(e1);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  static final class StreamOf2<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2) {
+      return ImmutableList.of(e1, e2).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2) {
+      return Stream.of(e1, e2);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  static final class StreamOf3<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2, T e3) {
+      return ImmutableList.of(e1, e2, e3).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2, T e3) {
+      return Stream.of(e1, e2, e3);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  static final class StreamOf4<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2, T e3, T e4) {
+      return ImmutableList.of(e1, e2, e3, e4).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2, T e3, T e4) {
+      return Stream.of(e1, e2, e3, e4);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  static final class StreamOf5<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2, T e3, T e4, T e5) {
+      return ImmutableList.of(e1, e2, e3, e4, e5).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2, T e3, T e4, T e5) {
+      return Stream.of(e1, e2, e3, e4, e5);
     }
   }
 }
