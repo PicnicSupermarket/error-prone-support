@@ -19,7 +19,7 @@ final class JUnitSingleArgumentsTest {
             "    arguments();",
             "    // BUG: Diagnostic contains:",
             "    arguments(1);",
-            "    arguments(1,2);",
+            "    arguments(1, 2);",
             "",
             "    identity();",
             "    requireNonNull(null);",
