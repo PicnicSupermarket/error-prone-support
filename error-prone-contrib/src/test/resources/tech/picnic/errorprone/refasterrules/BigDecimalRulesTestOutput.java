@@ -34,15 +34,11 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
         BigDecimal.ONE.signum() > 0,
         BigDecimal.ONE.signum() > 0,
         BigDecimal.ZERO.signum() > 0,
-        BigDecimal.ZERO.signum() > 0);
-  }
-
-  ImmutableSet<Boolean> testBigDecimalSignumIsNonnegative() {
-    return ImmutableSet.of(
-        BigDecimal.ONE.signum() >= 0,
-        BigDecimal.ONE.signum() >= 0,
-        BigDecimal.ZERO.signum() >= 0,
-        BigDecimal.ZERO.signum() >= 0);
+        BigDecimal.ZERO.signum() > 0,
+        BigDecimal.ONE.signum() <= 0,
+        BigDecimal.ONE.signum() <= 0,
+        BigDecimal.ZERO.signum() <= 0,
+        BigDecimal.ZERO.signum() <= 0);
   }
 
   ImmutableSet<Boolean> testBigDecimalSignumIsNegative() {
@@ -50,14 +46,10 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
         BigDecimal.ONE.signum() < 0,
         BigDecimal.ONE.signum() < 0,
         BigDecimal.ZERO.signum() < 0,
-        BigDecimal.ZERO.signum() < 0);
-  }
-
-  ImmutableSet<Boolean> testBigDecimalSignumIsNonpositive() {
-    return ImmutableSet.of(
-        BigDecimal.ONE.signum() <= 0,
-        BigDecimal.ONE.signum() <= 0,
-        BigDecimal.ZERO.signum() <= 0,
-        BigDecimal.ZERO.signum() <= 0);
+        BigDecimal.ZERO.signum() < 0,
+        BigDecimal.ONE.signum() >= 0,
+        BigDecimal.ONE.signum() >= 0,
+        BigDecimal.ZERO.signum() >= 0,
+        BigDecimal.ZERO.signum() >= 0);
   }
 }
