@@ -68,8 +68,8 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer using {@link BigDecimal#signum()} over comparing to {@link BigDecimal#ZERO}. */
-  static final class BigDecimalCompareToZero {
+  /** Prefer using {@link BigDecimal#signum()} over more contrived alternatives. */
+  static final class BigDecimalSignumIsZero {
     @BeforeTemplate
     boolean before(BigDecimal value) {
       return Refaster.anyOf(
@@ -83,30 +83,38 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer using {@link BigDecimal#signum()} over more contrived alternatives. */
-  static final class BigDecimalCompareToZeroPositive {
+  /**
+   * Prefer a {@link BigDecimal#signum()} comparison to 0 over more contrived or less clear
+   * alternatives.
+   */
+  static final class BigDecimalSignumIsPositive {
     @BeforeTemplate
     boolean before(BigDecimal value) {
       return Refaster.anyOf(
           value.compareTo(BigDecimal.ZERO) > 0,
           BigDecimal.ZERO.compareTo(value) < 0,
-          value.signum() > 0,
-          value.signum() >= 1,
-          value.signum() != -1);
+          value.signum() == 1,
+          value.signum() >= 1);
     }
 
     @AfterTemplate
     boolean after(BigDecimal value) {
-      return value.signum() == 1;
+      return value.signum() > 0;
     }
   }
 
-  /** Prefer using {@link BigDecimal#signum()} over comparing to {@link BigDecimal#ZERO}. */
-  static final class BigDecimalCompareToZeroPositiveInclusive {
+  /**
+   * Prefer a {@link BigDecimal#signum()} comparison to 0 over more contrived or less clear
+   * alternatives.
+   */
+  static final class BigDecimalSignumIsNonnegative {
     @BeforeTemplate
     boolean before(BigDecimal value) {
       return Refaster.anyOf(
-          value.compareTo(BigDecimal.ZERO) >= 0, BigDecimal.ZERO.compareTo(value) <= 0);
+          value.compareTo(BigDecimal.ZERO) >= 0,
+          BigDecimal.ZERO.compareTo(value) <= 0,
+          value.signum() != -1,
+          value.signum() > -1);
     }
 
     @AfterTemplate
@@ -115,44 +123,43 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer using {@link BigDecimal#signum()} over comparing to {@link BigDecimal#ZERO}. */
-  static final class BigDecimalCompareToZeroNegative {
+  /**
+   * Prefer a {@link BigDecimal#signum()} comparison to 0 over more contrived or less clear
+   * alternatives.
+   */
+  static final class BigDecimalSignumIsNegative {
     @BeforeTemplate
     boolean before(BigDecimal value) {
       return Refaster.anyOf(
-          value.compareTo(BigDecimal.ZERO) < 0, BigDecimal.ZERO.compareTo(value) > 0);
+          value.compareTo(BigDecimal.ZERO) < 0,
+          BigDecimal.ZERO.compareTo(value) > 0,
+          value.signum() == -1,
+          value.signum() <= -1);
     }
 
     @AfterTemplate
     boolean after(BigDecimal value) {
-      return value.signum() == -1;
+      return value.signum() < 0;
     }
   }
 
-  /** Prefer using {@link BigDecimal#signum()} over comparing to {@link BigDecimal#ZERO}. */
-  static final class BigDecimalCompareToZeroNegativeInclusive {
+  /**
+   * Prefer a {@link BigDecimal#signum()} comparison to 0 over more contrived or less clear
+   * alternatives.
+   */
+  static final class BigDecimalSignumIsNonpositive {
     @BeforeTemplate
     boolean before(BigDecimal value) {
       return Refaster.anyOf(
-          value.compareTo(BigDecimal.ZERO) <= 0, BigDecimal.ZERO.compareTo(value) >= 0);
+          value.compareTo(BigDecimal.ZERO) <= 0,
+          BigDecimal.ZERO.compareTo(value) >= 0,
+          value.signum() != 1,
+          value.signum() < 1);
     }
 
     @AfterTemplate
     boolean after(BigDecimal value) {
       return value.signum() <= 0;
-    }
-  }
-
-  /** {@link BigDecimal#signum()} does not produce values lower than {@code -1}. */
-  static final class BigDecimalNegativeSignum {
-    @BeforeTemplate
-    boolean before(BigDecimal value) {
-      return Refaster.anyOf(value.signum() < 0, value.signum() <= -1, value.signum() != 1);
-    }
-
-    @AfterTemplate
-    boolean after(BigDecimal value) {
-      return value.signum() == -1;
     }
   }
 }

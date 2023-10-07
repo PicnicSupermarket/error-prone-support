@@ -21,7 +21,7 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(new BigDecimal(2), new BigDecimal(2L), new BigDecimal(2.0));
   }
 
-  ImmutableSet<Boolean> testBigDecimalCompareToZero() {
+  ImmutableSet<Boolean> testBigDecimalSignumIsZero() {
     return ImmutableSet.of(
         BigDecimal.ONE.compareTo(BigDecimal.ZERO) == 0,
         BigDecimal.ZERO.compareTo(BigDecimal.ONE) == 0,
@@ -29,37 +29,35 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
         BigDecimal.ZERO.compareTo(BigDecimal.ONE) != 0);
   }
 
-  ImmutableSet<Boolean> testBigDecimalCompareToZeroPositive() {
+  ImmutableSet<Boolean> testBigDecimalSignumIsPositive() {
     return ImmutableSet.of(
         BigDecimal.ONE.compareTo(BigDecimal.ZERO) > 0,
         BigDecimal.ZERO.compareTo(BigDecimal.ONE) < 0,
-        BigDecimal.ZERO.signum() > 0,
-        BigDecimal.ZERO.signum() >= 1,
-        BigDecimal.ZERO.signum() != -1);
+        BigDecimal.ZERO.signum() == 1,
+        BigDecimal.ZERO.signum() >= 1);
   }
 
-  ImmutableSet<Boolean> testBigDecimalCompareToZeroPositiveInclusive() {
+  ImmutableSet<Boolean> testBigDecimalSignumIsNonnegative() {
     return ImmutableSet.of(
         BigDecimal.ONE.compareTo(BigDecimal.ZERO) >= 0,
-        BigDecimal.ZERO.compareTo(BigDecimal.ONE) <= 0);
+        BigDecimal.ZERO.compareTo(BigDecimal.ONE) <= 0,
+        BigDecimal.ZERO.signum() != -1,
+        BigDecimal.ZERO.signum() > -1);
   }
 
-  ImmutableSet<Boolean> testBigDecimalCompareToZeroNegative() {
+  ImmutableSet<Boolean> testBigDecimalSignumIsNegative() {
     return ImmutableSet.of(
         BigDecimal.ONE.compareTo(BigDecimal.ZERO) < 0,
-        BigDecimal.ZERO.compareTo(BigDecimal.ONE) > 0);
+        BigDecimal.ZERO.compareTo(BigDecimal.ONE) > 0,
+        BigDecimal.ZERO.signum() == -1,
+        BigDecimal.ZERO.signum() <= -1);
   }
 
-  ImmutableSet<Boolean> testBigDecimalCompareToZeroNegativeInclusive() {
+  ImmutableSet<Boolean> testBigDecimalSignumIsNonpositive() {
     return ImmutableSet.of(
         BigDecimal.ONE.compareTo(BigDecimal.ZERO) <= 0,
-        BigDecimal.ZERO.compareTo(BigDecimal.ONE) >= 0);
-  }
-
-  ImmutableSet<Boolean> testBigDecimalNegativeSignum() {
-    return ImmutableSet.of(
-        BigDecimal.ZERO.signum() < 0,
-        BigDecimal.ZERO.signum() <= -1,
-        BigDecimal.ZERO.signum() != 1);
+        BigDecimal.ZERO.compareTo(BigDecimal.ONE) >= 0,
+        BigDecimal.ZERO.signum() != 1,
+        BigDecimal.ZERO.signum() < 1);
   }
 }
