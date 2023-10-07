@@ -8,7 +8,9 @@ import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -382,6 +384,100 @@ final class PrimitiveRules {
     @AfterTemplate
     boolean after(double d) {
       return Double.isFinite(d);
+    }
+  }
+
+  /** Prefer an {@link Integer#signum(int)} comparison to 1 over less clear alternatives. */
+  static final class IntegerSignumIsPositive {
+    @BeforeTemplate
+    boolean before(int i) {
+      return Refaster.anyOf(Integer.signum(i) > 0, Integer.signum(i) >= 1);
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(int i) {
+      return Integer.signum(i) == 1;
+    }
+  }
+
+  /** Prefer an {@link Integer#signum(int)} comparison to -1 over less clear alternatives. */
+  static final class IntegerSignumIsNegative {
+    @BeforeTemplate
+    boolean before(int i) {
+      return Refaster.anyOf(Integer.signum(i) < 0, Integer.signum(i) <= -1);
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(int i) {
+      return Integer.signum(i) == -1;
+    }
+  }
+
+  /** Prefer an {@link Long#signum(long)} comparison to 1 over less clear alternatives. */
+  static final class LongSignumIsPositive {
+    @BeforeTemplate
+    boolean before(long l) {
+      return Refaster.anyOf(Long.signum(l) > 0, Long.signum(l) >= 1);
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(long l) {
+      return Long.signum(l) == 1;
+    }
+  }
+
+  /** Prefer an {@link Long#signum(long)} comparison to -1 over less clear alternatives. */
+  static final class LongSignumIsNegative {
+    @BeforeTemplate
+    boolean before(long l) {
+      return Refaster.anyOf(Long.signum(l) < 0, Long.signum(l) <= -1);
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(long l) {
+      return Long.signum(l) == -1;
+    }
+  }
+
+  /** Prefer a {@link Math#signum(double)} comparison to 1 over less clear alternatives. */
+  static final class MathSignumIsPositive {
+    @BeforeTemplate
+    boolean before(float v) {
+      return Refaster.anyOf(Math.signum(v) > 0, Math.signum(v) >= 1);
+    }
+
+    @BeforeTemplate
+    boolean before(double v) {
+      return Refaster.anyOf(Math.signum(v) > 0, Math.signum(v) >= 1);
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(double v) {
+      return Math.signum(v) == 1;
+    }
+  }
+
+  /** Prefer a {@link Math#signum(double)} comparison to -1 over less clear alternatives. */
+  static final class MathSignumIsNegative {
+    @BeforeTemplate
+    boolean before(float v) {
+      return Refaster.anyOf(Math.signum(v) < 0, Math.signum(v) <= -1);
+    }
+
+    @BeforeTemplate
+    boolean before(double v) {
+      return Refaster.anyOf(Math.signum(v) < 0, Math.signum(v) <= -1);
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(double v) {
+      return Math.signum(v) == -1;
     }
   }
 }

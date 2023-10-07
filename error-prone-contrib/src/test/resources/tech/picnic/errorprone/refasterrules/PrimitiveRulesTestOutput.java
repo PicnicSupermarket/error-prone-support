@@ -164,4 +164,54 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
   boolean testDoubleIsFinite() {
     return Double.isFinite(1);
   }
+
+  ImmutableSet<Boolean> testIntegerSignumIsPositive() {
+    return ImmutableSet.of(
+        Integer.signum(1) == 1,
+        Integer.signum(2) == 1,
+        Integer.signum(3) != 1,
+        Integer.signum(4) != 1);
+  }
+
+  ImmutableSet<Boolean> testIntegerSignumIsNegative() {
+    return ImmutableSet.of(
+        Integer.signum(1) == -1,
+        Integer.signum(2) == -1,
+        Integer.signum(3) != -1,
+        Integer.signum(4) != -1);
+  }
+
+  ImmutableSet<Boolean> testLongSignumIsPositive() {
+    return ImmutableSet.of(
+        Long.signum(1L) == 1, Long.signum(2L) == 1, Long.signum(3L) != 1, Long.signum(4L) != 1);
+  }
+
+  ImmutableSet<Boolean> testLongSignumIsNegative() {
+    return ImmutableSet.of(
+        Long.signum(1L) == -1, Long.signum(2L) == -1, Long.signum(3L) != -1, Long.signum(4L) != -1);
+  }
+
+  ImmutableSet<Boolean> testMathSignumIsPositive() {
+    return ImmutableSet.of(
+        Math.signum(1.0) == 1,
+        Math.signum(2.0) == 1,
+        Math.signum(3.0F) == 1,
+        Math.signum(4.0F) == 1,
+        Math.signum(5.0) != 1,
+        Math.signum(6.0) != 1,
+        Math.signum(7.0F) != 1,
+        Math.signum(8.0F) != 1);
+  }
+
+  ImmutableSet<Boolean> testMathSignumIsNegative() {
+    return ImmutableSet.of(
+        Math.signum(1.0) == -1,
+        Math.signum(2.0) == -1,
+        Math.signum(3.0F) == -1,
+        Math.signum(4.0F) == -1,
+        Math.signum(5.0) != -1,
+        Math.signum(6.0) != -1,
+        Math.signum(7.0F) != -1,
+        Math.signum(8.0F) != -1);
+  }
 }
