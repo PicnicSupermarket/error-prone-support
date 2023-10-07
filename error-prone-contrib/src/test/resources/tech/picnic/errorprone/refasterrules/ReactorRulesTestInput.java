@@ -520,7 +520,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         StepVerifier.create(Mono.empty())
             .verifyErrorMatches(IllegalStateException.class::isInstance),
         StepVerifier.create(Mono.empty())
-            .verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(IllegalStateException.class)));
+            .verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(AssertionError.class)));
   }
 
   Duration testStepVerifierLastStepVerifyErrorMatches() {

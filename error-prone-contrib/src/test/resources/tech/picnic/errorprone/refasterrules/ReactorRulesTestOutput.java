@@ -502,7 +502,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         StepVerifier.create(Mono.empty()).verifyError(IllegalArgumentException.class),
         StepVerifier.create(Mono.empty()).verifyError(IllegalStateException.class),
-        StepVerifier.create(Mono.empty()).verifyError(IllegalStateException.class));
+        StepVerifier.create(Mono.empty()).verifyError(AssertionError.class));
   }
 
   Duration testStepVerifierLastStepVerifyErrorMatches() {
