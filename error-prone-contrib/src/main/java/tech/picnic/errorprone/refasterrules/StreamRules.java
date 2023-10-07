@@ -357,6 +357,8 @@ final class StreamRules {
           stream.filter(predicate).findAny().isEmpty());
     }
 
+    // XXX: Consider extending `@Matches(IsIdentityOperation.class)` such that it can replace this
+    // template's `Refaster.anyOf` usage.
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
@@ -395,6 +397,8 @@ final class StreamRules {
           !stream.noneMatch(predicate), stream.filter(predicate).findAny().isPresent());
     }
 
+    // XXX: Consider extending `@Matches(IsIdentityOperation.class)` such that it can replace this
+    // template's `Refaster.anyOf` usage.
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
@@ -415,6 +419,8 @@ final class StreamRules {
       return stream.noneMatch(Refaster.anyOf(not(predicate), predicate.negate()));
     }
 
+    // XXX: Consider extending `@Matches(IsIdentityOperation.class)` such that it can replace this
+    // template's `Refaster.anyOf` usage.
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,

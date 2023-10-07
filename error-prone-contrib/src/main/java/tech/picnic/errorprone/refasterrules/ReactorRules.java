@@ -595,11 +595,16 @@ final class ReactorRules {
   }
 
   /** Avoid contrived alternatives to {@link Mono#flatMapIterable(Function)}. */
-  static final class MonoFlatMapIterable<T, S> {
+  static final class MonoFlatMapIterable<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
-    Flux<S> before(Mono<T> mono, Function<? super T, ? extends Iterable<? extends S>> function) {
+    Flux<S> before(
+        Mono<T> mono,
+        Function<? super T, I> function,
+        @Matches(IsIdentityOperation.class)
+            Function<? super I, ? extends Iterable<? extends S>> identityOperation) {
       return Refaster.anyOf(
-          mono.map(function).flatMapIterable(identity()), mono.flux().concatMapIterable(function));
+          mono.map(function).flatMapIterable(identityOperation),
+          mono.flux().concatMapIterable(function));
     }
 
     @AfterTemplate
@@ -629,11 +634,15 @@ final class ReactorRules {
    * Prefer {@link Flux#concatMapIterable(Function)} over alternatives with less clear syntax or
    * semantics.
    */
-  static final class FluxConcatMapIterable<T, S> {
+  static final class FluxConcatMapIterable<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
-    Flux<S> before(Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function) {
+    Flux<S> before(
+        Flux<T> flux,
+        Function<? super T, I> function,
+        @Matches(IsIdentityOperation.class)
+            Function<? super I, ? extends Iterable<? extends S>> identityOperation) {
       return Refaster.anyOf(
-          flux.flatMapIterable(function), flux.map(function).concatMapIterable(identity()));
+          flux.flatMapIterable(function), flux.map(function).concatMapIterable(identityOperation));
     }
 
     @AfterTemplate
@@ -646,13 +655,17 @@ final class ReactorRules {
    * Prefer {@link Flux#concatMapIterable(Function, int)} over alternatives with less clear syntax
    * or semantics.
    */
-  static final class FluxConcatMapIterableWithPrefetch<T, S> {
+  static final class FluxConcatMapIterableWithPrefetch<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
     Flux<S> before(
-        Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function, int prefetch) {
+        Flux<T> flux,
+        Function<? super T, I> function,
+        int prefetch,
+        @Matches(IsIdentityOperation.class)
+            Function<? super I, ? extends Iterable<? extends S>> identityOperation) {
       return Refaster.anyOf(
           flux.flatMapIterable(function, prefetch),
-          flux.map(function).concatMapIterable(identity(), prefetch));
+          flux.map(function).concatMapIterable(identityOperation, prefetch));
     }
 
     @AfterTemplate

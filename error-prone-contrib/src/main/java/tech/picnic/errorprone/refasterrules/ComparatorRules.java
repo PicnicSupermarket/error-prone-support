@@ -185,8 +185,8 @@ final class ComparatorRules {
   }
 
   /**
-   * Where applicable, prefer {@link Comparator#naturalOrder()} over {@link Function#identity()}, as
-   * it more clearly states intent.
+   * Where applicable, prefer {@link Comparator#naturalOrder()} over identity function-based
+   * comparisons, as the former more clearly states intent.
    */
   static final class ThenComparingNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
