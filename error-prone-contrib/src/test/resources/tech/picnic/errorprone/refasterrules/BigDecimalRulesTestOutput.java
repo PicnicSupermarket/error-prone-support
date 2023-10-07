@@ -23,33 +23,33 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Boolean> testBigDecimalSignumIsZero() {
     return ImmutableSet.of(
-        BigDecimal.ONE.signum() == 0,
-        BigDecimal.ONE.signum() == 0,
-        BigDecimal.ONE.signum() != 0,
-        BigDecimal.ONE.signum() != 0);
+        BigDecimal.valueOf(1).signum() == 0,
+        BigDecimal.valueOf(2).signum() == 0,
+        BigDecimal.valueOf(3).signum() != 0,
+        BigDecimal.valueOf(4).signum() != 0);
   }
 
   ImmutableSet<Boolean> testBigDecimalSignumIsPositive() {
     return ImmutableSet.of(
-        BigDecimal.ONE.signum() > 0,
-        BigDecimal.ONE.signum() > 0,
-        BigDecimal.ZERO.signum() > 0,
-        BigDecimal.ZERO.signum() > 0,
-        BigDecimal.ONE.signum() <= 0,
-        BigDecimal.ONE.signum() <= 0,
-        BigDecimal.ZERO.signum() <= 0,
-        BigDecimal.ZERO.signum() <= 0);
+        BigDecimal.valueOf(1).signum() > 0,
+        BigDecimal.valueOf(2).signum() > 0,
+        BigDecimal.valueOf(3).signum() > 0,
+        BigDecimal.valueOf(4).signum() > 0,
+        BigDecimal.valueOf(5).signum() <= 0,
+        BigDecimal.valueOf(6).signum() <= 0,
+        BigDecimal.valueOf(7).signum() <= 0,
+        BigDecimal.valueOf(8).signum() <= 0);
   }
 
   ImmutableSet<Boolean> testBigDecimalSignumIsNegative() {
     return ImmutableSet.of(
-        BigDecimal.ONE.signum() < 0,
-        BigDecimal.ONE.signum() < 0,
-        BigDecimal.ZERO.signum() < 0,
-        BigDecimal.ZERO.signum() < 0,
-        BigDecimal.ONE.signum() >= 0,
-        BigDecimal.ONE.signum() >= 0,
-        BigDecimal.ZERO.signum() >= 0,
-        BigDecimal.ZERO.signum() >= 0);
+        BigDecimal.valueOf(1).signum() < 0,
+        BigDecimal.valueOf(2).signum() < 0,
+        BigDecimal.valueOf(3).signum() < 0,
+        BigDecimal.valueOf(4).signum() < 0,
+        BigDecimal.valueOf(5).signum() >= 0,
+        BigDecimal.valueOf(6).signum() >= 0,
+        BigDecimal.valueOf(7).signum() >= 0,
+        BigDecimal.valueOf(8).signum() >= 0);
   }
 }

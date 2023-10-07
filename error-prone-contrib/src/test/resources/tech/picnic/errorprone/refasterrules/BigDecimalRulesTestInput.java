@@ -23,33 +23,33 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Boolean> testBigDecimalSignumIsZero() {
     return ImmutableSet.of(
-        BigDecimal.ONE.compareTo(BigDecimal.ZERO) == 0,
-        BigDecimal.ZERO.compareTo(BigDecimal.ONE) == 0,
-        BigDecimal.ONE.compareTo(BigDecimal.ZERO) != 0,
-        BigDecimal.ZERO.compareTo(BigDecimal.ONE) != 0);
+        BigDecimal.valueOf(1).compareTo(BigDecimal.ZERO) == 0,
+        BigDecimal.ZERO.compareTo(BigDecimal.valueOf(2)) == 0,
+        BigDecimal.valueOf(3).compareTo(BigDecimal.ZERO) != 0,
+        BigDecimal.ZERO.compareTo(BigDecimal.valueOf(4)) != 0);
   }
 
   ImmutableSet<Boolean> testBigDecimalSignumIsPositive() {
     return ImmutableSet.of(
-        BigDecimal.ONE.compareTo(BigDecimal.ZERO) > 0,
-        BigDecimal.ZERO.compareTo(BigDecimal.ONE) < 0,
-        BigDecimal.ZERO.signum() == 1,
-        BigDecimal.ZERO.signum() >= 1,
-        BigDecimal.ONE.compareTo(BigDecimal.ZERO) <= 0,
-        BigDecimal.ZERO.compareTo(BigDecimal.ONE) >= 0,
-        BigDecimal.ZERO.signum() != 1,
-        BigDecimal.ZERO.signum() < 1);
+        BigDecimal.valueOf(1).compareTo(BigDecimal.ZERO) > 0,
+        BigDecimal.ZERO.compareTo(BigDecimal.valueOf(2)) < 0,
+        BigDecimal.valueOf(3).signum() == 1,
+        BigDecimal.valueOf(4).signum() >= 1,
+        BigDecimal.valueOf(5).compareTo(BigDecimal.ZERO) <= 0,
+        BigDecimal.ZERO.compareTo(BigDecimal.valueOf(6)) >= 0,
+        BigDecimal.valueOf(7).signum() != 1,
+        BigDecimal.valueOf(8).signum() < 1);
   }
 
   ImmutableSet<Boolean> testBigDecimalSignumIsNegative() {
     return ImmutableSet.of(
-        BigDecimal.ONE.compareTo(BigDecimal.ZERO) < 0,
-        BigDecimal.ZERO.compareTo(BigDecimal.ONE) > 0,
-        BigDecimal.ZERO.signum() == -1,
-        BigDecimal.ZERO.signum() <= -1,
-        BigDecimal.ONE.compareTo(BigDecimal.ZERO) >= 0,
-        BigDecimal.ZERO.compareTo(BigDecimal.ONE) <= 0,
-        BigDecimal.ZERO.signum() != -1,
-        BigDecimal.ZERO.signum() > -1);
+        BigDecimal.valueOf(1).compareTo(BigDecimal.ZERO) < 0,
+        BigDecimal.ZERO.compareTo(BigDecimal.valueOf(2)) > 0,
+        BigDecimal.valueOf(3).signum() == -1,
+        BigDecimal.valueOf(4).signum() <= -1,
+        BigDecimal.valueOf(5).compareTo(BigDecimal.ZERO) >= 0,
+        BigDecimal.ZERO.compareTo(BigDecimal.valueOf(6)) <= 0,
+        BigDecimal.valueOf(7).signum() != -1,
+        BigDecimal.valueOf(8).signum() > -1);
   }
 }
