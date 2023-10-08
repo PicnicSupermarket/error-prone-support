@@ -3,80 +3,40 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.ImmutableSortedMultiset;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractCollectionAssert;
 import org.assertj.core.api.AbstractMapAssert;
 import org.assertj.core.api.MapAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
 @OnlineDocumentation
 final class AssertJMapRules {
   private AssertJMapRules() {}
 
-  // XXX: Reduce boilerplate using a `Matcher` that identifies "empty" instances.
   static final class AbstractMapAssertIsEmpty<K, V> {
     @BeforeTemplate
-    @SuppressWarnings("unchecked")
-    void before(AbstractMapAssert<?, ?, K, V> mapAssert) {
+    void before(
+        AbstractMapAssert<?, ?, K, V> mapAssert,
+        @Matches(IsEmpty.class) Map<? extends K, ? extends V> wellTypedMap,
+        @Matches(IsEmpty.class) Map<?, ?> arbitraryMap,
+        @Matches(IsEmpty.class) Iterable<? extends K> keys) {
       Refaster.anyOf(
-          mapAssert.containsExactlyEntriesOf(
-              Refaster.anyOf(
-                  ImmutableMap.of(),
-                  ImmutableBiMap.of(),
-                  ImmutableSortedMap.of(),
-                  new HashMap<>(),
-                  new LinkedHashMap<>(),
-                  new TreeMap<>())),
-          mapAssert.hasSameSizeAs(
-              Refaster.anyOf(
-                  ImmutableMap.of(),
-                  ImmutableBiMap.of(),
-                  ImmutableSortedMap.of(),
-                  new HashMap<>(),
-                  new LinkedHashMap<>(),
-                  new TreeMap<>())),
-          mapAssert.isEqualTo(
-              Refaster.anyOf(
-                  ImmutableMap.of(),
-                  ImmutableBiMap.of(),
-                  ImmutableSortedMap.of(),
-                  new HashMap<>(),
-                  new LinkedHashMap<>(),
-                  new TreeMap<>())),
-          mapAssert.containsOnlyKeys(
-              Refaster.anyOf(
-                  ImmutableList.of(),
-                  new ArrayList<>(),
-                  ImmutableSet.of(),
-                  new HashSet<>(),
-                  new LinkedHashSet<>(),
-                  ImmutableSortedSet.of(),
-                  new TreeSet<>(),
-                  ImmutableMultiset.of(),
-                  ImmutableSortedMultiset.of())),
+          mapAssert.containsExactlyEntriesOf(wellTypedMap),
+          mapAssert.containsExactlyInAnyOrderEntriesOf(wellTypedMap),
+          mapAssert.hasSameSizeAs(arbitraryMap),
+          mapAssert.isEqualTo(arbitraryMap),
+          mapAssert.containsOnlyKeys(keys),
           mapAssert.containsExactly(),
           mapAssert.containsOnly(),
           mapAssert.containsOnlyKeys());
@@ -112,15 +72,9 @@ final class AssertJMapRules {
 
   static final class AbstractMapAssertIsNotEmpty<K, V> {
     @BeforeTemplate
-    AbstractMapAssert<?, ?, K, V> before(AbstractMapAssert<?, ?, K, V> mapAssert) {
-      return mapAssert.isNotEqualTo(
-          Refaster.anyOf(
-              ImmutableMap.of(),
-              ImmutableBiMap.of(),
-              ImmutableSortedMap.of(),
-              new HashMap<>(),
-              new LinkedHashMap<>(),
-              new TreeMap<>()));
+    AbstractMapAssert<?, ?, K, V> before(
+        AbstractMapAssert<?, ?, K, V> mapAssert, @Matches(IsEmpty.class) Map<?, ?> map) {
+      return mapAssert.isNotEqualTo(map);
     }
 
     @AfterTemplate
@@ -148,12 +102,14 @@ final class AssertJMapRules {
 
   static final class AbstractMapAssertContainsExactlyInAnyOrderEntriesOf<K, V> {
     @BeforeTemplate
-    AbstractMapAssert<?, ?, K, V> before(AbstractMapAssert<?, ?, K, V> mapAssert, Map<K, V> map) {
+    AbstractMapAssert<?, ?, K, V> before(
+        AbstractMapAssert<?, ?, K, V> mapAssert, Map<? extends K, ? extends V> map) {
       return mapAssert.isEqualTo(map);
     }
 
     @AfterTemplate
-    AbstractMapAssert<?, ?, K, V> after(AbstractMapAssert<?, ?, K, V> mapAssert, Map<K, V> map) {
+    AbstractMapAssert<?, ?, K, V> after(
+        AbstractMapAssert<?, ?, K, V> mapAssert, Map<? extends K, ? extends V> map) {
       return mapAssert.containsExactlyInAnyOrderEntriesOf(map);
     }
   }
@@ -187,12 +143,12 @@ final class AssertJMapRules {
 
   static final class AbstractMapAssertHasSameSizeAs<K, V> {
     @BeforeTemplate
-    AbstractMapAssert<?, ?, K, V> before(AbstractMapAssert<?, ?, K, V> mapAssert, Map<K, V> map) {
+    AbstractMapAssert<?, ?, K, V> before(AbstractMapAssert<?, ?, K, V> mapAssert, Map<?, ?> map) {
       return mapAssert.hasSize(map.size());
     }
 
     @AfterTemplate
-    AbstractMapAssert<?, ?, K, V> after(AbstractMapAssert<?, ?, K, V> mapAssert, Map<K, V> map) {
+    AbstractMapAssert<?, ?, K, V> after(AbstractMapAssert<?, ?, K, V> mapAssert, Map<?, ?> map) {
       return mapAssert.hasSameSizeAs(map);
     }
   }
@@ -225,13 +181,14 @@ final class AssertJMapRules {
 
   static final class AssertThatMapContainsOnlyKeys<K, V> {
     @BeforeTemplate
-    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before(Map<K, V> map, Set<K> keys) {
+    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before(
+        Map<K, V> map, Set<? extends K> keys) {
       return assertThat(map.keySet()).hasSameElementsAs(keys);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    MapAssert<K, V> after(Map<K, V> map, Set<K> keys) {
+    MapAssert<K, V> after(Map<K, V> map, Set<? extends K> keys) {
       return assertThat(map).containsOnlyKeys(keys);
     }
   }

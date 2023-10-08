@@ -7,6 +7,7 @@ import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.argumentCount;
 import static com.google.errorprone.matchers.Matchers.isPrimitiveType;
 import static com.google.errorprone.matchers.Matchers.isSameType;
+import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
 
@@ -23,13 +24,18 @@ import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -41,21 +47,30 @@ import java.util.stream.Stream;
 // XXX: Also match (effectively) final variables that reference provably-empty objects.
 // XXX: Also handle `#copyOf(someEmptyInstance)`, `#sortedCopyOf(someEmptyInstance)`,
 // `Sets.immutableEnumSet(emptyIterable)` (and other `Sets` methods), `EnumSet.noneOf(...)`,
-// `emptyCollection.stream()`, `emptyMap.{keySet,values,entrySet}()`, etc.
+// `emptyCollection.stream()`, `emptyStream.collect(...)`, `emptyMap.{keySet,values,entrySet}()`,
+// etc.
 // XXX: Also recognize null-hostile "container" expression types that can only reference empty
 // instances, such as `ImmutableCollection<Void>` and `Flux<Void>`.
+// XXX: Also recognize empty instances of `Optional`, `OptionalInt`, `OptionalLong`, and
+// `OptionalDouble`.
+// XXX: Also recognize empty builders and `emptyBuilder.build()` invocations.
 public final class IsEmpty implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
   private static final Pattern EMPTY_INSTANCE_FACTORY_METHOD_PATTERN = Pattern.compile("empty.*");
-  private static final Matcher<Tree> PRIMITIVE_TYPE = isPrimitiveType();
+  private static final Matcher<Tree> EMPTY_COLLECTION_CONSTRUCTOR_ARGUMENT =
+      anyOf(isPrimitiveType(), isSubtypeOf(Comparator.class));
   // XXX: Extend this list to include additional JDK collection types with a public constructor.
   private static final Matcher<ExpressionTree> MUTABLE_COLLECTION_TYPE =
       anyOf(
           isSameType(ArrayList.class),
           isSameType(HashMap.class),
+          isSameType(HashSet.class),
           isSameType(LinkedHashMap.class),
+          isSameType(LinkedHashSet.class),
           isSameType(LinkedList.class),
           isSameType(Stack.class),
+          isSameType(TreeMap.class),
+          isSameType(TreeSet.class),
           isSameType(Vector.class));
   private static final Matcher<ExpressionTree> EMPTY_INSTANCE_FACTORY =
       anyOf(
@@ -107,10 +122,10 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
     }
 
     List<? extends ExpressionTree> arguments = ((NewClassTree) tree).getArguments();
-    if (arguments.stream().allMatch(a -> PRIMITIVE_TYPE.matches(a, state))) {
+    if (arguments.stream().allMatch(a -> EMPTY_COLLECTION_CONSTRUCTOR_ARGUMENT.matches(a, state))) {
       /*
        * This is a default constructor, or a constructor that creates an empty collection using
-       * custom (re)size/load factor parameters.
+       * custom (re)size/load factor parameters and/or a custom `Comparator`.
        */
       return true;
     }
