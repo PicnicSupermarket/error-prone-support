@@ -1594,6 +1594,7 @@ final class ReactorRules {
     Duration before(StepVerifier.LastStep step, Class<T> clazz) {
       return Refaster.anyOf(
           step.expectError(clazz).verify(),
+          step.verifyErrorMatches(clazz::isInstance),
           step.verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(clazz)));
     }
 
