@@ -47,6 +47,8 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
  * {@code @AfterTemplate} method. Ties are broken by preferring the order dictated by methods with a
  * larger number of parameters.
  */
+// XXX: This check can introduce suggestions that are incompatible with Error Prone's
+// `InconsistentOverloads` check. Review whether/how to improve this.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Refaster template parameters should be listed in a canonical order",

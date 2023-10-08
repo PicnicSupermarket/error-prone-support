@@ -437,10 +437,12 @@ final class ReactorRules {
   static final class FluxEmpty<T, S extends Comparable<? super S>> {
     @BeforeTemplate
     Flux<T> before(
-        int prefetch,
         Function<? super Object[], ? extends T> combinator,
+        int prefetch,
         Comparator<? super T> comparator) {
       return Refaster.anyOf(
+          Flux.zip(combinator),
+          Flux.zip(combinator, prefetch),
           Flux.concat(),
           Flux.concatDelayError(),
           Flux.firstWithSignal(),
@@ -456,13 +458,11 @@ final class ReactorRules {
           Flux.mergePriorityDelayError(prefetch, comparator),
           Flux.mergeSequential(),
           Flux.mergeSequential(prefetch),
-          Flux.mergeSequentialDelayError(prefetch),
-          Flux.zip(combinator),
-          Flux.zip(combinator, prefetch));
+          Flux.mergeSequentialDelayError(prefetch));
     }
 
     @BeforeTemplate
-    Flux<T> before(int prefetch, Function<Object[], T> combinator) {
+    Flux<T> before(Function<Object[], T> combinator, int prefetch) {
       return Refaster.anyOf(
           Flux.combineLatest(combinator), Flux.combineLatest(combinator, prefetch));
     }
@@ -1125,9 +1125,9 @@ final class ReactorRules {
         Function<? super S, P> function,
         @Matches(IsIdentityOperation.class)
             Function<? super P, ? extends Publisher<? extends T>> identityOperation,
+        int prefetch,
         boolean delayUntilEnd,
-        int maxConcurrency,
-        int prefetch) {
+        int maxConcurrency) {
       return Refaster.anyOf(
           mono.map(function).flatMapMany(identityOperation),
           mono.flux().concatMap(function),
