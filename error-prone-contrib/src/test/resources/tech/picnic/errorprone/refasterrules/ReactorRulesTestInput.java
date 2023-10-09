@@ -364,6 +364,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).map(Number.class::cast);
   }
 
+  Mono<Number> testMonoOfType() {
+    return Mono.just(1).filter(Number.class::isInstance).cast(Number.class);
+  }
+
+  Flux<Number> testFluxOfType() {
+    return Flux.just(1).filter(Number.class::isInstance).cast(Number.class);
+  }
+
   Mono<String> testMonoFlatMap() {
     return Mono.just("foo").map(Mono::just).flatMap(identity());
   }
