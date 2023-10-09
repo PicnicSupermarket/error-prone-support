@@ -36,6 +36,7 @@ final class RefasterRulesTest {
           AssortedRules.class,
           BigDecimalRules.class,
           BugCheckerRules.class,
+          ClassRules.class,
           CollectionRules.class,
           ComparatorRules.class,
           DoubleStreamRules.class,
