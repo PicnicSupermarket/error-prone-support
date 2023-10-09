@@ -152,6 +152,37 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just("foo").defaultIfEmpty("bar"), Flux.just("baz").defaultIfEmpty("qux"));
   }
 
+  ImmutableSet<Flux<?>> testFluxEmpty() {
+    return ImmutableSet.of(
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty(),
+        Flux.empty());
+  }
+
+  Flux<Integer> testFluxJust() {
+    return Flux.just(0);
+  }
+
   ImmutableSet<Mono<?>> testMonoIdentity() {
     return ImmutableSet.of(
         Mono.just(1),

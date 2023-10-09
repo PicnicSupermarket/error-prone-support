@@ -426,6 +426,74 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Flux#empty()} over more contrived alternatives. */
+  // XXX: In combination with the `IsEmpty` matcher introduced by
+  // https://github.com/PicnicSupermarket/error-prone-support/pull/744, the non-varargs overloads of
+  // most methods referenced here can be rewritten as well. Additionally, some invocations of
+  // methods such as `Flux#fromIterable`, `Flux#fromArray` and `Flux#justOrEmpty` can also be
+  // rewritten.
+  static final class FluxEmpty<T, S extends Comparable<? super S>> {
+    @BeforeTemplate
+    Flux<T> before(
+        int prefetch,
+        Function<? super Object[], ? extends T> combinator,
+        Comparator<? super T> comparator) {
+      return Refaster.anyOf(
+          Flux.concat(),
+          Flux.concatDelayError(),
+          Flux.firstWithSignal(),
+          Flux.just(),
+          Flux.merge(),
+          Flux.merge(prefetch),
+          Flux.mergeComparing(comparator),
+          Flux.mergeComparing(prefetch, comparator),
+          Flux.mergeComparingDelayError(prefetch, comparator),
+          Flux.mergeDelayError(prefetch),
+          Flux.mergePriority(comparator),
+          Flux.mergePriority(prefetch, comparator),
+          Flux.mergePriorityDelayError(prefetch, comparator),
+          Flux.mergeSequential(),
+          Flux.mergeSequential(prefetch),
+          Flux.mergeSequentialDelayError(prefetch),
+          Flux.zip(combinator),
+          Flux.zip(combinator, prefetch));
+    }
+
+    @BeforeTemplate
+    Flux<T> before(int prefetch, Function<Object[], T> combinator) {
+      return Refaster.anyOf(
+          Flux.combineLatest(combinator), Flux.combineLatest(combinator, prefetch));
+    }
+
+    @BeforeTemplate
+    Flux<S> before() {
+      return Refaster.anyOf(Flux.mergeComparing(), Flux.mergePriority());
+    }
+
+    @BeforeTemplate
+    Flux<Integer> before(int start) {
+      return Flux.range(start, 0);
+    }
+
+    @AfterTemplate
+    Flux<T> after() {
+      return Flux.empty();
+    }
+  }
+
+  /** Prefer {@link Flux#just(Object)} over more contrived alternatives. */
+  static final class FluxJust {
+    @BeforeTemplate
+    Flux<Integer> before(int start) {
+      return Flux.range(start, 1);
+    }
+
+    @AfterTemplate
+    Flux<Integer> after(int start) {
+      return Flux.just(start);
+    }
+  }
+
   /** Don't unnecessarily transform a {@link Mono} to an equivalent instance. */
   static final class MonoIdentity<T> {
     @BeforeTemplate
