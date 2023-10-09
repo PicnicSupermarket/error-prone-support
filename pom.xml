@@ -206,7 +206,7 @@
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.8.7</version.maven>
-        <version.mockito>5.5.0</version.mockito>
+        <version.mockito>5.6.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.10.14</version.nullaway>
         <version.pitest-git>1.1.2</version.pitest-git>
