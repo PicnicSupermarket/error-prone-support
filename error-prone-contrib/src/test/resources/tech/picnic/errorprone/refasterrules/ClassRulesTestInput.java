@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
+import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ClassRulesTest implements RefasterRuleCollectionTestCase {
