@@ -21,6 +21,7 @@ import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
+        ImmutableList.class,
         Objects.class,
         Streams.class,
         counting(),
@@ -265,5 +267,25 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<Integer> testStreamIterate() {
     return Stream.iterate(0, i -> i < 10, i -> i + 1);
+  }
+
+  Stream<Integer> testStreamOf1() {
+    return Stream.of(1);
+  }
+
+  Stream<Integer> testStreamOf2() {
+    return Stream.of(1, 2);
+  }
+
+  Stream<Integer> testStreamOf3() {
+    return Stream.of(1, 2, 3);
+  }
+
+  Stream<Integer> testStreamOf4() {
+    return Stream.of(1, 2, 3, 4);
+  }
+
+  Stream<Integer> testStreamOf5() {
+    return Stream.of(1, 2, 3, 4, 5);
   }
 }
