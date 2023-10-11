@@ -155,6 +155,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
   @VisibleForTesting
   static final ImmutableSetMultimap<String, String> STATIC_IMPORT_EXEMPTED_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
+          .put("com.google.common.base.Predicates", "contains")
           .put("com.mongodb.client.model.Filters", "empty")
           .putAll(
               "java.util.Collections",

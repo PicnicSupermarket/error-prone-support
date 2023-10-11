@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Predicates.containsPattern;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -12,8 +10,8 @@ final class StringJoinTest {
   void identification() {
     CompilationTestHelper.newInstance(StringJoin.class, getClass())
         .expectErrorMessage(
-            "valueOf", containsPattern("Prefer `String#valueOf` over `String#format`"))
-        .expectErrorMessage("join", containsPattern("Prefer `String#join` over `String#format`"))
+            "valueOf", m -> m.contains("Prefer `String#valueOf` over `String#format`"))
+        .expectErrorMessage("join", m -> m.contains("Prefer `String#join` over `String#format`"))
         .addSourceLines(
             "A.java",
             "import java.util.Formattable;",

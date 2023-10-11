@@ -61,6 +61,7 @@ final class RefasterRulesTest {
           MultimapRules.class,
           NullRules.class,
           OptionalRules.class,
+          PatternRules.class,
           PreconditionsRules.class,
           PrimitiveRules.class,
           ReactorRules.class,
