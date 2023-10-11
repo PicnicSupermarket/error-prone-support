@@ -139,11 +139,10 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
   }
 
   private static boolean isEmptyArrayCreation(ExpressionTree tree) {
-    if (!(tree instanceof NewArrayTree)) {
+    if (!(tree instanceof NewArrayTree newArray)) {
       return false;
     }
 
-    NewArrayTree newArray = (NewArrayTree) tree;
     return (!newArray.getDimensions().isEmpty()
             && ASTHelpers.constValue(newArray.getDimensions().get(0), Integer.class) == 0)
         || (newArray.getInitializers() != null && newArray.getInitializers().isEmpty());
