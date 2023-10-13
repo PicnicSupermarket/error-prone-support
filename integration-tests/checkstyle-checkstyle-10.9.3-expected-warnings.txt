@@ -1,0 +1,99 @@
+src/test/resources/com/puppycrawl/tools/checkstyle/grammar/antlr4/InputAntlr4AstRegressionTrickyYield.java:[8,16] 'yield' may become a restricted identifier in a future release
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/coding/illegalinstantiation/InputIllegalInstantiationLang3.java:[12,19] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/coding/illegalinstantiation/InputIllegalInstantiationLang3.java:[13,20] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic9.java:[27,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic9.java:[32,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic9.java:[39,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/coding/magicnumber/InputMagicNumber_6.java:[154,40] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsingleline/InputRegexpSinglelineSemantic3.java:[28,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsingleline/InputRegexpSinglelineSemantic3.java:[33,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsingleline/InputRegexpSinglelineSemantic3.java:[40,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/coding/finallocalvariable/InputFinalLocalVariableFalsePositives.java:[153,35] getSecurityManager() in java.lang.System has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/coding/innerassignment/InputInnerAssignment.java:[26,21] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/imports/avoidstaticimport/InputAvoidStaticImportDefault.java:[114,17] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/indentation/indentation/InputIndentationTryWithResourcesStrict.java:[59,69] non-varargs call of varargs method with inexact argument type for last parameter;
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsinglelinejava/InputRegexpSinglelineJavaSemantic.java:[27,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsinglelinejava/InputRegexpSinglelineJavaSemantic.java:[32,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsinglelinejava/InputRegexpSinglelineJavaSemantic.java:[39,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpmultiline/InputRegexpMultilineSemantic4.java:[29,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpmultiline/InputRegexpMultilineSemantic4.java:[34,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpmultiline/InputRegexpMultilineSemantic4.java:[41,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpmultiline/InputRegexpMultilineSemantic9.java:[29,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpmultiline/InputRegexpMultilineSemantic9.java:[34,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpmultiline/InputRegexpMultilineSemantic9.java:[41,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/metrics/classfanoutcomplexity/InputClassFanOutComplexityAnnotations.java:[72,20] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpmultiline/InputRegexpMultilineSemantic2.java:[29,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpmultiline/InputRegexpMultilineSemantic2.java:[34,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpmultiline/InputRegexpMultilineSemantic2.java:[41,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/imports/avoidstarimport/InputAvoidStarImportDefault.java:[113,17] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/imports/redundantimport/InputRedundantImportWithChecker.java:[113,17] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/javadocmissingleadingasterisk/InputJavadocMissingLeadingAsteriskCorrect.java:[83,1] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/blocks/emptyblock/InputEmptyBlockSemanticText.java:[23,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/blocks/emptyblock/InputEmptyBlockSemanticText.java:[27,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/blocks/emptyblock/InputEmptyBlockSemanticText.java:[33,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/imports/unusedimports/InputUnusedImports.java:[113,17] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic14.java:[27,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic14.java:[32,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic14.java:[39,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsingleline/InputRegexpSinglelineSemantic8.java:[28,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsingleline/InputRegexpSinglelineSemantic8.java:[33,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsingleline/InputRegexpSinglelineSemantic8.java:[40,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/blocks/emptyblock/InputEmptyBlockSemanticStatement.java:[23,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/blocks/emptyblock/InputEmptyBlockSemanticStatement.java:[27,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/blocks/emptyblock/InputEmptyBlockSemanticStatement.java:[33,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsinglelinejava/InputRegexpSinglelineJavaSemantic6.java:[28,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsinglelinejava/InputRegexpSinglelineJavaSemantic6.java:[33,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsinglelinejava/InputRegexpSinglelineJavaSemantic6.java:[40,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/coding/magicnumber/InputMagicNumber.java:[154,40] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpmultiline/InputRegexpMultilineSemantic6.java:[29,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpmultiline/InputRegexpMultilineSemantic6.java:[34,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpmultiline/InputRegexpMultilineSemantic6.java:[41,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/it/resources/com/google/checkstyle/test/chapter4formatting/rule4861blockcommentstyle/InputCommentsIndentationCommentIsAtTheEndOfBlock.java:[63,22] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/it/resources/com/google/checkstyle/test/chapter4formatting/rule4861blockcommentstyle/InputCommentsIndentationCommentIsAtTheEndOfBlock.java:[71,22] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/it/resources/com/google/checkstyle/test/chapter4formatting/rule4861blockcommentstyle/InputCommentsIndentationCommentIsAtTheEndOfBlock.java:[78,24] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/it/resources/com/google/checkstyle/test/chapter4formatting/rule4861blockcommentstyle/InputCommentsIndentationCommentIsAtTheEndOfBlock.java:[85,24] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/it/resources/com/google/checkstyle/test/chapter4formatting/rule4861blockcommentstyle/InputCommentsIndentationCommentIsAtTheEndOfBlock.java:[93,24] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/it/resources/com/google/checkstyle/test/chapter4formatting/rule4861blockcommentstyle/InputCommentsIndentationCommentIsAtTheEndOfBlock.java:[99,22] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/it/resources/com/google/checkstyle/test/chapter4formatting/rule4861blockcommentstyle/InputCommentsIndentationCommentIsAtTheEndOfBlock.java:[105,22] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/it/resources/com/google/checkstyle/test/chapter4formatting/rule4861blockcommentstyle/InputCommentsIndentationCommentIsAtTheEndOfBlock.java:[113,22] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic2.java:[27,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic2.java:[32,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic2.java:[39,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[53,12] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[82,10] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[100,12] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[115,12] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[137,16] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[166,14] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[185,16] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[199,16] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[215,16] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[243,14] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[261,16] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[275,16] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[25,1] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrect.java:[291,1] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/coding/hiddenfield/InputHiddenFieldLambdas.java:[29,21] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/annotation/missingdeprecated/InputMissingDeprecatedSpecialCase.java:[21,16] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/annotation/missingdeprecated/InputMissingDeprecatedSpecialCase.java:[26,17] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/annotation/missingdeprecated/InputMissingDeprecatedSpecialCase.java:[99,11] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/annotation/missingdeprecated/InputMissingDeprecatedSpecialCase.java:[106,11] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/annotation/missingdeprecated/InputMissingDeprecatedSpecialCase.java:[113,22] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic5.java:[27,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic5.java:[32,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic5.java:[39,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/indentation/indentation/InputIndentationChainedMethods.java:[10,13] non-varargs call of varargs method with inexact argument type for last parameter;
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsinglelinejava/InputRegexpSinglelineJavaSemantic2.java:[28,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsinglelinejava/InputRegexpSinglelineJavaSemantic2.java:[33,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexpsinglelinejava/InputRegexpSinglelineJavaSemantic2.java:[40,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic6.java:[27,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic6.java:[32,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/regexp/regexp/InputRegexpSemantic6.java:[39,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/coding/magicnumber/InputMagicNumber_2.java:[154,40] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/coding/magicnumber/InputMagicNumber_3.java:[160,40] Integer(int) in java.lang.Integer has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/blocks/emptyblock/InputEmptyBlockSemantic.java:[23,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/blocks/emptyblock/InputEmptyBlockSemantic.java:[27,21] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/blocks/emptyblock/InputEmptyBlockSemantic.java:[33,16] Boolean(boolean) in java.lang.Boolean has been deprecated and marked for removal
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrectCustom.java:[52,12] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrectCustom.java:[81,10] deprecated item is not annotated with @Deprecated
+src/test/resources/com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder/InputAtclauseOrderIncorrectCustom.java:[99,12] deprecated item is not annotated with @Deprecated
