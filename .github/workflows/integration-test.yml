@@ -32,9 +32,7 @@ jobs:
         run: mvn --version
       - name: Install error-prone-support snapshot
         run: mvn -T1C install -DskipTests -Dverification.skip
-      - name: Ensure runnable
-        run: chmod +x ./integration-tests/run.sh
-      - name: Check current directory
-        run: pwd && ls -l
       - name: Run integration test
-        run: ./integration-tests/run.sh
+        # ensure this script is executed in the integration-tests directory
+        working-directory: ./integration-tests
+        run: bash ./run.sh
