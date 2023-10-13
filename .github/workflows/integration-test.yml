@@ -3,7 +3,8 @@ on:
   # run action every time a new comment is created
   issue_comment:
     types: [ created ]
-
+permissions:
+  contents: read
 jobs:
   on_demand_integration_test:
     name: On-demand integration test
@@ -16,12 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1
         with:
           submodules: 'recursive'
           persist-credentials: false
       - name: Set up JDK
-        uses: actions/setup-java@v3 
+        uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
         with:
           # XXX TODO: java version matrix?
           java-version: 17.0.8
