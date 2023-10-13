@@ -1,0 +1,131 @@
+diff --git a/config/archunit-store/slices-should-be-free-of-cycles-suppressions b/config/archunit-store/slices-should-be-free-of-cycles-suppressions
+index ea99a44ee..05a77e1e6 100644
+--- a/config/archunit-store/slices-should-be-free-of-cycles-suppressions
++++ b/config/archunit-store/slices-should-be-free-of-cycles-suppressions
+@@ -1351,8 +1351,8 @@ Cycle detected: Slice checks.javadoc -> \
+     - Constructor <com.puppycrawl.tools.checkstyle.checks.javadoc.AtclauseOrderCheck.<init>()> calls method <com.puppycrawl.tools.checkstyle.utils.TokenUtil.asBitSet([I)> in (AtclauseOrderCheck.java:177)\
+     - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTagContinuationIndentationCheck.visitJavadocToken(com.puppycrawl.tools.checkstyle.api.DetailNode)> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getNextSibling(com.puppycrawl.tools.checkstyle.api.DetailNode)> in (JavadocTagContinuationIndentationCheck.java:177)\
+     - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.RequireEmptyLineBeforeBlockTagGroupCheck.isAnotherTagBefore(com.puppycrawl.tools.checkstyle.api.DetailNode)> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getPreviousSibling(com.puppycrawl.tools.checkstyle.api.DetailNode)> in (RequireEmptyLineBeforeBlockTagGroupCheck.java:177)\
++    - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocNodeImpl.toString()> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getTokenName(int)> in (JavadocNodeImpl.java:178)\
+     - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTagInfo$8.isValidOn(com.puppycrawl.tools.checkstyle.api.DetailAST)> calls method <com.puppycrawl.tools.checkstyle.utils.ScopeUtil.isLocalVariableDef(com.puppycrawl.tools.checkstyle.api.DetailAST)> in (JavadocTagInfo.java:178)\
+-    - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocNodeImpl.toString()> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getTokenName(int)> in (JavadocNodeImpl.java:179)\
+     - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.AbstractJavadocCheck.setJavadocTokens([Ljava.lang.String;)> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getTokenId(java.lang.String)> in (AbstractJavadocCheck.java:181)\
+     - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.RequireEmptyLineBeforeBlockTagGroupCheck.isAnotherTagBefore(com.puppycrawl.tools.checkstyle.api.DetailNode)> calls method <com.puppycrawl.tools.checkstyle.utils.JavadocUtil.getPreviousSibling(com.puppycrawl.tools.checkstyle.api.DetailNode)> in (RequireEmptyLineBeforeBlockTagGroupCheck.java:183)\
+     - Method <com.puppycrawl.tools.checkstyle.checks.javadoc.NonEmptyAtclauseDescriptionCheck.hasOnlyEmptyText(com.puppycrawl.tools.checkstyle.api.DetailNode)> calls method <com.puppycrawl.tools.checkstyle.utils.CommonUtil.isBlank(java.lang.String)> in (NonEmptyAtclauseDescriptionCheck.java:185)\
+diff --git a/pom.xml b/pom.xml
+index 6169c87e0..491c7fa88 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -230,10 +230,12 @@
+     <pitest.junit5.plugin.version>1.1.2</pitest.junit5.plugin.version>
+     <pitest.accelerator.junit5.plugin.version>1.0.4</pitest.accelerator.junit5.plugin.version>
+     <sonar.test.exclusions>**/test/resources/**/*,**/it/resources/**/*</sonar.test.exclusions>
++    <assertj.version>3.24.2</assertj.version>
+     <junit.version>5.9.2</junit.version>
+     <forbiddenapis.version>3.4</forbiddenapis.version>
+     <json-schema-validator.version>1.2.0</json-schema-validator.version>
+-    <error-prone.version>2.18.0</error-prone.version>
++    <error-prone.version>2.22.0</error-prone.version>
++    <error-prone-support.version>0.14.0</error-prone-support.version>
+     <checkerframework.version>3.27.0</checkerframework.version>
+   </properties>
+ 
+@@ -277,6 +279,12 @@
+     </dependency>
+ 
+     <!-- test scope stuff -->
++    <dependency>
++      <groupId>org.assertj</groupId>
++      <artifactId>assertj-core</artifactId>
++      <version>${assertj.version}</version>
++      <scope>test</scope>
++    </dependency>
+     <dependency>
+       <groupId>org.junit.jupiter</groupId>
+       <artifactId>junit-jupiter-api</artifactId>
+@@ -2305,7 +2313,7 @@
+                     <arg>-Xpkginfo:always</arg>
+                     <arg>-XDcompilePolicy=simple</arg>
+                     <arg>
+-                      -Xplugin:ErrorProne
++                      -Xplugin:ErrorProne ${error-prone.flags}
+                     </arg>
+                   </compilerArgs>
+                   <annotationProcessorPaths>
+@@ -2314,6 +2322,16 @@
+                       <artifactId>error_prone_core</artifactId>
+                       <version>${error-prone.version}</version>
+                     </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>error-prone-contrib</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>refaster-runner</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
+                   </annotationProcessorPaths>
+                 </configuration>
+               </execution>
+@@ -2358,7 +2376,8 @@
+                     <arg>-XDcompilePolicy=simple</arg>
+                     <arg>
+                       -Xplugin:ErrorProne \
+-                      -XepExcludedPaths:.*[\\/]resources[\\/].*
++                      -XepExcludedPaths:.*[\\/]resources[\\/].* \
++                      ${error-prone.flags}
+                     </arg>
+                   </compilerArgs>
+                   <annotationProcessorPaths>
+@@ -2367,6 +2386,16 @@
+                       <artifactId>error_prone_core</artifactId>
+                       <version>${error-prone.version}</version>
+                     </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>error-prone-contrib</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>refaster-runner</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
+                   </annotationProcessorPaths>
+                 </configuration>
+               </execution>
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
+index 61c59b613..9019964ad 100644
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
+@@ -63,6 +63,7 @@ public final class DetailNodeTreeStringPrinter {
+      * @return DetailNode tree
+      * @throws IllegalArgumentException if there is an error parsing the Javadoc.
+      */
++    @SuppressWarnings("CheckArgumentWithMessage")
+     public static DetailNode parseJavadocAsDetailNode(DetailAST blockComment) {
+         final JavadocDetailNodeParser parser = new JavadocDetailNodeParser();
+         final ParseStatus status = parser.parseJavadocAsDetailNode(blockComment);
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocNodeImpl.java b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocNodeImpl.java
+index fd90c4259..0c1b4f141 100644
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocNodeImpl.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocNodeImpl.java
+@@ -20,7 +20,6 @@
+ package com.puppycrawl.tools.checkstyle.checks.javadoc;
+ 
+ import java.util.Arrays;
+-import java.util.Objects;
+ import java.util.Optional;
+ 
+ import com.puppycrawl.tools.checkstyle.api.DetailNode;
+@@ -180,7 +179,7 @@ public class JavadocNodeImpl implements DetailNode {
+                 + ", text='" + text + '\''
+                 + ", lineNumber=" + lineNumber
+                 + ", columnNumber=" + columnNumber
+-                + ", children=" + Objects.hashCode(children)
++                + ", children=" + Arrays.hashCode(children)
+                 + ", parent=" + parent + ']';
+     }
+ 

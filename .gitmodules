@@ -1,0 +1,3 @@
+[submodule "integration-tests/checkstyle"]
+	path = integration-tests/checkstyle
+	url = git@github.com:checkstyle/checkstyle.git
