@@ -33,4 +33,4 @@ jobs:
       - name: Install error-prone-support snapshot
         run: mvn -T1C install -DskipTests -Dverification.skip
       - name: Run integration test
-        run: bash integration-tests/run.sh
+        run: bash ./integration-tests/run.sh
