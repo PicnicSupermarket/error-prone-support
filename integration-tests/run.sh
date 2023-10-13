@@ -2,8 +2,8 @@
 
 set -e -u -o pipefail
 
-project=druid
-revision=druid-26.0.0
+project=checkstyle
+revision=checkstyle-10.9.3
 
 if [ "${#}" -gt 1 ] || [[ ${1:---sync} != '--sync' ]]; then
   echo "Usage: ${0} [--sync]"
@@ -12,7 +12,7 @@ fi
 do_sync="${1:-}"
 
 error_prone_support_version="$(
-  mvn -f .. help:evaluate -Dexpression=project.version -q -DforceStdout
+ mvn -f .. help:evaluate -Dexpression=project.version -q -DforceStdout
 )"
 
 error_prone_shared_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
@@ -85,21 +85,24 @@ fi
 # - The `allCheckSectionJavaDocs` test is skipped because is validates that
 #   Javadoc has certain closing tags that are removed by Google Java Format.
 # XXX: Figure out why the `validateCliDocSections` test fails.
+echo "Validation file: ${validation_log_file}"
 mvn clean package \
     -Perror-prone-compile,error-prone-test-compile \
     -Derror-prone.flags="${error_prone_validation_flags}" \
     -Derror-prone-support.version="${error_prone_support_version}" \
     -Dmaven.compiler.showWarnings \
   | tee "${validation_log_file}"
+echo "Finished validation run!"
 
 baseline_warnings="../${project}-${revision}-expected-warnings.txt"
-generated_warnngs="$(grep -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_log_file}" | grep -P '\] \[')"
+# note: added '*' in the final grep, required in order to get matches in GNU grep 3.11
+generated_warnings="$(grep -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_log_file}" | grep -P '\]*\[')"
 if [ -n "${do_sync}" ]; then
   echo 'Saving emitted warnings...'
-  echo "${generated_warnngs}" > "${baseline_warnings}"
+  echo "${generated_warnings}" > "${baseline_warnings}"
 else
   echo 'Inspecting emitted warnings...'
-  if ! diff -u "${baseline_warnings}" <(echo "${generated_warnngs}"); then
+  if ! diff -u "${baseline_warnings}" <(echo "${generated_warnings}"); then
     echo 'Diagnostics output changed.'
     exit 1
   fi

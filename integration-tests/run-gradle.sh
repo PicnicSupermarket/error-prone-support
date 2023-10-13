@@ -43,15 +43,14 @@ git checkout -f "${revision}"
 git apply < "../${project}-${revision}-init.patch"
 git commit -m 'dependency: Introduce Error Prone Support' .
 
-# mvn com.spotify.fmt:fmt-maven-plugin:2.19:format \
-#   -DadditionalSourceDirectories='${project.basedir}${file.separator}src${file.separator}it${file.separator}java'
-./gradlew autostyleApply
+
+# XXX: autostyleApply is only available in calcite, need to find better approach
+./gradlew clean autostyleApply --no-build-cache
 git commit -m 'minor: Reformat using Google Java Format' .
 
 function apply_patch() {
   local current_diff="${1}"
-
-  ./gradlew clean autostyleApply compileJava -PenableErrorprone \
+ ./gradlew clean autostyleApply compileJava -PenableErrorprone \
     -Derror-prone.flags="${error_prone_patch_flags}" \
     -Derror-prone-support.version="${error_prone_support_version}" \
     --no-build-cache
@@ -63,6 +62,7 @@ function apply_patch() {
   fi
 }
 
+echo "Running patches..."
 apply_patch "$(git diff | shasum --algorithm 256)"
 
 baseline_patch="../${project}-${revision}-expected-changes.patch"
@@ -91,7 +91,7 @@ fi
   | tee "${validation_log_file}"
 
 baseline_warnings="../${project}-${revision}-expected-warnings.txt"
-generated_warnngs="$(grep -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_log_file}" | grep -P '\] \[')"
+generated_warnngs="$(grep -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_log_file}" | grep -P '\]*\[')"
 if [ -n "${do_sync}" ]; then
   echo 'Saving emitted warnings...'
   echo "${generated_warnngs}" > "${baseline_warnings}"
