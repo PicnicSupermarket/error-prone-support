@@ -1,0 +1,35 @@
+name: On-demand integration test
+on:
+  # run action every time a new comment is created
+  issue_comment:
+    types: [ created ]
+
+jobs:
+  on_demand_integration_test:
+    name: On-demand integration test
+    # Only run the integration test if the created comment is on a pull request
+    # and contains the string `/integration-test`
+    if: | 
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/integration-test')
+    # XXX TODO: Device matrix? 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          persist-credentials: false
+      - name: Set up JDK
+        uses: actions/setup-java@v3 
+        with:
+          # XXX TODO: java version matrix?
+          java-version: 17.0.8
+          distribution: temurin
+          cache: maven
+      - name: Display build environment details
+        run: mvn --version
+      - name: Install error-prone-support snapshot
+        run: mvn -T1C install -DskipTests -Dverification.skip
+      - name: Run integration test
+        run: echo "running integration test"
