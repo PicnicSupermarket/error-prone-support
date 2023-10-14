@@ -13,7 +13,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.util.TreePath;
-import com.sun.source.util.TreeScanner;
+import com.sun.source.util.TreePathScanner;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -34,15 +34,11 @@ abstract class AbstractMatcherTestChecker extends BugChecker implements Compilat
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree compilationUnit, VisitorState state) {
-    new TreeScanner<@Nullable Void, TreePath>() {
+    new TreePathScanner<@Nullable Void, @Nullable Void>() {
       @Override
-      public @Nullable Void scan(@Nullable Tree tree, TreePath treePath) {
-        if (tree == null) {
-          return null;
-        }
-
-        TreePath path = new TreePath(treePath, tree);
+      public @Nullable Void scan(@Nullable Tree tree, @Nullable Void unused) {
         if (tree instanceof ExpressionTree) {
+          TreePath path = new TreePath(getCurrentPath(), tree);
           ExpressionTree expressionTree = (ExpressionTree) tree;
           if (!isMethodSelect(expressionTree, path)
               && delegate.matches(expressionTree, state.withPath(path))) {
@@ -50,11 +46,11 @@ abstract class AbstractMatcherTestChecker extends BugChecker implements Compilat
           }
         }
 
-        return super.scan(tree, path);
+        return super.scan(tree, null);
       }
 
       @Override
-      public @Nullable Void visitImport(ImportTree tree, TreePath path) {
+      public @Nullable Void visitImport(ImportTree tree, @Nullable Void unused) {
         /*
          * We're not interested in matching import statements. While components of these
          * can be `ExpressionTree`s, they will never be matched by Refaster.
@@ -63,24 +59,24 @@ abstract class AbstractMatcherTestChecker extends BugChecker implements Compilat
       }
 
       @Override
-      public @Nullable Void visitMethod(MethodTree tree, TreePath path) {
+      public @Nullable Void visitMethod(MethodTree tree, @Nullable Void unused) {
         /*
          * We're not interested in matching e.g. parameter and return type declarations. While these
          * can be `ExpressionTree`s, they will never be matched by Refaster.
          */
-        return scan(tree.getBody(), new TreePath(path, tree));
+        return scan(tree.getBody(), null);
       }
 
       @Override
-      public @Nullable Void visitTypeCast(TypeCastTree tree, TreePath path) {
+      public @Nullable Void visitTypeCast(TypeCastTree tree, @Nullable Void unused) {
         /*
          * We're not interested in matching the parenthesized type subtree that is part of a type
          * cast expression. While such trees can be `ExpressionTree`s, they will never be matched by
          * Refaster.
          */
-        return scan(tree.getExpression(), new TreePath(path, tree));
+        return scan(tree.getExpression(), null);
       }
-    }.scan(compilationUnit, state.getPath());
+    }.scan(compilationUnit, null);
 
     return Description.NO_MATCH;
   }
