@@ -2,13 +2,14 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
-import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.bugpatterns.NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS;
 import static tech.picnic.errorprone.bugpatterns.NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.errorprone.BugPattern;
@@ -28,21 +29,19 @@ import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Type;
 import java.util.Optional;
 
-/**
- * A {@link BugChecker} that flags methods and constants that can and should be statically imported.
- */
+/** A {@link BugChecker} that flags type members that can and should be statically imported. */
 // XXX: Tricky cases:
 // - `org.springframework.http.HttpStatus` (not always an improvement, and `valueOf` must
 //    certainly be excluded)
 // - `com.google.common.collect.Tables`
-// - `ch.qos.logback.classic.Level.{DEBUG, ERROR, INFO, TRACE, WARN"}`
+// - `ch.qos.logback.classic.Level.{DEBUG, ERROR, INFO, TRACE, WARN}`
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Identifier should be statically imported",
     link = BUG_PATTERNS_BASE_URL + "StaticImport",
     linkType = CUSTOM,
     severity = SUGGESTION,
-    tags = SIMPLIFICATION)
+    tags = STYLE)
 public final class StaticImport extends BugChecker implements MemberSelectTreeMatcher {
   private static final long serialVersionUID = 1L;
 
@@ -54,6 +53,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
    * <p>Types listed here should be mutually exclusive with {@link
    * NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_TYPES}.
    */
+  @VisibleForTesting
   static final ImmutableSet<String> STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of(
           "com.google.common.base.Preconditions",
@@ -103,11 +103,16 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
   /**
    * Type members that should be statically imported.
    *
-   * <p>This should be mutually exclusive with {@link
-   * NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_MEMBERS}.
+   * <p>Please note that:
    *
-   * <p>Identifiers listed by {@link NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS} should
-   * be mutually exclusive with identifiers listed here.
+   * <ul>
+   *   <li>Types listed by {@link #STATIC_IMPORT_CANDIDATE_TYPES} should be omitted from this
+   *       collection.
+   *   <li>This collection should be mutually exclusive with {@link
+   *       NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_MEMBERS}.
+   *   <li>This collection should not list members contained in {@link
+   *       NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS}.
+   * </ul>
    */
   static final ImmutableSetMultimap<String, String> STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()

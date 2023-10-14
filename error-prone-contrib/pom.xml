@@ -73,6 +73,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.google.googlejavaformat</groupId>
             <artifactId>google-java-format</artifactId>
         </dependency>

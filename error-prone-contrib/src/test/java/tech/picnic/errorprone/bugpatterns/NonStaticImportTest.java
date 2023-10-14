@@ -9,6 +9,12 @@ import org.junit.jupiter.api.Test;
 
 final class NonStaticImportTest {
   @Test
+  void candidateTypesDoNotClash() {
+    assertThat(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_TYPES)
+        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
+  }
+
+  @Test
   void candidateMembersAreNotRedundant() {
     assertThat(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
         .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_TYPES);
@@ -18,19 +24,13 @@ final class NonStaticImportTest {
   }
 
   @Test
-  void badTypesDontClashWithStaticImportCandidates() {
-    assertThat(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_TYPES)
-        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
-  }
-
-  @Test
-  void badMembersDontClashWithStaticImportCandidates() {
+  void candidateMembersDoNotClash() {
     assertThat(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS.entries())
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.entries());
   }
 
   @Test
-  void badIdentifiersDontClashWithStaticImportCandidates() {
+  void candidateIdentifiersDoNotClash() {
     assertThat(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS)
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.values());
   }
@@ -52,15 +52,23 @@ final class NonStaticImportTest {
             "pkg/A.java",
             "package pkg;",
             "",
+            "// BUG: Diagnostic contains:",
             "import static com.google.common.collect.ImmutableList.copyOf;",
+            "// BUG: Diagnostic contains:",
             "import static java.lang.Integer.MAX_VALUE;",
+            "// BUG: Diagnostic contains:",
             "import static java.lang.Integer.MIN_VALUE;",
+            "// BUG: Diagnostic contains:",
             "import static java.time.Clock.systemUTC;",
+            "// BUG: Diagnostic contains:",
             "import static java.time.Instant.MIN;",
             "import static java.time.ZoneOffset.UTC;",
+            "// BUG: Diagnostic contains:",
             "import static java.util.Collections.min;",
             "import static java.util.Locale.ENGLISH;",
+            "// BUG: Diagnostic contains:",
             "import static java.util.Locale.ROOT;",
+            "// BUG: Diagnostic contains:",
             "import static java.util.Optional.empty;",
             "",
             "import com.google.common.collect.ImmutableList;",
@@ -76,29 +84,23 @@ final class NonStaticImportTest {
             "  private Integer MIN_VALUE = 12;",
             "",
             "  void m() {",
-            "    // BUG: Diagnostic contains:",
             "    systemUTC();",
             "    Clock.systemUTC();",
             "    ZoneOffset utcIsExempted = UTC;",
             "",
-            "    // BUG: Diagnostic contains:",
             "    Optional<Integer> optional1 = empty();",
             "    Optional<Integer> optional2 = Optional.empty();",
             "",
-            "    // BUG: Diagnostic contains:",
             "    ImmutableList<Integer> list1 = copyOf(ImmutableList.of());",
             "    ImmutableList<Integer> list2 = ImmutableList.copyOf(ImmutableList.of());",
             "",
-            "    // BUG: Diagnostic contains:",
             "    Locale locale1 = ROOT;",
             "    Locale locale2 = Locale.ROOT;",
             "    Locale isNotACandidate = ENGLISH;",
             "",
-            "    // BUG: Diagnostic contains:",
             "    Instant instant1 = MIN;",
             "    Instant instant2 = Instant.MIN;",
             "",
-            "    // BUG: Diagnostic contains:",
             "    ImmutableSet.of(min(ImmutableSet.of()));",
             "",
             "    Object builder = null;",
@@ -111,19 +113,12 @@ final class NonStaticImportTest {
             "",
             "    Integer from = 12;",
             "    Integer i1 = from;",
-            "",
-            "    create();",
-            "  }",
-            "",
-            "  void create() {",
-            "    Integer MIN_VALUE = 12;",
-            "    // Not flagged because identifier is not statically imported.",
-            "    Integer i1 = MIN_VALUE;",
             "  }",
             "}")
         .doTest();
   }
 
+  // XXX: Test multiple replacements of the same import.
   @Test
   void replacement() {
     BugCheckerRefactoringTestHelper.newInstance(NonStaticImport.class, getClass())
@@ -164,18 +159,14 @@ final class NonStaticImportTest {
             "",
             "    ImmutableSet.of(min(of()));",
             "  }",
+            "",
+            "  private static final class WithCustomConstant {",
+            "    private static final int MIN = 42;",
+            "    private static final int MAX = MIN;",
+            "  }",
             "}")
         .addOutputLines(
             "A.java",
-            "import static com.google.common.collect.ImmutableList.copyOf;",
-            "import static com.google.common.collect.ImmutableSet.of;",
-            "import static java.time.Clock.systemUTC;",
-            "import static java.time.Instant.MAX;",
-            "import static java.time.Instant.MIN;",
-            "import static java.util.Collections.min;",
-            "import static java.util.Locale.ROOT;",
-            "import static java.util.Optional.empty;",
-            "",
             "import com.google.common.collect.ImmutableList;",
             "import com.google.common.collect.ImmutableSet;",
             "import java.time.Clock;",
@@ -202,6 +193,11 @@ final class NonStaticImportTest {
             "    Instant i2 = Instant.MAX;",
             "",
             "    ImmutableSet.of(Collections.min(ImmutableSet.of()));",
+            "  }",
+            "",
+            "  private static final class WithCustomConstant {",
+            "    private static final int MIN = 42;",
+            "    private static final int MAX = MIN;",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);

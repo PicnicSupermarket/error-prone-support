@@ -9,9 +9,24 @@ import org.junit.jupiter.api.Test;
 
 final class StaticImportTest {
   @Test
-  void candidateMethodsAreNotRedundant() {
+  void candidateTypesDoNotClash() {
+    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES)
+        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_TYPES);
+  }
+
+  @Test
+  void candidateMembersAreNotRedundant() {
     assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
+  }
+
+  @Test
+  void candidateMembersDoNotClash() {
+    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.entries())
+        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS.entries());
+
+    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.values())
+        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS);
   }
 
   @Test
