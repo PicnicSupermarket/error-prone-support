@@ -441,7 +441,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-core</artifactId>
-                <version>4.10.2</version>
+                <version>4.11.0</version>
                 <!-- XXX: Drop this exclusion once we forgo enforcement of JDK
                 11 bytecode version compatibility. -->
                 <exclusions>
