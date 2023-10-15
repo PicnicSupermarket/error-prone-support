@@ -30,6 +30,7 @@ import com.sun.tools.javac.code.Type;
 import java.util.Optional;
 
 /** A {@link BugChecker} that flags type members that can and should be statically imported. */
+// XXX: This check is closely linked to `NonStaticImport`. Consider merging the two.
 // XXX: Tricky cases:
 // - `org.springframework.http.HttpStatus` (not always an improvement, and `valueOf` must
 //    certainly be excluded)

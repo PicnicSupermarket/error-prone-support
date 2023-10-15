@@ -34,6 +34,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
  * A {@link BugChecker} that flags static imports of type members that should *not* be statically
  * imported.
  */
+// XXX: This check is closely linked to `StaticImport`. Consider merging the two.
 // XXX: Add suppression support. If qualification of one more more identifiers is suppressed, then
 // the associated static import should *not* be removed.
 // XXX: Also introduce logic that disallows statically importing `ZoneOffset.ofHours` and other
