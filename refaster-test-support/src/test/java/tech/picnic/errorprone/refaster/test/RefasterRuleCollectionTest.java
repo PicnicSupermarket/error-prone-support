@@ -21,6 +21,7 @@ final class RefasterRuleCollectionTest {
         MethodWithoutPrefixRules.class,
         MisnamedTestClassRules.class,
         MissingTestAndWrongTestRules.class,
+        NonSortedElidedTypesAndStaticImportsTestRules.class,
         PartialTestMatchRules.class,
         RuleWithoutTestRules.class,
         ValidRules.class

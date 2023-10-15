@@ -1,12 +1,15 @@
 package tech.picnic.errorprone.refaster.test;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
+import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_RULES_PATTERN_FLAG;
 
 import com.google.common.collect.ImmutableList;
@@ -31,9 +34,14 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LineMap;
+import com.sun.source.tree.MemberSelectTree;
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
@@ -299,9 +307,63 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
                 tree,
                 SuggestedFix.prefixWith(
                     tree, String.format("/* ERROR: Method names should start with `test`. */%n"))));
+      } else {
+        reportUnSortedElidedTypesAndStaticImports(tree, state);
       }
 
       return Optional.empty();
+    }
+
+    private void reportUnSortedElidedTypesAndStaticImports(MethodTree tree, VisitorState state) {
+      Optional<ReturnTree> returnTree =
+          tree.getBody().getStatements().stream()
+              .filter(statement -> statement.getKind() == Kind.RETURN)
+              .findFirst()
+              .map(ReturnTree.class::cast);
+
+      returnTree
+          .map(ReturnTree::getExpression)
+          .map(MethodInvocationTree.class::cast)
+          .ifPresent(
+              methodInvocationTree -> {
+                List<? extends ExpressionTree> actualArgumentsOrdering =
+                    methodInvocationTree.getArguments();
+
+                ImmutableList<? extends ExpressionTree> desiredArgumentOrdering =
+                    actualArgumentsOrdering.stream()
+                        .sorted(
+                            comparing(
+                                arg -> getArgumentName(arg, state), String.CASE_INSENSITIVE_ORDER))
+                        .collect(toImmutableList());
+
+                if (!actualArgumentsOrdering.equals(desiredArgumentOrdering)) {
+                  String suggestion =
+                      desiredArgumentOrdering.stream()
+                          .map(state::getSourceForNode)
+                          .collect(joining(", ", "(", ")"));
+
+                  state.reportMatch(
+                      describeMatch(
+                          methodInvocationTree,
+                          SuggestedFix.prefixWith(
+                              returnTree.orElseThrow(),
+                              String.format(
+                                  "/* ERROR: Arguments of %s should be sorted lexicographically.%n"
+                                      + "Did you mean: `return ImmutableSet.of%s`. */%n",
+                                  tree.getName(), suggestion))));
+                }
+              });
+    }
+
+    private String getArgumentName(ExpressionTree arg, VisitorState state) {
+      switch (arg.getKind()) {
+        case MEMBER_SELECT:
+          return state.getSourceForNode(((MemberSelectTree) arg).getExpression());
+        case METHOD_INVOCATION:
+          return state.getSourceForNode(((MethodInvocationTree) arg).getMethodSelect());
+        default:
+          return "";
+      }
     }
 
     private ImmutableRangeMap<Integer, String> getMatchesInTree(
