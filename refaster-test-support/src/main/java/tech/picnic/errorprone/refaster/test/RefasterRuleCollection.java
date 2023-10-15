@@ -1,12 +1,15 @@
 package tech.picnic.errorprone.refaster.test;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
+import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_RULES_PATTERN_FLAG;
 
 import com.google.common.collect.ImmutableListMultimap;
@@ -31,9 +34,14 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LineMap;
+import com.sun.source.tree.MemberSelectTree;
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
@@ -67,6 +75,8 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
   private static final long serialVersionUID = 1L;
   private static final String RULE_COLLECTION_FLAG = "RefasterRuleCollection:RuleCollection";
   private static final String TEST_METHOD_NAME_PREFIX = "test";
+  private static final String ELIDED_TYPES_AND_STATIC_IMPORTS_METHOD_NAME =
+      "elidedTypesAndStaticImports";
 
   private final String ruleCollectionUnderTest;
   private final ImmutableSortedSet<String> rulesUnderTest;
@@ -133,7 +143,10 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
+    SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
+
     reportIncorrectClassName(tree, state);
+    reportUnSortedElidedTypesAndStaticImports(tree, state, fixBuilder);
 
     List<Description> matches = new ArrayList<>();
     delegate.matchCompilationUnit(
@@ -148,7 +161,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     reportMissingMatches(tree, indexedMatches, state);
     reportUnexpectedMatches(tree, indexedMatches, state);
 
-    return Description.NO_MATCH;
+    return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
   }
 
   private void reportIncorrectClassName(CompilationUnitTree tree, VisitorState state) {
@@ -172,6 +185,68 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
                 SuggestedFix.prefixWith(
                     typeDeclaration, String.format("/* ERROR: Unexpected token. */%n"))));
       }
+    }
+  }
+
+  private void reportUnSortedElidedTypesAndStaticImports(
+      CompilationUnitTree compilationUnit, VisitorState state, SuggestedFix.Builder fixBuilder) {
+    new TreeScanner<@Nullable Void, @Nullable Void>() {
+      @Override
+      public @Nullable Void visitMethod(MethodTree tree, @Nullable Void unused) {
+        String methodName = tree.getName().toString();
+        if (ELIDED_TYPES_AND_STATIC_IMPORTS_METHOD_NAME.equals(methodName)) {
+          Optional<ReturnTree> returnTree =
+              tree.getBody().getStatements().stream()
+                  .filter(statement -> statement.getKind() == Kind.RETURN)
+                  .findFirst()
+                  .map(ReturnTree.class::cast);
+
+          returnTree
+              .map(ReturnTree::getExpression)
+              .map(MethodInvocationTree.class::cast)
+              .ifPresent(
+                  methodInvocationTree -> {
+                    List<? extends ExpressionTree> actualArgumentsOrdering =
+                        methodInvocationTree.getArguments();
+
+                    ImmutableList<? extends ExpressionTree> desiredArgumentOrdering =
+                        actualArgumentsOrdering.stream()
+                            .sorted(
+                                comparing(
+                                    arg -> getArgumentName(arg, state),
+                                    String.CASE_INSENSITIVE_ORDER))
+                            .collect(toImmutableList());
+
+                    if (!actualArgumentsOrdering.equals(desiredArgumentOrdering)) {
+                      String suggestion =
+                          desiredArgumentOrdering.stream()
+                              .map(state::getSourceForNode)
+                              .collect(
+                                  joining(
+                                      ", ",
+                                      String.format(
+                                          "%s(",
+                                          state.getSourceForNode(
+                                              methodInvocationTree.getMethodSelect())),
+                                      ")"));
+
+                      fixBuilder.merge(SuggestedFix.replace(methodInvocationTree, suggestion));
+                    }
+                  });
+        }
+        return super.visitMethod(tree, null);
+      }
+    }.scan(compilationUnit, null);
+  }
+
+  private static String getArgumentName(ExpressionTree arg, VisitorState state) {
+    switch (arg.getKind()) {
+      case MEMBER_SELECT:
+        return state.getSourceForNode(((MemberSelectTree) arg).getExpression());
+      case METHOD_INVOCATION:
+        return state.getSourceForNode(((MethodInvocationTree) arg).getMethodSelect());
+      default:
+        return "";
     }
   }
 
@@ -296,7 +371,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
        * Unless this method is `RefasterRuleCollectionTestCase#elidedTypesAndStaticImports`, it's
        * misnamed.
        */
-      if (!"elidedTypesAndStaticImports".equals(methodName)) {
+      if (!ELIDED_TYPES_AND_STATIC_IMPORTS_METHOD_NAME.equals(methodName)) {
         state.reportMatch(
             describeMatch(
                 tree,
