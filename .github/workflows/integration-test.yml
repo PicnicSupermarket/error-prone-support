@@ -23,6 +23,10 @@ jobs:
           # ensure we fetch ALL commits and tags!
           fetch-depth: '0'
           persist-credentials: false
+      - name: Set git config
+        run: |
+           git config --global user.email "cody@picnic.tech"
+           git config --global user.name "cody"
       - name: Set up JDK
         uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
         with:
