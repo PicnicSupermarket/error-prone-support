@@ -42,3 +42,10 @@ jobs:
         # ensure this script is executed in the integration-tests directory
         working-directory: ./integration-tests
         run: bash ./run.sh
+      - name: Upload diff artifacts
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        with:
+          name: integration-test-diffs
+          path: |
+              ./integration-tests/checkstyle-checkstyle-10.9.3-expected-changes.patch
+              ./integration-tests/checkstyle-checkstyle-10.9.3-expected-warnings.txt
