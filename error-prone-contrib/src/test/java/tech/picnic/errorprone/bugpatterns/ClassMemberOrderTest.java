@@ -1,75 +1,83 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Predicates.containsPattern;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class ClassMemberOrderingTest {
+final class ClassMemberOrderTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(ClassMemberOrdering.class, getClass())
-        .expectErrorMessage(
-            "ClassMemberOrdering",
-            containsPattern("Fields, constructors and methods should follow standard ordering."))
+    CompilationTestHelper.newInstance(ClassMemberOrder.class, getClass())
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic matches: ClassMemberOrdering",
             "class A {",
-            "  char a = 'a';",
-            "  private static String FOO = \"foo\";",
-            "  static int ONE = 1;",
+            "  class Empty {}",
             "",
-            "  void m2() {}",
-            "",
-            "  public A() {}",
-            "",
-            "  private static String BAR = \"bar\";",
-            "  char b = 'b';",
-            "",
-            "  void m1() {",
-            "    System.out.println(\"foo\");",
+            "  class SingleField {",
+            "    private int field;",
             "  }",
             "",
-            "  static int TWO = 2;",
+            "  class FieldAndMethod {",
+            "    private int field;",
             "",
-            "  class Inner {}",
-            "",
-            "  static class StaticInner {}",
-            "}")
-        .addSourceLines(
-            "B.java",
-            "class B {",
-            "  private static String FOO = \"foo\";",
-            "  static int ONE = 1;",
-            "  private static String BAR = \"bar\";",
-            "",
-            "  static int TWO = 2;",
-            "",
-            "  char a = 'a';",
-            "",
-            "  char b = 'b';",
-            "",
-            "  public B() {}",
-            "",
-            "  void m1() {",
-            "    System.out.println(\"foo\");",
+            "    void foo() {}",
             "  }",
             "",
-            "  void m2() {}",
+            "  // BUG: Diagnostic contains:",
+            "  class MethodAndField {",
+            "    void foo() {}",
             "",
-            "  class Inner {}",
+            "    private int field;",
+            "  }",
             "",
-            "  static class StaticInner {}",
+            "  class AllSorted {",
+            "    private static String FOO = \"foo\";",
+            "    static String BAR = \"bar\";",
+            "    public static final int ONE = 1;",
+            "    protected static final int TWO = 2;",
+            "",
+            "    private char a = 'a';",
+            "    public char b = 'b';",
+            "",
+            "    static {",
+            "      FOO = \"foo2\";",
+            "    }",
+            "",
+            "    static {",
+            "      BAR = \"bar2\";",
+            "    }",
+            "",
+            "    {",
+            "      a = 'c';",
+            "    }",
+            "",
+            "    {",
+            "      b = 'd';",
+            "    }",
+            "",
+            "    public AllSorted() {}",
+            "",
+            "    AllSorted(int param) {}",
+            "",
+            "    int m1() {",
+            "      return 42;",
+            "    }",
+            "",
+            "    public void m2() {}",
+            "",
+            "    class Nested {}",
+            "",
+            "    static class StaticNested {}",
+            "  }",
             "}")
         .doTest();
   }
 
+  // XXX: Also test with an interface!
   @Test
-  void replacementFirstSuggestedFix() {
-    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
+  void replacement() {
+    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
@@ -79,6 +87,9 @@ final class ClassMemberOrderingTest {
             "  static int ONE = 1;",
             "",
             "  void m2() {}",
+            "",
+            "  {",
+            "  }",
             "",
             "  public A() {}",
             "",
@@ -101,13 +112,15 @@ final class ClassMemberOrderingTest {
             "  private static final int X = 1;",
             "  private static String FOO = \"foo\";",
             "  static int ONE = 1;",
+            "",
             "  private static String BAR = \"bar\";",
             "",
             "  static int TWO = 2;",
-            "",
             "  char a = 'a';",
-            "",
             "  char b = 'b';",
+            "",
+            "  {",
+            "  }",
             "",
             "  public A() {}",
             "",
@@ -122,11 +135,9 @@ final class ClassMemberOrderingTest {
             "  static class StaticInner {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
-  }
 
-  @Test
-  void replacementFirstSuggestedFixConsidersDefaultConstructor() {
-    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
+    // XXX: Merge.
+    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
@@ -141,6 +152,7 @@ final class ClassMemberOrderingTest {
         .addOutputLines(
             "A.java",
             "class A {",
+            "",
             "  private static final String foo = \"foo\";",
             "",
             "  static int one = 1;",
@@ -150,17 +162,15 @@ final class ClassMemberOrderingTest {
             "  void m1() {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
-  }
 
-  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
-  @Test
-  void replacementFirstSuggestedFixConsidersComments() {
-    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
+    // XXX: Merge.
+    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
             "  // detached comment from method",
-            "  ;void method1() {}",
+            "  ;",
+            "  void method1() {}",
             "",
             "  // first comment prior to method",
             "  // second comment prior to method",
@@ -176,11 +186,13 @@ final class ClassMemberOrderingTest {
         .addOutputLines(
             "A.java",
             "class A {",
+            "",
             "  // foo",
             "  /** Instantiates a new {@link A} instance. */",
             "  public A() {}",
-            "",
             "  // detached comment from method",
+            "  ;",
+            "",
             "  void method1() {}",
             "",
             "  // first comment prior to method",
@@ -191,11 +203,9 @@ final class ClassMemberOrderingTest {
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
-  }
 
-  @Test
-  void replacementFirstSuggestedFixConsidersAnnotations() {
-    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
+    // XXX: Merge.
+    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
@@ -208,6 +218,7 @@ final class ClassMemberOrderingTest {
         .addOutputLines(
             "A.java",
             "class A {",
+            "",
             "  @SuppressWarnings(\"bar\")",
             "  A() {}",
             "",
@@ -215,90 +226,60 @@ final class ClassMemberOrderingTest {
             "  void m1() {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
-  }
 
-  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
-  @Test
-  void replacementFirstSuggestedFixDoesNotModifyWhitespace() {
-    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
+    // XXX: Merge.
+    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
-            "",
-            "",
             "class A {",
-            "",
             "",
             "  // `m1()` comment.",
             "  void m1() {",
             "    // Print line 'foo' to stdout.",
             "    System.out.println(\"foo\");",
             "  }",
-            "  public  A  ()  {  }",
             "",
-            "",
+            "  public A() {}",
             "}")
         .addOutputLines(
             "A.java",
-            "",
-            "",
             "class A {",
             "",
+            "  public A() {}",
             "",
-            "",
-            "  public  A  ()  {  }",
             "  // `m1()` comment.",
             "  void m1() {",
             "    // Print line 'foo' to stdout.",
             "    System.out.println(\"foo\");",
             "  }",
-            "",
-            "",
             "}")
-        .doTest();
-  }
+        .doTest(TestMode.TEXT_MATCH);
 
-  // XXX: This test should fail, if we verify that whitespace is preserved.
-  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
-  void xxx() {
-    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrdering.class, getClass())
+    // XXX: Merge.
+    BugCheckerRefactoringTestHelper.newInstance(ClassMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
-            "",
-            "",
             "class A {",
-            "",
             "",
             "  // `m1()` comment.",
             "  void m1() {",
             "    // Print line 'foo' to stdout.",
             "    System.out.println(\"foo\");",
             "  }",
-            "  public  A  ()  {  }",
             "",
-            "",
+            "  public A() {}",
             "}")
         .addOutputLines(
             "A.java",
-            "",
-            "",
             "class A {",
             "",
-            "  ",
-            "     ",
-            "  \t  \t",
-            "     ",
-            "  ",
+            "  public A() {}",
             "",
-            "  public  A                    ()  {  }",
             "  // `m1()` comment.",
-            "  void m1",
-            "         ()",
-            "  {",
+            "  void m1() {",
             "    // Print line 'foo' to stdout.",
             "    System.out.println(\"foo\");",
             "  }",
-            "",
-            "",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
