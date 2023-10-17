@@ -3,6 +3,10 @@ on:
   # run action every time a new comment is created
   issue_comment:
     types: [ created ]
+  # enable this, to test the action without changing default branch
+  push:
+    branches: [ gdejong/integration-test-action ]
+
 permissions:
   contents: read
 jobs:
@@ -10,9 +14,10 @@ jobs:
     name: On-demand integration test
     # Only run the integration test if the created comment is on a pull request
     # and contains the string `/integration-test`
-    if: | 
-      github.event.issue.pull_request &&
-      contains(github.event.comment.body, '/integration-test')
+    # disable this to avoid having to change the default branch on EPS
+    # if: | 
+    #   github.event.issue.pull_request &&
+    #   contains(github.event.comment.body, '/integration-test')
     # XXX TODO: Device matrix? 
     runs-on: ubuntu-latest
     steps:
