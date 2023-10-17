@@ -41,6 +41,8 @@ jobs:
           cache: maven
       - name: Display build environment details
         run: mvn --version
+      - name: Display grep version
+        run: grep --version
       - name: Install error-prone-support snapshot
         run: mvn -T1C install -DskipTests -Dverification.skip
       - name: Run integration test
