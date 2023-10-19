@@ -442,42 +442,4 @@ final class PrimitiveRules {
       return Long.signum(l) == -1;
     }
   }
-
-  /** Prefer a {@link Math#signum(double)} comparison to 1 over less clear alternatives. */
-  static final class MathSignumIsPositive {
-    @BeforeTemplate
-    boolean before(float v) {
-      return Refaster.anyOf(Math.signum(v) > 0, Math.signum(v) >= 1);
-    }
-
-    @BeforeTemplate
-    boolean before(double v) {
-      return Refaster.anyOf(Math.signum(v) > 0, Math.signum(v) >= 1);
-    }
-
-    @AfterTemplate
-    @AlsoNegation
-    boolean after(double v) {
-      return Math.signum(v) == 1;
-    }
-  }
-
-  /** Prefer a {@link Math#signum(double)} comparison to -1 over less clear alternatives. */
-  static final class MathSignumIsNegative {
-    @BeforeTemplate
-    boolean before(float v) {
-      return Refaster.anyOf(Math.signum(v) < 0, Math.signum(v) <= -1);
-    }
-
-    @BeforeTemplate
-    boolean before(double v) {
-      return Refaster.anyOf(Math.signum(v) < 0, Math.signum(v) <= -1);
-    }
-
-    @AfterTemplate
-    @AlsoNegation
-    boolean after(double v) {
-      return Math.signum(v) == -1;
-    }
-  }
 }

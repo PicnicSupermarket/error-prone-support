@@ -190,28 +190,4 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Long.signum(1L) == -1, Long.signum(2L) == -1, Long.signum(3L) != -1, Long.signum(4L) != -1);
   }
-
-  ImmutableSet<Boolean> testMathSignumIsPositive() {
-    return ImmutableSet.of(
-        Math.signum(1.0) == 1,
-        Math.signum(2.0) == 1,
-        Math.signum(3.0F) == 1,
-        Math.signum(4.0F) == 1,
-        Math.signum(5.0) != 1,
-        Math.signum(6.0) != 1,
-        Math.signum(7.0F) != 1,
-        Math.signum(8.0F) != 1);
-  }
-
-  ImmutableSet<Boolean> testMathSignumIsNegative() {
-    return ImmutableSet.of(
-        Math.signum(1.0) == -1,
-        Math.signum(2.0) == -1,
-        Math.signum(3.0F) == -1,
-        Math.signum(4.0F) == -1,
-        Math.signum(5.0) != -1,
-        Math.signum(6.0) != -1,
-        Math.signum(7.0F) != -1,
-        Math.signum(8.0F) != -1);
-  }
 }
