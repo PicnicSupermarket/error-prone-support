@@ -164,4 +164,30 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
   boolean testDoubleIsFinite() {
     return Double.isFinite(1);
   }
+
+  ImmutableSet<Boolean> testIntegerSignumIsPositive() {
+    return ImmutableSet.of(
+        Integer.signum(1) == 1,
+        Integer.signum(2) == 1,
+        Integer.signum(3) != 1,
+        Integer.signum(4) != 1);
+  }
+
+  ImmutableSet<Boolean> testIntegerSignumIsNegative() {
+    return ImmutableSet.of(
+        Integer.signum(1) == -1,
+        Integer.signum(2) == -1,
+        Integer.signum(3) != -1,
+        Integer.signum(4) != -1);
+  }
+
+  ImmutableSet<Boolean> testLongSignumIsPositive() {
+    return ImmutableSet.of(
+        Long.signum(1L) == 1, Long.signum(2L) == 1, Long.signum(3L) != 1, Long.signum(4L) != 1);
+  }
+
+  ImmutableSet<Boolean> testLongSignumIsNegative() {
+    return ImmutableSet.of(
+        Long.signum(1L) == -1, Long.signum(2L) == -1, Long.signum(3L) != -1, Long.signum(4L) != -1);
+  }
 }
