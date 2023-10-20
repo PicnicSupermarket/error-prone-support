@@ -71,7 +71,7 @@ public final class MockitoMockClassReference extends BugChecker
     Tree parent = state.getPath().getParentPath().getLeaf();
     switch (parent.getKind()) {
       case VARIABLE:
-        return !ASTHelpers.hasNoExplicitType((VariableTree) parent, state)
+        return !ASTHelpers.hasImplicitType((VariableTree) parent, state)
             && MoreASTHelpers.areSameType(tree, parent, state);
       case ASSIGNMENT:
         return MoreASTHelpers.areSameType(tree, parent, state);
