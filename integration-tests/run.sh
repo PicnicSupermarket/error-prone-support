@@ -96,7 +96,9 @@ mvn clean package \
 echo "Finished validation run!"
 
 baseline_warnings="../${project}-${revision}-expected-warnings.txt"
-generated_warnngs="$(grep -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_log_file}" | grep -P '\] \[')"
+# note: added '*' in the final grep, required in order to get matches in GNU grep 3.11
+# disable sync mechanism, we just want to upload the expected warnings
+generated_warnings="$(grep -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_log_file}" | grep -P '\]*\[')"
 # if [ -n "${do_sync}" ]; then
 echo 'Saving emitted warnings...'
 echo "${generated_warnings}" > "${baseline_warnings}"
