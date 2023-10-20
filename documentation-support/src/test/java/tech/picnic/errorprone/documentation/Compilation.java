@@ -31,6 +31,7 @@ public final class Compilation {
       String outputDirectory, String path, String... lines) {
     compile(
         ImmutableList.of(
+            "-proc:none",
             "-Werror",
             "-Xlint:all,-processing,-serial",
             "-Xplugin:DocumentationGenerator -XoutputDirectory=" + outputDirectory),
