@@ -23,18 +23,18 @@ public final class Compilation {
   private Compilation() {}
 
   public static void compileWithDocumentationGenerator(
-      Path outputDirectory, String fileName, String... lines) {
-    compileWithDocumentationGenerator(outputDirectory.toAbsolutePath().toString(), fileName, lines);
+      Path outputDirectory, String path, String... lines) {
+    compileWithDocumentationGenerator(outputDirectory.toAbsolutePath().toString(), path, lines);
   }
 
   public static void compileWithDocumentationGenerator(
-      String outputDirectory, String fileName, String... lines) {
+      String outputDirectory, String path, String... lines) {
     compile(
         ImmutableList.of(
             "-Werror",
             "-Xlint:all,-processing,-serial",
             "-Xplugin:DocumentationGenerator -XoutputDirectory=" + outputDirectory),
-        FileObjects.forSourceLines(fileName, lines));
+        FileObjects.forSourceLines(path, lines));
   }
 
   private static void compile(ImmutableList<String> options, JavaFileObject javaFileObject) {

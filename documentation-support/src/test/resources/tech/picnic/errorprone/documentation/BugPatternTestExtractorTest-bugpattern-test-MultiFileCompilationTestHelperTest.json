@@ -5,11 +5,11 @@
       "classUnderTest": "MultiFileCompilationTestHelperTest.TestChecker",
       "entries": [
         {
-          "fileName": "A.java",
+          "path": "A.java",
           "code": "// BUG: Diagnostic contains:\nclass A {}\n"
         },
         {
-          "fileName": "B.java",
+          "path": "B.java",
           "code": "// BUG: Diagnostic contains:\nclass B {}\n"
         }
       ]

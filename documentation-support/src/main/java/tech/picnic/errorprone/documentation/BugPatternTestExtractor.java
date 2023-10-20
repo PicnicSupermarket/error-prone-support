@@ -87,7 +87,7 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
 
     private final List<TestCase> collectedTestCases = new ArrayList<>();
 
-    public ImmutableList<TestCase> getCollectedTests() {
+    private ImmutableList<TestCase> getCollectedTests() {
       return ImmutableList.copyOf(collectedTestCases);
     }
 
@@ -133,13 +133,13 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
     private static void extractIdentificationTestCases(
         MethodInvocationTree tree, List<TestEntry> sink, VisitorState state) {
       if (IDENTIFICATION_SOURCE_LINES.matches(tree, state)) {
-        String fileName = ASTHelpers.constValue(tree.getArguments().get(0), String.class);
+        String path = ASTHelpers.constValue(tree.getArguments().get(0), String.class);
         Optional<String> sourceCode =
             getSourceCode(tree).filter(s -> s.contains("// BUG: Diagnostic"));
-        if (fileName != null && sourceCode.isPresent()) {
+        if (path != null && sourceCode.isPresent()) {
           sink.add(
               new AutoValue_BugPatternTestExtractor_IdentificationTestEntry(
-                  fileName, sourceCode.orElseThrow()));
+                  path, sourceCode.orElseThrow()));
         }
       }
 
@@ -159,16 +159,16 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
          */
         MethodInvocationTree inputTree = (MethodInvocationTree) ASTHelpers.getReceiver(tree);
 
-        String fileName = ASTHelpers.constValue(inputTree.getArguments().get(0), String.class);
+        String path = ASTHelpers.constValue(inputTree.getArguments().get(0), String.class);
         Optional<String> inputCode = getSourceCode(inputTree);
-        if (fileName != null && inputCode.isPresent()) {
+        if (path != null && inputCode.isPresent()) {
           Optional<String> outputCode =
               REPLACEMENT_EXPECT_UNCHANGED.matches(tree, state) ? inputCode : getSourceCode(tree);
 
           if (outputCode.isPresent() && !inputCode.equals(outputCode)) {
             sink.add(
                 new AutoValue_BugPatternTestExtractor_ReplacementTestEntry(
-                    fileName, inputCode.orElseThrow(), outputCode.orElseThrow()));
+                    path, inputCode.orElseThrow(), outputCode.orElseThrow()));
           }
         }
       }
@@ -212,7 +212,7 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
   }
 
   interface TestEntry {
-    String fileName();
+    String path();
   }
 
   @AutoValue
