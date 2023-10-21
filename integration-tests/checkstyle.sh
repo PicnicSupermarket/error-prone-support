@@ -11,6 +11,8 @@ additional_source_directories='${project.basedir}${file.separator}src${file.sepa
 shared_error_prone_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
 patch_error_prone_flags=''
 validation_error_prone_flags=''
+patch_error_prone_flags='-XepOpt:Refaster:NamePattern=.*Workshop.*"'
+validation_error_prone_flags='-XepOpt:Refaster:NamePattern=.*Workshop.*"'
 # Validation skips some tests:
 # - The `metadataFilesGenerationAllFiles` test is skipped because it makes line
 #   number assertions that will fail when the code is formatted or patched.
