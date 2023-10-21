@@ -29,12 +29,26 @@ public final class Compilation {
 
   public static void compileWithDocumentationGenerator(
       String outputDirectory, String path, String... lines) {
+    /*
+     * The compiler options specified here largely match those used by Error Prone's
+     * `CompilationTestHelper`. A key difference is the stricter linting configuration. When
+     * compiling using JDK 21+, these lint options also require that certain JDK modules are
+     * explicitly exported.
+     */
     compile(
         ImmutableList.of(
+            "--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+            "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+            "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+            "-encoding",
+            "UTF-8",
+            "-parameters",
             "-proc:none",
             "-Werror",
-            "-Xlint:all,-processing,-serial",
-            "-Xplugin:DocumentationGenerator -XoutputDirectory=" + outputDirectory),
+            "-Xlint:all,-serial",
+            "-Xplugin:DocumentationGenerator -XoutputDirectory=" + outputDirectory,
+            "-XDdev",
+            "-XDcompilePolicy=simple"),
         FileObjects.forSourceLines(path, lines));
   }
 
