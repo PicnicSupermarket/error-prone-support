@@ -9,6 +9,7 @@ permissions:
   contents: read
 jobs:
   analyze-pr:
+    if: github.repository == 'PicnicSupermarket/error-prone-support'
     runs-on: ubuntu-22.04
     steps:
       - name: Install Harden-Runner

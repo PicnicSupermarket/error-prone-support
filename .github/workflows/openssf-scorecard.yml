@@ -14,6 +14,7 @@ permissions:
   contents: read
 jobs:
   analyze:
+    if: github.repository == 'PicnicSupermarket/error-prone-support'
     permissions:
       contents: read
       security-events: write
