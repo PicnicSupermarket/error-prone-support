@@ -17,7 +17,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Collections.class, Streams.class, identity());
+    return ImmutableSet.of(Collections.class, identity(), Streams.class);
   }
 
   ImmutableMap.Builder<String, Integer> testImmutableMapBuilder() {

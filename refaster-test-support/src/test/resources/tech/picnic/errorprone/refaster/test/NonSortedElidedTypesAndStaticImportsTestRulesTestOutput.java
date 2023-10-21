@@ -15,7 +15,7 @@ final class NonSortedElidedTypesAndStaticImportsTestRulesTest
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     /* ERROR: Arguments of elidedTypesAndStaticImports should be sorted lexicographically.
-    Did you mean: `(assertDoesNotThrow(() -> null), Iterables.class, Lists.class)`. */
+    Did you mean: `return ImmutableSet.of(assertDoesNotThrow(() -> null), Iterables.class, Lists.class)`. */
     return ImmutableSet.of(Lists.class, assertDoesNotThrow(() -> null), Iterables.class);
   }
 }

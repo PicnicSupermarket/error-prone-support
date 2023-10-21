@@ -32,12 +32,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         ArrayList.class,
+        assertThat(0),
         Collection.class,
         HashMap.class,
-        List.class,
         ImmutableCollection.class,
         ImmutableMap.class,
-        assertThat(0),
+        List.class,
         toCollection(null),
         toImmutableList(),
         toOptional());

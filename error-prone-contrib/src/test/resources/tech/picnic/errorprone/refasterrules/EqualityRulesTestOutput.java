@@ -14,7 +14,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Objects.class, Optional.class, not(null));
+    return ImmutableSet.of(not(null), Objects.class, Optional.class);
   }
 
   ImmutableSet<Boolean> testPrimitiveOrReferenceEquality() {
