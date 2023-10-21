@@ -9,8 +9,8 @@ revision='checkstyle-10.14.0'
 # XXX: Configure Renovate to manage the AssertJ version declared here.
 additional_build_flags='-Dassertj.version=3.24.2'
 additional_source_directories='${project.basedir}${file.separator}src${file.separator}it${file.separator}java,${project.basedir}${file.separator}src${file.separator}xdocs-examples${file.separator}java'
-patch_error_prone_flags=''
-validation_error_prone_flags=''
+patch_error_prone_flags='-XepOpt:Refaster:NamePattern=.*Workshop.*"'
+validation_error_prone_flags='-XepOpt:Refaster:NamePattern=.*Workshop.*"'
 # Validation skips some tests:
 # - The `metadataFilesGenerationAllFiles` test is skipped because it makes line
 #   number assertions that will fail when the code is formatted or patched.
