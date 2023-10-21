@@ -9,13 +9,13 @@ name: "Integration tests"
 on:
   issue_comment:
     types: [ created ]
+  pull_request:
+  push:
 permissions:
   contents: read
 jobs:
   run-integration-tests:
     name: On-demand integration test
-    if: |
-      github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
     runs-on: ubuntu-22.04
     steps:
       - name: Install Harden-Runner

@@ -13,6 +13,7 @@ permissions:
   contents: read
 jobs:
   analyze:
+    if: github.repository == 'PicnicSupermarket/error-prone-support'
     strategy:
       matrix:
         language: [ java, ruby ]
