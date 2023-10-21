@@ -48,6 +48,7 @@
         <module>refaster-runner</module>
         <module>refaster-support</module>
         <module>refaster-test-support</module>
+        <module>workshop</module>
     </modules>
 
     <scm child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
@@ -426,14 +427,6 @@
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
                 <version>1.15.10</version>
-            </dependency>
-            <!-- Specified so that Renovate will file Maven upgrade PRs, which
-            subsequently will cause `maven-enforcer-plugin` to require that
-            developers build the project using the latest Maven release. -->
-            <dependency>
-                <groupId>org.apache.maven</groupId>
-                <artifactId>maven-plugin-api</artifactId>
-                <version>${version.maven}</version>
             </dependency>
             <dependency>
                 <groupId>org.aspectj</groupId>
@@ -1121,9 +1114,6 @@
                             <requireMatchingCoordinates>
                                 <moduleNameMustMatchArtifactId>true</moduleNameMustMatchArtifactId>
                             </requireMatchingCoordinates>
-                            <requireMavenVersion>
-                                <version>${version.maven}</version>
-                            </requireMavenVersion>
                             <requireNoRepositories />
                             <requirePluginVersions />
                             <requireUpperBoundDeps />
@@ -1463,37 +1453,6 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.gaul</groupId>
-                    <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>2.9.0</version>
-                    <configuration>
-                        <exclusionPatterns>
-                            <!-- The plugin suggests replacing usages of
-                            Guava's `Iterables` class with
-                            `java.util.stream.Stream` equivalents, but the
-                            alternative is often more verbose, requiring
-                            unnecessary conversions to and from streams. -->
-                            <exclusionPattern>com/google/common/collect/Iterables\..*</exclusionPattern>
-                        </exclusionPatterns>
-                        <failOnViolations>false</failOnViolations>
-                        <ignorePackages>
-                            <!-- Some Refaster rules purposefully use outdated
-                            patterns in their `@BeforeTemplate` methods. -->
-                            <ignorePackage>tech.picnic.errorprone.refasterrules</ignorePackage>
-                        </ignorePackages>
-                        <javaVersion>${version.jdk}</javaVersion>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>run-modernizer</id>
-                            <goals>
-                                <goal>modernizer</goal>
-                            </goals>
-                            <phase>process-test-classes</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>0.8.12</version>
@@ -1506,6 +1465,7 @@
                     </configuration>
                 </plugin>
                 <plugin>
+<<<<<<< HEAD
                     <groupId>org.kordamp.maven</groupId>
                     <artifactId>pomchecker-maven-plugin</artifactId>
                     <version>1.14.0</version>
@@ -1524,6 +1484,8 @@
                     </executions>
                 </plugin>
                 <plugin>
+=======
+>>>>>>> 1d415add (Introduce `workshop` module)
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
                     <version>1.17.0</version>
@@ -1877,14 +1839,6 @@
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>tidy-maven-plugin</artifactId>
                     </plugin>
-                    <plugin>
-                        <groupId>org.gaul</groupId>
-                        <artifactId>modernizer-maven-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.kordamp.maven</groupId>
-                        <artifactId>pomchecker-maven-plugin</artifactId>
-                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -2111,21 +2065,6 @@
                                 <failOnMissing>true</failOnMissing>
                             </configuration>
                         </plugin>
-                        <plugin>
-                            <groupId>org.gaul</groupId>
-                            <artifactId>modernizer-maven-plugin</artifactId>
-                            <configuration>
-                                <failOnViolations>true</failOnViolations>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.kordamp.maven</groupId>
-                            <artifactId>pomchecker-maven-plugin</artifactId>
-                            <configuration>
-                                <failOnError>true</failOnError>
-                                <failOnWarning>true</failOnWarning>
-                            </configuration>
-                        </plugin>
                     </plugins>
                 </pluginManagement>
             </build>
@@ -2197,13 +2136,6 @@
                         <artifactId>maven-gpg-plugin</artifactId>
                     </plugin>
                     <?SORTPOM RESUME?>
-                    <plugin>
-                        <groupId>org.kordamp.maven</groupId>
-                        <artifactId>pomchecker-maven-plugin</artifactId>
-                        <configuration>
-                            <release>true</release>
-                        </configuration>
-                    </plugin>
                 </plugins>
             </build>
         </profile>
