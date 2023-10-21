@@ -22,17 +22,17 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Assertions.class,
-        assertDoesNotThrow(() -> null),
-        assertInstanceOf(null, null),
-        assertThrows(null, null),
-        assertThrowsExactly(null, null),
         (Runnable) () -> assertFalse(true),
         (Runnable) () -> assertNotNull(null),
         (Runnable) () -> assertNotSame(null, null),
         (Runnable) () -> assertNull(null),
         (Runnable) () -> assertSame(null, null),
-        (Runnable) () -> assertTrue(true));
+        (Runnable) () -> assertTrue(true),
+        assertDoesNotThrow(() -> null),
+        assertInstanceOf(null, null),
+        Assertions.class,
+        assertThrows(null, null),
+        assertThrowsExactly(null, null));
   }
 
   void testThrowNewAssertionError() {
