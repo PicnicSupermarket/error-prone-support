@@ -48,6 +48,7 @@
         <module>refaster-runner</module>
         <module>refaster-support</module>
         <module>refaster-test-support</module>
+        <module>workshop</module>
     </modules>
 
     <scm child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
@@ -408,14 +409,6 @@
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
                 <version>1.14.13</version>
-            </dependency>
-            <!-- Specified so that Renovate will file Maven upgrade PRs, which
-            subsequently will cause `maven-enforcer-plugin` to require that
-            developers build the project using the latest Maven release. -->
-            <dependency>
-                <groupId>org.apache.maven</groupId>
-                <artifactId>maven-plugin-api</artifactId>
-                <version>${version.maven}</version>
             </dependency>
             <dependency>
                 <groupId>org.aspectj</groupId>
@@ -1041,9 +1034,6 @@
                             <requireJavaVersion>
                                 <version>${version.jdk}</version>
                             </requireJavaVersion>
-                            <requireMavenVersion>
-                                <version>${version.maven}</version>
-                            </requireMavenVersion>
                             <requireNoRepositories />
                             <requirePluginVersions />
                             <requireUpperBoundDeps />

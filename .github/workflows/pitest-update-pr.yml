@@ -11,7 +11,7 @@ permissions:
   actions: read
 jobs:
   update-pr:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.repository == 'PicnicSupermarket/error-prone-support' }}
     permissions:
       actions: read
       checks: write

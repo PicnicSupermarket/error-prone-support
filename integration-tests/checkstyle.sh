@@ -66,21 +66,23 @@ error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE 
      -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" \
      -not -path "*/error-prone-experimental/*" \
      -not -path "*/error-prone-guidelines/*" \
+     -not -path "*/error-prone-contrib/*" \
      -print0 \
     | xargs -0 "${grep_command}" -hoP '[^.]+$' \
     | paste -s -d ',' -
-)"
+) -XepOpt:Refaster:NamePattern=.*Workshop.*"
 
 error_prone_validation_flags="${error_prone_shared_flags} -XepDisableAllChecks $(
   find "${error_prone_support_root}" \
      -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" \
      -not -path "*/error-prone-experimental/*" \
      -not -path "*/error-prone-guidelines/*" \
+     -not -path "*/error-prone-contrib/*" \
      -print0 \
     | xargs -0 "${grep_command}" -hoP '[^.]+$' \
     | "${sed_command}" -r 's,(.*),-Xep:\1:WARN,' \
     | paste -s -d ' ' -
-)"
+) -XepOpt:Refaster:NamePattern=.*Workshop.*"
 
 echo "Shared build flags: ${shared_build_flags}"
 echo "Error Prone patch flags: ${error_prone_patch_flags}"
@@ -168,6 +170,7 @@ mvn ${shared_build_flags} \
       -Dtest='
         !MetadataGeneratorUtilTest#metadataFilesGenerationAllFiles,
         !XdocsJavaDocsTest#allCheckSectionJavaDocs' \
+      -Dstyle.color=always \
     | tee "${validation_build_log}" \
   || failure=1
 
@@ -191,12 +194,15 @@ else
   # XXX: This "diff of diffs" also contains vacuous sections, introduced due to
   # line offset differences. Try to omit those from the final output.
   if ! diff -u "${expected_changes}" "${actual_changes}"; then
-    echo 'There are unexpected changes. Inspect the preceding output for details.'
+    echo 'There are unexpected changes.'
+    echo "Inspect the changes here: ${report_directory}/${test_name}-diff-of-diffs-changes.patch"
+    diff -u "${expected_changes}" "${actual_changes}" > "${report_directory}/${test_name}-diff-of-diffs-changes.patch"
     failure=1
   fi
   echo 'Inspecting emitted warnings...'
   if ! diff -u "${expected_warnings}" "${actual_warnings}"; then
-    echo 'Diagnostics output changed. Inspect the preceding output for details.'
+    echo 'Diagnostics output changed.'
+    diff -u "${expected_warnings}" "${actual_warnings}" > "${report_directory}/${test_name}-diff-of-diffs-warnings.patch"
     failure=1
   fi
 fi
