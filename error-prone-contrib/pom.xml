@@ -278,9 +278,6 @@
                                 <version>${project.version}</version>
                             </path>
                         </annotationProcessorPaths>
-                        <compilerArgs combine.children="append">
-                            <arg>-Xplugin:DocumentationGenerator -XoutputDirectory=${project.build.directory}/docs</arg>
-                        </compilerArgs>
                     </configuration>
                 </plugin>
             </plugins>

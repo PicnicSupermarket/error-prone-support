@@ -8,10 +8,10 @@
         <version>0.16.2-SNAPSHOT</version>
     </parent>
 
-    <artifactId>error-prone-guidelines</artifactId>
+    <artifactId>workshop</artifactId>
 
-    <name>Picnic :: Error Prone Support :: Guidelines</name>
-    <description>Coding guidelines for the Error Prone Support project.</description>
+    <name>Picnic :: Error Prone Support :: Workshop</name>
+    <description>Project for the Error Prone Workshop.</description>
     <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
@@ -42,15 +42,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>documentation-support</artifactId>
-            <!-- This dependency is declared only as a hint to Maven that
-            compilation depends on it; see the `maven-compiler-plugin`'s
-            `annotationProcessorPaths` configuration below. -->
+            <artifactId>error-prone-utils</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>error-prone-utils</artifactId>
+            <artifactId>refaster-compiler</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -59,45 +56,67 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.auto</groupId>
-            <artifactId>auto-common</artifactId>
-            <scope>provided</scope>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>refaster-test-support</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service-annotations</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.googlejavaformat</groupId>
-            <artifactId>google-java-format</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jspecify</groupId>
-            <artifactId>jspecify</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
-        <!-- XXX: Explicitly declared as a workaround for
-        https://github.com/pitest/pitest-junit5-plugin/issues/105. -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
+            <artifactId>junit-jupiter-params</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-java</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-java-11</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-templating</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -109,15 +128,20 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
                         <annotationProcessorPaths combine.children="append">
-                            <!-- XXX: Drop the version declarations once
-                            properly supported. See
-                            https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                             <path>
                                 <groupId>${project.groupId}</groupId>
-                                <artifactId>documentation-support</artifactId>
+                                <artifactId>refaster-compiler</artifactId>
+                                <version>${project.version}</version>
+                            </path>
+                            <path>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>refaster-support</artifactId>
                                 <version>${project.version}</version>
                             </path>
                         </annotationProcessorPaths>
+                        <compilerArgs combine.children="append">
+                            <arg>-Xplugin:RefasterRuleCompiler</arg>
+                        </compilerArgs>
                     </configuration>
                 </plugin>
             </plugins>
