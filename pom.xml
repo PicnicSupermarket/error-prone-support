@@ -1033,18 +1033,7 @@
                             </requireMavenVersion>
                             <requireNoRepositories />
                             <requirePluginVersions />
-                            <requireUpperBoundDeps>
-                                <excludes>
-                                    <!-- XXX:
-                                    `com.google.errorprone:error_prone_test_helpers`
-                                    pulls in a more recent version of Truth
-                                    than
-                                    `com.google.testing.compile:compile-testing`,
-                                    but the latter is incompatible with said
-                                    never version. -->
-                                    <exclude>com.google.truth:truth</exclude>
-                                </excludes>
-                            </requireUpperBoundDeps>
+                            <requireUpperBoundDeps />
                         </rules>
                     </configuration>
                     <dependencies>
@@ -1738,11 +1727,8 @@
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
                                     -XepOpt:Nullness:Conservative=false
                                     -XepOpt:StatementSwitchToExpressionSwitch:EnableAssignmentSwitchConversion=true
+                                    -XepOpt:StatementSwitchToExpressionSwitch:EnableDirectConversion=true
                                     -XepOpt:StatementSwitchToExpressionSwitch:EnableReturnSwitchConversion=true
-                                    <!-- XXX: Enable once this check respects
-                                    the compilation source version. See
-                                    https://github.com/google/error-prone/pull/3646.
-                                    -XepOpt:StatementSwitchToExpressionSwitch:EnableDirectConversion=true -->
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}
