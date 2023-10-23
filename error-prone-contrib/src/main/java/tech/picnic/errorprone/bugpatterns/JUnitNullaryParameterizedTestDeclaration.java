@@ -35,7 +35,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Nullary JUnit test methods need not be parameterized",
+    summary = "Nullary JUnit test methods should not be parameterized",
     link = BUG_PATTERNS_BASE_URL + "JUnitNullaryParameterizedTestDeclaration",
     linkType = CUSTOM,
     severity = SUGGESTION,
