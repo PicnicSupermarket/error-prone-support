@@ -6,28 +6,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedMultiset;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
@@ -47,6 +42,7 @@ import org.assertj.core.api.OptionalIntAssert;
 import org.assertj.core.api.OptionalLongAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsArray;
+import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
 /** Refaster rules related to AssertJ expressions and statements. */
 // XXX: Most `AbstractIntegerAssert` rules can also be applied for other primitive types. Generate
@@ -181,63 +177,16 @@ final class AssertJRules {
   static final class AssertThatObjectEnumerableIsEmpty<E> {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
-    void before(ObjectEnumerableAssert<?, E> enumAssert) {
+    void before(
+        ObjectEnumerableAssert<?, E> enumAssert,
+        @Matches(IsEmpty.class) Iterable<? extends E> wellTypedIterable,
+        @Matches(IsEmpty.class) Iterable<?> arbitrarilyTypedIterable) {
       Refaster.anyOf(
-          enumAssert.containsExactlyElementsOf(
-              Refaster.anyOf(
-                  ImmutableList.of(),
-                  new ArrayList<>(),
-                  ImmutableSet.of(),
-                  new HashSet<>(),
-                  new LinkedHashSet<>(),
-                  ImmutableSortedSet.of(),
-                  new TreeSet<>(),
-                  ImmutableMultiset.of(),
-                  ImmutableSortedMultiset.of())),
-          enumAssert.containsExactlyInAnyOrderElementsOf(
-              Refaster.anyOf(
-                  ImmutableList.of(),
-                  new ArrayList<>(),
-                  ImmutableSet.of(),
-                  new HashSet<>(),
-                  new LinkedHashSet<>(),
-                  ImmutableSortedSet.of(),
-                  new TreeSet<>(),
-                  ImmutableMultiset.of(),
-                  ImmutableSortedMultiset.of())),
-          enumAssert.hasSameElementsAs(
-              Refaster.anyOf(
-                  ImmutableList.of(),
-                  new ArrayList<>(),
-                  ImmutableSet.of(),
-                  new HashSet<>(),
-                  new LinkedHashSet<>(),
-                  ImmutableSortedSet.of(),
-                  new TreeSet<>(),
-                  ImmutableMultiset.of(),
-                  ImmutableSortedMultiset.of())),
-          enumAssert.hasSameSizeAs(
-              Refaster.anyOf(
-                  ImmutableList.of(),
-                  new ArrayList<>(),
-                  ImmutableSet.of(),
-                  new HashSet<>(),
-                  new LinkedHashSet<>(),
-                  ImmutableSortedSet.of(),
-                  new TreeSet<>(),
-                  ImmutableMultiset.of(),
-                  ImmutableSortedMultiset.of())),
-          enumAssert.isSubsetOf(
-              Refaster.anyOf(
-                  ImmutableList.of(),
-                  new ArrayList<>(),
-                  ImmutableSet.of(),
-                  new HashSet<>(),
-                  new LinkedHashSet<>(),
-                  ImmutableSortedSet.of(),
-                  new TreeSet<>(),
-                  ImmutableMultiset.of(),
-                  ImmutableSortedMultiset.of())),
+          enumAssert.containsExactlyElementsOf(wellTypedIterable),
+          enumAssert.containsExactlyInAnyOrderElementsOf(wellTypedIterable),
+          enumAssert.hasSameElementsAs(wellTypedIterable),
+          enumAssert.hasSameSizeAs(arbitrarilyTypedIterable),
+          enumAssert.isSubsetOf(wellTypedIterable),
           enumAssert.containsExactly(),
           enumAssert.containsExactlyInAnyOrder(),
           enumAssert.containsOnly(),
