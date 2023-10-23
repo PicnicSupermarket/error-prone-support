@@ -7,7 +7,6 @@ import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.comparingLong;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
-import static java.util.function.Function.identity;
 
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
@@ -16,6 +15,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
@@ -28,6 +28,7 @@ import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 
 /** Refaster rules related to expressions dealing with {@link Comparator}s. */
 @OnlineDocumentation
@@ -36,12 +37,12 @@ final class ComparatorRules {
 
   /** Prefer {@link Comparator#naturalOrder()} over more complicated constructs. */
   static final class NaturalOrder<T extends Comparable<? super T>> {
-    // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
     @BeforeTemplate
-    Comparator<T> before() {
+    Comparator<T> before(
+        @Matches(IsIdentityOperation.class) Function<? super T, ? extends T> keyExtractor) {
       return Refaster.anyOf(
           T::compareTo,
-          comparing(Refaster.anyOf(identity(), v -> v)),
+          comparing(keyExtractor),
           Collections.<T>reverseOrder(reverseOrder()),
           Comparator.<T>reverseOrder().reversed());
     }
@@ -72,10 +73,11 @@ final class ComparatorRules {
   }
 
   static final class CustomComparator<T> {
-    // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
     @BeforeTemplate
-    Comparator<T> before(Comparator<T> cmp) {
-      return comparing(Refaster.anyOf(identity(), v -> v), cmp);
+    Comparator<T> before(
+        Comparator<T> cmp,
+        @Matches(IsIdentityOperation.class) Function<? super T, ? extends T> keyExtractor) {
+      return comparing(keyExtractor, cmp);
     }
 
     @AfterTemplate
@@ -183,14 +185,15 @@ final class ComparatorRules {
   }
 
   /**
-   * Where applicable, prefer {@link Comparator#naturalOrder()} over {@link Function#identity()}, as
-   * it more clearly states intent.
+   * Where applicable, prefer {@link Comparator#naturalOrder()} over identity function-based
+   * comparisons, as the former more clearly states intent.
    */
   static final class ThenComparingNaturalOrder<T extends Comparable<? super T>> {
-    // XXX: Drop the `Refaster.anyOf` if/when we decide to rewrite one to the other.
     @BeforeTemplate
-    Comparator<T> before(Comparator<T> cmp) {
-      return cmp.thenComparing(Refaster.anyOf(identity(), v -> v));
+    Comparator<T> before(
+        Comparator<T> cmp,
+        @Matches(IsIdentityOperation.class) Function<? super T, ? extends T> keyExtractor) {
+      return cmp.thenComparing(keyExtractor);
     }
 
     @AfterTemplate

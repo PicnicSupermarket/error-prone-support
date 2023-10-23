@@ -3,7 +3,6 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
-import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.filtering;
@@ -51,6 +50,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
 import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
 
@@ -357,6 +357,8 @@ final class StreamRules {
           stream.filter(predicate).findAny().isEmpty());
     }
 
+    // XXX: Consider extending `@Matches(IsIdentityOperation.class)` such that it can replace this
+    // template's `Refaster.anyOf` usage.
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
@@ -395,6 +397,8 @@ final class StreamRules {
           !stream.noneMatch(predicate), stream.filter(predicate).findAny().isPresent());
     }
 
+    // XXX: Consider extending `@Matches(IsIdentityOperation.class)` such that it can replace this
+    // template's `Refaster.anyOf` usage.
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
@@ -415,6 +419,8 @@ final class StreamRules {
       return stream.noneMatch(Refaster.anyOf(not(predicate), predicate.negate()));
     }
 
+    // XXX: Consider extending `@Matches(IsIdentityOperation.class)` such that it can replace this
+    // template's `Refaster.anyOf` usage.
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
@@ -632,8 +638,11 @@ final class StreamRules {
 
   static final class StreamsConcat<T> {
     @BeforeTemplate
-    Stream<T> before(@Repeated Stream<T> stream) {
-      return Stream.of(Refaster.asVarargs(stream)).flatMap(Refaster.anyOf(identity(), s -> s));
+    Stream<T> before(
+        @Repeated Stream<T> stream,
+        @Matches(IsIdentityOperation.class)
+            Function<? super Stream<T>, ? extends Stream<? extends T>> mapper) {
+      return Stream.of(Refaster.asVarargs(stream)).flatMap(mapper);
     }
 
     @AfterTemplate

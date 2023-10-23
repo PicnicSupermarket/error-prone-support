@@ -37,6 +37,8 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 // the target method such a modification may change the code's semantics or performance.
 // XXX: Also flag `Stream#map`, `Mono#map` and `Flux#map` invocations where the given transformation
 // is effectively the identity operation.
+// XXX: Also flag nullary instance method invocations that represent an identity conversion, such as
+// `Boolean#booleanValue()`, `Byte#byteValue()` and friends.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid or clarify identity conversions",
