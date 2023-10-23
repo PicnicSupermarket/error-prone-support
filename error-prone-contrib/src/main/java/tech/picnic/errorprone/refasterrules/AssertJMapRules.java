@@ -29,13 +29,13 @@ final class AssertJMapRules {
     void before(
         AbstractMapAssert<?, ?, K, V> mapAssert,
         @Matches(IsEmpty.class) Map<? extends K, ? extends V> wellTypedMap,
-        @Matches(IsEmpty.class) Map<?, ?> arbitraryMap,
+        @Matches(IsEmpty.class) Map<?, ?> arbitrarilyTypedMap,
         @Matches(IsEmpty.class) Iterable<? extends K> keys) {
       Refaster.anyOf(
           mapAssert.containsExactlyEntriesOf(wellTypedMap),
           mapAssert.containsExactlyInAnyOrderEntriesOf(wellTypedMap),
-          mapAssert.hasSameSizeAs(arbitraryMap),
-          mapAssert.isEqualTo(arbitraryMap),
+          mapAssert.hasSameSizeAs(arbitrarilyTypedMap),
+          mapAssert.isEqualTo(arbitrarilyTypedMap),
           mapAssert.containsOnlyKeys(keys),
           mapAssert.containsExactly(),
           mapAssert.containsOnly(),

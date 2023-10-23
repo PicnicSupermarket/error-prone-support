@@ -180,12 +180,12 @@ final class AssertJRules {
     void before(
         ObjectEnumerableAssert<?, E> enumAssert,
         @Matches(IsEmpty.class) Iterable<? extends E> wellTypedIterable,
-        @Matches(IsEmpty.class) Iterable<?> arbitraryIterable) {
+        @Matches(IsEmpty.class) Iterable<?> arbitrarilyTypedIterable) {
       Refaster.anyOf(
           enumAssert.containsExactlyElementsOf(wellTypedIterable),
           enumAssert.containsExactlyInAnyOrderElementsOf(wellTypedIterable),
           enumAssert.hasSameElementsAs(wellTypedIterable),
-          enumAssert.hasSameSizeAs(arbitraryIterable),
+          enumAssert.hasSameSizeAs(arbitrarilyTypedIterable),
           enumAssert.isSubsetOf(wellTypedIterable),
           enumAssert.containsExactly(),
           enumAssert.containsExactlyInAnyOrder(),
