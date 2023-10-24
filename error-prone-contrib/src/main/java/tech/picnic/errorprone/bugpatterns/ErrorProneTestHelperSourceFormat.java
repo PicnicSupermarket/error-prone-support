@@ -5,6 +5,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
+import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -66,7 +67,12 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
               .named("addSourceLines"),
           instanceMethod()
               .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper")
-              .named("addInputLines"));
+              .named("addInputLines"),
+          // XXX: Add tests for `Compilation.compileWithDocumentationGenerator`. Until done, make
+          // sure to update this matcher if that method's class or name is changed/moved.
+          staticMethod()
+              .onClass("tech.picnic.errorprone.documentation.Compilation")
+              .named("compileWithDocumentationGenerator"));
   private static final Matcher<ExpressionTree> OUTPUT_SOURCE_ACCEPTING_METHOD =
       instanceMethod()
           .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper.ExpectOutput")
@@ -83,7 +89,8 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
     }
 
     List<? extends ExpressionTree> sourceLines =
-        tree.getArguments().subList(1, tree.getArguments().size());
+        tree.getArguments()
+            .subList(ASTHelpers.getSymbol(tree).params().size() - 1, tree.getArguments().size());
     if (sourceLines.isEmpty()) {
       return buildDescription(tree).setMessage("No source code provided").build();
     }
@@ -149,12 +156,13 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
     return FORMATTER.formatSource(withOptionallyRemovedImports);
   }
 
+  // XXX: This logic is duplicated in `BugPatternTestExtractor`. Can we do better?
   private static Optional<String> getConstantSourceCode(
       List<? extends ExpressionTree> sourceLines) {
     StringBuilder source = new StringBuilder();
 
     for (ExpressionTree sourceLine : sourceLines) {
-      Object value = ASTHelpers.constValue(sourceLine);
+      String value = ASTHelpers.constValue(sourceLine, String.class);
       if (value == null) {
         return Optional.empty();
       }

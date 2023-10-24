@@ -1,0 +1,15 @@
+{
+  "testClass": "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest",
+  "testCases": [
+    {
+      "classUnderTest": "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.TestChecker",
+      "entries": [
+        {
+          "path": "A.java",
+          "input": "class A {}\n",
+          "output": "class A { /* This is a change. */ }\n"
+        }
+      ]
+    }
+  ]
+}

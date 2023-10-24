@@ -1,8 +1,9 @@
 package tech.picnic.errorprone.documentation;
 
+import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
 import com.sun.source.tree.ClassTree;
-import com.sun.tools.javac.util.Context;
+import java.util.Optional;
 
 /**
  * Interface implemented by classes that define how to extract data of some type {@link T} from a
@@ -13,21 +14,20 @@ import com.sun.tools.javac.util.Context;
 @Immutable
 interface Extractor<T> {
   /**
-   * Extracts and returns an instance of {@link T} using the provided arguments.
+   * Returns the unique identifier of this extractor.
    *
-   * @param tree The {@link ClassTree} to analyze and from which to extract instances of {@link T}.
-   * @param context The {@link Context} in which the current compilation takes place.
-   * @return A non-null instance of {@link T}.
+   * @return A non-{@code null} string.
    */
-  // XXX: Drop `Context` parameter unless used.
-  T extract(ClassTree tree, Context context);
+  String identifier();
 
   /**
-   * Tells whether this {@link Extractor} can extract documentation content from the given {@link
-   * ClassTree}.
+   * Attempts to extract an instance of type {@link T} using the provided arguments.
    *
-   * @param tree The {@link ClassTree} of interest.
-   * @return {@code true} iff data extraction is supported.
+   * @param tree The {@link ClassTree} to analyze and from which to extract an instance of type
+   *     {@link T}.
+   * @param state A {@link VisitorState} describing the context in which the given {@link ClassTree}
+   *     is found.
+   * @return An instance of type {@link T}, if possible.
    */
-  boolean canExtract(ClassTree tree);
+  Optional<T> tryExtract(ClassTree tree, VisitorState state);
 }
