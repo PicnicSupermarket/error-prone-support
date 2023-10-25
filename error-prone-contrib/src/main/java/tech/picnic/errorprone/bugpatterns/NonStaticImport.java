@@ -78,7 +78,6 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
   static final ImmutableSetMultimap<String, String> NON_STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
           .put("com.google.common.base.Predicates", "contains")
-          .put("com.mongodb.client.model.Filters", "empty")
           .putAll(
               "java.util.Collections",
               "addAll",
@@ -92,7 +91,6 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
               "sort",
               "swap")
           .put("java.util.Locale", "ROOT")
-          .put("java.util.Optional", "empty")
           .putAll("java.util.regex.Pattern", "compile", "matches", "quote")
           .put("org.springframework.http.MediaType", "ALL")
           .build();
@@ -114,6 +112,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           "builder",
           "copyOf",
           "create",
+          "empty",
           "from",
           "getDefaultInstance",
           "INSTANCE",
@@ -138,7 +137,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
         getUndesiredStaticImports(tree, state);
 
     if (!undesiredStaticImports.isEmpty()) {
-      replaceUndesiredStaticImportUsages(tree, state, undesiredStaticImports);
+      replaceUndesiredStaticImportUsages(tree, undesiredStaticImports, state);
 
       for (UndesiredStaticImport staticImport : undesiredStaticImports.values()) {
         state.reportMatch(
@@ -159,13 +158,14 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
       if (importTree.isStatic() && qualifiedIdentifier instanceof MemberSelectTree) {
         MemberSelectTree memberSelectTree = (MemberSelectTree) qualifiedIdentifier;
         String type = SourceCode.treeToString(memberSelectTree.getExpression(), state);
-        String member = memberSelectTree.getIdentifier().toString();
-        if (shouldNotBeStaticallyImported(type, member)) {
+        String memberIdentifier = memberSelectTree.getIdentifier().toString();
+        if (shouldNotBeStaticallyImported(type, memberIdentifier)) {
           imports.put(
               type,
-              member,
+              memberIdentifier,
               new AutoValue_NonStaticImport_UndesiredStaticImport(
-                  importTree, SuggestedFix.builder().removeStaticImport(type + '.' + member)));
+                  importTree,
+                  SuggestedFix.builder().removeStaticImport(type + '.' + memberIdentifier)));
         }
       }
     }
@@ -182,8 +182,8 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
 
   private static void replaceUndesiredStaticImportUsages(
       CompilationUnitTree tree,
-      VisitorState state,
-      ImmutableTable<String, String, UndesiredStaticImport> undesiredStaticImports) {
+      ImmutableTable<String, String, UndesiredStaticImport> undesiredStaticImports,
+      VisitorState state) {
     new TreeScanner<@Nullable Void, @Nullable Void>() {
       @Override
       public @Nullable Void visitIdentifier(IdentifierTree node, @Nullable Void unused) {
