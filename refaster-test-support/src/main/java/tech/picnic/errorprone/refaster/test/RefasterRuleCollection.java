@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
-import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.util.Comparator.naturalOrder;
 import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_RULES_PATTERN_FLAG;
@@ -19,6 +18,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.SubContext;
@@ -126,7 +126,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
         .setArgs(ImmutableList.of("-XepOpt:" + RULE_COLLECTION_FLAG + '=' + className))
         .addInput(className + "TestInput.java")
         .addOutput(className + "TestOutput.java")
-        .doTest(TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Override

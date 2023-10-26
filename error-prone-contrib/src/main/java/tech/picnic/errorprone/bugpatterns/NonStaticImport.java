@@ -78,6 +78,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
   static final ImmutableSetMultimap<String, String> NON_STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
           .put("com.google.common.base.Predicates", "contains")
+          .put("com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode", "TEXT_MATCH")
           .putAll(
               "java.util.Collections",
               "addAll",
