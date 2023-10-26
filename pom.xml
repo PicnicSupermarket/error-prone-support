@@ -828,22 +828,15 @@
                                 <module name="io.spring.nohttp.checkstyle.check.NoHttpCheck" />
                             </module>
                         </checkstyleRules>
+                        <excludeGeneratedSources>true</excludeGeneratedSources>
                         <failOnViolation>false</failOnViolation>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                        <!-- The plugin's "excludes" property accepts an Ant
-                        pattern, but does not match against the full path. So
-                        rather than explicitly excluding generated sources, we
-                        have to explicitly include "original" sources. -->
-                        <sourceDirectories>
-                            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-                        </sourceDirectories>
-                        <testSourceDirectories>
-                            <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
-                            <!-- Refaster input and output test files represent
-                            valid Java code, exposed as resources on the test
-                            classpath. -->
-                            <testSourceDirectory>${basedir}/src/test/resources</testSourceDirectory>
-                        </testSourceDirectories>
+                        <resourceIncludes>**/*</resourceIncludes>
+                        <!-- XXX: The generated
+                        `target/generated-sources/license/THIRD-PARTY.txt`
+                        files are not excluded by the `excludeGeneratedSources`
+                        setting. Consider filing an issue for this. -->
+                        <resourceExcludes>THIRD-PARTY.txt</resourceExcludes>
                     </configuration>
                     <dependencies>
                         <dependency>
