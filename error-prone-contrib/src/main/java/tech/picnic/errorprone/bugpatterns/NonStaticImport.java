@@ -158,14 +158,13 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
       if (importTree.isStatic() && qualifiedIdentifier instanceof MemberSelectTree) {
         MemberSelectTree memberSelectTree = (MemberSelectTree) qualifiedIdentifier;
         String type = SourceCode.treeToString(memberSelectTree.getExpression(), state);
-        String memberIdentifier = memberSelectTree.getIdentifier().toString();
-        if (shouldNotBeStaticallyImported(type, memberIdentifier)) {
+        String member = memberSelectTree.getIdentifier().toString();
+        if (shouldNotBeStaticallyImported(type, member)) {
           imports.put(
               type,
-              memberIdentifier,
+              member,
               new AutoValue_NonStaticImport_UndesiredStaticImport(
-                  importTree,
-                  SuggestedFix.builder().removeStaticImport(type + '.' + memberIdentifier)));
+                  importTree, SuggestedFix.builder().removeStaticImport(type + '.' + member)));
         }
       }
     }
