@@ -9,21 +9,24 @@ import org.junit.jupiter.api.Test;
 
 final class StaticImportTest {
   @Test
-  void candidateMethodsAreNotRedundant() {
+  void candidateTypesDoNotClash() {
+    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES)
+        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_TYPES);
+  }
+
+  @Test
+  void candidateMembersAreNotRedundant() {
     assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
   }
 
   @Test
-  void exemptedMembersAreNotVacuous() {
-    assertThat(StaticImport.STATIC_IMPORT_EXEMPTED_MEMBERS.keySet())
-        .isSubsetOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
-  }
+  void candidateMembersDoNotClash() {
+    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.entries())
+        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS.entries());
 
-  @Test
-  void exemptedMembersAreNotRedundant() {
-    assertThat(StaticImport.STATIC_IMPORT_EXEMPTED_MEMBERS.values())
-        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_EXEMPTED_IDENTIFIERS);
+    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.values())
+        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS);
   }
 
   @Test
