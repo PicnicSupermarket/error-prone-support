@@ -87,7 +87,7 @@ fi
 
 pushd "${project_root}"
 
-# Make sure that Git is sufficient configured to enable committing to the
+# Make sure that Git is sufficiently configured to enable committing to the
 # project's Git repository.
 git config user.email || git config user.email "integration-test@example.com"
 git config user.name || git config user.name "Integration Test"
@@ -96,7 +96,7 @@ git config user.name || git config user.name "Integration Test"
 # required to run Error Prone with Error Prone Support and (b) formatting the
 # code using the same method by which it will be formatted after each
 # compilation round. The initial formatting operation ensures that subsequent
-# moifications can be rendered in a clean manner.
+# modifications can be rendered in a clean manner.
 git clean -fdx
 git apply < "${integration_test_root}/${test_name}-init.patch"
 git commit -m 'dependency: Introduce Error Prone Support' .
