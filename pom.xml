@@ -47,9 +47,9 @@
         <module>refaster-test-support</module>
     </modules>
 
-    <scm>
+    <scm child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
         <developerConnection>scm:git:git@github.com:PicnicSupermarket/error-prone-support.git</developerConnection>
-        <tag>v0.12.0</tag>
+        <tag>HEAD</tag>
         <url>https://github.com/PicnicSupermarket/error-prone-support</url>
     </scm>
     <issueManagement>
@@ -100,6 +100,10 @@
             <!-- The test JVMs are short-running. By disabling certain
             expensive JIT optimizations we actually speed up most tests. -->
             -XX:TieredStopAtLevel=1
+            <!-- The test JVMs run in a non-interactive and generally
+            multi-core context, where the Parallel Garbage Collector generally
+            has the highest throughput. -->
+            -XX:+UseParallelGC
             <!-- We cap memory usage. This may be relevant for build agents,
             but also prevents excessive memory usage by heavily parallelized
             local builds. -->
@@ -141,7 +145,7 @@
         <groupId.error-prone>com.google.errorprone</groupId.error-prone>
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2023-10-04T14:40:37Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>${git.commit.time}</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Glob pattern identifying Refaster rule definition files. These
         Java classes don't contain "regular" code, and thus require special
@@ -529,6 +533,14 @@
                         <forkMode>never</forkMode>
                         <failOnError>false</failOnError>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>check-source-format</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
@@ -704,6 +716,10 @@
                                             <!-- Instead, please use
                                             `com.google.errorprone.annotations.Immutable`. -->
                                         </property>
+                                        <property name="illegalClasses" value="org.jetbrains.annotations.CheckReturnValue">
+                                            <!-- Instead, please use
+                                            `com.google.errorprone.annotations.CheckReturnValue`. -->
+                                        </property>
                                         <property name="illegalClasses" value="org.jetbrains.annotations.VisibleForTesting">
                                             <!-- Instead, please use
                                             `com.google.common.annotations.VisibleForTesting`. -->
@@ -810,6 +826,7 @@
                                     <module name="RedundantModifier" />
                                     <module name="SimplifyBooleanExpression" />
                                     <module name="SimplifyBooleanReturn" />
+                                    <module name="SummaryJavadoc" />
                                     <module name="SuppressWarningsHolder">
                                         <property name="aliasList" value="com.puppycrawl.tools.checkstyle.checks.coding.UnusedLocalVariableCheck=unused" />
                                     </module>
@@ -1284,6 +1301,14 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>tidy-maven-plugin</artifactId>
                     <version>1.2.0</version>
+                    <executions>
+                        <execution>
+                            <id>check-pom</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1520,7 +1545,7 @@
                 `BugChecker` test code and the Refaster test files) does not
                 exhibit anti-patterns other than those associated with the
                 check/rule under test. Ideally all test cases are realistic. -->
-                <error-prone.self-check-args>-XepAllSuggestionsAsWarnings -Xep:MethodReferenceUsage:OFF</error-prone.self-check-args>
+                <error-prone.self-check-args>-Xep:MethodReferenceUsage:OFF</error-prone.self-check-args>
             </properties>
             <build>
                 <plugins>
@@ -1546,6 +1571,31 @@
             </build>
         </profile>
         <profile>
+            <!-- A counterpart to the `disallow-warnings` profile which
+            explicitly "tones down" plugins enabled by the `build-checks`
+            profile. Necessary for dealing with plugins that default to failing
+            the build upon encountering a violation. -->
+            <id>avoid-errors</id>
+            <activation>
+                <property>
+                    <name>verification.warn</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>tidy-maven-plugin</artifactId>
+                            <configuration>
+                                <skip>true</skip>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
             <!-- By default, we verify various aspects of a module and the
             artifact(s) it produces. We define these checks in a profile so
             that they can be disabled during development. See also the
@@ -1565,14 +1615,6 @@
                     <plugin>
                         <groupId>com.spotify.fmt</groupId>
                         <artifactId>fmt-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>check-source-format</id>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>de.thetaphi</groupId>
@@ -1652,6 +1694,10 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>tidy-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
                         <groupId>org.gaul</groupId>
                         <artifactId>modernizer-maven-plugin</artifactId>
                     </plugin>
@@ -1685,15 +1731,17 @@
                                     failing the build on the first error
                                     encountered. -->
                                     -XepAllErrorsAsWarnings
+                                    -XepAllSuggestionsAsWarnings
+                                    <!-- We want to enable almost all Error
+                                    Prone bug pattern checkers, so we enable
+                                    all and then selectively deactivate some. -->
+                                    -XepAllDisabledChecksAsWarnings
                                     <!-- Some generated classes violate Error
                                     Prone bug patterns. We cannot in all cases
                                     avoid that, so we simply tell Error Prone
                                     not to warn about generated code. -->
                                     -XepDisableWarningsInGeneratedCode
-                                    <!-- We want to enable almost all Error
-                                    Prone bug pattern checkers, so we enable
-                                    all and then selectively deactivate some. -->
-                                    -XepAllDisabledChecksAsWarnings
+                                    -XepExcludedPaths:\Q${project.build.directory}${file.separator}\E.*
                                     <!-- We don't target Android. -->
                                     -Xep:AndroidJdkLibsChecker:OFF
                                     <!-- XXX: Enable this once we open-source
@@ -1754,10 +1802,10 @@
             </properties>
         </profile>
         <profile>
-            <!-- The `build-checks` and `error-prone` profiles enable a bunch
-            of additional compile checks. By default, those warnings break the
-            build. This profile allows one to collect all build warnings
-            without failing the build. -->
+            <!-- The `build-checks` and `error-prone` profiles enable numerous
+            additional validations. By default, any violations break the build.
+            This profile allows one to collect all violations without failing
+            the build. -->
             <id>disallow-warnings</id>
             <activation>
                 <property>
