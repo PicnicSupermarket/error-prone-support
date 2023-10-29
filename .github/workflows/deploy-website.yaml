@@ -1,0 +1,51 @@
+name: Update `error-prone.picnic.tech` website content
+on:
+  pull_request:
+  push:
+    branches: [ master, website ]
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@d37167af451eb51448db3354e1057b75c4b268f7 # v1.155.0
+        with:
+          working-directory: ./website
+          bundler-cache: true
+      - name: Configure Github Pages
+        uses: actions/configure-pages@f156874f8191504dae5b037505266ed5dda6c382 # v3.0.6
+      - name: Generate documentation
+        run: ./generate-docs.sh
+      - name: Build website with Jekyll
+        working-directory: ./website
+        run: bundle exec jekyll build
+      - name: Validate HTML output
+        working-directory: ./website
+        # XXX: Drop `--disable_external true` once we fully adopted the
+        # "Refaster rules" terminology on our website and in the code.
+        run: bundle exec htmlproofer --disable_external true --check-external-hash false ./_site
+      - name: Upload website as artifact
+        uses: actions/upload-pages-artifact@a753861a5debcf57bf8b404356158c8e1e33150c # v2.0.0
+        with:
+          path: ./website/_site
+  deploy:
+    if: github.ref == 'refs/heads/website'
+    needs: build
+    permissions:
+      id-token: write
+      pages: write
+    runs-on: ubuntu-22.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@9dbe3824824f8a1377b8e298bafde1a50ede43e5 # v2.0.4

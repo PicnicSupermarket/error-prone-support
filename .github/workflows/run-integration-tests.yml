@@ -9,24 +9,20 @@ name: "Integration tests"
 on:
   issue_comment:
     types: [ created ]
-  # XXX: Drop.
-  pull_request:
 permissions:
   contents: read
 jobs:
   run-integration-tests:
     name: On-demand integration test
-    # XXX: Enable.
-    #if: |
-    #  github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
+    if: |
+      github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
     runs-on: ubuntu-22.04
     steps:
       - name: Check out code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           persist-credentials: false
-          # XXX: Enable.
-          #ref: refs/pull/${{ github.event.issue.number }}/head
+          ref: refs/pull/${{ github.event.issue.number }}/head
       - name: Set up JDK
         uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
         with:

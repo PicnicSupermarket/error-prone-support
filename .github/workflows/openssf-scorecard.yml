@@ -1,0 +1,36 @@
+# Analyzes the code base and GitHub project configuration for adherence to
+# security best practices for open source software. Identified issues are
+# registered with GitHub's code scanning dashboard. When a pull request is
+# analyzed, any offending lines are annotated. See
+# https://securityscorecards.dev for details.
+name: OpenSSF Scorecard update
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: '0 4 * * 1'
+permissions:
+  contents: read
+jobs:
+  analyze:
+    permissions:
+      contents: read
+      security-events: write
+      id-token: write
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          persist-credentials: false
+      - name: Run OpenSSF Scorecard analysis
+        uses: ossf/scorecard-action@0864cf19026789058feabb7e87baa5f140aac736 # v2.3.1
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          publish_results: ${{ github.ref == 'refs/heads/master' }}
+      - name: Update GitHub's code scanning dashboard
+        uses: github/codeql-action/upload-sarif@2cb752a87e96af96708ab57187ab6372ee1973ab # v2.22.0
+        with:
+          sarif_file: results.sarif

@@ -1,0 +1,36 @@
+# Analyzes the code base using SonarCloud. See
+# https://sonarcloud.io/project/overview?id=PicnicSupermarket_error-prone-support.
+name: SonarCloud analysis
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: '0 4 * * 1'
+permissions:
+  contents: read
+jobs:
+  analyze:
+    permissions:
+      contents: read
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up JDK
+        uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
+        with:
+          java-version: 17.0.8
+          distribution: temurin
+          cache: maven
+      - name: Create missing `test` directory
+        # XXX: Drop this step in favour of actually having a test.
+        run: mkdir refaster-compiler/src/test
+      - name: Perform SonarCloud analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -T1C jacoco:prepare-agent verify jacoco:report sonar:sonar -Dverification.skip -Dsonar.projectKey=PicnicSupermarket_error-prone-support
