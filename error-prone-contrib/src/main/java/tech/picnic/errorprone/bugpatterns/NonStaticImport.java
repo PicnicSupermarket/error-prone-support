@@ -58,7 +58,11 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
    */
   @VisibleForTesting
   static final ImmutableSet<String> NON_STATIC_IMPORT_CANDIDATE_TYPES =
-      ImmutableSet.of("com.google.common.base.Strings", "java.time.Clock", "java.time.ZoneOffset");
+      ImmutableSet.of(
+          "com.google.common.base.Strings",
+          "com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode",
+          "java.time.Clock",
+          "java.time.ZoneOffset");
 
   /**
    * Type members that should never be statically imported.
@@ -78,7 +82,6 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
   static final ImmutableSetMultimap<String, String> NON_STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
           .put("com.google.common.base.Predicates", "contains")
-          .put("com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode", "TEXT_MATCH")
           .putAll(
               "java.util.Collections",
               "addAll",
