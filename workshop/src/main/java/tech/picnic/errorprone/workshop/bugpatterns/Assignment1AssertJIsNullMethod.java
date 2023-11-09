@@ -13,6 +13,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.MethodInvocationTree;
@@ -49,11 +50,8 @@ public final class Assignment1AssertJIsNullMethod extends BugChecker
       return Description.NO_MATCH;
     }
 
-    SuggestedFix.Builder fix = SuggestedFix.builder();
-
-    // XXX: Using `fix.merge(<some code>);` make sure we rename the method invocation to `isNull`.
-    // See the `SuggestedFixes` class ;).
-
+    SuggestedFix.Builder fix =
+        SuggestedFix.builder().merge(SuggestedFixes.renameMethodInvocation(tree, "isNull", state));
     tree.getArguments().forEach(arg -> fix.merge(SuggestedFix.delete(arg)));
 
     return describeMatch(tree, fix.build());

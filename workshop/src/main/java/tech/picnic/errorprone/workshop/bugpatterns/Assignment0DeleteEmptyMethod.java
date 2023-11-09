@@ -8,7 +8,9 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
+import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MethodTree;
 
 /** A {@link BugChecker} that flags empty methods that seemingly can simply be deleted. */
@@ -25,9 +27,12 @@ public final class Assignment0DeleteEmptyMethod extends BugChecker implements Me
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    // XXX: Part 1: Ensure that we only delete methods that contain no statements.
-    // XXX: Part 2: Don't delete methods that are annotated with `@Override`.
+    if (tree.getBody() == null
+        || !tree.getBody().getStatements().isEmpty()
+        || ASTHelpers.hasAnnotation(tree, Override.class.getName(), state)) {
+      return Description.NO_MATCH;
+    }
 
-    return Description.NO_MATCH;
+    return describeMatch(tree, SuggestedFix.delete(tree));
   }
 }

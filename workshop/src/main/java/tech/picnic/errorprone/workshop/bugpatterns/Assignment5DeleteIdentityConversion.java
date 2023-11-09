@@ -13,6 +13,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.bugpatterns.TypesWithUndefinedEquality;
+import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
@@ -24,6 +25,7 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
 import java.util.Arrays;
 import java.util.List;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /** A {@link BugChecker} that flags redundant identity conversions. */
 @BugPattern(
@@ -66,9 +68,7 @@ public final class Assignment5DeleteIdentityConversion extends BugChecker
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     List<? extends ExpressionTree> arguments = tree.getArguments();
-    // XXX: Make sure we skip invocations that do not pass exactly one argument, by using the
-    // `tree`.
-    if (!IS_CONVERSION_METHOD.matches(tree, state)) {
+    if (arguments.size() != 1 || !IS_CONVERSION_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
@@ -91,9 +91,7 @@ public final class Assignment5DeleteIdentityConversion extends BugChecker
     }
 
     return buildDescription(tree)
-        // XXX: Use the `.addFix()` to suggest replacing the original `tree` with the `sourceTree`.
-        // Tip: You can get the actual String representation of a Tree by using the
-        // `SourceCode#treeToString`.
+        .addFix(SuggestedFix.replace(tree, SourceCode.treeToString(sourceTree, state)))
         .build();
   }
 

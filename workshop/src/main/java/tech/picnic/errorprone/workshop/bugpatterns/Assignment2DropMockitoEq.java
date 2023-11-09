@@ -14,6 +14,7 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import java.util.List;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -37,9 +38,13 @@ public final class Assignment2DropMockitoEq extends BugChecker
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     // XXX: Make sure to return `Description.NO_MATCH` if the `tree` doesn't have arguments, or if
     // the `isEqInvocation` method below returns `false` for at least one of the arguments.
+    List<? extends ExpressionTree> arguments = tree.getArguments();
+    if (arguments.isEmpty() || !arguments.stream().allMatch(arg -> isEqInvocation(arg, state))) {
+      return Description.NO_MATCH;
+    }
 
     SuggestedFix.Builder suggestedFix = SuggestedFix.builder();
-    for (ExpressionTree arg : tree.getArguments()) {
+    for (ExpressionTree arg : arguments) {
       suggestedFix.replace(
           arg,
           SourceCode.treeToString(
@@ -49,7 +54,6 @@ public final class Assignment2DropMockitoEq extends BugChecker
     return describeMatch(tree, suggestedFix.build());
   }
 
-  @SuppressWarnings("UnusedMethod" /* Recommended to use when implementing this assignment. */)
   private static boolean isEqInvocation(ExpressionTree tree, VisitorState state) {
     return tree instanceof MethodInvocationTree && MOCKITO_EQ_METHOD.matches(tree, state);
   }

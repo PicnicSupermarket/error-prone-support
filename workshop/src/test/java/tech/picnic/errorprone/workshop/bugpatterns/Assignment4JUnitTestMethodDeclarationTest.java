@@ -3,10 +3,8 @@ package tech.picnic.errorprone.workshop.bugpatterns;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Enable this to validate part 1.")
 final class Assignment4JUnitTestMethodDeclarationTest {
   @Test
   void identificationIllegalModifiers() {

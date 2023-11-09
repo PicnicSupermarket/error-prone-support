@@ -15,6 +15,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.MultiMatcher;
 import com.sun.source.tree.AnnotationTree;
@@ -44,13 +45,17 @@ public final class Assignment4JUnitTestMethodDeclaration extends BugChecker
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    // XXX: Part 1: Return `Description.NO_MATCH` if the method is not a `TEST_METHOD`.
+    if (!TEST_METHOD.matches(tree, state)) {
+      return Description.NO_MATCH;
+    }
 
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
 
     // XXX: Part 2: Make sure that JUnit test methods don't use any of the modifiers from the
     // `ILLEGAL_MODIFIERS` field, by using `SuggestedFixes#removeModifiers` and
     // `SuggestedFix.Builder#merge`.
+    SuggestedFixes.removeModifiers(tree.getModifiers(), state, ILLEGAL_MODIFIERS)
+        .ifPresent(fixBuilder::merge);
 
     if (fixBuilder.isEmpty()) {
       return Description.NO_MATCH;
