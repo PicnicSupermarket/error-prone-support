@@ -15,6 +15,11 @@ focussing on maintainability, consistency and avoidance of common pitfalls.
 > Error Prone is a static analysis tool for Java that catches common
 > programming mistakes at compile-time.
 
+Want to learn more about Error Prone (Support), how you can start using Error
+Prone in practice, and how we use it at Picnic? You can watch the conference
+talk [_Automating away bugs with Error Prone in practice_]
+[conference-talk-ep-rick].
+
 Read more on how Picnic uses Error Prone (Support) in the blog post [_Picnic
 loves Error Prone: producing high-quality and consistent Java
 code_][picnic-blog-ep-post].
@@ -265,6 +270,7 @@ channel; please see our [security policy][security] for details.
 [bug-checks-identity-conversion]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/IdentityConversion.java
 [codeql-badge]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/codeql.yml/badge.svg?branch=master&event=push
 [codeql-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/codeql.yml?query=branch:master+event:push
+[conference-talk-ep-rick]: https://www.youtube.com/watch?v=-47WD-3wKBs
 [contributing]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md
 [contributing-pull-request]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md#-opening-a-pull-request
 [error-prone-bugchecker]: https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
