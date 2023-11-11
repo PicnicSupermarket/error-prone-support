@@ -125,7 +125,9 @@ final class MoreMatchersTest {
     private static final long serialVersionUID = 1L;
     private static final Matcher<Tree> DELEGATE =
         MoreMatchers.isSubTypeOf(
-            generic(type(ImmutableSet.class.getName()), subOf(type(Number.class.getName()))));
+            generic(
+                type(ImmutableSet.class.getCanonicalName()),
+                subOf(type(Number.class.getCanonicalName()))));
 
     @Override
     public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {

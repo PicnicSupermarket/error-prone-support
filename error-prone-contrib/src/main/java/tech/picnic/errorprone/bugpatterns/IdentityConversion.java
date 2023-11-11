@@ -56,7 +56,7 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
                       .map(Class::getName)
                       .collect(toImmutableSet()))
               .named("valueOf"),
-          staticMethod().onClass(String.class.getName()).named("valueOf"),
+          staticMethod().onClass(String.class.getCanonicalName()).named("valueOf"),
           staticMethod()
               .onClassAny(
                   "com.google.common.collect.ImmutableBiMap",

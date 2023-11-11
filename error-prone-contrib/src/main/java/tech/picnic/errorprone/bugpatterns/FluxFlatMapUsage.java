@@ -66,7 +66,7 @@ public final class FluxFlatMapUsage extends BugChecker
       instanceMethod()
           .onDescendantOf(FLUX)
           .namedAnyOf("flatMap", "flatMapSequential")
-          .withParameters(Function.class.getName());
+          .withParameters(Function.class.getCanonicalName());
   private static final Supplier<Type> FLUX_OF_PUBLISHERS =
       VisitorState.memoize(
           generic(FLUX, subOf(generic(type("org.reactivestreams.Publisher"), unbound()))));

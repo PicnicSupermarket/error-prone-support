@@ -99,12 +99,12 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
           allOf(
               staticMethod()
                   .onClassAny(
-                      Stream.class.getName(),
-                      IntStream.class.getName(),
-                      LongStream.class.getName(),
-                      DoubleStream.class.getName(),
-                      List.class.getName(),
-                      Set.class.getName(),
+                      Stream.class.getCanonicalName(),
+                      IntStream.class.getCanonicalName(),
+                      LongStream.class.getCanonicalName(),
+                      DoubleStream.class.getCanonicalName(),
+                      List.class.getCanonicalName(),
+                      Set.class.getCanonicalName(),
                       "com.google.common.collect.ImmutableList",
                       "com.google.common.collect.ImmutableSet")
                   .named("of"),

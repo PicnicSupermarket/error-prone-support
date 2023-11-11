@@ -49,7 +49,7 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
   private static final long serialVersionUID = 1L;
   private static final Splitter FORMAT_SPECIFIER_SPLITTER = Splitter.on("%s");
   private static final Matcher<ExpressionTree> STRING_FORMAT_INVOCATION =
-      staticMethod().onClass(String.class.getName()).named("format");
+      staticMethod().onClass(String.class.getCanonicalName()).named("format");
   private static final Supplier<Type> CHAR_SEQUENCE_TYPE =
       Suppliers.typeFromClass(CharSequence.class);
   private static final Supplier<Type> FORMATTABLE_TYPE = Suppliers.typeFromClass(Formattable.class);

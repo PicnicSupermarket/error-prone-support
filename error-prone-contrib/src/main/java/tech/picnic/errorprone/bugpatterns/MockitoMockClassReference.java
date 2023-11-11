@@ -50,7 +50,7 @@ public final class MockitoMockClassReference extends BugChecker
   private static final long serialVersionUID = 1L;
   private static final Matcher<MethodInvocationTree> MOCKITO_MOCK_OR_SPY_WITH_HARDCODED_TYPE =
       allOf(
-          argument(0, allOf(isSameType(Class.class.getName()), not(isVariable()))),
+          argument(0, allOf(isSameType(Class.class.getCanonicalName()), not(isVariable()))),
           staticMethod().onClass("org.mockito.Mockito").namedAnyOf("mock", "spy"));
 
   /** Instantiates a new {@link MockitoMockClassReference} instance. */

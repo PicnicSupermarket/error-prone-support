@@ -48,7 +48,8 @@ public final class FluxImplicitBlock extends BugChecker implements MethodInvocat
           .onDescendantOf("reactor.core.publisher.Flux")
           .namedAnyOf("toIterable", "toStream")
           .withNoParameters();
-  private static final Supplier<Type> STREAM = Suppliers.typeFromString(Stream.class.getName());
+  private static final Supplier<Type> STREAM =
+      Suppliers.typeFromString(Stream.class.getCanonicalName());
 
   /** Instantiates a new {@link FluxImplicitBlock} instance. */
   public FluxImplicitBlock() {}

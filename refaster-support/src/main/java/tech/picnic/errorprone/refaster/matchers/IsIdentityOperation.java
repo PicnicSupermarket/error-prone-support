@@ -25,10 +25,10 @@ public final class IsIdentityOperation implements Matcher<ExpressionTree> {
       anyOf(
           staticMethod()
               .onDescendantOfAny(
-                  DoubleUnaryOperator.class.getName(),
-                  Function.class.getName(),
-                  IntUnaryOperator.class.getName(),
-                  LongUnaryOperator.class.getName())
+                  DoubleUnaryOperator.class.getCanonicalName(),
+                  Function.class.getCanonicalName(),
+                  IntUnaryOperator.class.getCanonicalName(),
+                  LongUnaryOperator.class.getCanonicalName())
               .named("identity"),
           isIdentityLambdaExpression());
 

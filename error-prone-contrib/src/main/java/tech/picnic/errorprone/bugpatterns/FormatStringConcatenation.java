@@ -68,7 +68,7 @@ public final class FormatStringConcatenation extends BugChecker
       anyMethod()
           .anyClass()
           .withAnyName()
-          .withParameters(String.class.getName(), Throwable.class.getName());
+          .withParameters(String.class.getCanonicalName(), Throwable.class.getCanonicalName());
 
   // XXX: Drop some of these methods if we use Refaster to replace some with others.
   private static final Matcher<ExpressionTree> ASSERTJ_FORMAT_METHOD =

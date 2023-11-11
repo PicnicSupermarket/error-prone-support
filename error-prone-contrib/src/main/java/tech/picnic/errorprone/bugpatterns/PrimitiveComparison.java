@@ -55,21 +55,21 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
   private static final Matcher<ExpressionTree> STATIC_COMPARISON_METHOD =
       anyOf(
           staticMethod()
-              .onClass(Comparator.class.getName())
+              .onClass(Comparator.class.getCanonicalName())
               .namedAnyOf("comparingInt", "comparingLong", "comparingDouble"),
           staticMethod()
-              .onClass(Comparator.class.getName())
+              .onClass(Comparator.class.getCanonicalName())
               .named("comparing")
-              .withParameters(Function.class.getName()));
+              .withParameters(Function.class.getCanonicalName()));
   private static final Matcher<ExpressionTree> INSTANCE_COMPARISON_METHOD =
       anyOf(
           instanceMethod()
-              .onDescendantOf(Comparator.class.getName())
+              .onDescendantOf(Comparator.class.getCanonicalName())
               .namedAnyOf("thenComparingInt", "thenComparingLong", "thenComparingDouble"),
           instanceMethod()
-              .onDescendantOf(Comparator.class.getName())
+              .onDescendantOf(Comparator.class.getCanonicalName())
               .named("thenComparing")
-              .withParameters(Function.class.getName()));
+              .withParameters(Function.class.getCanonicalName()));
 
   /** Instantiates a new {@link PrimitiveComparison} instance. */
   public PrimitiveComparison() {}
@@ -168,7 +168,7 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
     switch (expr.getKind()) {
       case IDENTIFIER:
         return SuggestedFix.builder()
-            .addStaticImport(Comparator.class.getName() + '.' + preferredMethodName)
+            .addStaticImport(Comparator.class.getCanonicalName() + '.' + preferredMethodName)
             .replace(expr, preferredMethodName)
             .build();
       case MEMBER_SELECT:

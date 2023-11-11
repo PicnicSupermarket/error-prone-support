@@ -72,7 +72,7 @@ public final class NonEmptyMono extends BugChecker implements MethodInvocationTr
           instanceMethod()
               .onDescendantOf("reactor.core.publisher.Flux")
               .named("reduce")
-              .withParameters(Object.class.getName(), BiFunction.class.getName()),
+              .withParameters(Object.class.getCanonicalName(), BiFunction.class.getCanonicalName()),
           instanceMethod()
               .onDescendantOf("reactor.core.publisher.Mono")
               .namedAnyOf("defaultIfEmpty", "hasElement", "single"));

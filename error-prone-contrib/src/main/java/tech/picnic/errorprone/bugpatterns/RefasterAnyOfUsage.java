@@ -35,7 +35,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class RefasterAnyOfUsage extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> REFASTER_ANY_OF =
-      staticMethod().onClass(Refaster.class.getName()).named("anyOf");
+      staticMethod().onClass(Refaster.class.getCanonicalName()).named("anyOf");
 
   /** Instantiates a new {@link RefasterAnyOfUsage} instance. */
   public RefasterAnyOfUsage() {}
