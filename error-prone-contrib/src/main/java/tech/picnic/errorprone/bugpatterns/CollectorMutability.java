@@ -82,13 +82,14 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
     String toCollectionSelect =
         SuggestedFixes.qualifyStaticImport(
             "java.util.stream.Collectors.toCollection", mutableFix, state);
+    String mutableCollection =
+        SuggestedFixes.qualifyType(state, mutableFix, "java.util." + mutableReplacement);
 
     return buildDescription(tree)
         .addFix(replaceMethodInvocation(tree, fullyQualifiedImmutableReplacement, state))
         .addFix(
             mutableFix
-                .addImport(String.format("java.util.%s", mutableReplacement))
-                .replace(tree, String.format("%s(%s::new)", toCollectionSelect, mutableReplacement))
+                .replace(tree, String.format("%s(%s::new)", toCollectionSelect, mutableCollection))
                 .build())
         .build();
   }
@@ -99,17 +100,19 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
       return Description.NO_MATCH;
     }
 
+    SuggestedFix.Builder mutableFix = SuggestedFix.builder();
+    String hashMap = SuggestedFixes.qualifyType(state, mutableFix, "java.util.HashMap");
+
     return buildDescription(tree)
         .addFix(
             replaceMethodInvocation(
                 tree, "com.google.common.collect.ImmutableMap.toImmutableMap", state))
         .addFix(
-            SuggestedFix.builder()
-                .addImport("java.util.HashMap")
+            mutableFix
                 .postfixWith(
                     tree.getArguments().get(argCount - 1),
                     (argCount == 2 ? ", (a, b) -> { throw new IllegalStateException(); }" : "")
-                        + ", HashMap::new")
+                        + String.format(", %s::new", hashMap))
                 .build())
         .build();
   }

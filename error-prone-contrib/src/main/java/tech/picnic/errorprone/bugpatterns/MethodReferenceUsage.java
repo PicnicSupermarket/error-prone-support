@@ -196,6 +196,8 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
     return tree.getParameters().stream().map(VariableTree::getName).collect(toImmutableList());
   }
 
+  // XXX: Resolve this suppression.
+  @SuppressWarnings("ImportSuggestion")
   private static Optional<SuggestedFix.Builder> constructFix(
       LambdaExpressionTree lambdaExpr, Symbol target, Object methodName) {
     Name sName = target.getSimpleName();
