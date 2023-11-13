@@ -18,6 +18,8 @@ import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Primitives;
@@ -136,10 +138,10 @@ public final class RedundantStringConversion extends BugChecker
   private static final Matcher<ExpressionTree> GUAVA_GUARD_INVOCATION =
       anyOf(
           staticMethod()
-              .onClass("com.google.common.base.Preconditions")
+              .onClass(Preconditions.class.getCanonicalName())
               .namedAnyOf("checkArgument", "checkState", "checkNotNull"),
           staticMethod()
-              .onClass("com.google.common.base.Verify")
+              .onClass(Verify.class.getCanonicalName())
               .namedAnyOf("verify", "verifyNotNull"));
   private static final Matcher<ExpressionTree> SLF4J_LOGGER_INVOCATION =
       instanceMethod()

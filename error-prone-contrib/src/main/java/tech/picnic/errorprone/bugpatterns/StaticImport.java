@@ -10,8 +10,24 @@ import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS
 
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Functions;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicates;
+import com.google.common.base.Verify;
+import com.google.common.collect.Comparators;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableRangeSet;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ImmutableSortedMultiset;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.MoreCollectors;
+import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -22,12 +38,25 @@ import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.matchers.Matchers;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Type;
+import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /** A {@link BugChecker} that flags type members that can and should be statically imported. */
 // XXX: This check is closely linked to `NonStaticImport`. Consider merging the two.
@@ -61,15 +90,15 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           "com.fasterxml.jackson.annotation.JsonFormat.Shape",
           "com.fasterxml.jackson.annotation.JsonInclude.Include",
           "com.fasterxml.jackson.annotation.JsonProperty.Access",
-          "com.google.common.base.Preconditions",
-          "com.google.common.base.Predicates",
-          "com.google.common.base.Verify",
-          "com.google.common.collect.MoreCollectors",
-          "com.google.errorprone.BugPattern.LinkType",
-          "com.google.errorprone.BugPattern.SeverityLevel",
-          "com.google.errorprone.BugPattern.StandardTags",
-          "com.google.errorprone.matchers.Matchers",
-          "com.google.errorprone.refaster.ImportPolicy",
+          Preconditions.class.getCanonicalName(),
+          Predicates.class.getCanonicalName(),
+          Verify.class.getCanonicalName(),
+          MoreCollectors.class.getCanonicalName(),
+          BugPattern.LinkType.class.getCanonicalName(),
+          BugPattern.SeverityLevel.class.getCanonicalName(),
+          BugPattern.StandardTags.class.getCanonicalName(),
+          Matchers.class.getCanonicalName(),
+          ImportPolicy.class.getCanonicalName(),
           "com.mongodb.client.model.Accumulators",
           "com.mongodb.client.model.Aggregates",
           "com.mongodb.client.model.Filters",
@@ -77,12 +106,12 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           "com.mongodb.client.model.Projections",
           "com.mongodb.client.model.Sorts",
           "com.mongodb.client.model.Updates",
-          "java.nio.charset.StandardCharsets",
-          "java.util.Collections",
-          "java.util.Comparator",
-          "java.util.Map.Entry",
-          "java.util.regex.Pattern",
-          "java.util.stream.Collectors",
+          StandardCharsets.class.getCanonicalName(),
+          Collections.class.getCanonicalName(),
+          Comparator.class.getCanonicalName(),
+          Map.Entry.class.getCanonicalName(),
+          Pattern.class.getCanonicalName(),
+          Collectors.class.getCanonicalName(),
           "org.assertj.core.api.Assertions",
           "org.assertj.core.api.InstanceOfAssertFactories",
           "org.assertj.core.api.SoftAssertions",
@@ -122,38 +151,38 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
   static final ImmutableSetMultimap<String, String> STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
           .putAll(
-              "com.google.common.collect.ImmutableListMultimap",
+              ImmutableListMultimap.class.getCanonicalName(),
               "flatteningToImmutableListMultimap",
               "toImmutableListMultimap")
-          .put("com.google.common.collect.ImmutableList", "toImmutableList")
-          .put("com.google.common.collect.ImmutableMap", "toImmutableMap")
-          .put("com.google.common.collect.ImmutableMultiset", "toImmutableMultiset")
-          .put("com.google.common.collect.ImmutableRangeSet", "toImmutableRangeSet")
+          .put(ImmutableList.class.getCanonicalName(), "toImmutableList")
+          .put(ImmutableMap.class.getCanonicalName(), "toImmutableMap")
+          .put(ImmutableMultiset.class.getCanonicalName(), "toImmutableMultiset")
+          .put(ImmutableRangeSet.class.getCanonicalName(), "toImmutableRangeSet")
           .putAll(
-              "com.google.common.collect.ImmutableSetMultimap",
+              ImmutableSetMultimap.class.getCanonicalName(),
               "flatteningToImmutableSetMultimap",
               "toImmutableSetMultimap")
-          .put("com.google.common.collect.ImmutableSet", "toImmutableSet")
-          .put("com.google.common.collect.ImmutableSortedMap", "toImmutableSortedMap")
-          .put("com.google.common.collect.ImmutableSortedMultiset", "toImmutableSortedMultiset")
-          .put("com.google.common.collect.ImmutableSortedSet", "toImmutableSortedSet")
-          .put("com.google.common.collect.ImmutableTable", "toImmutableTable")
-          .put("com.google.common.collect.Sets", "toImmutableEnumSet")
-          .put("com.google.common.base.Functions", "identity")
-          .put("java.time.ZoneOffset", "UTC")
-          .put("java.util.function.Function", "identity")
-          .put("java.util.function.Predicate", "not")
-          .put("java.util.UUID", "randomUUID")
+          .put(ImmutableSet.class.getCanonicalName(), "toImmutableSet")
+          .put(ImmutableSortedMap.class.getCanonicalName(), "toImmutableSortedMap")
+          .put(ImmutableSortedMultiset.class.getCanonicalName(), "toImmutableSortedMultiset")
+          .put(ImmutableSortedSet.class.getCanonicalName(), "toImmutableSortedSet")
+          .put(ImmutableTable.class.getCanonicalName(), "toImmutableTable")
+          .put(Sets.class.getCanonicalName(), "toImmutableEnumSet")
+          .put(Functions.class.getCanonicalName(), "identity")
+          .put(ZoneOffset.class.getCanonicalName(), "UTC")
+          .put(Function.class.getCanonicalName(), "identity")
+          .put(Predicate.class.getCanonicalName(), "not")
+          .put(UUID.class.getCanonicalName(), "randomUUID")
           .put("org.junit.jupiter.params.provider.Arguments", "arguments")
           .putAll(
-              "java.util.Objects",
+              Objects.class.getCanonicalName(),
               "checkIndex",
               "checkFromIndexSize",
               "checkFromToIndex",
               "requireNonNull",
               "requireNonNullElse",
               "requireNonNullElseGet")
-          .putAll("com.google.common.collect.Comparators", "emptiesFirst", "emptiesLast")
+          .putAll(Comparators.class.getCanonicalName(), "emptiesFirst", "emptiesLast")
           .build();
 
   /** Instantiates a new {@link StaticImport} instance. */

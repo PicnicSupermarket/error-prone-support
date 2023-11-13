@@ -9,6 +9,8 @@ import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS
 import com.google.auto.service.AutoService;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Predicates;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.ImmutableTable;
@@ -27,6 +29,11 @@ import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symbol;
+import java.time.Clock;
+import java.time.ZoneOffset;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
@@ -59,12 +66,12 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
   @VisibleForTesting
   static final ImmutableSet<String> NON_STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of(
-          "com.google.common.base.Strings",
+          Strings.class.getCanonicalName(),
           "com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode",
-          "com.google.errorprone.VisitorState",
-          "com.google.errorprone.util.ASTHelpers",
-          "java.time.Clock",
-          "java.time.ZoneOffset");
+          VisitorState.class.getCanonicalName(),
+          ASTHelpers.class.getCanonicalName(),
+          Clock.class.getCanonicalName(),
+          ZoneOffset.class.getCanonicalName());
 
   /**
    * Type members that should never be statically imported.
@@ -83,9 +90,9 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
   // specific context is left out.
   static final ImmutableSetMultimap<String, String> NON_STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
-          .put("com.google.common.base.Predicates", "contains")
+          .put(Predicates.class.getCanonicalName(), "contains")
           .putAll(
-              "java.util.Collections",
+              Collections.class.getCanonicalName(),
               "addAll",
               "copy",
               "fill",
@@ -96,8 +103,8 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
               "rotate",
               "sort",
               "swap")
-          .put("java.util.Locale", "ROOT")
-          .putAll("java.util.regex.Pattern", "compile", "matches", "quote")
+          .put(Locale.class.getCanonicalName(), "ROOT")
+          .putAll(Pattern.class.getCanonicalName(), "compile", "matches", "quote")
           .put("org.springframework.http.MediaType", "ALL")
           .build();
 

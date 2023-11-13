@@ -36,7 +36,9 @@ public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {
   private static final Matcher<Tree> PERMITTED_ANNOTATION =
       annotations(
           AT_LEAST_ONE,
-          anyOf(isType("java.lang.Override"), isType("org.aspectj.lang.annotation.Pointcut")));
+          anyOf(
+              isType(Override.class.getCanonicalName()),
+              isType("org.aspectj.lang.annotation.Pointcut")));
 
   /** Instantiates a new {@link EmptyMethod} instance. */
   public EmptyMethod() {}

@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.suppliers.Supplier;
@@ -31,7 +32,7 @@ public enum ThirdPartyLibrary {
    *
    * @see <a href="https://github.com/google/guava">Guava on GitHub</a>
    */
-  GUAVA("com.google.common.collect.ImmutableList"),
+  GUAVA(ImmutableList.class.getCanonicalName()),
   /**
    * VMWare's Project Reactor.
    *

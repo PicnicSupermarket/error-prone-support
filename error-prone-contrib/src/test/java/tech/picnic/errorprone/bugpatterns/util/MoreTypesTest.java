@@ -21,7 +21,10 @@ import com.google.errorprone.util.Signatures;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 final class MoreTypesTest {
@@ -157,39 +160,55 @@ final class MoreTypesTest {
           type("java.lang.Nonexistent"),
           generic(type("java.util.Integer"), unbound()),
           // Valid types.
-          type("java.lang.String"),
-          type("java.lang.Number"),
-          superOf(type("java.lang.Number")),
-          subOf(type("java.lang.Number")),
-          type("java.lang.Integer"),
-          superOf(type("java.lang.Integer")),
-          subOf(type("java.lang.Integer")),
-          type("java.util.Optional"),
-          raw(type("java.util.Optional")),
-          generic(type("java.util.Optional"), unbound()),
-          generic(type("java.util.Optional"), type("java.lang.Number")),
-          type("java.util.Collection"),
-          raw(type("java.util.Collection")),
-          generic(type("java.util.Collection"), unbound()),
-          generic(type("java.util.Collection"), type("java.lang.Number")),
-          generic(type("java.util.Collection"), superOf(type("java.lang.Number"))),
-          generic(type("java.util.Collection"), subOf(type("java.lang.Number"))),
-          generic(type("java.util.Collection"), type("java.lang.Integer")),
-          generic(type("java.util.Collection"), superOf(type("java.lang.Integer"))),
-          generic(type("java.util.Collection"), subOf(type("java.lang.Integer"))),
-          type("java.util.List"),
-          raw(type("java.util.List")),
-          generic(type("java.util.List"), unbound()),
-          generic(type("java.util.List"), type("java.lang.Number")),
-          generic(type("java.util.List"), superOf(type("java.lang.Number"))),
-          generic(type("java.util.List"), subOf(type("java.lang.Number"))),
-          generic(type("java.util.List"), type("java.lang.Integer")),
-          generic(type("java.util.List"), superOf(type("java.lang.Integer"))),
-          generic(type("java.util.List"), subOf(type("java.lang.Integer"))),
+          type(String.class.getCanonicalName()),
+          type(Number.class.getCanonicalName()),
+          superOf(type(Number.class.getCanonicalName())),
+          subOf(type(Number.class.getCanonicalName())),
+          type(Integer.class.getCanonicalName()),
+          superOf(type(Integer.class.getCanonicalName())),
+          subOf(type(Integer.class.getCanonicalName())),
+          type(Optional.class.getCanonicalName()),
+          raw(type(Optional.class.getCanonicalName())),
+          generic(type(Optional.class.getCanonicalName()), unbound()),
+          generic(type(Optional.class.getCanonicalName()), type(Number.class.getCanonicalName())),
+          type(Collection.class.getCanonicalName()),
+          raw(type(Collection.class.getCanonicalName())),
+          generic(type(Collection.class.getCanonicalName()), unbound()),
+          generic(type(Collection.class.getCanonicalName()), type(Number.class.getCanonicalName())),
           generic(
-              type("java.util.Map"),
-              type("java.lang.String"),
-              subOf(generic(type("java.util.Collection"), superOf(type("java.lang.Short"))))));
+              type(Collection.class.getCanonicalName()),
+              superOf(type(Number.class.getCanonicalName()))),
+          generic(
+              type(Collection.class.getCanonicalName()),
+              subOf(type(Number.class.getCanonicalName()))),
+          generic(
+              type(Collection.class.getCanonicalName()), type(Integer.class.getCanonicalName())),
+          generic(
+              type(Collection.class.getCanonicalName()),
+              superOf(type(Integer.class.getCanonicalName()))),
+          generic(
+              type(Collection.class.getCanonicalName()),
+              subOf(type(Integer.class.getCanonicalName()))),
+          type(List.class.getCanonicalName()),
+          raw(type(List.class.getCanonicalName())),
+          generic(type(List.class.getCanonicalName()), unbound()),
+          generic(type(List.class.getCanonicalName()), type(Number.class.getCanonicalName())),
+          generic(
+              type(List.class.getCanonicalName()), superOf(type(Number.class.getCanonicalName()))),
+          generic(
+              type(List.class.getCanonicalName()), subOf(type(Number.class.getCanonicalName()))),
+          generic(type(List.class.getCanonicalName()), type(Integer.class.getCanonicalName())),
+          generic(
+              type(List.class.getCanonicalName()), superOf(type(Integer.class.getCanonicalName()))),
+          generic(
+              type(List.class.getCanonicalName()), subOf(type(Integer.class.getCanonicalName()))),
+          generic(
+              type(Map.class.getCanonicalName()),
+              type(String.class.getCanonicalName()),
+              subOf(
+                  generic(
+                      type(Collection.class.getCanonicalName()),
+                      superOf(type(Short.class.getCanonicalName()))))));
     }
   }
 }
