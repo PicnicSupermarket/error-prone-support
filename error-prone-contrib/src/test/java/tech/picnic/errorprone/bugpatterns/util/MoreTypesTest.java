@@ -158,7 +158,7 @@ final class MoreTypesTest {
       return ImmutableSet.of(
           // Invalid types.
           type("java.lang.Nonexistent"),
-          generic(type("java.util.Integer"), unbound()),
+          generic(type("java.util.Nonexistent"), unbound()),
           // Valid types.
           type(String.class.getCanonicalName()),
           type(Number.class.getCanonicalName()),
