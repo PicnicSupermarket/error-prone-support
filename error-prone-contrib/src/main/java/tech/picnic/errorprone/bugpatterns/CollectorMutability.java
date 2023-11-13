@@ -58,7 +58,10 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
 
     if (LIST_COLLECTOR.matches(tree, state)) {
       return suggestToCollectionAlternatives(
-          tree, "com.google.common.collect.ImmutableList.toImmutableList", "ArrayList", state);
+          tree,
+          "com.google.common.collect.ImmutableList.toImmutableList",
+          "java.util.ArrayList",
+          state);
     }
 
     if (MAP_COLLECTOR.matches(tree, state)) {
@@ -67,7 +70,10 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
 
     if (SET_COLLECTOR.matches(tree, state)) {
       return suggestToCollectionAlternatives(
-          tree, "com.google.common.collect.ImmutableSet.toImmutableSet", "HashSet", state);
+          tree,
+          "com.google.common.collect.ImmutableSet.toImmutableSet",
+          "java.util.HashSet",
+          state);
     }
 
     return Description.NO_MATCH;
@@ -75,18 +81,17 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
 
   private Description suggestToCollectionAlternatives(
       MethodInvocationTree tree,
-      String fullyQualifiedImmutableReplacement,
+      String immutableReplacement,
       String mutableReplacement,
       VisitorState state) {
     SuggestedFix.Builder mutableFix = SuggestedFix.builder();
     String toCollectionSelect =
         SuggestedFixes.qualifyStaticImport(
             "java.util.stream.Collectors.toCollection", mutableFix, state);
-    String mutableCollection =
-        SuggestedFixes.qualifyType(state, mutableFix, "java.util." + mutableReplacement);
+    String mutableCollection = SuggestedFixes.qualifyType(state, mutableFix, mutableReplacement);
 
     return buildDescription(tree)
-        .addFix(replaceMethodInvocation(tree, fullyQualifiedImmutableReplacement, state))
+        .addFix(replaceMethodInvocation(tree, immutableReplacement, state))
         .addFix(
             mutableFix
                 .replace(tree, String.format("%s(%s::new)", toCollectionSelect, mutableCollection))
