@@ -116,7 +116,7 @@ public final class ErrorProneRuntimeClasspath extends BugChecker
             original,
             identifier
                 + ".class.getCanonicalName()"
-                + (suffix.isEmpty() ? "" : " + " + Constants.format(suffix)))
+                + (suffix.isEmpty() ? "" : (" + " + Constants.format(suffix))))
         .build();
   }
 
@@ -136,8 +136,8 @@ public final class ErrorProneRuntimeClasspath extends BugChecker
 
     /*
      * This class reference may not be safe; suggest using a string literal instead. (Note that
-     * dropping the type reference may make the associated import statement (if any) obsolete;
-     * dropping such imports is left to Error Prone's `RemoveUnusedImports` check.)
+     * dropping the type reference may make the associated import statement (if any) obsolete.
+     * Dropping such imports is left to Error Prone's `RemoveUnusedImports` check.)
      */
     return buildDescription(tree)
         .setMessage("This type may not be on the runtime classpath; use a string literal instead")
@@ -150,7 +150,9 @@ public final class ErrorProneRuntimeClasspath extends BugChecker
   private static boolean isTypeOnClasspath(String type, VisitorState state) {
     try {
       return ThirdPartyLibrary.canIntroduceUsage(type, state);
-    } catch (IllegalArgumentException e) {
+    } catch (
+        @SuppressWarnings("java:S1166" /* Not exceptional. */)
+        IllegalArgumentException e) {
       return false;
     }
   }
