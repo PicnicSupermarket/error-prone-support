@@ -71,6 +71,7 @@ final class ErrorProneRuntimeClasspathTest {
             "    m(float.class.getCanonicalName());",
             "    m(double.class.getCanonicalName());",
             "    m(java.lang.Iterable.class.getCanonicalName());",
+            "    m(CompilationTestHelper.class.toString());",
             "    // BUG: Diagnostic matches: USE_STRING_LITERAL",
             "    m(CompilationTestHelper.class.getCanonicalName());",
             "    // BUG: Diagnostic matches: USE_STRING_LITERAL",
