@@ -4,12 +4,14 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
 import com.google.errorprone.bugpatterns.BugChecker;
+import com.sun.tools.javac.util.Constants;
+import com.sun.tools.javac.util.Convert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(FixChoosers.class);
+    return ImmutableSet.of(Convert.class, FixChoosers.class);
   }
 
   ImmutableSet<BugCheckerRefactoringTestHelper> testBugCheckerRefactoringTestHelperIdentity() {
@@ -23,5 +25,9 @@ final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
     return BugCheckerRefactoringTestHelper.newInstance(BugChecker.class, getClass())
         .addInputLines("A.java", "class A {}")
         .expectUnchanged();
+  }
+
+  String testConstantsFormat() {
+    return Constants.format("foo");
   }
 }
