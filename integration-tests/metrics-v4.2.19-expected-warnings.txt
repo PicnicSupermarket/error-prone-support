@@ -1,0 +1,8 @@
+metrics-core/src/main/java/com/codahale/metrics/CsvReporter.java:[382,36] [FormatStringConcatenation] Defer string concatenation to the invoked method
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/GraphiteReporter.java:[429,18] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/GraphiteReporter.java:[434,20] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/GraphiteReporter.java:[447,21] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
+metrics-healthchecks/src/test/java/com/codahale/metrics/health/HealthCheckTest.java:[189,47] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
+metrics-healthchecks/src/test/java/com/codahale/metrics/health/HealthCheckTest.java:[203,47] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
+metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics/servlets/HealthCheckServletTest.java:[29,68] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
+metrics-servlets/src/test/java/com/codahale/metrics/servlets/HealthCheckServletTest.java:[30,68] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
