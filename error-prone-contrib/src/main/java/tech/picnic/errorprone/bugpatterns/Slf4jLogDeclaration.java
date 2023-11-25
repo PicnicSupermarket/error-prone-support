@@ -75,25 +75,28 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
   public Description matchClass(ClassTree tree, VisitorState state) {
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
 
-    fixLoggerVariableModifiers(tree, state, fixBuilder);
-    fixLoggerVariableDeclaration(state, fixBuilder);
-
-    return tree.getKind() == Kind.INTERFACE
-        ? describeMatch(tree)
-        : describeMatch(tree, fixBuilder.build());
-  }
-
-  private void fixLoggerVariableModifiers(ClassTree tree, VisitorState state, Builder fixBuilder) {
     for (Tree member : tree.getMembers()) {
       if (LOGGER.matches(member, state)) {
-        VariableTree variable = (VariableTree) member;
-        SuggestedFixes.addModifiers(
-                member, state, Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-            .ifPresent(fixBuilder::merge);
-        if (!variable.getName().toString().equals(canonicalizedLoggerName)) {
-          fixBuilder.merge(SuggestedFixes.renameVariable(variable, canonicalizedLoggerName, state));
+        if (tree.getKind() != Kind.INTERFACE) {
+          fixLoggerVariableModifiers(member, state, fixBuilder);
         }
+        canonicalizeLoggerVariable(member, state, fixBuilder);
       }
+    }
+    fixLoggerVariableDeclaration(state, fixBuilder);
+
+    return describeMatch(tree, fixBuilder.build());
+  }
+
+  private void fixLoggerVariableModifiers(Tree member, VisitorState state, Builder fixBuilder) {
+    SuggestedFixes.addModifiers(member, state, Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+        .ifPresent(fixBuilder::merge);
+  }
+
+  private void canonicalizeLoggerVariable(Tree member, VisitorState state, Builder fixBuilder) {
+    VariableTree variable = (VariableTree) member;
+    if (!variable.getName().toString().equals(canonicalizedLoggerName)) {
+      fixBuilder.merge(SuggestedFixes.renameVariable(variable, canonicalizedLoggerName, state));
     }
   }
 

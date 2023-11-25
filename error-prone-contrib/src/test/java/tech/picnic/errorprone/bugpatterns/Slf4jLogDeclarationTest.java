@@ -46,6 +46,10 @@ final class Slf4jLogDeclarationTest {
             "  }",
             "",
             "  class J {}",
+            "",
+            "  interface K {",
+            "    Logger NOT_PROPER_LOGGER_NAME = LoggerFactory.getLogger(A.class);",
+            "  }",
             "}")
         .addOutputLines(
             "A.java",
@@ -84,36 +88,10 @@ final class Slf4jLogDeclarationTest {
             "  }",
             "",
             "  class J {}",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
-  }
-
-  @Test
-  void doNotAddModifiersToDeclarationsInsideInterfaces() {
-    BugCheckerRefactoringTestHelper.newInstance(Slf4jLogDeclaration.class, getClass())
-        .addInputLines(
-            "A.java",
-            "import org.slf4j.Logger;",
-            "import org.slf4j.LoggerFactory;",
             "",
-            "interface A {",
-            "  Logger LOG = LoggerFactory.getLogger(A.class);",
-            "",
-            "  Logger LOG1 = LoggerFactory.getLogger(B.class);",
-            "",
-            "  class B {}",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "import org.slf4j.Logger;",
-            "import org.slf4j.LoggerFactory;",
-            "",
-            "interface A {",
-            "  Logger LOG = LoggerFactory.getLogger(A.class);",
-            "",
-            "  Logger LOG1 = LoggerFactory.getLogger(A.class);",
-            "",
-            "  class B {}",
+            "  interface K {",
+            "    Logger LOG = LoggerFactory.getLogger(K.class);",
+            "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
