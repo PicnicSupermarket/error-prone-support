@@ -73,16 +73,14 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    if (tree.getKind() == Kind.INTERFACE) {
-      return Description.NO_MATCH;
-    }
-
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
 
     fixLoggerVariableModifiers(tree, state, fixBuilder);
     fixLoggerVariableDeclaration(state, fixBuilder);
 
-    return describeMatch(tree, fixBuilder.build());
+    return tree.getKind() == Kind.INTERFACE
+        ? describeMatch(tree)
+        : describeMatch(tree, fixBuilder.build());
   }
 
   private void fixLoggerVariableModifiers(ClassTree tree, VisitorState state, Builder fixBuilder) {
