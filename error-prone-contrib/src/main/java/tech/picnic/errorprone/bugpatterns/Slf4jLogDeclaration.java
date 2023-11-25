@@ -14,7 +14,6 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
-import com.google.errorprone.fixes.SuggestedFix.Builder;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
@@ -85,22 +84,25 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
     }
     fixLoggerVariableDeclaration(state, fixBuilder);
 
-    return describeMatch(tree, fixBuilder.build());
+    return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
   }
 
-  private void fixLoggerVariableModifiers(Tree member, VisitorState state, Builder fixBuilder) {
+  private static void fixLoggerVariableModifiers(
+      Tree member, VisitorState state, SuggestedFix.Builder fixBuilder) {
     SuggestedFixes.addModifiers(member, state, Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
         .ifPresent(fixBuilder::merge);
   }
 
-  private void canonicalizeLoggerVariable(Tree member, VisitorState state, Builder fixBuilder) {
+  private void canonicalizeLoggerVariable(
+      Tree member, VisitorState state, SuggestedFix.Builder fixBuilder) {
     VariableTree variable = (VariableTree) member;
     if (!variable.getName().toString().equals(canonicalizedLoggerName)) {
       fixBuilder.merge(SuggestedFixes.renameVariable(variable, canonicalizedLoggerName, state));
     }
   }
 
-  private static void fixLoggerVariableDeclaration(VisitorState state, Builder fixBuilder) {
+  private static void fixLoggerVariableDeclaration(
+      VisitorState state, SuggestedFix.Builder fixBuilder) {
     for (Tree typeDeclaration : state.getPath().getCompilationUnit().getTypeDecls()) {
       if (typeDeclaration instanceof ClassTree) {
         new TreeScanner<@Nullable Void, Name>() {
@@ -109,6 +111,7 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
             return super.visitClass(classTree, classTree.getSimpleName());
           }
 
+          @Override
           public @Nullable Void visitMethodInvocation(
               MethodInvocationTree methodTree, Name className) {
             if (GET_LOGGER_METHOD.matches(methodTree, state)) {
