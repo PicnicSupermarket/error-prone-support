@@ -115,12 +115,12 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
           public @Nullable Void visitMethodInvocation(
               MethodInvocationTree methodTree, Name className) {
             if (GET_LOGGER_METHOD.matches(methodTree, state)) {
-              ExpressionTree arg1 = methodTree.getArguments().get(0);
-              String argumentName = SourceCode.treeToString(arg1, state);
+              ExpressionTree arg = methodTree.getArguments().get(0);
+              String argumentName = SourceCode.treeToString(arg, state);
 
               if (!className.contentEquals(argumentName)) {
                 fixBuilder.merge(
-                    SuggestedFix.replace(arg1, className + JavaFileObject.Kind.CLASS.extension));
+                    SuggestedFix.replace(arg, className + JavaFileObject.Kind.CLASS.extension));
               }
             }
             return super.visitMethodInvocation(methodTree, className);
