@@ -36,6 +36,7 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LineMap;
+import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
@@ -146,7 +147,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
 
     reportIncorrectClassName(tree, state);
-    reportUnSortedElidedTypesAndStaticImports(tree, state, fixBuilder);
+    reportUnSortedElidedTypesAndStaticImports(tree, fixBuilder, state);
 
     List<Description> matches = new ArrayList<>();
     delegate.matchCompilationUnit(
@@ -189,7 +190,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
   }
 
   private void reportUnSortedElidedTypesAndStaticImports(
-      CompilationUnitTree compilationUnit, VisitorState state, SuggestedFix.Builder fixBuilder) {
+      CompilationUnitTree compilationUnit, SuggestedFix.Builder fixBuilder, VisitorState state) {
     new TreeScanner<@Nullable Void, @Nullable Void>() {
       @Override
       public @Nullable Void visitMethod(MethodTree tree, @Nullable Void unused) {
@@ -245,6 +246,9 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
         return state.getSourceForNode(((MemberSelectTree) arg).getExpression());
       case METHOD_INVOCATION:
         return state.getSourceForNode(((MethodInvocationTree) arg).getMethodSelect());
+      case STRING_LITERAL:
+      case INT_LITERAL:
+        return ((LiteralTree) arg).getValue().toString();
       default:
         return "";
     }

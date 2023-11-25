@@ -14,7 +14,8 @@ final class NonSortedElidedTypesAndStaticImportsTestRulesTest
     implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Lists.class, assertDoesNotThrow(() -> null), Iterables.class);
+    return ImmutableSet.of(
+        Lists.class, 3, "k", assertDoesNotThrow(() -> null), Iterables.class, "K", 1);
   }
 }
 
