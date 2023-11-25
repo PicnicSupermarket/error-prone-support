@@ -3,8 +3,6 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
-import static com.google.errorprone.matchers.Matchers.allOf;
-import static com.google.errorprone.matchers.Matchers.hasIdentifier;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
@@ -49,8 +47,6 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class Slf4jLogDeclaration extends BugChecker
     implements ClassTreeMatcher, MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<ClassTree> TEST_CLASS_WITH_LOGGER =
-      allOf(hasIdentifier(isSubtypeOf("org.slf4j.Logger")));
   private static final Matcher<Tree> LOGGER = isSubtypeOf("org.slf4j.Logger");
   private static final String CANONICALIZED_LOGGER_NAME_FLAG =
       "Slf4jLogDeclaration:CanonicalizedLoggerName";
@@ -77,7 +73,7 @@ public final class Slf4jLogDeclaration extends BugChecker
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    if (tree.getKind() == Kind.INTERFACE || !TEST_CLASS_WITH_LOGGER.matches(tree, state)) {
+    if (tree.getKind() == Kind.INTERFACE) {
       return Description.NO_MATCH;
     }
 
