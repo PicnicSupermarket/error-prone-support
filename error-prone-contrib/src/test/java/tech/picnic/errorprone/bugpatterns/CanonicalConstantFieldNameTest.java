@@ -106,7 +106,7 @@ final class CanonicalConstantFieldNameTest {
   @Test
   void excludeFlaggedConstants() {
     BugCheckerRefactoringTestHelper.newInstance(CanonicalConstantFieldName.class, getClass())
-        .setArgs("-XepOpt:CanonicalConstantFieldName:ExcludedConstantFliedNames=excludedField")
+        .setArgs("-XepOpt:CanonicalConstantFieldName:ExcludedConstantFieldNames=excludedField")
         .addInputLines(
             "A.java",
             "class A {",
