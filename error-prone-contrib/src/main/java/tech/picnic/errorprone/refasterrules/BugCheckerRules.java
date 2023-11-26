@@ -55,6 +55,7 @@ final class BugCheckerRules {
     }
   }
 
+  /** Prefer using the {@link Constants} API over more verbose alternatives. */
   static final class ConstantsFormat {
     @BeforeTemplate
     String before(String value) {
