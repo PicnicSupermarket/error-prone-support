@@ -7,6 +7,8 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.sun.tools.javac.util.Constants;
+import com.sun.tools.javac.util.Convert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to {@link com.google.errorprone.bugpatterns.BugChecker} classes. */
@@ -50,6 +52,19 @@ final class BugCheckerRules {
     BugCheckerRefactoringTestHelper after(
         BugCheckerRefactoringTestHelper helper, String path, String source) {
       return helper.addInputLines(path, source).expectUnchanged();
+    }
+  }
+
+  /** Prefer using the {@link Constants} API over more verbose alternatives. */
+  static final class ConstantsFormat {
+    @BeforeTemplate
+    String before(String value) {
+      return String.format("\"%s\"", Convert.quote(value));
+    }
+
+    @AfterTemplate
+    String after(String value) {
+      return Constants.format(value);
     }
   }
 }
