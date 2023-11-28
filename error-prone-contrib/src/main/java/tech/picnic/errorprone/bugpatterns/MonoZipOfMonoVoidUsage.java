@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.bugpatterns.BugChecker.MemberReferenceTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
@@ -27,23 +26,21 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.util.List;
-import reactor.core.publisher.Mono;
 
 /**
- * A {@link BugChecker} that flags usages of {@link Mono#zip(Mono, Mono)}} and {@link
- * Mono#zipWith(Mono)}} with {@link Mono#empty()} parameters.
+ * A {@link BugChecker} that flags usages of Mono.zip(Mono, Mono) and Mono.zipWith(Mono) with
+ * Mono.empty() parameters.
  *
- * <p>{@link Mono#zip(Mono, Mono)} and {@link Mono#zipWith(Mono)} perform incorrectly upon retrieval
- * of the empty publisher and prematurely terminates the reactive chain from the execution. In most
- * cases this is not the desired behaviour.
+ * <p>Mono.zip(Mono, Mono) and Mono.zipWith(Mono) perform incorrectly upon retrieval of the empty
+ * publisher and prematurely terminates the reactive chain from the execution. In most cases this is
+ * not the desired behaviour.
  *
- * <p>NB: Mono&lt;?>#zipWith(Mono&lt;Void>) is allowed be the Reactor API, but it is an incorrect
- * usage of the API. It will be flagged by ErrorProne but the fix won't be supplied. The problem
- * with the original code should be revisited and fixed in a structural manner by the developer.
+ * <p>NB: Mono&lt;?&gt;#zipWith(Mono&lt;Void&gt;) is allowed be the Reactor API, but it is an
+ * incorrect usage of the API. It will be flagged by ErrorProne but the fix won't be supplied. The
+ * problem with the original code should be revisited and fixed in a structural manner by the
+ * developer.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -55,9 +52,9 @@ import reactor.core.publisher.Mono;
     severity = ERROR,
     tags = LIKELY_ERROR)
 public final class MonoZipOfMonoVoidUsage extends BugChecker
-    implements MethodInvocationTreeMatcher, MemberReferenceTreeMatcher {
+    implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Supplier<Type> MONO = type(Mono.class.getName());
+  private static final Supplier<Type> MONO = type("reactor.core.publisher.Mono");
   // Mono.empty() yields `Mono<Object>` under the hood
   private static final Supplier<Type> MONO_OBJECT_TYPE =
       VisitorState.memoize(generic(MONO, type(Object.class.getName())));
@@ -111,33 +108,21 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
         .build();
   }
 
-  @Override
-  public Description matchMemberReference(MemberReferenceTree tree, VisitorState state) {
-    boolean dynamicMono = MONO_ZIP_AND_WITH.matches(tree, state);
-    boolean staticMono = STATIC_MONO_ZIP.matches(tree, state);
-
-    if (!dynamicMono && !staticMono) {
-      return Description.NO_MATCH;
-    }
-    return describeMatch(tree);
-  }
-
   private static Matcher<MethodInvocationTree> hasArgumentOfType(Supplier<Type> type) {
     return hasArgumentOfTypes(ImmutableList.of(type));
   }
 
   /**
    * We need to extract real types from the generics because {@link ASTHelpers} cannot distinguish
-   * {@link Mono}&lt;{@link Integer}&gt; and {@link Mono}&lt;{@link Void}&gt; and reports those
-   * being the same.
+   * Mono&lt;Integer&gt; and Mono&lt;Void&gt; and reports those being the same.
    *
-   * <p>In case of {@link Mono}, we can infer the real type out of the parameters of the invocation
-   * ({@link MethodInvocationTree#getArguments()}):
+   * <p>In case of Mono, we can infer the real type out of the parameters of the invocation ({@link
+   * MethodInvocationTree#getArguments()}):
    *
    * <p>- either we have explicit variable declared and the provided type which will be inferred,
    *
-   * <p>- or we have a method invocation, like {@link Mono#just(Object)} or {@link Mono#empty()},
-   * for which we can also infer type.
+   * <p>- or we have a method invocation, like Mono.just(Object) or Mono.empty(), for which we can
+   * also infer type.
    *
    * <p>Similarly, we can infer the matching type
    *
@@ -149,12 +134,7 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
         tree.getArguments().stream()
             .anyMatch(
                 arg -> {
-                  List<Type> allParams = ASTHelpers.getType(arg).allparams();
-                  if (allParams.isEmpty()) {
-                    return false;
-                  }
-
-                  Type argumentType = allParams.get(0);
+                  Type argumentType = ASTHelpers.getType(arg).allparams().get(0);
                   return types.stream()
                       .map(type -> type.get(state).allparams().get(0))
                       .anyMatch(
