@@ -12,10 +12,8 @@ import static com.google.errorprone.util.ASTHelpers.isSameType;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.type;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.unbound;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -55,39 +53,29 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Supplier<Type> MONO = type("reactor.core.publisher.Mono");
-  // Mono.empty() yields `Mono<Object>` under the hood
-  private static final Supplier<Type> MONO_OBJECT_TYPE =
-      VisitorState.memoize(generic(MONO, type(Object.class.getName())));
   // In fact, we use `Mono<Void>` everywhere in codebases instead of `Mono<Object>` to represent
   // empty publisher
   private static final Supplier<Type> MONO_VOID_TYPE =
       VisitorState.memoize(generic(MONO, type(Void.class.getName())));
 
-  private static final Supplier<Type> MONO_UNBOUND_TYPE =
-      VisitorState.memoize(generic(MONO, unbound()));
-
   // On Mono.zip, at least one element should match empty in order to proceed.
   private static final Matcher<ExpressionTree> MONO_ZIP_AND_WITH =
       anyOf(
           allOf(
-              instanceMethod().onDescendantOf(MONO_UNBOUND_TYPE).namedAnyOf("zip", "zipWith"),
-              toType(
-                  MethodInvocationTree.class,
-                  hasArgumentOfTypes(ImmutableList.of(MONO_VOID_TYPE, MONO_OBJECT_TYPE)))),
+              instanceMethod().onDescendantOf(MONO).namedAnyOf("zip", "zipWith"),
+              toType(MethodInvocationTree.class, hasArgumentOfType(MONO_VOID_TYPE))),
+          allOf(
+              instanceMethod().onDescendantOf(MONO).namedAnyOf("zip", "zipWith"),
+              toType(MethodInvocationTree.class, staticMethod().onClass(MONO).named("empty"))),
           allOf(
               instanceMethod().onDescendantOf(MONO_VOID_TYPE).namedAnyOf("zip", "zipWith"),
-              toType(MethodInvocationTree.class, hasArgumentOfType(MONO_UNBOUND_TYPE))),
-          allOf(
-              instanceMethod().onDescendantOf(MONO_OBJECT_TYPE).namedAnyOf("zip", "zipWith"),
-              toType(MethodInvocationTree.class, hasArgumentOfType(MONO_UNBOUND_TYPE))));
+              toType(MethodInvocationTree.class, hasArgumentOfType(MONO))));
 
   // On Mono.zip, at least one element should match empty in order to proceed.
   private static final Matcher<ExpressionTree> STATIC_MONO_ZIP =
       allOf(
           staticMethod().onClass(MONO).named("zip"),
-          toType(
-              MethodInvocationTree.class,
-              hasArgumentOfTypes(ImmutableList.of(MONO_OBJECT_TYPE, MONO_VOID_TYPE))));
+          toType(MethodInvocationTree.class, hasArgumentOfType(MONO_VOID_TYPE)));
 
   /** Instantiates a new {@link MonoZipOfMonoVoidUsage} instance. */
   public MonoZipOfMonoVoidUsage() {}
@@ -108,10 +96,6 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
         .build();
   }
 
-  private static Matcher<MethodInvocationTree> hasArgumentOfType(Supplier<Type> type) {
-    return hasArgumentOfTypes(ImmutableList.of(type));
-  }
-
   /**
    * We need to extract real types from the generics because {@link ASTHelpers} cannot distinguish
    * Mono&lt;Integer&gt; and Mono&lt;Void&gt; and reports those being the same.
@@ -128,18 +112,14 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
    *
    * <p>In this case we will always have only one parameter.
    */
-  private static Matcher<MethodInvocationTree> hasArgumentOfTypes(
-      ImmutableList<Supplier<Type>> types) {
+  private static Matcher<MethodInvocationTree> hasArgumentOfType(Supplier<Type> type) {
     return (tree, state) ->
         tree.getArguments().stream()
             .anyMatch(
                 arg -> {
                   Type argumentType = ASTHelpers.getType(arg).allparams().get(0);
-                  return types.stream()
-                      .map(type -> type.get(state).allparams().get(0))
-                      .anyMatch(
-                          requiredMatchingType ->
-                              isSameType(argumentType, requiredMatchingType, state));
+                  Type requiredType = type.get(state).allparams().get(0);
+                  return isSameType(argumentType, requiredType, state);
                 });
   }
 }
