@@ -14,6 +14,7 @@ import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
 import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.type;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -26,6 +27,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.tree.JCTree;
 
 /**
  * A {@link BugChecker} that flags usages of Mono.zip(Mono, Mono) and Mono.zipWith(Mono) with
@@ -68,7 +70,7 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
               instanceMethod().onDescendantOf(MONO).named("zipWith"),
               toType(MethodInvocationTree.class, staticMethod().onClass(MONO).named("empty"))),
           allOf(
-              instanceMethod().onExactClass(MONO_VOID_TYPE).named("zipWith"),
+              onClassWithMethodName(MONO_VOID_TYPE, "zipWith"),
               toType(MethodInvocationTree.class, hasArgumentOfType(MONO))));
 
   // On Mono.zip, at least one element should match empty in order to proceed.
@@ -96,6 +98,31 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
         .build();
   }
 
+  private static Matcher<ExpressionTree> onClassWithMethodName(
+      Supplier<Type> genericDesiredType, String methodName) {
+    return (tree, state) -> {
+      JCTree.JCExpression methodSelect = ((JCTree.JCMethodInvocation) tree).getMethodSelect();
+      if (!(methodSelect instanceof JCTree.JCFieldAccess)) {
+        return false;
+      }
+      JCTree.JCFieldAccess methodExecuted = (JCTree.JCFieldAccess) methodSelect;
+      Type type = methodExecuted.selected.type;
+      String invokedMethodName = methodExecuted.getIdentifier().toString();
+      return invokedMethodName.equals(methodName)
+          && hasSameGenericType(type, genericDesiredType.get(state), state);
+    };
+  }
+
+  private static Matcher<MethodInvocationTree> hasArgumentOfType(
+      Supplier<Type> genericDesiredType) {
+    return (tree, state) ->
+        tree.getArguments().stream()
+            .anyMatch(
+                arg ->
+                    hasSameGenericType(
+                        ASTHelpers.getType(arg), genericDesiredType.get(state), state));
+  }
+
   /**
    * We need to extract real types from the generics because {@link ASTHelpers} cannot distinguish
    * Mono&lt;Integer&gt; and Mono&lt;Void&gt; and reports those being the same.
@@ -112,14 +139,10 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
    *
    * <p>In this case we will always have only one parameter.
    */
-  private static Matcher<MethodInvocationTree> hasArgumentOfType(Supplier<Type> type) {
-    return (tree, state) ->
-        tree.getArguments().stream()
-            .anyMatch(
-                arg -> {
-                  Type argumentType = ASTHelpers.getType(arg).allparams().get(0);
-                  Type requiredType = type.get(state).allparams().get(0);
-                  return isSameType(argumentType, requiredType, state);
-                });
+  private static boolean hasSameGenericType(
+      Type genericArgumentType, Type genericDesiredType, VisitorState state) {
+    Type argumentType = Iterables.getFirst(genericArgumentType.allparams(), Type.noType);
+    Type requiredType = Iterables.getOnlyElement(genericDesiredType.allparams());
+    return isSameType(argumentType, requiredType, state);
   }
 }

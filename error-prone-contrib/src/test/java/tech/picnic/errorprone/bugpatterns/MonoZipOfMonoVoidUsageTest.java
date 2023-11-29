@@ -4,6 +4,10 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class MonoZipOfMonoVoidUsageTest {
+  // Line 33 won't be reported as a bug.
+  // It's quite hard to catch this case as Mono.empty yields Mono<Object>, so matcher will be too
+  // wide.
+  // Additionally, it's not expected to occur in the real production code.
   @Test
   void identification() {
     CompilationTestHelper.newInstance(MonoZipOfMonoVoidUsage.class, getClass())
@@ -21,15 +25,11 @@ final class MonoZipOfMonoVoidUsageTest {
             "    // BUG: Diagnostic contains:",
             "    Mono.zip(a, a);",
             "    Mono.zip(e, e);",
-            // TODO: Should not be reported though
-            "    // BUG: Diagnostic contains:",
             "    e.zipWith(e);",
             "    // BUG: Diagnostic contains:",
             "    Mono.zip(d, c, b, a);",
             "    Mono.zip(d, c, b);",
             "    b.zipWith(b).zipWith(c).map(entry -> entry);",
-            // Not a bug - quite hard to catch this case. Additionally, it's not expected to occur
-            // in the real production code.
             "    Mono.zip(d, Mono.empty());",
             "    c.zipWith(b);",
             "    c.zipWith(d);",
@@ -38,7 +38,9 @@ final class MonoZipOfMonoVoidUsageTest {
             "    c.zipWith(c);",
             "  }",
             "",
-            "  private Mono<Integer> publisher() {return Mono.empty();}",
+            "  private Mono<Integer> publisher() {",
+            "    return Mono.empty();",
+            "  }",
             "}")
         .doTest();
   }
