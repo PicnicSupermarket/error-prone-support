@@ -83,6 +83,10 @@ final class MonoZipOfMonoVoidUsageTest {
             "    Mono.zip(a, a);",
             "    a.zipWith(a);",
             "  }",
+            "",
+            "  public void m2() {",
+            "    Class clazz = getClass();",
+            "  }",
             "}")
         .addOutputLines(
             "A.java",
@@ -95,6 +99,10 @@ final class MonoZipOfMonoVoidUsageTest {
             "",
             "    Mono.zip(a, a);",
             "    a.zipWith(a);",
+            "  }",
+            "",
+            "  public void m2() {",
+            "    Class clazz = getClass();",
             "  }",
             "}")
         .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);

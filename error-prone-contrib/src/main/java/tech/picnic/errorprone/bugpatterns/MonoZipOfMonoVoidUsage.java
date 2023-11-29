@@ -68,9 +68,7 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
           allOf(
               instanceMethod().onDescendantOf(MONO).named("zipWith"),
               toType(MethodInvocationTree.class, staticMethod().onClass(MONO).named("empty"))),
-          allOf(
-              onClassWithMethodName(MONO_VOID_TYPE, "zipWith"),
-              toType(MethodInvocationTree.class, hasGenericArgumentOfType(MONO))));
+          onClassWithMethodName(MONO_VOID_TYPE, "zipWith"));
 
   // On class Mono.zip, at least one element should match empty in order to proceed.
   private static final Matcher<ExpressionTree> STATIC_MONO_ZIP =
@@ -110,14 +108,6 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
       return invokedMethodName.equals(methodName)
           && hasSameGenericType(invokedType, genericDesiredType.get(state), state);
     };
-  }
-
-  private static Matcher<MethodInvocationTree> hasGenericArgumentOfType(
-      Supplier<Type> genericDesiredType) {
-    return (tree, state) ->
-        tree.getArguments().stream()
-            .anyMatch(
-                arg -> isSameType(ASTHelpers.getType(arg), genericDesiredType.get(state), state));
   }
 
   private static Matcher<MethodInvocationTree> hasGenericArgumentOfExactType(
