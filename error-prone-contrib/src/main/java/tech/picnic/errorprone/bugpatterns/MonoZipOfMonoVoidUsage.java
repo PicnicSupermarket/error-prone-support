@@ -56,19 +56,19 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
   // In fact, we use `Mono<Void>` everywhere in codebases instead of `Mono<Object>` to represent
   // empty publisher
   private static final Supplier<Type> MONO_VOID_TYPE =
-      VisitorState.memoize(generic(MONO, type(Void.class.getName())));
+      VisitorState.memoize(generic(MONO, type("java.lang.Void")));
 
   // On Mono.zip, at least one element should match empty in order to proceed.
   private static final Matcher<ExpressionTree> MONO_ZIP_AND_WITH =
       anyOf(
           allOf(
-              instanceMethod().onDescendantOf(MONO).namedAnyOf("zip", "zipWith"),
+              instanceMethod().onDescendantOf(MONO).named("zipWith"),
               toType(MethodInvocationTree.class, hasArgumentOfType(MONO_VOID_TYPE))),
           allOf(
-              instanceMethod().onDescendantOf(MONO).namedAnyOf("zip", "zipWith"),
+              instanceMethod().onDescendantOf(MONO).named("zipWith"),
               toType(MethodInvocationTree.class, staticMethod().onClass(MONO).named("empty"))),
           allOf(
-              instanceMethod().onDescendantOf(MONO_VOID_TYPE).namedAnyOf("zip", "zipWith"),
+              instanceMethod().onExactClass(MONO_VOID_TYPE).named("zipWith"),
               toType(MethodInvocationTree.class, hasArgumentOfType(MONO))));
 
   // On Mono.zip, at least one element should match empty in order to proceed.
