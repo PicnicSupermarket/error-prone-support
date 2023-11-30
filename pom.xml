@@ -213,7 +213,7 @@
         <version.mockito>5.7.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.10.17</version.nullaway>
-        <version.pitest-git>1.1.3</version.pitest-git>
+        <version.pitest-git>1.1.4</version.pitest-git>
         <version.surefire>3.2.2</version.surefire>
     </properties>
 
