@@ -14,4 +14,4 @@ fi
 do_sync="$([ "${#}" = 0 ] || [ "${1:-}" != '--sync' ] || echo 1)"
 report_directory="$([ "${#}" = 0 ] || ([ -z "${do_sync}" ] && echo "${1}") || ([ "${#}" = 1 ] || echo "${2}"))"
 
-./integration-test.sh "$test_name" "$project" "$repository" "$revision" "" "" "" "" "$do_sync" "$report_directory" 
+"$(dirname ${0})"/integration-test.sh "$test_name" "$project" "$repository" "$revision" "" "" "" "" "$do_sync" "$report_directory" 
