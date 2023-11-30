@@ -1,8 +1,6 @@
-metrics-core/src/main/java/com/codahale/metrics/CsvReporter.java:[382,36] [FormatStringConcatenation] Defer string concatenation to the invoked method
-metrics-graphite/src/main/java/com/codahale/metrics/graphite/GraphiteReporter.java:[429,18] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
-metrics-graphite/src/main/java/com/codahale/metrics/graphite/GraphiteReporter.java:[434,20] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
-metrics-graphite/src/main/java/com/codahale/metrics/graphite/GraphiteReporter.java:[447,21] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
-metrics-healthchecks/src/test/java/com/codahale/metrics/health/HealthCheckTest.java:[189,47] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
-metrics-healthchecks/src/test/java/com/codahale/metrics/health/HealthCheckTest.java:[203,47] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
-metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics/servlets/HealthCheckServletTest.java:[29,68] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
-metrics-servlets/src/test/java/com/codahale/metrics/servlets/HealthCheckServletTest.java:[30,68] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
+metrics-core/src/main/java/com/codahale/metrics/ScheduledReporter.java:[37,12] [removal] SecurityManager in java.lang has been deprecated and marked for removal
+metrics-core/src/main/java/com/codahale/metrics/ScheduledReporter.java:[37,38] [removal] getSecurityManager() in System has been deprecated and marked for removal
+metrics-healthchecks/src/main/java/com/codahale/metrics/health/HealthCheckRegistry.java:[269,32] [removal] getSecurityManager() in System has been deprecated and marked for removal
+metrics-healthchecks/src/main/java/com/codahale/metrics/health/HealthCheckRegistry.java:[269,6] [removal] SecurityManager in java.lang has been deprecated and marked for removal
+metrics-jvm/src/test/java/com/codahale/metrics/jvm/FileDescriptorRatioGaugeSunManagementNotExistsTest.java:[55,10] [removal] AccessController in java.security has been deprecated and marked for removal
+metrics-jvm/src/test/java/com/codahale/metrics/jvm/FileDescriptorRatioGaugeSunManagementNotExistsTest.java:[9,20] [removal] AccessController in java.security has been deprecated and marked for removal
