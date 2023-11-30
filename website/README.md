@@ -51,11 +51,11 @@ bundle install
 # Deployment
 
 The website is regenerated and deployed using the
-[`deploy-website.yaml`][error-prone-support-website-deploy-workflow] GitHub
+[`deploy-website.yml`][error-prone-support-website-deploy-workflow] GitHub
 Actions workflow any time a change is merged to `master`.
 
 [error-prone-support-website]: https://error-prone.picnic.tech
-[error-prone-support-website-deploy-workflow]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/deploy-website.yaml
+[error-prone-support-website-deploy-workflow]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/deploy-website.yml
 [jekyll]: https://jekyllrb.com
 [jekyll-docs]: https://jekyllrb.com/docs
 [jekyll-docs-installation]: https://jekyllrb.com/docs/installation
