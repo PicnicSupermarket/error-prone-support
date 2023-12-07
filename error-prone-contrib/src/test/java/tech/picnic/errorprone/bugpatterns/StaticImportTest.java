@@ -40,6 +40,7 @@ final class StaticImportTest {
             "import static java.util.function.Predicate.not;",
             "import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;",
             "",
+            "import com.fasterxml.jackson.annotation.JsonCreator;",
             "import com.google.common.base.Predicates;",
             "import com.google.common.collect.ImmutableMap;",
             "import com.google.common.collect.ImmutableMultiset;",
@@ -109,6 +110,12 @@ final class StaticImportTest {
             "  @UseImportPolicy(ImportPolicy.IMPORT_TOP_LEVEL)",
             "  void refasterAfterTemplate() {}",
             "",
+            "  // BUG: Diagnostic contains:",
+            "  @JsonCreator(mode = JsonCreator.Mode.DELEGATING)",
+            "  private static A create(int a) {",
+            "    return new A();",
+            "  }",
+            "",
             "  void toImmutableMultiset() {}",
             "}")
         .doTest();
@@ -121,6 +128,7 @@ final class StaticImportTest {
             "A.java",
             "import static java.util.function.Predicate.not;",
             "",
+            "import com.fasterxml.jackson.annotation.JsonCreator;",
             "import com.google.common.base.Predicates;",
             "import com.google.common.collect.ImmutableMap;",
             "import com.google.common.collect.ImmutableSet;",
@@ -186,9 +194,16 @@ final class StaticImportTest {
             "",
             "  @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)",
             "  final class Test {}",
+            "",
+            "  @JsonCreator(mode = JsonCreator.Mode.DELEGATING)",
+            "  private static A create(int a) {",
+            "    return new A();",
+            "  }",
+            "",
             "}")
         .addOutputLines(
             "A.java",
+            "import static com.fasterxml.jackson.annotation.JsonCreator.Mode.DELEGATING;",
             "import static com.google.common.collect.ImmutableMap.toImmutableMap;",
             "import static com.google.common.collect.ImmutableSet.toImmutableSet;",
             "import static com.google.errorprone.BugPattern.LinkType.NONE;",
@@ -208,6 +223,7 @@ final class StaticImportTest {
             "import static org.springframework.http.MediaType.APPLICATION_XHTML_XML;",
             "import static org.springframework.http.MediaType.TEXT_HTML;",
             "",
+            "import com.fasterxml.jackson.annotation.JsonCreator;",
             "import com.google.common.base.Predicates;",
             "import com.google.common.collect.ImmutableMap;",
             "import com.google.common.collect.ImmutableSet;",
@@ -266,6 +282,12 @@ final class StaticImportTest {
             "",
             "  @SpringBootTest(webEnvironment = RANDOM_PORT)",
             "  final class Test {}",
+            "",
+            "  @JsonCreator(mode = DELEGATING)",
+            "  private static A create(int a) {",
+            "    return new A();",
+            "  }",
+            "",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }

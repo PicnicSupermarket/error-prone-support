@@ -57,6 +57,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
   @VisibleForTesting
   static final ImmutableSet<String> STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of(
+          "com.fasterxml.jackson.annotation.JsonCreator.Mode",
           "com.google.common.base.Preconditions",
           "com.google.common.base.Predicates",
           "com.google.common.base.Verify",
