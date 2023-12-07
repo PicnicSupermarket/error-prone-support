@@ -199,7 +199,6 @@ final class StaticImportTest {
             "  private static A create(int a) {",
             "    return new A();",
             "  }",
-            "",
             "}")
         .addOutputLines(
             "A.java",
@@ -287,7 +286,6 @@ final class StaticImportTest {
             "  private static A create(int a) {",
             "    return new A();",
             "  }",
-            "",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
