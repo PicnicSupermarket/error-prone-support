@@ -1,6 +1,8 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
@@ -14,8 +16,10 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -260,6 +264,16 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Mono.just("foo").flatMap(s -> Mono.just(s)),
         Mono.just("bar").flatMap(s -> Mono.just(s.substring(1))));
+  }
+
+  ImmutableSet<Mono<Iterable<String>>> testMonoMapToIterable() {
+    return ImmutableSet.of(
+        Mono.just("foo").flatMapIterable(ImmutableSet::of).collect(toImmutableSet()),
+        Mono.just("bar").flatMapIterable(ImmutableSortedSet::of).collect(toImmutableSet()),
+        Mono.just("baz")
+            .flatMapIterable(ImmutableSet::of)
+            .collect(toImmutableSortedSet(naturalOrder())),
+        Mono.just("qux").flatMapIterable(Arrays::asList).collect(toCollection(ArrayList::new)));
   }
 
   ImmutableSet<Flux<Integer>> testFluxMap() {
@@ -569,6 +583,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Mono<Integer>> testMathFluxMax() {
     return ImmutableSet.of(
         MathFlux.min(Flux.just(1), reverseOrder()), MathFlux.max(Flux.just(2), naturalOrder()));
+  }
+
+  Mono<String> testFluxTransformToMonoSingleOrEmpty() {
+    return Flux.just("foo").transform(Flux::next).next();
   }
 
   ImmutableSet<Context> testContextEmpty() {
