@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 final class MonoZipOfMonoVoidUsageTest {
   /**
-   * Line 42 won't be reported as a bug. It's quite hard to catch this case as {@code Mono.empty()}
+   * Line 44 won't be reported as a bug. It's quite hard to catch this case as {@code Mono.empty()}
    * yields {@code Mono<Object>}, so matcher will be too wide. Additionally, it's not expected to
    * occur in the real production code.
    *
@@ -29,13 +29,15 @@ final class MonoZipOfMonoVoidUsageTest {
             "    Mono<Integer> c = Mono.just(1);",
             "    Mono<Integer> d = this.publisher();",
             "    Mono<T> e = Mono.just(t);",
-            "    // BUG: Diagnostic contains: `Mono#zip` and `Mono#zipWith` should not be executed against empty",
-            "    // publisher; remove it or suppress this warning and add a comment explaining its purpose",
+            "    // BUG: Diagnostic contains: `Mono#zip` and `Mono#zipWith` should not be executed against",
+            "    // `Mono#empty` or `Mono<Void>` parameter; please revisit the parameters used and make sure to",
+            "    // supply correct publishers instead",
             "    Mono.zip(a, a);",
             "    Mono.zip(e, e);",
             "    e.zipWith(e);",
-            "    // BUG: Diagnostic contains: `Mono#zip` and `Mono#zipWith` should not be executed against empty",
-            "    // publisher; remove it or suppress this warning and add a comment explaining its purpose",
+            "    // BUG: Diagnostic contains: `Mono#zip` and `Mono#zipWith` should not be executed against",
+            "    // `Mono#empty` or `Mono<Void>` parameter; please revisit the parameters used and make sure to",
+            "    // supply correct publishers instead",
             "    Mono.zip(d, c, b, a);",
             "    Mono.zip(d, c, b);",
             "    b.zipWith(b).zipWith(c).map(entry -> entry);",
@@ -45,16 +47,19 @@ final class MonoZipOfMonoVoidUsageTest {
             "    Mono.just(1).zipWith(Mono.just(1));",
             "    Mono.zip(Mono.just(1), Mono.just(1));",
             "    c.zipWith(c);",
-            "    // BUG: Diagnostic contains: `Mono#zip` and `Mono#zipWith` should not be executed against empty",
-            "    // publisher; remove it or suppress this warning and add a comment explaining its purpose",
+            "    // BUG: Diagnostic contains: `Mono#zip` and `Mono#zipWith` should not be executed against",
+            "    // `Mono#empty` or `Mono<Void>` parameter; please revisit the parameters used and make sure to",
+            "    // supply correct publishers instead",
             "    c.zipWith(a);",
-            "    // BUG: Diagnostic contains: `Mono#zip` and `Mono#zipWith` should not be executed against empty",
-            "    // publisher; remove it or suppress this warning and add a comment explaining its purpose",
+            "    // BUG: Diagnostic contains: `Mono#zip` and `Mono#zipWith` should not be executed against",
+            "    // `Mono#empty` or `Mono<Void>` parameter; please revisit the parameters used and make sure to",
+            "    // supply correct publishers instead",
             "    a.zipWith(c);",
             "    instance.zipWith(a);",
             "    c.zipWith(b, (first, second) -> first + second);",
-            "    // BUG: Diagnostic contains: `Mono#zip` and `Mono#zipWith` should not be executed against empty",
-            "    // publisher; remove it or suppress this warning and add a comment explaining its purpose",
+            "    // BUG: Diagnostic contains: `Mono#zip` and `Mono#zipWith` should not be executed against",
+            "    // `Mono#empty` or `Mono<Void>` parameter; please revisit the parameters used and make sure to",
+            "    // supply correct publishers instead",
             "    a.zipWith(c, (first, second) -> second);",
             "  }",
             "",
