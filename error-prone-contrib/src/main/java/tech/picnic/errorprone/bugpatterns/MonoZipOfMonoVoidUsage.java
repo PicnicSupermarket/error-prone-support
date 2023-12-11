@@ -3,8 +3,11 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
+import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.argument;
+import static com.google.errorprone.matchers.Matchers.hasArguments;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
@@ -73,11 +76,18 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
               toType(MethodInvocationTree.class, hasGenericArgumentOfExactType(MONO_VOID_TYPE))),
           allOf(
               instanceMethod().onDescendantOf(MONO).named("zipWith"),
-              toType(MethodInvocationTree.class, staticMethod().onClass(MONO).named("empty"))),
+              toType(
+                  MethodInvocationTree.class,
+                  argument(0, staticMethod().onClass(MONO).named("empty")))),
           onClassWithMethodName(MONO_VOID_TYPE, "zipWith"),
           allOf(
               staticMethod().onClass(MONO).named("zip"),
-              toType(MethodInvocationTree.class, hasGenericArgumentOfExactType(MONO_VOID_TYPE))));
+              toType(MethodInvocationTree.class, hasGenericArgumentOfExactType(MONO_VOID_TYPE))),
+          allOf(
+              staticMethod().onClass(MONO).named("zip"),
+              toType(
+                  MethodInvocationTree.class,
+                  hasArguments(AT_LEAST_ONE, staticMethod().onClass(MONO).named("empty")))));
 
   /** Instantiates a new {@link MonoZipOfMonoVoidUsage} instance. */
   public MonoZipOfMonoVoidUsage() {}

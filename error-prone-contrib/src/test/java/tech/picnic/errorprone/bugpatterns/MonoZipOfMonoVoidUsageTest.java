@@ -6,12 +6,8 @@ import org.junit.jupiter.api.Test;
 
 final class MonoZipOfMonoVoidUsageTest {
   /**
-   * Line 44 won't be reported as a bug. It's quite hard to catch this case as {@code Mono.empty()}
-   * yields {@code Mono<Object>}, so matcher will be too wide. Additionally, it's not expected to
-   * occur in the real production code.
-   *
-   * <p>Line 25 needed to simulate the unwanted intrinsic operations, which are not intended to be
-   * processed by the rule.
+   * Line 21 is needed to simulate the unwanted intrinsic operations, which are not intended to be
+   * processed by the rule but will be scanned anyway.
    */
   @Test
   void identification() {
@@ -41,6 +37,9 @@ final class MonoZipOfMonoVoidUsageTest {
             "    Mono.zip(d, c, b, a);",
             "    Mono.zip(d, c, b);",
             "    b.zipWith(b).zipWith(c).map(entry -> entry);",
+            "    // BUG: Diagnostic contains: `Mono#zip` and `Mono#zipWith` should not be executed against",
+            "    // `Mono#empty` or `Mono<Void>` parameter; please revisit the parameters used and make sure to",
+            "    // supply correct publishers instead",
             "    Mono.zip(d, Mono.empty());",
             "    c.zipWith(b);",
             "    c.zipWith(d);",
@@ -61,6 +60,10 @@ final class MonoZipOfMonoVoidUsageTest {
             "    // `Mono#empty` or `Mono<Void>` parameter; please revisit the parameters used and make sure to",
             "    // supply correct publishers instead",
             "    a.zipWith(c, (first, second) -> second);",
+            "    // BUG: Diagnostic contains: `Mono#zip` and `Mono#zipWith` should not be executed against",
+            "    // `Mono#empty` or `Mono<Void>` parameter; please revisit the parameters used and make sure to",
+            "    // supply correct publishers instead",
+            "    c.zipWith(Mono.empty());",
             "  }",
             "",
             "  private Mono<Integer> publisher() {",
