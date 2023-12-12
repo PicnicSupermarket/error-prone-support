@@ -63,31 +63,35 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
   private static final Supplier<Type> MONO = type("reactor.core.publisher.Mono");
 
   /**
-   * In fact, we use {@code Mono<Void>} everywhere in codebases instead of {@code Mono<Object>} to
-   * represent empty publisher.
+   * In fact, we use {@code Mono<Void>} everywhere in codebases instead of {@code Mono<Object>}
+   * (actual return type of {@code Mono.empty()}) to represent empty publisher.
    */
   private static final Supplier<Type> MONO_VOID_TYPE =
       VisitorState.memoize(generic(MONO, type("java.lang.Void")));
 
+  private static final String MONO_ZIP_WITH_METHOD = "zipWith";
+  private static final String MONO_ZIP_METHOD = "zip";
+  private static final String MONO_EMPTY_METHOD = "empty";
   private static final Matcher<ExpressionTree> ANY_MONO_VOID_IN_PUBLISHERS =
       anyOf(
           allOf(
-              instanceMethod().onDescendantOf(MONO).named("zipWith"),
+              instanceMethod().onDescendantOf(MONO).named(MONO_ZIP_WITH_METHOD),
               toType(MethodInvocationTree.class, hasGenericArgumentOfExactType(MONO_VOID_TYPE))),
           allOf(
-              instanceMethod().onDescendantOf(MONO).named("zipWith"),
+              instanceMethod().onDescendantOf(MONO).named(MONO_ZIP_WITH_METHOD),
               toType(
                   MethodInvocationTree.class,
-                  argument(0, staticMethod().onClass(MONO).named("empty")))),
-          onClassWithMethodName(MONO_VOID_TYPE, "zipWith"),
+                  argument(0, staticMethod().onClass(MONO).named(MONO_EMPTY_METHOD)))),
+          onClassWithMethodName(MONO_VOID_TYPE, MONO_ZIP_WITH_METHOD),
           allOf(
-              staticMethod().onClass(MONO).named("zip"),
+              staticMethod().onClass(MONO).named(MONO_ZIP_METHOD),
               toType(MethodInvocationTree.class, hasGenericArgumentOfExactType(MONO_VOID_TYPE))),
           allOf(
-              staticMethod().onClass(MONO).named("zip"),
+              staticMethod().onClass(MONO).named(MONO_ZIP_METHOD),
               toType(
                   MethodInvocationTree.class,
-                  hasArguments(AT_LEAST_ONE, staticMethod().onClass(MONO).named("empty")))));
+                  hasArguments(
+                      AT_LEAST_ONE, staticMethod().onClass(MONO).named(MONO_EMPTY_METHOD)))));
 
   /** Instantiates a new {@link MonoZipOfMonoVoidUsage} instance. */
   public MonoZipOfMonoVoidUsage() {}
