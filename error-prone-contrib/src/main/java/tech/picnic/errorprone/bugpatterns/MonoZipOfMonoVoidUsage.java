@@ -27,9 +27,9 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.tree.JCTree;
 import java.util.Optional;
 
 /**
@@ -108,19 +108,19 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
         getMethodExecuted(tree)
             .filter(
                 methodExecuted -> {
-                  Type invokedType = methodExecuted.getExpression().type;
+                  Type invokedType = ASTHelpers.getType(methodExecuted.getExpression());
                   String invokedMethodName = methodExecuted.getIdentifier().toString();
                   return invokedMethodName.equals(methodName)
-                      && hasSameGenericType(invokedType, genericDesiredType.get(state), state);
+                      && isOfSameGenericType(invokedType, genericDesiredType.get(state), state);
                 })
             .isPresent();
   }
 
-  private static Optional<JCTree.JCFieldAccess> getMethodExecuted(ExpressionTree expressionTree) {
-    return Optional.of((JCTree.JCMethodInvocation) expressionTree)
-        .map(JCTree.JCMethodInvocation::getMethodSelect)
-        .filter(JCTree.JCFieldAccess.class::isInstance)
-        .map(methodSelect -> (JCTree.JCFieldAccess) methodSelect);
+  private static Optional<MemberSelectTree> getMethodExecuted(ExpressionTree expressionTree) {
+    return Optional.of((MethodInvocationTree) expressionTree)
+        .map(MethodInvocationTree::getMethodSelect)
+        .filter(MemberSelectTree.class::isInstance)
+        .map(MemberSelectTree.class::cast);
   }
 
   private static Matcher<MethodInvocationTree> hasGenericArgumentOfExactType(
@@ -129,7 +129,7 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
         tree.getArguments().stream()
             .anyMatch(
                 arg ->
-                    hasSameGenericType(
+                    isOfSameGenericType(
                         ASTHelpers.getType(arg), genericDesiredType.get(state), state));
   }
 
@@ -148,7 +148,7 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
    *
    * <p>Similarly, we can infer the matching type.
    */
-  private static boolean hasSameGenericType(
+  private static boolean isOfSameGenericType(
       Type genericArgumentType, Type genericDesiredType, VisitorState state) {
     Type argumentType = Iterables.getFirst(genericArgumentType.allparams(), Type.noType);
     Type requiredType = Iterables.getOnlyElement(genericDesiredType.allparams());
