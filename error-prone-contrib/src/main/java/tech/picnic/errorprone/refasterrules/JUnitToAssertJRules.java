@@ -521,7 +521,7 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatByteIsEqualTo {
     @BeforeTemplate
-    void before (byte actual, byte expected) {
+    void before(byte actual, byte expected) {
       assertEquals(actual, expected);
     }
 
@@ -532,15 +532,67 @@ final class JUnitToAssertJRules {
     }
   }
 
-  static final class AssertThatByteIsEqualToWithMessage {
+  static final class AssertThatByteWithFailMessageStringIsEqualTo {
     @BeforeTemplate
-    void before (byte actual, byte expected, String message) {
+    void before(byte actual, byte expected, String message) {
       assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(byte actual, byte expected, String message) {
+      assertThat(actual).withFailMessage(message).isEqualTo(expected);
+    }
+  }
+
+  static final class AssertThatByteWithFailMessageSupplierIsEqualTo {
+    @BeforeTemplate
+    void before(byte actual, byte expected, Supplier<String> message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(byte actual, byte expected, Supplier<String> message) {
+      assertThat(actual).withFailMessage(message).isEqualTo(expected);
+    }
+  }
+
+  static final class AssertThatCharIsEqualTo {
+    @BeforeTemplate
+    void before(char actual, char expected) {
+      assertEquals(actual, expected);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(char actual, char expected) {
+      assertThat(actual).isEqualTo(expected);
+    }
+  }
+
+  static final class AssertThatCharWithFailMessageStringIsEqualTo {
+    @BeforeTemplate
+    void before(char actual, char expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(char actual, char expected, String message) {
+      assertThat(actual).withFailMessage(message).isEqualTo(expected);
+    }
+  }
+
+  static final class AssertThatCharWithFailMessageSupplierIsEqualTo {
+    @BeforeTemplate
+    void before(char actual, char expected, Supplier<String> message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(char actual, char expected, Supplier<String> message) {
       assertThat(actual).withFailMessage(message).isEqualTo(expected);
     }
   }

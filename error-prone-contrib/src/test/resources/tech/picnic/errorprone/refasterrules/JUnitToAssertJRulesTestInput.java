@@ -31,7 +31,9 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
         (Runnable) () -> assertNull(null),
         (Runnable) () -> assertSame(null, null),
         (Runnable) () -> assertTrue(true),
-        (Runnable) () -> assertEquals(0, 0));
+        (Runnable) () -> assertEquals(0, 0),
+        (Runnable) () -> assertEquals(0, 0, "foo"),
+        (Runnable) () -> assertEquals(0, 0, () -> "foo"));
   }
 
   void testThrowNewAssertionError() {
@@ -173,7 +175,27 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertInstanceOf(Object.class, new Object(), () -> "foo");
   }
 
-  void testAssertThatIsEqualTo() {
+  void testAssertThatByteIsEqualTo() {
     assertEquals((byte) 0, (byte) 0);
+  }
+
+  void testAssertThatByteWithFailMessageStringIsEqualTo() {
+    assertEquals((byte) 0, (byte) 0, "foo");
+  }
+
+  void testAssertThatByteWithFailMessageSupplierIsEqualTo() {
+    assertEquals((byte) 0, (byte) 0, () -> "foo");
+  }
+
+  void testAssertThatCharIsEqualTo() {
+    assertEquals('a', 'a');
+  }
+
+  void testAssertThatCharWithFailMessageStringIsEqualTo() {
+    assertEquals('a', 'a', "foo");
+  }
+
+  void testAssertThatCharWithFailMessageSupplierIsEqualTo() {
+    assertEquals('a', 'a', () -> "foo");
   }
 }
