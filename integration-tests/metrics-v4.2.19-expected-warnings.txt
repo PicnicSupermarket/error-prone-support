@@ -1,6 +1,131 @@
-metrics-core/src/main/java/com/codahale/metrics/ScheduledReporter.java:[37,12] [removal] SecurityManager in java.lang has been deprecated and marked for removal
-metrics-core/src/main/java/com/codahale/metrics/ScheduledReporter.java:[37,38] [removal] getSecurityManager() in System has been deprecated and marked for removal
-metrics-healthchecks/src/main/java/com/codahale/metrics/health/HealthCheckRegistry.java:[269,32] [removal] getSecurityManager() in System has been deprecated and marked for removal
-metrics-healthchecks/src/main/java/com/codahale/metrics/health/HealthCheckRegistry.java:[269,6] [removal] SecurityManager in java.lang has been deprecated and marked for removal
+metrics-caffeine/src/test/java/com/codahale/metrics/caffeine/MetricsStatsCounterTest.java:[89,9] [deprecation] recordEviction() in MetricsStatsCounter has been deprecated
+metrics-caffeine/src/test/java/com/codahale/metrics/caffeine/MetricsStatsCounterTest.java:[96,9] [deprecation] recordEviction(int) in MetricsStatsCounter has been deprecated
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/CollectdReporter.java:[150,8] [Refaster Rule] PreconditionsRules.CheckArgumentWithMessage: Refactoring opportunity
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/CollectdReporter.java:[154,8] [Refaster Rule] PreconditionsRules.CheckArgumentWithMessage: Refactoring opportunity
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/CollectdReporter.java:[81,68] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/PacketWriter.java:[124,20] [Refaster Rule] StringRules.StringIsNullOrEmpty: Refactoring opportunity
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/PacketWriter.java:[162,12] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/PacketWriter.java:[167,11] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/PacketWriter.java:[173,17] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/PacketWriter.java:[198,8] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/PacketWriter.java:[201,21] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/PacketWriter.java:[204,11] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/PacketWriter.java:[241,4] [Refaster Rule] PreconditionsRules.CheckStateWithMessage: Refactoring opportunity
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/PacketWriter.java:[250,36] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/PacketWriter.java:[266,6] [Refaster Rule] PreconditionsRules.CheckStateWithMessage: Refactoring opportunity
+metrics-collectd/src/main/java/com/codahale/metrics/collectd/Sender.java:[22,4] [Refaster Rule] PreconditionsRules.CheckStateWithMessage: Refactoring opportunity
+metrics-collectd/src/test/java/com/codahale/metrics/collectd/CollectdReporterTest.java:[249,43] [Refaster Rule] ImmutableMapRules.ImmutableMapOf1: Refactoring opportunity
+metrics-collectd/src/test/java/com/codahale/metrics/collectd/CollectdReporterTest.java:[255,40] [Refaster Rule] ImmutableListRules.ImmutableListOf: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/ConsoleReporter.java:[57,41] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/CsvReporter.java:[382,35] [FormatStringConcatenation] Defer string concatenation to the invoked method
+metrics-core/src/main/java/com/codahale/metrics/InstrumentedExecutorService.java:[196,25] [try] auto-closeable resource durationContext is never referenced in body of corresponding try statement
+metrics-core/src/main/java/com/codahale/metrics/InstrumentedExecutorService.java:[218,25] [try] auto-closeable resource context is never referenced in body of corresponding try statement
+metrics-core/src/main/java/com/codahale/metrics/LockFreeExponentiallyDecayingReservoir.java:[240,6] [Refaster Rule] PreconditionsRules.CheckArgumentWithMessage: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/MetricRegistry.java:[101,4] [Refaster Rule] PreconditionsRules.RequireNonNullWithMessageStatement: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/MetricRegistry.java:[50,21] [Refaster Rule] StringRules.StringIsNullOrEmpty: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/NoopMetricRegistry.java:[218,19] [Refaster Rule] ImmutableMapRules.ImmutableMapOf: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/NoopMetricRegistry.java:[39,4] [Refaster Rule] PreconditionsRules.RequireNonNullWithMessageStatement: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/NoopMetricRegistry.java:[608,21] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/NoopMetricRegistry.java:[614,21] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/NoopMetricRegistry.java:[620,21] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/ScheduledReporter.java:[132,16] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/ScheduledReporter.java:[145,4] [Refaster Rule] PreconditionsRules.RequireNonNullWithMessageStatement: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/ScheduledReporter.java:[158,78] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/ScheduledReporter.java:[176,4] [Refaster Rule] PreconditionsRules.CheckArgumentWithMessage: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/ScheduledReporter.java:[38,12] [removal] SecurityManager in java.lang has been deprecated and marked for removal
+metrics-core/src/main/java/com/codahale/metrics/ScheduledReporter.java:[38,38] [removal] getSecurityManager() in System has been deprecated and marked for removal
+metrics-core/src/main/java/com/codahale/metrics/SharedMetricRegistries.java:[87,4] [Refaster Rule] PreconditionsRules.CheckStateWithMessage: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/Slf4jReporter.java:[82,46] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/UniformSnapshot.java:[50,4] [Refaster Rule] PreconditionsRules.CheckArgumentWithMessage: Refactoring opportunity
+metrics-core/src/main/java/com/codahale/metrics/WeightedSnapshot.java:[67,4] [Refaster Rule] PreconditionsRules.CheckArgumentWithMessage: Refactoring opportunity
+metrics-core/src/test/java/com/codahale/metrics/SharedMetricRegistriesTest.java:[12,62] [deprecation] none() in ExpectedException has been deprecated
+metrics-core/src/test/java/com/codahale/metrics/WeightedSnapshotTest.java:[19,4] [Refaster Rule] PreconditionsRules.CheckArgumentWithMessage: Refactoring opportunity
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/Graphite.java:[119,4] [Refaster Rule] PreconditionsRules.CheckStateWithMessage: Refactoring opportunity
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/Graphite.java:[66,4] [Refaster Rule] PreconditionsRules.CheckArgumentWithMessage: Refactoring opportunity
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/Graphite.java:[70,4] [Refaster Rule] PreconditionsRules.CheckArgumentWithMessage: Refactoring opportunity
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/GraphiteRabbitMQ.java:[112,4] [Refaster Rule] PreconditionsRules.CheckStateWithMessage: Refactoring opportunity
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/GraphiteReporter.java:[429,17] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/GraphiteReporter.java:[434,19] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/GraphiteReporter.java:[447,20] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/GraphiteReporter.java:[84,46] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/GraphiteUDP.java:[46,4] [Refaster Rule] PreconditionsRules.CheckStateWithMessage: Refactoring opportunity
+metrics-graphite/src/main/java/com/codahale/metrics/graphite/PickledGraphite.java:[176,4] [Refaster Rule] PreconditionsRules.CheckStateWithMessage: Refactoring opportunity
+metrics-graphite/src/test/java/com/codahale/metrics/graphite/GraphiteReporterTest.java:[177,46] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-graphite/src/test/java/com/codahale/metrics/graphite/GraphiteReporterTest.java:[462,16] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-graphite/src/test/java/com/codahale/metrics/graphite/GraphiteReporterTest.java:[47,44] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-graphite/src/test/java/com/codahale/metrics/graphite/GraphiteReporterTest.java:[478,42] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-graphite/src/test/java/com/codahale/metrics/graphite/GraphiteReporterTest.java:[57,44] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-healthchecks/src/main/java/com/codahale/metrics/health/AsyncHealthCheckDecorator.java:[80,4] [Refaster Rule] PreconditionsRules.CheckArgumentWithMessage: Refactoring opportunity
+metrics-healthchecks/src/main/java/com/codahale/metrics/health/HealthCheckRegistry.java:[270,32] [removal] getSecurityManager() in System has been deprecated and marked for removal
+metrics-healthchecks/src/main/java/com/codahale/metrics/health/HealthCheckRegistry.java:[270,6] [removal] SecurityManager in java.lang has been deprecated and marked for removal
+metrics-healthchecks/src/main/java/com/codahale/metrics/health/HealthCheckRegistry.java:[96,6] [Refaster Rule] PreconditionsRules.CheckArgumentWithMessage: Refactoring opportunity
+metrics-healthchecks/src/test/java/com/codahale/metrics/health/HealthCheckTest.java:[189,46] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
+metrics-healthchecks/src/test/java/com/codahale/metrics/health/HealthCheckTest.java:[203,46] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
+metrics-healthchecks/src/test/java/com/codahale/metrics/health/SharedHealthCheckRegistriesTest.java:[13,70] [deprecation] none() in ExpectedException has been deprecated
+metrics-healthchecks/src/test/java/com/codahale/metrics/health/jvm/ThreadDeadlockHealthCheckTest.java:[20,61] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
+metrics-httpclient/src/test/java/com/codahale/metrics/httpclient/HttpClientMetricNameStrategiesTest.java:[101,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient/src/test/java/com/codahale/metrics/httpclient/HttpClientMetricNameStrategiesTest.java:[112,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient/src/test/java/com/codahale/metrics/httpclient/HttpClientMetricNameStrategiesTest.java:[120,22] [deprecation] rewriteURI(URI,HttpHost,boolean) in URIUtils has been deprecated
+metrics-httpclient/src/test/java/com/codahale/metrics/httpclient/HttpClientMetricNameStrategiesTest.java:[31,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient/src/test/java/com/codahale/metrics/httpclient/HttpClientMetricNameStrategiesTest.java:[38,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient/src/test/java/com/codahale/metrics/httpclient/HttpClientMetricNameStrategiesTest.java:[45,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient/src/test/java/com/codahale/metrics/httpclient/HttpClientMetricNameStrategiesTest.java:[54,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient/src/test/java/com/codahale/metrics/httpclient/HttpClientMetricNameStrategiesTest.java:[63,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient/src/test/java/com/codahale/metrics/httpclient/HttpClientMetricNameStrategiesTest.java:[70,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient/src/test/java/com/codahale/metrics/httpclient/HttpClientMetricNameStrategiesTest.java:[78,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient/src/test/java/com/codahale/metrics/httpclient/HttpClientMetricNameStrategiesTest.java:[86,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient/src/test/java/com/codahale/metrics/httpclient/HttpClientMetricNameStrategiesTest.java:[94,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/HttpClientMetricNameStrategiesTest.java:[23,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/HttpClientMetricNameStrategiesTest.java:[30,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/HttpClientMetricNameStrategiesTest.java:[37,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/HttpClientMetricNameStrategiesTest.java:[44,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/HttpClientMetricNameStrategiesTest.java:[53,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/HttpClientMetricNameStrategiesTest.java:[62,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/HttpClientMetricNameStrategiesTest.java:[69,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/HttpClientMetricNameStrategiesTest.java:[80,4] [deprecation] <T>assertThat(T,Matcher<? super T>) in Assert has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/HttpClientMetricNameStrategiesTest.java:[88,22] [deprecation] rewriteURI(URI,HttpHost,boolean) in URIUtils has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/InstrumentedHttpAsyncClientsTest.java:[126,8] [deprecation] SimpleHttpRequests in org.apache.hc.client5.http.async.methods has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/InstrumentedHttpAsyncClientsTest.java:[182,10] [deprecation] SimpleHttpRequests in org.apache.hc.client5.http.async.methods has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/InstrumentedHttpAsyncClientsTest.java:[26,47] [deprecation] SimpleHttpRequests in org.apache.hc.client5.http.async.methods has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/InstrumentedHttpAsyncClientsTest.java:[77,8] [deprecation] SimpleHttpRequests in org.apache.hc.client5.http.async.methods has been deprecated
+metrics-httpclient5/src/test/java/com/codahale/metrics/httpclient5/InstrumentedHttpClientsTest.java:[67,12] [deprecation] execute(ClassicHttpRequest) in HttpClient has been deprecated
+metrics-jakarta-servlet/src/main/java/io/dropwizard/metrics/servlet/AbstractInstrumentedFilter.java:[67,27] [Refaster Rule] StringRules.StringIsNullOrEmpty: Refactoring opportunity
+metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics/servlets/HealthCheckServletTest.java:[29,67] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
+metrics-jdbi3/src/main/java/com/codahale/metrics/jdbi3/InstrumentedTimingCollector.java:[9,33] [deprecation] TimingCollector in org.jdbi.v3.core.statement has been deprecated
+metrics-jdbi3/src/main/java/com/codahale/metrics/jdbi3/strategies/DefaultNameStrategy.java:[15,28] [Refaster Rule] StringRules.StringIsNullOrEmpty: Refactoring opportunity
+metrics-jdbi3/src/test/java/com/codahale/metrics/jdbi3/strategies/SmartNameStrategyTest.java:[17,10] [deprecation] InstrumentedTimingCollector in com.codahale.metrics.jdbi3 has been deprecated
+metrics-jdbi3/src/test/java/com/codahale/metrics/jdbi3/strategies/SmartNameStrategyTest.java:[23,20] [deprecation] InstrumentedTimingCollector in com.codahale.metrics.jdbi3 has been deprecated
+metrics-jdbi3/src/test/java/com/codahale/metrics/jdbi3/strategies/SmartNameStrategyTest.java:[8,33] [deprecation] InstrumentedTimingCollector in com.codahale.metrics.jdbi3 has been deprecated
+metrics-jersey2/src/main/java/com/codahale/metrics/jersey2/InstrumentedResourceMethodApplicationListener.java:[172,25] [Refaster Rule] ImmutableListRules.ImmutableListOf: Refactoring opportunity
+metrics-jersey2/src/main/java/com/codahale/metrics/jersey2/InstrumentedResourceMethodApplicationListener.java:[174,86] [Refaster Rule] ImmutableMapRules.ImmutableMapOf: Refactoring opportunity
+metrics-jersey2/src/main/java/com/codahale/metrics/jersey2/InstrumentedResourceMethodApplicationListener.java:[543,29] [Refaster Rule] StringRules.StringIsNullOrEmpty: Refactoring opportunity
+metrics-jersey3/src/main/java/com/codahale/metrics/jersey3/InstrumentedResourceMethodApplicationListener.java:[172,25] [Refaster Rule] ImmutableListRules.ImmutableListOf: Refactoring opportunity
+metrics-jersey3/src/main/java/com/codahale/metrics/jersey3/InstrumentedResourceMethodApplicationListener.java:[174,86] [Refaster Rule] ImmutableMapRules.ImmutableMapOf: Refactoring opportunity
+metrics-jersey3/src/main/java/com/codahale/metrics/jersey3/InstrumentedResourceMethodApplicationListener.java:[543,29] [Refaster Rule] StringRules.StringIsNullOrEmpty: Refactoring opportunity
+metrics-jersey31/src/main/java/io/dropwizard/metrics/jersey31/InstrumentedResourceMethodApplicationListener.java:[172,25] [Refaster Rule] ImmutableListRules.ImmutableListOf: Refactoring opportunity
+metrics-jersey31/src/main/java/io/dropwizard/metrics/jersey31/InstrumentedResourceMethodApplicationListener.java:[174,86] [Refaster Rule] ImmutableMapRules.ImmutableMapOf: Refactoring opportunity
+metrics-jersey31/src/main/java/io/dropwizard/metrics/jersey31/InstrumentedResourceMethodApplicationListener.java:[543,29] [Refaster Rule] StringRules.StringIsNullOrEmpty: Refactoring opportunity
+metrics-jetty10/src/main/java/io/dropwizard/metrics/jetty10/InstrumentedHandler.java:[177,22] [Refaster Rule] ImmutableMapRules.ImmutableMapOf: Refactoring opportunity
+metrics-jetty10/src/main/java/io/dropwizard/metrics/jetty10/InstrumentedHandler.java:[188,23] [Refaster Rule] ImmutableListRules.ImmutableListOf: Refactoring opportunity
+metrics-jetty10/src/main/java/io/dropwizard/metrics/jetty10/InstrumentedHttpChannelListener.java:[137,22] [Refaster Rule] ImmutableMapRules.ImmutableMapOf: Refactoring opportunity
+metrics-jetty10/src/main/java/io/dropwizard/metrics/jetty10/InstrumentedHttpChannelListener.java:[148,23] [Refaster Rule] ImmutableListRules.ImmutableListOf: Refactoring opportunity
+metrics-jetty11/src/main/java/io/dropwizard/metrics/jetty11/InstrumentedHandler.java:[177,22] [Refaster Rule] ImmutableMapRules.ImmutableMapOf: Refactoring opportunity
+metrics-jetty11/src/main/java/io/dropwizard/metrics/jetty11/InstrumentedHandler.java:[188,23] [Refaster Rule] ImmutableListRules.ImmutableListOf: Refactoring opportunity
+metrics-jetty11/src/main/java/io/dropwizard/metrics/jetty11/InstrumentedHttpChannelListener.java:[137,22] [Refaster Rule] ImmutableMapRules.ImmutableMapOf: Refactoring opportunity
+metrics-jetty11/src/main/java/io/dropwizard/metrics/jetty11/InstrumentedHttpChannelListener.java:[148,23] [Refaster Rule] ImmutableListRules.ImmutableListOf: Refactoring opportunity
+metrics-jetty9/src/main/java/com/codahale/metrics/jetty9/InstrumentedHandler.java:[185,22] [Refaster Rule] ImmutableMapRules.ImmutableMapOf: Refactoring opportunity
+metrics-jetty9/src/main/java/com/codahale/metrics/jetty9/InstrumentedHandler.java:[196,23] [Refaster Rule] ImmutableListRules.ImmutableListOf: Refactoring opportunity
+metrics-jetty9/src/main/java/com/codahale/metrics/jetty9/InstrumentedHttpChannelListener.java:[137,22] [Refaster Rule] ImmutableMapRules.ImmutableMapOf: Refactoring opportunity
+metrics-jetty9/src/main/java/com/codahale/metrics/jetty9/InstrumentedHttpChannelListener.java:[148,23] [Refaster Rule] ImmutableListRules.ImmutableListOf: Refactoring opportunity
+metrics-jmx/src/main/java/com/codahale/metrics/jmx/JmxReporter.java:[65,43] [Refaster Rule] ImmutableMapRules.ImmutableMapOf: Refactoring opportunity
+metrics-jmx/src/main/java/com/codahale/metrics/jmx/JmxReporter.java:[66,39] [Refaster Rule] ImmutableMapRules.ImmutableMapOf: Refactoring opportunity
+metrics-jmx/src/main/java/com/codahale/metrics/jmx/JmxReporter.java:[92,6] [Refaster Rule] PreconditionsRules.CheckArgumentWithMessage: Refactoring opportunity
+metrics-json/src/main/java/com/codahale/metrics/json/HealthCheckModule.java:[83,62] [Refaster Rule] ImmutableListRules.ImmutableListOf1: Refactoring opportunity
+metrics-jvm/src/main/java/com/codahale/metrics/jvm/ThreadDeadlockDetector.java:[55,19] [Refaster Rule] ImmutableSetRules.ImmutableSetOf: Refactoring opportunity
 metrics-jvm/src/test/java/com/codahale/metrics/jvm/FileDescriptorRatioGaugeSunManagementNotExistsTest.java:[55,10] [removal] AccessController in java.security has been deprecated and marked for removal
 metrics-jvm/src/test/java/com/codahale/metrics/jvm/FileDescriptorRatioGaugeSunManagementNotExistsTest.java:[9,20] [removal] AccessController in java.security has been deprecated and marked for removal
+metrics-jvm/src/test/java/com/codahale/metrics/jvm/GarbageCollectorMetricSetTest.java:[17,49] [Refaster Rule] ImmutableListRules.ImmutableListOf1: Refactoring opportunity
+metrics-log4j2/src/main/java/com/codahale/metrics/log4j2/InstrumentedAppender.java:[85,4] [deprecation] AbstractAppender(String,Filter,Layout<? extends Serializable>,boolean) in AbstractAppender has been deprecated
+metrics-log4j2/src/main/java/com/codahale/metrics/log4j2/InstrumentedAppender.java:[96,4] [deprecation] AbstractAppender(String,Filter,Layout<? extends Serializable>,boolean) in AbstractAppender has been deprecated
+metrics-servlet/src/main/java/com/codahale/metrics/servlet/AbstractInstrumentedFilter.java:[67,27] [Refaster Rule] StringRules.StringIsNullOrEmpty: Refactoring opportunity
+metrics-servlets/src/test/java/com/codahale/metrics/servlets/HealthCheckServletTest.java:[30,67] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
