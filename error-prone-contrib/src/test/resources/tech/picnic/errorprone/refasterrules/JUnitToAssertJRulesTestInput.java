@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,7 +30,8 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
         (Runnable) () -> assertNotSame(null, null),
         (Runnable) () -> assertNull(null),
         (Runnable) () -> assertSame(null, null),
-        (Runnable) () -> assertTrue(true));
+        (Runnable) () -> assertTrue(true),
+        (Runnable) () -> assertEquals(0, 0));
   }
 
   void testThrowNewAssertionError() {
@@ -169,5 +171,9 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
 
   void testAssertThatWithFailMessageSupplierIsInstanceOf() {
     assertInstanceOf(Object.class, new Object(), () -> "foo");
+  }
+
+  void testAssertThatIsEqualTo() {
+    assertEquals((byte) 0, (byte) 0);
   }
 }

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -515,6 +516,32 @@ final class JUnitToAssertJRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object actual, Class<T> clazz, Supplier<String> supplier) {
       assertThat(actual).withFailMessage(supplier).isInstanceOf(clazz);
+    }
+  }
+
+  static final class AssertThatByteIsEqualTo {
+    @BeforeTemplate
+    void before (byte actual, byte expected) {
+      assertEquals(actual, expected);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(byte actual, byte expected) {
+      assertThat(actual).isEqualTo(expected);
+    }
+  }
+
+  static final class AssertThatByteIsEqualToWithMessage {
+    @BeforeTemplate
+    void before (byte actual, byte expected, String message) {
+      assertEquals(actual, expected, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(byte actual, byte expected, String message) {
+      assertThat(actual).withFailMessage(message).isEqualTo(expected);
     }
   }
 }

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -33,7 +34,8 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
         (Runnable) () -> assertNotSame(null, null),
         (Runnable) () -> assertNull(null),
         (Runnable) () -> assertSame(null, null),
-        (Runnable) () -> assertTrue(true));
+        (Runnable) () -> assertTrue(true),
+        (Runnable) () -> assertEquals(0, 0));
   }
 
   void testThrowNewAssertionError() {
@@ -179,5 +181,9 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
 
   void testAssertThatWithFailMessageSupplierIsInstanceOf() {
     assertThat(new Object()).withFailMessage(() -> "foo").isInstanceOf(Object.class);
+  }
+
+  void testAssertThatIsEqualTo() {
+    assertThat((byte) 0).isEqualTo((byte) 0);
   }
 }
