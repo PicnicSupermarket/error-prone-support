@@ -78,10 +78,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.googlejavaformat</groupId>
-            <artifactId>google-java-format</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <scope>provided</scope>
@@ -182,6 +178,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-java</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.reactivestreams</groupId>
             <artifactId>reactive-streams</artifactId>
             <scope>provided</scope>
@@ -246,12 +247,24 @@
                                 <artifactId>refaster-support</artifactId>
                                 <version>${project.version}</version>
                             </path>
+                            <path>
+                                <groupId>org.openrewrite</groupId>
+                                <artifactId>rewrite-templating</artifactId>
+                                <version>LATEST</version>
+                            </path>
                         </annotationProcessorPaths>
                         <compilerArgs combine.children="append">
                             <arg>-Xplugin:RefasterRuleCompiler</arg>
                             <arg>-Xplugin:DocumentationGenerator -XoutputDirectory=${project.build.directory}/docs</arg>
                         </compilerArgs>
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.openrewrite</groupId>
+                            <artifactId>rewrite-java</artifactId>
+                            <version>${version.rewrite}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
