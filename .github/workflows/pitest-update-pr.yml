@@ -30,7 +30,7 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Download Pitest analysis artifact
-        uses: dawidd6/action-download-artifact@f29d1b6a8930683e80acedfbe6baa2930cd646b4 # v2.28.1
+        uses: dawidd6/action-download-artifact@e7466d1a7587ed14867642c2ca74b5bcc1e19a2d # v3.0.0
         with:
           workflow: ${{ github.event.workflow_run.workflow_id }}
           name: pitest-reports
