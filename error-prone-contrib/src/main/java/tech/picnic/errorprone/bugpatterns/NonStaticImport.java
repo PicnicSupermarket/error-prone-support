@@ -61,6 +61,8 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
       ImmutableSet.of(
           "com.google.common.base.Strings",
           "com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode",
+          "com.google.errorprone.util.ASTHelpers",
+          "com.google.errorprone.VisitorState",
           "java.time.Clock",
           "java.time.ZoneOffset");
 
