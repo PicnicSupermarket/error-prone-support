@@ -29,6 +29,7 @@ final class CanonicalClassNameUsageTest {
             "    instanceMethod().onExactClass(A.class.getCanonicalName());",
             "    MoreTypes.type(A.class.getCanonicalName());",
             "    MoreTypes.type(A.class.getCanonicalName() + \".SubType\");",
+            "    instanceMethod().onExactClass(new Object() {}.getClass().getName());",
             "    instanceMethod().onExactClass(methodInUnnamedPackage(A.class.getName()));",
             "    // BUG: Diagnostic contains:",
             "    instanceMethod().onExactClass(A.class.getName());",
