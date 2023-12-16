@@ -44,7 +44,7 @@ public final class ImportSuggestion extends BugChecker implements MethodInvocati
       return Description.NO_MATCH;
     }
 
-    switch (ASTHelpers.getSymbol(tree).name.toString()) {
+    switch (ASTHelpers.getSymbol(tree).getSimpleName().toString()) {
       case "addImport":
         return createDescription(
             tree, "SuggestedFix.Builder#addImport", "SuggestedFixes#qualifyType");
