@@ -215,6 +215,7 @@
         <version.nullaway>0.10.18</version.nullaway>
         <version.pitest-git>1.1.4</version.pitest-git>
         <version.rewrite>8.11.2</version.rewrite>
+        <version.rewrite-templating>1.4.0-SNAPSHOT</version.rewrite-templating>
         <version.surefire>3.2.3</version.surefire>
     </properties>
 
@@ -457,9 +458,11 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.openrewrite</groupId>
-                <artifactId>rewrite-java</artifactId>
-                <version>${version.rewrite}</version>
+                <groupId>org.openrewrite.recipe</groupId>
+                <artifactId>rewrite-recipe-bom</artifactId>
+                <version>2.5.3</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
