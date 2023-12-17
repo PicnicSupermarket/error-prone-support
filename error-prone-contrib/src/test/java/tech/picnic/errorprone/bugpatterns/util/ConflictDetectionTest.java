@@ -19,38 +19,40 @@ final class ConflictDetectionTest {
     CompilationTestHelper.newInstance(RenameBlockerFlagger.class, getClass())
         .addSourceLines(
             "pkg/A.java",
-            "package pkg;",
-            "",
-            "import static pkg.A.B.method3t;",
-            "",
-            "import pkg.A.method4t;",
-            "",
-            "class A {",
-            "  void method1() {",
-            "    method3t();",
-            "    method4(method4t.class);",
-            "  }",
-            "",
-            "  // BUG: Diagnostic contains: a method named `method2t` is already defined in this class or a",
-            "  // supertype",
-            "  void method2() {}",
-            "",
-            "  void method2t() {}",
-            "",
-            "  // BUG: Diagnostic contains: `method3t` is already statically imported",
-            "  void method3() {}",
-            "",
-            "  void method4(Object o) {}",
-            "",
-            "  // BUG: Diagnostic contains: `int` is not a valid identifier",
-            "  void in() {}",
-            "",
-            "  static class B {",
-            "    static void method3t() {}",
-            "  }",
-            "",
-            "  class method4t {}",
-            "}")
+            """
+            package pkg;
+
+            import static pkg.A.B.method3t;
+
+            import pkg.A.method4t;
+
+            class A {
+              void method1() {
+                method3t();
+                method4(method4t.class);
+              }
+
+              // BUG: Diagnostic contains: a method named `method2t` is already defined in this class or a
+              // supertype
+              void method2() {}
+
+              void method2t() {}
+
+              // BUG: Diagnostic contains: `method3t` is already statically imported
+              void method3() {}
+
+              void method4(Object o) {}
+
+              // BUG: Diagnostic contains: `int` is not a valid identifier
+              void in() {}
+
+              static class B {
+                static void method3t() {}
+              }
+
+              class method4t {}
+            }
+            """)
         .doTest();
   }
 

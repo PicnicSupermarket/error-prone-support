@@ -52,18 +52,20 @@ final class RefasterTest {
         .expectErrorMessage("StringOfSizeThreeRule", DIAGNOSTIC_STRING_OF_SIZE_THREE.asPredicate())
         .addSourceLines(
             "A.java",
-            "class A {",
-            "  void m() {",
-            "    // BUG: Diagnostic matches: StringOfSizeZeroRule",
-            "    boolean b1 = \"foo\".toCharArray().length == 0;",
-            "    // BUG: Diagnostic matches: StringOfSizeOneRule",
-            "    boolean b2 = \"bar\".toCharArray().length == 1;",
-            "    // BUG: Diagnostic matches: StringOfSizeTwoRule",
-            "    boolean b3 = \"baz\".toCharArray().length == 2;",
-            "    // BUG: Diagnostic matches: StringOfSizeThreeRule",
-            "    boolean b4 = \"qux\".toCharArray().length == 3;",
-            "  }",
-            "}")
+            """
+            class A {
+              void m() {
+                // BUG: Diagnostic matches: StringOfSizeZeroRule
+                boolean b1 = "foo".toCharArray().length == 0;
+                // BUG: Diagnostic matches: StringOfSizeOneRule
+                boolean b2 = "bar".toCharArray().length == 1;
+                // BUG: Diagnostic matches: StringOfSizeTwoRule
+                boolean b3 = "baz".toCharArray().length == 2;
+                // BUG: Diagnostic matches: StringOfSizeThreeRule
+                boolean b4 = "qux".toCharArray().length == 3;
+              }
+            }
+            """)
         .doTest();
   }
 
@@ -154,16 +156,18 @@ final class RefasterTest {
             .setArgs(arguments)
             .addSourceLines(
                 "A.java",
-                "class A {",
-                "  void m() {",
-                "    boolean[] bs = {",
-                "      \"foo\".toCharArray().length == 0,",
-                "      \"bar\".toCharArray().length == 1,",
-                "      \"baz\".toCharArray().length == 2,",
-                "      \"qux\".toCharArray().length == 3",
-                "    };",
-                "  }",
-                "}");
+                """
+                class A {
+                  void m() {
+                    boolean[] bs = {
+                      "foo".toCharArray().length == 0,
+                      "bar".toCharArray().length == 1,
+                      "baz".toCharArray().length == 2,
+                      "qux".toCharArray().length == 3
+                    };
+                  }
+                }
+                """);
 
     if (expectedSeverities.isEmpty()) {
       compilationTestHelper.doTest();
@@ -205,24 +209,28 @@ final class RefasterTest {
     BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())
         .addInputLines(
             "A.java",
-            "class A {",
-            "  void m() {",
-            "    boolean b1 = \"foo\".toCharArray().length == 0;",
-            "    boolean b2 = \"bar\".toCharArray().length == 1;",
-            "    boolean b3 = \"baz\".toCharArray().length == 2;",
-            "    boolean b4 = \"qux\".toCharArray().length == 3;",
-            "  }",
-            "}")
+            """
+            class A {
+              void m() {
+                boolean b1 = "foo".toCharArray().length == 0;
+                boolean b2 = "bar".toCharArray().length == 1;
+                boolean b3 = "baz".toCharArray().length == 2;
+                boolean b4 = "qux".toCharArray().length == 3;
+              }
+            }
+            """)
         .addOutputLines(
             "A.java",
-            "class A {",
-            "  void m() {",
-            "    boolean b1 = \"foo\".isEmpty();",
-            "    boolean b2 = \"bar\".length() == 1;",
-            "    boolean b3 = \"baz\".length() == 2;",
-            "    boolean b4 = \"qux\".length() == 3;",
-            "  }",
-            "}")
+            """
+            class A {
+              void m() {
+                boolean b1 = "foo".isEmpty();
+                boolean b2 = "bar".length() == 1;
+                boolean b3 = "baz".length() == 2;
+                boolean b4 = "qux".length() == 3;
+              }
+            }
+            """)
         .doTest(TestMode.TEXT_MATCH);
   }
 
@@ -233,24 +241,28 @@ final class RefasterTest {
             "-XepOpt:Refaster:NamePattern=.*\\$(StringOfSizeZeroVerboseRule|StringOfSizeTwoRule)$")
         .addInputLines(
             "A.java",
-            "class A {",
-            "  void m() {",
-            "    boolean b1 = \"foo\".toCharArray().length == 0;",
-            "    boolean b2 = \"bar\".toCharArray().length == 1;",
-            "    boolean b3 = \"baz\".toCharArray().length == 2;",
-            "    boolean b4 = \"qux\".toCharArray().length == 3;",
-            "  }",
-            "}")
+            """
+            class A {
+              void m() {
+                boolean b1 = "foo".toCharArray().length == 0;
+                boolean b2 = "bar".toCharArray().length == 1;
+                boolean b3 = "baz".toCharArray().length == 2;
+                boolean b4 = "qux".toCharArray().length == 3;
+              }
+            }
+            """)
         .addOutputLines(
             "A.java",
-            "class A {",
-            "  void m() {",
-            "    boolean b1 = \"foo\".length() + 1 == 1;",
-            "    boolean b2 = \"bar\".toCharArray().length == 1;",
-            "    boolean b3 = \"baz\".length() == 2;",
-            "    boolean b4 = \"qux\".toCharArray().length == 3;",
-            "  }",
-            "}")
+            """
+            class A {
+              void m() {
+                boolean b1 = "foo".length() + 1 == 1;
+                boolean b2 = "bar".toCharArray().length == 1;
+                boolean b3 = "baz".length() == 2;
+                boolean b4 = "qux".toCharArray().length == 3;
+              }
+            }
+            """)
         .doTest(TestMode.TEXT_MATCH);
   }
 }

@@ -62,7 +62,11 @@ final class DocumentationGeneratorTaskListenerTest {
     assertThatThrownBy(
             () ->
                 Compilation.compileWithDocumentationGenerator(
-                    outputDirectory, "A.java", "class A {}"))
+                    outputDirectory,
+                    "A.java",
+                    """
+                    class A {}
+                    """))
         .hasRootCauseInstanceOf(FileSystemException.class)
         .hasCauseInstanceOf(IllegalStateException.class)
         .hasMessageEndingWith("Error while creating directory with path '%s'", outputDirectory);
@@ -70,7 +74,10 @@ final class DocumentationGeneratorTaskListenerTest {
 
   @Test
   void noClassNoOutput(@TempDir Path outputDirectory) {
-    Compilation.compileWithDocumentationGenerator(outputDirectory, "A.java", "package pkg;");
+    Compilation.compileWithDocumentationGenerator(
+        outputDirectory, "A.java", """
+            package pkg;
+            """);
 
     assertThat(outputDirectory).isEmptyDirectory();
   }
@@ -81,7 +88,11 @@ final class DocumentationGeneratorTaskListenerTest {
     assertThatThrownBy(
             () ->
                 Compilation.compileWithDocumentationGenerator(
-                    actualOutputDirectory, "A.java", "package pkg;"))
+                    actualOutputDirectory,
+                    "A.java",
+                    """
+                    package pkg;
+                    """))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("Precisely one path must be provided");
   }
@@ -91,7 +102,9 @@ final class DocumentationGeneratorTaskListenerTest {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "DocumentationGeneratorTaskListenerTestClass.java",
-        "class DocumentationGeneratorTaskListenerTestClass {}");
+        """
+        class DocumentationGeneratorTaskListenerTestClass {}
+        """);
 
     // XXX: Once we support only JDK 15+, use a text block for the `expected` string.
     assertThat(

@@ -30,91 +30,93 @@ final class MoreTypesTest {
     CompilationTestHelper.newInstance(SubtypeFlagger.class, getClass())
         .addSourceLines(
             "/A.java",
-            "import java.util.Collection;",
-            "import java.util.List;",
-            "import java.util.Map;",
-            "import java.util.Optional;",
-            "import java.util.Set;",
-            "",
-            "class A<S, T> {",
-            "  void m() {",
-            "    Object object = factory();",
-            "    A a = factory();",
-            "",
-            "    // BUG: Diagnostic contains: [Number, ? super Number, Integer, ? super Integer]",
-            "    int integer = factory();",
-            "",
-            "    // BUG: Diagnostic contains: [String]",
-            "    String string = factory();",
-            "",
-            "    // BUG: Diagnostic contains: [Optional]",
-            "    Optional rawOptional = factory();",
-            "    // BUG: Diagnostic contains: [Optional, Optional<?>]",
-            "    Optional<S> optionalOfS = factory();",
-            "    // BUG: Diagnostic contains: [Optional, Optional<?>]",
-            "    Optional<T> optionalOfT = factory();",
-            "    // BUG: Diagnostic contains: [Optional, Optional<?>, Optional<Number>]",
-            "    Optional<Number> optionalOfNumber = factory();",
-            "    // BUG: Diagnostic contains: [Optional, Optional<?>]",
-            "    Optional<Integer> optionalOfInteger = factory();",
-            "",
-            "    // BUG: Diagnostic contains: [Collection]",
-            "    Collection rawCollection = factory();",
-            "    // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<Number>, Collection<? super",
-            "    // Number>, Collection<? extends Number>, Collection<? super Integer>]",
-            "    Collection<Number> collectionOfNumber = factory();",
-            "    // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<? extends Number>,",
-            "    // Collection<Integer>, Collection<? super Integer>, Collection<? extends Integer>]",
-            "    Collection<Integer> collectionOfInteger = factory();",
-            "    // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<? extends Number>]",
-            "    Collection<Short> collectionOfShort = factory();",
-            "",
-            "    // BUG: Diagnostic contains: [Collection, List]",
-            "    List rawList = factory();",
-            "    // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<Number>, Collection<? super",
-            "    // Number>, Collection<? extends Number>, Collection<? super Integer>, List, List<?>,",
-            "    // List<Number>, List<? super Number>, List<? extends Number>, List<? super Integer>]",
-            "    List<Number> listOfNumber = factory();",
-            "    // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<? extends Number>,",
-            "    // Collection<Integer>, Collection<? super Integer>, Collection<? extends Integer>, List,",
-            "    // List<?>, List<? extends Number>, List<Integer>, List<? super Integer>, List<? extends",
-            "    // Integer>]",
-            "    List<Integer> listOfInteger = factory();",
-            "    // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<? extends Number>, List,",
-            "    // List<?>, List<? extends Number>]",
-            "    List<Short> listOfShort = factory();",
-            "",
-            "    // BUG: Diagnostic contains: [Collection]",
-            "    Set rawSet = factory();",
-            "    // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<Number>, Collection<? super",
-            "    // Number>, Collection<? extends Number>, Collection<? super Integer>]",
-            "    Set<Number> setOfNumber = factory();",
-            "    // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<? extends Number>,",
-            "    // Collection<Integer>, Collection<? super Integer>, Collection<? extends Integer>]",
-            "    Set<Integer> setOfInteger = factory();",
-            "    // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<? extends Number>]",
-            "    Set<Short> setOfShort = factory();",
-            "",
-            "    Map rawMap = factory();",
-            "    Map<Number, Collection<Number>> mapFromNumberToCollectionOfNumber = factory();",
-            "    Map<Number, Collection<Short>> mapFromNumberToCollectionOfShort = factory();",
-            "    Map<Number, Collection<Integer>> mapFromNumberToCollectionOfInteger = factory();",
-            "    // BUG: Diagnostic contains: [Map<String, ? extends Collection<? super Short>>]",
-            "    Map<String, Collection<Number>> mapFromStringToCollectionOfNumber = factory();",
-            "    // BUG: Diagnostic contains: [Map<String, ? extends Collection<? super Short>>]",
-            "    Map<String, Collection<Short>> mapFromStringToCollectionOfShort = factory();",
-            "    Map<String, Collection<Integer>> mapFromStringToCollectionOfInteger = factory();",
-            "    // BUG: Diagnostic contains: [Map<String, ? extends Collection<? super Short>>]",
-            "    Map<String, List<Number>> mapFromStringToListOfNumber = factory();",
-            "    // BUG: Diagnostic contains: [Map<String, ? extends Collection<? super Short>>]",
-            "    Map<String, List<Short>> mapFromStringToListOfShort = factory();",
-            "    Map<String, List<Integer>> mapFromStringToListOfInteger = factory();",
-            "  }",
-            "",
-            "  private <T> T factory() {",
-            "    return null;",
-            "  }",
-            "}")
+            """
+            import java.util.Collection;
+            import java.util.List;
+            import java.util.Map;
+            import java.util.Optional;
+            import java.util.Set;
+
+            class A<S, T> {
+              void m() {
+                Object object = factory();
+                A a = factory();
+
+                // BUG: Diagnostic contains: [Number, ? super Number, Integer, ? super Integer]
+                int integer = factory();
+
+                // BUG: Diagnostic contains: [String]
+                String string = factory();
+
+                // BUG: Diagnostic contains: [Optional]
+                Optional rawOptional = factory();
+                // BUG: Diagnostic contains: [Optional, Optional<?>]
+                Optional<S> optionalOfS = factory();
+                // BUG: Diagnostic contains: [Optional, Optional<?>]
+                Optional<T> optionalOfT = factory();
+                // BUG: Diagnostic contains: [Optional, Optional<?>, Optional<Number>]
+                Optional<Number> optionalOfNumber = factory();
+                // BUG: Diagnostic contains: [Optional, Optional<?>]
+                Optional<Integer> optionalOfInteger = factory();
+
+                // BUG: Diagnostic contains: [Collection]
+                Collection rawCollection = factory();
+                // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<Number>, Collection<? super
+                // Number>, Collection<? extends Number>, Collection<? super Integer>]
+                Collection<Number> collectionOfNumber = factory();
+                // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<? extends Number>,
+                // Collection<Integer>, Collection<? super Integer>, Collection<? extends Integer>]
+                Collection<Integer> collectionOfInteger = factory();
+                // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<? extends Number>]
+                Collection<Short> collectionOfShort = factory();
+
+                // BUG: Diagnostic contains: [Collection, List]
+                List rawList = factory();
+                // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<Number>, Collection<? super
+                // Number>, Collection<? extends Number>, Collection<? super Integer>, List, List<?>,
+                // List<Number>, List<? super Number>, List<? extends Number>, List<? super Integer>]
+                List<Number> listOfNumber = factory();
+                // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<? extends Number>,
+                // Collection<Integer>, Collection<? super Integer>, Collection<? extends Integer>, List,
+                // List<?>, List<? extends Number>, List<Integer>, List<? super Integer>, List<? extends
+                // Integer>]
+                List<Integer> listOfInteger = factory();
+                // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<? extends Number>, List,
+                // List<?>, List<? extends Number>]
+                List<Short> listOfShort = factory();
+
+                // BUG: Diagnostic contains: [Collection]
+                Set rawSet = factory();
+                // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<Number>, Collection<? super
+                // Number>, Collection<? extends Number>, Collection<? super Integer>]
+                Set<Number> setOfNumber = factory();
+                // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<? extends Number>,
+                // Collection<Integer>, Collection<? super Integer>, Collection<? extends Integer>]
+                Set<Integer> setOfInteger = factory();
+                // BUG: Diagnostic contains: [Collection, Collection<?>, Collection<? extends Number>]
+                Set<Short> setOfShort = factory();
+
+                Map rawMap = factory();
+                Map<Number, Collection<Number>> mapFromNumberToCollectionOfNumber = factory();
+                Map<Number, Collection<Short>> mapFromNumberToCollectionOfShort = factory();
+                Map<Number, Collection<Integer>> mapFromNumberToCollectionOfInteger = factory();
+                // BUG: Diagnostic contains: [Map<String, ? extends Collection<? super Short>>]
+                Map<String, Collection<Number>> mapFromStringToCollectionOfNumber = factory();
+                // BUG: Diagnostic contains: [Map<String, ? extends Collection<? super Short>>]
+                Map<String, Collection<Short>> mapFromStringToCollectionOfShort = factory();
+                Map<String, Collection<Integer>> mapFromStringToCollectionOfInteger = factory();
+                // BUG: Diagnostic contains: [Map<String, ? extends Collection<? super Short>>]
+                Map<String, List<Number>> mapFromStringToListOfNumber = factory();
+                // BUG: Diagnostic contains: [Map<String, ? extends Collection<? super Short>>]
+                Map<String, List<Short>> mapFromStringToListOfShort = factory();
+                Map<String, List<Integer>> mapFromStringToListOfInteger = factory();
+              }
+
+              private <T> T factory() {
+                return null;
+              }
+            }
+            """)
         .doTest();
   }
 

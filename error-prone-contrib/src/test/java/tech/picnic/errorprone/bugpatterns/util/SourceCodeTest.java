@@ -32,22 +32,24 @@ final class SourceCodeTest {
     CompilationTestHelper.newInstance(TextBlockFlagger.class, getClass())
         .addSourceLines(
             "A.java",
-            "class A {",
-            "  String negative1() {",
-            "    return toString();",
-            "  }",
-            "",
-            "  String negative2() {",
-            "    return \"foo\";",
-            "  }",
-            "",
-            "  String positive1() {",
-            "    // BUG: Diagnostic contains:",
-            "    return \"\"\"",
-            "    foo",
-            "    \"\"\";",
-            "  }",
-            "}")
+            """
+            class A {
+              String negative1() {
+                return toString();
+              }
+
+              String negative2() {
+                return "foo";
+              }
+
+              String positive1() {
+                // BUG: Diagnostic contains:
+                return ""\"
+                foo
+                ""\";
+              }
+            }
+            """)
         .doTest();
   }
 
@@ -55,73 +57,84 @@ final class SourceCodeTest {
   void deleteWithTrailingWhitespaceAnnotations() {
     BugCheckerRefactoringTestHelper.newInstance(
             DeleteWithTrailingWhitespaceTestChecker.class, getClass())
-        .addInputLines("AnnotationToBeDeleted.java", "@interface AnnotationToBeDeleted {}")
+        .addInputLines(
+            "AnnotationToBeDeleted.java",
+            """
+            @interface AnnotationToBeDeleted {}
+            """)
         .expectUnchanged()
         .addInputLines(
-            "AnotherAnnotationToBeDeleted.java", "@interface AnotherAnnotationToBeDeleted {}")
+            "AnotherAnnotationToBeDeleted.java",
+            """
+            @interface AnotherAnnotationToBeDeleted {}
+            """)
         .expectUnchanged()
         .addInputLines(
             "AnnotationDeletions.java",
-            "interface AnnotationDeletions {",
-            "  class SoleAnnotation {",
-            "    @AnnotationToBeDeleted",
-            "    void m() {}",
-            "  }",
-            "",
-            "  class FirstAnnotation {",
-            "    @AnnotationToBeDeleted",
-            "    @Deprecated",
-            "    void m() {}",
-            "  }",
-            "",
-            "  class MiddleAnnotation {",
-            "    @Deprecated",
-            "    @AnnotationToBeDeleted",
-            "    @SuppressWarnings(\"foo\")",
-            "    void m() {}",
-            "  }",
-            "",
-            "  class LastAnnotation {",
-            "    @Deprecated",
-            "    @AnnotationToBeDeleted",
-            "    void m() {}",
-            "  }",
-            "",
-            "  class MultipleAnnotations {",
-            "    @AnnotationToBeDeleted",
-            "    @AnotherAnnotationToBeDeleted",
-            "    @Deprecated",
-            "    void m() {}",
-            "  }",
-            "}")
+            """
+            interface AnnotationDeletions {
+              class SoleAnnotation {
+                @AnnotationToBeDeleted
+                void m() {}
+              }
+
+              class FirstAnnotation {
+                @AnnotationToBeDeleted
+                @Deprecated
+                void m() {}
+              }
+
+              class MiddleAnnotation {
+                @Deprecated
+                @AnnotationToBeDeleted
+                @SuppressWarnings("foo")
+                void m() {}
+              }
+
+              class LastAnnotation {
+                @Deprecated
+                @AnnotationToBeDeleted
+                void m() {}
+              }
+
+              class MultipleAnnotations {
+                @AnnotationToBeDeleted
+                @AnotherAnnotationToBeDeleted
+                @Deprecated
+                void m() {}
+              }
+            }
+            """)
         .addOutputLines(
             "AnnotationDeletions.java",
-            "interface AnnotationDeletions {",
-            "  class SoleAnnotation {",
-            "    void m() {}",
-            "  }",
-            "",
-            "  class FirstAnnotation {",
-            "    @Deprecated",
-            "    void m() {}",
-            "  }",
-            "",
-            "  class MiddleAnnotation {",
-            "    @Deprecated",
-            "    @SuppressWarnings(\"foo\")",
-            "    void m() {}",
-            "  }",
-            "",
-            "  class LastAnnotation {",
-            "    @Deprecated",
-            "    void m() {}",
-            "  }",
-            "",
-            "  class MultipleAnnotations {",
-            "    @Deprecated",
-            "    void m() {}",
-            "  }",
-            "}")
+            """
+            interface AnnotationDeletions {
+              class SoleAnnotation {
+                void m() {}
+              }
+
+              class FirstAnnotation {
+                @Deprecated
+                void m() {}
+              }
+
+              class MiddleAnnotation {
+                @Deprecated
+                @SuppressWarnings("foo")
+                void m() {}
+              }
+
+              class LastAnnotation {
+                @Deprecated
+                void m() {}
+              }
+
+              class MultipleAnnotations {
+                @Deprecated
+                void m() {}
+              }
+            }
+            """)
         .doTest(TestMode.TEXT_MATCH);
   }
 
@@ -131,66 +144,70 @@ final class SourceCodeTest {
             DeleteWithTrailingWhitespaceTestChecker.class, getClass())
         .addInputLines(
             "MethodDeletions.java",
-            "interface MethodDeletions {",
-            "  class SoleMethod {",
-            "    void methodToBeDeleted() {}",
-            "  }",
-            "",
-            "  class FirstMethod {",
-            "    void methodToBeDeleted() {}",
-            "",
-            "    void finalMethod() {}",
-            "  }",
-            "",
-            "  class MiddleMethod {",
-            "    void initialMethod() {}",
-            "",
-            "    void methodToBeDeleted() {}",
-            "",
-            "    void finalMethod() {}",
-            "  }",
-            "",
-            "  class LastMethod {",
-            "    void initialMethod() {}",
-            "",
-            "    void methodToBeDeleted() {}",
-            "  }",
-            "",
-            "  class MultipleMethods {",
-            "    void method1ToBeDeleted() {}",
-            "",
-            "    void method2ToBeDeleted() {}",
-            "",
-            "    void middleMethod() {}",
-            "",
-            "    void method3ToBeDeleted() {}",
-            "",
-            "    void method4ToBeDeleted() {}",
-            "  }",
-            "}")
+            """
+            interface MethodDeletions {
+              class SoleMethod {
+                void methodToBeDeleted() {}
+              }
+
+              class FirstMethod {
+                void methodToBeDeleted() {}
+
+                void finalMethod() {}
+              }
+
+              class MiddleMethod {
+                void initialMethod() {}
+
+                void methodToBeDeleted() {}
+
+                void finalMethod() {}
+              }
+
+              class LastMethod {
+                void initialMethod() {}
+
+                void methodToBeDeleted() {}
+              }
+
+              class MultipleMethods {
+                void method1ToBeDeleted() {}
+
+                void method2ToBeDeleted() {}
+
+                void middleMethod() {}
+
+                void method3ToBeDeleted() {}
+
+                void method4ToBeDeleted() {}
+              }
+            }
+            """)
         .addOutputLines(
             "MethodDeletions.java",
-            "interface MethodDeletions {",
-            "  class SoleMethod {}",
-            "",
-            "  class FirstMethod {",
-            "    void finalMethod() {}",
-            "  }",
-            "",
-            "  class MiddleMethod {",
-            "    void initialMethod() {}",
-            "",
-            "    void finalMethod() {}",
-            "  }",
-            "",
-            "  class LastMethod {",
-            "    void initialMethod() {}",
-            "  }",
-            "",
-            "  class MultipleMethods {",
-            "    void middleMethod() {}",
-            "  }",
-            "}")
+            """
+            interface MethodDeletions {
+              class SoleMethod {}
+
+              class FirstMethod {
+                void finalMethod() {}
+              }
+
+              class MiddleMethod {
+                void initialMethod() {}
+
+                void finalMethod() {}
+              }
+
+              class LastMethod {
+                void initialMethod() {}
+              }
+
+              class MultipleMethods {
+                void middleMethod() {}
+              }
+            }
+            """)
         .doTest(TestMode.TEXT_MATCH);
   }
 
@@ -199,30 +216,34 @@ final class SourceCodeTest {
     BugCheckerRefactoringTestHelper.newInstance(UnwrapMethodInvocationTestChecker.class, getClass())
         .addInputLines(
             "A.java",
-            "import com.google.common.collect.ImmutableList;",
-            "",
-            "class A {",
-            "  Object[] m() {",
-            "    return new Object[][] {",
-            "      {ImmutableList.of()},",
-            "      {ImmutableList.of(1)},",
-            "      {com.google.common.collect.ImmutableList.of(1, 2)},",
-            "      {",
-            "        0, /*a*/",
-            "        ImmutableList /*b*/./*c*/ <Integer> /*d*/of /*e*/(/*f*/ 1 /*g*/, /*h*/ 2 /*i*/) /*j*/",
-            "      }",
-            "    };",
-            "  }",
-            "}")
+            """
+            import com.google.common.collect.ImmutableList;
+
+            class A {
+              Object[] m() {
+                return new Object[][] {
+                  {ImmutableList.of()},
+                  {ImmutableList.of(1)},
+                  {com.google.common.collect.ImmutableList.of(1, 2)},
+                  {
+                    0, /*a*/
+                    ImmutableList /*b*/./*c*/ <Integer> /*d*/of /*e*/(/*f*/ 1 /*g*/, /*h*/ 2 /*i*/) /*j*/
+                  }
+                };
+              }
+            }
+            """)
         .addOutputLines(
             "A.java",
-            "import com.google.common.collect.ImmutableList;",
-            "",
-            "class A {",
-            "  Object[] m() {",
-            "    return new Object[][] {{}, {1}, {1, 2}, {0, /*a*/ /*f*/ 1 /*g*/, /*h*/ 2 /*i*/ /*j*/}};",
-            "  }",
-            "}")
+            """
+            import com.google.common.collect.ImmutableList;
+
+            class A {
+              Object[] m() {
+                return new Object[][] {{}, {1}, {1, 2}, {0, /*a*/ /*f*/ 1 /*g*/, /*h*/ 2 /*i*/ /*j*/}};
+              }
+            }
+            """)
         .doTest(TestMode.TEXT_MATCH);
   }
 
@@ -232,30 +253,34 @@ final class SourceCodeTest {
             UnwrapMethodInvocationDroppingWhitespaceAndCommentsTestChecker.class, getClass())
         .addInputLines(
             "A.java",
-            "import com.google.common.collect.ImmutableList;",
-            "",
-            "class A {",
-            "  Object[] m() {",
-            "    return new Object[][] {",
-            "      {ImmutableList.of()},",
-            "      {ImmutableList.of(1)},",
-            "      {com.google.common.collect.ImmutableList.of(1, 2)},",
-            "      {",
-            "        0, /*a*/",
-            "        ImmutableList /*b*/./*c*/ <Integer> /*d*/of /*e*/(/*f*/ 1 /*g*/, /*h*/ 2 /*i*/) /*j*/",
-            "      }",
-            "    };",
-            "  }",
-            "}")
+            """
+            import com.google.common.collect.ImmutableList;
+
+            class A {
+              Object[] m() {
+                return new Object[][] {
+                  {ImmutableList.of()},
+                  {ImmutableList.of(1)},
+                  {com.google.common.collect.ImmutableList.of(1, 2)},
+                  {
+                    0, /*a*/
+                    ImmutableList /*b*/./*c*/ <Integer> /*d*/of /*e*/(/*f*/ 1 /*g*/, /*h*/ 2 /*i*/) /*j*/
+                  }
+                };
+              }
+            }
+            """)
         .addOutputLines(
             "A.java",
-            "import com.google.common.collect.ImmutableList;",
-            "",
-            "class A {",
-            "  Object[] m() {",
-            "    return new Object[][] {{}, {1}, {1, 2}, {0, /*a*/ 1, 2 /*j*/}};",
-            "  }",
-            "}")
+            """
+            import com.google.common.collect.ImmutableList;
+
+            class A {
+              Object[] m() {
+                return new Object[][] {{}, {1}, {1, 2}, {0, /*a*/ 1, 2 /*j*/}};
+              }
+            }
+            """)
         .doTest(TestMode.TEXT_MATCH);
   }
 

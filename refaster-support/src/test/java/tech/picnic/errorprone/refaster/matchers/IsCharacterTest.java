@@ -13,38 +13,40 @@ final class IsCharacterTest {
     CompilationTestHelper.newInstance(MatcherTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "class A {",
-            "  String negative1() {",
-            "    return \"a\";",
-            "  }",
-            "",
-            "  char[] negative2() {",
-            "    return \"a\".toCharArray();",
-            "  }",
-            "",
-            "  byte negative3() {",
-            "    return (byte) 0;",
-            "  }",
-            "",
-            "  int negative4() {",
-            "    return 0;",
-            "  }",
-            "",
-            "  char positive1() {",
-            "    // BUG: Diagnostic contains:",
-            "    return 'a';",
-            "  }",
-            "",
-            "  Character positive2() {",
-            "    // BUG: Diagnostic contains:",
-            "    return (Character) null;",
-            "  }",
-            "",
-            "  char positive3() {",
-            "    // BUG: Diagnostic contains:",
-            "    return (char) 1;",
-            "  }",
-            "}")
+            """
+            class A {
+              String negative1() {
+                return "a";
+              }
+
+              char[] negative2() {
+                return "a".toCharArray();
+              }
+
+              byte negative3() {
+                return (byte) 0;
+              }
+
+              int negative4() {
+                return 0;
+              }
+
+              char positive1() {
+                // BUG: Diagnostic contains:
+                return 'a';
+              }
+
+              Character positive2() {
+                // BUG: Diagnostic contains:
+                return (Character) null;
+              }
+
+              char positive3() {
+                // BUG: Diagnostic contains:
+                return (char) 1;
+              }
+            }
+            """)
         .doTest();
   }
 
