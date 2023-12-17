@@ -1218,12 +1218,14 @@
                             non-distributed (i.e. Picnic-internal) deployable
                             artifacts (i.e. web services). -->
                             <includedLicense>Apache-2.0</includedLicense>
+                            <includedLicense>BSD-2-Clause</includedLicense>
                             <includedLicense>BSD-3-Clause</includedLicense>
                             <includedLicense>CC0-1.0</includedLicense>
                             <includedLicense>CDDL-1.1</includedLicense>
                             <includedLicense>EPL-1.0</includedLicense>
                             <includedLicense>EPL-2.0</includedLicense>
                             <includedLicense>GPL-2.0-with-classpath-exception</includedLicense>
+                            <includedLicense>ICU</includedLicense>
                             <includedLicense>LGPL-3.0+</includedLicense>
                             <includedLicense>MIT</includedLicense>
                             <includedLicense>MIT-0</includedLicense>
@@ -1246,10 +1248,20 @@
                                 | The Apache Software License, Version 2.0
                             </licenseMerge>
                             <licenseMerge>
-                                <!-- -->
+                                <!-- XXX: Get projects referencing just "BSD"
+                                to explicitly state the clause count. -->
+                                BSD-2-Clause
+                                | The BSD License
+                            </licenseMerge>
+                            <licenseMerge>
+                                <!-- XXX: Get projects referencing just "BSD"
+                                to explicitly state the clause count. -->
                                 BSD-3-Clause
                                 | 3-Clause BSD License
                                 | BSD 3-clause
+                                | BSD 3-Clause "New" or "Revised" License (BSD-3-Clause)
+                                <!-- XXX: Typo; file ticket. -->
+                                | BSD licence
                                 | BSD License 3
                                 | Eclipse Distribution License (New BSD License)
                                 | New BSD License
@@ -1258,6 +1270,7 @@
                                 <!-- -->
                                 CC0-1.0
                                 | CC0
+                                | Public Domain, per Creative Commons CC0
                             </licenseMerge>
                             <licenseMerge>
                                 <!-- -->
@@ -1279,6 +1292,11 @@
                             </licenseMerge>
                             <licenseMerge>
                                 <!-- -->
+                                ICU
+                                | Unicode/ICU License
+                            </licenseMerge>
+                            <licenseMerge>
+                                <!-- -->
                                 GPL-2.0-with-classpath-exception
                                 | CDDL/GPLv2+CE
                                 | GNU General Public License, version 2 (GPL2), with the classpath exception
@@ -1286,7 +1304,8 @@
                                 | GPL2 w/ CPE
                             </licenseMerge>
                             <licenseMerge>
-                                <!-- -->
+                                <!-- XXX: Get projects referencing just "LGPL"
+                                to explicitly state the license version. -->
                                 LGPL-3.0+
                                 | GNU Lesser Public License
                             </licenseMerge>
@@ -1296,6 +1315,7 @@
                                 | MIT license
                                 | MIT License
                                 | The MIT License
+                                | The MIT License (MIT)
                             </licenseMerge>
                         </licenseMerges>
                         <!-- Nearly no projects ship a "missing third party
