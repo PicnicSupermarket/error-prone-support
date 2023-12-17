@@ -61,7 +61,7 @@ public final class OpenAi implements AutoCloseable {
                     ImmutableList.of(
                         new ChatMessage("system", "You are an expert Java developer"),
                         new ChatMessage("user", instruction)))
-                .model("gpt-3.5-turbo")
+                .model("gpt-4-1106-preview")
                 .temperature(0.0)
                 .build())
         .getChoices()
