@@ -11,8 +11,7 @@ import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
-class StringRulesRecipesTest implements RewriteTest {
-
+final class StringRulesRecipesTest implements RewriteTest {
   @Override
   public void defaults(RecipeSpec spec) {
     spec.recipe(new StringRulesRecipes());
@@ -20,9 +19,10 @@ class StringRulesRecipesTest implements RewriteTest {
 
   @Test
   void stringValueOf() {
+    // XXX: Use text blocks once supported.
     rewriteRun(
         // language=java
-        java( // This would be much better with text blocks
+        java(
             "import java.util.Objects;\n"
                 + "class Test {\n"
                 + "    String test(Object object) {\n"
