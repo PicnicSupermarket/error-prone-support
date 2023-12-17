@@ -125,8 +125,8 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
       }
 
       ExpressionTree receiver = ASTHelpers.getReceiver(tree);
-      return receiver instanceof MethodInvocationTree
-          ? getClassUnderTest((MethodInvocationTree) receiver, state)
+      return receiver instanceof MethodInvocationTree methodInvocation
+          ? getClassUnderTest(methodInvocation, state)
           : Optional.empty();
     }
 
@@ -144,8 +144,8 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
       }
 
       ExpressionTree receiver = ASTHelpers.getReceiver(tree);
-      if (receiver instanceof MethodInvocationTree) {
-        extractIdentificationTestCases((MethodInvocationTree) receiver, sink, state);
+      if (receiver instanceof MethodInvocationTree methodInvocation) {
+        extractIdentificationTestCases(methodInvocation, sink, state);
       }
     }
 
@@ -174,8 +174,8 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
       }
 
       ExpressionTree receiver = ASTHelpers.getReceiver(tree);
-      if (receiver instanceof MethodInvocationTree) {
-        extractReplacementTestCases((MethodInvocationTree) receiver, sink, state);
+      if (receiver instanceof MethodInvocationTree methodInvocation) {
+        extractReplacementTestCases(methodInvocation, sink, state);
       }
     }
 

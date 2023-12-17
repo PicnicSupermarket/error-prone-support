@@ -159,10 +159,9 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
         ImmutableTable.builder();
     for (ImportTree importTree : tree.getImports()) {
       Tree qualifiedIdentifier = importTree.getQualifiedIdentifier();
-      if (importTree.isStatic() && qualifiedIdentifier instanceof MemberSelectTree) {
-        MemberSelectTree memberSelectTree = (MemberSelectTree) qualifiedIdentifier;
-        String type = SourceCode.treeToString(memberSelectTree.getExpression(), state);
-        String member = memberSelectTree.getIdentifier().toString();
+      if (importTree.isStatic() && qualifiedIdentifier instanceof MemberSelectTree memberSelect) {
+        String type = SourceCode.treeToString(memberSelect.getExpression(), state);
+        String member = memberSelect.getIdentifier().toString();
         if (shouldNotBeStaticallyImported(type, member)) {
           imports.put(
               type,

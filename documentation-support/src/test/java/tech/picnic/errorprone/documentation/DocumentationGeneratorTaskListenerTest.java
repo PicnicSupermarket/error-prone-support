@@ -125,8 +125,8 @@ final class DocumentationGeneratorTaskListenerTest {
     }
 
     private static String describeTree(Tree tree) {
-      return (tree instanceof ClassTree)
-          ? String.join(": ", String.valueOf(tree.getKind()), ((ClassTree) tree).getSimpleName())
+      return (tree instanceof ClassTree clazz)
+          ? String.join(": ", String.valueOf(tree.getKind()), clazz.getSimpleName())
           : tree.getKind().toString();
     }
   }
