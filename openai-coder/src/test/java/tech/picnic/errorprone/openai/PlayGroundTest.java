@@ -57,10 +57,12 @@ final class PlayGroundTest {
         - Just write the new code. Don't explain yourself.
         - If the rule requires type parameters, declare those on the class.
         - Add all relevant imports.
+        - Omit Markdown backticks.
         """
             .stripTrailing();
 
     // XXX: ^ That trailing whitespace removal is crucial!!
+    // XXX: Also with GPT 4?
 
     assertThat(openAi.requestChatCompletion(input)).isEqualTo("XXX");
   }

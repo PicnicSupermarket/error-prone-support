@@ -6,7 +6,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.edit.EditRequest;
 import com.theokanning.openai.service.OpenAiService;
 import java.time.Duration;
 
@@ -17,7 +16,7 @@ public final class OpenAi implements AutoCloseable {
   // XXX: Rename.
   @VisibleForTesting static final String OPENAI_TOKEN_VARIABLE = "openapi_token";
   // XXX: Make configurable?
-  private static final Duration OPENAI_API_TIMEOUT = Duration.ofSeconds(30);
+  private static final Duration OPENAI_API_TIMEOUT = Duration.ofSeconds(120);
 
   private final OpenAiService openAiService;
 
@@ -39,17 +38,58 @@ public final class OpenAi implements AutoCloseable {
   // XXX: Improve error handling (catch `OpenAiHttpException`, expose its message and the backing
   // HTTP error code).
   String requestEdit(String input, String instruction) {
+    //    return openAiService
+    //        .createEdit(
+    //            EditRequest.builder()
+    //                .input(input)
+    //                .model("code-davinci-edit-001")
+    //                .instruction(instruction)
+    //                .temperature(0.0)
+    //                .build())
+    //        .getChoices()
+    //        .get(0)
+    //        .getText();
+
+    // XXX: Replace the `replace` hacks.
+    // XXX: The method signature is more generic than what this code does.
     return openAiService
-        .createEdit(
-            EditRequest.builder()
-                .input(input)
-                .model("code-davinci-edit-001")
-                .instruction(instruction)
+        .createChatCompletion(
+            ChatCompletionRequest.builder()
+                .messages(
+                    ImmutableList.of(
+                        new ChatMessage(
+                            "system",
+                            """
+                            You are an expert Java developer. You can only respond with Java code.
+                            The user reports build issues, and you suggest solutions.
+                            """),
+                        new ChatMessage(
+                            "user",
+                            """
+                            This is my code:
+
+                            XXX
+
+                            These are my build errors:
+                            YYY
+                            
+                            ###
+                            
+                            Please update the code to fix these errors. Requirements:
+                            - Just write the new code. Don't explain yourself.
+                            - Do not leave out unchanged parts of the code. So do not shorten your answer by including "X remains unchanged" lines.
+                            - Do not leave out or resolve code comments.
+                            - Omit Markdown code formatting.
+                            """
+                                .replace("XXX", input)
+                                .replace("YYY", instruction))))
+                .model("gpt-4-1106-preview")
                 .temperature(0.0)
                 .build())
         .getChoices()
         .get(0)
-        .getText();
+        .getMessage()
+        .getContent();
   }
 
   // XXX: Improve error handling, including checking the finish reason.
