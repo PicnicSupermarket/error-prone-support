@@ -30,6 +30,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
@@ -199,16 +200,21 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
     return getSingleReturnExpression(valueFactoryMethod)
         .flatMap(expression -> tryExtractValueSourceAttributeValue(expression, state))
         .map(
-            valueSourceAttributeValue ->
-                SuggestedFix.builder()
-                    .addImport("org.junit.jupiter.params.provider.ValueSource")
-                    .replace(
-                        methodSourceAnnotation,
-                        String.format(
-                            "@ValueSource(%s = %s)",
-                            toValueSourceAttributeName(parameterType), valueSourceAttributeValue))
-                    .delete(valueFactoryMethod)
-                    .build());
+            valueSourceAttributeValue -> {
+              SuggestedFix.Builder fix = SuggestedFix.builder();
+              String valueSource =
+                  SuggestedFixes.qualifyType(
+                      state, fix, "org.junit.jupiter.params.provider.ValueSource");
+              return fix.replace(
+                      methodSourceAnnotation,
+                      String.format(
+                          "@%s(%s = %s)",
+                          valueSource,
+                          toValueSourceAttributeName(parameterType),
+                          valueSourceAttributeValue))
+                  .delete(valueFactoryMethod)
+                  .build();
+            });
   }
 
   // XXX: This pattern also occurs a few times inside Error Prone; contribute upstream.

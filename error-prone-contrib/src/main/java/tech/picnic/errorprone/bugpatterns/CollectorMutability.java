@@ -58,7 +58,10 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
 
     if (LIST_COLLECTOR.matches(tree, state)) {
       return suggestToCollectionAlternatives(
-          tree, "com.google.common.collect.ImmutableList.toImmutableList", "ArrayList", state);
+          tree,
+          "com.google.common.collect.ImmutableList.toImmutableList",
+          "java.util.ArrayList",
+          state);
     }
 
     if (MAP_COLLECTOR.matches(tree, state)) {
@@ -67,7 +70,10 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
 
     if (SET_COLLECTOR.matches(tree, state)) {
       return suggestToCollectionAlternatives(
-          tree, "com.google.common.collect.ImmutableSet.toImmutableSet", "HashSet", state);
+          tree,
+          "com.google.common.collect.ImmutableSet.toImmutableSet",
+          "java.util.HashSet",
+          state);
     }
 
     return Description.NO_MATCH;
@@ -75,20 +81,20 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
 
   private Description suggestToCollectionAlternatives(
       MethodInvocationTree tree,
-      String fullyQualifiedImmutableReplacement,
+      String immutableReplacement,
       String mutableReplacement,
       VisitorState state) {
     SuggestedFix.Builder mutableFix = SuggestedFix.builder();
     String toCollectionSelect =
         SuggestedFixes.qualifyStaticImport(
             "java.util.stream.Collectors.toCollection", mutableFix, state);
+    String mutableCollection = SuggestedFixes.qualifyType(state, mutableFix, mutableReplacement);
 
     return buildDescription(tree)
-        .addFix(replaceMethodInvocation(tree, fullyQualifiedImmutableReplacement, state))
+        .addFix(replaceMethodInvocation(tree, immutableReplacement, state))
         .addFix(
             mutableFix
-                .addImport(String.format("java.util.%s", mutableReplacement))
-                .replace(tree, String.format("%s(%s::new)", toCollectionSelect, mutableReplacement))
+                .replace(tree, String.format("%s(%s::new)", toCollectionSelect, mutableCollection))
                 .build())
         .build();
   }
@@ -99,17 +105,19 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
       return Description.NO_MATCH;
     }
 
+    SuggestedFix.Builder mutableFix = SuggestedFix.builder();
+    String hashMap = SuggestedFixes.qualifyType(state, mutableFix, "java.util.HashMap");
+
     return buildDescription(tree)
         .addFix(
             replaceMethodInvocation(
                 tree, "com.google.common.collect.ImmutableMap.toImmutableMap", state))
         .addFix(
-            SuggestedFix.builder()
-                .addImport("java.util.HashMap")
+            mutableFix
                 .postfixWith(
                     tree.getArguments().get(argCount - 1),
                     (argCount == 2 ? ", (a, b) -> { throw new IllegalStateException(); }" : "")
-                        + ", HashMap::new")
+                        + String.format(", %s::new", hashMap))
                 .build())
         .build();
   }

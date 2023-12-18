@@ -17,6 +17,7 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
@@ -167,10 +168,11 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
     ExpressionTree expr = tree.getMethodSelect();
     switch (expr.getKind()) {
       case IDENTIFIER:
-        return SuggestedFix.builder()
-            .addStaticImport(Comparator.class.getCanonicalName() + '.' + preferredMethodName)
-            .replace(expr, preferredMethodName)
-            .build();
+        SuggestedFix.Builder fix = SuggestedFix.builder();
+        String replacement =
+            SuggestedFixes.qualifyStaticImport(
+                Comparator.class.getCanonicalName() + '.' + preferredMethodName, fix, state);
+        return fix.replace(expr, replacement).build();
       case MEMBER_SELECT:
         MemberSelectTree ms = (MemberSelectTree) tree.getMethodSelect();
         return SuggestedFix.replace(

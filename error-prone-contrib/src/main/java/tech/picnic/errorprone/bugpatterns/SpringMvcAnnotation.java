@@ -18,6 +18,7 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
@@ -114,9 +115,8 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
             .map(arg -> SourceCode.treeToString(arg, state))
             .collect(joining(", "));
 
-    return SuggestedFix.builder()
-        .addImport(ANN_PACKAGE_PREFIX + newAnnotation)
-        .replace(tree, String.format("@%s(%s)", newAnnotation, newArguments))
-        .build();
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+    String annotation = SuggestedFixes.qualifyType(state, fix, ANN_PACKAGE_PREFIX + newAnnotation);
+    return fix.replace(tree, String.format("@%s(%s)", annotation, newArguments)).build();
   }
 }
