@@ -42,10 +42,8 @@ jobs:
           cache: maven
       - name: Display build environment details
         run: mvn --version
-      - name: "TEST: Debug 1"
-        run: mvn -N help:effective-pom
-      - name: "TEST: Debug 2"
-        run: mvn com.github.ekryd.echo-maven-plugin:echo-maven-plugin:2.0.0:echo -Decho.message='\Q${project.build.directory}${file.separator}\E.*'
+      - name: "TEST: Debug"
+        run: mvn help:effective-pom -pl :refaster-runner
       - name: Build project against vanilla Error Prone, compile Javadoc
         run: mvn -T1C install javadoc:jar
       - name: Build project with self-check against Error Prone fork
