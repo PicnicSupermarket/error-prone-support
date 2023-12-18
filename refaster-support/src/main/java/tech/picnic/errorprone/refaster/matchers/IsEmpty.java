@@ -74,30 +74,30 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
           isSameType(Vector.class));
   private static final Matcher<ExpressionTree> EMPTY_INSTANCE_FACTORY =
       anyOf(
-          staticField(Collections.class.getName(), "EMPTY_LIST"),
-          staticField(Collections.class.getName(), "EMPTY_MAP"),
-          staticField(Collections.class.getName(), "EMPTY_SET"),
+          staticField(Collections.class.getCanonicalName(), "EMPTY_LIST"),
+          staticField(Collections.class.getCanonicalName(), "EMPTY_MAP"),
+          staticField(Collections.class.getCanonicalName(), "EMPTY_SET"),
           toType(
               MethodInvocationTree.class,
               allOf(
                   argumentCount(0),
                   anyOf(
                       staticMethod()
-                          .onClass(Collections.class.getName())
+                          .onClass(Collections.class.getCanonicalName())
                           .withNameMatching(EMPTY_INSTANCE_FACTORY_METHOD_PATTERN),
                       staticMethod()
                           .onDescendantOfAny(
-                              ImmutableCollection.class.getName(),
-                              ImmutableMap.class.getName(),
-                              ImmutableMultimap.class.getName(),
-                              List.class.getName(),
-                              Map.class.getName(),
-                              Set.class.getName(),
-                              Stream.class.getName())
+                              ImmutableCollection.class.getCanonicalName(),
+                              ImmutableMap.class.getCanonicalName(),
+                              ImmutableMultimap.class.getCanonicalName(),
+                              List.class.getCanonicalName(),
+                              Map.class.getCanonicalName(),
+                              Set.class.getCanonicalName(),
+                              Stream.class.getCanonicalName())
                           .named("of"),
                       staticMethod()
                           .onClassAny(
-                              Stream.class.getName(),
+                              Stream.class.getCanonicalName(),
                               "reactor.core.publisher.Flux",
                               "reactor.core.publisher.Mono",
                               "reactor.util.context.Context")

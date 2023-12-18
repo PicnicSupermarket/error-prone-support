@@ -86,7 +86,7 @@ public final class RedundantStringConversion extends BugChecker
   private static final Matcher<MethodInvocationTree> WELL_KNOWN_STRING_CONVERSION_METHODS =
       anyOf(
           instanceMethod()
-              .onDescendantOfAny(Object.class.getName())
+              .onDescendantOfAny(Object.class.getCanonicalName())
               .named("toString")
               .withNoParameters(),
           allOf(
@@ -100,7 +100,7 @@ public final class RedundantStringConversion extends BugChecker
                               .collect(toImmutableSet()))
                       .named("toString"),
                   allOf(
-                      staticMethod().onClass(String.class.getName()).named("valueOf"),
+                      staticMethod().onClass(String.class.getCanonicalName()).named("valueOf"),
                       not(
                           anyMethod()
                               .anyClass()
@@ -109,27 +109,29 @@ public final class RedundantStringConversion extends BugChecker
                                   ImmutableList.of(Suppliers.arrayOf(Suppliers.CHAR_TYPE))))))));
   private static final Matcher<ExpressionTree> STRINGBUILDER_APPEND_INVOCATION =
       instanceMethod()
-          .onDescendantOf(StringBuilder.class.getName())
+          .onDescendantOf(StringBuilder.class.getCanonicalName())
           .named("append")
-          .withParameters(String.class.getName());
+          .withParameters(String.class.getCanonicalName());
   private static final Matcher<ExpressionTree> STRINGBUILDER_INSERT_INVOCATION =
       instanceMethod()
-          .onDescendantOf(StringBuilder.class.getName())
+          .onDescendantOf(StringBuilder.class.getCanonicalName())
           .named("insert")
-          .withParameters(int.class.getName(), String.class.getName());
+          .withParameters(int.class.getCanonicalName(), String.class.getCanonicalName());
   private static final Matcher<ExpressionTree> FORMATTER_INVOCATION =
       anyOf(
-          staticMethod().onClass(String.class.getName()).named("format"),
-          instanceMethod().onDescendantOf(Formatter.class.getName()).named("format"),
+          staticMethod().onClass(String.class.getCanonicalName()).named("format"),
+          instanceMethod().onDescendantOf(Formatter.class.getCanonicalName()).named("format"),
           instanceMethod()
-              .onDescendantOfAny(PrintStream.class.getName(), PrintWriter.class.getName())
+              .onDescendantOfAny(
+                  PrintStream.class.getCanonicalName(), PrintWriter.class.getCanonicalName())
               .namedAnyOf("format", "printf"),
           instanceMethod()
-              .onDescendantOfAny(PrintStream.class.getName(), PrintWriter.class.getName())
+              .onDescendantOfAny(
+                  PrintStream.class.getCanonicalName(), PrintWriter.class.getCanonicalName())
               .namedAnyOf("print", "println")
-              .withParameters(Object.class.getName()),
+              .withParameters(Object.class.getCanonicalName()),
           staticMethod()
-              .onClass(Console.class.getName())
+              .onClass(Console.class.getCanonicalName())
               .namedAnyOf("format", "printf", "readline", "readPassword"));
   private static final Matcher<ExpressionTree> GUAVA_GUARD_INVOCATION =
       anyOf(

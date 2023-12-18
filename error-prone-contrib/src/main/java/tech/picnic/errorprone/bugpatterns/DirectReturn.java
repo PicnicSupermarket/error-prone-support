@@ -58,7 +58,10 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
   private static final Matcher<StatementTree> VARIABLE_RETURN = returnStatement(isVariable());
   private static final Matcher<ExpressionTree> MOCKITO_MOCK_OR_SPY_WITH_IMPLICIT_TYPE =
       allOf(
-          not(toType(MethodInvocationTree.class, argument(0, isSameType(Class.class.getName())))),
+          not(
+              toType(
+                  MethodInvocationTree.class,
+                  argument(0, isSameType(Class.class.getCanonicalName())))),
           staticMethod().onClass("org.mockito.Mockito").namedAnyOf("mock", "spy"));
 
   /** Instantiates a new {@link DirectReturn} instance. */
