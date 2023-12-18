@@ -1788,7 +1788,13 @@
                                     avoid that, so we simply tell Error Prone
                                     not to warn about generated code. -->
                                     -XepDisableWarningsInGeneratedCode
-                                    -XepExcludedPaths:\Q${project.build.directory}${file.separator}\E.*
+                                    <!-- XXX: Ideally we'd match against
+                                    `\Q${project.build.directory}${file.separator}\E.*`,
+                                    but that approach doesn't work on Windows,
+                                    as Error Prone matches against a path that
+                                    always contains forward-slash path
+                                    separators. -->
+                                    -XepExcludedPaths:.*/\Q${project.artifactId}\E/target/.*
                                     <!-- We don't target Android. -->
                                     -Xep:AndroidJdkLibsChecker:OFF
                                     <!-- XXX: Enable this once we open-source
