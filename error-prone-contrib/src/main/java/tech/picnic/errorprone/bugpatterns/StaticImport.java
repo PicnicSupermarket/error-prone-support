@@ -150,30 +150,26 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
    */
   static final ImmutableSetMultimap<String, String> STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
+          .putAll(Comparators.class.getCanonicalName(), "emptiesFirst", "emptiesLast")
+          .put(Function.class.getCanonicalName(), "identity")
+          .put(Functions.class.getCanonicalName(), "identity")
+          .put(ImmutableList.class.getCanonicalName(), "toImmutableList")
           .putAll(
               ImmutableListMultimap.class.getCanonicalName(),
               "flatteningToImmutableListMultimap",
               "toImmutableListMultimap")
-          .put(ImmutableList.class.getCanonicalName(), "toImmutableList")
           .put(ImmutableMap.class.getCanonicalName(), "toImmutableMap")
           .put(ImmutableMultiset.class.getCanonicalName(), "toImmutableMultiset")
           .put(ImmutableRangeSet.class.getCanonicalName(), "toImmutableRangeSet")
+          .put(ImmutableSet.class.getCanonicalName(), "toImmutableSet")
           .putAll(
               ImmutableSetMultimap.class.getCanonicalName(),
               "flatteningToImmutableSetMultimap",
               "toImmutableSetMultimap")
-          .put(ImmutableSet.class.getCanonicalName(), "toImmutableSet")
           .put(ImmutableSortedMap.class.getCanonicalName(), "toImmutableSortedMap")
           .put(ImmutableSortedMultiset.class.getCanonicalName(), "toImmutableSortedMultiset")
           .put(ImmutableSortedSet.class.getCanonicalName(), "toImmutableSortedSet")
           .put(ImmutableTable.class.getCanonicalName(), "toImmutableTable")
-          .put(Sets.class.getCanonicalName(), "toImmutableEnumSet")
-          .put(Functions.class.getCanonicalName(), "identity")
-          .put(ZoneOffset.class.getCanonicalName(), "UTC")
-          .put(Function.class.getCanonicalName(), "identity")
-          .put(Predicate.class.getCanonicalName(), "not")
-          .put(UUID.class.getCanonicalName(), "randomUUID")
-          .put("org.junit.jupiter.params.provider.Arguments", "arguments")
           .putAll(
               Objects.class.getCanonicalName(),
               "checkIndex",
@@ -182,7 +178,11 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
               "requireNonNull",
               "requireNonNullElse",
               "requireNonNullElseGet")
-          .putAll(Comparators.class.getCanonicalName(), "emptiesFirst", "emptiesLast")
+          .put(Predicate.class.getCanonicalName(), "not")
+          .put(Sets.class.getCanonicalName(), "toImmutableEnumSet")
+          .put(UUID.class.getCanonicalName(), "randomUUID")
+          .put(ZoneOffset.class.getCanonicalName(), "UTC")
+          .put("org.junit.jupiter.params.provider.Arguments", "arguments")
           .build();
 
   /** Instantiates a new {@link StaticImport} instance. */

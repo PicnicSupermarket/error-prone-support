@@ -66,12 +66,12 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
   @VisibleForTesting
   static final ImmutableSet<String> NON_STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of(
-          Strings.class.getCanonicalName(),
-          "com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode",
-          VisitorState.class.getCanonicalName(),
           ASTHelpers.class.getCanonicalName(),
           Clock.class.getCanonicalName(),
-          ZoneOffset.class.getCanonicalName());
+          Strings.class.getCanonicalName(),
+          VisitorState.class.getCanonicalName(),
+          ZoneOffset.class.getCanonicalName(),
+          "com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode");
 
   /**
    * Type members that should never be statically imported.
@@ -90,7 +90,6 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
   // specific context is left out.
   static final ImmutableSetMultimap<String, String> NON_STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
-          .put(Predicates.class.getCanonicalName(), "contains")
           .putAll(
               Collections.class.getCanonicalName(),
               "addAll",
@@ -105,6 +104,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
               "swap")
           .put(Locale.class.getCanonicalName(), "ROOT")
           .putAll(Pattern.class.getCanonicalName(), "compile", "matches", "quote")
+          .put(Predicates.class.getCanonicalName(), "contains")
           .put("org.springframework.http.MediaType", "ALL")
           .build();
 

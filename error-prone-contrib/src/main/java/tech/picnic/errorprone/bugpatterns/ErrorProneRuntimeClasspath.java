@@ -59,15 +59,21 @@ import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 public final class ErrorProneRuntimeClasspath extends BugChecker
     implements LiteralTreeMatcher, MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Pattern CLASSPATH_TYPES =
-      Pattern.compile(
-          "^(com\\.google\\.common\\..*|com\\.google\\.errorprone\\.([^\\.]+(?<!TestHelper)(\\..*)?)|java\\..*)$");
   private static final Matcher<ExpressionTree> GET_CANONICAL_NAME_INVOCATION =
       instanceMethod().onExactClass(Class.class.getCanonicalName()).named("getCanonicalName");
   private static final ImmutableSet<String> PRIMITIVE_TYPES =
       Primitives.allPrimitiveTypes().stream()
           .map(Class::getCanonicalName)
           .collect(toImmutableSet());
+
+  /**
+   * A pattern that matches fully qualified type names that are expected to be runtime dependencies
+   * of Error Prone, and that are thus presumed to be unconditionally present on a bug checker's
+   * runtime classpath.
+   */
+  private static final Pattern CLASSPATH_TYPES =
+      Pattern.compile(
+          "com\\.google\\.common\\..*|com\\.google\\.errorprone\\.([^\\.]+(?<!TestHelper)(\\..*)?)|java\\..*");
 
   /** Instantiates a new {@link ErrorProneRuntimeClasspath} instance. */
   public ErrorProneRuntimeClasspath() {}
