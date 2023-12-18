@@ -194,7 +194,7 @@
         <dependency>
             <groupId>org.openrewrite</groupId>
             <artifactId>rewrite-java-11</artifactId>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openrewrite</groupId>
@@ -270,11 +270,6 @@
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>refaster-support</artifactId>
                                 <version>${project.version}</version>
-                            </path>
-                            <path>
-                                <groupId>org.openrewrite</groupId>
-                                <artifactId>rewrite-templating</artifactId>
-                                <version>${version.rewrite-templating}</version>
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs combine.children="append">

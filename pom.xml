@@ -456,6 +456,13 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <!-- Specified as a workaround for
+            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
+            <dependency>
+                <groupId>org.openrewrite</groupId>
+                <artifactId>rewrite-templating</artifactId>
+                <version>${version.rewrite-templating}</version>
+            </dependency>
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
@@ -942,6 +949,11 @@
                                 <groupId>org.mockito</groupId>
                                 <artifactId>mockito-errorprone</artifactId>
                                 <version>${version.mockito}</version>
+                            </path>
+                            <path>
+                                <groupId>org.openrewrite</groupId>
+                                <artifactId>rewrite-templating</artifactId>
+                                <version>${version.rewrite-templating}</version>
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs>
