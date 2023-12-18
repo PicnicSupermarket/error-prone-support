@@ -11,6 +11,9 @@ permissions:
   contents: read
 jobs:
   analyze:
+    # Analysis of code in forked repositories is skipped, as such workflow runs
+    # do not have access to the requisite secrets.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       contents: read
     runs-on: ubuntu-22.04
