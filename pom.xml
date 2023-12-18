@@ -1794,7 +1794,7 @@
                                     as Error Prone matches against a path that
                                     always contains forward-slash path
                                     separators. -->
-                                    -XepExcludedPaths:.*/\Q${project.artifactId}\E/target/.*
+                                    -XepExcludedPaths:(?!.*/src/[^/]+/java/.*).*
                                     <!-- We don't target Android. -->
                                     -Xep:AndroidJdkLibsChecker:OFF
                                     <!-- XXX: Enable this once we open-source
