@@ -197,7 +197,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
   }
 
   // XXX: Resolve this suppression.
-  @SuppressWarnings("ImportSuggestion")
+  @SuppressWarnings("UnqualifiedSuggestedFixImport")
   private static Optional<SuggestedFix.Builder> constructFix(
       LambdaExpressionTree lambdaExpr, Symbol target, Object methodName) {
     Name sName = target.getSimpleName();

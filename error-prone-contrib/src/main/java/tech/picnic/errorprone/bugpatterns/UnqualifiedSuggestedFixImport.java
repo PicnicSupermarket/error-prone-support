@@ -26,17 +26,18 @@ import com.sun.source.tree.MethodInvocationTree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid direct invocation of `SuggestedFix#add{,Static}Import`",
-    link = BUG_PATTERNS_BASE_URL + "ImportSuggestion",
+    link = BUG_PATTERNS_BASE_URL + "UnqualifiedSuggestedFixImport",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)
-public final class ImportSuggestion extends BugChecker implements MethodInvocationTreeMatcher {
+public final class UnqualifiedSuggestedFixImport extends BugChecker
+    implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> FIX_BUILDER_METHOD =
       instanceMethod().onDescendantOf(SuggestedFix.Builder.class.getCanonicalName());
 
-  /** Instantiates a new {@link ImportSuggestion} instance. */
-  public ImportSuggestion() {}
+  /** Instantiates a new {@link UnqualifiedSuggestedFixImport} instance. */
+  public UnqualifiedSuggestedFixImport() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
