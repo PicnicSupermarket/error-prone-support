@@ -1238,6 +1238,7 @@
                             <includedLicense>EPL-2.0</includedLicense>
                             <includedLicense>GPL-2.0-with-classpath-exception</includedLicense>
                             <includedLicense>ICU</includedLicense>
+                            <includedLicense>LGPL-2.1+</includedLicense>
                             <includedLicense>LGPL-3.0+</includedLicense>
                             <includedLicense>MIT</includedLicense>
                             <includedLicense>MIT-0</includedLicense>
@@ -1301,6 +1302,7 @@
                                 EPL-2.0
                                 | Eclipse Public License - v 2.0
                                 | Eclipse Public License v2.0
+                                | EPL 2.0
                             </licenseMerge>
                             <licenseMerge>
                                 <!-- -->
@@ -1314,6 +1316,11 @@
                                 | GNU General Public License, version 2 (GPL2), with the classpath exception
                                 | GNU General Public License, version 2, with the Classpath Exception
                                 | GPL2 w/ CPE
+                            </licenseMerge>
+                            <licenseMerge>
+                                <!-- -->
+                                LGPL-2.1+
+                                | LGPL-2.1-or-later
                             </licenseMerge>
                             <licenseMerge>
                                 <!-- XXX: Get projects referencing just "LGPL"
