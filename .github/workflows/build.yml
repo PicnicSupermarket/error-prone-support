@@ -18,6 +18,10 @@ jobs:
             jdk: 17.0.8
             distribution: temurin
             experimental: false
+          - os: windows-2022
+            jdk: 17.0.8
+            distribution: temurin
+            experimental: false
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     steps:
