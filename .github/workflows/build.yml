@@ -42,8 +42,6 @@ jobs:
           cache: maven
       - name: Display build environment details
         run: mvn --version
-      - name: "TEST: Debug"
-        run: mvn help:effective-pom -pl :refaster-runner
       - name: Build project against vanilla Error Prone, compile Javadoc
         run: mvn -T1C install javadoc:jar
       - name: Build project with self-check against Error Prone fork
