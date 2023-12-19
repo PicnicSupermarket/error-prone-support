@@ -206,15 +206,9 @@
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.24.0</version.error-prone-orig>
-        <version.error-prone-slf4j>0.1.21</version.error-prone-slf4j>
-        <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>11</version.jdk>
         <version.maven>3.8.7</version.maven>
-        <version.mockito>5.8.0</version.mockito>
-        <version.nopen-checker>1.0.1</version.nopen-checker>
-        <version.nullaway>0.10.18</version.nullaway>
         <version.pitest-git>1.1.4</version.pitest-git>
-        <version.surefire>3.2.3</version.surefire>
     </properties>
 
     <dependencyManagement>
@@ -251,6 +245,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>error-prone-contrib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>refaster-compiler</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -283,6 +282,11 @@
             </dependency>
             <dependency>
                 <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service</artifactId>
+                <version>${version.auto-service}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.service</groupId>
                 <artifactId>auto-service-annotations</artifactId>
                 <version>${version.auto-service}</version>
             </dependency>
@@ -301,12 +305,10 @@
                 <artifactId>google-java-format</artifactId>
                 <version>1.19.1</version>
             </dependency>
-            <!-- Specified as a workaround for
-            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-beta-checker</artifactId>
-                <version>${version.guava-beta-checker}</version>
+                <version>1.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -320,19 +322,15 @@
                 <artifactId>truth</artifactId>
                 <version>1.2.0</version>
             </dependency>
-            <!-- Specified as a workaround for
-            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
                 <groupId>com.jakewharton.nopen</groupId>
                 <artifactId>nopen-checker</artifactId>
-                <version>${version.nopen-checker}</version>
+                <version>1.0.1</version>
             </dependency>
-            <!-- Specified as a workaround for
-            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway</artifactId>
-                <version>${version.nullaway}</version>
+                <version>0.10.18</version>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
@@ -371,12 +369,10 @@
                 <artifactId>jaxb-api</artifactId>
                 <version>2.3.1</version>
             </dependency>
-            <!-- Specified as a workaround for
-            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
                 <groupId>jp.skypencil.errorprone.slf4j</groupId>
                 <artifactId>errorprone-slf4j</artifactId>
-                <version>${version.error-prone-slf4j}</version>
+                <version>0.1.21</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -438,7 +434,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-bom</artifactId>
-                <version>${version.mockito}</version>
+                <version>5.8.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -884,18 +880,16 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
+                    <version>3.12.0</version>
                     <configuration>
                         <annotationProcessorPaths>
                             <path>
                                 <groupId>com.google.auto.value</groupId>
                                 <artifactId>auto-value</artifactId>
-                                <version>${version.auto-value}</version>
                             </path>
                             <path>
                                 <groupId>com.google.auto.service</groupId>
                                 <artifactId>auto-service</artifactId>
-                                <version>${version.auto-service}</version>
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs>
@@ -1144,7 +1138,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${version.surefire}</version>
+                    <version>3.2.3</version>
                     <configuration>
                         <includes>
                             <include>**/*Test.java</include>
@@ -1463,17 +1457,12 @@
             <!-- Error Prone checks that are not available from Maven Central;
             these are therefore not enabled by default. -->
             <id>non-maven-central</id>
-            <properties>
-                <version.reactor-error-prone>0.1.4</version.reactor-error-prone>
-            </properties>
             <dependencyManagement>
-                <!-- Specified as a workaround for
-                https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
                 <dependencies>
                     <dependency>
                         <groupId>com.github.lhotari</groupId>
                         <artifactId>reactor-error-prone</artifactId>
-                        <version>${version.reactor-error-prone}</version>
+                        <version>0.1.4</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -1487,7 +1476,6 @@
                                 <path>
                                     <groupId>com.github.lhotari</groupId>
                                     <artifactId>reactor-error-prone</artifactId>
-                                    <version>${version.reactor-error-prone}</version>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
@@ -1520,12 +1508,10 @@
                                 <path>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>error-prone-contrib</artifactId>
-                                    <version>${project.version}</version>
                                 </path>
                                 <path>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>refaster-runner</artifactId>
-                                    <version>${project.version}</version>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
@@ -1688,32 +1674,26 @@
                                 <path>
                                     <groupId>${groupId.error-prone}</groupId>
                                     <artifactId>error_prone_core</artifactId>
-                                    <version>${version.error-prone}</version>
                                 </path>
                                 <path>
                                     <groupId>com.google.guava</groupId>
                                     <artifactId>guava-beta-checker</artifactId>
-                                    <version>${version.guava-beta-checker}</version>
                                 </path>
                                 <path>
                                     <groupId>com.jakewharton.nopen</groupId>
                                     <artifactId>nopen-checker</artifactId>
-                                    <version>${version.nopen-checker}</version>
                                 </path>
                                 <path>
                                     <groupId>com.uber.nullaway</groupId>
                                     <artifactId>nullaway</artifactId>
-                                    <version>${version.nullaway}</version>
                                 </path>
                                 <path>
                                     <groupId>jp.skypencil.errorprone.slf4j</groupId>
                                     <artifactId>errorprone-slf4j</artifactId>
-                                    <version>${version.error-prone-slf4j}</version>
                                 </path>
                                 <path>
                                     <groupId>org.mockito</groupId>
                                     <artifactId>mockito-errorprone</artifactId>
-                                    <version>${version.mockito}</version>
                                 </path>
                             </annotationProcessorPaths>
                             <compilerArgs combine.children="append">

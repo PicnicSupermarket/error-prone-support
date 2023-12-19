@@ -66,7 +66,7 @@ it, read the installation guide for Maven or Gradle below.
                    <groupId>org.apache.maven.plugins</groupId>
                    <artifactId>maven-compiler-plugin</artifactId>
                    <!-- Prefer using the latest release. -->
-                   <version>3.11.0</version>
+                   <version>3.12.0</version>
                    <configuration>
                        <annotationProcessorPaths>
                            <!-- Error Prone itself. -->
