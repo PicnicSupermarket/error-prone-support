@@ -318,7 +318,7 @@
             <dependency>
                 <groupId>com.google.truth</groupId>
                 <artifactId>truth</artifactId>
-                <version>1.1.5</version>
+                <version>1.2.0</version>
             </dependency>
             <!-- Specified as a workaround for
             https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
