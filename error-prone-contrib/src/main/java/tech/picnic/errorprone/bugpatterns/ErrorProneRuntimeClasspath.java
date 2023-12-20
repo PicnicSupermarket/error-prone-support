@@ -73,7 +73,7 @@ public final class ErrorProneRuntimeClasspath extends BugChecker
    */
   private static final Pattern CLASSPATH_TYPES =
       Pattern.compile(
-          "com\\.google\\.common\\..*|com\\.google\\.errorprone\\.([^\\.]+(?<!TestHelper)(\\..*)?)|java\\..*");
+          "com\\.google\\.common\\..*|com\\.google\\.errorprone\\.([^.]+(?<!TestHelper)(\\..*)?)|java\\..*");
 
   /** Instantiates a new {@link ErrorProneRuntimeClasspath} instance. */
   public ErrorProneRuntimeClasspath() {}
