@@ -214,7 +214,7 @@
         <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.10.18</version.nullaway>
         <version.pitest-git>1.1.4</version.pitest-git>
-        <version.rewrite-templating>1.3.12</version.rewrite-templating>
+        <version.rewrite-templating>1.3.13</version.rewrite-templating>
         <version.surefire>3.2.3</version.surefire>
     </properties>
 
