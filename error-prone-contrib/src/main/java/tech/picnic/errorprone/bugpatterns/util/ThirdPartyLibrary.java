@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.bugpatterns.util;
 
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.suppliers.Supplier;
@@ -31,7 +32,7 @@ public enum ThirdPartyLibrary {
    *
    * @see <a href="https://github.com/google/guava">Guava on GitHub</a>
    */
-  GUAVA("com.google.common.collect.ImmutableList"),
+  GUAVA(ImmutableList.class.getCanonicalName()),
   /**
    * VMWare's Project Reactor.
    *
@@ -66,7 +67,14 @@ public enum ThirdPartyLibrary {
     return canUse.get(state);
   }
 
-  private static boolean canIntroduceUsage(String className, VisitorState state) {
+  /**
+   * Tells whether the given fully qualified type is available on the current class path.
+   *
+   * @param className The type of interest.
+   * @param state The context under consideration.
+   * @return {@code true} iff it is okay to assume or create a dependency on this type.
+   */
+  public static boolean canIntroduceUsage(String className, VisitorState state) {
     return shouldIgnoreClasspath(state) || isKnownClass(className, state);
   }
 

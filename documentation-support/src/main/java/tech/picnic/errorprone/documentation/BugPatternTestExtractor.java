@@ -67,7 +67,7 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
                 "com.google.errorprone.CompilationTestHelper",
                 "com.google.errorprone.BugCheckerRefactoringTestHelper")
             .named("newInstance")
-            .withParameters("java.lang.Class", "java.lang.Class");
+            .withParameters(Class.class.getCanonicalName(), Class.class.getCanonicalName());
     private static final Matcher<ExpressionTree> IDENTIFICATION_SOURCE_LINES =
         instanceMethod()
             .onDescendantOf("com.google.errorprone.CompilationTestHelper")

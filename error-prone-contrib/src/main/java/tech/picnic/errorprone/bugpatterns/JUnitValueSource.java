@@ -24,6 +24,8 @@ import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.HAS_METH
 import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.getMethodSourceFactoryNames;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
@@ -106,8 +108,8 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
                       DoubleStream.class.getCanonicalName(),
                       List.class.getCanonicalName(),
                       Set.class.getCanonicalName(),
-                      "com.google.common.collect.ImmutableList",
-                      "com.google.common.collect.ImmutableSet")
+                      ImmutableList.class.getCanonicalName(),
+                      ImmutableSet.class.getCanonicalName())
                   .named("of"),
               hasArguments(AT_LEAST_ONE, anything()),
               hasArguments(ALL, SUPPORTED_VALUE_FACTORY_VALUES)));
