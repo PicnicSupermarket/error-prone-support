@@ -99,33 +99,6 @@ public final class ErrorProneRuntimeClasspath extends BugChecker
         .build();
   }
 
-  private static SuggestedFix trySuggestClassReference(
-      LiteralTree tree, String value, VisitorState state) {
-    if (isTypeOnClasspath(value, state)) {
-      return suggestClassReference(tree, value, "", state);
-    }
-
-    int lastDot = value.lastIndexOf('.');
-    String type = value.substring(0, lastDot);
-    if (isTypeOnClasspath(type, state)) {
-      return suggestClassReference(tree, type, value.substring(lastDot), state);
-    }
-
-    return SuggestedFix.emptyFix();
-  }
-
-  private static SuggestedFix suggestClassReference(
-      LiteralTree original, String type, String suffix, VisitorState state) {
-    SuggestedFix.Builder fix = SuggestedFix.builder();
-    String identifier = SuggestedFixes.qualifyType(state, fix, type);
-    return fix.replace(
-            original,
-            identifier
-                + ".class.getCanonicalName()"
-                + (suffix.isEmpty() ? "" : (" + " + Constants.format(suffix))))
-        .build();
-  }
-
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     if (!GET_CANONICAL_NAME_INVOCATION.matches(tree, state)) {
@@ -150,6 +123,33 @@ public final class ErrorProneRuntimeClasspath extends BugChecker
         .addFix(
             SuggestedFix.replace(
                 tree, Constants.format(receiver.owner.getQualifiedName().toString())))
+        .build();
+  }
+
+  private static SuggestedFix trySuggestClassReference(
+      LiteralTree tree, String value, VisitorState state) {
+    if (isTypeOnClasspath(value, state)) {
+      return suggestClassReference(tree, value, "", state);
+    }
+
+    int lastDot = value.lastIndexOf('.');
+    String type = value.substring(0, lastDot);
+    if (isTypeOnClasspath(type, state)) {
+      return suggestClassReference(tree, type, value.substring(lastDot), state);
+    }
+
+    return SuggestedFix.emptyFix();
+  }
+
+  private static SuggestedFix suggestClassReference(
+      LiteralTree original, String type, String suffix, VisitorState state) {
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+    String identifier = SuggestedFixes.qualifyType(state, fix, type);
+    return fix.replace(
+            original,
+            identifier
+                + ".class.getCanonicalName()"
+                + (suffix.isEmpty() ? "" : (" + " + Constants.format(suffix))))
         .build();
   }
 
