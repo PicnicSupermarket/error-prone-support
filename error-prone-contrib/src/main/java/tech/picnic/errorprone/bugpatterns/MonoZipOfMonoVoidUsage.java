@@ -31,22 +31,20 @@ import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 /**
- * A {@link BugChecker} that flags usages of {@link
- * reactor.core.publisher.Mono#zip(reactor.core.publisher.Mono, reactor.core.publisher.Mono)} and
- * {@link reactor.core.publisher.Mono#zipWith(reactor.core.publisher.Mono)} with {@link
- * reactor.core.publisher.Mono#empty()} parameters.
+ * A {@link BugChecker} that flags usages of {@link Mono#zip(Mono, Mono)} and {@link
+ * Mono#zipWith(Mono)} with {@link Mono#empty()} parameters.
  *
- * <p>{@link reactor.core.publisher.Mono#zip(reactor.core.publisher.Mono,
- * reactor.core.publisher.Mono)} and {@link
- * reactor.core.publisher.Mono#zipWith(reactor.core.publisher.Mono)} perform incorrectly upon
- * retrieval of the empty publisher and prematurely terminates the reactive chain from the
- * execution. In most cases this is not the desired behaviour.
+ * <p>{@link Mono#zip(Mono, Mono)} and {@link Mono#zipWith(Mono)} perform incorrectly upon retrieval
+ * of the empty publisher and prematurely terminates the reactive chain from the execution. In most
+ * cases this is not the desired behaviour.
  *
- * <p>NB: {@code Mono<?>.zipWith(Mono<Void>)} is allowed by the Reactor API, but it is an incorrect
- * usage of the API. It will be flagged by ErrorProne but the fix won't be supplied. The problem
- * with the original code should be revisited and fixed in a structural manner by the developer.
+ * @apiNote {@code Mono<?>.zipWith(Mono<Void>)} is allowed by the Reactor API, but it is an
+ *     incorrect usage of the API. It will be flagged by ErrorProne but the fix won't be supplied.
+ *     The problem with the original code should be revisited and fixed in a structural manner by
+ *     the developer.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -60,14 +58,14 @@ import java.util.Optional;
 public final class MonoZipOfMonoVoidUsage extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Supplier<Type> MONO = type("reactor.core.publisher.Mono");
+  private static final Supplier<Type> MONO_SUPPLIER = type("reactor.core.publisher.Mono");
 
   /**
    * In fact, we use {@code Mono<Void>} everywhere in codebases instead of {@code Mono<Object>}
-   * (actual return type of {@code Mono.empty()}) to represent empty publisher.
+   * (actual return type of {@link Mono#empty()}) to represent empty publisher.
    */
-  private static final Supplier<Type> MONO_VOID_TYPE =
-      VisitorState.memoize(generic(MONO, type("java.lang.Void")));
+  private static final Supplier<Type> MONO_VOID_TYPE_SUPPLIER =
+      VisitorState.memoize(generic(MONO_SUPPLIER, type(Void.class.getCanonicalName())));
 
   private static final String MONO_ZIP_WITH_METHOD = "zipWith";
   private static final String MONO_ZIP_METHOD = "zip";
@@ -75,31 +73,35 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
   private static final Matcher<ExpressionTree> ANY_MONO_VOID_IN_PUBLISHERS =
       anyOf(
           allOf(
-              instanceMethod().onDescendantOf(MONO).named(MONO_ZIP_WITH_METHOD),
-              toType(MethodInvocationTree.class, hasGenericArgumentOfExactType(MONO_VOID_TYPE))),
-          allOf(
-              instanceMethod().onDescendantOf(MONO).named(MONO_ZIP_WITH_METHOD),
+              instanceMethod().onDescendantOf(MONO_SUPPLIER).named(MONO_ZIP_WITH_METHOD),
               toType(
                   MethodInvocationTree.class,
-                  argument(0, staticMethod().onClass(MONO).named(MONO_EMPTY_METHOD)))),
-          onClassWithMethodName(MONO_VOID_TYPE, MONO_ZIP_WITH_METHOD),
+                  hasGenericArgumentOfExactType(MONO_VOID_TYPE_SUPPLIER))),
           allOf(
-              staticMethod().onClass(MONO).named(MONO_ZIP_METHOD),
-              toType(MethodInvocationTree.class, hasGenericArgumentOfExactType(MONO_VOID_TYPE))),
+              instanceMethod().onDescendantOf(MONO_SUPPLIER).named(MONO_ZIP_WITH_METHOD),
+              toType(
+                  MethodInvocationTree.class,
+                  argument(0, staticMethod().onClass(MONO_SUPPLIER).named(MONO_EMPTY_METHOD)))),
+          onClassWithMethodName(MONO_VOID_TYPE_SUPPLIER, MONO_ZIP_WITH_METHOD),
           allOf(
-              staticMethod().onClass(MONO).named(MONO_ZIP_METHOD),
+              staticMethod().onClass(MONO_SUPPLIER).named(MONO_ZIP_METHOD),
+              toType(
+                  MethodInvocationTree.class,
+                  hasGenericArgumentOfExactType(MONO_VOID_TYPE_SUPPLIER))),
+          allOf(
+              staticMethod().onClass(MONO_SUPPLIER).named(MONO_ZIP_METHOD),
               toType(
                   MethodInvocationTree.class,
                   hasArguments(
-                      AT_LEAST_ONE, staticMethod().onClass(MONO).named(MONO_EMPTY_METHOD)))));
+                      AT_LEAST_ONE,
+                      staticMethod().onClass(MONO_SUPPLIER).named(MONO_EMPTY_METHOD)))));
 
   /** Instantiates a new {@link MonoZipOfMonoVoidUsage} instance. */
   public MonoZipOfMonoVoidUsage() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    boolean emptyPublisherMatches = ANY_MONO_VOID_IN_PUBLISHERS.matches(tree, state);
-    if (!emptyPublisherMatches) {
+    if (!ANY_MONO_VOID_IN_PUBLISHERS.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
@@ -146,7 +148,7 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
    *
    * <ul>
    *   <li>either we have explicit variable declared and the provided type which will be inferred,
-   *   <li>or we have a method invocation, like {@code Mono.just(Object)} or {@code Mono.empty()},
+   *   <li>or we have a method invocation, like {@link Mono#just(Object)} or {@link Mono#empty()},
    *       for which we can also infer type.
    * </ul>
    *
