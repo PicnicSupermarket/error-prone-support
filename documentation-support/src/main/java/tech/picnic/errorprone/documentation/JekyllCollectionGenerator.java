@@ -125,7 +125,7 @@ public final class JekyllCollectionGenerator {
     }
 
     void foo(Path root) throws IOException {
-      ImmutableList<JekyllBugPatternDescription> checks = getJekyllBugPatternDescriptions();
+      ImmutableList<JekyllBugPatternDescription> checks = getJekyllBugPatternDescriptions(root);
       ImmutableList<JekyllRefasterRuleCollectionDescription> rules =
           getJekyllRefasterRuleCollectionDescription();
 
@@ -162,7 +162,7 @@ public final class JekyllCollectionGenerator {
       }
     }
 
-    private ImmutableList<JekyllBugPatternDescription> getJekyllBugPatternDescriptions() {
+    private ImmutableList<JekyllBugPatternDescription> getJekyllBugPatternDescriptions(Path root) {
       ImmutableListMultimap<String, TestEntry> bugPatternTestCases =
           bugPatternTests.stream()
               .flatMap(testCases -> testCases.testCases().stream())
@@ -180,7 +180,7 @@ public final class JekyllCollectionGenerator {
                       b.severityLevel(),
                       b.tags(),
                       // XXX: Derive `Path` from filesytem.
-                      Path.of(b.source()).toString(),
+                      Path.of(b.source()).relativize(root).toString(),
                       bugPatternTestCases.get(b.fullyQualifiedName()).stream()
                           .filter(t -> t.type() == TestEntry.TestType.IDENTIFICATION)
                           .map(t -> ((IdentificationTestEntry) t).code())
