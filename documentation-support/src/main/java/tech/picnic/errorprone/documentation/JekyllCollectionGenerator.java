@@ -14,8 +14,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.patch.Patch;
@@ -51,11 +49,6 @@ import tech.picnic.errorprone.documentation.models.RefasterTemplateTestData;
 
 // XXX: Rename this class. Then also update the reference in `website/.gitignore`.
 public final class JekyllCollectionGenerator {
-  // XXX: Dedup with DocumentationGeneratorTaskListener.
-  private static final ObjectMapper OBJECT_MAPPER =
-      new ObjectMapper()
-          .setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
-          .registerModules(new GuavaModule(), new ParameterNamesModule());
   // XXX: Find a bette name. Also, externalize this.
   private static final PathMatcher PATH_MATCHER =
       FileSystems.getDefault().getPathMatcher("glob:**/target/docs/*.json");
@@ -100,7 +93,7 @@ public final class JekyllCollectionGenerator {
         new ArrayList<>();
 
     @Override
-    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
       if (!PATH_MATCHER.matches(file)) {
         return FileVisitResult.CONTINUE;
       }
@@ -110,12 +103,12 @@ public final class JekyllCollectionGenerator {
       // XXX: Alternatively, use polymorphism and let Jackson figure it out.
       String fileName = file.getFileName().toString();
       if (fileName.startsWith("bugpattern-test")) {
-        bugPatternTests.add(OBJECT_MAPPER.readValue(file.toFile(), TestCases.class));
+        bugPatternTests.add(Json.read(file, TestCases.class));
       } else if (fileName.startsWith("bugpattern")) {
-        bugPatterns.add(OBJECT_MAPPER.readValue(file.toFile(), BugPatternDocumentation.class));
+        bugPatterns.add(Json.read(file, BugPatternDocumentation.class));
       } else if (fileName.startsWith("refaster-test")) {
         refasterTemplateCollectionTests.add(
-            OBJECT_MAPPER.readValue(file.toFile(), RefasterTemplateCollectionTestData.class));
+            Json.read(file, RefasterTemplateCollectionTestData.class));
       } else {
         // XXX: Handle differently?
         throw new IllegalStateException("Unexpected file: " + fileName);

@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableList;
 // XXX: This class is not yet used.
 @AutoValue
 @JsonDeserialize(as = AutoValue_RefasterTemplateCollectionData.class)
-public abstract class RefasterTemplateCollectionData {
+abstract class RefasterTemplateCollectionData {
   static RefasterTemplateCollectionData create(
       String name, String description, String link, ImmutableList<RefasterTemplateData> templates) {
     return new AutoValue_RefasterTemplateCollectionData(name, description, link, templates);
