@@ -93,6 +93,9 @@ public final class BugPatternExtractor implements Extractor<BugPatternDocumentat
     return (T) value;
   }
 
+  // XXX: Here and below: Test (serialization round trips. And given that the only "production"
+  // reader of the serialized data is also defined in this package, perhaps we don't need to
+  // validate the serialized format.
   @AutoValue
   @JsonDeserialize(as = AutoValue_BugPatternExtractor_BugPatternDocumentation.class)
   abstract static class BugPatternDocumentation {

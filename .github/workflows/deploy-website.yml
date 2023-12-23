@@ -48,16 +48,22 @@ jobs:
           bundler-cache: true
       - name: Configure Github Pages
         uses: actions/configure-pages@1f0c5cde4bc74cd7e1254d0cb4de8d49e9068c7d # v4.0.0
+      - name: Set up JDK
+        uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
+        with:
+          java-version: 17.0.8
+          distribution: temurin
+          cache: maven
+      - name: Compile project and extract data
+        run: mvn -T1C clean install -DskipTests -Dverification.skip -Pdocgen
       - name: Generate documentation
-        run: ./generate-docs.sh
+        run: mvn exec:java@generate-docs -pl documentation-support
       - name: Build website with Jekyll
         working-directory: ./website
         run: bundle exec jekyll build
       - name: Validate HTML output
         working-directory: ./website
-        # XXX: Drop `--disable_external true` once we fully adopted the
-        # "Refaster rules" terminology on our website and in the code.
-        run: bundle exec htmlproofer --disable_external true --check-external-hash false ./_site
+        run: bundle exec htmlproofer --no-check-external-hash ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:

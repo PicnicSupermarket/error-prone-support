@@ -1,0 +1,6 @@
+ERROR:
+  color: red
+WARNING:
+  color: yellow
+SUGGESTION:
+  color: green

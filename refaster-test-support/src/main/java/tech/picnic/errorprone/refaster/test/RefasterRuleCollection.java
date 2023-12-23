@@ -9,6 +9,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.util.Comparator.naturalOrder;
 import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_RULES_PATTERN_FLAG;
 
+import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableRangeMap;
@@ -21,6 +22,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
+import com.google.errorprone.FileObjects;
 import com.google.errorprone.SubContext;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -38,12 +40,14 @@ import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.util.Position;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
+import javax.tools.JavaFileObject;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.runner.CodeTransformers;
 import tech.picnic.errorprone.refaster.runner.Refaster;
@@ -122,12 +126,26 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
   public static void validate(Class<?> clazz) {
     String className = clazz.getSimpleName();
 
+    JavaFileObject inputFile =
+        FileObjects.forResource(clazz, "input/" + className + "TestInput.java");
+    JavaFileObject outputFile =
+        FileObjects.forResource(clazz, "output/" + className + "TestOutput.java");
+
+    String inputContent;
+    String outputContent;
+    try {
+      inputContent = inputFile.getCharContent(true).toString();
+      outputContent = outputFile.getCharContent(true).toString();
+    } catch (IOException e) {
+      throw new VerifyException(e);
+    }
+
     BugCheckerRefactoringTestHelper.newInstance(RefasterRuleCollection.class, clazz)
         .setArgs(
             "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
             "-XepOpt:" + RULE_COLLECTION_FLAG + '=' + className)
-        .addInput(className + "TestInput.java")
-        .addOutput(className + "TestOutput.java")
+        .addInputLines(inputFile.getName(), inputContent.replace(".input", ""))
+        .addOutputLines(outputFile.getName(), outputContent.replace(".output", ""))
         .doTest(TestMode.TEXT_MATCH);
   }
 

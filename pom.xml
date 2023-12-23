@@ -358,6 +358,11 @@
                 <version>${version.nullaway}</version>
             </dependency>
             <dependency>
+                <groupId>io.github.java-diff-utils</groupId>
+                <artifactId>java-diff-utils</artifactId>
+                <version>4.12</version>
+            </dependency>
+            <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
                 <version>2023.0.4</version>
@@ -1742,6 +1747,11 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-enforcer-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.1.1</version>
                     </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
