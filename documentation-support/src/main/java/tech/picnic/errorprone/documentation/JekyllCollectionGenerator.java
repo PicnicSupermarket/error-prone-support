@@ -1,23 +1,25 @@
 package tech.picnic.errorprone.documentation;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableListMultimap.flatteningToImmutableListMultimap;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableTable.toImmutableTable;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.patch.Patch;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -57,21 +59,16 @@ public final class JekyllCollectionGenerator {
   private JekyllCollectionGenerator() {}
 
   public static void main(String[] args) throws IOException {
-    // XXX: Add validation.
-    Path root = Paths.get(args[0]).toAbsolutePath();
+    checkArgument(args.length == 1, "Precisely one project root path must be provided");
+    Path projectRoot = Paths.get(args[0]).toAbsolutePath();
 
-    // Find all JSON files matching one of the expected file formats.
-    // Deserialized and collect accordingly.
-    // Construct the relevant Jekyll collection files.
-    // Output them to the website's source directory.
+    generateIndex(projectRoot);
+    PageGenerator.apply(projectRoot);
+  }
 
-    DataCollector dataCollector = new DataCollector();
-
-    Files.walkFileTree(root, dataCollector);
-    dataCollector.foo(root);
-
+  private static void generateIndex(Path projectRoot) throws IOException {
     try (BufferedWriter writer =
-        Files.newBufferedWriter(root.resolve("website").resolve("index.md"))) {
+        Files.newBufferedWriter(projectRoot.resolve("website").resolve("index.md"), UTF_8)) {
       writer.write("---");
       writer.newLine();
       writer.write("layout: default");
@@ -80,17 +77,33 @@ public final class JekyllCollectionGenerator {
       writer.newLine();
       writer.write("---");
       writer.newLine();
-      writer.write(Files.readString(root.resolve("README.md")).replace("=\"website/", "=\""));
+      writer.write(
+          Files.readString(projectRoot.resolve("README.md")).replace("=\"website/", "=\""));
     }
   }
 
-  // XXX: Name.
-  private static final class DataCollector extends SimpleFileVisitor<Path> {
+  // XXX: Review this class should be split in two: one for bug patterns and one for Refaster rules.
+  private static final class PageGenerator extends SimpleFileVisitor<Path> {
+    private static final Splitter LINE_SPLITTER = Splitter.on(System.lineSeparator());
+    private static final YAMLMapper YAML_MAPPER =
+        YAMLMapper.builder()
+            .visibility(PropertyAccessor.FIELD, Visibility.ANY)
+            .disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET)
+            .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
+            .enable(YAMLGenerator.Feature.USE_PLATFORM_LINE_BREAKS)
+            .build();
+
     // XXX: Rename the data types?
     private final List<BugPatternDocumentation> bugPatterns = new ArrayList<>();
     private final List<TestCases> bugPatternTests = new ArrayList<>();
     private final List<RefasterTemplateCollectionTestData> refasterTemplateCollectionTests =
         new ArrayList<>();
+
+    static void apply(Path projectRoot) throws IOException {
+      PageGenerator pageGenerator = new PageGenerator();
+      Files.walkFileTree(projectRoot, pageGenerator);
+      pageGenerator.writePages(projectRoot);
+    }
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
@@ -117,45 +130,35 @@ public final class JekyllCollectionGenerator {
       return FileVisitResult.CONTINUE;
     }
 
-    void foo(Path root) throws IOException {
-      ImmutableList<JekyllBugPatternDescription> checks = getJekyllBugPatternDescriptions(root);
-      ImmutableList<JekyllRefasterRuleCollectionDescription> rules =
-          getJekyllRefasterRuleCollectionDescription();
+    private void writePages(Path projectRoot) throws IOException {
+      Path website = projectRoot.resolve("website");
+      writePages(
+          website.resolve("_bugpatterns"),
+          getJekyllBugPatternDescriptions(projectRoot),
+          JekyllBugPatternDescription::name);
+      writePages(
+          website.resolve("_refasterrules"),
+          getJekyllRefasterRuleCollectionDescription(),
+          JekyllRefasterRuleCollectionDescription::name);
+    }
 
-      // XXX: Move/extract/rename.
-      ObjectMapper mapper =
-          YAMLMapper.builder()
-              .visibility(PropertyAccessor.FIELD, Visibility.ANY)
-              .disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET)
-              .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
-              .enable(YAMLGenerator.Feature.USE_PLATFORM_LINE_BREAKS)
-              .build();
-
-      for (JekyllBugPatternDescription check : checks) {
-        Path directory = root.resolve("website").resolve("_bugpatterns");
+    private static <T> void writePages(
+        Path directory, ImmutableList<T> documents, Function<T, String> nameExtractor)
+        throws IOException {
+      for (T document : documents) {
         Files.createDirectories(directory);
         try (BufferedWriter writer =
-            Files.newBufferedWriter(directory.resolve(check.name() + ".md"))) {
-          mapper.writeValue(writer, check);
-          writer.write("---");
-          writer.newLine();
-        }
-      }
-
-      // XXX: Dedup this logic and the code above.
-      for (JekyllRefasterRuleCollectionDescription rule : rules) {
-        Path directory = root.resolve("website").resolve("_refasterrules");
-        Files.createDirectories(directory);
-        try (BufferedWriter writer =
-            Files.newBufferedWriter(directory.resolve(rule.name() + ".md"))) {
-          mapper.writeValue(writer, rule);
+            Files.newBufferedWriter(
+                directory.resolve(nameExtractor.apply(document) + ".md"), UTF_8)) {
+          YAML_MAPPER.writeValue(writer, document);
           writer.write("---");
           writer.newLine();
         }
       }
     }
 
-    private ImmutableList<JekyllBugPatternDescription> getJekyllBugPatternDescriptions(Path root) {
+    private ImmutableList<JekyllBugPatternDescription> getJekyllBugPatternDescriptions(
+        Path projectRoot) {
       ImmutableListMultimap<String, TestEntry> bugPatternTestCases =
           bugPatternTests.stream()
               .flatMap(testCases -> testCases.testCases().stream())
@@ -173,7 +176,7 @@ public final class JekyllCollectionGenerator {
                       b.severityLevel(),
                       b.tags(),
                       // XXX: Derive `Path` from filesytem.
-                      Path.of(b.source()).relativize(root).toString(),
+                      Path.of(b.source()).relativize(projectRoot).toString(),
                       bugPatternTestCases.get(b.fullyQualifiedName()).stream()
                           .filter(t -> t.type() == TestEntry.TestType.IDENTIFICATION)
                           .map(t -> ((IdentificationTestEntry) t).code())
@@ -251,8 +254,8 @@ public final class JekyllCollectionGenerator {
 
     private static String generateDiff(String before, String after) {
       // XXX: Extract splitter.
-      List<String> originalLines = Splitter.on(System.lineSeparator()).splitToList(before);
-      List<String> replacementLines = Splitter.on(System.lineSeparator()).splitToList(after);
+      List<String> originalLines = LINE_SPLITTER.splitToList(before);
+      List<String> replacementLines = LINE_SPLITTER.splitToList(after);
 
       Patch<String> diff = DiffUtils.diff(originalLines, replacementLines);
 
