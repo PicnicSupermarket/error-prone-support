@@ -75,6 +75,8 @@ public final class JekyllCollectionGenerator {
       writer.newLine();
       writer.write("title: Home");
       writer.newLine();
+      writer.write("nav_order: 1");
+      writer.newLine();
       writer.write("---");
       writer.newLine();
       writer.write(
