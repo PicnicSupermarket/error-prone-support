@@ -13,6 +13,8 @@ import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -30,6 +32,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.SimpleTreeVisitor;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -118,14 +121,14 @@ public final class FormatStringConcatenation extends BugChecker
   private static final Matcher<ExpressionTree> GUAVA_FORMAT_METHOD =
       anyOf(
           staticMethod()
-              .onClass("com.google.common.base.Preconditions")
+              .onClass(Preconditions.class.getCanonicalName())
               .namedAnyOf("checkArgument", "checkNotNull", "checkState"),
-          staticMethod().onClass("com.google.common.base.Verify").named("verify"));
+          staticMethod().onClass(Verify.class.getCanonicalName()).named("verify"));
   // XXX: Add `PrintWriter`, maybe others.
   private static final Matcher<ExpressionTree> JDK_FORMAT_METHOD =
       anyOf(
-          staticMethod().onClass("java.lang.String").named("format"),
-          instanceMethod().onExactClass("java.util.Formatter").named("format"));
+          staticMethod().onClass(String.class.getCanonicalName()).named("format"),
+          instanceMethod().onExactClass(Formatter.class.getCanonicalName()).named("format"));
   private static final Matcher<ExpressionTree> SLF4J_FORMAT_METHOD =
       instanceMethod()
           .onDescendantOf("org.slf4j.Logger")

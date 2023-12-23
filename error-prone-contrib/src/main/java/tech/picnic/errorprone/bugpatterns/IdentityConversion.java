@@ -10,6 +10,17 @@ import static com.google.errorprone.suppliers.Suppliers.OBJECT_TYPE;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableRangeMap;
+import com.google.common.collect.ImmutableRangeSet;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.ImmutableTable;
 import com.google.common.primitives.Primitives;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
@@ -20,6 +31,7 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ASTHelpers.TargetType;
 import com.sun.source.tree.ExpressionTree;
@@ -59,21 +71,19 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
           staticMethod().onClass(String.class.getCanonicalName()).named("valueOf"),
           staticMethod()
               .onClassAny(
-                  "com.google.common.collect.ImmutableBiMap",
-                  "com.google.common.collect.ImmutableList",
-                  "com.google.common.collect.ImmutableListMultimap",
-                  "com.google.common.collect.ImmutableMap",
-                  "com.google.common.collect.ImmutableMultimap",
-                  "com.google.common.collect.ImmutableMultiset",
-                  "com.google.common.collect.ImmutableRangeMap",
-                  "com.google.common.collect.ImmutableRangeSet",
-                  "com.google.common.collect.ImmutableSet",
-                  "com.google.common.collect.ImmutableSetMultimap",
-                  "com.google.common.collect.ImmutableTable")
+                  ImmutableBiMap.class.getCanonicalName(),
+                  ImmutableList.class.getCanonicalName(),
+                  ImmutableListMultimap.class.getCanonicalName(),
+                  ImmutableMap.class.getCanonicalName(),
+                  ImmutableMultimap.class.getCanonicalName(),
+                  ImmutableMultiset.class.getCanonicalName(),
+                  ImmutableRangeMap.class.getCanonicalName(),
+                  ImmutableRangeSet.class.getCanonicalName(),
+                  ImmutableSet.class.getCanonicalName(),
+                  ImmutableSetMultimap.class.getCanonicalName(),
+                  ImmutableTable.class.getCanonicalName())
               .named("copyOf"),
-          staticMethod()
-              .onClass("com.google.errorprone.matchers.Matchers")
-              .namedAnyOf("allOf", "anyOf"),
+          staticMethod().onClass(Matchers.class.getCanonicalName()).namedAnyOf("allOf", "anyOf"),
           staticMethod().onClass("reactor.adapter.rxjava.RxJava2Adapter"),
           staticMethod()
               .onClass("reactor.core.publisher.Flux")

@@ -100,7 +100,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#justOrEmpty(Object)} over more contrived alternatives. */
-  static final class MonoJustOrEmptyObject<@Nullable T> {
+  static final class MonoJustOrEmptyObject<T extends @Nullable Object> {
     @BeforeTemplate
     Mono<T> before(T value) {
       return Mono.justOrEmpty(Optional.ofNullable(value));

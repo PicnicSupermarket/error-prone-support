@@ -22,6 +22,10 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import java.io.InputStream;
+import java.time.ZoneId;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * A {@link BugChecker} that flags {@code @RequestMapping} methods that have one or more parameters
@@ -70,10 +74,10 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
                           isType(ANN_PACKAGE_PREFIX + "RequestHeader"),
                           isType(ANN_PACKAGE_PREFIX + "RequestParam"),
                           isType(ANN_PACKAGE_PREFIX + "RequestPart"))),
-                  isSameType("java.io.InputStream"),
-                  isSameType("java.time.ZoneId"),
-                  isSameType("java.util.Locale"),
-                  isSameType("java.util.TimeZone"),
+                  isSameType(InputStream.class.getCanonicalName()),
+                  isSameType(Locale.class.getCanonicalName()),
+                  isSameType(TimeZone.class.getCanonicalName()),
+                  isSameType(ZoneId.class.getCanonicalName()),
                   isSameType("jakarta.servlet.http.HttpServletRequest"),
                   isSameType("jakarta.servlet.http.HttpServletResponse"),
                   isSameType("javax.servlet.http.HttpServletRequest"),

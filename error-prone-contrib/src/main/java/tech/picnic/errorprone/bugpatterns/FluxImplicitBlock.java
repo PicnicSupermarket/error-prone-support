@@ -9,6 +9,7 @@ import static com.google.errorprone.matchers.method.MethodMatchers.instanceMetho
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -24,6 +25,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.util.Position;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
@@ -65,10 +67,11 @@ public final class FluxImplicitBlock extends BugChecker implements MethodInvocat
     if (ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)) {
       description.addFix(
           suggestBlockingElementCollection(
-              tree, "com.google.common.collect.ImmutableList.toImmutableList", state));
+              tree, ImmutableList.class.getCanonicalName() + ".toImmutableList", state));
     }
     description.addFix(
-        suggestBlockingElementCollection(tree, "java.util.stream.Collectors.toList", state));
+        suggestBlockingElementCollection(
+            tree, Collectors.class.getCanonicalName() + ".toList", state));
 
     return description.build();
   }

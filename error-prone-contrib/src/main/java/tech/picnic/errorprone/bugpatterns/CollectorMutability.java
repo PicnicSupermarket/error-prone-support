@@ -7,6 +7,9 @@ import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -17,7 +20,11 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 
 /**
@@ -38,7 +45,7 @@ import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
 public final class CollectorMutability extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> COLLECTOR_METHOD =
-      staticMethod().onClass("java.util.stream.Collectors");
+      staticMethod().onClass(Collectors.class.getCanonicalName());
   private static final Matcher<ExpressionTree> LIST_COLLECTOR =
       staticMethod().anyClass().named("toList");
   private static final Matcher<ExpressionTree> MAP_COLLECTOR =
@@ -59,8 +66,8 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
     if (LIST_COLLECTOR.matches(tree, state)) {
       return suggestToCollectionAlternatives(
           tree,
-          "com.google.common.collect.ImmutableList.toImmutableList",
-          "java.util.ArrayList",
+          ImmutableList.class.getCanonicalName() + ".toImmutableList",
+          ArrayList.class.getCanonicalName(),
           state);
     }
 
@@ -71,8 +78,8 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
     if (SET_COLLECTOR.matches(tree, state)) {
       return suggestToCollectionAlternatives(
           tree,
-          "com.google.common.collect.ImmutableSet.toImmutableSet",
-          "java.util.HashSet",
+          ImmutableSet.class.getCanonicalName() + ".toImmutableSet",
+          HashSet.class.getCanonicalName(),
           state);
     }
 
@@ -87,7 +94,7 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
     SuggestedFix.Builder mutableFix = SuggestedFix.builder();
     String toCollectionSelect =
         SuggestedFixes.qualifyStaticImport(
-            "java.util.stream.Collectors.toCollection", mutableFix, state);
+            Collectors.class.getCanonicalName() + ".toCollection", mutableFix, state);
     String mutableCollection = SuggestedFixes.qualifyType(state, mutableFix, mutableReplacement);
 
     return buildDescription(tree)
@@ -106,12 +113,13 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
     }
 
     SuggestedFix.Builder mutableFix = SuggestedFix.builder();
-    String hashMap = SuggestedFixes.qualifyType(state, mutableFix, "java.util.HashMap");
+    String hashMap =
+        SuggestedFixes.qualifyType(state, mutableFix, HashMap.class.getCanonicalName());
 
     return buildDescription(tree)
         .addFix(
             replaceMethodInvocation(
-                tree, "com.google.common.collect.ImmutableMap.toImmutableMap", state))
+                tree, ImmutableMap.class.getCanonicalName() + ".toImmutableMap", state))
         .addFix(
             mutableFix
                 .postfixWith(
