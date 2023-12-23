@@ -63,7 +63,7 @@ jobs:
         run: bundle exec jekyll build
       - name: Validate HTML output
         working-directory: ./website
-        run: bundle exec htmlproofer --no-check-external-hash ./_site
+        run: bundle exec htmlproofer --no-check-external-hash --swap-url 'https\://error-prone.picnic.tech:' ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
