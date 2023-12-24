@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -44,21 +43,6 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class JUnitToAssertJRules {
   private JUnitToAssertJRules() {}
 
-  public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(
-        Assertions.class,
-        assertDoesNotThrow(() -> null),
-        assertInstanceOf(null, null),
-        assertThrows(null, null),
-        assertThrowsExactly(null, null),
-        (Runnable) () -> assertFalse(true),
-        (Runnable) () -> assertNotNull(null),
-        (Runnable) () -> assertNotSame(null, null),
-        (Runnable) () -> assertNull(null),
-        (Runnable) () -> assertSame(null, null),
-        (Runnable) () -> assertTrue(true));
-  }
-
   static final class ThrowNewAssertionError {
     @BeforeTemplate
     void before() {
@@ -78,8 +62,13 @@ final class JUnitToAssertJRules {
       return Assertions.fail(message);
     }
 
+    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)` once
+    // https://github.com/google/error-prone/pull/3584 is resolved. Until that time, statically
+    // importing AssertJ's `fail` is likely to clash with an existing static import of JUnit's
+    // `fail`. Note that combining Error Prone's `RemoveUnusedImports` and
+    // `UnnecessarilyFullyQualified` checks and our `StaticImport` check will anyway cause the
+    // method to be imported statically if possible; just in a less efficient manner.
     @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     T after(String message) {
       return fail(message);
     }
@@ -91,8 +80,13 @@ final class JUnitToAssertJRules {
       return Assertions.fail(message, throwable);
     }
 
+    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)` once
+    // https://github.com/google/error-prone/pull/3584 is resolved. Until that time, statically
+    // importing AssertJ's `fail` is likely to clash with an existing static import of JUnit's
+    // `fail`. Note that combining Error Prone's `RemoveUnusedImports` and
+    // `UnnecessarilyFullyQualified` checks and our `StaticImport` check will anyway cause the
+    // method to be imported statically if possible; just in a less efficient manner.
     @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     T after(String message, Throwable throwable) {
       return fail(message, throwable);
     }
