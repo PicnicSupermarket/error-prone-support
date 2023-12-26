@@ -65,6 +65,8 @@ it, read the installation guide for Maven or Gradle below.
                <plugin>
                    <groupId>org.apache.maven.plugins</groupId>
                    <artifactId>maven-compiler-plugin</artifactId>
+                   <!-- Prefer using the latest release. -->
+                   <version>3.12.0</version>
                    <configuration>
                        <annotationProcessorPaths>
                            <!-- Error Prone itself. -->
@@ -94,8 +96,6 @@ it, read the installation guide for Maven or Gradle below.
                            </arg>
                            <arg>-XDcompilePolicy=simple</arg>
                        </compilerArgs>
-                       <!-- Some checks raise warnings rather than errors. -->
-                       <showWarnings>true</showWarnings>
                        <!-- Enable this if you'd like to fail your build upon warnings. -->
                        <!-- <failOnWarning>true</failOnWarning> -->
                    </configuration>
