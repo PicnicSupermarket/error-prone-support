@@ -1,0 +1,19 @@
+{
+  "fullyQualifiedName": "pkg.CompleteBugChecker",
+  "name": "OtherName",
+  "altNames": [
+    "Check"
+  ],
+  "link": "https://error-prone.picnic.tech",
+  "tags": [
+    "Simplification"
+  ],
+  "summary": "CompleteBugChecker summary",
+  "explanation": "Example explanation",
+  "severityLevel": "SUGGESTION",
+  "canDisable": false,
+  "suppressionAnnotations": [
+    "com.google.errorprone.BugPattern",
+    "org.junit.jupiter.api.Test"
+  ]
+}

@@ -26,6 +26,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZonedDateTime;
 
 /** A {@link BugChecker} that flags illegal time-zone related operations. */
 @AutoService(BugChecker.class)
@@ -42,11 +45,11 @@ public final class TimeZoneUsage extends BugChecker implements MethodInvocationT
       anyOf(
           allOf(
               instanceMethod()
-                  .onDescendantOf(Clock.class.getName())
+                  .onDescendantOf(Clock.class.getCanonicalName())
                   .namedAnyOf("getZone", "withZone"),
               not(enclosingClass(isSubtypeOf(Clock.class)))),
           staticMethod()
-              .onClass(Clock.class.getName())
+              .onClass(Clock.class.getCanonicalName())
               .namedAnyOf(
                   "system",
                   "systemDefaultZone",
@@ -56,11 +59,20 @@ public final class TimeZoneUsage extends BugChecker implements MethodInvocationT
                   "tickSeconds"),
           staticMethod()
               .onClassAny(
-                  LocalDate.class.getName(),
-                  LocalDateTime.class.getName(),
-                  LocalTime.class.getName())
+                  LocalDate.class.getCanonicalName(),
+                  LocalDateTime.class.getCanonicalName(),
+                  LocalTime.class.getCanonicalName(),
+                  OffsetDateTime.class.getCanonicalName(),
+                  OffsetTime.class.getCanonicalName(),
+                  ZonedDateTime.class.getCanonicalName())
               .named("now"),
-          staticMethod().onClassAny(Instant.class.getName()).named("now").withNoParameters());
+          staticMethod()
+              .onClassAny(Instant.class.getCanonicalName())
+              .named("now")
+              .withNoParameters());
+
+  /** Instantiates a new {@link TimeZoneUsage} instance. */
+  public TimeZoneUsage() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {

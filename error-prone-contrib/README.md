@@ -24,7 +24,6 @@ project:
 
 - Document how to apply patches.
 - Document each of the checks.
-- Add [SonarQube][sonarcloud] and [Codecov][codecov] integrations.
 - Add non-Java file formatting support, like we have internally at Picnic.
   (I.e., somehow open-source that stuff.)
 - Auto-generate a website listing each of the checks, just like the Error Prone
@@ -126,9 +125,6 @@ The following is a list of checks we'd like to see implemented:
   statement. Idem for other exception types.
 - A Guava-specific check that replaces simple anonymous `CacheLoader` subclass
   declarations with `CacheLoader.from(someLambda)`.
-- A Spring-specific check that enforces that methods with the `@Scheduled`
-  annotation are also annotated with New Relic's `@Trace` annotation. Such
-  methods should ideally not also represent Spring MVC endpoints.
 - A Spring-specific check that enforces that `@RequestMapping` annotations,
   when applied to a method, explicitly specify one or more target HTTP methods.
 - A Spring-specific check that looks for classes in which all `@RequestMapping`
@@ -267,13 +263,12 @@ Refaster's expressiveness:
   motivating example, see the two subtly different loop definitions in
   `CollectionRemoveAllFromCollectionExpression`.
 - Figure out why Refaster sometimes doesn't match the correct generic overload.
-  See the `AssertThatIterableHasOneComparableElementEqualTo` template for an
+  See the `AssertThatIterableHasOneComparableElementEqualTo` rule for an
   example.
 
 [autorefactor]: https://autorefactor.org
 [bettercodehub]: https://bettercodehub.com
 [checkstyle-external-project-tests]: https://github.com/checkstyle/checkstyle/blob/master/wercker.yml
-[codecov]: https://codecov.io
 [error-prone-bug-patterns]: https://errorprone.info/bugpatterns
 [error-prone]: https://errorprone.info
 [error-prone-repo]: https://github.com/google/error-prone
@@ -283,4 +278,3 @@ Refaster's expressiveness:
 [main-contributing]: ../CONTRIBUTING.md
 [main-readme]: ../README.md
 [modernizer-maven-plugin]: https://github.com/gaul/modernizer-maven-plugin
-[sonarcloud]: https://sonarcloud.io

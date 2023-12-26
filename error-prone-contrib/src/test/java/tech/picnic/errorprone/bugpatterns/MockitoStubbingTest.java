@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class MockitoStubbingTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(MockitoStubbing.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(MockitoStubbing.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(MockitoStubbing.class, getClass())
         .addSourceLines(
             "A.java",
             "import static org.mockito.ArgumentMatchers.eq;",
@@ -55,7 +50,7 @@ final class MockitoStubbingTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(MockitoStubbing.class, getClass())
         .addInputLines(
             "A.java",
             "import static org.mockito.ArgumentMatchers.eq;",

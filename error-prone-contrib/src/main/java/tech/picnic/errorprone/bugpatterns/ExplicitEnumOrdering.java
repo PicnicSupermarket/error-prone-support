@@ -44,7 +44,10 @@ import java.util.stream.Stream;
 public final class ExplicitEnumOrdering extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> EXPLICIT_ORDERING =
-      staticMethod().onClass(Ordering.class.getName()).named("explicit");
+      staticMethod().onClass(Ordering.class.getCanonicalName()).named("explicit");
+
+  /** Instantiates a new {@link ExplicitEnumOrdering} instance. */
+  public ExplicitEnumOrdering() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {

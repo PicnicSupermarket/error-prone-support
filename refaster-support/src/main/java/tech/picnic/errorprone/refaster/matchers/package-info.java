@@ -5,5 +5,5 @@
  * com.google.errorprone.refaster.annotation.NotMatches @NotMatches} annotations.
  */
 @com.google.errorprone.annotations.CheckReturnValue
-@javax.annotation.ParametersAreNonnullByDefault
+@org.jspecify.annotations.NullMarked
 package tech.picnic.errorprone.refaster.matchers;

@@ -17,6 +17,7 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
@@ -49,26 +50,30 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     linkType = CUSTOM,
     severity = WARNING,
     tags = PERFORMANCE)
+@SuppressWarnings("java:S1192" /* Factoring out repeated method names impacts readability. */)
 public final class PrimitiveComparison extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> STATIC_COMPARISON_METHOD =
       anyOf(
           staticMethod()
-              .onClass(Comparator.class.getName())
+              .onClass(Comparator.class.getCanonicalName())
               .namedAnyOf("comparingInt", "comparingLong", "comparingDouble"),
           staticMethod()
-              .onClass(Comparator.class.getName())
+              .onClass(Comparator.class.getCanonicalName())
               .named("comparing")
-              .withParameters(Function.class.getName()));
+              .withParameters(Function.class.getCanonicalName()));
   private static final Matcher<ExpressionTree> INSTANCE_COMPARISON_METHOD =
       anyOf(
           instanceMethod()
-              .onDescendantOf(Comparator.class.getName())
+              .onDescendantOf(Comparator.class.getCanonicalName())
               .namedAnyOf("thenComparingInt", "thenComparingLong", "thenComparingDouble"),
           instanceMethod()
-              .onDescendantOf(Comparator.class.getName())
+              .onDescendantOf(Comparator.class.getCanonicalName())
               .named("thenComparing")
-              .withParameters(Function.class.getName()));
+              .withParameters(Function.class.getCanonicalName()));
+
+  /** Instantiates a new {@link PrimitiveComparison} instance. */
+  public PrimitiveComparison() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
@@ -163,10 +168,11 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
     ExpressionTree expr = tree.getMethodSelect();
     switch (expr.getKind()) {
       case IDENTIFIER:
-        return SuggestedFix.builder()
-            .addStaticImport(Comparator.class.getName() + '.' + preferredMethodName)
-            .replace(expr, preferredMethodName)
-            .build();
+        SuggestedFix.Builder fix = SuggestedFix.builder();
+        String replacement =
+            SuggestedFixes.qualifyStaticImport(
+                Comparator.class.getCanonicalName() + '.' + preferredMethodName, fix, state);
+        return fix.replace(expr, replacement).build();
       case MEMBER_SELECT:
         MemberSelectTree ms = (MemberSelectTree) tree.getMethodSelect();
         return SuggestedFix.replace(

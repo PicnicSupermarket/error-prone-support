@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class EmptyMethodTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(EmptyMethod.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(EmptyMethod.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(EmptyMethod.class, getClass())
         .addSourceLines(
             "A.java",
             "class A {",
@@ -69,15 +64,25 @@ final class EmptyMethodTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(EmptyMethod.class, getClass())
         .addInputLines(
             "A.java",
             "final class A {",
             "  void instanceMethod() {}",
             "",
             "  static void staticMethod() {}",
+            "",
+            "  static void staticMethodWithComment() {",
+            "    /* Foo. */",
+            "  }",
             "}")
-        .addOutputLines("A.java", "final class A {}")
+        .addOutputLines(
+            "A.java",
+            "final class A {",
+            "  static void staticMethodWithComment() {",
+            "    /* Foo. */",
+            "  }",
+            "}")
         .doTest(TestMode.TEXT_MATCH);
   }
 }

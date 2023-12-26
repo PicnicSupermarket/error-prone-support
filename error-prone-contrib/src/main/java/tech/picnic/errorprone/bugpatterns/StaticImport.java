@@ -2,14 +2,32 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
-import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static java.util.Objects.requireNonNull;
+import static tech.picnic.errorprone.bugpatterns.NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS;
+import static tech.picnic.errorprone.bugpatterns.NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Functions;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicates;
+import com.google.common.base.Verify;
+import com.google.common.collect.Comparators;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableRangeSet;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ImmutableSortedMultiset;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.MoreCollectors;
+import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -20,55 +38,73 @@ import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.matchers.Matchers;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Type;
+import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-/**
- * A {@link BugChecker} that flags methods and constants that can and should be statically imported.
- */
+/** A {@link BugChecker} that flags type members that can and should be statically imported. */
+// XXX: This check is closely linked to `NonStaticImport`. Consider merging the two.
 // XXX: Tricky cases:
 // - `org.springframework.http.HttpStatus` (not always an improvement, and `valueOf` must
 //    certainly be excluded)
 // - `com.google.common.collect.Tables`
-// - `ch.qos.logback.classic.Level.{DEBUG, ERROR, INFO, TRACE, WARN"}`
-// XXX: Also introduce a check that disallows static imports of certain methods. Candidates:
-// - `com.google.common.base.Strings`
-// - `java.util.Optional.empty`
-// - `java.util.Locale.ROOT`
-// - `ZoneOffset.ofHours` and other `ofXXX`-style methods.
-// - `java.time.Clock`.
-// - Several other `java.time` classes.
-// - Likely any of `*.{ZERO, ONE, MIX, MAX, MIN_VALUE, MAX_VALUE}`.
+// - `ch.qos.logback.classic.Level.{DEBUG, ERROR, INFO, TRACE, WARN}`
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Identifier should be statically imported",
     link = BUG_PATTERNS_BASE_URL + "StaticImport",
     linkType = CUSTOM,
     severity = SUGGESTION,
-    tags = SIMPLIFICATION)
+    tags = STYLE)
 public final class StaticImport extends BugChecker implements MemberSelectTreeMatcher {
   private static final long serialVersionUID = 1L;
 
   /**
    * Types whose members should be statically imported, unless exempted by {@link
-   * #STATIC_IMPORT_EXEMPTED_MEMBERS} or {@link #STATIC_IMPORT_EXEMPTED_IDENTIFIERS}.
+   * NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_MEMBERS} or {@link
+   * NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS}.
+   *
+   * <p>Types listed here should be mutually exclusive with {@link
+   * NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_TYPES}.
    */
   @VisibleForTesting
   static final ImmutableSet<String> STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of(
-          "com.google.common.base.Preconditions",
-          "com.google.common.base.Predicates",
-          "com.google.common.base.Verify",
-          "com.google.common.collect.MoreCollectors",
-          "com.google.errorprone.BugPattern.LinkType",
-          "com.google.errorprone.BugPattern.SeverityLevel",
-          "com.google.errorprone.BugPattern.StandardTags",
-          "com.google.errorprone.matchers.Matchers",
-          "com.google.errorprone.refaster.ImportPolicy",
+          BugPattern.LinkType.class.getCanonicalName(),
+          BugPattern.SeverityLevel.class.getCanonicalName(),
+          BugPattern.StandardTags.class.getCanonicalName(),
+          Collections.class.getCanonicalName(),
+          Collectors.class.getCanonicalName(),
+          Comparator.class.getCanonicalName(),
+          ImportPolicy.class.getCanonicalName(),
+          Map.Entry.class.getCanonicalName(),
+          Matchers.class.getCanonicalName(),
+          MoreCollectors.class.getCanonicalName(),
+          Pattern.class.getCanonicalName(),
+          Preconditions.class.getCanonicalName(),
+          Predicates.class.getCanonicalName(),
+          StandardCharsets.class.getCanonicalName(),
+          Verify.class.getCanonicalName(),
+          "com.fasterxml.jackson.annotation.JsonCreator.Mode",
+          "com.fasterxml.jackson.annotation.JsonFormat.Shape",
+          "com.fasterxml.jackson.annotation.JsonInclude.Include",
+          "com.fasterxml.jackson.annotation.JsonProperty.Access",
           "com.mongodb.client.model.Accumulators",
           "com.mongodb.client.model.Aggregates",
           "com.mongodb.client.model.Filters",
@@ -76,12 +112,6 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           "com.mongodb.client.model.Projections",
           "com.mongodb.client.model.Sorts",
           "com.mongodb.client.model.Updates",
-          "java.nio.charset.StandardCharsets",
-          "java.util.Collections",
-          "java.util.Comparator",
-          "java.util.Map.Entry",
-          "java.util.regex.Pattern",
-          "java.util.stream.Collectors",
           "org.assertj.core.api.Assertions",
           "org.assertj.core.api.InstanceOfAssertFactories",
           "org.assertj.core.api.SoftAssertions",
@@ -101,94 +131,62 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           "org.springframework.http.HttpMethod",
           "org.springframework.http.MediaType",
           "org.testng.Assert",
-          "reactor.function.TupleUtils");
+          "reactor.function.TupleUtils",
+          "tech.picnic.errorprone.bugpatterns.util.MoreTypes");
 
-  /** Type members that should be statically imported. */
-  @VisibleForTesting
+  /**
+   * Type members that should be statically imported.
+   *
+   * <p>Please note that:
+   *
+   * <ul>
+   *   <li>Types listed by {@link #STATIC_IMPORT_CANDIDATE_TYPES} should be omitted from this
+   *       collection.
+   *   <li>This collection should be mutually exclusive with {@link
+   *       NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_MEMBERS}.
+   *   <li>This collection should not list members contained in {@link
+   *       NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS}.
+   * </ul>
+   */
   static final ImmutableSetMultimap<String, String> STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
+          .putAll(Comparators.class.getCanonicalName(), "emptiesFirst", "emptiesLast")
+          .put(Function.class.getCanonicalName(), "identity")
+          .put(Functions.class.getCanonicalName(), "identity")
+          .put(ImmutableList.class.getCanonicalName(), "toImmutableList")
           .putAll(
-              "com.google.common.collect.ImmutableListMultimap",
+              ImmutableListMultimap.class.getCanonicalName(),
               "flatteningToImmutableListMultimap",
               "toImmutableListMultimap")
-          .put("com.google.common.collect.ImmutableList", "toImmutableList")
-          .put("com.google.common.collect.ImmutableMap", "toImmutableMap")
-          .put("com.google.common.collect.ImmutableMultiset", "toImmutableMultiset")
-          .put("com.google.common.collect.ImmutableRangeSet", "toImmutableRangeSet")
+          .put(ImmutableMap.class.getCanonicalName(), "toImmutableMap")
+          .put(ImmutableMultiset.class.getCanonicalName(), "toImmutableMultiset")
+          .put(ImmutableRangeSet.class.getCanonicalName(), "toImmutableRangeSet")
+          .put(ImmutableSet.class.getCanonicalName(), "toImmutableSet")
           .putAll(
-              "com.google.common.collect.ImmutableSetMultimap",
+              ImmutableSetMultimap.class.getCanonicalName(),
               "flatteningToImmutableSetMultimap",
               "toImmutableSetMultimap")
-          .put("com.google.common.collect.ImmutableSet", "toImmutableSet")
-          .put("com.google.common.collect.ImmutableSortedMap", "toImmutableSortedMap")
-          .put("com.google.common.collect.ImmutableSortedMultiset", "toImmutableSortedMultiset")
-          .put("com.google.common.collect.ImmutableSortedSet", "toImmutableSortedSet")
-          .put("com.google.common.collect.ImmutableTable", "toImmutableTable")
-          .put("com.google.common.collect.Sets", "toImmutableEnumSet")
-          .put("com.google.common.base.Functions", "identity")
-          .put("java.time.ZoneOffset", "UTC")
-          .put("java.util.function.Function", "identity")
-          .put("java.util.function.Predicate", "not")
-          .put("java.util.UUID", "randomUUID")
-          .put("org.junit.jupiter.params.provider.Arguments", "arguments")
+          .put(ImmutableSortedMap.class.getCanonicalName(), "toImmutableSortedMap")
+          .put(ImmutableSortedMultiset.class.getCanonicalName(), "toImmutableSortedMultiset")
+          .put(ImmutableSortedSet.class.getCanonicalName(), "toImmutableSortedSet")
+          .put(ImmutableTable.class.getCanonicalName(), "toImmutableTable")
           .putAll(
-              "java.util.Objects",
+              Objects.class.getCanonicalName(),
               "checkIndex",
               "checkFromIndexSize",
               "checkFromToIndex",
               "requireNonNull",
               "requireNonNullElse",
               "requireNonNullElseGet")
-          .putAll("com.google.common.collect.Comparators", "emptiesFirst", "emptiesLast")
+          .put(Predicate.class.getCanonicalName(), "not")
+          .put(Sets.class.getCanonicalName(), "toImmutableEnumSet")
+          .put(UUID.class.getCanonicalName(), "randomUUID")
+          .put(ZoneOffset.class.getCanonicalName(), "UTC")
+          .put("org.junit.jupiter.params.provider.Arguments", "arguments")
           .build();
 
-  /**
-   * Type members that should never be statically imported.
-   *
-   * <p>Identifiers listed by {@link #STATIC_IMPORT_EXEMPTED_IDENTIFIERS} should be omitted from
-   * this collection.
-   */
-  // XXX: Perhaps the set of exempted `java.util.Collections` methods is too strict. For now any
-  // method name that could be considered "too vague" or could conceivably mean something else in a
-  // specific context is left out.
-  @VisibleForTesting
-  static final ImmutableSetMultimap<String, String> STATIC_IMPORT_EXEMPTED_MEMBERS =
-      ImmutableSetMultimap.<String, String>builder()
-          .put("com.mongodb.client.model.Filters", "empty")
-          .putAll(
-              "java.util.Collections",
-              "addAll",
-              "copy",
-              "fill",
-              "list",
-              "max",
-              "min",
-              "nCopies",
-              "rotate",
-              "sort",
-              "swap")
-          .putAll("java.util.regex.Pattern", "compile", "matches", "quote")
-          .put("org.springframework.http.MediaType", "ALL")
-          .build();
-
-  /**
-   * Identifiers that should never be statically imported.
-   *
-   * <p>This should be a superset of the identifiers flagged by {@link
-   * com.google.errorprone.bugpatterns.BadImport}.
-   */
-  @VisibleForTesting
-  static final ImmutableSet<String> STATIC_IMPORT_EXEMPTED_IDENTIFIERS =
-      ImmutableSet.of(
-          "builder",
-          "create",
-          "copyOf",
-          "from",
-          "getDefaultInstance",
-          "INSTANCE",
-          "newBuilder",
-          "of",
-          "valueOf");
+  /** Instantiates a new {@link StaticImport} instance. */
+  public StaticImport() {}
 
   @Override
   public Description matchMemberSelect(MemberSelectTree tree, VisitorState state) {
@@ -224,13 +222,13 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
 
   private static boolean isCandidate(MemberSelectTree tree) {
     String identifier = tree.getIdentifier().toString();
-    if (STATIC_IMPORT_EXEMPTED_IDENTIFIERS.contains(identifier)) {
+    if (NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(identifier)) {
       return false;
     }
 
     Type type = ASTHelpers.getType(tree.getExpression());
     return type != null
-        && !STATIC_IMPORT_EXEMPTED_MEMBERS.containsEntry(type.toString(), identifier);
+        && !NON_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type.toString(), identifier);
   }
 
   private static Optional<String> getCandidateSimpleName(StaticImportInfo importInfo) {

@@ -11,6 +11,9 @@ public final class IsArray implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> DELEGATE = isArrayType();
 
+  /** Instantiates a new {@link IsArray} instance. */
+  public IsArray() {}
+
   @Override
   public boolean matches(ExpressionTree tree, VisitorState state) {
     return DELEGATE.matches(tree, state);

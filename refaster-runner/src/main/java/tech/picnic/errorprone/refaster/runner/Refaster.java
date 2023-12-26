@@ -10,6 +10,7 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -40,14 +41,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import javax.inject.Inject;
 
 /**
- * A {@link BugChecker} that flags code that can be simplified using Refaster templates located on
- * the classpath.
+ * A {@link BugChecker} that flags code that can be simplified using Refaster rules located on the
+ * classpath.
  *
  * <p>This checker locates all {@code *.refaster} classpath resources and assumes that they contain
- * a {@link CodeTransformer}. The set of loaded Refaster templates can be restricted by passing
- * {@code -XepOpt:Refaster:NamePattern=<someRegex>}.
+ * a {@link CodeTransformer}. The set of loaded Refaster rules can be restricted by passing {@code
+ * -XepOpt:Refaster:NamePattern=<someRegex>}.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -55,15 +57,18 @@ import java.util.stream.Stream;
     linkType = NONE,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
+@SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
 public final class Refaster extends BugChecker implements CompilationUnitTreeMatcher {
-  /** Flag to pass a pattern that restricts which Refaster templates are loaded. */
-  public static final String INCLUDED_TEMPLATES_PATTERN_FLAG = "Refaster:NamePattern";
+  /** Flag to pass a pattern that restricts which Refaster rules are loaded. */
+  public static final String INCLUDED_RULES_PATTERN_FLAG = "Refaster:NamePattern";
 
   private static final long serialVersionUID = 1L;
 
+  // XXX: Review this suppression.
+  @SuppressWarnings({"java:S1948", "serial"} /* Concrete instance will be `Serializable`. */)
   private final RefasterRuleSelector ruleSelector;
 
-  /** Instantiates the default {@link Refaster}. */
+  /** Instantiates a default {@link Refaster} instance. */
   public Refaster() {
     this(ErrorProneFlags.empty());
   }
@@ -73,6 +78,8 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
    *
    * @param flags Any provided command line flags.
    */
+  @Inject
+  @VisibleForTesting
   public Refaster(ErrorProneFlags flags) {
     ruleSelector = createRefasterRuleSelector(flags);
   }
@@ -127,7 +134,10 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     for (Description description : byReplacementSize) {
       ImmutableRangeSet<Integer> ranges = getReplacementRanges(description, endPositions);
       if (ranges.asRanges().stream().noneMatch(replacedSections::intersects)) {
-        /* This suggested fix does not overlap with any ("larger") replacement seen until now. Apply it. */
+        /*
+         * This suggested fix does not overlap with any ("larger") replacement seen until now, so
+         * apply it.
+         */
         state.reportMatch(augmentDescription(description, getSeverityOverride(state)));
         replacedSections.addAll(ranges);
       }
@@ -159,20 +169,21 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
    * <p>The assigned severity is overridden only if this bug checker's severity was explicitly
    * configured.
    *
-   * <p>The original check name (i.e. the Refaster template name) is prepended to the {@link
+   * <p>The original check name (i.e. the Refaster rule name) is prepended to the {@link
    * Description}'s message. The replacement check name ("Refaster Rule", a name which includes a
    * space) is chosen such that it is guaranteed not to match any canonical bug checker name (as
    * that could cause {@link VisitorState#reportMatch(Description)}} to override the reported
    * severity).
    */
+  @SuppressWarnings("RestrictedApi" /* We create a heavily customized `Description` here. */)
   private static Description augmentDescription(
       Description description, Optional<SeverityLevel> severityOverride) {
     return Description.builder(
             description.position,
             "Refaster Rule",
             description.getLink(),
-            severityOverride.orElse(description.severity),
             String.join(": ", description.checkName, description.getRawMessage()))
+        .overrideSeverity(severityOverride.orElse(description.severity()))
         .addAllFixes(description.fixes)
         .build();
   }
@@ -206,7 +217,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
         CodeTransformers.getAllCodeTransformers();
     return RefasterRuleSelector.create(
         flags
-            .get(INCLUDED_TEMPLATES_PATTERN_FLAG)
+            .get(INCLUDED_RULES_PATTERN_FLAG)
             .map(Pattern::compile)
             .<ImmutableCollection<CodeTransformer>>map(
                 nameFilter -> filterCodeTransformers(allTransformers, nameFilter))

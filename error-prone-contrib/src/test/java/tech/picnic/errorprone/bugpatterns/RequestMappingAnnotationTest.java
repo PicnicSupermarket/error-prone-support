@@ -4,21 +4,20 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class RequestMappingAnnotationTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(RequestMappingAnnotation.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(RequestMappingAnnotation.class, getClass())
         .addSourceLines(
             "A.java",
+            "import jakarta.servlet.http.HttpServletRequest;",
+            "import jakarta.servlet.http.HttpServletResponse;",
             "import java.io.InputStream;",
             "import java.time.ZoneId;",
             "import java.util.Locale;",
             "import java.util.TimeZone;",
-            "import javax.servlet.http.HttpServletRequest;",
-            "import javax.servlet.http.HttpServletResponse;",
             "import org.springframework.http.HttpMethod;",
+            "import org.springframework.ui.Model;",
+            "import org.springframework.validation.BindingResult;",
             "import org.springframework.web.bind.annotation.DeleteMapping;",
             "import org.springframework.web.bind.annotation.GetMapping;",
             "import org.springframework.web.bind.annotation.PatchMapping;",
@@ -83,6 +82,12 @@ final class RequestMappingAnnotationTest {
             "",
             "  @RequestMapping",
             "  A properHttpMethod(HttpMethod method);",
+            "",
+            "  @RequestMapping",
+            "  A properModel(Model model);",
+            "",
+            "  @RequestMapping",
+            "  A properBindingResult(BindingResult result);",
             "",
             "  @RequestMapping",
             "  A properNativeWebRequest(NativeWebRequest request);",

@@ -7,6 +7,7 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyMethod;
 import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.anything;
 import static com.google.errorprone.matchers.Matchers.argumentCount;
 import static com.google.errorprone.matchers.Matchers.isNonNullUsingDataflow;
 import static com.google.errorprone.matchers.Matchers.isSameType;
@@ -17,6 +18,8 @@ import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Primitives;
@@ -49,6 +52,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+import javax.inject.Inject;
+import tech.picnic.errorprone.bugpatterns.util.Flags;
 import tech.picnic.errorprone.bugpatterns.util.MethodMatcherFactory;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
@@ -60,16 +65,18 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
+@SuppressWarnings({
+  "java:S1192" /* Factoring out repeated method names impacts readability. */,
+  "java:S2160" /* Super class equality definition suffices. */,
+  "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+})
 public final class RedundantStringConversion extends BugChecker
     implements BinaryTreeMatcher, CompoundAssignmentTreeMatcher, MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final String FLAG_PREFIX = "RedundantStringConversion:";
   private static final String EXTRA_STRING_CONVERSION_METHODS_FLAG =
-      FLAG_PREFIX + "ExtraConversionMethods";
+      "RedundantStringConversion:ExtraConversionMethods";
 
-  @SuppressWarnings("UnnecessaryLambda")
-  private static final Matcher<ExpressionTree> ANY_EXPR = (t, s) -> true;
-
+  private static final Matcher<ExpressionTree> ANY_EXPR = anything();
   private static final Matcher<ExpressionTree> LOCALE = isSameType(Locale.class);
   private static final Matcher<ExpressionTree> MARKER = isSubtypeOf("org.slf4j.Marker");
   private static final Matcher<ExpressionTree> STRING = isSameType(String.class);
@@ -81,7 +88,7 @@ public final class RedundantStringConversion extends BugChecker
   private static final Matcher<MethodInvocationTree> WELL_KNOWN_STRING_CONVERSION_METHODS =
       anyOf(
           instanceMethod()
-              .onDescendantOfAny(Object.class.getName())
+              .onDescendantOfAny(Object.class.getCanonicalName())
               .named("toString")
               .withNoParameters(),
           allOf(
@@ -95,7 +102,7 @@ public final class RedundantStringConversion extends BugChecker
                               .collect(toImmutableSet()))
                       .named("toString"),
                   allOf(
-                      staticMethod().onClass(String.class.getName()).named("valueOf"),
+                      staticMethod().onClass(String.class.getCanonicalName()).named("valueOf"),
                       not(
                           anyMethod()
                               .anyClass()
@@ -104,35 +111,37 @@ public final class RedundantStringConversion extends BugChecker
                                   ImmutableList.of(Suppliers.arrayOf(Suppliers.CHAR_TYPE))))))));
   private static final Matcher<ExpressionTree> STRINGBUILDER_APPEND_INVOCATION =
       instanceMethod()
-          .onDescendantOf(StringBuilder.class.getName())
+          .onDescendantOf(StringBuilder.class.getCanonicalName())
           .named("append")
-          .withParameters(String.class.getName());
+          .withParameters(String.class.getCanonicalName());
   private static final Matcher<ExpressionTree> STRINGBUILDER_INSERT_INVOCATION =
       instanceMethod()
-          .onDescendantOf(StringBuilder.class.getName())
+          .onDescendantOf(StringBuilder.class.getCanonicalName())
           .named("insert")
-          .withParameters(int.class.getName(), String.class.getName());
+          .withParameters(int.class.getCanonicalName(), String.class.getCanonicalName());
   private static final Matcher<ExpressionTree> FORMATTER_INVOCATION =
       anyOf(
-          staticMethod().onClass(String.class.getName()).named("format"),
-          instanceMethod().onDescendantOf(Formatter.class.getName()).named("format"),
+          staticMethod().onClass(String.class.getCanonicalName()).named("format"),
+          instanceMethod().onDescendantOf(Formatter.class.getCanonicalName()).named("format"),
           instanceMethod()
-              .onDescendantOfAny(PrintStream.class.getName(), PrintWriter.class.getName())
+              .onDescendantOfAny(
+                  PrintStream.class.getCanonicalName(), PrintWriter.class.getCanonicalName())
               .namedAnyOf("format", "printf"),
           instanceMethod()
-              .onDescendantOfAny(PrintStream.class.getName(), PrintWriter.class.getName())
+              .onDescendantOfAny(
+                  PrintStream.class.getCanonicalName(), PrintWriter.class.getCanonicalName())
               .namedAnyOf("print", "println")
-              .withParameters(Object.class.getName()),
+              .withParameters(Object.class.getCanonicalName()),
           staticMethod()
-              .onClass(Console.class.getName())
+              .onClass(Console.class.getCanonicalName())
               .namedAnyOf("format", "printf", "readline", "readPassword"));
   private static final Matcher<ExpressionTree> GUAVA_GUARD_INVOCATION =
       anyOf(
           staticMethod()
-              .onClass("com.google.common.base.Preconditions")
+              .onClass(Preconditions.class.getCanonicalName())
               .namedAnyOf("checkArgument", "checkState", "checkNotNull"),
           staticMethod()
-              .onClass("com.google.common.base.Verify")
+              .onClass(Verify.class.getCanonicalName())
               .namedAnyOf("verify", "verifyNotNull"));
   private static final Matcher<ExpressionTree> SLF4J_LOGGER_INVOCATION =
       instanceMethod()
@@ -141,7 +150,7 @@ public final class RedundantStringConversion extends BugChecker
 
   private final Matcher<MethodInvocationTree> conversionMethodMatcher;
 
-  /** Instantiates the default {@link RedundantStringConversion}. */
+  /** Instantiates a default {@link RedundantStringConversion} instance. */
   public RedundantStringConversion() {
     this(ErrorProneFlags.empty());
   }
@@ -151,7 +160,8 @@ public final class RedundantStringConversion extends BugChecker
    *
    * @param flags Any provided command line flags.
    */
-  public RedundantStringConversion(ErrorProneFlags flags) {
+  @Inject
+  RedundantStringConversion(ErrorProneFlags flags) {
     conversionMethodMatcher = createConversionMethodMatcher(flags);
   }
 
@@ -164,7 +174,7 @@ public final class RedundantStringConversion extends BugChecker
     ExpressionTree lhs = tree.getLeftOperand();
     ExpressionTree rhs = tree.getRightOperand();
     if (!STRING.matches(lhs, state)) {
-      return finalize(tree, tryFix(rhs, state, STRING));
+      return createDescription(tree, tryFix(rhs, state, STRING));
     }
 
     List<SuggestedFix.Builder> fixes = new ArrayList<>();
@@ -178,7 +188,7 @@ public final class RedundantStringConversion extends BugChecker
     }
     tryFix(rhs, state, ANY_EXPR).ifPresent(fixes::add);
 
-    return finalize(tree, fixes.stream().reduce(SuggestedFix.Builder::merge));
+    return createDescription(tree, fixes.stream().reduce(SuggestedFix.Builder::merge));
   }
 
   @Override
@@ -187,36 +197,36 @@ public final class RedundantStringConversion extends BugChecker
       return Description.NO_MATCH;
     }
 
-    return finalize(tree, tryFix(tree.getExpression(), state, ANY_EXPR));
+    return createDescription(tree, tryFix(tree.getExpression(), state, ANY_EXPR));
   }
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     if (STRINGBUILDER_APPEND_INVOCATION.matches(tree, state)) {
-      return finalize(tree, tryFixPositionalConverter(tree.getArguments(), state, 0));
+      return createDescription(tree, tryFixPositionalConverter(tree.getArguments(), state, 0));
     }
 
     if (STRINGBUILDER_INSERT_INVOCATION.matches(tree, state)) {
-      return finalize(tree, tryFixPositionalConverter(tree.getArguments(), state, 1));
+      return createDescription(tree, tryFixPositionalConverter(tree.getArguments(), state, 1));
     }
 
     if (FORMATTER_INVOCATION.matches(tree, state)) {
-      return finalize(tree, tryFixFormatter(tree.getArguments(), state));
+      return createDescription(tree, tryFixFormatter(tree.getArguments(), state));
     }
 
     if (GUAVA_GUARD_INVOCATION.matches(tree, state)) {
-      return finalize(tree, tryFixGuavaGuard(tree.getArguments(), state));
+      return createDescription(tree, tryFixGuavaGuard(tree.getArguments(), state));
     }
 
     if (SLF4J_LOGGER_INVOCATION.matches(tree, state)) {
-      return finalize(tree, tryFixSlf4jLogger(tree.getArguments(), state));
+      return createDescription(tree, tryFixSlf4jLogger(tree.getArguments(), state));
     }
 
     if (instanceMethod().matches(tree, state)) {
-      return finalize(tree, tryFix(tree, state, STRING));
+      return createDescription(tree, tryFix(tree, state, STRING));
     }
 
-    return finalize(tree, tryFix(tree, state, NON_NULL_STRING));
+    return createDescription(tree, tryFix(tree, state, NON_NULL_STRING));
   }
 
   private Optional<SuggestedFix.Builder> tryFixPositionalConverter(
@@ -299,7 +309,7 @@ public final class RedundantStringConversion extends BugChecker
 
     /* Simplify the values to be plugged into the format pattern, if possible. */
     return arguments.stream()
-        .skip(patternIndex + 1)
+        .skip(patternIndex + 1L)
         .map(arg -> tryFix(arg, state, remainingArgFilter))
         .flatMap(Optional::stream)
         .reduce(SuggestedFix.Builder::merge);
@@ -363,7 +373,7 @@ public final class RedundantStringConversion extends BugChecker
     return Optional.of(Iterables.getOnlyElement(methodInvocation.getArguments()));
   }
 
-  private Description finalize(Tree tree, Optional<SuggestedFix.Builder> fixes) {
+  private Description createDescription(Tree tree, Optional<SuggestedFix.Builder> fixes) {
     return fixes
         .map(SuggestedFix.Builder::build)
         .map(fix -> describeMatch(tree, fix))
@@ -374,10 +384,9 @@ public final class RedundantStringConversion extends BugChecker
       ErrorProneFlags flags) {
     // XXX: ErrorProneFlags#getList splits by comma, but method signatures may also contain commas.
     // For this class methods accepting more than one argument are not valid, but still: not nice.
-    return flags
-        .getList(EXTRA_STRING_CONVERSION_METHODS_FLAG)
-        .map(new MethodMatcherFactory()::create)
-        .map(m -> anyOf(WELL_KNOWN_STRING_CONVERSION_METHODS, m))
-        .orElse(WELL_KNOWN_STRING_CONVERSION_METHODS);
+    return anyOf(
+        WELL_KNOWN_STRING_CONVERSION_METHODS,
+        new MethodMatcherFactory()
+            .create(Flags.getList(flags, EXTRA_STRING_CONVERSION_METHODS_FLAG)));
   }
 }

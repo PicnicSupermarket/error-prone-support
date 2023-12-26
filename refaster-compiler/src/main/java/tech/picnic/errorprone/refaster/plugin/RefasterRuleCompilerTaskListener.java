@@ -28,10 +28,10 @@ import java.io.ObjectOutputStream;
 import java.io.UncheckedIOException;
 import java.lang.annotation.Annotation;
 import java.util.Map;
-import javax.annotation.Nullable;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.StandardLocation;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
 
 /**
@@ -55,26 +55,26 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
     }
 
     ClassTree tree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
-    if (tree == null || !containsRefasterTemplates(tree)) {
+    if (tree == null || !containsRefasterRules(tree)) {
       return;
     }
 
-    ImmutableMap<ClassTree, CodeTransformer> rules = compileRefasterTemplates(tree);
+    ImmutableMap<ClassTree, CodeTransformer> rules = compileRefasterRules(tree);
     for (Map.Entry<ClassTree, CodeTransformer> rule : rules.entrySet()) {
       try {
         outputCodeTransformer(rule.getValue(), getOutputFile(taskEvent, rule.getKey()));
       } catch (IOException e) {
-        throw new UncheckedIOException("Failed to persist compiled Refaster templates", e);
+        throw new UncheckedIOException("Failed to persist compiled Refaster rules", e);
       }
     }
   }
 
-  private ImmutableMap<ClassTree, CodeTransformer> compileRefasterTemplates(ClassTree tree) {
+  private ImmutableMap<ClassTree, CodeTransformer> compileRefasterRules(ClassTree tree) {
     ImmutableMap.Builder<ClassTree, CodeTransformer> rules = ImmutableMap.builder();
-    new TreeScanner<Void, ImmutableClassToInstanceMap<Annotation>>() {
-      @Nullable
+    new TreeScanner<@Nullable Void, ImmutableClassToInstanceMap<Annotation>>() {
       @Override
-      public Void visitClass(ClassTree node, ImmutableClassToInstanceMap<Annotation> annotations) {
+      public @Nullable Void visitClass(
+          ClassTree node, ImmutableClassToInstanceMap<Annotation> annotations) {
         ClassSymbol symbol = ASTHelpers.getSymbol(node);
 
         ImmutableList<CodeTransformer> transformers =
@@ -103,9 +103,9 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
         taskEvent.getSourceFile());
   }
 
-  private static boolean containsRefasterTemplates(ClassTree tree) {
+  private static boolean containsRefasterRules(ClassTree tree) {
     return Boolean.TRUE.equals(
-        new TreeScanner<Boolean, Void>() {
+        new TreeScanner<Boolean, @Nullable Void>() {
           @Override
           public Boolean visitAnnotation(AnnotationTree node, @Nullable Void unused) {
             Symbol sym = ASTHelpers.getSymbol(node);

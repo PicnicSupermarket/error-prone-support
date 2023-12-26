@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns.util;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
@@ -13,25 +14,13 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 final class MethodMatcherFactoryTest {
-  /** A {@link BugChecker} that flags method invocations matched by {@link #TEST_MATCHER}. */
-  @BugPattern(severity = SUGGESTION, summary = "Flags methods matched by the test matcher.")
-  public static final class MatchedMethodsFlagger extends BugChecker
-      implements MethodInvocationTreeMatcher {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-      if (TEST_MATCHER.matches(tree, state)) {
-        return buildDescription(tree).build();
-      }
-
-      return Description.NO_MATCH;
-    }
-  }
-
   private static final Matcher<ExpressionTree> TEST_MATCHER =
       new MethodMatcherFactory()
           .create(
@@ -40,25 +29,26 @@ final class MethodMatcherFactoryTest {
                   "com.example.A#m2(java.lang.String)",
                   "com.example.sub.B#m3(int,int)"));
 
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(MatchedMethodsFlagger.class, getClass());
+  private static Stream<Arguments> createWithMalformedSignaturesTestCases() {
+    /* { signatures } */
+    return Stream.of(
+        arguments(ImmutableList.of("foo.bar")),
+        arguments(ImmutableList.of("foo.bar#baz")),
+        arguments(ImmutableList.of("a", "foo.bar#baz()")),
+        arguments(ImmutableList.of("foo.bar#baz()", "a")));
+  }
 
-  @Test
-  void createWithMalformedSignatures() {
+  @MethodSource("createWithMalformedSignaturesTestCases")
+  @ParameterizedTest
+  void createWithMalformedSignatures(ImmutableList<String> signatures) {
     MethodMatcherFactory factory = new MethodMatcherFactory();
-    assertThatThrownBy(() -> factory.create(ImmutableList.of("foo.bar")))
-        .isInstanceOf(IllegalArgumentException.class);
-    assertThatThrownBy(() -> factory.create(ImmutableList.of("foo.bar#baz")))
-        .isInstanceOf(IllegalArgumentException.class);
-    assertThatThrownBy(() -> factory.create(ImmutableList.of("a", "foo.bar#baz()")))
-        .isInstanceOf(IllegalArgumentException.class);
-    assertThatThrownBy(() -> factory.create(ImmutableList.of("foo.bar#baz()", "a")))
+    assertThatThrownBy(() -> factory.create(signatures))
         .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void matcher() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(MatchedMethodsFlagger.class, getClass())
         .addSourceLines(
             "com/example/A.java",
             "package com.example;",
@@ -209,5 +199,21 @@ final class MethodMatcherFactoryTest {
             "  }",
             "}")
         .doTest();
+  }
+
+  /** A {@link BugChecker} that flags method invocations matched by {@link #TEST_MATCHER}. */
+  @BugPattern(severity = SUGGESTION, summary = "Flags methods matched by the test matcher.")
+  public static final class MatchedMethodsFlagger extends BugChecker
+      implements MethodInvocationTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+      if (TEST_MATCHER.matches(tree, state)) {
+        return buildDescription(tree).build();
+      }
+
+      return Description.NO_MATCH;
+    }
   }
 }

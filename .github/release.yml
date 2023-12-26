@@ -3,7 +3,7 @@ changelog:
     labels:
       - "ignore-changelog"
   categories:
-    - title: ":rocket: New Error Prone checks and Refaster templates"
+    - title: ":rocket: New Error Prone checks and Refaster rules"
       labels:
         - "new feature"
     - title: ":sparkles: Improvements"

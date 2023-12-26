@@ -37,6 +37,8 @@ import javax.lang.model.element.Name;
 
 /**
  * A {@link BugChecker} that flags lambda expressions that can be replaced with method references.
+ *
+ * @see IsInstanceLambdaUsage
  */
 // XXX: Other custom expressions we could rewrite:
 // - `a -> "str" + a` to `"str"::concat`. But only if `str` is provably non-null.
@@ -50,6 +52,9 @@ import javax.lang.model.element.Name;
 // `not(some::reference)`.
 // XXX: This check is extremely inefficient due to its reliance on `SuggestedFixes.compilesWithFix`.
 // Palantir's `LambdaMethodReference` check seems to suffer a similar issue at this time.
+// XXX: Expressions of the form `i -> SomeType.class.isInstance(i)` are not replaced; fix that using
+// a suitable generalization.
+// XXX: Consider folding the `IsInstanceLambdaUsage` check into this class.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer method references over lambda expressions",
@@ -59,6 +64,9 @@ import javax.lang.model.element.Name;
     tags = STYLE)
 public final class MethodReferenceUsage extends BugChecker implements LambdaExpressionTreeMatcher {
   private static final long serialVersionUID = 1L;
+
+  /** Instantiates a new {@link MethodReferenceUsage} instance. */
+  public MethodReferenceUsage() {}
 
   @Override
   public Description matchLambdaExpression(LambdaExpressionTree tree, VisitorState state) {
@@ -110,6 +118,8 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
         .flatMap(expectedInstance -> constructMethodRef(lambdaExpr, subTree, expectedInstance));
   }
 
+  @SuppressWarnings(
+      "java:S1151" /* Extracting `IDENTIFIER` case block to separate method does not improve readability. */)
   private static Optional<SuggestedFix.Builder> constructMethodRef(
       LambdaExpressionTree lambdaExpr,
       MethodInvocationTree subTree,
@@ -122,10 +132,9 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
           return Optional.empty();
         }
         Symbol sym = ASTHelpers.getSymbol(methodSelect);
-        if (!sym.isStatic()) {
-          return constructFix(lambdaExpr, "this", methodSelect);
-        }
-        return constructFix(lambdaExpr, sym.owner, methodSelect);
+        return ASTHelpers.isStatic(sym)
+            ? constructFix(lambdaExpr, sym.owner, methodSelect)
+            : constructFix(lambdaExpr, "this", methodSelect);
       case MEMBER_SELECT:
         return constructMethodRef(lambdaExpr, (MemberSelectTree) methodSelect, expectedInstance);
       default:
@@ -187,12 +196,14 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
     return tree.getParameters().stream().map(VariableTree::getName).collect(toImmutableList());
   }
 
+  // XXX: Resolve this suppression.
+  @SuppressWarnings("UnqualifiedSuggestedFixImport")
   private static Optional<SuggestedFix.Builder> constructFix(
       LambdaExpressionTree lambdaExpr, Symbol target, Object methodName) {
     Name sName = target.getSimpleName();
     Optional<SuggestedFix.Builder> fix = constructFix(lambdaExpr, sName, methodName);
 
-    if (!"java.lang".equals(target.packge().toString())) {
+    if (!"java.lang".equals(ASTHelpers.enclosingPackage(target).toString())) {
       Name fqName = target.getQualifiedName();
       if (!sName.equals(fqName)) {
         return fix.map(b -> b.addImport(fqName.toString()));

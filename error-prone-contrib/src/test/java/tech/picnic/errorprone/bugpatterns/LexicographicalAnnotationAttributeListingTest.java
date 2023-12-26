@@ -7,22 +7,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class LexicographicalAnnotationAttributeListingTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(
-          LexicographicalAnnotationAttributeListing.class, getClass());
-  private final CompilationTestHelper restrictedCompilationTestHelper =
-      CompilationTestHelper.newInstance(LexicographicalAnnotationAttributeListing.class, getClass())
-          .setArgs(
-              ImmutableList.of(
-                  "-XepOpt:LexicographicalAnnotationAttributeListing:Includes=pkg.A.Foo,pkg.A.Bar",
-                  "-XepOpt:LexicographicalAnnotationAttributeListing:Excludes=pkg.A.Bar#value"));
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(
-          LexicographicalAnnotationAttributeListing.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(LexicographicalAnnotationAttributeListing.class, getClass())
         .addSourceLines(
             "A.java",
             "import static java.math.RoundingMode.DOWN;",
@@ -63,18 +50,21 @@ final class LexicographicalAnnotationAttributeListingTest {
             "",
             "  @Foo({\"a\", \"b\"})",
             "  A sortedStrings();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo({\"b\", \"a\"})",
             "  A unsortedString();",
             "",
             "  @Foo({\"ab\", \"Ac\"})",
             "  A sortedStringCaseInsensitive();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo({\"ac\", \"Ab\"})",
             "  A unsortedStringCaseInsensitive();",
             "",
             "  @Foo({\"A\", \"a\"})",
             "  A sortedStringCaseInsensitiveWithTotalOrderFallback();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo({\"a\", \"A\"})",
             "  A unsortedStringCaseInsensitiveWithTotalOrderFallback();",
@@ -99,6 +89,7 @@ final class LexicographicalAnnotationAttributeListingTest {
             "",
             "  @Foo(cls = {int.class, long.class})",
             "  A sortedClasses();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo(cls = {long.class, int.class})",
             "  A unsortedClasses();",
@@ -111,6 +102,7 @@ final class LexicographicalAnnotationAttributeListingTest {
             "",
             "  @Foo(enums = {DOWN, UP})",
             "  A sortedEnums();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo(enums = {UP, DOWN})",
             "  A unsortedEnums();",
@@ -123,15 +115,18 @@ final class LexicographicalAnnotationAttributeListingTest {
             "",
             "  @Foo(anns = {@Bar(\"a\"), @Bar(\"b\")})",
             "  A sortedAnns();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
             "  A unsortedAnns();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo(anns = {@Bar(\"a\"), @Bar({\"b\", \"a\"})})",
             "  A unsortedInnderAnns();",
             "",
             "  @Foo({\"a=foo\", \"a.b=bar\", \"a.c=baz\"})",
             "  A hierarchicallySorted();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo({\"a.b=bar\", \"a.c=baz\", \"a=foo\"})",
             "  A hierarchicallyUnsorted();",
@@ -165,7 +160,8 @@ final class LexicographicalAnnotationAttributeListingTest {
   // `CanonicalAnnotationSyntax` checker correct the situation in a subsequent run.
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(
+            LexicographicalAnnotationAttributeListing.class, getClass())
         .addInputLines(
             "A.java",
             "import static java.math.RoundingMode.DOWN;",
@@ -246,7 +242,11 @@ final class LexicographicalAnnotationAttributeListingTest {
   @Test
   void filtering() {
     /* Some violations are not flagged because they are not in- or excluded. */
-    restrictedCompilationTestHelper
+    CompilationTestHelper.newInstance(LexicographicalAnnotationAttributeListing.class, getClass())
+        .setArgs(
+            ImmutableList.of(
+                "-XepOpt:LexicographicalAnnotationAttributeListing:Includes=pkg.A.Foo,pkg.A.Bar",
+                "-XepOpt:LexicographicalAnnotationAttributeListing:Excludes=pkg.A.Bar#value"))
         .addSourceLines(
             "pkg/A.java",
             "package pkg;",
@@ -273,12 +273,14 @@ final class LexicographicalAnnotationAttributeListingTest {
             "  // BUG: Diagnostic contains:",
             "  @Foo({\"b\", \"a\"})",
             "  A fooValue();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo(value2 = {\"b\", \"a\"})",
             "  A fooValue2();",
             "",
             "  @Bar({\"b\", \"a\"})",
             "  A barValue();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Bar(value2 = {\"b\", \"a\"})",
             "  A barValue2();",

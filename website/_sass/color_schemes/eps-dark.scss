@@ -1,0 +1,16 @@
+@import "./color_schemes/dark";
+@import "_variables";
+@import "_common";
+
+// Swap `$blue-000` and `$blue-300`, mainly for callouts. This is done by
+// default for red, but not for other colors.
+$blue-000: #183385;
+$blue-300: #2c84fa;
+
+// Use light-theme greys in dark theme so that summary callouts stand out more.
+// (Note that the former has four shades, while the latter has five.)
+$grey-dk-000: $grey-lt-000;
+$grey-dk-100: $grey-lt-100;
+$grey-dk-200: $grey-lt-200;
+$grey-dk-250: $grey-lt-200;
+$grey-dk-300: $grey-lt-300;

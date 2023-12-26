@@ -1,0 +1,14 @@
+{
+  "fullyQualifiedName": "pkg.MinimalBugChecker",
+  "name": "MinimalBugChecker",
+  "altNames": [],
+  "link": "",
+  "tags": [],
+  "summary": "MinimalBugChecker summary",
+  "explanation": "",
+  "severityLevel": "ERROR",
+  "canDisable": true,
+  "suppressionAnnotations": [
+    "java.lang.SuppressWarnings"
+  ]
+}

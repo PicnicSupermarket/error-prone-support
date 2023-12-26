@@ -67,6 +67,9 @@ public final class ImmutablesSortedSetComparator extends BugChecker implements M
                   hasAnnotation("org.immutables.value.Value.NaturalOrder"),
                   hasAnnotation("org.immutables.value.Value.ReverseOrder"))));
 
+  /** Instantiates a new {@link ImmutablesSortedSetComparator} instance. */
+  public ImmutablesSortedSetComparator() {}
+
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
     if (!METHOD_LACKS_ANNOTATION.matches(tree, state)) {

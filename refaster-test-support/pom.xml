@@ -5,13 +5,13 @@
     <parent>
         <groupId>tech.picnic.error-prone-support</groupId>
         <artifactId>error-prone-support</artifactId>
-        <version>0.3.1-SNAPSHOT</version>
+        <version>0.14.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>refaster-test-support</artifactId>
 
     <name>Picnic :: Error Prone Support :: Refaster Test Support</name>
-    <description>Opinionated utilities for the testing of Refaster templates.</description>
+    <description>Opinionated utilities for the testing of Refaster rules.</description>
 
     <dependencies>
         <dependency>
@@ -46,13 +46,18 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

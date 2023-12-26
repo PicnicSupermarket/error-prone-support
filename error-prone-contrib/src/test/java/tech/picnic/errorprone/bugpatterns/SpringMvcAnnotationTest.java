@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class SpringMvcAnnotationTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(SpringMvcAnnotation.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(SpringMvcAnnotation.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(SpringMvcAnnotation.class, getClass())
         .addSourceLines(
             "A.java",
             "import static org.springframework.web.bind.annotation.RequestMethod.DELETE;",
@@ -37,18 +32,23 @@ final class SpringMvcAnnotationTest {
             "",
             "  @RequestMapping(method = {})",
             "  A explicitDefault();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @RequestMapping(method = RequestMethod.GET)",
             "  A get();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @RequestMapping(method = {RequestMethod.POST})",
             "  A post();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @RequestMapping(method = {PUT})",
             "  A put();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @RequestMapping(method = {DELETE})",
             "  A delete();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @RequestMapping(method = {PATCH})",
             "  A patch();",
@@ -85,7 +85,7 @@ final class SpringMvcAnnotationTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(SpringMvcAnnotation.class, getClass())
         .addInputLines(
             "A.java",
             "import static org.springframework.web.bind.annotation.RequestMethod.PATCH;",

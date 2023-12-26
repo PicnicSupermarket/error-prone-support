@@ -1,5 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "helpers:pinGitHubActionDigests"
+  ],
   "packageRules": [
     {
       "matchPackagePatterns": [
@@ -9,10 +12,11 @@
       "separateMinorPatch": true
     },
     {
-      "matchPackagePatterns": [
-        "^com\\.palantir\\.baseline:baseline-error-prone$"
+      "matchDepNames": [
+        "github/codeql-action",
+        "ruby/setup-ruby"
       ],
-      "schedule": "* * 1 * *"
+      "schedule": "every 4 weeks on Monday"
     }
   ],
   "reviewers": [

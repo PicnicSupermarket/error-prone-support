@@ -7,16 +7,14 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class IdentityConversionTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(IdentityConversion.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(IdentityConversion.class, getClass())
         .addSourceLines(
-            "Foo.java",
+            "A.java",
+            "import static com.google.errorprone.matchers.Matchers.instanceMethod;",
+            "import static com.google.errorprone.matchers.Matchers.staticMethod;",
+            "",
             "import com.google.common.collect.ImmutableBiMap;",
             "import com.google.common.collect.ImmutableList;",
             "import com.google.common.collect.ImmutableListMultimap;",
@@ -28,12 +26,14 @@ final class IdentityConversionTest {
             "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSetMultimap;",
             "import com.google.common.collect.ImmutableTable;",
+            "import com.google.errorprone.matchers.Matcher;",
+            "import com.google.errorprone.matchers.Matchers;",
             "import reactor.adapter.rxjava.RxJava2Adapter;",
             "import reactor.core.publisher.Flux;",
             "import reactor.core.publisher.Mono;",
             "",
-            "public final class Foo {",
-            "  public void foo() {",
+            "public final class A {",
+            "  public void m() {",
             "    // BUG: Diagnostic contains:",
             "    Boolean b1 = Boolean.valueOf(Boolean.FALSE);",
             "    // BUG: Diagnostic contains:",
@@ -113,6 +113,13 @@ final class IdentityConversionTest {
             "    // BUG: Diagnostic contains:",
             "    short s4 = Short.valueOf(Short.MIN_VALUE);",
             "",
+            "    // BUG: Diagnostic contains:",
+            "    String boolStr = Boolean.valueOf(Boolean.FALSE).toString();",
+            "    int boolHash = Boolean.valueOf(false).hashCode();",
+            "    // BUG: Diagnostic contains:",
+            "    int byteHash = Byte.valueOf((Byte) Byte.MIN_VALUE).hashCode();",
+            "    String byteStr = Byte.valueOf(Byte.MIN_VALUE).toString();",
+            "",
             "    String str1 = String.valueOf(0);",
             "    // BUG: Diagnostic contains:",
             "    String str2 = String.valueOf(\"1\");",
@@ -143,7 +150,15 @@ final class IdentityConversionTest {
             "    ImmutableTable<Object, Object, Object> o11 = ImmutableTable.copyOf(ImmutableTable.of());",
             "",
             "    // BUG: Diagnostic contains:",
+            "    Matcher allOf1 = Matchers.allOf(instanceMethod());",
+            "    Matcher allOf2 = Matchers.allOf(instanceMethod(), staticMethod());",
+            "    // BUG: Diagnostic contains:",
+            "    Matcher anyOf1 = Matchers.anyOf(staticMethod());",
+            "    Matcher anyOf2 = Matchers.anyOf(instanceMethod(), staticMethod());",
+            "",
+            "    // BUG: Diagnostic contains:",
             "    Flux<Integer> flux1 = Flux.just(1).flatMap(e -> RxJava2Adapter.fluxToFlowable(Flux.just(2)));",
+            "",
             "    // BUG: Diagnostic contains:",
             "    Flux<Integer> flux2 = Flux.concat(Flux.just(1));",
             "    // BUG: Diagnostic contains:",
@@ -154,9 +169,9 @@ final class IdentityConversionTest {
             "    Flux<Integer> flux5 = Flux.merge(Flux.just(1));",
             "",
             "    // BUG: Diagnostic contains:",
-            "    Mono<Integer> m1 = Mono.from(Mono.just(1));",
+            "    Mono<Integer> mono1 = Mono.from(Mono.just(1));",
             "    // BUG: Diagnostic contains:",
-            "    Mono<Integer> m2 = Mono.fromDirect(Mono.just(1));",
+            "    Mono<Integer> mono2 = Mono.fromDirect(Mono.just(1));",
             "  }",
             "}")
         .doTest();
@@ -164,15 +179,17 @@ final class IdentityConversionTest {
 
   @Test
   void replacementFirstSuggestedFix() {
-    refactoringTestHelper
-        .setFixChooser(FixChoosers.FIRST)
+    BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass())
         .addInputLines(
-            "Foo.java",
+            "A.java",
+            "import static com.google.errorprone.matchers.Matchers.staticMethod;",
             "import static org.mockito.Mockito.when;",
             "",
             "import com.google.common.collect.ImmutableCollection;",
             "import com.google.common.collect.ImmutableList;",
             "import com.google.common.collect.ImmutableSet;",
+            "import com.google.errorprone.matchers.Matcher;",
+            "import com.google.errorprone.matchers.Matchers;",
             "import java.util.ArrayList;",
             "import java.util.Collection;",
             "import org.reactivestreams.Publisher;",
@@ -180,8 +197,8 @@ final class IdentityConversionTest {
             "import reactor.core.publisher.Flux;",
             "import reactor.core.publisher.Mono;",
             "",
-            "public final class Foo {",
-            "  public void foo() {",
+            "public final class A {",
+            "  public void m() {",
             "    ImmutableSet<Object> set1 = ImmutableSet.copyOf(ImmutableSet.of());",
             "    ImmutableSet<Object> set2 = ImmutableSet.copyOf(ImmutableList.of());",
             "",
@@ -206,18 +223,23 @@ final class IdentityConversionTest {
             "    Object o1 = ImmutableSet.copyOf(ImmutableList.of());",
             "    Object o2 = ImmutableSet.copyOf(ImmutableSet.of());",
             "",
+            "    Matcher matcher = Matchers.allOf(staticMethod());",
+            "",
             "    when(\"foo\".contains(\"f\")).thenAnswer(inv -> ImmutableSet.copyOf(ImmutableList.of(1)));",
             "  }",
             "",
             "  void bar(Publisher<Integer> publisher) {}",
             "}")
         .addOutputLines(
-            "Foo.java",
+            "A.java",
+            "import static com.google.errorprone.matchers.Matchers.staticMethod;",
             "import static org.mockito.Mockito.when;",
             "",
             "import com.google.common.collect.ImmutableCollection;",
             "import com.google.common.collect.ImmutableList;",
             "import com.google.common.collect.ImmutableSet;",
+            "import com.google.errorprone.matchers.Matcher;",
+            "import com.google.errorprone.matchers.Matchers;",
             "import java.util.ArrayList;",
             "import java.util.Collection;",
             "import org.reactivestreams.Publisher;",
@@ -225,8 +247,8 @@ final class IdentityConversionTest {
             "import reactor.core.publisher.Flux;",
             "import reactor.core.publisher.Mono;",
             "",
-            "public final class Foo {",
-            "  public void foo() {",
+            "public final class A {",
+            "  public void m() {",
             "    ImmutableSet<Object> set1 = ImmutableSet.of();",
             "    ImmutableSet<Object> set2 = ImmutableSet.copyOf(ImmutableList.of());",
             "",
@@ -251,6 +273,8 @@ final class IdentityConversionTest {
             "    Object o1 = ImmutableSet.copyOf(ImmutableList.of());",
             "    Object o2 = ImmutableSet.of();",
             "",
+            "    Matcher matcher = staticMethod();",
+            "",
             "    when(\"foo\".contains(\"f\")).thenAnswer(inv -> ImmutableSet.copyOf(ImmutableList.of(1)));",
             "  }",
             "",
@@ -261,17 +285,17 @@ final class IdentityConversionTest {
 
   @Test
   void replacementSecondSuggestedFix() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(IdentityConversion.class, getClass())
         .setFixChooser(FixChoosers.SECOND)
         .addInputLines(
-            "Foo.java",
+            "A.java",
             "import com.google.common.collect.ImmutableCollection;",
             "import com.google.common.collect.ImmutableList;",
             "import com.google.common.collect.ImmutableSet;",
             "import java.util.ArrayList;",
             "",
-            "public final class Foo {",
-            "  public void foo() {",
+            "public final class A {",
+            "  public void m() {",
             "    ImmutableSet<Object> set1 = ImmutableSet.copyOf(ImmutableSet.of());",
             "    ImmutableSet<Object> set2 = ImmutableSet.copyOf(ImmutableList.of());",
             "",
@@ -280,14 +304,14 @@ final class IdentityConversionTest {
             "  }",
             "}")
         .addOutputLines(
-            "Foo.java",
+            "A.java",
             "import com.google.common.collect.ImmutableCollection;",
             "import com.google.common.collect.ImmutableList;",
             "import com.google.common.collect.ImmutableSet;",
             "import java.util.ArrayList;",
             "",
-            "public final class Foo {",
-            "  public void foo() {",
+            "public final class A {",
+            "  public void m() {",
             "    @SuppressWarnings(\"IdentityConversion\")",
             "    ImmutableSet<Object> set1 = ImmutableSet.copyOf(ImmutableSet.of());",
             "    ImmutableSet<Object> set2 = ImmutableSet.copyOf(ImmutableList.of());",

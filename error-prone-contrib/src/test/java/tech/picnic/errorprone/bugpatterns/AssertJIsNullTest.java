@@ -1,20 +1,14 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class AssertJIsNullTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(AssertJIsNull.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(AssertJIsNull.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(AssertJIsNull.class, getClass())
         .addSourceLines(
             "A.java",
             "import static org.assertj.core.api.Assertions.assertThat;",
@@ -38,7 +32,7 @@ final class AssertJIsNullTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(AssertJIsNull.class, getClass())
         .addInputLines(
             "A.java",
             "import static org.assertj.core.api.Assertions.assertThat;",
@@ -59,6 +53,6 @@ final class AssertJIsNullTest {
             "    assertThat(\"foo\").isNull();",
             "  }",
             "}")
-        .doTest(TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 }

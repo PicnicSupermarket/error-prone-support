@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Describes the intent of a Refaster template or group of Refaster templates.
+ * Describes the intent of a Refaster rule or group of Refaster rules.
  *
  * <p>Annotations on nested classes override the description associated with any enclosing class.
  */
@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface Description {
   /**
-   * A description of the annotated Refaster template(s).
+   * A description of the annotated Refaster rule(s).
    *
    * @return A non-{@code null} string.
    */

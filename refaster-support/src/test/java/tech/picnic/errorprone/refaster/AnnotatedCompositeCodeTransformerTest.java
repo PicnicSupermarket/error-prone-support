@@ -38,17 +38,17 @@ import tech.picnic.errorprone.refaster.annotation.Severity;
 
 // XXX: Test the `ErrorProneOptions`-based severity override logic. (Right now that logic is tested
 // through `RefasterTest`, but ideally it is covered by tests in this class, closer to the code that
-// implements the relevant logic.)
+// implements the relevant logic.) See the comment in `#context()` below.
 final class AnnotatedCompositeCodeTransformerTest {
-  private static final DiagnosticPosition DUMMY_POSITION = mock(DiagnosticPosition.class);
-  private static final Fix DUMMY_FIX = mock(Fix.class);
-  private static final TreePath DUMMY_PATH = mock(TreePath.class);
+  private static final DiagnosticPosition DUMMY_POSITION = mock();
+  private static final Fix DUMMY_FIX = mock();
+  private static final TreePath DUMMY_PATH = mock();
   private static final String DEFAULT_PACKAGE = "";
   private static final String CUSTOM_PACKAGE = "com.example";
   private static final String SIMPLE_CLASS_NAME = "MyRefasterRule";
 
   private static Stream<Arguments> applyTestCases() {
-    /* { context, packageName, ruleName compositeAnnotations, delegateAnnotations, expectedDescription } */
+    /* { context, packageName, ruleName, compositeAnnotations, delegateAnnotations, expectedDescription } */
     return Stream.of(
         arguments(
             context(),
@@ -149,7 +149,7 @@ final class AnnotatedCompositeCodeTransformerTest {
       ImmutableSet<? extends Annotation> annotations,
       Context expectedContext,
       Description returnedDescription) {
-    CodeTransformer codeTransformer = mock(CodeTransformer.class);
+    CodeTransformer codeTransformer = mock();
 
     when(codeTransformer.annotations()).thenReturn(indexAnnotations(annotations));
     doAnswer(
@@ -171,17 +171,20 @@ final class AnnotatedCompositeCodeTransformerTest {
     return description(name, Optional.of(""), WARNING, "");
   }
 
+  @SuppressWarnings("RestrictedApi" /* We create a heavily customized `Description` here. */)
   private static Description description(
       String name, Optional<String> link, SeverityLevel severityLevel, String message) {
-    return Description.builder(DUMMY_POSITION, name, link.orElse(null), severityLevel, message)
+    return Description.builder(DUMMY_POSITION, name, link.orElse(null), message)
+        .overrideSeverity(severityLevel)
         .addFix(DUMMY_FIX)
         .build();
   }
 
   private static Context context() {
-    Context context = mock(Context.class);
-    when(context.get(ErrorProneOptions.class))
-        .thenReturn(ErrorProneOptions.processArgs(ImmutableList.of()));
+    // XXX: Use `ErrorProneOptions#processArgs` to test the
+    // `AnnotatedCompositeCodeTransformer#overrideSeverity` logic.
+    Context context = mock();
+    when(context.get(ErrorProneOptions.class)).thenReturn(ErrorProneOptions.empty());
     return context;
   }
 

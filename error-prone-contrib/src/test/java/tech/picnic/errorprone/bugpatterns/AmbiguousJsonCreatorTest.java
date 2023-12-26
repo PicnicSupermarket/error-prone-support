@@ -1,23 +1,16 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Predicates.containsPattern;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class AmbiguousJsonCreatorTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(AmbiguousJsonCreator.class, getClass())
-          .expectErrorMessage(
-              "X",
-              containsPattern("`JsonCreator.Mode` should be set for single-argument creators"));
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(AmbiguousJsonCreator.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(AmbiguousJsonCreator.class, getClass())
+        .expectErrorMessage(
+            "X", m -> m.contains("`JsonCreator.Mode` should be set for single-argument creators"))
         .addSourceLines(
             "Container.java",
             "import com.fasterxml.jackson.annotation.JsonCreator;",
@@ -118,7 +111,7 @@ final class AmbiguousJsonCreatorTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(AmbiguousJsonCreator.class, getClass())
         .addInputLines(
             "A.java",
             "import com.fasterxml.jackson.annotation.JsonCreator;",
@@ -143,6 +136,6 @@ final class AmbiguousJsonCreatorTest {
             "    return FOO;",
             "  }",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 }

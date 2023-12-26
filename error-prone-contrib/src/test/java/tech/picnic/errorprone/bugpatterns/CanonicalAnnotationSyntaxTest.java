@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class CanonicalAnnotationSyntaxTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(CanonicalAnnotationSyntax.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(CanonicalAnnotationSyntax.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(CanonicalAnnotationSyntax.class, getClass())
         .addSourceLines(
             "pkg/A.java",
             "package pkg;",
@@ -39,9 +34,11 @@ final class CanonicalAnnotationSyntaxTest {
             "  // BUG: Diagnostic contains:",
             "  @pkg.A.Foo()",
             "  A functional1();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @A.Foo()",
             "  A functional2();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo()",
             "  A functional3();",
@@ -58,9 +55,11 @@ final class CanonicalAnnotationSyntaxTest {
             "  // BUG: Diagnostic contains:",
             "  @pkg.A.Foo({1})",
             "  A singleton1();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @A.Foo({1})",
             "  A singleton2();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo({1})",
             "  A singleton3();",
@@ -68,9 +67,11 @@ final class CanonicalAnnotationSyntaxTest {
             "  // BUG: Diagnostic contains:",
             "  @pkg.A.Foo(value = 1)",
             "  A verbose1();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @A.Foo(value = 1)",
             "  A verbose2();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo(value = 1)",
             "  A verbose3();",
@@ -87,9 +88,11 @@ final class CanonicalAnnotationSyntaxTest {
             "  // BUG: Diagnostic contains:",
             "  @pkg.A.Foo(value2 = {2})",
             "  A customSingleton1();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @A.Foo(value2 = {2})",
             "  A customSingleton2();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo(value2 = {2})",
             "  A customSingleton3();",
@@ -117,11 +120,13 @@ final class CanonicalAnnotationSyntaxTest {
             "    1, 1,",
             "  })",
             "  A trailingComma1();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @A.Foo({",
             "    1, 1,",
             "  })",
             "  A trailingComma2();",
+            "",
             "  // BUG: Diagnostic contains:",
             "  @Foo({",
             "    1, 1,",
@@ -133,7 +138,7 @@ final class CanonicalAnnotationSyntaxTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(CanonicalAnnotationSyntax.class, getClass())
         .addInputLines(
             "pkg/A.java",
             "package pkg;",

@@ -4,12 +4,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class NestedOptionalsTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(NestedOptionals.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(NestedOptionals.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.util.Optional;",

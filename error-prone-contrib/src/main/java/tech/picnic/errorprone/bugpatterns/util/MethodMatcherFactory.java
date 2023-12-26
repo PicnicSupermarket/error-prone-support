@@ -18,8 +18,15 @@ import java.util.regex.Pattern;
 public final class MethodMatcherFactory {
   private static final Splitter ARGUMENT_TYPE_SPLITTER =
       Splitter.on(',').trimResults().omitEmptyStrings();
+
+  // XXX: Check whether we can use a parser for "standard" Java signatures here. Maybe
+  // `sun.reflect.generics.parser.SignatureParser`?
+  @SuppressWarnings("java:S5998" /* In practice there will be only modest recursion. */)
   private static final Pattern METHOD_SIGNATURE =
       Pattern.compile("([^\\s#(,)]+)#([^\\s#(,)]+)\\(((?:[^\\s#(,)]+(?:,[^\\s#(,)]+)*)?)\\)");
+
+  /** Instantiates a new {@link MethodMatcherFactory} instance. */
+  public MethodMatcherFactory() {}
 
   /**
    * Creates a {@link Matcher} of methods with any of the given signatures.

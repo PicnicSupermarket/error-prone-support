@@ -9,13 +9,14 @@
 set -e -u -o pipefail
 
 if [ "${#}" -gt 1 ]; then
-  echo "Usage: ./$(basename "${0}") [PatchChecks]"
+  echo "Usage: ${0} [PatchChecks]"
   exit 1
 fi
 
 patchChecks=${1:-}
 
 mvn clean test-compile fmt:format \
+  -s "$(dirname "${0}")/settings.xml" \
   -T 1.0C \
   -Perror-prone \
   -Perror-prone-fork \

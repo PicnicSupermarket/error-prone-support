@@ -1,0 +1,20 @@
+// Add support for external anchor icons.
+.external > svg {
+  width: 1rem;
+  vertical-align: text-bottom;
+}
+
+.label {
+  // Reduce spacing between labels and align with surrounding elements.
+  margin-left: 0 !important;
+}
+
+footer {
+  text-align: center;
+
+  img#logo {
+    width: 2rem;
+    margin: 0 auto;
+    display: block;
+  }
+}

@@ -5,13 +5,13 @@
     <parent>
         <groupId>tech.picnic.error-prone-support</groupId>
         <artifactId>error-prone-support</artifactId>
-        <version>0.3.1-SNAPSHOT</version>
+        <version>0.14.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>refaster-runner</artifactId>
 
     <name>Picnic :: Error Prone Support :: Refaster Runner</name>
-    <description>Exposes Refaster templates found on the classpath through a regular Error Prone check.</description>
+    <description>Exposes Refaster rules found on the classpath through a regular Error Prone check.</description>
 
     <dependencies>
         <dependency>
@@ -66,11 +66,6 @@
             <artifactId>auto-value-annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <scope>provided</scope>
@@ -81,9 +76,19 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

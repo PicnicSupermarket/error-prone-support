@@ -43,6 +43,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 // emitting a value (e.g. `Mono.empty()`, `someFlux.then()`, ...), or known not to complete normally
 // (`Mono.never()`, `someFlux.repeat()`, `Mono.error(...)`, ...). The latter category could
 // potentially be split out further.
+@SuppressWarnings("java:S1192" /* Factoring out repeated method names impacts readability. */)
 public final class NonEmptyMono extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> MONO_SIZE_CHECK =
@@ -71,10 +72,13 @@ public final class NonEmptyMono extends BugChecker implements MethodInvocationTr
           instanceMethod()
               .onDescendantOf("reactor.core.publisher.Flux")
               .named("reduce")
-              .withParameters(Object.class.getName(), BiFunction.class.getName()),
+              .withParameters(Object.class.getCanonicalName(), BiFunction.class.getCanonicalName()),
           instanceMethod()
               .onDescendantOf("reactor.core.publisher.Mono")
               .namedAnyOf("defaultIfEmpty", "hasElement", "single"));
+
+  /** Instantiates a new {@link NonEmptyMono} instance. */
+  public NonEmptyMono() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {

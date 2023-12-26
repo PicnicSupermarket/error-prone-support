@@ -46,6 +46,9 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
               CanonicalAnnotationSyntax::dropRedundantValueAttribute,
               CanonicalAnnotationSyntax::dropRedundantCurlies);
 
+  /** Instantiates a new {@link CanonicalAnnotationSyntax} instance. */
+  public CanonicalAnnotationSyntax() {}
+
   @Override
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
     return FIX_FACTORIES.stream()
@@ -88,8 +91,8 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
     ExpressionTree arg = args.get(0);
     if (state.getSourceForNode(arg) == null) {
       /*
-       * The annotation argument isn't doesn't have a source representation, e.g. because `value`
-       * isn't assigned to explicitly.
+       * The annotation argument doesn't have a source representation, e.g. because `value` isn't
+       * assigned explicitly.
        */
       return Optional.empty();
     }

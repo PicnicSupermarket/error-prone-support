@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class JUnitMethodDeclarationTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(JUnitMethodDeclaration.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(JUnitMethodDeclaration.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(JUnitMethodDeclaration.class, getClass())
         .addSourceLines(
             "A.java",
             "import static org.junit.jupiter.params.provider.Arguments.arguments;",
@@ -91,6 +86,9 @@ final class JUnitMethodDeclarationTest {
             "  private void tearDown8() {}",
             "",
             "  @Test",
+            "  void test() {}",
+            "",
+            "  @Test",
             "  void method1() {}",
             "",
             "  @Test",
@@ -144,8 +142,13 @@ final class JUnitMethodDeclarationTest {
             "  void test5() {}",
             "",
             "  @Test",
-            "  // BUG: Diagnostic contains: (but note that a method named `overload` already exists in this",
-            "  // class)",
+            "  // BUG: Diagnostic contains: (but note that a method named `toString` is already defined in this",
+            "  // class or a supertype)",
+            "  void testToString() {}",
+            "",
+            "  @Test",
+            "  // BUG: Diagnostic contains: (but note that a method named `overload` is already defined in this",
+            "  // class or a supertype)",
             "  void testOverload() {}",
             "",
             "  void overload() {}",
@@ -155,8 +158,20 @@ final class JUnitMethodDeclarationTest {
             "  void testArguments() {}",
             "",
             "  @Test",
-            "  // BUG: Diagnostic contains: (but note that `public` is a reserved keyword)",
+            "  // BUG: Diagnostic contains: (but note that `public` is not a valid identifier)",
             "  void testPublic() {}",
+            "",
+            "  @Test",
+            "  // BUG: Diagnostic contains: (but note that `null` is not a valid identifier)",
+            "  void testNull() {}",
+            "",
+            "  @Test",
+            "  // BUG: Diagnostic contains:",
+            "  void testRecord() {}",
+            "",
+            "  @Test",
+            "  // BUG: Diagnostic contains:",
+            "  void testMethodThatIsOverriddenWithoutOverrideAnnotation() {}",
             "}")
         .addSourceLines(
             "B.java",
@@ -218,6 +233,10 @@ final class JUnitMethodDeclarationTest {
             "",
             "  @Override",
             "  @Test",
+            "  void test() {}",
+            "",
+            "  @Override",
+            "  @Test",
             "  void method1() {}",
             "",
             "  @Override",
@@ -267,6 +286,10 @@ final class JUnitMethodDeclarationTest {
             "",
             "  @Override",
             "  @Test",
+            "  void testToString() {}",
+            "",
+            "  @Override",
+            "  @Test",
             "  void testOverload() {}",
             "",
             "  @Override",
@@ -279,6 +302,17 @@ final class JUnitMethodDeclarationTest {
             "  @Override",
             "  @Test",
             "  void testPublic() {}",
+            "",
+            "  @Override",
+            "  @Test",
+            "  void testNull() {}",
+            "",
+            "  @Override",
+            "  @Test",
+            "  void testRecord() {}",
+            "",
+            "  @Test",
+            "  void testMethodThatIsOverriddenWithoutOverrideAnnotation() {}",
             "}")
         .addSourceLines(
             "C.java",
@@ -306,7 +340,7 @@ final class JUnitMethodDeclarationTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(JUnitMethodDeclaration.class, getClass())
         .addInputLines(
             "A.java",
             "import static org.junit.jupiter.params.provider.Arguments.arguments;",
@@ -352,6 +386,9 @@ final class JUnitMethodDeclarationTest {
             "  protected void quux() {}",
             "",
             "  @Test",
+            "  public void testToString() {}",
+            "",
+            "  @Test",
             "  public void testOverload() {}",
             "",
             "  void overload() {}",
@@ -361,6 +398,9 @@ final class JUnitMethodDeclarationTest {
             "",
             "  @Test",
             "  private void testClass() {}",
+            "",
+            "  @Test",
+            "  private void testTrue() {}",
             "}")
         .addOutputLines(
             "A.java",
@@ -407,6 +447,9 @@ final class JUnitMethodDeclarationTest {
             "  void quux() {}",
             "",
             "  @Test",
+            "  void testToString() {}",
+            "",
+            "  @Test",
             "  void testOverload() {}",
             "",
             "  void overload() {}",
@@ -416,6 +459,9 @@ final class JUnitMethodDeclarationTest {
             "",
             "  @Test",
             "  void testClass() {}",
+            "",
+            "  @Test",
+            "  void testTrue() {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }

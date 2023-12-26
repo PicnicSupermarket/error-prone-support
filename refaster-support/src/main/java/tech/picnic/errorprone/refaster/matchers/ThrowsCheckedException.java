@@ -16,8 +16,12 @@ import java.util.Collection;
  * A matcher of functional interface expressions for which execution of the functional interface
  * method may throw a checked exception.
  */
+@SuppressWarnings("java:S2166" /* This type's name is suitable for a `Matcher`. */)
 public final class ThrowsCheckedException implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
+
+  /** Instantiates a new {@link ThrowsCheckedException} instance. */
+  public ThrowsCheckedException() {}
 
   @Override
   public boolean matches(ExpressionTree tree, VisitorState state) {
@@ -45,7 +49,9 @@ public final class ThrowsCheckedException implements Matcher<ExpressionTree> {
 
     try {
       return state.getTypes().findDescriptorType(type).getThrownTypes();
-    } catch (FunctionDescriptorLookupError e) {
+    } catch (
+        @SuppressWarnings("java:S1166" /* Not exceptional. */)
+        FunctionDescriptorLookupError e) {
       return ImmutableSet.of();
     }
   }

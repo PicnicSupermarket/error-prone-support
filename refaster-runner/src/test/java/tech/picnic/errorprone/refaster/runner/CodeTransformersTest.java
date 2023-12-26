@@ -7,16 +7,16 @@ import org.junit.jupiter.api.Test;
 final class CodeTransformersTest {
   /**
    * Verifies that {@link CodeTransformers#getAllCodeTransformers()} finds the code transformers
-   * compiled from {@link FooTemplates} on the classpath.
+   * compiled from {@link FooRules} on the classpath.
    */
   @Test
   void getAllCodeTransformers() {
     assertThat(CodeTransformers.getAllCodeTransformers().keySet())
         .containsExactlyInAnyOrder(
-            "FooTemplates$StringOfSizeZeroTemplate",
-            "FooTemplates$StringOfSizeZeroVerboseTemplate",
-            "FooTemplates$StringOfSizeOneTemplate",
-            "FooTemplates$ExtraGrouping$StringOfSizeTwoTemplate",
-            "FooTemplates$ExtraGrouping$StringOfSizeThreeTemplate");
+            "FooRules$StringOfSizeZeroRule",
+            "FooRules$StringOfSizeZeroVerboseRule",
+            "FooRules$StringOfSizeOneRule",
+            "FooRules$ExtraGrouping$StringOfSizeTwoRule",
+            "FooRules$ExtraGrouping$StringOfSizeThreeRule");
   }
 }

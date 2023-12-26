@@ -1,24 +1,17 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Predicates.containsPattern;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class StringJoinTest {
-  private final CompilationTestHelper compilationHelper =
-      CompilationTestHelper.newInstance(StringJoin.class, getClass())
-          .expectErrorMessage(
-              "valueOf", containsPattern("Prefer `String#valueOf` over `String#format`"))
-          .expectErrorMessage("join", containsPattern("Prefer `String#join` over `String#format`"));
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(StringJoin.class, getClass());
-
   @Test
   void identification() {
-    compilationHelper
+    CompilationTestHelper.newInstance(StringJoin.class, getClass())
+        .expectErrorMessage(
+            "valueOf", m -> m.contains("Prefer `String#valueOf` over `String#format`"))
+        .expectErrorMessage("join", m -> m.contains("Prefer `String#join` over `String#format`"))
         .addSourceLines(
             "A.java",
             "import java.util.Formattable;",
@@ -63,7 +56,7 @@ final class StringJoinTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(StringJoin.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",

@@ -5,13 +5,13 @@
     <parent>
         <groupId>tech.picnic.error-prone-support</groupId>
         <artifactId>error-prone-support</artifactId>
-        <version>0.3.1-SNAPSHOT</version>
+        <version>0.14.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>refaster-compiler</artifactId>
 
     <name>Picnic :: Error Prone Support :: Refaster Compiler</name>
-    <description>A Java compiler plugin that identifies and compiles Refaster templates, storing them as resource files on the classpath.</description>
+    <description>A Java compiler plugin that identifies and compiles Refaster rules, storing them as resource files on the classpath.</description>
 
     <dependencies>
         <dependency>
@@ -37,13 +37,13 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

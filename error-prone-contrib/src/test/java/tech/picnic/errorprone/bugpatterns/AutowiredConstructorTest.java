@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class AutowiredConstructorTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(AutowiredConstructor.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(AutowiredConstructor.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(AutowiredConstructor.class, getClass())
         .addSourceLines(
             "Container.java",
             "import com.google.errorprone.annotations.Immutable;",
@@ -71,7 +66,7 @@ final class AutowiredConstructorTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(AutowiredConstructor.class, getClass())
         .addInputLines(
             "Container.java",
             "import org.springframework.beans.factory.annotation.Autowired;",
@@ -94,13 +89,11 @@ final class AutowiredConstructorTest {
             "",
             "interface Container {",
             "  class A {",
-            "",
             "    @Deprecated",
             "    A() {}",
             "  }",
             "",
             "  class B {",
-            "",
             "    B(String x) {}",
             "  }",
             "}")

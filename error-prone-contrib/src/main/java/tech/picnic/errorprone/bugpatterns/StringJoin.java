@@ -1,9 +1,10 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.errorprone.BugPattern.LinkType.NONE;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.Splitter;
@@ -22,16 +23,16 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.util.Convert;
+import com.sun.tools.javac.util.Constants;
 import java.util.Formattable;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
- * A {@link BugChecker} which flags {@link String#format(String, Object...)} invocations which can
- * be replaced with a {@link String#join(CharSequence, CharSequence...)} or even a {@link
+ * A {@link BugChecker} that flags {@link String#format(String, Object...)} invocations which can be
+ * replaced with a {@link String#join(CharSequence, CharSequence...)} or even a {@link
  * String#valueOf} invocation.
  */
 // XXX: What about `v1 + "sep" + v2` and similar expressions? Do we want to rewrite those to
@@ -40,17 +41,21 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `String#join` over `String#format`",
-    linkType = NONE,
+    link = BUG_PATTERNS_BASE_URL + "StringJoin",
+    linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
 public final class StringJoin extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Splitter FORMAT_SPECIFIER_SPLITTER = Splitter.on("%s");
   private static final Matcher<ExpressionTree> STRING_FORMAT_INVOCATION =
-      staticMethod().onClass(String.class.getName()).named("format");
+      staticMethod().onClass(String.class.getCanonicalName()).named("format");
   private static final Supplier<Type> CHAR_SEQUENCE_TYPE =
       Suppliers.typeFromClass(CharSequence.class);
   private static final Supplier<Type> FORMATTABLE_TYPE = Suppliers.typeFromClass(Formattable.class);
+
+  /** Instantiates a new {@link StringJoin} instance. */
+  public StringJoin() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
@@ -145,7 +150,7 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
     SuggestedFix.Builder fix =
         SuggestedFix.builder()
             .replace(tree.getMethodSelect(), "String.join")
-            .replace(arguments.next(), String.format("\"%s\"", Convert.quote(separator)));
+            .replace(arguments.next(), Constants.format(separator));
 
     while (arguments.hasNext()) {
       ExpressionTree argument = arguments.next();

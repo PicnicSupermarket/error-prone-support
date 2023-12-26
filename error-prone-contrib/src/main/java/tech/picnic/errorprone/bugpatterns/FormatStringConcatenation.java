@@ -13,6 +13,8 @@ import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -30,9 +32,10 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.SimpleTreeVisitor;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
@@ -59,6 +62,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class FormatStringConcatenation extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
+
   /**
    * AssertJ exposes varargs {@code fail} methods with a {@link Throwable}-accepting overload, the
    * latter of which should not be flagged.
@@ -67,7 +71,8 @@ public final class FormatStringConcatenation extends BugChecker
       anyMethod()
           .anyClass()
           .withAnyName()
-          .withParameters(String.class.getName(), Throwable.class.getName());
+          .withParameters(String.class.getCanonicalName(), Throwable.class.getCanonicalName());
+
   // XXX: Drop some of these methods if we use Refaster to replace some with others.
   private static final Matcher<ExpressionTree> ASSERTJ_FORMAT_METHOD =
       anyOf(
@@ -116,18 +121,21 @@ public final class FormatStringConcatenation extends BugChecker
   private static final Matcher<ExpressionTree> GUAVA_FORMAT_METHOD =
       anyOf(
           staticMethod()
-              .onClass("com.google.common.base.Preconditions")
+              .onClass(Preconditions.class.getCanonicalName())
               .namedAnyOf("checkArgument", "checkNotNull", "checkState"),
-          staticMethod().onClass("com.google.common.base.Verify").named("verify"));
+          staticMethod().onClass(Verify.class.getCanonicalName()).named("verify"));
   // XXX: Add `PrintWriter`, maybe others.
   private static final Matcher<ExpressionTree> JDK_FORMAT_METHOD =
       anyOf(
-          staticMethod().onClass("java.lang.String").named("format"),
-          instanceMethod().onExactClass("java.util.Formatter").named("format"));
+          staticMethod().onClass(String.class.getCanonicalName()).named("format"),
+          instanceMethod().onExactClass(Formatter.class.getCanonicalName()).named("format"));
   private static final Matcher<ExpressionTree> SLF4J_FORMAT_METHOD =
       instanceMethod()
           .onDescendantOf("org.slf4j.Logger")
           .namedAnyOf("debug", "error", "info", "trace", "warn");
+
+  /** Instantiates a new {@link FormatStringConcatenation} instance. */
+  public FormatStringConcatenation() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
@@ -204,7 +212,7 @@ public final class FormatStringConcatenation extends BugChecker
   }
 
   private static class ReplacementArgumentsConstructor
-      extends SimpleTreeVisitor<Void, VisitorState> {
+      extends SimpleTreeVisitor<@Nullable Void, VisitorState> {
     private final StringBuilder formatString = new StringBuilder();
     private final List<Tree> formatArguments = new ArrayList<>();
     private final String formatSpecifier;
@@ -213,9 +221,8 @@ public final class FormatStringConcatenation extends BugChecker
       this.formatSpecifier = formatSpecifier;
     }
 
-    @Nullable
     @Override
-    public Void visitBinary(BinaryTree tree, VisitorState state) {
+    public @Nullable Void visitBinary(BinaryTree tree, VisitorState state) {
       if (tree.getKind() == Kind.PLUS && isStringTyped(tree, state)) {
         tree.getLeftOperand().accept(this, state);
         tree.getRightOperand().accept(this, state);
@@ -226,15 +233,13 @@ public final class FormatStringConcatenation extends BugChecker
       return null;
     }
 
-    @Nullable
     @Override
-    public Void visitParenthesized(ParenthesizedTree tree, VisitorState state) {
+    public @Nullable Void visitParenthesized(ParenthesizedTree tree, VisitorState state) {
       return tree.getExpression().accept(this, state);
     }
 
-    @Nullable
     @Override
-    protected Void defaultAction(Tree tree, VisitorState state) {
+    protected @Nullable Void defaultAction(Tree tree, VisitorState state) {
       appendExpression(tree);
       return null;
     }

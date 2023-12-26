@@ -39,6 +39,8 @@ public class NodeBenchmark {
   private ImmutableListMultimap<NodeTestCase<Integer>, NodeTestCaseEntry<Integer>> testCases;
 
   public static void main(String[] args) throws RunnerException {
+    // XXX: Update `ErrorProneRuntimeClasspath` to allow same-package `Class` references.
+    @SuppressWarnings("ErrorProneRuntimeClasspath")
     String testRegex = Pattern.quote(NodeBenchmark.class.getCanonicalName());
     new Runner(new OptionsBuilder().include(testRegex).forks(1).build()).run();
   }

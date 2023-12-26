@@ -22,6 +22,10 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import java.io.InputStream;
+import java.time.ZoneId;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * A {@link BugChecker} that flags {@code @RequestMapping} methods that have one or more parameters
@@ -70,18 +74,25 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
                           isType(ANN_PACKAGE_PREFIX + "RequestHeader"),
                           isType(ANN_PACKAGE_PREFIX + "RequestParam"),
                           isType(ANN_PACKAGE_PREFIX + "RequestPart"))),
-                  isSameType("java.io.InputStream"),
-                  isSameType("java.time.ZoneId"),
-                  isSameType("java.util.Locale"),
-                  isSameType("java.util.TimeZone"),
+                  isSameType(InputStream.class.getCanonicalName()),
+                  isSameType(Locale.class.getCanonicalName()),
+                  isSameType(TimeZone.class.getCanonicalName()),
+                  isSameType(ZoneId.class.getCanonicalName()),
+                  isSameType("jakarta.servlet.http.HttpServletRequest"),
+                  isSameType("jakarta.servlet.http.HttpServletResponse"),
                   isSameType("javax.servlet.http.HttpServletRequest"),
                   isSameType("javax.servlet.http.HttpServletResponse"),
                   isSameType("org.springframework.http.HttpMethod"),
+                  isSameType("org.springframework.ui.Model"),
+                  isSameType("org.springframework.validation.BindingResult"),
                   isSameType("org.springframework.web.context.request.NativeWebRequest"),
                   isSameType("org.springframework.web.context.request.WebRequest"),
                   isSameType("org.springframework.web.server.ServerWebExchange"),
                   isSameType("org.springframework.web.util.UriBuilder"),
                   isSameType("org.springframework.web.util.UriComponentsBuilder"))));
+
+  /** Instantiates a new {@link RequestMappingAnnotation} instance. */
+  public RequestMappingAnnotation() {}
 
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
@@ -92,8 +103,9 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
             && LACKS_PARAMETER_ANNOTATION.matches(tree, state)
         ? buildDescription(tree)
             .setMessage(
-                "Not all parameters of this request mapping method are annotated; this may be a mistake. "
-                    + "If the unannotated parameters represent query string parameters, annotate them with `@RequestParam`.")
+                "Not all parameters of this request mapping method are annotated; this may be a "
+                    + "mistake. If the unannotated parameters represent query string parameters, "
+                    + "annotate them with `@RequestParam`.")
             .build()
         : Description.NO_MATCH;
   }

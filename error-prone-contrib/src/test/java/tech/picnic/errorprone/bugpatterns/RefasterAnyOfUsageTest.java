@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class RefasterAnyOfUsageTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(RefasterAnyOfUsage.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(RefasterAnyOfUsage.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(RefasterAnyOfUsage.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.google.errorprone.refaster.Refaster;",
@@ -38,7 +33,7 @@ final class RefasterAnyOfUsageTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(RefasterAnyOfUsage.class, getClass())
         .addInputLines(
             "A.java",
             "import com.google.errorprone.refaster.Refaster;",

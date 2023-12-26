@@ -6,14 +6,9 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class MethodReferenceUsageTest {
-  private final CompilationTestHelper compilationTestHelper =
-      CompilationTestHelper.newInstance(MethodReferenceUsage.class, getClass());
-  private final BugCheckerRefactoringTestHelper refactoringTestHelper =
-      BugCheckerRefactoringTestHelper.newInstance(MethodReferenceUsage.class, getClass());
-
   @Test
   void identification() {
-    compilationTestHelper
+    CompilationTestHelper.newInstance(MethodReferenceUsage.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.google.common.collect.Streams;",
@@ -323,7 +318,7 @@ final class MethodReferenceUsageTest {
 
   @Test
   void replacement() {
-    refactoringTestHelper
+    BugCheckerRefactoringTestHelper.newInstance(MethodReferenceUsage.class, getClass())
         .addInputLines(
             "A.java",
             "import static java.util.Collections.emptyList;",

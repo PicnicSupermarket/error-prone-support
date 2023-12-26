@@ -42,16 +42,19 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
   private static final long serialVersionUID = 1L;
   private static final Splitter CLASS_NAME_SPLITTER = Splitter.on('.').limit(2);
 
+  AnnotatedCompositeCodeTransformer() {}
+
   abstract String packageName();
 
   /**
-   * Returns the {@link CodeTransformer}s to which actual code transformation is delegated.
+   * Return The {@link CodeTransformer}s to which to delegate.
    *
-   * @return The transformers to which this instance's {@link #annotations() annotations} apply.
+   * @return The ordered {@link CodeTransformer}s to which to delegate.
    */
   public abstract ImmutableList<CodeTransformer> transformers();
 
   @Override
+  @SuppressWarnings("java:S3038" /* All AutoValue properties must be specified explicitly. */)
   public abstract ImmutableClassToInstanceMap<Annotation> annotations();
 
   /**
@@ -70,16 +73,15 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
   }
 
   /**
-   * Creates a derivative {@link AnnotatedCompositeCodeTransformer} that wraps only the given
-   * transformer.
+   * Returns a new {@link AnnotatedCompositeCodeTransformer} similar to this one, but with the
+   * specified transformers.
    *
-   * @param transformer The {@link CodeTransformer} to which the new instance will delegate
-   *     transformations.
-   * @return A non-{@code null} {@link AnnotatedCompositeCodeTransformer} with the same {@link
-   *     #packageName() package name} and {@link #annotations() annotations} as this transformer.
+   * @param transformers The replacement transformers.
+   * @return A derivative {@link AnnotatedCompositeCodeTransformer}.
    */
-  public AnnotatedCompositeCodeTransformer withTransformer(CodeTransformer transformer) {
-    return create(packageName(), ImmutableList.of(transformer), annotations());
+  public AnnotatedCompositeCodeTransformer withTransformers(CodeTransformer... transformers) {
+    return new AutoValue_AnnotatedCompositeCodeTransformer(
+        packageName(), ImmutableList.copyOf(transformers), annotations());
   }
 
   @Override
@@ -93,6 +95,7 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
     }
   }
 
+  @SuppressWarnings("RestrictedApi" /* We create a heavily customized `Description` here. */)
   private Description augmentDescription(
       Description description, CodeTransformer delegate, Context context) {
     String shortCheckName = getShortCheckName(description.checkName);
@@ -100,23 +103,24 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
             description.position,
             shortCheckName,
             getLinkPattern(delegate, shortCheckName).orElse(null),
-            overrideSeverity(getSeverity(delegate), context),
             getDescription(delegate))
+        .overrideSeverity(overrideSeverity(getSeverity(delegate), context))
         .addAllFixes(description.fixes)
         .build();
   }
 
   private String getShortCheckName(String fullCheckName) {
-    if (packageName().isEmpty()) {
+    String packageName = packageName();
+    if (packageName.isEmpty()) {
       return fullCheckName;
     }
 
-    String prefix = packageName() + '.';
+    String prefix = packageName + '.';
     checkState(
         fullCheckName.startsWith(prefix),
-        "Refaster template class '%s' is not located in package '%s'",
+        "Refaster rule class '%s' is not located in package '%s'",
         fullCheckName,
-        packageName());
+        packageName);
 
     return fullCheckName.substring(prefix.length());
   }
@@ -161,8 +165,7 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
 
   private static SeverityLevel overrideSeverity(SeverityLevel severity, Context context) {
     ErrorProneOptions options = context.get(ErrorProneOptions.class);
-    SeverityLevel minSeverity =
-        ErrorProneFork.isSuggestionsAsWarningsEnabled(options) ? WARNING : SUGGESTION;
+    SeverityLevel minSeverity = options.isSuggestionsAsWarnings() ? WARNING : SUGGESTION;
     SeverityLevel maxSeverity = options.isDropErrorsToWarnings() ? WARNING : ERROR;
 
     return Comparators.max(Comparators.min(severity, minSeverity), maxSeverity);

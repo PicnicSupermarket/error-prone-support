@@ -1,0 +1,14 @@
+{
+  "testClass": "SingleFileCompilationTestHelperTest",
+  "testCases": [
+    {
+      "classUnderTest": "SingleFileCompilationTestHelperTest.TestChecker",
+      "entries": [
+        {
+          "path": "A.java",
+          "code": "// BUG: Diagnostic contains:\nclass A {}\n"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "testClass": "MultiFileCompilationTestHelperTest",
+  "testCases": [
+    {
+      "classUnderTest": "MultiFileCompilationTestHelperTest.TestChecker",
+      "entries": [
+        {
+          "path": "A.java",
+          "code": "// BUG: Diagnostic contains:\nclass A {}\n"
+        },
+        {
+          "path": "B.java",
+          "code": "// BUG: Diagnostic contains:\nclass B {}\n"
+        }
+      ]
+    }
+  ]
+}
