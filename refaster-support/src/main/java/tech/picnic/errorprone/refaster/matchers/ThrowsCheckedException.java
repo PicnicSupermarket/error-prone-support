@@ -1,13 +1,11 @@
 package tech.picnic.errorprone.refaster.matchers;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MemberReferenceTree;
-import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types.FunctionDescriptorLookupError;
 import java.util.Collection;
@@ -25,42 +23,45 @@ public final class ThrowsCheckedException implements Matcher<ExpressionTree> {
 
   @Override
   public boolean matches(ExpressionTree tree, VisitorState state) {
-    return containsCheckedException(getThrownTypes(tree, state), state);
-  }
-
-  private static Collection<Type> getThrownTypes(ExpressionTree tree, VisitorState state) {
     if (tree instanceof LambdaExpressionTree) {
-      return ASTHelpers.getThrownExceptions(((LambdaExpressionTree) tree).getBody(), state);
+      return throwsCheckedException((LambdaExpressionTree) tree, state);
     }
 
     if (tree instanceof MemberReferenceTree) {
-      Symbol symbol = ASTHelpers.getSymbol(tree);
-      if (symbol == null) {
-        return ImmutableSet.of();
-      }
-
-      return symbol.type.getThrownTypes();
+      return throwsCheckedException((MemberReferenceTree) tree, state);
     }
 
     Type type = ASTHelpers.getType(tree);
-    if (type == null) {
-      return ImmutableSet.of();
-    }
+    return type != null && throwsCheckedException(type, state);
+  }
 
+  private static boolean throwsCheckedException(LambdaExpressionTree tree, VisitorState state) {
+    return containsCheckedException(ASTHelpers.getThrownExceptions(tree.getBody(), state), state);
+  }
+
+  private static boolean throwsCheckedException(MemberReferenceTree tree, VisitorState state) {
+    return containsCheckedException(ASTHelpers.getSymbol(tree).type.getThrownTypes(), state);
+  }
+
+  private static boolean throwsCheckedException(Type type, VisitorState state) {
     try {
-      return state.getTypes().findDescriptorType(type).getThrownTypes();
+      return containsCheckedException(
+          state.getTypes().findDescriptorType(type).getThrownTypes(), state);
     } catch (
         @SuppressWarnings("java:S1166" /* Not exceptional. */)
         FunctionDescriptorLookupError e) {
-      return ImmutableSet.of();
+      /* This isn't a functional interface: check its supertypes. */
+      return state.getTypes().directSupertypes(type).stream()
+          .anyMatch(t -> throwsCheckedException(t, state));
     }
   }
 
   private static boolean containsCheckedException(Collection<Type> types, VisitorState state) {
-    return !types.stream()
-        .allMatch(
-            t ->
-                ASTHelpers.isSubtype(t, state.getSymtab().runtimeExceptionType, state)
-                    || ASTHelpers.isSubtype(t, state.getSymtab().errorType, state));
+    return types.stream().anyMatch(type -> isCheckedException(type, state));
+  }
+
+  private static boolean isCheckedException(Type type, VisitorState state) {
+    return !ASTHelpers.isSubtype(type, state.getSymtab().runtimeExceptionType, state)
+        && !ASTHelpers.isSubtype(type, state.getSymtab().errorType, state);
   }
 }
