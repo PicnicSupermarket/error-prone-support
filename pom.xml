@@ -330,7 +330,7 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway</artifactId>
-                <version>0.10.18</version>
+                <version>0.10.19</version>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
