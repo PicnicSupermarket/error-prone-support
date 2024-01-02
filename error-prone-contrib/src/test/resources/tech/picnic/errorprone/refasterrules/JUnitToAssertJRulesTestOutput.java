@@ -3,7 +3,6 @@ package tech.picnic.errorprone.refasterrules;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -41,11 +40,11 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Object testFailWithMessage() {
-    return fail("foo");
+    return org.assertj.core.api.Assertions.fail("foo");
   }
 
   Object testFailWithMessageAndThrowable() {
-    return fail("foo", new IllegalStateException());
+    return org.assertj.core.api.Assertions.fail("foo", new IllegalStateException());
   }
 
   void testFailWithThrowable() {
