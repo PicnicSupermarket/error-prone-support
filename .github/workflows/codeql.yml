@@ -32,13 +32,13 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@407ffafae6a767df3e0230c3df91b6443ae8df75 # v2.22.8
+        uses: github/codeql-action/init@012739e5082ff0c22ca6d6ab32e07c36df03c4a4 # v3.22.12
         with:
           languages: ${{ matrix.language }}
       - name: Perform minimal build
         if: matrix.language == 'java'
         run: mvn -T1C clean package -DskipTests -Dverification.skip
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@407ffafae6a767df3e0230c3df91b6443ae8df75 # v2.22.8
+        uses: github/codeql-action/analyze@012739e5082ff0c22ca6d6ab32e07c36df03c4a4 # v3.22.12
         with:
           category: /language:${{ matrix.language }}
