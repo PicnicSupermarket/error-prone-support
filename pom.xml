@@ -207,7 +207,12 @@
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.24.0</version.error-prone-orig>
         <version.jdk>11</version.jdk>
+        <version.jmh>1.37</version.jmh>
         <version.maven>3.8.7</version.maven>
+        <!-- XXX: Consider providing our own implementation with similar
+        functionality, and designing it such that JMH classes would not need to
+        be annotated `@Open`. -->
+        <version.nopen>1.0.1</version.nopen>
         <version.pitest-git>1.1.4</version.pitest-git>
     </properties>
 
@@ -324,8 +329,13 @@
             </dependency>
             <dependency>
                 <groupId>com.jakewharton.nopen</groupId>
+                <artifactId>nopen-annotations</artifactId>
+                <version>${version.nopen}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jakewharton.nopen</groupId>
                 <artifactId>nopen-checker</artifactId>
-                <version>1.0.1</version>
+                <version>${version.nopen}</version>
             </dependency>
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
@@ -452,6 +462,16 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>${version.jmh}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-generator-annprocess</artifactId>
+                <version>${version.jmh}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-bom</artifactId>
                 <version>2.0.10</version>
@@ -545,7 +565,6 @@
                     <configuration>
                         <bundledSignatures>
                             <bundledSignature>jdk-internal</bundledSignature>
-                            <bundledSignature>jdk-reflection</bundledSignature>
                             <bundledSignature>jdk-system-out</bundledSignature>
                             <!-- Other bundles are available but currently not
                             enabled:
@@ -555,6 +574,10 @@
                             - jdk-deprecated: we compile with `-Xlint:all`,
                               which causes the build to fail when _any_
                               deprecated method is called.
+                            - jdk-reflection: this bundle should probably be
+                              enabled, but currently
+                              `java.lang.reflect.AccessibleObject#setAccessible`
+                              is still called in various places.
                             - jdk-non-portable: the Error Prone integration
                               crucially relies on some of these APIs.
                             - jdk-unsafe: see
@@ -888,8 +911,17 @@
                                 <artifactId>auto-value</artifactId>
                             </path>
                             <path>
+                                <groupId>com.google.auto.value</groupId>
+                                <artifactId>auto-value</artifactId>
+                                <version>${version.auto-value}</version>
+                            </path>
+                            <path>
                                 <groupId>com.google.auto.service</groupId>
                                 <artifactId>auto-service</artifactId>
+                            </path>
+                            <path>
+                                <groupId>org.openjdk.jmh</groupId>
+                                <artifactId>jmh-generator-annprocess</artifactId>
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs>
@@ -1158,6 +1190,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.1.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
                     <version>2.3.0</version>
                     <configuration>
@@ -1230,6 +1267,7 @@
                                 <!-- -->
                                 GPL-2.0-with-classpath-exception
                                 | CDDL/GPLv2+CE
+                                | GNU General Public License (GPL), version 2, with the Classpath exception
                                 | GNU General Public License, version 2 (GPL2), with the classpath exception
                                 | GNU General Public License, version 2, with the Classpath Exception
                                 | GPL2 w/ CPE
@@ -1436,17 +1474,6 @@
                                         </dependencies>
                                     </banDuplicateClasses>
                                 </rules>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <systemPropertyVariables>
-                                    <!-- Property used by `ErrorProneForkTest`
-                                    to verify fork identification. -->
-                                    <error-prone-fork-in-use>true</error-prone-fork-in-use>
-                                </systemPropertyVariables>
                             </configuration>
                         </plugin>
                     </plugins>
@@ -1939,6 +1966,67 @@
                         <artifactId>maven-gpg-plugin</artifactId>
                     </plugin>
                     <?SORTPOM RESUME?>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- Enables execution of a JMH benchmark. Given a benchmark class
+            `tech.picnic.MyBenchmark`, the following command (executed against
+            the (sub)module in which the benchmark resides) will compile and
+            execute said benchmark:
+
+              mvn process-test-classes -Dverification.skip \
+                -Djmh.run-benchmark=tech.picnic.MyBenchmark
+            -->
+            <id>run-jmh-benchmark</id>
+            <activation>
+                <property>
+                    <name>jmh.run-benchmark</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>build-jmh-runtime-classpath</id>
+                                <goals>
+                                    <goal>build-classpath</goal>
+                                </goals>
+                                <configuration>
+                                    <outputProperty>testClasspath</outputProperty>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>run-jmh-benchmark</id>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <phase>process-test-classes</phase>
+                                <configuration>
+                                    <classpathScope>test</classpathScope>
+                                    <mainClass>${jmh.run-benchmark}</mainClass>
+                                    <systemProperties>
+                                        <!-- The runtime classpath is defined
+                                        in this way so that any JVMs forked by
+                                        JMH will have the desired classpath. -->
+                                        <systemProperty>
+                                            <key>java.class.path</key>
+                                            <value>${project.build.testOutputDirectory}${path.separator}${project.build.outputDirectory}${path.separator}${testClasspath}</value>
+                                        </systemProperty>
+                                    </systemProperties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>

@@ -46,7 +46,12 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
 
   abstract String packageName();
 
-  abstract ImmutableList<CodeTransformer> transformers();
+  /**
+   * Return The {@link CodeTransformer}s to which to delegate.
+   *
+   * @return The ordered {@link CodeTransformer}s to which to delegate.
+   */
+  public abstract ImmutableList<CodeTransformer> transformers();
 
   @Override
   @SuppressWarnings("java:S3038" /* All AutoValue properties must be specified explicitly. */)
@@ -65,6 +70,18 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
       ImmutableList<CodeTransformer> transformers,
       ImmutableClassToInstanceMap<Annotation> annotations) {
     return new AutoValue_AnnotatedCompositeCodeTransformer(packageName, transformers, annotations);
+  }
+
+  /**
+   * Returns a new {@link AnnotatedCompositeCodeTransformer} similar to this one, but with the
+   * specified transformers.
+   *
+   * @param transformers The replacement transformers.
+   * @return A derivative {@link AnnotatedCompositeCodeTransformer}.
+   */
+  public AnnotatedCompositeCodeTransformer withTransformers(CodeTransformer... transformers) {
+    return new AutoValue_AnnotatedCompositeCodeTransformer(
+        packageName(), ImmutableList.copyOf(transformers), annotations());
   }
 
   @Override
