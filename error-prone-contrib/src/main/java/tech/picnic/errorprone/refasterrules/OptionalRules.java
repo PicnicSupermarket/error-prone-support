@@ -388,8 +388,7 @@ final class OptionalRules {
     @BeforeTemplate
     Optional<T> before(Optional<T> optional, Comparator<? super T> comparator) {
       return Refaster.anyOf(
-          optional.or(() -> Optional.empty()),
-          optional.or(Optional::empty),
+          optional.or(Refaster.anyOf(() -> Optional.empty(), Optional::empty)),
           optional.stream().findFirst(),
           optional.stream().findAny(),
           optional.stream().min(comparator),
