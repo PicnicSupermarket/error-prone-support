@@ -205,7 +205,7 @@
         <version.auto-value>1.10.4</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.24.0</version.error-prone-orig>
+        <version.error-prone-orig>2.24.1</version.error-prone-orig>
         <version.jdk>11</version.jdk>
         <version.maven>3.8.7</version.maven>
         <version.pitest-git>1.1.4</version.pitest-git>
