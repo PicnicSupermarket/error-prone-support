@@ -122,8 +122,8 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         Optional.of("bar").or(Optional::empty),
         Optional.of("baz").stream().findFirst(),
         Optional.of("qux").stream().findAny(),
-        Optional.of("corge").stream().min(String::compareTo),
-        Optional.of("grault").stream().max(String::compareTo));
+        Optional.of("quux").stream().min(String::compareTo),
+        Optional.of("quuz").stream().max(String::compareTo));
   }
 
   ImmutableSet<Optional<String>> testOptionalFilter() {

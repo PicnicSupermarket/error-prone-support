@@ -119,8 +119,8 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         Optional.of("bar"),
         Optional.of("baz"),
         Optional.of("qux"),
-        Optional.of("corge"),
-        Optional.of("grault"));
+        Optional.of("quux"),
+        Optional.of("quuz"));
   }
 
   ImmutableSet<Optional<String>> testOptionalFilter() {
