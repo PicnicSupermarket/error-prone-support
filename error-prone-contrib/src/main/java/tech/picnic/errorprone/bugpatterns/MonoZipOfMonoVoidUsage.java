@@ -6,7 +6,6 @@ import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyOf;
-import static com.google.errorprone.matchers.Matchers.argument;
 import static com.google.errorprone.matchers.Matchers.hasArguments;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
@@ -58,43 +57,38 @@ import reactor.core.publisher.Mono;
 public final class MonoZipOfMonoVoidUsage extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Supplier<Type> MONO_SUPPLIER = type("reactor.core.publisher.Mono");
 
   /**
    * In fact, we use {@code Mono<Void>} everywhere in codebases instead of {@code Mono<Object>}
    * (actual return type of {@link Mono#empty()}) to represent empty publisher.
    */
-  private static final Supplier<Type> MONO_VOID_TYPE_SUPPLIER =
-      VisitorState.memoize(generic(MONO_SUPPLIER, type(Void.class.getCanonicalName())));
-
   private static final String MONO_ZIP_WITH_METHOD = "zipWith";
+
   private static final String MONO_ZIP_METHOD = "zip";
   private static final String MONO_EMPTY_METHOD = "empty";
+  private static final Supplier<Type> MONO_VOID_TYPE_SUPPLIER =
+      VisitorState.memoize(
+          generic(type("reactor.core.publisher.Mono"), type(Void.class.getCanonicalName())));
+  private static final Matcher<ExpressionTree> MONO_ZIP_AND_MONO_ZIP_WITH =
+      anyOf(
+          instanceMethod().onDescendantOf(MONO_VOID_TYPE_SUPPLIER).named(MONO_ZIP_WITH_METHOD),
+          staticMethod().onClass(MONO_VOID_TYPE_SUPPLIER).named(MONO_ZIP_METHOD));
+  private static final Matcher<ExpressionTree> GENERIC_ARGUMENT_DERIVED_FROM_MONO_TYPE =
+      toType(MethodInvocationTree.class, hasGenericArgumentOfExactType(MONO_VOID_TYPE_SUPPLIER));
+  private static final Matcher<ExpressionTree> HAS_MONO_EMPTY_AS_ARGUMENT =
+      toType(
+          MethodInvocationTree.class,
+          hasArguments(
+              AT_LEAST_ONE,
+              staticMethod().onClass(MONO_VOID_TYPE_SUPPLIER).named(MONO_EMPTY_METHOD)));
+  private static final Matcher<ExpressionTree> OPERATORS_WITH_MONO_VOID_GENERIC_ARGUMENT =
+      allOf(
+          MONO_ZIP_AND_MONO_ZIP_WITH,
+          anyOf(GENERIC_ARGUMENT_DERIVED_FROM_MONO_TYPE, HAS_MONO_EMPTY_AS_ARGUMENT));
   private static final Matcher<ExpressionTree> ANY_MONO_VOID_IN_PUBLISHERS =
       anyOf(
-          allOf(
-              instanceMethod().onDescendantOf(MONO_SUPPLIER).named(MONO_ZIP_WITH_METHOD),
-              toType(
-                  MethodInvocationTree.class,
-                  hasGenericArgumentOfExactType(MONO_VOID_TYPE_SUPPLIER))),
-          allOf(
-              instanceMethod().onDescendantOf(MONO_SUPPLIER).named(MONO_ZIP_WITH_METHOD),
-              toType(
-                  MethodInvocationTree.class,
-                  argument(0, staticMethod().onClass(MONO_SUPPLIER).named(MONO_EMPTY_METHOD)))),
-          onClassWithMethodName(MONO_VOID_TYPE_SUPPLIER, MONO_ZIP_WITH_METHOD),
-          allOf(
-              staticMethod().onClass(MONO_SUPPLIER).named(MONO_ZIP_METHOD),
-              toType(
-                  MethodInvocationTree.class,
-                  hasGenericArgumentOfExactType(MONO_VOID_TYPE_SUPPLIER))),
-          allOf(
-              staticMethod().onClass(MONO_SUPPLIER).named(MONO_ZIP_METHOD),
-              toType(
-                  MethodInvocationTree.class,
-                  hasArguments(
-                      AT_LEAST_ONE,
-                      staticMethod().onClass(MONO_SUPPLIER).named(MONO_EMPTY_METHOD)))));
+          OPERATORS_WITH_MONO_VOID_GENERIC_ARGUMENT,
+          onClassWithMethodName(MONO_VOID_TYPE_SUPPLIER, MONO_ZIP_WITH_METHOD));
 
   /** Instantiates a new {@link MonoZipOfMonoVoidUsage} instance. */
   public MonoZipOfMonoVoidUsage() {}
