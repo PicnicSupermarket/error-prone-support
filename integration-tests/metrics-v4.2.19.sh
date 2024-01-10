@@ -18,4 +18,4 @@ report_directory="$([ "${#}" = 0 ] || ([ -z "${do_sync}" ] && echo "${1}") || ([
 # as they introduce changes that expect guava to be on the classpath.
 patch_flags="-Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern=^((?!(Immutable|Preconditions|StringRules\.StringIsNullOrEmpty)).*)"
 
-"$(dirname ${0})"/integration-test.sh "$test_name" "$project" "$repository" "$revision" "" "${patch_flags}" "" "" "$do_sync" "$report_directory" 
+"$(dirname ${0})"/integration-test.sh "$test_name" "$project" "$repository" "$revision" "" "" "${patch_flags}" "" "" "$do_sync" "$report_directory" 

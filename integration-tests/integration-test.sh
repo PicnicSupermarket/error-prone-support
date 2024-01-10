@@ -8,8 +8,8 @@ integration_test_root="$(cd "$(dirname -- "${0}")" && pwd)"
 error_prone_support_root="${integration_test_root}/.."
 repos_root="${integration_test_root}/.repos"
 
-if [ "${#}" -ne 10 ]; then
-  >&2 echo "Usage $(basename "${0}") [TestName] [Project] [Repository] [Revision] [BuildFlags] [PatchFlags] [ValidationEpFlags] [ValidationMvnFlags] [DoSync] [ReportDirectory]"
+if [ "${#}" -ne 11 ]; then
+  >&2 echo "Usage $(basename "${0}") [TestName] [Project] [Repository] [Revision] [BuildFlags] [AdditionalSourceDirectories] [PatchFlags] [ValidationEpFlags] [ValidationMvnFlags] [DoSync] [ReportDirectory]"
   exit 1
 fi
 
@@ -18,11 +18,12 @@ project="${2}"
 repository="${3}"
 revision="${4}"
 build_flags="${5}"
-patch_flags="${6}"
-validation_ep_flags="${7}"
-validation_mvn_flags="${8}"
-do_sync="${9}"
-report_directory="${10}"
+additional_src_directories="${6}"
+patch_flags="${7}"
+validation_ep_flags="${8}"
+validation_mvn_flags="${9}"
+do_sync="${10}"
+report_directory="${11}"
 
 if [ -n "${report_directory}" ]; then
   mkdir -p "${report_directory}"
@@ -55,7 +56,7 @@ shared_build_flags="
   -Derror-prone-support.version=$(
     mvn -f "${error_prone_support_root}" help:evaluate -Dexpression=project.version -q -DforceStdout
   )
-  -DadditionalSourceDirectories=\${project.basedir}\${file.separator}src\${file.separator}it\${file.separator}java,\${project.basedir}\${file.separator}src\${file.separator}xdocs-examples\${file.separator}java
+  -DadditionalSourceDirectories=${additional_src_directories}
   ${build_flags}
   "
 
