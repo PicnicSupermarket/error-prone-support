@@ -39,6 +39,15 @@ final class RefasterMethodParameterOrderTest {
             "      assertThat(map).containsValue(value);",
             "    }",
             "  }",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  class UnusedLexicographicallyUnorderedParameters {",
+            "    @BeforeTemplate",
+            "    void foo(int a, int b) {}",
+            "",
+            "    @BeforeTemplate",
+            "    void bar(int b, int a) {}",
+            "  }",
             "}")
         .doTest();
   }
