@@ -19,4 +19,4 @@ build_flags="-Dassertj.version=3.24.2"
 validation_mvn_flags="-Dtest=!MetadataGeneratorUtilTest#metadataFilesGenerationAllFiles,!XdocsJavaDocsTest#allCheckSectionJavaDocs" 
 additional_src_directories="\${project.basedir}\${file.separator}src\${file.separator}it\${file.separator}java,\${project.basedir}\${file.separator}src\${file.separator}xdocs-examples\${file.separator}java"
 
-"$(dirname ${0})"/integration-test.sh "$test_name" "$project" "$repository" "$revision" "$build_flags" "$additional_src_directories" "" "$validation_mvn_flags" "$do_sync" "$report_directory"
+"$(dirname ${0})"/integration-test.sh "$test_name" "$project" "$repository" "$revision" "$build_flags" "$additional_src_directories" "" "" "$validation_mvn_flags" "$do_sync" "$report_directory"
