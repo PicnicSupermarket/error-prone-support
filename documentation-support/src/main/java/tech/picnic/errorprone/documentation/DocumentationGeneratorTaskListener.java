@@ -1,10 +1,5 @@
 package tech.picnic.errorprone.documentation;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
@@ -15,10 +10,7 @@ import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.util.Context;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,9 +30,6 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
           ImmutableList.copyOf(
               ServiceLoader.load(
                   Extractor.class, DocumentationGeneratorTaskListener.class.getClassLoader()));
-
-  private static final ObjectMapper OBJECT_MAPPER =
-      new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 
   private final Context context;
   private final Path docsPath;
@@ -94,13 +83,7 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   }
 
   private <T> void writeToFile(String identifier, String className, T data) {
-    File file = docsPath.resolve(String.format("%s-%s.json", identifier, className)).toFile();
-
-    try (FileWriter fileWriter = new FileWriter(file, UTF_8)) {
-      OBJECT_MAPPER.writeValue(fileWriter, data);
-    } catch (IOException e) {
-      throw new UncheckedIOException(String.format("Cannot write to file '%s'", file.getPath()), e);
-    }
+    Json.write(docsPath.resolve(String.format("%s-%s.json", identifier, className)), data);
   }
 
   private static String getSimpleClassName(URI path) {

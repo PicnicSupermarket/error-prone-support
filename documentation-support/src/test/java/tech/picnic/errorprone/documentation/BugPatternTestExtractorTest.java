@@ -1,13 +1,16 @@
 package tech.picnic.errorprone.documentation;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.io.Resources;
-import java.io.IOException;
+import com.google.common.collect.ImmutableList;
+import java.net.URI;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import tech.picnic.errorprone.documentation.BugPatternTestExtractor.IdentificationTestEntry;
+import tech.picnic.errorprone.documentation.BugPatternTestExtractor.ReplacementTestEntry;
+import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestCase;
+import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestCases;
 
 final class BugPatternTestExtractorTest {
   @Test
@@ -246,7 +249,7 @@ final class BugPatternTestExtractorTest {
   }
 
   @Test
-  void singleFileCompilationTestHelper(@TempDir Path outputDirectory) throws IOException {
+  void singleFileCompilationTestHelper(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "SingleFileCompilationTestHelperTest.java",
@@ -263,12 +266,22 @@ final class BugPatternTestExtractorTest {
         "  }",
         "}");
 
-    verifyGeneratedFileContent(outputDirectory, "SingleFileCompilationTestHelperTest");
+    verifyGeneratedFileContent(
+        outputDirectory,
+        "SingleFileCompilationTestHelperTest",
+        TestCases.create(
+            URI.create("file:///SingleFileCompilationTestHelperTest.java"),
+            "SingleFileCompilationTestHelperTest",
+            ImmutableList.of(
+                TestCase.create(
+                    "SingleFileCompilationTestHelperTest.TestChecker",
+                    ImmutableList.of(
+                        IdentificationTestEntry.create(
+                            "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))))));
   }
 
   @Test
-  void singleFileCompilationTestHelperWithSetArgs(@TempDir Path outputDirectory)
-      throws IOException {
+  void singleFileCompilationTestHelperWithSetArgs(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "SingleFileCompilationTestHelperWithSetArgsTest.java",
@@ -286,11 +299,22 @@ final class BugPatternTestExtractorTest {
         "  }",
         "}");
 
-    verifyGeneratedFileContent(outputDirectory, "SingleFileCompilationTestHelperWithSetArgsTest");
+    verifyGeneratedFileContent(
+        outputDirectory,
+        "SingleFileCompilationTestHelperWithSetArgsTest",
+        TestCases.create(
+            URI.create("file:///SingleFileCompilationTestHelperWithSetArgsTest.java"),
+            "SingleFileCompilationTestHelperWithSetArgsTest",
+            ImmutableList.of(
+                TestCase.create(
+                    "SingleFileCompilationTestHelperWithSetArgsTest.TestChecker",
+                    ImmutableList.of(
+                        IdentificationTestEntry.create(
+                            "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))))));
   }
 
   @Test
-  void multiFileCompilationTestHelper(@TempDir Path outputDirectory) throws IOException {
+  void multiFileCompilationTestHelper(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "MultiFileCompilationTestHelperTest.java",
@@ -308,11 +332,24 @@ final class BugPatternTestExtractorTest {
         "  }",
         "}");
 
-    verifyGeneratedFileContent(outputDirectory, "MultiFileCompilationTestHelperTest");
+    verifyGeneratedFileContent(
+        outputDirectory,
+        "MultiFileCompilationTestHelperTest",
+        TestCases.create(
+            URI.create("file:///MultiFileCompilationTestHelperTest.java"),
+            "MultiFileCompilationTestHelperTest",
+            ImmutableList.of(
+                TestCase.create(
+                    "MultiFileCompilationTestHelperTest.TestChecker",
+                    ImmutableList.of(
+                        IdentificationTestEntry.create(
+                            "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"),
+                        IdentificationTestEntry.create(
+                            "B.java", "// BUG: Diagnostic contains:\nclass B {}\n"))))));
   }
 
   @Test
-  void singleFileBugCheckerRefactoringTestHelper(@TempDir Path outputDirectory) throws IOException {
+  void singleFileBugCheckerRefactoringTestHelper(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "SingleFileBugCheckerRefactoringTestHelperTest.java",
@@ -330,12 +367,23 @@ final class BugPatternTestExtractorTest {
         "  }",
         "}");
 
-    verifyGeneratedFileContent(outputDirectory, "SingleFileBugCheckerRefactoringTestHelperTest");
+    verifyGeneratedFileContent(
+        outputDirectory,
+        "SingleFileBugCheckerRefactoringTestHelperTest",
+        TestCases.create(
+            URI.create("file:///SingleFileBugCheckerRefactoringTestHelperTest.java"),
+            "SingleFileBugCheckerRefactoringTestHelperTest",
+            ImmutableList.of(
+                TestCase.create(
+                    "SingleFileBugCheckerRefactoringTestHelperTest.TestChecker",
+                    ImmutableList.of(
+                        ReplacementTestEntry.create(
+                            "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
   }
 
   @Test
   void singleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestMode(
-      @TempDir Path outputDirectory) throws IOException {
+      @TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.java",
@@ -359,11 +407,21 @@ final class BugPatternTestExtractorTest {
 
     verifyGeneratedFileContent(
         outputDirectory,
-        "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest");
+        "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest",
+        TestCases.create(
+            URI.create(
+                "file:///SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.java"),
+            "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest",
+            ImmutableList.of(
+                TestCase.create(
+                    "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.TestChecker",
+                    ImmutableList.of(
+                        ReplacementTestEntry.create(
+                            "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
   }
 
   @Test
-  void multiFileBugCheckerRefactoringTestHelper(@TempDir Path outputDirectory) throws IOException {
+  void multiFileBugCheckerRefactoringTestHelper(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "MultiFileBugCheckerRefactoringTestHelperTest.java",
@@ -383,12 +441,24 @@ final class BugPatternTestExtractorTest {
         "  }",
         "}");
 
-    verifyGeneratedFileContent(outputDirectory, "MultiFileBugCheckerRefactoringTestHelperTest");
+    verifyGeneratedFileContent(
+        outputDirectory,
+        "MultiFileBugCheckerRefactoringTestHelperTest",
+        TestCases.create(
+            URI.create("file:///MultiFileBugCheckerRefactoringTestHelperTest.java"),
+            "MultiFileBugCheckerRefactoringTestHelperTest",
+            ImmutableList.of(
+                TestCase.create(
+                    "MultiFileBugCheckerRefactoringTestHelperTest.TestChecker",
+                    ImmutableList.of(
+                        ReplacementTestEntry.create(
+                            "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"),
+                        ReplacementTestEntry.create(
+                            "B.java", "class B {}\n", "class B { /* This is a change. */ }\n"))))));
   }
 
   @Test
-  void compilationAndBugCheckerRefactoringTestHelpers(@TempDir Path outputDirectory)
-      throws IOException {
+  void compilationAndBugCheckerRefactoringTestHelpers(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "CompilationAndBugCheckerRefactoringTestHelpersTest.java",
@@ -412,12 +482,27 @@ final class BugPatternTestExtractorTest {
         "}");
 
     verifyGeneratedFileContent(
-        outputDirectory, "CompilationAndBugCheckerRefactoringTestHelpersTest");
+        outputDirectory,
+        "CompilationAndBugCheckerRefactoringTestHelpersTest",
+        TestCases.create(
+            URI.create("file:///CompilationAndBugCheckerRefactoringTestHelpersTest.java"),
+            "CompilationAndBugCheckerRefactoringTestHelpersTest",
+            ImmutableList.of(
+                TestCase.create(
+                    "CompilationAndBugCheckerRefactoringTestHelpersTest.TestChecker",
+                    ImmutableList.of(
+                        IdentificationTestEntry.create(
+                            "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))),
+                TestCase.create(
+                    "CompilationAndBugCheckerRefactoringTestHelpersTest.TestChecker",
+                    ImmutableList.of(
+                        ReplacementTestEntry.create(
+                            "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
   }
 
   @Test
   void compilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNames(
-      @TempDir Path outputDirectory) throws IOException {
+      @TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest.java",
@@ -446,23 +531,28 @@ final class BugPatternTestExtractorTest {
 
     verifyGeneratedFileContent(
         outputDirectory,
-        "CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest");
+        "CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest",
+        TestCases.create(
+            URI.create(
+                "file:///CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest.java"),
+            "pkg.CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest",
+            ImmutableList.of(
+                TestCase.create(
+                    "pkg.CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest.CustomTestChecker",
+                    ImmutableList.of(
+                        IdentificationTestEntry.create(
+                            "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))),
+                TestCase.create(
+                    "pkg.CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest.CustomTestChecker2",
+                    ImmutableList.of(
+                        ReplacementTestEntry.create(
+                            "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
   }
 
-  private static void verifyGeneratedFileContent(Path outputDirectory, String testClass)
-      throws IOException {
-    String resourceName = String.format("bugpattern-test-%s.json", testClass);
-    assertThat(outputDirectory.resolve(resourceName))
-        .content(UTF_8)
-        .isEqualToIgnoringWhitespace(
-            getResource(
-                String.join("-", BugPatternTestExtractorTest.class.getSimpleName(), resourceName)));
-  }
-
-  // XXX: Once we support only JDK 15+, drop this method in favour of including the resources as
-  // text blocks in this class.
-  private static String getResource(String resourceName) throws IOException {
-    return Resources.toString(
-        Resources.getResource(BugPatternTestExtractorTest.class, resourceName), UTF_8);
+  private static void verifyGeneratedFileContent(
+      Path outputDirectory, String testClass, TestCases expected) {
+    assertThat(outputDirectory.resolve(String.format("bugpattern-test-%s.json", testClass)))
+        .exists()
+        .returns(expected, path -> Json.read(path, TestCases.class));
   }
 }
