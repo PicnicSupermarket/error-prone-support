@@ -45,9 +45,13 @@ final class RefasterMethodParameterOrderTest {
 
   @Test
   void replacement() {
+    // XXX: Drop the package declaration once OpenRewrite properly handles Refaster rules in the
+    // unnamed package.
     BugCheckerRefactoringTestHelper.newInstance(RefasterMethodParameterOrder.class, getClass())
         .addInputLines(
-            "A.java",
+            "pkg/A.java",
+            "package pkg;",
+            "",
             "import com.google.errorprone.refaster.annotation.AfterTemplate;",
             "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
             "",
@@ -82,7 +86,9 @@ final class RefasterMethodParameterOrderTest {
             "  }",
             "}")
         .addOutputLines(
-            "A.java",
+            "pkg/A.java",
+            "package pkg;",
+            "",
             "import com.google.errorprone.refaster.annotation.AfterTemplate;",
             "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
             "",
