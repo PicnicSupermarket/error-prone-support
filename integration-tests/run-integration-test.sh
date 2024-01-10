@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # This script is not meant to be invoked manually, instead it should be invoked
 # through one of the integration test scripts such as the metrics or checkstyle one.
 

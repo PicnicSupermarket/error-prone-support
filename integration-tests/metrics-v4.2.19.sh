@@ -14,8 +14,8 @@ fi
 do_sync="$([ "${#}" = 0 ] || [ "${1:-}" != '--sync' ] || echo 1)"
 report_directory="$([ "${#}" = 0 ] || ([ -z "${do_sync}" ] && echo "${1}") || ([ "${#}" = 1 ] || echo "${2}"))"
 
-# XXX: We exclude the CollectorMutability and the Immutable*|Preconditions*|StringRules.StringIsNullOrEmpty refaster rules
+# XXX: We exclude the `CollectorMutability` and the `Immutable*|Preconditions*|StringRules.StringIsNullOrEmpty` refaster rules
 # as they introduce changes that expect guava to be on the classpath.
 patch_flags="-Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern=^((?!(Immutable|Preconditions|StringRules\.StringIsNullOrEmpty)).*)"
 
-"$(dirname ${0})"/integration-test.sh "$test_name" "$project" "$repository" "$revision" "" "" "${patch_flags}" "" "" "$do_sync" "$report_directory" 
+"$(dirname ${0})"/run-integration-test.sh "$test_name" "$project" "$repository" "$revision" "" "" "${patch_flags}" "" "" "$do_sync" "$report_directory" 

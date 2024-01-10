@@ -15,7 +15,7 @@ jobs:
   run-integration-tests:
     strategy:
       matrix:
-        integration-test: ["checkstyle.sh", "metrics-v4.2.19.sh"]
+        integration-test: ["checkstyle", "metrics-v4.2.19"]
     name: On-demand integration test
     if: |
       github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
@@ -43,12 +43,12 @@ jobs:
       - name: Install project to local Maven repository
         run: mvn -T1C install -DskipTests -Dverification.skip
       - name: Run integration test
-        run: xvfb-run ./integration-tests/${{ matrix.integration-test }} "${{ runner.temp }}/artifacts"
+        run: xvfb-run "./integration-tests/${{ matrix.integration-test }}.sh" "${{ runner.temp }}/artifacts"
       - name: Upload artifacts on failure
         if: ${{ failure() }}
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
         with:
-          name: integration-test-checkstyle
+          name: "integration-test-${{ matrix.integration-test }}"
           path: "${{ runner.temp }}/artifacts"
       - name: Remove installed project artifacts
         run: mvn build-helper:remove-project-artifact
