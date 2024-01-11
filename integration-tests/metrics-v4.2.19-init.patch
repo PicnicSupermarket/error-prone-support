@@ -23,7 +23,7 @@ index 0bd1297..7c69a08 100644
          try {
              return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
 diff --git a/pom.xml b/pom.xml
-index 6192b52..bcbd571 100644
+index 6192b52..8c312b6 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -68,7 +68,8 @@
@@ -73,7 +73,7 @@ index 6192b52..bcbd571 100644
 +                        <artifactId>maven-compiler-plugin</artifactId>
 +                        <version>${maven-compiler-plugin.version}</version>
 +                        <executions>
-+                            <!-- Skip the default-compile execution as we don't want to execute the compile goal twice -->
++                            <!-- Skip the `default-compile` execution as we don't want to execute the compile goal twice -->
 +                            <execution>
 +                                <id>default-compile</id>
 +                                <phase>compile</phase>
@@ -132,7 +132,7 @@ index 6192b52..bcbd571 100644
 +                        <artifactId>maven-compiler-plugin</artifactId>
 +                        <version>${maven-compiler-plugin.version}</version>
 +                        <executions>
-+                            <!-- Skip the default-testCompile execution as we don't want to execute the compile goal twice -->
++                            <!-- Skip the `default-testCompile` execution as we don't want to execute the compile goal twice -->
 +                            <execution>
 +                                <id>default-testCompile</id>
 +                                <phase>test-compile</phase>
