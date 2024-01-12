@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
@@ -11,6 +12,10 @@ import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Optional;
@@ -26,6 +31,23 @@ import tech.picnic.errorprone.refaster.matchers.IsLikelyTrivialComputation;
 @OnlineDocumentation
 final class OptionalRules {
   private OptionalRules() {}
+
+  // XXX: Move or drop.
+  @Target(ElementType.METHOD)
+  @Retention(RetentionPolicy.SOURCE)
+  @interface BeforeExample {}
+
+  // XXX: Move or drop.
+  @Target(ElementType.METHOD)
+  @Retention(RetentionPolicy.SOURCE)
+  @interface AfterExample {}
+
+  // XXX: Move or drop.
+  interface RefasterExpressionExamples<T> {
+    ImmutableList<T> before();
+
+    ImmutableList<T> after();
+  }
 
   /** Prefer {@link Optional#empty()} over the more contrived alternative. */
   static final class OptionalEmpty<T> {
@@ -53,6 +75,40 @@ final class OptionalRules {
     Optional<T> after(T object) {
       return Optional.ofNullable(object);
     }
+
+    @BeforeExample
+    @SuppressWarnings({
+      "TernaryOperatorOptionalNegativeFiltering",
+      "TernaryOperatorOptionalPositiveFiltering"
+    } /* Special cases. */)
+    ImmutableList<Optional<String>> input() {
+      return ImmutableList.of(
+          toString() == null ? Optional.empty() : Optional.of(toString()),
+          toString() != null ? Optional.of(toString()) : Optional.empty());
+    }
+
+    @AfterExample
+    ImmutableList<Optional<String>> output() {
+      return ImmutableList.of(Optional.ofNullable(toString()), Optional.ofNullable(toString()));
+    }
+
+    static final class Examples implements RefasterExpressionExamples<Optional<String>> {
+      @Override
+      @SuppressWarnings({
+        "TernaryOperatorOptionalNegativeFiltering",
+        "TernaryOperatorOptionalPositiveFiltering"
+      } /* Special cases. */)
+      public ImmutableList<Optional<String>> before() {
+        return ImmutableList.of(
+            toString() == null ? Optional.empty() : Optional.of(toString()),
+            toString() != null ? Optional.of(toString()) : Optional.empty());
+      }
+
+      @Override
+      public ImmutableList<Optional<String>> after() {
+        return ImmutableList.of(Optional.ofNullable(toString()), Optional.ofNullable(toString()));
+      }
+    }
   }
 
   /** Prefer {@link Optional#isEmpty()} over the more verbose alternative. */
@@ -66,6 +122,16 @@ final class OptionalRules {
     boolean after(Optional<T> optional) {
       return optional.isEmpty();
     }
+
+    @BeforeExample
+    ImmutableList<Boolean> input() {
+      return ImmutableList.of(!Optional.empty().isPresent(), !Optional.of("foo").isPresent());
+    }
+
+    @AfterExample
+    ImmutableList<Boolean> output() {
+      return ImmutableList.of(Optional.empty().isEmpty(), Optional.of("foo").isEmpty());
+    }
   }
 
   /** Prefer {@link Optional#isPresent()} over the inverted alternative. */
@@ -78,6 +144,16 @@ final class OptionalRules {
     @AfterTemplate
     boolean after(Optional<T> optional) {
       return optional.isPresent();
+    }
+
+    @BeforeExample
+    ImmutableList<Boolean> input() {
+      return ImmutableList.of(!Optional.empty().isEmpty(), !Optional.of("foo").isEmpty());
+    }
+
+    @AfterExample
+    ImmutableList<Boolean> output() {
+      return ImmutableList.of(Optional.empty().isPresent(), Optional.of("foo").isPresent());
     }
   }
 
