@@ -582,4 +582,898 @@ final class TimeRules {
       return Period.ZERO;
     }
   }
+
+  /** Prefer {@link LocalDate#plusDays} (and variants) over more contrived alternatives. */
+  static final class LocalDatePlusDays {
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, int days) {
+      return Refaster.anyOf(
+          localDate.plus(days, ChronoUnit.DAYS), localDate.plus(Period.ofDays(days)));
+    }
+
+    @AfterTemplate
+    LocalDate after(LocalDate localDate, int days) {
+      return localDate.plusDays(days);
+    }
+  }
+
+  static final class LocalDatePlusWeeks {
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, int weeks) {
+      return Refaster.anyOf(
+          localDate.plus(weeks, ChronoUnit.WEEKS), localDate.plus(Period.ofWeeks(weeks)));
+    }
+
+    @AfterTemplate
+    LocalDate after(LocalDate localDate, int weeks) {
+      return localDate.plusWeeks(weeks);
+    }
+  }
+
+  static final class LocalDatePlusMonths {
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, int months) {
+      return Refaster.anyOf(
+          localDate.plus(months, ChronoUnit.MONTHS), localDate.plus(Period.ofMonths(months)));
+    }
+
+    @AfterTemplate
+    LocalDate after(LocalDate localDate, int months) {
+      return localDate.plusMonths(months);
+    }
+  }
+
+  static final class LocalDatePlusYears {
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, int years) {
+      return Refaster.anyOf(
+          localDate.plus(years, ChronoUnit.YEARS), localDate.plus(Period.ofYears(years)));
+    }
+
+    @AfterTemplate
+    LocalDate after(LocalDate localDate, int years) {
+      return localDate.plusYears(years);
+    }
+  }
+
+  static final class LocalDateMinusDays {
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, int days) {
+      return Refaster.anyOf(
+          localDate.minus(days, ChronoUnit.DAYS), localDate.minus(Period.ofDays(days)));
+    }
+
+    @AfterTemplate
+    LocalDate after(LocalDate localDate, int days) {
+      return localDate.minusDays(days);
+    }
+  }
+
+  static final class LocalDateMinusWeeks {
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, int weeks) {
+      return Refaster.anyOf(
+          localDate.minus(weeks, ChronoUnit.WEEKS), localDate.minus(Period.ofWeeks(weeks)));
+    }
+
+    @AfterTemplate
+    LocalDate after(LocalDate localDate, int weeks) {
+      return localDate.minusWeeks(weeks);
+    }
+  }
+
+  static final class LocalDateMinusMonths {
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, int months) {
+      return Refaster.anyOf(
+          localDate.minus(months, ChronoUnit.MONTHS), localDate.minus(Period.ofMonths(months)));
+    }
+
+    @AfterTemplate
+    LocalDate after(LocalDate localDate, int months) {
+      return localDate.minusMonths(months);
+    }
+  }
+
+  static final class LocalDateMinusYears {
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, int years) {
+      return Refaster.anyOf(
+          localDate.minus(years, ChronoUnit.YEARS), localDate.minus(Period.ofYears(years)));
+    }
+
+    @AfterTemplate
+    LocalDate after(LocalDate localDate, int years) {
+      return localDate.minusYears(years);
+    }
+  }
+
+  /** Prefer {@link LocalTime#plusNanos} (and variants) over more contrived alternatives. */
+  static final class LocalTimePlusNanos {
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, int nanos) {
+      return Refaster.anyOf(
+          localTime.plus(nanos, ChronoUnit.NANOS), localTime.plus(Duration.ofNanos(nanos)));
+    }
+
+    @AfterTemplate
+    LocalTime after(LocalTime localTime, int nanos) {
+      return localTime.plusNanos(nanos);
+    }
+  }
+
+  static final class LocalTimePlusSeconds {
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, int seconds) {
+      return Refaster.anyOf(
+          localTime.plus(seconds, ChronoUnit.SECONDS), localTime.plus(Duration.ofSeconds(seconds)));
+    }
+
+    @AfterTemplate
+    LocalTime after(LocalTime localTime, int seconds) {
+      return localTime.plusSeconds(seconds);
+    }
+  }
+
+  static final class LocalTimePlusMinutes {
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, int minutes) {
+      return Refaster.anyOf(
+          localTime.plus(minutes, ChronoUnit.MINUTES), localTime.plus(Duration.ofMinutes(minutes)));
+    }
+
+    @AfterTemplate
+    LocalTime after(LocalTime localTime, int minutes) {
+      return localTime.plusMinutes(minutes);
+    }
+  }
+
+  static final class LocalTimePlusHours {
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, int hours) {
+      return Refaster.anyOf(
+          localTime.plus(hours, ChronoUnit.HOURS), localTime.plus(Duration.ofHours(hours)));
+    }
+
+    @AfterTemplate
+    LocalTime after(LocalTime localTime, int hours) {
+      return localTime.plusHours(hours);
+    }
+  }
+
+  static final class LocalTimeMinusNanos {
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, int nanos) {
+      return Refaster.anyOf(
+          localTime.minus(nanos, ChronoUnit.NANOS), localTime.minus(Duration.ofNanos(nanos)));
+    }
+
+    @AfterTemplate
+    LocalTime after(LocalTime localTime, int nanos) {
+      return localTime.minusNanos(nanos);
+    }
+  }
+
+  static final class LocalTimeMinusSeconds {
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, int seconds) {
+      return Refaster.anyOf(
+          localTime.minus(seconds, ChronoUnit.SECONDS),
+          localTime.minus(Duration.ofSeconds(seconds)));
+    }
+
+    @AfterTemplate
+    LocalTime after(LocalTime localTime, int seconds) {
+      return localTime.minusSeconds(seconds);
+    }
+  }
+
+  static final class LocalTimeMinusMinutes {
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, int minutes) {
+      return Refaster.anyOf(
+          localTime.minus(minutes, ChronoUnit.MINUTES),
+          localTime.minus(Duration.ofMinutes(minutes)));
+    }
+
+    @AfterTemplate
+    LocalTime after(LocalTime localTime, int minutes) {
+      return localTime.minusMinutes(minutes);
+    }
+  }
+
+  static final class LocalTimeMinusHours {
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, int hours) {
+      return Refaster.anyOf(
+          localTime.minus(hours, ChronoUnit.HOURS), localTime.minus(Duration.ofHours(hours)));
+    }
+
+    @AfterTemplate
+    LocalTime after(LocalTime localTime, int hours) {
+      return localTime.minusHours(hours);
+    }
+  }
+
+  /** Prefer {@link OffsetTime#plusNanos} (and variants) over more contrived alternatives. */
+  static final class OffsetTimePlusNanos {
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, int nanos) {
+      return Refaster.anyOf(
+          offsetTime.plus(nanos, ChronoUnit.NANOS), offsetTime.plus(Duration.ofNanos(nanos)));
+    }
+
+    @AfterTemplate
+    OffsetTime after(OffsetTime offsetTime, int nanos) {
+      return offsetTime.plusNanos(nanos);
+    }
+  }
+
+  static final class OffsetTimePlusSeconds {
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, int seconds) {
+      return Refaster.anyOf(
+          offsetTime.plus(seconds, ChronoUnit.SECONDS),
+          offsetTime.plus(Duration.ofSeconds(seconds)));
+    }
+
+    @AfterTemplate
+    OffsetTime after(OffsetTime offsetTime, int seconds) {
+      return offsetTime.plusSeconds(seconds);
+    }
+  }
+
+  static final class OffsetTimePlusMinutes {
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, int minutes) {
+      return Refaster.anyOf(
+          offsetTime.plus(minutes, ChronoUnit.MINUTES),
+          offsetTime.plus(Duration.ofMinutes(minutes)));
+    }
+
+    @AfterTemplate
+    OffsetTime after(OffsetTime offsetTime, int minutes) {
+      return offsetTime.plusMinutes(minutes);
+    }
+  }
+
+  static final class OffsetTimePlusHours {
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, int hours) {
+      return Refaster.anyOf(
+          offsetTime.plus(hours, ChronoUnit.HOURS), offsetTime.plus(Duration.ofHours(hours)));
+    }
+
+    @AfterTemplate
+    OffsetTime after(OffsetTime offsetTime, int hours) {
+      return offsetTime.plusHours(hours);
+    }
+  }
+
+  static final class OffsetTimeMinusNanos {
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, int nanos) {
+      return Refaster.anyOf(
+          offsetTime.minus(nanos, ChronoUnit.NANOS), offsetTime.minus(Duration.ofNanos(nanos)));
+    }
+
+    @AfterTemplate
+    OffsetTime after(OffsetTime offsetTime, int nanos) {
+      return offsetTime.minusNanos(nanos);
+    }
+  }
+
+  static final class OffsetTimeMinusSeconds {
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, int seconds) {
+      return Refaster.anyOf(
+          offsetTime.minus(seconds, ChronoUnit.SECONDS),
+          offsetTime.minus(Duration.ofSeconds(seconds)));
+    }
+
+    @AfterTemplate
+    OffsetTime after(OffsetTime offsetTime, int seconds) {
+      return offsetTime.minusSeconds(seconds);
+    }
+  }
+
+  static final class OffsetTimeMinusMinutes {
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, int minutes) {
+      return Refaster.anyOf(
+          offsetTime.minus(minutes, ChronoUnit.MINUTES),
+          offsetTime.minus(Duration.ofMinutes(minutes)));
+    }
+
+    @AfterTemplate
+    OffsetTime after(OffsetTime offsetTime, int minutes) {
+      return offsetTime.minusMinutes(minutes);
+    }
+  }
+
+  static final class OffsetTimeMinusHours {
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, int hours) {
+      return Refaster.anyOf(
+          offsetTime.minus(hours, ChronoUnit.HOURS), offsetTime.minus(Duration.ofHours(hours)));
+    }
+
+    @AfterTemplate
+    OffsetTime after(OffsetTime offsetTime, int hours) {
+      return offsetTime.minusHours(hours);
+    }
+  }
+
+  /** Prefer {@link LocalDateTime#plusNanos} (and variants) over more contrived alternatives. */
+  static final class LocalDateTimePlusNanos {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int nanos) {
+      return Refaster.anyOf(
+          localDateTime.plus(nanos, ChronoUnit.NANOS), localDateTime.plus(Duration.ofNanos(nanos)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int nanos) {
+      return localDateTime.plusNanos(nanos);
+    }
+  }
+
+  static final class LocalDateTimePlusSeconds {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int seconds) {
+      return Refaster.anyOf(
+          localDateTime.plus(seconds, ChronoUnit.SECONDS),
+          localDateTime.plus(Duration.ofSeconds(seconds)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int seconds) {
+      return localDateTime.plusSeconds(seconds);
+    }
+  }
+
+  static final class LocalDateTimePlusMinutes {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int minutes) {
+      return Refaster.anyOf(
+          localDateTime.plus(minutes, ChronoUnit.MINUTES),
+          localDateTime.plus(Duration.ofMinutes(minutes)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int minutes) {
+      return localDateTime.plusMinutes(minutes);
+    }
+  }
+
+  static final class LocalDateTimePlusHours {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int hours) {
+      return Refaster.anyOf(
+          localDateTime.plus(hours, ChronoUnit.HOURS), localDateTime.plus(Duration.ofHours(hours)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int hours) {
+      return localDateTime.plusHours(hours);
+    }
+  }
+
+  static final class LocalDateTimePlusWeeks {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int weeks) {
+      return Refaster.anyOf(
+          localDateTime.plus(weeks, ChronoUnit.WEEKS), localDateTime.plus(Period.ofWeeks(weeks)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int weeks) {
+      return localDateTime.plusWeeks(weeks);
+    }
+  }
+
+  static final class LocalDateTimePlusMonths {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int months) {
+      return Refaster.anyOf(
+          localDateTime.plus(months, ChronoUnit.MONTHS),
+          localDateTime.plus(Period.ofMonths(months)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int months) {
+      return localDateTime.plusMonths(months);
+    }
+  }
+
+  static final class LocalDateTimePlusYears {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int years) {
+      return Refaster.anyOf(
+          localDateTime.plus(years, ChronoUnit.YEARS), localDateTime.plus(Period.ofYears(years)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int years) {
+      return localDateTime.plusYears(years);
+    }
+  }
+
+  static final class LocalDateTimeMinusNanos {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int nanos) {
+      return Refaster.anyOf(
+          localDateTime.minus(nanos, ChronoUnit.NANOS),
+          localDateTime.minus(Duration.ofNanos(nanos)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int nanos) {
+      return localDateTime.minusNanos(nanos);
+    }
+  }
+
+  static final class LocalDateTimeMinusSeconds {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int seconds) {
+      return Refaster.anyOf(
+          localDateTime.minus(seconds, ChronoUnit.SECONDS),
+          localDateTime.minus(Duration.ofSeconds(seconds)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int seconds) {
+      return localDateTime.minusSeconds(seconds);
+    }
+  }
+
+  static final class LocalDateTimeMinusMinutes {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int minutes) {
+      return Refaster.anyOf(
+          localDateTime.minus(minutes, ChronoUnit.MINUTES),
+          localDateTime.minus(Duration.ofMinutes(minutes)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int minutes) {
+      return localDateTime.minusMinutes(minutes);
+    }
+  }
+
+  static final class LocalDateTimeMinusHours {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int hours) {
+      return Refaster.anyOf(
+          localDateTime.minus(hours, ChronoUnit.HOURS),
+          localDateTime.minus(Duration.ofHours(hours)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int hours) {
+      return localDateTime.minusHours(hours);
+    }
+  }
+
+  static final class LocalDateTimeMinusWeeks {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int weeks) {
+      return Refaster.anyOf(
+          localDateTime.minus(weeks, ChronoUnit.WEEKS), localDateTime.minus(Period.ofWeeks(weeks)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int weeks) {
+      return localDateTime.minusWeeks(weeks);
+    }
+  }
+
+  static final class LocalDateTimeMinusMonths {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int months) {
+      return Refaster.anyOf(
+          localDateTime.minus(months, ChronoUnit.MONTHS),
+          localDateTime.minus(Period.ofMonths(months)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int months) {
+      return localDateTime.minusMonths(months);
+    }
+  }
+
+  static final class LocalDateTimeMinusYears {
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, int years) {
+      return Refaster.anyOf(
+          localDateTime.minus(years, ChronoUnit.YEARS), localDateTime.minus(Period.ofYears(years)));
+    }
+
+    @AfterTemplate
+    LocalDateTime after(LocalDateTime localDateTime, int years) {
+      return localDateTime.minusYears(years);
+    }
+  }
+
+  /** Prefer {@link OffsetDateTime#plusNanos} (and variants) over more contrived alternatives. */
+  static final class OffsetDateTimePlusNanos {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int nanos) {
+      return Refaster.anyOf(
+          localDateTime.plus(nanos, ChronoUnit.NANOS), localDateTime.plus(Duration.ofNanos(nanos)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int nanos) {
+      return localDateTime.plusNanos(nanos);
+    }
+  }
+
+  static final class OffsetDateTimePlusSeconds {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int seconds) {
+      return Refaster.anyOf(
+          localDateTime.plus(seconds, ChronoUnit.SECONDS),
+          localDateTime.plus(Duration.ofSeconds(seconds)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int seconds) {
+      return localDateTime.plusSeconds(seconds);
+    }
+  }
+
+  static final class OffsetDateTimePlusMinutes {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int minutes) {
+      return Refaster.anyOf(
+          localDateTime.plus(minutes, ChronoUnit.MINUTES),
+          localDateTime.plus(Duration.ofMinutes(minutes)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int minutes) {
+      return localDateTime.plusMinutes(minutes);
+    }
+  }
+
+  static final class OffsetDateTimePlusHours {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int hours) {
+      return Refaster.anyOf(
+          localDateTime.plus(hours, ChronoUnit.HOURS), localDateTime.plus(Duration.ofHours(hours)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int hours) {
+      return localDateTime.plusHours(hours);
+    }
+  }
+
+  static final class OffsetDateTimePlusWeeks {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int weeks) {
+      return Refaster.anyOf(
+          localDateTime.plus(weeks, ChronoUnit.WEEKS), localDateTime.plus(Period.ofWeeks(weeks)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int weeks) {
+      return localDateTime.plusWeeks(weeks);
+    }
+  }
+
+  static final class OffsetDateTimePlusMonths {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int months) {
+      return Refaster.anyOf(
+          localDateTime.plus(months, ChronoUnit.MONTHS),
+          localDateTime.plus(Period.ofMonths(months)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int months) {
+      return localDateTime.plusMonths(months);
+    }
+  }
+
+  static final class OffsetDateTimePlusYears {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int years) {
+      return Refaster.anyOf(
+          localDateTime.plus(years, ChronoUnit.YEARS), localDateTime.plus(Period.ofYears(years)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int years) {
+      return localDateTime.plusYears(years);
+    }
+  }
+
+  static final class OffsetDateTimeMinusNanos {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int nanos) {
+      return Refaster.anyOf(
+          localDateTime.minus(nanos, ChronoUnit.NANOS),
+          localDateTime.minus(Duration.ofNanos(nanos)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int nanos) {
+      return localDateTime.minusNanos(nanos);
+    }
+  }
+
+  static final class OffsetDateTimeMinusSeconds {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int seconds) {
+      return Refaster.anyOf(
+          localDateTime.minus(seconds, ChronoUnit.SECONDS),
+          localDateTime.minus(Duration.ofSeconds(seconds)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int seconds) {
+      return localDateTime.minusSeconds(seconds);
+    }
+  }
+
+  static final class OffsetDateTimeMinusMinutes {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int minutes) {
+      return Refaster.anyOf(
+          localDateTime.minus(minutes, ChronoUnit.MINUTES),
+          localDateTime.minus(Duration.ofMinutes(minutes)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int minutes) {
+      return localDateTime.minusMinutes(minutes);
+    }
+  }
+
+  static final class OffsetDateTimeMinusHours {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int hours) {
+      return Refaster.anyOf(
+          localDateTime.minus(hours, ChronoUnit.HOURS),
+          localDateTime.minus(Duration.ofHours(hours)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int hours) {
+      return localDateTime.minusHours(hours);
+    }
+  }
+
+  static final class OffsetDateTimeMinusWeeks {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int weeks) {
+      return Refaster.anyOf(
+          localDateTime.minus(weeks, ChronoUnit.WEEKS), localDateTime.minus(Period.ofWeeks(weeks)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int weeks) {
+      return localDateTime.minusWeeks(weeks);
+    }
+  }
+
+  static final class OffsetDateTimeMinusMonths {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int months) {
+      return Refaster.anyOf(
+          localDateTime.minus(months, ChronoUnit.MONTHS),
+          localDateTime.minus(Period.ofMonths(months)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int months) {
+      return localDateTime.minusMonths(months);
+    }
+  }
+
+  static final class OffsetDateTimeMinusYears {
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime localDateTime, int years) {
+      return Refaster.anyOf(
+          localDateTime.minus(years, ChronoUnit.YEARS), localDateTime.minus(Period.ofYears(years)));
+    }
+
+    @AfterTemplate
+    OffsetDateTime after(OffsetDateTime localDateTime, int years) {
+      return localDateTime.minusYears(years);
+    }
+  }
+
+  /** Prefer {@link ZonedDateTime#plusNanos} (and variants) over more contrived alternatives. */
+  static final class ZonedDateTimePlusNanos {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int nanos) {
+      return Refaster.anyOf(
+          zonedDateTime.plus(nanos, ChronoUnit.NANOS), zonedDateTime.plus(Duration.ofNanos(nanos)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int nanos) {
+      return zonedDateTime.plusNanos(nanos);
+    }
+  }
+
+  static final class ZonedDateTimePlusSeconds {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int seconds) {
+      return Refaster.anyOf(
+          zonedDateTime.plus(seconds, ChronoUnit.SECONDS),
+          zonedDateTime.plus(Duration.ofSeconds(seconds)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int seconds) {
+      return zonedDateTime.plusSeconds(seconds);
+    }
+  }
+
+  static final class ZonedDateTimePlusMinutes {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int minutes) {
+      return Refaster.anyOf(
+          zonedDateTime.plus(minutes, ChronoUnit.MINUTES),
+          zonedDateTime.plus(Duration.ofMinutes(minutes)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int minutes) {
+      return zonedDateTime.plusMinutes(minutes);
+    }
+  }
+
+  static final class ZonedDateTimePlusHours {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int hours) {
+      return Refaster.anyOf(
+          zonedDateTime.plus(hours, ChronoUnit.HOURS), zonedDateTime.plus(Duration.ofHours(hours)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int hours) {
+      return zonedDateTime.plusHours(hours);
+    }
+  }
+
+  static final class ZonedDateTimePlusWeeks {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int weeks) {
+      return Refaster.anyOf(
+          zonedDateTime.plus(weeks, ChronoUnit.WEEKS), zonedDateTime.plus(Period.ofWeeks(weeks)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int weeks) {
+      return zonedDateTime.plusWeeks(weeks);
+    }
+  }
+
+  static final class ZonedDateTimePlusMonths {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int months) {
+      return Refaster.anyOf(
+          zonedDateTime.plus(months, ChronoUnit.MONTHS),
+          zonedDateTime.plus(Period.ofMonths(months)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int months) {
+      return zonedDateTime.plusMonths(months);
+    }
+  }
+
+  static final class ZonedDateTimePlusYears {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int years) {
+      return Refaster.anyOf(
+          zonedDateTime.plus(years, ChronoUnit.YEARS), zonedDateTime.plus(Period.ofYears(years)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int years) {
+      return zonedDateTime.plusYears(years);
+    }
+  }
+
+  static final class ZonedDateTimeMinusNanos {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int nanos) {
+      return Refaster.anyOf(
+          zonedDateTime.minus(nanos, ChronoUnit.NANOS),
+          zonedDateTime.minus(Duration.ofNanos(nanos)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int nanos) {
+      return zonedDateTime.minusNanos(nanos);
+    }
+  }
+
+  static final class ZonedDateTimeMinusSeconds {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int seconds) {
+      return Refaster.anyOf(
+          zonedDateTime.minus(seconds, ChronoUnit.SECONDS),
+          zonedDateTime.minus(Duration.ofSeconds(seconds)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int seconds) {
+      return zonedDateTime.minusSeconds(seconds);
+    }
+  }
+
+  static final class ZonedDateTimeMinusMinutes {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int minutes) {
+      return Refaster.anyOf(
+          zonedDateTime.minus(minutes, ChronoUnit.MINUTES),
+          zonedDateTime.minus(Duration.ofMinutes(minutes)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int minutes) {
+      return zonedDateTime.minusMinutes(minutes);
+    }
+  }
+
+  static final class ZonedDateTimeMinusHours {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int hours) {
+      return Refaster.anyOf(
+          zonedDateTime.minus(hours, ChronoUnit.HOURS),
+          zonedDateTime.minus(Duration.ofHours(hours)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int hours) {
+      return zonedDateTime.minusHours(hours);
+    }
+  }
+
+  static final class ZonedDateTimeMinusWeeks {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int weeks) {
+      return Refaster.anyOf(
+          zonedDateTime.minus(weeks, ChronoUnit.WEEKS), zonedDateTime.minus(Period.ofWeeks(weeks)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int weeks) {
+      return zonedDateTime.minusWeeks(weeks);
+    }
+  }
+
+  static final class ZonedDateTimeMinusMonths {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int months) {
+      return Refaster.anyOf(
+          zonedDateTime.minus(months, ChronoUnit.MONTHS),
+          zonedDateTime.minus(Period.ofMonths(months)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int months) {
+      return zonedDateTime.minusMonths(months);
+    }
+  }
+
+  static final class ZonedDateTimeMinusYears {
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, int years) {
+      return Refaster.anyOf(
+          zonedDateTime.minus(years, ChronoUnit.YEARS), zonedDateTime.minus(Period.ofYears(years)));
+    }
+
+    @AfterTemplate
+    ZonedDateTime after(ZonedDateTime zonedDateTime, int years) {
+      return zonedDateTime.minusYears(years);
+    }
+  }
 }
