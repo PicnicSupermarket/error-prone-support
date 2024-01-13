@@ -6,11 +6,13 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.suppliers.Supplier;
 import com.sun.tools.javac.code.ClassFinder;
 import com.sun.tools.javac.code.Source;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.CompletionFailure;
 import com.sun.tools.javac.code.Symbol.ModuleSymbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.util.Name;
+import javax.lang.model.element.Modifier;
 
 /**
  * Utility class that helps decide whether it is appropriate to introduce references to (well-known)
@@ -91,7 +93,7 @@ public enum ThirdPartyLibrary {
 
   private static boolean isPublicClassInSymbolTable(String typeName, VisitorState state) {
     Type type = state.getTypeFromString(typeName);
-    return type != null && type.tsym.isPublic();
+    return type != null && isPublic(type.tsym);
   }
 
   private static boolean canLoadPublicClass(String typeName, VisitorState state) {
@@ -104,12 +106,17 @@ public enum ThirdPartyLibrary {
             : symtab.unnamedModule;
     Name binaryName = state.binaryNameFromClassname(typeName);
     try {
-      return classFinder.loadClass(module, binaryName).isPublic();
+      return isPublic(classFinder.loadClass(module, binaryName));
     } catch (
         @SuppressWarnings("java:S1166" /* Not exceptional. */)
         CompletionFailure e) {
       return false;
     }
+  }
+
+  // XXX: Once we target JDK 14+, drop this method in favour of `Symbol#isPublic()`.
+  private static boolean isPublic(Symbol symbol) {
+    return symbol.getModifiers().contains(Modifier.PUBLIC);
   }
 
   private static boolean shouldIgnoreClasspath(VisitorState state) {
