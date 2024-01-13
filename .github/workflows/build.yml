@@ -30,16 +30,12 @@ jobs:
       # on Maven Central, and once against the Picnic Error Prone fork,
       # additionally enabling all checks defined in this project and any Error
       # Prone checks available only from other artifact repositories.
-      - name: Check out code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-        with:
-          persist-credentials: false
-      - name: Set up JDK
-        uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@fa2c7e4517ed008b1f73e7e0195a9eecf5582cd4 # v1.11.0
         with:
           java-version: ${{ matrix.jdk }}
-          distribution: ${{ matrix.distribution }}
-          cache: maven
+          java-distribution: ${{ matrix.distribution }}
+          maven-version: 3.9.6
       - name: Display build environment details
         run: mvn --version
       - name: Build project against vanilla Error Prone, compile Javadoc

@@ -18,17 +18,13 @@ jobs:
       contents: read
     runs-on: ubuntu-22.04
     steps:
-      - name: Check out code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@fa2c7e4517ed008b1f73e7e0195a9eecf5582cd4 # v1.11.0
         with:
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Set up JDK
-        uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
-        with:
+          checkout-fetch-depth: 0
           java-version: 17.0.8
-          distribution: temurin
-          cache: maven
+          java-distribution: temurin
+          maven-version: 3.9.6
       - name: Create missing `test` directory
         # XXX: Drop this step in favour of actually having a test.
         run: mkdir refaster-compiler/src/test
