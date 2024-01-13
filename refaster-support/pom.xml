@@ -12,6 +12,7 @@
 
     <name>Picnic :: Error Prone Support :: Refaster Support</name>
     <description>Helper utilities for use with Refaster rules.</description>
+    <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
         <!-- This dependency is listed out-of-order so as not to confuse the
