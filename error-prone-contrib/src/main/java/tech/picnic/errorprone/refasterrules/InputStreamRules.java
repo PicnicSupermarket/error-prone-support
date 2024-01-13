@@ -6,8 +6,12 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link InputStream}s. */
+// XXX: Add a rule for `ByteStreams.skipFully(in, n)` -> `in.skipNBytes(n)` once we have a way to
+// target JDK 12+ APIs.
+@OnlineDocumentation
 final class InputStreamRules {
   private InputStreamRules() {}
 
@@ -34,17 +38,4 @@ final class InputStreamRules {
       return in.readAllBytes();
     }
   }
-
-  // XXX: Enable once we have a way to target JDK 12+ APIs.
-  // static final class InputStreamSkipNBytes {
-  //  @BeforeTemplate
-  //  void before(InputStream in, long n) throws IOException {
-  //    ByteStreams.skipFully(in, n);
-  //  }
-  //
-  //  @AfterTemplate
-  //  void after(InputStream in, long n) throws IOException {
-  //    in.skipNBytes(n);
-  //  }
-  // }
 }
