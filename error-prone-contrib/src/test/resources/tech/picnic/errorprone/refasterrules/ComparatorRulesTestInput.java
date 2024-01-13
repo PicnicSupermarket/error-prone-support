@@ -3,6 +3,8 @@ package tech.picnic.errorprone.refasterrules;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.maxBy;
+import static java.util.stream.Collectors.minBy;
 
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
@@ -10,7 +12,9 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.function.BinaryOperator;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -160,5 +164,13 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
 
   BinaryOperator<String> testComparatorsMax() {
     return BinaryOperator.maxBy(naturalOrder());
+  }
+
+  Collector<Integer, ?, Optional<Integer>> testMinByNaturalOrder() {
+    return maxBy(reverseOrder());
+  }
+
+  Collector<Integer, ?, Optional<Integer>> testMaxByNaturalOrder() {
+    return minBy(reverseOrder());
   }
 }
