@@ -437,10 +437,12 @@ final class ReactorRules {
   static final class FluxEmpty<T, S extends Comparable<? super S>> {
     @BeforeTemplate
     Flux<T> before(
-        int prefetch,
         Function<? super Object[], ? extends T> combinator,
+        int prefetch,
         Comparator<? super T> comparator) {
       return Refaster.anyOf(
+          Flux.zip(combinator),
+          Flux.zip(combinator, prefetch),
           Flux.concat(),
           Flux.concatDelayError(),
           Flux.firstWithSignal(),
@@ -456,13 +458,11 @@ final class ReactorRules {
           Flux.mergePriorityDelayError(prefetch, comparator),
           Flux.mergeSequential(),
           Flux.mergeSequential(prefetch),
-          Flux.mergeSequentialDelayError(prefetch),
-          Flux.zip(combinator),
-          Flux.zip(combinator, prefetch));
+          Flux.mergeSequentialDelayError(prefetch));
     }
 
     @BeforeTemplate
-    Flux<T> before(int prefetch, Function<Object[], T> combinator) {
+    Flux<T> before(Function<Object[], T> combinator, int prefetch) {
       return Refaster.anyOf(
           Flux.combineLatest(combinator), Flux.combineLatest(combinator, prefetch));
     }
@@ -727,7 +727,7 @@ final class ReactorRules {
     abstract S transformation(@MayOptionallyUse T value);
 
     @BeforeTemplate
-    Flux<S> before(Flux<T> flux, boolean delayUntilEnd, int maxConcurrency, int prefetch) {
+    Flux<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int maxConcurrency) {
       return Refaster.anyOf(
           flux.concatMap(x -> Mono.just(transformation(x))),
           flux.concatMap(x -> Flux.just(transformation(x))),
@@ -795,7 +795,7 @@ final class ReactorRules {
 
     @BeforeTemplate
     @SuppressWarnings("java:S138" /* Method is long, but not complex. */)
-    Publisher<S> before(Flux<T> flux, boolean delayUntilEnd, int maxConcurrency, int prefetch) {
+    Publisher<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int maxConcurrency) {
       return Refaster.anyOf(
           flux.concatMap(
               x ->
@@ -1125,9 +1125,9 @@ final class ReactorRules {
         Function<? super S, P> function,
         @Matches(IsIdentityOperation.class)
             Function<? super P, ? extends Publisher<? extends T>> identityOperation,
+        int prefetch,
         boolean delayUntilEnd,
-        int maxConcurrency,
-        int prefetch) {
+        int maxConcurrency) {
       return Refaster.anyOf(
           mono.map(function).flatMapMany(identityOperation),
           mono.flux().concatMap(function),
@@ -1669,7 +1669,7 @@ final class ReactorRules {
   // a `@Matches(DoesNotDropElements.class)` or `@NotMatches(MayDropElements.class)` guard.
   static final class FluxAsStepVerifierExpectNext<T, L extends List<T>> {
     @BeforeTemplate
-    StepVerifier.Step<L> before(Flux<T> flux, Collector<? super T, ?, L> listCollector, T object) {
+    StepVerifier.Step<L> before(Flux<T> flux, T object, Collector<? super T, ?, L> listCollector) {
       return flux.collect(listCollector)
           .as(StepVerifier::create)
           .assertNext(list -> assertThat(list).containsExactly(object));

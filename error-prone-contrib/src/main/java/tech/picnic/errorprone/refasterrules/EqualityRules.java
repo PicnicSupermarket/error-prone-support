@@ -157,23 +157,13 @@ final class EqualityRules {
   }
 
   /** Avoid contrived ways of handling {@code null} values during equality testing. */
-  static final class EqualsLhsNullable<T, S> {
+  static final class Equals<T, S> {
     @BeforeTemplate
     boolean before(T value1, S value2) {
-      return Optional.ofNullable(value1).equals(Optional.of(value2));
-    }
-
-    @AfterTemplate
-    boolean after(T value1, S value2) {
-      return value2.equals(value1);
-    }
-  }
-
-  /** Avoid contrived ways of handling {@code null} values during equality testing. */
-  static final class EqualsRhsNullable<T, S> {
-    @BeforeTemplate
-    boolean before(T value1, S value2) {
-      return Optional.of(value1).equals(Optional.ofNullable(value2));
+      return Refaster.anyOf(
+          Optional.of(value1).equals(Optional.of(value2)),
+          Optional.of(value1).equals(Optional.ofNullable(value2)),
+          Optional.ofNullable(value2).equals(Optional.of(value1)));
     }
 
     @AfterTemplate
@@ -183,7 +173,7 @@ final class EqualityRules {
   }
 
   /** Avoid contrived ways of handling {@code null} values during equality testing. */
-  static final class EqualsLhsAndRhsNullable<T, S> {
+  static final class ObjectsEquals<T, S> {
     @BeforeTemplate
     boolean before(T value1, S value2) {
       return Optional.ofNullable(value1).equals(Optional.ofNullable(value2));

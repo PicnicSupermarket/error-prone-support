@@ -455,14 +455,14 @@ final class AssertJThrowingCallableRules {
   static final class AssertThatThrownBy {
     @BeforeTemplate
     AbstractObjectAssert<?, ?> before(
-        Class<? extends Throwable> exceptionType, ThrowingCallable throwingCallable) {
+        ThrowingCallable throwingCallable, Class<? extends Throwable> exceptionType) {
       return assertThatExceptionOfType(exceptionType).isThrownBy(throwingCallable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractObjectAssert<?, ?> after(
-        Class<? extends Throwable> exceptionType, ThrowingCallable throwingCallable) {
+        ThrowingCallable throwingCallable, Class<? extends Throwable> exceptionType) {
       return assertThatThrownBy(throwingCallable).isInstanceOf(exceptionType);
     }
   }
@@ -471,8 +471,8 @@ final class AssertJThrowingCallableRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownBy" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(
-        Class<? extends Throwable> exceptionType,
         ThrowingCallable throwingCallable,
+        Class<? extends Throwable> exceptionType,
         String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)
@@ -482,8 +482,8 @@ final class AssertJThrowingCallableRules {
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractObjectAssert<?, ?> after(
-        Class<? extends Throwable> exceptionType,
         ThrowingCallable throwingCallable,
+        Class<? extends Throwable> exceptionType,
         String message) {
       return assertThatThrownBy(throwingCallable).isInstanceOf(exceptionType).hasMessage(message);
     }
@@ -493,8 +493,8 @@ final class AssertJThrowingCallableRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownBy" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(
-        Class<? extends Throwable> exceptionType,
         ThrowingCallable throwingCallable,
+        Class<? extends Throwable> exceptionType,
         String message,
         @Repeated Object parameters) {
       return assertThatExceptionOfType(exceptionType)
@@ -505,8 +505,8 @@ final class AssertJThrowingCallableRules {
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractObjectAssert<?, ?> after(
-        Class<? extends Throwable> exceptionType,
         ThrowingCallable throwingCallable,
+        Class<? extends Throwable> exceptionType,
         String message,
         @Repeated Object parameters) {
       return assertThatThrownBy(throwingCallable)
@@ -519,8 +519,8 @@ final class AssertJThrowingCallableRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownBy" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(
-        Class<? extends Throwable> exceptionType,
         ThrowingCallable throwingCallable,
+        Class<? extends Throwable> exceptionType,
         String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)
@@ -530,8 +530,8 @@ final class AssertJThrowingCallableRules {
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractObjectAssert<?, ?> after(
-        Class<? extends Throwable> exceptionType,
         ThrowingCallable throwingCallable,
+        Class<? extends Throwable> exceptionType,
         String message) {
       return assertThatThrownBy(throwingCallable)
           .isInstanceOf(exceptionType)
@@ -543,8 +543,8 @@ final class AssertJThrowingCallableRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownBy" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(
-        Class<? extends Throwable> exceptionType,
         ThrowingCallable throwingCallable,
+        Class<? extends Throwable> exceptionType,
         String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)
@@ -554,8 +554,8 @@ final class AssertJThrowingCallableRules {
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractObjectAssert<?, ?> after(
-        Class<? extends Throwable> exceptionType,
         ThrowingCallable throwingCallable,
+        Class<? extends Throwable> exceptionType,
         String message) {
       return assertThatThrownBy(throwingCallable)
           .isInstanceOf(exceptionType)
@@ -567,8 +567,8 @@ final class AssertJThrowingCallableRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownBy" /* This is a more specific template. */)
     AbstractObjectAssert<?, ?> before(
-        Class<? extends Throwable> exceptionType,
         ThrowingCallable throwingCallable,
+        Class<? extends Throwable> exceptionType,
         String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)
@@ -578,8 +578,8 @@ final class AssertJThrowingCallableRules {
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractObjectAssert<?, ?> after(
-        Class<? extends Throwable> exceptionType,
         ThrowingCallable throwingCallable,
+        Class<? extends Throwable> exceptionType,
         String message) {
       return assertThatThrownBy(throwingCallable)
           .isInstanceOf(exceptionType)
