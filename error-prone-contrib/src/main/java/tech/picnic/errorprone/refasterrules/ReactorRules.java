@@ -5,7 +5,11 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.MoreCollectors.toOptional;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.maxBy;
+import static java.util.stream.Collectors.minBy;
 import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static reactor.function.TupleUtils.function;
@@ -41,6 +45,7 @@ import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.math.MathFlux;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 import reactor.util.context.Context;
@@ -597,6 +602,11 @@ final class ReactorRules {
   /** Avoid contrived alternatives to {@link Mono#flatMapIterable(Function)}. */
   static final class MonoFlatMapIterable<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
+    Flux<S> before(Mono<T> mono, Function<? super T, I> function) {
+      return mono.map(function).flatMapMany(Flux::fromIterable);
+    }
+
+    @BeforeTemplate
     Flux<S> before(
         Mono<T> mono,
         Function<? super T, I> function,
@@ -608,7 +618,7 @@ final class ReactorRules {
     }
 
     @AfterTemplate
-    Flux<S> after(Mono<T> mono, Function<? super T, ? extends Iterable<? extends S>> function) {
+    Flux<S> after(Mono<T> mono, Function<? super T, I> function) {
       return mono.flatMapIterable(function);
     }
   }
@@ -950,11 +960,12 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid vacuous invocations of {@link Mono#ignoreElement()}. */
+  /** Avoid vacuous operations prior to invocation of {@link Mono#thenMany(Publisher)}. */
   static final class MonoThenMany<T, S> {
     @BeforeTemplate
     Flux<S> before(Mono<T> mono, Publisher<S> publisher) {
-      return mono.ignoreElement().thenMany(publisher);
+      return Refaster.anyOf(
+          mono.ignoreElement().thenMany(publisher), mono.flux().thenMany(publisher));
     }
 
     @AfterTemplate
@@ -992,11 +1003,11 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid vacuous invocations of {@link Mono#ignoreElement()}. */
+  /** Avoid vacuous operations prior to invocation of {@link Mono#then(Mono)}. */
   static final class MonoThenMono<T, S> {
     @BeforeTemplate
     Mono<S> before(Mono<T> mono1, Mono<S> mono2) {
-      return mono1.ignoreElement().then(mono2);
+      return Refaster.anyOf(mono1.ignoreElement().then(mono2), mono1.flux().then(mono2));
     }
 
     @BeforeTemplate
@@ -1579,6 +1590,107 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Flux#sort()} over more verbose alternatives. */
+  static final class FluxSort<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux) {
+      return flux.sort(naturalOrder());
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux) {
+      return flux.sort();
+    }
+  }
+
+  /** Prefer {@link MathFlux#min(Publisher)} over less efficient alternatives. */
+  static final class FluxTransformMin<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Mono<T> before(Flux<T> flux) {
+      return flux.sort().next();
+    }
+
+    @AfterTemplate
+    Mono<T> after(Flux<T> flux) {
+      return flux.transform(MathFlux::min).next();
+    }
+  }
+
+  /**
+   * Prefer {@link MathFlux#min(Publisher, Comparator)} over less efficient or more verbose
+   * alternatives.
+   */
+  static final class FluxTransformMinWithComparator<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Mono<T> before(Flux<T> flux, Comparator<? super T> cmp) {
+      return Refaster.anyOf(
+          flux.sort(cmp).next(), flux.collect(minBy(cmp)).flatMap(Mono::justOrEmpty));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Flux<T> flux, Comparator<? super T> cmp) {
+      return flux.transform(f -> MathFlux.min(f, cmp)).next();
+    }
+  }
+
+  /** Prefer {@link MathFlux#max(Publisher)} over less efficient alternatives. */
+  static final class FluxTransformMax<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Mono<T> before(Flux<T> flux) {
+      return flux.sort().last();
+    }
+
+    @AfterTemplate
+    Mono<T> after(Flux<T> flux) {
+      return flux.transform(MathFlux::max).next();
+    }
+  }
+
+  /**
+   * Prefer {@link MathFlux#max(Publisher, Comparator)} over less efficient or more verbose
+   * alternatives.
+   */
+  static final class FluxTransformMaxWithComparator<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Mono<T> before(Flux<T> flux, Comparator<? super T> cmp) {
+      return Refaster.anyOf(
+          flux.sort(cmp).last(), flux.collect(maxBy(cmp)).flatMap(Mono::justOrEmpty));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Flux<T> flux, Comparator<? super T> cmp) {
+      return flux.transform(f -> MathFlux.max(f, cmp)).next();
+    }
+  }
+
+  /** Prefer {@link MathFlux#min(Publisher)} over more contrived alternatives. */
+  static final class MathFluxMin<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Mono<T> before(Publisher<T> publisher) {
+      return Refaster.anyOf(
+          MathFlux.min(publisher, naturalOrder()), MathFlux.max(publisher, reverseOrder()));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Publisher<T> publisher) {
+      return MathFlux.min(publisher);
+    }
+  }
+
+  /** Prefer {@link MathFlux#max(Publisher)} over more contrived alternatives. */
+  static final class MathFluxMax<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Mono<T> before(Publisher<T> publisher) {
+      return Refaster.anyOf(
+          MathFlux.min(publisher, reverseOrder()), MathFlux.max(publisher, naturalOrder()));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Publisher<T> publisher) {
+      return MathFlux.max(publisher);
+    }
+  }
+
   /** Prefer {@link reactor.util.context.Context#empty()}} over more verbose alternatives. */
   // XXX: Introduce Refaster rules or a `BugChecker` that maps `(Immutable)Map.of(k, v)` to
   // `Context.of(k, v)` and likewise for multi-pair overloads.
@@ -1611,7 +1723,7 @@ final class ReactorRules {
   static final class StepVerifierFromMono<T> {
     @BeforeTemplate
     StepVerifier.FirstStep<? extends T> before(Mono<T> mono) {
-      return StepVerifier.create(mono);
+      return Refaster.anyOf(StepVerifier.create(mono), mono.flux().as(StepVerifier::create));
     }
 
     @AfterTemplate
