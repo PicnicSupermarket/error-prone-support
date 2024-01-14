@@ -21,7 +21,11 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ErrorProneToken;
-import com.sun.source.tree.*;
+import com.sun.source.tree.BlockTree;
+import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.parser.Tokens;
 import com.sun.tools.javac.util.Position;
@@ -63,6 +67,9 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
                 return isStatic((BlockTree) tree) ? 3 : 4;
               case METHOD:
                 return isConstructor((MethodTree) tree) ? 5 : 6;
+              case CLASS:
+              case INTERFACE:
+                return isStatic((ClassTree) tree) ? 8 : 7;
               default:
                 throw new VerifyException("Unexpected member kind: " + tree.getKind());
             }
@@ -100,6 +107,11 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
     return blockTree.isStatic();
   }
 
+  private static boolean isStatic(ClassTree classTree) {
+    Set<Modifier> modifiers = classTree.getModifiers().getFlags();
+    return modifiers.contains(Modifier.STATIC);
+  }
+
   private static boolean isConstructor(MethodTree methodTree) {
     return ASTHelpers.getSymbol(methodTree).isConstructor();
   }
@@ -107,7 +119,8 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
   private static boolean shouldBeSorted(Tree tree) {
     return tree instanceof VariableTree
         || (tree instanceof MethodTree && !ASTHelpers.isGeneratedConstructor((MethodTree) tree))
-        || tree instanceof BlockTree;
+        || tree instanceof BlockTree
+        || tree instanceof ClassTree;
   }
 
   private static SuggestedFix replaceTypeMembers(
