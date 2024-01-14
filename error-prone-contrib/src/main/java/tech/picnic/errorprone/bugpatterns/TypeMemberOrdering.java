@@ -12,6 +12,7 @@ import com.google.auto.service.AutoService;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
@@ -27,6 +28,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.parser.Tokens;
 import com.sun.tools.javac.util.Position;
 import java.util.Comparator;
@@ -75,6 +77,13 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
             }
           });
 
+  /**
+   * Collection of values that are when provided in a {@link SuppressWarnings} annotation of a
+   * member, this BugChecker will not sort it.
+   */
+  private static final ImmutableSet<String> RECOGNIZED_SUPPRESSIONS =
+      ImmutableSet.of("all", TypeMemberOrdering.class.getSimpleName());
+
   /** Instantiates a new {@link TypeMemberOrdering} instance. */
   public TypeMemberOrdering() {}
 
@@ -117,10 +126,34 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
   }
 
   private static boolean shouldBeSorted(Tree tree) {
+    if (hasRecognizedSuppressWarnings(tree)) {
+      return false;
+    }
+    ;
     return tree instanceof VariableTree
         || (tree instanceof MethodTree && !ASTHelpers.isGeneratedConstructor((MethodTree) tree))
         || tree instanceof BlockTree
         || tree instanceof ClassTree;
+  }
+
+  private static Boolean hasRecognizedSuppressWarnings(Tree tree) {
+    return Optional.ofNullable(
+            ASTHelpers.getAnnotationWithSimpleName(
+                ASTHelpers.getAnnotations(tree), "SuppressWarnings"))
+        .flatMap(
+            suppressWarningsTree ->
+                ASTHelpers.getAnnotationMirror(suppressWarningsTree)
+                    .getElementValues()
+                    .values()
+                    .stream()
+                    // Assuming SuppressWarnings has a single member (`String[] value()`)
+                    .findAny())
+        .map(
+            annotationValue ->
+                ((Attribute.Array) annotationValue)
+                    .getValue().map(attr -> (String) attr.getValue()).stream()
+                        .anyMatch(RECOGNIZED_SUPPRESSIONS::contains))
+        .orElse(false);
   }
 
   private static SuggestedFix replaceTypeMembers(
