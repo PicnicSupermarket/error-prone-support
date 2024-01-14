@@ -19,7 +19,7 @@ final class TypeMemberOrderingTest {
     CompilationTestHelper.newInstance(TypeMemberOrdering.class, getClass())
         .expectErrorMessage(
             "TypeMemberOrdering",
-            containsPattern("Fields, constructors and methods should follow standard ordering."))
+            containsPattern("Type members should be ordered in a standard way"))
         .addSourceLines(
             "A.java",
             "// BUG: Diagnostic matches: TypeMemberOrdering",
@@ -69,6 +69,10 @@ final class TypeMemberOrderingTest {
             "  class Inner {}",
             "",
             "  static class StaticInner {}",
+            "}")
+        .addSourceLines(
+            "Empty.java",
+            "class Empty {",
             "}")
         .doTest();
   }
