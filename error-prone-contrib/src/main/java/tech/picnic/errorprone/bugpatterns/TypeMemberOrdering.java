@@ -89,14 +89,14 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    ImmutableList<TypeMemberWithComments> typeMembers =
+    ImmutableList<TypeMember> typeMembers =
         getTypeMembersWithComments(tree, state).stream()
             .filter(typeMember -> shouldBeSorted(typeMember.tree()))
             .collect(toImmutableList());
 
-    ImmutableList<TypeMemberWithComments> sortedTypeMembers =
+    ImmutableList<TypeMember> sortedTypeMembers =
         ImmutableList.sortedCopyOf(
-            comparing(TypeMemberWithComments::tree, BY_PREFERRED_TYPE_MEMBER_ORDER), typeMembers);
+            comparing(TypeMember::tree, BY_PREFERRED_TYPE_MEMBER_ORDER), typeMembers);
 
     if (typeMembers.equals(sortedTypeMembers)) {
       return Description.NO_MATCH;
@@ -157,8 +157,8 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
   }
 
   private static SuggestedFix replaceTypeMembers(
-      ImmutableList<TypeMemberWithComments> typeMembers,
-      ImmutableList<TypeMemberWithComments> replacementTypeMembers,
+      ImmutableList<TypeMember> typeMembers,
+      ImmutableList<TypeMember> replacementTypeMembers,
       VisitorState state) {
     return Streams.zip(
             typeMembers.stream(),
@@ -169,7 +169,7 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
   }
 
   private static SuggestedFix replaceTypeMember(
-      TypeMemberWithComments original, TypeMemberWithComments replacement, VisitorState state) {
+      TypeMember original, TypeMember replacement, VisitorState state) {
     /* Technically this check is not necessary, but it avoids redundant replacements. */
     if (original.equals(replacement)) {
       return SuggestedFix.emptyFix();
@@ -185,12 +185,12 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
   }
 
   /** Returns the type's members with their comments. */
-  private static ImmutableList<TypeMemberWithComments> getTypeMembersWithComments(
+  private static ImmutableList<TypeMember> getTypeMembersWithComments(
       ClassTree tree, VisitorState state) {
     return tree.getMembers().stream()
         .map(
             member ->
-                new AutoValue_TypeMemberOrdering_TypeMemberWithComments(
+                new AutoValue_TypeMemberOrdering_TypeMember(
                     member, getTypeMemberComments(tree, member, state)))
         .collect(toImmutableList());
   }
@@ -228,7 +228,7 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
   }
 
   @AutoValue
-  abstract static class TypeMemberWithComments {
+  abstract static class TypeMember {
     abstract Tree tree();
 
     abstract ImmutableList<String> comments();
