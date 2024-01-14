@@ -21,10 +21,7 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ErrorProneToken;
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.VariableTree;
+import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.parser.Tokens;
 import com.sun.tools.javac.util.Position;
@@ -62,8 +59,10 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
             switch (tree.getKind()) {
               case VARIABLE:
                 return isStatic((VariableTree) tree) ? 1 : 2;
+              case BLOCK:
+                return isStatic((BlockTree) tree) ? 3 : 4;
               case METHOD:
-                return isConstructor((MethodTree) tree) ? 3 : 4;
+                return isConstructor((MethodTree) tree) ? 5 : 6;
               default:
                 throw new VerifyException("Unexpected member kind: " + tree.getKind());
             }
@@ -97,13 +96,18 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
     return modifiers.contains(Modifier.STATIC);
   }
 
+  private static boolean isStatic(BlockTree blockTree) {
+    return blockTree.isStatic();
+  }
+
   private static boolean isConstructor(MethodTree methodTree) {
     return ASTHelpers.getSymbol(methodTree).isConstructor();
   }
 
   private static boolean shouldBeSorted(Tree tree) {
     return tree instanceof VariableTree
-        || (tree instanceof MethodTree && !ASTHelpers.isGeneratedConstructor((MethodTree) tree));
+        || (tree instanceof MethodTree && !ASTHelpers.isGeneratedConstructor((MethodTree) tree))
+        || tree instanceof BlockTree;
   }
 
   private static SuggestedFix replaceTypeMembers(
