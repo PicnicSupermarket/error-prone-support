@@ -10,6 +10,7 @@ import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS
 
 import com.google.auto.service.AutoService;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
@@ -64,7 +65,7 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
               case METHOD:
                 return isConstructor((MethodTree) tree) ? 3 : 4;
               default:
-                throw new IllegalStateException("Unexpected kind: " + tree.getKind());
+                throw new VerifyException("Unexpected member kind: " + tree.getKind());
             }
           });
 
@@ -72,9 +73,9 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
   public TypeMemberOrdering() {}
 
   @Override
-  public Description matchClass(ClassTree classTree, VisitorState state) {
+  public Description matchClass(ClassTree tree, VisitorState state) {
     ImmutableList<TypeMemberWithComments> typeMembers =
-        getTypeMembersWithComments(classTree, state).stream()
+        getTypeMembersWithComments(tree, state).stream()
             .filter(typeMember -> shouldBeSorted(typeMember.tree()))
             .collect(toImmutableList());
 
@@ -86,7 +87,7 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
       return Description.NO_MATCH;
     }
 
-    return buildDescription(classTree)
+    return buildDescription(tree)
         .addFix(replaceTypeMembers(typeMembers, sortedTypeMembers, state))
         .build();
   }
@@ -112,13 +113,13 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
     return Streams.zip(
             typeMembers.stream(),
             replacementTypeMembers.stream(),
-            (original, replacement) -> replaceTypeMember(state, original, replacement))
+            (original, replacement) -> replaceTypeMember(original, replacement, state))
         .reduce(SuggestedFix.builder(), SuggestedFix.Builder::merge, SuggestedFix.Builder::merge)
         .build();
   }
 
   private static SuggestedFix replaceTypeMember(
-      VisitorState state, TypeMemberWithComments original, TypeMemberWithComments replacement) {
+      TypeMemberWithComments original, TypeMemberWithComments replacement, VisitorState state) {
     /* Technically this check is not necessary, but it avoids redundant replacements. */
     if (original.equals(replacement)) {
       return SuggestedFix.emptyFix();
@@ -135,19 +136,19 @@ public final class TypeMemberOrdering extends BugChecker implements BugChecker.C
 
   /** Returns the type's members with their comments. */
   private static ImmutableList<TypeMemberWithComments> getTypeMembersWithComments(
-      ClassTree classTree, VisitorState state) {
-    return classTree.getMembers().stream()
+      ClassTree tree, VisitorState state) {
+    return tree.getMembers().stream()
         .map(
             member ->
                 new AutoValue_TypeMemberOrdering_TypeMemberWithComments(
-                    member, getTypeMemberComments(state, classTree, member)))
+                    member, getTypeMemberComments(tree, member, state)))
         .collect(toImmutableList());
   }
 
   private static ImmutableList<String> getTypeMemberComments(
-      VisitorState state, ClassTree classTree, Tree member) {
-    int typeStart = ASTHelpers.getStartPosition(classTree);
-    int typeEnd = state.getEndPosition(classTree);
+      ClassTree tree, Tree member, VisitorState state) {
+    int typeStart = ASTHelpers.getStartPosition(tree);
+    int typeEnd = state.getEndPosition(tree);
     int memberStart = ASTHelpers.getStartPosition(member);
     int memberEnd = state.getEndPosition(member);
     if (typeStart == Position.NOPOS
