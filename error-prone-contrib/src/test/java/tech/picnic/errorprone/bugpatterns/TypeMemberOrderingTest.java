@@ -6,7 +6,6 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 /*
-TODO: Skip members annotated with @SuppressWarnings() all or TypeMemberOrdering
 TODO: Add tests for interfaces and records
 */
 final class TypeMemberOrderingTest {
@@ -67,20 +66,20 @@ final class TypeMemberOrderingTest {
             "  static class StaticInner {}",
             "}")
         .addSourceLines(
-            "SuppressWarningsAll.java",
-            "@SuppressWarnings(\"all\")",
-            "class SuppressWarningsAll {",
-            "  void method() {}",
+            "C.java",
+            "class C {",
+            "  @SuppressWarnings({\"foo\", \"all\", \"bar\"})",
+            "  void unorderedMethod() {}",
             "",
-            "  SuppressWarningsAll() {}",
+            "  C() {}",
             "}")
         .addSourceLines(
-            "SuppressWarningsCheck.java",
-            "@SuppressWarnings(\"TypeMemberOrdering\")",
-            "class SuppressWarningsCheck {",
-            "  void method() {}",
+            "D.java",
+            "class D {",
+            "  @SuppressWarnings(\"TypeMemberOrdering\")",
+            "  void unorderedMethod() {}",
             "",
-            "  SuppressWarningsCheck() {}",
+            "  D() {}",
             "}")
         .addSourceLines("Empty.java", "class Empty {}")
         .doTest();
