@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Predicates.containsPattern;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
@@ -19,7 +18,7 @@ final class TypeMemberOrderingTest {
     CompilationTestHelper.newInstance(TypeMemberOrdering.class, getClass())
         .expectErrorMessage(
             "TypeMemberOrdering",
-            containsPattern("Type members should be ordered in a standard way"))
+            message -> message.contains("Type members should be ordered in a standard way"))
         .addSourceLines(
             "A.java",
             "// BUG: Diagnostic matches: TypeMemberOrdering",
@@ -75,6 +74,7 @@ final class TypeMemberOrderingTest {
             "@SuppressWarnings(\"all\")",
             "class SuppressWarningsAll {",
             "  void method() {}",
+            "",
             "  SuppressWarningsAll() {}",
             "}")
         .addSourceLines(
@@ -82,14 +82,15 @@ final class TypeMemberOrderingTest {
             "@SuppressWarnings(\"TypeMemberOrdering\")",
             "class SuppressWarningsCheck {",
             "  void method() {}",
+            "",
             "  SuppressWarningsCheck() {}",
             "}")
-        .addSourceLines("Empty.java", "class Empty {", "}")
+        .addSourceLines("Empty.java", "class Empty {}")
         .doTest();
   }
 
   @Test
-  void replacementFirstSuggestedFix() {
+  void replacementSuggestedFix() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
@@ -146,7 +147,7 @@ final class TypeMemberOrderingTest {
   }
 
   @Test
-  void replacementFirstSuggestedFixConsidersDefaultConstructor() {
+  void replacementSuggestedFixConsidersDefaultConstructor() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
@@ -175,7 +176,7 @@ final class TypeMemberOrderingTest {
 
   @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
-  void replacementFirstSuggestedFixConsidersComments() {
+  void replacementSuggestedFixConsidersComments() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
@@ -215,7 +216,7 @@ final class TypeMemberOrderingTest {
   }
 
   @Test
-  void replacementFirstSuggestedFixConsidersAnnotations() {
+  void replacementSuggestedFixConsidersAnnotations() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
@@ -240,7 +241,7 @@ final class TypeMemberOrderingTest {
 
   @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
-  void replacementFirstSuggestedFixDoesNotModifyWhitespace() {
+  void replacementSuggestedFixDoesNotModifyWhitespace() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrdering.class, getClass())
         .addInputLines(
             "A.java",
@@ -275,7 +276,7 @@ final class TypeMemberOrderingTest {
             "",
             "",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   // XXX: This test should fail, if we verify that whitespace is preserved.
