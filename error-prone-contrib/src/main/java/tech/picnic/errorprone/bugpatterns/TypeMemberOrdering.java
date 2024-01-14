@@ -35,21 +35,25 @@ import java.util.stream.Stream;
 import javax.lang.model.element.Modifier;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
-/** A {@link BugChecker} that flags classes with non-standard member ordering. */
+/**
+ * A {@link BugChecker} that flags classes with non-standard member ordering.
+ *
+ * <p>Type members should be ordered in a standard way, which is: static fields, non-static fields,
+ * constructors and methods.
+ */
 // XXX: Reference
 // https://checkstyle.sourceforge.io/apidocs/com/puppycrawl/tools/checkstyle/checks/coding/DeclarationOrderCheck.html
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Class members should be ordered in a standard way",
-    explanation =
-        "Class members should be ordered in a standard way, which is: "
-            + "static fields, non-static fields, constructors and methods.",
     link = BUG_PATTERNS_BASE_URL + "ClassMemberOrdering",
     linkType = CUSTOM,
     severity = WARNING,
     tags = STYLE)
 public final class ClassMemberOrdering extends BugChecker implements BugChecker.ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
+
+  // TODO: Copy should be sorted and comparator in-sync.
   /** Orders {@link Tree}s to match the standard Java type member declaration order. */
   private static final Comparator<Tree> BY_PREFERRED_TYPE_MEMBER_ORDER =
       comparing(
@@ -76,7 +80,7 @@ public final class ClassMemberOrdering extends BugChecker implements BugChecker.
 
     ImmutableList<ClassMemberWithComments> sortedClassMembers =
         ImmutableList.sortedCopyOf(
-            (a, b) -> BY_PREFERRED_TYPE_MEMBER_ORDER.compare(a.tree(), b.tree()), classMembers);
+            comparing(ClassMemberWithComments::tree, BY_PREFERRED_TYPE_MEMBER_ORDER), classMembers);
 
     if (classMembers.equals(sortedClassMembers)) {
       return Description.NO_MATCH;
@@ -84,10 +88,6 @@ public final class ClassMemberOrdering extends BugChecker implements BugChecker.
 
     return buildDescription(classTree)
         .addFix(replaceClassMembers(classMembers, sortedClassMembers, state))
-        .setMessage(
-            "Fields, constructors and methods should follow standard ordering. "
-                + "The standard ordering is: static fields, non-static fields, "
-                + "constructors and methods.")
         .build();
   }
 
@@ -158,15 +158,19 @@ public final class ClassMemberOrdering extends BugChecker implements BugChecker.
       return ImmutableList.of();
     }
 
-    Optional<Integer> previousClassTokenEndPos =
+    // TODO: Move identifying "previous member end position" to an outer loop,
+    //  Loop once and identify for all members
+    // TODO: Check if this handles properly comments on the first member.
+    Optional<Integer> previousMemberEndPos =
         state.getOffsetTokens(typeStart, typeEnd).stream()
             .map(ErrorProneToken::endPos)
             .takeWhile(endPos -> endPos < memberStart)
             .reduce((earlierPos, laterPos) -> laterPos);
 
     List<ErrorProneToken> classMemberTokens =
-        state.getOffsetTokens(previousClassTokenEndPos.orElse(memberStart), memberEnd);
+        state.getOffsetTokens(previousMemberEndPos.orElse(memberStart), memberEnd);
 
+    // TODO: double check this .get(0)
     return classMemberTokens.get(0).comments().stream()
         .map(Tokens.Comment::getText)
         .collect(toImmutableList());

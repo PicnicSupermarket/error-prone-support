@@ -7,6 +7,12 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
+/*
+TODO: Order static and non-static initializer blocks.
+TODO: Skip classes / members annotated with @SuppressWarnings() all or classMemberOrdering
+TODO: Rename Class* to Type* -- this can apply also to interfaces or records
+TODO: Handle inner types
+*/
 final class ClassMemberOrderingTest {
   @Test
   void identification() {
