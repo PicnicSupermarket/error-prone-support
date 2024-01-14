@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 /*
 TODO: Order static and non-static initializer blocks.
-TODO: Skip types / members annotated with @SuppressWarnings() all or typeMemberOrdering
+TODO: Skip members annotated with @SuppressWarnings() all or TypeMemberOrdering
 TODO: Add tests for interfaces and records
 TODO: Handle inner types
 */
@@ -71,9 +71,20 @@ final class TypeMemberOrderingTest {
             "  static class StaticInner {}",
             "}")
         .addSourceLines(
-            "Empty.java",
-            "class Empty {",
+            "SuppressWarningsAll.java",
+            "@SuppressWarnings(\"all\")",
+            "class SuppressWarningsAll {",
+            "  void method() {}",
+            "  SuppressWarningsAll() {}",
             "}")
+        .addSourceLines(
+            "SuppressWarningsCheck.java",
+            "@SuppressWarnings(\"TypeMemberOrdering\")",
+            "class SuppressWarningsCheck {",
+            "  void method() {}",
+            "  SuppressWarningsCheck() {}",
+            "}")
+        .addSourceLines("Empty.java", "class Empty {", "}")
         .doTest();
   }
 
