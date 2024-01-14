@@ -6,10 +6,8 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 /*
-TODO: Order static and non-static initializer blocks.
 TODO: Skip members annotated with @SuppressWarnings() all or TypeMemberOrdering
 TODO: Add tests for interfaces and records
-TODO: Handle inner types
 */
 final class TypeMemberOrderingTest {
   @Test
