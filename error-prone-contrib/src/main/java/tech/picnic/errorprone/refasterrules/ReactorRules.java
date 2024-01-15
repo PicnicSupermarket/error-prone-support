@@ -1042,12 +1042,15 @@ final class ReactorRules {
   /** Prefer {@link Mono#singleOptional()} over more contrived alternatives. */
   // XXX: Consider creating a plugin that flags/discourages `Mono<Optional<T>>` method return
   // types, just as we discourage nullable `Boolean`s and `Optional`s.
+  // XXX: The `mono.transform(Mono::singleOptional)` replacement is a special case of a more general
+  // rule. Consider introducing an Error Prone check for this.
   static final class MonoSingleOptional<T> {
     @BeforeTemplate
     Mono<Optional<T>> before(Mono<T> mono) {
       return Refaster.anyOf(
           mono.flux().collect(toOptional()),
-          mono.map(Optional::of).defaultIfEmpty(Optional.empty()));
+          mono.map(Optional::of).defaultIfEmpty(Optional.empty()),
+          mono.transform(Mono::singleOptional));
     }
 
     @AfterTemplate
