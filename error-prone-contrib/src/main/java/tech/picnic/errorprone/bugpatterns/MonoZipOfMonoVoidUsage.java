@@ -63,7 +63,6 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
    * (actual return type of {@link Mono#empty()}) to represent empty publisher.
    */
   private static final String MONO_ZIP_WITH_METHOD = "zipWith";
-
   private static final String MONO_ZIP_METHOD = "zip";
   private static final String MONO_EMPTY_METHOD = "empty";
   private static final Supplier<Type> MONO_VOID_TYPE_SUPPLIER =
