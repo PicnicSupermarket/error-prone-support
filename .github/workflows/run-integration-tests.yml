@@ -31,7 +31,7 @@ jobs:
         run: xvfb-run ./integration-tests/checkstyle-10.12.4.sh "${{ runner.temp }}/artifacts"
       - name: Upload artifacts on failure
         if: ${{ failure() }}
-        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+        uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595 # v4.1.0
         with:
           name: integration-test-checkstyle-10.12.4
           path: "${{ runner.temp }}/artifacts"
