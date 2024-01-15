@@ -57,11 +57,6 @@ import reactor.core.publisher.Mono;
 public final class MonoZipOfMonoVoidUsage extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-
-  /**
-   * In fact, we use {@code Mono<Void>} everywhere in codebases instead of {@code Mono<Object>}
-   * (actual return type of {@link Mono#empty()}) to represent empty publisher.
-   */
   private static final String MONO_ZIP_WITH_METHOD = "zipWith";
   private static final String MONO_ZIP_METHOD = "zip";
   private static final String MONO_EMPTY_METHOD = "empty";
