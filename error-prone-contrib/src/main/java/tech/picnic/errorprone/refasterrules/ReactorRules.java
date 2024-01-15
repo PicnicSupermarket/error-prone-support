@@ -1612,7 +1612,7 @@ final class ReactorRules {
 
     @AfterTemplate
     Mono<T> after(Flux<T> flux) {
-      return flux.transform(MathFlux::min).next();
+      return flux.transform(MathFlux::min).singleOrEmpty();
     }
   }
 
@@ -1629,7 +1629,7 @@ final class ReactorRules {
 
     @AfterTemplate
     Mono<T> after(Flux<T> flux, Comparator<? super T> cmp) {
-      return flux.transform(f -> MathFlux.min(f, cmp)).next();
+      return flux.transform(f -> MathFlux.min(f, cmp)).singleOrEmpty();
     }
   }
 
@@ -1642,7 +1642,7 @@ final class ReactorRules {
 
     @AfterTemplate
     Mono<T> after(Flux<T> flux) {
-      return flux.transform(MathFlux::max).next();
+      return flux.transform(MathFlux::max).singleOrEmpty();
     }
   }
 
@@ -1659,7 +1659,7 @@ final class ReactorRules {
 
     @AfterTemplate
     Mono<T> after(Flux<T> flux, Comparator<? super T> cmp) {
-      return flux.transform(f -> MathFlux.max(f, cmp)).next();
+      return flux.transform(f -> MathFlux.max(f, cmp)).singleOrEmpty();
     }
   }
 

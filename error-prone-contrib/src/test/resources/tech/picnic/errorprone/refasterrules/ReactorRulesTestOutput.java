@@ -530,23 +530,23 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Mono<Integer> testFluxTransformMin() {
-    return Flux.just(1).transform(MathFlux::min).next();
+    return Flux.just(1).transform(MathFlux::min).singleOrEmpty();
   }
 
   ImmutableSet<Mono<Integer>> testFluxTransformMinWithComparator() {
     return ImmutableSet.of(
-        Flux.just(1).transform(f -> MathFlux.min(f, reverseOrder())).next(),
-        Flux.just(2).transform(f -> MathFlux.min(f, reverseOrder())).next());
+        Flux.just(1).transform(f -> MathFlux.min(f, reverseOrder())).singleOrEmpty(),
+        Flux.just(2).transform(f -> MathFlux.min(f, reverseOrder())).singleOrEmpty());
   }
 
   Mono<Integer> testFluxTransformMax() {
-    return Flux.just(1).transform(MathFlux::max).next();
+    return Flux.just(1).transform(MathFlux::max).singleOrEmpty();
   }
 
   ImmutableSet<Mono<Integer>> testFluxTransformMaxWithComparator() {
     return ImmutableSet.of(
-        Flux.just(1).transform(f -> MathFlux.max(f, reverseOrder())).next(),
-        Flux.just(2).transform(f -> MathFlux.max(f, reverseOrder())).next());
+        Flux.just(1).transform(f -> MathFlux.max(f, reverseOrder())).singleOrEmpty(),
+        Flux.just(2).transform(f -> MathFlux.max(f, reverseOrder())).singleOrEmpty());
   }
 
   ImmutableSet<Mono<Integer>> testMathFluxMin() {
