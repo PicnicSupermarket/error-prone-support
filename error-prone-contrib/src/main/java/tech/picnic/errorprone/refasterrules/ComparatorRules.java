@@ -7,6 +7,8 @@ import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.comparingLong;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
+import static java.util.stream.Collectors.maxBy;
+import static java.util.stream.Collectors.minBy;
 
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
@@ -21,11 +23,13 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
@@ -381,6 +385,38 @@ final class ComparatorRules {
     @AfterTemplate
     BinaryOperator<T> after() {
       return Comparators::max;
+    }
+  }
+
+  /**
+   * Prefer {@link Comparator#naturalOrder()} over {@link Comparator#reverseOrder()} where possible.
+   */
+  static final class MinByNaturalOrder<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Collector<T, ?, Optional<T>> before() {
+      return maxBy(reverseOrder());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Collector<T, ?, Optional<T>> after() {
+      return minBy(naturalOrder());
+    }
+  }
+
+  /**
+   * Prefer {@link Comparator#naturalOrder()} over {@link Comparator#reverseOrder()} where possible.
+   */
+  static final class MaxByNaturalOrder<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Collector<T, ?, Optional<T>> before() {
+      return minBy(reverseOrder());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Collector<T, ?, Optional<T>> after() {
+      return maxBy(naturalOrder());
     }
   }
 }
