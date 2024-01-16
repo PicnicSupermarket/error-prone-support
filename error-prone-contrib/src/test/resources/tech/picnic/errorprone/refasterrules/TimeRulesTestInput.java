@@ -225,372 +225,382 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<LocalDate> testLocalDatePlusDays() {
     return ImmutableSet.of(
-        LocalDate.EPOCH.plus(1, ChronoUnit.DAYS), LocalDate.EPOCH.plus(Period.ofDays(1)));
+        LocalDate.EPOCH.plus(1L, ChronoUnit.DAYS), LocalDate.EPOCH.plus(Period.ofDays(1)));
   }
 
   ImmutableSet<LocalDate> testLocalDatePlusWeeks() {
     return ImmutableSet.of(
-        LocalDate.EPOCH.plus(1, ChronoUnit.WEEKS), LocalDate.EPOCH.plus(Period.ofWeeks(1)));
+        LocalDate.EPOCH.plus(1L, ChronoUnit.WEEKS), LocalDate.EPOCH.plus(Period.ofWeeks(1)));
   }
 
   ImmutableSet<LocalDate> testLocalDatePlusMonths() {
     return ImmutableSet.of(
-        LocalDate.EPOCH.plus(1, ChronoUnit.MONTHS), LocalDate.EPOCH.plus(Period.ofMonths(1)));
+        LocalDate.EPOCH.plus(1L, ChronoUnit.MONTHS), LocalDate.EPOCH.plus(Period.ofMonths(1)));
   }
 
   ImmutableSet<LocalDate> testLocalDatePlusYears() {
     return ImmutableSet.of(
-        LocalDate.EPOCH.plus(1, ChronoUnit.YEARS), LocalDate.EPOCH.plus(Period.ofYears(1)));
+        LocalDate.EPOCH.plus(1L, ChronoUnit.YEARS), LocalDate.EPOCH.plus(Period.ofYears(1)));
   }
 
   ImmutableSet<LocalDate> testLocalDateMinusDays() {
     return ImmutableSet.of(
-        LocalDate.EPOCH.minus(1, ChronoUnit.DAYS), LocalDate.EPOCH.minus(Period.ofDays(1)));
+        LocalDate.EPOCH.minus(1L, ChronoUnit.DAYS), LocalDate.EPOCH.minus(Period.ofDays(1)));
   }
 
   ImmutableSet<LocalDate> testLocalDateMinusWeeks() {
     return ImmutableSet.of(
-        LocalDate.EPOCH.minus(1, ChronoUnit.WEEKS), LocalDate.EPOCH.minus(Period.ofWeeks(1)));
+        LocalDate.EPOCH.minus(1L, ChronoUnit.WEEKS), LocalDate.EPOCH.minus(Period.ofWeeks(1)));
   }
 
   ImmutableSet<LocalDate> testLocalDateMinusMonths() {
     return ImmutableSet.of(
-        LocalDate.EPOCH.minus(1, ChronoUnit.MONTHS), LocalDate.EPOCH.minus(Period.ofMonths(1)));
+        LocalDate.EPOCH.minus(1L, ChronoUnit.MONTHS), LocalDate.EPOCH.minus(Period.ofMonths(1)));
   }
 
   ImmutableSet<LocalDate> testLocalDateMinusYears() {
     return ImmutableSet.of(
-        LocalDate.EPOCH.minus(1, ChronoUnit.YEARS), LocalDate.EPOCH.minus(Period.ofYears(1)));
+        LocalDate.EPOCH.minus(1L, ChronoUnit.YEARS), LocalDate.EPOCH.minus(Period.ofYears(1)));
   }
 
   ImmutableSet<LocalTime> testLocalTimePlusNanos() {
     return ImmutableSet.of(
-        LocalTime.NOON.plus(1, ChronoUnit.NANOS), LocalTime.NOON.plus(Duration.ofNanos(1)));
+        LocalTime.NOON.plus(1L, ChronoUnit.NANOS), LocalTime.NOON.plus(Duration.ofNanos(1)));
   }
 
   ImmutableSet<LocalTime> testLocalTimePlusSeconds() {
     return ImmutableSet.of(
-        LocalTime.NOON.plus(1, ChronoUnit.SECONDS), LocalTime.NOON.plus(Duration.ofSeconds(1)));
+        LocalTime.NOON.plus(1L, ChronoUnit.SECONDS), LocalTime.NOON.plus(Duration.ofSeconds(1)));
   }
 
   ImmutableSet<LocalTime> testLocalTimePlusMinutes() {
     return ImmutableSet.of(
-        LocalTime.NOON.plus(1, ChronoUnit.MINUTES), LocalTime.NOON.plus(Duration.ofMinutes(1)));
+        LocalTime.NOON.plus(1L, ChronoUnit.MINUTES), LocalTime.NOON.plus(Duration.ofMinutes(1)));
   }
 
   ImmutableSet<LocalTime> testLocalTimePlusHours() {
     return ImmutableSet.of(
-        LocalTime.NOON.plus(1, ChronoUnit.HOURS), LocalTime.NOON.plus(Duration.ofHours(1)));
+        LocalTime.NOON.plus(1L, ChronoUnit.HOURS), LocalTime.NOON.plus(Duration.ofHours(1)));
   }
 
   ImmutableSet<LocalTime> testLocalTimeMinusNanos() {
     return ImmutableSet.of(
-        LocalTime.NOON.minus(1, ChronoUnit.NANOS), LocalTime.NOON.minus(Duration.ofNanos(1)));
+        LocalTime.NOON.minus(1L, ChronoUnit.NANOS), LocalTime.NOON.minus(Duration.ofNanos(1)));
   }
 
   ImmutableSet<LocalTime> testLocalTimeMinusSeconds() {
     return ImmutableSet.of(
-        LocalTime.NOON.minus(1, ChronoUnit.SECONDS), LocalTime.NOON.minus(Duration.ofSeconds(1)));
+        LocalTime.NOON.minus(1L, ChronoUnit.SECONDS), LocalTime.NOON.minus(Duration.ofSeconds(1)));
   }
 
   ImmutableSet<LocalTime> testLocalTimeMinusMinutes() {
     return ImmutableSet.of(
-        LocalTime.NOON.minus(1, ChronoUnit.MINUTES), LocalTime.NOON.minus(Duration.ofMinutes(1)));
+        LocalTime.NOON.minus(1L, ChronoUnit.MINUTES), LocalTime.NOON.minus(Duration.ofMinutes(1)));
   }
 
   ImmutableSet<LocalTime> testLocalTimeMinusHours() {
     return ImmutableSet.of(
-        LocalTime.NOON.minus(1, ChronoUnit.HOURS), LocalTime.NOON.minus(Duration.ofHours(1)));
+        LocalTime.NOON.minus(1L, ChronoUnit.HOURS), LocalTime.NOON.minus(Duration.ofHours(1)));
   }
 
   ImmutableSet<OffsetTime> testOffsetTimePlusNanos() {
     return ImmutableSet.of(
-        OffsetTime.MIN.plus(1, ChronoUnit.NANOS), OffsetTime.MIN.plus(Duration.ofNanos(1)));
+        OffsetTime.MIN.plus(1L, ChronoUnit.NANOS), OffsetTime.MIN.plus(Duration.ofNanos(1)));
   }
 
   ImmutableSet<OffsetTime> testOffsetTimePlusSeconds() {
     return ImmutableSet.of(
-        OffsetTime.MIN.plus(1, ChronoUnit.SECONDS), OffsetTime.MIN.plus(Duration.ofSeconds(1)));
+        OffsetTime.MIN.plus(1L, ChronoUnit.SECONDS), OffsetTime.MIN.plus(Duration.ofSeconds(1)));
   }
 
   ImmutableSet<OffsetTime> testOffsetTimePlusMinutes() {
     return ImmutableSet.of(
-        OffsetTime.MIN.plus(1, ChronoUnit.MINUTES), OffsetTime.MIN.plus(Duration.ofMinutes(1)));
+        OffsetTime.MIN.plus(1L, ChronoUnit.MINUTES), OffsetTime.MIN.plus(Duration.ofMinutes(1)));
   }
 
   ImmutableSet<OffsetTime> testOffsetTimePlusHours() {
     return ImmutableSet.of(
-        OffsetTime.MIN.plus(1, ChronoUnit.HOURS), OffsetTime.MIN.plus(Duration.ofHours(1)));
+        OffsetTime.MIN.plus(1L, ChronoUnit.HOURS), OffsetTime.MIN.plus(Duration.ofHours(1)));
   }
 
   ImmutableSet<OffsetTime> testOffsetTimeMinusNanos() {
     return ImmutableSet.of(
-        OffsetTime.MAX.minus(1, ChronoUnit.NANOS), OffsetTime.MAX.minus(Duration.ofNanos(1)));
+        OffsetTime.MAX.minus(1L, ChronoUnit.NANOS), OffsetTime.MAX.minus(Duration.ofNanos(1)));
   }
 
   ImmutableSet<OffsetTime> testOffsetTimeMinusSeconds() {
     return ImmutableSet.of(
-        OffsetTime.MAX.minus(1, ChronoUnit.SECONDS), OffsetTime.MAX.minus(Duration.ofSeconds(1)));
+        OffsetTime.MAX.minus(1L, ChronoUnit.SECONDS), OffsetTime.MAX.minus(Duration.ofSeconds(1)));
   }
 
   ImmutableSet<OffsetTime> testOffsetTimeMinusMinutes() {
     return ImmutableSet.of(
-        OffsetTime.MAX.minus(1, ChronoUnit.MINUTES), OffsetTime.MAX.minus(Duration.ofMinutes(1)));
+        OffsetTime.MAX.minus(1L, ChronoUnit.MINUTES), OffsetTime.MAX.minus(Duration.ofMinutes(1)));
   }
 
   ImmutableSet<OffsetTime> testOffsetTimeMinusHours() {
     return ImmutableSet.of(
-        OffsetTime.MAX.minus(1, ChronoUnit.HOURS), OffsetTime.MAX.minus(Duration.ofHours(1)));
+        OffsetTime.MAX.minus(1L, ChronoUnit.HOURS), OffsetTime.MAX.minus(Duration.ofHours(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimePlusNanos() {
     return ImmutableSet.of(
-        LocalDateTime.MIN.plus(1, ChronoUnit.NANOS), LocalDateTime.MIN.plus(Duration.ofNanos(1)));
+        LocalDateTime.MIN.plus(1L, ChronoUnit.NANOS), LocalDateTime.MIN.plus(Duration.ofNanos(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimePlusSeconds() {
     return ImmutableSet.of(
-        LocalDateTime.MIN.plus(1, ChronoUnit.SECONDS),
+        LocalDateTime.MIN.plus(1L, ChronoUnit.SECONDS),
         LocalDateTime.MIN.plus(Duration.ofSeconds(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimePlusMinutes() {
     return ImmutableSet.of(
-        LocalDateTime.MIN.plus(1, ChronoUnit.MINUTES),
+        LocalDateTime.MIN.plus(1L, ChronoUnit.MINUTES),
         LocalDateTime.MIN.plus(Duration.ofMinutes(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimePlusHours() {
     return ImmutableSet.of(
-        LocalDateTime.MIN.plus(1, ChronoUnit.HOURS), LocalDateTime.MIN.plus(Duration.ofHours(1)));
+        LocalDateTime.MIN.plus(1L, ChronoUnit.HOURS), LocalDateTime.MIN.plus(Duration.ofHours(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimePlusDays() {
     return ImmutableSet.of(
-        LocalDateTime.MIN.plus(1, ChronoUnit.DAYS), LocalDateTime.MIN.plus(Period.ofDays(1)));
+        LocalDateTime.MIN.plus(1L, ChronoUnit.DAYS), LocalDateTime.MIN.plus(Period.ofDays(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimePlusWeeks() {
     return ImmutableSet.of(
-        LocalDateTime.MIN.plus(1, ChronoUnit.WEEKS), LocalDateTime.MIN.plus(Period.ofWeeks(1)));
+        LocalDateTime.MIN.plus(1L, ChronoUnit.WEEKS), LocalDateTime.MIN.plus(Period.ofWeeks(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimePlusMonths() {
     return ImmutableSet.of(
-        LocalDateTime.MIN.plus(1, ChronoUnit.MONTHS), LocalDateTime.MIN.plus(Period.ofMonths(1)));
+        LocalDateTime.MIN.plus(1L, ChronoUnit.MONTHS), LocalDateTime.MIN.plus(Period.ofMonths(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimePlusYears() {
     return ImmutableSet.of(
-        LocalDateTime.MIN.plus(1, ChronoUnit.YEARS), LocalDateTime.MIN.plus(Period.ofYears(1)));
+        LocalDateTime.MIN.plus(1L, ChronoUnit.YEARS), LocalDateTime.MIN.plus(Period.ofYears(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimeMinusNanos() {
     return ImmutableSet.of(
-        LocalDateTime.MAX.minus(1, ChronoUnit.NANOS), LocalDateTime.MAX.minus(Duration.ofNanos(1)));
+        LocalDateTime.MAX.minus(1L, ChronoUnit.NANOS),
+        LocalDateTime.MAX.minus(Duration.ofNanos(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimeMinusSeconds() {
     return ImmutableSet.of(
-        LocalDateTime.MAX.minus(1, ChronoUnit.SECONDS),
+        LocalDateTime.MAX.minus(1L, ChronoUnit.SECONDS),
         LocalDateTime.MAX.minus(Duration.ofSeconds(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimeMinusMinutes() {
     return ImmutableSet.of(
-        LocalDateTime.MAX.minus(1, ChronoUnit.MINUTES),
+        LocalDateTime.MAX.minus(1L, ChronoUnit.MINUTES),
         LocalDateTime.MAX.minus(Duration.ofMinutes(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimeMinusHours() {
     return ImmutableSet.of(
-        LocalDateTime.MAX.minus(1, ChronoUnit.HOURS), LocalDateTime.MAX.minus(Duration.ofHours(1)));
+        LocalDateTime.MAX.minus(1L, ChronoUnit.HOURS),
+        LocalDateTime.MAX.minus(Duration.ofHours(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimeMinusDays() {
     return ImmutableSet.of(
-        LocalDateTime.MAX.minus(1, ChronoUnit.DAYS), LocalDateTime.MAX.minus(Period.ofDays(1)));
+        LocalDateTime.MAX.minus(1L, ChronoUnit.DAYS), LocalDateTime.MAX.minus(Period.ofDays(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimeMinusWeeks() {
     return ImmutableSet.of(
-        LocalDateTime.MAX.minus(1, ChronoUnit.WEEKS), LocalDateTime.MAX.minus(Period.ofWeeks(1)));
+        LocalDateTime.MAX.minus(1L, ChronoUnit.WEEKS), LocalDateTime.MAX.minus(Period.ofWeeks(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimeMinusMonths() {
     return ImmutableSet.of(
-        LocalDateTime.MAX.minus(1, ChronoUnit.MONTHS), LocalDateTime.MAX.minus(Period.ofMonths(1)));
+        LocalDateTime.MAX.minus(1L, ChronoUnit.MONTHS),
+        LocalDateTime.MAX.minus(Period.ofMonths(1)));
   }
 
   ImmutableSet<LocalDateTime> testLocalDateTimeMinusYears() {
     return ImmutableSet.of(
-        LocalDateTime.MAX.minus(1, ChronoUnit.YEARS), LocalDateTime.MAX.minus(Period.ofYears(1)));
+        LocalDateTime.MAX.minus(1L, ChronoUnit.YEARS), LocalDateTime.MAX.minus(Period.ofYears(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimePlusNanos() {
     return ImmutableSet.of(
-        OffsetDateTime.MIN.plus(1, ChronoUnit.NANOS), OffsetDateTime.MIN.plus(Duration.ofNanos(1)));
+        OffsetDateTime.MIN.plus(1L, ChronoUnit.NANOS),
+        OffsetDateTime.MIN.plus(Duration.ofNanos(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimePlusSeconds() {
     return ImmutableSet.of(
-        OffsetDateTime.MIN.plus(1, ChronoUnit.SECONDS),
+        OffsetDateTime.MIN.plus(1L, ChronoUnit.SECONDS),
         OffsetDateTime.MIN.plus(Duration.ofSeconds(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimePlusMinutes() {
     return ImmutableSet.of(
-        OffsetDateTime.MIN.plus(1, ChronoUnit.MINUTES),
+        OffsetDateTime.MIN.plus(1L, ChronoUnit.MINUTES),
         OffsetDateTime.MIN.plus(Duration.ofMinutes(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimePlusHours() {
     return ImmutableSet.of(
-        OffsetDateTime.MIN.plus(1, ChronoUnit.HOURS), OffsetDateTime.MIN.plus(Duration.ofHours(1)));
+        OffsetDateTime.MIN.plus(1L, ChronoUnit.HOURS),
+        OffsetDateTime.MIN.plus(Duration.ofHours(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimePlusDays() {
     return ImmutableSet.of(
-        OffsetDateTime.MIN.plus(1, ChronoUnit.DAYS), OffsetDateTime.MIN.plus(Period.ofDays(1)));
+        OffsetDateTime.MIN.plus(1L, ChronoUnit.DAYS), OffsetDateTime.MIN.plus(Period.ofDays(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimePlusWeeks() {
     return ImmutableSet.of(
-        OffsetDateTime.MIN.plus(1, ChronoUnit.WEEKS), OffsetDateTime.MIN.plus(Period.ofWeeks(1)));
+        OffsetDateTime.MIN.plus(1L, ChronoUnit.WEEKS), OffsetDateTime.MIN.plus(Period.ofWeeks(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimePlusMonths() {
     return ImmutableSet.of(
-        OffsetDateTime.MIN.plus(1, ChronoUnit.MONTHS), OffsetDateTime.MIN.plus(Period.ofMonths(1)));
+        OffsetDateTime.MIN.plus(1L, ChronoUnit.MONTHS),
+        OffsetDateTime.MIN.plus(Period.ofMonths(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimePlusYears() {
     return ImmutableSet.of(
-        OffsetDateTime.MIN.plus(1, ChronoUnit.YEARS), OffsetDateTime.MIN.plus(Period.ofYears(1)));
+        OffsetDateTime.MIN.plus(1L, ChronoUnit.YEARS), OffsetDateTime.MIN.plus(Period.ofYears(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimeMinusNanos() {
     return ImmutableSet.of(
-        OffsetDateTime.MAX.minus(1, ChronoUnit.NANOS),
+        OffsetDateTime.MAX.minus(1L, ChronoUnit.NANOS),
         OffsetDateTime.MAX.minus(Duration.ofNanos(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimeMinusSeconds() {
     return ImmutableSet.of(
-        OffsetDateTime.MAX.minus(1, ChronoUnit.SECONDS),
+        OffsetDateTime.MAX.minus(1L, ChronoUnit.SECONDS),
         OffsetDateTime.MAX.minus(Duration.ofSeconds(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimeMinusMinutes() {
     return ImmutableSet.of(
-        OffsetDateTime.MAX.minus(1, ChronoUnit.MINUTES),
+        OffsetDateTime.MAX.minus(1L, ChronoUnit.MINUTES),
         OffsetDateTime.MAX.minus(Duration.ofMinutes(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimeMinusHours() {
     return ImmutableSet.of(
-        OffsetDateTime.MAX.minus(1, ChronoUnit.HOURS),
+        OffsetDateTime.MAX.minus(1L, ChronoUnit.HOURS),
         OffsetDateTime.MAX.minus(Duration.ofHours(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimeMinusDays() {
     return ImmutableSet.of(
-        OffsetDateTime.MAX.minus(1, ChronoUnit.DAYS), OffsetDateTime.MAX.minus(Period.ofDays(1)));
+        OffsetDateTime.MAX.minus(1L, ChronoUnit.DAYS), OffsetDateTime.MAX.minus(Period.ofDays(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimeMinusWeeks() {
     return ImmutableSet.of(
-        OffsetDateTime.MAX.minus(1, ChronoUnit.WEEKS), OffsetDateTime.MAX.minus(Period.ofWeeks(1)));
+        OffsetDateTime.MAX.minus(1L, ChronoUnit.WEEKS),
+        OffsetDateTime.MAX.minus(Period.ofWeeks(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimeMinusMonths() {
     return ImmutableSet.of(
-        OffsetDateTime.MAX.minus(1, ChronoUnit.MONTHS),
+        OffsetDateTime.MAX.minus(1L, ChronoUnit.MONTHS),
         OffsetDateTime.MAX.minus(Period.ofMonths(1)));
   }
 
   ImmutableSet<OffsetDateTime> testOffsetDateTimeMinusYears() {
     return ImmutableSet.of(
-        OffsetDateTime.MAX.minus(1, ChronoUnit.YEARS), OffsetDateTime.MAX.minus(Period.ofYears(1)));
+        OffsetDateTime.MAX.minus(1L, ChronoUnit.YEARS),
+        OffsetDateTime.MAX.minus(Period.ofYears(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimePlusNanos() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.plus(1, ChronoUnit.NANOS), ZONED_DATE_TIME.plus(Duration.ofNanos(1)));
+        ZONED_DATE_TIME.plus(1L, ChronoUnit.NANOS), ZONED_DATE_TIME.plus(Duration.ofNanos(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimePlusSeconds() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.plus(1, ChronoUnit.SECONDS), ZONED_DATE_TIME.plus(Duration.ofSeconds(1)));
+        ZONED_DATE_TIME.plus(1L, ChronoUnit.SECONDS), ZONED_DATE_TIME.plus(Duration.ofSeconds(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimePlusMinutes() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.plus(1, ChronoUnit.MINUTES), ZONED_DATE_TIME.plus(Duration.ofMinutes(1)));
+        ZONED_DATE_TIME.plus(1L, ChronoUnit.MINUTES), ZONED_DATE_TIME.plus(Duration.ofMinutes(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimePlusHours() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.plus(1, ChronoUnit.HOURS), ZONED_DATE_TIME.plus(Duration.ofHours(1)));
+        ZONED_DATE_TIME.plus(1L, ChronoUnit.HOURS), ZONED_DATE_TIME.plus(Duration.ofHours(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimePlusDays() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.plus(1, ChronoUnit.DAYS), ZONED_DATE_TIME.plus(Period.ofDays(1)));
+        ZONED_DATE_TIME.plus(1L, ChronoUnit.DAYS), ZONED_DATE_TIME.plus(Period.ofDays(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimePlusWeeks() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.plus(1, ChronoUnit.WEEKS), ZONED_DATE_TIME.plus(Period.ofWeeks(1)));
+        ZONED_DATE_TIME.plus(1L, ChronoUnit.WEEKS), ZONED_DATE_TIME.plus(Period.ofWeeks(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimePlusMonths() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.plus(1, ChronoUnit.MONTHS), ZONED_DATE_TIME.plus(Period.ofMonths(1)));
+        ZONED_DATE_TIME.plus(1L, ChronoUnit.MONTHS), ZONED_DATE_TIME.plus(Period.ofMonths(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimePlusYears() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.plus(1, ChronoUnit.YEARS), ZONED_DATE_TIME.plus(Period.ofYears(1)));
+        ZONED_DATE_TIME.plus(1L, ChronoUnit.YEARS), ZONED_DATE_TIME.plus(Period.ofYears(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimeMinusNanos() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.minus(1, ChronoUnit.NANOS), ZONED_DATE_TIME.minus(Duration.ofNanos(1)));
+        ZONED_DATE_TIME.minus(1L, ChronoUnit.NANOS), ZONED_DATE_TIME.minus(Duration.ofNanos(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimeMinusSeconds() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.minus(1, ChronoUnit.SECONDS), ZONED_DATE_TIME.minus(Duration.ofSeconds(1)));
+        ZONED_DATE_TIME.minus(1L, ChronoUnit.SECONDS),
+        ZONED_DATE_TIME.minus(Duration.ofSeconds(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimeMinusMinutes() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.minus(1, ChronoUnit.MINUTES), ZONED_DATE_TIME.minus(Duration.ofMinutes(1)));
+        ZONED_DATE_TIME.minus(1L, ChronoUnit.MINUTES),
+        ZONED_DATE_TIME.minus(Duration.ofMinutes(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimeMinusHours() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.minus(1, ChronoUnit.HOURS), ZONED_DATE_TIME.minus(Duration.ofHours(1)));
+        ZONED_DATE_TIME.minus(1L, ChronoUnit.HOURS), ZONED_DATE_TIME.minus(Duration.ofHours(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimeMinusDays() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.minus(1, ChronoUnit.DAYS), ZONED_DATE_TIME.minus(Period.ofDays(1)));
+        ZONED_DATE_TIME.minus(1L, ChronoUnit.DAYS), ZONED_DATE_TIME.minus(Period.ofDays(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimeMinusWeeks() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.minus(1, ChronoUnit.WEEKS), ZONED_DATE_TIME.minus(Period.ofWeeks(1)));
+        ZONED_DATE_TIME.minus(1L, ChronoUnit.WEEKS), ZONED_DATE_TIME.minus(Period.ofWeeks(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimeMinusMonths() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.minus(1, ChronoUnit.MONTHS), ZONED_DATE_TIME.minus(Period.ofMonths(1)));
+        ZONED_DATE_TIME.minus(1L, ChronoUnit.MONTHS), ZONED_DATE_TIME.minus(Period.ofMonths(1)));
   }
 
   ImmutableSet<ZonedDateTime> testZonedDateTimeMinusYears() {
     return ImmutableSet.of(
-        ZONED_DATE_TIME.minus(1, ChronoUnit.YEARS), ZONED_DATE_TIME.minus(Period.ofYears(1)));
+        ZONED_DATE_TIME.minus(1L, ChronoUnit.YEARS), ZONED_DATE_TIME.minus(Period.ofYears(1)));
   }
 }

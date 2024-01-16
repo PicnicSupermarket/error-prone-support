@@ -587,8 +587,12 @@ final class TimeRules {
   static final class LocalDatePlusDays {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int days) {
-      return Refaster.anyOf(
-          localDate.plus(days, ChronoUnit.DAYS), localDate.plus(Period.ofDays(days)));
+      return localDate.plus(Period.ofDays(days));
+    }
+
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, long days) {
+      return localDate.plus(days, ChronoUnit.DAYS);
     }
 
     @AfterTemplate
@@ -601,8 +605,12 @@ final class TimeRules {
   static final class LocalDatePlusWeeks {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int weeks) {
-      return Refaster.anyOf(
-          localDate.plus(weeks, ChronoUnit.WEEKS), localDate.plus(Period.ofWeeks(weeks)));
+      return localDate.plus(Period.ofWeeks(weeks));
+    }
+
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, long weeks) {
+      return localDate.plus(weeks, ChronoUnit.WEEKS);
     }
 
     @AfterTemplate
@@ -615,8 +623,12 @@ final class TimeRules {
   static final class LocalDatePlusMonths {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int months) {
-      return Refaster.anyOf(
-          localDate.plus(months, ChronoUnit.MONTHS), localDate.plus(Period.ofMonths(months)));
+      return localDate.plus(Period.ofMonths(months));
+    }
+
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, long months) {
+      return localDate.plus(months, ChronoUnit.MONTHS);
     }
 
     @AfterTemplate
@@ -629,8 +641,12 @@ final class TimeRules {
   static final class LocalDatePlusYears {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int years) {
-      return Refaster.anyOf(
-          localDate.plus(years, ChronoUnit.YEARS), localDate.plus(Period.ofYears(years)));
+      return localDate.plus(Period.ofYears(years));
+    }
+
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, long years) {
+      return localDate.plus(years, ChronoUnit.YEARS);
     }
 
     @AfterTemplate
@@ -643,8 +659,12 @@ final class TimeRules {
   static final class LocalDateMinusDays {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int days) {
-      return Refaster.anyOf(
-          localDate.minus(days, ChronoUnit.DAYS), localDate.minus(Period.ofDays(days)));
+      return localDate.minus(Period.ofDays(days));
+    }
+
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, long days) {
+      return localDate.minus(days, ChronoUnit.DAYS);
     }
 
     @AfterTemplate
@@ -657,8 +677,12 @@ final class TimeRules {
   static final class LocalDateMinusWeeks {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int weeks) {
-      return Refaster.anyOf(
-          localDate.minus(weeks, ChronoUnit.WEEKS), localDate.minus(Period.ofWeeks(weeks)));
+      return localDate.minus(Period.ofWeeks(weeks));
+    }
+
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, long weeks) {
+      return localDate.minus(weeks, ChronoUnit.WEEKS);
     }
 
     @AfterTemplate
@@ -671,8 +695,12 @@ final class TimeRules {
   static final class LocalDateMinusMonths {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int months) {
-      return Refaster.anyOf(
-          localDate.minus(months, ChronoUnit.MONTHS), localDate.minus(Period.ofMonths(months)));
+      return localDate.minus(Period.ofMonths(months));
+    }
+
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, long months) {
+      return localDate.minus(months, ChronoUnit.MONTHS);
     }
 
     @AfterTemplate
@@ -685,8 +713,12 @@ final class TimeRules {
   static final class LocalDateMinusYears {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int years) {
-      return Refaster.anyOf(
-          localDate.minus(years, ChronoUnit.YEARS), localDate.minus(Period.ofYears(years)));
+      return localDate.minus(Period.ofYears(years));
+    }
+
+    @BeforeTemplate
+    LocalDate before(LocalDate localDate, long years) {
+      return localDate.minus(years, ChronoUnit.YEARS);
     }
 
     @AfterTemplate
@@ -699,8 +731,12 @@ final class TimeRules {
   static final class LocalTimePlusNanos {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int nanos) {
-      return Refaster.anyOf(
-          localTime.plus(nanos, ChronoUnit.NANOS), localTime.plus(Duration.ofNanos(nanos)));
+      return localTime.plus(Duration.ofNanos(nanos));
+    }
+
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, long nanos) {
+      return localTime.plus(nanos, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
@@ -713,8 +749,12 @@ final class TimeRules {
   static final class LocalTimePlusSeconds {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int seconds) {
-      return Refaster.anyOf(
-          localTime.plus(seconds, ChronoUnit.SECONDS), localTime.plus(Duration.ofSeconds(seconds)));
+      return localTime.plus(Duration.ofSeconds(seconds));
+    }
+
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, long seconds) {
+      return localTime.plus(seconds, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
@@ -727,8 +767,12 @@ final class TimeRules {
   static final class LocalTimePlusMinutes {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int minutes) {
-      return Refaster.anyOf(
-          localTime.plus(minutes, ChronoUnit.MINUTES), localTime.plus(Duration.ofMinutes(minutes)));
+      return localTime.plus(Duration.ofMinutes(minutes));
+    }
+
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, long minutes) {
+      return localTime.plus(minutes, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
@@ -741,8 +785,12 @@ final class TimeRules {
   static final class LocalTimePlusHours {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int hours) {
-      return Refaster.anyOf(
-          localTime.plus(hours, ChronoUnit.HOURS), localTime.plus(Duration.ofHours(hours)));
+      return localTime.plus(Duration.ofHours(hours));
+    }
+
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, long hours) {
+      return localTime.plus(hours, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
@@ -755,8 +803,12 @@ final class TimeRules {
   static final class LocalTimeMinusNanos {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int nanos) {
-      return Refaster.anyOf(
-          localTime.minus(nanos, ChronoUnit.NANOS), localTime.minus(Duration.ofNanos(nanos)));
+      return localTime.minus(Duration.ofNanos(nanos));
+    }
+
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, long nanos) {
+      return localTime.minus(nanos, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
@@ -769,9 +821,12 @@ final class TimeRules {
   static final class LocalTimeMinusSeconds {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int seconds) {
-      return Refaster.anyOf(
-          localTime.minus(seconds, ChronoUnit.SECONDS),
-          localTime.minus(Duration.ofSeconds(seconds)));
+      return localTime.minus(Duration.ofSeconds(seconds));
+    }
+
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, long seconds) {
+      return localTime.minus(seconds, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
@@ -784,9 +839,12 @@ final class TimeRules {
   static final class LocalTimeMinusMinutes {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int minutes) {
-      return Refaster.anyOf(
-          localTime.minus(minutes, ChronoUnit.MINUTES),
-          localTime.minus(Duration.ofMinutes(minutes)));
+      return localTime.minus(Duration.ofMinutes(minutes));
+    }
+
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, long minutes) {
+      return localTime.minus(minutes, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
@@ -799,8 +857,12 @@ final class TimeRules {
   static final class LocalTimeMinusHours {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int hours) {
-      return Refaster.anyOf(
-          localTime.minus(hours, ChronoUnit.HOURS), localTime.minus(Duration.ofHours(hours)));
+      return localTime.minus(Duration.ofHours(hours));
+    }
+
+    @BeforeTemplate
+    LocalTime before(LocalTime localTime, long hours) {
+      return localTime.minus(hours, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
@@ -813,8 +875,12 @@ final class TimeRules {
   static final class OffsetTimePlusNanos {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int nanos) {
-      return Refaster.anyOf(
-          offsetTime.plus(nanos, ChronoUnit.NANOS), offsetTime.plus(Duration.ofNanos(nanos)));
+      return offsetTime.plus(Duration.ofNanos(nanos));
+    }
+
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, long nanos) {
+      return offsetTime.plus(nanos, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
@@ -827,9 +893,12 @@ final class TimeRules {
   static final class OffsetTimePlusSeconds {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int seconds) {
-      return Refaster.anyOf(
-          offsetTime.plus(seconds, ChronoUnit.SECONDS),
-          offsetTime.plus(Duration.ofSeconds(seconds)));
+      return offsetTime.plus(Duration.ofSeconds(seconds));
+    }
+
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, long seconds) {
+      return offsetTime.plus(seconds, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
@@ -842,9 +911,12 @@ final class TimeRules {
   static final class OffsetTimePlusMinutes {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int minutes) {
-      return Refaster.anyOf(
-          offsetTime.plus(minutes, ChronoUnit.MINUTES),
-          offsetTime.plus(Duration.ofMinutes(minutes)));
+      return offsetTime.plus(Duration.ofMinutes(minutes));
+    }
+
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, long minutes) {
+      return offsetTime.plus(minutes, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
@@ -857,8 +929,12 @@ final class TimeRules {
   static final class OffsetTimePlusHours {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int hours) {
-      return Refaster.anyOf(
-          offsetTime.plus(hours, ChronoUnit.HOURS), offsetTime.plus(Duration.ofHours(hours)));
+      return offsetTime.plus(Duration.ofHours(hours));
+    }
+
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, long hours) {
+      return offsetTime.plus(hours, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
@@ -871,8 +947,12 @@ final class TimeRules {
   static final class OffsetTimeMinusNanos {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int nanos) {
-      return Refaster.anyOf(
-          offsetTime.minus(nanos, ChronoUnit.NANOS), offsetTime.minus(Duration.ofNanos(nanos)));
+      return offsetTime.minus(Duration.ofNanos(nanos));
+    }
+
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, long nanos) {
+      return offsetTime.minus(nanos, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
@@ -885,9 +965,12 @@ final class TimeRules {
   static final class OffsetTimeMinusSeconds {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int seconds) {
-      return Refaster.anyOf(
-          offsetTime.minus(seconds, ChronoUnit.SECONDS),
-          offsetTime.minus(Duration.ofSeconds(seconds)));
+      return offsetTime.minus(Duration.ofSeconds(seconds));
+    }
+
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, long seconds) {
+      return offsetTime.minus(seconds, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
@@ -900,9 +983,12 @@ final class TimeRules {
   static final class OffsetTimeMinusMinutes {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int minutes) {
-      return Refaster.anyOf(
-          offsetTime.minus(minutes, ChronoUnit.MINUTES),
-          offsetTime.minus(Duration.ofMinutes(minutes)));
+      return offsetTime.minus(Duration.ofMinutes(minutes));
+    }
+
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, long minutes) {
+      return offsetTime.minus(minutes, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
@@ -915,8 +1001,12 @@ final class TimeRules {
   static final class OffsetTimeMinusHours {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int hours) {
-      return Refaster.anyOf(
-          offsetTime.minus(hours, ChronoUnit.HOURS), offsetTime.minus(Duration.ofHours(hours)));
+      return offsetTime.minus(Duration.ofHours(hours));
+    }
+
+    @BeforeTemplate
+    OffsetTime before(OffsetTime offsetTime, long hours) {
+      return offsetTime.minus(hours, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
@@ -929,8 +1019,12 @@ final class TimeRules {
   static final class LocalDateTimePlusNanos {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int nanos) {
-      return Refaster.anyOf(
-          localDateTime.plus(nanos, ChronoUnit.NANOS), localDateTime.plus(Duration.ofNanos(nanos)));
+      return localDateTime.plus(Duration.ofNanos(nanos));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long nanos) {
+      return localDateTime.plus(nanos, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
@@ -943,9 +1037,12 @@ final class TimeRules {
   static final class LocalDateTimePlusSeconds {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int seconds) {
-      return Refaster.anyOf(
-          localDateTime.plus(seconds, ChronoUnit.SECONDS),
-          localDateTime.plus(Duration.ofSeconds(seconds)));
+      return localDateTime.plus(Duration.ofSeconds(seconds));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long seconds) {
+      return localDateTime.plus(seconds, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
@@ -958,9 +1055,12 @@ final class TimeRules {
   static final class LocalDateTimePlusMinutes {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int minutes) {
-      return Refaster.anyOf(
-          localDateTime.plus(minutes, ChronoUnit.MINUTES),
-          localDateTime.plus(Duration.ofMinutes(minutes)));
+      return localDateTime.plus(Duration.ofMinutes(minutes));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long minutes) {
+      return localDateTime.plus(minutes, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
@@ -973,8 +1073,12 @@ final class TimeRules {
   static final class LocalDateTimePlusHours {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int hours) {
-      return Refaster.anyOf(
-          localDateTime.plus(hours, ChronoUnit.HOURS), localDateTime.plus(Duration.ofHours(hours)));
+      return localDateTime.plus(Duration.ofHours(hours));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long hours) {
+      return localDateTime.plus(hours, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
@@ -987,8 +1091,12 @@ final class TimeRules {
   static final class LocalDateTimePlusDays {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int days) {
-      return Refaster.anyOf(
-          localDateTime.plus(days, ChronoUnit.DAYS), localDateTime.plus(Period.ofDays(days)));
+      return localDateTime.plus(Period.ofDays(days));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long days) {
+      return localDateTime.plus(days, ChronoUnit.DAYS);
     }
 
     @AfterTemplate
@@ -1001,8 +1109,12 @@ final class TimeRules {
   static final class LocalDateTimePlusWeeks {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int weeks) {
-      return Refaster.anyOf(
-          localDateTime.plus(weeks, ChronoUnit.WEEKS), localDateTime.plus(Period.ofWeeks(weeks)));
+      return localDateTime.plus(Period.ofWeeks(weeks));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long weeks) {
+      return localDateTime.plus(weeks, ChronoUnit.WEEKS);
     }
 
     @AfterTemplate
@@ -1015,9 +1127,12 @@ final class TimeRules {
   static final class LocalDateTimePlusMonths {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int months) {
-      return Refaster.anyOf(
-          localDateTime.plus(months, ChronoUnit.MONTHS),
-          localDateTime.plus(Period.ofMonths(months)));
+      return localDateTime.plus(Period.ofMonths(months));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long months) {
+      return localDateTime.plus(months, ChronoUnit.MONTHS);
     }
 
     @AfterTemplate
@@ -1030,8 +1145,12 @@ final class TimeRules {
   static final class LocalDateTimePlusYears {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int years) {
-      return Refaster.anyOf(
-          localDateTime.plus(years, ChronoUnit.YEARS), localDateTime.plus(Period.ofYears(years)));
+      return localDateTime.plus(Period.ofYears(years));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long years) {
+      return localDateTime.plus(years, ChronoUnit.YEARS);
     }
 
     @AfterTemplate
@@ -1044,9 +1163,12 @@ final class TimeRules {
   static final class LocalDateTimeMinusNanos {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int nanos) {
-      return Refaster.anyOf(
-          localDateTime.minus(nanos, ChronoUnit.NANOS),
-          localDateTime.minus(Duration.ofNanos(nanos)));
+      return localDateTime.minus(Duration.ofNanos(nanos));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long nanos) {
+      return localDateTime.minus(nanos, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
@@ -1059,9 +1181,12 @@ final class TimeRules {
   static final class LocalDateTimeMinusSeconds {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int seconds) {
-      return Refaster.anyOf(
-          localDateTime.minus(seconds, ChronoUnit.SECONDS),
-          localDateTime.minus(Duration.ofSeconds(seconds)));
+      return localDateTime.minus(Duration.ofSeconds(seconds));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long seconds) {
+      return localDateTime.minus(seconds, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
@@ -1074,9 +1199,12 @@ final class TimeRules {
   static final class LocalDateTimeMinusMinutes {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int minutes) {
-      return Refaster.anyOf(
-          localDateTime.minus(minutes, ChronoUnit.MINUTES),
-          localDateTime.minus(Duration.ofMinutes(minutes)));
+      return localDateTime.minus(Duration.ofMinutes(minutes));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long minutes) {
+      return localDateTime.minus(minutes, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
@@ -1089,9 +1217,12 @@ final class TimeRules {
   static final class LocalDateTimeMinusHours {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int hours) {
-      return Refaster.anyOf(
-          localDateTime.minus(hours, ChronoUnit.HOURS),
-          localDateTime.minus(Duration.ofHours(hours)));
+      return localDateTime.minus(Duration.ofHours(hours));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long hours) {
+      return localDateTime.minus(hours, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
@@ -1104,8 +1235,12 @@ final class TimeRules {
   static final class LocalDateTimeMinusDays {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int days) {
-      return Refaster.anyOf(
-          localDateTime.minus(days, ChronoUnit.DAYS), localDateTime.minus(Period.ofDays(days)));
+      return localDateTime.minus(Period.ofDays(days));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long days) {
+      return localDateTime.minus(days, ChronoUnit.DAYS);
     }
 
     @AfterTemplate
@@ -1118,8 +1253,12 @@ final class TimeRules {
   static final class LocalDateTimeMinusWeeks {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int weeks) {
-      return Refaster.anyOf(
-          localDateTime.minus(weeks, ChronoUnit.WEEKS), localDateTime.minus(Period.ofWeeks(weeks)));
+      return localDateTime.minus(Period.ofWeeks(weeks));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long weeks) {
+      return localDateTime.minus(weeks, ChronoUnit.WEEKS);
     }
 
     @AfterTemplate
@@ -1132,9 +1271,12 @@ final class TimeRules {
   static final class LocalDateTimeMinusMonths {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int months) {
-      return Refaster.anyOf(
-          localDateTime.minus(months, ChronoUnit.MONTHS),
-          localDateTime.minus(Period.ofMonths(months)));
+      return localDateTime.minus(Period.ofMonths(months));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long months) {
+      return localDateTime.minus(months, ChronoUnit.MONTHS);
     }
 
     @AfterTemplate
@@ -1147,8 +1289,12 @@ final class TimeRules {
   static final class LocalDateTimeMinusYears {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int years) {
-      return Refaster.anyOf(
-          localDateTime.minus(years, ChronoUnit.YEARS), localDateTime.minus(Period.ofYears(years)));
+      return localDateTime.minus(Period.ofYears(years));
+    }
+
+    @BeforeTemplate
+    LocalDateTime before(LocalDateTime localDateTime, long years) {
+      return localDateTime.minus(years, ChronoUnit.YEARS);
     }
 
     @AfterTemplate
@@ -1161,9 +1307,12 @@ final class TimeRules {
   static final class OffsetDateTimePlusNanos {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int nanos) {
-      return Refaster.anyOf(
-          offsetDateTime.plus(nanos, ChronoUnit.NANOS),
-          offsetDateTime.plus(Duration.ofNanos(nanos)));
+      return offsetDateTime.plus(Duration.ofNanos(nanos));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long nanos) {
+      return offsetDateTime.plus(nanos, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
@@ -1176,9 +1325,12 @@ final class TimeRules {
   static final class OffsetDateTimePlusSeconds {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int seconds) {
-      return Refaster.anyOf(
-          offsetDateTime.plus(seconds, ChronoUnit.SECONDS),
-          offsetDateTime.plus(Duration.ofSeconds(seconds)));
+      return offsetDateTime.plus(Duration.ofSeconds(seconds));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long seconds) {
+      return offsetDateTime.plus(seconds, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
@@ -1191,9 +1343,12 @@ final class TimeRules {
   static final class OffsetDateTimePlusMinutes {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int minutes) {
-      return Refaster.anyOf(
-          offsetDateTime.plus(minutes, ChronoUnit.MINUTES),
-          offsetDateTime.plus(Duration.ofMinutes(minutes)));
+      return offsetDateTime.plus(Duration.ofMinutes(minutes));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long minutes) {
+      return offsetDateTime.plus(minutes, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
@@ -1206,9 +1361,12 @@ final class TimeRules {
   static final class OffsetDateTimePlusHours {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int hours) {
-      return Refaster.anyOf(
-          offsetDateTime.plus(hours, ChronoUnit.HOURS),
-          offsetDateTime.plus(Duration.ofHours(hours)));
+      return offsetDateTime.plus(Duration.ofHours(hours));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long hours) {
+      return offsetDateTime.plus(hours, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
@@ -1221,8 +1379,12 @@ final class TimeRules {
   static final class OffsetDateTimePlusDays {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int days) {
-      return Refaster.anyOf(
-          offsetDateTime.plus(days, ChronoUnit.DAYS), offsetDateTime.plus(Period.ofDays(days)));
+      return offsetDateTime.plus(Period.ofDays(days));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long days) {
+      return offsetDateTime.plus(days, ChronoUnit.DAYS);
     }
 
     @AfterTemplate
@@ -1235,8 +1397,12 @@ final class TimeRules {
   static final class OffsetDateTimePlusWeeks {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int weeks) {
-      return Refaster.anyOf(
-          offsetDateTime.plus(weeks, ChronoUnit.WEEKS), offsetDateTime.plus(Period.ofWeeks(weeks)));
+      return offsetDateTime.plus(Period.ofWeeks(weeks));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long weeks) {
+      return offsetDateTime.plus(weeks, ChronoUnit.WEEKS);
     }
 
     @AfterTemplate
@@ -1249,9 +1415,12 @@ final class TimeRules {
   static final class OffsetDateTimePlusMonths {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int months) {
-      return Refaster.anyOf(
-          offsetDateTime.plus(months, ChronoUnit.MONTHS),
-          offsetDateTime.plus(Period.ofMonths(months)));
+      return offsetDateTime.plus(Period.ofMonths(months));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long months) {
+      return offsetDateTime.plus(months, ChronoUnit.MONTHS);
     }
 
     @AfterTemplate
@@ -1264,8 +1433,12 @@ final class TimeRules {
   static final class OffsetDateTimePlusYears {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int years) {
-      return Refaster.anyOf(
-          offsetDateTime.plus(years, ChronoUnit.YEARS), offsetDateTime.plus(Period.ofYears(years)));
+      return offsetDateTime.plus(Period.ofYears(years));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long years) {
+      return offsetDateTime.plus(years, ChronoUnit.YEARS);
     }
 
     @AfterTemplate
@@ -1278,9 +1451,12 @@ final class TimeRules {
   static final class OffsetDateTimeMinusNanos {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int nanos) {
-      return Refaster.anyOf(
-          offsetDateTime.minus(nanos, ChronoUnit.NANOS),
-          offsetDateTime.minus(Duration.ofNanos(nanos)));
+      return offsetDateTime.minus(Duration.ofNanos(nanos));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long nanos) {
+      return offsetDateTime.minus(nanos, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
@@ -1293,9 +1469,12 @@ final class TimeRules {
   static final class OffsetDateTimeMinusSeconds {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int seconds) {
-      return Refaster.anyOf(
-          offsetDateTime.minus(seconds, ChronoUnit.SECONDS),
-          offsetDateTime.minus(Duration.ofSeconds(seconds)));
+      return offsetDateTime.minus(Duration.ofSeconds(seconds));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long seconds) {
+      return offsetDateTime.minus(seconds, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
@@ -1308,9 +1487,12 @@ final class TimeRules {
   static final class OffsetDateTimeMinusMinutes {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int minutes) {
-      return Refaster.anyOf(
-          offsetDateTime.minus(minutes, ChronoUnit.MINUTES),
-          offsetDateTime.minus(Duration.ofMinutes(minutes)));
+      return offsetDateTime.minus(Duration.ofMinutes(minutes));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long minutes) {
+      return offsetDateTime.minus(minutes, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
@@ -1323,9 +1505,12 @@ final class TimeRules {
   static final class OffsetDateTimeMinusHours {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int hours) {
-      return Refaster.anyOf(
-          offsetDateTime.minus(hours, ChronoUnit.HOURS),
-          offsetDateTime.minus(Duration.ofHours(hours)));
+      return offsetDateTime.minus(Duration.ofHours(hours));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long hours) {
+      return offsetDateTime.minus(hours, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
@@ -1338,8 +1523,12 @@ final class TimeRules {
   static final class OffsetDateTimeMinusDays {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int days) {
-      return Refaster.anyOf(
-          offsetDateTime.minus(days, ChronoUnit.DAYS), offsetDateTime.minus(Period.ofDays(days)));
+      return offsetDateTime.minus(Period.ofDays(days));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long days) {
+      return offsetDateTime.minus(days, ChronoUnit.DAYS);
     }
 
     @AfterTemplate
@@ -1352,9 +1541,12 @@ final class TimeRules {
   static final class OffsetDateTimeMinusWeeks {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int weeks) {
-      return Refaster.anyOf(
-          offsetDateTime.minus(weeks, ChronoUnit.WEEKS),
-          offsetDateTime.minus(Period.ofWeeks(weeks)));
+      return offsetDateTime.minus(Period.ofWeeks(weeks));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long weeks) {
+      return offsetDateTime.minus(weeks, ChronoUnit.WEEKS);
     }
 
     @AfterTemplate
@@ -1367,9 +1559,12 @@ final class TimeRules {
   static final class OffsetDateTimeMinusMonths {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int months) {
-      return Refaster.anyOf(
-          offsetDateTime.minus(months, ChronoUnit.MONTHS),
-          offsetDateTime.minus(Period.ofMonths(months)));
+      return offsetDateTime.minus(Period.ofMonths(months));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long months) {
+      return offsetDateTime.minus(months, ChronoUnit.MONTHS);
     }
 
     @AfterTemplate
@@ -1382,9 +1577,12 @@ final class TimeRules {
   static final class OffsetDateTimeMinusYears {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int years) {
-      return Refaster.anyOf(
-          offsetDateTime.minus(years, ChronoUnit.YEARS),
-          offsetDateTime.minus(Period.ofYears(years)));
+      return offsetDateTime.minus(Period.ofYears(years));
+    }
+
+    @BeforeTemplate
+    OffsetDateTime before(OffsetDateTime offsetDateTime, long years) {
+      return offsetDateTime.minus(years, ChronoUnit.YEARS);
     }
 
     @AfterTemplate
@@ -1397,8 +1595,12 @@ final class TimeRules {
   static final class ZonedDateTimePlusNanos {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int nanos) {
-      return Refaster.anyOf(
-          zonedDateTime.plus(nanos, ChronoUnit.NANOS), zonedDateTime.plus(Duration.ofNanos(nanos)));
+      return zonedDateTime.plus(Duration.ofNanos(nanos));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long nanos) {
+      return zonedDateTime.plus(nanos, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
@@ -1411,9 +1613,12 @@ final class TimeRules {
   static final class ZonedDateTimePlusSeconds {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int seconds) {
-      return Refaster.anyOf(
-          zonedDateTime.plus(seconds, ChronoUnit.SECONDS),
-          zonedDateTime.plus(Duration.ofSeconds(seconds)));
+      return zonedDateTime.plus(Duration.ofSeconds(seconds));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long seconds) {
+      return zonedDateTime.plus(seconds, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
@@ -1426,9 +1631,12 @@ final class TimeRules {
   static final class ZonedDateTimePlusMinutes {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int minutes) {
-      return Refaster.anyOf(
-          zonedDateTime.plus(minutes, ChronoUnit.MINUTES),
-          zonedDateTime.plus(Duration.ofMinutes(minutes)));
+      return zonedDateTime.plus(Duration.ofMinutes(minutes));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long minutes) {
+      return zonedDateTime.plus(minutes, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
@@ -1441,8 +1649,12 @@ final class TimeRules {
   static final class ZonedDateTimePlusHours {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int hours) {
-      return Refaster.anyOf(
-          zonedDateTime.plus(hours, ChronoUnit.HOURS), zonedDateTime.plus(Duration.ofHours(hours)));
+      return zonedDateTime.plus(Duration.ofHours(hours));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long hours) {
+      return zonedDateTime.plus(hours, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
@@ -1455,8 +1667,12 @@ final class TimeRules {
   static final class ZonedDateTimePlusDays {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int days) {
-      return Refaster.anyOf(
-          zonedDateTime.plus(days, ChronoUnit.DAYS), zonedDateTime.plus(Period.ofDays(days)));
+      return zonedDateTime.plus(Period.ofDays(days));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long days) {
+      return zonedDateTime.plus(days, ChronoUnit.DAYS);
     }
 
     @AfterTemplate
@@ -1469,8 +1685,12 @@ final class TimeRules {
   static final class ZonedDateTimePlusWeeks {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int weeks) {
-      return Refaster.anyOf(
-          zonedDateTime.plus(weeks, ChronoUnit.WEEKS), zonedDateTime.plus(Period.ofWeeks(weeks)));
+      return zonedDateTime.plus(Period.ofWeeks(weeks));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long weeks) {
+      return zonedDateTime.plus(weeks, ChronoUnit.WEEKS);
     }
 
     @AfterTemplate
@@ -1483,9 +1703,12 @@ final class TimeRules {
   static final class ZonedDateTimePlusMonths {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int months) {
-      return Refaster.anyOf(
-          zonedDateTime.plus(months, ChronoUnit.MONTHS),
-          zonedDateTime.plus(Period.ofMonths(months)));
+      return zonedDateTime.plus(Period.ofMonths(months));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long months) {
+      return zonedDateTime.plus(months, ChronoUnit.MONTHS);
     }
 
     @AfterTemplate
@@ -1498,8 +1721,12 @@ final class TimeRules {
   static final class ZonedDateTimePlusYears {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int years) {
-      return Refaster.anyOf(
-          zonedDateTime.plus(years, ChronoUnit.YEARS), zonedDateTime.plus(Period.ofYears(years)));
+      return zonedDateTime.plus(Period.ofYears(years));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long years) {
+      return zonedDateTime.plus(years, ChronoUnit.YEARS);
     }
 
     @AfterTemplate
@@ -1512,9 +1739,12 @@ final class TimeRules {
   static final class ZonedDateTimeMinusNanos {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int nanos) {
-      return Refaster.anyOf(
-          zonedDateTime.minus(nanos, ChronoUnit.NANOS),
-          zonedDateTime.minus(Duration.ofNanos(nanos)));
+      return zonedDateTime.minus(Duration.ofNanos(nanos));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long nanos) {
+      return zonedDateTime.minus(nanos, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
@@ -1527,9 +1757,12 @@ final class TimeRules {
   static final class ZonedDateTimeMinusSeconds {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int seconds) {
-      return Refaster.anyOf(
-          zonedDateTime.minus(seconds, ChronoUnit.SECONDS),
-          zonedDateTime.minus(Duration.ofSeconds(seconds)));
+      return zonedDateTime.minus(Duration.ofSeconds(seconds));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long seconds) {
+      return zonedDateTime.minus(seconds, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
@@ -1542,9 +1775,12 @@ final class TimeRules {
   static final class ZonedDateTimeMinusMinutes {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int minutes) {
-      return Refaster.anyOf(
-          zonedDateTime.minus(minutes, ChronoUnit.MINUTES),
-          zonedDateTime.minus(Duration.ofMinutes(minutes)));
+      return zonedDateTime.minus(Duration.ofMinutes(minutes));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long minutes) {
+      return zonedDateTime.minus(minutes, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
@@ -1557,9 +1793,12 @@ final class TimeRules {
   static final class ZonedDateTimeMinusHours {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int hours) {
-      return Refaster.anyOf(
-          zonedDateTime.minus(hours, ChronoUnit.HOURS),
-          zonedDateTime.minus(Duration.ofHours(hours)));
+      return zonedDateTime.minus(Duration.ofHours(hours));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long hours) {
+      return zonedDateTime.minus(hours, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
@@ -1572,8 +1811,12 @@ final class TimeRules {
   static final class ZonedDateTimeMinusDays {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int days) {
-      return Refaster.anyOf(
-          zonedDateTime.minus(days, ChronoUnit.DAYS), zonedDateTime.minus(Period.ofDays(days)));
+      return zonedDateTime.minus(Period.ofDays(days));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long days) {
+      return zonedDateTime.minus(days, ChronoUnit.DAYS);
     }
 
     @AfterTemplate
@@ -1586,8 +1829,12 @@ final class TimeRules {
   static final class ZonedDateTimeMinusWeeks {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int weeks) {
-      return Refaster.anyOf(
-          zonedDateTime.minus(weeks, ChronoUnit.WEEKS), zonedDateTime.minus(Period.ofWeeks(weeks)));
+      return zonedDateTime.minus(Period.ofWeeks(weeks));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long weeks) {
+      return zonedDateTime.minus(weeks, ChronoUnit.WEEKS);
     }
 
     @AfterTemplate
@@ -1600,9 +1847,12 @@ final class TimeRules {
   static final class ZonedDateTimeMinusMonths {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int months) {
-      return Refaster.anyOf(
-          zonedDateTime.minus(months, ChronoUnit.MONTHS),
-          zonedDateTime.minus(Period.ofMonths(months)));
+      return zonedDateTime.minus(Period.ofMonths(months));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long months) {
+      return zonedDateTime.minus(months, ChronoUnit.MONTHS);
     }
 
     @AfterTemplate
@@ -1615,8 +1865,12 @@ final class TimeRules {
   static final class ZonedDateTimeMinusYears {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int years) {
-      return Refaster.anyOf(
-          zonedDateTime.minus(years, ChronoUnit.YEARS), zonedDateTime.minus(Period.ofYears(years)));
+      return zonedDateTime.minus(Period.ofYears(years));
+    }
+
+    @BeforeTemplate
+    ZonedDateTime before(ZonedDateTime zonedDateTime, long years) {
+      return zonedDateTime.minus(years, ChronoUnit.YEARS);
     }
 
     @AfterTemplate
