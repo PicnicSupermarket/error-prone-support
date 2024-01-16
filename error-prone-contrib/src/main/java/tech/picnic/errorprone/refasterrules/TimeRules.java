@@ -583,6 +583,9 @@ final class TimeRules {
     }
   }
 
+  // XXX: The `DateType{Plus,Minus}Unit` rules below contain a lot of boilerplate. Consider
+  // introducing an Error Prone check instead.
+
   /** Prefer {@link LocalDate#plusDays(long)} over more contrived alternatives. */
   static final class LocalDatePlusDays {
     @BeforeTemplate
