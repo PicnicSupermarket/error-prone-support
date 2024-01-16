@@ -17,6 +17,8 @@ import java.time.temporal.ChronoUnit;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class TimeRulesTest implements RefasterRuleCollectionTestCase {
+  private static final ZonedDateTime ZONED_DATE_TIME = Instant.EPOCH.atZone(ZoneOffset.UTC);
+
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(ChronoUnit.class);
@@ -511,9 +513,6 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         OffsetDateTime.MAX.minus(1, ChronoUnit.YEARS), OffsetDateTime.MAX.minus(Period.ofYears(1)));
   }
-
-  private static final ZonedDateTime ZONED_DATE_TIME =
-      ZonedDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
 
   ImmutableSet<ZonedDateTime> testZonedDateTimePlusNanos() {
     return ImmutableSet.of(
