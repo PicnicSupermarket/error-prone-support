@@ -41,9 +41,7 @@ import reactor.core.publisher.Mono;
  * cases this is not the desired behaviour.
  *
  * @apiNote {@code Mono<?>.zipWith(Mono<Void>)} is allowed by the Reactor API, but it is an
- *     incorrect usage of the API. It will be flagged by ErrorProne but the fix won't be supplied.
- *     The problem with the original code should be revisited and fixed in a structural manner by
- *     the developer.
+ *     incorrect usage of the API.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -57,24 +55,19 @@ import reactor.core.publisher.Mono;
 public final class MonoZipOfMonoVoidUsage extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final String MONO_ZIP_WITH_METHOD = "zipWith";
-  private static final String MONO_ZIP_METHOD = "zip";
-  private static final String MONO_EMPTY_METHOD = "empty";
-  private static final Supplier<Type> MONO_VOID_TYPE_SUPPLIER =
+  private static final Supplier<Type> MONO_VOID_TYPE =
       VisitorState.memoize(
           generic(type("reactor.core.publisher.Mono"), type(Void.class.getCanonicalName())));
   private static final Matcher<ExpressionTree> MONO_ZIP_AND_MONO_ZIP_WITH =
       anyOf(
-          instanceMethod().onDescendantOf(MONO_VOID_TYPE_SUPPLIER).named(MONO_ZIP_WITH_METHOD),
-          staticMethod().onClass(MONO_VOID_TYPE_SUPPLIER).named(MONO_ZIP_METHOD));
+          instanceMethod().onDescendantOf(MONO_VOID_TYPE).named("zipWith"),
+          staticMethod().onClass(MONO_VOID_TYPE).named("zip"));
   private static final Matcher<ExpressionTree> GENERIC_ARGUMENT_DERIVED_FROM_MONO_TYPE =
-      toType(MethodInvocationTree.class, hasGenericArgumentOfExactType(MONO_VOID_TYPE_SUPPLIER));
+      toType(MethodInvocationTree.class, hasGenericArgumentOfExactType(MONO_VOID_TYPE));
   private static final Matcher<ExpressionTree> HAS_MONO_EMPTY_AS_ARGUMENT =
       toType(
           MethodInvocationTree.class,
-          hasArguments(
-              AT_LEAST_ONE,
-              staticMethod().onClass(MONO_VOID_TYPE_SUPPLIER).named(MONO_EMPTY_METHOD)));
+          hasArguments(AT_LEAST_ONE, staticMethod().onClass(MONO_VOID_TYPE).named("empty")));
   private static final Matcher<ExpressionTree> OPERATORS_WITH_MONO_VOID_GENERIC_ARGUMENT =
       allOf(
           MONO_ZIP_AND_MONO_ZIP_WITH,
@@ -82,7 +75,7 @@ public final class MonoZipOfMonoVoidUsage extends BugChecker
   private static final Matcher<ExpressionTree> ANY_MONO_VOID_IN_PUBLISHERS =
       anyOf(
           OPERATORS_WITH_MONO_VOID_GENERIC_ARGUMENT,
-          onClassWithMethodName(MONO_VOID_TYPE_SUPPLIER, MONO_ZIP_WITH_METHOD));
+          onClassWithMethodName(MONO_VOID_TYPE, "zipWith"));
 
   /** Instantiates a new {@link MonoZipOfMonoVoidUsage} instance. */
   public MonoZipOfMonoVoidUsage() {}
