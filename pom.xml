@@ -304,11 +304,6 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>com.github.bsideup.jabel</groupId>
-                <artifactId>jabel-javac-plugin</artifactId>
-                <version>1.0.0</version>
-            </dependency>
-            <dependency>
                 <groupId>com.google.auto</groupId>
                 <artifactId>auto-common</artifactId>
                 <version>1.2.2</version>
@@ -359,6 +354,14 @@
                 <groupId>com.jakewharton.nopen</groupId>
                 <artifactId>nopen-checker</artifactId>
                 <version>${version.nopen-checker}</version>
+            </dependency>
+            <!-- XXX: Use a version 1.0.1+ release with the
+            `com.github.bsideup.jabel` groupId once available. See
+            https://github.com/bsideup/jabel/issues/182. -->
+            <dependency>
+                <groupId>com.pkware.jabel</groupId>
+                <artifactId>jabel-javac-plugin</artifactId>
+                <version>1.0.1-1</version>
             </dependency>
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
@@ -939,10 +942,6 @@
                             declarations once properly supported. See
                             https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                             <path>
-                                <groupId>com.github.bsideup.jabel</groupId>
-                                <artifactId>jabel-javac-plugin</artifactId>
-                            </path>
-                            <path>
                                 <groupId>com.google.auto.value</groupId>
                                 <artifactId>auto-value</artifactId>
                                 <version>${version.auto-value}</version>
@@ -951,6 +950,10 @@
                                 <groupId>com.google.auto.service</groupId>
                                 <artifactId>auto-service</artifactId>
                                 <version>${version.auto-service}</version>
+                            </path>
+                            <path>
+                                <groupId>com.pkware.jabel</groupId>
+                                <artifactId>jabel-javac-plugin</artifactId>
                             </path>
                             <path>
                                 <groupId>org.openrewrite</groupId>
