@@ -342,9 +342,10 @@ public final class RedundantStringConversion extends BugChecker
     return switch (methodInvocation.getArguments().size()) {
       case 0 -> trySimplifyNullaryMethod(methodInvocation, state);
       case 1 -> trySimplifyUnaryMethod(methodInvocation, state);
-      default -> throw new IllegalStateException(
-          "Cannot simplify method call with two or more arguments: "
-              + SourceCode.treeToString(tree, state));
+      default ->
+          throw new IllegalStateException(
+              "Cannot simplify method call with two or more arguments: "
+                  + SourceCode.treeToString(tree, state));
     };
   }
 

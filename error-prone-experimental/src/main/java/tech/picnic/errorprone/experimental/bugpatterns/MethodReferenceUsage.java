@@ -88,11 +88,11 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
       LambdaExpressionTree lambdaExpr, Tree subTree) {
     return switch (subTree.getKind()) {
       case BLOCK -> constructMethodRef(lambdaExpr, (BlockTree) subTree);
-      case EXPRESSION_STATEMENT -> constructMethodRef(
-          lambdaExpr, ((ExpressionStatementTree) subTree).getExpression());
+      case EXPRESSION_STATEMENT ->
+          constructMethodRef(lambdaExpr, ((ExpressionStatementTree) subTree).getExpression());
       case METHOD_INVOCATION -> constructMethodRef(lambdaExpr, (MethodInvocationTree) subTree);
-      case PARENTHESIZED -> constructMethodRef(
-          lambdaExpr, ((ParenthesizedTree) subTree).getExpression());
+      case PARENTHESIZED ->
+          constructMethodRef(lambdaExpr, ((ParenthesizedTree) subTree).getExpression());
       case RETURN -> constructMethodRef(lambdaExpr, ((ReturnTree) subTree).getExpression());
       default -> Optional.empty();
     };

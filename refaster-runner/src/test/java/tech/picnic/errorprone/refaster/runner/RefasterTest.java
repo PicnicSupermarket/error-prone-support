@@ -195,8 +195,9 @@ final class RefasterTest {
       case "Note" -> SUGGESTION;
       case "warning" -> WARNING;
       case "error" -> ERROR;
-      default -> throw new IllegalStateException(
-          String.format("Unrecognized diagnostics prefix '%s'", compilerDiagnosticsPrefix));
+      default ->
+          throw new IllegalStateException(
+              String.format("Unrecognized diagnostics prefix '%s'", compilerDiagnosticsPrefix));
     };
   }
 

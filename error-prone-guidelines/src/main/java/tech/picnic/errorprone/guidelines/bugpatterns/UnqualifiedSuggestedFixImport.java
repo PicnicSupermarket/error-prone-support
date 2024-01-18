@@ -46,10 +46,11 @@ public final class UnqualifiedSuggestedFixImport extends BugChecker
     }
 
     return switch (ASTHelpers.getSymbol(tree).getSimpleName().toString()) {
-      case "addImport" -> createDescription(
-          tree, "SuggestedFix.Builder#addImport", "SuggestedFixes#qualifyType");
-      case "addStaticImport" -> createDescription(
-          tree, "SuggestedFix.Builder#addStaticImport", "SuggestedFixes#qualifyStaticImport");
+      case "addImport" ->
+          createDescription(tree, "SuggestedFix.Builder#addImport", "SuggestedFixes#qualifyType");
+      case "addStaticImport" ->
+          createDescription(
+              tree, "SuggestedFix.Builder#addStaticImport", "SuggestedFixes#qualifyStaticImport");
       default -> Description.NO_MATCH;
     };
   }
