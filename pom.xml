@@ -976,6 +976,10 @@
                         </compilerArgs>
                         <parameters>true</parameters>
                         <showWarnings>false</showWarnings>
+                        <!-- The actual source level is specified by
+                        `version.jdk.source`, but javac requires that `-source`
+                        is not greater than `-target`. Thanks to the Jabel
+                        plugin the code can be compiled anyway. -->
                         <source>${version.jdk.target}</source>
                         <target>${version.jdk.target}</target>
                         <!-- Erroneously inverted logic... for details, see
