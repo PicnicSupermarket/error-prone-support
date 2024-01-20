@@ -56,6 +56,7 @@ import java.util.stream.Stream;
 // XXX: Also recognize empty builders and `emptyBuilder.build()` invocations.
 public final class IsEmpty implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
+  private static final Integer ZERO = 0;
   private static final Pattern EMPTY_INSTANCE_FACTORY_METHOD_PATTERN = Pattern.compile("empty.*");
   private static final Matcher<Tree> EMPTY_COLLECTION_CONSTRUCTOR_ARGUMENT =
       anyOf(isPrimitiveType(), isSubtypeOf(Comparator.class));
@@ -145,7 +146,7 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
 
     NewArrayTree newArray = (NewArrayTree) tree;
     return (!newArray.getDimensions().isEmpty()
-            && ASTHelpers.constValue(newArray.getDimensions().get(0), Integer.class) == 0)
+            && ZERO.equals(ASTHelpers.constValue(newArray.getDimensions().get(0), Integer.class)))
         || (newArray.getInitializers() != null && newArray.getInitializers().isEmpty());
   }
 }
