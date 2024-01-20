@@ -18,9 +18,9 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         assertThatExceptionOfType(Throwable.class),
-        assertThatIOException(),
         assertThatIllegalArgumentException(),
         assertThatIllegalStateException(),
+        assertThatIOException(),
         assertThatNullPointerException());
   }
 

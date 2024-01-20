@@ -37,18 +37,18 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        ImmutableList.class,
-        Objects.class,
-        Streams.class,
         counting(),
         filtering(null, null),
         flatMapping(null, null),
         identity(),
+        ImmutableList.class,
         mapping(null, null),
         maxBy(null),
         minBy(null),
         not(null),
+        Objects.class,
         reducing(null),
+        Streams.class,
         summarizingDouble(null),
         summarizingInt(null),
         summarizingLong(null),
