@@ -16,15 +16,15 @@ jobs:
         uses: s4u/setup-maven-action@fa2c7e4517ed008b1f73e7e0195a9eecf5582cd4 # v1.11.0
         with:
           java-version: |
-            11.0.20
-            17.0.8
+            11.0.22
+            17.0.10
           java-distribution: temurin
           maven-version: 3.9.6
       - name: Display build environment details
         run: mvn --version
       - name: Build project against vanilla Error Prone
-        run: mvn install -Dsurefire.jdk-toolchain-version=11.0.20
+        run: mvn install -Dsurefire.jdk-toolchain-version=11.0.22
       - name: Build project with self-check against Error Prone fork
-        run: mvn clean verify -Perror-prone-fork -Dsurefire.jdk-toolchain-version=11.0.20 -s settings.xml
+        run: mvn clean verify -Perror-prone-fork -Dsurefire.jdk-toolchain-version=11.0.22 -s settings.xml
       - name: Remove installed project artifacts
         run: mvn build-helper:remove-project-artifact
