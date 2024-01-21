@@ -23,8 +23,8 @@ jobs:
       - name: Display build environment details
         run: mvn --version
       - name: Build project against vanilla Error Prone
-        run: mvn install -Dsurefire.jdk-toolchain-version=11.0.22
+        run: mvn -T1C install -Dsurefire.jdk-toolchain-version=11.0.22
       - name: Build project with self-check against Error Prone fork
-        run: mvn clean verify -Perror-prone-fork -Dsurefire.jdk-toolchain-version=11.0.22 -s settings.xml
+        run: mvn -T1C clean verify -Perror-prone-fork -Dsurefire.jdk-toolchain-version=11.0.22 -s settings.xml
       - name: Remove installed project artifacts
         run: mvn build-helper:remove-project-artifact
