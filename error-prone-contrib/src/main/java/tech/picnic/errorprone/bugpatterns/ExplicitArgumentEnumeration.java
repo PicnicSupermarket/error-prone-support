@@ -27,6 +27,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import java.util.Arrays;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.lang.model.element.Modifier;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 
 /**
@@ -132,7 +134,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
     ImmutableList<MethodSymbol> overloads =
         ASTHelpers.matchingMethods(
                 method.getSimpleName(),
-                m -> m.isPublic() && !m.equals(method),
+                m -> isPublic(m) && !m.equals(method),
                 method.enclClass().type,
                 state.getTypes())
             .collect(toImmutableList());
@@ -189,5 +191,10 @@ public final class ExplicitArgumentEnumeration extends BugChecker
                 .merge(SuggestedFixes.renameMethodInvocation(tree, alternative, state))
                 .merge(fix)
                 .build());
+  }
+
+  // XXX: Once we target JDK 14+, drop this method in favour of `Symbol#isPublic()`.
+  private static boolean isPublic(Symbol symbol) {
+    return symbol.getModifiers().contains(Modifier.PUBLIC);
   }
 }
