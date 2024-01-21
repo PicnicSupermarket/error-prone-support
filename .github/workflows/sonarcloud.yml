@@ -32,4 +32,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -T1C jacoco:prepare-agent verify jacoco:report sonar:sonar -Dverification.skip -Dsonar.projectKey=PicnicSupermarket_error-prone-support
+        run: mvn jacoco:prepare-agent verify jacoco:report sonar:sonar -Dverification.skip -Dsonar.projectKey=PicnicSupermarket_error-prone-support
