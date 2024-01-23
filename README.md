@@ -49,7 +49,9 @@ high-quality and consistent Java code_][picnic-blog-ep-post].
 ### Installation
 
 This library is built on top of [Error Prone][error-prone-orig-repo]. To use
-it, read the installation guide for Maven or Gradle below.
+it, read the installation guide for Maven or Gradle below. The library requires
+that your build is executed using JDK 17 or above, but supports builds that
+[target][baeldung-java-source-target-options] older versions of Java.
 
 #### Maven
 
@@ -263,6 +265,7 @@ guidelines][contributing].
 If you want to report a security vulnerability, please do so through a private
 channel; please see our [security policy][security] for details.
 
+[baeldung-java-source-target-options]: https://www.baeldung.com/java-source-target-options
 [bug-checks]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
 [bug-checks-identity-conversion]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/IdentityConversion.java
 [codeql-badge]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/codeql.yml/badge.svg?branch=master&event=push

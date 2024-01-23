@@ -93,13 +93,20 @@ final class DocumentationGeneratorTaskListenerTest {
         "DocumentationGeneratorTaskListenerTestClass.java",
         "class DocumentationGeneratorTaskListenerTestClass {}");
 
-    // XXX: Once we support only JDK 15+, use a text block for the `expected` string.
     assertThat(
             outputDirectory.resolve(
                 "documentation-generator-task-listener-test-DocumentationGeneratorTaskListenerTestClass.json"))
         .content(UTF_8)
         .isEqualToIgnoringWhitespace(
-            "{\"className\":\"DocumentationGeneratorTaskListenerTestClass\",\"path\":[\"CLASS: DocumentationGeneratorTaskListenerTestClass\",\"COMPILATION_UNIT\"]}");
+            """
+            {
+              "className": "DocumentationGeneratorTaskListenerTestClass",
+              "path": [
+                "CLASS: DocumentationGeneratorTaskListenerTestClass",
+                "COMPILATION_UNIT"
+              ]
+            }
+            """);
   }
 
   @Immutable
