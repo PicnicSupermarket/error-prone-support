@@ -33,6 +33,7 @@ import java.time.Clock;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.bugpatterns.util.SourceCode;
@@ -71,7 +72,9 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           Strings.class.getCanonicalName(),
           VisitorState.class.getCanonicalName(),
           ZoneOffset.class.getCanonicalName(),
-          "com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode");
+          "com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode",
+          "reactor.core.publisher.Flux",
+          "reactor.core.publisher.Mono");
 
   /**
    * Type members that should never be statically imported.
@@ -103,6 +106,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
               "sort",
               "swap")
           .put(Locale.class.getCanonicalName(), "ROOT")
+          .put(Optional.class.getCanonicalName(), "empty")
           .putAll(Pattern.class.getCanonicalName(), "compile", "matches", "quote")
           .put(Predicates.class.getCanonicalName(), "contains")
           .put("org.springframework.http.MediaType", "ALL")
@@ -125,7 +129,6 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           "builder",
           "copyOf",
           "create",
-          "empty",
           "from",
           "getDefaultInstance",
           "INSTANCE",
