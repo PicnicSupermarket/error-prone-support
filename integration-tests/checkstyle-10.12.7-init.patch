@@ -1,0 +1,196 @@
+diff --git a/pom.xml b/pom.xml
+index 7e0e4e3..f7a4969 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -250,6 +250,7 @@
+       -Xep:MethodReferenceUsage:OFF
+       <!-- We prefer to qualify all static method calls with class name. -->
+       -Xep:StaticImport:OFF
++      ${error-prone.flags}
+     </error-prone.configuration-args>
+   </properties>
+ 
+@@ -349,6 +350,12 @@
+       <version>1.2.0</version>
+       <scope>test</scope>
+     </dependency>
++    <dependency>
++      <groupId>org.assertj</groupId>
++      <artifactId>assertj-core</artifactId>
++      <version>${assertj.version}</version>
++      <scope>test</scope>
++    </dependency>
+     <dependency>
+       <groupId>nl.jqno.equalsverifier</groupId>
+       <artifactId>equalsverifier</artifactId>
+@@ -2396,6 +2403,8 @@
+                     <arg>
+                       -Xplugin:ErrorProne ${error-prone.configuration-args}
+                     </arg>
++                    <arg>-Xmaxwarns</arg>
++                    <arg>1000000</arg>
+                   </compilerArgs>
+                   <annotationProcessorPaths>
+                     <path>
+@@ -2408,6 +2417,11 @@
+                       <artifactId>error-prone-contrib</artifactId>
+                       <version>${error-prone-support.version}</version>
+                     </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>refaster-runner</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
+                   </annotationProcessorPaths>
+                 </configuration>
+               </execution>
+@@ -2455,6 +2469,8 @@
+                       -XepExcludedPaths:.*[\\/]resources[\\/].* \
+                       ${error-prone.configuration-args}
+                     </arg>
++                    <arg>-Xmaxwarns</arg>
++                    <arg>1000000</arg>
+                   </compilerArgs>
+                   <annotationProcessorPaths>
+                     <path>
+@@ -2467,6 +2483,11 @@
+                       <artifactId>error-prone-contrib</artifactId>
+                       <version>${error-prone-support.version}</version>
+                     </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>refaster-runner</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
+                   </annotationProcessorPaths>
+                 </configuration>
+               </execution>
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
+index 61c59b6..74dec9a 100644
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
+@@ -63,6 +63,8 @@ public final class DetailNodeTreeStringPrinter {
+      * @return DetailNode tree
+      * @throws IllegalArgumentException if there is an error parsing the Javadoc.
+      */
++    // Invoking `getParseErrorMessage` requires that `status.getParseErrorMessage()` is `null`.
++    @SuppressWarnings("CheckArgumentWithMessage")
+     public static DetailNode parseJavadocAsDetailNode(DetailAST blockComment) {
+         final JavadocDetailNodeParser parser = new JavadocDetailNodeParser();
+         final ParseStatus status = parser.parseJavadocAsDetailNode(blockComment);
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/Main.java b/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
+index ad8df04..decf6e5 100644
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
+@@ -626,6 +626,8 @@ public final class Main {
+             + "reported to standard out in plain format. Checkstyle requires a configuration "
+             + "XML file that configures the checks to apply.",
+             mixinStandardHelpOptions = true)
++    // XXX: Don't reorder arguments to `picocli.CommandLine.Option#names`.
++    @SuppressWarnings("LexicographicalAnnotationAttributeListing")
+     private static final class CliOptions {
+ 
+         /** Width of CLI help option. */
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java b/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
+index bfa2a87..b6a4235 100644
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
+@@ -139,6 +139,9 @@ public class SarifLogger extends AbstractAutomaticBean implements AuditListener
+     @Override
+     public void auditFinished(AuditEvent event) {
+         final String version = SarifLogger.class.getPackage().getImplementationVersion();
++        // Here `version` may be `null`, while `String#replace` requires non-`null` arguments.
++        // XXX: Investigate better nullness handling by `IdentityConversion`.
++        @SuppressWarnings("IdentityConversion")
+         final String rendered = report
+             .replace(VERSION_PLACEHOLDER, String.valueOf(version))
+             .replace(RESULTS_PLACEHOLDER, String.join(",\n", results));
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java b/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
+index 036ece9..4198abc 100644
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
+@@ -520,6 +520,10 @@ public final class SiteUtil {
+      * @return a set of properties for the given class.
+      */
+     public static Set<String> getPropertiesForDocumentation(Class<?> clss, Object instance) {
++        // XXX: File PR to replace `.collect(toSet())` with `.collect(toCollection(HashSet::new))`.
++        // XXX: Update `CollectorMutability` to recognize cases such as this one, where the created
++        // collection is clearly modified.
++        @SuppressWarnings("CollectorMutability")
+         final Set<String> properties =
+                 getProperties(clss).stream()
+                     .filter(prop -> {
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
+index 017d376..6932691 100644
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
+@@ -93,6 +93,8 @@ import de.thetaphi.forbiddenapis.SuppressForbidden;
+  * @noinspectionreason ClassWithTooManyDependencies - complex tests require a large number
+  *      of imports
+  */
++// This class is referenced from another package.
++@SuppressWarnings("JUnitClassModifiers")
+ public class CheckerTest extends AbstractModuleTestSupport {
+ 
+     @TempDir
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
+index 575cd83..cf0b0a1 100644
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
+@@ -47,6 +47,8 @@ import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
+ /**
+  * Unit test for ConfigurationLoader.
+  */
++// This class is referenced from another package.
++@SuppressWarnings("JUnitClassModifiers")
+ public class ConfigurationLoaderTest extends AbstractPathTestSupport {
+ 
+     @Override
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
+index 440c5c5..17bc2e9 100644
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
+@@ -98,6 +98,8 @@ public class PackageObjectFactoryTest {
+     public void testCtorNullPackageException1() {
+         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+         try {
++            // XXX: Don't suggest `ImmutableSet.of(elem)` for nullable `elem`.
++            @SuppressWarnings("ImmutableSetOf1")
+             final Object test = new PackageObjectFactory(Collections.singleton(null), classLoader);
+             assertWithMessage("Exception is expected but got " + test).fail();
+         }
+@@ -126,6 +128,8 @@ public class PackageObjectFactoryTest {
+     public void testCtorNullPackageException3() {
+         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+         try {
++            // XXX: Don't suggest `ImmutableSet.of(elem)` for nullable `elem`.
++            @SuppressWarnings("ImmutableSetOf1")
+             final Object test = new PackageObjectFactory(Collections.singleton(null), classLoader,
+                     TRY_IN_ALL_REGISTERED_PACKAGES);
+             assertWithMessage("Exception is expected but got " + test).fail();
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
+index f6668ca..e263b7b 100644
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
+@@ -81,6 +81,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+  * @noinspectionreason ClassWithTooManyDependencies - complex tests require a
+  *      large number of imports
+  */
++// This class is referenced from another package.
++@SuppressWarnings("JUnitClassModifiers")
+ public class TreeWalkerTest extends AbstractModuleTestSupport {
+ 
+     @TempDir
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
+index 3b0cf86..74dbf73 100644
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
+@@ -47,6 +47,8 @@ import com.puppycrawl.tools.checkstyle.checks.coding.NestedIfDepthCheck;
+ import com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck;
+ import com.puppycrawl.tools.checkstyle.checks.naming.AccessModifierOption;
+ 
++// This class is referenced from another package.
++@SuppressWarnings("JUnitClassModifiers")
+ public class CheckUtilTest extends AbstractModuleTestSupport {
+ 
+     @Override

@@ -32,7 +32,7 @@ jobs:
       - name: Install project to local Maven repository
         run: mvn -T1C install -DskipTests -Dverification.skip
       - name: Run integration test
-        run: xvfb-run ./integration-tests/checkstyle-10.12.6.sh "${{ runner.temp }}/artifacts"
+        run: xvfb-run ./integration-tests/checkstyle-10.12.7.sh "${{ runner.temp }}/artifacts"
       - name: Upload artifacts on failure
         if: ${{ failure() }}
         uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3

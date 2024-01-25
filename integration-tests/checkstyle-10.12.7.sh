@@ -9,7 +9,7 @@ repos_root="${integration_test_root}/.repos"
 test_name="$(basename "${0}" .sh)"
 project=checkstyle
 repository=https://github.com/checkstyle/checkstyle.git
-revision=checkstyle-10.12.6
+revision=checkstyle-10.12.7
 
 if [ "${#}" -gt 2 ] || ([ "${#}" = 2 ] && [ "${1:---sync}" != '--sync' ]); then
   echo "Usage: ${0} [--sync] [<report_directory>]"
