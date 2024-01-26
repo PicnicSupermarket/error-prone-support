@@ -72,7 +72,7 @@ final class NonStaticImportTest {
             "import java.time.ZoneOffset;",
             "import java.util.Locale;",
             "import java.util.Map;",
-            "import pkg.A.Wrapper.ZERO;",
+            "import pkg.A.Wrapper.INSTANCE;",
             "",
             "class A {",
             "  private Integer MIN_VALUE = 12;",
@@ -92,7 +92,7 @@ final class NonStaticImportTest {
             "    empty();",
             "",
             "    list();",
-            "    new ZERO();",
+            "    new INSTANCE();",
             "  }",
             "",
             "  static final class WithMethodThatIsSelectivelyFlagged {",
@@ -102,7 +102,7 @@ final class NonStaticImportTest {
             "  }",
             "",
             "  static final class Wrapper {",
-            "    static final class ZERO {}",
+            "    static final class INSTANCE {}",
             "  }",
             "}")
         .doTest();
