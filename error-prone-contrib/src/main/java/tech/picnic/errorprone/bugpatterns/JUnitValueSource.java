@@ -19,9 +19,9 @@ import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.HAS_METHOD_SOURCE;
-import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.getMethodSourceFactoryNames;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.MoreJUnitMatchers.HAS_METHOD_SOURCE;
+import static tech.picnic.errorprone.utils.MoreJUnitMatchers.getMethodSourceFactoryNames;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
@@ -58,7 +58,7 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags JUnit tests with a {@link

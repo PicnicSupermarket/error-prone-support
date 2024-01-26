@@ -4,11 +4,11 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.subOf;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.type;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.unbound;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.MoreTypes.generic;
+import static tech.picnic.errorprone.utils.MoreTypes.subOf;
+import static tech.picnic.errorprone.utils.MoreTypes.type;
+import static tech.picnic.errorprone.utils.MoreTypes.unbound;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Iterables;

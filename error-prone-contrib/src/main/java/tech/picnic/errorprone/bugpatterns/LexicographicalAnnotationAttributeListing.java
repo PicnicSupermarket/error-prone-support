@@ -7,7 +7,7 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.Splitter;
@@ -42,9 +42,9 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.AnnotationAttributeMatcher;
-import tech.picnic.errorprone.bugpatterns.util.Flags;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.AnnotationAttributeMatcher;
+import tech.picnic.errorprone.utils.Flags;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags annotation array listings which aren't sorted lexicographically.

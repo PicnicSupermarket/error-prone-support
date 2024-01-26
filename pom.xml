@@ -41,6 +41,7 @@
     <modules>
         <module>documentation-support</module>
         <module>error-prone-contrib</module>
+        <module>error-prone-utils</module>
         <module>refaster-compiler</module>
         <module>refaster-runner</module>
         <module>refaster-support</module>
@@ -253,6 +254,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>error-prone-contrib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>error-prone-utils</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
