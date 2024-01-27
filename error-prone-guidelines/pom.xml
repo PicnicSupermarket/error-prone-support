@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>tech.picnic.error-prone-support</groupId>
+        <artifactId>error-prone-support</artifactId>
+        <version>0.14.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>error-prone-guidelines</artifactId>
+
+    <name>Picnic :: Error Prone Support :: Error Prone Guidelines</name>
+    <description>Error Prone checks defining coding guidelines for the Error Prone project.</description>
+    <url>https://error-prone.picnic.tech</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>${groupId.error-prone}</groupId>
+            <artifactId>error_prone_annotation</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${groupId.error-prone}</groupId>
+            <artifactId>error_prone_annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${groupId.error-prone}</groupId>
+            <artifactId>error_prone_check_api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${groupId.error-prone}</groupId>
+            <artifactId>error_prone_core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${groupId.error-prone}</groupId>
+            <artifactId>error_prone_test_helpers</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>documentation-support</artifactId>
+            <!-- This dependency is declared only as a hint to Maven that
+            compilation depends on it; see the `maven-compiler-plugin`'s
+            `annotationProcessorPaths` configuration below. -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>error-prone-utils</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.googlejavaformat</groupId>
+            <artifactId>google-java-format</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- XXX: Explicitly declared as a workaround for
+        https://github.com/pitest/pitest-junit5-plugin/issues/105. -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <annotationProcessorPaths combine.children="append">
+                            <!-- XXX: Drop the version declarations once
+                            properly supported. See
+                            https://youtrack.jetbrains.com/issue/IDEA-342187. -->
+                            <path>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>documentation-support</artifactId>
+                                <version>${project.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                        <compilerArgs combine.children="append">
+                            <arg>-Xplugin:DocumentationGenerator -XoutputDirectory=${project.build.directory}/docs</arg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
