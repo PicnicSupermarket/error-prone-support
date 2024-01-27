@@ -46,16 +46,22 @@ format_goal='com.spotify.fmt:fmt-maven-plugin:2.21.1:format'
 
 error_prone_shared_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
 
+# XXX: Drop the `ErrorProneRuntimeClasspath` exclusion once that check resides
+# in a separate Maven module.
 error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE -XepPatchChecks:$(
   find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -print0 \
     | xargs -0 grep -hoP '[^.]+$' \
+    | grep -v ErrorProneRuntimeClasspath \
     | paste -s -d ','
 )"
 
+# XXX: Drop the `ErrorProneRuntimeClasspath` exclusion once that check resides
+# in a separate Maven module.
 error_prone_validation_flags="${error_prone_shared_flags} -XepDisableAllChecks $(
   find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -print0 \
     | xargs -0 grep -hoP '[^.]+$' \
     | sed -r 's,(.*),-Xep:\1:WARN,' \
+    | grep -v ErrorProneRuntimeClasspath \
     | paste -s -d ' '
 )"
 

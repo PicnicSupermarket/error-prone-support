@@ -16605,6 +16605,15 @@
      final Configuration config = new DefaultConfiguration("myName");
      final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
      final PropertyCacheFile cache = new PropertyCacheFile(config, filePath);
+@@ -221,7 +221,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+ 
+     final MessageDigest digest = MessageDigest.getInstance("SHA-1");
+     final URI uri = CommonUtil.getUriByFilename(pathToResource);
+-    final byte[] input = ByteStreams.toByteArray(new BufferedInputStream(uri.toURL().openStream()));
++    final byte[] input = new BufferedInputStream(uri.toURL().openStream()).readAllBytes();
+     final ByteArrayOutputStream out = new ByteArrayOutputStream();
+     try (ObjectOutputStream oos = new ObjectOutputStream(out)) {
+       oos.writeObject(input);
 @@ -235,7 +235,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
@@ -16632,16 +16641,22 @@
      final DefaultConfiguration config = new DefaultConfiguration("myConfig");
      config.addProperty("attr", "value");
  
-@@ -315,7 +315,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -314,11 +314,11 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+    * @noinspectionreason ResultOfMethodCallIgnored - Setup for mockito to only mock toByteArray to
     *     throw exception.
     */
-   @Test
+-  @Test
++  @SuppressWarnings("InputStreamReadAllBytes")
+   // XXX: Drop suppression once
+   // https://github.com/checkstyle/checkstyle/pull/14362 is resolved.
+-  @SuppressWarnings("InputStreamReadAllBytes")
 -  public void testNonExistentResource() throws IOException {
++  @Test
 +  void nonExistentResource() throws IOException {
      final Configuration config = new DefaultConfiguration("myName");
      final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
      final PropertyCacheFile cache = new PropertyCacheFile(config, filePath);
-@@ -350,7 +350,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -353,7 +353,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -16650,7 +16665,7 @@
      final Configuration config = new DefaultConfiguration("myName");
      final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
      final PropertyCacheFile cache = new PropertyCacheFile(config, filePath);
-@@ -389,8 +389,8 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -392,8 +392,8 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
     * @param rawMessages exception messages separated by ';'
     */
    @ParameterizedTest

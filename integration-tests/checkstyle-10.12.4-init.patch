@@ -161,6 +161,18 @@
              final Object test = new PackageObjectFactory(Collections.singleton(null), classLoader,
                      TRY_IN_ALL_REGISTERED_PACKAGES);
              assertWithMessage("Exception is expected but got " + test).fail();
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
+@@ -338,6 +338,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+      *                     mock toByteArray to throw exception.
+      */
+     @Test
++    // XXX: Drop suppression once
++    // https://github.com/checkstyle/checkstyle/pull/14362 is resolved.
++    @SuppressWarnings("InputStreamReadAllBytes")
+     public void testNonExistentResource() throws IOException {
+         final Configuration config = new DefaultConfiguration("myName");
+         final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
 @@ -79,6 +79,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
