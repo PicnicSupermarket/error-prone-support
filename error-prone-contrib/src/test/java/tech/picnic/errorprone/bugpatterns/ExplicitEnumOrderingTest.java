@@ -75,6 +75,8 @@ final class ExplicitEnumOrderingTest {
             "    Ordering.explicit(IsoEra.BCE, SOURCE, RetentionPolicy.CLASS);",
             "    // BUG: Diagnostic contains: RetentionPolicy.SOURCE, IsoEra.BCE",
             "    Ordering.explicit(CLASS, RUNTIME, CE);",
+            "",
+            "    Ordering.explicit(BCE, null, CE);",
             "  }",
             "}")
         .doTest();
