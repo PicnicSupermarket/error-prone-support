@@ -9,7 +9,6 @@ import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAS
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static java.util.Comparator.comparing;
-import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.toCollection;
 import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -194,7 +193,10 @@ public final class ExhaustiveRefasterTypeMigration extends BugChecker implements
       knownEntries.putIfAbsent(existingOrder.get(i), i);
     }
 
-    return comparing((String v) -> knownEntries.getOrDefault(v, -1)).thenComparing(naturalOrder());
+    // XXX: The lexicographical order applied to unknown entries aims to match the order applied by
+    // the `LexicographicalAnnotationAttributeListing` check; consider deduplicating this logic.
+    return comparing((String v) -> knownEntries.getOrDefault(v, -1))
+        .thenComparing(String.CASE_INSENSITIVE_ORDER);
   }
 
   /**
