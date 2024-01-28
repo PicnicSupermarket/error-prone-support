@@ -72,7 +72,7 @@ public final class ExplicitEnumOrdering extends BugChecker implements MethodInvo
       List<? extends ExpressionTree> expressions) {
     return expressions.stream()
         .map(ASTHelpers::getSymbol)
-        .filter(Symbol::isEnum)
+        .filter(s -> s != null && s.isEnum())
         .collect(
             collectingAndThen(
                 toImmutableSetMultimap(Symbol::asType, Symbol::toString),
