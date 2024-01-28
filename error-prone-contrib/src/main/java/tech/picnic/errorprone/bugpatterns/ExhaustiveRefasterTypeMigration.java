@@ -25,6 +25,7 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.MultiMatcher;
 import com.google.errorprone.matchers.MultiMatcher.MultiMatchResult;
+import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.Signatures;
 import com.sun.source.tree.AnnotationTree;
@@ -83,7 +84,7 @@ public final class ExhaustiveRefasterTypeMigration extends BugChecker implements
   private static final MultiMatcher<Tree, AnnotationTree> IS_TYPE_MIGRATION =
       annotations(AT_LEAST_ONE, isType("tech.picnic.errorprone.refaster.annotation.TypeMigration"));
   private static final MultiMatcher<Tree, AnnotationTree> HAS_BEFORE_TEMPLATE =
-      annotations(AT_LEAST_ONE, isType("com.google.errorprone.refaster.annotation.BeforeTemplate"));
+      annotations(AT_LEAST_ONE, isType(BeforeTemplate.class.getCanonicalName()));
   private static final String TYPE_MIGRATION_TYPE_ELEMENT = "of";
   private static final String TYPE_MIGRATION_UNMIGRATED_METHODS_ELEMENT = "unmigratedMethods";
 
