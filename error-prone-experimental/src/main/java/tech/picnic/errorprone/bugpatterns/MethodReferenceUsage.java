@@ -38,7 +38,7 @@ import javax.lang.model.element.Name;
 /**
  * A {@link BugChecker} that flags lambda expressions that can be replaced with method references.
  *
- * @see IsInstanceLambdaUsage
+ * <p>See the `IsInstanceLambdaUsage` check in the `error-prone-contrib` module.
  */
 // XXX: Other custom expressions we could rewrite:
 // - `a -> "str" + a` to `"str"::concat`. But only if `str` is provably non-null.

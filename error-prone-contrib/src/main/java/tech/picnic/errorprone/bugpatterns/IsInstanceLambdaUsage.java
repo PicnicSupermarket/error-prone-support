@@ -24,7 +24,7 @@ import tech.picnic.errorprone.utils.SourceCode;
  * A {@link BugChecker} that flags lambda expressions that can be replaced with a method reference
  * of the form {@code T.class::isInstance}.
  *
- * @see MethodReferenceUsage
+ * <p>See the `MethodReferenceUsage` check in the `error-prone-experimental` module.
  */
 // XXX: Consider folding this logic into the `MethodReferenceUsage` check.
 @AutoService(BugChecker.class)
