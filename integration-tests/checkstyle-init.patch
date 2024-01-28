@@ -22,16 +22,19 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2405,7 +2413,7 @@
-                     </path>
-                     <path>
-                       <groupId>tech.picnic.error-prone-support</groupId>
--                      <artifactId>error-prone-contrib</artifactId>
-+                      <artifactId>refaster-runner</artifactId>
+@@ -2408,6 +2416,11 @@
+                       <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
++                    <path>
++                      <groupId>tech.picnic.error-prone-support</groupId>
++                      <artifactId>refaster-runner</artifactId>
++                      <version>${error-prone-support.version}</version>
++                    </path>
                    </annotationProcessorPaths>
-@@ -2452,9 +2460,10 @@
+                 </configuration>
+               </execution>
+@@ -2452,9 +2465,10 @@
                      <arg>-XDcompilePolicy=simple</arg>
                      <arg>
                        -Xplugin:ErrorProne \
@@ -43,7 +46,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2467,6 +2476,11 @@
+@@ -2467,6 +2481,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>

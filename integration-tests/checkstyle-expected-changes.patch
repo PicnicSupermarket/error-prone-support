@@ -9608,6 +9608,3446 @@
              "/COMPILATION_UNIT/CLASS_DEF[./IDENT["
                  + "@text='SuppressionXpathRegressionWhitespaceAroundNotFollowed']]/OBJBLOCK"
                  + "/VARIABLE_DEF[./IDENT[@text='bad']]/ASSIGN");
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/AbstractAutomaticBean.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/AbstractAutomaticBean.java
+@@ -275,8 +275,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
+   /** A converter that converts a string to a pattern. */
+   private static final class PatternConverter implements Converter {
+ 
+-    @SuppressWarnings("unchecked")
+     @Override
++    @SuppressWarnings("unchecked")
+     public Object convert(Class type, Object value) {
+       return CommonUtil.createPattern(value.toString());
+     }
+@@ -285,8 +285,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
+   /** A converter that converts strings to severity level. */
+   private static final class SeverityLevelConverter implements Converter {
+ 
+-    @SuppressWarnings("unchecked")
+     @Override
++    @SuppressWarnings("unchecked")
+     public Object convert(Class type, Object value) {
+       return SeverityLevel.getInstance(value.toString());
+     }
+@@ -295,8 +295,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
+   /** A converter that converts strings to scope. */
+   private static final class ScopeConverter implements Converter {
+ 
+-    @SuppressWarnings("unchecked")
+     @Override
++    @SuppressWarnings("unchecked")
+     public Object convert(Class type, Object value) {
+       return Scope.getInstance(value.toString());
+     }
+@@ -305,8 +305,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
+   /** A converter that converts strings to uri. */
+   private static final class UriConverter implements Converter {
+ 
+-    @SuppressWarnings("unchecked")
+     @Override
++    @SuppressWarnings("unchecked")
+     public Object convert(Class type, Object value) {
+       final String url = value.toString();
+       URI result = null;
+@@ -329,8 +329,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
+    */
+   private static final class RelaxedStringArrayConverter implements Converter {
+ 
+-    @SuppressWarnings("unchecked")
+     @Override
++    @SuppressWarnings("unchecked")
+     public Object convert(Class type, Object value) {
+       final StringTokenizer tokenizer =
+           new StringTokenizer(value.toString().trim(), COMMA_SEPARATOR);
+@@ -355,8 +355,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
+     /** Constant for optimization. */
+     private static final AccessModifierOption[] EMPTY_MODIFIER_ARRAY = new AccessModifierOption[0];
+ 
+-    @SuppressWarnings("unchecked")
+     @Override
++    @SuppressWarnings("unchecked")
+     public Object convert(Class type, Object value) {
+       // Converts to a String and trims it for the tokenizer.
+       final StringTokenizer tokenizer =
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/Checker.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/Checker.java
+@@ -19,6 +19,9 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static com.google.common.collect.ImmutableList.toImmutableList;
++import static com.google.common.collect.ImmutableSet.toImmutableSet;
++
+ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+ import com.puppycrawl.tools.checkstyle.api.AuditListener;
+ import com.puppycrawl.tools.checkstyle.api.BeforeExecutionFileFilter;
+@@ -50,7 +53,6 @@ import java.util.Locale;
+ import java.util.Set;
+ import java.util.SortedSet;
+ import java.util.TreeSet;
+-import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+@@ -215,7 +217,7 @@ public class Checker extends AbstractAutomaticBean implements MessageDispatcher,
+     final List<File> targetFiles =
+         files.stream()
+             .filter(file -> CommonUtil.matchesFileExtension(file, fileExtensions))
+-            .collect(Collectors.toList());
++            .collect(toImmutableList());
+     processFiles(targetFiles);
+ 
+     // Finish up
+@@ -244,7 +246,7 @@ public class Checker extends AbstractAutomaticBean implements MessageDispatcher,
+             resource -> {
+               return ((ExternalResourceHolder) resource).getExternalResourceLocations().stream();
+             })
+-        .collect(Collectors.toSet());
++        .collect(toImmutableSet());
+   }
+ 
+   /** Notify all listeners about the audit start. */
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/ConfigurationLoader.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/ConfigurationLoader.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static com.google.common.base.Preconditions.checkState;
++
+ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+ import com.puppycrawl.tools.checkstyle.api.Configuration;
+ import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
+@@ -523,9 +525,7 @@ public final class ConfigurationLoader {
+         final DefaultConfiguration top = configStack.peek();
+         top.addMessage(key, value);
+       } else {
+-        if (!METADATA.equals(qName)) {
+-          throw new IllegalStateException("Unknown name:" + qName + ".");
+-        }
++        checkState(METADATA.equals(qName), "Unknown name:%s.", qName);
+       }
+     }
+ 
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/DefaultLogger.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/DefaultLogger.java
+@@ -19,6 +19,9 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++import static java.nio.charset.StandardCharsets.UTF_8;
++
+ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+ import com.puppycrawl.tools.checkstyle.api.AuditListener;
+ import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
+@@ -27,7 +30,6 @@ import java.io.OutputStream;
+ import java.io.OutputStreamWriter;
+ import java.io.PrintWriter;
+ import java.io.Writer;
+-import java.nio.charset.StandardCharsets;
+ 
+ /**
+  * Simple plain logger for text output. This is maybe not very suitable for a text output into a
+@@ -126,21 +128,17 @@ public class DefaultLogger extends AbstractAutomaticBean implements AuditListene
+       OutputStream errorStream,
+       OutputStreamOptions errorStreamOptions,
+       AuditEventFormatter messageFormatter) {
+-    if (infoStreamOptions == null) {
+-      throw new IllegalArgumentException("Parameter infoStreamOptions can not be null");
+-    }
++    checkArgument(infoStreamOptions != null, "Parameter infoStreamOptions can not be null");
+     closeInfo = infoStreamOptions == OutputStreamOptions.CLOSE;
+-    if (errorStreamOptions == null) {
+-      throw new IllegalArgumentException("Parameter errorStreamOptions can not be null");
+-    }
++    checkArgument(errorStreamOptions != null, "Parameter errorStreamOptions can not be null");
+     closeError = errorStreamOptions == OutputStreamOptions.CLOSE;
+-    final Writer infoStreamWriter = new OutputStreamWriter(infoStream, StandardCharsets.UTF_8);
++    final Writer infoStreamWriter = new OutputStreamWriter(infoStream, UTF_8);
+     infoWriter = new PrintWriter(infoStreamWriter);
+ 
+     if (infoStream == errorStream) {
+       errorWriter = infoWriter;
+     } else {
+-      final Writer errorStreamWriter = new OutputStreamWriter(errorStream, StandardCharsets.UTF_8);
++      final Writer errorStreamWriter = new OutputStreamWriter(errorStream, UTF_8);
+       errorWriter = new PrintWriter(errorStreamWriter);
+     }
+     formatter = messageFormatter;
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/Definitions.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/Definitions.java
+@@ -19,6 +19,7 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import com.google.common.collect.ImmutableSet;
+ import java.util.Set;
+ 
+ /** Contains constant definitions common to the package. */
+@@ -29,7 +30,7 @@ public final class Definitions {
+ 
+   /** Name of modules which are not checks, but are internal modules. */
+   public static final Set<String> INTERNAL_MODULES =
+-      Set.of(
++      ImmutableSet.of(
+           "com.puppycrawl.tools.checkstyle.meta.JavadocMetadataScraper",
+           "com.puppycrawl.tools.checkstyle.site.ClassAndPropertiesSettersJavadocScraper");
+ 
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/JavaAstVisitor.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/JavaAstVisitor.java
+@@ -19,19 +19,21 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static com.google.common.collect.ImmutableList.toImmutableList;
++import static java.util.Objects.requireNonNullElseGet;
++import static java.util.stream.Collectors.toCollection;
++
++import com.google.common.collect.ImmutableList;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+ import com.puppycrawl.tools.checkstyle.grammar.java.JavaLanguageLexer;
+ import com.puppycrawl.tools.checkstyle.grammar.java.JavaLanguageParser;
+ import com.puppycrawl.tools.checkstyle.grammar.java.JavaLanguageParserBaseVisitor;
+ import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
+ import java.util.ArrayList;
+-import java.util.Collections;
+ import java.util.Iterator;
+ import java.util.List;
+-import java.util.Optional;
+ import java.util.Queue;
+ import java.util.concurrent.ConcurrentLinkedQueue;
+-import java.util.stream.Collectors;
+ import org.antlr.v4.runtime.BufferedTokenStream;
+ import org.antlr.v4.runtime.CommonTokenStream;
+ import org.antlr.v4.runtime.ParserRuleContext;
+@@ -406,7 +408,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+         methodDef,
+         ctx.children.stream()
+             .filter(child -> !(child instanceof JavaLanguageParser.ArrayDeclaratorContext))
+-            .collect(Collectors.toList()));
++            .collect(toImmutableList()));
+ 
+     // We add C style array declarator brackets to TYPE ast
+     final DetailAstImpl typeAst = (DetailAstImpl) methodDef.findFirstToken(TokenTypes.TYPE);
+@@ -469,7 +471,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+     final List<ParseTree> children =
+         ctx.children.stream()
+             .filter(child -> !(child instanceof JavaLanguageParser.ArrayDeclaratorContext))
+-            .collect(Collectors.toList());
++            .collect(toImmutableList());
+     processChildren(methodDef, children);
+ 
+     // We add C style array declarator brackets to TYPE ast
+@@ -780,7 +782,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+     final DetailAstImpl dummyNode = new DetailAstImpl();
+     // Since the TYPE AST is built by visitAnnotationMethodOrConstantRest(), we skip it
+     // here (child [0])
+-    processChildren(dummyNode, Collections.singletonList(ctx.children.get(1)));
++    processChildren(dummyNode, ImmutableList.of(ctx.children.get(1)));
+     // We also append the SEMI token to the first child [size() - 1],
+     // until https://github.com/checkstyle/checkstyle/issues/3151
+     dummyNode.getFirstChild().addChild(create(ctx.SEMI()));
+@@ -804,7 +806,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+         annotationFieldDef,
+         ctx.children.stream()
+             .filter(child -> !(child instanceof JavaLanguageParser.ArrayDeclaratorContext))
+-            .collect(Collectors.toList()));
++            .collect(toImmutableList()));
+ 
+     // We add C style array declarator brackets to TYPE ast
+     final DetailAstImpl typeAst =
+@@ -852,7 +854,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+         primaryCtorCall,
+         ctx.children.stream()
+             .filter(child -> !child.equals(ctx.LITERAL_SUPER()))
+-            .collect(Collectors.toList()));
++            .collect(toImmutableList()));
+     return primaryCtorCall;
+   }
+ 
+@@ -1090,7 +1092,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+         catchParameterDef,
+         ctx.children.stream()
+             .filter(child -> !(child instanceof JavaLanguageParser.VariableModifierContext))
+-            .collect(Collectors.toList()));
++            .collect(toImmutableList()));
+     return catchParameterDef;
+   }
+ 
+@@ -1421,8 +1423,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+ 
+     // We always add an 'ELIST' node
+     final DetailAstImpl expressionList =
+-        Optional.ofNullable(visit(ctx.expressionList()))
+-            .orElseGet(() -> createImaginary(TokenTypes.ELIST));
++        requireNonNullElseGet(visit(ctx.expressionList()), () -> createImaginary(TokenTypes.ELIST));
+ 
+     DetailAstPair.addAstChild(currentAst, expressionList);
+     DetailAstPair.addAstChild(currentAst, create(ctx.RPAREN()));
+@@ -1448,8 +1449,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+     methodCall.addChild(visit(ctx.id()));
+     // We always add an 'ELIST' node
+     final DetailAstImpl expressionList =
+-        Optional.ofNullable(visit(ctx.expressionList()))
+-            .orElseGet(() -> createImaginary(TokenTypes.ELIST));
++        requireNonNullElseGet(visit(ctx.expressionList()), () -> createImaginary(TokenTypes.ELIST));
+ 
+     methodCall.addChild(expressionList);
+     methodCall.addChild(create((Token) ctx.RPAREN().getPayload()));
+@@ -1508,7 +1508,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+     final List<ParseTree> children =
+         ctx.children.stream()
+             .filter(child -> !child.equals(ctx.DOUBLE_COLON()))
+-            .collect(Collectors.toList());
++            .collect(toImmutableList());
+     processChildren(doubleColon, children);
+     return doubleColon;
+   }
+@@ -1520,7 +1520,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+         root,
+         ctx.children.stream()
+             .filter(child -> !child.equals(ctx.QUESTION()))
+-            .collect(Collectors.toList()));
++            .collect(toImmutableList()));
+     return root;
+   }
+ 
+@@ -1547,7 +1547,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+       final Queue<DetailAstImpl> descendantList =
+           binOpList.parallelStream()
+               .map(this::getInnerBopAst)
+-              .collect(Collectors.toCollection(ConcurrentLinkedQueue::new));
++              .collect(toCollection(ConcurrentLinkedQueue::new));
+ 
+       bop.addChild(descendantList.poll());
+       DetailAstImpl pointer = bop.getFirstChild();
+@@ -1584,8 +1584,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+         create(TokenTypes.METHOD_CALL, (Token) ctx.LPAREN().getPayload());
+     // We always add an 'ELIST' node
+     final DetailAstImpl expressionList =
+-        Optional.ofNullable(visit(ctx.expressionList()))
+-            .orElseGet(() -> createImaginary(TokenTypes.ELIST));
++        requireNonNullElseGet(visit(ctx.expressionList()), () -> createImaginary(TokenTypes.ELIST));
+ 
+     final DetailAstImpl dot = create(ctx.DOT());
+     dot.addChild(visit(ctx.expr()));
+@@ -1618,8 +1617,8 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+ 
+     // We add an 'PARAMETERS' node here whether it exists or not
+     final DetailAstImpl parameters =
+-        Optional.ofNullable(visit(ctx.formalParameterList()))
+-            .orElseGet(() -> createImaginary(TokenTypes.PARAMETERS));
++        requireNonNullElseGet(
++            visit(ctx.formalParameterList()), () -> createImaginary(TokenTypes.PARAMETERS));
+     addLastSibling(lparen, parameters);
+     addLastSibling(lparen, create(ctx.RPAREN()));
+     return lparen;
+@@ -1882,8 +1881,8 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+       root.addChild(dot);
+ 
+       final DetailAstImpl expressionList =
+-          Optional.ofNullable(visit(ctx.expressionList()))
+-              .orElseGet(() -> createImaginary(TokenTypes.ELIST));
++          requireNonNullElseGet(
++              visit(ctx.expressionList()), () -> createImaginary(TokenTypes.ELIST));
+       root.addChild(expressionList);
+ 
+       root.addChild(create(ctx.RPAREN()));
+@@ -1898,8 +1897,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+ 
+     // We always add an 'ELIST' node
+     final DetailAstImpl expressionList =
+-        Optional.ofNullable(visit(ctx.expressionList()))
+-            .orElseGet(() -> createImaginary(TokenTypes.ELIST));
++        requireNonNullElseGet(visit(ctx.expressionList()), () -> createImaginary(TokenTypes.ELIST));
+     addLastSibling(lparen, expressionList);
+     addLastSibling(lparen, create(ctx.RPAREN()));
+     return lparen;
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/JavadocPropertiesGenerator.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/JavadocPropertiesGenerator.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static java.nio.charset.StandardCharsets.UTF_8;
++
+ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.DetailNode;
+@@ -28,7 +30,6 @@ import com.puppycrawl.tools.checkstyle.utils.JavadocUtil;
+ import java.io.File;
+ import java.io.IOException;
+ import java.io.PrintWriter;
+-import java.nio.charset.StandardCharsets;
+ import java.util.function.Consumer;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+@@ -92,7 +93,7 @@ public final class JavadocPropertiesGenerator {
+    * @throws CheckstyleException if a javadoc comment can not be parsed
+    */
+   private static void writePropertiesFile(CliOptions options) throws CheckstyleException {
+-    try (PrintWriter writer = new PrintWriter(options.outputFile, StandardCharsets.UTF_8)) {
++    try (PrintWriter writer = new PrintWriter(options.outputFile, UTF_8)) {
+       final DetailAST top =
+           JavaParser.parseFile(options.inputFile, JavaParser.Options.WITH_COMMENTS).getFirstChild();
+       final DetailAST objBlock = getClassBody(top);
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/LocalizedMessage.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/LocalizedMessage.java
+@@ -19,13 +19,14 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static java.nio.charset.StandardCharsets.UTF_8;
++
+ import com.puppycrawl.tools.checkstyle.utils.UnmodifiableCollectionUtil;
+ import java.io.IOException;
+ import java.io.InputStreamReader;
+ import java.io.Reader;
+ import java.net.URL;
+ import java.net.URLConnection;
+-import java.nio.charset.StandardCharsets;
+ import java.text.MessageFormat;
+ import java.util.Locale;
+ import java.util.MissingResourceException;
+@@ -147,8 +148,7 @@ public class LocalizedMessage {
+         final URLConnection connection = url.openConnection();
+         if (connection != null) {
+           connection.setUseCaches(!reload);
+-          try (Reader streamReader =
+-              new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8)) {
++          try (Reader streamReader = new InputStreamReader(connection.getInputStream(), UTF_8)) {
+             // Only this line is changed to make it read property files as UTF-8.
+             resourceBundle = new PropertyResourceBundle(streamReader);
+           }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static java.util.stream.Collectors.toCollection;
++
+ import com.puppycrawl.tools.checkstyle.AbstractAutomaticBean.OutputStreamOptions;
+ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+ import com.puppycrawl.tools.checkstyle.api.AuditListener;
+@@ -38,7 +40,6 @@ import java.util.ArrayList;
+ import java.util.LinkedList;
+ import java.util.List;
+ import java.util.Locale;
+-import java.util.Objects;
+ import java.util.Properties;
+ import java.util.logging.ConsoleHandler;
+ import java.util.logging.Filter;
+@@ -46,7 +47,6 @@ import java.util.logging.Level;
+ import java.util.logging.LogRecord;
+ import java.util.logging.Logger;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import picocli.CommandLine;
+@@ -274,7 +274,7 @@ public final class Main {
+       final String stringAst =
+           AstTreeStringPrinter.printFileAst(file, JavaParser.Options.WITHOUT_COMMENTS);
+       System.out.print(stringAst);
+-    } else if (Objects.nonNull(options.xpath)) {
++    } else if (options.xpath != null) {
+       final String branch = XpathUtil.printXpathBranch(options.xpath, filesToProcess.get(0));
+       System.out.print(branch);
+     } else if (options.printAstWithComments) {
+@@ -791,7 +791,7 @@ public final class Main {
+               .map(File::getAbsolutePath)
+               .map(Pattern::quote)
+               .map(pattern -> Pattern.compile("^" + pattern + "$"))
+-              .collect(Collectors.toCollection(ArrayList::new));
++              .collect(toCollection(ArrayList::new));
+       result.addAll(excludeRegex);
+       return result;
+     }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/MetadataGeneratorLogger.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/MetadataGeneratorLogger.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static java.nio.charset.StandardCharsets.UTF_8;
++
+ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+ import com.puppycrawl.tools.checkstyle.api.AuditListener;
+ import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
+@@ -26,7 +28,6 @@ import java.io.OutputStream;
+ import java.io.OutputStreamWriter;
+ import java.io.PrintWriter;
+ import java.io.Writer;
+-import java.nio.charset.StandardCharsets;
+ 
+ /** Simple logger for metadata generator util. */
+ public class MetadataGeneratorLogger extends AbstractAutomaticBean implements AuditListener {
+@@ -48,7 +49,7 @@ public class MetadataGeneratorLogger extends AbstractAutomaticBean implements Au
+    */
+   public MetadataGeneratorLogger(
+       OutputStream outputStream, OutputStreamOptions outputStreamOptions) {
+-    final Writer errorStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
++    final Writer errorStreamWriter = new OutputStreamWriter(outputStream, UTF_8);
+     errorWriter = new PrintWriter(errorStreamWriter);
+     formatter = new AuditEventDefaultFormatter();
+     closeErrorWriter = outputStreamOptions == OutputStreamOptions.CLOSE;
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/PackageNamesLoader.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/PackageNamesLoader.java
+@@ -19,13 +19,14 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static java.util.Collections.unmodifiableSet;
++
+ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+ import java.io.BufferedInputStream;
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.net.URL;
+ import java.util.ArrayDeque;
+-import java.util.Collections;
+ import java.util.Deque;
+ import java.util.Enumeration;
+ import java.util.HashMap;
+@@ -137,7 +138,7 @@ public final class PackageNamesLoader extends XmlLoader {
+       throw new CheckstyleException("unable to open one of package files", ex);
+     }
+ 
+-    return Collections.unmodifiableSet(result);
++    return unmodifiableSet(result);
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/PackageObjectFactory.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/PackageObjectFactory.java
+@@ -19,10 +19,18 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++import static com.google.common.collect.ImmutableList.toImmutableList;
++import static java.util.stream.Collectors.groupingBy;
++import static java.util.stream.Collectors.joining;
++import static java.util.stream.Collectors.mapping;
++import static java.util.stream.Collectors.toCollection;
++
++import com.google.common.collect.ImmutableMap;
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+ import com.puppycrawl.tools.checkstyle.utils.ModuleReflectionUtil;
+ import java.io.IOException;
+-import java.util.Collections;
+ import java.util.HashMap;
+ import java.util.HashSet;
+ import java.util.LinkedHashSet;
+@@ -31,7 +39,6 @@ import java.util.Map;
+ import java.util.Map.Entry;
+ import java.util.Set;
+ import java.util.function.Supplier;
+-import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ 
+ /**
+@@ -126,12 +133,8 @@ public class PackageObjectFactory implements ModuleFactory {
+    */
+   public PackageObjectFactory(
+       Set<String> packageNames, ClassLoader moduleClassLoader, ModuleLoadOption moduleLoadOption) {
+-    if (moduleClassLoader == null) {
+-      throw new IllegalArgumentException(NULL_LOADER_MESSAGE);
+-    }
+-    if (packageNames.contains(null)) {
+-      throw new IllegalArgumentException(NULL_PACKAGE_MESSAGE);
+-    }
++    checkArgument(moduleClassLoader != null, NULL_LOADER_MESSAGE);
++    checkArgument(!packageNames.contains(null), NULL_PACKAGE_MESSAGE);
+ 
+     // create a copy of the given set, but retain ordering
+     packages = new LinkedHashSet<>(packageNames);
+@@ -147,14 +150,10 @@ public class PackageObjectFactory implements ModuleFactory {
+    * @throws IllegalArgumentException if moduleClassLoader is null or packageNames is null
+    */
+   public PackageObjectFactory(String packageName, ClassLoader moduleClassLoader) {
+-    if (moduleClassLoader == null) {
+-      throw new IllegalArgumentException(NULL_LOADER_MESSAGE);
+-    }
+-    if (packageName == null) {
+-      throw new IllegalArgumentException(NULL_PACKAGE_MESSAGE);
+-    }
++    checkArgument(moduleClassLoader != null, NULL_LOADER_MESSAGE);
++    checkArgument(packageName != null, NULL_PACKAGE_MESSAGE);
+ 
+-    packages = Collections.singleton(packageName);
++    packages = ImmutableSet.of(packageName);
+     this.moduleClassLoader = moduleClassLoader;
+   }
+ 
+@@ -272,7 +271,7 @@ public class PackageObjectFactory implements ModuleFactory {
+       returnValue = createObject(fullModuleNames.iterator().next());
+     } else {
+       final String optionalNames =
+-          fullModuleNames.stream().sorted().collect(Collectors.joining(STRING_SEPARATOR));
++          fullModuleNames.stream().sorted().collect(joining(STRING_SEPARATOR));
+       final LocalizedMessage exceptionMessage =
+           new LocalizedMessage(
+               Definitions.CHECKSTYLE_BUNDLE,
+@@ -299,12 +298,11 @@ public class PackageObjectFactory implements ModuleFactory {
+       returnValue =
+           ModuleReflectionUtil.getCheckstyleModules(packages, loader).stream()
+               .collect(
+-                  Collectors.groupingBy(
++                  groupingBy(
+                       Class::getSimpleName,
+-                      Collectors.mapping(
+-                          Class::getCanonicalName, Collectors.toCollection(HashSet::new))));
++                      mapping(Class::getCanonicalName, toCollection(HashSet::new))));
+     } catch (IOException ignore) {
+-      returnValue = Collections.emptyMap();
++      returnValue = ImmutableMap.of();
+     }
+     return returnValue;
+   }
+@@ -318,8 +316,8 @@ public class PackageObjectFactory implements ModuleFactory {
+   public static String getShortFromFullModuleNames(String fullName) {
+     return NAME_TO_FULL_MODULE_NAME.entrySet().stream()
+         .filter(entry -> entry.getValue().equals(fullName))
+-        .map(Entry::getKey)
+         .findFirst()
++        .map(Entry::getKey)
+         .orElse(fullName);
+   }
+ 
+@@ -333,7 +331,7 @@ public class PackageObjectFactory implements ModuleFactory {
+   private static String joinPackageNamesWithClassName(String className, Set<String> packages) {
+     return packages.stream()
+         .collect(
+-            Collectors.joining(
++            joining(
+                 PACKAGE_SEPARATOR + className + STRING_SEPARATOR,
+                 "",
+                 PACKAGE_SEPARATOR + className));
+@@ -381,7 +379,7 @@ public class PackageObjectFactory implements ModuleFactory {
+         packages.stream()
+             .map(packageName -> packageName + PACKAGE_SEPARATOR + name)
+             .flatMap(className -> Stream.of(className, className + CHECK_SUFFIX))
+-            .collect(Collectors.toList());
++            .collect(toImmutableList());
+     Object instance = null;
+     for (String possibleName : possibleNames) {
+       instance = createObject(possibleName);
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/PropertiesExpander.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/PropertiesExpander.java
+@@ -19,10 +19,11 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
++import com.google.common.collect.Maps;
+ import java.util.Map;
+ import java.util.Properties;
+-import java.util.function.Function;
+-import java.util.stream.Collectors;
+ 
+ /** Resolves external properties from an underlying {@code Properties} object. */
+ public final class PropertiesExpander implements PropertyResolver {
+@@ -37,12 +38,8 @@ public final class PropertiesExpander implements PropertyResolver {
+    * @throws IllegalArgumentException when properties argument is null
+    */
+   public PropertiesExpander(Properties properties) {
+-    if (properties == null) {
+-      throw new IllegalArgumentException("cannot pass null");
+-    }
+-    values =
+-        properties.stringPropertyNames().stream()
+-            .collect(Collectors.toMap(Function.identity(), properties::getProperty));
++    checkArgument(properties != null, "cannot pass null");
++    values = Maps.toMap(properties.stringPropertyNames(), properties::getProperty);
+   }
+ 
+   @Override
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/PropertyCacheFile.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/PropertyCacheFile.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
+ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+ import com.puppycrawl.tools.checkstyle.api.Configuration;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+@@ -93,12 +95,8 @@ public final class PropertyCacheFile {
+    * @throws IllegalArgumentException when either arguments are null
+    */
+   public PropertyCacheFile(Configuration config, String fileName) {
+-    if (config == null) {
+-      throw new IllegalArgumentException("config can not be null");
+-    }
+-    if (fileName == null) {
+-      throw new IllegalArgumentException("fileName can not be null");
+-    }
++    checkArgument(config != null, "config can not be null");
++    checkArgument(fileName != null, "fileName can not be null");
+     this.config = config;
+     this.fileName = fileName;
+   }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
+@@ -19,6 +19,9 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++import static java.nio.charset.StandardCharsets.UTF_8;
++
+ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+ import com.puppycrawl.tools.checkstyle.api.AuditListener;
+ import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
+@@ -29,7 +32,6 @@ import java.io.OutputStream;
+ import java.io.OutputStreamWriter;
+ import java.io.PrintWriter;
+ import java.io.StringWriter;
+-import java.nio.charset.StandardCharsets;
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.Locale;
+@@ -107,10 +109,8 @@ public class SarifLogger extends AbstractAutomaticBean implements AuditListener
+    */
+   public SarifLogger(OutputStream outputStream, OutputStreamOptions outputStreamOptions)
+       throws IOException {
+-    if (outputStreamOptions == null) {
+-      throw new IllegalArgumentException("Parameter outputStreamOptions can not be null");
+-    }
+-    writer = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
++    checkArgument(outputStreamOptions != null, "Parameter outputStreamOptions can not be null");
++    writer = new PrintWriter(new OutputStreamWriter(outputStream, UTF_8));
+     closeStream = outputStreamOptions == OutputStreamOptions.CLOSE;
+     report = readResource("/com/puppycrawl/tools/checkstyle/sarif/SarifReport.template");
+     resultLineColumn =
+@@ -307,7 +307,7 @@ public class SarifLogger extends AbstractAutomaticBean implements AuditListener
+         result.write(buffer, 0, length);
+         length = inputStream.read(buffer);
+       }
+-      return result.toString(StandardCharsets.UTF_8);
++      return result.toString(UTF_8);
+     }
+   }
+ }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/SuppressionsStringPrinter.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/SuppressionsStringPrinter.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static java.util.stream.Collectors.joining;
++
+ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.FileText;
+@@ -30,7 +32,6 @@ import java.util.List;
+ import java.util.Locale;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ 
+ /** Class for constructing xpath queries to suppress nodes with specified line and column number. */
+ public final class SuppressionsStringPrinter {
+@@ -98,6 +99,6 @@ public final class SuppressionsStringPrinter {
+     final XpathQueryGenerator queryGenerator =
+         new XpathQueryGenerator(detailAST, lineNumber, columnNumber, fileText, tabWidth);
+     final List<String> suppressions = queryGenerator.generate();
+-    return suppressions.stream().collect(Collectors.joining(LINE_SEPARATOR, "", LINE_SEPARATOR));
++    return suppressions.stream().collect(joining(LINE_SEPARATOR, "", LINE_SEPARATOR));
+   }
+ }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/ThreadModeSettings.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/ThreadModeSettings.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
+ import java.io.Serializable;
+ 
+ /**
+@@ -93,14 +95,12 @@ public class ThreadModeSettings implements Serializable {
+    */
+   public final String resolveName(String name) {
+     if (checkerThreadsNumber > 1) {
+-      if (CHECKER_MODULE_NAME.equals(name)) {
+-        throw new IllegalArgumentException(
+-            "Multi thread mode for Checker module is not implemented");
+-      }
+-      if (TREE_WALKER_MODULE_NAME.equals(name)) {
+-        throw new IllegalArgumentException(
+-            "Multi thread mode for TreeWalker module is not implemented");
+-      }
++      checkArgument(
++          !CHECKER_MODULE_NAME.equals(name),
++          "Multi thread mode for Checker module is not implemented");
++      checkArgument(
++          !TREE_WALKER_MODULE_NAME.equals(name),
++          "Multi thread mode for TreeWalker module is not implemented");
+     }
+ 
+     return name;
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/TreeWalker.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/TreeWalker.java
+@@ -19,6 +19,10 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static com.google.common.collect.ImmutableSet.toImmutableSet;
++import static java.util.Comparator.naturalOrder;
++import static java.util.Comparator.nullsLast;
++
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
+ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+@@ -41,7 +45,6 @@ import java.util.Map;
+ import java.util.Set;
+ import java.util.SortedSet;
+ import java.util.TreeSet;
+-import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ 
+ /** Responsible for walking an abstract syntax tree and notifying interested checks at each node. */
+@@ -371,7 +374,7 @@ public final class TreeWalker extends AbstractFileSetCheck implements ExternalRe
+             resource -> {
+               return ((ExternalResourceHolder) resource).getExternalResourceLocations().stream();
+             })
+-        .collect(Collectors.toSet());
++        .collect(toImmutableSet());
+   }
+ 
+   /**
+@@ -403,8 +406,8 @@ public final class TreeWalker extends AbstractFileSetCheck implements ExternalRe
+   private static SortedSet<AbstractCheck> createNewCheckSortedSet() {
+     return new TreeSet<>(
+         Comparator.<AbstractCheck, String>comparing(check -> check.getClass().getName())
+-            .thenComparing(AbstractCheck::getId, Comparator.nullsLast(Comparator.naturalOrder()))
+-            .thenComparing(AbstractCheck::hashCode));
++            .thenComparing(AbstractCheck::getId, nullsLast(naturalOrder()))
++            .thenComparingInt(AbstractCheck::hashCode));
+   }
+ 
+   /** State of AST. Indicates whether tree contains certain nodes. */
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/XMLLogger.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/XMLLogger.java
+@@ -19,6 +19,10 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++import static java.nio.charset.StandardCharsets.UTF_8;
++import static java.util.Collections.synchronizedList;
++
+ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+ import com.puppycrawl.tools.checkstyle.api.AuditListener;
+ import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
+@@ -28,9 +32,7 @@ import java.io.OutputStream;
+ import java.io.OutputStreamWriter;
+ import java.io.PrintWriter;
+ import java.io.StringWriter;
+-import java.nio.charset.StandardCharsets;
+ import java.util.ArrayList;
+-import java.util.Collections;
+ import java.util.List;
+ import java.util.Map;
+ import java.util.concurrent.ConcurrentHashMap;
+@@ -90,10 +92,8 @@ public class XMLLogger extends AbstractAutomaticBean implements AuditListener {
+    * @throws IllegalArgumentException if outputStreamOptions is null.
+    */
+   public XMLLogger(OutputStream outputStream, OutputStreamOptions outputStreamOptions) {
+-    writer = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+-    if (outputStreamOptions == null) {
+-      throw new IllegalArgumentException("Parameter outputStreamOptions can not be null");
+-    }
++    writer = new PrintWriter(new OutputStreamWriter(outputStream, UTF_8));
++    checkArgument(outputStreamOptions != null, "Parameter outputStreamOptions can not be null");
+     closeStream = outputStreamOptions == OutputStreamOptions.CLOSE;
+   }
+ 
+@@ -328,10 +328,10 @@ public class XMLLogger extends AbstractAutomaticBean implements AuditListener {
+   private static final class FileMessages {
+ 
+     /** The file error events. */
+-    private final List<AuditEvent> errors = Collections.synchronizedList(new ArrayList<>());
++    private final List<AuditEvent> errors = synchronizedList(new ArrayList<>());
+ 
+     /** The file exceptions. */
+-    private final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
++    private final List<Throwable> exceptions = synchronizedList(new ArrayList<>());
+ 
+     /**
+      * Returns the file error events.
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/XpathFileGeneratorAuditListener.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/XpathFileGeneratorAuditListener.java
+@@ -19,13 +19,14 @@
+ 
+ package com.puppycrawl.tools.checkstyle;
+ 
++import static java.nio.charset.StandardCharsets.UTF_8;
++
+ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+ import com.puppycrawl.tools.checkstyle.api.AuditListener;
+ import java.io.File;
+ import java.io.OutputStream;
+ import java.io.OutputStreamWriter;
+ import java.io.PrintWriter;
+-import java.nio.charset.StandardCharsets;
+ 
+ /**
+  * Generates <b>suppressions.xml</b> file, based on violations occurred. See issue <a
+@@ -54,7 +55,7 @@ public class XpathFileGeneratorAuditListener extends AbstractAutomaticBean
+    */
+   public XpathFileGeneratorAuditListener(
+       OutputStream out, OutputStreamOptions outputStreamOptions) {
+-    writer = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
++    writer = new PrintWriter(new OutputStreamWriter(out, UTF_8));
+     closeStream = outputStreamOptions == OutputStreamOptions.CLOSE;
+   }
+ 
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/ant/CheckstyleAntTask.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/ant/CheckstyleAntTask.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.ant;
+ 
++import static com.google.common.collect.ImmutableList.toImmutableList;
++
+ import com.puppycrawl.tools.checkstyle.AbstractAutomaticBean.OutputStreamOptions;
+ import com.puppycrawl.tools.checkstyle.Checker;
+ import com.puppycrawl.tools.checkstyle.ConfigurationLoader;
+@@ -47,7 +49,6 @@ import java.util.Locale;
+ import java.util.Map;
+ import java.util.Objects;
+ import java.util.Properties;
+-import java.util.stream.Collectors;
+ import org.apache.tools.ant.BuildException;
+ import org.apache.tools.ant.DirectoryScanner;
+ import org.apache.tools.ant.Project;
+@@ -580,7 +581,7 @@ public class CheckstyleAntTask extends Task {
+     return Arrays.stream(fileNames)
+         .map(name -> scanner.getBasedir() + File.separator + name)
+         .map(File::new)
+-        .collect(Collectors.toList());
++        .collect(toImmutableList());
+   }
+ 
+   /** Poor man enumeration for the formatter types. */
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/api/AbstractCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/api/AbstractCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.api;
+ 
++import static java.util.Collections.unmodifiableSet;
++
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+ import java.util.Collections;
+ import java.util.HashSet;
+@@ -107,7 +109,7 @@ public abstract class AbstractCheck extends AbstractViolationReporter {
+    * @return the set of token names
+    */
+   public final Set<String> getTokenNames() {
+-    return Collections.unmodifiableSet(tokens);
++    return unmodifiableSet(tokens);
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/api/AbstractFileSetCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/api/AbstractFileSetCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.api;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+ import java.io.File;
+ import java.util.Arrays;
+@@ -164,9 +166,7 @@ public abstract class AbstractFileSetCheck extends AbstractViolationReporter
+    * @throws IllegalArgumentException is argument is null
+    */
+   public final void setFileExtensions(String... extensions) {
+-    if (extensions == null) {
+-      throw new IllegalArgumentException("Extensions array can not be null");
+-    }
++    checkArgument(extensions != null, "Extensions array can not be null");
+ 
+     fileExtensions = new String[extensions.length];
+     for (int i = 0; i < extensions.length; i++) {
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/api/AuditEvent.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/api/AuditEvent.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.api;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
+ /**
+  * Raw event for audit.
+  *
+@@ -69,9 +71,7 @@ public final class AuditEvent {
+    * @throws IllegalArgumentException if {@code src} is {@code null}.
+    */
+   public AuditEvent(Object src, String fileName, Violation violation) {
+-    if (src == null) {
+-      throw new IllegalArgumentException("null source");
+-    }
++    checkArgument(src != null, "null source");
+ 
+     source = src;
+     this.fileName = fileName;
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/api/BeforeExecutionFileFilterSet.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/api/BeforeExecutionFileFilterSet.java
+@@ -19,7 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.api;
+ 
+-import java.util.Collections;
++import static java.util.Collections.unmodifiableSet;
++
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+@@ -56,7 +57,7 @@ public final class BeforeExecutionFileFilterSet implements BeforeExecutionFileFi
+    * @return the Filters of the filter set.
+    */
+   public Set<BeforeExecutionFileFilter> getBeforeExecutionFileFilters() {
+-    return Collections.unmodifiableSet(beforeExecutionFileFilters);
++    return unmodifiableSet(beforeExecutionFileFilters);
+   }
+ 
+   @Override
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/api/FileContents.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/api/FileContents.java
+@@ -19,12 +19,13 @@
+ 
+ package com.puppycrawl.tools.checkstyle.api;
+ 
++import static java.util.Collections.unmodifiableMap;
++
+ import com.puppycrawl.tools.checkstyle.grammar.CommentListener;
+ import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+ import java.util.ArrayList;
+ import java.util.Collection;
+-import java.util.Collections;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
+@@ -293,7 +294,7 @@ public final class FileContents implements CommentListener {
+    * @return the Map of comments
+    */
+   public Map<Integer, TextBlock> getSingleLineComments() {
+-    return Collections.unmodifiableMap(cppComments);
++    return unmodifiableMap(cppComments);
+   }
+ 
+   /**
+@@ -303,7 +304,7 @@ public final class FileContents implements CommentListener {
+    * @return the map of comments
+    */
+   public Map<Integer, List<TextBlock>> getBlockComments() {
+-    return Collections.unmodifiableMap(clangComments);
++    return unmodifiableMap(clangComments);
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/api/FilterSet.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/api/FilterSet.java
+@@ -19,7 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.api;
+ 
+-import java.util.Collections;
++import static java.util.Collections.unmodifiableSet;
++
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+@@ -56,7 +57,7 @@ public class FilterSet implements Filter {
+    * @return the Filters of the filter set.
+    */
+   public Set<Filter> getFilters() {
+-    return Collections.unmodifiableSet(filters);
++    return unmodifiableSet(filters);
+   }
+ 
+   @Override
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/api/SeverityLevelCounter.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/api/SeverityLevelCounter.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.api;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
+ import java.util.concurrent.atomic.AtomicInteger;
+ 
+ /**
+@@ -40,9 +42,7 @@ public final class SeverityLevelCounter implements AuditListener {
+    * @throws IllegalArgumentException when level is null
+    */
+   public SeverityLevelCounter(SeverityLevel level) {
+-    if (level == null) {
+-      throw new IllegalArgumentException("'level' cannot be null");
+-    }
++    checkArgument(level != null, "'level' cannot be null");
+     this.level = level;
+   }
+ 
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/api/Violation.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/api/Violation.java
+@@ -385,7 +385,7 @@ public final class Violation implements Comparable<Violation> {
+         && Objects.equals(columnNo, violation.columnNo)
+         && Objects.equals(columnCharIndex, violation.columnCharIndex)
+         && Objects.equals(tokenType, violation.tokenType)
+-        && Objects.equals(severityLevel, violation.severityLevel)
++        && severityLevel == violation.severityLevel
+         && Objects.equals(moduleId, violation.moduleId)
+         && Objects.equals(key, violation.key)
+         && Objects.equals(bundle, violation.bundle)
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/AvoidEscapedUnicodeCharactersCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/AvoidEscapedUnicodeCharactersCheck.java
+@@ -265,8 +265,8 @@ public class AvoidEscapedUnicodeCharactersCheck extends AbstractCheck {
+   }
+ 
+   // suppress deprecation until https://github.com/checkstyle/checkstyle/issues/11166
+-  @SuppressWarnings("deprecation")
+   @Override
++  @SuppressWarnings("deprecation")
+   public void beginTree(DetailAST rootAST) {
+     singlelineComments = getFileContents().getSingleLineComments();
+     blockComments = getFileContents().getBlockComments();
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/LineSeparatorOption.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/LineSeparatorOption.java
+@@ -19,7 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks;
+ 
+-import java.nio.charset.StandardCharsets;
++import static java.nio.charset.StandardCharsets.US_ASCII;
++
+ import java.util.Arrays;
+ 
+ /**
+@@ -55,7 +56,7 @@ public enum LineSeparatorOption {
+    * @param sep the line separator, e.g. "\r\n"
+    */
+   LineSeparatorOption(String sep) {
+-    lineSeparator = sep.getBytes(StandardCharsets.US_ASCII);
++    lineSeparator = sep.getBytes(US_ASCII);
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/OrderedPropertiesCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/OrderedPropertiesCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks;
+ 
++import static java.util.Collections.enumeration;
++
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
+ import com.puppycrawl.tools.checkstyle.api.FileText;
+@@ -27,7 +29,6 @@ import java.io.IOException;
+ import java.io.InputStream;
+ import java.nio.file.Files;
+ import java.util.ArrayList;
+-import java.util.Collections;
+ import java.util.Enumeration;
+ import java.util.Iterator;
+ import java.util.List;
+@@ -191,7 +192,7 @@ public class OrderedPropertiesCheck extends AbstractFileSetCheck {
+     /** Returns a copy of the keys. */
+     @Override
+     public Enumeration<Object> keys() {
+-      return Collections.enumeration(keyList);
++      return enumeration(keyList);
+     }
+ 
+     /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/SuppressWarningsHolder.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/SuppressWarningsHolder.java
+@@ -19,12 +19,14 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
++import com.google.common.collect.ImmutableList;
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+-import java.util.Collections;
+ import java.util.HashMap;
+ import java.util.LinkedList;
+ import java.util.List;
+@@ -296,7 +298,7 @@ public class SuppressWarningsHolder extends AbstractCheck {
+    */
+   private static List<String> getAllAnnotationValues(DetailAST ast) {
+     // get values of annotation
+-    List<String> values = Collections.emptyList();
++    List<String> values = ImmutableList.of();
+     final DetailAST lparenAST = ast.findFirstToken(TokenTypes.LPAREN);
+     if (lparenAST != null) {
+       final DetailAST nextAST = lparenAST.getNextSibling();
+@@ -378,9 +380,7 @@ public class SuppressWarningsHolder extends AbstractCheck {
+    * @throws IllegalArgumentException if the AST is invalid
+    */
+   private static String getIdentifier(DetailAST ast) {
+-    if (ast == null) {
+-      throw new IllegalArgumentException("Identifier AST expected, but get null.");
+-    }
++    checkArgument(ast != null, "Identifier AST expected, but get null.");
+     final String identifier;
+     if (ast.getType() == TokenTypes.IDENT) {
+       identifier = ast.getText();
+@@ -436,7 +436,7 @@ public class SuppressWarningsHolder extends AbstractCheck {
+     final List<String> annotationValues;
+     switch (ast.getType()) {
+       case TokenTypes.EXPR:
+-        annotationValues = Collections.singletonList(getStringExpr(ast));
++        annotationValues = ImmutableList.of(getStringExpr(ast));
+         break;
+       case TokenTypes.ANNOTATION_ARRAY_INIT:
+         annotationValues = findAllExpressionsInChildren(ast);
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/TranslationCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/TranslationCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks;
+ 
++import com.google.common.collect.ImmutableSet;
++import com.google.common.collect.Sets;
+ import com.puppycrawl.tools.checkstyle.Definitions;
+ import com.puppycrawl.tools.checkstyle.GlobalStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.LocalizedMessage;
+@@ -32,7 +34,6 @@ import java.io.File;
+ import java.io.InputStream;
+ import java.nio.file.Files;
+ import java.nio.file.NoSuchFileException;
+-import java.util.Arrays;
+ import java.util.HashSet;
+ import java.util.Locale;
+ import java.util.Map;
+@@ -46,7 +47,6 @@ import java.util.TreeSet;
+ import java.util.concurrent.ConcurrentHashMap;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ 
+@@ -226,7 +226,7 @@ public class TranslationCheck extends AbstractFileSetCheck {
+    * @since 6.11
+    */
+   public void setRequiredTranslations(String... translationCodes) {
+-    requiredTranslations = Arrays.stream(translationCodes).collect(Collectors.toSet());
++    requiredTranslations = ImmutableSet.copyOf(translationCodes);
+     validateUserSpecifiedLanguageCodes(requiredTranslations);
+   }
+ 
+@@ -497,9 +497,7 @@ public class TranslationCheck extends AbstractFileSetCheck {
+     for (Entry<File, Set<String>> fileKey : fileKeys.entrySet()) {
+       final Set<String> currentFileKeys = fileKey.getValue();
+       final Set<String> missingKeys =
+-          keysThatMustExist.stream()
+-              .filter(key -> !currentFileKeys.contains(key))
+-              .collect(Collectors.toSet());
++          Sets.difference(keysThatMustExist, currentFileKeys).immutableCopy();
+       if (!missingKeys.isEmpty()) {
+         final MessageDispatcher dispatcher = getMessageDispatcher();
+         final String path = fileKey.getKey().getAbsolutePath();
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/UncommentedMainCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/UncommentedMainCheck.java
+@@ -19,6 +19,7 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -60,7 +61,7 @@ public class UncommentedMainCheck extends AbstractCheck {
+ 
+   /** Set of possible String array types. */
+   private static final Set<String> STRING_PARAMETER_NAMES =
+-      Set.of(
++      ImmutableSet.of(
+           String[].class.getCanonicalName(),
+           String.class.getCanonicalName(),
+           String[].class.getSimpleName(),
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/annotation/MissingOverrideCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/annotation/MissingOverrideCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.annotation;
+ 
++import static java.util.Objects.requireNonNullElse;
++
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -152,8 +154,7 @@ public final class MissingOverrideCheck extends AbstractCheck {
+     final DetailAST startNode;
+     if (modifiers.hasChildren()) {
+       startNode =
+-          Optional.ofNullable(ast.getFirstChild().findFirstToken(TokenTypes.ANNOTATION))
+-              .orElse(modifiers);
++          requireNonNullElse(ast.getFirstChild().findFirstToken(TokenTypes.ANNOTATION), modifiers);
+     } else {
+       startNode = ast.findFirstToken(TokenTypes.TYPE);
+     }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/annotation/SuppressWarningsCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/annotation/SuppressWarningsCheck.java
+@@ -19,13 +19,14 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.annotation;
+ 
++import static java.util.Objects.requireNonNullElse;
++
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+ import com.puppycrawl.tools.checkstyle.utils.AnnotationUtil;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+-import java.util.Objects;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+ 
+@@ -162,7 +163,7 @@ public class SuppressWarningsCheck extends AbstractCheck {
+       final DetailAST token = warningHolder.findFirstToken(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
+ 
+       // case like '@SuppressWarnings(value = UNUSED)'
+-      final DetailAST parent = Objects.requireNonNullElse(token, warningHolder);
++      final DetailAST parent = requireNonNullElse(token, warningHolder);
+       DetailAST warning = parent.findFirstToken(TokenTypes.EXPR);
+ 
+       // rare case with empty array ex: @SuppressWarnings({})
+@@ -242,10 +243,10 @@ public class SuppressWarningsCheck extends AbstractCheck {
+     final DetailAST annValuePair =
+         annotation.findFirstToken(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
+ 
+-    final DetailAST annArrayInitParent = Objects.requireNonNullElse(annValuePair, annotation);
++    final DetailAST annArrayInitParent = requireNonNullElse(annValuePair, annotation);
+     final DetailAST annArrayInit =
+         annArrayInitParent.findFirstToken(TokenTypes.ANNOTATION_ARRAY_INIT);
+-    return Objects.requireNonNullElse(annArrayInit, annotation);
++    return requireNonNullElse(annArrayInit, annotation);
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/FallThroughCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/FallThroughCheck.java
+@@ -370,7 +370,7 @@ public class FallThroughCheck extends AbstractCheck {
+     return Optional.ofNullable(getNextNonCommentAst(ast))
+         .map(DetailAST::getPreviousSibling)
+         .map(previous -> previous.getFirstChild().getText())
+-        .map(text -> reliefPattern.matcher(text).find())
+-        .orElse(Boolean.FALSE);
++        .filter(text -> reliefPattern.matcher(text).find())
++        .isPresent();
+   }
+ }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalCatchCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalCatchCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.coding;
+ 
++import static java.util.stream.Collectors.toCollection;
++
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -28,7 +30,6 @@ import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
+ import java.util.Arrays;
+ import java.util.HashSet;
+ import java.util.Set;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Checks that certain exception types do not appear in a {@code catch} statement.
+@@ -74,7 +75,7 @@ public final class IllegalCatchCheck extends AbstractCheck {
+                 "java.lang.RuntimeException",
+                 "java.lang.Throwable",
+               })
+-          .collect(Collectors.toCollection(HashSet::new));
++          .collect(toCollection(HashSet::new));
+ 
+   /**
+    * Setter to specify exception class names to reject.
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalInstantiationCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalInstantiationCheck.java
+@@ -19,16 +19,15 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.coding;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.FullIdent;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+-import java.util.Arrays;
+ import java.util.HashSet;
+ import java.util.Set;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Checks for illegal instantiations where a factory method is preferred.
+@@ -314,6 +313,6 @@ public class IllegalInstantiationCheck extends AbstractCheck {
+    * @since 3.0
+    */
+   public void setClasses(String... names) {
+-    classes = Arrays.stream(names).collect(Collectors.toSet());
++    classes = ImmutableSet.copyOf(names);
+   }
+ }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalThrowsCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalThrowsCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.coding;
+ 
++import static java.util.stream.Collectors.toCollection;
++
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -30,7 +32,6 @@ import java.util.Arrays;
+ import java.util.Collections;
+ import java.util.HashSet;
+ import java.util.Set;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Checks that specified types are not declared to be thrown. Declaring that a method throws {@code
+@@ -69,7 +70,7 @@ public final class IllegalThrowsCheck extends AbstractCheck {
+               new String[] {
+                 "finalize",
+               })
+-          .collect(Collectors.toCollection(HashSet::new));
++          .collect(toCollection(HashSet::new));
+ 
+   /** Specify throw class names to reject. */
+   private final Set<String> illegalClassNames =
+@@ -82,7 +83,7 @@ public final class IllegalThrowsCheck extends AbstractCheck {
+                 "java.lang.RuntimeException",
+                 "java.lang.Throwable",
+               })
+-          .collect(Collectors.toCollection(HashSet::new));
++          .collect(toCollection(HashSet::new));
+ 
+   /**
+    * Allow to ignore checking overridden methods (marked with {@code Override} or {@code
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalTokenTextCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalTokenTextCheck.java
+@@ -19,12 +19,14 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.coding;
+ 
++import static java.util.Objects.requireNonNullElse;
++import static java.util.regex.Pattern.CASE_INSENSITIVE;
++
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+-import java.util.Objects;
+ import java.util.regex.Pattern;
+ 
+ /**
+@@ -124,7 +126,7 @@ public class IllegalTokenTextCheck extends AbstractCheck {
+    * @since 3.2
+    */
+   public void setMessage(String message) {
+-    this.message = Objects.requireNonNullElse(message, "");
++    this.message = requireNonNullElse(message, "");
+   }
+ 
+   /**
+@@ -156,7 +158,7 @@ public class IllegalTokenTextCheck extends AbstractCheck {
+   private void updateRegexp() {
+     final int compileFlags;
+     if (ignoreCase) {
+-      compileFlags = Pattern.CASE_INSENSITIVE;
++      compileFlags = CASE_INSENSITIVE;
+     } else {
+       compileFlags = 0;
+     }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/MatchXpathCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/MatchXpathCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.coding;
+ 
++import static com.google.common.collect.ImmutableList.toImmutableList;
++
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -26,7 +28,6 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+ import com.puppycrawl.tools.checkstyle.xpath.AbstractNode;
+ import com.puppycrawl.tools.checkstyle.xpath.RootNode;
+ import java.util.List;
+-import java.util.stream.Collectors;
+ import net.sf.saxon.Configuration;
+ import net.sf.saxon.om.Item;
+ import net.sf.saxon.sxpath.XPathDynamicContext;
+@@ -142,7 +143,7 @@ public class MatchXpathCheck extends AbstractCheck {
+       final List<Item> matchingItems = xpathExpression.evaluate(xpathDynamicContext);
+       return matchingItems.stream()
+           .map(item -> (DetailAST) ((AbstractNode) item).getUnderlyingNode())
+-          .collect(Collectors.toList());
++          .collect(toImmutableList());
+     } catch (XPathException ex) {
+       throw new IllegalStateException("Evaluation of Xpath query failed: " + query, ex);
+     }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/ModifiedControlVariableCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/ModifiedControlVariableCheck.java
+@@ -19,6 +19,7 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.coding;
+ 
++import com.google.common.collect.Sets;
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -31,7 +32,6 @@ import java.util.HashSet;
+ import java.util.LinkedList;
+ import java.util.List;
+ import java.util.Set;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Checks that for loop control variables are not modified inside the for block. An example is:
+@@ -293,9 +293,7 @@ public final class ModifiedControlVariableCheck extends AbstractCheck {
+   private static Set<String> getVariablesManagedByForLoop(DetailAST ast) {
+     final Set<String> initializedVariables = getForInitVariables(ast);
+     final Set<String> iteratingVariables = getForIteratorVariables(ast);
+-    return initializedVariables.stream()
+-        .filter(iteratingVariables::contains)
+-        .collect(Collectors.toSet());
++    return Sets.intersection(initializedVariables, iteratingVariables).immutableCopy();
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/ParameterAssignmentCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/ParameterAssignmentCheck.java
+@@ -19,6 +19,7 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.coding;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -26,7 +27,6 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+ import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
+ import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
+ import java.util.ArrayDeque;
+-import java.util.Collections;
+ import java.util.Deque;
+ import java.util.HashSet;
+ import java.util.Set;
+@@ -99,7 +99,7 @@ public final class ParameterAssignmentCheck extends AbstractCheck {
+   public void beginTree(DetailAST rootAST) {
+     // clear data
+     parameterNamesStack.clear();
+-    parameterNames = Collections.emptySet();
++    parameterNames = ImmutableSet.of();
+   }
+ 
+   @Override
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/UnusedLocalVariableCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/UnusedLocalVariableCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.coding;
+ 
++import static com.google.common.collect.ImmutableList.toImmutableList;
++
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -36,7 +38,6 @@ import java.util.List;
+ import java.util.Map;
+ import java.util.Optional;
+ import java.util.Set;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Checks that a local variable is declared and/or assigned, but not used. Doesn't support <a
+@@ -480,7 +481,7 @@ public class UnusedLocalVariableCheck extends AbstractCheck {
+             typeDeclDesc -> {
+               return hasSameNameAsSuperClass(superClassName, typeDeclDesc);
+             })
+-        .collect(Collectors.toList());
++        .collect(toImmutableList());
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/DesignForExtensionCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/DesignForExtensionCheck.java
+@@ -19,6 +19,9 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.design;
+ 
++import static java.util.Objects.requireNonNullElse;
++
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -27,14 +30,11 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+ import com.puppycrawl.tools.checkstyle.utils.JavadocUtil;
+ import com.puppycrawl.tools.checkstyle.utils.ScopeUtil;
+ import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
+-import java.util.Arrays;
+-import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Set;
+ import java.util.function.Predicate;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Checks that classes are designed for extension (subclass creation).
+@@ -176,11 +176,10 @@ public class DesignForExtensionCheck extends AbstractCheck {
+ 
+   /** Specify annotations which allow the check to skip the method from validation. */
+   private Set<String> ignoredAnnotations =
+-      Arrays.stream(
+-              new String[] {
+-                "Test", "Before", "After", "BeforeClass", "AfterClass",
+-              })
+-          .collect(Collectors.toSet());
++      ImmutableSet.copyOf(
++          new String[] {
++            "Test", "Before", "After", "BeforeClass", "AfterClass",
++          });
+ 
+   /**
+    * Specify the comment text pattern which qualifies a method as designed for extension. Supports
+@@ -195,7 +194,7 @@ public class DesignForExtensionCheck extends AbstractCheck {
+    * @since 7.2
+    */
+   public void setIgnoredAnnotations(String... ignoredAnnotations) {
+-    this.ignoredAnnotations = Arrays.stream(ignoredAnnotations).collect(Collectors.toSet());
++    this.ignoredAnnotations = ImmutableSet.copyOf(ignoredAnnotations);
+   }
+ 
+   /**
+@@ -396,7 +395,7 @@ public class DesignForExtensionCheck extends AbstractCheck {
+    */
+   private static String getAnnotationName(DetailAST annotation) {
+     final DetailAST dotAst = annotation.findFirstToken(TokenTypes.DOT);
+-    final DetailAST parent = Objects.requireNonNullElse(dotAst, annotation);
++    final DetailAST parent = requireNonNullElse(dotAst, annotation);
+     return parent.findFirstToken(TokenTypes.IDENT).getText();
+   }
+ 
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/FinalClassCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/FinalClassCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.design;
+ 
++import static java.util.Comparator.comparingInt;
++
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -310,7 +312,7 @@ public class FinalClassCheck extends AbstractCheck {
+   private Optional<ClassDesc> getNearestClassWithSameName(
+       String className, ToIntFunction<ClassDesc> countProvider) {
+     final String dotAndClassName = PACKAGE_SEPARATOR.concat(className);
+-    final Comparator<ClassDesc> longestMatch = Comparator.comparingInt(countProvider);
++    final Comparator<ClassDesc> longestMatch = comparingInt(countProvider);
+     return innerClasses.entrySet().stream()
+         .filter(entry -> entry.getKey().endsWith(dotAndClassName))
+         .map(Map.Entry::getValue)
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/ThrowsCountCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/ThrowsCountCheck.java
+@@ -19,11 +19,12 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.design;
+ 
++import static java.util.Objects.requireNonNullElse;
++
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+-import java.util.Objects;
+ 
+ /**
+  * Restricts throws statements to a specified count. Methods with "Override" or "java.lang.Override"
+@@ -167,7 +168,7 @@ public final class ThrowsCountCheck extends AbstractCheck {
+    */
+   private static String getAnnotationName(DetailAST annotation) {
+     final DetailAST dotAst = annotation.findFirstToken(TokenTypes.DOT);
+-    final DetailAST parent = Objects.requireNonNullElse(dotAst, annotation);
++    final DetailAST parent = requireNonNullElse(dotAst, annotation);
+     return parent.findFirstToken(TokenTypes.IDENT).getText();
+   }
+ 
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/VisibilityModifierCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/VisibilityModifierCheck.java
+@@ -19,6 +19,9 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.design;
+ 
++import static java.util.stream.Collectors.toCollection;
++
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -33,7 +36,6 @@ import java.util.HashSet;
+ import java.util.List;
+ import java.util.Set;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Checks visibility of class members. Only static final, immutable or annotated by specified
+@@ -152,7 +154,7 @@ public class VisibilityModifierCheck extends AbstractCheck {
+ 
+   /** Default ignore annotations canonical names. */
+   private static final Set<String> DEFAULT_IGNORE_ANNOTATIONS =
+-      Set.of(
++      ImmutableSet.of(
+           "org.junit.Rule",
+           "org.junit.ClassRule",
+           "com.google.common.annotations.VisibleForTesting");
+@@ -685,7 +687,7 @@ public class VisibilityModifierCheck extends AbstractCheck {
+   private static Set<String> getClassShortNames(Set<String> canonicalClassNames) {
+     return canonicalClassNames.stream()
+         .map(CommonUtil::baseClassName)
+-        .collect(Collectors.toCollection(HashSet::new));
++        .collect(toCollection(HashSet::new));
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/header/AbstractHeaderCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/header/AbstractHeaderCheck.java
+@@ -19,6 +19,9 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.header;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.PropertyType;
+ import com.puppycrawl.tools.checkstyle.XdocsPropertyType;
+ import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
+@@ -35,7 +38,6 @@ import java.net.URI;
+ import java.nio.charset.Charset;
+ import java.nio.charset.UnsupportedCharsetException;
+ import java.util.ArrayList;
+-import java.util.Collections;
+ import java.util.List;
+ import java.util.Set;
+ import java.util.regex.Pattern;
+@@ -116,10 +118,9 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
+    * @throws IllegalArgumentException if header has already been set
+    */
+   private void checkHeaderNotInitialized() {
+-    if (!readerLines.isEmpty()) {
+-      throw new IllegalArgumentException(
+-          "header has already been set - " + "set either header or headerFile, not both");
+-    }
++    checkArgument(
++        readerLines.isEmpty(),
++        "header has already been set - " + "set either header or headerFile, not both");
+   }
+ 
+   /**
+@@ -190,9 +191,9 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
+     final Set<String> result;
+ 
+     if (headerFile == null) {
+-      result = Collections.emptySet();
++      result = ImmutableSet.of();
+     } else {
+-      result = Collections.singleton(headerFile.toString());
++      result = ImmutableSet.of(headerFile.toString());
+     }
+ 
+     return result;
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/header/RegexpHeaderCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/header/RegexpHeaderCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.header;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.FileText;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+@@ -263,9 +265,7 @@ public class RegexpHeaderCheck extends AbstractHeaderCheck {
+   @Override
+   public void setHeader(String header) {
+     if (!CommonUtil.isBlank(header)) {
+-      if (!CommonUtil.isPatternValid(header)) {
+-        throw new IllegalArgumentException("Unable to parse format: " + header);
+-      }
++      checkArgument(CommonUtil.isPatternValid(header), "Unable to parse format: %s", header);
+       super.setHeader(header);
+     }
+   }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/imports/CustomImportOrderCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/imports/CustomImportOrderCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.imports;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -648,10 +650,10 @@ public class CustomImportOrderCheck extends AbstractCheck {
+     } else if (ruleStr.startsWith(SAME_PACKAGE_RULE_GROUP)) {
+       final String rule = ruleStr.substring(ruleStr.indexOf('(') + 1, ruleStr.indexOf(')'));
+       samePackageMatchingDepth = Integer.parseInt(rule);
+-      if (samePackageMatchingDepth <= 0) {
+-        throw new IllegalArgumentException(
+-            "SAME_PACKAGE rule parameter should be positive integer: " + ruleStr);
+-      }
++      checkArgument(
++          samePackageMatchingDepth > 0,
++          "SAME_PACKAGE rule parameter should be positive integer: %s",
++          ruleStr);
+       customOrderRules.add(SAME_PACKAGE_RULE_GROUP);
+     } else {
+       throw new IllegalStateException("Unexpected rule: " + ruleStr);
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/imports/ImportControlCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/imports/ImportControlCheck.java
+@@ -19,6 +19,7 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.imports;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+@@ -27,7 +28,6 @@ import com.puppycrawl.tools.checkstyle.api.ExternalResourceHolder;
+ import com.puppycrawl.tools.checkstyle.api.FullIdent;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+ import java.net.URI;
+-import java.util.Collections;
+ import java.util.Set;
+ import java.util.regex.Pattern;
+ 
+@@ -167,8 +167,8 @@ public class ImportControlCheck extends AbstractCheck implements ExternalResourc
+   }
+ 
+   // suppress deprecation until https://github.com/checkstyle/checkstyle/issues/11166
+-  @SuppressWarnings("deprecation")
+   @Override
++  @SuppressWarnings("deprecation")
+   public void beginTree(DetailAST rootAST) {
+     currentImportControl = null;
+     processCurrentFile = path.matcher(getFilePath()).find();
+@@ -207,7 +207,7 @@ public class ImportControlCheck extends AbstractCheck implements ExternalResourc
+ 
+   @Override
+   public Set<String> getExternalResourceLocations() {
+-    return Collections.singleton(file.toString());
++    return ImmutableSet.of(file.toString());
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/imports/ImportOrderCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/imports/ImportOrderCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.imports;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -658,9 +660,7 @@ public class ImportOrderCheck extends AbstractCheck {
+         // matches any package
+         grp = Pattern.compile("");
+       } else if (pkg.startsWith(FORWARD_SLASH)) {
+-        if (!pkg.endsWith(FORWARD_SLASH)) {
+-          throw new IllegalArgumentException("Invalid group: " + pkg);
+-        }
++        checkArgument(pkg.endsWith(FORWARD_SLASH), "Invalid group: %s", pkg);
+         pkg = pkg.substring(1, pkg.length() - 1);
+         grp = Pattern.compile(pkg);
+       } else {
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/AbstractJavadocCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/AbstractJavadocCheck.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.javadoc;
+ 
++import static com.google.common.collect.ImmutableList.toImmutableList;
++
+ import com.puppycrawl.tools.checkstyle.JavadocDetailNodeParser;
+ import com.puppycrawl.tools.checkstyle.JavadocDetailNodeParser.ParseErrorMessage;
+ import com.puppycrawl.tools.checkstyle.JavadocDetailNodeParser.ParseStatus;
+@@ -36,7 +38,6 @@ import java.util.HashSet;
+ import java.util.Locale;
+ import java.util.Map;
+ import java.util.Set;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Base class for Checks that process Javadoc comments.
+@@ -182,7 +183,7 @@ public abstract class AbstractJavadocCheck extends AbstractCheck {
+     validateDefaultJavadocTokens();
+     if (javadocTokens.isEmpty()) {
+       javadocTokens.addAll(
+-          Arrays.stream(getDefaultJavadocTokens()).boxed().collect(Collectors.toList()));
++          Arrays.stream(getDefaultJavadocTokens()).boxed().collect(toImmutableList()));
+     } else {
+       final int[] acceptableJavadocTokens = getAcceptableJavadocTokens();
+       Arrays.sort(acceptableJavadocTokens);
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocBlockTagLocationCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocBlockTagLocationCheck.java
+@@ -19,14 +19,13 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.javadoc;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailNode;
+ import com.puppycrawl.tools.checkstyle.api.JavadocTokenTypes;
+-import java.util.Arrays;
+ import java.util.Set;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Checks that a <a
+@@ -123,7 +122,7 @@ public class JavadocBlockTagLocationCheck extends AbstractJavadocCheck {
+    * @since 8.24
+    */
+   public final void setTags(String... values) {
+-    tags = Arrays.stream(values).collect(Collectors.toSet());
++    tags = ImmutableSet.copyOf(values);
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocMethodCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocMethodCheck.java
+@@ -19,6 +19,7 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.javadoc;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -219,7 +220,7 @@ public class JavadocMethodCheck extends AbstractCheck {
+   private boolean allowMissingReturnTag;
+ 
+   /** Specify annotations that allow missed documentation. */
+-  private Set<String> allowedAnnotations = Set.of("Override");
++  private Set<String> allowedAnnotations = ImmutableSet.of("Override");
+ 
+   /**
+    * Setter to control whether to validate {@code throws} tags.
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocStyleCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocStyleCheck.java
+@@ -257,8 +257,8 @@ public class JavadocStyleCheck extends AbstractCheck {
+   }
+ 
+   // suppress deprecation until https://github.com/checkstyle/checkstyle/issues/11166
+-  @SuppressWarnings("deprecation")
+   @Override
++  @SuppressWarnings("deprecation")
+   public void visitToken(DetailAST ast) {
+     if (shouldCheck(ast)) {
+       final FileContents contents = getFileContents();
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTagInfo.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTagInfo.java
+@@ -19,6 +19,10 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.javadoc;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++import static java.util.function.Function.identity;
++import static java.util.stream.Collectors.toUnmodifiableMap;
++
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.Scope;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+@@ -27,8 +31,6 @@ import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
+ import java.util.Arrays;
+ import java.util.BitSet;
+ import java.util.Map;
+-import java.util.function.Function;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * This enum defines the various Javadoc tags and their properties.
+@@ -299,11 +301,9 @@ public enum JavadocTagInfo {
+   static {
+     final JavadocTagInfo[] values = values();
+     TEXT_TO_TAG =
+-        Arrays.stream(values)
+-            .collect(Collectors.toUnmodifiableMap(JavadocTagInfo::getText, Function.identity()));
++        Arrays.stream(values).collect(toUnmodifiableMap(JavadocTagInfo::getText, identity()));
+     NAME_TO_TAG =
+-        Arrays.stream(values)
+-            .collect(Collectors.toUnmodifiableMap(JavadocTagInfo::getName, Function.identity()));
++        Arrays.stream(values).collect(toUnmodifiableMap(JavadocTagInfo::getName, identity()));
+   }
+ 
+   /** The tag text. * */
+@@ -376,15 +376,11 @@ public enum JavadocTagInfo {
+    * @throws IllegalArgumentException if the text is not a valid tag
+    */
+   public static JavadocTagInfo fromText(final String text) {
+-    if (text == null) {
+-      throw new IllegalArgumentException("the text is null");
+-    }
++    checkArgument(text != null, "the text is null");
+ 
+     final JavadocTagInfo tag = TEXT_TO_TAG.get(text);
+ 
+-    if (tag == null) {
+-      throw new IllegalArgumentException("the text [" + text + "] is not a valid Javadoc tag text");
+-    }
++    checkArgument(tag != null, "the text [%s] is not a valid Javadoc tag text", text);
+ 
+     return tag;
+   }
+@@ -399,15 +395,11 @@ public enum JavadocTagInfo {
+    *     {@link JavadocTagInfo#isValidName(String)}
+    */
+   public static JavadocTagInfo fromName(final String name) {
+-    if (name == null) {
+-      throw new IllegalArgumentException("the name is null");
+-    }
++    checkArgument(name != null, "the name is null");
+ 
+     final JavadocTagInfo tag = NAME_TO_TAG.get(name);
+ 
+-    if (tag == null) {
+-      throw new IllegalArgumentException("the name [" + name + "] is not a valid Javadoc tag name");
+-    }
++    checkArgument(tag != null, "the name [%s] is not a valid Javadoc tag name", name);
+ 
+     return tag;
+   }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTypeCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTypeCheck.java
+@@ -19,6 +19,7 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.javadoc;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -160,7 +161,7 @@ public class JavadocTypeCheck extends AbstractCheck {
+    * Specify annotations that allow skipping validation at all. Only short names are allowed, e.g.
+    * {@code Generated}.
+    */
+-  private Set<String> allowedAnnotations = Set.of("Generated");
++  private Set<String> allowedAnnotations = ImmutableSet.of("Generated");
+ 
+   /**
+    * Setter to specify the visibility scope where Javadoc comments are checked.
+@@ -256,8 +257,8 @@ public class JavadocTypeCheck extends AbstractCheck {
+   }
+ 
+   // suppress deprecation until https://github.com/checkstyle/checkstyle/issues/11166
+-  @SuppressWarnings("deprecation")
+   @Override
++  @SuppressWarnings("deprecation")
+   public void visitToken(DetailAST ast) {
+     if (shouldCheck(ast)) {
+       final FileContents contents = getFileContents();
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocVariableCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocVariableCheck.java
+@@ -126,8 +126,8 @@ public class JavadocVariableCheck extends AbstractCheck {
+   }
+ 
+   // suppress deprecation until https://github.com/checkstyle/checkstyle/issues/11166
+-  @SuppressWarnings("deprecation")
+   @Override
++  @SuppressWarnings("deprecation")
+   public void visitToken(DetailAST ast) {
+     if (shouldCheck(ast)) {
+       final FileContents contents = getFileContents();
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/MissingJavadocMethodCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/MissingJavadocMethodCheck.java
+@@ -19,6 +19,7 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.javadoc;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -141,7 +142,7 @@ public class MissingJavadocMethodCheck extends AbstractCheck {
+   private Pattern ignoreMethodNamesRegex;
+ 
+   /** Configure annotations that allow missed documentation. */
+-  private Set<String> allowedAnnotations = Set.of("Override");
++  private Set<String> allowedAnnotations = ImmutableSet.of("Override");
+ 
+   /**
+    * Setter to configure annotations that allow missed documentation.
+@@ -225,8 +226,8 @@ public class MissingJavadocMethodCheck extends AbstractCheck {
+   }
+ 
+   // suppress deprecation until https://github.com/checkstyle/checkstyle/issues/11166
+-  @SuppressWarnings("deprecation")
+   @Override
++  @SuppressWarnings("deprecation")
+   public final void visitToken(DetailAST ast) {
+     final Scope theScope = ScopeUtil.getScope(ast);
+     if (shouldCheck(ast, theScope)) {
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/MissingJavadocTypeCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/MissingJavadocTypeCheck.java
+@@ -19,6 +19,7 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.javadoc;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -87,7 +88,7 @@ public class MissingJavadocTypeCheck extends AbstractCheck {
+    * Specify annotations that allow missed documentation. If annotation is present in target sources
+    * in multiple forms of qualified name, all forms should be listed in this property.
+    */
+-  private Set<String> skipAnnotations = Set.of("Generated");
++  private Set<String> skipAnnotations = ImmutableSet.of("Generated");
+ 
+   /**
+    * Setter to specify the visibility scope where Javadoc comments are checked.
+@@ -143,8 +144,8 @@ public class MissingJavadocTypeCheck extends AbstractCheck {
+   }
+ 
+   // suppress deprecation until https://github.com/checkstyle/checkstyle/issues/11166
+-  @SuppressWarnings("deprecation")
+   @Override
++  @SuppressWarnings("deprecation")
+   public void visitToken(DetailAST ast) {
+     if (shouldCheck(ast)) {
+       final FileContents contents = getFileContents();
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/SingleLineJavadocCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/SingleLineJavadocCheck.java
+@@ -19,6 +19,7 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.javadoc;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.DetailNode;
+@@ -70,7 +71,7 @@ public class SingleLineJavadocCheck extends AbstractJavadocCheck {
+    * href="https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html#CHDBEFIF">
+    * block tags</a> which are ignored by the check.
+    */
+-  private Set<String> ignoredTags = Set.of();
++  private Set<String> ignoredTags = ImmutableSet.of();
+ 
+   /**
+    * Control whether <a
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/WriteTagCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/WriteTagCheck.java
+@@ -158,8 +158,8 @@ public class WriteTagCheck extends AbstractCheck {
+   }
+ 
+   // suppress deprecation until https://github.com/checkstyle/checkstyle/issues/11166
+-  @SuppressWarnings("deprecation")
+   @Override
++  @SuppressWarnings("deprecation")
+   public void visitToken(DetailAST ast) {
+     final FileContents contents = getFileContents();
+     final int lineNo = ast.getLineNo();
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/utils/InlineTagUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/utils/InlineTagUtil.java
+@@ -19,6 +19,10 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.javadoc.utils;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++import static java.util.regex.Pattern.DOTALL;
++import static java.util.regex.Pattern.MULTILINE;
++
+ import com.puppycrawl.tools.checkstyle.api.LineColumn;
+ import java.util.ArrayList;
+ import java.util.List;
+@@ -30,11 +34,10 @@ public final class InlineTagUtil {
+ 
+   /** Inline tag pattern. */
+   private static final Pattern INLINE_TAG_PATTERN =
+-      Pattern.compile("\\{@(\\p{Alpha}+)\\b(.*?)}", Pattern.DOTALL);
++      Pattern.compile("\\{@(\\p{Alpha}+)\\b(.*?)}", DOTALL);
+ 
+   /** Pattern to recognize leading "*" characters in Javadoc. */
+-  private static final Pattern JAVADOC_PREFIX_PATTERN =
+-      Pattern.compile("^\\s*\\*", Pattern.MULTILINE);
++  private static final Pattern JAVADOC_PREFIX_PATTERN = Pattern.compile("^\\s*\\*", MULTILINE);
+ 
+   /** Pattern matching whitespace, used by {@link InlineTagUtil#collapseWhitespace(String)}. */
+   private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
+@@ -60,9 +63,9 @@ public final class InlineTagUtil {
+    */
+   public static List<TagInfo> extractInlineTags(String... lines) {
+     for (String line : lines) {
+-      if (line.indexOf(LINE_FEED) != -1 || line.indexOf(CARRIAGE_RETURN) != -1) {
+-        throw new IllegalArgumentException("comment lines cannot contain newlines");
+-      }
++      checkArgument(
++          line.indexOf(LINE_FEED) == -1 && line.indexOf(CARRIAGE_RETURN) == -1,
++          "comment lines cannot contain newlines");
+     }
+ 
+     final String commentText = convertLinesToString(lines);
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/metrics/AbstractClassCouplingCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/metrics/AbstractClassCouplingCheck.java
+@@ -19,6 +19,11 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.metrics;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++import static com.google.common.collect.ImmutableList.toImmutableList;
++import static java.util.function.Predicate.not;
++
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -29,7 +34,6 @@ import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
+ import java.util.ArrayDeque;
+ import java.util.ArrayList;
+ import java.util.Arrays;
+-import java.util.Collections;
+ import java.util.Deque;
+ import java.util.HashMap;
+ import java.util.List;
+@@ -37,9 +41,7 @@ import java.util.Map;
+ import java.util.Optional;
+ import java.util.Set;
+ import java.util.TreeSet;
+-import java.util.function.Predicate;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ 
+ /** Base class for coupling calculation. */
+ @FileStatefulCheck
+@@ -124,7 +126,7 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
+           "Stream");
+ 
+   /** Package names to ignore. */
+-  private static final Set<String> DEFAULT_EXCLUDED_PACKAGES = Collections.emptySet();
++  private static final Set<String> DEFAULT_EXCLUDED_PACKAGES = ImmutableSet.of();
+ 
+   /** Pattern to match brackets in a full type name. */
+   private static final Pattern BRACKET_PATTERN = Pattern.compile("\\[[^]]*]");
+@@ -207,13 +209,11 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
+    */
+   public final void setExcludedPackages(String... excludedPackages) {
+     final List<String> invalidIdentifiers =
+-        Arrays.stream(excludedPackages)
+-            .filter(Predicate.not(CommonUtil::isName))
+-            .collect(Collectors.toList());
+-    if (!invalidIdentifiers.isEmpty()) {
+-      throw new IllegalArgumentException(
+-          "the following values are not valid identifiers: " + invalidIdentifiers);
+-    }
++        Arrays.stream(excludedPackages).filter(not(CommonUtil::isName)).collect(toImmutableList());
++    checkArgument(
++        invalidIdentifiers.isEmpty(),
++        "the following values are not valid identifiers: %s",
++        invalidIdentifiers);
+ 
+     this.excludedPackages = Set.of(excludedPackages);
+   }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/naming/AbbreviationAsWordInNameCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/naming/AbbreviationAsWordInNameCheck.java
+@@ -19,18 +19,17 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.naming;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+ import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+-import java.util.Arrays;
+ import java.util.HashSet;
+ import java.util.LinkedList;
+ import java.util.List;
+ import java.util.Set;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Validates abbreviations (consecutive capital letters) length in identifier name, it also allows
+@@ -199,7 +198,7 @@ public class AbbreviationAsWordInNameCheck extends AbstractCheck {
+    */
+   public void setAllowedAbbreviations(String... allowedAbbreviations) {
+     if (allowedAbbreviations != null) {
+-      this.allowedAbbreviations = Arrays.stream(allowedAbbreviations).collect(Collectors.toSet());
++      this.allowedAbbreviations = ImmutableSet.copyOf(allowedAbbreviations);
+     }
+   }
+ 
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/naming/LambdaParameterNameCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/naming/LambdaParameterNameCheck.java
+@@ -22,7 +22,6 @@ package com.puppycrawl.tools.checkstyle.checks.naming;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+ import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
+-import java.util.Objects;
+ 
+ /**
+  * Checks lambda parameter names.
+@@ -70,7 +69,7 @@ public class LambdaParameterNameCheck extends AbstractNameCheck {
+   public void visitToken(DetailAST ast) {
+     final boolean isInSwitchRule = ast.getParent().getType() == TokenTypes.SWITCH_RULE;
+ 
+-    if (Objects.nonNull(ast.findFirstToken(TokenTypes.PARAMETERS))) {
++    if (ast.findFirstToken(TokenTypes.PARAMETERS) != null) {
+       final DetailAST parametersNode = ast.findFirstToken(TokenTypes.PARAMETERS);
+       TokenUtil.forEachChild(parametersNode, TokenTypes.PARAMETER_DEF, super::visitToken);
+     } else if (!isInSwitchRule) {
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/regexp/DetectorOptions.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/regexp/DetectorOptions.java
+@@ -19,6 +19,9 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.regexp;
+ 
++import static java.util.Objects.requireNonNullElse;
++import static java.util.regex.Pattern.CASE_INSENSITIVE;
++
+ import com.puppycrawl.tools.checkstyle.api.AbstractViolationReporter;
+ import java.util.Optional;
+ import java.util.regex.Pattern;
+@@ -242,8 +245,8 @@ public final class DetectorOptions {
+      * @return DetectorOptions instance.
+      */
+     public DetectorOptions build() {
+-      message = Optional.ofNullable(message).orElse("");
+-      suppressor = Optional.ofNullable(suppressor).orElse(NeverSuppress.INSTANCE);
++      message = requireNonNullElse(message, "");
++      suppressor = requireNonNullElse(suppressor, NeverSuppress.INSTANCE);
+       pattern = Optional.ofNullable(format).map(this::createPattern).orElse(null);
+       return DetectorOptions.this;
+     }
+@@ -257,7 +260,7 @@ public final class DetectorOptions {
+     private Pattern createPattern(String formatValue) {
+       int options = compileFlags;
+       if (ignoreCase) {
+-        options |= Pattern.CASE_INSENSITIVE;
++        options |= CASE_INSENSITIVE;
+       }
+       return Pattern.compile(formatValue, options);
+     }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/regexp/MultilineDetector.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/regexp/MultilineDetector.java
+@@ -19,6 +19,7 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.regexp;
+ 
++import com.google.common.base.Strings;
+ import com.puppycrawl.tools.checkstyle.api.FileText;
+ import com.puppycrawl.tools.checkstyle.api.LineColumn;
+ import java.util.regex.Matcher;
+@@ -69,7 +70,7 @@ class MultilineDetector {
+     resetState();
+ 
+     final String format = options.getFormat();
+-    if (format == null || format.isEmpty()) {
++    if (Strings.isNullOrEmpty(format)) {
+       options.getReporter().log(1, MSG_EMPTY);
+     } else {
+       matcher = options.getPattern().matcher(fileText.getFullText());
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpCheck.java
+@@ -19,6 +19,9 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.regexp;
+ 
++import static java.util.regex.Pattern.MULTILINE;
++
++import com.google.common.base.Strings;
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -151,7 +154,7 @@ public class RegexpCheck extends AbstractCheck {
+   private int errorCount;
+ 
+   /** Specify the pattern to match against. */
+-  private Pattern format = Pattern.compile("^$", Pattern.MULTILINE);
++  private Pattern format = Pattern.compile("^$", MULTILINE);
+ 
+   /** The matcher. */
+   private Matcher matcher;
+@@ -218,7 +221,7 @@ public class RegexpCheck extends AbstractCheck {
+    * @since 4.0
+    */
+   public final void setFormat(Pattern pattern) {
+-    format = CommonUtil.createPattern(pattern.pattern(), Pattern.MULTILINE);
++    format = CommonUtil.createPattern(pattern.pattern(), MULTILINE);
+   }
+ 
+   @Override
+@@ -237,8 +240,8 @@ public class RegexpCheck extends AbstractCheck {
+   }
+ 
+   // suppress deprecation until https://github.com/checkstyle/checkstyle/issues/11166
+-  @SuppressWarnings("deprecation")
+   @Override
++  @SuppressWarnings("deprecation")
+   public void beginTree(DetailAST rootAST) {
+     matcher = format.matcher(getFileContents().getText().getFullText());
+     matchCount = 0;
+@@ -336,7 +339,7 @@ public class RegexpCheck extends AbstractCheck {
+   private String getMessage() {
+     String msg;
+ 
+-    if (message == null || message.isEmpty()) {
++    if (Strings.isNullOrEmpty(message)) {
+       msg = format.pattern();
+     } else {
+       msg = message;
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpMultilineCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpMultilineCheck.java
+@@ -19,13 +19,15 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.regexp;
+ 
++import static java.util.regex.Pattern.DOTALL;
++import static java.util.regex.Pattern.MULTILINE;
++
+ import com.puppycrawl.tools.checkstyle.PropertyType;
+ import com.puppycrawl.tools.checkstyle.StatelessCheck;
+ import com.puppycrawl.tools.checkstyle.XdocsPropertyType;
+ import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
+ import com.puppycrawl.tools.checkstyle.api.FileText;
+ import java.io.File;
+-import java.util.regex.Pattern;
+ 
+ /**
+  * Checks that a specified pattern matches across multiple lines in any file type.
+@@ -121,9 +123,9 @@ public class RegexpMultilineCheck extends AbstractFileSetCheck {
+     final int result;
+ 
+     if (matchAcrossLines) {
+-      result = Pattern.DOTALL;
++      result = DOTALL;
+     } else {
+-      result = Pattern.MULTILINE;
++      result = MULTILINE;
+     }
+ 
+     return result;
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpSinglelineJavaCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpSinglelineJavaCheck.java
+@@ -102,8 +102,8 @@ public class RegexpSinglelineJavaCheck extends AbstractCheck {
+   }
+ 
+   // suppress deprecation until https://github.com/checkstyle/checkstyle/issues/11166
+-  @SuppressWarnings("deprecation")
+   @Override
++  @SuppressWarnings("deprecation")
+   public void beginTree(DetailAST rootAST) {
+     MatchSuppressor suppressor = null;
+     if (ignoreComments) {
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/filters/SuppressWithPlainTextCommentFilter.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/filters/SuppressWithPlainTextCommentFilter.java
+@@ -356,7 +356,7 @@ public class SuppressWithPlainTextCommentFilter extends AbstractAutomaticBean im
+       }
+       final Suppression suppression = (Suppression) other;
+       return Objects.equals(lineNo, suppression.lineNo)
+-          && Objects.equals(suppressionType, suppression.suppressionType)
++          && suppressionType == suppression.suppressionType
+           && Objects.equals(eventSourceRegexp, suppression.eventSourceRegexp)
+           && Objects.equals(eventMessageRegexp, suppression.eventMessageRegexp)
+           && Objects.equals(eventIdRegexp, suppression.eventIdRegexp);
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/filters/SuppressionCommentFilter.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/filters/SuppressionCommentFilter.java
+@@ -483,7 +483,7 @@ public class SuppressionCommentFilter extends AbstractAutomaticBean implements T
+       final Tag tag = (Tag) other;
+       return Objects.equals(line, tag.line)
+           && Objects.equals(column, tag.column)
+-          && Objects.equals(tagType, tag.tagType)
++          && tagType == tag.tagType
+           && Objects.equals(text, tag.text)
+           && Objects.equals(tagCheckRegexp, tag.tagCheckRegexp)
+           && Objects.equals(tagMessageRegexp, tag.tagMessageRegexp)
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/filters/SuppressionXpathFilter.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/filters/SuppressionXpathFilter.java
+@@ -19,13 +19,13 @@
+ 
+ package com.puppycrawl.tools.checkstyle.filters;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.AbstractAutomaticBean;
+ import com.puppycrawl.tools.checkstyle.TreeWalkerAuditEvent;
+ import com.puppycrawl.tools.checkstyle.TreeWalkerFilter;
+ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+ import com.puppycrawl.tools.checkstyle.api.ExternalResourceHolder;
+ import com.puppycrawl.tools.checkstyle.utils.FilterUtil;
+-import java.util.Collections;
+ import java.util.HashSet;
+ import java.util.Objects;
+ import java.util.Set;
+@@ -186,7 +186,7 @@ public class SuppressionXpathFilter extends AbstractAutomaticBean
+ 
+   @Override
+   public Set<String> getExternalResourceLocations() {
+-    return Collections.singleton(file);
++    return ImmutableSet.of(file);
+   }
+ 
+   @Override
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/filters/XpathFilterElement.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/filters/XpathFilterElement.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.filters;
+ 
++import static com.google.common.collect.ImmutableList.toImmutableList;
++
+ import com.puppycrawl.tools.checkstyle.TreeWalkerAuditEvent;
+ import com.puppycrawl.tools.checkstyle.TreeWalkerFilter;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+@@ -28,7 +30,6 @@ import java.util.List;
+ import java.util.Objects;
+ import java.util.Optional;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ import net.sf.saxon.Configuration;
+ import net.sf.saxon.om.Item;
+ import net.sf.saxon.sxpath.XPathDynamicContext;
+@@ -163,7 +164,7 @@ public class XpathFilterElement implements TreeWalkerFilter {
+     } else {
+       isMatching = false;
+       final List<AbstractNode> nodes =
+-          getItems(event).stream().map(AbstractNode.class::cast).collect(Collectors.toList());
++          getItems(event).stream().map(AbstractNode.class::cast).collect(toImmutableList());
+       for (AbstractNode abstractNode : nodes) {
+         isMatching =
+             abstractNode.getTokenType() == event.getTokenType()
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/gui/TreeTable.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/gui/TreeTable.java
+@@ -19,6 +19,9 @@
+ 
+ package com.puppycrawl.tools.checkstyle.gui;
+ 
++import static java.util.stream.Collectors.joining;
++import static java.util.stream.Collectors.toCollection;
++
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.utils.XpathUtil;
+ import com.puppycrawl.tools.checkstyle.xpath.ElementNode;
+@@ -36,7 +39,6 @@ import java.util.Collection;
+ import java.util.Deque;
+ import java.util.EventObject;
+ import java.util.List;
+-import java.util.stream.Collectors;
+ import javax.swing.AbstractAction;
+ import javax.swing.Action;
+ import javax.swing.JTable;
+@@ -203,7 +205,7 @@ public final class TreeTable extends JTable {
+             XpathUtil.getXpathItems(xpath, new RootNode(rootAST)).stream()
+                 .map(ElementNode.class::cast)
+                 .map(ElementNode::getUnderlyingNode)
+-                .collect(Collectors.toCollection(ArrayDeque::new));
++                .collect(toCollection(ArrayDeque::new));
+         updateTreeTable(xpath, nodes);
+       } catch (XPathException exception) {
+         xpathEditor.setText(xpathEditor.getText() + NEWLINE + exception.getMessage());
+@@ -254,7 +256,7 @@ public final class TreeTable extends JTable {
+   private static String getAllMatchingXpathQueriesText(Deque<DetailAST> nodes) {
+     return nodes.stream()
+         .map(XpathQueryGenerator::generateXpathQuery)
+-        .collect(Collectors.joining(NEWLINE, "", NEWLINE));
++        .collect(joining(NEWLINE, "", NEWLINE));
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/meta/JavadocMetadataScraper.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/meta/JavadocMetadataScraper.java
+@@ -19,6 +19,10 @@
+ 
+ package com.puppycrawl.tools.checkstyle.meta;
+ 
++import static java.util.Collections.unmodifiableMap;
++import static java.util.stream.Collectors.joining;
++
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.DetailNode;
+@@ -28,7 +32,6 @@ import com.puppycrawl.tools.checkstyle.checks.javadoc.AbstractJavadocCheck;
+ import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
+ import java.util.ArrayDeque;
+ import java.util.Arrays;
+-import java.util.Collections;
+ import java.util.Deque;
+ import java.util.HashMap;
+ import java.util.HashSet;
+@@ -39,7 +42,6 @@ import java.util.Optional;
+ import java.util.Set;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ import javax.xml.parsers.ParserConfigurationException;
+ import javax.xml.transform.TransformerException;
+ 
+@@ -98,7 +100,7 @@ public class JavadocMetadataScraper extends AbstractJavadocCheck {
+    * files.
+    */
+   private static final Set<String> PROPERTIES_TO_NOT_WRITE =
+-      Set.of(
++      ImmutableSet.of(
+           "null",
+           "the charset property of the parent <a href=https://checkstyle.org/"
+               + "config.html#Checker>Checker</a> module");
+@@ -477,7 +479,7 @@ public class JavadocMetadataScraper extends AbstractJavadocCheck {
+     return Arrays.stream(parentNode.getChildren())
+         .filter(child -> child.getType() == JavadocTokenTypes.TEXT)
+         .map(node -> QUOTE_PATTERN.matcher(node.getText().trim()).replaceAll(""))
+-        .collect(Collectors.joining(" "));
++        .collect(joining(" "));
+   }
+ 
+   /**
+@@ -594,7 +596,7 @@ public class JavadocMetadataScraper extends AbstractJavadocCheck {
+    * @return map containing module details of supplied checks.
+    */
+   public static Map<String, ModuleDetails> getModuleDetailsStore() {
+-    return Collections.unmodifiableMap(MODULE_DETAILS_STORE);
++    return unmodifiableMap(MODULE_DETAILS_STORE);
+   }
+ 
+   /** Reset the module detail store of any previous information. */
+@@ -673,7 +675,7 @@ public class JavadocMetadataScraper extends AbstractJavadocCheck {
+     return getFirstChildOfType(ast, JavadocTokenTypes.TEXT, 0)
+         .map(DetailNode::getText)
+         .map(pattern::matcher)
+-        .map(Matcher::matches)
+-        .orElse(Boolean.FALSE);
++        .filter(Matcher::matches)
++        .isPresent();
+   }
+ }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/meta/MetadataGeneratorUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/meta/MetadataGeneratorUtil.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.meta;
+ 
++import static com.google.common.collect.ImmutableList.toImmutableList;
++
+ import com.puppycrawl.tools.checkstyle.AbstractAutomaticBean.OutputStreamOptions;
+ import com.puppycrawl.tools.checkstyle.Checker;
+ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+@@ -34,7 +36,6 @@ import java.nio.file.Path;
+ import java.nio.file.Paths;
+ import java.util.ArrayList;
+ import java.util.List;
+-import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ 
+ /** Class which handles all the metadata generation and writing calls. */
+@@ -98,7 +99,7 @@ public final class MetadataGeneratorUtil {
+                           || fileName.endsWith("Check.java")
+                           || fileName.endsWith("Filter.java");
+                     })
+-                .collect(Collectors.toList()));
++                .collect(toImmutableList()));
+       }
+     }
+ 
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/meta/ModuleDetails.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/meta/ModuleDetails.java
+@@ -19,8 +19,9 @@
+ 
+ package com.puppycrawl.tools.checkstyle.meta;
+ 
++import static java.util.Collections.unmodifiableList;
++
+ import java.util.ArrayList;
+-import java.util.Collections;
+ import java.util.List;
+ 
+ /** Simple POJO class for module details. */
+@@ -125,7 +126,7 @@ public final class ModuleDetails {
+    * @return property list of module
+    */
+   public List<ModulePropertyDetails> getProperties() {
+-    return Collections.unmodifiableList(properties);
++    return unmodifiableList(properties);
+   }
+ 
+   /**
+@@ -152,7 +153,7 @@ public final class ModuleDetails {
+    * @return violation message keys of module
+    */
+   public List<String> getViolationMessageKeys() {
+-    return Collections.unmodifiableList(violationMessageKeys);
++    return unmodifiableList(violationMessageKeys);
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/site/ClassAndPropertiesSettersJavadocScraper.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/ClassAndPropertiesSettersJavadocScraper.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.site;
+ 
++import static java.util.Collections.unmodifiableMap;
++
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.DetailNode;
+@@ -27,7 +29,6 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+ import com.puppycrawl.tools.checkstyle.checks.javadoc.AbstractJavadocCheck;
+ import com.puppycrawl.tools.checkstyle.utils.BlockCommentPosition;
+ import java.beans.Introspector;
+-import java.util.Collections;
+ import java.util.LinkedHashMap;
+ import java.util.Map;
+ import java.util.regex.Pattern;
+@@ -65,7 +66,7 @@ public class ClassAndPropertiesSettersJavadocScraper extends AbstractJavadocChec
+    * @return the javadocs.
+    */
+   public static Map<String, DetailNode> getJavadocsForModuleOrProperty() {
+-    return Collections.unmodifiableMap(JAVADOC_FOR_MODULE_OR_PROPERTY);
++    return unmodifiableMap(JAVADOC_FOR_MODULE_OR_PROPERTY);
+   }
+ 
+   @Override
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/site/ExampleMacro.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/ExampleMacro.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.site;
+ 
++import static java.util.stream.Collectors.joining;
++
+ import java.io.IOException;
+ import java.nio.file.Files;
+ import java.nio.file.Path;
+@@ -26,7 +28,6 @@ import java.util.ArrayList;
+ import java.util.Collection;
+ import java.util.List;
+ import java.util.Locale;
+-import java.util.stream.Collectors;
+ import org.apache.maven.doxia.macro.AbstractMacro;
+ import org.apache.maven.doxia.macro.Macro;
+ import org.apache.maven.doxia.macro.MacroExecutionException;
+@@ -121,7 +122,7 @@ public class ExampleMacro extends AbstractMacro {
+         .dropWhile(line -> !XML_CONFIG_START.equals(line))
+         .skip(1)
+         .takeWhile(line -> !XML_CONFIG_END.equals(line))
+-        .collect(Collectors.joining(NEWLINE));
++        .collect(joining(NEWLINE));
+   }
+ 
+   /**
+@@ -136,7 +137,7 @@ public class ExampleMacro extends AbstractMacro {
+         .dropWhile(line -> !line.contains(CODE_SNIPPET_START))
+         .skip(1)
+         .takeWhile(line -> !line.contains(CODE_SNIPPET_END))
+-        .collect(Collectors.joining(NEWLINE));
++        .collect(joining(NEWLINE));
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/site/PropertiesMacro.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/PropertiesMacro.java
+@@ -19,6 +19,10 @@
+ 
+ package com.puppycrawl.tools.checkstyle.site;
+ 
++import static com.google.common.collect.ImmutableList.toImmutableList;
++import static java.util.Collections.unmodifiableSet;
++
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.PropertyType;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailNode;
+@@ -29,14 +33,12 @@ import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
+ import java.io.File;
+ import java.lang.reflect.Field;
+ import java.util.Arrays;
+-import java.util.Collections;
+ import java.util.LinkedList;
+ import java.util.List;
+ import java.util.Locale;
+ import java.util.Map;
+ import java.util.Set;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ import org.apache.maven.doxia.macro.AbstractMacro;
+ import org.apache.maven.doxia.macro.Macro;
+ import org.apache.maven.doxia.macro.MacroExecutionException;
+@@ -54,16 +56,15 @@ public class PropertiesMacro extends AbstractMacro {
+ 
+   /** Set of properties not inherited from the base token configuration. */
+   public static final Set<String> NON_BASE_TOKEN_PROPERTIES =
+-      Collections.unmodifiableSet(
+-          Arrays.stream(
+-                  new String[] {
+-                    "AtclauseOrder - target",
+-                    "DescendantToken - limitedTokens",
+-                    "IllegalType - memberModifiers",
+-                    "MagicNumber - constantWaiverParentToken",
+-                    "MultipleStringLiterals - ignoreOccurrenceContext",
+-                  })
+-              .collect(Collectors.toSet()));
++      unmodifiableSet(
++          ImmutableSet.copyOf(
++              new String[] {
++                "AtclauseOrder - target",
++                "DescendantToken - limitedTokens",
++                "IllegalType - memberModifiers",
++                "MagicNumber - constantWaiverParentToken",
++                "MultipleStringLiterals - ignoreOccurrenceContext",
++              }));
+ 
+   /** The precompiled pattern for a comma followed by a space. */
+   private static final Pattern COMMA_SPACE_PATTERN = Pattern.compile(", ");
+@@ -331,7 +332,7 @@ public class PropertiesMacro extends AbstractMacro {
+         final List<String> configurableTokens =
+             SiteUtil.getDifference(check.getAcceptableTokens(), check.getRequiredTokens()).stream()
+                 .map(TokenUtil::getTokenName)
+-                .collect(Collectors.toList());
++                .collect(toImmutableList());
+         sink.text("subset of tokens");
+ 
+         writeTokensList(sink, configurableTokens, SiteUtil.PATH_TO_TOKEN_TYPES, true);
+@@ -343,7 +344,7 @@ public class PropertiesMacro extends AbstractMacro {
+                   check.getAcceptableJavadocTokens(), check.getRequiredJavadocTokens())
+               .stream()
+               .map(JavadocUtil::getTokenName)
+-              .collect(Collectors.toList());
++              .collect(toImmutableList());
+       sink.text("subset of javadoc tokens");
+       writeTokensList(sink, configurableTokens, SiteUtil.PATH_TO_JAVADOC_TOKEN_TYPES, true);
+     } else {
+@@ -470,7 +471,7 @@ public class PropertiesMacro extends AbstractMacro {
+         final List<String> configurableTokens =
+             SiteUtil.getDifference(check.getDefaultTokens(), check.getRequiredTokens()).stream()
+                 .map(TokenUtil::getTokenName)
+-                .collect(Collectors.toList());
++                .collect(toImmutableList());
+         writeTokensList(sink, configurableTokens, SiteUtil.PATH_TO_TOKEN_TYPES, true);
+       }
+     } else if (SiteUtil.JAVADOC_TOKENS.equals(propertyName)) {
+@@ -479,7 +480,7 @@ public class PropertiesMacro extends AbstractMacro {
+           SiteUtil.getDifference(check.getDefaultJavadocTokens(), check.getRequiredJavadocTokens())
+               .stream()
+               .map(JavadocUtil::getTokenName)
+-              .collect(Collectors.toList());
++              .collect(toImmutableList());
+       writeTokensList(sink, configurableTokens, SiteUtil.PATH_TO_JAVADOC_TOKEN_TYPES, true);
+     } else {
+       final String defaultValue = getDefaultValue(propertyName, field, instance);
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
+@@ -19,6 +19,14 @@
+ 
+ package com.puppycrawl.tools.checkstyle.site;
+ 
++import static com.google.common.collect.ImmutableList.toImmutableList;
++import static com.google.common.collect.ImmutableSet.toImmutableSet;
++import static java.util.stream.Collectors.joining;
++import static java.util.stream.Collectors.toSet;
++
++import com.google.common.base.Strings;
++import com.google.common.collect.ImmutableList;
++import com.google.common.collect.ImmutableSet;
+ import com.google.common.collect.Lists;
+ import com.puppycrawl.tools.checkstyle.Checker;
+ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+@@ -72,7 +80,6 @@ import java.util.Optional;
+ import java.util.Set;
+ import java.util.TreeSet;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ import java.util.stream.IntStream;
+ import java.util.stream.Stream;
+ import javax.annotation.Nullable;
+@@ -156,7 +163,7 @@ public final class SiteUtil {
+ 
+   /** Set of properties that are undocumented. Those are internal properties. */
+   private static final Set<String> UNDOCUMENTED_PROPERTIES =
+-      Set.of(
++      ImmutableSet.of(
+           "SuppressWithNearbyCommentFilter.fileContents", "SuppressionCommentFilter.fileContents");
+ 
+   /** Properties that can not be gathered from class instance. */
+@@ -440,7 +447,7 @@ public final class SiteUtil {
+             (path, attr) -> {
+               return attr.isRegularFile() && path.toString().endsWith(".xml.template");
+             })) {
+-      return stream.collect(Collectors.toSet());
++      return stream.collect(toImmutableSet());
+     } catch (IOException ioException) {
+       throw new MacroExecutionException("Failed to find xdocs templates", ioException);
+     }
+@@ -467,7 +474,7 @@ public final class SiteUtil {
+     }
+ 
+     // If parent class is not found, check interfaces
+-    if (parentModuleName == null || parentModuleName.isEmpty()) {
++    if (Strings.isNullOrEmpty(parentModuleName)) {
+       final Class<?>[] interfaces = moduleClass.getInterfaces();
+       for (Class<?> interfaceClass : interfaces) {
+         parentModuleName = CLASS_TO_PARENT_MODULE.get(interfaceClass);
+@@ -477,7 +484,7 @@ public final class SiteUtil {
+       }
+     }
+ 
+-    if (parentModuleName == null || parentModuleName.isEmpty()) {
++    if (Strings.isNullOrEmpty(parentModuleName)) {
+       final String message =
+           String.format(
+               Locale.ROOT, "Failed to find parent module for %s", moduleClass.getSimpleName());
+@@ -505,7 +512,7 @@ public final class SiteUtil {
+                 prop -> {
+                   return !isGlobalProperty(clss, prop) && !isUndocumentedProperty(clss, prop);
+                 })
+-            .collect(Collectors.toSet());
++            .collect(toSet());
+     properties.addAll(getNonExplicitProperties(instance, clss));
+     return new TreeSet<>(properties);
+   }
+@@ -624,7 +631,7 @@ public final class SiteUtil {
+     treeWalkerConfig.addChild(scraperCheckConfig);
+     try {
+       checker.configure(defaultConfiguration);
+-      final List<File> filesToProcess = List.of(moduleFile);
++      final List<File> filesToProcess = ImmutableList.of(moduleFile);
+       checker.process(filesToProcess);
+       checker.destroy();
+     } catch (CheckstyleException checkstyleException) {
+@@ -947,9 +954,7 @@ public final class SiteUtil {
+     if (value != null && Array.getLength(value) > 0) {
+       result =
+           removeSquareBrackets(
+-              Arrays.stream((Pattern[]) value)
+-                  .map(Pattern::pattern)
+-                  .collect(Collectors.joining(COMMA_SPACE)));
++              Arrays.stream((Pattern[]) value).map(Pattern::pattern).collect(joining(COMMA_SPACE)));
+     }
+ 
+     if (result.isEmpty()) {
+@@ -981,8 +986,7 @@ public final class SiteUtil {
+       result = "";
+     } else {
+       try (Stream<?> valuesStream = getValuesStream(value)) {
+-        result =
+-            valuesStream.map(String.class::cast).sorted().collect(Collectors.joining(COMMA_SPACE));
++        result = valuesStream.map(String.class::cast).sorted().collect(joining(COMMA_SPACE));
+       }
+     }
+ 
+@@ -1023,10 +1027,7 @@ public final class SiteUtil {
+   private static String getIntArrayPropertyValue(Object value) {
+     try (IntStream stream = getIntStream(value)) {
+       String result =
+-          stream
+-              .mapToObj(TokenUtil::getTokenName)
+-              .sorted()
+-              .collect(Collectors.joining(COMMA_SPACE));
++          stream.mapToObj(TokenUtil::getTokenName).sorted().collect(joining(COMMA_SPACE));
+       if (result.isEmpty()) {
+         result = CURLY_BRACKETS;
+       }
+@@ -1132,11 +1133,11 @@ public final class SiteUtil {
+    */
+   public static List<Integer> getDifference(int[] tokens, int... subtractions) {
+     final Set<Integer> subtractionsSet =
+-        Arrays.stream(subtractions).boxed().collect(Collectors.toSet());
++        Arrays.stream(subtractions).boxed().collect(toImmutableSet());
+     return Arrays.stream(tokens)
+         .boxed()
+         .filter(token -> !subtractionsSet.contains(token))
+-        .collect(Collectors.toList());
++        .collect(toImmutableList());
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/site/XdocsTemplateParser.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/XdocsTemplateParser.java
+@@ -19,6 +19,7 @@
+ 
+ package com.puppycrawl.tools.checkstyle.site;
+ 
++import com.google.common.base.Strings;
+ import java.io.File;
+ import java.io.IOException;
+ import java.io.Reader;
+@@ -119,7 +120,7 @@ public class XdocsTemplateParser extends XdocParser {
+   private void processMacroStart(XmlPullParser parser) throws MacroExecutionException {
+     macroName = parser.getAttributeValue(null, Attribute.NAME.toString());
+ 
+-    if (macroName == null || macroName.isEmpty()) {
++    if (Strings.isNullOrEmpty(macroName)) {
+       final String message =
+           String.format(
+               Locale.ROOT,
+@@ -138,7 +139,7 @@ public class XdocsTemplateParser extends XdocParser {
+    * @throws MacroExecutionException if the parameter name or value is not specified.
+    */
+   private void processParamStart(XmlPullParser parser, Sink sink) throws MacroExecutionException {
+-    if (macroName != null && !macroName.isEmpty()) {
++    if (!Strings.isNullOrEmpty(macroName)) {
+       final String paramName = parser.getAttributeValue(null, Attribute.NAME.toString());
+       final String paramValue = parser.getAttributeValue(null, Attribute.VALUE.toString());
+ 
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/utils/AnnotationUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/utils/AnnotationUtil.java
+@@ -19,6 +19,9 @@
+ 
+ package com.puppycrawl.tools.checkstyle.utils;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.FullIdent;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+@@ -38,7 +41,7 @@ public final class AnnotationUtil {
+   private static final String FQ_OVERRIDE = "java.lang." + OVERRIDE;
+ 
+   /** Simple and fully-qualified {@link Override Override} annotation names. */
+-  private static final Set<String> OVERRIDE_ANNOTATIONS = Set.of(OVERRIDE, FQ_OVERRIDE);
++  private static final Set<String> OVERRIDE_ANNOTATIONS = ImmutableSet.of(OVERRIDE, FQ_OVERRIDE);
+ 
+   /**
+    * Private utility constructor.
+@@ -92,9 +95,7 @@ public final class AnnotationUtil {
+    * @throws IllegalArgumentException when ast or annotations are null
+    */
+   public static boolean containsAnnotation(DetailAST ast, Set<String> annotations) {
+-    if (annotations == null) {
+-      throw new IllegalArgumentException("annotations cannot be null");
+-    }
++    checkArgument(annotations != null, "annotations cannot be null");
+     boolean result = false;
+     if (!annotations.isEmpty()) {
+       final DetailAST firstMatchingAnnotation =
+@@ -150,9 +151,7 @@ public final class AnnotationUtil {
+    * @throws IllegalArgumentException when ast is null
+    */
+   public static DetailAST getAnnotationHolder(DetailAST ast) {
+-    if (ast == null) {
+-      throw new IllegalArgumentException(THE_AST_IS_NULL);
+-    }
++    checkArgument(ast != null, THE_AST_IS_NULL);
+ 
+     final DetailAST annotationHolder;
+ 
+@@ -182,17 +181,11 @@ public final class AnnotationUtil {
+    * @throws IllegalArgumentException when ast or annotations are null; when annotation is blank
+    */
+   public static DetailAST getAnnotation(final DetailAST ast, String annotation) {
+-    if (ast == null) {
+-      throw new IllegalArgumentException(THE_AST_IS_NULL);
+-    }
++    checkArgument(ast != null, THE_AST_IS_NULL);
+ 
+-    if (annotation == null) {
+-      throw new IllegalArgumentException("the annotation is null");
+-    }
++    checkArgument(annotation != null, "the annotation is null");
+ 
+-    if (CommonUtil.isBlank(annotation)) {
+-      throw new IllegalArgumentException("the annotation is empty or spaces");
+-    }
++    checkArgument(!CommonUtil.isBlank(annotation), "the annotation is empty or spaces");
+ 
+     return findFirstAnnotation(
+         ast,
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/utils/CheckUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/utils/CheckUtil.java
+@@ -19,6 +19,11 @@
+ 
+ package com.puppycrawl.tools.checkstyle.utils;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++import static java.util.function.Predicate.not;
++import static java.util.stream.Collectors.joining;
++import static java.util.stream.Collectors.toUnmodifiableSet;
++
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.FullIdent;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+@@ -29,9 +34,7 @@ import java.util.Arrays;
+ import java.util.Collection;
+ import java.util.List;
+ import java.util.Set;
+-import java.util.function.Predicate;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ 
+ /** Contains utility methods for the checks. */
+@@ -315,9 +318,7 @@ public final class CheckUtil {
+    */
+   private static AccessModifierOption getAccessModifierFromModifiersTokenDirectly(
+       DetailAST modifiersToken) {
+-    if (modifiersToken == null) {
+-      throw new IllegalArgumentException("expected non-null AST-token with type 'MODIFIERS'");
+-    }
++    checkArgument(modifiersToken != null, "expected non-null AST-token with type 'MODIFIERS'");
+ 
+     AccessModifierOption accessModifier = AccessModifierOption.PACKAGE;
+     for (DetailAST token = modifiersToken.getFirstChild();
+@@ -369,8 +370,8 @@ public final class CheckUtil {
+   public static Set<String> parseClassNames(String... classNames) {
+     return Arrays.stream(classNames)
+         .flatMap(className -> Stream.of(className, CommonUtil.baseClassName(className)))
+-        .filter(Predicate.not(String::isEmpty))
+-        .collect(Collectors.toUnmodifiableSet());
++        .filter(not(String::isEmpty))
++        .collect(toUnmodifiableSet());
+   }
+ 
+   /**
+@@ -391,7 +392,7 @@ public final class CheckUtil {
+ 
+     return lines.stream()
+         .map(line -> stripIndentAndTrailingWhitespaceFromLine(line, indent))
+-        .collect(Collectors.joining(System.lineSeparator(), suffix, suffix));
++        .collect(joining(System.lineSeparator(), suffix, suffix));
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/utils/CommonUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/utils/CommonUtil.java
+@@ -32,7 +32,6 @@ import java.net.URL;
+ import java.nio.file.Path;
+ import java.nio.file.Paths;
+ import java.util.BitSet;
+-import java.util.Objects;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+ import java.util.regex.PatternSyntaxException;
+@@ -506,7 +505,7 @@ public final class CommonUtil {
+    * @return true if the arg is blank.
+    */
+   public static boolean isBlank(String value) {
+-    return Objects.isNull(value) || indexOfNonWhitespace(value) >= value.length();
++    return value == null || indexOfNonWhitespace(value) >= value.length();
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/utils/JavadocUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/utils/JavadocUtil.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.utils;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.DetailNode;
+ import com.puppycrawl.tools.checkstyle.api.JavadocTokenTypes;
+@@ -262,9 +264,7 @@ public final class JavadocUtil {
+    */
+   public static String getTokenName(int id) {
+     final String name = TOKEN_VALUE_TO_NAME.get(id);
+-    if (name == null) {
+-      throw new IllegalArgumentException(UNKNOWN_JAVADOC_TOKEN_ID_EXCEPTION_MESSAGE + id);
+-    }
++    checkArgument(name != null, "%s%s", UNKNOWN_JAVADOC_TOKEN_ID_EXCEPTION_MESSAGE, id);
+     return name;
+   }
+ 
+@@ -277,9 +277,7 @@ public final class JavadocUtil {
+    */
+   public static int getTokenId(String name) {
+     final Integer id = TOKEN_NAME_TO_VALUE.get(name);
+-    if (id == null) {
+-      throw new IllegalArgumentException("Unknown javadoc token name. Given name " + name);
+-    }
++    checkArgument(id != null, "Unknown javadoc token name. Given name %s", name);
+     return id;
+   }
+ 
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/utils/ModuleReflectionUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/utils/ModuleReflectionUtil.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.utils;
+ 
++import static com.google.common.collect.ImmutableSet.toImmutableSet;
++
+ import com.google.common.reflect.ClassPath;
+ import com.puppycrawl.tools.checkstyle.AbstractAutomaticBean;
+ import com.puppycrawl.tools.checkstyle.TreeWalkerFilter;
+@@ -33,7 +35,6 @@ import java.lang.reflect.Constructor;
+ import java.lang.reflect.Modifier;
+ import java.util.Collection;
+ import java.util.Set;
+-import java.util.stream.Collectors;
+ 
+ /** Contains utility methods for module reflection. */
+ public final class ModuleReflectionUtil {
+@@ -57,7 +58,7 @@ public final class ModuleReflectionUtil {
+         .flatMap(pkg -> classPath.getTopLevelClasses(pkg).stream())
+         .map(ClassPath.ClassInfo::load)
+         .filter(ModuleReflectionUtil::isCheckstyleModule)
+-        .collect(Collectors.toSet());
++        .collect(toImmutableSet());
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/utils/ScopeUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/utils/ScopeUtil.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.utils;
+ 
++import static java.util.Objects.requireNonNullElseGet;
++
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.Scope;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+@@ -78,8 +80,7 @@ public final class ScopeUtil {
+    * @see #getDefaultScope(DetailAST)
+    */
+   public static Scope getScopeFromMods(DetailAST aMods) {
+-    return Optional.ofNullable(getDeclaredScopeFromMods(aMods))
+-        .orElseGet(() -> getDefaultScope(aMods));
++    return requireNonNullElseGet(getDeclaredScopeFromMods(aMods), () -> getDefaultScope(aMods));
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/utils/TokenUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/utils/TokenUtil.java
+@@ -19,6 +19,11 @@
+ 
+ package com.puppycrawl.tools.checkstyle.utils;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
++import static com.google.common.collect.ImmutableMap.toImmutableMap;
++import static java.util.function.Predicate.not;
++import static java.util.stream.Collectors.toUnmodifiableMap;
++
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+ import java.lang.reflect.Field;
+@@ -31,7 +36,6 @@ import java.util.Optional;
+ import java.util.ResourceBundle;
+ import java.util.function.Consumer;
+ import java.util.function.Predicate;
+-import java.util.stream.Collectors;
+ import java.util.stream.IntStream;
+ 
+ /** Contains utility methods for tokens. */
+@@ -91,7 +95,7 @@ public final class TokenUtil {
+   public static Map<String, Integer> nameToValueMapFromPublicIntFields(Class<?> cls) {
+     return Arrays.stream(cls.getDeclaredFields())
+         .filter(fld -> Modifier.isPublic(fld.getModifiers()) && fld.getType() == Integer.TYPE)
+-        .collect(Collectors.toUnmodifiableMap(Field::getName, fld -> getIntFromField(fld, null)));
++        .collect(toUnmodifiableMap(Field::getName, fld -> getIntFromField(fld, null)));
+   }
+ 
+   /**
+@@ -101,8 +105,7 @@ public final class TokenUtil {
+    * @return inverted map
+    */
+   public static Map<Integer, String> invertMap(Map<String, Integer> map) {
+-    return map.entrySet().stream()
+-        .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
++    return map.entrySet().stream().collect(toImmutableMap(Map.Entry::getValue, Map.Entry::getKey));
+   }
+ 
+   /**
+@@ -134,9 +137,7 @@ public final class TokenUtil {
+    */
+   public static String getTokenName(int id) {
+     final String name = TOKEN_VALUE_TO_NAME.get(id);
+-    if (name == null) {
+-      throw new IllegalArgumentException(String.format(Locale.ROOT, TOKEN_ID_EXCEPTION_FORMAT, id));
+-    }
++    checkArgument(name != null, String.format(Locale.ROOT, TOKEN_ID_EXCEPTION_FORMAT, id));
+     return name;
+   }
+ 
+@@ -149,10 +150,7 @@ public final class TokenUtil {
+    */
+   public static int getTokenId(String name) {
+     final Integer id = TOKEN_NAME_TO_VALUE.get(name);
+-    if (id == null) {
+-      throw new IllegalArgumentException(
+-          String.format(Locale.ROOT, TOKEN_NAME_EXCEPTION_FORMAT, name));
+-    }
++    checkArgument(id != null, String.format(Locale.ROOT, TOKEN_NAME_EXCEPTION_FORMAT, name));
+     return id;
+   }
+ 
+@@ -164,10 +162,9 @@ public final class TokenUtil {
+    * @throws IllegalArgumentException when name is unknown
+    */
+   public static String getShortDescription(String name) {
+-    if (!TOKEN_NAME_TO_VALUE.containsKey(name)) {
+-      throw new IllegalArgumentException(
+-          String.format(Locale.ROOT, TOKEN_NAME_EXCEPTION_FORMAT, name));
+-    }
++    checkArgument(
++        TOKEN_NAME_TO_VALUE.containsKey(name),
++        String.format(Locale.ROOT, TOKEN_NAME_EXCEPTION_FORMAT, name));
+ 
+     final String tokenTypes = "com.puppycrawl.tools.checkstyle.api.tokentypes";
+     final ResourceBundle bundle = ResourceBundle.getBundle(tokenTypes, Locale.ROOT);
+@@ -332,7 +329,7 @@ public final class TokenUtil {
+   public static BitSet asBitSet(String... tokens) {
+     return Arrays.stream(tokens)
+         .map(String::trim)
+-        .filter(Predicate.not(String::isEmpty))
++        .filter(not(String::isEmpty))
+         .mapToInt(TokenUtil::getTokenId)
+         .collect(BitSet::new, BitSet::set, BitSet::or);
+   }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/utils/UnmodifiableCollectionUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/utils/UnmodifiableCollectionUtil.java
+@@ -19,13 +19,15 @@
+ 
+ package com.puppycrawl.tools.checkstyle.utils;
+ 
++import static java.util.stream.Collectors.toUnmodifiableList;
++
++import com.google.common.collect.ImmutableSet;
+ import java.util.Arrays;
+ import java.util.Collection;
+ import java.util.Collections;
+ import java.util.List;
+ import java.util.Map;
+ import java.util.Set;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Note: it simply wraps the existing JDK methods to provide a workaround for Pitest survival on
+@@ -68,7 +70,7 @@ public final class UnmodifiableCollectionUtil {
+    * @return An unmodifiable List containing elements of the specified type.
+    */
+   public static <S, T> List<T> unmodifiableList(Collection<S> items, Class<T> elementType) {
+-    return items.stream().map(elementType::cast).collect(Collectors.toUnmodifiableList());
++    return items.stream().map(elementType::cast).collect(toUnmodifiableList());
+   }
+ 
+   /**
+@@ -103,6 +105,6 @@ public final class UnmodifiableCollectionUtil {
+    * @return immutable set
+    */
+   public static <T> Set<T> singleton(T obj) {
+-    return Collections.singleton(obj);
++    return ImmutableSet.of(obj);
+   }
+ }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/utils/XpathUtil.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/utils/XpathUtil.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.utils;
+ 
++import static java.util.stream.Collectors.joining;
++
+ import com.puppycrawl.tools.checkstyle.AstTreeStringPrinter;
+ import com.puppycrawl.tools.checkstyle.JavaParser;
+ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+@@ -34,7 +36,6 @@ import java.util.BitSet;
+ import java.util.List;
+ import java.util.Locale;
+ import java.util.regex.Pattern;
+-import java.util.stream.Collectors;
+ import net.sf.saxon.Configuration;
+ import net.sf.saxon.om.Item;
+ import net.sf.saxon.om.NodeInfo;
+@@ -194,7 +195,7 @@ public final class XpathUtil {
+       return matchingItems.stream()
+           .map(item -> ((ElementNode) item).getUnderlyingNode())
+           .map(AstTreeStringPrinter::printBranch)
+-          .collect(Collectors.joining(DELIMITER));
++          .collect(joining(DELIMITER));
+     } catch (XPathException ex) {
+       final String errMsg =
+           String.format(
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/xpath/AbstractNode.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/xpath/AbstractNode.java
+@@ -19,7 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.xpath;
+ 
+-import java.util.Collections;
++import static java.util.Collections.unmodifiableList;
++
+ import java.util.List;
+ import net.sf.saxon.Configuration;
+ import net.sf.saxon.event.Receiver;
+@@ -91,7 +92,7 @@ public abstract class AbstractNode implements NodeInfo {
+     if (children == null) {
+       children = createChildren();
+     }
+-    return Collections.unmodifiableList(children);
++    return unmodifiableList(children);
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/xpath/XpathQueryGenerator.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/xpath/XpathQueryGenerator.java
+@@ -19,6 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.xpath;
+ 
++import static com.google.common.collect.ImmutableList.toImmutableList;
++
+ import com.puppycrawl.tools.checkstyle.TreeWalkerAuditEvent;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.FileText;
+@@ -27,7 +29,6 @@ import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
+ import com.puppycrawl.tools.checkstyle.utils.XpathUtil;
+ import java.util.ArrayList;
+ import java.util.List;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Generates xpath queries. Xpath queries are generated based on received {@code DetailAst} element,
+@@ -145,7 +146,7 @@ public class XpathQueryGenerator {
+   public List<String> generate() {
+     return getMatchingAstElements().stream()
+         .map(XpathQueryGenerator::generateXpathQuery)
+-        .collect(Collectors.toList());
++        .collect(toImmutableList());
+   }
+ 
+   /**
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/AbstractAutomaticBeanTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/AbstractAutomaticBeanTest.java
 @@ -34,9 +34,9 @@ import org.apache.commons.beanutils.ConvertUtilsBean;
