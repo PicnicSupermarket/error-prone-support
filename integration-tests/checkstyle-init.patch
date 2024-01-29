@@ -1,7 +1,7 @@
 --- a/pom.xml
 +++ b/pom.xml
-@@ -349,6 +349,12 @@
-       <version>1.2.0</version>
+@@ -362,6 +362,12 @@
+       <version>1.3.0</version>
        <scope>test</scope>
      </dependency>
 +    <dependency>
@@ -13,7 +13,7 @@
      <dependency>
        <groupId>nl.jqno.equalsverifier</groupId>
        <artifactId>equalsverifier</artifactId>
-@@ -2396,6 +2402,8 @@
+@@ -2412,6 +2418,8 @@
                      <arg>
                        -Xplugin:ErrorProne ${error-prone.configuration-args}
                      </arg>
@@ -22,7 +22,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2408,6 +2416,11 @@
+@@ -2424,6 +2432,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -34,7 +34,7 @@
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
-@@ -2452,9 +2465,10 @@
+@@ -2468,9 +2481,10 @@
                      <arg>-XDcompilePolicy=simple</arg>
                      <arg>
                        -Xplugin:ErrorProne \
@@ -46,7 +46,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2467,6 +2481,11 @@
+@@ -2483,6 +2497,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -94,7 +94,7 @@
              .replace(RESULTS_PLACEHOLDER, String.join(",\n", results));
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
-@@ -520,6 +520,10 @@ public final class SiteUtil {
+@@ -564,6 +564,10 @@ public final class SiteUtil {
       * @return a set of properties for the given class.
       */
      public static Set<String> getPropertiesForDocumentation(Class<?> clss, Object instance) {
@@ -149,7 +149,7 @@
              assertWithMessage("Exception is expected but got " + test).fail();
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
-@@ -338,6 +338,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -429,6 +429,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
       *                     mock toByteArray to throw exception.
       */
      @Test
