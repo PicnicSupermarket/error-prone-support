@@ -6,10 +6,13 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.suppliers.Supplier;
 import com.sun.tools.javac.code.ClassFinder;
 import com.sun.tools.javac.code.Source;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.CompletionFailure;
 import com.sun.tools.javac.code.Symbol.ModuleSymbol;
 import com.sun.tools.javac.code.Symtab;
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.util.Name;
+import javax.lang.model.element.Modifier;
 
 /**
  * Utility class that helps decide whether it is appropriate to introduce references to (well-known)
@@ -70,12 +73,12 @@ public enum ThirdPartyLibrary {
   /**
    * Tells whether the given fully qualified type is available on the current class path.
    *
-   * @param className The type of interest.
+   * @param typeName The type of interest.
    * @param state The context under consideration.
    * @return {@code true} iff it is okay to assume or create a dependency on this type.
    */
-  public static boolean canIntroduceUsage(String className, VisitorState state) {
-    return shouldIgnoreClasspath(state) || isKnownClass(className, state);
+  public static boolean canIntroduceUsage(String typeName, VisitorState state) {
+    return shouldIgnoreClasspath(state) || isKnownClass(typeName, state);
   }
 
   /**
@@ -84,11 +87,16 @@ public enum ThirdPartyLibrary {
    * <p>The {@link VisitorState}'s symbol table is consulted first. If the type has not yet been
    * loaded, then an attempt is made to do so.
    */
-  private static boolean isKnownClass(String className, VisitorState state) {
-    return state.getTypeFromString(className) != null || canLoadClass(className, state);
+  private static boolean isKnownClass(String typeName, VisitorState state) {
+    return isPublicClassInSymbolTable(typeName, state) || canLoadPublicClass(typeName, state);
   }
 
-  private static boolean canLoadClass(String className, VisitorState state) {
+  private static boolean isPublicClassInSymbolTable(String typeName, VisitorState state) {
+    Type type = state.getTypeFromString(typeName);
+    return type != null && isPublic(type.tsym);
+  }
+
+  private static boolean canLoadPublicClass(String typeName, VisitorState state) {
     ClassFinder classFinder = ClassFinder.instance(state.context);
     Symtab symtab = state.getSymtab();
     // XXX: Drop support for targeting Java 8 once the oldest supported JDK drops such support.
@@ -96,15 +104,19 @@ public enum ThirdPartyLibrary {
         Source.instance(state.context).compareTo(Source.JDK9) < 0
             ? symtab.noModule
             : symtab.unnamedModule;
-    Name binaryName = state.binaryNameFromClassname(className);
+    Name binaryName = state.binaryNameFromClassname(typeName);
     try {
-      classFinder.loadClass(module, binaryName);
-      return true;
+      return isPublic(classFinder.loadClass(module, binaryName));
     } catch (
         @SuppressWarnings("java:S1166" /* Not exceptional. */)
         CompletionFailure e) {
       return false;
     }
+  }
+
+  // XXX: Once we target JDK 14+, drop this method in favour of `Symbol#isPublic()`.
+  private static boolean isPublic(Symbol symbol) {
+    return symbol.getModifiers().contains(Modifier.PUBLIC);
   }
 
   private static boolean shouldIgnoreClasspath(VisitorState state) {

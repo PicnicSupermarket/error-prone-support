@@ -47,6 +47,7 @@ final class ErrorProneRuntimeClasspathTest {
             "    m(\"com.google.errorprone.NonExistent\");",
             "    m(\"com.google.common.NonExistent.toString\");",
             "    m(\"java.lang.NonExistent\");",
+            "    m(\"com.google.common.collect.ImmutableEnumSet\");",
             "    // BUG: Diagnostic matches: USE_CLASS_REFERENCE",
             "    m(\"com.google.errorprone.BugPattern\");",
             "    // BUG: Diagnostic matches: USE_CLASS_REFERENCE",
