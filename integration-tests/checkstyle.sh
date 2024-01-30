@@ -9,7 +9,7 @@ repos_root="${integration_test_root}/.repos"
 test_name="$(basename "${0}" .sh)"
 project=checkstyle
 repository=https://github.com/checkstyle/checkstyle.git
-revision=checkstyle-10.12.4
+revision=checkstyle-10.13.0
 
 if [ "${#}" -gt 2 ] || ([ "${#}" = 2 ] && [ "${1:---sync}" != '--sync' ]); then
   echo "Usage: ${0} [--sync] [<report_directory>]"
@@ -46,16 +46,22 @@ format_goal='com.spotify.fmt:fmt-maven-plugin:2.21.1:format'
 
 error_prone_shared_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
 
+# XXX: Drop the `ErrorProneRuntimeClasspath` exclusion once that check resides
+# in a separate Maven module.
 error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE -XepPatchChecks:$(
   find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -print0 \
     | xargs -0 grep -hoP '[^.]+$' \
+    | grep -v ErrorProneRuntimeClasspath \
     | paste -s -d ','
 )"
 
+# XXX: Drop the `ErrorProneRuntimeClasspath` exclusion once that check resides
+# in a separate Maven module.
 error_prone_validation_flags="${error_prone_shared_flags} -XepDisableAllChecks $(
   find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -print0 \
     | xargs -0 grep -hoP '[^.]+$' \
     | sed -r 's,(.*),-Xep:\1:WARN,' \
+    | grep -v ErrorProneRuntimeClasspath \
     | paste -s -d ' '
 )"
 
@@ -110,7 +116,7 @@ function apply_patch() {
 
   mvn ${shared_build_flags} ${extra_build_args} \
     package "${format_goal}" \
-    -Derror-prone.flags="${error_prone_patch_flags}" \
+    -Derror-prone.configuration-args="${error_prone_patch_flags}" \
     -DskipTests
 
   if ! git diff --exit-code; then
@@ -141,7 +147,7 @@ apply_patch ''
 validation_build_log="${report_directory}/${test_name}-validation-build-log.txt"
 mvn ${shared_build_flags} \
       clean package \
-      -Derror-prone.flags="${error_prone_validation_flags}" \
+      -Derror-prone.configuration-args="${error_prone_validation_flags}" \
       -Dtest='
         !MetadataGeneratorUtilTest#metadataFilesGenerationAllFiles,
         !XdocsJavaDocsTest#allCheckSectionJavaDocs' \

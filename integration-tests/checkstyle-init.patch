@@ -1,7 +1,7 @@
 --- a/pom.xml
 +++ b/pom.xml
-@@ -334,6 +334,12 @@
-       <version>1.1.3</version>
+@@ -362,6 +362,12 @@
+       <version>1.3.0</version>
        <scope>test</scope>
      </dependency>
 +    <dependency>
@@ -13,27 +13,19 @@
      <dependency>
        <groupId>nl.jqno.equalsverifier</groupId>
        <artifactId>equalsverifier</artifactId>
-@@ -2397,8 +2403,10 @@
-                     <arg>-Xpkginfo:always</arg>
-                     <arg>-XDcompilePolicy=simple</arg>
+@@ -2412,6 +2418,8 @@
                      <arg>
--                      -Xplugin:ErrorProne
-+                      -Xplugin:ErrorProne ${error-prone.flags}
+                       -Xplugin:ErrorProne ${error-prone.configuration-args}
                      </arg>
 +                    <arg>-Xmaxwarns</arg>
 +                    <arg>1000000</arg>
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2406,6 +2414,16 @@
-                       <artifactId>error_prone_core</artifactId>
-                       <version>${error-prone.version}</version>
+@@ -2424,6 +2432,11 @@
+                       <artifactId>error-prone-contrib</artifactId>
+                       <version>${error-prone-support.version}</version>
                      </path>
-+                    <path>
-+                      <groupId>tech.picnic.error-prone-support</groupId>
-+                      <artifactId>error-prone-contrib</artifactId>
-+                      <version>${error-prone-support.version}</version>
-+                    </path>
 +                    <path>
 +                      <groupId>tech.picnic.error-prone-support</groupId>
 +                      <artifactId>refaster-runner</artifactId>
@@ -42,28 +34,22 @@
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
-@@ -2449,9 +2467,10 @@
-                     <arg>-Xpkginfo:always</arg>
+@@ -2468,9 +2481,10 @@
                      <arg>-XDcompilePolicy=simple</arg>
                      <arg>
--                      -Xplugin:ErrorProne \
--                      -XepExcludedPaths:.*[\\/]resources[\\/].*
-+                      -Xplugin:ErrorProne ${error-prone.flags}
+                       -Xplugin:ErrorProne \
+-                      -XepExcludedPaths:.*[\\/]resources[\\/].* \
+                       ${error-prone.configuration-args}
                      </arg>
 +                    <arg>-Xmaxwarns</arg>
 +                    <arg>1000000</arg>
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2459,6 +2478,16 @@
-                       <artifactId>error_prone_core</artifactId>
-                       <version>${error-prone.version}</version>
+@@ -2483,6 +2497,11 @@
+                       <artifactId>error-prone-contrib</artifactId>
+                       <version>${error-prone-support.version}</version>
                      </path>
-+                    <path>
-+                      <groupId>tech.picnic.error-prone-support</groupId>
-+                      <artifactId>error-prone-contrib</artifactId>
-+                      <version>${error-prone-support.version}</version>
-+                    </path>
 +                    <path>
 +                      <groupId>tech.picnic.error-prone-support</groupId>
 +                      <artifactId>refaster-runner</artifactId>
@@ -108,7 +94,7 @@
              .replace(RESULTS_PLACEHOLDER, String.join(",\n", results));
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
-@@ -419,6 +419,10 @@ public final class SiteUtil {
+@@ -564,6 +564,10 @@ public final class SiteUtil {
       * @return a set of properties for the given class.
       */
      public static Set<String> getPropertiesForDocumentation(Class<?> clss, Object instance) {
@@ -132,7 +118,7 @@
      @TempDir
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
-@@ -46,6 +46,8 @@ import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
+@@ -47,6 +47,8 @@ import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
  /**
   * Unit test for ConfigurationLoader.
   */
@@ -161,9 +147,21 @@
              final Object test = new PackageObjectFactory(Collections.singleton(null), classLoader,
                      TRY_IN_ALL_REGISTERED_PACKAGES);
              assertWithMessage("Exception is expected but got " + test).fail();
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
+@@ -429,6 +429,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+      *                     mock toByteArray to throw exception.
+      */
+     @Test
++    // XXX: Drop suppression once
++    // https://github.com/checkstyle/checkstyle/pull/14362 is resolved.
++    @SuppressWarnings("InputStreamReadAllBytes")
+     public void testNonExistentResource() throws IOException {
+         final Configuration config = new DefaultConfiguration("myName");
+         final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
-@@ -79,6 +79,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+@@ -81,6 +81,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
   * @noinspectionreason ClassWithTooManyDependencies - complex tests require a
   *      large number of imports
   */
