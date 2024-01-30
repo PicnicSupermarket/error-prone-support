@@ -73,7 +73,9 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
                           isType(ANN_PACKAGE_PREFIX + "RequestBody"),
                           isType(ANN_PACKAGE_PREFIX + "RequestHeader"),
                           isType(ANN_PACKAGE_PREFIX + "RequestParam"),
-                          isType(ANN_PACKAGE_PREFIX + "RequestPart"))),
+                          isType(ANN_PACKAGE_PREFIX + "RequestPart"),
+                          isType(
+                              "org.springframework.security.core.annotation.CurrentSecurityContext"))),
                   isSameType(InputStream.class.getCanonicalName()),
                   isSameType(Locale.class.getCanonicalName()),
                   isSameType(TimeZone.class.getCanonicalName()),
