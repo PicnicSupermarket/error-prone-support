@@ -14,7 +14,7 @@ jobs:
         distribution: [ temurin ]
         experimental: [ false ]
         include:
-          - os: macos-12
+          - os: macos-14
             jdk: 17.0.8
             distribution: temurin
             experimental: false
