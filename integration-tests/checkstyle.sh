@@ -2,7 +2,7 @@
 
 set -e -u -o pipefail
 
-integration_test_root="$(cd `dirname -- $0` && pwd)"
+integration_test_root="$(cd "$(dirname -- "${0}")" && pwd)"
 error_prone_support_root="${integration_test_root}/.."
 repos_root="${integration_test_root}/.repos"
 
@@ -65,8 +65,8 @@ error_prone_shared_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separato
 # in a separate Maven module.
 error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE -XepPatchChecks:$(
   find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -print0 \
-    | xargs -0 ${grep_command} -hoP '[^.]+$' \
-    | ${grep_command} -v ErrorProneRuntimeClasspath \
+    | xargs -0 "${grep_command}" -hoP '[^.]+$' \
+    | "${grep_command}" -v ErrorProneRuntimeClasspath \
     | paste -s -d ',' -
 )"
 
@@ -75,8 +75,8 @@ error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE 
 error_prone_validation_flags="${error_prone_shared_flags} -XepDisableAllChecks $(
   find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -print0 \
     | xargs -0 ${grep_command} -hoP '[^.]+$' \
-    | ${sed_command} -r 's,(.*),-Xep:\1:WARN,' \
-    | ${grep_command} -v ErrorProneRuntimeClasspath \
+    | "${sed_command}" -r 's,(.*),-Xep:\1:WARN,' \
+    | "${grep_command}" -v ErrorProneRuntimeClasspath \
     | paste -s -d ' ' -
 )"
 
@@ -166,19 +166,18 @@ mvn ${shared_build_flags} \
       -Dtest='
         !MetadataGeneratorUtilTest#metadataFilesGenerationAllFiles,
         !XdocsJavaDocsTest#allCheckSectionJavaDocs' \
-      -Dstyle.color=always \
     | tee "${validation_build_log}" \
   || failure=1
 
 # Collect the applied changes.
 expected_changes="${integration_test_root}/${test_name}-expected-changes.patch"
 actual_changes="${report_directory}/${test_name}-changes.patch"
-(git diff "${diff_base}"..HEAD | ${grep_command} -vP '^(diff|index)' || true) >"${actual_changes}"
+(git diff "${diff_base}"..HEAD | "${grep_command}" -vP '^(diff|index)' || true) > "${actual_changes}"
 
 # Collect the warnings reported by Error Prone Support checks.
 expected_warnings="${integration_test_root}/${test_name}-expected-warnings.txt"
 actual_warnings="${report_directory}/${test_name}-validation-build-warnings.txt"
-(${grep_command} -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_build_log}" | ${grep_command} -P '\] \[' || true) | LC_ALL=C sort >"${actual_warnings}"
+( "${grep_command}" -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_build_log}" | "${grep_command}" -P '\] \[' || true) | LC_ALL=C sort > "${actual_warnings}"
 
 # Persist or validate the applied changes and reported warnings.
 if [ -n "${do_sync}" ]; then
