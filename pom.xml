@@ -492,7 +492,7 @@
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>5.3.13.RELEASE</version>
+                <version>5.8.9</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
