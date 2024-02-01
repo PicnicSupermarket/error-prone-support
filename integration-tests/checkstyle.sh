@@ -177,7 +177,7 @@ actual_changes="${report_directory}/${test_name}-changes.patch"
 # Collect the warnings reported by Error Prone Support checks.
 expected_warnings="${integration_test_root}/${test_name}-expected-warnings.txt"
 actual_warnings="${report_directory}/${test_name}-validation-build-warnings.txt"
-( "${grep_command}" -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_build_log}" | "${grep_command}" -P '\] \[' || true) | LC_ALL=C sort > "${actual_warnings}"
+("${grep_command}" -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_build_log}" | "${grep_command}" -P '\] \[' || true) | LC_ALL=C sort > "${actual_warnings}"
 
 # Persist or validate the applied changes and reported warnings.
 if [ -n "${do_sync}" ]; then
@@ -186,21 +186,19 @@ if [ -n "${do_sync}" ]; then
   cp "${actual_warnings}" "${expected_warnings}"
 else
   echo 'Inspecting changes...'
-  diff_of_diffs_changes_output="${report_directory}/${test_name}-diff-of-diffs-changes.patch"
-  diff_of_diffs_warnings_output="${report_directory}/${test_name}-diff-of-diffs-warnings.patch"
   # XXX: This "diff of diffs" also contains vacuous sections, introduced due to
   # line offset differences. Try to omit those from the final output.
   if ! diff -u "${expected_changes}" "${actual_changes}"; then
     echo 'There are unexpected changes.'
-    diff -u "${expected_changes}" "${actual_changes}" > "${diff_of_diffs_changes_output}"
-    echo "Inspect the changes here: ${diff_of_diffs_changes_output}"
+    echo "Execute the following command to see the changes:"
+    echo "$ diff -u ${expected_changes} ${actual_changes}"
     failure=1
   fi
   echo 'Inspecting emitted warnings...'
   if ! diff -u "${expected_warnings}" "${actual_warnings}"; then
     echo 'Diagnostics output changed.'
-    diff -u "${expected_warnings}" "${actual_warnings}" > "${diff_of_diffs_warnings_output}"
-    echo "Inspect the changes here: ${diff_of_diffs_warnings_output}"
+    echo "Execute the following command to see the warnings:"
+    echo "$ diff -u ${expected_warnings} ${actual_warnings}"
     failure=1
   fi
 fi
