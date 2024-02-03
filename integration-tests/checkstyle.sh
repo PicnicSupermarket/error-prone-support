@@ -74,7 +74,7 @@ error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE 
 # in a separate Maven module.
 error_prone_validation_flags="${error_prone_shared_flags} -XepDisableAllChecks $(
   find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -print0 \
-    | xargs -0 ${grep_command} -hoP '[^.]+$' \
+    | xargs -0 "${grep_command}" -hoP '[^.]+$' \
     | "${sed_command}" -r 's,(.*),-Xep:\1:WARN,' \
     | "${grep_command}" -v ErrorProneRuntimeClasspath \
     | paste -s -d ' ' -
@@ -190,15 +190,15 @@ else
   # line offset differences. Try to omit those from the final output.
   if ! diff -u "${expected_changes}" "${actual_changes}"; then
     echo 'There are unexpected changes.'
-    echo "Execute the following command to see the changes:"
-    echo "$ diff -u ${expected_changes} ${actual_changes}"
+    echo "Inspect the preceding output or execute the following command to see the changes:"
+    echo "$ diff -u '${expected_changes}' '${actual_changes}'"
     failure=1
   fi
   echo 'Inspecting emitted warnings...'
   if ! diff -u "${expected_warnings}" "${actual_warnings}"; then
     echo 'Diagnostics output changed.'
-    echo "Execute the following command to see the warnings:"
-    echo "$ diff -u ${expected_warnings} ${actual_warnings}"
+    echo "Inspect the preceding output or execute the following command to see the warnings:"
+    echo "$ diff -u '${expected_warnings}' '${actual_warnings}'"
     failure=1
   fi
 fi
