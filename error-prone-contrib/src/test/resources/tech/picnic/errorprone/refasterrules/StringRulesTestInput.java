@@ -84,4 +84,8 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
   int testUtf8EncodedLength() {
     return "foo".getBytes(UTF_8).length;
   }
+
+  String testStringCopyValueOf() {
+    return String.copyValueOf(new char[] {'f', 'o', 'o'}, 0, 3);
+  }
 }

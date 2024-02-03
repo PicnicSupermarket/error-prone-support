@@ -163,6 +163,22 @@ final class StringRules {
   }
 
   /**
+   * Prefer direct invocation of {@link String#copyValueOf(char[])} over the indirection introduced
+   * by {@link String#copyValueOf(char[])}.
+   */
+  static final class StringCopyValueOf {
+    @BeforeTemplate
+    String before(char[] data, int offset, int count) {
+      return String.copyValueOf(data, offset, count);
+    }
+
+    @AfterTemplate
+    String after(char[] data, int offset, int count) {
+      return new String(data, offset, count);
+    }
+  }
+
+  /**
    * Prefer direct delegation to {@link String#valueOf(Object)} over the indirection introduced by
    * {@link Objects#toString(Object)}.
    */
