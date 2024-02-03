@@ -163,18 +163,35 @@ final class StringRules {
   }
 
   /**
-   * Prefer direct invocation of {@link String#copyValueOf(char[])} over the indirection introduced
-   * by {@link String#copyValueOf(char[])}.
+   * Prefer direct invocation of {@link String#String(char[], int, int)} over the indirection
+   * introduced by alternatives.
    */
-  static final class StringCopyValueOf {
+  static final class NewStringFromCharArraySubSequence {
     @BeforeTemplate
     String before(char[] data, int offset, int count) {
-      return String.copyValueOf(data, offset, count);
+      return Refaster.anyOf(
+          String.valueOf(data, offset, count), String.copyValueOf(data, offset, count));
     }
 
     @AfterTemplate
     String after(char[] data, int offset, int count) {
       return new String(data, offset, count);
+    }
+  }
+
+  /**
+   * Prefer direct invocation of {@link String#String(char[])} over the indirection introduced by
+   * alternatives.
+   */
+  static final class NewStringFromCharArray {
+    @BeforeTemplate
+    String before(char[] data) {
+      return Refaster.anyOf(String.valueOf(data), new String(data, 0, data.length));
+    }
+
+    @AfterTemplate
+    String after(char[] data) {
+      return new String(data);
     }
   }
 

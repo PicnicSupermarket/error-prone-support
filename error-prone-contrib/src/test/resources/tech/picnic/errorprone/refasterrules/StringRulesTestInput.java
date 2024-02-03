@@ -73,6 +73,18 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
     return Objects.toString("foo");
   }
 
+  ImmutableSet<String> testNewStringFromCharArraySubSequence() {
+    return ImmutableSet.of(
+        String.valueOf(new char[] {'f', 'o', 'o'}, 0, 1),
+        String.copyValueOf(new char[] {'b', 'a', 'r'}, 2, 3));
+  }
+
+  ImmutableSet<String> testNewStringFromCharArray() {
+    return ImmutableSet.of(
+        String.valueOf(new char[] {'f', 'o', 'o'}),
+        new String(new char[] {'b', 'a', 'r'}, 0, new char[] {'b', 'a', 'r'}.length));
+  }
+
   Function<Object, String> testStringValueOfMethodReference() {
     return Objects::toString;
   }
@@ -83,9 +95,5 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
 
   int testUtf8EncodedLength() {
     return "foo".getBytes(UTF_8).length;
-  }
-
-  String testStringCopyValueOf() {
-    return String.copyValueOf(new char[] {'f', 'o', 'o'}, 0, 3);
   }
 }
