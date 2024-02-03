@@ -189,16 +189,12 @@ else
   # XXX: This "diff of diffs" also contains vacuous sections, introduced due to
   # line offset differences. Try to omit those from the final output.
   if ! diff -u "${expected_changes}" "${actual_changes}"; then
-    echo 'There are unexpected changes.'
-    echo "Inspect the preceding output or execute the following command to see the changes:"
-    echo "$ diff -u '${expected_changes}' '${actual_changes}'"
+    echo 'There are unexpected changes. Inspect the preceding output for details.'
     failure=1
   fi
   echo 'Inspecting emitted warnings...'
   if ! diff -u "${expected_warnings}" "${actual_warnings}"; then
-    echo 'Diagnostics output changed.'
-    echo "Inspect the preceding output or execute the following command to see the warnings:"
-    echo "$ diff -u '${expected_warnings}' '${actual_warnings}'"
+    echo 'Diagnostics output changed. Inspect the preceding output for details.'
     failure=1
   fi
 fi
