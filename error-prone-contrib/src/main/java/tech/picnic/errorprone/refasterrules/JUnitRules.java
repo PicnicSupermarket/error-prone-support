@@ -23,6 +23,7 @@ final class JUnitRules {
     }
 
     @AfterTemplate
+    @SuppressWarnings("JUnitSingleArguments" /* The bugpattern does not understand Repeated. */)
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Arguments after(@Repeated T objects) {
       return arguments(objects);
