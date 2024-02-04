@@ -10,8 +10,8 @@
 
     <artifactId>error-prone-guidelines</artifactId>
 
-    <name>Picnic :: Error Prone Support :: Error Prone Guidelines</name>
-    <description>Error Prone checks defining coding guidelines for the Error Prone project.</description>
+    <name>Picnic :: Error Prone Support :: Guidelines</name>
+    <description>Coding guidelines for the Error Prone Support project.</description>
     <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
@@ -59,11 +59,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.auto.value</groupId>
-            <artifactId>auto-value-annotations</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.google.googlejavaformat</groupId>
             <artifactId>google-java-format</artifactId>
         </dependency>
@@ -93,11 +88,6 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

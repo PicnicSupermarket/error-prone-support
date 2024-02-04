@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.guidelines.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
@@ -14,7 +14,7 @@ final class ErrorProneTestHelperSourceFormatTest {
             "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
             "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
             "import com.google.errorprone.CompilationTestHelper;",
-            "import tech.picnic.errorprone.bugpatterns.RefasterAnyOfUsage;",
+            "import tech.picnic.errorprone.guidelines.bugpatterns.RefasterAnyOfUsage;",
             "",
             "class A {",
             "  private final CompilationTestHelper compilationTestHelper =",
@@ -63,7 +63,7 @@ final class ErrorProneTestHelperSourceFormatTest {
             "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
             "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
             "import com.google.errorprone.CompilationTestHelper;",
-            "import tech.picnic.errorprone.bugpatterns.RefasterAnyOfUsage;",
+            "import tech.picnic.errorprone.guidelines.bugpatterns.RefasterAnyOfUsage;",
             "",
             "class A {",
             "  private final CompilationTestHelper compilationTestHelper =",
@@ -105,7 +105,7 @@ final class ErrorProneTestHelperSourceFormatTest {
             "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
             "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
             "import com.google.errorprone.CompilationTestHelper;",
-            "import tech.picnic.errorprone.bugpatterns.RefasterAnyOfUsage;",
+            "import tech.picnic.errorprone.guidelines.bugpatterns.RefasterAnyOfUsage;",
             "",
             "class A {",
             "  private final CompilationTestHelper compilationTestHelper =",

@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.guidelines.bugpatterns;
 
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
@@ -36,6 +36,8 @@ import tech.picnic.errorprone.utils.SourceCode;
  * <p>The arguments to such methods can be flattened without affecting semantics, while making the
  * code more readable.
  */
+// XXX: Move this check to the `error-prone-contrib` module once it also covers non-Error Prone
+// methods.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =

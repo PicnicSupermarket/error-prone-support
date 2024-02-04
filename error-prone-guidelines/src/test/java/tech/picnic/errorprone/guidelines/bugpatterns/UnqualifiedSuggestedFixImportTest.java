@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.guidelines.bugpatterns;
 
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
