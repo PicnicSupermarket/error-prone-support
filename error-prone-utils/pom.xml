@@ -32,11 +32,6 @@
         </dependency>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_test_helpers</artifactId>
             <scope>provided</scope>
         </dependency>
