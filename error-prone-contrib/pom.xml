@@ -50,6 +50,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>error-prone-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>refaster-support</artifactId>
             <scope>provided</scope>
         </dependency>

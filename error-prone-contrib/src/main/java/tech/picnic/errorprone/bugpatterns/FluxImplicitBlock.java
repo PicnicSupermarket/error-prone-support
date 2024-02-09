@@ -6,7 +6,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.CONCURRENCY;
 import static com.google.errorprone.BugPattern.StandardTags.PERFORMANCE;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
@@ -27,7 +27,7 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.util.Position;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import tech.picnic.errorprone.bugpatterns.util.ThirdPartyLibrary;
+import tech.picnic.errorprone.utils.ThirdPartyLibrary;
 
 /**
  * A {@link BugChecker} that flags {@link reactor.core.publisher.Flux} operator usages that may

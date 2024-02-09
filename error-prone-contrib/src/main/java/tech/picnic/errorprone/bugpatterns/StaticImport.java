@@ -6,7 +6,7 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.bugpatterns.NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS;
 import static tech.picnic.errorprone.bugpatterns.NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
@@ -132,7 +132,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           "org.springframework.http.MediaType",
           "org.testng.Assert",
           "reactor.function.TupleUtils",
-          "tech.picnic.errorprone.bugpatterns.util.MoreTypes");
+          "tech.picnic.errorprone.utils.MoreTypes");
 
   /**
    * Type members that should be statically imported.

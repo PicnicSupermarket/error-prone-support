@@ -7,7 +7,7 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.sun.tools.javac.code.TypeAnnotations.AnnotationType.DECLARATION;
 import static com.sun.tools.javac.code.TypeAnnotations.AnnotationType.TYPE;
 import static java.util.Comparator.comparing;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
@@ -28,7 +28,7 @@ import com.sun.tools.javac.code.TypeAnnotations.AnnotationType;
 import java.util.Comparator;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags annotations that are not lexicographically sorted.
