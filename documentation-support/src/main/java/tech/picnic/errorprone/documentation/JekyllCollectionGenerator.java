@@ -50,6 +50,9 @@ import tech.picnic.errorprone.documentation.models.RefasterTemplateCollectionTes
 import tech.picnic.errorprone.documentation.models.RefasterTemplateTestData;
 
 // XXX: Rename this class. Then also update the reference in `website/.gitignore`.
+// XXX: Now that we have bug checkers in multiple Maven modules, we should
+// likely document the source of each check on the website, perhaps even
+// grouping them by module.
 public final class JekyllCollectionGenerator {
   // XXX: Find a bette name. Also, externalize this.
   private static final PathMatcher PATH_MATCHER =

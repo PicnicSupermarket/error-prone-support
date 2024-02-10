@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.refasterrules;
+package tech.picnic.errorprone.refasterrules.output;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.ByteStreams;
