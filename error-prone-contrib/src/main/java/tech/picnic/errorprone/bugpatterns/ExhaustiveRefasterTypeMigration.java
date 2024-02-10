@@ -10,7 +10,7 @@ import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toCollection;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.common.AnnotationMirrors;
 import com.google.auto.service.AutoService;
