@@ -22,15 +22,11 @@ import static java.util.stream.Collectors.summarizingLong;
 import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
-import java.util.Collection;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -38,7 +34,6 @@ import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -49,8 +44,12 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         ImmutableList.class,
+        ImmutableMap.class,
+        List.class,
+        Map.class,
         Objects.class,
         Streams.class,
+        collectingAndThen(null, null),
         counting(),
         filtering(null, null),
         flatMapping(null, null),
@@ -65,7 +64,9 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         summarizingLong(null),
         summingDouble(null),
         summingInt(null),
-        summingLong(null));
+        summingLong(null),
+        toImmutableList(),
+        toImmutableMap(null, null));
   }
 
   String testJoining() {
@@ -119,43 +120,18 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of("bar").map(String::length).findFirst());
   }
 
-  Boolean testStreamCollectingAndThenCollectionIsEmpty() {
-    return Stream.of(1).collect(collectingAndThen(toList(), Collection::isEmpty));
-  }
-
-  Boolean testStreamCollectingAndThenImmutableListIsEmpty() {
-    return Stream.of(1).collect(collectingAndThen(toImmutableList(), ImmutableList::isEmpty));
-  }
-
-  Boolean testStreamCollectingAndThenListIsEmpty() {
-    return Stream.of(1).collect(collectingAndThen(toList(), List::isEmpty));
-  }
-
-  Boolean testStreamCollectingAndThenImmutableSetIsEmpty() {
-    return Stream.of(1).collect(collectingAndThen(toImmutableSet(), ImmutableSet::isEmpty));
-  }
-
-  Boolean testStreamCollectingAndThenSetIsEmpty() {
-    return Stream.of(1).collect(collectingAndThen(toSet(), Set::isEmpty));
-  }
-
-  Boolean testStreamCollectingAndThenImmutableMapIsEmpty() {
-    return Stream.of(1)
-        .collect(
-            collectingAndThen(toImmutableMap(key -> key, value -> value), ImmutableMap::isEmpty));
-  }
-
-  Boolean testStreamCollectingAndThenMapIsEmpty() {
-    return Stream.of(1).collect(collectingAndThen(toMap(key -> key, value -> value), Map::isEmpty));
-  }
-
   ImmutableSet<Boolean> testStreamIsEmpty() {
     return ImmutableSet.of(
         Stream.of(1).count() == 0,
         Stream.of(2).count() <= 0,
         Stream.of(3).count() < 1,
         Stream.of(4).findFirst().isEmpty(),
-        Stream.of(5).collect(toImmutableSet()).isEmpty());
+        Stream.of(5).collect(toImmutableSet()).isEmpty(),
+        Stream.of(6).collect(collectingAndThen(toImmutableList(), List::isEmpty)),
+        Stream.of(7).collect(collectingAndThen(toImmutableList(), ImmutableList::isEmpty)),
+        Stream.of(8).collect(collectingAndThen(toImmutableMap(k -> k, v -> v), Map::isEmpty)),
+        Stream.of(9)
+            .collect(collectingAndThen(toImmutableMap(k -> k, v -> v), ImmutableMap::isEmpty)));
   }
 
   ImmutableSet<Boolean> testStreamIsNotEmpty() {

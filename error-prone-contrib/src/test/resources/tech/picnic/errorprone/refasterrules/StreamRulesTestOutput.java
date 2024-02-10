@@ -1,11 +1,14 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.filtering;
 import static java.util.stream.Collectors.flatMapping;
@@ -22,12 +25,15 @@ import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
+import java.util.List;
 import java.util.LongSummaryStatistics;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -40,8 +46,12 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         ImmutableList.class,
+        ImmutableMap.class,
+        List.class,
+        Map.class,
         Objects.class,
         Streams.class,
+        collectingAndThen(null, null),
         counting(),
         filtering(null, null),
         flatMapping(null, null),
@@ -56,7 +66,9 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         summarizingLong(null),
         summingDouble(null),
         summingInt(null),
-        summingLong(null));
+        summingLong(null),
+        toImmutableList(),
+        toImmutableMap(null, null));
   }
 
   String testJoining() {
@@ -109,41 +121,17 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of("bar").findFirst().map(String::length));
   }
 
-  Boolean testStreamCollectingAndThenCollectionIsEmpty() {
-    return Stream.of(1).findAny().isEmpty();
-  }
-
-  Boolean testStreamCollectingAndThenImmutableListIsEmpty() {
-    return Stream.of(1).findAny().isEmpty();
-  }
-
-  Boolean testStreamCollectingAndThenListIsEmpty() {
-    return Stream.of(1).findAny().isEmpty();
-  }
-
-  Boolean testStreamCollectingAndThenImmutableSetIsEmpty() {
-    return Stream.of(1).findAny().isEmpty();
-  }
-
-  Boolean testStreamCollectingAndThenSetIsEmpty() {
-    return Stream.of(1).findAny().isEmpty();
-  }
-
-  Boolean testStreamCollectingAndThenImmutableMapIsEmpty() {
-    return Stream.of(1).findAny().isEmpty();
-  }
-
-  Boolean testStreamCollectingAndThenMapIsEmpty() {
-    return Stream.of(1).findAny().isEmpty();
-  }
-
   ImmutableSet<Boolean> testStreamIsEmpty() {
     return ImmutableSet.of(
         Stream.of(1).findAny().isEmpty(),
         Stream.of(2).findAny().isEmpty(),
         Stream.of(3).findAny().isEmpty(),
         Stream.of(4).findAny().isEmpty(),
-        Stream.of(5).findAny().isEmpty());
+        Stream.of(5).findAny().isEmpty(),
+        Stream.of(6).findAny().isEmpty(),
+        Stream.of(7).findAny().isEmpty(),
+        Stream.of(8).findAny().isEmpty(),
+        Stream.of(9).findAny().isEmpty());
   }
 
   ImmutableSet<Boolean> testStreamIsNotEmpty() {

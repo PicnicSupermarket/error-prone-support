@@ -21,8 +21,6 @@ import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
@@ -39,12 +37,10 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
-import java.util.List;
 import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -256,112 +252,25 @@ final class StreamRules {
     }
   }
 
-  // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
-  static final class StreamCollectingAndThenCollectionIsEmpty<T> {
-    @BeforeTemplate
-    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends Collection<?>> collector) {
-      return stream.collect(collectingAndThen(collector, Collection::isEmpty));
-    }
-
-    @AfterTemplate
-    boolean after(Stream<T> stream) {
-      return stream.findAny().isEmpty();
-    }
-  }
-
-  // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
-  static final class StreamCollectingAndThenImmutableListIsEmpty<T> {
-    @BeforeTemplate
-    boolean before(
-        Stream<T> stream, Collector<? super T, ?, ? extends ImmutableList<?>> collector) {
-      return stream.collect(collectingAndThen(collector, ImmutableList::isEmpty));
-    }
-
-    @AfterTemplate
-    boolean after(Stream<T> stream) {
-      return stream.findAny().isEmpty();
-    }
-  }
-
-  // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
-  static final class StreamCollectingAndThenListIsEmpty<T> {
-    @BeforeTemplate
-    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends List<?>> collector) {
-      return stream.collect(collectingAndThen(collector, List::isEmpty));
-    }
-
-    @AfterTemplate
-    boolean after(Stream<T> stream) {
-      return stream.findAny().isEmpty();
-    }
-  }
-
-  // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
-  static final class StreamCollectingAndThenImmutableSetIsEmpty<T> {
-    @BeforeTemplate
-    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends ImmutableSet<?>> collector) {
-      return stream.collect(collectingAndThen(collector, ImmutableSet::isEmpty));
-    }
-
-    @AfterTemplate
-    boolean after(Stream<T> stream) {
-      return stream.findAny().isEmpty();
-    }
-  }
-
-  // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
-  static final class StreamCollectingAndThenSetIsEmpty<T> {
-    @BeforeTemplate
-    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends Set<?>> collector) {
-      return stream.collect(collectingAndThen(collector, Set::isEmpty));
-    }
-
-    @AfterTemplate
-    boolean after(Stream<T> stream) {
-      return stream.findAny().isEmpty();
-    }
-  }
-
-  // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
-  static final class StreamCollectingAndThenImmutableMapIsEmpty<T> {
-    @BeforeTemplate
-    boolean before(
-        Stream<T> stream, Collector<? super T, ?, ? extends ImmutableMap<?, ?>> collector) {
-      return stream.collect(collectingAndThen(collector, ImmutableMap::isEmpty));
-    }
-
-    @AfterTemplate
-    boolean after(Stream<T> stream) {
-      return stream.findAny().isEmpty();
-    }
-  }
-
-  // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
-  static final class StreamCollectingAndThenMapIsEmpty<T> {
-    @BeforeTemplate
-    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends Map<?, ?>> collector) {
-      return stream.collect(collectingAndThen(collector, Map::isEmpty));
-    }
-
-    @AfterTemplate
-    boolean after(Stream<T> stream) {
-      return stream.findAny().isEmpty();
-    }
-  }
-
   /** In order to test whether a stream has any element, simply try to find one. */
   // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
   // (Perhaps we could add a `@Matches` guard that validates that the collector expression does not
   // contain a `Collectors#filtering` call. That'd still not be 100% accurate, though.)
-  static final class StreamIsEmpty<T> {
+  static final class StreamIsEmpty<T, K, V, C extends Collection<K>, M extends Map<K, V>> {
     @BeforeTemplate
-    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends Collection<?>> collector) {
+    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends C> collector) {
       return Refaster.anyOf(
           stream.count() == 0,
           stream.count() <= 0,
           stream.count() < 1,
           stream.findFirst().isEmpty(),
-          stream.collect(collector).isEmpty());
+          stream.collect(collector).isEmpty(),
+          stream.collect(collectingAndThen(collector, C::isEmpty)));
+    }
+
+    @BeforeTemplate
+    boolean before2(Stream<T> stream, Collector<? super T, ?, ? extends M> collector) {
+      return stream.collect(collectingAndThen(collector, M::isEmpty));
     }
 
     @AfterTemplate
