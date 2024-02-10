@@ -29,7 +29,8 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         !ImmutableSet.of(5).isEmpty(),
         !ImmutableSet.of(6).isEmpty(),
         ImmutableSet.of(7).isEmpty(),
-        ImmutableSet.of(8).isEmpty());
+        ImmutableSet.of(8).isEmpty(),
+        ImmutableSet.of(9).isEmpty());
   }
 
   ImmutableSet<Integer> testCollectionSize() {

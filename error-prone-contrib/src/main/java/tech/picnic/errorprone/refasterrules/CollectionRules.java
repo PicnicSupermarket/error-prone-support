@@ -41,7 +41,8 @@ final class CollectionRules {
           collection.size() == 0,
           collection.size() <= 0,
           collection.size() < 1,
-          Iterables.isEmpty(collection));
+          Iterables.isEmpty(collection),
+          collection.stream().findAny().isEmpty());
     }
 
     @BeforeTemplate
