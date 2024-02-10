@@ -109,6 +109,34 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of("bar").findFirst().map(String::length));
   }
 
+  Boolean testStreamCollectingAndThenCollectionIsEmpty() {
+    return Stream.of(1).findAny().isEmpty();
+  }
+
+  Boolean testStreamCollectingAndThenImmutableListIsEmpty() {
+    return Stream.of(1).findAny().isEmpty();
+  }
+
+  Boolean testStreamCollectingAndThenListIsEmpty() {
+    return Stream.of(1).findAny().isEmpty();
+  }
+
+  Boolean testStreamCollectingAndThenImmutableSetIsEmpty() {
+    return Stream.of(1).findAny().isEmpty();
+  }
+
+  Boolean testStreamCollectingAndThenSetIsEmpty() {
+    return Stream.of(1).findAny().isEmpty();
+  }
+
+  Boolean testStreamCollectingAndThenImmutableMapIsEmpty() {
+    return Stream.of(1).findAny().isEmpty();
+  }
+
+  Boolean testStreamCollectingAndThenMapIsEmpty() {
+    return Stream.of(1).findAny().isEmpty();
+  }
+
   ImmutableSet<Boolean> testStreamIsEmpty() {
     return ImmutableSet.of(
         Stream.of(1).findAny().isEmpty(),

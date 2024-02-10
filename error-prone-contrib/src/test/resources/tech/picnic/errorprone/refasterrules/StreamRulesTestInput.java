@@ -1,10 +1,13 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.filtering;
 import static java.util.stream.Collectors.flatMapping;
@@ -19,15 +22,23 @@ import static java.util.stream.Collectors.summarizingLong;
 import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import java.util.Collection;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
+import java.util.List;
 import java.util.LongSummaryStatistics;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -106,6 +117,36 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Stream.of("foo").map(s -> s.length()).findFirst(),
         Stream.of("bar").map(String::length).findFirst());
+  }
+
+  Boolean testStreamCollectingAndThenCollectionIsEmpty() {
+    return Stream.of(1).collect(collectingAndThen(toList(), Collection::isEmpty));
+  }
+
+  Boolean testStreamCollectingAndThenImmutableListIsEmpty() {
+    return Stream.of(1).collect(collectingAndThen(toImmutableList(), ImmutableList::isEmpty));
+  }
+
+  Boolean testStreamCollectingAndThenListIsEmpty() {
+    return Stream.of(1).collect(collectingAndThen(toList(), List::isEmpty));
+  }
+
+  Boolean testStreamCollectingAndThenImmutableSetIsEmpty() {
+    return Stream.of(1).collect(collectingAndThen(toImmutableSet(), ImmutableSet::isEmpty));
+  }
+
+  Boolean testStreamCollectingAndThenSetIsEmpty() {
+    return Stream.of(1).collect(collectingAndThen(toSet(), Set::isEmpty));
+  }
+
+  Boolean testStreamCollectingAndThenImmutableMapIsEmpty() {
+    return Stream.of(1)
+        .collect(
+            collectingAndThen(toImmutableMap(key -> key, value -> value), ImmutableMap::isEmpty));
+  }
+
+  Boolean testStreamCollectingAndThenMapIsEmpty() {
+    return Stream.of(1).collect(collectingAndThen(toMap(key -> key, value -> value), Map::isEmpty));
   }
 
   ImmutableSet<Boolean> testStreamIsEmpty() {
