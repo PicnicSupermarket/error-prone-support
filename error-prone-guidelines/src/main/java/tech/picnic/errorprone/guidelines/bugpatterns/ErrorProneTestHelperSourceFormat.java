@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.guidelines.bugpatterns;
 
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;

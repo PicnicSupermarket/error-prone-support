@@ -42,6 +42,7 @@
         <module>documentation-support</module>
         <module>error-prone-contrib</module>
         <module>error-prone-experimental</module>
+        <module>error-prone-guidelines</module>
         <module>error-prone-utils</module>
         <module>refaster-compiler</module>
         <module>refaster-runner</module>
@@ -260,6 +261,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>error-prone-experimental</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>error-prone-guidelines</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1616,6 +1622,11 @@
                                 <path>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>error-prone-experimental</artifactId>
+                                    <version>${project.version}</version>
+                                </path>
+                                <path>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>error-prone-guidelines</artifactId>
                                     <version>${project.version}</version>
                                 </path>
                                 <path>
