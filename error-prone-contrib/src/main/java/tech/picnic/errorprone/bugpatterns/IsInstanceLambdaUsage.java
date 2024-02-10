@@ -23,10 +23,9 @@ import tech.picnic.errorprone.utils.SourceCode;
 /**
  * A {@link BugChecker} that flags lambda expressions that can be replaced with a method reference
  * of the form {@code T.class::isInstance}.
- *
- * @see MethodReferenceUsage
  */
-// XXX: Consider folding this logic into the `MethodReferenceUsage` check.
+// XXX: Consider folding this logic into the `MethodReferenceUsage` check of the
+// `error-prone-experimental` module.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `Class::isInstance` method reference over equivalent lambda expression",

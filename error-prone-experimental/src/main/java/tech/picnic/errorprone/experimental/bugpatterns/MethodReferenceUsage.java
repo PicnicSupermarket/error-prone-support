@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.experimental.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
@@ -37,8 +37,6 @@ import javax.lang.model.element.Name;
 
 /**
  * A {@link BugChecker} that flags lambda expressions that can be replaced with method references.
- *
- * @see IsInstanceLambdaUsage
  */
 // XXX: Other custom expressions we could rewrite:
 // - `a -> "str" + a` to `"str"::concat`. But only if `str` is provably non-null.
@@ -54,7 +52,8 @@ import javax.lang.model.element.Name;
 // Palantir's `LambdaMethodReference` check seems to suffer a similar issue at this time.
 // XXX: Expressions of the form `i -> SomeType.class.isInstance(i)` are not replaced; fix that using
 // a suitable generalization.
-// XXX: Consider folding the `IsInstanceLambdaUsage` check into this class.
+// XXX: Consider folding the `IsInstanceLambdaUsage` check of the `error-prone-contrib` module into
+// this class.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer method references over lambda expressions",
