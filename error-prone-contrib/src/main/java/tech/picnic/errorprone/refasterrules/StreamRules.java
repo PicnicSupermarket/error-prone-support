@@ -269,10 +269,6 @@ final class StreamRules {
     }
   }
 
-  // cannot fit the @BeforeTemplates in the same rule, since they have the same signature (only
-  // difference
-  // is reduction type of the collector)
-
   // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
   static final class StreamCollectingAndThenImmutableListIsEmpty<T> {
     @BeforeTemplate
