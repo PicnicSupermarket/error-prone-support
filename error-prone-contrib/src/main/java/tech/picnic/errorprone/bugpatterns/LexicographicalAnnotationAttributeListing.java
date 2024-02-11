@@ -51,6 +51,9 @@ import tech.picnic.errorprone.utils.SourceCode;
  * <p>The idea behind this checker is that maintaining a sorted sequence simplifies conflict
  * resolution, and can even avoid it if two branches add the same entry.
  */
+// XXX: In some places we declare a `@SuppressWarnings` annotation with a final value of
+// `key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict`. That entry must stay
+// last. Consider adding (generic?) support for such cases.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Where possible, sort annotation array attributes lexicographically",
