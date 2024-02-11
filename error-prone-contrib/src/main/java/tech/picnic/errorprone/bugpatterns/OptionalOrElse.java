@@ -45,7 +45,9 @@ import tech.picnic.errorprone.utils.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Prefer `Optional#orElseGet` over `Optional#orElse` if the fallback requires additional computation",
+        """
+        Prefer `Optional#orElseGet` over `Optional#orElse` if the fallback requires additional \
+        computation""",
     linkType = NONE,
     severity = WARNING,
     tags = PERFORMANCE)
@@ -96,40 +98,38 @@ public final class OptionalOrElse extends BugChecker implements MethodInvocation
   private static boolean requiresComputation(ExpressionTree tree) {
     return !(tree instanceof IdentifierTree
         || tree instanceof LiteralTree
-        || (tree instanceof MemberSelectTree
-            && !requiresComputation(((MemberSelectTree) tree).getExpression()))
+        || (tree instanceof MemberSelectTree memberSelect
+            && !requiresComputation(memberSelect.getExpression()))
         || ASTHelpers.constValue(tree) != null);
   }
 
   /** Returns the nullary method reference matching the given expression, if any. */
   private static Optional<String> tryMethodReferenceConversion(
       ExpressionTree tree, VisitorState state) {
-    if (!(tree instanceof MethodInvocationTree)) {
+    if (!(tree instanceof MethodInvocationTree methodInvocation)) {
       return Optional.empty();
     }
 
-    MethodInvocationTree invocation = (MethodInvocationTree) tree;
-    if (!invocation.getArguments().isEmpty()) {
+    if (!methodInvocation.getArguments().isEmpty()) {
       return Optional.empty();
     }
 
-    if (!(invocation.getMethodSelect() instanceof MemberSelectTree)) {
+    if (!(methodInvocation.getMethodSelect() instanceof MemberSelectTree memberSelect)) {
       return Optional.empty();
     }
 
-    MemberSelectTree method = (MemberSelectTree) invocation.getMethodSelect();
-    if (requiresComputation(method.getExpression())) {
+    if (requiresComputation(memberSelect.getExpression())) {
       return Optional.empty();
     }
 
     return Optional.of(
-        SourceCode.treeToString(method.getExpression(), state)
+        SourceCode.treeToString(memberSelect.getExpression(), state)
             + "::"
-            + (invocation.getTypeArguments().isEmpty()
+            + (methodInvocation.getTypeArguments().isEmpty()
                 ? ""
-                : invocation.getTypeArguments().stream()
+                : methodInvocation.getTypeArguments().stream()
                     .map(arg -> SourceCode.treeToString(arg, state))
                     .collect(joining(",", "<", ">")))
-            + method.getIdentifier());
+            + memberSelect.getIdentifier());
   }
 }
