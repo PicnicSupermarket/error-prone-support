@@ -34,7 +34,9 @@ import java.time.ZonedDateTime;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone",
+        """
+        Derive the current time from an existing `Clock` Spring bean, and don't rely on a \
+        `Clock`'s time zone""",
     link = BUG_PATTERNS_BASE_URL + "TimeZoneUsage",
     linkType = CUSTOM,
     severity = WARNING,
