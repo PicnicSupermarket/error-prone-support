@@ -136,16 +136,13 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   }
 
   private static Optional<SeverityLevel> toSeverityLevel(Severity severity) {
-    switch (severity) {
-      case DEFAULT:
-        return Optional.empty();
-      case WARN:
-        return Optional.of(WARNING);
-      case ERROR:
-        return Optional.of(ERROR);
-      default:
-        throw new IllegalStateException(String.format("Unsupported severity='%s'", severity));
-    }
+    return switch (severity) {
+      case DEFAULT -> Optional.empty();
+      case WARN -> Optional.of(WARNING);
+      case ERROR -> Optional.of(ERROR);
+      default ->
+          throw new IllegalStateException(String.format("Unsupported severity='%s'", severity));
+    };
   }
 
   /**

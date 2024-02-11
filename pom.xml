@@ -211,7 +211,7 @@
         <version.error-prone-orig>2.24.1</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.22</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
-        <version.jdk>11</version.jdk>
+        <version.jdk>17</version.jdk>
         <version.maven>3.9.5</version.maven>
         <version.mockito>5.10.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
@@ -467,14 +467,6 @@
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-core</artifactId>
                 <version>4.11.1</version>
-                <!-- XXX: Drop this exclusion once we forgo enforcement of JDK
-                11 bytecode version compatibility. -->
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mongodb</groupId>
-                        <artifactId>bson-record-codec</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.openrewrite</groupId>
@@ -2016,11 +2008,6 @@
         </profile>
         <profile>
             <id>sonar</id>
-            <activation>
-                <property>
-                    <name>sonar.projectKey</name>
-                </property>
-            </activation>
             <properties>
                 <maven.test.failure.ignore>true</maven.test.failure.ignore>
             </properties>

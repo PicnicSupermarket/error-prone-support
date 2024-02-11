@@ -331,36 +331,32 @@ public final class RedundantStringConversion extends BugChecker
   }
 
   private Optional<ExpressionTree> trySimplify(ExpressionTree tree, VisitorState state) {
-    if (tree.getKind() != Kind.METHOD_INVOCATION) {
+    if (!(tree instanceof MethodInvocationTree methodInvocation)) {
       return Optional.empty();
     }
 
-    MethodInvocationTree methodInvocation = (MethodInvocationTree) tree;
     if (!conversionMethodMatcher.matches(methodInvocation, state)) {
       return Optional.empty();
     }
 
-    switch (methodInvocation.getArguments().size()) {
-      case 0:
-        return trySimplifyNullaryMethod(methodInvocation, state);
-      case 1:
-        return trySimplifyUnaryMethod(methodInvocation, state);
-      default:
-        throw new IllegalStateException(
-            "Cannot simplify method call with two or more arguments: "
-                + SourceCode.treeToString(tree, state));
-    }
+    return switch (methodInvocation.getArguments().size()) {
+      case 0 -> trySimplifyNullaryMethod(methodInvocation, state);
+      case 1 -> trySimplifyUnaryMethod(methodInvocation, state);
+      default ->
+          throw new IllegalStateException(
+              "Cannot simplify method call with two or more arguments: "
+                  + SourceCode.treeToString(tree, state));
+    };
   }
 
   private static Optional<ExpressionTree> trySimplifyNullaryMethod(
       MethodInvocationTree methodInvocation, VisitorState state) {
-    if (!instanceMethod().matches(methodInvocation, state)) {
+    if (!instanceMethod().matches(methodInvocation, state)
+        || !(methodInvocation.getMethodSelect() instanceof MemberSelectTree memberSelect)) {
       return Optional.empty();
     }
 
-    return Optional.of(methodInvocation.getMethodSelect())
-        .filter(methodSelect -> methodSelect.getKind() == Kind.MEMBER_SELECT)
-        .map(methodSelect -> ((MemberSelectTree) methodSelect).getExpression())
+    return Optional.of(memberSelect.getExpression())
         .filter(expr -> !"super".equals(SourceCode.treeToString(expr, state)));
   }
 

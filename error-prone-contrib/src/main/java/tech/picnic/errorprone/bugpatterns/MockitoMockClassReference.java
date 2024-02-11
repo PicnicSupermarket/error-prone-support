@@ -67,20 +67,19 @@ public final class MockitoMockClassReference extends BugChecker
     return describeMatch(tree, SuggestedFixes.removeElement(arguments.get(0), arguments, state));
   }
 
+  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static boolean isTypeDerivableFromContext(MethodInvocationTree tree, VisitorState state) {
     Tree parent = state.getPath().getParentPath().getLeaf();
-    switch (parent.getKind()) {
-      case VARIABLE:
-        return !ASTHelpers.hasImplicitType((VariableTree) parent, state)
-            && MoreASTHelpers.areSameType(tree, parent, state);
-      case ASSIGNMENT:
-        return MoreASTHelpers.areSameType(tree, parent, state);
-      case RETURN:
-        return MoreASTHelpers.findMethodExitedOnReturn(state)
-            .filter(m -> MoreASTHelpers.areSameType(tree, m.getReturnType(), state))
-            .isPresent();
-      default:
-        return false;
-    }
+    return switch (parent.getKind()) {
+      case VARIABLE ->
+          !ASTHelpers.hasImplicitType((VariableTree) parent, state)
+              && MoreASTHelpers.areSameType(tree, parent, state);
+      case ASSIGNMENT -> MoreASTHelpers.areSameType(tree, parent, state);
+      case RETURN ->
+          MoreASTHelpers.findMethodExitedOnReturn(state)
+              .filter(m -> MoreASTHelpers.areSameType(tree, m.getReturnType(), state))
+              .isPresent();
+      default -> false;
+    };
   }
 }

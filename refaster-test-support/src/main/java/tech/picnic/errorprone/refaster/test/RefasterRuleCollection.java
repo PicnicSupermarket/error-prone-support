@@ -154,8 +154,8 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     String expectedClassName = ruleCollectionUnderTest + "Test";
 
     for (Tree typeDeclaration : tree.getTypeDecls()) {
-      if (typeDeclaration instanceof ClassTree) {
-        if (!((ClassTree) typeDeclaration).getSimpleName().contentEquals(expectedClassName)) {
+      if (typeDeclaration instanceof ClassTree classTree) {
+        if (!classTree.getSimpleName().contentEquals(expectedClassName)) {
           state.reportMatch(
               describeMatch(
                   typeDeclaration,
@@ -276,9 +276,10 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
             unexpectedMatchesByLineNumber.entries().stream()
                 .map(
                     e ->
-                        String.format(
-                            "Rule `%s` matches on line %s, while it should match in a method named `test%s`.",
-                            e.getValue(), e.getKey(), e.getValue()))
+                        """
+                        Rule `%s` matches on line %s, while it should match in a method named \
+                        `test%s`."""
+                            .formatted(e.getValue(), e.getKey(), e.getValue()))
                 .collect(toImmutableSet()),
             state);
       }

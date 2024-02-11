@@ -93,13 +93,20 @@ final class DocumentationGeneratorTaskListenerTest {
         "DocumentationGeneratorTaskListenerTestClass.java",
         "class DocumentationGeneratorTaskListenerTestClass {}");
 
-    // XXX: Once we support only JDK 15+, use a text block for the `expected` string.
     assertThat(
             outputDirectory.resolve(
                 "documentation-generator-task-listener-test-DocumentationGeneratorTaskListenerTestClass.json"))
         .content(UTF_8)
         .isEqualToIgnoringWhitespace(
-            "{\"className\":\"DocumentationGeneratorTaskListenerTestClass\",\"path\":[\"CLASS: DocumentationGeneratorTaskListenerTestClass\",\"COMPILATION_UNIT\"]}");
+            """
+            {
+              "className": "DocumentationGeneratorTaskListenerTestClass",
+              "path": [
+                "CLASS: DocumentationGeneratorTaskListenerTestClass",
+                "COMPILATION_UNIT"
+              ]
+            }
+            """);
   }
 
   @Immutable
@@ -125,8 +132,8 @@ final class DocumentationGeneratorTaskListenerTest {
     }
 
     private static String describeTree(Tree tree) {
-      return (tree instanceof ClassTree)
-          ? String.join(": ", String.valueOf(tree.getKind()), ((ClassTree) tree).getSimpleName())
+      return (tree instanceof ClassTree clazz)
+          ? String.join(": ", String.valueOf(tree.getKind()), clazz.getSimpleName())
           : tree.getKind().toString();
     }
   }

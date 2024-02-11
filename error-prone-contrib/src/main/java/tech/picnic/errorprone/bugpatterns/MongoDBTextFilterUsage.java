@@ -24,7 +24,9 @@ import com.sun.source.tree.MethodInvocationTree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Avoid MongoDB's `$text` filter operator, as it can trigger heavy queries and even cause the server to run out of memory",
+        """
+        Avoid MongoDB's `$text` filter operator, as it can trigger heavy queries and even cause \
+        the server to run out of memory""",
     link = BUG_PATTERNS_BASE_URL + "MongoDBTextFilterUsage",
     linkType = CUSTOM,
     severity = SUGGESTION,

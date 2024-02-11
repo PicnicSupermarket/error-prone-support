@@ -23,7 +23,7 @@ public final class IsLikelyTrivialComputation implements Matcher<ExpressionTree>
 
   @Override
   public boolean matches(ExpressionTree expressionTree, VisitorState state) {
-    if (expressionTree instanceof MethodInvocationTree) {
+    if (expressionTree instanceof MethodInvocationTree methodInvocation) {
       // XXX: Method invocations are generally *not* trivial computations, but we make an exception
       // for nullary method invocations on the result of a trivial computation. This exception
       // allows this `Matcher` to by the `OptionalOrElseGet` Refaster rule, such that it does not
@@ -31,7 +31,6 @@ public final class IsLikelyTrivialComputation implements Matcher<ExpressionTree>
       // references. Once the `MethodReferenceUsage` bug checker is production-ready, this exception
       // should be removed. (But at that point, instead defining a `RequiresComputation` matcher may
       // be more appropriate.)
-      MethodInvocationTree methodInvocation = (MethodInvocationTree) expressionTree;
       if (methodInvocation.getArguments().isEmpty()
           && matches(methodInvocation.getMethodSelect())) {
         return true;
@@ -44,9 +43,8 @@ public final class IsLikelyTrivialComputation implements Matcher<ExpressionTree>
   // XXX: Some `BinaryTree`s may represent what could be considered "trivial computations".
   // Depending on feedback such trees may be matched in the future.
   private static boolean matches(ExpressionTree expressionTree) {
-    if (expressionTree instanceof ArrayAccessTree) {
-      return matches(((ArrayAccessTree) expressionTree).getExpression())
-          && matches(((ArrayAccessTree) expressionTree).getIndex());
+    if (expressionTree instanceof ArrayAccessTree arrayAccess) {
+      return matches(arrayAccess.getExpression()) && matches(arrayAccess.getIndex());
     }
 
     if (expressionTree instanceof LiteralTree) {
@@ -65,26 +63,26 @@ public final class IsLikelyTrivialComputation implements Matcher<ExpressionTree>
       return true;
     }
 
-    if (expressionTree instanceof MemberReferenceTree) {
-      return matches(((MemberReferenceTree) expressionTree).getQualifierExpression());
+    if (expressionTree instanceof MemberReferenceTree memberReference) {
+      return matches(memberReference.getQualifierExpression());
     }
 
-    if (expressionTree instanceof MemberSelectTree) {
-      return matches(((MemberSelectTree) expressionTree).getExpression());
+    if (expressionTree instanceof MemberSelectTree memberSelect) {
+      return matches(memberSelect.getExpression());
     }
 
-    if (expressionTree instanceof ParenthesizedTree) {
-      return matches(((ParenthesizedTree) expressionTree).getExpression());
+    if (expressionTree instanceof ParenthesizedTree parenthesized) {
+      return matches(parenthesized.getExpression());
     }
 
-    if (expressionTree instanceof TypeCastTree) {
-      return matches(((TypeCastTree) expressionTree).getExpression());
+    if (expressionTree instanceof TypeCastTree typeCast) {
+      return matches(typeCast.getExpression());
     }
 
-    if (expressionTree instanceof UnaryTree) {
+    if (expressionTree instanceof UnaryTree unary) {
       // XXX: Arguably side-effectful options such as pre- and post-increment and -decrement are not
       // trivial.
-      return matches(((UnaryTree) expressionTree).getExpression());
+      return matches(unary.getExpression());
     }
 
     return false;

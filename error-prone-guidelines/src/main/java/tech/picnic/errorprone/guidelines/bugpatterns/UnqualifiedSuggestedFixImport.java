@@ -45,16 +45,14 @@ public final class UnqualifiedSuggestedFixImport extends BugChecker
       return Description.NO_MATCH;
     }
 
-    switch (ASTHelpers.getSymbol(tree).getSimpleName().toString()) {
-      case "addImport":
-        return createDescription(
-            tree, "SuggestedFix.Builder#addImport", "SuggestedFixes#qualifyType");
-      case "addStaticImport":
-        return createDescription(
-            tree, "SuggestedFix.Builder#addStaticImport", "SuggestedFixes#qualifyStaticImport");
-      default:
-        return Description.NO_MATCH;
-    }
+    return switch (ASTHelpers.getSymbol(tree).getSimpleName().toString()) {
+      case "addImport" ->
+          createDescription(tree, "SuggestedFix.Builder#addImport", "SuggestedFixes#qualifyType");
+      case "addStaticImport" ->
+          createDescription(
+              tree, "SuggestedFix.Builder#addStaticImport", "SuggestedFixes#qualifyStaticImport");
+      default -> Description.NO_MATCH;
+    };
   }
 
   private Description createDescription(

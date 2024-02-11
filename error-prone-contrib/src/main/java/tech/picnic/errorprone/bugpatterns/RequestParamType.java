@@ -34,7 +34,9 @@ import tech.picnic.errorprone.utils.Flags;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "By default, `@RequestParam` does not support `ImmutableCollection` and `ImmutableMap` subtypes",
+        """
+        By default, `@RequestParam` does not support `ImmutableCollection` and `ImmutableMap` \
+        subtypes""",
     link = BUG_PATTERNS_BASE_URL + "RequestParamType",
     linkType = CUSTOM,
     severity = ERROR,

@@ -124,9 +124,6 @@
                                 <version>${project.version}</version>
                             </path>
                         </annotationProcessorPaths>
-                        <compilerArgs combine.children="append">
-                            <arg>-Xplugin:RefasterRuleCompiler</arg>
-                        </compilerArgs>
                     </configuration>
                 </plugin>
             </plugins>

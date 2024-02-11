@@ -44,6 +44,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.tools.javac.code.Type;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
@@ -209,15 +210,10 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
     Tree parentTree =
         requireNonNull(state.getPath().getParentPath(), "MemberSelectTree lacks enclosing node")
             .getLeaf();
-    switch (parentTree.getKind()) {
-      case IMPORT:
-      case MEMBER_SELECT:
-        return false;
-      case METHOD_INVOCATION:
-        return ((MethodInvocationTree) parentTree).getTypeArguments().isEmpty();
-      default:
-        return true;
-    }
+
+    return parentTree instanceof MethodInvocationTree methodInvocation
+        ? methodInvocation.getTypeArguments().isEmpty()
+        : (parentTree.getKind() != Kind.IMPORT && parentTree.getKind() != Kind.MEMBER_SELECT);
   }
 
   private static boolean isCandidate(MemberSelectTree tree) {

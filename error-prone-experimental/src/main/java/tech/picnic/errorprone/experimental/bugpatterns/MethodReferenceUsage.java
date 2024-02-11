@@ -27,7 +27,6 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.ParenthesizedTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
@@ -84,22 +83,19 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
         .orElse(Description.NO_MATCH);
   }
 
+  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static Optional<SuggestedFix.Builder> constructMethodRef(
       LambdaExpressionTree lambdaExpr, Tree subTree) {
-    switch (subTree.getKind()) {
-      case BLOCK:
-        return constructMethodRef(lambdaExpr, (BlockTree) subTree);
-      case EXPRESSION_STATEMENT:
-        return constructMethodRef(lambdaExpr, ((ExpressionStatementTree) subTree).getExpression());
-      case METHOD_INVOCATION:
-        return constructMethodRef(lambdaExpr, (MethodInvocationTree) subTree);
-      case PARENTHESIZED:
-        return constructMethodRef(lambdaExpr, ((ParenthesizedTree) subTree).getExpression());
-      case RETURN:
-        return constructMethodRef(lambdaExpr, ((ReturnTree) subTree).getExpression());
-      default:
-        return Optional.empty();
-    }
+    return switch (subTree.getKind()) {
+      case BLOCK -> constructMethodRef(lambdaExpr, (BlockTree) subTree);
+      case EXPRESSION_STATEMENT ->
+          constructMethodRef(lambdaExpr, ((ExpressionStatementTree) subTree).getExpression());
+      case METHOD_INVOCATION -> constructMethodRef(lambdaExpr, (MethodInvocationTree) subTree);
+      case PARENTHESIZED ->
+          constructMethodRef(lambdaExpr, ((ParenthesizedTree) subTree).getExpression());
+      case RETURN -> constructMethodRef(lambdaExpr, ((ReturnTree) subTree).getExpression());
+      default -> Optional.empty();
+    };
   }
 
   private static Optional<SuggestedFix.Builder> constructMethodRef(
@@ -117,33 +113,35 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
         .flatMap(expectedInstance -> constructMethodRef(lambdaExpr, subTree, expectedInstance));
   }
 
-  @SuppressWarnings(
-      "java:S1151" /* Extracting `IDENTIFIER` case block to separate method does not improve readability. */)
+  // XXX: Review whether to use switch pattern matching once the targeted JDK supports this.
   private static Optional<SuggestedFix.Builder> constructMethodRef(
       LambdaExpressionTree lambdaExpr,
       MethodInvocationTree subTree,
       Optional<Name> expectedInstance) {
     ExpressionTree methodSelect = subTree.getMethodSelect();
-    switch (methodSelect.getKind()) {
-      case IDENTIFIER:
-        if (expectedInstance.isPresent()) {
-          /* Direct method call; there is no matching "implicit parameter". */
-          return Optional.empty();
-        }
-        Symbol sym = ASTHelpers.getSymbol(methodSelect);
-        return ASTHelpers.isStatic(sym)
-            ? constructFix(lambdaExpr, sym.owner, methodSelect)
-            : constructFix(lambdaExpr, "this", methodSelect);
-      case MEMBER_SELECT:
-        return constructMethodRef(lambdaExpr, (MemberSelectTree) methodSelect, expectedInstance);
-      default:
-        throw new VerifyException("Unexpected type of expression: " + methodSelect.getKind());
+
+    if (methodSelect instanceof IdentifierTree) {
+      if (expectedInstance.isPresent()) {
+        /* Direct method call; there is no matching "implicit parameter". */
+        return Optional.empty();
+      }
+
+      Symbol sym = ASTHelpers.getSymbol(methodSelect);
+      return ASTHelpers.isStatic(sym)
+          ? constructFix(lambdaExpr, sym.owner, methodSelect)
+          : constructFix(lambdaExpr, "this", methodSelect);
     }
+
+    if (methodSelect instanceof MemberSelectTree memberSelect) {
+      return constructMethodRef(lambdaExpr, memberSelect, expectedInstance);
+    }
+
+    throw new VerifyException("Unexpected type of expression: " + methodSelect.getKind());
   }
 
   private static Optional<SuggestedFix.Builder> constructMethodRef(
       LambdaExpressionTree lambdaExpr, MemberSelectTree subTree, Optional<Name> expectedInstance) {
-    if (subTree.getExpression().getKind() != Kind.IDENTIFIER) {
+    if (!(subTree.getExpression() instanceof IdentifierTree identifier)) {
       // XXX: Could be parenthesized. Handle. Also in other classes.
       /*
        * Only suggest a replacement if the method select's expression provably doesn't have
@@ -152,12 +150,12 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
       return Optional.empty();
     }
 
-    Name lhs = ((IdentifierTree) subTree.getExpression()).getName();
+    Name lhs = identifier.getName();
     if (expectedInstance.isEmpty()) {
       return constructFix(lambdaExpr, lhs, subTree.getIdentifier());
     }
 
-    Type lhsType = ASTHelpers.getType(subTree.getExpression());
+    Type lhsType = ASTHelpers.getType(identifier);
     if (lhsType == null || !expectedInstance.orElseThrow().equals(lhs)) {
       return Optional.empty();
     }
@@ -182,8 +180,8 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
 
     for (int i = 0; i < args.size(); i++) {
       ExpressionTree arg = args.get(i);
-      if (arg.getKind() != Kind.IDENTIFIER
-          || !((IdentifierTree) arg).getName().equals(expectedArguments.get(i + diff))) {
+      if (!(arg instanceof IdentifierTree identifier)
+          || !identifier.getName().equals(expectedArguments.get(i + diff))) {
         return Optional.empty();
       }
     }

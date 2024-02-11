@@ -81,9 +81,8 @@ public final class CanonicalClassNameUsage extends BugChecker
       path = path.getParentPath();
     }
 
-    return path.getLeaf() instanceof MethodInvocationTree
-        && isOwnedByCanonicalNameUsingType(
-            ASTHelpers.getSymbol((MethodInvocationTree) path.getLeaf()));
+    return path.getLeaf() instanceof MethodInvocationTree methodInvocation
+        && isOwnedByCanonicalNameUsingType(ASTHelpers.getSymbol(methodInvocation));
   }
 
   private static boolean isOwnedByCanonicalNameUsingType(MethodSymbol symbol) {

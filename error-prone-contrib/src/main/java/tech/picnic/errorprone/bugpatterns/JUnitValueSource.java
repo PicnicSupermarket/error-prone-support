@@ -265,8 +265,8 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
             arguments.stream()
                 .map(
                     arg ->
-                        arg instanceof MethodInvocationTree
-                            ? Iterables.getOnlyElement(((MethodInvocationTree) arg).getArguments())
+                        arg instanceof MethodInvocationTree methodInvocation
+                            ? Iterables.getOnlyElement(methodInvocation.getArguments())
                             : arg)
                 .map(argument -> SourceCode.treeToString(argument, state))
                 .collect(joining(", ")))
@@ -276,16 +276,12 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   private static String toValueSourceAttributeName(Type type) {
     String typeString = type.tsym.name.toString();
 
-    switch (typeString) {
-      case "Class":
-        return "classes";
-      case "Character":
-        return "chars";
-      case "Integer":
-        return "ints";
-      default:
-        return typeString.toLowerCase(Locale.ROOT) + 's';
-    }
+    return switch (typeString) {
+      case "Class" -> "classes";
+      case "Character" -> "chars";
+      case "Integer" -> "ints";
+      default -> typeString.toLowerCase(Locale.ROOT) + 's';
+    };
   }
 
   private static <T> Optional<T> getElementIfSingleton(Collection<T> collection) {
@@ -297,11 +293,10 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   private static Matcher<ExpressionTree> isSingleDimensionArrayCreationWithAllElementsMatching(
       Matcher<? super ExpressionTree> elementMatcher) {
     return (tree, state) -> {
-      if (!(tree instanceof NewArrayTree)) {
+      if (!(tree instanceof NewArrayTree newArray)) {
         return false;
       }
 
-      NewArrayTree newArray = (NewArrayTree) tree;
       return newArray.getDimensions().isEmpty()
           && !newArray.getInitializers().isEmpty()
           && newArray.getInitializers().stream()
