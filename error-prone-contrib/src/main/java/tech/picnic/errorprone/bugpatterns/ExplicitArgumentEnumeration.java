@@ -25,9 +25,9 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
+import com.google.errorprone.util.Visibility;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Element;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -91,6 +91,8 @@ public final class ExplicitArgumentEnumeration extends BugChecker
               OBJECT_ENUMERABLE_ASSERT,
               "containsExactlyInAnyOrderElementsOf",
               "containsExactlyInAnyOrder")
+          .put(OBJECT_ENUMERABLE_ASSERT, "containsOnlyElementsOf", "containsOnly")
+          .put(OBJECT_ENUMERABLE_ASSERT, "containsOnlyOnceElementsOf", "containsOnlyOnce")
           .put(OBJECT_ENUMERABLE_ASSERT, "doesNotContainAnyElementsOf", "doesNotContain")
           .put(OBJECT_ENUMERABLE_ASSERT, "hasSameElementsAs", "containsOnly")
           .put(STEP_VERIFIER_STEP, "expectNextSequence", "expectNext")
@@ -102,6 +104,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     if (tree.getArguments().size() != 1) {
+      /* Performance optimization: non-unary method invocations cannot be simplified. */
       return Description.NO_MATCH;
     }
 
@@ -111,8 +114,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
     }
 
     ExpressionTree argument = tree.getArguments().get(0);
-    if (!(argument instanceof MethodInvocationTree)
-        || !EXPLICIT_ITERABLE_CREATOR.matches(argument, state)) {
+    if (!EXPLICIT_ITERABLE_CREATOR.matches(argument, state)) {
       return Description.NO_MATCH;
     }
 
@@ -131,10 +133,14 @@ public final class ExplicitArgumentEnumeration extends BugChecker
 
   private static Optional<SuggestedFix> trySuggestCallingVarargsOverload(
       MethodSymbol method, MethodInvocationTree argument, VisitorState state) {
+    /*
+     * Collect all overloads of the given method that we are sure to be able to call. Note that the
+     * `isAtLeastAsVisible` check is conservative heuristic.
+     */
     ImmutableList<MethodSymbol> overloads =
         ASTHelpers.matchingMethods(
                 method.getSimpleName(),
-                m -> isPublic(m) && !m.equals(method),
+                m -> isAtLeastAsVisible(m, method),
                 method.enclClass().type,
                 state.getTypes())
             .collect(toImmutableList());
@@ -176,25 +182,19 @@ public final class ExplicitArgumentEnumeration extends BugChecker
       MethodInvocationTree argument,
       VisitorState state,
       Map<String, String> alternatives) {
-    String name = ASTHelpers.getSymbol(tree).getSimpleName().toString();
-    String alternative = alternatives.get(name);
-
-    if (alternative == null) {
-      return Optional.empty();
-    }
-
-    SuggestedFix fix = SourceCode.unwrapMethodInvocation(argument, state);
-    return Optional.of(
-        alternative.equals(name)
-            ? fix
-            : SuggestedFix.builder()
-                .merge(SuggestedFixes.renameMethodInvocation(tree, alternative, state))
-                .merge(fix)
-                .build());
+    return Optional.ofNullable(
+            alternatives.get(ASTHelpers.getSymbol(tree).getSimpleName().toString()))
+        .map(
+            replacement ->
+                SuggestedFix.builder()
+                    .merge(SuggestedFixes.renameMethodInvocation(tree, replacement, state))
+                    .merge(SourceCode.unwrapMethodInvocation(argument, state))
+                    .build());
   }
 
-  // XXX: Once we target JDK 14+, drop this method in favour of `Symbol#isPublic()`.
-  private static boolean isPublic(Symbol symbol) {
-    return symbol.getModifiers().contains(Modifier.PUBLIC);
+  private static boolean isAtLeastAsVisible(Element symbol, Element reference) {
+    return Visibility.fromModifiers(symbol.getModifiers())
+            .compareTo(Visibility.fromModifiers(reference.getModifiers()))
+        >= 0;
   }
 }
