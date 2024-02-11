@@ -129,11 +129,10 @@ public final class BugPatternLink extends BugChecker implements ClassTreeMatcher
     }
 
     ExpressionTree link = AnnotationMatcherUtils.getArgument(annotation, "link");
-    if (!(link instanceof BinaryTree)) {
+    if (!(link instanceof BinaryTree binary)) {
       return false;
     }
 
-    BinaryTree binary = (BinaryTree) link;
     verify(binary.getKind() == Kind.PLUS, "Unexpected binary operator");
     return IS_BUG_PATTERNS_BASE_URL.matches(binary.getLeftOperand(), state)
         && className.contentEquals(ASTHelpers.constValue(binary.getRightOperand(), String.class));
