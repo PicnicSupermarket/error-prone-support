@@ -50,8 +50,9 @@ import tech.picnic.errorprone.utils.ThirdPartyLibrary;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Prefer `Class#getCanonicalName()` over an equivalent string literal if and only if the "
-            + "type will be on the runtime classpath",
+        """
+        Prefer `Class#getCanonicalName()` over an equivalent string literal if and only if the \
+        type will be on the runtime classpath""",
     link = BUG_PATTERNS_BASE_URL + "ErrorProneRuntimeClasspath",
     linkType = CUSTOM,
     severity = SUGGESTION,

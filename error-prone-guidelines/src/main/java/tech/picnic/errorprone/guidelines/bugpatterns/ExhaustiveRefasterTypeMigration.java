@@ -72,8 +72,9 @@ import org.jspecify.annotations.Nullable;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "The set of unmigrated methods listed by the `@TypeMigration` annotation must be minimal "
-            + "yet exhaustive",
+        """
+        The set of unmigrated methods listed by the `@TypeMigration` annotation must be minimal \
+        yet exhaustive""",
     link = BUG_PATTERNS_BASE_URL + "ExhaustiveRefasterTypeMigration",
     linkType = CUSTOM,
     severity = WARNING,
