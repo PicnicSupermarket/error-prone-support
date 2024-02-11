@@ -57,7 +57,7 @@ import org.jspecify.annotations.Nullable;
 // XXX: As-is this checker assumes that a method is fully migrated if it is invoked inside at least
 // one `@BeforeTemplate` method. A stronger check would be to additionally verify that:
 // 1. Such invocations are not conditionally matched. That is, there should be no constraint on
-//    their context (i.e any surrounding code), and their parameters must be `@BeforeTemplate`
+//    their context (i.e. any surrounding code), and their parameters must be `@BeforeTemplate`
 //    method parameters with types that are not more restrictive than those of the method itself.
 //    Additionally, the result of non-void methods should be "returned" by the `@BeforeTemplate`
 //    method, so that Refaster will match any expression, rather than just statements. (One caveat

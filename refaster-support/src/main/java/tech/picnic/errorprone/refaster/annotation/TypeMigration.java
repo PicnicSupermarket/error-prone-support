@@ -10,10 +10,10 @@ import java.lang.annotation.Target;
  * indicated type.
  */
 // XXX: Add support for `#unmigratedFields()`.
-// XXX: Consider making this annotation `@Repeatable`, for cases where a single Refaster rules
+// XXX: Consider making this annotation `@Repeatable`, for cases where a single Refaster rule
 // collection migrates away from multiple types.
-@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.TYPE)
 public @interface TypeMigration {
   /**
    * The type migrated away from.
