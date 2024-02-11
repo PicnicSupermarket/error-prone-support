@@ -124,4 +124,8 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
   boolean testStringStartsWith() {
     return "foo".substring(1).startsWith("bar");
   }
+
+  String testStringFormatted() {
+    return String.format("%s%s", "foo", "bar");
+  }
 }
