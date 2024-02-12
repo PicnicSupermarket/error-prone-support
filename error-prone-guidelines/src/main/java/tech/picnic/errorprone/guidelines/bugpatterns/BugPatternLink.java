@@ -95,6 +95,24 @@ public final class BugPatternLink extends BugChecker implements ClassTreeMatcher
     return describeMatch(annotation, suggestFix(tree, state, annotation));
   }
 
+  private static boolean isCompliant(
+      AnnotationTree annotation, Name className, VisitorState state) {
+    ExpressionTree linkType = AnnotationMatcherUtils.getArgument(annotation, "linkType");
+    if (IS_LINK_TYPE_NONE.matches(linkType, state)) {
+      /* This bug checker explicitly declares that there is no link. */
+      return true;
+    }
+
+    ExpressionTree link = AnnotationMatcherUtils.getArgument(annotation, "link");
+    if (!(link instanceof BinaryTree binary)) {
+      return false;
+    }
+
+    verify(binary.getKind() == Kind.PLUS, "Unexpected binary operator");
+    return IS_BUG_PATTERNS_BASE_URL.matches(binary.getLeftOperand(), state)
+        && className.contentEquals(ASTHelpers.constValue(binary.getRightOperand(), String.class));
+  }
+
   private static SuggestedFix suggestFix(
       ClassTree tree, VisitorState state, AnnotationTree annotation) {
     SuggestedFix.Builder fix = SuggestedFix.builder();
@@ -118,23 +136,5 @@ public final class BugPatternLink extends BugChecker implements ClassTreeMatcher
             annotation, state, "linkType", ImmutableList.of(linkType)));
 
     return fix.build();
-  }
-
-  private static boolean isCompliant(
-      AnnotationTree annotation, Name className, VisitorState state) {
-    ExpressionTree linkType = AnnotationMatcherUtils.getArgument(annotation, "linkType");
-    if (IS_LINK_TYPE_NONE.matches(linkType, state)) {
-      /* This bug checker explicitly declares that there is no link. */
-      return true;
-    }
-
-    ExpressionTree link = AnnotationMatcherUtils.getArgument(annotation, "link");
-    if (!(link instanceof BinaryTree binary)) {
-      return false;
-    }
-
-    verify(binary.getKind() == Kind.PLUS, "Unexpected binary operator");
-    return IS_BUG_PATTERNS_BASE_URL.matches(binary.getLeftOperand(), state)
-        && className.contentEquals(ASTHelpers.constValue(binary.getRightOperand(), String.class));
   }
 }

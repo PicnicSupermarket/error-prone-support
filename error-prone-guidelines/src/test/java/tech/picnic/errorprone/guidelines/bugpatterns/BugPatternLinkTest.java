@@ -42,7 +42,7 @@ final class BugPatternLinkTest {
             "import tech.picnic.errorprone.utils.Documentation;",
             "",
             "@BugPattern(",
-            "    summary = \"Error Prone Support class in subpackge with proper link\",",
+            "    summary = \"Error Prone Support class in subpackage with proper link\",",
             "    link = Documentation.BUG_PATTERNS_BASE_URL + \"D\",",
             "    linkType = BugPattern.LinkType.CUSTOM,",
             "    severity = BugPattern.SeverityLevel.ERROR)",
