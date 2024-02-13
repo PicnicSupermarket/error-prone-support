@@ -20,4 +20,12 @@ final class InputStreamRulesTest implements RefasterRuleCollectionTestCase {
   byte[] testInputStreamReadAllBytes() throws IOException {
     return new ByteArrayInputStream(new byte[0]).readAllBytes();
   }
+
+  byte[] testInputStreamReadNBytes() throws IOException {
+    return new ByteArrayInputStream(new byte[0]).readNBytes(0);
+  }
+
+  void testInputStreamSkipNBytes() throws IOException {
+    new ByteArrayInputStream(new byte[0]).skipNBytes(0);
+  }
 }
