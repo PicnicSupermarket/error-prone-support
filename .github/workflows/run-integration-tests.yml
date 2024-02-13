@@ -17,7 +17,7 @@ jobs:
   run-integration-tests:
     strategy:
       matrix:
-        integration-test: ["checkstyle", "metrics-v4.2.19"]
+        integration-test: ["checkstyle", "metrics"]
     name: On-demand integration test
     # if: |
       # github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
