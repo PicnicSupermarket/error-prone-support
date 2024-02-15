@@ -35,13 +35,21 @@ final class CollectionRules {
    */
   static final class CollectionIsEmpty<T> {
     @BeforeTemplate
-    @SuppressWarnings("java:S1155" /* This violation will be rewritten. */)
+    @SuppressWarnings({
+      "java:S1155" /* This violation will be rewritten. */,
+      "LexicographicalAnnotationAttributeListing" /* `key-*` entry must remain last. */,
+      "OptionalFirstCollectionElement" /* This is a more specific template. */,
+      "StreamIsEmpty" /* This is a more specific template. */,
+      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     boolean before(Collection<T> collection) {
       return Refaster.anyOf(
           collection.size() == 0,
           collection.size() <= 0,
           collection.size() < 1,
-          Iterables.isEmpty(collection));
+          Iterables.isEmpty(collection),
+          collection.stream().findAny().isEmpty(),
+          collection.stream().findFirst().isEmpty());
     }
 
     @BeforeTemplate
@@ -337,7 +345,9 @@ final class CollectionRules {
 
   /**
    * Don't use the ternary operator to extract the first element of a possibly-empty {@link
-   * Collection} as an {@link Optional}.
+   * Collection} as an {@link Optional}, and (when applicable) prefer {@link Stream#findFirst()}
+   * over {@link Stream#findAny()} to communicate that the collection's first element (if any,
+   * according to iteration order) will be returned.
    */
   static final class OptionalFirstCollectionElement<T> {
     @BeforeTemplate
