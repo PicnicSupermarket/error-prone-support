@@ -627,4 +627,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   Duration testStepVerifierLastStepVerifyTimeout() {
     return Mono.empty().as(StepVerifier::create).verifyTimeout(Duration.ZERO);
   }
+
+  Flux<String> testFluxFromIterable() {
+    return Flux.fromIterable(ImmutableList.of("foo"));
+  }
 }

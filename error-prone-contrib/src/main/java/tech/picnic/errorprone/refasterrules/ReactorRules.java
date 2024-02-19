@@ -221,19 +221,6 @@ final class ReactorRules {
     }
   }
 
-  /** Don't unnecessarily convert {@link Collection} to {@link Stream} before creating {@link Flux}. */
-  static final class FluxFromIterable<T> {
-    @BeforeTemplate
-    Flux<T> before(Collection<T> c) {
-      return Flux.fromStream(c.stream());
-    }
-
-    @AfterTemplate
-    Flux<T> after(Collection<T> c) {
-      return Flux.fromIterable(c);
-    }
-  }
-
   /**
    * Prefer {@link Flux#zip(Publisher, Publisher)} over a chained {@link Flux#zipWith(Publisher)},
    * as the former better conveys that the {@link Publisher}s may be subscribed to concurrently, and
@@ -1911,6 +1898,21 @@ final class ReactorRules {
     @AfterTemplate
     Duration after(StepVerifier.LastStep step, Duration duration) {
       return step.verifyTimeout(duration);
+    }
+  }
+
+  /**
+   * Don't unnecessarily convert {@link Collection} to {@link Stream} before creating {@link Flux}.
+   */
+  static final class FluxFromIterable<T> {
+    @BeforeTemplate
+    Flux<T> before(Collection<T> c) {
+      return Flux.fromStream(c.stream());
+    }
+
+    @AfterTemplate
+    Flux<T> after(Collection<T> c) {
+      return Flux.fromIterable(c);
     }
   }
 }
