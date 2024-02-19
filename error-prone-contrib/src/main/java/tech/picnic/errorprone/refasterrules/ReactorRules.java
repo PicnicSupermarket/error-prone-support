@@ -41,6 +41,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -217,6 +218,19 @@ final class ReactorRules {
     @AfterTemplate
     Mono<R> after(Mono<T> mono, Mono<S> other, BiFunction<T, S, R> combinator) {
       return Mono.zip(mono, other).map(function(combinator));
+    }
+  }
+
+  /** Don't unnecessarily convert {@link Collection} to {@link Stream} before creating {@link Flux}. */
+  static final class FluxFromIterable<T> {
+    @BeforeTemplate
+    Flux<T> before(Collection<T> c) {
+      return Flux.fromStream(c.stream());
+    }
+
+    @AfterTemplate
+    Flux<T> after(Collection<T> c) {
+      return Flux.fromIterable(c);
     }
   }
 
