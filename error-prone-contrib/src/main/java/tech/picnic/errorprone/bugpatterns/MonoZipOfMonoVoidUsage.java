@@ -10,9 +10,9 @@ import static com.google.errorprone.matchers.Matchers.hasArguments;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.type;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.MoreTypes.generic;
+import static tech.picnic.errorprone.utils.MoreTypes.type;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Iterables;
