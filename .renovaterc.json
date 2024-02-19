@@ -13,6 +13,7 @@
     },
     {
       "matchDepNames": [
+        "dawidd6/action-download-artifact",
         "github/codeql-action",
         "ruby/setup-ruby"
       ],
