@@ -1207,17 +1207,18 @@ final class ReactorRules {
   }
 
   /**
-   * Don't unnecessarily convert {@link Collection} to {@link Stream} before creating {@link Flux}.
+   * Don't unnecessarily convert a {@link Collection} to a {@link Stream} before creating a {@link
+   * Flux}.
    */
   static final class FluxFromIterable<T> {
     @BeforeTemplate
-    Flux<T> before(Collection<T> c) {
-      return Flux.fromStream(c.stream());
+    Flux<T> before(Collection<T> collection) {
+      return Flux.fromStream(collection.stream());
     }
 
     @AfterTemplate
-    Flux<T> after(Collection<T> c) {
-      return Flux.fromIterable(c);
+    Flux<T> after(Collection<T> collection) {
+      return Flux.fromIterable(collection);
     }
   }
 
