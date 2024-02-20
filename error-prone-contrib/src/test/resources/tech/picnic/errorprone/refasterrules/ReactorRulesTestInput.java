@@ -432,6 +432,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just(ImmutableList.of("bar")).concatMap(Flux::fromIterable, 2));
   }
 
+  Flux<String> testFluxFromIterable() {
+    return Flux.fromStream(ImmutableList.of("foo").stream());
+  }
+
   ImmutableSet<Mono<Integer>> testFluxCountMapMathToIntExact() {
     return ImmutableSet.of(
         Flux.just(1).collect(toImmutableList()).map(Collection::size),
@@ -645,9 +649,5 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Duration testStepVerifierLastStepVerifyTimeout() {
     return Mono.empty().as(StepVerifier::create).expectTimeout(Duration.ZERO).verify();
-  }
-
-  Flux<String> testFluxFromIterable() {
-    return Flux.fromStream(ImmutableList.of("foo").stream());
   }
 }

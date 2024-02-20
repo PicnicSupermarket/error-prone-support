@@ -1207,6 +1207,21 @@ final class ReactorRules {
   }
 
   /**
+   * Don't unnecessarily convert {@link Collection} to {@link Stream} before creating {@link Flux}.
+   */
+  static final class FluxFromIterable<T> {
+    @BeforeTemplate
+    Flux<T> before(Collection<T> c) {
+      return Flux.fromStream(c.stream());
+    }
+
+    @AfterTemplate
+    Flux<T> after(Collection<T> c) {
+      return Flux.fromIterable(c);
+    }
+  }
+
+  /**
    * Prefer {@link Flux#count()} followed by a conversion from {@code long} to {@code int} over
    * collecting into a list and counting its elements.
    */
@@ -1898,21 +1913,6 @@ final class ReactorRules {
     @AfterTemplate
     Duration after(StepVerifier.LastStep step, Duration duration) {
       return step.verifyTimeout(duration);
-    }
-  }
-
-  /**
-   * Don't unnecessarily convert {@link Collection} to {@link Stream} before creating {@link Flux}.
-   */
-  static final class FluxFromIterable<T> {
-    @BeforeTemplate
-    Flux<T> before(Collection<T> c) {
-      return Flux.fromStream(c.stream());
-    }
-
-    @AfterTemplate
-    Flux<T> after(Collection<T> c) {
-      return Flux.fromIterable(c);
     }
   }
 }
