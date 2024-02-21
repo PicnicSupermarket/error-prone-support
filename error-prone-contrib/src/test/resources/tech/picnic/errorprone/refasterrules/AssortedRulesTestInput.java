@@ -13,6 +13,7 @@ import com.google.common.collect.Streams;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.stream.Stream;
+import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
@@ -26,6 +27,10 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
         Splitter.class,
         Streams.class,
         toImmutableSet());
+  }
+
+  Mono<Void> testIllegalStateExceptionSupplier() {
+    return Mono.error(() -> new IllegalStateException("ISE"));
   }
 
   int testCheckIndex() {

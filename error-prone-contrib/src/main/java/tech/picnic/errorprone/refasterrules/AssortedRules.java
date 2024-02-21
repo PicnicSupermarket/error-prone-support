@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -34,6 +35,18 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 @OnlineDocumentation
 final class AssortedRules {
   private AssortedRules() {}
+
+  final class IllegalStateExceptionSupplier {
+    @BeforeTemplate
+    Supplier<IllegalStateException> before(String message) {
+      return () -> new IllegalStateException(message);
+    }
+
+    @AfterTemplate
+    Supplier<IllegalStateException> after(String message) {
+      return () -> new IllegalStateException("XXX");
+    }
+  }
 
   /** Prefer {@link Objects#checkIndex(int, int)} over the Guava alternative. */
   static final class CheckIndex {
