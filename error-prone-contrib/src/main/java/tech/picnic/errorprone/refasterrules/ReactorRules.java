@@ -41,7 +41,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
-import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -1206,10 +1205,7 @@ final class ReactorRules {
     }
   }
 
-  /**
-   * Don't unnecessarily convert a {@link Collection} to a {@link Stream} before creating a {@link
-   * Flux}.
-   */
+  /** Prefer {@link Flux#fromIterable(Iterable)} over less efficient alternatives. */
   static final class FluxFromIterable<T> {
     @BeforeTemplate
     Flux<T> before(Collection<T> collection) {
