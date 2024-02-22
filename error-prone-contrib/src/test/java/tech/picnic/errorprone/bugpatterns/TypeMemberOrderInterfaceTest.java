@@ -5,6 +5,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
+// XXX: Add test case for abstract class and default methods.
 final class TypeMemberOrderInterfaceTest {
   @Test
   void identification() {
