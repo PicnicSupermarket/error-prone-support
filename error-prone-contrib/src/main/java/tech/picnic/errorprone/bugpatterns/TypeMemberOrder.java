@@ -20,6 +20,7 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Var;
 import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
@@ -29,9 +30,11 @@ import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.parser.Tokens.TokenKind;
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Position;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +70,7 @@ import javax.lang.model.element.Modifier;
     linkType = CUSTOM,
     severity = WARNING,
     tags = STYLE)
-public final class TypeMemberOrder extends BugChecker implements BugChecker.ClassTreeMatcher {
+public final class TypeMemberOrder extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
 
   /** Instantiates a new {@link TypeMemberOrder} instance. */
@@ -75,9 +78,8 @@ public final class TypeMemberOrder extends BugChecker implements BugChecker.Clas
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    if (tree.getKind() != Tree.Kind.CLASS
-        && tree.getKind() != Tree.Kind.INTERFACE
-        && tree.getKind() != Tree.Kind.ENUM) {
+    Kind kind = tree.getKind();
+    if (kind != Kind.CLASS && kind != Kind.INTERFACE && kind != Kind.ENUM) {
       return Description.NO_MATCH;
     }
 
@@ -85,6 +87,7 @@ public final class TypeMemberOrder extends BugChecker implements BugChecker.Clas
     // present in-between members.
     ImmutableList<TypeMember> members =
         tree.getMembers().stream()
+            // XXX: Maybe we can remove this filter?
             .filter(TypeMemberOrder::hasSource)
             .map(m -> new AutoValue_TypeMemberOrder_TypeMember(m, getPreferredOrdinal(m, state)))
             .collect(toImmutableList());
@@ -127,9 +130,7 @@ public final class TypeMemberOrder extends BugChecker implements BugChecker.Clas
       case BLOCK -> Optional.of(isStatic((BlockTree) tree) ? 3 : 4);
       case METHOD -> Optional.of(isConstructor((MethodTree) tree) ? 5 : 6);
       case CLASS, INTERFACE, ENUM -> Optional.of(7);
-      default ->
-      // TODO: Should we log unhandled kinds?
-      Optional.empty();
+      default -> Optional.empty();
     };
   }
 
@@ -138,21 +139,20 @@ public final class TypeMemberOrder extends BugChecker implements BugChecker.Clas
   }
 
   private static boolean hasSource(Tree tree) {
-    if (tree.getKind() == Tree.Kind.METHOD) {
+    if (tree.getKind() == Kind.METHOD) {
       return !ASTHelpers.isGeneratedConstructor(((MethodTree) tree));
     }
     return true;
   }
 
   /**
-   * Returns true if Tree is an enumerator of an enumerated type, or false otherwise.
+   * Returns true if `Tree` is an enumerator of an enumerated type, or false otherwise.
    *
    * @see com.sun.tools.javac.tree.Pretty#isEnumerator(JCTree)
    * @see com.sun.tools.javac.code.Flags#ENUM
    */
   private static boolean isEnumerator(Tree tree) {
-    return tree instanceof JCTree.JCVariableDecl
-        && (((JCTree.JCVariableDecl) tree).mods.flags & ENUM) != 0;
+    return tree instanceof JCVariableDecl && (((JCVariableDecl) tree).mods.flags & ENUM) != 0;
   }
 
   /**
@@ -174,7 +174,7 @@ public final class TypeMemberOrder extends BugChecker implements BugChecker.Clas
         .dropWhile(token -> token.kind() != TokenKind.LBRACE)
         // XXX: To accommodate enums, start processing the body, after the enumerated type's
         // enumerators.
-        .dropWhile(token -> tree.getKind() == Tree.Kind.ENUM && token.kind() != TokenKind.SEMI)
+        .dropWhile(token -> tree.getKind() == Kind.ENUM && token.kind() != TokenKind.SEMI)
         .findFirst()
         .map(ErrorProneToken::endPos)
         .orElse(Position.NOPOS);
@@ -211,7 +211,7 @@ public final class TypeMemberOrder extends BugChecker implements BugChecker.Clas
                 member.tree(),
                 start,
                 end,
-                member.preferredOrdinal().orElseThrow(/* Unreachable due to preceding check. */)));
+                member.preferredOrdinal().orElseThrow(/* Unreachable due to preceding check. */ )));
       }
       start = end;
     }
