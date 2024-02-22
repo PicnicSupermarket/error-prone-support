@@ -1205,6 +1205,19 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Flux#fromIterable(Iterable)} over less efficient alternatives. */
+  static final class FluxFromIterable<T> {
+    @BeforeTemplate
+    Flux<T> before(Collection<T> collection) {
+      return Flux.fromStream(collection.stream());
+    }
+
+    @AfterTemplate
+    Flux<T> after(Collection<T> collection) {
+      return Flux.fromIterable(collection);
+    }
+  }
+
   /**
    * Prefer {@link Flux#count()} followed by a conversion from {@code long} to {@code int} over
    * collecting into a list and counting its elements.
