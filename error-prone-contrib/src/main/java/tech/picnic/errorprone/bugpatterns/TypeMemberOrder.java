@@ -9,7 +9,7 @@ import static com.sun.tools.javac.code.Flags.ENUM;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Objects.requireNonNull;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.auto.value.AutoValue;
@@ -122,21 +122,15 @@ public final class TypeMemberOrder extends BugChecker implements BugChecker.Clas
     if (!canMove(tree, state)) {
       return Optional.empty();
     }
-    switch (tree.getKind()) {
-      case VARIABLE:
-        return Optional.of(isStatic((VariableTree) tree) ? 1 : 2);
-      case BLOCK:
-        return Optional.of(isStatic((BlockTree) tree) ? 3 : 4);
-      case METHOD:
-        return Optional.of(isConstructor((MethodTree) tree) ? 5 : 6);
-      case CLASS:
-      case INTERFACE:
-      case ENUM:
-        return Optional.of(7);
-      default:
-        // TODO: Should we log unhandled kinds?
-        return Optional.empty();
-    }
+    return switch (tree.getKind()) {
+      case VARIABLE -> Optional.of(isStatic((VariableTree) tree) ? 1 : 2);
+      case BLOCK -> Optional.of(isStatic((BlockTree) tree) ? 3 : 4);
+      case METHOD -> Optional.of(isConstructor((MethodTree) tree) ? 5 : 6);
+      case CLASS, INTERFACE, ENUM -> Optional.of(7);
+      default ->
+      // TODO: Should we log unhandled kinds?
+      Optional.empty();
+    };
   }
 
   private boolean canMove(Tree tree, VisitorState state) {
@@ -217,7 +211,7 @@ public final class TypeMemberOrder extends BugChecker implements BugChecker.Clas
                 member.tree(),
                 start,
                 end,
-                member.preferredOrdinal().orElseThrow(/* Unreachable due to preceding check. */ )));
+                member.preferredOrdinal().orElseThrow(/* Unreachable due to preceding check. */)));
       }
       start = end;
     }
