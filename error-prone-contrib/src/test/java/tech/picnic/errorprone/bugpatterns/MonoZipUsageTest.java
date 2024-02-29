@@ -7,15 +7,17 @@ final class MonoZipUsageTest {
   @Test
   void identification() {
     CompilationTestHelper.newInstance(MonoZipUsage.class, getClass())
+        .expectErrorMessage(
+            "X",
+            m ->
+                m.contains(
+                    "Invoking a `Mono#zip` or `Mono#zipWith` on a `Mono#empty()` is a no-op."))
         .addSourceLines(
             "A.java",
             "import reactor.core.publisher.Mono;",
             "",
             "class A {",
             "  <T> void m(T t) {",
-            "    // BUG: Diagnostic contains:",
-            "    Mono.empty().zipWith(Mono.just(1));",
-            "",
             "    Mono<Void> emptyMono = Mono.empty();",
             "    Mono<Integer> integerMono = Mono.empty();",
             "",
@@ -43,20 +45,8 @@ final class MonoZipUsageTest {
             "    // BUG: Diagnostic contains:",
             "    Mono.just(1).zipWith(emptyMono);",
             "",
-            "    // BUG: Diagnostic contains:",
+            "    // BUG: Diagnostic matches: X",
             "    Mono.empty().zipWith(Mono.just(1));",
-            //            "    e.zipWith(e);",
-            //            "    b.zipWith(b).zipWith(c).map(entry -> entry);",
-            //            "    c.zipWith(b);",
-            //            "    c.zipWith(d);",
-            //            "    c.zipWith(c);",
-            //            "    // BUG: Diagnostic contains:",
-            //            "    c.zipWith(a);",
-            //            "    c.zipWith(b, (first, second) -> first + second);",
-            //            "    // BUG: Diagnostic contains:",
-            //            "    a.zipWith(c, (first, second) -> second);",
-            //            "    // BUG: Diagnostic contains:",
-            //            "    c.zipWith(Mono.empty());",
             "  }",
             "}")
         .doTest();

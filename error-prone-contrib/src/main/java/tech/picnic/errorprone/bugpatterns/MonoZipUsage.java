@@ -61,23 +61,6 @@ public final class MonoZipUsage extends BugChecker implements MethodInvocationTr
           instanceMethod().onDescendantOf(type("reactor.core.publisher.Mono")).named("zipWith"),
           staticMethod().onClass(type("reactor.core.publisher.Mono")).named("zip"));
 
-  //  private static final MultiMatcher<MethodInvocationTree, ExpressionTree> TREEEE =
-  //      hasArguments(AT_LEAST_ONE, staticMethod().onClass(MONO_VOID).named("empty"));
-
-  //  private static final Matcher<ExpressionTree> GENERIC_ARGUMENT_DERIVED_FROM_MONO_TYPE =
-  //      toType(MethodInvocationTree.class, hasGenericArgumentOfExactType(MONO_VOID));
-  //  private static final Matcher<ExpressionTree> HAS_MONO_EMPTY_AS_ARGUMENT =
-  //      toType(
-  //          MethodInvocationTree.class,
-  //          hasArguments(AT_LEAST_ONE, staticMethod().onClass(MONO_VOID).named("empty")));
-  //  private static final Matcher<ExpressionTree> OPERATORS_WITH_MONO_VOID_GENERIC_ARGUMENT =
-  //      allOf(
-  //          MONO_ZIP_AND_ZIP_WITH,
-  //          anyOf(GENERIC_ARGUMENT_DERIVED_FROM_MONO_TYPE, HAS_MONO_EMPTY_AS_ARGUMENT));
-  //  private static final Matcher<ExpressionTree> ANY_MONO_VOID_IN_PUBLISHERS =
-  //      anyOf(OPERATORS_WITH_MONO_VOID_GENERIC_ARGUMENT, onClassWithMethodName(MONO_VOID,
-  // "zipWith"));
-
   /** Instantiates a new {@link MonoZipUsage} instance. */
   public MonoZipUsage() {}
 
@@ -87,9 +70,9 @@ public final class MonoZipUsage extends BugChecker implements MethodInvocationTr
       return Description.NO_MATCH;
     }
 
-    if (isInvokedOnMonoEmpty(tree, state)) {
+    if (ownerIsMonoEmpty(tree, state)) {
       return buildDescription(tree)
-          .setMessage("Can't invoke `Mono#zip` or `Mono#zipWith` on a `Mono#empty()`")
+          .setMessage("Invoking a `Mono#zip` or `Mono#zipWith` on a `Mono#empty()` is a no-op.")
           .build();
     }
 
@@ -97,6 +80,7 @@ public final class MonoZipUsage extends BugChecker implements MethodInvocationTr
     if (arguments.stream()
         .noneMatch(
             arg ->
+                // XXX: We can probably provide a single `Matcher` for these two things.
                 MONO_EMPTY.matches(arg, state)
                     || state
                         .getTypes()
@@ -106,64 +90,9 @@ public final class MonoZipUsage extends BugChecker implements MethodInvocationTr
     return describeMatch(tree);
   }
 
-  private static boolean isInvokedOnMonoEmpty(MethodInvocationTree tree, VisitorState state) {
-    return MONO_EMPTY.matches(((MemberSelectTree) tree.getMethodSelect()).getExpression(), state);
+  // XXX: Can we do this in a nicer way?
+  private static boolean ownerIsMonoEmpty(MethodInvocationTree tree, VisitorState state) {
+    MemberSelectTree methodSelect = (MemberSelectTree) tree.getMethodSelect();
+    return MONO_EMPTY.matches(methodSelect.getExpression(), state);
   }
-
-  //  private static Matcher<ExpressionTree> onClassWithMethodName(
-  //      Supplier<Type> genericDesiredType, String methodName) {
-  //    return (tree, state) ->
-  //        getMethodExecuted(tree)
-  //            .filter(
-  //                methodExecuted -> {
-  //                  Type invokedType = ASTHelpers.getType(methodExecuted.getExpression());
-  //                  Name invokedMethodName = methodExecuted.getIdentifier();
-  //                  return invokedMethodName.contentEquals(methodName)
-  //                      && isOfSameGenericType(invokedType, genericDesiredType.get(state), state);
-  //                })
-  //            .isPresent();
-  //  }
-  //
-  //  private static Optional<MemberSelectTree> getMethodExecuted(ExpressionTree expressionTree) {
-  //    return Optional.of((MethodInvocationTree) expressionTree)
-  //        .map(MethodInvocationTree::getMethodSelect)
-  //        .filter(MemberSelectTree.class::isInstance)
-  //        .map(MemberSelectTree.class::cast);
-  //  }
-  //
-  //  private static Matcher<MethodInvocationTree> hasGenericArgumentOfExactType(
-  //      Supplier<Type> genericDesiredType) {
-  //    return (tree, state) ->
-  //        tree.getArguments().stream()
-  //            .anyMatch(
-  //                arg ->
-  //                    isOfSameGenericType(
-  //                        ASTHelpers.getType(arg), genericDesiredType.get(state), state));
-  //  }
-  //
-  //  /**
-  //   * We need to extract real types from the generics because {@link ASTHelpers} cannot
-  // distinguish
-  //   * {@code Mono<Integer>} and {@code Mono<Void>} and reports those being the same.
-  //   *
-  //   * <p>In case of {@code Mono}, we can infer the real type out of the parameters of the
-  // invocation
-  //   * ({@link MethodInvocationTree#getArguments()}):
-  //   *
-  //   * <ul>
-  //   *   <li>either we have explicit variable declared and the provided type which will be
-  // inferred,
-  //   *   <li>or we have a method invocation, like {@link Mono#just(Object)} or {@link
-  // Mono#empty()},
-  //   *       for which we can also infer type.
-  //   * </ul>
-  //   *
-  //   * <p>Similarly, we can infer the matching type.
-  //   */
-  //  private static boolean isOfSameGenericType(
-  //      Type genericArgumentType, Type genericDesiredType, VisitorState state) {
-  //    Type argumentType = Iterables.getFirst(genericArgumentType.allparams(), Type.noType);
-  //    Type requiredType = Iterables.getOnlyElement(genericDesiredType.allparams());
-  //    return ASTHelpers.isSameType(argumentType, requiredType, state);
-  //  }
 }
