@@ -69,10 +69,9 @@ public final class MonoZipUsage extends BugChecker implements MethodInvocationTr
       return Description.NO_MATCH;
     }
 
-    if (isInvokedOnMonoEmpty(tree, state)) {
+    if (isZipWithOnMonoThatCompletesEmpty(tree, state)) {
       return buildDescription(tree)
-          .setMessage(
-              "Invoking a `Mono#zip` or `Mono#zipWith` on a `Mono#empty()` or `Mono<Void>` is a no-op.")
+          .setMessage("Invoking `Mono#zipWith` on a `Mono#empty()` or `Mono<Void>` is a no-op.")
           .build();
     }
 
@@ -83,7 +82,8 @@ public final class MonoZipUsage extends BugChecker implements MethodInvocationTr
     return describeMatch(tree);
   }
 
-  private static boolean isInvokedOnMonoEmpty(MethodInvocationTree tree, VisitorState state) {
+  private static boolean isZipWithOnMonoThatCompletesEmpty(
+      MethodInvocationTree tree, VisitorState state) {
     MemberSelectTree methodSelect = (MemberSelectTree) tree.getMethodSelect();
     return MONO_VOID_OR_MONO_EMPTY.matches(methodSelect.getExpression(), state);
   }

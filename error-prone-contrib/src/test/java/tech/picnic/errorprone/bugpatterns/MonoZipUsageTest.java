@@ -11,7 +11,7 @@ final class MonoZipUsageTest {
             "X",
             m ->
                 m.contains(
-                    "Invoking a `Mono#zip` or `Mono#zipWith` on a `Mono#empty()` or `Mono<Void>` is a no-op."))
+                    "Invoking `Mono#zipWith` on a `Mono#empty()` or `Mono<Void>` is a no-op."))
         .addSourceLines(
             "A.java",
             "import reactor.core.publisher.Flux;",
