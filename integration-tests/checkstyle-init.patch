@@ -1,6 +1,26 @@
+diff --git a/pom.xml b/pom.xml
+index 4a7e545..87768a5 100644
 --- a/pom.xml
 +++ b/pom.xml
-@@ -362,6 +362,12 @@
+@@ -235,7 +235,7 @@
+     <json-schema-validator.version>1.2.0</json-schema-validator.version>
+     <checkerframework.version>3.42.0</checkerframework.version>
+     <error-prone.version>2.24.1</error-prone.version>
+-    <error-prone-support.version>0.14.0</error-prone-support.version>
++    <error-prone-support.version>0.15.0</error-prone-support.version>
+     <doxia.version>1.12.0</doxia.version>
+     <error-prone.configuration-args>
+       -Xep:AmbiguousJsonCreator:ERROR
+@@ -259,8 +259,6 @@
+       -Xep:JUnitValueSource:OFF
+       <!-- Until https://github.com/checkstyle/checkstyle/issues/14194. -->
+       -Xep:LexicographicalAnnotationListing:OFF
+-      <!-- This check is not finalized. -->
+-      -Xep:MethodReferenceUsage:OFF
+       <!-- We prefer to qualify all static method calls with class name. -->
+       -Xep:StaticImport:OFF
+     </error-prone.configuration-args>
+@@ -362,6 +360,12 @@
        <version>1.3.0</version>
        <scope>test</scope>
      </dependency>
@@ -13,7 +33,7 @@
      <dependency>
        <groupId>nl.jqno.equalsverifier</groupId>
        <artifactId>equalsverifier</artifactId>
-@@ -2412,6 +2418,8 @@
+@@ -2412,6 +2416,8 @@
                      <arg>
                        -Xplugin:ErrorProne ${error-prone.configuration-args}
                      </arg>
@@ -22,7 +42,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2424,6 +2432,11 @@
+@@ -2424,6 +2430,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -34,7 +54,7 @@
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
-@@ -2468,9 +2481,10 @@
+@@ -2468,9 +2479,10 @@
                      <arg>-XDcompilePolicy=simple</arg>
                      <arg>
                        -Xplugin:ErrorProne \
@@ -46,7 +66,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2483,6 +2497,11 @@
+@@ -2483,6 +2495,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -58,6 +78,8 @@
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
+index ccd5e54..db7ecd3 100644
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
 @@ -63,6 +63,8 @@ public final class DetailNodeTreeStringPrinter {
@@ -69,6 +91,8 @@
      public static DetailNode parseJavadocAsDetailNode(DetailAST blockComment) {
          final JavadocDetailNodeParser parser = new JavadocDetailNodeParser();
          final ParseStatus status = parser.parseJavadocAsDetailNode(blockComment);
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/Main.java b/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
+index 889beac..7b31391 100644
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
 @@ -626,6 +626,8 @@ public final class Main {
@@ -80,6 +104,8 @@
      private static final class CliOptions {
  
          /** Width of CLI help option. */
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java b/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
+index 82e848b..653fcf2 100644
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
 @@ -139,6 +139,9 @@ public class SarifLogger extends AbstractAutomaticBean implements AuditListener
@@ -92,6 +118,8 @@
          final String rendered = report
              .replace(VERSION_PLACEHOLDER, String.valueOf(version))
              .replace(RESULTS_PLACEHOLDER, String.join(",\n", results));
+diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java b/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
+index 73c56e2..cc07dc1 100644
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
 @@ -564,6 +564,10 @@ public final class SiteUtil {
@@ -105,6 +133,8 @@
          final Set<String> properties =
                  getProperties(clss).stream()
                      .filter(prop -> {
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
+index 2489988..b13f103 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
 @@ -93,6 +93,8 @@ import de.thetaphi.forbiddenapis.SuppressForbidden;
@@ -116,6 +146,8 @@
  public class CheckerTest extends AbstractModuleTestSupport {
  
      @TempDir
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
+index fdd31e7..2fdae26 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
 @@ -47,6 +47,8 @@ import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
@@ -127,6 +159,8 @@
  public class ConfigurationLoaderTest extends AbstractPathTestSupport {
  
      @Override
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
+index 71df609..68ab409 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
 @@ -98,6 +98,8 @@ public class PackageObjectFactoryTest {
@@ -147,6 +181,8 @@
              final Object test = new PackageObjectFactory(Collections.singleton(null), classLoader,
                      TRY_IN_ALL_REGISTERED_PACKAGES);
              assertWithMessage("Exception is expected but got " + test).fail();
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
+index 8da3ae3..fc4dd8f 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
 @@ -429,6 +429,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
@@ -159,6 +195,8 @@
      public void testNonExistentResource() throws IOException {
          final Configuration config = new DefaultConfiguration("myName");
          final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
+index 9d10231..6d5d709 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
 @@ -81,6 +81,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
@@ -170,6 +208,8 @@
  public class TreeWalkerTest extends AbstractModuleTestSupport {
  
      @TempDir
+diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
+index 2cfeffd..7daaf06 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
 @@ -47,6 +47,8 @@ import com.puppycrawl.tools.checkstyle.checks.coding.NestedIfDepthCheck;
