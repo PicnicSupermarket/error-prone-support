@@ -59,8 +59,8 @@ public final class MonoZipUsage extends BugChecker implements MethodInvocationTr
           typePredicateMatcher(isSubTypeOf(generic(MONO, type(Void.class.getCanonicalName())))));
   private static final Matcher<ExpressionTree> MONO_ZIP_OR_ZIP_WITH =
       anyOf(
-          instanceMethod().onDescendantOf(type("reactor.core.publisher.Mono")).named("zipWith"),
-          staticMethod().onClass(type("reactor.core.publisher.Mono")).named("zip"));
+          instanceMethod().onDescendantOf(MONO).named("zipWith"),
+          staticMethod().onClass(MONO).named("zip"));
 
   /** Instantiates a new {@link MonoZipUsage} instance. */
   public MonoZipUsage() {}
