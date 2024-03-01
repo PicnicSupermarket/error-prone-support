@@ -61,19 +61,23 @@ format_goal='com.spotify.fmt:fmt-maven-plugin:2.21.1:format'
 
 error_prone_shared_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
 
-# XXX: Drop the `ErrorProneRuntimeClasspath` exclusion once that check resides
-# in a separate Maven module.
+# XXX: Drop the exclusions once we know how to improve this.
 error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE -XepPatchChecks:$(
-  find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -print0 \
+  find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" \
+     -not -path "*/error-prone-guidelines/*" \
+     -not -path "*/error-prone-experimental/*" \
+     -print0 \
     | xargs -0 "${grep_command}" -hoP '[^.]+$' \
     | "${grep_command}" -v ErrorProneRuntimeClasspath \
     | paste -s -d ',' -
 )"
 
-# XXX: Drop the `ErrorProneRuntimeClasspath` exclusion once that check resides
-# in a separate Maven module.
+# XXX: Drop the exclusions once we know how to improve this.
 error_prone_validation_flags="${error_prone_shared_flags} -XepDisableAllChecks $(
-  find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" -print0 \
+  find "${error_prone_support_root}" -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" \
+     -not -path "*/error-prone-guidelines/*" \
+     -not -path "*/error-prone-experimental/*" \
+     -print0 \
     | xargs -0 "${grep_command}" -hoP '[^.]+$' \
     | "${sed_command}" -r 's,(.*),-Xep:\1:WARN,' \
     | "${grep_command}" -v ErrorProneRuntimeClasspath \
