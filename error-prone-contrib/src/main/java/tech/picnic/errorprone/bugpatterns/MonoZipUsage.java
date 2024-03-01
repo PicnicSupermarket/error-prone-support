@@ -51,11 +51,9 @@ public final class MonoZipUsage extends BugChecker implements MethodInvocationTr
   private static final long serialVersionUID = 1L;
   private static final Supplier<Type> MONO =
       Suppliers.typeFromString("reactor.core.publisher.Mono");
-  private static final Matcher<ExpressionTree> MONO_EMPTY =
-      staticMethod().onDescendantOf(MONO).named("empty");
   private static final Matcher<ExpressionTree> MONO_VOID_OR_MONO_EMPTY =
       anyOf(
-          MONO_EMPTY,
+          staticMethod().onDescendantOf(MONO).named("empty"),
           typePredicateMatcher(isSubTypeOf(generic(MONO, type(Void.class.getCanonicalName())))));
   private static final Matcher<ExpressionTree> MONO_ZIP_OR_ZIP_WITH =
       anyOf(
@@ -84,9 +82,8 @@ public final class MonoZipUsage extends BugChecker implements MethodInvocationTr
     return describeMatch(tree);
   }
 
-  // XXX: Can we do this in a nicer way?
   private static boolean isInvokedOnMonoEmpty(MethodInvocationTree tree, VisitorState state) {
     MemberSelectTree methodSelect = (MemberSelectTree) tree.getMethodSelect();
-    return MONO_EMPTY.matches(methodSelect.getExpression(), state);
+    return MONO_VOID_OR_MONO_EMPTY.matches(methodSelect.getExpression(), state);
   }
 }

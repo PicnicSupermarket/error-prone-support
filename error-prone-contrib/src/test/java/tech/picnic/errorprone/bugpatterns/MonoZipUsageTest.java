@@ -14,10 +14,13 @@ final class MonoZipUsageTest {
                     "Invoking a `Mono#zip` or `Mono#zipWith` on a `Mono#empty()` is a no-op."))
         .addSourceLines(
             "A.java",
+            "import reactor.core.publisher.Flux;",
             "import reactor.core.publisher.Mono;",
             "",
             "class A {",
             "  <T> void m(T t) {",
+            "    Flux.just(1).zip(Flux.empty(), Flux.just(2));",
+            "",
             "    Mono<Void> emptyMono = Mono.empty();",
             "    Mono<Integer> integerMono = Mono.empty();",
             "",
@@ -47,6 +50,8 @@ final class MonoZipUsageTest {
             "",
             "    // BUG: Diagnostic matches: X",
             "    Mono.empty().zipWith(Mono.just(1));",
+            "    // BUG: Diagnostic matches: X",
+            "    emptyMono.zipWith(Mono.just(1));",
             "  }",
             "}")
         .doTest();
