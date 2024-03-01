@@ -71,7 +71,8 @@ public final class MonoZipUsage extends BugChecker implements MethodInvocationTr
 
     if (isInvokedOnMonoEmpty(tree, state)) {
       return buildDescription(tree)
-          .setMessage("Invoking a `Mono#zip` or `Mono#zipWith` on a `Mono#empty()` is a no-op.")
+          .setMessage(
+              "Invoking a `Mono#zip` or `Mono#zipWith` on a `Mono#empty()` or `Mono<Void>` is a no-op.")
           .build();
     }
 
