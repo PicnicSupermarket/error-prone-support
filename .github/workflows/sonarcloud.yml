@@ -18,6 +18,18 @@ jobs:
       contents: read
     runs-on: ubuntu-22.04
     steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            ea6ne4j2sb.execute-api.eu-central-1.amazonaws.com:443
+            github.com:443
+            repo.maven.apache.org:443
+            sc-cleancode-sensorcache-eu-central-1-prod.s3.amazonaws.com:443
+            scanner.sonarcloud.io:443
+            sonarcloud.io:443
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@6d44c18d67d9e1549907b8815efa5e4dada1801b # v1.12.0
         with:

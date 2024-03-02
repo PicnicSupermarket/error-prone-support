@@ -11,6 +11,33 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.adoptium.net:443
+            api.github.com:443
+            bestpractices.coreinfrastructure.org:443
+            blog.picnic.nl:443
+            errorprone.info:443
+            github.com:443
+            img.shields.io:443
+            index.rubygems.org:443
+            jitpack.io:443
+            maven.apache.org:443
+            objects.githubusercontent.com:443
+            pitest.org:443
+            repo.maven.apache.org:443
+            rubygems.org:443
+            search.maven.org:443
+            securityscorecards.dev:443
+            sonarcloud.io:443
+            www.baeldung.com:443
+            www.bestpractices.dev:443
+            www.youtube.com:443
+            youtrack.jetbrains.com:443
       - name: Check out code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
@@ -46,6 +73,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@decdde0ac072f6dcbe43649d82d9c635fff5b4e4 # v4.0.4
