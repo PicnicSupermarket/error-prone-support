@@ -5,7 +5,8 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static javax.tools.JavaFileObject.Kind.CLASS;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -14,6 +15,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFix.Builder;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
@@ -27,14 +29,13 @@ import com.sun.source.util.TreeScanner;
 import javax.inject.Inject;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
-import javax.tools.JavaFileObject;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that warns when SLF4J declarations are not canonicalized across the project.
  *
- * @apiNote The default canonicalized logger name can be overriden through {@link ErrorProneFlags
+ * @apiNote The default canonicalized logger name can be overridden through {@link ErrorProneFlags
  *     flag arguments}.
  */
 @AutoService(BugChecker.class)
@@ -82,7 +83,7 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
         canonicalizeLoggerVariable(member, state, fixBuilder);
       }
     }
-    fixLoggerVariableDeclaration(state, fixBuilder);
+    fixLoggerVariableDeclaration(tree, state, fixBuilder);
 
     return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
   }
@@ -96,38 +97,33 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
   private void canonicalizeLoggerVariable(
       Tree member, VisitorState state, SuggestedFix.Builder fixBuilder) {
     VariableTree variable = (VariableTree) member;
-    if (!variable.getName().toString().equals(canonicalizedLoggerName)) {
+    if (!variable.getName().contentEquals(canonicalizedLoggerName)) {
       fixBuilder.merge(SuggestedFixes.renameVariable(variable, canonicalizedLoggerName, state));
     }
   }
 
   private static void fixLoggerVariableDeclaration(
-      VisitorState state, SuggestedFix.Builder fixBuilder) {
-    for (Tree typeDeclaration : state.getPath().getCompilationUnit().getTypeDecls()) {
-      if (typeDeclaration instanceof ClassTree) {
-        new TreeScanner<@Nullable Void, Name>() {
-          @Override
-          public @Nullable Void visitClass(ClassTree classTree, Name className) {
-            return super.visitClass(classTree, classTree.getSimpleName());
-          }
-
-          @Override
-          public @Nullable Void visitMethodInvocation(
-              MethodInvocationTree methodTree, Name className) {
-            if (GET_LOGGER_METHOD.matches(methodTree, state)) {
-              ExpressionTree arg = methodTree.getArguments().get(0);
-              String argumentName = SourceCode.treeToString(arg, state);
-
-              if (!className.contentEquals(argumentName)) {
-                fixBuilder.merge(
-                    SuggestedFix.replace(arg, className + JavaFileObject.Kind.CLASS.extension));
-              }
-            }
-            return super.visitMethodInvocation(methodTree, className);
-          }
-        }.scan(typeDeclaration, null);
+      ClassTree tree, VisitorState state, Builder fixBuilder) {
+    new TreeScanner<@Nullable Void, Name>() {
+      @Override
+      public @Nullable Void visitClass(ClassTree classTree, Name className) {
+        return super.visitClass(classTree, classTree.getSimpleName());
       }
-    }
+
+      @Override
+      public @Nullable Void visitMethodInvocation(MethodInvocationTree methodTree, Name className) {
+        if (GET_LOGGER_METHOD.matches(methodTree, state)) {
+          ExpressionTree arg = methodTree.getArguments().get(0);
+          String argumentName = SourceCode.treeToString(arg, state);
+
+          if (!className.contentEquals(
+              argumentName.substring(0, argumentName.indexOf(CLASS.extension)))) {
+            fixBuilder.merge(SuggestedFix.replace(arg, className + CLASS.extension));
+          }
+        }
+        return super.visitMethodInvocation(methodTree, className);
+      }
+    }.scan(tree, tree.getSimpleName());
   }
 
   private static String getCanonicalizedLoggerName(ErrorProneFlags flags) {
