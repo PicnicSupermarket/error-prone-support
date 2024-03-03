@@ -15,7 +15,6 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
-import com.google.errorprone.fixes.SuggestedFix.Builder;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
@@ -103,7 +102,7 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
   }
 
   private static void fixLoggerVariableDeclaration(
-      ClassTree tree, VisitorState state, Builder fixBuilder) {
+      ClassTree tree, VisitorState state, SuggestedFix.Builder fixBuilder) {
     new TreeScanner<@Nullable Void, Name>() {
       @Override
       public @Nullable Void visitClass(ClassTree classTree, Name className) {
