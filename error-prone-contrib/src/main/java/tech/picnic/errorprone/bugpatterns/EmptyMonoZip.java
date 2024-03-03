@@ -25,43 +25,39 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
-import java.util.List;
 import reactor.core.publisher.Mono;
 
 /**
- * A {@link BugChecker} that flags usages of {@link Mono#zip(Mono, Mono)} and {@link
- * Mono#zipWith(Mono)} with {@link Mono#empty()} as arguments.
+ * A {@link BugChecker} that flags {@link Mono#zip} and {@link Mono#zipWith} invocations with a
+ * {@code Mono<Void>} or {@link Mono#empty()} argument or receiver.
  *
- * <p>Usage of {@code Mono.zip} and {@code Mono.zipWith} methods with {@code Mono.empty()} as
- * arguments can lead to unintended behavior. When a {@code Mono} completes empty or encounters an
- * error, the reactive chain may prematurely terminate, which might not align with the intended
- * logic.
- *
- * @apiNote While {@code Mono<?>.zipWith(Mono<Void>)} is technically allowed by the Reactor API, it
- *     is considered an incorrect usage as it can lead to unexpected behavior.
+ * <p>When a zipped reactive stream completes empty, then the other zipped streams will be cancelled
+ * (or not subscribed to), and the operation as a whole will complete empty as well. This is
+ * generally not what was intended.
  */
+// XXX: Generalize this check to also cover `Flux` zip operations.
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Don't pass a `Mono<Void>` argument or `Mono.empty()` to Mono#{zip,With}`",
-    link = BUG_PATTERNS_BASE_URL + "MonoZipUsage",
+    summary = "Don't pass a `Mono<Void>` or `Mono.empty()` argument to `Mono#{zip,With}`",
+    link = BUG_PATTERNS_BASE_URL + "EmptyMonoZip",
     linkType = CUSTOM,
     severity = ERROR,
     tags = LIKELY_ERROR)
-public final class MonoZipUsage extends BugChecker implements MethodInvocationTreeMatcher {
+public final class EmptyMonoZip extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Supplier<Type> MONO =
       Suppliers.typeFromString("reactor.core.publisher.Mono");
-  private static final Matcher<ExpressionTree> MONO_VOID_OR_MONO_EMPTY =
-      anyOf(
-          staticMethod().onDescendantOf(MONO).named("empty"),
-          typePredicateMatcher(isSubTypeOf(generic(MONO, type(Void.class.getCanonicalName())))));
   private static final Matcher<ExpressionTree> MONO_ZIP_OR_ZIP_WITH =
       anyOf(
           instanceMethod().onDescendantOf(MONO).named("zipWith"),
           staticMethod().onClass(MONO).named("zip"));
+  private static final Matcher<ExpressionTree> EMPTY_MONO =
+      anyOf(
+          staticMethod().onDescendantOf(MONO).named("empty"),
+          typePredicateMatcher(isSubTypeOf(generic(MONO, type(Void.class.getCanonicalName())))));
 
-  /** Instantiates a new {@link MonoZipUsage} instance. */
-  public MonoZipUsage() {}
+  /** Instantiates a new {@link EmptyMonoZip} instance. */
+  public EmptyMonoZip() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
@@ -69,22 +65,25 @@ public final class MonoZipUsage extends BugChecker implements MethodInvocationTr
       return Description.NO_MATCH;
     }
 
-    if (isZipWithOnMonoThatCompletesEmpty(tree, state)) {
+    if (hasEmptyReceiver(tree, state)) {
       return buildDescription(tree)
-          .setMessage("Invoking `Mono#zipWith` on a `Mono#empty()` or `Mono<Void>` is a no-op.")
+          .setMessage("Invoking `Mono#zipWith` on `Mono#empty()` or a `Mono<Void>` is a no-op")
           .build();
     }
 
-    List<? extends ExpressionTree> arguments = tree.getArguments();
-    if (arguments.stream().noneMatch(arg -> MONO_VOID_OR_MONO_EMPTY.matches(arg, state))) {
-      return Description.NO_MATCH;
+    if (hasEmptyArguments(tree, state)) {
+      return describeMatch(tree);
     }
-    return describeMatch(tree);
+
+    return Description.NO_MATCH;
   }
 
-  private static boolean isZipWithOnMonoThatCompletesEmpty(
-      MethodInvocationTree tree, VisitorState state) {
-    MemberSelectTree methodSelect = (MemberSelectTree) tree.getMethodSelect();
-    return MONO_VOID_OR_MONO_EMPTY.matches(methodSelect.getExpression(), state);
+  private static boolean hasEmptyReceiver(MethodInvocationTree tree, VisitorState state) {
+    return tree.getMethodSelect() instanceof MemberSelectTree memberSelect
+        && EMPTY_MONO.matches(memberSelect.getExpression(), state);
+  }
+
+  private static boolean hasEmptyArguments(MethodInvocationTree tree, VisitorState state) {
+    return tree.getArguments().stream().anyMatch(arg -> EMPTY_MONO.matches(arg, state));
   }
 }
