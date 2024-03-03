@@ -26,7 +26,7 @@ final class EmptyMonoZipTest {
             "",
             "class A {",
             "  void m() {",
-            "    Flux.just(1).zip(Flux.empty(), Flux.just(2));",
+            "    Flux.just(1).zip(Mono.empty(), Flux.just(2));",
             "",
             "    Mono<Void> voidMono = Mono.empty();",
             "    Mono<Integer> integerMono = Mono.empty();",
