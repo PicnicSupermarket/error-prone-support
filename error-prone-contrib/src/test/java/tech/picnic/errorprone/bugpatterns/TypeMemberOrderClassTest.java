@@ -137,6 +137,39 @@ final class TypeMemberOrderClassTest {
   }
 
   @Test
+  void replacementSuggestedFixAbstractMethods() {
+    BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
+        .addInputLines(
+            "A.java",
+            "abstract class A {",
+            "  static class InnerClass {}",
+            "",
+            "  void foo() {}",
+            "",
+            "  abstract void bar();",
+            "",
+            "  void baz() {}",
+            "",
+            "  A() {}",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "abstract class A {",
+            "",
+            "  A() {}",
+            "",
+            "  void foo() {}",
+            "",
+            "  abstract void bar();",
+            "",
+            "  void baz() {}",
+            "",
+            "  static class InnerClass {}",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
   void replacementSuggestedFixConsidersUnmovableMembers() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addInputLines(

@@ -87,13 +87,12 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
     // present in-between members.
     ImmutableList<TypeMember> members =
         tree.getMembers().stream()
-            // XXX: Maybe we can remove this filter?
             .filter(TypeMemberOrder::hasSource)
             .map(m -> new AutoValue_TypeMemberOrder_TypeMember(m, getPreferredOrdinal(m, state)))
             .collect(toImmutableList());
 
     // List of the sortable members' preferred ordinals,
-    // ordered by the member's position in original source.
+    // ordered by the member's position in the original source.
     ImmutableList<Integer> preferredOrdinals =
         members.stream()
             .filter(m -> m.preferredOrdinal().isPresent())
@@ -130,6 +129,7 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
       case BLOCK -> Optional.of(isStatic((BlockTree) tree) ? 3 : 4);
       case METHOD -> Optional.of(isConstructor((MethodTree) tree) ? 5 : 6);
       case CLASS, INTERFACE, ENUM -> Optional.of(7);
+        // TODO: Should we log unhandled kinds?
       default -> Optional.empty();
     };
   }
@@ -172,8 +172,14 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
             sourceCode.subSequence(typeStart, typeEnd).toString(), typeStart, state.context)
         .stream()
         .dropWhile(token -> token.kind() != TokenKind.LBRACE)
-        // XXX: To accommodate enums, start processing the body, after the enumerated type's
-        // enumerators.
+        /*
+         * To accommodate enums, skip processing their enumerators.
+         * This is needed as ErrorProne has access to the enumerations individually, but not to the
+         * whole expression that declares them, leaving the semicolon trailing the declarations
+         * unaccounted for. The current logic would move this trailing semicolon with the first
+         * member after the enumerations instead of leaving it to close the enumerations'
+         * declaration, introducing a syntax error.
+         */
         .dropWhile(token -> tree.getKind() == Kind.ENUM && token.kind() != TokenKind.SEMI)
         .findFirst()
         .map(ErrorProneToken::endPos)
@@ -198,7 +204,7 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
     for (TypeMember member : members) {
       int end = state.getEndPosition(member.tree());
       if (isEnumerator(member.tree())) {
-        // XXX: To accommodate enums, skip enumerators of enumerated types.
+        // To accommodate enums, skip processing their enumerators.
         continue;
       }
       verify(

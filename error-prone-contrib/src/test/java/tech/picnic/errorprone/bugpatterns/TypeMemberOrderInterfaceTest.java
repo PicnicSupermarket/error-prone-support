@@ -5,7 +5,6 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-// XXX: Add test case for abstract class and default methods.
 final class TypeMemberOrderInterfaceTest {
   @Test
   void identification() {
@@ -89,6 +88,39 @@ final class TypeMemberOrderInterfaceTest {
             "  static interface InnerInterface {}",
             "",
             "  static enum InnerEnum {}",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void replacementSuggestedFixDefaultMethods() {
+    BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
+        .addInputLines(
+            "A.java",
+            "interface A {",
+            "  class InnerClass {}",
+            "",
+            "  void foo();",
+            "",
+            "  default void bar() {}",
+            "",
+            "  void baz();",
+            "",
+            "  static final int QUX = 1;",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "interface A {",
+            "",
+            "  static final int QUX = 1;",
+            "",
+            "  void foo();",
+            "",
+            "  default void bar() {}",
+            "",
+            "  void baz();",
+            "",
+            "  class InnerClass {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
