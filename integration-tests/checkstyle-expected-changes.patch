@@ -811,7 +811,7 @@
      final String msgPreceded = "ws.preceded";
      final String msgFollowed = "ws.followed";
      final Configuration checkConfig = getModuleConfig("GenericWhitespace");
-@@ -65,7 +65,7 @@ public class GenericWhitespaceTest extends AbstractGoogleModuleTestSupport {
+@@ -66,7 +66,7 @@ public class GenericWhitespaceTest extends AbstractGoogleModuleTestSupport {
    }
  
    @Test
@@ -820,7 +820,7 @@
      final String msgPreceded = "ws.preceded";
      final String msgFollowed = "ws.followed";
      final String msgNotPreceded = "ws.notPreceded";
-@@ -109,7 +109,7 @@ public class GenericWhitespaceTest extends AbstractGoogleModuleTestSupport {
+@@ -112,7 +112,7 @@ public class GenericWhitespaceTest extends AbstractGoogleModuleTestSupport {
    }
  
    @Test
@@ -5007,6 +5007,43 @@
  
      runVerifications(moduleConfig, fileToProcess, expectedViolation, expectedXpathQueries);
    }
+--- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionIllegalInstantiationTest.java
++++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionIllegalInstantiationTest.java
+@@ -28,14 +28,14 @@ import java.util.Arrays;
+ import java.util.List;
+ import org.junit.jupiter.api.Test;
+ 
+-public class XpathRegressionIllegalInstantiationTest extends AbstractXpathTestSupport {
++final class XpathRegressionIllegalInstantiationTest extends AbstractXpathTestSupport {
+   @Override
+   protected String getCheckName() {
+     return IllegalInstantiationCheck.class.getSimpleName();
+   }
+ 
+   @Test
+-  public void testSimple() throws Exception {
++  void simple() throws Exception {
+     final String fileName = "SuppressionXpathRegressionIllegalInstantiationSimple.java";
+     final File fileToProcess = new File(getNonCompilablePath(fileName));
+ 
+@@ -61,7 +61,7 @@ public class XpathRegressionIllegalInstantiationTest extends AbstractXpathTestSu
+   }
+ 
+   @Test
+-  public void testAnonymous() throws Exception {
++  void anonymous() throws Exception {
+     final String fileName = "SuppressionXpathRegressionIllegalInstantiationAnonymous.java";
+     final File fileToProcess = new File(getNonCompilablePath(fileName));
+ 
+@@ -88,7 +88,7 @@ public class XpathRegressionIllegalInstantiationTest extends AbstractXpathTestSu
+   }
+ 
+   @Test
+-  public void testInterface() throws Exception {
++  void testInterface() throws Exception {
+     final String fileName = "SuppressionXpathRegressionIllegalInstantiationInterface.java";
+     final File fileToProcess = new File(getNonCompilablePath(fileName));
+ 
 --- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionIllegalThrowsTest.java
 +++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionIllegalThrowsTest.java
 @@ -19,14 +19,14 @@
@@ -6586,6 +6623,44 @@
      final File fileToProcess = new File(getPath("SuppressionXpathRegressionMethodCount4.java"));
  
      final DefaultConfiguration moduleConfig = createModuleConfig(MethodCountCheck.class);
+--- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionMethodLengthTest.java
++++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionMethodLengthTest.java
+@@ -28,7 +28,7 @@ import java.util.Arrays;
+ import java.util.List;
+ import org.junit.jupiter.api.Test;
+ 
+-public class XpathRegressionMethodLengthTest extends AbstractXpathTestSupport {
++final class XpathRegressionMethodLengthTest extends AbstractXpathTestSupport {
+ 
+   private final String checkName = MethodLengthCheck.class.getSimpleName();
+ 
+@@ -38,7 +38,7 @@ public class XpathRegressionMethodLengthTest extends AbstractXpathTestSupport {
+   }
+ 
+   @Test
+-  public void testSimple() throws Exception {
++  void simple() throws Exception {
+     final File fileToProcess =
+         new File(getPath("SuppressionXpathRegressionMethodLengthSimple.java"));
+ 
+@@ -75,7 +75,7 @@ public class XpathRegressionMethodLengthTest extends AbstractXpathTestSupport {
+   }
+ 
+   @Test
+-  public void testNoEmptyLines() throws Exception {
++  void noEmptyLines() throws Exception {
+     final File fileToProcess =
+         new File(getPath("SuppressionXpathRegressionMethodLengthNoEmptyLines.java"));
+ 
+@@ -105,7 +105,7 @@ public class XpathRegressionMethodLengthTest extends AbstractXpathTestSupport {
+   }
+ 
+   @Test
+-  public void testSingleToken() throws Exception {
++  void singleToken() throws Exception {
+     final File fileToProcess =
+         new File(getPath("SuppressionXpathRegressionMethodLengthSingleToken.java"));
+ 
 --- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionMethodNameTest.java
 +++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionMethodNameTest.java
 @@ -19,15 +19,15 @@
@@ -7053,6 +7128,80 @@
      final File fileToProcess =
          new File(getPath("SuppressionXpathRegressionModifierOrderAnnotation.java"));
  
+--- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionMultipleStringLiteralsTest.java
++++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionMultipleStringLiteralsTest.java
+@@ -21,15 +21,15 @@ package org.checkstyle.suppressionxpathfilter;
+ 
+ import static com.puppycrawl.tools.checkstyle.checks.coding.MultipleStringLiteralsCheck.MSG_KEY;
+ 
++import com.google.common.collect.ImmutableList;
+ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+ import com.puppycrawl.tools.checkstyle.checks.coding.MultipleStringLiteralsCheck;
+ import java.io.File;
+ import java.util.Arrays;
+-import java.util.Collections;
+ import java.util.List;
+ import org.junit.jupiter.api.Test;
+ 
+-public class XpathRegressionMultipleStringLiteralsTest extends AbstractXpathTestSupport {
++final class XpathRegressionMultipleStringLiteralsTest extends AbstractXpathTestSupport {
+ 
+   @Override
+   protected String getCheckName() {
+@@ -38,7 +38,7 @@ public class XpathRegressionMultipleStringLiteralsTest extends AbstractXpathTest
+   }
+ 
+   @Test
+-  public void testDefault() throws Exception {
++  void testDefault() throws Exception {
+     final File fileToProcess =
+         new File(getPath("SuppressionXpathRegressionMultipleStringLiteralsDefault.java"));
+ 
+@@ -64,7 +64,7 @@ public class XpathRegressionMultipleStringLiteralsTest extends AbstractXpathTest
+   }
+ 
+   @Test
+-  public void testAllowDuplicates() throws Exception {
++  void allowDuplicates() throws Exception {
+     final File fileToProcess =
+         new File(getPath("SuppressionXpathRegressionMultipleStringLiteralsAllowDuplicates.java"));
+ 
+@@ -76,7 +76,7 @@ public class XpathRegressionMultipleStringLiteralsTest extends AbstractXpathTest
+     };
+ 
+     final List<String> expectedXpathQueries =
+-        Collections.singletonList(
++        ImmutableList.of(
+             "/COMPILATION_UNIT/CLASS_DEF[./IDENT"
+                 + "[@text='SuppressionXpathRegressionMultipleStringLiteralsAllowDuplicates']]"
+                 + "/OBJBLOCK/METHOD_DEF[./IDENT[@text='myTest']]/SLIST/VARIABLE_DEF"
+@@ -87,7 +87,7 @@ public class XpathRegressionMultipleStringLiteralsTest extends AbstractXpathTest
+   }
+ 
+   @Test
+-  public void testIgnoreRegexp() throws Exception {
++  void ignoreRegexp() throws Exception {
+     final File fileToProcess =
+         new File(getPath("SuppressionXpathRegressionMultipleStringLiteralsIgnoreRegexp.java"));
+ 
+@@ -99,7 +99,7 @@ public class XpathRegressionMultipleStringLiteralsTest extends AbstractXpathTest
+     };
+ 
+     final List<String> expectedXpathQueries =
+-        Collections.singletonList(
++        ImmutableList.of(
+             "/COMPILATION_UNIT/CLASS_DEF[./IDENT"
+                 + "[@text='SuppressionXpathRegressionMultipleStringLiteralsIgnoreRegexp']]"
+                 + "/OBJBLOCK/METHOD_DEF[./IDENT[@text='myTest']]/SLIST/VARIABLE_DEF"
+@@ -109,7 +109,7 @@ public class XpathRegressionMultipleStringLiteralsTest extends AbstractXpathTest
+   }
+ 
+   @Test
+-  public void testIgnoreOccurrenceContext() throws Exception {
++  void ignoreOccurrenceContext() throws Exception {
+     final String filePath =
+         "SuppressionXpathRegressionMultipleStringLiteralsIgnoreOccurrenceContext.java";
+     final File fileToProcess = new File(getPath(filePath));
 --- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionMultipleVariableDeclarationsTest.java
 +++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionMultipleVariableDeclarationsTest.java
 @@ -26,7 +26,7 @@ import java.util.Arrays;
@@ -8262,6 +8411,79 @@
              "/COMPILATION_UNIT"
                  + "/CLASS_DEF[./IDENT[@text"
                  + "='SuppressionXpathRegressionParameterNameAccessModifier']]"
+--- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionParameterNumberTest.java
++++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionParameterNumberTest.java
+@@ -21,14 +21,14 @@ package org.checkstyle.suppressionxpathfilter;
+ 
+ import static com.puppycrawl.tools.checkstyle.checks.sizes.ParameterNumberCheck.MSG_KEY;
+ 
++import com.google.common.collect.ImmutableList;
+ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+ import com.puppycrawl.tools.checkstyle.checks.sizes.ParameterNumberCheck;
+ import java.io.File;
+-import java.util.Collections;
+ import java.util.List;
+ import org.junit.jupiter.api.Test;
+ 
+-public class XpathRegressionParameterNumberTest extends AbstractXpathTestSupport {
++final class XpathRegressionParameterNumberTest extends AbstractXpathTestSupport {
+ 
+   @Override
+   protected String getCheckName() {
+@@ -36,7 +36,7 @@ public class XpathRegressionParameterNumberTest extends AbstractXpathTestSupport
+   }
+ 
+   @Test
+-  public void testDefault() throws Exception {
++  void testDefault() throws Exception {
+     final File fileToProcess =
+         new File(getPath("SuppressionXpathRegressionParameterNumberDefault.java"));
+ 
+@@ -47,7 +47,7 @@ public class XpathRegressionParameterNumberTest extends AbstractXpathTestSupport
+     };
+ 
+     final List<String> expectedXpathQueries =
+-        Collections.singletonList(
++        ImmutableList.of(
+             "/COMPILATION_UNIT/CLASS_DEF"
+                 + "[./IDENT[@text='SuppressionXpathRegressionParameterNumberDefault']]"
+                 + "/OBJBLOCK/METHOD_DEF/IDENT[@text='myMethod']");
+@@ -56,7 +56,7 @@ public class XpathRegressionParameterNumberTest extends AbstractXpathTestSupport
+   }
+ 
+   @Test
+-  public void testMethods() throws Exception {
++  void methods() throws Exception {
+     final File fileToProcess =
+         new File(getPath("SuppressionXpathRegressionParameterNumberMethods.java"));
+ 
+@@ -69,7 +69,7 @@ public class XpathRegressionParameterNumberTest extends AbstractXpathTestSupport
+     };
+ 
+     final List<String> expectedXpathQueries =
+-        Collections.singletonList(
++        ImmutableList.of(
+             "/COMPILATION_UNIT/CLASS_DEF"
+                 + "[./IDENT[@text='SuppressionXpathRegressionParameterNumberMethods']]"
+                 + "/OBJBLOCK/METHOD_DEF/IDENT[@text='myMethod']");
+@@ -78,7 +78,7 @@ public class XpathRegressionParameterNumberTest extends AbstractXpathTestSupport
+   }
+ 
+   @Test
+-  public void testIgnoreOverriddenMethods() throws Exception {
++  void ignoreOverriddenMethods() throws Exception {
+     final String filePath =
+         getPath("SuppressionXpathRegressionParameterNumberIgnoreOverriddenMethods.java");
+     final File fileToProcess = new File(filePath);
+@@ -91,7 +91,7 @@ public class XpathRegressionParameterNumberTest extends AbstractXpathTestSupport
+     };
+ 
+     final List<String> expectedXpathQueries =
+-        Collections.singletonList(
++        ImmutableList.of(
+             "/COMPILATION_UNIT/CLASS_DEF[./IDENT"
+                 + "[@text='SuppressionXpathRegressionParameterNumberIgnoreOverriddenMethods']]"
+                 + "/OBJBLOCK/CTOR_DEF/IDENT"
 --- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionParenPadTest.java
 +++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionParenPadTest.java
 @@ -19,16 +19,16 @@
@@ -8859,6 +9081,62 @@
              "/COMPILATION_UNIT/CLASS_DEF"
                  + "[./IDENT[@text='SuppressionXpathRegressionRightCurlyFour']]/OBJBLOCK"
                  + "/METHOD_DEF[./IDENT[@text='sample']]/SLIST/LITERAL_IF/SLIST/RCURLY");
+--- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionSimplifyBooleanExpressionTest.java
++++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionSimplifyBooleanExpressionTest.java
+@@ -21,15 +21,15 @@ package org.checkstyle.suppressionxpathfilter;
+ 
+ import static com.puppycrawl.tools.checkstyle.checks.coding.SimplifyBooleanExpressionCheck.MSG_KEY;
+ 
++import com.google.common.collect.ImmutableList;
+ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+ import com.puppycrawl.tools.checkstyle.checks.coding.SimplifyBooleanExpressionCheck;
+ import java.io.File;
+ import java.util.Arrays;
+-import java.util.Collections;
+ import java.util.List;
+ import org.junit.jupiter.api.Test;
+ 
+-public class XpathRegressionSimplifyBooleanExpressionTest extends AbstractXpathTestSupport {
++final class XpathRegressionSimplifyBooleanExpressionTest extends AbstractXpathTestSupport {
+ 
+   @Override
+   protected String getCheckName() {
+@@ -37,7 +37,7 @@ public class XpathRegressionSimplifyBooleanExpressionTest extends AbstractXpathT
+   }
+ 
+   @Test
+-  public void testSimple() throws Exception {
++  void simple() throws Exception {
+     final String fileName = "SuppressionXpathRegressionSimplifyBooleanExpressionSimple.java";
+     final File fileToProcess = new File(getPath(fileName));
+ 
+@@ -61,7 +61,7 @@ public class XpathRegressionSimplifyBooleanExpressionTest extends AbstractXpathT
+   }
+ 
+   @Test
+-  public void testAnonymous() throws Exception {
++  void anonymous() throws Exception {
+     final String fileName = "SuppressionXpathRegressionSimplifyBooleanExpressionAnonymous.java";
+     final File fileToProcess = new File(getPath(fileName));
+ 
+@@ -87,7 +87,7 @@ public class XpathRegressionSimplifyBooleanExpressionTest extends AbstractXpathT
+   }
+ 
+   @Test
+-  public void testInterface() throws Exception {
++  void testInterface() throws Exception {
+     final String fileName = "SuppressionXpathRegressionSimplifyBooleanExpressionInterface.java";
+     final File fileToProcess = new File(getPath(fileName));
+ 
+@@ -99,7 +99,7 @@ public class XpathRegressionSimplifyBooleanExpressionTest extends AbstractXpathT
+     };
+ 
+     final List<String> expectedXpathQuery =
+-        Collections.singletonList(
++        ImmutableList.of(
+             "/COMPILATION_UNIT/CLASS_DEF[./IDENT"
+                 + "[@text='SuppressionXpathRegressionSimplifyBooleanExpressionInterface']]"
+                 + "/OBJBLOCK/INTERFACE_DEF[./IDENT[@text='Inner']]/OBJBLOCK/METHOD_DEF[./IDENT"
 --- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionSimplifyBooleanReturnTest.java
 +++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionSimplifyBooleanReturnTest.java
 @@ -21,14 +21,14 @@ package org.checkstyle.suppressionxpathfilter;
@@ -10113,7 +10391,7 @@
                  + "/VARIABLE_DEF[./IDENT[@text='bad']]/ASSIGN");
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/AbstractAutomaticBean.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/AbstractAutomaticBean.java
-@@ -275,8 +275,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
+@@ -276,8 +276,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
    /** A converter that converts a string to a pattern. */
    private static final class PatternConverter implements Converter {
  
@@ -10123,7 +10401,7 @@
      public Object convert(Class type, Object value) {
        return CommonUtil.createPattern(value.toString());
      }
-@@ -285,8 +285,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
+@@ -286,8 +286,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
    /** A converter that converts strings to severity level. */
    private static final class SeverityLevelConverter implements Converter {
  
@@ -10133,7 +10411,7 @@
      public Object convert(Class type, Object value) {
        return SeverityLevel.getInstance(value.toString());
      }
-@@ -295,8 +295,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
+@@ -296,8 +296,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
    /** A converter that converts strings to scope. */
    private static final class ScopeConverter implements Converter {
  
@@ -10143,17 +10421,19 @@
      public Object convert(Class type, Object value) {
        return Scope.getInstance(value.toString());
      }
-@@ -305,8 +305,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
+@@ -306,9 +306,9 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
    /** A converter that converts strings to uri. */
    private static final class UriConverter implements Converter {
  
 -    @SuppressWarnings("unchecked")
-     @Override
+-    @Override
+     @Nullable
++    @Override
 +    @SuppressWarnings("unchecked")
      public Object convert(Class type, Object value) {
        final String url = value.toString();
        URI result = null;
-@@ -329,8 +329,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
+@@ -331,8 +331,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
     */
    private static final class RelaxedStringArrayConverter implements Converter {
  
@@ -10163,7 +10443,7 @@
      public Object convert(Class type, Object value) {
        final StringTokenizer tokenizer =
            new StringTokenizer(value.toString().trim(), COMMA_SEPARATOR);
-@@ -355,8 +355,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
+@@ -357,8 +357,8 @@ public abstract class AbstractAutomaticBean implements Configurable, Contextuali
      /** Constant for optimization. */
      private static final AccessModifierOption[] EMPTY_MODIFIER_ARRAY = new AccessModifierOption[0];
  
@@ -10948,31 +11228,30 @@
    }
  
    /**
-@@ -403,8 +406,8 @@ public final class TreeWalker extends AbstractFileSetCheck implements ExternalRe
+@@ -403,7 +406,7 @@ public final class TreeWalker extends AbstractFileSetCheck implements ExternalRe
    private static SortedSet<AbstractCheck> createNewCheckSortedSet() {
      return new TreeSet<>(
          Comparator.<AbstractCheck, String>comparing(check -> check.getClass().getName())
 -            .thenComparing(AbstractCheck::getId, Comparator.nullsLast(Comparator.naturalOrder()))
--            .thenComparing(AbstractCheck::hashCode));
 +            .thenComparing(AbstractCheck::getId, nullsLast(naturalOrder()))
-+            .thenComparingInt(AbstractCheck::hashCode));
+             .thenComparingInt(AbstractCheck::hashCode));
    }
  
-   /** State of AST. Indicates whether tree contains certain nodes. */
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/XMLLogger.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/XMLLogger.java
-@@ -19,6 +19,10 @@
+@@ -19,6 +19,11 @@
  
  package com.puppycrawl.tools.checkstyle;
  
 +import static com.google.common.base.Preconditions.checkArgument;
 +import static java.nio.charset.StandardCharsets.UTF_8;
 +import static java.util.Collections.synchronizedList;
++import static java.util.Collections.unmodifiableList;
 +
  import com.puppycrawl.tools.checkstyle.api.AuditEvent;
  import com.puppycrawl.tools.checkstyle.api.AuditListener;
  import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
-@@ -28,9 +32,7 @@ import java.io.OutputStream;
+@@ -27,9 +32,7 @@ import java.io.OutputStream;
  import java.io.OutputStreamWriter;
  import java.io.PrintWriter;
  import java.io.StringWriter;
@@ -10982,7 +11261,7 @@
  import java.util.List;
  import java.util.Map;
  import java.util.concurrent.ConcurrentHashMap;
-@@ -90,10 +92,8 @@ public class XMLLogger extends AbstractAutomaticBean implements AuditListener {
+@@ -89,10 +92,8 @@ public class XMLLogger extends AbstractAutomaticBean implements AuditListener {
     * @throws IllegalArgumentException if outputStreamOptions is null.
     */
    public XMLLogger(OutputStream outputStream, OutputStreamOptions outputStreamOptions) {
@@ -10995,7 +11274,7 @@
      closeStream = outputStreamOptions == OutputStreamOptions.CLOSE;
    }
  
-@@ -328,10 +328,10 @@ public class XMLLogger extends AbstractAutomaticBean implements AuditListener {
+@@ -327,10 +328,10 @@ public class XMLLogger extends AbstractAutomaticBean implements AuditListener {
    private static final class FileMessages {
  
      /** The file error events. */
@@ -11008,6 +11287,24 @@
  
      /**
       * Returns the file error events.
+@@ -338,7 +339,7 @@ public class XMLLogger extends AbstractAutomaticBean implements AuditListener {
+      * @return the file error events.
+      */
+     public List<AuditEvent> getErrors() {
+-      return Collections.unmodifiableList(errors);
++      return unmodifiableList(errors);
+     }
+ 
+     /**
+@@ -356,7 +357,7 @@ public class XMLLogger extends AbstractAutomaticBean implements AuditListener {
+      * @return the file exceptions.
+      */
+     public List<Throwable> getExceptions() {
+-      return Collections.unmodifiableList(exceptions);
++      return unmodifiableList(exceptions);
+     }
+ 
+     /**
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/XpathFileGeneratorAuditListener.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/XpathFileGeneratorAuditListener.java
 @@ -19,13 +19,14 @@
@@ -11347,15 +11644,24 @@
          annotationValues = findAllExpressionsInChildren(ast);
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/TranslationCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/TranslationCheck.java
-@@ -19,6 +19,8 @@
+@@ -19,6 +19,9 @@
  
  package com.puppycrawl.tools.checkstyle.checks;
  
++import static java.util.Collections.unmodifiableSet;
 +import static java.util.stream.Collectors.toUnmodifiableSet;
 +
  import com.puppycrawl.tools.checkstyle.Definitions;
  import com.puppycrawl.tools.checkstyle.GlobalStatefulCheck;
  import com.puppycrawl.tools.checkstyle.LocalizedMessage;
+@@ -32,7 +35,6 @@ import java.io.InputStream;
+ import java.nio.file.Files;
+ import java.nio.file.NoSuchFileException;
+ import java.util.Arrays;
+-import java.util.Collections;
+ import java.util.HashSet;
+ import java.util.Locale;
+ import java.util.Map;
 @@ -46,7 +48,6 @@ import java.util.TreeSet;
  import java.util.concurrent.ConcurrentHashMap;
  import java.util.regex.Matcher;
@@ -11382,6 +11688,15 @@
        if (!missingKeys.isEmpty()) {
          final MessageDispatcher dispatcher = getMessageDispatcher();
          final String path = fileKey.getKey().getAbsolutePath();
+@@ -622,7 +623,7 @@ public class TranslationCheck extends AbstractFileSetCheck {
+      * @return the set of files
+      */
+     public Set<File> getFiles() {
+-      return Collections.unmodifiableSet(files);
++      return unmodifiableSet(files);
+     }
+ 
+     /**
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/UncommentedMainCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/UncommentedMainCheck.java
 @@ -19,6 +19,7 @@
@@ -11462,6 +11777,41 @@
    }
  
    /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/EqualsAvoidNullCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/EqualsAvoidNullCheck.java
+@@ -19,12 +19,13 @@
+ 
+ package com.puppycrawl.tools.checkstyle.checks.coding;
+ 
++import static java.util.Collections.unmodifiableSet;
++
+ import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
+ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+ import com.puppycrawl.tools.checkstyle.api.DetailAST;
+ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+ import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
+-import java.util.Collections;
+ import java.util.HashMap;
+ import java.util.HashSet;
+ import java.util.Map;
+@@ -552,7 +553,7 @@ public class EqualsAvoidNullCheck extends AbstractCheck {
+      * @return children of this frame.
+      */
+     public Set<FieldFrame> getChildren() {
+-      return Collections.unmodifiableSet(children);
++      return unmodifiableSet(children);
+     }
+ 
+     /**
+@@ -618,7 +619,7 @@ public class EqualsAvoidNullCheck extends AbstractCheck {
+      * @return method calls of this frame.
+      */
+     public Set<DetailAST> getMethodCalls() {
+-      return Collections.unmodifiableSet(methodCalls);
++      return unmodifiableSet(methodCalls);
+     }
+ 
+     /**
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/FallThroughCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/FallThroughCheck.java
 @@ -370,7 +370,7 @@ public class FallThroughCheck extends AbstractCheck {
@@ -12585,6 +12935,27 @@
    public void beginTree(DetailAST rootAST) {
      MatchSuppressor suppressor = null;
      if (ignoreComments) {
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/filters/CsvFilterElement.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/filters/CsvFilterElement.java
+@@ -19,7 +19,8 @@
+ 
+ package com.puppycrawl.tools.checkstyle.filters;
+ 
+-import java.util.Collections;
++import static java.util.Collections.unmodifiableSet;
++
+ import java.util.HashSet;
+ import java.util.Objects;
+ import java.util.Set;
+@@ -73,7 +74,7 @@ class CsvFilterElement implements IntFilterElement {
+    * @return the IntFilters of the filter set.
+    */
+   protected Set<IntFilterElement> getFilters() {
+-    return Collections.unmodifiableSet(filters);
++    return unmodifiableSet(filters);
+   }
+ 
+   /**
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/filters/SuppressWithPlainTextCommentFilter.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/filters/SuppressWithPlainTextCommentFilter.java
 @@ -356,7 +356,7 @@ public class SuppressWithPlainTextCommentFilter extends AbstractAutomaticBean im
@@ -12873,7 +13244,7 @@
  import org.apache.maven.doxia.macro.AbstractMacro;
  import org.apache.maven.doxia.macro.Macro;
  import org.apache.maven.doxia.macro.MacroExecutionException;
-@@ -121,7 +122,7 @@ public class ExampleMacro extends AbstractMacro {
+@@ -142,7 +143,7 @@ public class ExampleMacro extends AbstractMacro {
          .dropWhile(line -> !XML_CONFIG_START.equals(line))
          .skip(1)
          .takeWhile(line -> !XML_CONFIG_END.equals(line))
@@ -12882,7 +13253,7 @@
    }
  
    /**
-@@ -136,7 +137,7 @@ public class ExampleMacro extends AbstractMacro {
+@@ -157,7 +158,7 @@ public class ExampleMacro extends AbstractMacro {
          .dropWhile(line -> !line.contains(CODE_SNIPPET_START))
          .skip(1)
          .takeWhile(line -> !line.contains(CODE_SNIPPET_END))
@@ -13042,7 +13413,7 @@
        final String message =
            String.format(
                Locale.ROOT, "Failed to find parent module for %s", moduleClass.getSimpleName());
-@@ -545,7 +552,7 @@ public final class SiteUtil {
+@@ -541,7 +548,7 @@ public final class SiteUtil {
                  prop -> {
                    return !isGlobalProperty(clss, prop) && !isUndocumentedProperty(clss, prop);
                  })
@@ -13051,7 +13422,7 @@
      properties.addAll(getNonExplicitProperties(instance, clss));
      return new TreeSet<>(properties);
    }
-@@ -664,7 +671,7 @@ public final class SiteUtil {
+@@ -660,7 +667,7 @@ public final class SiteUtil {
      treeWalkerConfig.addChild(scraperCheckConfig);
      try {
        checker.configure(defaultConfiguration);
@@ -13060,7 +13431,7 @@
        checker.process(filesToProcess);
        checker.destroy();
      } catch (CheckstyleException checkstyleException) {
-@@ -987,9 +994,7 @@ public final class SiteUtil {
+@@ -983,9 +990,7 @@ public final class SiteUtil {
      if (value != null && Array.getLength(value) > 0) {
        result =
            removeSquareBrackets(
@@ -13071,7 +13442,7 @@
      }
  
      if (result.isEmpty()) {
-@@ -1021,8 +1026,7 @@ public final class SiteUtil {
+@@ -1017,8 +1022,7 @@ public final class SiteUtil {
        result = "";
      } else {
        try (Stream<?> valuesStream = getValuesStream(value)) {
@@ -13081,7 +13452,7 @@
        }
      }
  
-@@ -1063,10 +1067,7 @@ public final class SiteUtil {
+@@ -1059,10 +1063,7 @@ public final class SiteUtil {
    private static String getIntArrayPropertyValue(Object value) {
      try (IntStream stream = getIntStream(value)) {
        String result =
@@ -13093,7 +13464,7 @@
        if (result.isEmpty()) {
          result = CURLY_BRACKETS;
        }
-@@ -1172,11 +1173,11 @@ public final class SiteUtil {
+@@ -1168,11 +1169,11 @@ public final class SiteUtil {
     */
    public static List<Integer> getDifference(int[] tokens, int... subtractions) {
      final Set<Integer> subtractionsSet =
@@ -13459,7 +13830,7 @@
  
  /**
   * Note: it simply wraps the existing JDK methods to provide a workaround for Pitest survival on
-@@ -68,7 +70,7 @@ public final class UnmodifiableCollectionUtil {
+@@ -57,7 +59,7 @@ public final class UnmodifiableCollectionUtil {
     * @return An unmodifiable List containing elements of the specified type.
     */
    public static <S, T> List<T> unmodifiableList(Collection<S> items, Class<T> elementType) {
@@ -13468,7 +13839,7 @@
    }
  
    /**
-@@ -103,6 +105,6 @@ public final class UnmodifiableCollectionUtil {
+@@ -92,6 +94,6 @@ public final class UnmodifiableCollectionUtil {
     * @return immutable set
     */
    public static <T> Set<T> singleton(T obj) {
@@ -13504,6 +13875,31 @@
      } catch (XPathException ex) {
        final String errMsg =
            String.format(
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/xpath/AbstractElementNode.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/xpath/AbstractElementNode.java
+@@ -19,11 +19,12 @@
+ 
+ package com.puppycrawl.tools.checkstyle.xpath;
+ 
++import static java.util.Collections.unmodifiableList;
++
+ import com.puppycrawl.tools.checkstyle.xpath.iterators.DescendantIterator;
+ import com.puppycrawl.tools.checkstyle.xpath.iterators.FollowingIterator;
+ import com.puppycrawl.tools.checkstyle.xpath.iterators.PrecedingIterator;
+ import com.puppycrawl.tools.checkstyle.xpath.iterators.ReverseListIterator;
+-import java.util.Collections;
+ import java.util.List;
+ import java.util.Optional;
+ import net.sf.saxon.om.AxisInfo;
+@@ -306,7 +307,7 @@ public abstract class AbstractElementNode extends AbstractNode {
+    */
+   private List<AbstractNode> getPrecedingSiblings() {
+     final List<AbstractNode> siblings = parent.getChildren();
+-    return Collections.unmodifiableList(siblings.subList(0, indexAmongSiblings));
++    return unmodifiableList(siblings.subList(0, indexAmongSiblings));
+   }
+ 
+   /**
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/xpath/AbstractNode.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/xpath/AbstractNode.java
 @@ -19,7 +19,8 @@
@@ -13689,7 +14085,17 @@
      checker.process(files);
      checker.destroy();
    }
-@@ -444,11 +446,11 @@ public abstract class AbstractModuleTestSupport extends AbstractPathTestSupport
+@@ -436,8 +438,7 @@ public abstract class AbstractModuleTestSupport extends AbstractPathTestSupport
+    * @throws Exception if there is a problem during checker configuration
+    */
+   protected static void execute(Checker checker, String... filenames) throws Exception {
+-    final List<File> files =
+-        Arrays.stream(filenames).map(File::new).collect(Collectors.toUnmodifiableList());
++    final List<File> files = Arrays.stream(filenames).map(File::new).collect(toUnmodifiableList());
+     checker.process(files);
+     checker.destroy();
+   }
+@@ -458,11 +459,11 @@ public abstract class AbstractModuleTestSupport extends AbstractPathTestSupport
          actualViolations.stream()
              .map(violation -> violation.substring(0, violation.indexOf(':')))
              .map(Integer::valueOf)
@@ -13703,7 +14109,7 @@
      assertWithMessage("Violation lines for %s differ.", file)
          .that(actualViolationLines)
          .isEqualTo(expectedViolationLines);
-@@ -471,7 +473,7 @@ public abstract class AbstractModuleTestSupport extends AbstractPathTestSupport
+@@ -485,7 +486,7 @@ public abstract class AbstractModuleTestSupport extends AbstractPathTestSupport
        throws Exception {
      stream.flush();
      stream.reset();
@@ -13712,7 +14118,7 @@
      final Checker checker = createChecker(config);
      final Map<String, List<String>> actualViolations = getActualViolations(checker.process(files));
      checker.destroy();
-@@ -490,8 +492,7 @@ public abstract class AbstractModuleTestSupport extends AbstractPathTestSupport
+@@ -504,8 +505,7 @@ public abstract class AbstractModuleTestSupport extends AbstractPathTestSupport
    private Map<String, List<String>> getActualViolations(int errorCount) throws IOException {
      // process each of the lines
      try (ByteArrayInputStream inputStream = new ByteArrayInputStream(stream.toByteArray());
@@ -13722,7 +14128,7 @@
        final Map<String, List<String>> actualViolations = new HashMap<>();
        for (String line = lnr.readLine();
            line != null && lnr.getLineNumber() <= errorCount;
-@@ -594,7 +595,7 @@ public abstract class AbstractModuleTestSupport extends AbstractPathTestSupport
+@@ -608,7 +608,7 @@ public abstract class AbstractModuleTestSupport extends AbstractPathTestSupport
    protected static String[] removeSuppressed(
        String[] actualViolations, String... suppressedViolations) {
      final List<String> actualViolationsList =
@@ -14174,7 +14580,7 @@
      assertWithMessage("ExternalResourceHolder has changed his parent")
          .that(ExternalResourceHolder.class.isAssignableFrom(HiddenFieldCheck.class))
          .isFalse();
-@@ -610,7 +611,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -609,7 +610,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14183,7 +14589,7 @@
      final Checker checker = new Checker();
      final PackageObjectFactory factory =
          new PackageObjectFactory(new HashSet<>(), Thread.currentThread().getContextClassLoader());
-@@ -651,7 +652,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -650,7 +651,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14192,7 +14598,7 @@
      final DefaultConfiguration checkerConfig = createRootConfig(null);
      checkerConfig.addProperty("charset", StandardCharsets.UTF_8.name());
      final File cacheFile = File.createTempFile("junit", null, temporaryFolder);
-@@ -700,7 +701,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -698,7 +699,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14201,7 +14607,7 @@
      final DefaultConfiguration violationCheck =
          createModuleConfig(DummyFileSetViolationCheck.class);
      final DefaultConfiguration checkerConfig = new DefaultConfiguration("myConfig");
-@@ -713,7 +714,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -711,7 +712,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
      checker.configure(checkerConfig);
      checker.addListener(getBriefUtLogger());
  
@@ -14210,7 +14616,7 @@
      checker.clearCache();
      // invoke destroy to persist cache
      final PropertyCacheFile cache = TestUtil.getInternalState(checker, "cacheFile");
-@@ -728,7 +729,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -726,7 +727,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14219,7 +14625,7 @@
      final Checker checker = new Checker();
      checker.setFileExtensions(".test1", "test2");
      final String[] actual = TestUtil.getInternalState(checker, "fileExtensions");
-@@ -738,7 +739,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -736,7 +737,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14228,7 +14634,7 @@
      // The idea of the test is to check that when cache file is not set,
      // the invocation of clearCache method does not throw an exception.
      final Checker checker = new Checker();
-@@ -757,7 +758,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -755,7 +756,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
     *     does not require serialization
     */
    @Test
@@ -14237,7 +14643,7 @@
      // Assume that I/O error is happened when we try to invoke 'lastModified()' method.
      final String errorMessage =
          "Java Virtual Machine is broken"
-@@ -813,7 +814,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -811,7 +812,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
     *     does not require serialization
     */
    @Test
@@ -14246,7 +14652,7 @@
      // Assume that I/O error is happened when we try to invoke 'lastModified()' method.
      final String errorMessage =
          "Java Virtual Machine is broken"
-@@ -871,8 +872,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -869,8 +870,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
  
    /** It is OK to have long test method name here as it describes the test purpose. */
    @Test
@@ -14256,7 +14662,7 @@
      assertWithMessage("ExternalResourceHolder has changed its parent")
          .that(ExternalResourceHolder.class.isAssignableFrom(DummyFilter.class))
          .isFalse();
-@@ -918,8 +918,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -915,8 +915,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    /** It is OK to have long test method name here as it describes the test purpose. */
    // -@cs[ExecutableStatementCount] This test needs to verify many things.
    @Test
@@ -14266,7 +14672,7 @@
      // Use case (https://github.com/checkstyle/checkstyle/pull/3092#issuecomment-218162436):
      // Imagine that cache exists in a file. New version of Checkstyle appear.
      // New release contains update to a some check to have additional external resource.
-@@ -1000,7 +999,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -996,7 +995,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14275,7 +14681,7 @@
      final DefaultConfiguration checkConfig1 =
          createModuleConfig(CheckWhichDoesNotRequireCommentNodes.class);
      final DefaultConfiguration checkConfig2 =
-@@ -1019,7 +1018,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1015,7 +1014,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14284,7 +14690,7 @@
      final File cacheFile = File.createTempFile("junit", null, temporaryFolder);
      final DefaultConfiguration violationCheck =
          createModuleConfig(DummyFileSetViolationCheck.class);
-@@ -1048,7 +1047,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1043,7 +1042,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14293,7 +14699,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(CheckWhichThrowsError.class);
      final String filePath = getPath("InputChecker.java");
      try {
-@@ -1062,7 +1061,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1057,7 +1056,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14302,7 +14708,7 @@
      final File cacheFile = File.createTempFile("junit", null, temporaryFolder);
  
      final DefaultConfiguration checkConfig = createModuleConfig(CheckWhichThrowsError.class);
-@@ -1079,7 +1078,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1074,7 +1073,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
  
      final String filePath = getPath("InputChecker.java");
      try {
@@ -14311,7 +14717,7 @@
        assertWithMessage("Exception is expected").fail();
      } catch (CheckstyleException ex) {
        assertWithMessage("Error message is not expected")
-@@ -1107,7 +1106,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1102,7 +1101,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
     *     does not require serialization
     */
    @Test
@@ -14320,7 +14726,7 @@
      final File cacheFile = File.createTempFile("junit", null, temporaryFolder);
  
      final DefaultConfiguration checkerConfig = new DefaultConfiguration("configuration");
-@@ -1183,7 +1182,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1178,7 +1177,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
     *     does not require serialization
     */
    @Test
@@ -14329,7 +14735,7 @@
      final File cacheFile = File.createTempFile("junit", null, temporaryFolder);
  
      final DefaultConfiguration checkerConfig = new DefaultConfiguration("configuration");
-@@ -1254,7 +1253,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1249,7 +1248,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
     *     does not require serialization
     */
    @Test
@@ -14338,7 +14744,7 @@
      final String errorMessage = "Security Exception";
      final RuntimeException expectedError = new SecurityException(errorMessage);
  
-@@ -1302,7 +1301,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1297,7 +1296,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
     *     does not require serialization
     */
    @Test
@@ -14347,7 +14753,7 @@
      final File cacheFile = File.createTempFile("junit", null, temporaryFolder);
  
      final DefaultConfiguration checkerConfig = new DefaultConfiguration("configuration");
-@@ -1361,7 +1360,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1356,7 +1355,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14356,16 +14762,16 @@
      final DefaultConfiguration checkConfig = createModuleConfig(CheckWhichThrowsError.class);
  
      final DefaultConfiguration treeWalkerConfig = createModuleConfig(TreeWalker.class);
-@@ -1381,7 +1380,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1376,7 +1375,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testTabViolationDefault() throws Exception {
 +  void tabViolationDefault() throws Exception {
-     final DefaultConfiguration checkConfig =
-         createModuleConfig(VerifyPositionAfterTabFileSet.class);
      final String[] expected = {
-@@ -1391,7 +1390,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+       "10:17: violation", "13:33: violation",
+     };
+@@ -1384,7 +1383,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14374,7 +14780,7 @@
      final DefaultConfiguration checkConfig =
          createModuleConfig(VerifyPositionAfterTabFileSet.class);
      final DefaultConfiguration checkerConfig = createRootConfig(checkConfig);
-@@ -1403,11 +1402,11 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1396,11 +1395,11 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14388,7 +14794,7 @@
      final List<String> expected = Arrays.asList("beginProcessing", "finishProcessing", "destroy");
      assertWithMessage("Method calls were not expected")
          .that(fileSet.getMethodCalls())
-@@ -1415,7 +1414,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1408,7 +1407,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14397,7 +14803,7 @@
      final DummyFileSet fileSet = new DummyFileSet();
      final Checker checker = new Checker();
      checker.addFileSetCheck(fileSet);
-@@ -1425,7 +1424,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1418,7 +1417,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14406,7 +14812,7 @@
      final Checker checker = new Checker();
      final DebugAuditAdapter auditAdapter = new DebugAuditAdapter();
      final PackageObjectFactory factory =
-@@ -1442,14 +1441,14 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1435,14 +1434,14 @@ public class CheckerTest extends AbstractModuleTestSupport {
      checker.setModuleFactory(factory);
      checker.setupChild(createModuleConfig(DebugAuditAdapter.class));
      // Let's try fire some events
@@ -14423,7 +14829,7 @@
      final Checker checker = new Checker();
      final TestBeforeExecutionFileFilter fileFilter = new TestBeforeExecutionFileFilter();
      final PackageObjectFactory factory =
-@@ -1465,14 +1464,14 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1458,14 +1457,14 @@ public class CheckerTest extends AbstractModuleTestSupport {
          };
      checker.setModuleFactory(factory);
      checker.setupChild(createModuleConfig(TestBeforeExecutionFileFilter.class));
@@ -14440,7 +14846,7 @@
      final Checker checker = new Checker();
      final DummyFileSet fileSet = new DummyFileSet();
      final PackageObjectFactory factory =
-@@ -1494,7 +1493,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1487,7 +1486,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
  
    // -@cs[CheckstyleTestMakeup] must use raw class to directly initialize DefaultLogger
    @Test
@@ -14449,7 +14855,7 @@
      final Checker checker = new Checker();
      try (CloseAndFlushTestByteArrayOutputStream testInfoOutputStream =
              new CloseAndFlushTestByteArrayOutputStream();
-@@ -1530,7 +1529,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1522,7 +1521,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
  
    // -@cs[CheckstyleTestMakeup] must use raw class to directly initialize DefaultLogger
    @Test
@@ -14458,7 +14864,7 @@
      final Checker checker = new Checker();
      try (CloseAndFlushTestByteArrayOutputStream testInfoOutputStream =
          new CloseAndFlushTestByteArrayOutputStream()) {
-@@ -1552,7 +1551,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1543,7 +1542,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14467,7 +14873,7 @@
      // we need to test a module with two instances, one with id and the other not
      final DefaultConfiguration moduleConfig1 = createModuleConfig(NewlineAtEndOfFileCheck.class);
      final DefaultConfiguration moduleConfig2 = createModuleConfig(NewlineAtEndOfFileCheck.class);
-@@ -1584,10 +1583,9 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1575,10 +1574,9 @@ public class CheckerTest extends AbstractModuleTestSupport {
  
      // super.verify does not work here, for we change the logger
      out.flush();
@@ -14480,7 +14886,7 @@
        // we need to ignore the unrelated lines
        final List<String> actual =
            lnr.lines()
-@@ -1595,7 +1593,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1586,7 +1584,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
                .filter(line -> !getCheckMessage(AUDIT_FINISHED_MESSAGE).equals(line))
                .limit(expected.length)
                .sorted()
@@ -14489,7 +14895,7 @@
        Arrays.sort(expected);
  
        for (int i = 0; i < expected.length; i++) {
-@@ -1612,7 +1610,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1603,7 +1601,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14498,7 +14904,7 @@
      final Checker checker = createChecker(createModuleConfig(TranslationCheck.class));
      final OutputStream infoStream = new ByteArrayOutputStream();
      final OutputStream errorStream = new ByteArrayOutputStream();
-@@ -1625,7 +1623,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1616,7 +1614,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
      checker.setCacheFile(cacheFile.getAbsolutePath());
  
      final File testFile = File.createTempFile("testFile", ".java", temporaryFolder);
@@ -14507,7 +14913,7 @@
      checker.process(files);
  
      assertWithMessage("Cached file should not be processed twice")
-@@ -1637,7 +1635,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1628,7 +1626,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
  
    @SuppressForbidden
    @Test
@@ -14516,7 +14922,7 @@
      final String[] expected = {
        "4: " + getCheckMessage(LineLengthCheck.class, MSG_KEY, 75, 238),
      };
-@@ -1652,7 +1650,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1643,7 +1641,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -14525,7 +14931,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(CheckWhichThrowsError.class);
  
      final DefaultConfiguration treeWalkerConfig = createModuleConfig(TreeWalker.class);
-@@ -1939,7 +1937,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -1930,7 +1928,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
      }
  
      public List<String> getMethodCalls() {
@@ -17506,7 +17912,15 @@
      final String propertiesUserHome = properties.getProperty("user.home");
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
-@@ -54,7 +54,7 @@ import org.junit.jupiter.params.ParameterizedTest;
+@@ -25,7 +25,6 @@ import static org.mockito.ArgumentMatchers.any;
+ import static org.mockito.Mockito.mockStatic;
+ 
+ import com.google.common.io.BaseEncoding;
+-import com.google.common.io.ByteStreams;
+ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+ import com.puppycrawl.tools.checkstyle.api.Configuration;
+ import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
+@@ -54,7 +53,7 @@ import org.junit.jupiter.params.ParameterizedTest;
  import org.junit.jupiter.params.provider.ValueSource;
  import org.mockito.MockedStatic;
  
@@ -17515,7 +17929,7 @@
  
    @TempDir public File temporaryFolder;
  
-@@ -64,7 +64,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -64,7 +63,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -17524,7 +17938,7 @@
      try {
        final Object test = new PropertyCacheFile(null, "");
        assertWithMessage("exception expected but got " + test).fail();
-@@ -85,7 +85,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -85,7 +84,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -17533,7 +17947,7 @@
      final Configuration config = new DefaultConfiguration("myName");
      final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
      final PropertyCacheFile cache = new PropertyCacheFile(config, filePath);
-@@ -102,7 +102,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -102,7 +101,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -17542,7 +17956,7 @@
      final Configuration config = new DefaultConfiguration("myName");
      final PropertyCacheFile cache = new PropertyCacheFile(config, "fileDoesNotExist.txt");
  
-@@ -114,7 +114,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -114,7 +113,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -17551,7 +17965,7 @@
      final Configuration config = new DefaultConfiguration("myName");
      final PropertyCacheFile cache =
          new PropertyCacheFile(config, getPath("InputPropertyCacheFile"));
-@@ -136,7 +136,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -136,7 +135,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -17560,7 +17974,7 @@
      final Configuration config = new DefaultConfiguration("myName");
      final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
      final PropertyCacheFile cache = new PropertyCacheFile(config, filePath);
-@@ -154,7 +154,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -154,7 +153,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -17569,7 +17983,7 @@
      final Configuration config = new DefaultConfiguration("myName");
      final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
      final PropertyCacheFile cache = new PropertyCacheFile(config, filePath);
-@@ -180,7 +180,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -180,7 +179,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -17578,7 +17992,7 @@
      final Configuration config = new DefaultConfiguration("myName");
      final String externalResourcePath =
          File.createTempFile("junit", null, temporaryFolder).getPath();
-@@ -209,7 +209,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -209,7 +208,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -17587,7 +18001,7 @@
      final Configuration config = new DefaultConfiguration("myName");
      final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
      final PropertyCacheFile cache = new PropertyCacheFile(config, filePath);
-@@ -223,7 +223,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -223,7 +222,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
  
      final MessageDigest digest = MessageDigest.getInstance("SHA-1");
      final URI uri = CommonUtil.getUriByFilename(pathToResource);
@@ -17596,7 +18010,7 @@
      final ByteArrayOutputStream out = new ByteArrayOutputStream();
      try (ObjectOutputStream oos = new ObjectOutputStream(out)) {
        oos.writeObject(input);
-@@ -237,7 +237,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -237,7 +236,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -17605,7 +18019,7 @@
      final Configuration config = new DefaultConfiguration("myName");
      final String filePath =
          String.format(Locale.ENGLISH, "%s%2$stemp%2$scache.temp", temporaryFolder, File.separator);
-@@ -250,7 +250,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -250,7 +249,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -17614,7 +18028,7 @@
      final Configuration config = new DefaultConfiguration("myName");
      final String fileName = "temp.cache";
      final Path filePath = Paths.get(fileName);
-@@ -263,9 +263,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -263,9 +262,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
      Files.delete(filePath);
    }
  
@@ -17623,10 +18037,10 @@
 -  public void testPersistWithSymbolicLinkToDirectory() throws IOException {
 +  @Test
 +  void persistWithSymbolicLinkToDirectory() throws IOException {
-     final Path tempDirectory = Files.createTempDirectory("tempDir");
-     final Path symbolicLinkDirectory =
-         Files.createTempDirectory("symbolicLinkDir").resolve("symbolicLink");
-@@ -283,9 +283,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+     final Path tempDirectory = temporaryFolder.toPath();
+     final Path symbolicLinkDirectory = temporaryFolder.toPath().resolve("symbolicLink");
+     Files.createSymbolicLink(symbolicLinkDirectory, tempDirectory);
+@@ -282,9 +281,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
          .isTrue();
    }
  
@@ -17635,10 +18049,10 @@
 -  public void testSymbolicLinkResolution() throws IOException {
 +  @Test
 +  void symbolicLinkResolution() throws IOException {
-     final Path tempDirectory = Files.createTempDirectory("tempDir");
-     final Path symbolicLinkDirectory =
-         Files.createTempDirectory("symbolicLinkDir").resolve("symbolicLink");
-@@ -303,9 +303,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+     final Path tempDirectory = temporaryFolder.toPath();
+     final Path symbolicLinkDirectory = temporaryFolder.toPath().resolve("symbolicLink");
+     Files.createSymbolicLink(symbolicLinkDirectory, tempDirectory);
+@@ -301,9 +300,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
          .isTrue();
    }
  
@@ -17648,9 +18062,9 @@
 +  @Test
 +  void symbolicLinkToNonDirectory() throws IOException {
      final Path tempFile = Files.createTempFile("tempFile", null);
-     final Path symbolicLinkDirectory = Files.createTempDirectory("symbolicLinkDir");
+     final Path symbolicLinkDirectory = temporaryFolder.toPath();
      final Path symbolicLink = symbolicLinkDirectory.resolve("symbolicLink");
-@@ -325,9 +325,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -323,9 +322,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
          .contains(expectedMessage);
    }
  
@@ -17659,10 +18073,10 @@
 -  public void testMultipleSymbolicLinkResolution() throws IOException {
 +  @Test
 +  void multipleSymbolicLinkResolution() throws IOException {
-     final Path actualDirectory = Files.createTempDirectory("actualDir");
-     final Path firstSymbolicLink = Files.createTempDirectory("firstLinkDir").resolve("firstLink");
+     final Path actualDirectory = temporaryFolder.toPath();
+     final Path firstSymbolicLink = temporaryFolder.toPath().resolve("firstLink");
      Files.createSymbolicLink(firstSymbolicLink, actualDirectory);
-@@ -349,7 +349,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -346,7 +345,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -17671,22 +18085,16 @@
      final DefaultConfiguration config = new DefaultConfiguration("myConfig");
      config.addProperty("attr", "value");
  
-@@ -401,11 +401,11 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
-    * @noinspectionreason ResultOfMethodCallIgnored - Setup for mockito to only mock toByteArray to
-    *     throw exception.
-    */
--  @Test
-+  @SuppressWarnings("InputStreamReadAllBytes")
-   // XXX: Drop suppression once
-   // https://github.com/checkstyle/checkstyle/pull/14362 is resolved.
--  @SuppressWarnings("InputStreamReadAllBytes")
+@@ -392,7 +391,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+   }
+ 
+   @Test
 -  public void testNonExistentResource() throws IOException {
-+  @Test
 +  void nonExistentResource() throws IOException {
      final Configuration config = new DefaultConfiguration("myName");
      final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
      final PropertyCacheFile cache = new PropertyCacheFile(config, filePath);
-@@ -440,7 +440,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -421,7 +420,7 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -17695,7 +18103,7 @@
      final Configuration config = new DefaultConfiguration("myName");
      final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
      final PropertyCacheFile cache = new PropertyCacheFile(config, filePath);
-@@ -479,8 +479,8 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
+@@ -460,8 +459,8 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
     * @param rawMessages exception messages separated by ';'
     */
    @ParameterizedTest
@@ -17997,7 +18405,7 @@
  import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
  import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
  import com.puppycrawl.tools.checkstyle.api.Configuration;
-@@ -59,7 +63,6 @@ import java.nio.file.Files;
+@@ -58,7 +62,6 @@ import java.nio.file.StandardCopyOption;
  import java.util.ArrayList;
  import java.util.Arrays;
  import java.util.Collection;
@@ -18005,29 +18413,24 @@
  import java.util.HashSet;
  import java.util.List;
  import java.util.Set;
-@@ -91,10 +94,10 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -90,7 +93,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testProperFileExtension() throws Exception {
 +  void properFileExtension() throws Exception {
-     final DefaultConfiguration checkConfig = createModuleConfig(ConstantNameCheck.class);
-     final File file = new File(temporaryFolder, "file.java");
--    try (Writer writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
-+    try (Writer writer = Files.newBufferedWriter(file.toPath(), UTF_8)) {
-       final String content = "public class Main { public static final int k = 5 + 4; }";
-       writer.write(content);
-     }
-@@ -132,7 +135,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+     final String path = getPath("InputTreeWalkerProperFileExtension.java");
+     final String[] expected = {
+       "10:27: "
+@@ -126,14 +129,14 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
     * @throws Exception if an error occurs
     */
    @Test
 -  public void testNoAuditEventsWithoutFilters() throws Exception {
 +  void noAuditEventsWithoutFilters() throws Exception {
-     final DefaultConfiguration checkConfig = createModuleConfig(OneTopLevelClassCheck.class);
      final String[] expected = {
-       "5:1: "
-@@ -140,7 +143,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+       "10:1: "
+           + getCheckMessage(
                OneTopLevelClassCheck.class, OneTopLevelClassCheck.MSG_KEY, "InputTreeWalkerInner"),
      };
      try (MockedConstruction<TreeWalkerAuditEvent> mocked =
@@ -18036,16 +18439,16 @@
              TreeWalkerAuditEvent.class,
              (mock, context) -> {
                throw new CheckstyleException("No audit events expected");
-@@ -154,7 +157,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -147,7 +150,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
     * that the {@code if (!ordinaryChecks.isEmpty())} condition cannot be removed.
     */
    @Test
 -  public void testConditionRequiredWithoutOrdinaryChecks() throws Exception {
 +  void conditionRequiredWithoutOrdinaryChecks() throws Exception {
-     final DefaultConfiguration checkConfig = createModuleConfig(JavadocParagraphCheck.class);
      final String[] expected = {
-       "3: "
-@@ -167,7 +170,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+       "7: "
+           + getCheckMessage(
+@@ -159,7 +162,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
          JavaParser.parseFile(new File(path), JavaParser.Options.WITH_COMMENTS);
      // Ensure that there is no calls to walk(..., AstState.ORDINARY)
      doThrow(IllegalStateException.class).when(mockAst).getFirstChild();
@@ -18054,15 +18457,14 @@
        parser.when(() -> JavaParser.parse(any(FileContents.class))).thenReturn(mockAst);
        // This will re-enable walk(..., AstState.WITH_COMMENTS)
        parser.when(() -> JavaParser.appendHiddenCommentNodes(mockAst)).thenReturn(realAst);
-@@ -181,15 +184,14 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -173,14 +176,13 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
     * that the {@code if (!commentChecks.isEmpty())} condition cannot be removed.
     */
    @Test
 -  public void testConditionRequiredWithoutCommentChecks() throws Exception {
 +  void conditionRequiredWithoutCommentChecks() throws Exception {
-     final DefaultConfiguration checkConfig = createModuleConfig(OneTopLevelClassCheck.class);
      final String[] expected = {
-       "5:1: "
+       "10:1: "
            + getCheckMessage(
                OneTopLevelClassCheck.class, OneTopLevelClassCheck.MSG_KEY, "InputTreeWalkerInner"),
      };
@@ -18072,20 +18474,16 @@
        // Ensure that there is no calls to walk(..., AstState.WITH_COMMENTS)
        parser
            .when(() -> JavaParser.appendHiddenCommentNodes(any(DetailAST.class)))
-@@ -200,10 +202,10 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -191,7 +193,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testImproperFileExtension() throws Exception {
 +  void improperFileExtension() throws Exception {
-     final DefaultConfiguration checkConfig = createModuleConfig(ConstantNameCheck.class);
-     final File file = new File(temporaryFolder, "file.pdf");
--    try (Writer writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
-+    try (Writer writer = Files.newBufferedWriter(file.toPath(), UTF_8)) {
-       final String content = "public class Main { public static final int k = 5 + 4; }";
-       writer.write(content);
-     }
-@@ -212,7 +214,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+     final String regularFilePath = getPath("InputTreeWalkerImproperFileExtension.java");
+     final File originalFile = new File(regularFilePath);
+     final File tempFile = new File(temporaryFolder, "file.pdf");
+@@ -201,7 +203,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18094,16 +18492,16 @@
      final DefaultConfiguration checkConfig = createModuleConfig(HiddenFieldCheck.class);
      checkConfig.addProperty("tokens", "VARIABLE_DEF, ENUM_DEF, CLASS_DEF, METHOD_DEF," + "IMPORT");
      try {
-@@ -237,7 +239,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -225,7 +227,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testOnEmptyFile() throws Exception {
 +  void onEmptyFile() throws Exception {
      final DefaultConfiguration checkConfig = createModuleConfig(HiddenFieldCheck.class);
-     final String pathToEmptyFile = File.createTempFile("file", ".java", temporaryFolder).getPath();
-     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
-@@ -246,7 +248,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+     final File emptyFile = File.createTempFile("file", ".java", temporaryFolder);
+     execute(checkConfig, emptyFile.getPath());
+@@ -234,7 +236,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18112,7 +18510,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(JavadocPackageCheck.class);
  
      try {
-@@ -264,7 +266,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -250,7 +252,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18121,7 +18519,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      final PackageObjectFactory factory =
          new PackageObjectFactory(new HashSet<>(), Thread.currentThread().getContextClassLoader());
-@@ -285,7 +287,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -271,7 +273,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18130,7 +18528,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      final DefaultConfiguration config = new DefaultConfiguration("default config");
      treeWalker.setTabWidth(1);
-@@ -298,7 +300,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -284,7 +286,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18139,7 +18537,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(BadJavaDocCheck.class);
      final String pathToEmptyFile = File.createTempFile("file", ".java", temporaryFolder).getPath();
  
-@@ -322,7 +324,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -307,7 +309,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18148,7 +18546,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      final PackageObjectFactory factory =
          new PackageObjectFactory(new HashSet<>(), Thread.currentThread().getContextClassLoader());
-@@ -350,7 +352,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -335,7 +337,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18157,16 +18555,15 @@
      final TreeWalker treeWalker = new TreeWalker();
      treeWalker.setTabWidth(1);
      treeWalker.configure(new DefaultConfiguration("default config"));
-@@ -362,7 +364,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -347,14 +349,14 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testWithCacheWithNoViolation() throws Exception {
 +  void withCacheWithNoViolation() throws Exception {
-     final DefaultConfiguration checkConfig = createModuleConfig(HiddenFieldCheck.class);
-     final Checker checker = createChecker(checkConfig);
-     final PackageObjectFactory factory =
-@@ -375,7 +377,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+     final String path = getPath("InputTreeWalkerWithCacheWithNoViolation.java");
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(path, expected);
    }
  
    @Test
@@ -18175,7 +18572,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      treeWalker.configure(createModuleConfig(TypeNameCheck.class));
      final PackageObjectFactory factory =
-@@ -398,7 +400,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -377,7 +379,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18184,16 +18581,19 @@
      final TreeWalker treeWalker = new TreeWalker();
      treeWalker.configure(createModuleConfig(TypeNameCheck.class));
      final PackageObjectFactory factory =
-@@ -421,7 +423,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -400,9 +402,9 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testRequiredTokenIsEmptyIntArray() throws Exception {
 +  void requiredTokenIsEmptyIntArray() throws Exception {
-     final DefaultConfiguration checkConfig = createModuleConfig(RequiredTokenIsEmptyIntArray.class);
-     final String pathToEmptyFile = File.createTempFile("file", ".java", temporaryFolder).getPath();
- 
-@@ -430,7 +432,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+     final File file = new File(temporaryFolder, "file.java");
+-    try (Writer writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
++    try (Writer writer = Files.newBufferedWriter(file.toPath(), UTF_8)) {
+       final String configComment =
+           "/*\n"
+               + "com.puppycrawl.tools.checkstyle.TreeWalkerTest"
+@@ -415,7 +417,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18202,7 +18602,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      final PackageObjectFactory factory =
          new PackageObjectFactory(new HashSet<>(), Thread.currentThread().getContextClassLoader());
-@@ -445,7 +447,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -430,7 +432,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18211,7 +18611,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      treeWalker.configure(createModuleConfig(TypeNameCheck.class));
      treeWalker.configure(createModuleConfig(CommentsIndentationCheck.class));
-@@ -472,7 +474,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -457,7 +459,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18220,34 +18620,34 @@
      final TreeWalker treeWalker = new TreeWalker();
      final PackageObjectFactory factory =
          new PackageObjectFactory(new HashSet<>(), Thread.currentThread().getContextClassLoader());
-@@ -492,7 +494,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -477,7 +479,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testBehaviourWithChecksAndFilters() throws Exception {
 +  void behaviourWithChecksAndFilters() throws Exception {
-     final DefaultConfiguration filterConfig = createModuleConfig(SuppressionCommentFilter.class);
-     filterConfig.addProperty("checkCPP", "false");
  
-@@ -513,7 +515,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+     final String[] expected = {
+       "17:17: "
+@@ -492,7 +494,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testMultiCheckOrder() throws Exception {
 +  void multiCheckOrder() throws Exception {
-     final DefaultConfiguration treeWalkerConfig = createModuleConfig(TreeWalker.class);
-     treeWalkerConfig.addChild(createModuleConfig(WhitespaceAroundCheck.class));
-     treeWalkerConfig.addChild(createModuleConfig(WhitespaceAfterCheck.class));
-@@ -527,7 +529,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+ 
+     final String[] expected = {
+       "13:9: " + getCheckMessage(WhitespaceAfterCheck.class, "ws.notFollowed", "if"),
+@@ -503,7 +505,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testMultiCheckOfSameTypeNoIdResultsInOrderingByHash() throws Exception {
 +  void multiCheckOfSameTypeNoIdResultsInOrderingByHash() throws Exception {
  
-     final DefaultConfiguration configuration1 = createModuleConfig(ParameterNameCheck.class);
-     configuration1.addProperty("format", "^[a-z]([a-z0-9][a-zA-Z0-9]*)?$");
-@@ -557,7 +559,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+     final String[] expected = {
+       "15:28: "
+@@ -521,7 +523,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18256,7 +18656,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      treeWalker.setSeverity("error");
      treeWalker.setTabWidth(100);
-@@ -573,7 +575,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -537,7 +539,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18264,8 +18664,8 @@
 +  void checkInitIsCalledInTreeWalker() throws Exception {
      final DefaultConfiguration checkConfig = createModuleConfig(VerifyInitCheck.class);
      final File file = File.createTempFile("file", ".pdf", temporaryFolder);
-     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
-@@ -582,7 +584,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+     execute(checkConfig, file.getPath());
+@@ -545,7 +547,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18274,7 +18674,7 @@
      VerifyDestroyCheck.resetDestroyWasCalled();
      final DefaultConfiguration checkConfig = createModuleConfig(VerifyDestroyCheck.class);
      final File file = File.createTempFile("file", ".pdf", temporaryFolder);
-@@ -594,7 +596,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -556,7 +558,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18283,7 +18683,7 @@
      VerifyDestroyCheck.resetDestroyWasCalled();
      final DefaultConfiguration checkConfig = createModuleConfig(VerifyDestroyCommentCheck.class);
      final File file = File.createTempFile("file", ".pdf", temporaryFolder);
-@@ -606,7 +608,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -567,7 +569,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18292,16 +18692,16 @@
      final DefaultConfiguration filterConfig = createModuleConfig(SuppressionXpathFilter.class);
      filterConfig.addProperty("file", getPath("InputTreeWalkerSuppressionXpathFilter.xml"));
      final DefaultConfiguration treeWalkerConfig = createModuleConfig(TreeWalker.class);
-@@ -629,7 +631,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -589,7 +591,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testTreeWalkerFilterAbsolutePath() throws Exception {
 +  void treeWalkerFilterAbsolutePath() throws Exception {
-     final DefaultConfiguration filterConfig = createModuleConfig(SuppressionXpathFilter.class);
-     filterConfig.addProperty("file", getPath("InputTreeWalkerSuppressionXpathFilterAbsolute.xml"));
-     final DefaultConfiguration checkConfig = createModuleConfig(LeftCurlyCheck.class);
-@@ -649,7 +651,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+     // test is only valid when relative paths are given
+     final String filePath =
+         "src/test/resources/"
+@@ -601,7 +603,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -18310,7 +18710,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(EmptyStatementCheck.class);
      final DefaultConfiguration filterConfig =
          createModuleConfig(SuppressWithNearbyCommentFilter.class);
-@@ -673,7 +675,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -626,7 +628,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
     * @throws Exception if file is not found
     */
    @Test
@@ -18319,7 +18719,7 @@
  
      final DefaultConfiguration configuration1 = createModuleConfig(AaCheck.class);
      configuration1.addProperty("id", "2");
-@@ -684,7 +686,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -637,7 +639,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
      treeWalkerConfig.addChild(configuration2);
      treeWalkerConfig.addChild(configuration1);
  
@@ -20965,7 +21365,7 @@
  import java.util.HashSet;
  import java.util.List;
  import java.util.Set;
-@@ -75,15 +76,15 @@ public final class TestInputConfiguration {
+@@ -76,15 +77,15 @@ public final class TestInputConfiguration {
    }
  
    public List<ModuleInputConfiguration> getChildrenModules() {
@@ -20984,7 +21384,7 @@
    }
  
    public DefaultConfiguration createConfiguration() {
-@@ -162,7 +163,7 @@ public final class TestInputConfiguration {
+@@ -163,7 +164,7 @@ public final class TestInputConfiguration {
      }
  
      public List<ModuleInputConfiguration> getChildrenModules() {
@@ -23157,39 +23557,39 @@
    }
  
    @Test
--  public void testCheck() throws Exception {
-+  void check() throws Exception {
+-  public void testAnnotationOnSameLineCheckPublicMethodAndVariable() throws Exception {
++  void annotationOnSameLineCheckPublicMethodAndVariable() throws Exception {
      final String[] expected = {
        "17:5: " + getCheckMessage(MSG_KEY_ANNOTATION_ON_SAME_LINE, "Annotation"),
        "18:5: " + getCheckMessage(MSG_KEY_ANNOTATION_ON_SAME_LINE, "Annotation"),
-@@ -81,7 +81,7 @@ public class AnnotationOnSameLineCheckTest extends AbstractModuleTestSupport {
+@@ -82,7 +82,7 @@ public class AnnotationOnSameLineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
--  public void testCheckAcceptableTokens() throws Exception {
-+  void checkAcceptableTokens() throws Exception {
+-  public void testAnnotationOnSameLineCheckTokensOnMethodAndVar() throws Exception {
++  void annotationOnSameLineCheckTokensOnMethodAndVar() throws Exception {
      final String[] expected = {
        "18:5: " + getCheckMessage(MSG_KEY_ANNOTATION_ON_SAME_LINE, "Annotation3"),
        "19:5: " + getCheckMessage(MSG_KEY_ANNOTATION_ON_SAME_LINE, "Annotation"),
-@@ -92,7 +92,7 @@ public class AnnotationOnSameLineCheckTest extends AbstractModuleTestSupport {
+@@ -94,7 +94,7 @@ public class AnnotationOnSameLineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
--  public void testCheck2() throws Exception {
-+  void check2() throws Exception {
+-  public void testAnnotationOnSameLineCheckPrivateAndDeprecatedVar() throws Exception {
++  void annotationOnSameLineCheckPrivateAndDeprecatedVar() throws Exception {
      final String[] expected = {
        "19:5: " + getCheckMessage(MSG_KEY_ANNOTATION_ON_SAME_LINE, "Ann"),
        "24:5: " + getCheckMessage(MSG_KEY_ANNOTATION_ON_SAME_LINE, "SuppressWarnings"),
-@@ -103,7 +103,7 @@ public class AnnotationOnSameLineCheckTest extends AbstractModuleTestSupport {
+@@ -106,7 +106,7 @@ public class AnnotationOnSameLineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
--  public void testCheckOnDifferentTokens() throws Exception {
-+  void checkOnDifferentTokens() throws Exception {
+-  public void testAnnotationOnSameLineCheckInterfaceAndEnum() throws Exception {
++  void annotationOnSameLineCheckInterfaceAndEnum() throws Exception {
      final String[] expected = {
        "14:1: " + getCheckMessage(MSG_KEY_ANNOTATION_ON_SAME_LINE, "Ann"),
        "17:5: " + getCheckMessage(MSG_KEY_ANNOTATION_ON_SAME_LINE, "Ann"),
-@@ -127,7 +127,7 @@ public class AnnotationOnSameLineCheckTest extends AbstractModuleTestSupport {
+@@ -130,7 +130,7 @@ public class AnnotationOnSameLineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -26542,8 +26942,8 @@
    }
  
    @Test
--  public void testDefault() throws Exception {
-+  void testDefault() throws Exception {
+-  public void testIllegalCatchCheckDefaultTokens() throws Exception {
++  void illegalCatchCheckDefaultTokens() throws Exception {
  
      final String[] expected = {
        "14:11: " + getCheckMessage(MSG_KEY, "RuntimeException"),
@@ -26551,30 +26951,30 @@
    }
  
    @Test
--  public void testIllegalClassNames() throws Exception {
-+  void illegalClassNames() throws Exception {
+-  public void testIllegalCatchCheckSuperclassThrowable() throws Exception {
++  void illegalCatchCheckSuperclassThrowable() throws Exception {
      final String[] expected = {
        "14:11: " + getCheckMessage(MSG_KEY, "Exception"),
        "15:11: " + getCheckMessage(MSG_KEY, "Throwable"),
-@@ -60,7 +60,7 @@ public class IllegalCatchCheckTest extends AbstractModuleTestSupport {
+@@ -61,7 +61,7 @@ public class IllegalCatchCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
--  public void testIllegalClassNamesBad() throws Exception {
-+  void illegalClassNamesBad() throws Exception {
+-  public void testIllegalCatchCheckSuperclassException() throws Exception {
++  void illegalCatchCheckSuperclassException() throws Exception {
      // check that incorrect names don't break the Check
      final String[] expected = {
        "15:11: " + getCheckMessage(MSG_KEY, "Exception"),
-@@ -71,7 +71,7 @@ public class IllegalCatchCheckTest extends AbstractModuleTestSupport {
+@@ -73,7 +73,7 @@ public class IllegalCatchCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
--  public void testMultipleTypes() throws Exception {
-+  void multipleTypes() throws Exception {
+-  public void testIllegalCatchCheckMultipleExceptions() throws Exception {
++  void illegalCatchCheckMultipleExceptions() throws Exception {
      final String[] expected = {
        "15:11: " + getCheckMessage(MSG_KEY, "RuntimeException"),
        "15:11: " + getCheckMessage(MSG_KEY, "SQLException"),
-@@ -90,7 +90,7 @@ public class IllegalCatchCheckTest extends AbstractModuleTestSupport {
+@@ -93,7 +93,7 @@ public class IllegalCatchCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -26852,66 +27252,66 @@
    }
  
    @Test
--  public void testCheckWithDefaultSettings() throws Exception {
-+  void checkWithDefaultSettings() throws Exception {
+-  public void testIllegalTokensCheckDefaultTokenLabel() throws Exception {
++  void illegalTokensCheckDefaultTokenLabel() throws Exception {
      final String[] expected = {
        "36:14: " + getCheckMessage(MSG_KEY, "label:"),
        "38:25: " + getCheckMessage(MSG_KEY, "anotherLabel:"),
-@@ -44,7 +44,7 @@ public class IllegalTokenCheckTest extends AbstractModuleTestSupport {
+@@ -45,7 +45,7 @@ public class IllegalTokenCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
--  public void testPreviouslyIllegalTokens() throws Exception {
-+  void previouslyIllegalTokens() throws Exception {
+-  public void testIllegalTokensCheckSwitchAndPostIncDec() throws Exception {
++  void illegalTokensCheckSwitchAndPostIncDec() throws Exception {
      final String[] expected = {
        "18:9: " + getCheckMessage(MSG_KEY, "switch"),
        "21:18: " + getCheckMessage(MSG_KEY, "--"),
-@@ -54,7 +54,7 @@ public class IllegalTokenCheckTest extends AbstractModuleTestSupport {
+@@ -56,7 +56,7 @@ public class IllegalTokenCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
--  public void testNative() throws Exception {
-+  void testNative() throws Exception {
+-  public void testIllegalTokensCheckTokenNative() throws Exception {
++  void illegalTokensCheckTokenNative() throws Exception {
      final String[] expected = {
        "27:12: " + getCheckMessage(MSG_KEY, "native"),
      };
-@@ -62,10 +62,10 @@ public class IllegalTokenCheckTest extends AbstractModuleTestSupport {
+@@ -64,10 +64,10 @@ public class IllegalTokenCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
--  public void testCommentContentToken() throws Exception {
-+  void commentContentToken() throws Exception {
+-  public void testIllegalTokensCheckCommentsContent() throws Exception {
++  void illegalTokensCheckCommentsContent() throws Exception {
  
-     final String path = getPath("InputIllegalTokens4.java");
+     final String path = getPath("InputIllegalTokensCheckCommentsContent.java");
 -    final String lineSeparator = CheckUtil.getLineSeparatorForFile(path, StandardCharsets.UTF_8);
 +    final String lineSeparator = CheckUtil.getLineSeparatorForFile(path, UTF_8);
      final String[] expected = {
        "1:3: "
            + getCheckMessage(
-@@ -99,7 +99,7 @@ public class IllegalTokenCheckTest extends AbstractModuleTestSupport {
+@@ -101,7 +101,7 @@ public class IllegalTokenCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
--  public void testBlockCommentBeginToken() throws Exception {
-+  void blockCommentBeginToken() throws Exception {
+-  public void testIllegalTokensCheckBlockCommentBegin() throws Exception {
++  void illegalTokensCheckBlockCommentBegin() throws Exception {
  
      final String[] expected = {
        "1:1: " + getCheckMessage(MSG_KEY, "/*"), "10:1: " + getCheckMessage(MSG_KEY, "/*"),
-@@ -108,7 +108,7 @@ public class IllegalTokenCheckTest extends AbstractModuleTestSupport {
+@@ -111,7 +111,7 @@ public class IllegalTokenCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
--  public void testBlockCommentEndToken() throws Exception {
-+  void blockCommentEndToken() throws Exception {
+-  public void testIllegalTokensCheckBlockCommentEnd() throws Exception {
++  void illegalTokensCheckBlockCommentEnd() throws Exception {
  
      final String[] expected = {
        "6:1: " + getCheckMessage(MSG_KEY, "*/"), "12:2: " + getCheckMessage(MSG_KEY, "*/"),
-@@ -117,7 +117,7 @@ public class IllegalTokenCheckTest extends AbstractModuleTestSupport {
+@@ -120,7 +120,7 @@ public class IllegalTokenCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
--  public void testSingleLineCommentToken() throws Exception {
-+  void singleLineCommentToken() throws Exception {
+-  public void testIllegalTokensCheckSingleLineComment() throws Exception {
++  void illegalTokensCheckSingleLineComment() throws Exception {
  
      final String[] expected = {
        "38:27: " + getCheckMessage(MSG_KEY, "//"), "42:26: " + getCheckMessage(MSG_KEY, "//"),
@@ -27035,7 +27435,7 @@
    @Test
 -  public void testAcceptableTokensMakeSense() {
 +  void acceptableTokensMakeSense() {
-     final int expectedTokenTypesTotalNumber = 194;
+     final int expectedTokenTypesTotalNumber = 195;
      assertWithMessage(
              "Total number of TokenTypes has changed, acceptable tokens in"
 @@ -192,7 +193,7 @@ public class IllegalTokenTextCheckTest extends AbstractModuleTestSupport {
@@ -28503,12 +28903,29 @@
    }
  
    @Test
--  public void testMultiCaseClass() throws Exception {
-+  void multiCaseClass() throws Exception {
+-  public void testMultiCaseSmallTalkStyle() throws Exception {
++  void multiCaseSmallTalkStyle() throws Exception {
      final String[] expected = {
-       "13:59: " + getCheckMessage(MSG_KEY),
-       "93:21: " + getCheckMessage(MSG_KEY),
-@@ -51,7 +52,7 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
+       "13:59: " + getCheckMessage(MSG_KEY), "87:21: " + getCheckMessage(MSG_KEY),
+     };
+@@ -45,7 +46,7 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
+   }
+ 
+   @Test
+-  public void testMultiCaseLoops() throws Exception {
++  void multiCaseLoops() throws Exception {
+     final String[] expected = {
+       "27:18: " + getCheckMessage(MSG_KEY),
+       "53:17: " + getCheckMessage(MSG_KEY),
+@@ -58,14 +59,14 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
+   }
+ 
+   @Test
+-  public void testMultiCaseDeclarations() throws Exception {
++  void multiCaseDeclarations() throws Exception {
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(
+         getPath("InputOneStatementPerLineSingleLineForDeclarations.java"), expected);
    }
  
    @Test
@@ -28517,16 +28934,25 @@
      final OneStatementPerLineCheck check = new OneStatementPerLineCheck();
      assertWithMessage("Acceptable tokens should not be null")
          .that(check.getAcceptableTokens())
-@@ -65,7 +66,7 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
+@@ -79,7 +80,7 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
--  public void testWithMultilineStatements() throws Exception {
-+  void withMultilineStatements() throws Exception {
+-  public void testDeclarationsWithMultilineStatements() throws Exception {
++  void declarationsWithMultilineStatements() throws Exception {
      final String[] expected = {
        "49:21: " + getCheckMessage(MSG_KEY),
        "66:17: " + getCheckMessage(MSG_KEY),
-@@ -81,7 +82,7 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
+@@ -92,7 +93,7 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
+   }
+ 
+   @Test
+-  public void testLoopsAndTryWithResourceWithMultilineStatements() throws Exception {
++  void loopsAndTryWithResourceWithMultilineStatements() throws Exception {
+     final String[] expected = {
+       "53:39: " + getCheckMessage(MSG_KEY),
+       "86:44: " + getCheckMessage(MSG_KEY),
+@@ -103,7 +104,7 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -28535,7 +28961,7 @@
      final String[] expected = {
        "39:4: " + getCheckMessage(MSG_KEY),
        "44:54: " + getCheckMessage(MSG_KEY),
-@@ -95,7 +96,7 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
+@@ -117,7 +118,7 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -28544,7 +28970,7 @@
      final String[] expected = {
        "32:42: " + getCheckMessage(MSG_KEY),
        "36:43: " + getCheckMessage(MSG_KEY),
-@@ -108,14 +109,14 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
+@@ -130,14 +131,14 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -28561,7 +28987,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(OneStatementPerLineCheck.class);
  
      final String[] expected = {
-@@ -132,22 +133,22 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
+@@ -154,22 +155,22 @@ public class OneStatementPerLineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38223,12 +38649,21 @@
    }
  
    @Test
--  public void testScopes() throws Exception {
-+  void scopes() throws Exception {
+-  public void testJavadocVariableOnInnerClassFields() throws Exception {
++  void javadocVariableOnInnerClassFields() throws Exception {
      final String[] expected = {
        "15:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
        "16:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
-@@ -150,7 +150,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
+@@ -129,7 +129,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
+   }
+ 
+   @Test
+-  public void testJavadocVariableOnPublicInnerClassFields() throws Exception {
++  void javadocVariableOnPublicInnerClassFields() throws Exception {
+     final String[] expected = {
+       "14:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
+       "15:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
+@@ -158,7 +158,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38237,7 +38672,7 @@
      final String[] expected = {
        "15:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
        "16:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
-@@ -161,7 +161,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
+@@ -169,7 +169,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38246,7 +38681,7 @@
      final String[] expected = {
        "17:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
        "18:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
-@@ -201,7 +201,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
+@@ -209,7 +209,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38255,7 +38690,7 @@
      final String[] expected = {
        "15:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
        "16:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
-@@ -244,7 +244,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
+@@ -252,7 +252,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38264,7 +38699,7 @@
      final String[] expected = {
        "15:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
        "16:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
-@@ -288,7 +288,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
+@@ -296,7 +296,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38273,7 +38708,7 @@
      final String[] expected = {
        "16:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
      };
-@@ -297,7 +297,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
+@@ -305,7 +305,7 @@ public class JavadocVariableCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -45187,7 +45622,7 @@
      final String[] expected = {
        "22:14: " + getCheckMessage(MSG_WS_PRECEDED, "<"),
        "22:14: " + getCheckMessage(MSG_WS_FOLLOWED, "<"),
-@@ -100,7 +100,7 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
+@@ -102,7 +102,7 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -45196,7 +45631,7 @@
      final String[] expected = {
        "16:2: " + getCheckMessage(MSG_WS_PRECEDED, ">"),
        "18:2: " + getCheckMessage(MSG_WS_PRECEDED, "<"),
-@@ -109,7 +109,7 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
+@@ -111,7 +111,7 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -45205,7 +45640,7 @@
      final String[] expected = {
        "17:1: " + getCheckMessage(MSG_WS_NOT_PRECEDED, "&"),
      };
-@@ -117,25 +117,25 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
+@@ -119,25 +119,25 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -45235,7 +45670,7 @@
      final String[] expected = {
        "16:37: " + getCheckMessage(MSG_WS_FOLLOWED, ">"),
      };
-@@ -143,13 +143,13 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
+@@ -145,13 +145,13 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -45251,7 +45686,34 @@
      final String[] expected = {
        "35:2: " + getCheckMessage(MSG_WS_PRECEDED, '>'),
        "40:35: " + getCheckMessage(MSG_WS_PRECEDED, '<'),
-@@ -167,7 +167,7 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
+@@ -163,7 +163,7 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
+   }
+ 
+   @Test
+-  public void testBeforeCtorInvocation() throws Exception {
++  void beforeCtorInvocation() throws Exception {
+     final String[] expected = {
+       "17:31: " + getCheckMessage(MSG_WS_FOLLOWED, '>'),
+       "19:56: " + getCheckMessage(MSG_WS_FOLLOWED, '>'),
+@@ -187,7 +187,7 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
+   }
+ 
+   @Test
+-  public void testAfterNew() throws Exception {
++  void afterNew() throws Exception {
+     final String[] expected = {
+       "17:30: " + getCheckMessage(MSG_WS_FOLLOWED, '>'),
+       "21:12: " + getCheckMessage(MSG_WS_FOLLOWED, '<'),
+@@ -213,7 +213,7 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
+   }
+ 
+   @Test
+-  public void testBeforeRecordHeader() throws Exception {
++  void beforeRecordHeader() throws Exception {
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(
+         getNonCompilablePath("InputGenericWhitespaceBeforeRecordHeader.java"), expected);
+@@ -226,7 +226,7 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
     * @throws Exception if there is an error.
     */
    @Test
@@ -45260,7 +45722,7 @@
      final GenericWhitespaceCheck check = new GenericWhitespaceCheck();
      final FileText fileText =
          new FileText(
-@@ -181,12 +181,15 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
+@@ -240,12 +240,15 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
      assertWithMessage("State is not cleared on beginTree")
          .that(
              TestUtil.isStatefulFieldClearedDuringBeginTree(
@@ -45278,7 +45740,7 @@
      final GenericWhitespaceCheck genericWhitespaceCheckObj = new GenericWhitespaceCheck();
      final int[] actual = genericWhitespaceCheckObj.getAcceptableTokens();
      final int[] expected = {
-@@ -196,7 +199,7 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
+@@ -255,7 +258,7 @@ public class GenericWhitespaceCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -49595,7 +50057,7 @@
          getNonCompilablePath("InputSemicolonBetweenImports.java"), expected);
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/grammar/GeneratedJavaTokenTypesTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/grammar/GeneratedJavaTokenTypesTest.java
-@@ -20,15 +20,15 @@
+@@ -20,16 +20,16 @@
  package com.puppycrawl.tools.checkstyle.grammar;
  
  import static com.google.common.truth.Truth.assertWithMessage;
@@ -49609,11 +50071,12 @@
 -import java.util.Collections;
  import java.util.List;
  import java.util.Objects;
+ import java.util.Set;
 -import java.util.stream.Collectors;
  import org.antlr.v4.runtime.VocabularyImpl;
  import org.junit.jupiter.api.Test;
  
-@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Test;
+@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
   * @noinspectionreason ClassIndependentOfModule - architecture of test modules requires this
   *     structure
   */
@@ -49621,8 +50084,8 @@
 +final class GeneratedJavaTokenTypesTest {
  
    /**
-    * New tokens must be added onto the end of the list with new numbers, and old tokens must remain
-@@ -52,7 +52,7 @@ public class GeneratedJavaTokenTypesTest {
+    * The following tokens are not declared in the lexer's 'tokens' block, they will always appear
+@@ -69,7 +69,7 @@ public class GeneratedJavaTokenTypesTest {
     * <p>Issue: <a href="https://github.com/checkstyle/checkstyle/issues/505">#505</a>
     */
    @Test
@@ -49631,7 +50094,7 @@
      final String message =
          "A token's number has changed. Please open"
              + " 'GeneratedJavaTokenTypesTest' and confirm which token is at fault.\n"
-@@ -305,13 +305,11 @@ public class GeneratedJavaTokenTypesTest {
+@@ -332,17 +332,15 @@ public class GeneratedJavaTokenTypesTest {
     * unused tokens and cause Collections#lastIndexOfSubList to return a -1 and fail the test.
     */
    @Test
@@ -49645,15 +50108,11 @@
 -            .collect(Collectors.toUnmodifiableList());
 +        Arrays.stream(nullableSymbolicNames).filter(Objects::nonNull).collect(toUnmodifiableList());
  
-     // Since the following tokens are not declared in the 'tokens' block,
-     // they will always appear last in the list of symbolic names provided
-@@ -335,7 +333,7 @@ public class GeneratedJavaTokenTypesTest {
- 
      // Get the starting index of the sublist of tokens, or -1 if sublist
      // is not present.
--    final int lastIndexOfSublist = Collections.lastIndexOfSubList(allTokenNames, unusedTokenNames);
-+    final int lastIndexOfSublist = lastIndexOfSubList(allTokenNames, unusedTokenNames);
-     final int expectedNumberOfUsedTokens = allTokenNames.size() - unusedTokenNames.size();
+-    final int lastIndexOfSublist = Collections.lastIndexOfSubList(allTokenNames, INTERNAL_TOKENS);
++    final int lastIndexOfSublist = lastIndexOfSubList(allTokenNames, INTERNAL_TOKENS);
+     final int expectedNumberOfUsedTokens = allTokenNames.size() - INTERNAL_TOKENS.size();
      final String message =
          "New tokens must be added to the 'tokens' block in the" + " lexer grammar.";
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/grammar/HexFloatsTest.java
@@ -50630,8 +51089,8 @@
          getNonCompilablePath("InputJava20RecordDecompositionEnhancedForLoopTricky.java"));
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/grammar/java21/Java21AstRegressionTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/grammar/java21/Java21AstRegressionTest.java
-@@ -22,7 +22,7 @@ package com.puppycrawl.tools.checkstyle.grammar.java21;
- import com.puppycrawl.tools.checkstyle.AbstractTreeTestSupport;
+@@ -28,7 +28,7 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+ import java.io.File;
  import org.junit.jupiter.api.Test;
  
 -public class Java21AstRegressionTest extends AbstractTreeTestSupport {
@@ -50639,7 +51098,7 @@
  
    @Override
    protected String getPackageLocation() {
-@@ -30,7 +30,7 @@ public class Java21AstRegressionTest extends AbstractTreeTestSupport {
+@@ -36,7 +36,7 @@ public class Java21AstRegressionTest extends AbstractTreeTestSupport {
    }
  
    @Test
@@ -50648,7 +51107,7 @@
      verifyAst(
          getNonCompilablePath("ExpectedStringTemplateBasic.txt"),
          getNonCompilablePath("InputStringTemplateBasic.java"));
-@@ -42,7 +42,7 @@ public class Java21AstRegressionTest extends AbstractTreeTestSupport {
+@@ -48,28 +48,28 @@ public class Java21AstRegressionTest extends AbstractTreeTestSupport {
     * vs. four spaces.
     */
    @Test
@@ -50657,6 +51116,39 @@
      verifyAst(
          getNonCompilablePath("ExpectedStringTemplateBasicWithTabs.txt"),
          getNonCompilablePath("InputStringTemplateBasicWithTabs.java"));
+   }
+ 
+   @Test
+-  public void testUnnamedVariableBasic() throws Exception {
++  void unnamedVariableBasic() throws Exception {
+     verifyAst(
+         getNonCompilablePath("ExpectedUnnamedVariableBasic.txt"),
+         getNonCompilablePath("InputUnnamedVariableBasic.java"));
+   }
+ 
+   @Test
+-  public void testUnnamedVariableSwitch() throws Exception {
++  void unnamedVariableSwitch() throws Exception {
+     verifyAst(
+         getNonCompilablePath("ExpectedUnnamedVariableSwitch.txt"),
+         getNonCompilablePath("InputUnnamedVariableSwitch.java"));
+   }
+ 
+   @Test
+-  public void testTextBlockConsecutiveEscapes() throws Exception {
++  void textBlockConsecutiveEscapes() throws Exception {
+     verifyAst(
+         getNonCompilablePath("ExpectedTextBlockConsecutiveEscapes.txt"),
+         getNonCompilablePath("InputTextBlockConsecutiveEscapes.java"));
+@@ -83,7 +83,7 @@ public class Java21AstRegressionTest extends AbstractTreeTestSupport {
+    * @throws Exception if an error occurs
+    */
+   @Test
+-  public void testTextBlockParsingFail() throws Exception {
++  void textBlockParsingFail() throws Exception {
+     final File file = new File(getNonCompilablePath("InputTextBlockParsingFail.java.fail"));
+ 
+     final Throwable throwable =
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/grammar/java8/AnnotationTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/grammar/java8/AnnotationTest.java
 @@ -23,7 +23,7 @@ import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
@@ -52509,8 +53001,8 @@
      GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "IllegalTokenText",
          Stream.of(
-@@ -469,7 +469,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
-                 "CHAR_LITERAL",
+@@ -470,7 +470,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+                 // until #14291
                  "TEXT_BLOCK_CONTENT",
                  "STRING_TEMPLATE_CONTENT")
 -            .collect(Collectors.toUnmodifiableSet()));
@@ -52518,7 +53010,7 @@
      GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "OperatorWrap",
          Stream.of(
-@@ -490,7 +490,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -491,7 +491,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                  // COLON token ignored in check config, explained in
                  // https://github.com/checkstyle/checkstyle/issues/4122
                  "COLON")
@@ -52527,7 +53019,7 @@
      GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "NoWhitespaceBefore",
          Stream.of(
-@@ -500,7 +500,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -501,7 +501,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                  // whitespace is necessary between a type annotation and ellipsis
                  // according '4.6.2 Horizontal whitespace point 9'
                  "ELLIPSIS")
@@ -52536,7 +53028,7 @@
      INTERNAL_MODULES =
          Definitions.INTERNAL_MODULES.stream()
              .map(
-@@ -508,7 +508,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -509,7 +509,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                    final String[] packageTokens = moduleName.split("\\.");
                    return packageTokens[packageTokens.length - 1];
                  })
@@ -52545,7 +53037,7 @@
    }
  
    @Override
-@@ -517,7 +517,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -518,7 +518,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -52554,7 +53046,7 @@
      final String inputFilePath = getPath("InputAllChecksDefaultConfig.java");
      final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
  
-@@ -537,7 +537,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -538,7 +538,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -52563,7 +53055,7 @@
      for (Class<?> check : CheckUtil.getCheckstyleChecks()) {
        if (AbstractCheck.class.isAssignableFrom(check)) {
          final AbstractCheck testedCheck =
-@@ -554,7 +554,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -555,7 +555,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -52572,7 +53064,7 @@
      for (Class<?> check : CheckUtil.getCheckstyleChecks()) {
        if (AbstractCheck.class.isAssignableFrom(check)) {
          final AbstractCheck testedCheck =
-@@ -571,7 +571,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -572,7 +572,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -52581,7 +53073,7 @@
      for (Class<?> check : CheckUtil.getCheckstyleChecks()) {
        if (AbstractCheck.class.isAssignableFrom(check)) {
          final AbstractCheck testedCheck =
-@@ -588,7 +588,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -589,7 +589,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -52590,7 +53082,7 @@
      for (Class<?> module : CheckUtil.getCheckstyleModules()) {
        if (ModuleReflectionUtil.isRootModule(module)
            || ModuleReflectionUtil.isFilterModule(module)
-@@ -608,7 +608,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -609,7 +609,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -52599,7 +53091,7 @@
      final Set<String> modulesReferencedInConfig = CheckUtil.getConfigCheckStyleModules();
      final Set<String> moduleNames = CheckUtil.getSimpleNames(CheckUtil.getCheckstyleModules());
  
-@@ -625,7 +625,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -626,7 +626,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -52608,7 +53100,7 @@
      final Configuration configuration =
          ConfigurationUtil.loadConfiguration("config/checkstyle-checks.xml");
  
-@@ -634,7 +634,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -635,7 +635,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -52617,7 +53109,7 @@
      final Configuration configuration =
          ConfigurationUtil.loadConfiguration("src/main/resources/google_checks.xml");
  
-@@ -732,7 +732,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -733,7 +733,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -52626,7 +53118,7 @@
      final Set<String> checkstyleModulesNames =
          CheckUtil.getSimpleNames(CheckUtil.getCheckstyleModules());
      final Set<String> modulesNamesWhichHaveXdocs = XdocUtil.getModulesNamesWhichHaveXdoc();
-@@ -754,7 +754,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -755,7 +755,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -52635,7 +53127,7 @@
      final Set<String> configChecks = CheckUtil.getConfigCheckStyleModules();
      final Set<String> moduleNames = CheckUtil.getSimpleNames(CheckUtil.getCheckstyleModules());
      moduleNames.removeAll(INTERNAL_MODULES);
-@@ -766,7 +766,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -767,7 +767,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -52644,7 +53136,7 @@
      for (Class<?> module : CheckUtil.getCheckstyleChecks()) {
        final String name = module.getSimpleName();
        final Set<Field> messages = CheckUtil.getCheckMessages(module, false);
-@@ -785,7 +785,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -786,7 +786,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -53003,15 +53495,6 @@
      final ArchCondition<JavaClass> beSuppressedClass =
          new SuppressionArchCondition<>(SUPPRESSED_CLASSES_FOR_STATEFUL_CHECK_RULE, "be suppressed");
  
-@@ -352,7 +351,7 @@ public class ImmutabilityTest {
-                 "Field <%s> should %s in %s",
-                 item.getFullName(),
-                 getDescription(),
--                item.getSourceCodeLocation().toString());
-+                item.getSourceCodeLocation());
-         events.add(SimpleConditionEvent.violated(item, message));
-       }
-     }
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsJavaDocsTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsJavaDocsTest.java
 @@ -68,7 +68,7 @@ import org.w3c.dom.NamedNodeMap;
@@ -53338,7 +53821,7 @@
            JavadocStyleCheck.class,
            JavadocMethodCheck.class,
            JavadocTypeCheck.class,
-@@ -115,7 +118,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -110,7 +113,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
            "VisibilityModifier");
  
    // Modules that will never have xpath support ever because they not report violations
@@ -53347,7 +53830,7 @@
  
    private static final Set<String> SIMPLE_CHECK_NAMES = getSimpleCheckNames();
    private static final Map<String, String> ALLOWED_DIRECTORY_AND_CHECKS =
-@@ -136,9 +139,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -131,9 +134,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
  
    private static Map<String, String> getAllowedDirectoryAndChecks() {
      return SIMPLE_CHECK_NAMES.stream()
@@ -53358,7 +53841,7 @@
    }
  
    private static Set<String> getInternalModules() {
-@@ -148,11 +149,11 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -143,11 +144,11 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
                final String[] packageTokens = moduleName.split("\\.");
                return packageTokens[packageTokens.length - 1];
              })
@@ -53372,7 +53855,7 @@
      javaDir = Paths.get("src/it/java/" + getPackageLocation());
      inputDir = Paths.get(getPath(""));
    }
-@@ -168,12 +169,12 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -163,12 +164,12 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -53387,7 +53870,7 @@
      // add the extra checks
      abstractJavadocCheckNames.addAll(REGEXP_JAVADOC_CHECKS);
      final Set<String> abstractJavadocCheckSimpleNames =
-@@ -187,7 +188,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -182,7 +183,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -53396,7 +53879,7 @@
      final Set<String> compatibleChecks = new HashSet<>();
      final Pattern pattern = Pattern.compile("^XpathRegression(.+)Test\\.java$");
      try (DirectoryStream<Path> javaPaths = Files.newDirectoryStream(javaDir)) {
-@@ -231,7 +232,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -226,7 +227,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
      final Set<String> allChecks = new HashSet<>(SIMPLE_CHECK_NAMES);
      allChecks.removeAll(INCOMPATIBLE_JAVADOC_CHECK_NAMES);
      allChecks.removeAll(INCOMPATIBLE_CHECK_NAMES);
@@ -53405,7 +53888,7 @@
      allChecks.removeAll(MISSING_CHECK_NAMES);
      allChecks.removeAll(NO_VIOLATION_MODULES);
      allChecks.removeAll(compatibleChecks);
-@@ -246,7 +247,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -241,7 +242,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -55095,8 +55578,21 @@
          .isEqualTo("abc");
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/utils/ModuleReflectionUtilTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/utils/ModuleReflectionUtilTest.java
-@@ -39,17 +39,17 @@ import java.io.File;
+@@ -23,6 +23,7 @@ import static com.google.common.truth.Truth.assertWithMessage;
+ import static com.puppycrawl.tools.checkstyle.PackageObjectFactory.BASE_PACKAGE;
+ import static com.puppycrawl.tools.checkstyle.internal.utils.TestUtil.isUtilsClassHasPrivateConstructor;
+ 
++import com.google.common.collect.ImmutableSet;
+ import com.puppycrawl.tools.checkstyle.AbstractAutomaticBean;
+ import com.puppycrawl.tools.checkstyle.DefaultLogger;
+ import com.puppycrawl.tools.checkstyle.TreeWalkerAuditEvent;
+@@ -38,22 +39,21 @@ import com.puppycrawl.tools.checkstyle.api.Filter;
+ import com.puppycrawl.tools.checkstyle.api.RootModule;
+ import java.io.File;
+ import java.io.IOException;
+-import java.util.Collections;
  import java.util.List;
+ import java.util.Set;
  import org.junit.jupiter.api.Test;
  
 -public class ModuleReflectionUtilTest {
@@ -55116,7 +55612,19 @@
      assertWithMessage("Should return true when checkstyle module is passed")
          .that(ModuleReflectionUtil.isCheckstyleModule(CheckClass.class))
          .isTrue();
-@@ -74,7 +74,7 @@ public class ModuleReflectionUtilTest {
+@@ -83,9 +83,9 @@ public class ModuleReflectionUtilTest {
+    * ModuleReflectionUtil.getCheckstyleModules is returning an empty set.
+    */
+   @Test
+-  public void testGetCheckStyleModules() throws IOException {
++  void getCheckStyleModules() throws IOException {
+     final ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+-    final Set<String> packages = Collections.singleton(BASE_PACKAGE + ".checks.javadoc.utils");
++    final Set<String> packages = ImmutableSet.of(BASE_PACKAGE + ".checks.javadoc.utils");
+ 
+     assertWithMessage("specified package has no checkstyle modules")
+         .that(ModuleReflectionUtil.getCheckstyleModules(packages, classLoader))
+@@ -93,7 +93,7 @@ public class ModuleReflectionUtilTest {
    }
  
    @Test
@@ -55125,7 +55633,7 @@
      assertWithMessage("Should return true when valid checkstyle class is passed")
          .that(ModuleReflectionUtil.isCheckstyleModule(ValidCheckstyleClass.class))
          .isTrue();
-@@ -93,7 +93,7 @@ public class ModuleReflectionUtilTest {
+@@ -112,7 +112,7 @@ public class ModuleReflectionUtilTest {
    }
  
    @Test
@@ -55134,7 +55642,7 @@
      assertWithMessage("Should return true when valid checkstyle check is passed")
          .that(ModuleReflectionUtil.isCheckstyleTreeWalkerCheck(CheckClass.class))
          .isTrue();
-@@ -103,7 +103,7 @@ public class ModuleReflectionUtilTest {
+@@ -122,7 +122,7 @@ public class ModuleReflectionUtilTest {
    }
  
    @Test
@@ -55143,7 +55651,7 @@
      assertWithMessage("Should return true when valid checkstyle file set module is passed")
          .that(ModuleReflectionUtil.isFileSetModule(FileSetModuleClass.class))
          .isTrue();
-@@ -113,7 +113,7 @@ public class ModuleReflectionUtilTest {
+@@ -132,7 +132,7 @@ public class ModuleReflectionUtilTest {
    }
  
    @Test
@@ -55152,7 +55660,7 @@
      assertWithMessage("Should return true when valid checkstyle filter module is passed")
          .that(ModuleReflectionUtil.isFilterModule(FilterClass.class))
          .isTrue();
-@@ -123,7 +123,7 @@ public class ModuleReflectionUtilTest {
+@@ -142,7 +142,7 @@ public class ModuleReflectionUtilTest {
    }
  
    @Test
@@ -55161,7 +55669,7 @@
      assertWithMessage("Should return true when valid checkstyle file filter module is passed")
          .that(ModuleReflectionUtil.isFileFilterModule(FileFilterModuleClass.class))
          .isTrue();
-@@ -133,7 +133,7 @@ public class ModuleReflectionUtilTest {
+@@ -152,7 +152,7 @@ public class ModuleReflectionUtilTest {
    }
  
    @Test
@@ -55170,7 +55678,7 @@
      assertWithMessage("Should return true when valid checkstyle TreeWalker filter module is passed")
          .that(ModuleReflectionUtil.isTreeWalkerFilterModule(TreeWalkerFilterClass.class))
          .isTrue();
-@@ -143,7 +143,7 @@ public class ModuleReflectionUtilTest {
+@@ -162,7 +162,7 @@ public class ModuleReflectionUtilTest {
    }
  
    @Test
@@ -55179,7 +55687,7 @@
      assertWithMessage("Should return true when valid checkstyle AuditListener module is passed")
          .that(ModuleReflectionUtil.isAuditListener(DefaultLogger.class))
          .isTrue();
-@@ -153,7 +153,7 @@ public class ModuleReflectionUtilTest {
+@@ -172,7 +172,7 @@ public class ModuleReflectionUtilTest {
    }
  
    @Test
@@ -55188,7 +55696,7 @@
      assertWithMessage("Should return true when valid checkstyle root module is passed")
          .that(ModuleReflectionUtil.isRootModule(RootModuleClass.class))
          .isTrue();
-@@ -163,7 +163,7 @@ public class ModuleReflectionUtilTest {
+@@ -182,7 +182,7 @@ public class ModuleReflectionUtilTest {
    }
  
    @Test
@@ -55520,7 +56028,7 @@
 +  void getTokenTypesTotalNumber() {
      final int tokenTypesTotalNumber = TokenUtil.getTokenTypesTotalNumber();
  
-     assertWithMessage("Invalid token total number").that(tokenTypesTotalNumber).isEqualTo(194);
+     assertWithMessage("Invalid token total number").that(tokenTypesTotalNumber).isEqualTo(195);
    }
  
    @Test
@@ -57823,10 +58331,10 @@
      verifyWithInlineConfigParser(getPath("Example16.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/FinalParametersCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/FinalParametersCheckExamplesTest.java
-@@ -24,28 +24,28 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck.MSG_KE
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class FinalParametersCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class FinalParametersCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -57837,25 +58345,27 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "14:32: " + getCheckMessage(MSG_KEY, "n"),
+       "16:25: " + getCheckMessage(MSG_KEY, "x"),
+@@ -41,7 +41,7 @@ public class FinalParametersCheckExamplesTest extends AbstractExamplesModuleTest
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "16:32: " + getCheckMessage(MSG_KEY, "n"),
+     };
+@@ -49,7 +49,7 @@ public class FinalParametersCheckExamplesTest extends AbstractExamplesModuleTest
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "19:27: " + getCheckMessage(MSG_KEY, "args"),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/NewlineAtEndOfFileCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/NewlineAtEndOfFileCheckExamplesTest.java
 @@ -26,21 +26,21 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
@@ -57921,10 +58431,10 @@
      verifyWithInlineConfigParser(getPath("Example6.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/NoCodeInFileCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/NoCodeInFileCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.NoCodeInFileCheck.MSG_KEY_N
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class NoCodeInFileCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class NoCodeInFileCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -57935,17 +58445,18 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "1: " + getCheckMessage(MSG_KEY_NO_CODE),
+     };
+@@ -40,7 +40,7 @@ public class NoCodeInFileCheckExamplesTest extends AbstractExamplesModuleTestSup
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "1: " + getCheckMessage(MSG_KEY_NO_CODE),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/OrderedPropertiesCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/OrderedPropertiesCheckExamplesTest.java
 @@ -24,14 +24,14 @@ import org.junit.jupiter.api.Disabled;
@@ -57967,10 +58478,10 @@
      verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/OuterTypeFilenameCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/OuterTypeFilenameCheckExamplesTest.java
-@@ -24,42 +24,42 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,21 +24,21 @@ import static com.puppycrawl.tools.checkstyle.checks.OuterTypeFilenameCheck.MSG_
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class OuterTypeFilenameCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class OuterTypeFilenameCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -57983,45 +58494,48 @@
 +  void example1() throws Exception {
      final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     verifyWithInlineConfigParser(getPath("Example1.java"), expected);
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "11:1: " + getCheckMessage(MSG_KEY),
+     };
+@@ -47,7 +47,7 @@ public class OuterTypeFilenameCheckExamplesTest extends AbstractExamplesModuleTe
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "11:1: " + getCheckMessage(MSG_KEY),
+     };
+@@ -56,7 +56,7 @@ public class OuterTypeFilenameCheckExamplesTest extends AbstractExamplesModuleTe
    }
  
    @Test
 -  public void testExample4() throws Exception {
 +  void example4() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
+     final String[] expected = {
+       "11:1: " + getCheckMessage(MSG_KEY),
+     };
+@@ -65,7 +65,7 @@ public class OuterTypeFilenameCheckExamplesTest extends AbstractExamplesModuleTe
    }
  
    @Test
 -  public void testExample5() throws Exception {
 +  void example5() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example5.txt"), expected);
+     final String[] expected = {
+       "11:1: " + getCheckMessage(MSG_KEY),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/TodoCommentCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/TodoCommentCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.TodoCommentCheck.MSG_KEY;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class TodoCommentCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class TodoCommentCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -58032,17 +58546,18 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "15:14: " + getCheckMessage(MSG_KEY, "TODO:"),
+     };
+@@ -40,7 +40,7 @@ public class TodoCommentCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "1:3: " + getCheckMessage(MSG_KEY, "(TODO)|(FIXME)"),
+       "18:14: " + getCheckMessage(MSG_KEY, "(TODO)|(FIXME)"),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/TrailingCommentCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/TrailingCommentCheckExamplesTest.java
 @@ -24,35 +24,35 @@ import org.junit.jupiter.api.Disabled;
@@ -58784,32 +59299,24 @@
        "19:5: " + getCheckMessage(MSG_KEY),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/AvoidDoubleBraceInitializationCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/AvoidDoubleBraceInitializationCheckExamplesTest.java
-@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,7 +24,7 @@ import static com.puppycrawl.tools.checkstyle.checks.coding.AvoidDoubleBraceInit
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class AvoidDoubleBraceInitializationCheckExamplesTest
 +final class AvoidDoubleBraceInitializationCheckExamplesTest
      extends AbstractExamplesModuleTestSupport {
    @Override
    protected String getPackageLocation() {
-@@ -32,14 +32,14 @@ public class AvoidDoubleBraceInitializationCheckExamplesTest
+@@ -32,7 +32,7 @@ public class AvoidDoubleBraceInitializationCheckExamplesTest
    }
  
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
-   }
- 
-   @Test
--  public void testExample2() throws Exception {
-+  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "16:43: " + getCheckMessage(MSG_KEY, "list1"), "21:42: " + getCheckMessage(MSG_KEY, "list2"),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/AvoidInlineConditionalsCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/AvoidInlineConditionalsCheckExamplesTest.java
 @@ -24,14 +24,14 @@ import org.junit.jupiter.api.Disabled;
@@ -60211,10 +60718,10 @@
      verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/UnnecessaryParenthesesCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/UnnecessaryParenthesesCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -28,14 +28,14 @@ import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthes
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class UnnecessaryParenthesesCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class UnnecessaryParenthesesCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -60225,17 +60732,18 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "17:18: " + getCheckMessage(MSG_ASSIGN),
+       "19:13: " + getCheckMessage(MSG_IDENT, "square"),
+@@ -53,7 +53,7 @@ public class UnnecessaryParenthesesCheckExamplesTest extends AbstractExamplesMod
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "18:18: " + getCheckMessage(MSG_EXPR), "26:19: " + getCheckMessage(MSG_EXPR),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/UnnecessarySemicolonAfterOuterTypeDeclarationCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/UnnecessarySemicolonAfterOuterTypeDeclarationCheckExamplesTest.java
 @@ -24,7 +24,7 @@ import org.junit.jupiter.api.Disabled;
@@ -60495,10 +61003,10 @@
      verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/design/InnerTypeLastCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/design/InnerTypeLastCheckExamplesTest.java
-@@ -24,14 +24,14 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.design.InnerTypeLastCheck.M
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class InnerTypeLastCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class InnerTypeLastCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -60509,9 +61017,9 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "14:3: " + getCheckMessage(MSG_KEY), "20:3: " + getCheckMessage(MSG_KEY),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/design/InterfaceIsTypeCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/design/InterfaceIsTypeCheckExamplesTest.java
 @@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.design.InterfaceIsTypeCheck
@@ -61605,10 +62113,10 @@
      verifyWithInlineConfigParser(getPath("Example7.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocMissingLeadingAsteriskCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocMissingLeadingAsteriskCheckExamplesTest.java
-@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,7 +24,7 @@ import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMissingLeadi
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class JavadocMissingLeadingAsteriskCheckExamplesTest
 +final class JavadocMissingLeadingAsteriskCheckExamplesTest
      extends AbstractExamplesModuleTestSupport {
@@ -61620,9 +62128,9 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "34: " + getCheckMessage(MSG_MISSING_ASTERISK),
+       "39: " + getCheckMessage(MSG_MISSING_ASTERISK),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocMissingWhitespaceAfterAsteriskCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocMissingWhitespaceAfterAsteriskCheckExamplesTest.java
 @@ -24,7 +24,7 @@ import org.junit.jupiter.api.Disabled;
@@ -62226,10 +62734,10 @@
      verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/metrics/BooleanExpressionComplexityCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/metrics/BooleanExpressionComplexityCheckExamplesTest.java
-@@ -24,29 +24,28 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,15 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.metrics.BooleanExpressionCo
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class BooleanExpressionComplexityCheckExamplesTest
 -    extends AbstractExamplesModuleTestSupport {
 +final class BooleanExpressionComplexityCheckExamplesTest extends AbstractExamplesModuleTestSupport {
@@ -62241,25 +62749,27 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "20:15: " + getCheckMessage(MSG_KEY, 5, 3), "24:15: " + getCheckMessage(MSG_KEY, 6, 3),
+     };
+@@ -41,7 +40,7 @@ public class BooleanExpressionComplexityCheckExamplesTest
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "25:15: " + getCheckMessage(MSG_KEY, 6, 5),
+     };
+@@ -50,7 +49,7 @@ public class BooleanExpressionComplexityCheckExamplesTest
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "25:15: " + getCheckMessage(MSG_KEY, 4, 3),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/metrics/ClassDataAbstractionCouplingCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/metrics/ClassDataAbstractionCouplingCheckExamplesTest.java
 @@ -24,7 +24,7 @@ import org.junit.jupiter.api.Disabled;
@@ -62884,10 +63394,10 @@
        "21:28: " + getCheckMessage(MSG_INVALID_PATTERN, "fourth_Const4", DEFAULT_PATTERN),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/IllegalIdentifierNameCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/IllegalIdentifierNameCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MS
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class IllegalIdentifierNameCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class IllegalIdentifierNameCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -62898,17 +63408,18 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
+     final String format = "(?i)^(?!(record|yield|var|permits|sealed|_)$).+$";
  
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+@@ -46,7 +46,7 @@ public class IllegalIdentifierNameCheckExamplesTest extends AbstractExamplesModu
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
+     final String format = "(?i)^(?!(record|yield|var|permits|sealed|open|transitive|_)$).+$";
  
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/InterfaceTypeParameterNameCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/InterfaceTypeParameterNameCheckExamplesTest.java
 @@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MS
@@ -63260,10 +63771,10 @@
        "27:23: " + "Parameter name 'b' must match pattern '^[a-z][a-z0-9][a-zA-Z0-9]*$'",
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/PatternVariableNameCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/PatternVariableNameCheckExamplesTest.java
-@@ -24,28 +24,28 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MS
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class PatternVariableNameCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class PatternVariableNameCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -63274,25 +63785,27 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String pattern = "^[a-z][a-zA-Z0-9]*$";
+ 
+@@ -44,7 +44,7 @@ public class PatternVariableNameCheckExamplesTest extends AbstractExamplesModule
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String pattern = "^[a-z](_?[a-zA-Z0-9]+)*$";
+ 
+@@ -56,7 +56,7 @@ public class PatternVariableNameCheckExamplesTest extends AbstractExamplesModule
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String pattern = "^[a-z][_a-zA-Z0-9]{2,}$";
+ 
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/RecordComponentNameCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/RecordComponentNameCheckExamplesTest.java
 @@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
@@ -64020,10 +64533,10 @@
      verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/MethodLengthCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/MethodLengthCheckExamplesTest.java
-@@ -24,28 +24,28 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodLengthCheck.MSG
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class MethodLengthCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class MethodLengthCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -64034,25 +64547,27 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final int max = 4;
+ 
+@@ -45,7 +45,7 @@ public class MethodLengthCheckExamplesTest extends AbstractExamplesModuleTestSup
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final int max = 4;
+ 
+@@ -57,7 +57,7 @@ public class MethodLengthCheckExamplesTest extends AbstractExamplesModuleTestSup
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "33:3: " + getCheckMessage(MSG_KEY, 6, 4, "firstMethod"),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/OuterTypeNumberCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/OuterTypeNumberCheckExamplesTest.java
 @@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
@@ -65046,9 +65561,9 @@
 -public class SuppressWithPlainTextCommentFilterExamplesTest
 +final class SuppressWithPlainTextCommentFilterExamplesTest
      extends AbstractExamplesModuleTestSupport {
+ 
    @Override
-   protected String getPackageLocation() {
-@@ -32,56 +32,56 @@ public class SuppressWithPlainTextCommentFilterExamplesTest
+@@ -33,63 +33,63 @@ public class SuppressWithPlainTextCommentFilterExamplesTest
    }
  
    @Test
@@ -65113,6 +65628,14 @@
      final String[] expected = {};
  
      verifyWithInlineConfigParser(getPath("Example8.txt"), expected);
+   }
+ 
+   @Test
+-  public void testExample9() throws Exception {
++  void example9() throws Exception {
+     final String[] expected = {};
+ 
+     verifyWithInlineConfigParser(getNonCompilablePath("Example9.java"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/filters/SuppressionCommentFilterExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/filters/SuppressionCommentFilterExamplesTest.java
 @@ -24,63 +24,63 @@ import org.junit.jupiter.api.Disabled;
