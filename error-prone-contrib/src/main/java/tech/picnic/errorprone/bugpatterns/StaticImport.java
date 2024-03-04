@@ -39,6 +39,7 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matchers;
+import com.google.errorprone.predicates.TypePredicates;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MemberSelectTree;
@@ -101,6 +102,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           Preconditions.class.getCanonicalName(),
           Predicates.class.getCanonicalName(),
           StandardCharsets.class.getCanonicalName(),
+          TypePredicates.class.getCanonicalName(),
           Verify.class.getCanonicalName(),
           "com.fasterxml.jackson.annotation.JsonCreator.Mode",
           "com.fasterxml.jackson.annotation.JsonFormat.Shape",
