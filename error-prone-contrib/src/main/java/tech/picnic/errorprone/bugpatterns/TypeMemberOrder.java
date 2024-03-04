@@ -83,16 +83,15 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
       return Description.NO_MATCH;
     }
 
-    // Keep track of all members, including unmovable ones, to exclude them from the sources
-    // present in-between members.
+    // All members that can be moved or may lay between movable ones.
     ImmutableList<TypeMember> members =
         tree.getMembers().stream()
-            .filter(TypeMemberOrder::hasSource)
+            .filter(member -> isGeneratedConstructor(member) && !isEnumerator(member))
             .map(m -> new AutoValue_TypeMemberOrder_TypeMember(m, getPreferredOrdinal(m, state)))
             .collect(toImmutableList());
 
-    // List of the sortable members' preferred ordinals,
-    // ordered by the member's position in the original source.
+    // List of the sortable members' preferred ordinals, ordered by the member's position in the
+    // original source.
     ImmutableList<Integer> preferredOrdinals =
         members.stream()
             .filter(m -> m.preferredOrdinal().isPresent())
@@ -116,29 +115,7 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
     return describeMatch(tree, sortTypeMembers(bodyStartPos, members, state));
   }
 
-  /**
-   * Returns the preferred ordinal of the given member, or empty if it's unmovable for any reason,
-   * including it lacking a preferred ordinal.
-   */
-  private Optional<Integer> getPreferredOrdinal(Tree tree, VisitorState state) {
-    if (!canMove(tree, state)) {
-      return Optional.empty();
-    }
-    return switch (tree.getKind()) {
-      case VARIABLE -> Optional.of(isStatic((VariableTree) tree) ? 1 : 2);
-      case BLOCK -> Optional.of(isStatic((BlockTree) tree) ? 3 : 4);
-      case METHOD -> Optional.of(isConstructor((MethodTree) tree) ? 5 : 6);
-      case CLASS, INTERFACE, ENUM -> Optional.of(7);
-        // TODO: Should we log unhandled kinds?
-      default -> Optional.empty();
-    };
-  }
-
-  private boolean canMove(Tree tree, VisitorState state) {
-    return hasSource(tree) && !isSuppressed(tree, state) && !isEnumerator(tree);
-  }
-
-  private static boolean hasSource(Tree tree) {
+  private static boolean isGeneratedConstructor(Tree tree) {
     if (tree.getKind() == Kind.METHOD) {
       return !ASTHelpers.isGeneratedConstructor(((MethodTree) tree));
     }
@@ -153,6 +130,24 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
    */
   private static boolean isEnumerator(Tree tree) {
     return tree instanceof JCVariableDecl && (((JCVariableDecl) tree).mods.flags & ENUM) != 0;
+  }
+
+  /**
+   * Returns the preferred ordinal of the given member, or empty if it's unmovable for any reason,
+   * including it lacking a preferred ordinal.
+   */
+  private Optional<Integer> getPreferredOrdinal(Tree tree, VisitorState state) {
+    if (isSuppressed(tree, state)) {
+      return Optional.empty();
+    }
+    return switch (tree.getKind()) {
+      case VARIABLE -> Optional.of(isStatic((VariableTree) tree) ? 1 : 2);
+      case BLOCK -> Optional.of(isStatic((BlockTree) tree) ? 3 : 4);
+      case METHOD -> Optional.of(isConstructor((MethodTree) tree) ? 5 : 6);
+      case CLASS, INTERFACE, ENUM -> Optional.of(7);
+        // TODO: Should we log unhandled kinds?
+      default -> Optional.empty();
+    };
   }
 
   /**
@@ -203,10 +198,6 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
     @Var int start = bodyStartPos;
     for (TypeMember member : members) {
       int end = state.getEndPosition(member.tree());
-      if (isEnumerator(member.tree())) {
-        // To accommodate enums, skip processing their enumerators.
-        continue;
-      }
       verify(
           end != Position.NOPOS && start < end,
           "Unexpected member end position, member: %s",
