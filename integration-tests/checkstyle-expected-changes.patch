@@ -10859,7 +10859,7 @@
        final String branch = XpathUtil.printXpathBranch(options.xpath, filesToProcess.get(0));
        System.out.print(branch);
      } else if (options.printAstWithComments) {
-@@ -791,7 +791,7 @@ public final class Main {
+@@ -789,7 +789,7 @@ public final class Main {
                .map(File::getAbsolutePath)
                .map(Pattern::quote)
                .map(pattern -> Pattern.compile("^" + pattern + "$"))

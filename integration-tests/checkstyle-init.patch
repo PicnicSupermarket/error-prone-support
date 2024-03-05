@@ -69,17 +69,6 @@
      public static DetailNode parseJavadocAsDetailNode(DetailAST blockComment) {
          final JavadocDetailNodeParser parser = new JavadocDetailNodeParser();
          final ParseStatus status = parser.parseJavadocAsDetailNode(blockComment);
---- a/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
-+++ b/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
-@@ -626,6 +626,8 @@ public final class Main {
-             + "reported to standard out in plain format. Checkstyle requires a configuration "
-             + "XML file that configures the checks to apply.",
-             mixinStandardHelpOptions = true)
-+    // XXX: Don't reorder arguments to `picocli.CommandLine.Option#names`.
-+    @SuppressWarnings("LexicographicalAnnotationAttributeListing")
-     private static final class CliOptions {
- 
-         /** Width of CLI help option. */
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
 @@ -139,6 +139,9 @@ public class SarifLogger extends AbstractAutomaticBean implements AuditListener
