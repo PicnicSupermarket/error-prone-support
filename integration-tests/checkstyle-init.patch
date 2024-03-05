@@ -1,7 +1,7 @@
 --- a/pom.xml
 +++ b/pom.xml
-@@ -362,6 +362,12 @@
-       <version>1.3.0</version>
+@@ -366,6 +366,12 @@
+       <version>1.4.1</version>
        <scope>test</scope>
      </dependency>
 +    <dependency>
@@ -13,7 +13,7 @@
      <dependency>
        <groupId>nl.jqno.equalsverifier</groupId>
        <artifactId>equalsverifier</artifactId>
-@@ -2412,6 +2418,8 @@
+@@ -2422,6 +2428,8 @@
                      <arg>
                        -Xplugin:ErrorProne ${error-prone.configuration-args}
                      </arg>
@@ -22,7 +22,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2424,6 +2432,11 @@
+@@ -2434,6 +2442,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -34,7 +34,7 @@
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
-@@ -2468,9 +2481,10 @@
+@@ -2476,9 +2489,10 @@
                      <arg>-XDcompilePolicy=simple</arg>
                      <arg>
                        -Xplugin:ErrorProne \
@@ -46,7 +46,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2483,6 +2497,11 @@
+@@ -2491,6 +2505,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -69,17 +69,6 @@
      public static DetailNode parseJavadocAsDetailNode(DetailAST blockComment) {
          final JavadocDetailNodeParser parser = new JavadocDetailNodeParser();
          final ParseStatus status = parser.parseJavadocAsDetailNode(blockComment);
---- a/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
-+++ b/src/main/java/com/puppycrawl/tools/checkstyle/Main.java
-@@ -626,6 +626,8 @@ public final class Main {
-             + "reported to standard out in plain format. Checkstyle requires a configuration "
-             + "XML file that configures the checks to apply.",
-             mixinStandardHelpOptions = true)
-+    // XXX: Don't reorder arguments to `picocli.CommandLine.Option#names`.
-+    @SuppressWarnings("LexicographicalAnnotationAttributeListing")
-     private static final class CliOptions {
- 
-         /** Width of CLI help option. */
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
 @@ -139,6 +139,9 @@ public class SarifLogger extends AbstractAutomaticBean implements AuditListener
@@ -92,19 +81,6 @@
          final String rendered = report
              .replace(VERSION_PLACEHOLDER, String.valueOf(version))
              .replace(RESULTS_PLACEHOLDER, String.join(",\n", results));
---- a/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
-+++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
-@@ -564,6 +564,10 @@ public final class SiteUtil {
-      * @return a set of properties for the given class.
-      */
-     public static Set<String> getPropertiesForDocumentation(Class<?> clss, Object instance) {
-+        // XXX: File PR to replace `.collect(toSet())` with `.collect(toCollection(HashSet::new))`.
-+        // XXX: Update `CollectorMutability` to recognize cases such as this one, where the created
-+        // collection is clearly modified.
-+        @SuppressWarnings("CollectorMutability")
-         final Set<String> properties =
-                 getProperties(clss).stream()
-                     .filter(prop -> {
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
 @@ -93,6 +93,8 @@ import de.thetaphi.forbiddenapis.SuppressForbidden;
@@ -147,21 +123,9 @@
              final Object test = new PackageObjectFactory(Collections.singleton(null), classLoader,
                      TRY_IN_ALL_REGISTERED_PACKAGES);
              assertWithMessage("Exception is expected but got " + test).fail();
---- a/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
-+++ b/src/test/java/com/puppycrawl/tools/checkstyle/PropertyCacheFileTest.java
-@@ -429,6 +429,9 @@ public class PropertyCacheFileTest extends AbstractPathTestSupport {
-      *                     mock toByteArray to throw exception.
-      */
-     @Test
-+    // XXX: Drop suppression once
-+    // https://github.com/checkstyle/checkstyle/pull/14362 is resolved.
-+    @SuppressWarnings("InputStreamReadAllBytes")
-     public void testNonExistentResource() throws IOException {
-         final Configuration config = new DefaultConfiguration("myName");
-         final String filePath = File.createTempFile("junit", null, temporaryFolder).getPath();
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
-@@ -81,6 +81,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+@@ -80,6 +80,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
   * @noinspectionreason ClassWithTooManyDependencies - complex tests require a
   *      large number of imports
   */
