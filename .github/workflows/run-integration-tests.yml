@@ -19,8 +19,8 @@ jobs:
       matrix:
         integration-test: ["checkstyle", "metrics"]
     name: On-demand integration test
-    # if: |
-      # github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
+    if: |
+      github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
     runs-on: ubuntu-22.04
     steps:
       - name: Install Harden-Runner
