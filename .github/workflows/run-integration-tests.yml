@@ -16,7 +16,7 @@ permissions:
 jobs:
   run-integration-tests:
     runs-on: ubuntu-22.04
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
+#    if: github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
     # XXX: Configure permissions.
     strategy:
       matrix:
@@ -39,7 +39,7 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@6d44c18d67d9e1549907b8815efa5e4dada1801b # v1.12.0
         with:
-          checkout-ref: "refs/pull/${{ github.event.issue.number }}/head"
+          checkout-ref: "refs/pull/894/head"
           java-version: 17.0.10
           java-distribution: temurin
           maven-version: 3.9.6
