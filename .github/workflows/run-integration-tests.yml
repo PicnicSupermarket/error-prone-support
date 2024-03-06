@@ -15,13 +15,14 @@ permissions:
   contents: read
 jobs:
   run-integration-tests:
+    runs-on: ubuntu-22.04
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
+    # XXX: Configure permissions.
     strategy:
       matrix:
-        integration-test: ["checkstyle", "metrics"]
+        integration-test: [ "metrics", "checkstyle" ]
     name: On-demand integration test
-    if: |
-      github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
-    runs-on: ubuntu-22.04
+
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
