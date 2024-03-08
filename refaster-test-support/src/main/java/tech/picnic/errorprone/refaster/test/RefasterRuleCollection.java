@@ -277,7 +277,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
             unexpectedMatchesByLineNumber.entries().stream()
                 .map(
                     e ->
-                        """
+                            """
                         Rule `%s` matches on line %s, while it should match in a method named \
                         `test%s`."""
                             .formatted(e.getValue(), e.getKey(), e.getValue()))
