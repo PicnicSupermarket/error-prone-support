@@ -97,7 +97,7 @@ public final class DuplicateAnnotationAttributeListing extends BugChecker
   private Optional<Fix> removeDuplicateAnnotationEntries(AnnotationTree tree, VisitorState state) {
     return matcher
         .extractMatchingArguments(tree)
-        .map(expr -> extractArray(expr).flatMap(arr -> removeDuplicates(arr, state)))
+        .map(expr -> extractArray(expr).flatMap(arr -> removeDuplicates(arr, tree, state)))
         .flatMap(Optional::stream)
         .reduce(SuggestedFix.Builder::merge)
         .map(SuggestedFix.Builder::build);
@@ -110,7 +110,7 @@ public final class DuplicateAnnotationAttributeListing extends BugChecker
   }
 
   private static Optional<SuggestedFix.Builder> removeDuplicates(
-      NewArrayTree array, VisitorState state) {
+      NewArrayTree array, AnnotationTree tree, VisitorState state) {
     if (array.getInitializers().size() < 2) {
       /* There's only one element, no duplicates are expected. */
       return Optional.empty();
@@ -125,11 +125,7 @@ public final class DuplicateAnnotationAttributeListing extends BugChecker
       return Optional.empty();
     }
 
-    // In the case of String entries, if after removing the duplicates in a listing array, there's
-    // only one element left, then we can omit the brackets.
-    boolean stringEntries =
-        nonDuplicateEntries.stream().map(Tree::getKind).allMatch(Tree.Kind.STRING_LITERAL::equals);
-    String prefix = stringEntries && nonDuplicateEntries.size() == 1 ? "" : "{";
+    String prefix = shouldOmitBrackets(tree, nonDuplicateEntries) ? "" : "{";
     String suffix = prefix.isBlank() ? "" : "}";
 
     String suggestion =
@@ -137,19 +133,6 @@ public final class DuplicateAnnotationAttributeListing extends BugChecker
             .map(expr -> extractName(state, expr))
             .collect(joining(", ", prefix, suffix));
     return Optional.of(SuggestedFix.builder().replace(array, suggestion));
-  }
-
-  private static String extractName(VisitorState state, Tree expr) {
-    String exprString = SourceCode.treeToString(expr, state);
-
-    Symbol symbol = ASTHelpers.getSymbol(expr);
-    if (symbol != null) {
-      return (symbol.getKind() == INTERFACE || symbol.getKind() == CLASS)
-          ? exprString + Kind.CLASS.extension
-          : exprString;
-    }
-
-    return exprString;
   }
 
   /**
@@ -233,6 +216,34 @@ public final class DuplicateAnnotationAttributeListing extends BugChecker
     }.scan(array, visitedAnnotations);
 
     return nodes.build();
+  }
+
+  // In the case of entries defined for the special attribute name value, if after removing the
+  // duplicates in a listing array, there's only one element left, then we can omit the brackets.
+  private static boolean shouldOmitBrackets(
+      AnnotationTree tree, ImmutableSet<Tree> nonDuplicateEntries) {
+    boolean hasValueKeyword =
+        tree.getArguments().stream()
+            .filter(arg -> arg.getKind() == Tree.Kind.ASSIGNMENT)
+            .map(AssignmentTree.class::cast)
+            .map(AssignmentTree::getVariable)
+            .map(IdentifierTree.class::cast)
+            .map(IdentifierTree::getName)
+            .anyMatch(name -> name.contentEquals("value"));
+    return nonDuplicateEntries.size() == 1 && hasValueKeyword;
+  }
+
+  private static String extractName(VisitorState state, Tree expr) {
+    String exprString = SourceCode.treeToString(expr, state);
+
+    Symbol symbol = ASTHelpers.getSymbol(expr);
+    if (symbol != null) {
+      return (symbol.getKind() == INTERFACE || symbol.getKind() == CLASS)
+          ? exprString + Kind.CLASS.extension
+          : exprString;
+    }
+
+    return exprString;
   }
 
   private static AnnotationAttributeMatcher createAnnotationAttributeMatcher(
