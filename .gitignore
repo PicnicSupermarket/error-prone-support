@@ -4,6 +4,7 @@
 .DS_Store
 .factorypath
 .idea/*
+!.idea/icon.svg
 .project
 .settings
 target
@@ -12,6 +13,3 @@ target
 
 # The Git repositories checked out by the integration test framework.
 integration-tests/.repos
-
-# Specific file exclusions.
-!.idea/icon.png
