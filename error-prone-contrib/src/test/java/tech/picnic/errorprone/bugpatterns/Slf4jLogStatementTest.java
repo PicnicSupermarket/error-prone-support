@@ -19,7 +19,6 @@ final class Slf4jLogStatementTest {
             "class A {",
             "  private static final String FMT0 = \"format-string-without-placeholders\";",
             "  private static final String FMT1 = \"format-string-with-{}-placeholder\";",
-            "  private static final String FMT2 = \"format-string-with-{}-{}-placeholders\";",
             "  private static final String FMT_ERR = \"format-string-with-%s-placeholder\";",
             "  private static final Logger LOG = LoggerFactory.getLogger(A.class);",
             "",
