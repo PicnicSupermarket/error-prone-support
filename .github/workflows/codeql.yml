@@ -29,7 +29,9 @@ jobs:
           allowed-endpoints: >
             api.github.com:443
             github.com:443
+            objects.githubusercontent.com:443
             repo.maven.apache.org:443
+            uploads.github.com:443
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@6d44c18d67d9e1549907b8815efa5e4dada1801b # v1.12.0
         with:

@@ -21,8 +21,15 @@ jobs:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
         with:
-          # XXX: Replace with `block` policy.
-          egress-policy: audit
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            checkstyle.org:443
+            github.com:443
+            oss.sonatype.org:443
+            raw.githubusercontent.com:443
+            repo.maven.apache.org:443
+            repository.sonatype.org:443
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@6d44c18d67d9e1549907b8815efa5e4dada1801b # v1.12.0
         with:
