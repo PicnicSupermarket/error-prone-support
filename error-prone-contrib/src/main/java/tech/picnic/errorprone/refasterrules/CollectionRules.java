@@ -39,7 +39,7 @@ final class CollectionRules {
       "java:S1155" /* This violation will be rewritten. */,
       "LexicographicalAnnotationAttributeListing" /* `key-*` entry must remain last. */,
       "OptionalFirstCollectionElement" /* This is a more specific template. */,
-      "StreamIsEmpty" /* This is a more specific template. */,
+      "StreamFindAnyIsEmpty" /* This is a more specific template. */,
       "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     boolean before(Collection<T> collection) {
