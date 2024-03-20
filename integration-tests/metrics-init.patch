@@ -31,7 +31,7 @@ index 6192b52..8c312b6 100644
          <errorprone.version>2.19.1</errorprone.version>
          <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
 -
-+        <error-prone-support.flags>-Xplugin:ErrorProne -XepDisableWarningsInGeneratedCode ${error-prone.flags}</error-prone-support.flags>
++        <error-prone-support.flags>-Xplugin:ErrorProne -XepDisableWarningsInGeneratedCode ${error-prone.configuration-args}</error-prone-support.flags>
 +        <java.version>8</java.version>
          <sonar.projectKey>dropwizard_metrics</sonar.projectKey>
          <sonar.organization>dropwizard</sonar.organization>

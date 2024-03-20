@@ -14,7 +14,7 @@ fi
 do_sync="$([ "${#}" = 0 ] || [ "${1:-}" != '--sync' ] || echo 1)"
 report_directory="$([ "${#}" = 0 ] || ([ -z "${do_sync}" ] && echo "${1}") || ([ "${#}" = 1 ] || echo "${2}"))"
 
-# XXX: We exclude the `CollectorMutability` and the `Immutable*|Preconditions*|StringRules.StringIsNullOrEmpty` Rsefaster rules
+# XXX: We exclude the `CollectorMutability` and the `Immutable*|Preconditions*|StringRules.StringIsNullOrEmpty` Refaster rules
 # as they introduce changes that expect Guava to be on the classpath.
 patch_flags="-Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern=^((?!(Immutable|Preconditions|StringRules\.StringIsNullOrEmpty)).*)"
 
