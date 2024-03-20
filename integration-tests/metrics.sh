@@ -16,7 +16,7 @@ report_directory="$([ "${#}" = 0 ] || ([ -z "${do_sync}" ] && echo "${1}") || ([
 
 # XXX: We exclude the `CollectorMutability` and the `Immutable*|Preconditions*|StringRules.StringIsNullOrEmpty` Refaster rules
 # as they introduce changes that expect Guava to be on the classpath.
-patch_flags="-Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern=^((?!(Immutable|Preconditions|StringRules\.StringIsNullOrEmpty)).*)"
+patch_flags="-Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern=^(?!ImmutableSetRules\$ImmutableSetOf).*"
 
 "$(dirname "${0}")"/run-integration-test.sh \
   "${test_name}" \
