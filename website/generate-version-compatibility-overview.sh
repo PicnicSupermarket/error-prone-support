@@ -10,15 +10,21 @@ source "${HOME}/.sdkman/bin/sdkman-init.sh"
 
 set -e -u -o pipefail
 
+# Currently all released Error Prone Support versions are compatible with Java
+# 17.
+java_version=17.0.10-tem
+(set +u && echo n | sdk install java "${java_version}")
+sdk use java "${java_version}"
+
 output_file="$(dirname "${0}")/_data/compatibility.yml"
 
-ep_versions=$(
+ep_versions="$(
   git ls-remote \
       --exit-code --refs --sort='-v:refname' \
       https://github.com/google/error-prone.git \
       'v*.*' \
     | grep -oP '(?<=/v)[^/]+$'
-)
+)"
 
 work_dir="$(mktemp -d)"
 trap 'rm -rf -- "${work_dir=}"' INT TERM HUP EXIT
@@ -39,26 +45,43 @@ for eps_version in ${eps_versions}; do
   (set +u && echo n | sdk install maven "${mvn_version}")
   sdk use maven "${mvn_version}"
 
+  # Collect the list of checks supported by this version of Error Prone
+  # Support.
+  # XXX: Conditionally omit the `MethodReferenceUsage` exclusion once that
+  # check is production-ready.
+  mvn clean compile -Dverification.skip -DskipTests
+  checks="$(
+    find \
+       -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" \
+       -not -path "*/error-prone-experimental/*" \
+       -not -path "*/error-prone-guidelines/*" \
+       -print0 \
+      | xargs -0 grep -hoP '[^.]+$' \
+      | grep -v '^MethodReferenceUsage$' \
+      | paste -s -d ',' -
+    )"
+
   # Remove any Error Prone flags used by this build that may not be compatible
   # with the targeted version of Error Prone. Removal of these build flags does
   # not influence the compatibility assessment.
   sed -i -r 's,-XepAllSuggestionsAsWarnings|-Xep:\w+:\w+,,g' pom.xml
 
   # Using each Error Prone release, attempt to build and test the source, while
-  # also applying the Maven Central-hosted Refaster rules. This determines
-  # source and behavioral (in)compatibility with Error Prone APIs, while also
-  # assessing whether the Refaster rules are deserialization-compatible.
+  # also applying the Maven Central-hosted Error Prone Support-defined checks
+  # and Refaster rules. This determines source and behavioral (in)compatibility
+  # with Error Prone APIs, while also assessing whether the Refaster rules are
+  # deserialization-compatible.
   for ep_version in ${ep_versions}; do
     echo "Testing Error Prone Support ${eps_version} with Error Prone ${ep_version}..."
     mvn clean test \
         -Perror-prone \
-        -Derror-prone.patch-checks=Refaster \
+        -Derror-prone.patch-checks="${checks}" \
         -Ppatch \
         -Pself-check \
         -Dverification.skip \
         -Dversion.error-prone-orig="${ep_version}" \
       && echo "SUCCESS: { \"eps_version\": \"${eps_version}\", \"ep_version\": \"${ep_version}\" }" || true
-    # Undo any changes applied by Refaster.
+    # Undo any changes applied by the checks.
     git checkout -- '*.java'
   done
 done | tee "${build_log}"
