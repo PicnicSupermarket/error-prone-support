@@ -2,7 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
-import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
+import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static javax.tools.JavaFileObject.Kind.CLASS;
@@ -32,10 +32,10 @@ import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
- * A {@link BugChecker} that warns when SLF4J declarations are not canonicalized across the project.
+ * A {@link BugChecker} that warns when SLF4J declarations are not canonical.
  *
- * @apiNote The default canonicalized logger name can be overridden through {@link ErrorProneFlags
- *     flag arguments}.
+ * @apiNote The default canonical logger name can be overridden through {@link ErrorProneFlags flag
+ *     arguments}.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -43,7 +43,7 @@ import tech.picnic.errorprone.utils.SourceCode;
     link = BUG_PATTERNS_BASE_URL + "Slf4jLogDeclaration",
     linkType = CUSTOM,
     severity = WARNING,
-    tags = LIKELY_ERROR)
+    tags = STYLE)
 public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> LOGGER = isSubtypeOf("org.slf4j.Logger");
@@ -87,12 +87,6 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
     return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
   }
 
-  private void suggestCanonicalModifiers(
-      Tree member, SuggestedFix.Builder fixBuilder, VisitorState state) {
-    SuggestedFixes.addModifiers(member, state, Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-        .ifPresent(fixBuilder::merge);
-  }
-
   private void canonicalizeLoggerVariable(
       VariableTree variableTree, SuggestedFix.Builder fixBuilder, VisitorState state) {
     if (!variableTree.getName().contentEquals(canonicalLoggerName)) {
@@ -124,6 +118,12 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
         return super.visitMethodInvocation(tree, className);
       }
     }.scan(tree, tree.getSimpleName());
+  }
+
+  private static void suggestCanonicalModifiers(
+      Tree member, SuggestedFix.Builder fixBuilder, VisitorState state) {
+    SuggestedFixes.addModifiers(member, state, Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+        .ifPresent(fixBuilder::merge);
   }
 
   private static String getCanonicalLoggerName(ErrorProneFlags flags) {
