@@ -21,6 +21,9 @@ final class CanonicalConstantFieldNameTest {
             "  public static final int baz = 3;",
             "  static final int qux = 4;",
             "  private final int quux = 5;",
+            "  int quuz = 6;",
+            "",
+            "  private static final long serialVersionUID = 1L;",
             "",
             "  // BUG: Diagnostic contains: a variable named `NUMBER` is already defined in this scope",
             "  private static final int number = B.NUMBER;",
@@ -84,30 +87,6 @@ final class CanonicalConstantFieldNameTest {
             "",
             "    private static final int NUMBER_FROM_ANOTHER_CLASS = 5;",
             "  }",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
-  }
-
-  @Test
-  void doNotReplaceExcludedOrPublicConstantsByDefault() {
-    BugCheckerRefactoringTestHelper.newInstance(CanonicalConstantFieldName.class, getClass())
-        .addInputLines(
-            "A.java",
-            "class A {",
-            "  private static final long serialVersionUID = 1L;",
-            "",
-            "  public static final int number = 1;",
-            "",
-            "  static final int anotherNumber = 2;",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "class A {",
-            "  private static final long serialVersionUID = 1L;",
-            "",
-            "  public static final int number = 1;",
-            "",
-            "  static final int anotherNumber = 2;",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
