@@ -11,9 +11,18 @@ final class CanonicalConstantFieldNameTest {
     CompilationTestHelper.newInstance(CanonicalConstantFieldName.class, getClass())
         .addSourceLines(
             "A.java",
+            "  // BUG: Diagnostic contains:",
             "class A {",
-            "  // BUG: Diagnostic contains: Suggested fix for constant name conflicts with an already defined",
-            "  // variable `NUMBER`.",
+            "  private static final int foo = 1;",
+            "  private static final int foobar = 1;",
+            "  private static final int foobarbaz = 1;",
+            "",
+            "  private final int bar = 2;",
+            "  public static final int baz = 3;",
+            "  static final int qux = 4;",
+            "  private final int quux = 5;",
+            "",
+            "  // BUG: Diagnostic contains: a variable named `NUMBER` is already defined in this scope",
             "  private static final int number = B.NUMBER;",
             "",
             "  class B {",
@@ -106,20 +115,20 @@ final class CanonicalConstantFieldNameTest {
   @Test
   void excludeFlaggedConstants() {
     BugCheckerRefactoringTestHelper.newInstance(CanonicalConstantFieldName.class, getClass())
-        .setArgs("-XepOpt:CanonicalConstantFieldName:ExcludedConstantFieldNames=excludedField")
+        .setArgs("-XepOpt:CanonicalConstantFieldName:ExcludedConstantFieldNames=foo")
         .addInputLines(
             "A.java",
             "class A {",
             "  private static final int number = 1;",
             "",
-            "  private static final int excludedField = 3;",
+            "  private static final int foo = 3;",
             "}")
         .addOutputLines(
             "A.java",
             "class A {",
             "  private static final int NUMBER = 1;",
             "",
-            "  private static final int excludedField = 3;",
+            "  private static final int foo = 3;",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }

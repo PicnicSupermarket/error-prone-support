@@ -6,7 +6,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.hasModifier;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
@@ -33,7 +33,8 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.lang.model.element.Modifier;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.Flags;
+import tech.picnic.errorprone.utils.Flags;
+
 
 /**
  * A {@link BugChecker} that flags constant variables that do not follow the upper snake case naming
@@ -43,17 +44,15 @@ import tech.picnic.errorprone.bugpatterns.util.Flags;
  *
  * <pre>{@code
  * private static final int simpleNumber = 1;
- *
  * }</pre>
  *
  * <p>To the following:
  *
  * <pre>{@code
  * private static final int SIMPLE_NUMBER = 1;
- *
  * }</pre>
  *
- * @apiNote This {@link BugChecker checker} has two optional flags:
+ * @apiNote This check has two optional flags:
  *     <ul>
  *       <li>`ExcludedConstantFieldNames`: A list of field names to exclude from this check.
  *       <li>`IncludePublicConstantFields`: Whether to include public constants when running this
@@ -96,26 +95,26 @@ public final class CanonicalConstantFieldName extends BugChecker
    */
   @Inject
   CanonicalConstantFieldName(ErrorProneFlags flags) {
-    optionalExcludedConstantFieldNames = getCanonicalLoggerName(flags);
+    optionalExcludedConstantFieldNames = getAllowedFieldNames(flags);
     includePublicConstantFieldNames = isIncludePrivateConstantFieldNames(flags);
   }
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
-    ImmutableList.Builder<VariableTree> variablesInCompilationUnitBuilder = ImmutableList.builder();
+    ImmutableList.Builder<VariableTree> variablesInFileBuilder = ImmutableList.builder();
     new TreeScanner<@Nullable Void, @Nullable Void>() {
       @Override
       public @Nullable Void visitClass(ClassTree classTree, @Nullable Void unused) {
         for (Tree member : classTree.getMembers()) {
           if (member.getKind() == Kind.VARIABLE) {
-            variablesInCompilationUnitBuilder.add((VariableTree) member);
+            variablesInFileBuilder.add((VariableTree) member);
           }
         }
         return super.visitClass(classTree, unused);
       }
     }.scan(tree, null);
 
-    ImmutableList<VariableTree> variables = variablesInCompilationUnitBuilder.build();
+    ImmutableList<VariableTree> variables = variablesInFileBuilder.build();
     if (variables.isEmpty()) {
       return Description.NO_MATCH;
     }
@@ -152,8 +151,7 @@ public final class CanonicalConstantFieldName extends BugChecker
         buildDescription(tree)
             .setMessage(
                 String.format(
-                    "Suggested fix for constant name conflicts with an already defined variable `%s`.",
-                    replacement))
+                    "a variable named `%s` is already defined in this scope", replacement))
             .build());
   }
 
@@ -174,7 +172,7 @@ public final class CanonicalConstantFieldName extends BugChecker
     return TO_SNAKE_CASE.matcher(variableName).replaceAll("$1_$2").toUpperCase(Locale.ROOT);
   }
 
-  private static ImmutableList<String> getCanonicalLoggerName(ErrorProneFlags flags) {
+  private static ImmutableList<String> getAllowedFieldNames(ErrorProneFlags flags) {
     return Flags.getList(flags, EXCLUDED_CONSTANT_FIELD_NAMES);
   }
 
