@@ -9,6 +9,7 @@ import static javax.tools.JavaFileObject.Kind.CLASS;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
@@ -82,7 +83,7 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
         canonicalizeLoggerVariable((VariableTree) member, fixBuilder, state);
       }
     }
-    fixLoggerVariableDeclarations(tree, fixBuilder, state);
+    updateLoggerVariableDeclarations(tree, fixBuilder, state);
 
     return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
   }
@@ -90,13 +91,11 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
   private void canonicalizeLoggerVariable(
       VariableTree variableTree, SuggestedFix.Builder fixBuilder, VisitorState state) {
     if (!variableTree.getName().contentEquals(canonicalLoggerName)) {
-      fixBuilder
-          .merge(SuggestedFixes.renameVariable(variableTree, canonicalLoggerName, state))
-          .build();
+      fixBuilder.merge(SuggestedFixes.renameVariable(variableTree, canonicalLoggerName, state));
     }
   }
 
-  private static void fixLoggerVariableDeclarations(
+  private static void updateLoggerVariableDeclarations(
       ClassTree tree, SuggestedFix.Builder fixBuilder, VisitorState state) {
     new TreeScanner<@Nullable Void, Name>() {
       @Override
@@ -107,11 +106,12 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
       @Override
       public @Nullable Void visitMethodInvocation(MethodInvocationTree tree, Name className) {
         if (GET_LOGGER_METHOD.matches(tree, state)) {
-          ExpressionTree arg = tree.getArguments().get(0);
-          String argumentName = SourceCode.treeToString(arg, state);
+          ExpressionTree arg = Iterables.getOnlyElement(tree.getArguments());
+          String argumentSource = SourceCode.treeToString(arg, state);
 
-          String findAName = argumentName.substring(0, argumentName.indexOf(CLASS.extension));
-          if (!className.contentEquals(findAName)) {
+          String argumentClassName =
+              argumentSource.substring(0, argumentSource.indexOf(CLASS.extension));
+          if (!className.contentEquals(argumentClassName)) {
             fixBuilder.merge(SuggestedFix.replace(arg, className + CLASS.extension));
           }
         }

@@ -2,6 +2,7 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -14,50 +15,44 @@ final class Slf4jLogDeclarationTest {
             "import org.slf4j.Logger;",
             "import org.slf4j.LoggerFactory;",
             "",
+            // XXX: This one should not be here...
             "// BUG: Diagnostic contains:",
             "class A {",
-            "  Logger FOO = LoggerFactory.getLogger(A.class);",
+            "  private static final Logger LOG = LoggerFactory.getLogger(A.class);",
             "",
             "  // BUG: Diagnostic contains:",
-            "  static class B {",
-            "    private Logger BAR = LoggerFactory.getLogger(B.class);",
+            "  static class VariableMissingStaticFinal {",
+            "    private Logger LOG = LoggerFactory.getLogger(VariableMissingStaticFinal.class);",
             "  }",
             "",
             "  // BUG: Diagnostic contains:",
-            "  static class C {",
-            "    private static Logger BAZ = LoggerFactory.getLogger(C.class);",
+            "  static class VariableMissingFinal {",
+            "    private static Logger LOG = LoggerFactory.getLogger(VariableMissingFinal.class);",
             "  }",
             "",
             "  // BUG: Diagnostic contains:",
-            "  static class D {",
-            "    static final Logger QUX = LoggerFactory.getLogger(D.class);",
+            "  static class VariableMissingPrivate {",
+            "    static final Logger LOG = LoggerFactory.getLogger(VariableMissingPrivate.class);",
             "  }",
             "",
             "  // BUG: Diagnostic contains:",
-            "  static class E {",
-            "    private final Logger QUUX = LoggerFactory.getLogger(E.class);",
+            "  static class VariableMissingStatic {",
+            "    private final Logger LOG = LoggerFactory.getLogger(VariableMissingStatic.class);",
             "  }",
             "",
             "  // BUG: Diagnostic contains:",
-            "  static class F {",
-            "    private static final Logger CORGE = LoggerFactory.getLogger(F.class);",
+            "  static class WrongVariableName {",
+            "    private static final Logger GRAPLY = LoggerFactory.getLogger(WrongVariableName.class);",
             "  }",
             "",
             "  // BUG: Diagnostic contains:",
-            "  static class G {",
-            "    private static final Logger GRAPLY = LoggerFactory.getLogger(G.class);",
+            "  static class WrongArgumentGetLogger {",
+            "    private static final Logger LOG = LoggerFactory.getLogger(String.class);",
             "  }",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  static class H {",
-            "    private static final Logger WALDO = LoggerFactory.getLogger(J.class);",
-            "  }",
-            "",
-            "  class J {}",
             "",
             "  // BUG: Diagnostic contains:",
             "  interface K {",
-            "    Logger FRED = LoggerFactory.getLogger(A.class);",
+            "    Logger FOO = LoggerFactory.getLogger(A.class);",
             "  }",
             "}")
         .doTest();
@@ -73,6 +68,10 @@ final class Slf4jLogDeclarationTest {
             "",
             "class A {",
             "  Logger FOO = LoggerFactory.getLogger(A.class);",
+            "",
+            "  static class WrongArgumentGetLogger {",
+            "    private static final Logger LOG = LoggerFactory.getLogger(String.class);",
+            "  }",
             "}")
         .addOutputLines(
             "A.java",
@@ -81,8 +80,12 @@ final class Slf4jLogDeclarationTest {
             "",
             "class A {",
             "  private static final Logger LOG = LoggerFactory.getLogger(A.class);",
+            "",
+            "  static class WrongArgumentGetLogger {",
+            "    private static final Logger LOG = LoggerFactory.getLogger(WrongArgumentGetLogger.class);",
+            "  }",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
@@ -105,6 +108,6 @@ final class Slf4jLogDeclarationTest {
             "class A {",
             "  private static final Logger BAR = LoggerFactory.getLogger(A.class);",
             "}")
-        .doTest();
+        .doTest(TestMode.TEXT_MATCH);
   }
 }
