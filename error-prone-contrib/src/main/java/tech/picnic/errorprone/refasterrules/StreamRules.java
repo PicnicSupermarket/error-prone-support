@@ -25,6 +25,7 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
@@ -256,7 +257,7 @@ final class StreamRules {
   // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
   // (Perhaps we could add a `@Matches` guard that validates that the collector expression does not
   // contain a `Collectors#filtering` call. That'd still not be 100% accurate, though.)
-  static final class StreamIsEmpty<T, K, V, C extends Collection<K>, M extends Map<K, V>> {
+  static final class StreamFindAnyIsEmpty<T, K, V, C extends Collection<K>, M extends Map<K, V>> {
     @BeforeTemplate
     boolean before(Stream<T> stream, Collector<? super T, ?, ? extends C> collector) {
       return Refaster.anyOf(
@@ -274,20 +275,20 @@ final class StreamRules {
     }
 
     @AfterTemplate
+    @AlsoNegation
     boolean after(Stream<T> stream) {
       return stream.findAny().isEmpty();
     }
   }
 
-  /** In order to test whether a stream has any element, simply try to find one. */
-  static final class StreamIsNotEmpty<T> {
+  /**
+   * Prefer {@link Stream#findAny()} over {@link Stream#findFirst()} if one only cares whether the
+   * stream is nonempty.
+   */
+  static final class StreamFindAnyIsPresent<T> {
     @BeforeTemplate
     boolean before(Stream<T> stream) {
-      return Refaster.anyOf(
-          stream.count() != 0,
-          stream.count() > 0,
-          stream.count() >= 1,
-          stream.findFirst().isPresent());
+      return stream.findFirst().isPresent();
     }
 
     @AfterTemplate
