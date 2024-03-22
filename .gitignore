@@ -3,7 +3,7 @@
 .classpath
 .DS_Store
 .factorypath
-.idea/*
+**/.idea/*
 !.idea/icon.svg
 .project
 .settings
