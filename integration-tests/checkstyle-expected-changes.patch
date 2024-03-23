@@ -53686,6 +53686,15 @@
      final ModuleFactory moduleFactory = TestUtil.getPackageObjectFactory();
  
      final Path path = Paths.get(XdocUtil.DIRECTORY_PATH + "/config.xml");
+@@ -1081,7 +1083,7 @@ public class XdocsPagesTest {
+         Optional.ofNullable(field)
+             .map(nonNullField -> nonNullField.getAnnotation(XdocsPropertyType.class))
+             .map(propertyType -> propertyType.value().getDescription())
+-            .orElse(fieldClass.getSimpleName());
++            .orElseGet(fieldClass::getSimpleName);
+     final String expectedValue =
+         getModulePropertyExpectedValue(sectionName, propertyName, field, fieldClass, instance);
+ 
 @@ -1364,7 +1366,7 @@ public class XdocsPagesTest {
          final Object[] array = (Object[]) value;
          valuesStream = Arrays.stream(array);
