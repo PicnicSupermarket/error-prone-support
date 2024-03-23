@@ -24,7 +24,8 @@ import tech.picnic.errorprone.workshop.bugpatterns.util.SourceCode;
     summary = "Don't unnecessarily use Mockito's `eq(...)`",
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
-public final class Assignment2DropMockitoEq extends BugChecker implements MethodInvocationTreeMatcher {
+public final class Assignment2DropMockitoEq extends BugChecker
+    implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> MOCKITO_EQ_METHOD =
       staticMethod().onClass("org.mockito.ArgumentMatchers").named("eq");

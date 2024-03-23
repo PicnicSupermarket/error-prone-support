@@ -160,7 +160,8 @@ final class Assignment5DeleteIdentityConversionTest {
 
   @Test
   void replacement() {
-    BugCheckerRefactoringTestHelper.newInstance(Assignment5DeleteIdentityConversion.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(
+            Assignment5DeleteIdentityConversion.class, getClass())
         .addInputLines(
             "A.java",
             "import static com.google.errorprone.matchers.Matchers.staticMethod;",

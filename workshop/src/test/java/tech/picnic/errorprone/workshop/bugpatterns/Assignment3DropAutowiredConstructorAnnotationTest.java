@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test;
 final class Assignment3DropAutowiredConstructorAnnotationTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(Assignment3DropAutowiredConstructorAnnotation.class, getClass())
+    CompilationTestHelper.newInstance(
+            Assignment3DropAutowiredConstructorAnnotation.class, getClass())
         .addSourceLines(
             "Container.java",
             "import com.google.errorprone.annotations.Immutable;",

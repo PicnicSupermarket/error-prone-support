@@ -31,7 +31,8 @@ import javax.lang.model.element.Modifier;
   "UnusedMethod",
   "UnusedVariable"
 } /* This check is yet to be implemented as part of the demo. */)
-public final class Assignment4JUnitTestMethodDeclaration extends BugChecker implements MethodTreeMatcher {
+public final class Assignment4JUnitTestMethodDeclaration extends BugChecker
+    implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final ImmutableSet<Modifier> ILLEGAL_MODIFIERS =
       Sets.immutableEnumSet(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC);

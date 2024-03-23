@@ -29,7 +29,8 @@ import com.sun.source.tree.MethodInvocationTree;
     summary = "Prefer `.isNull()` over `.isEqualTo(null)`",
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
-public final class Assignment1AssertJIsNullMethod extends BugChecker implements MethodInvocationTreeMatcher {
+public final class Assignment1AssertJIsNullMethod extends BugChecker
+    implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<MethodInvocationTree> ASSERT_IS_EQUAL_TO_NULL =
       allOf(
