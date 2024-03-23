@@ -3,16 +3,16 @@ changelog:
     labels:
       - "ignore-changelog"
   categories:
+    - title: ":warning: Update considerations and deprecations"
+      labels:
+        - "breaking change"
+        - "deprecation"
     - title: ":rocket: New Error Prone checks and Refaster rules"
       labels:
         - "new feature"
     - title: ":sparkles: Improvements"
       labels:
         - "improvement"
-    - title: ":warning: Update considerations and deprecations"
-      labels:
-        - "breaking change"
-        - "deprecation"
     - title: ":bug: Bug fixes"
       labels:
         - "bug"
