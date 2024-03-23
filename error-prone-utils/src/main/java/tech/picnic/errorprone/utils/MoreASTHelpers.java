@@ -78,4 +78,14 @@ public final class MoreASTHelpers {
   public static boolean areSameType(Tree treeA, Tree treeB, VisitorState state) {
     return ASTHelpers.isSameType(ASTHelpers.getType(treeA), ASTHelpers.getType(treeB), state);
   }
+
+  /**
+   * Tells whether a given tree is a generated constructor.
+   *
+   * @param tree The tree of interest.
+   * @return Whether the specified tree is a generated constructor.
+   */
+  public static boolean isGeneratedConstructor(Tree tree) {
+    return tree instanceof MethodTree methodTree && ASTHelpers.isGeneratedConstructor(methodTree);
+  }
 }

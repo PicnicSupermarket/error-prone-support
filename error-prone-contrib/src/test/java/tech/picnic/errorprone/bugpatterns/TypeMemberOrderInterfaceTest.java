@@ -11,7 +11,7 @@ final class TypeMemberOrderInterfaceTest {
     CompilationTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .expectErrorMessage(
             "TypeMemberOrder",
-            message -> message.contains("Type members should be ordered in a standard way"))
+            message -> message.contains("Type members should be ordered in a canonical order"))
         .addSourceLines(
             "A.java",
             "// BUG: Diagnostic matches: TypeMemberOrder",
@@ -60,7 +60,7 @@ final class TypeMemberOrderInterfaceTest {
   }
 
   @Test
-  void replacementSuggestedFix() {
+  void replacement() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
@@ -93,7 +93,7 @@ final class TypeMemberOrderInterfaceTest {
   }
 
   @Test
-  void replacementSuggestedFixDefaultMethods() {
+  void replacementDefaultMethods() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
@@ -126,7 +126,7 @@ final class TypeMemberOrderInterfaceTest {
   }
 
   @Test
-  void replacementSuggestedFixConsidersUnmovableMembers() {
+  void replacementUnmovableMembers() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
@@ -166,7 +166,7 @@ final class TypeMemberOrderInterfaceTest {
   }
 
   @Test
-  void replacementSuggestedFixConsidersDanglingComments() {
+  void replacementDanglingComments() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
