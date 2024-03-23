@@ -42,7 +42,8 @@ final class Assignment4JUnitTestMethodDeclarationTest {
 
   @Test
   void replacementIllegalModifiers() {
-    BugCheckerRefactoringTestHelper.newInstance(Assignment4JUnitTestMethodDeclaration.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(
+            Assignment4JUnitTestMethodDeclaration.class, getClass())
         .addInputLines(
             "A.java",
             "import org.junit.jupiter.api.Test;",

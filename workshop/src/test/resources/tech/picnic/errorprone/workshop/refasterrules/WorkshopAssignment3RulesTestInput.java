@@ -17,7 +17,8 @@ final class WorkshopAssignment3RulesTest implements RefasterRuleCollectionTestCa
       throw new IllegalArgumentException("The string is not empty");
     }
     if (!"bar".isEmpty()) {
-      throw new IllegalArgumentException("The rule should be able rewrite all kinds of messages ;).");
+      throw new IllegalArgumentException(
+          "The rule should be able rewrite all kinds of messages ;).");
     }
   }
 }
