@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.lang.model.element.Modifier;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
 
 /**
  * A {@link BugChecker} that flags classes with a non-canonical member order.
@@ -61,11 +62,9 @@ import javax.lang.model.element.Modifier;
  *     href="https://checkstyle.sourceforge.io/apidocs/com/puppycrawl/tools/checkstyle/checks/coding/DeclarationOrderCheck.html">Checkstyle's
  *     {@code DeclarationOrderCheck}</a>
  */
-// XXX: Reference
-// https://checkstyle.sourceforge.io/apidocs/com/puppycrawl/tools/checkstyle/checks/coding/DeclarationOrderCheck.html
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Type members should be ordered in a standard way",
+    summary = "Type members should be defined in a canonical order",
     link = BUG_PATTERNS_BASE_URL + "TypeMemberOrder",
     linkType = CUSTOM,
     severity = WARNING,
@@ -78,20 +77,23 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    Kind kind = tree.getKind();
-    if (kind != Kind.CLASS && kind != Kind.INTERFACE && kind != Kind.ENUM) {
+    Kind treeKind = tree.getKind();
+    if (treeKind != Kind.CLASS && treeKind != Kind.INTERFACE && treeKind != Kind.ENUM) {
       return Description.NO_MATCH;
     }
 
-    // All members that can be moved or may lay between movable ones.
+    /* All members that can be moved or may lay between movable ones. */
     ImmutableList<TypeMember> members =
         tree.getMembers().stream()
-            .filter(member -> isGeneratedConstructor(member) && !isEnumerator(member))
+            .filter(
+                member -> !MoreASTHelpers.isGeneratedConstructor(member) && !isEnumerator(member))
             .map(m -> new AutoValue_TypeMemberOrder_TypeMember(m, getPreferredOrdinal(m, state)))
             .collect(toImmutableList());
 
-    // List of the sortable members' preferred ordinals, ordered by the member's position in the
-    // original source.
+    /*
+      List of the sortable members' preferred ordinals, ordered by the member's position in the
+      original source.
+    */
     ImmutableList<Integer> preferredOrdinals =
         members.stream()
             .filter(m -> m.preferredOrdinal().isPresent())
@@ -115,21 +117,14 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
     return describeMatch(tree, sortTypeMembers(bodyStartPos, members, state));
   }
 
-  private static boolean isGeneratedConstructor(Tree tree) {
-    if (tree.getKind() == Kind.METHOD) {
-      return !ASTHelpers.isGeneratedConstructor(((MethodTree) tree));
-    }
-    return true;
-  }
-
   /**
-   * Returns true if `Tree` is an enumerator of an enumerated type, or false otherwise.
+   * Returns true if {@link Tree} is an enumerator of an enumerated type, false otherwise.
    *
    * @see com.sun.tools.javac.tree.Pretty#isEnumerator(JCTree)
    * @see com.sun.tools.javac.code.Flags#ENUM
    */
   private static boolean isEnumerator(Tree tree) {
-    return tree instanceof JCVariableDecl && (((JCVariableDecl) tree).mods.flags & ENUM) != 0;
+    return tree instanceof JCVariableDecl variableDecl && (variableDecl.mods.flags & ENUM) != 0;
   }
 
   /**
@@ -162,7 +157,7 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
       return Position.NOPOS;
     }
 
-    // We return the source code position of the first token that follows the first left brace.
+    /* We return the source code position of the first token that follows the first left brace. */
     return ErrorProneTokens.getTokens(
             sourceCode.subSequence(typeStart, typeEnd).toString(), typeStart, state.context)
         .stream()
