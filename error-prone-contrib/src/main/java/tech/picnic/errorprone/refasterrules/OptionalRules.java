@@ -360,7 +360,7 @@ final class OptionalRules {
   /** Prefer {@link Optional#or(Supplier)} over more verbose alternatives. */
   static final class OptionalOrOtherOptional<T> {
     @BeforeTemplate
-    @SuppressWarnings("NestedOptionals" /* Auto-fix for the `NestedOptionals` check. */)
+    @SuppressWarnings("NestedOptionals")
     Optional<T> before(Optional<T> optional1, Optional<T> optional2) {
       // XXX: Note that rewriting the first and third variant will change the code's behavior if
       // `optional2` has side-effects.
@@ -386,7 +386,7 @@ final class OptionalRules {
    */
   static final class OptionalIdentity<T> {
     @BeforeTemplate
-    @SuppressWarnings("NestedOptionals" /* Auto-fix for the `NestedOptionals` check. */)
+    @SuppressWarnings("NestedOptionals")
     Optional<T> before(Optional<T> optional, Comparator<? super T> comparator) {
       return Refaster.anyOf(
           optional.or(Refaster.anyOf(() -> Optional.empty(), Optional::empty)),
