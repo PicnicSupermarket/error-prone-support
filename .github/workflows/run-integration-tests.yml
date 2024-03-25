@@ -7,16 +7,22 @@
 # https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
 name: "Integration tests"
 on:
+  pull_request:
+    branches: [ master ]
   issue_comment:
     types: [ created ]
 permissions:
   contents: read
 jobs:
   run-integration-tests:
-    name: On-demand integration test
-    if: |
-      github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
     runs-on: ubuntu-22.04
+#    if: github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
+    # XXX: Configure permissions.
+    strategy:
+      matrix:
+        integration-test: [ "metrics", "checkstyle" ]
+    name: On-demand integration test
+
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
@@ -33,19 +39,19 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@6d44c18d67d9e1549907b8815efa5e4dada1801b # v1.12.0
         with:
-          checkout-ref: "refs/pull/${{ github.event.issue.number }}/head"
+          checkout-ref: "refs/pull/894/head"
           java-version: 17.0.10
           java-distribution: temurin
           maven-version: 3.9.6
       - name: Install project to local Maven repository
         run: mvn -T1C install -DskipTests -Dverification.skip
       - name: Run integration test
-        run: xvfb-run ./integration-tests/checkstyle.sh "${{ runner.temp }}/artifacts"
+        run: xvfb-run "./integration-tests/${{ matrix.integration-test }}.sh" "${{ runner.temp }}/artifacts"
       - name: Upload artifacts on failure
         if: ${{ failure() }}
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
         with:
-          name: integration-test-checkstyle
+          name: "integration-test-${{ matrix.integration-test }}"
           path: "${{ runner.temp }}/artifacts"
       - name: Remove installed project artifacts
         run: mvn build-helper:remove-project-artifact
