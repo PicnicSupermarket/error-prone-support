@@ -952,8 +952,7 @@
                             <arg>10000</arg>
                         </compilerArgs>
                         <parameters>true</parameters>
-                        <source>${version.jdk}</source>
-                        <target>${version.jdk}</target>
+                        <release>${version.jdk}</release>
                         <showWarnings>false</showWarnings>
                         <!-- Erroneously inverted logic... for details, see
                         https://issues.apache.org/jira/browse/MCOMPILER-209. -->
