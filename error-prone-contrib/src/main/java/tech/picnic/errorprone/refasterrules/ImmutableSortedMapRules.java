@@ -37,8 +37,6 @@ final class ImmutableSortedMapRules {
    * Prefer {@link ImmutableSortedMap#naturalOrder()} over the alternative that requires explicitly
    * providing the {@link Comparator}.
    */
-  // XXX: This drops generic type information, sometimes leading to non-compilable code. See
-  // https://github.com/google/error-prone/pull/2706.
   static final class ImmutableSortedMapNaturalOrderBuilder<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     ImmutableSortedMap.Builder<K, V> before() {
@@ -47,7 +45,7 @@ final class ImmutableSortedMapRules {
 
     @AfterTemplate
     ImmutableSortedMap.Builder<K, V> after() {
-      return ImmutableSortedMap.naturalOrder();
+      return ImmutableSortedMap.<K, V>naturalOrder();
     }
   }
 
@@ -55,8 +53,6 @@ final class ImmutableSortedMapRules {
    * Prefer {@link ImmutableSortedMap#reverseOrder()} over the alternative that requires explicitly
    * providing the {@link Comparator}.
    */
-  // XXX: This drops generic type information, sometimes leading to non-compilable code. See
-  // https://github.com/google/error-prone/pull/2706.
   static final class ImmutableSortedMapReverseOrderBuilder<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     ImmutableSortedMap.Builder<K, V> before() {
@@ -65,7 +61,7 @@ final class ImmutableSortedMapRules {
 
     @AfterTemplate
     ImmutableSortedMap.Builder<K, V> after() {
-      return ImmutableSortedMap.reverseOrder();
+      return ImmutableSortedMap.<K, V>reverseOrder();
     }
   }
 

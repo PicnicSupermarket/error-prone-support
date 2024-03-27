@@ -29,8 +29,6 @@ final class ImmutableSetRules {
   private ImmutableSetRules() {}
 
   /** Prefer {@link ImmutableSet#builder()} over the associated constructor. */
-  // XXX: This drops generic type information, sometimes leading to non-compilable code. See
-  // https://github.com/google/error-prone/pull/2706.
   static final class ImmutableSetBuilder<T> {
     @BeforeTemplate
     ImmutableSet.Builder<T> before() {
@@ -39,7 +37,7 @@ final class ImmutableSetRules {
 
     @AfterTemplate
     ImmutableSet.Builder<T> after() {
-      return ImmutableSet.builder();
+      return ImmutableSet.<T>builder();
     }
   }
 

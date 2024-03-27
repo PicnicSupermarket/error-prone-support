@@ -21,8 +21,8 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Arrays.class, Collections.class, Streams.class, not(null));
   }
 
-  ImmutableSet.Builder<String> testImmutableSetBuilder() {
-    return new ImmutableSet.Builder<>();
+  ImmutableSet<ImmutableSet.Builder<String>> testImmutableSetBuilder() {
+    return ImmutableSet.of(new ImmutableSet.Builder<>(), new ImmutableSet.Builder<Integer>());
   }
 
   ImmutableSet<ImmutableSet<Integer>> testIterableToImmutableSet() {
