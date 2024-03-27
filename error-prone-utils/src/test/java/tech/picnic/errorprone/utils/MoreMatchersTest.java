@@ -26,32 +26,34 @@ final class MoreMatchersTest {
     CompilationTestHelper.newInstance(HasMetaAnnotationTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "import org.junit.jupiter.api.AfterAll;",
-            "import org.junit.jupiter.api.RepeatedTest;",
-            "import org.junit.jupiter.api.Test;",
-            "import org.junit.jupiter.api.TestTemplate;",
-            "import org.junit.jupiter.params.ParameterizedTest;",
-            "",
-            "class A {",
-            "  void negative1() {}",
-            "",
-            "  @Test",
-            "  void negative2() {}",
-            "",
-            "  @AfterAll",
-            "  void negative3() {}",
-            "",
-            "  @TestTemplate",
-            "  void negative4() {}",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @ParameterizedTest",
-            "  void positive1() {}",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @RepeatedTest(2)",
-            "  void positive2() {}",
-            "}")
+            """
+            import org.junit.jupiter.api.AfterAll;
+            import org.junit.jupiter.api.RepeatedTest;
+            import org.junit.jupiter.api.Test;
+            import org.junit.jupiter.api.TestTemplate;
+            import org.junit.jupiter.params.ParameterizedTest;
+
+            class A {
+              void negative1() {}
+
+              @Test
+              void negative2() {}
+
+              @AfterAll
+              void negative3() {}
+
+              @TestTemplate
+              void negative4() {}
+
+              // BUG: Diagnostic contains:
+              @ParameterizedTest
+              void positive1() {}
+
+              // BUG: Diagnostic contains:
+              @RepeatedTest(2)
+              void positive2() {}
+            }
+            """)
         .doTest();
   }
 
@@ -60,33 +62,35 @@ final class MoreMatchersTest {
     CompilationTestHelper.newInstance(IsSubTypeOfTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "import com.google.common.collect.ImmutableList;",
-            "import com.google.common.collect.ImmutableSet;",
-            "import com.google.common.collect.ImmutableSortedSet;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    ImmutableSet.of(\"foo\");",
-            "    ImmutableSortedSet.of(\"foo\");",
-            "    ImmutableList.of(\"foo\");",
-            "    ImmutableList.of(1);",
-            "    ImmutableList.of(1.0);",
-            "    ImmutableList.of((Number) 1);",
-            "",
-            "    // BUG: Diagnostic contains:",
-            "    ImmutableSet.of(1);",
-            "    // BUG: Diagnostic contains:",
-            "    ImmutableSet.of(1.0);",
-            "    // BUG: Diagnostic contains:",
-            "    ImmutableSet.of((Number) 1);",
-            "    // BUG: Diagnostic contains:",
-            "    ImmutableSortedSet.of(1);",
-            "    // BUG: Diagnostic contains:",
-            "    ImmutableSortedSet.of(1.0);",
-            "    // BUG: Diagnostic contains:",
-            "    ImmutableSortedSet.of((Number) 1);",
-            "  }",
-            "}")
+            """
+            import com.google.common.collect.ImmutableList;
+            import com.google.common.collect.ImmutableSet;
+            import com.google.common.collect.ImmutableSortedSet;
+
+            class A {
+              void m() {
+                ImmutableSet.of("foo");
+                ImmutableSortedSet.of("foo");
+                ImmutableList.of("foo");
+                ImmutableList.of(1);
+                ImmutableList.of(1.0);
+                ImmutableList.of((Number) 1);
+
+                // BUG: Diagnostic contains:
+                ImmutableSet.of(1);
+                // BUG: Diagnostic contains:
+                ImmutableSet.of(1.0);
+                // BUG: Diagnostic contains:
+                ImmutableSet.of((Number) 1);
+                // BUG: Diagnostic contains:
+                ImmutableSortedSet.of(1);
+                // BUG: Diagnostic contains:
+                ImmutableSortedSet.of(1.0);
+                // BUG: Diagnostic contains:
+                ImmutableSortedSet.of((Number) 1);
+              }
+            }
+            """)
         .doTest();
   }
 
@@ -96,11 +100,13 @@ final class MoreMatchersTest {
         .withClasspath()
         .addSourceLines(
             "A.java",
-            "class A {",
-            "  void m() {",
-            "    System.out.println(toString());",
-            "  }",
-            "}")
+            """
+            class A {
+              void m() {
+                System.out.println(toString());
+              }
+            }
+            """)
         .doTest();
   }
 

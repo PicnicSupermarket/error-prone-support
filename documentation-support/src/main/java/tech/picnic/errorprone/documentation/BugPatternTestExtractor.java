@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestCases;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * An {@link Extractor} that describes how to extract data from classes that test a {@code
@@ -189,21 +190,10 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
       }
     }
 
-    // XXX: This logic is duplicated in `ErrorProneTestSourceFormat`. Can we do better?
     private static Optional<String> getSourceCode(MethodInvocationTree tree) {
-      List<? extends ExpressionTree> sourceLines =
-          tree.getArguments().subList(1, tree.getArguments().size());
-      StringBuilder source = new StringBuilder();
-
-      for (ExpressionTree sourceLine : sourceLines) {
-        String value = ASTHelpers.constValue(sourceLine, String.class);
-        if (value == null) {
-          return Optional.empty();
-        }
-        source.append(value).append('\n');
-      }
-
-      return Optional.of(source.toString());
+      return SourceCode.joinConstantSourceCodeLines(
+              tree.getArguments().subList(1, tree.getArguments().size()))
+          .map(s -> s + '\n');
     }
   }
 

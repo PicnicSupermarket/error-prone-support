@@ -9,18 +9,20 @@ final class MongoDBTextFilterUsageTest {
     CompilationTestHelper.newInstance(MongoDBTextFilterUsage.class, getClass())
         .addSourceLines(
             "A.java",
-            "import com.mongodb.client.model.Filters;",
-            "import com.mongodb.client.model.TextSearchOptions;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    Filters.eq(\"foo\", \"bar\");",
-            "    // BUG: Diagnostic contains:",
-            "    Filters.text(\"foo\");",
-            "    // BUG: Diagnostic contains:",
-            "    Filters.text(\"foo\", new TextSearchOptions());",
-            "  }",
-            "}")
+            """
+            import com.mongodb.client.model.Filters;
+            import com.mongodb.client.model.TextSearchOptions;
+
+            class A {
+              void m() {
+                Filters.eq("foo", "bar");
+                // BUG: Diagnostic contains:
+                Filters.text("foo");
+                // BUG: Diagnostic contains:
+                Filters.text("foo", new TextSearchOptions());
+              }
+            }
+            """)
         .doTest();
   }
 }

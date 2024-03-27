@@ -19,26 +19,28 @@ final class UnqualifiedSuggestedFixImportTest {
                     "Prefer `SuggestedFixes#qualifyStaticImport` over direct invocation of `SuggestedFix.Builder#addStaticImport`"))
         .addSourceLines(
             "A.java",
-            "import com.google.errorprone.fixes.SuggestedFix;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    System.out.println(\"foo\");",
-            "    addImport(\"bar\");",
-            "    addStaticImport(\"baz\");",
-            "",
-            "    SuggestedFix.Builder builder = SuggestedFix.builder();",
-            "    // BUG: Diagnostic matches: IMPORT",
-            "    builder.addImport(\"java.lang.String\");",
-            "    // BUG: Diagnostic matches: STATIC_IMPORT",
-            "    builder.addStaticImport(\"java.lang.String.toString\");",
-            "    builder.build();",
-            "  }",
-            "",
-            "  private void addImport(String s) {}",
-            "",
-            "  private void addStaticImport(String s) {}",
-            "}")
+            """
+            import com.google.errorprone.fixes.SuggestedFix;
+
+            class A {
+              void m() {
+                System.out.println("foo");
+                addImport("bar");
+                addStaticImport("baz");
+
+                SuggestedFix.Builder builder = SuggestedFix.builder();
+                // BUG: Diagnostic matches: IMPORT
+                builder.addImport("java.lang.String");
+                // BUG: Diagnostic matches: STATIC_IMPORT
+                builder.addStaticImport("java.lang.String.toString");
+                builder.build();
+              }
+
+              private void addImport(String s) {}
+
+              private void addStaticImport(String s) {}
+            }
+            """)
         .doTest();
   }
 }
