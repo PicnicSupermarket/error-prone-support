@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
@@ -9,6 +10,7 @@ import static java.util.stream.Collectors.minBy;
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -50,6 +52,10 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.comparingInt(String::length),
         Comparator.comparingInt(String::length),
         Comparator.comparing(s -> "foo", Comparator.comparingInt(String::length)));
+  }
+
+  Comparator<String> testComparingEnum() {
+    return comparing(s -> RoundingMode.valueOf(s));
   }
 
   Comparator<String> testThenComparing() {
@@ -162,5 +168,17 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
 
   Collector<Integer, ?, Optional<Integer>> testMaxByNaturalOrder() {
     return maxBy(naturalOrder());
+  }
+
+  ImmutableSet<Boolean> testIsLessThan() {
+    return ImmutableSet.of(
+        RoundingMode.UP.compareTo(RoundingMode.DOWN) < 0,
+        RoundingMode.UP.compareTo(RoundingMode.DOWN) >= 0);
+  }
+
+  ImmutableSet<Boolean> testIsLessThanOrEqualTo() {
+    return ImmutableSet.of(
+        RoundingMode.UP.compareTo(RoundingMode.DOWN) <= 0,
+        RoundingMode.UP.compareTo(RoundingMode.DOWN) > 0);
   }
 }

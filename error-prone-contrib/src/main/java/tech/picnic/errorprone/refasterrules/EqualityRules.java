@@ -30,8 +30,9 @@ final class EqualityRules {
     // XXX: This Refaster rule is the topic of https://github.com/google/error-prone/issues/559. We
     // work around the issue by selecting the "largest replacements". See the `Refaster` check.
     @BeforeTemplate
+    @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
     boolean before(T a, T b) {
-      return Refaster.anyOf(a.equals(b), Objects.equals(a, b));
+      return Refaster.anyOf(a.equals(b), Objects.equals(a, b), a.ordinal() == b.ordinal());
     }
 
     @AfterTemplate

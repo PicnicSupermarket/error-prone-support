@@ -21,6 +21,8 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         RoundingMode.UP == RoundingMode.DOWN,
         RoundingMode.UP == RoundingMode.DOWN,
+        RoundingMode.UP == RoundingMode.DOWN,
+        RoundingMode.UP != RoundingMode.DOWN,
         RoundingMode.UP != RoundingMode.DOWN,
         RoundingMode.UP != RoundingMode.DOWN);
   }

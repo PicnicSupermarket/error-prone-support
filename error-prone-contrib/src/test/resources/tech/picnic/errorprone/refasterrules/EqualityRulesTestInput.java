@@ -21,8 +21,10 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         RoundingMode.UP.equals(RoundingMode.DOWN),
         Objects.equals(RoundingMode.UP, RoundingMode.DOWN),
+        RoundingMode.UP.ordinal() == RoundingMode.DOWN.ordinal(),
         !RoundingMode.UP.equals(RoundingMode.DOWN),
-        !Objects.equals(RoundingMode.UP, RoundingMode.DOWN));
+        !Objects.equals(RoundingMode.UP, RoundingMode.DOWN),
+        RoundingMode.UP.ordinal() != RoundingMode.DOWN.ordinal());
   }
 
   boolean testEqualsPredicate() {
