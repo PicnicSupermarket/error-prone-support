@@ -38,8 +38,6 @@ import tech.picnic.errorprone.utils.SourceCode;
  */
 // XXX: Currently this checker only flags method-level annotations. It should likely also flag
 // type-, field- and parameter-level annotations.
-// XXX: Duplicate entries are often a mistake. Consider introducing a similar `BugChecker` that
-// flags duplicates.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Sort annotations lexicographically where possible",
