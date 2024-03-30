@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
@@ -15,26 +14,22 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.VariableTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
-import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
-import com.sun.tools.javac.code.Symbol.VarSymbol;
 import java.util.Locale;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.lang.model.element.Modifier;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.Flags;
-
 
 /**
  * A {@link BugChecker} that flags constant variables that do not follow the upper snake case naming
@@ -66,8 +61,7 @@ import tech.picnic.errorprone.utils.Flags;
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)
-public final class CanonicalConstantFieldName extends BugChecker
-    implements CompilationUnitTreeMatcher {
+public final class CanonicalConstantFieldName extends BugChecker implements VariableTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> IS_CONSTANT =
       allOf(hasModifier(Modifier.STATIC), hasModifier(Modifier.FINAL));
@@ -100,49 +94,43 @@ public final class CanonicalConstantFieldName extends BugChecker
   }
 
   @Override
-  public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
+  public Description matchVariable(VariableTree tree, VisitorState state) {
+    String variableName = tree.getName().toString();
+    if (IS_CONSTANT.matches(tree, state)
+        && isFieldAccessModifierApplicable(tree, state)
+        && !isUpperSnakeCase(variableName)
+        && !isVariableNameExcluded(variableName)) {
+      SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
+
+      ImmutableList<VariableTree> variablesInCompilationUnit =
+          getVariablesInCompilationUnit(state.getPath().getCompilationUnit());
+      String replacement = toUpperSnakeCase(variableName);
+      if (variablesInCompilationUnit.stream()
+          .map(ASTHelpers::getSymbol)
+          .noneMatch(s -> s.getSimpleName().toString().equals(replacement))) {
+        fixBuilder.merge(SuggestedFixes.renameVariable(tree, replacement, state));
+      } else {
+        reportConstantRenameBlocker(tree, replacement, state);
+      }
+
+      return describeMatch(tree, fixBuilder.build());
+    }
+
+    return Description.NO_MATCH;
+  }
+
+  private static ImmutableList<VariableTree> getVariablesInCompilationUnit(
+      CompilationUnitTree tree) {
     ImmutableList.Builder<VariableTree> variablesInFileBuilder = ImmutableList.builder();
     new TreeScanner<@Nullable Void, @Nullable Void>() {
       @Override
-      public @Nullable Void visitClass(ClassTree classTree, @Nullable Void unused) {
-        for (Tree member : classTree.getMembers()) {
-          if (member.getKind() == Kind.VARIABLE) {
-            variablesInFileBuilder.add((VariableTree) member);
-          }
-        }
-        return super.visitClass(classTree, unused);
+      public @Nullable Void visitVariable(VariableTree variableTree, @Nullable Void unused) {
+        variablesInFileBuilder.add(variableTree);
+        return super.visitVariable(variableTree, unused);
       }
     }.scan(tree, null);
 
-    ImmutableList<VariableTree> variables = variablesInFileBuilder.build();
-    if (variables.isEmpty()) {
-      return Description.NO_MATCH;
-    }
-
-    ImmutableList<VarSymbol> variableSymbols =
-        variables.stream().map(ASTHelpers::getSymbol).collect(toImmutableList());
-    SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
-    variables.forEach(
-        variableTree -> {
-          if (IS_CONSTANT.matches(variableTree, state)
-              && isFieldAccessModifierApplicable(variableTree, state)) {
-            VarSymbol variableSymbol = ASTHelpers.getSymbol(variableTree);
-            String variableName = variableSymbol.getSimpleName().toString();
-
-            if (!isUpperSnakeCase(variableName) && !isVariableNameExcluded(variableName)) {
-              String replacement = toUpperSnakeCase(variableName);
-
-              if (variableSymbols.stream()
-                  .noneMatch(s -> s.getSimpleName().toString().equals(replacement))) {
-                fixBuilder.merge(SuggestedFixes.renameVariable(variableTree, replacement, state));
-              } else {
-                reportConstantRenameBlocker(variableTree, replacement, state);
-              }
-            }
-          }
-        });
-
-    return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
+    return variablesInFileBuilder.build();
   }
 
   private void reportConstantRenameBlocker(
@@ -160,7 +148,7 @@ public final class CanonicalConstantFieldName extends BugChecker
   }
 
   private static boolean isUpperSnakeCase(String name) {
-    return name.equals(toUpperSnakeCase(name));
+    return name.contentEquals(toUpperSnakeCase(name));
   }
 
   private boolean isVariableNameExcluded(String variableName) {
