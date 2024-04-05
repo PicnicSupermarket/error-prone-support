@@ -45,6 +45,7 @@ import tech.picnic.errorprone.utils.SourceCode;
     linkType = CUSTOM,
     severity = WARNING,
     tags = STYLE)
+// XXX: Do not match on `Class` but on `VariableTree`. That improves on the reporting.
 public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> LOGGER = isSubtypeOf("org.slf4j.Logger");
