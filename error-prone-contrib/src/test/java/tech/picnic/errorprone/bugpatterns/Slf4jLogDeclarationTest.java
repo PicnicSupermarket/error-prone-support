@@ -7,6 +7,7 @@ import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class Slf4jLogDeclarationTest {
+  // XXX: Add testcase that we flag lowercase logger names.
   @Test
   void identification() {
     CompilationTestHelper.newInstance(Slf4jLogDeclaration.class, getClass())
@@ -19,6 +20,10 @@ final class Slf4jLogDeclarationTest {
             "// BUG: Diagnostic contains:",
             "class A {",
             "  private static final Logger LOG = LoggerFactory.getLogger(A.class);",
+            "",
+            "  void m() {",
+            "    LOG.trace(\"foo\");",
+            "  }",
             "",
             "  // BUG: Diagnostic contains:",
             "  static class VariableMissingStaticFinal {",
@@ -58,6 +63,11 @@ final class Slf4jLogDeclarationTest {
         .doTest();
   }
 
+  // XXX: Introduce test case where we actually use the incorrect log name and check that it is
+  // correctly renamed. So e.g. a usage of `LOG` in normal a method, but also nested class.
+  // And in an interface, if you have a default method that uses the incorrect `log` method, is it
+  // also renamed.
+  // XXX: This will kill some of the mutants, and take a look to the remaining ones.
   @Test
   void replacementWithDefaultCanonicalLoggerName() {
     BugCheckerRefactoringTestHelper.newInstance(Slf4jLogDeclaration.class, getClass())
@@ -67,7 +77,7 @@ final class Slf4jLogDeclarationTest {
             "import org.slf4j.LoggerFactory;",
             "",
             "class A {",
-            "  Logger FOO = LoggerFactory.getLogger(A.class);",
+            "  Logger foo = LoggerFactory.getLogger(A.class);",
             "",
             "  static class WrongArgumentGetLogger {",
             "    private static final Logger LOG = LoggerFactory.getLogger(String.class);",
