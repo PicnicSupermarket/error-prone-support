@@ -109,25 +109,4 @@ final class CanonicalConstantFieldNameTest {
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
-
-  @Test
-  void includePublicConstants() {
-    BugCheckerRefactoringTestHelper.newInstance(CanonicalConstantFieldName.class, getClass())
-        .setArgs("-XepOpt:CanonicalConstantFieldName:IncludePublicConstantFields=true")
-        .addInputLines(
-            "A.java",
-            "class A {",
-            "  int nonConstantNumber = 1;",
-            "",
-            "  public static final int number = 2;",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "class A {",
-            "  int nonConstantNumber = 1;",
-            "",
-            "  public static final int NUMBER = 2;",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
-  }
 }

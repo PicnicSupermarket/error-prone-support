@@ -47,12 +47,8 @@ import tech.picnic.errorprone.utils.Flags;
  * private static final int SIMPLE_NUMBER = 1;
  * }</pre>
  *
- * @apiNote This check has two optional flags:
- *     <ul>
- *       <li>`ExcludedConstantFieldNames`: A list of field names to exclude from this check.
- *       <li>`IncludePublicConstantFields`: Whether to include public constants when running this
- *           check.
- *     </ul>
+ * @apiNote This check has an optional flag `ExcludedConstantFieldNames` that represents a list of
+ *     field names to exclude from this check.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -64,18 +60,15 @@ import tech.picnic.errorprone.utils.Flags;
 public final class CanonicalConstantFieldName extends BugChecker implements VariableTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> IS_CONSTANT =
-      allOf(hasModifier(Modifier.STATIC), hasModifier(Modifier.FINAL));
-  private static final Matcher<Tree> IS_PRIVATE = hasModifier(Modifier.PRIVATE);
+      allOf(
+          hasModifier(Modifier.STATIC), hasModifier(Modifier.PRIVATE), hasModifier(Modifier.FINAL));
   private static final Pattern TO_SNAKE_CASE = Pattern.compile("([a-z])([A-Z])");
   private static final ImmutableSet<String> DEFAULT_EXCLUDED_CONSTANT_FIELD_NAMES =
       ImmutableSet.of("serialVersionUID");
   private static final String EXCLUDED_CONSTANT_FIELD_NAMES =
       "CanonicalConstantFieldName:ExcludedConstantFieldNames";
-  private static final String IS_INCLUDE_PUBLIC_CONSTANT_FIELDS =
-      "CanonicalConstantFieldName:IncludePublicConstantFields";
 
   private final ImmutableList<String> optionalExcludedConstantFieldNames;
-  private final boolean includePublicConstantFieldNames;
 
   /** Instantiates a default {@link CanonicalConstantFieldName} instance. */
   public CanonicalConstantFieldName() {
@@ -90,14 +83,12 @@ public final class CanonicalConstantFieldName extends BugChecker implements Vari
   @Inject
   CanonicalConstantFieldName(ErrorProneFlags flags) {
     optionalExcludedConstantFieldNames = getAllowedFieldNames(flags);
-    includePublicConstantFieldNames = isIncludePrivateConstantFieldNames(flags);
   }
 
   @Override
   public Description matchVariable(VariableTree tree, VisitorState state) {
     String variableName = tree.getName().toString();
     if (IS_CONSTANT.matches(tree, state)
-        && isFieldAccessModifierApplicable(tree, state)
         && !isUpperSnakeCase(variableName)
         && !isVariableNameExcluded(variableName)) {
       SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
@@ -143,10 +134,6 @@ public final class CanonicalConstantFieldName extends BugChecker implements Vari
             .build());
   }
 
-  private boolean isFieldAccessModifierApplicable(VariableTree tree, VisitorState state) {
-    return includePublicConstantFieldNames || IS_PRIVATE.matches(tree, state);
-  }
-
   private static boolean isUpperSnakeCase(String name) {
     return name.contentEquals(toUpperSnakeCase(name));
   }
@@ -162,9 +149,5 @@ public final class CanonicalConstantFieldName extends BugChecker implements Vari
 
   private static ImmutableList<String> getAllowedFieldNames(ErrorProneFlags flags) {
     return Flags.getList(flags, EXCLUDED_CONSTANT_FIELD_NAMES);
-  }
-
-  private static boolean isIncludePrivateConstantFieldNames(ErrorProneFlags flags) {
-    return flags.getBoolean(IS_INCLUDE_PUBLIC_CONSTANT_FIELDS).orElse(false);
   }
 }
