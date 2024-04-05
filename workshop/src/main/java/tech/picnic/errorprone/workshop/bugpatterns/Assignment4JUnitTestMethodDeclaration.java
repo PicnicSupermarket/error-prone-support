@@ -48,8 +48,9 @@ public final class Assignment4JUnitTestMethodDeclaration extends BugChecker
 
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
 
-    // XXX: Part 2: Make sure that JUnit test methods don't use `ILLEGAL_MODIFIERS` by using
-    // `SuggestedFixes#removeModifiers` and `SuggestedFix.Builder#merge`.
+    // XXX: Part 2: Make sure that JUnit test methods don't use any of the modifiers from the
+    // `ILLEGAL_MODIFIERS` field, by using `SuggestedFixes#removeModifiers` and
+    // `SuggestedFix.Builder#merge`.
 
     if (fixBuilder.isEmpty()) {
       return Description.NO_MATCH;

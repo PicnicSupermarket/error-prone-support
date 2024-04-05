@@ -5,13 +5,14 @@
     <parent>
         <groupId>tech.picnic.error-prone-support</groupId>
         <artifactId>error-prone-support</artifactId>
-        <version>0.14.1-SNAPSHOT</version>
+        <version>0.16.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>workshop</artifactId>
 
     <name>Picnic :: Error Prone Support :: Workshop</name>
     <description>Project for the Error Prone Workshop.</description>
+    <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
         <dependency>
@@ -37,6 +38,11 @@
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_test_helpers</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>error-prone-utils</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

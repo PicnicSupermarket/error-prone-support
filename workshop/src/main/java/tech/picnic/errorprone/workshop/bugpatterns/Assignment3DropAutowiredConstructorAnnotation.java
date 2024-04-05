@@ -20,7 +20,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.util.ArrayList;
 import java.util.List;
-import tech.picnic.errorprone.workshop.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /** A {@link BugChecker} that flags redundant {@code @Autowired} constructor annotations. */
 @BugPattern(
@@ -39,7 +39,7 @@ public final class Assignment3DropAutowiredConstructorAnnotation extends BugChec
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
     // XXX: Using the `ASTHelpers#getConstructors` method, return `Description.NO_MATCH` if we do
-    // not have exactly 1 constructor (so drop the `new ArrayList<>()` part).
+    // not have exactly 1 constructor (start by dropping `new ArrayList<>()` on the next line).
     List<MethodTree> constructors = new ArrayList<>();
 
     MultiMatchResult<AnnotationTree> hasAutowiredAnnotation =
