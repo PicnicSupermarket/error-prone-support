@@ -14,21 +14,22 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.VariableTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
-import com.sun.source.tree.ClassTree;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.util.Name;
 import javax.inject.Inject;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.SourceCode;
 
@@ -46,14 +47,14 @@ import tech.picnic.errorprone.utils.SourceCode;
     severity = WARNING,
     tags = STYLE)
 // XXX: Do not match on `Class` but on `VariableTree`. That improves on the reporting.
-public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMatcher {
+public final class Slf4jLogDeclaration extends BugChecker implements VariableTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> LOGGER = isSubtypeOf("org.slf4j.Logger");
+  private static final Matcher<ExpressionTree> GET_LOGGER_METHOD =
+      staticMethod().onDescendantOf("org.slf4j.LoggerFactory").named("getLogger");
   private static final String CANONICAL_LOGGER_NAME_FLAG =
       "Slf4jLogDeclaration:CanonicalLoggerName";
   private static final String DEFAULT_CANONICAL_LOGGER_NAME = "LOG";
-  private static final Matcher<ExpressionTree> GET_LOGGER_METHOD =
-      staticMethod().onDescendantOf("org.slf4j.LoggerFactory").named("getLogger");
 
   private final String canonicalLoggerName;
 
@@ -73,18 +74,23 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
   }
 
   @Override
-  public Description matchClass(ClassTree tree, VisitorState state) {
+  public Description matchVariable(VariableTree tree, VisitorState state) {
+    if (!LOGGER.matches(tree, state)) {
+      return Description.NO_MATCH;
+    }
+
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
 
-    for (Tree member : tree.getMembers()) {
-      if (LOGGER.matches(member, state)) {
-        if (tree.getKind() != Kind.INTERFACE) {
-          suggestCanonicalModifiers(member, fixBuilder, state);
-        }
-        canonicalizeLoggerVariable((VariableTree) member, fixBuilder, state);
-      }
+    Symbol enclosingElement = ASTHelpers.getSymbol(tree).getEnclosingElement();
+    if (enclosingElement == null) {
+      return Description.NO_MATCH;
     }
-    updateLoggerVariableDeclarations(tree, fixBuilder, state);
+
+    if (enclosingElement.getKind() != ElementKind.INTERFACE) {
+      suggestCanonicalModifiers(tree, fixBuilder, state);
+    }
+    canonicalizeLoggerVariable(tree, fixBuilder, state);
+    updateGetLoggerArgument(tree, enclosingElement.getSimpleName(), fixBuilder, state);
 
     return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
   }
@@ -96,29 +102,28 @@ public final class Slf4jLogDeclaration extends BugChecker implements ClassTreeMa
     }
   }
 
-  private static void updateLoggerVariableDeclarations(
-      ClassTree tree, SuggestedFix.Builder fixBuilder, VisitorState state) {
+  private static void updateGetLoggerArgument(
+      VariableTree tree,
+      Name enclosingElementName,
+      SuggestedFix.Builder fixBuilder,
+      VisitorState state) {
     new TreeScanner<@Nullable Void, Name>() {
       @Override
-      public @Nullable Void visitClass(ClassTree classTree, Name className) {
-        return super.visitClass(classTree, classTree.getSimpleName());
-      }
-
-      @Override
-      public @Nullable Void visitMethodInvocation(MethodInvocationTree tree, Name className) {
+      public @Nullable Void visitMethodInvocation(
+          MethodInvocationTree tree, Name enclosingElementName) {
         if (GET_LOGGER_METHOD.matches(tree, state)) {
           ExpressionTree arg = Iterables.getOnlyElement(tree.getArguments());
-          String argumentSource = SourceCode.treeToString(arg, state);
+          String argumentName = SourceCode.treeToString(arg, state);
 
           String argumentClassName =
-              argumentSource.substring(0, argumentSource.indexOf(CLASS.extension));
-          if (!className.contentEquals(argumentClassName)) {
-            fixBuilder.merge(SuggestedFix.replace(arg, className + CLASS.extension));
+              argumentName.substring(0, argumentName.indexOf(CLASS.extension));
+          if (!enclosingElementName.contentEquals(argumentClassName)) {
+            fixBuilder.merge(SuggestedFix.replace(arg, enclosingElementName + CLASS.extension));
           }
         }
-        return super.visitMethodInvocation(tree, className);
+        return super.visitMethodInvocation(tree, enclosingElementName);
       }
-    }.scan(tree, tree.getSimpleName());
+    }.scan(tree, enclosingElementName);
   }
 
   private static void suggestCanonicalModifiers(
