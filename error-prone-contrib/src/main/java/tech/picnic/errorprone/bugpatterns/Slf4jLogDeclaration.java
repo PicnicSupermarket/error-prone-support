@@ -84,12 +84,12 @@ public final class Slf4jLogDeclaration extends BugChecker implements VariableTre
       return Description.NO_MATCH;
     }
 
-    SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
-
     Symbol enclosingElement = ASTHelpers.getSymbol(tree).getEnclosingElement();
     if (enclosingElement == null) {
       return Description.NO_MATCH;
     }
+
+    SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
 
     if (enclosingElement.getKind() != ElementKind.INTERFACE) {
       suggestCanonicalModifiers(tree, fixBuilder, state);
@@ -137,7 +137,7 @@ public final class Slf4jLogDeclaration extends BugChecker implements VariableTre
                     arg, argumentName.replace(argumentClassName, enclosingElementName)));
           }
         }
-        return super.visitMethodInvocation(tree, enclosingElementName);
+        return null;
       }
     }.scan(tree, enclosingElementName);
   }
