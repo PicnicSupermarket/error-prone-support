@@ -1,11 +1,11 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
-import static javax.tools.JavaFileObject.Kind.CLASS;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -23,10 +23,12 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.util.Name;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
@@ -52,9 +54,12 @@ public final class Slf4jLogDeclaration extends BugChecker implements VariableTre
   private static final Matcher<Tree> LOGGER = isSubtypeOf("org.slf4j.Logger");
   private static final Matcher<ExpressionTree> GET_LOGGER_METHOD =
       staticMethod().onDescendantOf("org.slf4j.LoggerFactory").named("getLogger");
+
   private static final String CANONICAL_LOGGER_NAME_FLAG =
       "Slf4jLogDeclaration:CanonicalLoggerName";
   private static final String DEFAULT_CANONICAL_LOGGER_NAME = "LOG";
+  private static final Pattern STRING_LITERAL_ARGUMENT = Pattern.compile("\"(.*?)\"");
+  private static final Pattern CLASS_ARGUMENT = Pattern.compile("(.*?)\\.class");
 
   private final String canonicalLoggerName;
 
@@ -115,10 +120,21 @@ public final class Slf4jLogDeclaration extends BugChecker implements VariableTre
           ExpressionTree arg = Iterables.getOnlyElement(tree.getArguments());
           String argumentName = SourceCode.treeToString(arg, state);
 
-          String argumentClassName =
-              argumentName.substring(0, argumentName.indexOf(CLASS.extension));
+          String argumentClassName;
+          if (arg.getKind() == Kind.STRING_LITERAL) {
+            java.util.regex.Matcher matcher = STRING_LITERAL_ARGUMENT.matcher(argumentName);
+            checkArgument(matcher.matches(), "Invalid argument name.");
+            argumentClassName = matcher.group(1);
+          } else {
+            java.util.regex.Matcher matcher = CLASS_ARGUMENT.matcher(argumentName);
+            checkArgument(matcher.matches(), "Invalid argument name.");
+            argumentClassName = matcher.group(1);
+          }
+
           if (!enclosingElementName.contentEquals(argumentClassName)) {
-            fixBuilder.merge(SuggestedFix.replace(arg, enclosingElementName + CLASS.extension));
+            fixBuilder.merge(
+                SuggestedFix.replace(
+                    arg, argumentName.replace(argumentClassName, enclosingElementName)));
           }
         }
         return super.visitMethodInvocation(tree, enclosingElementName);
