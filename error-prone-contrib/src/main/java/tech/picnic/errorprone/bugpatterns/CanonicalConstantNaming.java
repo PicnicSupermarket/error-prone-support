@@ -21,7 +21,6 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
 import java.util.Locale;
@@ -47,42 +46,42 @@ import tech.picnic.errorprone.utils.Flags;
  * private static final int SIMPLE_NUMBER = 1;
  * }</pre>
  *
- * @apiNote This check has an optional flag `ExcludedConstantFieldNames` that represents a list of
- *     field names to exclude from this check.
+ * @apiNote This check has an optional flag `AllowedConstantNames` that represents a list of field
+ *     names to exclude from this check.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Constant variables should adhere to the `UPPER_SNAKE_CASE` naming convention",
-    link = BUG_PATTERNS_BASE_URL + "CanonicalConstantFieldName",
+    link = BUG_PATTERNS_BASE_URL + "CanonicalConstantNaming",
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)
-public final class CanonicalConstantFieldName extends BugChecker implements VariableTreeMatcher {
+public final class CanonicalConstantNaming extends BugChecker implements VariableTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<Tree> IS_CONSTANT =
+  private static final Matcher<VariableTree> IS_CONSTANT =
       allOf(
           hasModifier(Modifier.STATIC), hasModifier(Modifier.PRIVATE), hasModifier(Modifier.FINAL));
-  private static final Pattern TO_SNAKE_CASE = Pattern.compile("([a-z])([A-Z])");
-  private static final ImmutableSet<String> DEFAULT_EXCLUDED_CONSTANT_FIELD_NAMES =
+  private static final Pattern SNAKE_CASE = Pattern.compile("([a-z])([A-Z])");
+  private static final ImmutableSet<String> DEFAULT_ALLOWED_CONSTANT_NAMES =
       ImmutableSet.of("serialVersionUID");
-  private static final String EXCLUDED_CONSTANT_FIELD_NAMES =
-      "CanonicalConstantFieldName:ExcludedConstantFieldNames";
+  private static final String ALLOWED_CONSTANT_NAMES_FLAG =
+      "CanonicalConstantNaming:AllowedConstantNames";
 
-  private final ImmutableList<String> optionalExcludedConstantFieldNames;
+  private final ImmutableList<String> allowedConstantNames;
 
-  /** Instantiates a default {@link CanonicalConstantFieldName} instance. */
-  public CanonicalConstantFieldName() {
+  /** Instantiates a default {@link CanonicalConstantNaming} instance. */
+  public CanonicalConstantNaming() {
     this(ErrorProneFlags.empty());
   }
 
   /**
-   * Instantiates a customized {@link CanonicalConstantFieldName}.
+   * Instantiates a customized {@link CanonicalConstantNaming}.
    *
    * @param flags Any provided command line flags.
    */
   @Inject
-  CanonicalConstantFieldName(ErrorProneFlags flags) {
-    optionalExcludedConstantFieldNames = getAllowedFieldNames(flags);
+  CanonicalConstantNaming(ErrorProneFlags flags) {
+    allowedConstantNames = getAllowedFieldNames(flags);
   }
 
   @Override
@@ -90,7 +89,7 @@ public final class CanonicalConstantFieldName extends BugChecker implements Vari
     String variableName = tree.getName().toString();
     if (IS_CONSTANT.matches(tree, state)
         && !isUpperSnakeCase(variableName)
-        && !isVariableNameExcluded(variableName)) {
+        && !isVariableNameAllowed(variableName)) {
       SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
 
       ImmutableList<VariableTree> variablesInCompilationUnit =
@@ -138,16 +137,16 @@ public final class CanonicalConstantFieldName extends BugChecker implements Vari
     return name.contentEquals(toUpperSnakeCase(name));
   }
 
-  private boolean isVariableNameExcluded(String variableName) {
-    return optionalExcludedConstantFieldNames.contains(variableName)
-        || DEFAULT_EXCLUDED_CONSTANT_FIELD_NAMES.contains(variableName);
+  private boolean isVariableNameAllowed(String variableName) {
+    return allowedConstantNames.contains(variableName)
+        || DEFAULT_ALLOWED_CONSTANT_NAMES.contains(variableName);
   }
 
   private static String toUpperSnakeCase(String variableName) {
-    return TO_SNAKE_CASE.matcher(variableName).replaceAll("$1_$2").toUpperCase(Locale.ROOT);
+    return SNAKE_CASE.matcher(variableName).replaceAll("$1_$2").toUpperCase(Locale.ROOT);
   }
 
   private static ImmutableList<String> getAllowedFieldNames(ErrorProneFlags flags) {
-    return Flags.getList(flags, EXCLUDED_CONSTANT_FIELD_NAMES);
+    return Flags.getList(flags, ALLOWED_CONSTANT_NAMES_FLAG);
   }
 }

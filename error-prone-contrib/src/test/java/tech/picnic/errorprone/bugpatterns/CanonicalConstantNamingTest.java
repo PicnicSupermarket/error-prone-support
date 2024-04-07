@@ -5,10 +5,10 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class CanonicalConstantFieldNameTest {
+final class CanonicalConstantNamingTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(CanonicalConstantFieldName.class, getClass())
+    CompilationTestHelper.newInstance(CanonicalConstantNaming.class, getClass())
         .addSourceLines(
             "A.java",
             "class A {",
@@ -39,7 +39,7 @@ final class CanonicalConstantFieldNameTest {
 
   @Test
   void replacement() {
-    BugCheckerRefactoringTestHelper.newInstance(CanonicalConstantFieldName.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(CanonicalConstantNaming.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
@@ -90,9 +90,9 @@ final class CanonicalConstantFieldNameTest {
   }
 
   @Test
-  void excludeFlaggedConstants() {
-    BugCheckerRefactoringTestHelper.newInstance(CanonicalConstantFieldName.class, getClass())
-        .setArgs("-XepOpt:CanonicalConstantFieldName:ExcludedConstantFieldNames=foo")
+  void allowedConstantsFlag() {
+    BugCheckerRefactoringTestHelper.newInstance(CanonicalConstantNaming.class, getClass())
+        .setArgs("-XepOpt:CanonicalConstantNaming:AllowedConstantNames=foo")
         .addInputLines(
             "A.java",
             "class A {",
