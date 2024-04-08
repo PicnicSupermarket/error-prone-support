@@ -87,26 +87,37 @@ public final class CanonicalConstantNaming extends BugChecker implements Variabl
   @Override
   public Description matchVariable(VariableTree tree, VisitorState state) {
     String variableName = tree.getName().toString();
-    if (IS_CONSTANT.matches(tree, state)
-        && !isUpperSnakeCase(variableName)
-        && !isVariableNameAllowed(variableName)) {
-      SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
-
-      ImmutableList<VariableTree> variablesInCompilationUnit =
-          getVariablesInCompilationUnit(state.getPath().getCompilationUnit());
-      String replacement = toUpperSnakeCase(variableName);
-      if (variablesInCompilationUnit.stream()
-          .map(ASTHelpers::getSymbol)
-          .noneMatch(s -> s.getSimpleName().toString().equals(replacement))) {
-        fixBuilder.merge(SuggestedFixes.renameVariable(tree, replacement, state));
-      } else {
-        reportConstantRenameBlocker(tree, replacement, state);
-      }
-
-      return describeMatch(tree, fixBuilder.build());
+    if (!IS_CONSTANT.matches(tree, state)
+        || isUpperSnakeCase(variableName)
+        || isVariableNameAllowed(variableName)) {
+      return Description.NO_MATCH;
     }
 
-    return Description.NO_MATCH;
+    SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
+
+    ImmutableList<VariableTree> variablesInCompilationUnit =
+        getVariablesInCompilationUnit(state.getPath().getCompilationUnit());
+    String replacement = toUpperSnakeCase(variableName);
+    if (isVariableNameInUse(variablesInCompilationUnit, replacement)) {
+      reportConstantRenameBlocker(tree, replacement, state);
+    } else {
+      fixBuilder.merge(SuggestedFixes.renameVariable(tree, replacement, state));
+    }
+
+    return describeMatch(tree, fixBuilder.build());
+  }
+
+  private static ImmutableList<String> getAllowedFieldNames(ErrorProneFlags flags) {
+    return Flags.getList(flags, ALLOWED_CONSTANT_NAMES_FLAG);
+  }
+
+  private static boolean isUpperSnakeCase(String name) {
+    return name.contentEquals(toUpperSnakeCase(name));
+  }
+
+  private boolean isVariableNameAllowed(String variableName) {
+    return allowedConstantNames.contains(variableName)
+        || DEFAULT_ALLOWED_CONSTANT_NAMES.contains(variableName);
   }
 
   private static ImmutableList<VariableTree> getVariablesInCompilationUnit(
@@ -123,6 +134,17 @@ public final class CanonicalConstantNaming extends BugChecker implements Variabl
     return variablesInFileBuilder.build();
   }
 
+  private static String toUpperSnakeCase(String variableName) {
+    return SNAKE_CASE.matcher(variableName).replaceAll("$1_$2").toUpperCase(Locale.ROOT);
+  }
+
+  private static boolean isVariableNameInUse(
+      ImmutableList<VariableTree> variablesInCompilationUnit, String replacement) {
+    return variablesInCompilationUnit.stream()
+        .map(ASTHelpers::getSymbol)
+        .anyMatch(s -> s.getSimpleName().toString().equals(replacement));
+  }
+
   private void reportConstantRenameBlocker(
       VariableTree tree, String replacement, VisitorState state) {
     state.reportMatch(
@@ -131,22 +153,5 @@ public final class CanonicalConstantNaming extends BugChecker implements Variabl
                 String.format(
                     "a variable named `%s` is already defined in this scope", replacement))
             .build());
-  }
-
-  private static boolean isUpperSnakeCase(String name) {
-    return name.contentEquals(toUpperSnakeCase(name));
-  }
-
-  private boolean isVariableNameAllowed(String variableName) {
-    return allowedConstantNames.contains(variableName)
-        || DEFAULT_ALLOWED_CONSTANT_NAMES.contains(variableName);
-  }
-
-  private static String toUpperSnakeCase(String variableName) {
-    return SNAKE_CASE.matcher(variableName).replaceAll("$1_$2").toUpperCase(Locale.ROOT);
-  }
-
-  private static ImmutableList<String> getAllowedFieldNames(ErrorProneFlags flags) {
-    return Flags.getList(flags, ALLOWED_CONSTANT_NAMES_FLAG);
   }
 }
