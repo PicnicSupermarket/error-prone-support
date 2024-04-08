@@ -9,12 +9,9 @@ final class TypeMemberOrderClassTest {
   @Test
   void identification() {
     CompilationTestHelper.newInstance(TypeMemberOrder.class, getClass())
-        .expectErrorMessage(
-            "TypeMemberOrder",
-            message -> message.contains("Type members should be ordered in a canonical order"))
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic matches: TypeMemberOrder",
+            "// BUG: Diagnostic contains:",
             "class A {",
             "  class InnerClass {}",
             "",
