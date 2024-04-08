@@ -18,7 +18,7 @@ final class CanonicalConstantNamingTest {
             "  // BUG: Diagnostic contains:",
             "  private static final int bar_BAR = 2;",
             "",
-            "  private final int baz= 2;",
+            "  private final int baz = 2;",
             "",
             "  public static final int qux = 3;",
             "",
