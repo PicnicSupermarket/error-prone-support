@@ -1,9 +1,14 @@
 package tech.picnic.errorprone.workshop.refasterrules;
 
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.refaster.Refaster;
+import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.BeforeTemplate;
+
+import java.util.Collections;
+import java.util.List;
 
 /** Refaster rules for the second assignment of the workshop. */
-@SuppressWarnings("UnusedTypeParameter" /* Ignore this for demo purposes. */)
 final class WorkshopAssignment2Rules {
   private WorkshopAssignment2Rules() {}
 
@@ -12,6 +17,18 @@ final class WorkshopAssignment2Rules {
    * immutability of the resulting list at the type level.
    */
   static final class ImmutableListOfOne<T> {
-    // XXX: Implement this Refaster rule.
+    @BeforeTemplate
+    static <T> List<T> before(T t) {
+      return ImmutableList.copyOf(
+          Refaster.anyOf(
+              Collections.singletonList(t),
+              List.of(t))
+      );
+    }
+
+    @AfterTemplate
+    static <T> List<T> after(T t) {
+      return ImmutableList.of(t);
+    }
   }
 }
