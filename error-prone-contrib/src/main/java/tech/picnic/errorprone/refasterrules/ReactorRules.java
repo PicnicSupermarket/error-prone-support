@@ -3,7 +3,6 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.MoreCollectors.toOptional;
-import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
@@ -52,7 +51,6 @@ import reactor.util.context.Context;
 import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
-import tech.picnic.errorprone.refaster.annotation.Severity;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
@@ -380,30 +378,23 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#take(long, boolean)} over {@link Flux#take(long)}.
+   * Prefer {@link Flux#take(long)} over {@link Flux#take(long, boolean)} where relevant.
    *
    * <p>In Reactor versions prior to 3.5.0, {@code Flux#take(long)} makes an unbounded request
-   * upstream, and is equivalent to {@code Flux#take(long, false)}. In 3.5.0, the behavior of {@code
-   * Flux#take(long)} will change to that of {@code Flux#take(long, true)}.
-   *
-   * <p>The intent with this Refaster rule is to get the new behavior before upgrading to Reactor
-   * 3.5.0.
+   * upstream, and is equivalent to {@code Flux#take(long, false)}. From version 3.5.0 onwards, the
+   * behavior of {@code Flux#take(long)} instead matches {@code Flux#take(long, true)}.
    */
-  // XXX: Drop this rule some time after upgrading to Reactor 3.6.0, or introduce a way to apply
-  // this rule only when an older version of Reactor is on the classpath.
-  // XXX: Once Reactor 3.6.0 is out, introduce a rule that rewrites code in the opposite direction.
   @Description(
-      "Prior to Reactor 3.5.0, `take(n)` requests and unbounded number of elements upstream.")
-  @Severity(WARNING)
+      "From Reactor 3.5.0 onwards, `take(n)` no longer requests an unbounded number of elements upstream.")
   static final class FluxTake<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, long n) {
-      return flux.take(n);
+      return flux.take(n, /* limitRequest= */ true);
     }
 
     @AfterTemplate
     Flux<T> after(Flux<T> flux, long n) {
-      return flux.take(n, /* limitRequest= */ true);
+      return flux.take(n);
     }
   }
 

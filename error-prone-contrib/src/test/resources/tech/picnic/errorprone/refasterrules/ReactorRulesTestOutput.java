@@ -147,7 +147,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Flux<Integer> testFluxTake() {
-    return Flux.just(1, 2, 3).take(1, true);
+    return Flux.just(1, 2, 3).take(1);
   }
 
   Mono<String> testMonoDefaultIfEmpty() {
