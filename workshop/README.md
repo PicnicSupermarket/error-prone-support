@@ -62,44 +62,5 @@ Some utility classes that you can use:
 * `com.google.errorprone.fixes.SuggestedFixes`: contains helper methods for
   creating `Fix`es.
 
-## Part 3 (optional): Validating changes with the integration tests
-
-We created an integration testing framework that allows us to see the impact of
-the rules that are created. This testing framework can be executed locally and
-via GitHub Actions.
-
-If you still have more than 10-15 minutes left, and you want to test this
-locally, run the following commands:
-
-```sh
-mvn clean install -DskipTests -Dverification.skip
-./integration-tests/checkstyle-10.12.4.sh
-```
-
-Once the process is complete, and changes are introduced, the following output
-will be printed:
-
-```
-There are unexpected changes.
-Inspect the changes here: /tmp/tmp.Cmr423L1pA/checkstyle-10.12.4-diff-of-diffs-changes.patch
-```
-
-This file is provided for your review using your preferred text editor.
-Alternatively, you can also navigate to the repository by going to the
-`./integration-tests/.repos/checkstyle` directory and executing `git log -p` to
-view the commit history and associated changes.
-
-This shows the impact of the rules that you wrote when they are applied to
-Checkstyle!
-
-The other option is to execute the integration test via GitHub Actions. You
-only need to commit and push to the branch. This will trigger execution of the
-integration tests, which will run for about 10 minutes. When the build is
-finished, go to the _Actions_ tab in your fork and navigate to your most recent
-commit and click on it. Then click on _Summary_ and download the artifact
-`integration-test-checkstyle-10.12.4` at the bottom. Once done, unzip the
-artifact and inspect the `checkstyle-10.12.4-diff-of-diffs-changes.patch` file
-to see the changes.
-
 [eps-github]: https://github.com/PicnicSupermarket/error-prone-support
 [eps-workshop-codelabjug]: https://drive.google.com/file/d/1Q9HD5rKrcFszonOGqPqa2p7vyvV30brg/view
