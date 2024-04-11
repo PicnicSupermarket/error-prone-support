@@ -637,6 +637,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         .verifyErrorMatches(IllegalArgumentException.class::equals);
   }
 
+  void testStepVerifierLastStepVerifyErrorMatchesAssertions() {
+    Mono.empty()
+        .as(StepVerifier::create)
+        .verifyErrorMatches(IllegalArgumentException.class::equals);
+  }
+
   Duration testStepVerifierLastStepVerifyErrorSatisfies() {
     return Mono.empty().as(StepVerifier::create).verifyErrorSatisfies(t -> {});
   }

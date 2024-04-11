@@ -1921,6 +1921,22 @@ final class ReactorRules {
   }
 
   /**
+   * Prefer {@link StepVerifier.LastStep#verifyErrorMatches(Predicate)} over more verbose
+   * alternatives.
+   */
+  static final class StepVerifierLastStepVerifyErrorMatchesAssertions {
+    @BeforeTemplate
+    void before(StepVerifier.LastStep step, Predicate<Throwable> predicate) {
+      step.expectError().verifyThenAssertThat().hasOperatorErrorMatching(predicate);
+    }
+
+    @AfterTemplate
+    void after(StepVerifier.LastStep step, Predicate<Throwable> predicate) {
+      step.verifyErrorMatches(predicate);
+    }
+  }
+
+  /**
    * Prefer {@link StepVerifier.LastStep#verifyErrorSatisfies(Consumer)} over more verbose
    * alternatives.
    */
