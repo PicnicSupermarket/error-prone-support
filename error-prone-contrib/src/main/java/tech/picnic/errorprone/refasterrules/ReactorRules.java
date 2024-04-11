@@ -1768,6 +1768,38 @@ final class ReactorRules {
     }
   }
 
+  /**
+   * Prefer {@link StepVerifier.LastStep#verify()} over a dangling {@link
+   * StepVerifier#verifyThenAssertThat()}.
+   */
+  static final class StepVerifierVerify {
+    @BeforeTemplate
+    void before(StepVerifier stepVerifier) {
+      stepVerifier.verifyThenAssertThat();
+    }
+
+    @AfterTemplate
+    void after(StepVerifier stepVerifier) {
+      stepVerifier.verify();
+    }
+  }
+
+  /**
+   * Prefer {@link StepVerifier.LastStep#verify(Duration)} over a dangling {@link
+   * StepVerifier#verifyThenAssertThat(Duration)}.
+   */
+  static final class StepVerifierVerifyDuration {
+    @BeforeTemplate
+    void before(StepVerifier stepVerifier, Duration duration) {
+      stepVerifier.verifyThenAssertThat(duration);
+    }
+
+    @AfterTemplate
+    void after(StepVerifier stepVerifier, Duration duration) {
+      stepVerifier.verify(duration);
+    }
+  }
+
   /** Don't unnecessarily invoke {@link StepVerifier#verifyLater()} multiple times. */
   static final class StepVerifierVerifyLater {
     @BeforeTemplate

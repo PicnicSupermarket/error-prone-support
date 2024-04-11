@@ -586,6 +586,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).as(StepVerifier::create);
   }
 
+  void testStepVerifierVerify() {
+    Mono.empty().as(StepVerifier::create).expectError().verify();
+  }
+
+  void testStepVerifierVerifyDuration() {
+    Mono.empty().as(StepVerifier::create).expectError().verify(Duration.ZERO);
+  }
+
   StepVerifier testStepVerifierVerifyLater() {
     return Mono.empty().as(StepVerifier::create).expectError().verifyLater();
   }
