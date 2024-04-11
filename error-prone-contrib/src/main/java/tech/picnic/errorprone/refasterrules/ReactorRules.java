@@ -43,6 +43,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -1932,6 +1933,30 @@ final class ReactorRules {
     @AfterTemplate
     Duration after(StepVerifier.LastStep step, Consumer<Throwable> consumer) {
       return step.verifyErrorSatisfies(consumer);
+    }
+  }
+
+  /**
+   * Prefer {@link StepVerifier.LastStep#verifyErrorSatisfies(Consumer)} with AssertJ over more
+   * contrived alternatives.
+   */
+  static final class StepVerifierLastStepVerifyErrorSatisfiesAssertJ {
+    @BeforeTemplate
+    void before(StepVerifier.LastStep step, Class<? extends Throwable> clazz, String message) {
+      Refaster.anyOf(
+          step.expectError()
+              .verifyThenAssertThat()
+              .hasOperatorErrorOfType(clazz)
+              .hasOperatorErrorWithMessage(message),
+          step.expectError(clazz).verifyThenAssertThat().hasOperatorErrorWithMessage(message),
+          step.expectErrorMessage(message).verifyThenAssertThat().hasOperatorErrorOfType(clazz));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(StepVerifier.LastStep step, Class<? extends Throwable> clazz, String message) {
+      step.verifyErrorSatisfies(
+          t -> Assertions.assertThat(t).isInstanceOf(clazz).hasMessage(message));
     }
   }
 
