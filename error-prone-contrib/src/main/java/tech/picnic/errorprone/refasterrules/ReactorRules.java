@@ -1768,6 +1768,19 @@ final class ReactorRules {
     }
   }
 
+  /** Don't unnecessarily invoke {@link StepVerifier#verifyLater()} multiple times. */
+  static final class StepVerifierVerifyLater {
+    @BeforeTemplate
+    StepVerifier before(StepVerifier stepVerifier) {
+      return stepVerifier.verifyLater().verifyLater();
+    }
+
+    @AfterTemplate
+    StepVerifier after(StepVerifier stepVerifier) {
+      return stepVerifier.verifyLater();
+    }
+  }
+
   /** Don't unnecessarily have {@link StepVerifier.Step} expect no elements. */
   static final class StepVerifierStepIdentity<T> {
     @BeforeTemplate
