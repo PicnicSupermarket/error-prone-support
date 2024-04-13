@@ -25,6 +25,11 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     checkArgument(!"foo".isEmpty(), "The string is empty");
   }
 
+  void testCheckArgumentWithMessageAndArguments() {
+    checkArgument("foo".isEmpty(), "The %s is empty", 1);
+    checkArgument("bar".isEmpty(), "The %s is %s", 2.0, false);
+  }
+
   void testCheckElementIndexWithMessage() {
     checkElementIndex(1, 2, "My index");
   }
@@ -59,5 +64,10 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
 
   void testCheckStateWithMessage() {
     checkState(!"foo".isEmpty(), "The string is empty");
+  }
+
+  void testCheckStateWithMessageAndArguments() {
+    checkState("foo".isEmpty(), "The %s is empty", 1);
+    checkState("bar".isEmpty(), "The %s is %s", 2.0, false);
   }
 }

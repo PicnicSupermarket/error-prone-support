@@ -1,6 +1,8 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableSet;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
@@ -22,6 +24,11 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     if ("foo".isEmpty()) {
       throw new IllegalArgumentException("The string is empty");
     }
+  }
+
+  void testCheckArgumentWithMessageAndArguments() {
+    checkArgument("foo".isEmpty(), String.format("The %s is empty", 1));
+    checkArgument("bar".isEmpty(), "The %s is %s".formatted(2.0, false));
   }
 
   void testCheckElementIndexWithMessage() {
@@ -72,5 +79,10 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     if ("foo".isEmpty()) {
       throw new IllegalStateException("The string is empty");
     }
+  }
+
+  void testCheckStateWithMessageAndArguments() {
+    checkState("foo".isEmpty(), String.format("The %s is empty", 1));
+    checkState("bar".isEmpty(), "The %s is %s".formatted(2.0, false));
   }
 }

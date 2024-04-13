@@ -9,8 +9,11 @@ import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.FormatMethod;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Objects;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -49,6 +52,26 @@ final class PreconditionsRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(boolean condition, String message) {
       checkArgument(!condition, message);
+    }
+  }
+
+  /**
+   * Prefer {@link Preconditions#checkArgument(boolean, String, Object...)} over more verbose
+   * alternatives.
+   */
+  // XXX: This check assumes that the format string only uses `%s` placeholders.
+  static final class CheckArgumentWithMessageAndArguments {
+    @BeforeTemplate
+    @FormatMethod
+    void before(boolean condition, String message, @Repeated Object... args) {
+      checkArgument(
+          condition, Refaster.anyOf(String.format(message, args), message.formatted(args)));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(boolean condition, String message, @Repeated Object... args) {
+      checkArgument(condition, message, args);
     }
   }
 
@@ -203,6 +226,25 @@ final class PreconditionsRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(boolean condition, String message) {
       checkState(!condition, message);
+    }
+  }
+
+  /**
+   * Prefer {@link Preconditions#checkState(boolean, String, Object...)} over more verbose
+   * alternatives.
+   */
+  // XXX: This check assumes that the format string only uses `%s` placeholders.
+  static final class CheckStateWithMessageAndArguments {
+    @BeforeTemplate
+    @FormatMethod
+    void before(boolean condition, String message, @Repeated Object... args) {
+      checkState(condition, Refaster.anyOf(String.format(message, args), message.formatted(args)));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(boolean condition, String message, @Repeated Object... args) {
+      checkState(condition, message, args);
     }
   }
 }
