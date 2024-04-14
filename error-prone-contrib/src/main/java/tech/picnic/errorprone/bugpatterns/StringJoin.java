@@ -23,7 +23,6 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.util.Constants;
 import java.util.Formattable;
 import java.util.Iterator;
 import java.util.List;
@@ -150,7 +149,7 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
     SuggestedFix.Builder fix =
         SuggestedFix.builder()
             .replace(tree.getMethodSelect(), "String.join")
-            .replace(arguments.next(), Constants.format(separator));
+            .replace(arguments.next(), SourceCode.toStringConstantExpression(separator));
 
     while (arguments.hasNext()) {
       ExpressionTree argument = arguments.next();
