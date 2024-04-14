@@ -8,18 +8,43 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.LiteralTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
+import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import java.util.Optional;
 import javax.lang.model.element.Name;
 import org.junit.jupiter.api.Test;
 
 final class SourceCodeTest {
+  @Test
+  void toStringConstantExpression() {
+    BugCheckerRefactoringTestHelper.newInstance(
+            ToStringConstantExpressionTestChecker.class, getClass())
+        .addInputLines(
+            "A.java",
+            "class A {",
+            "  String m() {",
+            "    return \"foo\\\"bar\\'baz\\bqux\";",
+            "  }",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "class A {",
+            "  String m() {",
+            "    return \"foo\\\"bar'baz\\bqux\";",
+            "  }",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
   @Test
   void deleteWithTrailingWhitespaceAnnotations() {
     BugCheckerRefactoringTestHelper.newInstance(
@@ -226,6 +251,27 @@ final class SourceCodeTest {
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
+  }
+
+  /**
+   * A {@link BugChecker} that applies {@link SourceCode#toStringConstantExpression(CharSequence)}
+   * to string literals.
+   */
+  @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
+  public static final class ToStringConstantExpressionTestChecker extends BugChecker
+      implements LiteralTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchLiteral(LiteralTree tree, VisitorState state) {
+      return Optional.ofNullable(ASTHelpers.constValue(tree, String.class))
+          .map(
+              constant ->
+                  describeMatch(
+                      tree,
+                      SuggestedFix.replace(tree, SourceCode.toStringConstantExpression(constant))))
+          .orElse(Description.NO_MATCH);
+    }
   }
 
   /**

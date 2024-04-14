@@ -30,8 +30,8 @@ import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree.Kind;
-import com.sun.tools.javac.util.Constants;
 import javax.lang.model.element.Name;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags {@link BugChecker} declarations inside {@code
@@ -126,7 +126,7 @@ public final class BugPatternLink extends BugChecker implements ClassTreeMatcher
             state,
             "link",
             ImmutableList.of(
-                linkPrefix + " + " + Constants.format(tree.getSimpleName().toString()))));
+                linkPrefix + " + " + SourceCode.toStringConstantExpression(tree.getSimpleName()))));
 
     String linkType =
         SuggestedFixes.qualifyStaticImport(
