@@ -10,6 +10,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.sun.tools.javac.util.Constants;
 import com.sun.tools.javac.util.Convert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /** Refaster rules related to {@link com.google.errorprone.bugpatterns.BugChecker} classes. */
 @OnlineDocumentation
@@ -55,16 +56,24 @@ final class BugCheckerRules {
     }
   }
 
-  /** Prefer using the {@link Constants} API over more verbose alternatives. */
+  /**
+   * Prefer {@link SourceCode#toStringConstantExpression(CharSequence)} over alternatives that
+   * unnecessarily escape single quote characters.
+   */
   static final class ConstantsFormat {
+    @BeforeTemplate
+    String before(CharSequence value) {
+      return Constants.format(value);
+    }
+
     @BeforeTemplate
     String before(String value) {
       return String.format("\"%s\"", Convert.quote(value));
     }
 
     @AfterTemplate
-    String after(String value) {
-      return Constants.format(value);
+    String after(CharSequence value) {
+      return SourceCode.toStringConstantExpression(value);
     }
   }
 }
