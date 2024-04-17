@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
-import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -19,19 +18,17 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
-import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.util.Name;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.SourceCode;
 
@@ -48,18 +45,15 @@ import tech.picnic.errorprone.utils.SourceCode;
     linkType = CUSTOM,
     severity = WARNING,
     tags = STYLE)
-// XXX: Do not match on `Class` but on `VariableTree`. That improves on the reporting.
 public final class Slf4jLogDeclaration extends BugChecker implements VariableTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<Tree> LOGGER = isSubtypeOf("org.slf4j.Logger");
   private static final Matcher<ExpressionTree> GET_LOGGER_METHOD =
       staticMethod().onDescendantOf("org.slf4j.LoggerFactory").named("getLogger");
-
   private static final String CANONICAL_LOGGER_NAME_FLAG =
       "Slf4jLogDeclaration:CanonicalLoggerName";
   private static final String DEFAULT_CANONICAL_LOGGER_NAME = "LOG";
-  private static final Pattern STRING_LITERAL_ARGUMENT = Pattern.compile("\"(.*?)\"");
-  private static final Pattern CLASS_ARGUMENT = Pattern.compile("(.*?)\\.class");
+  private static final Pattern STRING_LITERAL_ARGUMENT_PATTERN = Pattern.compile("\"(.*?)\"");
+  private static final Pattern CLASS_ARGUMENT_PATTERN = Pattern.compile("(.*?)\\.class");
 
   private final String canonicalLoggerName;
 
@@ -80,27 +74,27 @@ public final class Slf4jLogDeclaration extends BugChecker implements VariableTre
 
   @Override
   public Description matchVariable(VariableTree tree, VisitorState state) {
-    if (!LOGGER.matches(tree, state)) {
+    if (!GET_LOGGER_METHOD.matches(tree.getInitializer(), state)) {
       return Description.NO_MATCH;
     }
 
-    Symbol enclosingElement = ASTHelpers.getSymbol(tree).getEnclosingElement();
-    if (enclosingElement == null) {
+    ClassTree clazz = state.findEnclosing(ClassTree.class);
+    if (clazz == null) {
       return Description.NO_MATCH;
     }
 
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
 
-    if (enclosingElement.getKind() != ElementKind.INTERFACE) {
+    if (clazz.getKind() != Kind.INTERFACE) {
       suggestCanonicalModifiers(tree, fixBuilder, state);
     }
-    canonicalizeLoggerVariable(tree, fixBuilder, state);
-    updateGetLoggerArgument(tree, enclosingElement.getSimpleName(), fixBuilder, state);
+    canonicalizeLoggerVariableName(tree, fixBuilder, state);
+    updateGetLoggerArgument(tree, clazz.getSimpleName(), fixBuilder, state);
 
     return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
   }
 
-  private void canonicalizeLoggerVariable(
+  private void canonicalizeLoggerVariableName(
       VariableTree variableTree, SuggestedFix.Builder fixBuilder, VisitorState state) {
     if (!variableTree.getName().contentEquals(canonicalLoggerName)) {
       fixBuilder.merge(SuggestedFixes.renameVariable(variableTree, canonicalLoggerName, state));
@@ -120,17 +114,15 @@ public final class Slf4jLogDeclaration extends BugChecker implements VariableTre
           ExpressionTree arg = Iterables.getOnlyElement(tree.getArguments());
           String argumentName = SourceCode.treeToString(arg, state);
 
-          String argumentClassName;
+          java.util.regex.Matcher matcher;
           if (arg.getKind() == Kind.STRING_LITERAL) {
-            java.util.regex.Matcher matcher = STRING_LITERAL_ARGUMENT.matcher(argumentName);
-            checkArgument(matcher.matches(), "Invalid argument name.");
-            argumentClassName = matcher.group(1);
+            matcher = STRING_LITERAL_ARGUMENT_PATTERN.matcher(argumentName);
           } else {
-            java.util.regex.Matcher matcher = CLASS_ARGUMENT.matcher(argumentName);
-            checkArgument(matcher.matches(), "Invalid argument name.");
-            argumentClassName = matcher.group(1);
+            matcher = CLASS_ARGUMENT_PATTERN.matcher(argumentName);
           }
 
+          checkArgument(matcher.matches(), "Invalid argument name.");
+          String argumentClassName = matcher.group(1);
           if (!enclosingElementName.contentEquals(argumentClassName)) {
             fixBuilder.merge(
                 SuggestedFix.replace(
@@ -143,8 +135,8 @@ public final class Slf4jLogDeclaration extends BugChecker implements VariableTre
   }
 
   private static void suggestCanonicalModifiers(
-      Tree member, SuggestedFix.Builder fixBuilder, VisitorState state) {
-    SuggestedFixes.addModifiers(member, state, Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+      Tree tree, SuggestedFix.Builder fixBuilder, VisitorState state) {
+    SuggestedFixes.addModifiers(tree, state, Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
         .ifPresent(fixBuilder::merge);
   }
 
