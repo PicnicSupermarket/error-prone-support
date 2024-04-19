@@ -24,12 +24,10 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
-import com.sun.source.util.TreeScanner;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
-import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -84,12 +82,12 @@ public final class Slf4jLogDeclaration extends BugChecker implements VariableTre
     }
 
     SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
-
     if (clazz.getKind() != Kind.INTERFACE) {
       suggestCanonicalModifiers(tree, fixBuilder, state);
     }
     canonicalizeLoggerVariableName(tree, fixBuilder, state);
-    updateGetLoggerArgument(tree, clazz.getSimpleName(), fixBuilder, state);
+    updateGetLoggerArgument(
+        (MethodInvocationTree) tree.getInitializer(), clazz.getSimpleName(), fixBuilder, state);
 
     return fixBuilder.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fixBuilder.build());
   }
@@ -102,36 +100,26 @@ public final class Slf4jLogDeclaration extends BugChecker implements VariableTre
   }
 
   private static void updateGetLoggerArgument(
-      VariableTree tree,
-      Name enclosingElementName,
+      MethodInvocationTree tree,
+      Name className,
       SuggestedFix.Builder fixBuilder,
       VisitorState state) {
-    new TreeScanner<@Nullable Void, Name>() {
-      @Override
-      public @Nullable Void visitMethodInvocation(
-          MethodInvocationTree tree, Name enclosingElementName) {
-        if (GET_LOGGER_METHOD.matches(tree, state)) {
-          ExpressionTree arg = Iterables.getOnlyElement(tree.getArguments());
-          String argumentName = SourceCode.treeToString(arg, state);
+    ExpressionTree arg = Iterables.getOnlyElement(tree.getArguments());
+    String argumentName = SourceCode.treeToString(arg, state);
 
-          java.util.regex.Matcher matcher;
-          if (arg.getKind() == Kind.STRING_LITERAL) {
-            matcher = STRING_LITERAL_ARGUMENT_PATTERN.matcher(argumentName);
-          } else {
-            matcher = CLASS_ARGUMENT_PATTERN.matcher(argumentName);
-          }
+    java.util.regex.Matcher matcher;
+    if (arg.getKind() == Kind.STRING_LITERAL) {
+      matcher = STRING_LITERAL_ARGUMENT_PATTERN.matcher(argumentName);
+    } else {
+      matcher = CLASS_ARGUMENT_PATTERN.matcher(argumentName);
+    }
 
-          checkArgument(matcher.matches(), "Invalid argument name.");
-          String argumentClassName = matcher.group(1);
-          if (!enclosingElementName.contentEquals(argumentClassName)) {
-            fixBuilder.merge(
-                SuggestedFix.replace(
-                    arg, argumentName.replace(argumentClassName, enclosingElementName)));
-          }
-        }
-        return null;
-      }
-    }.scan(tree, enclosingElementName);
+    checkArgument(matcher.matches(), "Invalid argument name.");
+    String argumentClassName = matcher.group(1);
+    if (!className.contentEquals(argumentClassName)) {
+      fixBuilder.merge(
+          SuggestedFix.replace(arg, argumentName.replace(argumentClassName, className)));
+    }
   }
 
   private static void suggestCanonicalModifiers(
