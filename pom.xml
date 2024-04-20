@@ -212,6 +212,7 @@
         <version.error-prone-slf4j>0.1.24</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>17</version.jdk>
+        <version.jmh>1.37</version.jmh>
         <version.maven>3.9.5</version.maven>
         <version.mockito>5.11.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
@@ -467,6 +468,11 @@
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-core</artifactId>
                 <version>5.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>${version.jmh}</version>
             </dependency>
             <dependency>
                 <groupId>org.openrewrite</groupId>
@@ -931,6 +937,11 @@
                                 <groupId>com.google.auto.service</groupId>
                                 <artifactId>auto-service</artifactId>
                                 <version>${version.auto-service}</version>
+                            </path>
+                            <path>
+                                <groupId>org.openjdk.jmh</groupId>
+                                <artifactId>jmh-generator-annprocess</artifactId>
+                                <version>${version.jmh}</version>
                             </path>
                             <path>
                                 <groupId>org.openrewrite</groupId>
@@ -2052,6 +2063,67 @@
                         </plugin>
                     </plugins>
                 </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <!-- Enables execution of a JMH benchmark. Given a benchmark class
+            `tech.picnic.MyBenchmark`, the following command (executed against
+            the (sub)module in which the benchmark resides) will compile and
+            execute said benchmark:
+
+              mvn process-test-classes -Dverification.skip \
+                -Djmh.run-benchmark=tech.picnic.MyBenchmark
+            -->
+            <id>run-jmh-benchmark</id>
+            <activation>
+                <property>
+                    <name>jmh.run-benchmark</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>build-jmh-runtime-classpath</id>
+                                <goals>
+                                    <goal>build-classpath</goal>
+                                </goals>
+                                <configuration>
+                                    <outputProperty>testClasspath</outputProperty>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>run-jmh-benchmark</id>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <phase>process-test-classes</phase>
+                                <configuration>
+                                    <classpathScope>test</classpathScope>
+                                    <mainClass>${jmh.run-benchmark}</mainClass>
+                                    <systemProperties>
+                                        <!-- The runtime classpath is defined
+                                        in this way so that any JVMs forked by
+                                        JMH will have the desired classpath. -->
+                                        <systemProperty>
+                                            <key>java.class.path</key>
+                                            <value>${project.build.testOutputDirectory}${path.separator}${project.build.outputDirectory}${path.separator}${testClasspath}</value>
+                                        </systemProperty>
+                                    </systemProperties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
         <profile>
