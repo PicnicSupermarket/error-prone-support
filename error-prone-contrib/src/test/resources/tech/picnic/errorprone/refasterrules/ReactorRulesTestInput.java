@@ -118,6 +118,16 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just("foo", "bar").zipWithIterable(ImmutableSet.of(1, 2), String::repeat);
   }
 
+  ImmutableSet<?> testMonoError() {
+    IllegalStateException exception = new IllegalStateException();
+    return ImmutableSet.of(Mono.error(exception), Mono.error(new IllegalArgumentException()));
+  }
+
+  ImmutableSet<?> testFluxError() {
+    IllegalStateException exception = new IllegalStateException();
+    return ImmutableSet.of(Flux.error(exception), Flux.error(new IllegalArgumentException()));
+  }
+
   Mono<Void> testMonoDeferredError() {
     return Mono.defer(() -> Mono.error(new IllegalStateException()));
   }
@@ -573,6 +583,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Mono<Integer>> testMathFluxMax() {
     return ImmutableSet.of(
         MathFlux.min(Flux.just(1), reverseOrder()), MathFlux.max(Flux.just(2), naturalOrder()));
+  }
+
+  Mono<String> testOptionalMapOrElse() {
+    return Mono.justOrEmpty(Optional.of("foo")).flatMap(Mono::just).switchIfEmpty(Mono.just("bar"));
   }
 
   ImmutableSet<Context> testContextEmpty() {

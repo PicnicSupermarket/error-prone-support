@@ -22,9 +22,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
+import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /**
@@ -208,6 +211,27 @@ final class AssortedRules {
     @AfterTemplate
     Stream<String> after(Splitter splitter, CharSequence charSequence) {
       return splitter.splitToStream(charSequence);
+    }
+  }
+
+  /**
+   * Don't defer to subscription-time non-reactive operations that can efficiently be performed
+   * during assembly.
+   */
+  // XXX: There are all kinds of variations on this theme. Generalize.
+  // XXX: Drop or move to `ReactorRules`.
+  static final class MonoFromSupplierOptionalMapOrElse<T, S> {
+    @BeforeTemplate
+    Mono<S> before(Optional<T> optional, Function<? super T, S> transformer, S value) {
+      return Refaster.anyOf(
+              Mono.justOrEmpty(optional).map(transformer),
+              Mono.justOrEmpty(optional).mapNotNull(transformer))
+          .defaultIfEmpty(value);
+    }
+
+    @AfterTemplate
+    Mono<? extends S> after(Optional<T> optional, Function<? super T, S> transformer, S value) {
+      return Mono.fromSupplier(() -> optional.map(transformer).orElse(value));
     }
   }
 

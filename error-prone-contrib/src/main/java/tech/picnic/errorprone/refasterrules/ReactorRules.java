@@ -53,6 +53,7 @@ import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
+import tech.picnic.errorprone.refaster.matchers.IsLikelyTrivialComputation;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster rules related to Reactor expressions and statements. */
@@ -172,6 +173,7 @@ final class ReactorRules {
    *
    * <p>In particular, avoid mixing of the {@link Optional} and {@link Mono} APIs.
    */
+  // XXX: Below we now have the opposite advice. Test.
   static final class MonoFromOptionalSwitchIfEmpty<T> {
     @BeforeTemplate
     Mono<T> before(Optional<T> optional, Mono<T> mono) {
@@ -298,6 +300,38 @@ final class ReactorRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Flux<R> after(Flux<T> flux, Iterable<S> iterable, BiFunction<T, S, R> combinator) {
       return flux.zipWithIterable(iterable).map(function(combinator));
+    }
+  }
+
+  /**
+   * Don't eagerly instantiate {@link Throwable}s for {@link Mono#error(Throwable)}; let the
+   * framework do it on subscription.
+   */
+  static final class MonoError<T> {
+    @BeforeTemplate
+    Mono<T> before(@NotMatches(IsLikelyTrivialComputation.class) Throwable throwable) {
+      return Mono.error(throwable);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Throwable throwable) {
+      return Mono.error(() -> throwable);
+    }
+  }
+
+  /**
+   * Don't eagerly instantiate {@link Throwable}s for {@link Flux#error(Throwable)}; let the
+   * framework do it on subscription.
+   */
+  static final class FluxError<T> {
+    @BeforeTemplate
+    Flux<T> before(@NotMatches(IsLikelyTrivialComputation.class) Throwable throwable) {
+      return Flux.error(throwable);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Throwable throwable) {
+      return Flux.error(() -> throwable);
     }
   }
 
@@ -1695,6 +1729,22 @@ final class ReactorRules {
     @AfterTemplate
     Mono<T> after(Publisher<T> publisher) {
       return MathFlux.max(publisher);
+    }
+  }
+
+  /**
+   * Don't defer to subscription-time non-reactive operations that can efficiently be performed
+   * during assembly.
+   */
+  static final class OptionalMapOrElse<T, S, M extends Mono<? extends S>> {
+    @BeforeTemplate
+    Mono<S> before(Optional<T> optional, Function<? super T, M> transformer, M mono) {
+      return Mono.justOrEmpty(optional).flatMap(transformer).switchIfEmpty(mono);
+    }
+
+    @AfterTemplate
+    Mono<? extends S> after(Optional<T> optional, Function<? super T, M> transformer, M mono) {
+      return optional.map(transformer).orElse(mono);
     }
   }
 

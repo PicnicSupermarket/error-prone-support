@@ -45,6 +45,12 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         Optional.of("baz").equals(Optional.of("qux")));
   }
 
+  ImmutableSet<Boolean> testNotOptionalEqualsOptional() {
+    return ImmutableSet.of(
+        !Optional.of("foo").equals(Optional.of("bar")),
+        !Optional.of("baz").equals(Optional.of("qux")));
+  }
+
   ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
     return ImmutableSet.of(
         stream(ImmutableSet.of("foo").iterator()).findFirst(),

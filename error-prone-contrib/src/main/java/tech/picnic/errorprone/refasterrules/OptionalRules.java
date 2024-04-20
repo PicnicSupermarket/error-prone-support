@@ -127,6 +127,20 @@ final class OptionalRules {
     }
   }
 
+  /** Prefer {@link Optional#equals(Object)} over more contrived alternatives. */
+  static final class NotOptionalEqualsOptional<T, S> {
+    @BeforeTemplate
+    boolean before(Optional<T> optional, S value) {
+      return Refaster.anyOf(
+          optional.filter(value::equals).isEmpty(), optional.stream().noneMatch(value::equals));
+    }
+
+    @AfterTemplate
+    boolean after(Optional<T> optional, S value) {
+      return !optional.equals(Optional.of(value));
+    }
+  }
+
   /**
    * Don't use the ternary operator to extract the first element of a possibly-empty {@link
    * Iterator} as an {@link Optional}.
