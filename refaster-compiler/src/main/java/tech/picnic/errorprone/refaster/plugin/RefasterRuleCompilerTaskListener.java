@@ -112,7 +112,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
             return (sym != null
                     && sym.getQualifiedName()
                         .contentEquals(BeforeTemplate.class.getCanonicalName()))
-                || super.visitAnnotation(node, unused);
+                || super.visitAnnotation(node, null);
           }
 
           @Override

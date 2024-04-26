@@ -192,7 +192,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
       @Override
       public @Nullable Void visitIdentifier(IdentifierTree node, @Nullable Void unused) {
         nodes.add(ImmutableList.of(node.getName().toString()));
-        return super.visitIdentifier(node, unused);
+        return super.visitIdentifier(node, null);
       }
 
       @Override
@@ -203,13 +203,13 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
                 ? STRING_ARGUMENT_SPLITTER.splitToStream(str).collect(toImmutableList())
                 : ImmutableList.of(String.valueOf(value)));
 
-        return super.visitLiteral(node, unused);
+        return super.visitLiteral(node, null);
       }
 
       @Override
       public @Nullable Void visitPrimitiveType(PrimitiveTypeTree node, @Nullable Void unused) {
         nodes.add(ImmutableList.of(node.getPrimitiveTypeKind().toString()));
-        return super.visitPrimitiveType(node, unused);
+        return super.visitPrimitiveType(node, null);
       }
     }.scan(array, null);
 
