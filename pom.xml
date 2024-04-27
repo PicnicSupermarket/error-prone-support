@@ -45,6 +45,7 @@
         <module>error-prone-guidelines</module>
         <module>error-prone-utils</module>
         <module>refaster-compiler</module>
+        <module>refaster-rule-benchmark-generator</module>
         <module>refaster-runner</module>
         <module>refaster-support</module>
         <module>refaster-test-support</module>

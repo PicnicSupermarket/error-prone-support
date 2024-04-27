@@ -58,6 +58,12 @@ public class ReactorRulesBenchmarks {
     Mono<T> after(Optional<T> optional, Mono<T> mono) {
       return Mono.justOrEmpty(optional).switchIfEmpty(mono);
     }
+
+    // XXX: Methods such as this one could perhaps be inferred in the common case.
+    @Benchmarked.OnResult
+    T subscribe(Mono<T> mono) {
+      return mono.block();
+    }
   }
 
   // XXX: Variations like this would be generated.

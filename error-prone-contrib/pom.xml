@@ -279,12 +279,18 @@
                             </path>
                             <path>
                                 <groupId>${project.groupId}</groupId>
+                                <artifactId>refaster-rule-benchmark-generator</artifactId>
+                                <version>${project.version}</version>
+                            </path>
+                            <path>
+                                <groupId>${project.groupId}</groupId>
                                 <artifactId>refaster-support</artifactId>
                                 <version>${project.version}</version>
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs combine.children="append">
                             <arg>-Xplugin:DocumentationGenerator -XoutputDirectory=${project.build.directory}/docs</arg>
+                            <arg>-Xplugin:RefasterRuleBenchmarkGenerator -XoutputDirectory=${project.build.directory}/generated-test-sources/test-annotations</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>

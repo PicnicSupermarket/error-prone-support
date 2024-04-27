@@ -8,17 +8,18 @@
         <version>0.16.2-SNAPSHOT</version>
     </parent>
 
-    <artifactId>error-prone-guidelines</artifactId>
+    <artifactId>refaster-rule-benchmark-generator</artifactId>
 
-    <name>Picnic :: Error Prone Support :: Guidelines</name>
-    <description>Coding guidelines for the Error Prone Support project.</description>
+    <name>Picnic :: Error Prone Support :: Refaster Rule Benchmark Generator</name>
+    <!-- XXX: Review description: can this be an annotation processor? -->
+    <description>Compiler plugin that derives JMH benchmarks from Refaster Rules.</description>
     <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
+        <!-- XXX: Prune this list. -->
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_annotation</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
@@ -28,40 +29,43 @@
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_check_api</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_core</artifactId>
+            <!-- XXX: Review scope. -->
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${groupId.error-prone}</groupId>
             <artifactId>error_prone_test_helpers</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>documentation-support</artifactId>
-            <!-- This dependency is declared only as a hint to Maven that
-            compilation depends on it; see the `maven-compiler-plugin`'s
-            `annotationProcessorPaths` configuration below. -->
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>error-prone-utils</artifactId>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-support</artifactId>
-            <scope>provided</scope>
+            <!-- XXX: Review scope. -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.auto</groupId>
             <artifactId>auto-common</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>
@@ -69,12 +73,17 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.googlejavaformat</groupId>
-            <artifactId>google-java-format</artifactId>
+            <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value-annotations</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -90,7 +99,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <!-- XXX: Explicitly declared as a workaround for
         https://github.com/pitest/pitest-junit5-plugin/issues/105. -->
@@ -99,32 +108,10 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <annotationProcessorPaths combine.children="append">
-                            <!-- XXX: Drop the version declarations once
-                            properly supported. See
-                            https://youtrack.jetbrains.com/issue/IDEA-342187. -->
-                            <path>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>documentation-support</artifactId>
-                                <version>${project.version}</version>
-                            </path>
-                        </annotationProcessorPaths>
-                        <compilerArgs combine.children="append">
-                            <arg>-Xplugin:DocumentationGenerator -XoutputDirectory=${project.build.directory}/docs</arg>
-                            <!-- XXX: Enable `refaster-rule-benchmark-generator` here. -->
-                        </compilerArgs>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 </project>

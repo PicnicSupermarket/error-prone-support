@@ -18,10 +18,14 @@ public @interface Benchmarked {
   // - Specify warmup and measurement iterations.
   // - Specify output time unit.
   // - Value generation hints.f
-  // Once configuration is supported, annotations on nested classes should override the configuration specified by outer classes.
+  // Once configuration is supported, annotations on nested classes should override the
+  // configuration specified by outer classes.
 
   // XXX: Explain use. Allow restriction by name?
-  public @interface Param {
+  @Target(ElementType.FIELD)
+  @interface Param {}
 
-  }
+  // XXX: Explain use
+  @Target(ElementType.METHOD)
+  @interface OnResult {}
 }

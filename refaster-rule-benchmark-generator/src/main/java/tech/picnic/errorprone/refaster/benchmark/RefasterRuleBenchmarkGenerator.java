@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.documentation;
+package tech.picnic.errorprone.refaster.benchmark;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -13,16 +13,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** A compiler {@link Plugin} that generates JMH benchmarks for Refaster rules. */
-// XXX: Move logic to separate package and Maven module.
 // XXX: Review whether this can be an annotation processor instead.
 @AutoService(Plugin.class)
-public final class RefasterBenchmarkGenerator implements Plugin {
+public final class RefasterRuleBenchmarkGenerator implements Plugin {
   @VisibleForTesting static final String OUTPUT_DIRECTORY_FLAG = "-XoutputDirectory";
   private static final Pattern OUTPUT_DIRECTORY_FLAG_PATTERN =
       Pattern.compile(Pattern.quote(OUTPUT_DIRECTORY_FLAG) + "=(.*)");
 
-  /** Instantiates a new {@link RefasterBenchmarkGenerator} instance. */
-  public RefasterBenchmarkGenerator() {}
+  /** Instantiates a new {@link RefasterRuleBenchmarkGenerator} instance. */
+  public RefasterRuleBenchmarkGenerator() {}
 
   @Override
   public String getName() {
@@ -34,9 +33,9 @@ public final class RefasterBenchmarkGenerator implements Plugin {
     checkArgument(args.length == 1, "Precisely one path must be provided");
 
     // XXX: Drop all path logic: instead generate in the same package as the Refaster rule
-    // collection.
+    // collection. (But how do we then determine the base directory?)
     javacTask.addTaskListener(
-        new RefasterBenchmarkGeneratorTaskListener(
+        new RefasterRuleBenchmarkGeneratorTaskListener(
             ((BasicJavacTask) javacTask).getContext(), getOutputPath(args[0])));
   }
 
