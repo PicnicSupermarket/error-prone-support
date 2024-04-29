@@ -15,6 +15,10 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Streams.class);
   }
 
+  Optional<String> testOptionalEmpty() {
+    return Optional.empty();
+  }
+
   ImmutableSet<Optional<String>> testOptionalOfNullable() {
     return ImmutableSet.of(Optional.ofNullable(toString()), Optional.ofNullable(toString()));
   }

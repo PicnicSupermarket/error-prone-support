@@ -27,6 +27,19 @@ import tech.picnic.errorprone.refaster.matchers.IsLikelyTrivialComputation;
 final class OptionalRules {
   private OptionalRules() {}
 
+  /** Prefer {@link Optional#empty()} over the more contrived alternative. */
+  static final class OptionalEmpty<T> {
+    @BeforeTemplate
+    Optional<T> before() {
+      return Optional.ofNullable(null);
+    }
+
+    @AfterTemplate
+    Optional<T> after() {
+      return Optional.empty();
+    }
+  }
+
   static final class OptionalOfNullable<T> {
     // XXX: Refaster should be smart enough to also rewrite occurrences in which there are
     // parentheses around the null check, but that's currently not the case. Try to fix that.
