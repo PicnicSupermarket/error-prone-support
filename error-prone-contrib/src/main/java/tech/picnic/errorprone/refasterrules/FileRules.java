@@ -50,6 +50,7 @@ final class FileRules {
    */
   static final class FilesCreateTempFileToFile {
     @BeforeTemplate
+    @SuppressWarnings("java:S5443" /* This violation will be rewritten. */)
     File before(String prefix, String suffix) throws IOException {
       return Refaster.anyOf(
           File.createTempFile(prefix, suffix), File.createTempFile(prefix, suffix, null));
