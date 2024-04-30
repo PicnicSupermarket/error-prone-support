@@ -28,4 +28,8 @@ public @interface Benchmarked {
   // XXX: Explain use
   @Target(ElementType.METHOD)
   @interface OnResult {}
+
+  // XXX: Explain use
+  @Target(ElementType.METHOD)
+  @interface MinimalPlaceholder {}
 }

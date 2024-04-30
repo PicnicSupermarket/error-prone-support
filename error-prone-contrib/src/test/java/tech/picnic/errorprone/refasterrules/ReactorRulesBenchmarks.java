@@ -1,7 +1,10 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static org.openjdk.jmh.results.format.ResultFormatType.JSON;
+
 import com.google.errorprone.refaster.annotation.AfterTemplate;
-import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.Placeholder;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -10,21 +13,20 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.OperationsPerInvocation;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
-import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.refaster.annotation.Benchmarked;
-import tech.picnic.errorprone.refasterrules.ReactorRules.MonoFromOptionalSwitchIfEmpty;
 
 // XXX: Fix warmup and measurements etc.
+// XXX: Flag cases where the `before` code is faster, taking into account variation.
 @SuppressWarnings("FieldCanBeFinal") // XXX: Triggers CompilesWithFix!!!
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)
@@ -33,11 +35,17 @@ import tech.picnic.errorprone.refasterrules.ReactorRules.MonoFromOptionalSwitchI
     jvmArgs = {"-Xms256M", "-Xmx256M"},
     value = 1)
 @Warmup(iterations = 1)
-@Measurement(iterations = 1)
+@Measurement(iterations = 10, time = 1)
 public class ReactorRulesBenchmarks {
   public static void main(String[] args) throws RunnerException {
     String testRegex = Pattern.quote(ReactorRulesBenchmarks.class.getCanonicalName());
-    new Runner(new OptionsBuilder().include(testRegex).addProfiler(GCProfiler.class).build()).run();
+    new Runner(
+            new OptionsBuilder()
+                .include(testRegex)
+                .addProfiler(GCProfiler.class)
+                .resultFormat(JSON) // XXX: Review.
+                .build())
+        .run();
   }
 
   // XXX: What a benchmarked rule could look like.
@@ -49,7 +57,7 @@ public class ReactorRulesBenchmarks {
     @Benchmarked.Param private final Mono<String> emptyMono = Mono.<String>empty().hide();
     @Benchmarked.Param private final Mono<String> nonEmptyMono = Mono.just("bar").hide();
 
-    @BeforeTemplate
+    // XXX: Dropped to hide this class from `RefasterRuleCompilerTaskListener`: @BeforeTemplate
     Mono<T> before(Optional<T> optional, Mono<T> mono) {
       return optional.map(Mono::just).orElse(mono);
     }
@@ -86,16 +94,6 @@ public class ReactorRulesBenchmarks {
       return before.block();
     }
 
-    // XXX: In the common case the `x100` variant this doesn't add much. Leave out, at least by
-    // default.
-    @Benchmark
-    @OperationsPerInvocation(100)
-    public void beforeSubscribe100(Blackhole bh) {
-      for (int i = 0; i < 100; i++) {
-        bh.consume(before.block());
-      }
-    }
-
     @Benchmark
     public Mono<String> after() {
       return rule.after(optional, mono);
@@ -105,12 +103,84 @@ public class ReactorRulesBenchmarks {
     public String afterSubscribe() {
       return after.block();
     }
+  }
 
-    @Benchmark
-    @OperationsPerInvocation(100)
-    public void afterSubscribe100(Blackhole bh) {
-      for (int i = 0; i < 100; i++) {
-        bh.consume(after.block());
+  /////////////////////////////
+
+  abstract static class MonoFlatMapToFlux<T, S> {
+    @Placeholder(allowsIdentity = true)
+    abstract Mono<S> transformation(@MayOptionallyUse T value);
+
+    // XXX: Dropped to hide this class from `RefasterRuleCompilerTaskListener`: @BeforeTemplate
+    Flux<S> before(Mono<T> mono) {
+      return mono.flatMapMany(v -> transformation(v));
+    }
+
+    @AfterTemplate
+    Flux<S> after(Mono<T> mono) {
+      return mono.flatMap(v -> transformation(v)).flux();
+    }
+
+    @Benchmarked.OnResult
+    Long subscribe(Flux<T> flux) {
+      return flux.count().block();
+    }
+
+    @Benchmarked.MinimalPlaceholder
+    <X> Mono<X> identity(X value) {
+      return Mono.just(value);
+    }
+  }
+
+  public static class MonoFlatMapToFluxBenchmarks extends ReactorRulesBenchmarks {
+    abstract static class Rule<T, S> {
+      abstract Mono<S> transformation(T value);
+
+      Flux<S> before(Mono<T> mono) {
+        return mono.flatMapMany(v -> transformation(v));
+      }
+
+      Flux<S> after(Mono<T> mono) {
+        return mono.flatMap(v -> transformation(v)).flux();
+      }
+    }
+
+    // XXX: For variantions, we could use `@Param(strings)` indirection, like in
+    // https://github.com/openjdk/jmh/blob/master/jmh-samples/src/main/java/org/openjdk/jmh/samples/JMHSample_35_Profilers.java
+
+    // XXX: Or we can make the benchmark abstract and have subclasses for each variant:
+    // https://github.com/openjdk/jmh/blob/master/jmh-samples/src/main/java/org/openjdk/jmh/samples/JMHSample_24_Inheritance.java
+
+    public static class MonoFlatMapToFluxStringStringBenchmark extends MonoFlatMapToFluxBenchmarks {
+      private final Rule<String, String> rule =
+          new Rule<>() {
+            @Override
+            Mono<String> transformation(String value) {
+              return Mono.just(value);
+            }
+          };
+      private final Mono<String> mono = Mono.just("foo");
+      private final Flux<String> before = rule.before(mono);
+      private final Flux<String> after = rule.after(mono);
+
+      @Benchmark
+      public Flux<String> before() {
+        return rule.before(mono);
+      }
+
+      @Benchmark
+      public Flux<String> after() {
+        return rule.after(mono);
+      }
+
+      @Benchmark
+      public Long onResultOfBefore() {
+        return before.count().block();
+      }
+
+      @Benchmark
+      public Long onResultOfAfter() {
+        return after.count().block();
       }
     }
   }

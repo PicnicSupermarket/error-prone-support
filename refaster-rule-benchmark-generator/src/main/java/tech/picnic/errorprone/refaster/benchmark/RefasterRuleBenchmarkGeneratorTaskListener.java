@@ -98,6 +98,7 @@ final class RefasterRuleBenchmarkGeneratorTaskListener implements TaskListener {
   private static Rule.Method process(MethodTree methodTree, VisitorState state) {
     // XXX: Initially, disallow `Refaster.x` usages.
     // XXX: Initially, disallow references to `@Placeholder` methods.
+    // XXX: Disallow `void` methods. (Can't be black-holed.)
     return new Rule.Method(methodTree);
   }
 
