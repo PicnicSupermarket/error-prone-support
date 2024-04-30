@@ -2,12 +2,15 @@ package tech.picnic.errorprone.refasterrules;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with files. */
@@ -38,6 +41,23 @@ final class FileRules {
     @AfterTemplate
     String after(Path path) throws IOException {
       return Files.readString(path);
+    }
+  }
+
+  /**
+   * Prefer {@link Files#createTempFile(String, String, FileAttribute[])} over alternatives that
+   * create files will more liberal permissions.
+   */
+  static final class FilesCreateTempFileToFile {
+    @BeforeTemplate
+    File before(String prefix, String suffix) throws IOException {
+      return Refaster.anyOf(
+          File.createTempFile(prefix, suffix), File.createTempFile(prefix, suffix, null));
+    }
+
+    @AfterTemplate
+    File after(String prefix, String suffix) throws IOException {
+      return Files.createTempFile(prefix, suffix).toFile();
     }
   }
 }
