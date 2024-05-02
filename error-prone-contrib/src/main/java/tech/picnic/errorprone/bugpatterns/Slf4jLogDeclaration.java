@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
@@ -114,7 +114,7 @@ public final class Slf4jLogDeclaration extends BugChecker implements VariableTre
       matcher = CLASS_ARGUMENT_PATTERN.matcher(argumentName);
     }
 
-    checkArgument(matcher.matches(), "Invalid argument name.");
+    checkState(matcher.matches());
     String argumentClassName = matcher.group(1);
     if (!className.contentEquals(argumentClassName)) {
       fixBuilder.merge(
