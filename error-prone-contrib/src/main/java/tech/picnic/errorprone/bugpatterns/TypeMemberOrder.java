@@ -151,7 +151,8 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
    */
   private static int getBodyStartPos(ClassTree tree, VisitorState state) {
     CharSequence sourceCode = state.getSourceCode();
-    int typeStart = ASTHelpers.getStartPosition(tree);
+    /* To avoid including the type's preceding annotations, use `getPreferredPosition()` rather than ASTHelpers. */
+    int typeStart = ((JCTree.JCClassDecl) tree).getPreferredPosition();
     int typeEnd = state.getEndPosition(tree);
     if (sourceCode == null || typeStart == Position.NOPOS || typeEnd == Position.NOPOS) {
       return Position.NOPOS;
