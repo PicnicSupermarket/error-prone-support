@@ -232,7 +232,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
       @Override
       public @Nullable Void visitReturn(ReturnTree node, @Nullable Void unused) {
         returnExpressions.add(node.getExpression());
-        return super.visitReturn(node, unused);
+        return super.visitReturn(node, null);
       }
 
       @Override
