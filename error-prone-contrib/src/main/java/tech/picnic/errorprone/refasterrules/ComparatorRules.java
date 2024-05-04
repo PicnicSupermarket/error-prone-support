@@ -290,7 +290,7 @@ final class ComparatorRules {
   static final class MinOfPairCustomOrder<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
-    T before(T value1, T value2, Comparator<T> cmp) {
+    T before(T value1, T value2, Comparator<? super T> cmp) {
       return Refaster.anyOf(
           cmp.compare(value1, value2) <= 0 ? value1 : value2,
           cmp.compare(value1, value2) > 0 ? value2 : value1,
@@ -305,7 +305,7 @@ final class ComparatorRules {
     }
 
     @AfterTemplate
-    T after(T value1, T value2, Comparator<T> cmp) {
+    T after(T value1, T value2, Comparator<? super T> cmp) {
       return Comparators.min(value1, value2, cmp);
     }
   }
@@ -357,7 +357,7 @@ final class ComparatorRules {
   static final class MaxOfPairCustomOrder<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
-    T before(T value1, T value2, Comparator<T> cmp) {
+    T before(T value1, T value2, Comparator<? super T> cmp) {
       return Refaster.anyOf(
           cmp.compare(value1, value2) >= 0 ? value1 : value2,
           cmp.compare(value1, value2) < 0 ? value2 : value1,
@@ -372,7 +372,7 @@ final class ComparatorRules {
     }
 
     @AfterTemplate
-    T after(T value1, T value2, Comparator<T> cmp) {
+    T after(T value1, T value2, Comparator<? super T> cmp) {
       return Comparators.max(value1, value2, cmp);
     }
   }
