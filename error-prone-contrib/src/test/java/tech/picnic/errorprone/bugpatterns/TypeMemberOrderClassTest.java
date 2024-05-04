@@ -315,4 +315,38 @@ final class TypeMemberOrderClassTest {
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
+
+  @Test
+  void replacementComplexAnnotation() {
+    BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
+        .addInputLines(
+            "A.java",
+            "final class A {",
+            "",
+            "  @interface AnnotationWithClassReferences {",
+            "    Class<?>[] value() default {};",
+            "  }",
+            "",
+            "  @AnnotationWithClassReferences({Object.class})",
+            "  class InnerClass {",
+            "    String bar;",
+            "    private static final int foo = 1;",
+            "  }",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "final class A {",
+            "",
+            "  @interface AnnotationWithClassReferences {",
+            "    Class<?>[] value() default {};",
+            "  }",
+            "",
+            "  @AnnotationWithClassReferences({Object.class})",
+            "  class InnerClass {",
+            "    private static final int foo = 1;",
+            "    String bar;",
+            "  }",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
 }
