@@ -215,7 +215,7 @@
         <version.maven>3.9.5</version.maven>
         <version.mockito>5.11.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
-        <version.nullaway>0.10.25</version.nullaway>
+        <version.nullaway>0.10.26</version.nullaway>
         <version.pitest-git>1.1.4</version.pitest-git>
         <version.rewrite-templating>1.8.0</version.rewrite-templating>
         <version.surefire>3.2.3</version.surefire>
