@@ -50,6 +50,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         identity(),
         ImmutableList.class,
         ImmutableMap.class,
+        List.class,
         Map.class,
         mapping(null, null),
         maxBy(null),

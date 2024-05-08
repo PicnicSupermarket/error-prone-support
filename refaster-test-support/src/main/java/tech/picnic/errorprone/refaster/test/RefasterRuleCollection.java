@@ -12,6 +12,7 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_RULES_PATTERN_FLAG;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableRangeMap;
@@ -241,17 +242,13 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
   }
 
   private static String getArgumentName(ExpressionTree arg, VisitorState state) {
-    switch (arg.getKind()) {
-      case MEMBER_SELECT:
-        return state.getSourceForNode(((MemberSelectTree) arg).getExpression());
-      case METHOD_INVOCATION:
-        return state.getSourceForNode(((MethodInvocationTree) arg).getMethodSelect());
-      case STRING_LITERAL:
-      case INT_LITERAL:
-        return ((LiteralTree) arg).getValue().toString();
-      default:
-        return "";
-    }
+    return switch (arg.getKind()) {
+      case MEMBER_SELECT -> state.getSourceForNode(((MemberSelectTree) arg).getExpression());
+      case METHOD_INVOCATION ->
+          state.getSourceForNode(((MethodInvocationTree) arg).getMethodSelect());
+      case STRING_LITERAL, INT_LITERAL -> ((LiteralTree) arg).getValue().toString();
+      default -> "";
+    };
   }
 
   private static ImmutableRangeMap<Integer, String> indexRuleMatches(
