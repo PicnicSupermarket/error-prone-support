@@ -24,8 +24,10 @@ jobs:
           disable-sudo: true
           egress-policy: block
           allowed-endpoints: >
+            api.adoptium.net:443
             checkstyle.org:443
             github.com:443
+            objects.githubusercontent.com:433
             oss.sonatype.org:443
             raw.githubusercontent.com:443
             repo.maven.apache.org:443
