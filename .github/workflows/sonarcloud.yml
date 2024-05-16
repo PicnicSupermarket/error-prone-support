@@ -27,7 +27,7 @@ jobs:
             api.adoptium.net:443
             ea6ne4j2sb.execute-api.eu-central-1.amazonaws.com:443
             github.com:443
-            objects.githubusercontent.com:433
+            objects.githubusercontent.com:443
             repo.maven.apache.org:443
             sc-cleancode-sensorcache-eu-central-1-prod.s3.amazonaws.com:443
             scanner.sonarcloud.io:443
