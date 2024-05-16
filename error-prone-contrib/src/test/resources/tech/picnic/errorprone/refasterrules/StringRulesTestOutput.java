@@ -136,4 +136,8 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
   boolean testStringStartsWith() {
     return "foo".startsWith("bar", 1);
   }
+
+  String testNewStringChar() {
+    return new String(new char[] {'f', 'o', 'o'});
+  }
 }
