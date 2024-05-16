@@ -246,5 +246,9 @@ final class StringRules {
   }
 
   // Rewrite `String#copyValueOf(char[])` to `new String(char[])`.
+  // Example:
+  // String.copyValueOf(new char[]);
+  // -->
+  // new String(new char[]);
   
 }
