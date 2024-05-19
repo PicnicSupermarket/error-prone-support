@@ -31,8 +31,10 @@ jobs:
           disable-sudo: true
           egress-policy: block
           allowed-endpoints: >
+            api.adoptium.net:443
             github.com:443
             jitpack.io:443
+            objects.githubusercontent.com:443
             repo.maven.apache.org:443
       # We run the build twice for each supported JDK: once against the
       # original Error Prone release, using only Error Prone checks available
