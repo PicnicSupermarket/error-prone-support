@@ -82,28 +82,6 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
       return Description.NO_MATCH;
     }
 
-    /* All members that can be moved or may lay between movable ones. */
-    ImmutableList<TypeMember> members =
-        tree.getMembers().stream()
-            .filter(
-                member -> !MoreASTHelpers.isGeneratedConstructor(member) && !isEnumerator(member))
-            .map(m -> new AutoValue_TypeMemberOrder_TypeMember(m, getPreferredOrdinal(m, state)))
-            .collect(toImmutableList());
-
-    /*
-      List of the sortable members' preferred ordinals, ordered by the member's position in the
-      original source.
-    */
-    ImmutableList<Integer> preferredOrdinals =
-        members.stream()
-            .filter(m -> m.preferredOrdinal().isPresent())
-            .map(m -> m.preferredOrdinal().orElseThrow(/* Unreachable due to preceding check. */ ))
-            .collect(toImmutableList());
-
-    if (Comparators.isInOrder(preferredOrdinals, naturalOrder())) {
-      return Description.NO_MATCH;
-    }
-
     int bodyStartPos = getBodyStartPos(tree, state);
     if (bodyStartPos == Position.NOPOS) {
       /*
@@ -114,17 +92,22 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
       return Description.NO_MATCH;
     }
 
+    ImmutableList<TypeMember> members = getAllTypeMembers(tree, state);
+    ImmutableList<Integer> preferredOrdinals = extractPreferredOrdinals(members);
+
+    if (Comparators.isInOrder(preferredOrdinals, naturalOrder())) {
+      return Description.NO_MATCH;
+    }
+
     return describeMatch(tree, sortTypeMembers(bodyStartPos, members, state));
   }
 
-  /**
-   * Returns true if {@link Tree} is an enumerator of an enumerated type, false otherwise.
-   *
-   * @see com.sun.tools.javac.tree.Pretty#isEnumerator(JCTree)
-   * @see com.sun.tools.javac.code.Flags#ENUM
-   */
-  private static boolean isEnumerator(Tree tree) {
-    return tree instanceof JCVariableDecl variableDecl && (variableDecl.mods.flags & ENUM) != 0;
+  /** Returns all members that can be moved or may lay between movable ones. */
+  private ImmutableList<TypeMember> getAllTypeMembers(ClassTree tree, VisitorState state) {
+    return tree.getMembers().stream()
+        .filter(member -> !MoreASTHelpers.isGeneratedConstructor(member) && !isEnumerator(member))
+        .map(m -> new AutoValue_TypeMemberOrder_TypeMember(m, getPreferredOrdinal(m, state)))
+        .collect(toImmutableList());
   }
 
   /**
@@ -140,7 +123,6 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
       case BLOCK -> Optional.of(isStatic((BlockTree) tree) ? 3 : 4);
       case METHOD -> Optional.of(isConstructor((MethodTree) tree) ? 5 : 6);
       case CLASS, INTERFACE, ENUM -> Optional.of(7);
-        // TODO: Should we log unhandled kinds?
       default -> Optional.empty();
     };
   }
@@ -158,14 +140,14 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
       return Position.NOPOS;
     }
 
-    /* We return the source code position of the first token that follows the first left brace. */
+    /* Returns the source code position of the first token that comes after the first curly left bracket. */
     return ErrorProneTokens.getTokens(
             sourceCode.subSequence(typeStart, typeEnd).toString(), typeStart, state.context)
         .stream()
         .dropWhile(token -> token.kind() != TokenKind.LBRACE)
         /*
          * To accommodate enums, skip processing their enumerators.
-         * This is needed as ErrorProne has access to the enumerations individually, but not to the
+         * This is needed as Error Prone has access to the enumerations individually, but not to the
          * whole expression that declares them, leaving the semicolon trailing the declarations
          * unaccounted for. The current logic would move this trailing semicolon with the first
          * member after the enumerations instead of leaving it to close the enumerations'
@@ -175,6 +157,28 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
         .findFirst()
         .map(ErrorProneToken::endPos)
         .orElse(Position.NOPOS);
+  }
+
+  /**
+   * Returns a list of the sortable members' preferred ordinals, ordered by the member's position in
+   * the original source.
+   */
+  private static ImmutableList<Integer> extractPreferredOrdinals(
+      ImmutableList<TypeMember> members) {
+    return members.stream()
+        .filter(m -> m.preferredOrdinal().isPresent())
+        .map(m -> m.preferredOrdinal().orElseThrow(/* Unreachable due to preceding check. */ ))
+        .collect(toImmutableList());
+  }
+
+  /**
+   * Returns true if {@link Tree} is an enumerator of an enumerated type, false otherwise.
+   *
+   * @see com.sun.tools.javac.tree.Pretty#isEnumerator(JCTree)
+   * @see com.sun.tools.javac.code.Flags#ENUM
+   */
+  private static boolean isEnumerator(Tree tree) {
+    return tree instanceof JCVariableDecl variableDecl && (variableDecl.mods.flags & ENUM) != 0;
   }
 
   /**
@@ -196,8 +200,9 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
       int end = state.getEndPosition(member.tree());
       verify(
           end != Position.NOPOS && start < end,
-          "Unexpected member end position, member: %s",
-          member);
+          "Unexpected member end position, member: %s, end position: %s",
+          member,
+          end);
       if (member.preferredOrdinal().isPresent()) {
         membersWithSource.add(
             new AutoValue_TypeMemberOrder_MovableTypeMember(
@@ -232,6 +237,7 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
     return ASTHelpers.getSymbol(methodTree).isConstructor();
   }
 
+  /** XXX: Write this. Every member that is in a ClassTree? */
   @AutoValue
   abstract static class TypeMember {
     abstract Tree tree();
@@ -239,6 +245,7 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
     abstract Optional<Integer> preferredOrdinal();
   }
 
+  /** Type members that have a sourcecode and are not generated, are considered to be movable. */
   @AutoValue
   abstract static class MovableTypeMember {
     abstract Tree tree();

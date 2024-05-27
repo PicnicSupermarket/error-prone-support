@@ -78,7 +78,15 @@ final class TypeMemberOrderClassTest {
             "",
             "  D() {}",
             "}")
-        .addSourceLines("E.java", "class E {}")
+        .addSourceLines(
+            "E.java",
+            "@SuppressWarnings(\"TypeMemberOrder\")",
+            "class E {",
+            "  void unorderedMethod() {}",
+            "",
+            "  E() {}",
+            "}")
+        .addSourceLines("F.java", "class F {}")
         .doTest();
   }
 
@@ -215,7 +223,7 @@ final class TypeMemberOrderClassTest {
   }
 
   @Test
-  void replacementDefaultConstructor() {
+  void replacementHandlesGeneratedDefaultConstructor() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
@@ -263,9 +271,13 @@ final class TypeMemberOrderClassTest {
         .addInputLines(
             "A.java",
             "class A {",
-            "  /* `foo` method's dangling comment. */",
+            "  /* empty statement's dangling comment */",
             "  ;",
-            "  // `foo` method's comment",
+            "  /**",
+            "   * Multiline JavaDoc",
+            "   *",
+            "   * <p>`foo` method's comment",
+            "   */",
             "  int foo() {",
             "    return foo;",
             "  }",
@@ -279,7 +291,7 @@ final class TypeMemberOrderClassTest {
             "  static {",
             "    System.out.println(\"foo\");",
             "  }",
-            "  /* `bar` field's dangling comment. */ ;",
+            "  /* `bar` field's dangling comment */",
             "",
             "  private final int bar = 2;",
             "  // `foo` field's comment",
@@ -291,7 +303,7 @@ final class TypeMemberOrderClassTest {
             "class A {",
             "  // `foo` field's comment",
             "  private static final int foo = 1;",
-            "  /* `bar` field's dangling comment. */ ;",
+            "  /* `bar` field's dangling comment */",
             "",
             "  private final int bar = 2;",
             "",
@@ -304,10 +316,14 @@ final class TypeMemberOrderClassTest {
             "  {",
             "    System.out.println(\"bar\");",
             "  }",
-            "  /* `foo` method's dangling comment. */",
+            "  /* empty statement's dangling comment */",
             "  ;",
             "",
-            "  // `foo` method's comment",
+            "  /**",
+            "   * Multiline JavaDoc",
+            "   *",
+            "   * <p>`foo` method's comment",
+            "   */",
             "  int foo() {",
             "    return foo;",
             "  }",
@@ -328,7 +344,13 @@ final class TypeMemberOrderClassTest {
             "  }",
             "",
             "  @AnnotationWithClassReferences({Object.class})",
-            "  class InnerClass {",
+            "  class InnerClassOneValue {",
+            "    String bar;",
+            "    private static final int foo = 1;",
+            "  }",
+            "",
+            "  @AnnotationWithClassReferences(value = {Integer.class, String.class})",
+            "  class InnerClassTwoValues {",
             "    String bar;",
             "    private static final int foo = 1;",
             "  }",
@@ -342,7 +364,13 @@ final class TypeMemberOrderClassTest {
             "  }",
             "",
             "  @AnnotationWithClassReferences({Object.class})",
-            "  class InnerClass {",
+            "  class InnerClassOneValue {",
+            "    private static final int foo = 1;",
+            "    String bar;",
+            "  }",
+            "",
+            "  @AnnotationWithClassReferences(value = {Integer.class, String.class})",
+            "  class InnerClassTwoValues {",
             "    private static final int foo = 1;",
             "    String bar;",
             "  }",
