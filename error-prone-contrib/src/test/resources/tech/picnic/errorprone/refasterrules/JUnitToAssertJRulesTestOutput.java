@@ -35,8 +35,8 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
         (Runnable) () -> assertTrue(true));
   }
 
-  void testThrowNewAssertionError() {
-    throw new AssertionError();
+  Object testFail() {
+    return org.assertj.core.api.Assertions.fail();
   }
 
   Object testFailWithMessage() {
@@ -47,8 +47,8 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     return org.assertj.core.api.Assertions.fail("foo", new IllegalStateException());
   }
 
-  void testFailWithThrowable() {
-    throw new AssertionError(new IllegalStateException());
+  Object testFailWithThrowable() {
+    return org.assertj.core.api.Assertions.fail(new IllegalStateException());
   }
 
   void testAssertThatIsTrue() {
