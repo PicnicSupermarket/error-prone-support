@@ -679,6 +679,7 @@
                                         <property name="allowNonPrintableEscapes" value="true" />
                                     </module>
                                     <module name="AvoidNoArgumentSuperConstructorCall" />
+                                    <module name="ConstructorsDeclarationGrouping" />
                                     <module name="DeclarationOrder">
                                         <!-- We don't enforce sorting fields by
                                         their visibility modifier, for two
