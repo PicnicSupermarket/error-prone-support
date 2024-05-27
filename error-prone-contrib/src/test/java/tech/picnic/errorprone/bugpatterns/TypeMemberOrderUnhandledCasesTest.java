@@ -3,7 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class TypeMemberOrderUnhandledKindsTest {
+final class TypeMemberOrderUnhandledCasesTest {
   @Test
   void identification() {
     CompilationTestHelper.newInstance(TypeMemberOrder.class, getClass())

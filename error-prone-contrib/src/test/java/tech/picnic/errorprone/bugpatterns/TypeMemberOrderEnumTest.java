@@ -208,7 +208,7 @@ final class TypeMemberOrderEnumTest {
   }
 
   @Test
-  void replacementDefaultConstructor() {
+  void replacementHandlesGeneratedDefaultConstructor() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
