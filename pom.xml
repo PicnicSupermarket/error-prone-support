@@ -679,6 +679,7 @@
                                         <property name="allowNonPrintableEscapes" value="true" />
                                     </module>
                                     <module name="AvoidNoArgumentSuperConstructorCall" />
+                                    <module name="ConstructorsDeclarationGrouping" />
                                     <module name="DeclarationOrder">
                                         <!-- We don't enforce sorting fields by
                                         their visibility modifier, for two
@@ -891,7 +892,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.16.0</version>
+                            <version>10.17.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
