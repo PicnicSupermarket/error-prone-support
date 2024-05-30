@@ -208,6 +208,36 @@ final class TypeMemberOrderEnumTest {
   }
 
   @Test
+  void nieuwe() {
+    BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
+        .addInputLines(
+            "A.java",
+            "enum A {",
+            "  FOO;",
+            "",
+            "  enum InnerEnum {}",
+            "",
+            "  @SuppressWarnings(\"TypeMemberOrder\")",
+            "  final int baz = 2;",
+            "",
+            "  static final int BAR = 1;",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "enum A {",
+            "  FOO;",
+            "",
+            "  static final int BAR = 1;",
+            "",
+            "  @SuppressWarnings(\"TypeMemberOrder\")",
+            "  final int baz = 2;",
+            "",
+            "  enum InnerEnum {}",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
   void replacementHandlesGeneratedDefaultConstructor() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addInputLines(

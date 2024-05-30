@@ -1,19 +1,15 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Verify.verify;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.sun.tools.javac.code.Flags.ENUM;
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.naturalOrder;
 import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
@@ -36,12 +32,9 @@ import com.sun.tools.javac.parser.Tokens.TokenKind;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Position;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.lang.model.element.Modifier;
-import tech.picnic.errorprone.utils.MoreASTHelpers;
 
 /**
  * A {@link BugChecker} that flags classes with a non-canonical member order.
@@ -97,24 +90,41 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
       return Description.NO_MATCH;
     }
 
-    ImmutableList<TypeMember> members = getAllTypeMembers(tree, state);
-    ImmutableList<Integer> preferredOrdinals = extractPreferredOrdinals(members);
+    ImmutableList<TypeMember> members = getAllTypeMembers(tree, bodyStartPos, state);
+    ImmutableList<TypeMember> sorted =
+        members.stream()
+            .filter(e -> e.preferredOrdinal().isPresent())
+            .sorted()
+            .collect(toImmutableList());
 
-    if (Comparators.isInOrder(preferredOrdinals, naturalOrder())) {
+    if (members.stream()
+        .filter(e -> e.preferredOrdinal().isPresent())
+        .collect(toImmutableList())
+        .equals(sorted)) {
       return Description.NO_MATCH;
     }
 
-    return describeMatch(tree, sortTypeMembers(bodyStartPos, members, state));
+    return describeMatch(tree, sortTypeMembers(members, state));
   }
 
   /** Returns all members that can be moved or may lay between movable ones. */
-  // XXX: Check if does have source code.
-  private ImmutableList<TypeMember> getAllTypeMembers(ClassTree tree, VisitorState state) {
-    return tree.getMembers().stream()
-        .filter(
-            member -> !MoreASTHelpers.isGeneratedConstructor(member) && !isEnumDefinition(member))
-        .map(m -> new AutoValue_TypeMemberOrder_TypeMember(m, getMemberTypeOrdinal(m, state)))
-        .collect(toImmutableList());
+  private ImmutableList<TypeMember> getAllTypeMembers(
+      ClassTree tree, int bodyStartPos, VisitorState state) {
+    ImmutableList.Builder<TypeMember> builder = ImmutableList.builder();
+    @Var int startPos = bodyStartPos;
+    for (Tree member : tree.getMembers()) {
+      if (isEnumDefinition(member) || state.getEndPosition(member) == Position.NOPOS) {
+        continue;
+      }
+
+      AutoValue_TypeMemberOrder_TypeMember hoi =
+          new AutoValue_TypeMemberOrder_TypeMember(
+              member, startPos, state.getEndPosition(member), getMemberTypeOrdinal(member, state));
+      builder.add(hoi);
+
+      startPos = state.getEndPosition(member);
+    }
+    return builder.build();
   }
 
   /**
@@ -123,7 +133,7 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
    */
   private Optional<Integer> getMemberTypeOrdinal(Tree tree, VisitorState state) {
     // Check hier ook die andere.
-    if (isSuppressed(tree, state)) {
+    if (isSuppressed(tree, state) || isEnumDefinition(tree)) {
       return Optional.empty();
     }
     return switch (tree.getKind()) {
@@ -174,18 +184,6 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
   }
 
   /**
-   * Returns a list of the sortable members' preferred ordinals, ordered by the member's position in
-   * the original source.
-   */
-  private static ImmutableList<Integer> extractPreferredOrdinals(
-      ImmutableList<TypeMember> members) {
-    return members.stream()
-        .filter(m -> m.preferredOrdinal().isPresent())
-        .map(m -> m.preferredOrdinal().orElseThrow(/* Unreachable due to preceding check. */ ))
-        .collect(toImmutableList());
-  }
-
-  /**
    * Returns true if {@link Tree} is an enum or an enumerator definition, false otherwise.
    *
    * @see com.sun.tools.javac.tree.Pretty#isEnumerator(JCTree)
@@ -206,34 +204,11 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
    *     resolve this.
    */
   private static SuggestedFix sortTypeMembers(
-      int bodyStartPos, ImmutableList<TypeMember> members, VisitorState state) {
-    List<MovableTypeMember> membersWithSource = new ArrayList<>();
-
-    @Var int start = bodyStartPos;
-    for (TypeMember member : members) {
-      int end = state.getEndPosition(member.tree());
-      verify(
-          end != Position.NOPOS && start < end,
-          "Unexpected member end position, member: %s, end position: %s",
-          member,
-          end);
-      if (member.preferredOrdinal().isPresent()) {
-        // XXX: .isPresent(). Boven in ook doen, map naar optional. Filter isEmpty, mapNotNull?
-        membersWithSource.add(
-            new AutoValue_TypeMemberOrder_MovableTypeMember(
-                member.tree(),
-                start,
-                end,
-                member.preferredOrdinal().orElseThrow(/* Unreachable due to preceding check. */ )));
-      }
-      start = end;
-    }
-
+      ImmutableList<TypeMember> members, VisitorState state) {
     CharSequence sourceCode = requireNonNull(state.getSourceCode(), "Source code");
     return Streams.zip(
-            membersWithSource.stream(),
-            membersWithSource.stream()
-                .sorted(comparing(MovableTypeMember::preferredOrdinal, naturalOrder())),
+            members.stream().filter(e -> e.preferredOrdinal().isPresent()),
+            members.stream().filter(e -> e.preferredOrdinal().isPresent()).sorted(),
             (original, replacement) -> original.replaceWith(replacement, sourceCode))
         .reduce(SuggestedFix.builder(), SuggestedFix.Builder::merge, SuggestedFix.Builder::merge)
         .build();
@@ -252,26 +227,32 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
     return ASTHelpers.getSymbol(methodTree).isConstructor();
   }
 
+  //  /** Type members that have a sourcecode and are not generated, are considered to be movable.
+  // */
   /** XXX: Write this. Every member that is in a ClassTree? */
   @AutoValue
-  abstract static class TypeMember {
-    abstract Tree tree();
-
-    abstract Optional<Integer> preferredOrdinal();
-  }
-
-  /** Type members that have a sourcecode and are not generated, are considered to be movable. */
-  @AutoValue
-  abstract static class MovableTypeMember {
+  abstract static class TypeMember implements Comparable<TypeMember> {
     abstract Tree tree();
 
     abstract int startPosition();
 
     abstract int endPosition();
 
-    abstract int preferredOrdinal();
+    abstract Optional<Integer> preferredOrdinal();
 
-    SuggestedFix replaceWith(MovableTypeMember other, CharSequence fullSourceCode) {
+    @Override
+    public int compareTo(TypeMemberOrder.TypeMember o) {
+      if (preferredOrdinal().isEmpty() || o.preferredOrdinal().isEmpty()) {
+        return 0;
+        //      } else if (preferredOrdinal().isEmpty() && o.preferredOrdinal().isPresent()) {
+        //        return -1;
+        //      } else if (preferredOrdinal().isPresent() && o.preferredOrdinal().isEmpty()) {
+        //        return 1;
+      }
+      return preferredOrdinal().orElseThrow().compareTo(o.preferredOrdinal().orElseThrow());
+    }
+
+    SuggestedFix replaceWith(TypeMember other, CharSequence fullSourceCode) {
       return equals(other)
           ? SuggestedFix.emptyFix()
           : SuggestedFix.replace(
