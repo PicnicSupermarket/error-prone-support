@@ -56,10 +56,6 @@ import javax.lang.model.element.Modifier;
  *     {@code DeclarationOrderCheck}</a>
  */
 // XXX: Consider introducing support for ordering members in records or annotation definitions.
-// XXX: Merge the type members, go over all of them, check if they have a source code and then don't
-// consider them.
-// Make sure that we implement comparable and can just call "sort" on the list and they are ready.
-// As a result we don't need the optionals anymore.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Type members should be defined in a canonical order",
@@ -90,17 +86,11 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
       return Description.NO_MATCH;
     }
 
-    ImmutableList<TypeMember> members = getAllTypeMembers(tree, bodyStartPos, state);
-    ImmutableList<TypeMember> sorted =
-        members.stream()
-            .filter(e -> e.preferredOrdinal().isPresent())
-            .sorted()
-            .collect(toImmutableList());
+    ImmutableList<TypeMember> members =
+        getAllTypeMembers(tree, bodyStartPos, state).stream().collect(toImmutableList());
+    ImmutableList<TypeMember> sorted = members.stream().sorted().collect(toImmutableList());
 
-    if (members.stream()
-        .filter(e -> e.preferredOrdinal().isPresent())
-        .collect(toImmutableList())
-        .equals(sorted)) {
+    if (members.equals(sorted)) {
       return Description.NO_MATCH;
     }
 
@@ -111,18 +101,21 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
   private ImmutableList<TypeMember> getAllTypeMembers(
       ClassTree tree, int bodyStartPos, VisitorState state) {
     ImmutableList.Builder<TypeMember> builder = ImmutableList.builder();
-    @Var int startPos = bodyStartPos;
+    @Var int currentStartPos = bodyStartPos;
     for (Tree member : tree.getMembers()) {
-      if (isEnumDefinition(member) || state.getEndPosition(member) == Position.NOPOS) {
+      if (state.getEndPosition(member) == Position.NOPOS) {
         continue;
       }
 
-      AutoValue_TypeMemberOrder_TypeMember hoi =
-          new AutoValue_TypeMemberOrder_TypeMember(
-              member, startPos, state.getEndPosition(member), getMemberTypeOrdinal(member, state));
-      builder.add(hoi);
+      int treeStartPos = currentStartPos;
+      getMemberTypeOrdinal(member, state)
+          .ifPresent(
+              e ->
+                  builder.add(
+                      new AutoValue_TypeMemberOrder_TypeMember(
+                          member, treeStartPos, state.getEndPosition(member), e)));
 
-      startPos = state.getEndPosition(member);
+      currentStartPos = state.getEndPosition(member);
     }
     return builder.build();
   }
@@ -132,7 +125,6 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
    * including it lacking a preferred ordinal.
    */
   private Optional<Integer> getMemberTypeOrdinal(Tree tree, VisitorState state) {
-    // Check hier ook die andere.
     if (isSuppressed(tree, state) || isEnumDefinition(tree)) {
       return Optional.empty();
     }
@@ -207,8 +199,8 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
       ImmutableList<TypeMember> members, VisitorState state) {
     CharSequence sourceCode = requireNonNull(state.getSourceCode(), "Source code");
     return Streams.zip(
-            members.stream().filter(e -> e.preferredOrdinal().isPresent()),
-            members.stream().filter(e -> e.preferredOrdinal().isPresent()).sorted(),
+            members.stream(),
+            members.stream().sorted(),
             (original, replacement) -> original.replaceWith(replacement, sourceCode))
         .reduce(SuggestedFix.builder(), SuggestedFix.Builder::merge, SuggestedFix.Builder::merge)
         .build();
@@ -238,18 +230,14 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
 
     abstract int endPosition();
 
-    abstract Optional<Integer> preferredOrdinal();
+    abstract Integer preferredOrdinal();
 
     @Override
     public int compareTo(TypeMemberOrder.TypeMember o) {
-      if (preferredOrdinal().isEmpty() || o.preferredOrdinal().isEmpty()) {
-        return 0;
-        //      } else if (preferredOrdinal().isEmpty() && o.preferredOrdinal().isPresent()) {
-        //        return -1;
-        //      } else if (preferredOrdinal().isPresent() && o.preferredOrdinal().isEmpty()) {
-        //        return 1;
-      }
-      return preferredOrdinal().orElseThrow().compareTo(o.preferredOrdinal().orElseThrow());
+      //      if (preferredOrdinal().isEmpty() || o.preferredOrdinal().isEmpty()) {
+      //        return 0;
+      //      }
+      return preferredOrdinal().compareTo(o.preferredOrdinal());
     }
 
     SuggestedFix replaceWith(TypeMember other, CharSequence fullSourceCode) {
