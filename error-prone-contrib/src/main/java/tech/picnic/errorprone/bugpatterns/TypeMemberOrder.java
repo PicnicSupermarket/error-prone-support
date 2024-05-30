@@ -62,6 +62,11 @@ import tech.picnic.errorprone.utils.MoreASTHelpers;
  *     href="https://checkstyle.sourceforge.io/apidocs/com/puppycrawl/tools/checkstyle/checks/coding/DeclarationOrderCheck.html">Checkstyle's
  *     {@code DeclarationOrderCheck}</a>
  */
+// XXX: Consider introducing support for ordering members in records or annotation definitions.
+// XXX: Merge the type members, go over all of them, check if they have a source code and then don't
+// consider them.
+// Make sure that we implement comparable and can just call "sort" on the list and they are ready.
+// As a result we don't need the optionals anymore.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Type members should be defined in a canonical order",
@@ -103,10 +108,12 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
   }
 
   /** Returns all members that can be moved or may lay between movable ones. */
+  // XXX: Check if does have source code.
   private ImmutableList<TypeMember> getAllTypeMembers(ClassTree tree, VisitorState state) {
     return tree.getMembers().stream()
-        .filter(member -> !MoreASTHelpers.isGeneratedConstructor(member) && !isEnumerator(member))
-        .map(m -> new AutoValue_TypeMemberOrder_TypeMember(m, getPreferredOrdinal(m, state)))
+        .filter(
+            member -> !MoreASTHelpers.isGeneratedConstructor(member) && !isEnumDefinition(member))
+        .map(m -> new AutoValue_TypeMemberOrder_TypeMember(m, getMemberTypeOrdinal(m, state)))
         .collect(toImmutableList());
   }
 
@@ -114,7 +121,8 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
    * Returns the preferred ordinal of the given member, or empty if it's unmovable for any reason,
    * including it lacking a preferred ordinal.
    */
-  private Optional<Integer> getPreferredOrdinal(Tree tree, VisitorState state) {
+  private Optional<Integer> getMemberTypeOrdinal(Tree tree, VisitorState state) {
+    // Check hier ook die andere.
     if (isSuppressed(tree, state)) {
       return Optional.empty();
     }
@@ -133,25 +141,31 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
    */
   private static int getBodyStartPos(ClassTree tree, VisitorState state) {
     CharSequence sourceCode = state.getSourceCode();
-    /* To avoid including the type's preceding annotations, use `getPreferredPosition()` rather than ASTHelpers. */
+    /*
+     * To avoid including the type's preceding annotations, use `getPreferredPosition()` rather than
+     * `ASTHelpers`.
+     */
     int typeStart = ((JCTree.JCClassDecl) tree).getPreferredPosition();
     int typeEnd = state.getEndPosition(tree);
     if (sourceCode == null || typeStart == Position.NOPOS || typeEnd == Position.NOPOS) {
       return Position.NOPOS;
     }
 
-    /* Returns the source code position of the first token that comes after the first curly left bracket. */
+    /*
+     * Returns the source code position of the first token that comes after the first curly left
+     * bracket.
+     */
     return ErrorProneTokens.getTokens(
             sourceCode.subSequence(typeStart, typeEnd).toString(), typeStart, state.context)
         .stream()
         .dropWhile(token -> token.kind() != TokenKind.LBRACE)
         /*
-         * To accommodate enums, skip processing their enumerators.
-         * This is needed as Error Prone has access to the enumerations individually, but not to the
-         * whole expression that declares them, leaving the semicolon trailing the declarations
-         * unaccounted for. The current logic would move this trailing semicolon with the first
-         * member after the enumerations instead of leaving it to close the enumerations'
-         * declaration, introducing a syntax error.
+         * To accommodate enums, skip processing their enumerators. This is needed as Error Prone
+         * has access to the enumerations individually, but not to the whole expression that
+         * declares them, leaving the semicolon trailing the declarations unaccounted for. The
+         * current logic would move this trailing semicolon with the first member after the
+         * enumerations instead of leaving it to close the enumerations' declaration, introducing a
+         * syntax error.
          */
         .dropWhile(token -> tree.getKind() == Kind.ENUM && token.kind() != TokenKind.SEMI)
         .findFirst()
@@ -172,12 +186,12 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
   }
 
   /**
-   * Returns true if {@link Tree} is an enumerator of an enumerated type, false otherwise.
+   * Returns true if {@link Tree} is an enum or an enumerator definition, false otherwise.
    *
    * @see com.sun.tools.javac.tree.Pretty#isEnumerator(JCTree)
    * @see com.sun.tools.javac.code.Flags#ENUM
    */
-  private static boolean isEnumerator(Tree tree) {
+  private static boolean isEnumDefinition(Tree tree) {
     return tree instanceof JCVariableDecl variableDecl && (variableDecl.mods.flags & ENUM) != 0;
   }
 
@@ -204,6 +218,7 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
           member,
           end);
       if (member.preferredOrdinal().isPresent()) {
+        // XXX: .isPresent(). Boven in ook doen, map naar optional. Filter isEmpty, mapNotNull?
         membersWithSource.add(
             new AutoValue_TypeMemberOrder_MovableTypeMember(
                 member.tree(),
