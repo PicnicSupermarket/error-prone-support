@@ -86,9 +86,9 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
     }
 
     ImmutableList<TypeMember> members = getAllTypeMembers(tree, bodyStartPos, state);
-    ImmutableList<TypeMember> sorted = ImmutableList.sortedCopyOf(members);
+    ImmutableList<TypeMember> sortedMembers = ImmutableList.sortedCopyOf(members);
 
-    if (members.equals(sorted)) {
+    if (members.equals(sortedMembers)) {
       return Description.NO_MATCH;
     }
 
@@ -123,7 +123,7 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
    * including it lacking a preferred ordinal.
    */
   private Optional<Integer> getMemberTypeOrdinal(Tree tree, VisitorState state) {
-    if (isSuppressed(tree, state) || isEnumDefinition(tree)) {
+    if (isSuppressed(tree, state) || isEnumeratorDefinition(tree)) {
       return Optional.empty();
     }
     return switch (tree.getKind()) {
@@ -179,7 +179,7 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
    * @see com.sun.tools.javac.tree.Pretty#isEnumerator(JCTree)
    * @see com.sun.tools.javac.code.Flags#ENUM
    */
-  private static boolean isEnumDefinition(Tree tree) {
+  private static boolean isEnumeratorDefinition(Tree tree) {
     return tree instanceof JCVariableDecl variableDecl && (variableDecl.mods.flags & ENUM) != 0;
   }
 
@@ -217,9 +217,6 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
     return ASTHelpers.getSymbol(methodTree).isConstructor();
   }
 
-  //  /** Type members that have a sourcecode and are not generated, are considered to be movable.
-  // */
-  /** XXX: Write this. Every member that is in a ClassTree? */
   @AutoValue
   abstract static class TypeMember implements Comparable<TypeMember> {
     abstract Tree tree();
@@ -232,9 +229,6 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
 
     @Override
     public int compareTo(TypeMemberOrder.TypeMember o) {
-      //      if (preferredOrdinal().isEmpty() || o.preferredOrdinal().isEmpty()) {
-      //        return 0;
-      //      }
       return preferredOrdinal().compareTo(o.preferredOrdinal());
     }
 
