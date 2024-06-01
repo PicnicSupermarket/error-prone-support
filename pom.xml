@@ -1042,6 +1042,9 @@
                             <requireJavaVersion>
                                 <version>${version.jdk}</version>
                             </requireJavaVersion>
+                            <requireMatchingCoordinates>
+                                <moduleNameMustMatchArtifactId>true</moduleNameMustMatchArtifactId>
+                            </requireMatchingCoordinates>
                             <requireMavenVersion>
                                 <version>${version.maven}</version>
                             </requireMavenVersion>
