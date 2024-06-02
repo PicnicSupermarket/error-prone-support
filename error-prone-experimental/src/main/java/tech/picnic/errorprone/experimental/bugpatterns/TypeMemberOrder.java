@@ -113,7 +113,7 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
                       new AutoValue_TypeMemberOrder_TypeMember(
                           member, treeStartPos, state.getEndPosition(member), e)));
 
-      currentStartPos = state.getEndPosition(member);
+      currentStartPos = Math.max(currentStartPos, state.getEndPosition(member));
     }
     return builder.build();
   }

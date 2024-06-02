@@ -3,7 +3,6 @@ package tech.picnic.errorprone.experimental.bugpatterns;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 final class TypeMemberOrderEnumTest {
@@ -86,7 +85,6 @@ final class TypeMemberOrderEnumTest {
         .doTest();
   }
 
-  @Disabled
   @Test
   void replacement() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
@@ -209,7 +207,6 @@ final class TypeMemberOrderEnumTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
-  @Disabled
   @Test
   void replacementHandlesGeneratedDefaultConstructor() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
@@ -264,7 +261,6 @@ final class TypeMemberOrderEnumTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
-  @Disabled
   @Test
   void replacementDanglingComments() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
