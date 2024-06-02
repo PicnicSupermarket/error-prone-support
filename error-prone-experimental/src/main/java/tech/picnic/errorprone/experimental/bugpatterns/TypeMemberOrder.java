@@ -1,6 +1,5 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.experimental.bugpatterns;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
@@ -86,9 +85,8 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
       return Description.NO_MATCH;
     }
 
-    ImmutableList<TypeMember> members =
-        getAllTypeMembers(tree, bodyStartPos, state).stream().collect(toImmutableList());
-    ImmutableList<TypeMember> sorted = members.stream().sorted().collect(toImmutableList());
+    ImmutableList<TypeMember> members = getAllTypeMembers(tree, bodyStartPos, state);
+    ImmutableList<TypeMember> sorted = ImmutableList.sortedCopyOf(members);
 
     if (members.equals(sorted)) {
       return Description.NO_MATCH;
