@@ -1,4 +1,4 @@
-package tech.picnic.errorprone.bugpatterns;
+package tech.picnic.errorprone.experimental.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
@@ -291,6 +291,7 @@ final class TypeMemberOrderClassTest {
             "  static {",
             "    System.out.println(\"foo\");",
             "  }",
+            "",
             "  /* `bar` field's dangling comment */",
             "",
             "  private final int bar = 2;",
@@ -303,6 +304,7 @@ final class TypeMemberOrderClassTest {
             "class A {",
             "  // `foo` field's comment",
             "  private static final int foo = 1;",
+            "",
             "  /* `bar` field's dangling comment */",
             "",
             "  private final int bar = 2;",
