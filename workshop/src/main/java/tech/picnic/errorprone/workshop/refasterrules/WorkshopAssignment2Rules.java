@@ -12,6 +12,7 @@ final class WorkshopAssignment2Rules {
    * immutability of the resulting list at the type level.
    */
   static final class ImmutableListOfOne<T> {
-    // XXX: Implement this Refaster rule.
+    // XXX: Implement this Refaster rule, preferably by using only one `@BeforeTemplate`.
+    // Tip: use the type argument.
   }
 }
