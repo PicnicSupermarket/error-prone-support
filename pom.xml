@@ -209,7 +209,7 @@
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.27.1</version.error-prone-orig>
-        <version.error-prone-slf4j>0.1.24</version.error-prone-slf4j>
+        <version.error-prone-slf4j>0.1.25</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>17</version.jdk>
         <version.maven>3.9.5</version.maven>
