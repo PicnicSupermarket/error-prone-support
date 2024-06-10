@@ -557,6 +557,7 @@ final class ReactorRules {
         @Matches(IsIdentityOperation.class)
             Function<? super P, ? extends Publisher<? extends S>> identityOperation) {
       return Refaster.anyOf(
+          flux.concatMap(function, 0),
           flux.flatMap(function, 1),
           flux.flatMapSequential(function, 1),
           flux.map(function).concatMap(identityOperation));
