@@ -113,6 +113,7 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
                       new AutoValue_TypeMemberOrder_TypeMember(
                           member, treeStartPos, state.getEndPosition(member), e)));
 
+      /* XXX: Write explanation about this enum. */
       currentStartPos = Math.max(currentStartPos, state.getEndPosition(member));
     }
     return builder.build();
