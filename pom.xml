@@ -214,6 +214,7 @@
         <version.jdk>17</version.jdk>
         <version.maven>3.9.5</version.maven>
         <version.mockito>5.12.0</version.mockito>
+        <version.mongodb>5.1.0</version.mongodb>
         <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.11.0</version.nullaway>
         <version.pitest-git>1.1.4</version.pitest-git>
@@ -465,8 +466,13 @@
             </dependency>
             <dependency>
                 <groupId>org.mongodb</groupId>
+                <artifactId>bson</artifactId>
+                <version>${version.mongodb}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-core</artifactId>
-                <version>5.1.0</version>
+                <version>${version.mongodb}</version>
             </dependency>
             <dependency>
                 <groupId>org.openrewrite</groupId>
