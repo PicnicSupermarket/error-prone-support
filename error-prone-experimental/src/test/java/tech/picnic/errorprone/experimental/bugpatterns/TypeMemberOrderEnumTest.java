@@ -91,7 +91,8 @@ final class TypeMemberOrderEnumTest {
         .addInputLines(
             "A.java",
             "enum A {",
-            "  FOO;",
+            "  FOO,",
+            "  BAR;",
             "",
             "  class InnerClass {}",
             "",
@@ -112,13 +113,14 @@ final class TypeMemberOrderEnumTest {
             "  }",
             "",
             "  final int baz = 2;",
-            "  static final int BAR = 1;",
+            "  static final int BAZ = 1;",
             "}")
         .addOutputLines(
             "A.java",
             "enum A {",
-            "  FOO;",
-            "  static final int BAR = 1;",
+            "  FOO,",
+            "  BAR;",
+            "  static final int BAZ = 1;",
             "",
             "  final int baz = 2;",
             "",
