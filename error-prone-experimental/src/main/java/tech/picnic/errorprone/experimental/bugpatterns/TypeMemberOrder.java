@@ -10,12 +10,14 @@ import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 import com.google.auto.service.AutoService;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Var;
 import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
+import com.google.errorprone.fixes.Replacement;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
@@ -23,6 +25,7 @@ import com.google.errorprone.util.ErrorProneToken;
 import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
@@ -55,6 +58,7 @@ import javax.lang.model.element.Modifier;
  *     {@code DeclarationOrderCheck}</a>
  */
 // XXX: Consider introducing support for ordering members in records or annotation definitions.
+// XXX: Exclude checkstyle from running against (this checker's) test files.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Type members should be defined in a canonical order",
@@ -62,17 +66,34 @@ import javax.lang.model.element.Modifier;
     linkType = CUSTOM,
     severity = WARNING,
     tags = STYLE)
-public final class TypeMemberOrder extends BugChecker implements ClassTreeMatcher {
+public final class TypeMemberOrder extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
 
   /** Instantiates a new {@link TypeMemberOrder} instance. */
   public TypeMemberOrder() {}
 
   @Override
-  public Description matchClass(ClassTree tree, VisitorState state) {
+  public Description matchCompilationUnit(
+      CompilationUnitTree compilationUnitTree, VisitorState state) {
+    SuggestedFix.Builder suggestedFixes = SuggestedFix.builder();
+    for (Tree tree : compilationUnitTree.getTypeDecls()) {
+      if (!isSuppressed(tree, state) && tree instanceof ClassTree classTree) {
+        suggestedFixes.merge(
+            matchClass(classTree, state, (JCTree.JCCompilationUnit) compilationUnitTree));
+      }
+    }
+    SuggestedFix suggestedFix = suggestedFixes.build();
+    if (suggestedFix.isEmpty()) {
+      return Description.NO_MATCH;
+    }
+    return describeMatch(compilationUnitTree, suggestedFix);
+  }
+
+  private SuggestedFix matchClass(
+      ClassTree tree, VisitorState state, JCTree.JCCompilationUnit compilationUnit) {
     Kind treeKind = tree.getKind();
     if (treeKind != Kind.CLASS && treeKind != Kind.INTERFACE && treeKind != Kind.ENUM) {
-      return Description.NO_MATCH;
+      return SuggestedFix.emptyFix();
     }
 
     int bodyStartPos = getBodyStartPos(tree, state);
@@ -82,17 +103,52 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
        * that (part of) its code was generated. Even if the source code for a subset of its members
        * is available, dealing with this edge case is not worth the trouble.
        */
-      return Description.NO_MATCH;
+      return SuggestedFix.emptyFix();
     }
 
     ImmutableList<TypeMember> members = getAllTypeMembers(tree, bodyStartPos, state);
-    ImmutableList<TypeMember> sortedMembers = ImmutableList.sortedCopyOf(members);
+    boolean topLevelSorted = members.equals(ImmutableList.sortedCopyOf(members));
 
-    if (members.equals(sortedMembers)) {
-      return Description.NO_MATCH;
+    if (topLevelSorted) {
+      SuggestedFix.Builder nestedSuggestedFixes = SuggestedFix.builder();
+      for (TypeMember member : members) {
+        if (member.tree() instanceof ClassTree memberClassTree) {
+          SuggestedFix other = matchClass(memberClassTree, state, compilationUnit);
+          nestedSuggestedFixes.merge(other);
+        }
+      }
+      return nestedSuggestedFixes.build();
     }
 
-    return describeMatch(tree, sortTypeMembers(members, state));
+    CharSequence source = requireNonNull(state.getSourceCode(), "Source code");
+    ImmutableMap.Builder<TypeMember, String> typeMemberSource = ImmutableMap.builder();
+
+    for (TypeMember member : members) {
+      if (member.tree() instanceof ClassTree memberClassTree) {
+        SuggestedFix suggestedFix = matchClass(memberClassTree, state, compilationUnit);
+        @Var
+        String memberSource =
+            source.subSequence(member.startPosition(), member.endPosition()).toString();
+        // Diff between memberSource and replacement positions.
+        @Var int diff = -member.startPosition();
+        for (Replacement replacement : suggestedFix.getReplacements(compilationUnit.endPositions)) {
+          memberSource =
+              memberSource.subSequence(0, replacement.startPosition() + diff)
+                  + replacement.replaceWith()
+                  + memberSource.subSequence(
+                      replacement.endPosition() + diff, memberSource.length());
+          diff +=
+              replacement.replaceWith().length()
+                  - (replacement.endPosition() - replacement.startPosition());
+        }
+        typeMemberSource.put(member, memberSource);
+      } else {
+        typeMemberSource.put(
+            member, source.subSequence(member.startPosition(), member.endPosition()).toString());
+      }
+    }
+
+    return sortTypeMembers(members, typeMemberSource.build());
   }
 
   /** Returns all members that can be moved or may lay between movable ones. */
@@ -177,7 +233,6 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
   /**
    * Returns true if {@link Tree} is an enum or an enumerator definition, false otherwise.
    *
-   * @see com.sun.tools.javac.tree.Pretty#isEnumerator(JCTree)
    * @see com.sun.tools.javac.code.Flags#ENUM
    */
   private static boolean isEnumeratorDefinition(Tree tree) {
@@ -195,12 +250,17 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
    *     resolve this.
    */
   private static SuggestedFix sortTypeMembers(
-      ImmutableList<TypeMember> members, VisitorState state) {
-    CharSequence sourceCode = requireNonNull(state.getSourceCode(), "Source code");
+      ImmutableList<TypeMember> members, ImmutableMap<TypeMember, String> sourceCode) {
     return Streams.zip(
             members.stream(),
             members.stream().sorted(),
-            (original, replacement) -> original.replaceWith(replacement, sourceCode))
+            (original, replacement) -> {
+              String replacementSource = requireNonNull(sourceCode.get(replacement), "replacement");
+              return original.equals(replacement)
+                  ? SuggestedFix.emptyFix()
+                  : SuggestedFix.replace(
+                      original.startPosition(), original.endPosition(), replacementSource);
+            })
         .reduce(SuggestedFix.builder(), SuggestedFix.Builder::merge, SuggestedFix.Builder::merge)
         .build();
   }
@@ -226,20 +286,11 @@ public final class TypeMemberOrder extends BugChecker implements ClassTreeMatche
 
     abstract int endPosition();
 
-    abstract Integer preferredOrdinal();
+    abstract int preferredOrdinal();
 
     @Override
     public int compareTo(TypeMemberOrder.TypeMember o) {
-      return preferredOrdinal().compareTo(o.preferredOrdinal());
-    }
-
-    SuggestedFix replaceWith(TypeMember other, CharSequence fullSourceCode) {
-      return equals(other)
-          ? SuggestedFix.emptyFix()
-          : SuggestedFix.replace(
-              startPosition(),
-              endPosition(),
-              fullSourceCode.subSequence(other.startPosition(), other.endPosition()).toString());
+      return Integer.compare(preferredOrdinal(), o.preferredOrdinal());
     }
   }
 }
