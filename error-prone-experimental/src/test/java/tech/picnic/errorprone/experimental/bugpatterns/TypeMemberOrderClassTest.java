@@ -1,8 +1,12 @@
 package tech.picnic.errorprone.experimental.bugpatterns;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import org.junit.jupiter.api.Test;
 
 final class TypeMemberOrderClassTest {
@@ -142,8 +146,44 @@ final class TypeMemberOrderClassTest {
             "    return foo;",
             "  }",
             "",
-            "  class Inner {}",
+            "  class Inner {",
+            "",
+            "    private final int innerBar = 2;",
+            "",
+            "    int innerFoo() {",
+            "      return 1;",
+            "    }",
+            "  }",
             "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void replacementNestedClasses() {
+    BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
+        .addInputLines(
+            "A.java",
+            // XXX: Use dedicated helper method to read test files here and below.
+            new BufferedReader(
+                    new InputStreamReader(
+                        this.getClass()
+                            .getClassLoader()
+                            .getResourceAsStream(
+                                "TypeMemberOrderNestedCompilationUnitTestInput.java"),
+                        UTF_8))
+                .lines()
+                .toArray(String[]::new))
+        .addOutputLines(
+            "A.java",
+            new BufferedReader(
+                    new InputStreamReader(
+                        this.getClass()
+                            .getClassLoader()
+                            .getResourceAsStream(
+                                "TypeMemberOrderNestedCompilationUnitTestOutput.java"),
+                        UTF_8))
+                .lines()
+                .toArray(String[]::new))
         .doTest(TestMode.TEXT_MATCH);
   }
 
@@ -345,7 +385,7 @@ final class TypeMemberOrderClassTest {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
-            "final class A {",
+            "class A {",
             "",
             "  @interface AnnotationWithClassReferences {",
             "    Class<?>[] value() default {};",
@@ -365,7 +405,7 @@ final class TypeMemberOrderClassTest {
             "}")
         .addOutputLines(
             "A.java",
-            "final class A {",
+            "class A {",
             "",
             "  @interface AnnotationWithClassReferences {",
             "    Class<?>[] value() default {};",
