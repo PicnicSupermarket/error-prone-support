@@ -95,7 +95,10 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
                   metadata.getClassTree(), dataProviderMetadata.getMethodTree(), state)
               .ifPresent(
                   fix ->
-                      state.reportMatch(describeMatch(dataProviderMetadata.getMethodTree(), fix)));
+                      state.reportMatch(
+                          describeMatch(
+                              dataProviderMetadata.getMethodTree(),
+                              fix.toBuilder().removeStaticImport("org.testng.Assert.*").build())));
         }
 
         for (Entry<MethodTree, SetupTeardownType> entry : metadata.getSetupTeardown().entrySet()) {
