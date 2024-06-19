@@ -20,6 +20,7 @@ import com.sun.tools.javac.parser.Tokens.Comment;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import tech.picnic.errorprone.util.SourceCode;
 
 // XXX: Can this one also implement a `Migrator`?
@@ -64,7 +65,7 @@ final class DataProviderMigrator {
             dataProviderReturnTree ->
                 SuggestedFix.builder()
                     .addStaticImport("org.junit.jupiter.params.provider.Arguments.arguments")
-                    .addImport("java.util.stream.Stream")
+                    .addImport(Stream.class.getCanonicalName())
                     .addImport("org.junit.jupiter.params.provider.Arguments")
                     .delete(methodTree)
                     .postfixWith(

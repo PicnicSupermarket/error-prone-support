@@ -5,6 +5,7 @@ import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import tech.picnic.errorprone.util.SourceCode;
 
 /**
@@ -26,7 +27,7 @@ final class TimeOutAttributeMigrator implements AttributeMigrator {
             timeOut ->
                 SuggestedFix.builder()
                     .addImport("org.junit.jupiter.api.Timeout")
-                    .addStaticImport("java.util.concurrent.TimeUnit.MILLISECONDS")
+                    .addStaticImport(TimeUnit.class.getCanonicalName() + ".MILLISECONDS")
                     .prefixWith(
                         methodTree,
                         String.format(
