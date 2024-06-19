@@ -7,7 +7,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.AnnotationMetadata;
 
 /**
  * A {@link AttributeMigrator} that migrates the {@code org.testng.annotations.Test#dataProvider}
@@ -17,7 +17,7 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
 final class DataProviderAttributeMigrator implements AttributeMigrator {
   @Override
   public Optional<SuggestedFix> migrate(
-      TestNGMetadata metadata,
+      TestNgMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {

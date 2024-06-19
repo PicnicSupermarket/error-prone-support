@@ -6,14 +6,14 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.AnnotationMetadata;
 
 /** A {@link AttributeMigrator} that migrates the {@code enabled} attribute. */
 @Immutable
 final class EnabledAttributeMigrator implements AttributeMigrator {
   @Override
   public Optional<SuggestedFix> migrate(
-      TestNGMetadata metadata,
+      TestNgMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {

@@ -5,7 +5,7 @@ import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.util.SourceCode;
 
 /**
@@ -16,7 +16,7 @@ import tech.picnic.errorprone.util.SourceCode;
 final class PriorityAttributeMigrator implements AttributeMigrator {
   @Override
   public Optional<SuggestedFix> migrate(
-      TestNGMetadata metadata,
+      TestNgMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {

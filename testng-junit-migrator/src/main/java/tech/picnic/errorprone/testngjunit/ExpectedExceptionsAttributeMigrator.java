@@ -13,7 +13,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import java.util.Optional;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.util.SourceCode;
 
 /** A {@link AttributeMigrator} that migrates the {@code expectedExceptions} attribute. */
@@ -21,7 +21,7 @@ import tech.picnic.errorprone.util.SourceCode;
 final class ExpectedExceptionsAttributeMigrator implements AttributeMigrator {
   @Override
   public Optional<SuggestedFix> migrate(
-      TestNGMetadata metadata,
+      TestNgMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {

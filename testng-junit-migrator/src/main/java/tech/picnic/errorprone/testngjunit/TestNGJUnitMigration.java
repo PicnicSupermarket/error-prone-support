@@ -23,9 +23,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.DataProviderMetadata;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.SetupTeardownType;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.AnnotationMetadata;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.DataProviderMetadata;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.SetupTeardownType;
 
 /**
  * A {@link BugChecker} that migrates TestNG unit tests to JUnit 5.
@@ -80,14 +80,14 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     TestNGScanner scanner = new TestNGScanner(state);
-    ImmutableMap<ClassTree, TestNGMetadata> classMetaData = scanner.collectMetadataForClasses(tree);
+    ImmutableMap<ClassTree, TestNgMetadata> classMetaData = scanner.collectMetadataForClasses(tree);
 
-    new TreeScanner<@Nullable Void, TestNGMetadata>() {
+    new TreeScanner<@Nullable Void, TestNgMetadata>() {
       @Override
-      public @Nullable Void visitClass(ClassTree node, TestNGMetadata testNGMetadata) {
-        TestNGMetadata metadata = classMetaData.get(node);
+      public @Nullable Void visitClass(ClassTree node, TestNgMetadata testNgMetadata) {
+        TestNgMetadata metadata = classMetaData.get(node);
         if (metadata == null) {
-          return super.visitClass(node, testNGMetadata);
+          return super.visitClass(node, testNgMetadata);
         }
 
         for (DataProviderMetadata dataProviderMetadata : metadata.getDataProvidersInUse()) {
@@ -108,7 +108,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       }
 
       @Override
-      public @Nullable Void visitMethod(MethodTree tree, TestNGMetadata metadata) {
+      public @Nullable Void visitMethod(MethodTree tree, TestNgMetadata metadata) {
         /* Make sure ALL Tests in the class can be migrated. */
         if (conservativeMode && !canMigrateAllTestsInClass(metadata, state)) {
           return super.visitMethod(tree, metadata);
@@ -133,7 +133,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   }
 
   private static ImmutableList<SuggestedFix> buildAttributeFixes(
-      TestNGMetadata metadata,
+      TestNgMetadata metadata,
       AnnotationMetadata annotationMetadata,
       MethodTree methodTree,
       VisitorState state) {
@@ -147,7 +147,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
 
   private static boolean canMigrateTest(
       MethodTree methodTree,
-      TestNGMetadata metadata,
+      TestNgMetadata metadata,
       AnnotationMetadata annotationMetadata,
       VisitorState state) {
     ImmutableList<TestAnnotationAttribute> attributes =
@@ -164,13 +164,13 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
                         .isPresent());
   }
 
-  private static boolean canMigrateAllTestsInClass(TestNGMetadata metadata, VisitorState state) {
+  private static boolean canMigrateAllTestsInClass(TestNgMetadata metadata, VisitorState state) {
     return metadata.getMethodAnnotations().entrySet().stream()
         .allMatch(entry -> canMigrateTest(entry.getKey(), metadata, entry.getValue(), state));
   }
 
   private static Optional<SuggestedFix> trySuggestFix(
-      TestNGMetadata metadata,
+      TestNgMetadata metadata,
       AnnotationMetadata annotation,
       String attributeName,
       MethodTree methodTree,

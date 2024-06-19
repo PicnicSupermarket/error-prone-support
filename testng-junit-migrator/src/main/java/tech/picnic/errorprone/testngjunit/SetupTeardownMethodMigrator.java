@@ -8,7 +8,7 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.SetupTeardownType;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.SetupTeardownType;
 
 /**
  * A helper class that migrates TestNG setup and teardown methods to their JUnit Jupiter equivalent.

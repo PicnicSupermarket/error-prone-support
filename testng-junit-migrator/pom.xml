@@ -12,6 +12,7 @@
 
     <name>Picnic :: Error Prone Support :: TestNG JUnit Migrator</name>
     <description>A tool to migrate TestNG tests to JUnit</description>
+    <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
         <dependency>

@@ -17,8 +17,8 @@ import tech.picnic.errorprone.util.SourceCode;
 final class TimeOutAttributeMigrator implements AttributeMigrator {
   @Override
   public Optional<SuggestedFix> migrate(
-      TestNGMetadata metadata,
-      TestNGMetadata.AnnotationMetadata annotation,
+      TestNgMetadata metadata,
+      TestNgMetadata.AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {
     return Optional.ofNullable(annotation.getAttributes().get("timeOut"))
