@@ -49,7 +49,7 @@ final class ExpectedExceptionsAttributeMigrator implements AttributeMigrator {
 
                           return fix.build();
                         })
-                    .orElse(SuggestedFix.emptyFix()));
+                    .orElseGet(SuggestedFix::emptyFix));
   }
 
   private static Optional<String> getExpectedException(
