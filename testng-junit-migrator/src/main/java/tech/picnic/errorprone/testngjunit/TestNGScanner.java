@@ -24,9 +24,9 @@ import com.sun.source.util.TreeScanner;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.DataProviderMetadata;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.SetupTeardownType;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.AnnotationMetadata;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.DataProviderMetadata;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.SetupTeardownType;
 
 /**
  * A {@link TreeScanner} which will scan a {@link com.sun.source.tree.CompilationUnitTree} and
@@ -34,13 +34,13 @@ import tech.picnic.errorprone.testngjunit.TestNGMetadata.SetupTeardownType;
  *
  * <p>This data can be retrieved using {@link #collectMetadataForClasses(CompilationUnitTree)}.
  */
-final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Builder> {
+final class TestNGScanner extends TreeScanner<@Nullable Void, TestNgMetadata.Builder> {
   private static final Matcher<MethodTree> TESTNG_TEST_METHOD =
       anyOf(
           hasAnnotation("org.testng.annotations.Test"),
           allOf(hasModifier(Modifier.PUBLIC), not(hasModifier(Modifier.STATIC))));
 
-  private final ImmutableMap.Builder<ClassTree, TestNGMetadata> metadataBuilder =
+  private final ImmutableMap.Builder<ClassTree, TestNgMetadata> metadataBuilder =
       ImmutableMap.builder();
   private final VisitorState state;
 
@@ -49,10 +49,10 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
   }
 
   @Override
-  public @Nullable Void visitClass(ClassTree tree, TestNGMetadata.Builder unused) {
-    TestNGMetadata.Builder builder = TestNGMetadata.builder();
+  public @Nullable Void visitClass(ClassTree tree, TestNgMetadata.Builder unused) {
+    TestNgMetadata.Builder builder = TestNgMetadata.builder();
     builder.setClassTree(tree);
-    getTestNGAnnotation(tree, state).ifPresent(builder::setClassLevelAnnotationMetadata);
+    getTestNgAnnotation(tree, state).ifPresent(builder::setClassLevelAnnotationMetadata);
     super.visitClass(tree, builder);
     metadataBuilder.put(tree, builder.build());
 
@@ -60,7 +60,7 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
   }
 
   @Override
-  public @Nullable Void visitMethod(MethodTree tree, TestNGMetadata.Builder builder) {
+  public @Nullable Void visitMethod(MethodTree tree, TestNgMetadata.Builder builder) {
     if (ASTHelpers.isGeneratedConstructor(tree)) {
       return super.visitMethod(tree, builder);
     }
@@ -79,7 +79,7 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
     }
 
     if (TESTNG_TEST_METHOD.matches(tree, state)) {
-      getTestNGAnnotation(tree, state)
+      getTestNgAnnotation(tree, state)
           .or(builder::getClassLevelAnnotationMetadata)
           .ifPresent(annotation -> builder.methodAnnotationsBuilder().put(tree, annotation));
     }
@@ -87,14 +87,14 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNGMetadata.Bui
     return super.visitMethod(tree, builder);
   }
 
-  public ImmutableMap<ClassTree, TestNGMetadata> collectMetadataForClasses(
+  public ImmutableMap<ClassTree, TestNgMetadata> collectMetadataForClasses(
       CompilationUnitTree tree) {
     scan(tree, null);
     return metadataBuilder.build();
   }
 
   @CanIgnoreReturnValue
-  private static Optional<AnnotationMetadata> getTestNGAnnotation(Tree tree, VisitorState state) {
+  private static Optional<AnnotationMetadata> getTestNgAnnotation(Tree tree, VisitorState state) {
     return ASTHelpers.getAnnotations(tree).stream()
         .filter(annotation -> TESTNG_TEST_ANNOTATION.matches(annotation, state))
         .findFirst()

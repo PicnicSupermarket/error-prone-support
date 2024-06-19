@@ -16,7 +16,7 @@ final class UnsupportedAttributeMigrator {
   private UnsupportedAttributeMigrator() {}
 
   static Optional<SuggestedFix> migrate(
-      TestNGMetadata.AnnotationMetadata annotation,
+      TestNgMetadata.AnnotationMetadata annotation,
       MethodTree methodTree,
       String attributeName,
       VisitorState state) {

@@ -24,7 +24,7 @@ import java.util.Optional;
  * TestNGJUnitMigration}.
  */
 @AutoValue
-abstract class TestNGMetadata {
+abstract class TestNgMetadata {
   abstract ClassTree getClassTree();
 
   abstract Optional<AnnotationMetadata> getClassLevelAnnotationMetadata();
@@ -70,7 +70,7 @@ abstract class TestNGMetadata {
   }
 
   static Builder builder() {
-    return new AutoValue_TestNGMetadata.Builder();
+    return new AutoValue_TestNgMetadata.Builder();
   }
 
   @AutoValue.Builder
@@ -93,7 +93,7 @@ abstract class TestNGMetadata {
 
     abstract Builder setDataProviderMetadata(ImmutableMap<String, DataProviderMetadata> value);
 
-    abstract TestNGMetadata build();
+    abstract TestNgMetadata build();
   }
 
   /**
@@ -125,7 +125,7 @@ abstract class TestNGMetadata {
      */
     public static AnnotationMetadata create(
         AnnotationTree annotationTree, ImmutableMap<String, ExpressionTree> attributes) {
-      return new AutoValue_TestNGMetadata_AnnotationMetadata(annotationTree, attributes);
+      return new AutoValue_TestNgMetadata_AnnotationMetadata(annotationTree, attributes);
     }
   }
 
@@ -166,9 +166,9 @@ abstract class TestNGMetadata {
     private final boolean requiresStaticMethod;
 
     SetupTeardownType(
-        String testNGAnnotationClass, String junitAnnotationClass, boolean requiresStaticMethod) {
-      annotationMatcher = isType(testNGAnnotationClass);
-      methodTreeMatcher = hasAnnotation(testNGAnnotationClass);
+        String testNgAnnotationClass, String junitAnnotationClass, boolean requiresStaticMethod) {
+      annotationMatcher = isType(testNgAnnotationClass);
+      methodTreeMatcher = hasAnnotation(testNgAnnotationClass);
       this.junitAnnotationClass = junitAnnotationClass;
       this.requiresStaticMethod = requiresStaticMethod;
     }
@@ -209,7 +209,7 @@ abstract class TestNGMetadata {
      * @return A new {@link DataProviderMetadata} instance.
      */
     public static DataProviderMetadata create(MethodTree methodTree) {
-      return new AutoValue_TestNGMetadata_DataProviderMetadata(
+      return new AutoValue_TestNgMetadata_DataProviderMetadata(
           methodTree, methodTree.getName().toString());
     }
   }

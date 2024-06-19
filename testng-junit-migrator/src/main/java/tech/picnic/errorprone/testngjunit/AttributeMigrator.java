@@ -5,7 +5,7 @@ import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.MethodTree;
 import java.util.Optional;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.AnnotationMetadata;
 
 /**
  * Interface implemented by classes that define how to migrate a specific attribute from a TestNG
@@ -22,7 +22,7 @@ interface AttributeMigrator {
    *     Optional#empty()} if the {@link AttributeMigrator} is not able to migrate the attribute.
    */
   Optional<SuggestedFix> migrate(
-      TestNGMetadata metadata,
+      TestNgMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state);

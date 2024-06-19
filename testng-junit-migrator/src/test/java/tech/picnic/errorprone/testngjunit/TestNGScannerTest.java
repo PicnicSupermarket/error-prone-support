@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.lang.model.element.Name;
 import org.junit.jupiter.api.Test;
-import tech.picnic.errorprone.testngjunit.TestNGMetadata.AnnotationMetadata;
+import tech.picnic.errorprone.testngjunit.TestNgMetadata.AnnotationMetadata;
 
 final class TestNGScannerTest {
   @Test
@@ -167,7 +167,7 @@ final class TestNGScannerTest {
       implements CompilationUnitTreeMatcher, ClassTreeMatcher, MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
     // XXX: find better way to do this
-    private ImmutableMap<ClassTree, TestNGMetadata> classMetaData = ImmutableMap.of();
+    private ImmutableMap<ClassTree, TestNgMetadata> classMetaData = ImmutableMap.of();
 
     @Override
     public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
@@ -180,7 +180,7 @@ final class TestNGScannerTest {
     @Override
     public Description matchClass(ClassTree tree, VisitorState state) {
       Optional.ofNullable(classMetaData.get(tree))
-          .flatMap(TestNGMetadata::getClassLevelAnnotationMetadata)
+          .flatMap(TestNgMetadata::getClassLevelAnnotationMetadata)
           .ifPresent(annotation -> reportAnnotationMessage(tree, annotation, state));
       return Description.NO_MATCH;
     }
@@ -188,7 +188,7 @@ final class TestNGScannerTest {
     @Override
     public Description matchMethod(MethodTree tree, VisitorState state) {
       ClassTree classTree = state.findEnclosing(ClassTree.class);
-      Optional<TestNGMetadata> metadata = Optional.ofNullable(classTree).map(classMetaData::get);
+      Optional<TestNgMetadata> metadata = Optional.ofNullable(classTree).map(classMetaData::get);
 
       if (metadata.isEmpty()) {
         return Description.NO_MATCH;
@@ -203,14 +203,14 @@ final class TestNGScannerTest {
     }
 
     private void reportClassLevelAnnotation(
-        ClassTree classTree, TestNGMetadata metadata, VisitorState state) {
+        ClassTree classTree, TestNgMetadata metadata, VisitorState state) {
       metadata
           .getClassLevelAnnotationMetadata()
           .ifPresent(annotation -> reportAnnotationMessage(classTree, annotation, state));
     }
 
     private void reportTestMethods(
-        MethodTree tree, ClassTree classTree, TestNGMetadata metadata, VisitorState state) {
+        MethodTree tree, ClassTree classTree, TestNgMetadata metadata, VisitorState state) {
       metadata
           .getClassLevelAnnotationMetadata()
           .filter(not(isEqual(metadata.getMethodAnnotations().get(tree))))
@@ -219,7 +219,7 @@ final class TestNGScannerTest {
     }
 
     private void reportSetupTeardownMethods(
-        MethodTree tree, ClassTree classTree, TestNGMetadata metadata, VisitorState state) {
+        MethodTree tree, ClassTree classTree, TestNgMetadata metadata, VisitorState state) {
       metadata.getSetupTeardown().entrySet().stream()
           .filter(entry -> entry.getKey().equals(tree))
           .findFirst()
@@ -234,7 +234,7 @@ final class TestNGScannerTest {
     }
 
     private void reportDataProviderMethods(
-        MethodTree tree, ClassTree classTree, TestNGMetadata metadata, VisitorState state) {
+        MethodTree tree, ClassTree classTree, TestNgMetadata metadata, VisitorState state) {
       metadata.getDataProviderMetadata().entrySet().stream()
           .filter(entry -> entry.getValue().getMethodTree().equals(tree))
           .findFirst()
