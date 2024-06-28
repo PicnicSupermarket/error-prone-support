@@ -205,19 +205,19 @@
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.1.1</version.auto-service>
-        <version.auto-value>1.10.4</version.auto-value>
+        <version.auto-value>1.11.0</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.28.0</version.error-prone-orig>
-        <version.error-prone-slf4j>0.1.24</version.error-prone-slf4j>
+        <version.error-prone-slf4j>0.1.25</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>17</version.jdk>
         <version.maven>3.9.5</version.maven>
         <version.mockito>5.12.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
-        <version.nullaway>0.10.26</version.nullaway>
+        <version.nullaway>0.11.0</version.nullaway>
         <version.pitest-git>1.1.4</version.pitest-git>
-        <version.rewrite-templating>1.9.2</version.rewrite-templating>
+        <version.rewrite-templating>1.11.1</version.rewrite-templating>
         <version.surefire>3.2.3</version.surefire>
     </properties>
 
@@ -338,7 +338,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>33.2.0-jre</version>
+                <version>33.2.1-jre</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -360,7 +360,7 @@
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2023.0.6</version>
+                <version>2023.0.7</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -382,7 +382,7 @@
             <dependency>
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
-                <version>6.0.0</version>
+                <version>6.1.0</version>
             </dependency>
             <dependency>
                 <groupId>javax.inject</groupId>
@@ -407,7 +407,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.14.16</version>
+                <version>1.14.17</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -432,7 +432,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.43.0</version>
+                <version>3.44.0</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -466,7 +466,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-core</artifactId>
-                <version>5.1.0</version>
+                <version>5.1.1</version>
             </dependency>
             <dependency>
                 <groupId>org.openrewrite</groupId>
@@ -476,7 +476,7 @@
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>2.11.1</version>
+                <version>2.13.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -490,19 +490,19 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>6.1.8</version>
+                <version>6.1.10</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>3.2.5</version>
+                <version>3.3.1</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>6.3.0</version>
+                <version>6.3.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -624,7 +624,7 @@
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
                     <artifactId>git-commit-id-maven-plugin</artifactId>
-                    <version>8.0.2</version>
+                    <version>9.0.0</version>
                     <configuration>
                         <injectAllReactorProjects>true</injectAllReactorProjects>
                         <runOnlyOnce>true</runOnlyOnce>
@@ -643,7 +643,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.4.0</version>
                     <configuration>
                         <checkstyleRules>
                             <!-- We only enable rules that are not enforced by
@@ -912,7 +912,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.3.2</version>
+                    <version>3.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -964,7 +964,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.7.1</version>
                     <configuration>
                         <!-- XXX: Drop `ignoreAllNonTestScoped` once
                         https://issues.apache.org/jira/browse/MNG-6058 is
@@ -987,7 +987,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <fail>false</fail>
                         <rules>
@@ -1042,6 +1042,9 @@
                             <requireJavaVersion>
                                 <version>${version.jdk}</version>
                             </requireJavaVersion>
+                            <requireMatchingCoordinates>
+                                <moduleNameMustMatchArtifactId>true</moduleNameMustMatchArtifactId>
+                            </requireMatchingCoordinates>
                             <requireMavenVersion>
                                 <version>${version.maven}</version>
                             </requireMavenVersion>
@@ -1087,7 +1090,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.4.2</version>
                     <configuration>
                         <skipIfEmpty>true</skipIfEmpty>
                         <archive>
@@ -1115,7 +1118,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.6.3</version>
+                    <version>3.7.0</version>
                     <configuration>
                         <additionalJOptions>
                             <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</additionalJOption>
@@ -1144,7 +1147,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1.0</version>
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <preparationProfiles>release</preparationProfiles>
@@ -1185,7 +1188,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <includes>
                             <include>**/*Test.java</include>
@@ -1467,7 +1470,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.11.0.3922</version>
+                    <version>4.0.0.4121</version>
                 </plugin>
             </plugins>
         </pluginManagement>

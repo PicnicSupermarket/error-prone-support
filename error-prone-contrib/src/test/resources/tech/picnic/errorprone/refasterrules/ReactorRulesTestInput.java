@@ -207,11 +207,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Flux<Integer>> testFluxConcatMap() {
     return ImmutableSet.of(
-        Flux.just(1).flatMap(Mono::just, 1),
-        Flux.just(2).flatMapSequential(Mono::just, 1),
-        Flux.just(3).map(Mono::just).concatMap(identity()),
-        Flux.just(4).map(Mono::just).concatMap(v -> v),
-        Flux.just(5).map(Mono::just).concatMap(v -> Mono.empty()));
+        Flux.just(1).concatMap(Mono::just, 0),
+        Flux.just(2).flatMap(Mono::just, 1),
+        Flux.just(3).flatMapSequential(Mono::just, 1),
+        Flux.just(4).map(Mono::just).concatMap(identity()),
+        Flux.just(5).map(Mono::just).concatMap(v -> v),
+        Flux.just(6).map(Mono::just).concatMap(v -> Mono.empty()));
   }
 
   ImmutableSet<Flux<Integer>> testFluxConcatMapWithPrefetch() {
