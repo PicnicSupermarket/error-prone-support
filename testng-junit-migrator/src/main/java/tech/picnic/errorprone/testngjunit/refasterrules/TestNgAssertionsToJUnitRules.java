@@ -9,61 +9,67 @@ import org.junit.jupiter.api.Assertions;
 import org.testng.Assert;
 
 /** Refaster rules to replace TestNG assertions with JUnit equivalents. */
+@SuppressWarnings("StaticImport")
 final class TestNgAssertionsToJUnitRules {
   private TestNgAssertionsToJUnitRules() {}
 
+  @SuppressWarnings("AssertEqual")
   static final class AssertEquals {
     @BeforeTemplate
-    void before(Object actual, Object expected) {
+    void before(Object expected, Object actual) {
       Assert.assertEquals(actual, expected);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected) {
+    void after(Object expected, Object actual) {
       Assertions.assertEquals(expected, actual);
     }
   }
 
+  @SuppressWarnings("AssertEqualWithMessage")
   static final class AssertEqualsMessage {
     @BeforeTemplate
-    void before(Object actual, Object expected, String message) {
+    void before(Object expected, Object actual, String message) {
       Assert.assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected, String message) {
+    void after(Object expected, Object actual, String message) {
       Assertions.assertEquals(expected, actual, message);
     }
   }
 
+  @SuppressWarnings("AssertUnequal")
   static final class AssertNotEquals {
     @BeforeTemplate
-    void before(Object actual, Object expected) {
+    void before(Object expected, Object actual) {
       Assert.assertNotEquals(actual, expected);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected) {
+    void after(Object expected, Object actual) {
       Assertions.assertNotEquals(expected, actual);
     }
   }
 
+  @SuppressWarnings("AssertUnequalWithMessage")
   static final class AssertNotEqualsMessage {
     @BeforeTemplate
-    void before(Object actual, Object expected, String message) {
+    void before(Object expected, Object actual, String message) {
       Assert.assertNotEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected, String message) {
+    void after(Object expected, Object actual, String message) {
       Assertions.assertNotEquals(expected, actual, message);
     }
   }
 
+  @SuppressWarnings({"AssertFalse", "AssertThatIsFalse"})
   static final class AssertFalseCondition {
     @BeforeTemplate
     void before(boolean condition) {
@@ -77,6 +83,7 @@ final class TestNgAssertionsToJUnitRules {
     }
   }
 
+  @SuppressWarnings({"AssertFalseWithMessage", "AssertThatWithFailMessageStringIsFalse"})
   static final class AssertFalseConditionMessage {
     @BeforeTemplate
     void before(boolean condition, String message) {
@@ -90,6 +97,7 @@ final class TestNgAssertionsToJUnitRules {
     }
   }
 
+  @SuppressWarnings({"AssertThatIsTrue", "AssertTrue"})
   static final class AssertTrueCondition {
     @BeforeTemplate
     void before(boolean condition) {
@@ -103,6 +111,7 @@ final class TestNgAssertionsToJUnitRules {
     }
   }
 
+  @SuppressWarnings({"AssertThatWithFailMessageStringIsTrue", "AssertTrueWithMessage"})
   static final class AssertTrueConditionMessage {
     @BeforeTemplate
     void before(boolean condition, String message) {
