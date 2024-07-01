@@ -1,15 +1,12 @@
 package tech.picnic.errorprone.testngjunit.refasterrules;
 
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
 
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import org.junit.jupiter.api.Assertions;
+import org.testng.Assert;
 
 /** Refaster rules to replace TestNG assertions with JUnit equivalents. */
 final class TestNgAssertionsToJUnitRules {
@@ -17,105 +14,105 @@ final class TestNgAssertionsToJUnitRules {
 
   static final class AssertEquals {
     @BeforeTemplate
-    void before(Object expected, Object actual) {
-      assertThat(actual).isEqualTo(expected);
+    void before(Object actual, Object expected) {
+      Assert.assertEquals(actual, expected);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object expected, Object actual) {
-      assertEquals(expected, actual);
+    void after(Object actual, Object expected) {
+      Assertions.assertEquals(expected, actual);
     }
   }
 
   static final class AssertEqualsMessage {
     @BeforeTemplate
-    void before(Object expected, Object actual, String message) {
-      assertThat(actual).withFailMessage(message).isEqualTo(expected);
+    void before(Object actual, Object expected, String message) {
+      Assert.assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object expected, Object actual, String message) {
-      assertEquals(expected, actual, message);
+    void after(Object actual, Object expected, String message) {
+      Assertions.assertEquals(expected, actual, message);
     }
   }
 
   static final class AssertNotEquals {
     @BeforeTemplate
-    void before(Object expected, Object actual) {
-      assertThat(actual).isNotEqualTo(expected);
+    void before(Object actual, Object expected) {
+      Assert.assertNotEquals(actual, expected);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object expected, Object actual) {
-      assertNotEquals(expected, actual);
+    void after(Object actual, Object expected) {
+      Assertions.assertNotEquals(expected, actual);
     }
   }
 
   static final class AssertNotEqualsMessage {
     @BeforeTemplate
-    void before(Object expected, Object actual, String message) {
-      assertThat(actual).withFailMessage(message).isNotEqualTo(expected);
+    void before(Object actual, Object expected, String message) {
+      Assert.assertNotEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object expected, Object actual, String message) {
-      assertNotEquals(expected, actual, message);
+    void after(Object actual, Object expected, String message) {
+      Assertions.assertNotEquals(expected, actual, message);
     }
   }
 
   static final class AssertFalseCondition {
     @BeforeTemplate
     void before(boolean condition) {
-      assertThat(condition).isFalse();
+      Assert.assertFalse(condition);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(boolean condition) {
-      assertThat(condition).isFalse();
+      Assertions.assertFalse(condition);
     }
   }
 
   static final class AssertFalseConditionMessage {
     @BeforeTemplate
     void before(boolean condition, String message) {
-      assertThat(condition).withFailMessage(message).isFalse();
+      Assert.assertFalse(condition, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(boolean condition, String message) {
-      assertThat(condition).withFailMessage(message).isFalse();
+      Assertions.assertFalse(condition, message);
     }
   }
 
   static final class AssertTrueCondition {
     @BeforeTemplate
     void before(boolean condition) {
-      assertThat(condition).isTrue();
+      Assert.assertTrue(condition);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(boolean condition) {
-      assertThat(condition).isTrue();
+      Assertions.assertTrue(condition);
     }
   }
 
   static final class AssertTrueConditionMessage {
     @BeforeTemplate
     void before(boolean condition, String message) {
-      assertThat(condition).withFailMessage(message).isTrue();
+      Assert.assertTrue(condition, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(boolean condition, String message) {
-      assertThat(condition).withFailMessage(message).isTrue();
+      Assertions.assertTrue(condition, message);
     }
   }
 }
