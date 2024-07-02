@@ -26,8 +26,8 @@ import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import com.sun.tools.javac.util.Constants;
 import java.util.regex.Pattern;
+import tech.picnic.errorprone.utils.SourceCode;
 import tech.picnic.errorprone.utils.ThirdPartyLibrary;
 
 /**
@@ -123,7 +123,7 @@ public final class ErrorProneRuntimeClasspath extends BugChecker
         .setMessage("This type may not be on the runtime classpath; use a string literal instead")
         .addFix(
             SuggestedFix.replace(
-                tree, Constants.format(receiver.owner.getQualifiedName().toString())))
+                tree, SourceCode.toStringConstantExpression(receiver.owner.getQualifiedName())))
         .build();
   }
 
@@ -150,7 +150,7 @@ public final class ErrorProneRuntimeClasspath extends BugChecker
             original,
             identifier
                 + ".class.getCanonicalName()"
-                + (suffix.isEmpty() ? "" : (" + " + Constants.format(suffix))))
+                + (suffix.isEmpty() ? "" : (" + " + SourceCode.toStringConstantExpression(suffix))))
         .build();
   }
 

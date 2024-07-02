@@ -14,6 +14,7 @@ import com.google.errorprone.util.ErrorProneToken;
 import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
+import com.sun.tools.javac.util.Convert;
 import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import com.sun.tools.javac.util.Position;
 import java.util.Optional;
@@ -40,6 +41,27 @@ public final class SourceCode {
   public static String treeToString(Tree tree, VisitorState state) {
     String src = state.getSourceForNode(tree);
     return src != null ? src : tree.toString();
+  }
+
+  /**
+   * Returns a Java string constant expression (i.e., a quoted string) representing the given input.
+   *
+   * @apiNote This method differs from {@link com.sun.tools.javac.util.Constants#format(Object)} in
+   *     that it does not superfluously escape single quote characters.
+   * @param str The string of interest.
+   * @return A non-{@code null} string.
+   */
+  public static String toStringConstantExpression(CharSequence str) {
+    StringBuilder result = new StringBuilder("\"");
+    for (int i = 0; i < str.length(); i++) {
+      char c = str.charAt(i);
+      if (c == '\'') {
+        result.append('\'');
+      } else {
+        result.append(Convert.quote(c));
+      }
+    }
+    return result.append('"').toString();
   }
 
   /**
