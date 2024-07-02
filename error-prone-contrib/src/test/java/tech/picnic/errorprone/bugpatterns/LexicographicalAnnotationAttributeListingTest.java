@@ -12,146 +12,148 @@ final class LexicographicalAnnotationAttributeListingTest {
     CompilationTestHelper.newInstance(LexicographicalAnnotationAttributeListing.class, getClass())
         .addSourceLines(
             "A.java",
-            "import static java.math.RoundingMode.DOWN;",
-            "import static java.math.RoundingMode.UP;",
-            "",
-            "import com.fasterxml.jackson.annotation.JsonPropertyOrder;",
-            "import io.swagger.annotations.ApiImplicitParam;",
-            "import io.swagger.annotations.ApiImplicitParams;",
-            "import io.swagger.v3.oas.annotations.Parameter;",
-            "import io.swagger.v3.oas.annotations.Parameters;",
-            "import java.math.RoundingMode;",
-            "import javax.xml.bind.annotation.XmlType;",
-            "import org.springframework.context.annotation.PropertySource;",
-            "import org.springframework.test.context.TestPropertySource;",
-            "",
-            "interface A {",
-            "  @interface Foo {",
-            "    String[] value() default {};",
-            "",
-            "    int[] ints() default {};",
-            "",
-            "    Class<?>[] cls() default {};",
-            "",
-            "    RoundingMode[] enums() default {};",
-            "",
-            "    Bar[] anns() default {};",
-            "  }",
-            "",
-            "  @interface Bar {",
-            "    String[] value() default {};",
-            "  }",
-            "",
-            "  @Foo({})",
-            "  A noString();",
-            "",
-            "  @Foo({\"a\"})",
-            "  A oneString();",
-            "",
-            "  @Foo({\"a\", \"b\"})",
-            "  A sortedStrings();",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @Foo({\"b\", \"a\"})",
-            "  A unsortedString();",
-            "",
-            "  @Foo({\"ab\", \"Ac\"})",
-            "  A sortedStringCaseInsensitive();",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @Foo({\"ac\", \"Ab\"})",
-            "  A unsortedStringCaseInsensitive();",
-            "",
-            "  @Foo({\"A\", \"a\"})",
-            "  A sortedStringCaseInsensitiveWithTotalOrderFallback();",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @Foo({\"a\", \"A\"})",
-            "  A unsortedStringCaseInsensitiveWithTotalOrderFallback();",
-            "",
-            "  @Foo(ints = {})",
-            "  A noInts();",
-            "",
-            "  @Foo(ints = {0})",
-            "  A oneInt();",
-            "",
-            "  @Foo(ints = {0, 1})",
-            "  A sortedInts();",
-            "",
-            "  @Foo(ints = {1, 0})",
-            "  A unsortedInts();",
-            "",
-            "  @Foo(cls = {})",
-            "  A noClasses();",
-            "",
-            "  @Foo(cls = {int.class})",
-            "  A oneClass();",
-            "",
-            "  @Foo(cls = {int.class, long.class})",
-            "  A sortedClasses();",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @Foo(cls = {long.class, int.class})",
-            "  A unsortedClasses();",
-            "",
-            "  @Foo(enums = {})",
-            "  A noEnums();",
-            "",
-            "  @Foo(enums = {DOWN})",
-            "  A oneEnum();",
-            "",
-            "  @Foo(enums = {DOWN, UP})",
-            "  A sortedEnums();",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @Foo(enums = {UP, DOWN})",
-            "  A unsortedEnums();",
-            "",
-            "  @Foo(anns = {})",
-            "  A noAnns();",
-            "",
-            "  @Foo(anns = {@Bar(\"a\")})",
-            "  A oneAnn();",
-            "",
-            "  @Foo(anns = {@Bar(\"a\"), @Bar(\"b\")})",
-            "  A sortedAnns();",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
-            "  A unsortedAnns();",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @Foo(anns = {@Bar(\"a\"), @Bar({\"b\", \"a\"})})",
-            "  A unsortedInnderAnns();",
-            "",
-            "  @Foo({\"a=foo\", \"a.b=bar\", \"a.c=baz\"})",
-            "  A hierarchicallySorted();",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @Foo({\"a.b=bar\", \"a.c=baz\", \"a=foo\"})",
-            "  A hierarchicallyUnsorted();",
-            "",
-            "  @JsonPropertyOrder({\"field2\", \"field1\"})",
-            "  A dto();",
-            "",
-            "  @ApiImplicitParams({@ApiImplicitParam(\"p2\"), @ApiImplicitParam(\"p1\")})",
-            "  A firstEndpoint();",
-            "",
-            "  @Parameters({@Parameter(name = \"p2\"), @Parameter(name = \"p1\")})",
-            "  A secondEndpoint();",
-            "",
-            "  @XmlType(propOrder = {\"field2\", \"field1\"})",
-            "  class XmlTypeDummy {}",
-            "",
-            "  @PropertySource({\"field2\", \"field1\"})",
-            "  class PropertySourceDummy {}",
-            "",
-            "  @TestPropertySource(locations = {\"field2\", \"field1\"})",
-            "  class FirstTestPropertySourceDummy {}",
-            "",
-            "  @TestPropertySource({\"field2\", \"field1\"})",
-            "  class SecondTestPropertySourceDummy {}",
-            "}")
+            """
+            import static java.math.RoundingMode.DOWN;
+            import static java.math.RoundingMode.UP;
+
+            import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+            import io.swagger.annotations.ApiImplicitParam;
+            import io.swagger.annotations.ApiImplicitParams;
+            import io.swagger.v3.oas.annotations.Parameter;
+            import io.swagger.v3.oas.annotations.Parameters;
+            import java.math.RoundingMode;
+            import javax.xml.bind.annotation.XmlType;
+            import org.springframework.context.annotation.PropertySource;
+            import org.springframework.test.context.TestPropertySource;
+
+            interface A {
+              @interface Foo {
+                String[] value() default {};
+
+                int[] ints() default {};
+
+                Class<?>[] cls() default {};
+
+                RoundingMode[] enums() default {};
+
+                Bar[] anns() default {};
+              }
+
+              @interface Bar {
+                String[] value() default {};
+              }
+
+              @Foo({})
+              A noString();
+
+              @Foo({"a"})
+              A oneString();
+
+              @Foo({"a", "b"})
+              A sortedStrings();
+
+              // BUG: Diagnostic contains:
+              @Foo({"b", "a"})
+              A unsortedString();
+
+              @Foo({"ab", "Ac"})
+              A sortedStringCaseInsensitive();
+
+              // BUG: Diagnostic contains:
+              @Foo({"ac", "Ab"})
+              A unsortedStringCaseInsensitive();
+
+              @Foo({"A", "a"})
+              A sortedStringCaseInsensitiveWithTotalOrderFallback();
+
+              // BUG: Diagnostic contains:
+              @Foo({"a", "A"})
+              A unsortedStringCaseInsensitiveWithTotalOrderFallback();
+
+              @Foo(ints = {})
+              A noInts();
+
+              @Foo(ints = {0})
+              A oneInt();
+
+              @Foo(ints = {0, 1})
+              A sortedInts();
+
+              @Foo(ints = {1, 0})
+              A unsortedInts();
+
+              @Foo(cls = {})
+              A noClasses();
+
+              @Foo(cls = {int.class})
+              A oneClass();
+
+              @Foo(cls = {int.class, long.class})
+              A sortedClasses();
+
+              // BUG: Diagnostic contains:
+              @Foo(cls = {long.class, int.class})
+              A unsortedClasses();
+
+              @Foo(enums = {})
+              A noEnums();
+
+              @Foo(enums = {DOWN})
+              A oneEnum();
+
+              @Foo(enums = {DOWN, UP})
+              A sortedEnums();
+
+              // BUG: Diagnostic contains:
+              @Foo(enums = {UP, DOWN})
+              A unsortedEnums();
+
+              @Foo(anns = {})
+              A noAnns();
+
+              @Foo(anns = {@Bar("a")})
+              A oneAnn();
+
+              @Foo(anns = {@Bar("a"), @Bar("b")})
+              A sortedAnns();
+
+              // BUG: Diagnostic contains:
+              @Foo(anns = {@Bar("b"), @Bar("a")})
+              A unsortedAnns();
+
+              // BUG: Diagnostic contains:
+              @Foo(anns = {@Bar("a"), @Bar({"b", "a"})})
+              A unsortedInnderAnns();
+
+              @Foo({"a=foo", "a.b=bar", "a.c=baz"})
+              A hierarchicallySorted();
+
+              // BUG: Diagnostic contains:
+              @Foo({"a.b=bar", "a.c=baz", "a=foo"})
+              A hierarchicallyUnsorted();
+
+              @JsonPropertyOrder({"field2", "field1"})
+              A dto();
+
+              @ApiImplicitParams({@ApiImplicitParam("p2"), @ApiImplicitParam("p1")})
+              A firstEndpoint();
+
+              @Parameters({@Parameter(name = "p2"), @Parameter(name = "p1")})
+              A secondEndpoint();
+
+              @XmlType(propOrder = {"field2", "field1"})
+              class XmlTypeDummy {}
+
+              @PropertySource({"field2", "field1"})
+              class PropertySourceDummy {}
+
+              @TestPropertySource(locations = {"field2", "field1"})
+              class FirstTestPropertySourceDummy {}
+
+              @TestPropertySource({"field2", "field1"})
+              class SecondTestPropertySourceDummy {}
+            }
+            """)
         .doTest();
   }
 
@@ -164,78 +166,82 @@ final class LexicographicalAnnotationAttributeListingTest {
             LexicographicalAnnotationAttributeListing.class, getClass())
         .addInputLines(
             "A.java",
-            "import static java.math.RoundingMode.DOWN;",
-            "import static java.math.RoundingMode.UP;",
-            "",
-            "import java.math.RoundingMode;",
-            "",
-            "interface A {",
-            "  @interface Foo {",
-            "    String[] value() default {};",
-            "",
-            "    Class<?>[] cls() default {};",
-            "",
-            "    RoundingMode[] enums() default {};",
-            "",
-            "    Bar[] anns() default {};",
-            "  }",
-            "",
-            "  @interface Bar {",
-            "    String[] value() default {};",
-            "  }",
-            "",
-            "  @Foo({\" \", \"\", \"b\", \"a\"})",
-            "  A unsortedString();",
-            "",
-            "  @Foo(cls = {long.class, int.class})",
-            "  A unsortedClasses();",
-            "",
-            "  @Foo(enums = {UP, DOWN})",
-            "  A unsortedEnums();",
-            "",
-            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
-            "  A unsortedAnns();",
-            "",
-            "  @Foo(anns = {@Bar(\"a\"), @Bar({\"b\", \"a\"})})",
-            "  A unsortedInnderAnns();",
-            "}")
+            """
+            import static java.math.RoundingMode.DOWN;
+            import static java.math.RoundingMode.UP;
+
+            import java.math.RoundingMode;
+
+            interface A {
+              @interface Foo {
+                String[] value() default {};
+
+                Class<?>[] cls() default {};
+
+                RoundingMode[] enums() default {};
+
+                Bar[] anns() default {};
+              }
+
+              @interface Bar {
+                String[] value() default {};
+              }
+
+              @Foo({" ", "", "b", "a"})
+              A unsortedString();
+
+              @Foo(cls = {long.class, int.class})
+              A unsortedClasses();
+
+              @Foo(enums = {UP, DOWN})
+              A unsortedEnums();
+
+              @Foo(anns = {@Bar("b"), @Bar("a")})
+              A unsortedAnns();
+
+              @Foo(anns = {@Bar("a"), @Bar({"b", "a"})})
+              A unsortedInnderAnns();
+            }
+            """)
         .addOutputLines(
             "A.java",
-            "import static java.math.RoundingMode.DOWN;",
-            "import static java.math.RoundingMode.UP;",
-            "",
-            "import java.math.RoundingMode;",
-            "",
-            "interface A {",
-            "  @interface Foo {",
-            "    String[] value() default {};",
-            "",
-            "    Class<?>[] cls() default {};",
-            "",
-            "    RoundingMode[] enums() default {};",
-            "",
-            "    Bar[] anns() default {};",
-            "  }",
-            "",
-            "  @interface Bar {",
-            "    String[] value() default {};",
-            "  }",
-            "",
-            "  @Foo({\"\", \" \", \"a\", \"b\"})",
-            "  A unsortedString();",
-            "",
-            "  @Foo(cls = {int.class, long.class})",
-            "  A unsortedClasses();",
-            "",
-            "  @Foo(enums = {DOWN, UP})",
-            "  A unsortedEnums();",
-            "",
-            "  @Foo(anns = {@Bar(\"a\"), @Bar(\"b\")})",
-            "  A unsortedAnns();",
-            "",
-            "  @Foo(anns = {@Bar(\"a\"), @Bar({\"a\", \"b\"})})",
-            "  A unsortedInnderAnns();",
-            "}")
+            """
+            import static java.math.RoundingMode.DOWN;
+            import static java.math.RoundingMode.UP;
+
+            import java.math.RoundingMode;
+
+            interface A {
+              @interface Foo {
+                String[] value() default {};
+
+                Class<?>[] cls() default {};
+
+                RoundingMode[] enums() default {};
+
+                Bar[] anns() default {};
+              }
+
+              @interface Bar {
+                String[] value() default {};
+              }
+
+              @Foo({"", " ", "a", "b"})
+              A unsortedString();
+
+              @Foo(cls = {int.class, long.class})
+              A unsortedClasses();
+
+              @Foo(enums = {DOWN, UP})
+              A unsortedEnums();
+
+              @Foo(anns = {@Bar("a"), @Bar("b")})
+              A unsortedAnns();
+
+              @Foo(anns = {@Bar("a"), @Bar({"a", "b"})})
+              A unsortedInnderAnns();
+            }
+            """)
         .doTest(TestMode.TEXT_MATCH);
   }
 
@@ -249,48 +255,50 @@ final class LexicographicalAnnotationAttributeListingTest {
                 "-XepOpt:LexicographicalAnnotationAttributeListing:Excludes=pkg.A.Bar#value"))
         .addSourceLines(
             "pkg/A.java",
-            "package pkg;",
-            "",
-            "interface A {",
-            "  @interface Foo {",
-            "    String[] value() default {};",
-            "",
-            "    String[] value2() default {};",
-            "  }",
-            "",
-            "  @interface Bar {",
-            "    String[] value() default {};",
-            "",
-            "    String[] value2() default {};",
-            "  }",
-            "",
-            "  @interface Baz {",
-            "    String[] value() default {};",
-            "",
-            "    String[] value2() default {};",
-            "  }",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @Foo({\"b\", \"a\"})",
-            "  A fooValue();",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @Foo(value2 = {\"b\", \"a\"})",
-            "  A fooValue2();",
-            "",
-            "  @Bar({\"b\", \"a\"})",
-            "  A barValue();",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  @Bar(value2 = {\"b\", \"a\"})",
-            "  A barValue2();",
-            "",
-            "  @Baz({\"b\", \"a\"})",
-            "  A bazValue();",
-            "",
-            "  @Baz(value2 = {\"b\", \"a\"})",
-            "  A bazValue2();",
-            "}")
+            """
+            package pkg;
+
+            interface A {
+              @interface Foo {
+                String[] value() default {};
+
+                String[] value2() default {};
+              }
+
+              @interface Bar {
+                String[] value() default {};
+
+                String[] value2() default {};
+              }
+
+              @interface Baz {
+                String[] value() default {};
+
+                String[] value2() default {};
+              }
+
+              // BUG: Diagnostic contains:
+              @Foo({"b", "a"})
+              A fooValue();
+
+              // BUG: Diagnostic contains:
+              @Foo(value2 = {"b", "a"})
+              A fooValue2();
+
+              @Bar({"b", "a"})
+              A barValue();
+
+              // BUG: Diagnostic contains:
+              @Bar(value2 = {"b", "a"})
+              A barValue2();
+
+              @Baz({"b", "a"})
+              A bazValue();
+
+              @Baz(value2 = {"b", "a"})
+              A bazValue2();
+            }
+            """)
         .doTest();
   }
 }
