@@ -18,7 +18,7 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Arrays.class, Collections.class, Comparator.class, Streams.class, naturalOrder());
+        Arrays.class, Collections.class, Comparator.class, naturalOrder(), Streams.class);
   }
 
   ImmutableList.Builder<String> testImmutableListBuilder() {

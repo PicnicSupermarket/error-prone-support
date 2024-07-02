@@ -25,10 +25,10 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Arrays.class,
         Collections.class,
+        identity(),
         ImmutableList.class,
         ImmutableSet.class,
-        Stream.class,
-        identity());
+        Stream.class);
   }
 
   ImmutableSet<Comparator<String>> testNaturalOrder() {

@@ -20,7 +20,7 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Arrays.class, Joiner.class, Objects.class, Stream.class, Streams.class, joining(), UTF_8);
+        UTF_8, Arrays.class, Joiner.class, joining(), Objects.class, Stream.class, Streams.class);
   }
 
   ImmutableSet<Boolean> testStringIsEmpty() {

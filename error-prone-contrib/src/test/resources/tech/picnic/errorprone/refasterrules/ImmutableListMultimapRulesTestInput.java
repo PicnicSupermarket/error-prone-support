@@ -22,7 +22,7 @@ final class ImmutableListMultimapRulesTest implements RefasterRuleCollectionTest
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Streams.class, flatteningToImmutableListMultimap(null, null), identity());
+        flatteningToImmutableListMultimap(null, null), identity(), Streams.class);
   }
 
   ImmutableSet<ImmutableMultimap.Builder<String, Integer>> testImmutableListMultimapBuilder() {
