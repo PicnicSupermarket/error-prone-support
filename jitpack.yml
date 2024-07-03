@@ -3,3 +3,5 @@ before_install:
   - sdk update
   - sdk install java 17.0.10-tem
   - sdk use java 17.0.10-tem
+  - sdk install maven 3.9.8
+  - sdk use maven 3.9.8
