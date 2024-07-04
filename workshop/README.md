@@ -1,6 +1,6 @@
 # Error Prone Workshop
 
-Download the slides [here][eps-workshop-jprime].
+Download the slides [here][eps-workshop-slides].
 
 ## Initial setup of the workshop
 
@@ -49,6 +49,23 @@ Tips:
   `testExampleStringIsEmpty` method that shows the input and output to test the
   Refaster rule.
 
+
+## Part 2: Writing Error Prone checks
+
+During this part of the workshop we will implement parts of multiple Error
+Prone `BugChecker`s. Each of these classes contain `XXX` comments explaining
+what needs to be implemented. However, before diving in, make sure to first
+navigate to a check's associated test class to drop the class-level `@Disabled`
+annotation. Upon initial execution the tests will fail; the goal is to get then
+to pass.
+
+Some utility classes that you can use:
+
+* `com.google.errorprone.util.ASTHelpers`: contains many common operations on
+  the Abstract Syntax Tree.
+* `com.google.errorprone.fixes.SuggestedFixes`: contains helper methods for
+  creating `Fix`es.
+
 ### Tips and tricks
 
 If you are working from the command line, it is suggested to run commands in
@@ -69,23 +86,5 @@ commands:
 mvn clean install -Dtest=WorkshopRefasterRulesTest -Dverification.skip
 ```
 
-# Optional part for the jPrime workshop
-
-## Part 2: Writing Error Prone checks
-
-During this part of the workshop we will implement parts of multiple Error
-Prone `BugChecker`s. Each of these classes contain `XXX` comments explaining
-what needs to be implemented. However, before diving in, make sure to first
-navigate to a check's associated test class to drop the class-level `@Disabled`
-annotation. Upon initial execution the tests will fail; the goal is to get then
-to pass.
-
-Some utility classes that you can use:
-
-* `com.google.errorprone.util.ASTHelpers`: contains many common operations on
-  the Abstract Syntax Tree.
-* `com.google.errorprone.fixes.SuggestedFixes`: contains helper methods for
-  creating `Fix`es.
-
 [eps-github]: https://github.com/PicnicSupermarket/error-prone-support
-[eps-workshop-jprime]: https://drive.google.com/file/d/1BCs6tXKUSaatwSVqLeCx5QkZCVRtvw9k/view?usp=sharing
+[eps-workshop-slides]: https://drive.google.com/file/d/19c5675wvRws9e-75jsS-spaD9-Sgw6BQ/view?usp=sharing
