@@ -49,7 +49,6 @@ Tips:
   `testExampleStringIsEmpty` method that shows the input and output to test the
   Refaster rule.
 
-
 ## Part 2: Writing Error Prone checks
 
 During this part of the workshop we will implement parts of multiple Error
@@ -71,20 +70,35 @@ Some utility classes that you can use:
 If you are working from the command line, it is suggested to run commands in
 the `workshop` directory. To do this, navigate to the root of the repository
 and run:
+
 ```bash
 cd workshop
 ```
 
 In case you want to do a fast build to just compile the project, run:
+
 ```bash
 mvn clean install -DskipTests -Dverification.skip
 ```
 
 In case you want to run one test from the command line, run the following
 commands:
+
 ```bash
 mvn clean install -Dtest=WorkshopRefasterRulesTest -Dverification.skip
 ```
 
+### Troubleshooting
+
+Make sure to use the latest version of JDK 21 or 17.
+
+In some specific cases the `-Dverification.skip` is not correctly processed. In
+that case, use `-D"verification.skip"`.
+
+In case there is an error mentioning the `BetaApi` check, please rebuild or try
+to `Reload All Maven projects`.
+
+
 [eps-github]: https://github.com/PicnicSupermarket/error-prone-support
+
 [eps-workshop-slides]: https://drive.google.com/file/d/19c5675wvRws9e-75jsS-spaD9-Sgw6BQ/view?usp=sharing
