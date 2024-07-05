@@ -24,7 +24,7 @@ final class EnabledAttributeMigrator implements AttributeMigrator {
             unused ->
                 SuggestedFix.builder()
                     .addImport("org.junit.jupiter.api.Disabled")
-                    .prefixWith(methodTree, "@Disabled\n")
+                    .prefixWith(methodTree, "@Disabled\n    ")
                     .build())
         .or(() -> Optional.of(SuggestedFix.emptyFix()));
   }

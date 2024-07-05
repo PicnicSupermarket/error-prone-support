@@ -25,7 +25,7 @@ final class DescriptionAttributeMigrator implements AttributeMigrator {
                     .prefixWith(
                         methodTree,
                         String.format(
-                            "@DisplayName(%s)%n", SourceCode.treeToString(description, state)))
+                            "@DisplayName(%s)%n    ", SourceCode.treeToString(description, state)))
                     .build());
   }
 }
