@@ -191,7 +191,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
     SuggestedFix.Builder fixBuilder =
         SuggestedFix.builder().delete(annotationMetadata.getAnnotationTree());
     if (!annotationMetadata.getAttributes().containsKey("dataProvider")) {
-      fixBuilder.prefixWith(methodTree, "@org.junit.jupiter.api.Test\n");
+      fixBuilder.prefixWith(methodTree, "@org.junit.jupiter.api.Test\n    ");
     }
 
     return fixBuilder.build();
