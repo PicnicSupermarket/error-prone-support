@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
 
 import com.google.common.collect.BoundType;
@@ -14,7 +15,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Objects.class, Optional.class, not(null));
+    return ImmutableSet.of(Objects.class, Optional.class, isEqual(null), not(null));
   }
 
   ImmutableSet<Boolean> testPrimitiveOrReferenceEquality() {
@@ -31,6 +32,10 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     // XXX: When boxing is involved this rule seems to break. Example:
     // Stream.of(1).anyMatch(e -> Integer.MIN_VALUE.equals(e));
     return Stream.of("foo").anyMatch(s -> "bar".equals(s));
+  }
+
+  boolean testPredicateIsEqualEnums() {
+    return Stream.of(RoundingMode.UP).anyMatch(isEqual(RoundingMode.DOWN));
   }
 
   boolean testDoubleNegation() {

@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -40,6 +41,21 @@ final class EqualityRules {
     @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
     boolean after(T a, T b) {
       return a == b;
+    }
+  }
+
+  /**
+   * Prefer reference-based equality for enums over {@link Predicate#isEqual(Object)} comparison.
+   */
+  static final class PredicateIsEqualEnums<T extends Enum<T>> {
+    @BeforeTemplate
+    Predicate<T> before(T a) {
+      return isEqual(a);
+    }
+
+    @AfterTemplate
+    Predicate<T> after(T a) {
+      return v -> v == a;
     }
   }
 
