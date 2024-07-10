@@ -44,13 +44,11 @@ final class EqualityRules {
     }
   }
 
-  /**
-   * Prefer reference-based equality for enums over {@link Predicate#isEqual(Object)} comparison.
-   */
-  static final class PredicateIsEqualEnums<T extends Enum<T>> {
+  /** Prefer reference-based equality for enums over more contrived equality checks. */
+  static final class EnumsReferenceEqualityLambda<T extends Enum<T>> {
     @BeforeTemplate
     Predicate<T> before(T a) {
-      return isEqual(a);
+      return Refaster.anyOf(isEqual(a), a::equals);
     }
 
     @AfterTemplate

@@ -34,8 +34,11 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of("foo").anyMatch("bar"::equals);
   }
 
-  boolean testPredicateIsEqualEnums() {
-    return Stream.of(RoundingMode.UP).anyMatch(v -> v == RoundingMode.DOWN);
+  ImmutableSet<Boolean> testEnumsReferenceEqualityLambda() {
+
+    return ImmutableSet.of(
+        Stream.of(RoundingMode.UP).anyMatch(v -> v == RoundingMode.DOWN),
+        Stream.of(RoundingMode.UP).anyMatch(v -> v == RoundingMode.DOWN));
   }
 
   boolean testDoubleNegation() {
