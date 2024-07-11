@@ -35,7 +35,6 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Boolean> testEnumsReferenceEqualityLambda() {
-
     return ImmutableSet.of(
         Stream.of(RoundingMode.UP).anyMatch(isEqual(RoundingMode.DOWN)),
         Stream.of(RoundingMode.UP).anyMatch(RoundingMode.DOWN::equals));

@@ -20,7 +20,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class EqualityRules {
   private EqualityRules() {}
 
-  /** Prefer reference-based quality for enums. */
+  /** Prefer reference-based equality for enums. */
   // Primitive value comparisons are not listed, because Error Prone flags those out of the box.
   static final class PrimitiveOrReferenceEquality<T extends Enum<T>> {
     /**
