@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -1902,6 +1903,35 @@ final class ReactorRules {
     @AfterTemplate
     Duration after(StepVerifier.LastStep step, Duration duration) {
       return step.verifyTimeout(duration);
+    }
+  }
+
+  /** Prefer {@link Mono#fromFuture(Supplier)} over {@link Mono#fromFuture(CompletableFuture)}. */
+  static final class MonoFromFuture<T> {
+    @BeforeTemplate
+    Mono<T> before(CompletableFuture<T> future) {
+      return Mono.fromFuture(future);
+    }
+
+    @AfterTemplate
+    Mono<T> after(CompletableFuture<T> future) {
+      return Mono.fromFuture(() -> future);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#fromFuture(Supplier, boolean)} over {@link
+   * Mono#fromFuture(CompletableFuture, boolean)}.
+   */
+  static final class MonoFromFutureSuppressCancel<T> {
+    @BeforeTemplate
+    Mono<T> before(CompletableFuture<T> future, boolean suppressCancel) {
+      return Mono.fromFuture(future, suppressCancel);
+    }
+
+    @AfterTemplate
+    Mono<T> after(CompletableFuture<T> future, boolean suppressCancel) {
+      return Mono.fromFuture(() -> future, suppressCancel);
     }
   }
 }
