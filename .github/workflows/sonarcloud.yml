@@ -25,6 +25,7 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
+            api.sonarcloud.io:443
             ea6ne4j2sb.execute-api.eu-central-1.amazonaws.com:443
             github.com:443
             objects.githubusercontent.com:443
