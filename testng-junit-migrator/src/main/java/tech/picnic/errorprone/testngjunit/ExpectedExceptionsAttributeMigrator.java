@@ -8,6 +8,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
@@ -25,31 +27,61 @@ final class ExpectedExceptionsAttributeMigrator implements AttributeMigrator {
       AnnotationMetadata annotation,
       MethodTree methodTree,
       VisitorState state) {
-    return Optional.ofNullable(annotation.getAttributes().get("expectedExceptions"))
-        .map(
-            expectedExceptions ->
-                getExpectedException(expectedExceptions, state)
-                    .map(
-                        expectedException -> {
-                          SuggestedFix.Builder fix =
-                              SuggestedFix.builder()
-                                  .replace(
-                                      methodTree.getBody(),
-                                      buildWrappedBody(
-                                          methodTree.getBody(), expectedException, state));
-                          ImmutableList<String> removedExceptions =
-                              getRemovedExceptions(expectedExceptions, state);
-                          if (!removedExceptions.isEmpty()) {
-                            fix.prefixWith(
-                                methodTree,
-                                String.format(
-                                    "// XXX: Removed handling of `%s` because this migration doesn't support%n// XXX: multiple expected exceptions.%n",
-                                    String.join(", ", removedExceptions)));
-                          }
 
-                          return fix.build();
-                        })
-                    .orElseGet(SuggestedFix::emptyFix));
+    // XXX: New more conservative way:
+    String methodName = methodTree.getName().toString();
+
+    AnnotationTree testAnnotation =
+        ASTHelpers.getAnnotationWithSimpleName(ASTHelpers.getAnnotations(methodTree), "Test");
+    SuggestedFix.Builder fix = SuggestedFix.builder().delete(testAnnotation);
+
+    Optional<String> exception =
+        Optional.ofNullable(annotation.getAttributes().get("expectedExceptions"))
+            .flatMap(expectedExceptions -> getExpectedException(expectedExceptions, state));
+    if (exception.isEmpty()) {
+      return Optional.empty();
+    }
+
+    String newMethod =
+        """
+            @Test
+            void test%s() {
+              assertThrows(%s, () -> %s());
+            }
+        """
+            .formatted(
+                Character.toLowerCase(methodName.charAt(0)) + methodName.substring(1),
+                exception.orElseThrow(),
+                methodName);
+    fix.prefixWith(methodTree, newMethod)
+        .addImport("org.junit.jupiter.api.Assertions.assertThrows");
+    return Optional.of(fix.build());
+
+    /* return Optional.ofNullable(annotation.getAttributes().get("expectedExceptions"))
+    .map(
+        expectedExceptions ->
+            getExpectedException(expectedExceptions, state)
+                .map(
+                    expectedException -> {
+                      SuggestedFix.Builder fix =
+                          SuggestedFix.builder()
+                              .replace(
+                                  methodTree.getBody(),
+                                  buildWrappedBody(
+                                      methodTree.getBody(), expectedException, state));
+                      ImmutableList<String> removedExceptions =
+                          getRemovedExceptions(expectedExceptions, state);
+                      if (!removedExceptions.isEmpty()) {
+                        fix.prefixWith(
+                            methodTree,
+                            String.format(
+                                "// XXX: Removed handling of `%s` because this migration doesn't support%n// XXX: multiple expected exceptions.%n",
+                                String.join(", ", removedExceptions)));
+                      }
+
+                      return fix.build();
+                    })
+                .orElseGet(SuggestedFix::emptyFix));*/
   }
 
   private static Optional<String> getExpectedException(

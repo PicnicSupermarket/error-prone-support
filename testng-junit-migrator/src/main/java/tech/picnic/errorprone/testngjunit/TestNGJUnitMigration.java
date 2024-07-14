@@ -15,6 +15,8 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.MethodTree;
@@ -56,8 +58,11 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   private static final long serialVersionUID = 1L;
   private static final String CONSERVATIVE_MIGRATION_MODE_FLAG =
       "TestNGJUnitMigration:ConservativeMode";
+  private static final String BEHAVIOR_PRESERVING_MODE_FLAG =
+      "TestNGJUnitMigration:BehaviorPreserving";
 
   private final boolean conservativeMode;
+  private final boolean strictBehaviorPreserving;
 
   /**
    * Instantiates a new {@link TestNGJUnitMigration} instance. This will default to the aggressive
@@ -75,6 +80,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   @Inject
   TestNGJUnitMigration(ErrorProneFlags flags) {
     conservativeMode = flags.getBoolean(CONSERVATIVE_MIGRATION_MODE_FLAG).orElse(false);
+    strictBehaviorPreserving = flags.getBoolean(BEHAVIOR_PRESERVING_MODE_FLAG).orElse(false);
   }
 
   @Override
@@ -91,14 +97,23 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
         }
 
         for (DataProviderMetadata dataProviderMetadata : metadata.getDataProvidersInUse()) {
-          DataProviderMigrator.createFix(
-                  metadata.getClassTree(), dataProviderMetadata.getMethodTree(), state)
-              .ifPresent(
-                  fix ->
-                      state.reportMatch(
-                          describeMatch(
-                              dataProviderMetadata.getMethodTree(),
-                              fix.toBuilder().removeStaticImport("org.testng.Assert.*").build())));
+          // XXX: Make this configurable.
+          MethodTree methodTree = dataProviderMetadata.getMethodTree();
+          AnnotationTree dpAnnotation =
+              ASTHelpers.getAnnotationWithSimpleName(
+                  ASTHelpers.getAnnotations(methodTree), "DataProvider");
+          if (dpAnnotation != null) {
+            state.reportMatch(describeMatch(dpAnnotation, SuggestedFix.delete(dpAnnotation)));
+          }
+          //          DataProviderMigrator.createFix(
+          //                  metadata.getClassTree(), dataProviderMetadata.getMethodTree(), state)
+          //              .ifPresent(
+          //                  fix ->
+          //                      state.reportMatch(
+          //                          describeMatch(
+          //                              dataProviderMetadata.getMethodTree(),
+          //
+          // fix.toBuilder().removeStaticImport("org.testng.Assert.*").build())));
         }
 
         for (Entry<MethodTree, SetupTeardownType> entry : metadata.getSetupTeardown().entrySet()) {
@@ -190,7 +205,8 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       AnnotationMetadata annotationMetadata, MethodTree methodTree) {
     SuggestedFix.Builder fixBuilder =
         SuggestedFix.builder().delete(annotationMetadata.getAnnotationTree());
-    if (!annotationMetadata.getAttributes().containsKey("dataProvider")) {
+    if (!annotationMetadata.getAttributes().containsKey("dataProvider")
+        && !annotationMetadata.getAttributes().containsKey("expectedExceptions")) {
       fixBuilder.prefixWith(methodTree, "@org.junit.jupiter.api.Test\n    ");
     }
 
