@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
 
 import com.google.common.collect.BoundType;
@@ -14,10 +15,10 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Objects.class, Optional.class, not(null));
+    return ImmutableSet.of(Objects.class, Optional.class, isEqual(null), not(null));
   }
 
-  ImmutableSet<Boolean> testPrimitiveOrReferenceEquality() {
+  ImmutableSet<Boolean> testEnumReferenceEquality() {
     return ImmutableSet.of(
         RoundingMode.UP.equals(RoundingMode.DOWN),
         Objects.equals(RoundingMode.UP, RoundingMode.DOWN),
@@ -25,6 +26,10 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
         !RoundingMode.UP.equals(RoundingMode.DOWN),
         !Objects.equals(RoundingMode.UP, RoundingMode.DOWN),
         RoundingMode.UP.ordinal() != RoundingMode.DOWN.ordinal());
+  }
+
+  ImmutableSet<Predicate<RoundingMode>> testEnumReferenceEqualityLambda() {
+    return ImmutableSet.of(isEqual(RoundingMode.DOWN), RoundingMode.UP::equals);
   }
 
   boolean testEqualsPredicate() {

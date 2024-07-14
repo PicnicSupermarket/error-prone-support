@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -19,9 +20,9 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class EqualityRules {
   private EqualityRules() {}
 
-  /** Prefer reference-based quality for enums. */
-  // Primitive value comparisons are not listed, because Error Prone flags those out of the box.
-  static final class PrimitiveOrReferenceEquality<T extends Enum<T>> {
+  /** Prefer reference-based equality for enums. */
+  // Primitive value comparisons are not matched, because Error Prone flags those out of the box.
+  static final class EnumReferenceEquality<T extends Enum<T>> {
     /**
      * Enums can be compared by reference. It is safe to do so even in the face of refactorings,
      * because if the type is ever converted to a non-enum, then Error-Prone will complain about any
@@ -40,6 +41,19 @@ final class EqualityRules {
     @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
     boolean after(T a, T b) {
       return a == b;
+    }
+  }
+
+  /** Prefer reference-based equality for enums. */
+  static final class EnumReferenceEqualityLambda<T extends Enum<T>> {
+    @BeforeTemplate
+    Predicate<T> before(T e) {
+      return Refaster.anyOf(isEqual(e), e::equals);
+    }
+
+    @AfterTemplate
+    Predicate<T> after(T e) {
+      return v -> v == e;
     }
   }
 
