@@ -18,7 +18,7 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Objects.class, Optional.class, isEqual(null), not(null));
   }
 
-  ImmutableSet<Boolean> testPrimitiveOrReferenceEquality() {
+  ImmutableSet<Boolean> testEnumReferenceEquality() {
     return ImmutableSet.of(
         RoundingMode.UP == RoundingMode.DOWN,
         RoundingMode.UP == RoundingMode.DOWN,
@@ -28,16 +28,14 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
         RoundingMode.UP != RoundingMode.DOWN);
   }
 
+  ImmutableSet<Predicate<RoundingMode>> testEnumReferenceEqualityLambda() {
+    return ImmutableSet.of(v -> v == RoundingMode.DOWN, v -> v == RoundingMode.UP);
+  }
+
   boolean testEqualsPredicate() {
     // XXX: When boxing is involved this rule seems to break. Example:
     // Stream.of(1).anyMatch(e -> Integer.MIN_VALUE.equals(e));
     return Stream.of("foo").anyMatch("bar"::equals);
-  }
-
-  ImmutableSet<Boolean> testEnumsReferenceEqualityLambda() {
-    return ImmutableSet.of(
-        Stream.of(RoundingMode.UP).anyMatch(v -> v == RoundingMode.DOWN),
-        Stream.of(RoundingMode.UP).anyMatch(v -> v == RoundingMode.DOWN));
   }
 
   boolean testDoubleNegation() {

@@ -21,8 +21,8 @@ final class EqualityRules {
   private EqualityRules() {}
 
   /** Prefer reference-based equality for enums. */
-  // Primitive value comparisons are not listed, because Error Prone flags those out of the box.
-  static final class PrimitiveOrReferenceEquality<T extends Enum<T>> {
+  // Primitive value comparisons are not matched, because Error Prone flags those out of the box.
+  static final class EnumReferenceEquality<T extends Enum<T>> {
     /**
      * Enums can be compared by reference. It is safe to do so even in the face of refactorings,
      * because if the type is ever converted to a non-enum, then Error-Prone will complain about any
@@ -44,16 +44,16 @@ final class EqualityRules {
     }
   }
 
-  /** Prefer reference-based equality for enums over more contrived equality checks. */
-  static final class EnumsReferenceEqualityLambda<T extends Enum<T>> {
+  /** Prefer reference-based equality for enums. */
+  static final class EnumReferenceEqualityLambda<T extends Enum<T>> {
     @BeforeTemplate
-    Predicate<T> before(T a) {
-      return Refaster.anyOf(isEqual(a), a::equals);
+    Predicate<T> before(T e) {
+      return Refaster.anyOf(isEqual(e), e::equals);
     }
 
     @AfterTemplate
-    Predicate<T> after(T a) {
-      return v -> v == a;
+    Predicate<T> after(T e) {
+      return v -> v == e;
     }
   }
 
