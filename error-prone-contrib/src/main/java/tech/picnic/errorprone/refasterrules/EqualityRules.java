@@ -52,6 +52,7 @@ final class EqualityRules {
     }
 
     @AfterTemplate
+    @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
     Predicate<T> after(T e) {
       return v -> v == e;
     }
