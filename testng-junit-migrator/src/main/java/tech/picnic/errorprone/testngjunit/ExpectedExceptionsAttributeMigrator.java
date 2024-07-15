@@ -50,7 +50,7 @@ final class ExpectedExceptionsAttributeMigrator implements AttributeMigrator {
             }
         """
             .formatted(
-                Character.toLowerCase(methodName.charAt(0)) + methodName.substring(1),
+                Character.toUpperCase(methodName.charAt(0)) + methodName.substring(1),
                 exception.orElseThrow(),
                 methodName);
     fix.prefixWith(methodTree, newMethod)
