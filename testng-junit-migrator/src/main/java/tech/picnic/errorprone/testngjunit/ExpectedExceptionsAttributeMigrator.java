@@ -54,7 +54,7 @@ final class ExpectedExceptionsAttributeMigrator implements AttributeMigrator {
                 exception.orElseThrow(),
                 methodName);
     fix.prefixWith(methodTree, newMethod)
-        .addImport("org.junit.jupiter.api.Assertions.assertThrows");
+        .addStaticImport("org.junit.jupiter.api.Assertions.assertThrows");
     return Optional.of(fix.build());
 
     /* return Optional.ofNullable(annotation.getAttributes().get("expectedExceptions"))

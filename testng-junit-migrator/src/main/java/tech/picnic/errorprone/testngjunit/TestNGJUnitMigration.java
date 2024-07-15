@@ -21,6 +21,7 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.util.TreeScanner;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -96,24 +97,35 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
           return super.visitClass(node, testNgMetadata);
         }
 
+        // XXX: Why is this not fixed anymore?
+        List<? extends AnnotationTree> annotationTrees = ASTHelpers.getAnnotations(node);
+        if (!annotationTrees.isEmpty()) {
+          AnnotationTree classLevelTestAnnotation = annotationTrees.get(0);
+          state.reportMatch(
+              describeMatch(
+                  classLevelTestAnnotation, SuggestedFix.delete(classLevelTestAnnotation)));
+        }
+
         for (DataProviderMetadata dataProviderMetadata : metadata.getDataProvidersInUse()) {
-          // XXX: Make this configurable.
-          MethodTree methodTree = dataProviderMetadata.getMethodTree();
-          AnnotationTree dpAnnotation =
-              ASTHelpers.getAnnotationWithSimpleName(
-                  ASTHelpers.getAnnotations(methodTree), "DataProvider");
-          if (dpAnnotation != null) {
-            state.reportMatch(describeMatch(dpAnnotation, SuggestedFix.delete(dpAnnotation)));
+          if (strictBehaviorPreserving) {
+            MethodTree methodTree = dataProviderMetadata.getMethodTree();
+            AnnotationTree dpAnnotation =
+                ASTHelpers.getAnnotationWithSimpleName(
+                    ASTHelpers.getAnnotations(methodTree), "DataProvider");
+            if (dpAnnotation != null) {
+              state.reportMatch(describeMatch(dpAnnotation, SuggestedFix.delete(dpAnnotation)));
+            }
+            continue;
           }
-          //          DataProviderMigrator.createFix(
-          //                  metadata.getClassTree(), dataProviderMetadata.getMethodTree(), state)
-          //              .ifPresent(
-          //                  fix ->
-          //                      state.reportMatch(
-          //                          describeMatch(
-          //                              dataProviderMetadata.getMethodTree(),
-          //
-          // fix.toBuilder().removeStaticImport("org.testng.Assert.*").build())));
+
+          DataProviderMigrator.createFix(
+                  metadata.getClassTree(), dataProviderMetadata.getMethodTree(), state)
+              .ifPresent(
+                  fix ->
+                      state.reportMatch(
+                          describeMatch(
+                              dataProviderMetadata.getMethodTree(),
+                              fix.toBuilder().removeStaticImport("org.testng.Assert.*").build())));
         }
 
         for (Entry<MethodTree, SetupTeardownType> entry : metadata.getSetupTeardown().entrySet()) {
