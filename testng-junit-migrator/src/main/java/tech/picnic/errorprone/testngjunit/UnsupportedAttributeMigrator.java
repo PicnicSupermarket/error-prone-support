@@ -26,7 +26,7 @@ final class UnsupportedAttributeMigrator {
                 SuggestedFix.prefixWith(
                     methodTree,
                     String.format(
-                        "// XXX: Attribute `%s` is not supported, value: `%s`%n",
+                        "// XXX: Attribute `%s` is not supported, value: `%s`",
                         attributeName, SourceCode.treeToString(value, state))));
   }
 }
