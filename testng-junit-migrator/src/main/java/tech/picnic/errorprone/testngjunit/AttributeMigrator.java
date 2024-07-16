@@ -17,6 +17,8 @@ interface AttributeMigrator {
    * Attempts to create a {@link SuggestedFix}.
    *
    * @param methodTree The method tree the annotation is on.
+   * @param minimalChangesMode Whether the migration should introduce the minimal changes required
+   *     to migrate.
    * @param state The visitor state.
    * @return an {@link Optional} containing the created fix. This returns an {@link
    *     Optional#empty()} if the {@link AttributeMigrator} is not able to migrate the attribute.
@@ -25,5 +27,6 @@ interface AttributeMigrator {
       TestNgMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
+      boolean minimalChangesMode,
       VisitorState state);
 }

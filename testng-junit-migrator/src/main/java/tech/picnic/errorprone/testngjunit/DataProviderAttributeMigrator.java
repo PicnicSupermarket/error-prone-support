@@ -20,6 +20,7 @@ final class DataProviderAttributeMigrator implements AttributeMigrator {
       TestNgMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
+      boolean minimalChangesMode,
       VisitorState state) {
     ExpressionTree dataProviderNameExpressionTree = annotation.getAttributes().get("dataProvider");
     if (dataProviderNameExpressionTree == null) {

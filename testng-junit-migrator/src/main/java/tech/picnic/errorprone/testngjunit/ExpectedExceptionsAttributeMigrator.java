@@ -26,62 +26,63 @@ final class ExpectedExceptionsAttributeMigrator implements AttributeMigrator {
       TestNgMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
+      boolean minimalChangesMode,
       VisitorState state) {
+    if (minimalChangesMode) {
+      String methodName = methodTree.getName().toString();
 
-    // XXX: New more conservative way:
-    String methodName = methodTree.getName().toString();
+      AnnotationTree testAnnotation =
+          ASTHelpers.getAnnotationWithSimpleName(ASTHelpers.getAnnotations(methodTree), "Test");
+      SuggestedFix.Builder fix = SuggestedFix.builder().delete(testAnnotation);
 
-    AnnotationTree testAnnotation =
-        ASTHelpers.getAnnotationWithSimpleName(ASTHelpers.getAnnotations(methodTree), "Test");
-    SuggestedFix.Builder fix = SuggestedFix.builder().delete(testAnnotation);
+      Optional<String> exception =
+          Optional.ofNullable(annotation.getAttributes().get("expectedExceptions"))
+              .flatMap(expectedExceptions -> getExpectedException(expectedExceptions, state));
+      if (exception.isEmpty()) {
+        return Optional.empty();
+      }
 
-    Optional<String> exception =
-        Optional.ofNullable(annotation.getAttributes().get("expectedExceptions"))
-            .flatMap(expectedExceptions -> getExpectedException(expectedExceptions, state));
-    if (exception.isEmpty()) {
-      return Optional.empty();
-    }
-
-    String newMethod =
-        """
-            @Test
+      String newMethod =
+          """
+        @org.junit.jupiter.api.Test
             void test%s() {
               assertThrows(%s, () -> %s());
             }
         """
-            .formatted(
-                Character.toUpperCase(methodName.charAt(0)) + methodName.substring(1),
-                exception.orElseThrow(),
-                methodName);
-    fix.prefixWith(methodTree, newMethod)
-        .addStaticImport("org.junit.jupiter.api.Assertions.assertThrows");
-    return Optional.of(fix.build());
+              .formatted(
+                  Character.toUpperCase(methodName.charAt(0)) + methodName.substring(1),
+                  exception.orElseThrow(),
+                  methodName);
+      fix.prefixWith(methodTree, newMethod)
+          .addStaticImport("org.junit.jupiter.api.Assertions.assertThrows");
+      return Optional.of(fix.build());
+    }
 
-    /* return Optional.ofNullable(annotation.getAttributes().get("expectedExceptions"))
-    .map(
-        expectedExceptions ->
-            getExpectedException(expectedExceptions, state)
-                .map(
-                    expectedException -> {
-                      SuggestedFix.Builder fix =
-                          SuggestedFix.builder()
-                              .replace(
-                                  methodTree.getBody(),
-                                  buildWrappedBody(
-                                      methodTree.getBody(), expectedException, state));
-                      ImmutableList<String> removedExceptions =
-                          getRemovedExceptions(expectedExceptions, state);
-                      if (!removedExceptions.isEmpty()) {
-                        fix.prefixWith(
-                            methodTree,
-                            String.format(
-                                "// XXX: Removed handling of `%s` because this migration doesn't support%n// XXX: multiple expected exceptions.%n",
-                                String.join(", ", removedExceptions)));
-                      }
+    return Optional.ofNullable(annotation.getAttributes().get("expectedExceptions"))
+        .map(
+            expectedExceptions ->
+                getExpectedException(expectedExceptions, state)
+                    .map(
+                        expectedException -> {
+                          SuggestedFix.Builder fix =
+                              SuggestedFix.builder()
+                                  .replace(
+                                      methodTree.getBody(),
+                                      buildWrappedBody(
+                                          methodTree.getBody(), expectedException, state));
+                          ImmutableList<String> removedExceptions =
+                              getRemovedExceptions(expectedExceptions, state);
+                          if (!removedExceptions.isEmpty()) {
+                            fix.prefixWith(
+                                methodTree,
+                                String.format(
+                                    "// XXX: Removed handling of `%s` because this migration doesn't support%n// XXX: multiple expected exceptions.%n",
+                                    String.join(", ", removedExceptions)));
+                          }
 
-                      return fix.build();
-                    })
-                .orElseGet(SuggestedFix::emptyFix));*/
+                          return fix.build();
+                        })
+                    .orElseGet(SuggestedFix::emptyFix));
   }
 
   private static Optional<String> getExpectedException(

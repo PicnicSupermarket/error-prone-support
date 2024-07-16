@@ -19,6 +19,7 @@ final class PriorityAttributeMigrator implements AttributeMigrator {
       TestNgMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
+      boolean minimalChangesMode,
       VisitorState state) {
     return Optional.ofNullable(annotation.getAttributes().get("priority"))
         .map(
