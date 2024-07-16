@@ -21,6 +21,7 @@ final class TimeOutAttributeMigrator implements AttributeMigrator {
       TestNgMetadata metadata,
       TestNgMetadata.AnnotationMetadata annotation,
       MethodTree methodTree,
+      boolean minimalChangesMode,
       VisitorState state) {
     return Optional.ofNullable(annotation.getAttributes().get("timeOut"))
         .map(

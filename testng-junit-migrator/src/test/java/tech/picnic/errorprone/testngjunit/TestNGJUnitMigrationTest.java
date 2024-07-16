@@ -406,7 +406,7 @@ final class TestNGJUnitMigrationTest {
   @Test
   void replacementMoreBehaviorPreserving() {
     BugCheckerRefactoringTestHelper.newInstance(TestNGJUnitMigration.class, getClass())
-        .setArgs("-XepOpt:TestNGJUnitMigration:BehaviorPreserving=true")
+        .setArgs("-XepOpt:TestNGJUnitMigration:MinimalChanges=true")
         .addInputLines(
             "A.java",
             "import org.testng.annotations.DataProvider;",
@@ -489,6 +489,7 @@ final class TestNGJUnitMigrationTest {
             "",
             "  // XXX: Attribute `dataProvider` is not supported, value:",
             "  // `\"dataProviderFieldReturnValueTestCases\"`",
+            "",
             "  public void dataProviderFieldReturnValue(int foo, int bar) {}",
             "",
             "  @DataProvider",
@@ -507,7 +508,7 @@ final class TestNGJUnitMigrationTest {
             "    };",
             "  }",
             "",
-            "  @Test",
+            "  @org.junit.jupiter.api.Test",
             "  void testSingleExpectedException() {",
             "    assertThrows(RuntimeException.class, () -> singleExpectedException());",
             "  }",
@@ -516,7 +517,7 @@ final class TestNGJUnitMigrationTest {
             "    throw new RuntimeException(\"foo\");",
             "  }",
             "",
-            "  @Test",
+            "  @org.junit.jupiter.api.Test",
             "  void testSingleExpectedExceptionArray() {",
             "    assertThrows(RuntimeException.class, () -> singleExpectedExceptionArray());",
             "  }",
@@ -526,9 +527,10 @@ final class TestNGJUnitMigrationTest {
             "  }",
             "",
             "  // XXX: Attribute `expectedExceptions` is not supported, value: `{}`",
+            "",
             "  public void emptyExpectedExceptions() {}",
             "",
-            "  @Test",
+            "  @org.junit.jupiter.api.Test",
             "  void testMultipleExpectedExceptions() {",
             "    assertThrows(IllegalArgumentException.class, () -> multipleExpectedExceptions());",
             "  }",

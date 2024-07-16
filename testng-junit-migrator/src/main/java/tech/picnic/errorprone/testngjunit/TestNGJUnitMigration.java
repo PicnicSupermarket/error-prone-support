@@ -59,8 +59,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   private static final long serialVersionUID = 1L;
   private static final String CONSERVATIVE_MIGRATION_MODE_FLAG =
       "TestNGJUnitMigration:ConservativeMode";
-  private static final String BEHAVIOR_PRESERVING_MODE_FLAG =
-      "TestNGJUnitMigration:BehaviorPreserving";
+  private static final String MINIMAL_CHANGES_MODE_FLAG = "TestNGJUnitMigration:MinimalChanges";
 
   private final boolean conservativeMode;
   private final boolean strictBehaviorPreserving;
@@ -81,7 +80,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   @Inject
   TestNGJUnitMigration(ErrorProneFlags flags) {
     conservativeMode = flags.getBoolean(CONSERVATIVE_MIGRATION_MODE_FLAG).orElse(false);
-    strictBehaviorPreserving = flags.getBoolean(BEHAVIOR_PRESERVING_MODE_FLAG).orElse(false);
+    strictBehaviorPreserving = flags.getBoolean(MINIMAL_CHANGES_MODE_FLAG).orElse(false);
   }
 
   @Override
@@ -98,12 +97,14 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
         }
 
         // XXX: Why is this not fixed anymore?
-        List<? extends AnnotationTree> annotationTrees = ASTHelpers.getAnnotations(node);
-        if (!annotationTrees.isEmpty()) {
-          AnnotationTree classLevelTestAnnotation = annotationTrees.get(0);
-          state.reportMatch(
-              describeMatch(
-                  classLevelTestAnnotation, SuggestedFix.delete(classLevelTestAnnotation)));
+        if (strictBehaviorPreserving) {
+          List<? extends AnnotationTree> annotationTrees = ASTHelpers.getAnnotations(node);
+          if (!annotationTrees.isEmpty()) {
+            AnnotationTree classLevelTestAnnotation = annotationTrees.get(0);
+            state.reportMatch(
+                describeMatch(
+                    classLevelTestAnnotation, SuggestedFix.delete(classLevelTestAnnotation)));
+          }
         }
 
         for (DataProviderMetadata dataProviderMetadata : metadata.getDataProvidersInUse()) {
@@ -162,7 +163,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
     return Description.NO_MATCH;
   }
 
-  private static ImmutableList<SuggestedFix> buildAttributeFixes(
+  private ImmutableList<SuggestedFix> buildAttributeFixes(
       TestNgMetadata metadata,
       AnnotationMetadata annotationMetadata,
       MethodTree methodTree,
@@ -175,7 +176,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
         .collect(toImmutableList());
   }
 
-  private static boolean canMigrateTest(
+  private boolean canMigrateTest(
       MethodTree methodTree,
       TestNgMetadata metadata,
       AnnotationMetadata annotationMetadata,
@@ -190,16 +191,21 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
             .allMatch(
                 kind ->
                     kind.getAttributeMigrator()
-                        .migrate(metadata, annotationMetadata, methodTree, state)
+                        .migrate(
+                            metadata,
+                            annotationMetadata,
+                            methodTree,
+                            strictBehaviorPreserving,
+                            state)
                         .isPresent());
   }
 
-  private static boolean canMigrateAllTestsInClass(TestNgMetadata metadata, VisitorState state) {
+  private boolean canMigrateAllTestsInClass(TestNgMetadata metadata, VisitorState state) {
     return metadata.getMethodAnnotations().entrySet().stream()
         .allMatch(entry -> canMigrateTest(entry.getKey(), metadata, entry.getValue(), state));
   }
 
-  private static Optional<SuggestedFix> trySuggestFix(
+  private Optional<SuggestedFix> trySuggestFix(
       TestNgMetadata metadata,
       AnnotationMetadata annotation,
       String attributeName,
@@ -207,18 +213,24 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
       VisitorState state) {
     return TestAnnotationAttribute.fromString(attributeName)
         .map(TestAnnotationAttribute::getAttributeMigrator)
-        .flatMap(migrator -> migrator.migrate(metadata, annotation, methodTree, state))
+        .flatMap(
+            migrator ->
+                migrator.migrate(metadata, annotation, methodTree, strictBehaviorPreserving, state))
         .or(
             () ->
                 UnsupportedAttributeMigrator.migrate(annotation, methodTree, attributeName, state));
   }
 
-  private static SuggestedFix migrateAnnotation(
+  private SuggestedFix migrateAnnotation(
       AnnotationMetadata annotationMetadata, MethodTree methodTree) {
     SuggestedFix.Builder fixBuilder =
         SuggestedFix.builder().delete(annotationMetadata.getAnnotationTree());
-    if (!annotationMetadata.getAttributes().containsKey("dataProvider")
-        && !annotationMetadata.getAttributes().containsKey("expectedExceptions")) {
+
+    boolean hasDataProviderAttr = annotationMetadata.getAttributes().containsKey("dataProvider");
+    boolean hasExpectedExceptionsAttr =
+        annotationMetadata.getAttributes().containsKey("expectedExceptions");
+
+    if (!hasDataProviderAttr && (!strictBehaviorPreserving || !hasExpectedExceptionsAttr)) {
       fixBuilder.prefixWith(methodTree, "@org.junit.jupiter.api.Test\n    ");
     }
 

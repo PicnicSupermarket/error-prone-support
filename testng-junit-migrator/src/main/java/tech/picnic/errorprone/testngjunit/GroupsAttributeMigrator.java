@@ -22,6 +22,7 @@ final class GroupsAttributeMigrator implements AttributeMigrator {
       TestNgMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
+      boolean minimalChangesMode,
       VisitorState state) {
     ExpressionTree groupsExpression = annotation.getAttributes().get("groups");
     if (groupsExpression == null) {

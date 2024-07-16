@@ -16,6 +16,7 @@ final class EnabledAttributeMigrator implements AttributeMigrator {
       TestNgMetadata metadata,
       AnnotationMetadata annotation,
       MethodTree methodTree,
+      boolean minimalChangesMode,
       VisitorState state) {
     return Optional.ofNullable(annotation.getAttributes().get("enabled"))
         .map(enabled -> ((LiteralTree) enabled).getValue())
