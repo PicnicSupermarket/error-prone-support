@@ -35,11 +35,12 @@ final class DataProviderMigrator {
   /**
    * Tells whether the specified {@code DataProvider} can be migrated.
    *
-   * @param methodTree The dataprovider methode tree.
+   * @param methodTree The dataprovider method tree.
    * @return {@code true} if the data provider can be migrated or else {@code false}.
    */
   static boolean canFix(MethodTree methodTree) {
-    return getDataProviderReturnTree(getReturnTree(methodTree)).isPresent();
+    // XXX: Make it configurable that we can migrate in `minimalChanges` mode.
+    return true; // getDataProviderReturnTree(getReturnTree(methodTree)).isPresent();
   }
 
   /**
