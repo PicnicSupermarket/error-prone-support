@@ -37,7 +37,7 @@ final class DataProviderAttributeMigrator implements AttributeMigrator {
             .addImport("org.junit.jupiter.params.ParameterizedTest")
             .addImport("org.junit.jupiter.params.provider.MethodSource")
             .prefixWith(methodTree, "@ParameterizedTest\n")
-            .prefixWith(methodTree, String.format("@MethodSource(\"%s\")%n", dataProviderName))
+            .prefixWith(methodTree, String.format("    @MethodSource(\"%s\")", dataProviderName))
             .build());
   }
 }

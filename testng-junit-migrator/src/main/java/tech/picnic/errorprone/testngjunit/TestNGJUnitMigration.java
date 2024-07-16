@@ -14,6 +14,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import javax.inject.Inject;
+import javax.lang.model.element.Modifier;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.testngjunit.TestNgMetadata.AnnotationMetadata;
 import tech.picnic.errorprone.testngjunit.TestNgMetadata.DataProviderMetadata;
@@ -80,7 +82,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
   @Inject
   TestNGJUnitMigration(ErrorProneFlags flags) {
     conservativeMode = flags.getBoolean(CONSERVATIVE_MIGRATION_MODE_FLAG).orElse(false);
-    strictBehaviorPreserving = flags.getBoolean(MINIMAL_CHANGES_MODE_FLAG).orElse(false);
+    strictBehaviorPreserving = flags.getBoolean(MINIMAL_CHANGES_MODE_FLAG).orElse(true);
   }
 
   @Override
@@ -110,11 +112,26 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
         for (DataProviderMetadata dataProviderMetadata : metadata.getDataProvidersInUse()) {
           if (strictBehaviorPreserving) {
             MethodTree methodTree = dataProviderMetadata.getMethodTree();
+
+            state.reportMatch(
+                describeMatch(
+                    methodTree,
+                    SuggestedFixes.addModifiers(methodTree, state, Modifier.STATIC).orElseThrow()));
+
             AnnotationTree dpAnnotation =
                 ASTHelpers.getAnnotationWithSimpleName(
                     ASTHelpers.getAnnotations(methodTree), "DataProvider");
             if (dpAnnotation != null) {
-              state.reportMatch(describeMatch(dpAnnotation, SuggestedFix.delete(dpAnnotation)));
+              //  state.reportMatch(describeMatch(dpAnnotation,
+              // SuggestedFix.delete(dpAnnotation)));
+              // XXX: VERY UGLY WAY TO FIX THIS THE OPENJDK empty line problem.
+              state.reportMatch(
+                  describeMatch(
+                      dpAnnotation,
+                      SuggestedFix.replace(
+                          ASTHelpers.getStartPosition(dpAnnotation) - 5,
+                          state.getEndPosition(dpAnnotation),
+                          "")));
             }
             continue;
           }
@@ -223,8 +240,14 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
 
   private SuggestedFix migrateAnnotation(
       AnnotationMetadata annotationMetadata, MethodTree methodTree) {
-    SuggestedFix.Builder fixBuilder =
-        SuggestedFix.builder().delete(annotationMetadata.getAnnotationTree());
+    SuggestedFix.Builder builder = SuggestedFix.builder();
+    if (annotationMetadata.getAttributes().isEmpty() && strictBehaviorPreserving) {
+      builder.replace(annotationMetadata.getAnnotationTree(), "@org.junit.jupiter.api.Test");
+
+      return builder.build();
+    }
+
+    SuggestedFix.Builder fixBuilder = builder.delete(annotationMetadata.getAnnotationTree());
 
     boolean hasDataProviderAttr = annotationMetadata.getAttributes().containsKey("dataProvider");
     boolean hasExpectedExceptionsAttr =
