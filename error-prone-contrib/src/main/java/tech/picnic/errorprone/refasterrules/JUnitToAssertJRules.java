@@ -327,7 +327,7 @@ final class JUnitToAssertJRules {
       return Assertions.fail(message);
     }
 
-    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)`. See `ThrowNewAssertionError` comment.
+    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)`. See `Fail` comment.
     @AfterTemplate
     T after(String message) {
       return fail(message);
@@ -340,7 +340,7 @@ final class JUnitToAssertJRules {
       return Assertions.fail(message, throwable);
     }
 
-    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)`. See `ThrowNewAssertionError` comment.
+    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)`. See `Fail` comment.
     @AfterTemplate
     T after(String message, Throwable throwable) {
       return fail(message, throwable);
@@ -353,7 +353,7 @@ final class JUnitToAssertJRules {
       return Assertions.fail(throwable);
     }
 
-    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)`. See `ThrowNewAssertionError` comment.
+    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)`. See `Fail` comment.
     @AfterTemplate
     @DoNotCall
     T after(Throwable throwable) {
