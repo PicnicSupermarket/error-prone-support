@@ -1728,6 +1728,19 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Flux#just(Object)} over more verbose alternatives. */
+  static final class MonoJustRepeatTakeOne<T> {
+    @BeforeTemplate
+    Flux<T> before(T value) {
+      return Mono.just(value).repeat().take(1);
+    }
+
+    @AfterTemplate
+    Flux<T> after(T value) {
+      return Flux.just(value);
+    }
+  }
+
   /** Prefer {@link Mono#as(Function)} when creating a {@link StepVerifier}. */
   static final class StepVerifierFromMono<T> {
     @BeforeTemplate

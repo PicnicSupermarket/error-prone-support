@@ -585,6 +585,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(PublisherProbe.of(Mono.empty()), PublisherProbe.of(Flux.empty()));
   }
 
+  Flux<Integer> testMonoJustRepeatTakeOne() {
+    return Mono.just(5).repeat().take(1);
+  }
+
   ImmutableSet<StepVerifier.FirstStep<Integer>> testStepVerifierFromMono() {
     return ImmutableSet.of(
         StepVerifier.create(Mono.just(1)), Mono.just(2).flux().as(StepVerifier::create));
