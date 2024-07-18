@@ -385,6 +385,11 @@
                 <version>6.1.0</version>
             </dependency>
             <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>1.3.2</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.inject</groupId>
                 <artifactId>javax.inject</artifactId>
                 <version>1</version>
@@ -1300,6 +1305,7 @@
                                 <!-- -->
                                 GPL-2.0-with-classpath-exception
                                 | CDDL/GPLv2+CE
+                                | CDDL + GPLv2 with classpath exception
                                 | GNU General Public License, version 2 (GPL2), with the classpath exception
                                 | GNU General Public License, version 2, with the Classpath Exception
                                 | GPL2 w/ CPE
