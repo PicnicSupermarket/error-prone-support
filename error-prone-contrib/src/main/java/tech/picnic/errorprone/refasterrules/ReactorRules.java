@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -1902,6 +1903,43 @@ final class ReactorRules {
     @AfterTemplate
     Duration after(StepVerifier.LastStep step, Duration duration) {
       return step.verifyTimeout(duration);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#fromFuture(Supplier)} over {@link Mono#fromFuture(CompletableFuture)}, as
+   * the former may defer initiation of the asynchornous computation until subscription.
+   */
+  static final class MonoFromFutureSupplier<T> {
+    // XXX: Constrain the `future` parameter using `@NotMatches(IsIdentityOperation.class)` once
+    // `IsIdentityOperation` no longer matches nullary method invocations.
+    @BeforeTemplate
+    Mono<T> before(CompletableFuture<T> future) {
+      return Mono.fromFuture(future);
+    }
+
+    @AfterTemplate
+    Mono<T> after(CompletableFuture<T> future) {
+      return Mono.fromFuture(() -> future);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#fromFuture(Supplier, boolean)} over {@link
+   * Mono#fromFuture(CompletableFuture, boolean)}, as the former may defer initiation of the
+   * asynchornous computation until subscription.
+   */
+  static final class MonoFromFutureSupplierBoolean<T> {
+    // XXX: Constrain the `future` parameter using `@NotMatches(IsIdentityOperation.class)` once
+    // `IsIdentityOperation` no longer matches nullary method invocations.
+    @BeforeTemplate
+    Mono<T> before(CompletableFuture<T> future, boolean suppressCancel) {
+      return Mono.fromFuture(future, suppressCancel);
+    }
+
+    @AfterTemplate
+    Mono<T> after(CompletableFuture<T> future, boolean suppressCancel) {
+      return Mono.fromFuture(() -> future, suppressCancel);
     }
   }
 }

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -650,5 +651,13 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Duration testStepVerifierLastStepVerifyTimeout() {
     return Mono.empty().as(StepVerifier::create).expectTimeout(Duration.ZERO).verify();
+  }
+
+  Mono<Void> testMonoFromFutureSupplier() {
+    return Mono.fromFuture(CompletableFuture.completedFuture(null));
+  }
+
+  Mono<Void> testMonoFromFutureSupplierBoolean() {
+    return Mono.fromFuture(CompletableFuture.completedFuture(null), true);
   }
 }
