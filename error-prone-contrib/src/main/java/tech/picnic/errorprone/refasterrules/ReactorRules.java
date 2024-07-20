@@ -481,15 +481,20 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#just(Object)} over more contrived alternatives. */
-  static final class FluxJust {
+  static final class FluxJust<T> {
     @BeforeTemplate
-    Flux<Integer> before(int start) {
-      return Flux.range(start, 1);
+    Flux<Integer> before(int value) {
+      return Flux.range(value, 1);
+    }
+
+    @BeforeTemplate
+    Flux<T> before(T value) {
+      return Mono.just(value).repeat().take(1);
     }
 
     @AfterTemplate
-    Flux<Integer> after(int start) {
-      return Flux.just(start);
+    Flux<T> after(T value) {
+      return Flux.just(value);
     }
   }
 
