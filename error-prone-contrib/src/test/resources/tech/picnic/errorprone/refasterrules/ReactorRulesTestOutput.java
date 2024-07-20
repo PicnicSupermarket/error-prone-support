@@ -634,11 +634,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.empty().as(StepVerifier::create).verifyTimeout(Duration.ZERO);
   }
 
-  Mono<Void> testMonoFromFuture() {
+  Mono<Void> testMonoFromFutureSupplier() {
     return Mono.fromFuture(() -> CompletableFuture.completedFuture(null));
   }
 
-  Mono<Void> testMonoFromFutureSuppressCancel() {
+  Mono<Void> testMonoFromFutureSupplierBoolean() {
     return Mono.fromFuture(() -> CompletableFuture.completedFuture(null), true);
   }
 }
