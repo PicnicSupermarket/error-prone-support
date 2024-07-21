@@ -49,6 +49,7 @@ import reactor.math.MathFlux;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -74,6 +75,22 @@ final class ReactorRules {
     @AfterTemplate
     Mono<T> after(Supplier<? extends T> supplier) {
       return Mono.fromSupplier(supplier);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#fromSupplier(Supplier)} over more contrived alternatives when working with
+   * reactor's {@link ContextView}.
+   */
+  static final class MonoDeferContextualFromSupplier<K, V> {
+    @BeforeTemplate
+    Mono<V> before(K key) {
+      return Mono.deferContextual(contextView -> contextView.getOrDefault(key, Mono.empty()));
+    }
+
+    @AfterTemplate
+    Mono<V> after(K key) {
+      return Mono.deferContextual(contextView -> Mono.fromSupplier(() -> contextView.get(key)));
     }
   }
 

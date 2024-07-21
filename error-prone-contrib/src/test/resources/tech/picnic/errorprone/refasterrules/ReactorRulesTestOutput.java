@@ -63,6 +63,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.fromSupplier(this::toString));
   }
 
+  Mono<String> testMonoDeferContextualFromSupplier() {
+    return Mono.deferContextual(contextView -> Mono.fromSupplier(() -> contextView.get("a")));
+  }
+
   ImmutableSet<Mono<String>> testMonoEmpty() {
     return ImmutableSet.of(Mono.empty(), Mono.empty());
   }
