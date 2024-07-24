@@ -41,6 +41,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -1913,7 +1914,7 @@ final class ReactorRules {
 
   /**
    * Prefer {@link Mono#fromFuture(Supplier)} over {@link Mono#fromFuture(CompletableFuture)}, as
-   * the former may defer initiation of the asynchornous computation until subscription.
+   * the former may defer initiation of the asynchronous computation until subscription.
    */
   static final class MonoFromFutureSupplier<T> {
     // XXX: Constrain the `future` parameter using `@NotMatches(IsIdentityOperation.class)` once
@@ -1945,6 +1946,22 @@ final class ReactorRules {
     @AfterTemplate
     Mono<T> after(CompletableFuture<T> future, boolean suppressCancel) {
       return Mono.fromFuture(() -> future, suppressCancel);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#fromStream(Supplier)} over {@link Flux#fromStream(Stream)}, as the former
+   * may defer initiation of the asynchronous computation until subscription.
+   */
+  static final class FluxFromStreamSupplier<T> {
+    @BeforeTemplate
+    Flux<T> before(Stream<T> stream) {
+      return Flux.fromStream(stream);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Stream<T> stream) {
+      return Flux.fromStream(() -> stream);
     }
   }
 }

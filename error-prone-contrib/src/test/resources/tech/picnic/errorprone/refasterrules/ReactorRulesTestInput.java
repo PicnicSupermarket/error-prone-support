@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.math.MathFlux;
@@ -659,5 +660,9 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Mono<Void> testMonoFromFutureSupplierBoolean() {
     return Mono.fromFuture(CompletableFuture.completedFuture(null), true);
+  }
+
+  Flux<Integer> testFluxFromStreamSupplier() {
+    return Flux.fromStream(Stream.of(1));
   }
 }

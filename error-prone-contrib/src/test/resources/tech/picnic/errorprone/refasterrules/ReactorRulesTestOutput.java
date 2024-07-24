@@ -25,6 +25,8 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.random.RandomGenerator;
+import java.util.stream.Stream;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -640,5 +642,9 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Mono<Void> testMonoFromFutureSupplierBoolean() {
     return Mono.fromFuture(() -> CompletableFuture.completedFuture(null), true);
+  }
+
+  Flux<Integer> testFluxFromStreamSupplier() {
+    return Flux.fromStream(() -> RandomGenerator.StreamableGenerator.of(1));
   }
 }
