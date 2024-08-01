@@ -70,6 +70,10 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     }
   }
 
+  Stream<Integer> testSetStream() {
+    return ImmutableSet.of(1).stream().distinct();
+  }
+
   ArrayList<String> testNewArrayListFromCollection() {
     return Lists.newArrayList(ImmutableList.of("foo"));
   }

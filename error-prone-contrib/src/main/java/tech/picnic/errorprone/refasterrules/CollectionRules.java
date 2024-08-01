@@ -184,6 +184,19 @@ final class CollectionRules {
     }
   }
 
+  /** Rely on Set's property to preserve distinct elements. */
+  static final class SetStream<T> {
+    @BeforeTemplate
+    Stream<?> before(Set<T> set) {
+      return set.stream().distinct();
+    }
+
+    @AfterTemplate
+    Stream<?> after(Set<T> set) {
+      return set.stream();
+    }
+  }
+
   /** Prefer {@link ArrayList#ArrayList(Collection)} over the Guava alternative. */
   @SuppressWarnings(
       "NonApiType" /* Matching against `List` would unnecessarily constrain the rule. */)
