@@ -981,8 +981,8 @@
                                 <compilerArgs combine.self="override">
                                     <!-- When Java 8 is targeted we can't use
                                     the `add-exports` flag. And since this goal
-                                    only compiles generated code, static
-                                    analysis also not relevant. As such we
+                                    only recompiles already-compiled code,
+                                    static analysis is irrelevant. As such we
                                     clear all compiler arguments, and only
                                     suppress source/target/bootstrap classpath
                                     warnings. -->
