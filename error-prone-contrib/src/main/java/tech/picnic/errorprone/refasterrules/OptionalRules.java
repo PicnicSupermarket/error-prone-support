@@ -231,11 +231,7 @@ final class OptionalRules {
     @BeforeTemplate
     @SuppressWarnings("NullAway")
     Optional<S> before(Optional<T> optional) {
-      // XXX: This use of `.get()` rather than `.orElseThrow()` should be flagged by the
-      // `OptionalOrElseThrow` rule when building with
-      // `mvn clean install -Perror-prone-fork -Pnon-maven-central -Pself-check`
-      // (Requires a prior `mvn install`.)
-      return optional.map(v -> toOptionalFunction(v).get());
+      return optional.map(v -> toOptionalFunction(v).orElseThrow());
     }
 
     @AfterTemplate
