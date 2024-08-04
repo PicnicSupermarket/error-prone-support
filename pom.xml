@@ -945,13 +945,6 @@
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs>
-                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
-                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
-                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
-                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
-                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
-                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
                             <arg>-Xmaxerrs</arg>
                             <arg>10000</arg>
                             <arg>-Xmaxwarns</arg>
@@ -965,6 +958,79 @@
                         https://issues.apache.org/jira/browse/MCOMPILER-209. -->
                         <useIncrementalCompilation>false</useIncrementalCompilation>
                     </configuration>
+                    <executions>
+                        <!-- Refaster rule collections, identified as classes
+                        whose name ends in `Rules`, are compiled to target
+                        Java 8. This causes the OpenRewrite recipe sources
+                        generated from those files by the `rewrite-templating`
+                        annotation processor to also be compiled to target Java
+                        8. The latter is important for compatiblity with the
+                        wider OpenRewrite ecosystem. Note that Refaster rules
+                        can safely reference APIs defined using a higher
+                        bytecode level, as long as they don't use newer
+                        language constructs. -->
+                        <!-- XXX: Once the OpenRewrite baseline is raised to a
+                        more recent Java version, drop and/or deduplicate the
+                        `compilerArgs` configuration. The current configuration
+                        makes sure that the `add-exports` flags are not
+                        specified when targeting Java 8, as they are
+                        unsupported in that context. -->
+                        <!-- XXX: This somehow breaks the Refaster self-check:
+                        `@BeforeTemplate` definitions that contain code
+                        simplified by other rules are no longer flagged. This a
+                        deal-breaker from a maintenance point of view. Figure
+                        out why this happens. -->
+                        <execution>
+                            <id>default-compile</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <compilerArgs combine.children="append">
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                                </compilerArgs>
+                                <excludes>
+                                    <exclude>**/*Rules.java</exclude>
+                                </excludes>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>default-testCompile</id>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                            <configuration>
+                                <compilerArgs combine.children="append">
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                                </compilerArgs>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>compile-recipes</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <source>8</source>
+                                <target>8</target>
+                                <includes>
+                                    <include>**/*Rules.java</include>
+                                </includes>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -2091,6 +2157,40 @@
                         </configuration>
                     </plugin>
                 </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- This profile is active when the project is loaded into
+            IntelliJ IDEA. -->
+            <!-- XXX: Drop this configuration once the `add-exports` flags are
+            part of the default `maven-compiler-plugin` configuration, or when
+            https://youtrack.jetbrains.com/issue/IDEA-202136 is resolved. -->
+            <id>idea</id>
+            <activation>
+                <property>
+                    <name>idea.maven.embedder.version</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <compilerArgs combine.children="append">
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                                </compilerArgs>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
     </profiles>
