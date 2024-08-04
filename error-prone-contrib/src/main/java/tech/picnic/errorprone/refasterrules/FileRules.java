@@ -57,6 +57,8 @@ final class FileRules {
     }
 
     @AfterTemplate
+    @SuppressWarnings(
+        "java:S5443" /* On POSIX systems the file will only have user read-write permissions. */)
     File after(String prefix, String suffix) throws IOException {
       return Files.createTempFile(prefix, suffix).toFile();
     }
