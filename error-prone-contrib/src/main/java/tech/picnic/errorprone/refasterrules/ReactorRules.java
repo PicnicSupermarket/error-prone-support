@@ -1205,10 +1205,17 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#fromIterable(Iterable)} over less efficient alternatives. */
+  // XXX: Once the `FluxFromStreamSupplier` rule is constrained using
+  // `@NotMatches(IsIdentityOperation.class)`, this rule should also cover
+  // `Flux.fromStream(collection.stream())`.
   static final class FluxFromIterable<T> {
+    // XXX: Once the `MethodReferenceUsage` check is generally enabled, drop the second
+    // `Refaster.anyOf` variant.
     @BeforeTemplate
     Flux<T> before(Collection<T> collection) {
-      return Flux.fromStream(collection.stream());
+      return Flux.fromStream(
+          Refaster.<Supplier<Stream<? extends T>>>anyOf(
+              collection::stream, () -> collection.stream()));
     }
 
     @AfterTemplate
@@ -1933,7 +1940,7 @@ final class ReactorRules {
   /**
    * Prefer {@link Mono#fromFuture(Supplier, boolean)} over {@link
    * Mono#fromFuture(CompletableFuture, boolean)}, as the former may defer initiation of the
-   * asynchornous computation until subscription.
+   * asynchronous computation until subscription.
    */
   static final class MonoFromFutureSupplierBoolean<T> {
     // XXX: Constrain the `future` parameter using `@NotMatches(IsIdentityOperation.class)` once
@@ -1951,9 +1958,12 @@ final class ReactorRules {
 
   /**
    * Prefer {@link Flux#fromStream(Supplier)} over {@link Flux#fromStream(Stream)}, as the former
-   * may defer initiation of the asynchronous computation until subscription.
+   * yields a {@link Flux} that is more likely to behave as expected when subscribed to more than
+   * once.
    */
   static final class FluxFromStreamSupplier<T> {
+    // XXX: Constrain the `stream` parameter using `@NotMatches(IsIdentityOperation.class)` once
+    // `IsIdentityOperation` no longer matches nullary method invocations.
     @BeforeTemplate
     Flux<T> before(Stream<T> stream) {
       return Flux.fromStream(stream);

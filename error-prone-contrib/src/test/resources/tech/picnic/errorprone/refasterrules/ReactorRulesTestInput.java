@@ -435,8 +435,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just(ImmutableList.of("bar")).concatMap(Flux::fromIterable, 2));
   }
 
-  Flux<String> testFluxFromIterable() {
-    return Flux.fromStream(ImmutableList.of("foo").stream());
+  ImmutableSet<Flux<String>> testFluxFromIterable() {
+    return ImmutableSet.of(
+        Flux.fromStream(ImmutableList.of("foo")::stream),
+        Flux.fromStream(() -> ImmutableList.of("bar").stream()));
   }
 
   ImmutableSet<Mono<Integer>> testFluxCountMapMathToIntExact() {
