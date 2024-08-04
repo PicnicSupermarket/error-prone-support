@@ -1163,6 +1163,7 @@
                                 <goal>jar</goal>
                             </goals>
                             <configuration>
+                                <classesDirectory>${project.build.directory}/openrewrite-recipes</classesDirectory>
                                 <classifier>recipes</classifier>
                                 <includes>
                                     <includes>**/*Recipe$*.class</includes>
