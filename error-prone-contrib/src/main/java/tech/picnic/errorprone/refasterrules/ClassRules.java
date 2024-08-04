@@ -77,4 +77,17 @@ final class ClassRules {
       return Refaster.<S>clazz()::cast;
     }
   }
+
+  /** Prefer {@link Class#cast(Object)} method references over more verbose alternatives. */
+  static final class ClassReferenceCast<T, S> {
+    @BeforeTemplate
+    Function<T, S> before(Class<? extends S> clazz) {
+      return o -> clazz.cast(o);
+    }
+
+    @AfterTemplate
+    Function<T, S> after(Class<? extends S> clazz) {
+      return clazz::cast;
+    }
+  }
 }

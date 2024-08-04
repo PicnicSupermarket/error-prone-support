@@ -28,4 +28,9 @@ final class ClassRulesTest implements RefasterRuleCollectionTestCase {
   Function<Number, Integer> testClassLiteralCast() {
     return Integer.class::cast;
   }
+
+  Function<Number, Integer> testClassReferenceCast() {
+    Class<? extends Integer> clazz = Integer.class;
+    return clazz::cast;
+  }
 }
