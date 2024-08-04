@@ -184,7 +184,12 @@ final class CollectionRules {
     }
   }
 
-  /** Rely on Set's property to preserve distinct elements. */
+  /** Don't unnecessarily call {@link Stream#distinct()} on an already-unique stream of elements. */
+  // XXX: This rule assumes that the `Set` relies on `Object#equals`, rather than a custom
+  // equivalence relation.
+  // XXX: Expressions that drop or reorder elements from the stream, such as `.filter`, `.skip` and
+  // `sorted`, can similarly be simplified. Covering all cases is better done using an Error Prone
+  // check.
   static final class SetStream<T> {
     @BeforeTemplate
     Stream<?> before(Set<T> set) {
