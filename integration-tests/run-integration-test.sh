@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
-# This script is not meant to be invoked manually, instead it should be invoked
-# through one of the integration test scripts such as `checkstyle.sh`.
+# Integration test framework for Maven builds.
+#
+# This script is not meant to be invoked manually. Instead it should be invoked
+# through one of the top-level integration test scripts, such as
+# `checkstyle.sh`.
 
 set -e -u -o pipefail
 
@@ -9,8 +12,8 @@ integration_test_root="$(cd "$(dirname -- "${0}")" && pwd)"
 error_prone_support_root="${integration_test_root}/.."
 repos_root="${integration_test_root}/.repos"
 
-if [ "${#}" -ne 11 ]; then
-  >&2 echo "Usage $(basename "${0}") [TestName] [Project] [Repository] [Revision] [BuildFlags] [AdditionalSourceDirectories] [PatchFlags] [ValidationEpFlags] [ValidationMvnFlags] [DoSync] [ReportDirectory]"
+if [ "${#}" -lt 9 ] || [ "${#}" -gt 11 ] || ([ "${#}" = 11 ] && [ "${10:---sync}" != '--sync' ]); then
+  >&2 echo "Usage: $(basename "${0}") <test_name> <project> <repository> <revision> <additional_build_flags> <additional_source_directories> <patch_error_prone_flags> <validation_error_prone_flags> <validation_build_flags> [--sync] [<report_directory>]"
   exit 1
 fi
 
@@ -18,13 +21,13 @@ test_name="${1}"
 project="${2}"
 repository="${3}"
 revision="${4}"
-build_flags="${5}"
-additional_src_directories="${6}"
-patch_flags="${7}"
-validation_ep_flags="${8}"
-validation_mvn_flags="${9}"
-do_sync="${10}"
-report_directory="${11}"
+additional_build_flags="${5}"
+additional_source_directories="${6}"
+patch_error_prone_flags="${7}"
+validation_error_prone_flags="${8}"
+validation_build_flags="${9}"
+do_sync="$([ "${#}" = 9 ] || [ "${10:-}" != '--sync' ] || echo 1)"
+report_directory="$([ "${#}" = 9 ] || ([ -z "${do_sync}" ] && echo "${10}") || ([ "${#}" = 10 ] || echo "${11}"))"
 
 if [ -n "${report_directory}" ]; then
   mkdir -p "${report_directory}"
@@ -48,7 +51,6 @@ case "$(uname -s)" in
     ;;
 esac
 
-# XXX: Configure Renovate to manage the AssertJ version declared here.
 shared_build_flags="
   -Perror-prone-compile,error-prone-test-compile
   -Derror-prone.version=$(
@@ -57,8 +59,8 @@ shared_build_flags="
   -Derror-prone-support.version=$(
     mvn -f "${error_prone_support_root}" help:evaluate -Dexpression=project.version -q -DforceStdout
   )
-  -DadditionalSourceDirectories=${additional_src_directories}
-  ${build_flags}
+  -DadditionalSourceDirectories=${additional_source_directories}
+  ${additional_build_flags}
   "
 
 # XXX: Configure Renovate to manage the fmt-maven-plugin version declared here.
@@ -77,18 +79,18 @@ error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE 
       -print0 \
     | xargs -0 "${grep_command}" -hoP '[^.]+$' \
     | paste -s -d ',' -
-) ${patch_flags}"
+) ${patch_error_prone_flags}"
 
 error_prone_validation_flags="${error_prone_shared_flags} -XepDisableAllChecks $(
-  find "${error_prone_support_root}" \
-     -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" \
-     -not -path "*/error-prone-experimental/*" \
-     -not -path "*/error-prone-guidelines/*" \
-     -print0 \
+   find "${error_prone_support_root}" \
+      -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" \
+      -not -path "*/error-prone-experimental/*" \
+      -not -path "*/error-prone-guidelines/*" \
+      -print0 \
     | xargs -0 "${grep_command}" -hoP '[^.]+$' \
     | "${sed_command}" -r 's,(.*),-Xep:\1:WARN,' \
     | paste -s -d ' ' -
-) ${validation_ep_flags}"
+) ${validation_error_prone_flags}"
 
 echo "Shared build flags: ${shared_build_flags}"
 echo "Error Prone patch flags: ${error_prone_patch_flags}"
@@ -120,8 +122,8 @@ pushd "${project_root}"
 
 # Make sure that Git is sufficiently configured to enable committing to the
 # project's Git repository.
-git config user.email || git config user.email "integration-test@example.com"
-git config user.name || git config user.name "Integration Test"
+git config user.email || git config user.email 'integration-test@example.com'
+git config user.name || git config user.name 'Integration Test'
 
 # Prepare the code for analysis by (a) applying the minimal set of changes
 # required to run Error Prone with Error Prone Support and (b) formatting the
@@ -164,16 +166,12 @@ apply_patch ''
 # Run one more full build and log the output.
 #
 # By also running the tests, we validate that the (majority of) applied changes
-# are behavior preserving. Some tests are skipped:
-# - The `metadataFilesGenerationAllFiles` test is skipped because it makes line
-#   number assertions that will fail when the code is formatted or patched.
-# - The `allCheckSectionJavaDocs` test is skipped because is validates that
-#   Javadoc has certain closing tags that are removed by Google Java Format.
+# are behavior preserving.
 validation_build_log="${report_directory}/${test_name}-validation-build-log.txt"
 mvn ${shared_build_flags} \
       clean package \
       -Derror-prone.configuration-args="${error_prone_validation_flags}" \
-      ${validation_mvn_flags} \
+      ${validation_build_flags} \
     | tee "${validation_build_log}" \
   || failure=1
 
@@ -210,4 +208,3 @@ fi
 if [ -n "${failure:-}" ]; then
   exit 1
 fi
-
