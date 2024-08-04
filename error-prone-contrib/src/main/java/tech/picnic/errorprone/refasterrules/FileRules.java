@@ -46,7 +46,7 @@ final class FileRules {
 
   /**
    * Prefer {@link Files#createTempFile(String, String, FileAttribute[])} over alternatives that
-   * create files will more liberal permissions.
+   * create files with more liberal permissions.
    */
   static final class FilesCreateTempFileToFile {
     @BeforeTemplate
