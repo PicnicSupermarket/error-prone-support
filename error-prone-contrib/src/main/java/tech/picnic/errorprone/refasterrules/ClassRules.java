@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -60,6 +61,20 @@ final class ClassRules {
     @AfterTemplate
     Predicate<S> after(Class<T> clazz) {
       return clazz::isInstance;
+    }
+  }
+
+  /** Prefer {@link Class#cast(Object)} method references over more verbose alternatives. */
+  static final class ClassLiteralCast<T, S> {
+    @BeforeTemplate
+    @SuppressWarnings("unchecked")
+    Function<T, S> before() {
+      return t -> (S) t;
+    }
+
+    @AfterTemplate
+    Function<T, S> after() {
+      return Refaster.<S>clazz()::cast;
     }
   }
 }

@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -22,5 +23,9 @@ final class ClassRulesTest implements RefasterRuleCollectionTestCase {
   Predicate<String> testClassReferenceIsInstancePredicate() throws IOException {
     Class<?> clazz = CharSequence.class;
     return s -> clazz.isInstance(s);
+  }
+
+  Function<Number, Integer> testClassLiteralCast() {
+    return i -> (Integer) i;
   }
 }
