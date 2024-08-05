@@ -1150,6 +1150,9 @@
                                 <goal>jar</goal>
                             </goals>
                             <configuration>
+                                <!-- These Java 17 bytecode classes are omitted
+                                from the default JAR, as instead we produce a
+                                separate artifact with Java 8 bytecode variants. -->
                                 <excludes>
                                     <excludes>**/*Recipe$*.class</excludes>
                                     <excludes>**/*Recipe.class</excludes>
@@ -1158,6 +1161,8 @@
                             </configuration>
                         </execution>
                         <execution>
+                            <!-- Creates a custom JAR with Java 8-compatible
+                            OpenRewrite recipe classess. -->
                             <id>create-openrewrite-recipes-jar</id>
                             <goals>
                                 <goal>jar</goal>
