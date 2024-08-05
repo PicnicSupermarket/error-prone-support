@@ -27,11 +27,9 @@ jobs:
             api.adoptium.net:443
             checkstyle.org:443
             github.com:443
-            objects.githubusercontent.com:443
-            oss.sonatype.org:443
-            raw.githubusercontent.com:443
+            *.githubusercontent.com:443
             repo.maven.apache.org:443
-            repository.sonatype.org:443
+            *.sonatype.org:443
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@489441643219d2b93ee2a127b2402eb640a1b947 # v1.13.0
         with:
