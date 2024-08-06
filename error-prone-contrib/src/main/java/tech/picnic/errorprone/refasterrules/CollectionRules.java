@@ -184,6 +184,24 @@ final class CollectionRules {
     }
   }
 
+  /** Don't unnecessarily call {@link Stream#distinct()} on an already-unique stream of elements. */
+  // XXX: This rule assumes that the `Set` relies on `Object#equals`, rather than a custom
+  // equivalence relation.
+  // XXX: Expressions that drop or reorder elements from the stream, such as `.filter`, `.skip` and
+  // `sorted`, can similarly be simplified. Covering all cases is better done using an Error Prone
+  // check.
+  static final class SetStream<T> {
+    @BeforeTemplate
+    Stream<?> before(Set<T> set) {
+      return set.stream().distinct();
+    }
+
+    @AfterTemplate
+    Stream<?> after(Set<T> set) {
+      return set.stream();
+    }
+  }
+
   /** Prefer {@link ArrayList#ArrayList(Collection)} over the Guava alternative. */
   @SuppressWarnings(
       "NonApiType" /* Matching against `List` would unnecessarily constrain the rule. */)

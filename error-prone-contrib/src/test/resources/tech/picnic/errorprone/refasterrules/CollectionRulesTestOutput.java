@@ -62,6 +62,10 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     new HashSet<Number>().removeAll(ImmutableSet.of(2));
   }
 
+  Stream<Integer> testSetStream() {
+    return ImmutableSet.of(1).stream();
+  }
+
   ArrayList<String> testNewArrayListFromCollection() {
     return new ArrayList<>(ImmutableList.of("foo"));
   }
