@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -429,8 +430,9 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just(ImmutableList.of("bar")).concatMapIterable(identity(), 2));
   }
 
-  Flux<String> testFluxFromIterable() {
-    return Flux.fromIterable(ImmutableList.of("foo"));
+  ImmutableSet<Flux<String>> testFluxFromIterable() {
+    return ImmutableSet.of(
+        Flux.fromIterable(ImmutableList.of("foo")), Flux.fromIterable(ImmutableList.of("bar")));
   }
 
   ImmutableSet<Mono<Integer>> testFluxCountMapMathToIntExact() {
@@ -640,5 +642,9 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Mono<Void> testMonoFromFutureSupplierBoolean() {
     return Mono.fromFuture(() -> CompletableFuture.completedFuture(null), true);
+  }
+
+  Flux<Integer> testFluxFromStreamSupplier() {
+    return Flux.fromStream(() -> Stream.of(1));
   }
 }
