@@ -114,7 +114,7 @@ else
     || (
          git -C "${project_root}" fetch --depth 1 "${repository}" "${revision}" \
            && git -C "${project_root}" checkout --force FETCH_HEAD \
-           && (git -C "${project_root}" tag "${revision}" --message "${revision}" || true)
+           && (git -C "${project_root}" tag "${revision}" || true)
        )
 fi
 
