@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -244,9 +243,8 @@ final class LexicographicalAnnotationAttributeListingTest {
     /* Some violations are not flagged because they are not in- or excluded. */
     CompilationTestHelper.newInstance(LexicographicalAnnotationAttributeListing.class, getClass())
         .setArgs(
-            ImmutableList.of(
-                "-XepOpt:LexicographicalAnnotationAttributeListing:Includes=pkg.A.Foo,pkg.A.Bar",
-                "-XepOpt:LexicographicalAnnotationAttributeListing:Excludes=pkg.A.Bar#value"))
+            "-XepOpt:LexicographicalAnnotationAttributeListing:Includes=pkg.A.Foo,pkg.A.Bar",
+            "-XepOpt:LexicographicalAnnotationAttributeListing:Excludes=pkg.A.Bar#value")
         .addSourceLines(
             "pkg/A.java",
             "package pkg;",
