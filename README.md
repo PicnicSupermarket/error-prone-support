@@ -247,6 +247,12 @@ Java Compiler_ and deselect the option _Use '--release' option for
 cross-compilation (Java 9 and later)_. See [IDEA-288052][idea-288052] for
 details.
 
+The `BugChecker` implementations provided by this project are tested using
+Error Prone's `CompilationTestHelper` and `BugCheckerRefactoringTestHelper`
+classes. These utilities accept text blocks containing inline Java source code.
+To ease modification of this inline source code, consider using IntelliJ IDEA's
+[language injection][idea-language-injection] feature.
+
 ## 💡 How it works
 
 This project provides additional [`BugChecker`][error-prone-bugchecker]
@@ -284,6 +290,7 @@ channel; please see our [security policy][security] for details.
 [github-actions-build-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yml?query=branch:master&event=push
 [google-java-format]: https://github.com/google/google-java-format
 [idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
+[idea-language-injection]: https://www.jetbrains.com/help/idea/using-language-injections.html
 [license-badge]: https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
 [license]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/LICENSE.md
 [maven-central-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue

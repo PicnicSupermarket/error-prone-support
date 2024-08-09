@@ -13,52 +13,54 @@ final class IsIdentityOperationTest {
     CompilationTestHelper.newInstance(MatcherTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "import java.util.function.BinaryOperator;",
-            "import java.util.function.DoubleUnaryOperator;",
-            "import java.util.function.Function;",
-            "import java.util.function.IntUnaryOperator;",
-            "import java.util.function.LongUnaryOperator;",
-            "import java.util.function.UnaryOperator;",
-            "",
-            "class A {",
-            "  BinaryOperator<String> negative1() {",
-            "    return (a, b) -> a;",
-            "  }",
-            "",
-            "  UnaryOperator<String> negative2() {",
-            "    return a -> a + a;",
-            "  }",
-            "",
-            "  DoubleUnaryOperator positive1() {",
-            "    // BUG: Diagnostic contains:",
-            "    return DoubleUnaryOperator.identity();",
-            "  }",
-            "",
-            "  Function<Integer, Integer> positive2() {",
-            "    // BUG: Diagnostic contains:",
-            "    return Function.identity();",
-            "  }",
-            "",
-            "  UnaryOperator<String> positive3() {",
-            "    // BUG: Diagnostic contains:",
-            "    return UnaryOperator.identity();",
-            "  }",
-            "",
-            "  IntUnaryOperator positive4() {",
-            "    // BUG: Diagnostic contains:",
-            "    return IntUnaryOperator.identity();",
-            "  }",
-            "",
-            "  LongUnaryOperator positive5() {",
-            "    // BUG: Diagnostic contains:",
-            "    return LongUnaryOperator.identity();",
-            "  }",
-            "",
-            "  UnaryOperator positive6() {",
-            "    // BUG: Diagnostic contains:",
-            "    return a -> a;",
-            "  }",
-            "}")
+            """
+            import java.util.function.BinaryOperator;
+            import java.util.function.DoubleUnaryOperator;
+            import java.util.function.Function;
+            import java.util.function.IntUnaryOperator;
+            import java.util.function.LongUnaryOperator;
+            import java.util.function.UnaryOperator;
+
+            class A {
+              BinaryOperator<String> negative1() {
+                return (a, b) -> a;
+              }
+
+              UnaryOperator<String> negative2() {
+                return a -> a + a;
+              }
+
+              DoubleUnaryOperator positive1() {
+                // BUG: Diagnostic contains:
+                return DoubleUnaryOperator.identity();
+              }
+
+              Function<Integer, Integer> positive2() {
+                // BUG: Diagnostic contains:
+                return Function.identity();
+              }
+
+              UnaryOperator<String> positive3() {
+                // BUG: Diagnostic contains:
+                return UnaryOperator.identity();
+              }
+
+              IntUnaryOperator positive4() {
+                // BUG: Diagnostic contains:
+                return IntUnaryOperator.identity();
+              }
+
+              LongUnaryOperator positive5() {
+                // BUG: Diagnostic contains:
+                return LongUnaryOperator.identity();
+              }
+
+              UnaryOperator positive6() {
+                // BUG: Diagnostic contains:
+                return a -> a;
+              }
+            }
+            """)
         .doTest();
   }
 

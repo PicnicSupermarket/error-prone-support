@@ -13,30 +13,32 @@ final class IsRefasterAsVarargsTest {
     CompilationTestHelper.newInstance(MatcherTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "import com.google.errorprone.refaster.Refaster;",
-            "",
-            "class A {",
-            "  int[] negative1() {",
-            "    return new int[4];",
-            "  }",
-            "",
-            "  String[] negative2() {",
-            "    return \"foo\".split(\"o\");",
-            "  }",
-            "",
-            "  String[] negative3() {",
-            "    return asVarArgs(\"bar\");",
-            "  }",
-            "",
-            "  String[] positive1() {",
-            "    // BUG: Diagnostic contains:",
-            "    return Refaster.asVarargs(\"o\");",
-            "  }",
-            "",
-            "  private static String[] asVarArgs(String s) {",
-            "    return s.split(\"a\");",
-            "  }",
-            "}")
+            """
+            import com.google.errorprone.refaster.Refaster;
+
+            class A {
+              int[] negative1() {
+                return new int[4];
+              }
+
+              String[] negative2() {
+                return "foo".split("o");
+              }
+
+              String[] negative3() {
+                return asVarArgs("bar");
+              }
+
+              String[] positive1() {
+                // BUG: Diagnostic contains:
+                return Refaster.asVarargs("o");
+              }
+
+              private static String[] asVarArgs(String s) {
+                return s.split("a");
+              }
+            }
+            """)
         .doTest();
   }
 
