@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
-import java.util.List;
 import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Objects;
@@ -120,21 +119,6 @@ final class StreamRules {
     @AfterTemplate
     Stream<T> after(T[] array) {
       return Arrays.stream(array);
-    }
-  }
-
-  /**
-   * Prefer {@link Arrays#asList(Object[])} over {@link Stream#toList()} as the former is clearer.
-   */
-  static final class ArraysAsList<T> {
-    @BeforeTemplate
-    List<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
-      return Arrays.stream(array).toList();
-    }
-
-    @AfterTemplate
-    List<T> after(T[] array) {
-      return Arrays.asList(array);
     }
   }
 

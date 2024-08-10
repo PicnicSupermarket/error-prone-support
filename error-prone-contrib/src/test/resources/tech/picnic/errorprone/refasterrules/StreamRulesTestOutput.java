@@ -87,10 +87,6 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Arrays.stream(new String[] {"foo", "bar"});
   }
 
-  List<String> testArraysAsList() {
-    return Arrays.asList(new String[] {"foo", "bar"});
-  }
-
   Stream<Integer> testConcatOneStream() {
     return Stream.of(1);
   }

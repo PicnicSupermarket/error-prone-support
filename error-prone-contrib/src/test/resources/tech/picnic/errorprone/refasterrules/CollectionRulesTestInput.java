@@ -6,9 +6,11 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Stream;
@@ -96,6 +98,10 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
 
   String testImmutableCollectionToString() {
     return ImmutableSet.of(1).asList().toString();
+  }
+
+  List<String> testArraysAsList() {
+    return Arrays.stream(new String[0]).toList();
   }
 
   ImmutableSet<Object[]> testCollectionToArray() {

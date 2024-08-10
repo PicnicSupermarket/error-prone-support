@@ -27,7 +27,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
-import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -85,10 +84,6 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<String> testStreamOfArray() {
     return Stream.of(new String[] {"foo", "bar"});
-  }
-
-  List<String> testArraysAsList() {
-    return Arrays.stream(new String[] {"foo", "bar"}).toList();
   }
 
   Stream<Integer> testConcatOneStream() {
