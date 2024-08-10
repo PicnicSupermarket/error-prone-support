@@ -21,7 +21,6 @@ import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Symbol.PackageSymbol;
 import com.sun.tools.javac.main.JavaCompiler;
 import com.sun.tools.javac.util.Context;
-import com.sun.tools.javac.util.Name;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
@@ -137,10 +136,10 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
     return enclosingPackage == null ? "" : enclosingPackage.toString();
   }
 
-  private static CharSequence toSimpleFlatName(ClassSymbol symbol) {
-    Name flatName = symbol.flatName();
+  private static String toSimpleFlatName(ClassSymbol symbol) {
+    String flatName = symbol.flatName().toString();
     int lastDot = flatName.lastIndexOf((byte) '.');
-    return lastDot < 0 ? flatName : flatName.subSequence(lastDot + 1, flatName.length());
+    return lastDot < 0 ? flatName : flatName.substring(lastDot + 1);
   }
 
   private static void outputCodeTransformer(CodeTransformer codeTransformer, FileObject target)
