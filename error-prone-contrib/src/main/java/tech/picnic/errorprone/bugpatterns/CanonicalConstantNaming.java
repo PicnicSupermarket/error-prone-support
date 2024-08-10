@@ -127,7 +127,7 @@ public final class CanonicalConstantNaming extends BugChecker implements Variabl
       @Override
       public @Nullable Void visitVariable(VariableTree variableTree, @Nullable Void unused) {
         variablesInFileBuilder.add(variableTree);
-        return super.visitVariable(variableTree, unused);
+        return super.visitVariable(variableTree, null);
       }
     }.scan(tree, null);
 
