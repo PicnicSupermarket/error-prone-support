@@ -8,7 +8,9 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
 
 /** Refaster rules related to expressions dealing with (arbitrary) collections. */
 // XXX: There are other Guava `Iterables` methods that should not be called if the input is known to
@@ -291,6 +294,23 @@ final class CollectionRules {
     @AfterTemplate
     String after(ImmutableCollection<T> collection) {
       return collection.toString();
+    }
+  }
+
+  /** Prefer {@link Arrays#asList(Object[])} over more contrived alternatives. */
+  // XXX: Consider moving this rule to `ImmutableListRules` and having it suggest
+  // `ImmutableList#copyOf`. That would retain immutability, at the cost of no longer handling
+  // `null`s.
+  static final class ArraysAsList<T> {
+    // XXX: This expression produces an unmodifiable list, while the alternative doesn't.
+    @BeforeTemplate
+    List<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
+      return Arrays.stream(array).toList();
+    }
+
+    @AfterTemplate
+    List<T> after(T[] array) {
+      return Arrays.asList(array);
     }
   }
 
