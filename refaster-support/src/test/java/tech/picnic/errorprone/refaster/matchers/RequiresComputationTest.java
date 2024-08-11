@@ -132,7 +132,7 @@ final class RequiresComputationTest {
   public static final class MatcherTestChecker extends AbstractMatcherTestChecker {
     private static final long serialVersionUID = 1L;
 
-    // XXX: This is a false negative reported by Checkstyle. See
+    // XXX: This is a false positive reported by Checkstyle. See
     // https://github.com/checkstyle/checkstyle/issues/10161#issuecomment-1242732120.
     @SuppressWarnings("RedundantModifier")
     public MatcherTestChecker() {
