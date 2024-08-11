@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
-import tech.picnic.errorprone.refaster.matchers.IsLikelyTrivialComputation;
+import tech.picnic.errorprone.refaster.matchers.RequiresComputation;
 
 /** Refaster rules related to expressions dealing with {@link Optional}s. */
 @OnlineDocumentation
@@ -255,24 +255,21 @@ final class OptionalRules {
   }
 
   /**
-   * Prefer {@link Optional#orElseGet(Supplier)} over {@link Optional#orElse(Object)} if the
-   * fallback value is not the result of a trivial computation.
+   * Prefer {@link Optional#orElse(Object)} over {@link Optional#orElseGet(Supplier)} if the
+   * fallback value does not require non-trivial computation.
    */
-  // XXX: This rule may introduce a compilation error: the `value` expression may reference a
-  // non-effectively final variable, which is not allowed in the replacement lambda expression.
-  // Review whether a `@Matcher` can be used to avoid this.
-  // XXX: Once `MethodReferenceUsage` is "production ready", replace
-  // `@NotMatches(IsLikelyTrivialComputation.class)` with `@Matches(RequiresComputation.class)` (and
-  // reimplement the matcher accordingly).
-  static final class OptionalOrElseGet<T> {
+  // XXX: This rule is the counterpart to the `OptionalOrElseGet` bug checker. Once the
+  // `MethodReferenceUsage` bug checker is "production ready", that bug checker may similarly be
+  // replaced with a Refaster rule.
+  static final class OptionalOrElse<T> {
     @BeforeTemplate
-    T before(Optional<T> optional, @NotMatches(IsLikelyTrivialComputation.class) T value) {
-      return optional.orElse(value);
+    T before(Optional<T> optional, @NotMatches(RequiresComputation.class) T value) {
+      return optional.orElseGet(() -> value);
     }
 
     @AfterTemplate
     T after(Optional<T> optional, T value) {
-      return optional.orElseGet(() -> value);
+      return optional.orElse(value);
     }
   }
 
@@ -373,7 +370,12 @@ final class OptionalRules {
   /** Prefer {@link Optional#or(Supplier)} over more verbose alternatives. */
   static final class OptionalOrOtherOptional<T> {
     @BeforeTemplate
-    @SuppressWarnings("NestedOptionals")
+    @SuppressWarnings({
+      "LexicographicalAnnotationAttributeListing" /* `key-*` entry must remain last. */,
+      "NestedOptionals" /* This violation will be rewritten. */,
+      "OptionalOrElse" /* Here `optional2` is a stand-in for expressions that may require computation. */,
+      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     Optional<T> before(Optional<T> optional1, Optional<T> optional2) {
       // XXX: Note that rewriting the first and third variant will change the code's behavior if
       // `optional2` has side-effects.

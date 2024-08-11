@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refaster.matchers;
 
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ArrayAccessTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
@@ -9,34 +10,19 @@ import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.ParenthesizedTree;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.tree.UnaryTree;
 
-/** A matcher of expressions that likely require little to no computation. */
-public final class IsLikelyTrivialComputation implements Matcher<ExpressionTree> {
+/** A matcher of expressions that may a non-trivial amount of computation. */
+public final class RequiresComputation implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
 
-  /** Instantiates a new {@link IsLikelyTrivialComputation} instance. */
-  public IsLikelyTrivialComputation() {}
+  /** Instantiates a new {@link RequiresComputation} instance. */
+  public RequiresComputation() {}
 
   @Override
   public boolean matches(ExpressionTree expressionTree, VisitorState state) {
-    if (expressionTree instanceof MethodInvocationTree methodInvocation) {
-      // XXX: Method invocations are generally *not* trivial computations, but we make an exception
-      // for nullary method invocations on the result of a trivial computation. This exception
-      // allows this `Matcher` to by the `OptionalOrElseGet` Refaster rule, such that it does not
-      // suggest the introduction of lambda expressions that are better expressed as method
-      // references. Once the `MethodReferenceUsage` bug checker is production-ready, this exception
-      // should be removed. (But at that point, instead defining a `RequiresComputation` matcher may
-      // be more appropriate.)
-      if (methodInvocation.getArguments().isEmpty()
-          && matches(methodInvocation.getMethodSelect())) {
-        return true;
-      }
-    }
-
     return matches(expressionTree);
   }
 
@@ -44,11 +30,11 @@ public final class IsLikelyTrivialComputation implements Matcher<ExpressionTree>
   // Depending on feedback such trees may be matched in the future.
   private static boolean matches(ExpressionTree expressionTree) {
     if (expressionTree instanceof ArrayAccessTree arrayAccess) {
-      return matches(arrayAccess.getExpression()) && matches(arrayAccess.getIndex());
+      return matches(arrayAccess.getExpression()) || matches(arrayAccess.getIndex());
     }
 
     if (expressionTree instanceof LiteralTree) {
-      return true;
+      return false;
     }
 
     if (expressionTree instanceof LambdaExpressionTree) {
@@ -56,11 +42,14 @@ public final class IsLikelyTrivialComputation implements Matcher<ExpressionTree>
        * Lambda expressions encapsulate computations, but their definition does not involve
        * significant computation.
        */
-      return true;
+      return false;
     }
 
     if (expressionTree instanceof IdentifierTree) {
-      return true;
+      // XXX: Generally identifiers don't by themselves represent a computation, though they may be
+      // a stand-in for one if they are a Refaster template method argument. Can we identify such
+      // cases, also when the `Matcher` is invoked by Refaster?
+      return false;
     }
 
     if (expressionTree instanceof MemberReferenceTree memberReference) {
@@ -80,11 +69,15 @@ public final class IsLikelyTrivialComputation implements Matcher<ExpressionTree>
     }
 
     if (expressionTree instanceof UnaryTree unary) {
-      // XXX: Arguably side-effectful options such as pre- and post-increment and -decrement are not
-      // trivial.
+      // XXX: Arguably side-effectful options such as pre- and post-increment and -decrement
+      // represent non-trivial computations.
       return matches(unary.getExpression());
     }
 
-    return false;
+    if (ASTHelpers.constValue(expressionTree) != null) {
+      return false;
+    }
+
+    return true;
   }
 }
