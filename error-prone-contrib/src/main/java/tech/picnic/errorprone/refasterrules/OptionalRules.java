@@ -373,7 +373,7 @@ final class OptionalRules {
     @SuppressWarnings({
       "LexicographicalAnnotationAttributeListing" /* `key-*` entry must remain last. */,
       "NestedOptionals" /* This violation will be rewritten. */,
-      "OptionalOrElse" /* Here `optional2` is a stand-in for expressions that may require computation. */,
+      "OptionalOrElse" /* Parameters represent expressions that may require computation. */,
       "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     Optional<T> before(Optional<T> optional1, Optional<T> optional2) {

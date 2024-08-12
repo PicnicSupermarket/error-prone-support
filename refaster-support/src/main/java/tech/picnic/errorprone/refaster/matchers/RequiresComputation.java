@@ -74,10 +74,6 @@ public final class RequiresComputation implements Matcher<ExpressionTree> {
       return matches(unary.getExpression());
     }
 
-    if (ASTHelpers.constValue(expressionTree) != null) {
-      return false;
-    }
-
-    return true;
+    return ASTHelpers.constValue(expressionTree) == null;
   }
 }
