@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refasterrules.output;
 
+import com.google.common.collect.ImmutableSet;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -13,5 +15,10 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
 
   String testFilesReadString() throws IOException {
     return Files.readString(Paths.get("foo"));
+  }
+
+  ImmutableSet<File> testFilesCreateTempFileToFile() throws IOException {
+    return ImmutableSet.of(
+        Files.createTempFile("foo", "bar").toFile(), Files.createTempFile("baz", "qux").toFile());
   }
 }

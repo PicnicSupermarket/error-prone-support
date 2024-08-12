@@ -161,8 +161,9 @@ final class TestNGToAssertJRules {
 
     @AfterTemplate
     @DoNotCall
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after() {
-      throw new AssertionError();
+      fail();
     }
   }
 

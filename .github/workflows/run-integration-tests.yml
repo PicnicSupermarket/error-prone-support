@@ -19,19 +19,21 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
         with:
           disable-sudo: true
           egress-policy: block
           allowed-endpoints: >
+            api.adoptium.net:443
             checkstyle.org:443
             github.com:443
+            objects.githubusercontent.com:443
             oss.sonatype.org:443
             raw.githubusercontent.com:443
             repo.maven.apache.org:443
             repository.sonatype.org:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@6d44c18d67d9e1549907b8815efa5e4dada1801b # v1.12.0
+        uses: s4u/setup-maven-action@489441643219d2b93ee2a127b2402eb640a1b947 # v1.13.0
         with:
           checkout-ref: "refs/pull/${{ github.event.issue.number }}/head"
           java-version: 17.0.10
@@ -43,7 +45,7 @@ jobs:
         run: xvfb-run ./integration-tests/checkstyle.sh "${{ runner.temp }}/artifacts"
       - name: Upload artifacts on failure
         if: ${{ failure() }}
-        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           name: integration-test-checkstyle
           path: "${{ runner.temp }}/artifacts"

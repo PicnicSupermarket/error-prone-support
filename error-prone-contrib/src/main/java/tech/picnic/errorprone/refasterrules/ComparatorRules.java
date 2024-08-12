@@ -16,8 +16,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
+import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
@@ -89,6 +92,24 @@ final class ComparatorRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<T> after(Comparator<T> cmp) {
       return cmp;
+    }
+  }
+
+  /** Don't explicitly compare enums by their ordinal. */
+  abstract static class ComparingEnum<E extends Enum<E>, T> {
+    @Placeholder(allowsIdentity = true)
+    abstract E toEnumFunction(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
+    Comparator<T> before() {
+      return comparingInt(v -> toEnumFunction(v).ordinal());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Comparator<T> after() {
+      return comparing(v -> toEnumFunction(v));
     }
   }
 
@@ -269,7 +290,7 @@ final class ComparatorRules {
   static final class MinOfPairCustomOrder<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
-    T before(T value1, T value2, Comparator<T> cmp) {
+    T before(T value1, T value2, Comparator<? super T> cmp) {
       return Refaster.anyOf(
           cmp.compare(value1, value2) <= 0 ? value1 : value2,
           cmp.compare(value1, value2) > 0 ? value2 : value1,
@@ -284,7 +305,7 @@ final class ComparatorRules {
     }
 
     @AfterTemplate
-    T after(T value1, T value2, Comparator<T> cmp) {
+    T after(T value1, T value2, Comparator<? super T> cmp) {
       return Comparators.min(value1, value2, cmp);
     }
   }
@@ -336,7 +357,7 @@ final class ComparatorRules {
   static final class MaxOfPairCustomOrder<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
-    T before(T value1, T value2, Comparator<T> cmp) {
+    T before(T value1, T value2, Comparator<? super T> cmp) {
       return Refaster.anyOf(
           cmp.compare(value1, value2) >= 0 ? value1 : value2,
           cmp.compare(value1, value2) < 0 ? value2 : value1,
@@ -351,7 +372,7 @@ final class ComparatorRules {
     }
 
     @AfterTemplate
-    T after(T value1, T value2, Comparator<T> cmp) {
+    T after(T value1, T value2, Comparator<? super T> cmp) {
       return Comparators.max(value1, value2, cmp);
     }
   }
@@ -417,6 +438,36 @@ final class ComparatorRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Collector<T, ?, Optional<T>> after() {
       return maxBy(naturalOrder());
+    }
+  }
+
+  /** Don't explicitly compare enums by their ordinal. */
+  static final class IsLessThan<E extends Enum<E>> {
+    @BeforeTemplate
+    @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
+    boolean before(E value1, E value2) {
+      return value1.ordinal() < value2.ordinal();
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(E value1, E value2) {
+      return value1.compareTo(value2) < 0;
+    }
+  }
+
+  /** Don't explicitly compare enums by their ordinal. */
+  static final class IsLessThanOrEqualTo<E extends Enum<E>> {
+    @BeforeTemplate
+    @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
+    boolean before(E value1, E value2) {
+      return value1.ordinal() <= value2.ordinal();
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(E value1, E value2) {
+      return value1.compareTo(value2) <= 0;
     }
   }
 }

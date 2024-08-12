@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-22.04 ]
-        jdk: [ 17.0.10, 21.0.2 ]
+        jdk: [ 17.0.10, 21.0.2, 22.0.2 ]
         distribution: [ temurin ]
         experimental: [ false ]
         include:
@@ -26,13 +26,15 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
         with:
           disable-sudo: true
           egress-policy: block
           allowed-endpoints: >
+            api.adoptium.net:443
             github.com:443
             jitpack.io:443
+            objects.githubusercontent.com:443
             repo.maven.apache.org:443
       # We run the build twice for each supported JDK: once against the
       # original Error Prone release, using only Error Prone checks available
@@ -40,7 +42,7 @@ jobs:
       # additionally enabling all checks defined in this project and any Error
       # Prone checks available only from other artifact repositories.
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@6d44c18d67d9e1549907b8815efa5e4dada1801b # v1.12.0
+        uses: s4u/setup-maven-action@489441643219d2b93ee2a127b2402eb640a1b947 # v1.13.0
         with:
           java-version: ${{ matrix.jdk }}
           java-distribution: ${{ matrix.distribution }}

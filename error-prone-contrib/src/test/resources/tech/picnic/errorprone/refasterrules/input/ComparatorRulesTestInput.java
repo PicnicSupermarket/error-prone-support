@@ -9,6 +9,7 @@ import static java.util.stream.Collectors.minBy;
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,6 +53,10 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.comparing(identity(), Comparator.comparingInt(String::length)),
         Comparator.comparing(s -> s, Comparator.comparingInt(String::length)),
         Comparator.comparing(s -> "foo", Comparator.comparingInt(String::length)));
+  }
+
+  Comparator<String> testComparingEnum() {
+    return Comparator.comparingInt(s -> RoundingMode.valueOf(s).ordinal());
   }
 
   Comparator<String> testThenComparing() {
@@ -172,5 +177,17 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
 
   Collector<Integer, ?, Optional<Integer>> testMaxByNaturalOrder() {
     return minBy(reverseOrder());
+  }
+
+  ImmutableSet<Boolean> testIsLessThan() {
+    return ImmutableSet.of(
+        RoundingMode.UP.ordinal() < RoundingMode.DOWN.ordinal(),
+        RoundingMode.UP.ordinal() >= RoundingMode.DOWN.ordinal());
+  }
+
+  ImmutableSet<Boolean> testIsLessThanOrEqualTo() {
+    return ImmutableSet.of(
+        RoundingMode.UP.ordinal() <= RoundingMode.DOWN.ordinal(),
+        RoundingMode.UP.ordinal() > RoundingMode.DOWN.ordinal());
   }
 }

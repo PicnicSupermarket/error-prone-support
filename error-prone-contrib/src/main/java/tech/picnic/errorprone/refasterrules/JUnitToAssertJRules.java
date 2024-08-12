@@ -302,16 +302,22 @@ import tech.picnic.errorprone.refaster.annotation.TypeMigration;
 final class JUnitToAssertJRules {
   private JUnitToAssertJRules() {}
 
-  static final class ThrowNewAssertionError {
+  static final class Fail<T> {
     @BeforeTemplate
-    void before() {
-      Assertions.fail();
+    T before() {
+      return Assertions.fail();
     }
 
+    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)` once
+    // https://github.com/google/error-prone/pull/3584 is resolved. Until that time, statically
+    // importing AssertJ's `fail` is likely to clash with an existing static import of JUnit's
+    // `fail`. Note that combining Error Prone's `RemoveUnusedImports` and
+    // `UnnecessarilyFullyQualified` checks and our `StaticImport` check will anyway cause the
+    // method to be imported statically if possible; just in a less efficient manner.
     @AfterTemplate
     @DoNotCall
-    void after() {
-      throw new AssertionError();
+    T after() {
+      return fail();
     }
   }
 
@@ -321,12 +327,7 @@ final class JUnitToAssertJRules {
       return Assertions.fail(message);
     }
 
-    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)` once
-    // https://github.com/google/error-prone/pull/3584 is resolved. Until that time, statically
-    // importing AssertJ's `fail` is likely to clash with an existing static import of JUnit's
-    // `fail`. Note that combining Error Prone's `RemoveUnusedImports` and
-    // `UnnecessarilyFullyQualified` checks and our `StaticImport` check will anyway cause the
-    // method to be imported statically if possible; just in a less efficient manner.
+    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)`. See `Fail` comment.
     @AfterTemplate
     T after(String message) {
       return fail(message);
@@ -339,28 +340,24 @@ final class JUnitToAssertJRules {
       return Assertions.fail(message, throwable);
     }
 
-    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)` once
-    // https://github.com/google/error-prone/pull/3584 is resolved. Until that time, statically
-    // importing AssertJ's `fail` is likely to clash with an existing static import of JUnit's
-    // `fail`. Note that combining Error Prone's `RemoveUnusedImports` and
-    // `UnnecessarilyFullyQualified` checks and our `StaticImport` check will anyway cause the
-    // method to be imported statically if possible; just in a less efficient manner.
+    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)`. See `Fail` comment.
     @AfterTemplate
     T after(String message, Throwable throwable) {
       return fail(message, throwable);
     }
   }
 
-  static final class FailWithThrowable {
+  static final class FailWithThrowable<T> {
     @BeforeTemplate
-    void before(Throwable throwable) {
-      Assertions.fail(throwable);
+    T before(Throwable throwable) {
+      return Assertions.fail(throwable);
     }
 
+    // XXX: Add `@UseImportPolicy(STATIC_IMPORT_ALWAYS)`. See `Fail` comment.
     @AfterTemplate
     @DoNotCall
-    void after(Throwable throwable) {
-      throw new AssertionError(throwable);
+    T after(Throwable throwable) {
+      return fail(throwable);
     }
   }
 

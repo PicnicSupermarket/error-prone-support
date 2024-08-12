@@ -210,7 +210,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           }
         }
 
-        return super.visitIdentifier(node, unused);
+        return super.visitIdentifier(node, null);
       }
     }.scan(tree, null);
   }

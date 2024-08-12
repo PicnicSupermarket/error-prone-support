@@ -337,7 +337,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
       return indexedMatches.subRangeMap(Range.closedOpen(startPosition, endPosition));
     }
 
-    private ImmutableListMultimap<Long, String> getUnexpectedMatchesByLineNumber(
+    private static ImmutableListMultimap<Long, String> getUnexpectedMatchesByLineNumber(
         ImmutableRangeMap<Integer, String> matches, String ruleUnderTest, VisitorState state) {
       LineMap lineMap = state.getPath().getCompilationUnit().getLineMap();
       return matches.asMapOfRanges().entrySet().stream()

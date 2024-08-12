@@ -120,7 +120,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of("bar").map(String::length).findFirst());
   }
 
-  ImmutableSet<Boolean> testStreamIsEmpty() {
+  ImmutableSet<Boolean> testStreamFindAnyIsEmpty() {
     return ImmutableSet.of(
         Stream.of(1).count() == 0,
         Stream.of(2).count() <= 0,
@@ -131,15 +131,14 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of(7).collect(collectingAndThen(toImmutableList(), ImmutableList::isEmpty)),
         Stream.of(8).collect(collectingAndThen(toImmutableMap(k -> k, v -> v), Map::isEmpty)),
         Stream.of(9)
-            .collect(collectingAndThen(toImmutableMap(k -> k, v -> v), ImmutableMap::isEmpty)));
+            .collect(collectingAndThen(toImmutableMap(k -> k, v -> v), ImmutableMap::isEmpty)),
+        Stream.of(10).count() != 0,
+        Stream.of(11).count() > 0,
+        Stream.of(12).count() >= 1);
   }
 
-  ImmutableSet<Boolean> testStreamIsNotEmpty() {
-    return ImmutableSet.of(
-        Stream.of(1).count() != 0,
-        Stream.of(2).count() > 0,
-        Stream.of(3).count() >= 1,
-        Stream.of(4).findFirst().isPresent());
+  boolean testStreamFindAnyIsPresent() {
+    return Stream.of(1).findFirst().isPresent();
   }
 
   ImmutableSet<Optional<String>> testStreamMin() {

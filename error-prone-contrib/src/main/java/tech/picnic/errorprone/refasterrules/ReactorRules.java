@@ -3,7 +3,6 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.MoreCollectors.toOptional;
-import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
@@ -34,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -41,6 +41,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -52,7 +53,6 @@ import reactor.util.context.Context;
 import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
-import tech.picnic.errorprone.refaster.annotation.Severity;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
@@ -380,30 +380,23 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#take(long, boolean)} over {@link Flux#take(long)}.
+   * Prefer {@link Flux#take(long)} over {@link Flux#take(long, boolean)} where relevant.
    *
    * <p>In Reactor versions prior to 3.5.0, {@code Flux#take(long)} makes an unbounded request
-   * upstream, and is equivalent to {@code Flux#take(long, false)}. In 3.5.0, the behavior of {@code
-   * Flux#take(long)} will change to that of {@code Flux#take(long, true)}.
-   *
-   * <p>The intent with this Refaster rule is to get the new behavior before upgrading to Reactor
-   * 3.5.0.
+   * upstream, and is equivalent to {@code Flux#take(long, false)}. From version 3.5.0 onwards, the
+   * behavior of {@code Flux#take(long)} instead matches {@code Flux#take(long, true)}.
    */
-  // XXX: Drop this rule some time after upgrading to Reactor 3.6.0, or introduce a way to apply
-  // this rule only when an older version of Reactor is on the classpath.
-  // XXX: Once Reactor 3.6.0 is out, introduce a rule that rewrites code in the opposite direction.
   @Description(
-      "Prior to Reactor 3.5.0, `take(n)` requests and unbounded number of elements upstream.")
-  @Severity(WARNING)
+      "From Reactor 3.5.0 onwards, `take(n)` no longer requests an unbounded number of elements upstream.")
   static final class FluxTake<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, long n) {
-      return flux.take(n);
+      return flux.take(n, /* limitRequest= */ true);
     }
 
     @AfterTemplate
     Flux<T> after(Flux<T> flux, long n) {
-      return flux.take(n, /* limitRequest= */ true);
+      return flux.take(n);
     }
   }
 
@@ -489,15 +482,20 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#just(Object)} over more contrived alternatives. */
-  static final class FluxJust {
+  static final class FluxJust<T> {
     @BeforeTemplate
-    Flux<Integer> before(int start) {
-      return Flux.range(start, 1);
+    Flux<Integer> before(int value) {
+      return Flux.range(value, 1);
+    }
+
+    @BeforeTemplate
+    Flux<T> before(T value) {
+      return Mono.just(value).repeat().take(1);
     }
 
     @AfterTemplate
-    Flux<Integer> after(int start) {
-      return Flux.just(start);
+    Flux<T> after(T value) {
+      return Flux.just(value);
     }
   }
 
@@ -566,6 +564,7 @@ final class ReactorRules {
         @Matches(IsIdentityOperation.class)
             Function<? super P, ? extends Publisher<? extends S>> identityOperation) {
       return Refaster.anyOf(
+          flux.concatMap(function, 0),
           flux.flatMap(function, 1),
           flux.flatMapSequential(function, 1),
           flux.map(function).concatMap(identityOperation));
@@ -1206,10 +1205,17 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#fromIterable(Iterable)} over less efficient alternatives. */
+  // XXX: Once the `FluxFromStreamSupplier` rule is constrained using
+  // `@NotMatches(IsIdentityOperation.class)`, this rule should also cover
+  // `Flux.fromStream(collection.stream())`.
   static final class FluxFromIterable<T> {
+    // XXX: Once the `MethodReferenceUsage` check is generally enabled, drop the second
+    // `Refaster.anyOf` variant.
     @BeforeTemplate
     Flux<T> before(Collection<T> collection) {
-      return Flux.fromStream(collection.stream());
+      return Flux.fromStream(
+          Refaster.<Supplier<Stream<? extends T>>>anyOf(
+              collection::stream, () -> collection.stream()));
     }
 
     @AfterTemplate
@@ -1910,6 +1916,62 @@ final class ReactorRules {
     @AfterTemplate
     Duration after(StepVerifier.LastStep step, Duration duration) {
       return step.verifyTimeout(duration);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#fromFuture(Supplier)} over {@link Mono#fromFuture(CompletableFuture)}, as
+   * the former may defer initiation of the asynchronous computation until subscription.
+   */
+  static final class MonoFromFutureSupplier<T> {
+    // XXX: Constrain the `future` parameter using `@NotMatches(IsIdentityOperation.class)` once
+    // `IsIdentityOperation` no longer matches nullary method invocations.
+    @BeforeTemplate
+    Mono<T> before(CompletableFuture<T> future) {
+      return Mono.fromFuture(future);
+    }
+
+    @AfterTemplate
+    Mono<T> after(CompletableFuture<T> future) {
+      return Mono.fromFuture(() -> future);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#fromFuture(Supplier, boolean)} over {@link
+   * Mono#fromFuture(CompletableFuture, boolean)}, as the former may defer initiation of the
+   * asynchronous computation until subscription.
+   */
+  static final class MonoFromFutureSupplierBoolean<T> {
+    // XXX: Constrain the `future` parameter using `@NotMatches(IsIdentityOperation.class)` once
+    // `IsIdentityOperation` no longer matches nullary method invocations.
+    @BeforeTemplate
+    Mono<T> before(CompletableFuture<T> future, boolean suppressCancel) {
+      return Mono.fromFuture(future, suppressCancel);
+    }
+
+    @AfterTemplate
+    Mono<T> after(CompletableFuture<T> future, boolean suppressCancel) {
+      return Mono.fromFuture(() -> future, suppressCancel);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#fromStream(Supplier)} over {@link Flux#fromStream(Stream)}, as the former
+   * yields a {@link Flux} that is more likely to behave as expected when subscribed to more than
+   * once.
+   */
+  static final class FluxFromStreamSupplier<T> {
+    // XXX: Constrain the `stream` parameter using `@NotMatches(IsIdentityOperation.class)` once
+    // `IsIdentityOperation` no longer matches nullary method invocations.
+    @BeforeTemplate
+    Flux<T> before(Stream<T> stream) {
+      return Flux.fromStream(stream);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Stream<T> stream) {
+      return Flux.fromStream(() -> stream);
     }
   }
 }
