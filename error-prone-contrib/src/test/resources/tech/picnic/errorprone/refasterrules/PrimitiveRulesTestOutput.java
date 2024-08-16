@@ -9,6 +9,8 @@ import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
+import com.google.common.primitives.UnsignedInts;
+import com.google.common.primitives.UnsignedLongs;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
@@ -22,7 +24,9 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         Floats.class,
         Ints.class,
         Longs.class,
-        Shorts.class);
+        Shorts.class,
+        UnsignedInts.class,
+        UnsignedLongs.class);
   }
 
   ImmutableSet<Boolean> testLessThan() {
@@ -169,5 +173,61 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Boolean> testLongSignumIsNegative() {
     return ImmutableSet.of(
         Long.signum(1L) == -1, Long.signum(2L) == -1, Long.signum(3L) != -1, Long.signum(4L) != -1);
+  }
+
+  int testIntegerCompareUnsigned() {
+    return Integer.compareUnsigned(1, 2);
+  }
+
+  long testLongCompareUnsigned() {
+    return Long.compareUnsigned(1, 2);
+  }
+
+  int testIntegerDivideUnsigned() {
+    return Integer.divideUnsigned(1, 2);
+  }
+
+  long testLongDivideUnsigned() {
+    return Long.divideUnsigned(1, 2);
+  }
+
+  int testIntegerRemainderUnsigned() {
+    return Integer.remainderUnsigned(1, 2);
+  }
+
+  long testLongRemainderUnsigned() {
+    return Long.remainderUnsigned(1, 2);
+  }
+
+  ImmutableSet<Integer> testIntegerParseUnsignedInt() {
+    return ImmutableSet.of(Integer.parseUnsignedInt("1"), Integer.parseUnsignedInt("2"));
+  }
+
+  ImmutableSet<Long> testLongParseUnsignedLong() {
+    return ImmutableSet.of(Long.parseUnsignedLong("1"), Long.parseUnsignedLong("2"));
+  }
+
+  int testIntegerParseUnsignedIntWithRadix() {
+    return Integer.parseUnsignedInt("1", 2);
+  }
+
+  long testLongParseUnsignedLongWithRadix() {
+    return Long.parseUnsignedLong("1", 2);
+  }
+
+  ImmutableSet<String> testIntegerToUnsignedString() {
+    return ImmutableSet.of(Integer.toUnsignedString(1), Integer.toUnsignedString(2));
+  }
+
+  ImmutableSet<String> testLongToUnsignedString() {
+    return ImmutableSet.of(Long.toUnsignedString(1), Long.toUnsignedString(2));
+  }
+
+  String testIntegerToUnsignedStringWithRadix() {
+    return Integer.toUnsignedString(1, 2);
+  }
+
+  String testLongToUnsignedStringWithRadix() {
+    return Long.toUnsignedString(1, 2);
   }
 }
