@@ -13,6 +13,7 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collector;
@@ -107,11 +108,21 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.<String>reverseOrder().compare("baz", "qux"));
   }
 
+  void testSortCollections() {
+    Collections.sort(List.of("foo", "bar"), naturalOrder());
+  }
+
   String testMinOfArray() {
     return Arrays.stream(new String[0]).min(naturalOrder()).orElseThrow();
   }
 
-  String testMinOfCollection() {
+  ImmutableSet<String> testMinOfCollection() {
+    ImmutableSet<String> collection = ImmutableSet.of("foo", "bar");
+    return ImmutableSet.of(
+        Collections.min(collection, naturalOrder()), Collections.max(collection, reverseOrder()));
+  }
+
+  String testMinOfCollectionComparator() {
     return ImmutableSet.of("foo", "bar").stream().min(naturalOrder()).orElseThrow();
   }
 
@@ -147,7 +158,13 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return Arrays.stream(new String[0]).max(naturalOrder()).orElseThrow();
   }
 
-  String testMaxOfCollection() {
+  ImmutableSet<String> testMaxOfCollection() {
+    ImmutableSet<String> collection = ImmutableSet.of("foo", "bar");
+    return ImmutableSet.of(
+        Collections.max(collection, naturalOrder()), Collections.min(collection, reverseOrder()));
+  }
+
+  String testMaxOfCollectionComparator() {
     return ImmutableSet.of("foo", "bar").stream().max(naturalOrder()).orElseThrow();
   }
 
