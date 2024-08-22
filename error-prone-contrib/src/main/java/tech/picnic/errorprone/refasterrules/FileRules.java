@@ -115,7 +115,7 @@ final class FileRules {
   }
 
   /**
-   * Prefer {@link Files#createTempFile(Path,String, String, FileAttribute[])} over alternatives
+   * Prefer {@link Files#createTempFile(Path, String, String, FileAttribute[])} over alternatives
    * that create files with more liberal permissions.
    */
   static final class FilesCreateTempFileInCustomDirectoryToFile {
