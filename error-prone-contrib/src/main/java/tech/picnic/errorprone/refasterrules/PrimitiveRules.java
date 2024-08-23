@@ -192,72 +192,8 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer {@link Boolean#compare(boolean, boolean)} over the Guava alternative. */
-  static final class BooleanCompare {
-    @BeforeTemplate
-    int before(boolean a, boolean b) {
-      return Booleans.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(boolean a, boolean b) {
-      return Boolean.compare(a, b);
-    }
-  }
-
-  /** Prefer {@link Character#compare(char, char)} over the Guava alternative. */
-  static final class CharacterCompare {
-    @BeforeTemplate
-    int before(char a, char b) {
-      return Chars.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(char a, char b) {
-      return Character.compare(a, b);
-    }
-  }
-
-  /** Prefer {@link Short#compare(short, short)} over the Guava alternative. */
-  static final class ShortCompare {
-    @BeforeTemplate
-    int before(short a, short b) {
-      return Shorts.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(short a, short b) {
-      return Short.compare(a, b);
-    }
-  }
-
-  /** Prefer {@link Integer#compare(int, int)} over the Guava alternative. */
-  static final class IntegerCompare {
-    @BeforeTemplate
-    int before(int a, int b) {
-      return Ints.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(int a, int b) {
-      return Integer.compare(a, b);
-    }
-  }
-
-  /** Prefer {@link Long#compare(long, long)} over the Guava alternative. */
-  static final class LongCompare {
-    @BeforeTemplate
-    int before(long a, long b) {
-      return Longs.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(long a, long b) {
-      return Long.compare(a, b);
-    }
-  }
-
   /** Prefer {@link Float#compare(float, float)} over the Guava alternative. */
+  // XXX: Drop this rule once https://github.com/google/guava/pull/7371 is released.
   static final class FloatCompare {
     @BeforeTemplate
     int before(float a, float b) {
@@ -271,6 +207,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@link Double#compare(double, double)} over the Guava alternative. */
+  // XXX: Drop this rule once https://github.com/google/guava/pull/7371 is released.
   static final class DoubleCompare {
     @BeforeTemplate
     int before(double a, double b) {
