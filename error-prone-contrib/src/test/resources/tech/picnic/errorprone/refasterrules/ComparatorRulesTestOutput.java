@@ -14,7 +14,6 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collector;
@@ -99,20 +98,20 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of("foo".compareTo("bar"), "qux".compareTo("baz"));
   }
 
-  void testSortCollections() {
-    Collections.sort(List.of("foo", "bar"));
+  void testCollectionsSort() {
+    Collections.sort(ImmutableList.of("foo", "bar"));
+  }
+
+  ImmutableSet<String> testCollectionsMin() {
+    return ImmutableSet.of(
+        Collections.min(ImmutableList.of("foo")), Collections.min(ImmutableList.of("bar")));
   }
 
   String testMinOfArray() {
     return Collections.min(Arrays.asList(new String[0]), naturalOrder());
   }
 
-  ImmutableSet<String> testMinOfCollection() {
-    ImmutableSet<String> collection = ImmutableSet.of("foo", "bar");
-    return ImmutableSet.of(Collections.min(collection), Collections.min(collection));
-  }
-
-  String testMinOfCollectionComparator() {
+  String testCollectionsMinWithComparator() {
     return Collections.min(ImmutableSet.of("foo", "bar"), naturalOrder());
   }
 
@@ -144,16 +143,16 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparators.min("a", "b", (a, b) -> 1));
   }
 
+  ImmutableSet<String> testCollectionsMax() {
+    return ImmutableSet.of(
+        Collections.max(ImmutableList.of("foo")), Collections.max(ImmutableList.of("bar")));
+  }
+
   String testMaxOfArray() {
     return Collections.max(Arrays.asList(new String[0]), naturalOrder());
   }
 
-  ImmutableSet<String> testMaxOfCollection() {
-    ImmutableSet<String> collection = ImmutableSet.of("foo", "bar");
-    return ImmutableSet.of(Collections.max(collection), Collections.max(collection));
-  }
-
-  String testMaxOfCollectionComparator() {
+  String testCollectionsMaxWithComparator() {
     return Collections.max(ImmutableSet.of("foo", "bar"), naturalOrder());
   }
 

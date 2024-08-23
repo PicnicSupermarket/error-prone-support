@@ -246,7 +246,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Collections#sort(List)} over more verbose alternatives. */
-  static final class SortCollections<T extends Comparable<? super T>> {
+  static final class CollectionsSort<T extends Comparable<? super T>> {
     @BeforeTemplate
     void before(List<T> collection) {
       Collections.sort(collection, naturalOrder());
@@ -255,6 +255,20 @@ final class ComparatorRules {
     @AfterTemplate
     void after(List<T> collection) {
       Collections.sort(collection);
+    }
+  }
+
+  /** Prefer {@link Collections#min(Collection)} over more verbose alternatives. */
+  static final class CollectionsMin<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    T before(Collection<T> collection) {
+      return Refaster.anyOf(
+          Collections.min(collection, naturalOrder()), Collections.max(collection, reverseOrder()));
+    }
+
+    @AfterTemplate
+    T after(Collection<T> collection) {
+      return Collections.min(collection);
     }
   }
 
@@ -274,25 +288,11 @@ final class ComparatorRules {
     }
   }
 
-  /** Prefer {@link Collections#min(Collection)} over more verbose alternatives. */
-  static final class MinOfCollection<T extends Comparable<? super T>> {
-    @BeforeTemplate
-    T before(Collection<T> collection) {
-      return Refaster.anyOf(
-          Collections.min(collection, naturalOrder()), Collections.max(collection, reverseOrder()));
-    }
-
-    @AfterTemplate
-    T after(Collection<T> collection) {
-      return Collections.min(collection);
-    }
-  }
-
   /**
    * Avoid unnecessary creation of a {@link Stream} to determine the minimum of a known collection
    * of values.
    */
-  static final class MinOfCollectionComparator<S, T extends S> {
+  static final class CollectionsMinWithComparator<S, T extends S> {
     @BeforeTemplate
     T before(Collection<T> collection, Comparator<S> cmp) {
       return collection.stream().min(cmp).orElseThrow();
@@ -371,24 +371,8 @@ final class ComparatorRules {
     }
   }
 
-  /**
-   * Avoid unnecessary creation of a {@link Stream} to determine the maximum of a known collection
-   * of values.
-   */
-  static final class MaxOfArray<S, T extends S> {
-    @BeforeTemplate
-    T before(T[] array, Comparator<S> cmp) {
-      return Arrays.stream(array).max(cmp).orElseThrow();
-    }
-
-    @AfterTemplate
-    T after(T[] array, Comparator<S> cmp) {
-      return Collections.max(Arrays.asList(array), cmp);
-    }
-  }
-
   /** Prefer {@link Collections#max(Collection)} over more verbose alternatives. */
-  static final class MaxOfCollection<T extends Comparable<? super T>> {
+  static final class CollectionsMax<T extends Comparable<? super T>> {
     @BeforeTemplate
     T before(Collection<T> collection) {
       return Refaster.anyOf(
@@ -405,7 +389,23 @@ final class ComparatorRules {
    * Avoid unnecessary creation of a {@link Stream} to determine the maximum of a known collection
    * of values.
    */
-  static final class MaxOfCollectionComparator<S, T extends S> {
+  static final class MaxOfArray<S, T extends S> {
+    @BeforeTemplate
+    T before(T[] array, Comparator<S> cmp) {
+      return Arrays.stream(array).max(cmp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(T[] array, Comparator<S> cmp) {
+      return Collections.max(Arrays.asList(array), cmp);
+    }
+  }
+
+  /**
+   * Avoid unnecessary creation of a {@link Stream} to determine the maximum of a known collection
+   * of values.
+   */
+  static final class CollectionsMaxWithComparator<S, T extends S> {
     @BeforeTemplate
     T before(Collection<T> collection, Comparator<S> cmp) {
       return collection.stream().max(cmp).orElseThrow();

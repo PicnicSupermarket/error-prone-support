@@ -13,7 +13,6 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collector;
@@ -108,21 +107,21 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.<String>reverseOrder().compare("baz", "qux"));
   }
 
-  void testSortCollections() {
-    Collections.sort(List.of("foo", "bar"), naturalOrder());
+  void testCollectionsSort() {
+    Collections.sort(ImmutableList.of("foo", "bar"), naturalOrder());
+  }
+
+  ImmutableSet<String> testCollectionsMin() {
+    return ImmutableSet.of(
+        Collections.min(ImmutableList.of("foo"), naturalOrder()),
+        Collections.max(ImmutableList.of("bar"), reverseOrder()));
   }
 
   String testMinOfArray() {
     return Arrays.stream(new String[0]).min(naturalOrder()).orElseThrow();
   }
 
-  ImmutableSet<String> testMinOfCollection() {
-    ImmutableSet<String> collection = ImmutableSet.of("foo", "bar");
-    return ImmutableSet.of(
-        Collections.min(collection, naturalOrder()), Collections.max(collection, reverseOrder()));
-  }
-
-  String testMinOfCollectionComparator() {
+  String testCollectionsMinWithComparator() {
     return ImmutableSet.of("foo", "bar").stream().min(naturalOrder()).orElseThrow();
   }
 
@@ -154,17 +153,17 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Collections.min(ImmutableSet.of("a", "b"), (a, b) -> 1));
   }
 
+  ImmutableSet<String> testCollectionsMax() {
+    return ImmutableSet.of(
+        Collections.max(ImmutableList.of("foo"), naturalOrder()),
+        Collections.min(ImmutableList.of("bar"), reverseOrder()));
+  }
+
   String testMaxOfArray() {
     return Arrays.stream(new String[0]).max(naturalOrder()).orElseThrow();
   }
 
-  ImmutableSet<String> testMaxOfCollection() {
-    ImmutableSet<String> collection = ImmutableSet.of("foo", "bar");
-    return ImmutableSet.of(
-        Collections.max(collection, naturalOrder()), Collections.min(collection, reverseOrder()));
-  }
-
-  String testMaxOfCollectionComparator() {
+  String testCollectionsMaxWithComparator() {
     return ImmutableSet.of("foo", "bar").stream().max(naturalOrder()).orElseThrow();
   }
 
