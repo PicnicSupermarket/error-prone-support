@@ -24,6 +24,7 @@ import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Optional;
@@ -247,14 +248,46 @@ final class ComparatorRules {
    * Avoid unnecessary creation of a {@link Stream} to determine the minimum of a known collection
    * of values.
    */
-  static final class MinOfVarargs<T> {
+  static final class MinOfArray<S, T extends S> {
     @BeforeTemplate
-    T before(@Repeated T value, Comparator<T> cmp) {
+    T before(T[] array, Comparator<S> cmp) {
+      return Arrays.stream(array).min(cmp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(T[] array, Comparator<S> cmp) {
+      return Collections.min(Arrays.asList(array), cmp);
+    }
+  }
+
+  /**
+   * Avoid unnecessary creation of a {@link Stream} to determine the minimum of a known collection
+   * of values.
+   */
+  static final class MinOfCollection<S, T extends S> {
+    @BeforeTemplate
+    T before(Collection<T> collection, Comparator<S> cmp) {
+      return collection.stream().min(cmp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(Collection<T> collection, Comparator<S> cmp) {
+      return Collections.min(collection, cmp);
+    }
+  }
+
+  /**
+   * Avoid unnecessary creation of a {@link Stream} to determine the minimum of a known collection
+   * of values.
+   */
+  static final class MinOfVarargs<S, T extends S> {
+    @BeforeTemplate
+    T before(@Repeated T value, Comparator<S> cmp) {
       return Stream.of(Refaster.asVarargs(value)).min(cmp).orElseThrow();
     }
 
     @AfterTemplate
-    T after(@Repeated T value, Comparator<T> cmp) {
+    T after(@Repeated T value, Comparator<S> cmp) {
       return Collections.min(Arrays.asList(value), cmp);
     }
   }
@@ -314,14 +347,46 @@ final class ComparatorRules {
    * Avoid unnecessary creation of a {@link Stream} to determine the maximum of a known collection
    * of values.
    */
-  static final class MaxOfVarargs<T> {
+  static final class MaxOfArray<S, T extends S> {
     @BeforeTemplate
-    T before(@Repeated T value, Comparator<T> cmp) {
+    T before(T[] array, Comparator<S> cmp) {
+      return Arrays.stream(array).max(cmp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(T[] array, Comparator<S> cmp) {
+      return Collections.max(Arrays.asList(array), cmp);
+    }
+  }
+
+  /**
+   * Avoid unnecessary creation of a {@link Stream} to determine the maximum of a known collection
+   * of values.
+   */
+  static final class MaxOfCollection<S, T extends S> {
+    @BeforeTemplate
+    T before(Collection<T> collection, Comparator<S> cmp) {
+      return collection.stream().max(cmp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(Collection<T> collection, Comparator<S> cmp) {
+      return Collections.max(collection, cmp);
+    }
+  }
+
+  /**
+   * Avoid unnecessary creation of a {@link Stream} to determine the maximum of a known collection
+   * of values.
+   */
+  static final class MaxOfVarargs<S, T extends S> {
+    @BeforeTemplate
+    T before(@Repeated T value, Comparator<S> cmp) {
       return Stream.of(Refaster.asVarargs(value)).max(cmp).orElseThrow();
     }
 
     @AfterTemplate
-    T after(@Repeated T value, Comparator<T> cmp) {
+    T after(@Repeated T value, Comparator<S> cmp) {
       return Collections.max(Arrays.asList(value), cmp);
     }
   }
