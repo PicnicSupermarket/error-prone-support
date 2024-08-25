@@ -40,7 +40,7 @@ jobs:
           checkout-fetch-depth: 0
           java-version: 17.0.10
           java-distribution: temurin
-          maven-version: 3.9.6
+          maven-version: 3.9.8
       - name: Create missing `test` directory
         # XXX: Drop this step in favour of actually having a test.
         run: mkdir refaster-compiler/src/test

@@ -38,7 +38,7 @@ jobs:
           checkout-ref: "refs/pull/${{ github.event.issue.number }}/head"
           java-version: 17.0.10
           java-distribution: temurin
-          maven-version: 3.9.6
+          maven-version: 3.9.8
       - name: Install project to local Maven repository
         run: mvn -T1C install -DskipTests -Dverification.skip
       - name: Run integration test

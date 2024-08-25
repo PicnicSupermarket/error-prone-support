@@ -212,12 +212,12 @@
         <version.error-prone-slf4j>0.1.25</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>17</version.jdk>
-        <version.maven>3.9.5</version.maven>
+        <version.maven>3.9.8</version.maven>
         <version.mockito>5.12.0</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
-        <version.nullaway>0.11.1</version.nullaway>
+        <version.nullaway>0.11.2</version.nullaway>
         <version.pitest-git>1.1.4</version.pitest-git>
-        <version.rewrite-templating>1.12.3</version.rewrite-templating>
+        <version.rewrite-templating>1.13.0</version.rewrite-templating>
         <version.surefire>3.2.3</version.surefire>
     </properties>
 
@@ -365,7 +365,7 @@
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2023.0.8</version>
+                <version>2023.0.9</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -417,7 +417,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.14.18</version>
+                <version>1.14.19</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -462,7 +462,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.10.3</version>
+                <version>5.11.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -1114,7 +1114,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>3.2.4</version>
+                    <version>3.2.5</version>
                     <executions>
                         <execution>
                             <id>sign-artifacts</id>
