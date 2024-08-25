@@ -38,26 +38,29 @@ jobs:
             www.bestpractices.dev:443
             www.youtube.com:443
             youtrack.jetbrains.com:443
-      - name: Check out code
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@489441643219d2b93ee2a127b2402eb640a1b947 # v1.13.0
         with:
-          persist-credentials: false
+          java-version: 17.0.10
+          java-distribution: temurin
+          maven-version: 3.9.6
       - uses: ruby/setup-ruby@6bd3d993c602f6b675728ebaecb2b569ff86e99b # v1.174.0
         with:
           working-directory: ./website
           bundler-cache: true
       - name: Configure Github Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - name: Compile project and extract data
+        run: mvn -T1C clean install -DskipTests -Dverification.skip -Pdocgen
       - name: Generate documentation
-        run: ./generate-docs.sh
+        run: mvn exec:java@generate-docs -pl documentation-support
       - name: Build website with Jekyll
         working-directory: ./website
         run: bundle exec jekyll build
       - name: Validate HTML output
         working-directory: ./website
-        # XXX: Drop `--disable_external true` once we fully adopted the
-        # "Refaster rules" terminology on our website and in the code.
-        run: bundle exec htmlproofer --disable_external true --check-external-hash false ./_site
+        # XXX: StackOverflow returns a 403 when run on GHA.
+        run: bundle exec htmlproofer --no-check-external-hash --swap-url 'https\://error-prone.picnic.tech:' --ignore-urls '/^https:\/\/stackoverflow.com\/.*/' ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:

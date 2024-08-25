@@ -39,7 +39,15 @@
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -66,6 +74,10 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.java-diff-utils</groupId>
+            <artifactId>java-diff-utils</artifactId>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
@@ -95,4 +107,29 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>generate-docs</id>
+                            <goals>
+                                <goal>java</goal>
+                            </goals>
+                            <configuration>
+                                <mainClass>tech.picnic.errorprone.documentation.JekyllCollectionGenerator</mainClass>
+                                <arguments>
+                                    <argument>${maven.multiModuleProjectDirectory}</argument>
+                                </arguments>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
