@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static reactor.function.TupleUtils.function;
 
+import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -1953,6 +1954,22 @@ final class ReactorRules {
     @AfterTemplate
     Mono<T> after(CompletableFuture<T> future, boolean suppressCancel) {
       return Mono.fromFuture(() -> future, suppressCancel);
+    }
+  }
+
+  /**
+   * Don't propagate {@link Mono} cancellations to an upstream cache value computation, as
+   * completion of such computations may benefit concurrent or subsequent cache usages.
+   */
+  static final class MonoFromFutureAsyncLoadingCacheGet<K, V> {
+    @BeforeTemplate
+    Mono<V> before(AsyncLoadingCache<K, V> cache, K key) {
+      return Mono.fromFuture(() -> cache.get(key));
+    }
+
+    @AfterTemplate
+    Mono<V> after(AsyncLoadingCache<K, V> cache, K key) {
+      return Mono.fromFuture(() -> cache.get(key), /* suppressCancel= */ true);
     }
   }
 
