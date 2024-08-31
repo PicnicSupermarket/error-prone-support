@@ -34,21 +34,25 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocumentation;
+import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestCase;
+import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestCases;
 import tech.picnic.errorprone.documentation.BugPatternTestExtractor.IdentificationTestEntry;
 import tech.picnic.errorprone.documentation.BugPatternTestExtractor.ReplacementTestEntry;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestCase;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestCases;
 import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestEntry;
-import tech.picnic.errorprone.documentation.models.RefasterTemplateCollectionTestData;
-import tech.picnic.errorprone.documentation.models.RefasterTemplateTestData;
+import tech.picnic.errorprone.documentation.RefasterRuleCollectionTestExtractor.RefasterTestCase;
+import tech.picnic.errorprone.documentation.RefasterRuleCollectionTestExtractor.RefasterTestCases;
 
+/**
+ * A command line utility that produces configuration files for the Jekyll-based Error Prone Support
+ * website.
+ */
+// XXX: Expand the class documentation.
 // XXX: Rename this class. Then also update the reference in `website/.gitignore`.
 // XXX: Now that we have bug checkers in multiple Maven modules, we should
 // likely document the source of each check on the website, perhaps even
@@ -61,9 +65,16 @@ public final class JekyllCollectionGenerator {
   // XXX: Review class setup.
   private JekyllCollectionGenerator() {}
 
+  /**
+   * Runs the application.
+   *
+   * @param args Arguments to the application; must specify the path to the Error Prone Support
+   *     project root, and nothing else.
+   * @throws IOException If any file could not be read or written.
+   */
   public static void main(String[] args) throws IOException {
     checkArgument(args.length == 1, "Precisely one project root path must be provided");
-    Path projectRoot = Paths.get(args[0]).toAbsolutePath();
+    Path projectRoot = Path.of(args[0]).toAbsolutePath();
 
     generateIndex(projectRoot);
     PageGenerator.apply(projectRoot);
@@ -98,11 +109,9 @@ public final class JekyllCollectionGenerator {
             .enable(YAMLGenerator.Feature.USE_PLATFORM_LINE_BREAKS)
             .build();
 
-    // XXX: Rename the data types?
     private final List<BugPatternDocumentation> bugPatterns = new ArrayList<>();
-    private final List<TestCases> bugPatternTests = new ArrayList<>();
-    private final List<RefasterTemplateCollectionTestData> refasterTemplateCollectionTests =
-        new ArrayList<>();
+    private final List<BugPatternTestCases> bugPatternTests = new ArrayList<>();
+    private final List<RefasterTestCases> refasterRuleCollectionTests = new ArrayList<>();
 
     static void apply(Path projectRoot) throws IOException {
       PageGenerator pageGenerator = new PageGenerator();
@@ -119,14 +128,15 @@ public final class JekyllCollectionGenerator {
       // XXX: If we use a consistent ID separator, then this can become a switch statement. Now we
       // depend on evaluation order.
       // XXX: Alternatively, use polymorphism and let Jackson figure it out.
+      // XXX: If we stick with an ID-based approach, then deduplicate the ID references here and in
+      // the `Extractor` implementations.
       String fileName = file.getFileName().toString();
       if (fileName.startsWith("bugpattern-test")) {
-        bugPatternTests.add(Json.read(file, TestCases.class));
+        bugPatternTests.add(Json.read(file, BugPatternTestCases.class));
       } else if (fileName.startsWith("bugpattern")) {
         bugPatterns.add(Json.read(file, BugPatternDocumentation.class));
-      } else if (fileName.startsWith("refaster-test")) {
-        refasterTemplateCollectionTests.add(
-            Json.read(file, RefasterTemplateCollectionTestData.class));
+      } else if (fileName.startsWith("refaster-rule-collection-test")) {
+        refasterRuleCollectionTests.add(Json.read(file, RefasterTestCases.class));
       } else {
         // XXX: Handle differently?
         throw new IllegalStateException("Unexpected file: " + fileName);
@@ -169,7 +179,7 @@ public final class JekyllCollectionGenerator {
               .flatMap(testCases -> testCases.testCases().stream())
               .collect(
                   flatteningToImmutableListMultimap(
-                      TestCase::classUnderTest, t -> t.entries().stream()));
+                      BugPatternTestCase::classUnderTest, t -> t.entries().stream()));
 
       return bugPatterns.stream()
           .map(
@@ -195,13 +205,13 @@ public final class JekyllCollectionGenerator {
 
     private ImmutableList<JekyllRefasterRuleCollectionDescription>
         getJekyllRefasterRuleCollectionDescription() {
-      ImmutableTable<String, Boolean, List<RefasterTemplateTestData>> refasterTests =
-          refasterTemplateCollectionTests.stream()
+      ImmutableTable<String, Boolean, List<RefasterTestCase>> refasterTests =
+          refasterRuleCollectionTests.stream()
               .collect(
                   toImmutableTable(
-                      RefasterTemplateCollectionTestData::templateCollection,
-                      RefasterTemplateCollectionTestData::isInput,
-                      RefasterTemplateCollectionTestData::templateTests));
+                      RefasterTestCases::ruleCollection,
+                      RefasterTestCases::isInput,
+                      RefasterTestCases::testCases));
 
       return refasterTests.rowMap().entrySet().stream()
           .map(
@@ -222,8 +232,7 @@ public final class JekyllCollectionGenerator {
     }
 
     private static ImmutableList<JekyllRefasterRuleCollectionDescription.Rule> getRules(
-        @Nullable List<RefasterTemplateTestData> inputTests,
-        @Nullable List<RefasterTemplateTestData> outputTests) {
+        @Nullable List<RefasterTestCase> inputTests, @Nullable List<RefasterTestCase> outputTests) {
       ImmutableMap<String, String> inputs = indexRefasterTestData(inputTests);
       ImmutableMap<String, String> outputs = indexRefasterTestData(outputTests);
 
@@ -243,14 +252,11 @@ public final class JekyllCollectionGenerator {
     }
 
     private static ImmutableMap<String, String> indexRefasterTestData(
-        @Nullable List<RefasterTemplateTestData> data) {
+        @Nullable List<RefasterTestCase> data) {
       return data == null
           ? ImmutableMap.of()
           : data.stream()
-              .collect(
-                  toImmutableMap(
-                      RefasterTemplateTestData::templateName,
-                      RefasterTemplateTestData::templateTestContent));
+              .collect(toImmutableMap(RefasterTestCase::name, RefasterTestCase::content));
     }
 
     private static String generateDiff(ReplacementTestEntry testEntry) {

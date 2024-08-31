@@ -14,7 +14,7 @@ Jekyll-digestible format. Unless and relevant Java code has been changed, these
 commands needs to be executed once.
 
 ```sh
-mvn -T1C clean install -DskipTests -Dverification.skip -Pdocgen
+mvn -T1C clean install -DskipTests -Dverification.skip
 mvn exec:java@generate-docs -pl documentation-support
 ```
 

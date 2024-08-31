@@ -51,7 +51,7 @@ jobs:
       - name: Configure Github Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
       - name: Compile project and extract data
-        run: mvn -T1C clean install -DskipTests -Dverification.skip -Pdocgen
+        run: mvn -T1C clean install -DskipTests -Dverification.skip
       - name: Generate documentation
         run: mvn exec:java@generate-docs -pl documentation-support
       - name: Build website with Jekyll
