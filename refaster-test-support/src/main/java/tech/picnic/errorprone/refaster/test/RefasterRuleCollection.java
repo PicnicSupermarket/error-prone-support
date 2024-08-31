@@ -61,6 +61,9 @@ import tech.picnic.errorprone.refaster.runner.Refaster;
 // XXX: This check currently only validates that one `Refaster.anyOf` branch in one
 // `@BeforeTemplate` method is covered by a test. Review how we can make sure that _all_
 // `@BeforeTemplate` methods and `Refaster.anyOf` branches are covered.
+// XXX: Look into replacing this setup with another that allows test cases to be co-located
+// with/nested within the rules. This way any rule change only requires modifications in a single
+// place, rather than in three.
 @BugPattern(summary = "Exercises a Refaster rule collection", linkType = NONE, severity = ERROR)
 @SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
 public final class RefasterRuleCollection extends BugChecker implements CompilationUnitTreeMatcher {

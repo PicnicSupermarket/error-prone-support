@@ -35,6 +35,7 @@ final class ImmutableSortedMultisetRulesTest implements RefasterRuleCollectionTe
     return ImmutableMultiset.of(ImmutableSortedMultiset.of(), ImmutableSortedMultiset.of());
   }
 
+  @SuppressWarnings("unchecked")
   ImmutableMultiset<ImmutableSortedMultiset<Integer>> testIterableToImmutableSortedMultiset() {
     return ImmutableMultiset.of(
         ImmutableSortedMultiset.copyOf(ImmutableList.of(1)),
