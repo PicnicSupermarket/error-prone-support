@@ -287,6 +287,55 @@
                             <arg>-Xplugin:DocumentationGenerator -XoutputDirectory=${project.build.directory}/docs</arg>
                         </compilerArgs>
                     </configuration>
+                    <executions>
+                        <!-- The Refaster input/output test classes used by
+                        `RefasterRuleCollection` are modelled as classpath
+                        resources, and thus not subject to the default test
+                        compilation step. These two custom compilation steps
+                        serve two purposes:
+                        - To provide early feedback in case of syntax errors.
+                        - To enable the `DocumentationGenerator` compiler
+                        plugin to extract documentation metadata from them.
+                        Note that the input and output files must be compiled
+                        separately and to distinct output directories, as they
+                        define the same set of class names. -->
+                        <!-- XXX: Drop these executions if/when the Refaster
+                        test framework is reimlemented such that tests can be
+                        located alongside rules, rather than in two additional
+                        resource files. -->
+                        <execution>
+                            <id>compile-refaster-test-input</id>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                            <phase>process-test-resources</phase>
+                            <configuration>
+                                <compileSourceRoots>
+                                    <compileSourceRoot>${project.basedir}/src/test/resources</compileSourceRoot>
+                                </compileSourceRoots>
+                                <testIncludes>
+                                    <testInclude>**/*Input.java</testInclude>
+                                </testIncludes>
+                                <outputDirectory>${project.build.directory}/refaster-test-input</outputDirectory>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>compile-refaster-test-output</id>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                            <phase>process-test-resources</phase>
+                            <configuration>
+                                <compileSourceRoots>
+                                    <compileSourceRoot>${project.basedir}/src/test/resources</compileSourceRoot>
+                                </compileSourceRoots>
+                                <testIncludes>
+                                    <testInclude>**/*Output.java</testInclude>
+                                </testIncludes>
+                                <outputDirectory>${project.build.directory}/refaster-test-output</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

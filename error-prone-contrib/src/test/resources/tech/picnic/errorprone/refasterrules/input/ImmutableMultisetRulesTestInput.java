@@ -26,6 +26,7 @@ final class ImmutableMultisetRulesTest implements RefasterRuleCollectionTestCase
         Stream.<Integer>empty().collect(toImmutableMultiset()));
   }
 
+  @SuppressWarnings("unchecked")
   ImmutableMultiset<ImmutableMultiset<Integer>> testIterableToImmutableMultiset() {
     return ImmutableMultiset.of(
         ImmutableList.of(1).stream().collect(toImmutableMultiset()),
