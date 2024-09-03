@@ -70,7 +70,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
     String className = tree.getSimpleName().toString();
 
     // XXX: Instead of throwing an error here, it'd be nicer to have a bug checker validate key
-    // aspects of `RefasterRuleCollectionRefasterTestCase` subtypes.
+    // aspects of `RefasterRuleCollectionTestCase` subtypes.
     return tryExtractPatternGroup(className, TEST_CLASS_NAME_PATTERN)
         .orElseThrow(
             violation(
@@ -82,7 +82,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
     String path = sourceFile.getPath();
 
     // XXX: Instead of throwing an error here, it'd be nicer to have a bug checker validate key
-    // aspects of `RefasterRuleCollectionRefasterTestCase` subtypes.
+    // aspects of `RefasterRuleCollectionTestCase` subtypes.
     return "Input"
         .equals(
             tryExtractPatternGroup(path, TEST_CLASS_FILE_NAME_PATTERN)
@@ -118,7 +118,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
   private static String getFormattedSource(MethodTree method, VisitorState state) {
     String source = SourceCode.treeToString(method, state);
     int finalNewline = source.lastIndexOf(LINE_SEPARATOR);
-    if (finalNewline < 0) {
+    if (finalNewline == -1) {
       return source;
     }
 
