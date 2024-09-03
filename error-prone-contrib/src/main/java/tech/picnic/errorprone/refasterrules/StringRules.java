@@ -246,6 +246,7 @@ final class StringRules {
   }
 
   /** Prefer {@link String#indexOf(int, int)} over less efficient alternatives. */
+  // XXX: The suggested alternative may yield a result less than -1.
   static final class StringIndexOfChar {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
@@ -255,11 +256,12 @@ final class StringRules {
 
     @AfterTemplate
     int after(String string, int ch, int fromIndex) {
-      return string.indexOf(ch, fromIndex);
+      return string.indexOf(ch, fromIndex) - fromIndex;
     }
   }
 
   /** Prefer {@link String#indexOf(String, int)} over less efficient alternatives. */
+  // XXX: The suggested alternative may yield a result less than -1.
   static final class StringIndexOfString {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
@@ -269,7 +271,7 @@ final class StringRules {
 
     @AfterTemplate
     int after(String string, String substring, int fromIndex) {
-      return string.indexOf(substring, fromIndex);
+      return string.indexOf(substring, fromIndex) - fromIndex;
     }
   }
 

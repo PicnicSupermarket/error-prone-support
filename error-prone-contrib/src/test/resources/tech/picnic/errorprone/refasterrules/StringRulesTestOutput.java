@@ -98,11 +98,11 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   int testStringIndexOfChar() {
-    return "foo".indexOf('a', 1);
+    return "foo".indexOf('a', 1) - 1;
   }
 
   int testStringIndexOfString() {
-    return "foo".indexOf("bar", 1);
+    return "foo".indexOf("bar", 1) - 1;
   }
 
   int testStringLastIndexOfChar() {
