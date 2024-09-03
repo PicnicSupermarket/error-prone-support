@@ -248,6 +248,7 @@ final class StringRules {
   /** Prefer {@link String#indexOf(int, int)} over less efficient alternatives. */
   static final class StringIndexOfChar {
     @BeforeTemplate
+    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
     int before(String string, int ch, int fromIndex) {
       return string.substring(fromIndex).indexOf(ch);
     }
@@ -261,6 +262,7 @@ final class StringRules {
   /** Prefer {@link String#indexOf(String, int)} over less efficient alternatives. */
   static final class StringIndexOfString {
     @BeforeTemplate
+    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
     int before(String string, String substring, int fromIndex) {
       return string.substring(fromIndex).indexOf(substring);
     }
@@ -277,8 +279,9 @@ final class StringRules {
   /** Prefer {@link String#lastIndexOf(int, int)} over less efficient alternatives. */
   static final class StringLastIndexOfChar {
     @BeforeTemplate
+    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
     int before(String string, int ch, int fromIndex) {
-      return string.substring(fromIndex).lastIndexOf(ch);
+      return string.substring(0, fromIndex).lastIndexOf(ch);
     }
 
     @AfterTemplate
@@ -290,8 +293,9 @@ final class StringRules {
   /** Prefer {@link String#lastIndexOf(String, int)} over less efficient alternatives. */
   static final class StringLastIndexOfString {
     @BeforeTemplate
+    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
     int before(String string, String substring, int fromIndex) {
-      return string.substring(fromIndex).lastIndexOf(substring);
+      return string.substring(0, fromIndex).lastIndexOf(substring);
     }
 
     @AfterTemplate
@@ -303,6 +307,7 @@ final class StringRules {
   /** Prefer {@link String#startsWith(String, int)} over less efficient alternatives. */
   static final class StringStartsWith {
     @BeforeTemplate
+    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
     boolean before(String string, String prefix, int fromIndex) {
       return string.substring(fromIndex).startsWith(prefix);
     }
