@@ -122,7 +122,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
       return source;
     }
 
-    int indentation = source.substring(finalNewline).lastIndexOf(' ');
+    int indentation = Math.max(0, source.lastIndexOf(' ') - finalNewline);
     String prefixToStrip = " ".repeat(indentation);
 
     return LINE_SPLITTER
