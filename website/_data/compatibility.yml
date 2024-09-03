@@ -4,6 +4,7 @@ releases:
   - version: 0.18.0
     compatible:
       - "2.30.0"
+      - "2.31.0"
   - version: 0.17.0
     compatible:
       - "2.29.2"
