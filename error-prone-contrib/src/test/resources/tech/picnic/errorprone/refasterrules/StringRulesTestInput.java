@@ -96,4 +96,24 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
   int testUtf8EncodedLength() {
     return "foo".getBytes(UTF_8).length;
   }
+
+  int testStringIndexOfChar() {
+    return "foo".substring(1).indexOf('a');
+  }
+
+  int testStringIndexOfString() {
+    return "foo".substring(1).indexOf("bar");
+  }
+
+  int testStringLastIndexOfChar() {
+    return "foo".substring(1).lastIndexOf('a');
+  }
+
+  int testStringLastIndexOfString() {
+    return "foo".substring(1).lastIndexOf("bar");
+  }
+
+  boolean testStringStartsWith() {
+    return "foo".substring(1).startsWith("bar");
+  }
 }
