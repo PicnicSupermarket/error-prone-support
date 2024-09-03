@@ -80,11 +80,9 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.of("foo").or(() -> Optional.of("bar")).orElseThrow();
   }
 
-  ImmutableSet<String> testOptionalOrElseGet() {
+  ImmutableSet<String> testOptionalOrElse() {
     return ImmutableSet.of(
-        Optional.of("foo").orElse("bar"),
-        Optional.of("baz").orElse(toString()),
-        Optional.of("qux").orElseGet(() -> String.valueOf(true)));
+        Optional.of("foo").orElse("bar"), Optional.of("baz").orElseGet(() -> toString()));
   }
 
   ImmutableSet<Object> testStreamFlatMapOptional() {

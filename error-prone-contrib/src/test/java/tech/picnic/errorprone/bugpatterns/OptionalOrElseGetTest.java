@@ -5,14 +5,15 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class OptionalOrElseTest {
+final class OptionalOrElseGetTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(OptionalOrElse.class, getClass())
+    CompilationTestHelper.newInstance(OptionalOrElseGet.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.google.errorprone.refaster.Refaster;",
             "import java.util.Optional;",
+            "import java.util.function.Supplier;",
             "",
             "class A {",
             "  private final Optional<Object> optional = Optional.empty();",
@@ -27,6 +28,7 @@ final class OptionalOrElseTest {
             "    optional.orElse(string);",
             "    optional.orElse(this.string);",
             "    optional.orElse(Refaster.anyOf(\"constant\", \"another\"));",
+            "    Optional.<Supplier<String>>empty().orElse(() -> \"constant\");",
             "",
             "    // BUG: Diagnostic contains:",
             "    Optional.empty().orElse(string + \"constant\");",
@@ -67,7 +69,7 @@ final class OptionalOrElseTest {
 
   @Test
   void replacement() {
-    BugCheckerRefactoringTestHelper.newInstance(OptionalOrElse.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(OptionalOrElseGet.class, getClass())
         .addInputLines(
             "A.java",
             "import java.util.Optional;",
