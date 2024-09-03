@@ -279,7 +279,6 @@ final class StringRules {
   /** Prefer {@link String#lastIndexOf(int, int)} over less efficient alternatives. */
   static final class StringLastIndexOfChar {
     @BeforeTemplate
-    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
     int before(String string, int ch, int fromIndex) {
       return string.substring(0, fromIndex).lastIndexOf(ch);
     }
@@ -293,7 +292,6 @@ final class StringRules {
   /** Prefer {@link String#lastIndexOf(String, int)} over less efficient alternatives. */
   static final class StringLastIndexOfString {
     @BeforeTemplate
-    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
     int before(String string, String substring, int fromIndex) {
       return string.substring(0, fromIndex).lastIndexOf(substring);
     }
