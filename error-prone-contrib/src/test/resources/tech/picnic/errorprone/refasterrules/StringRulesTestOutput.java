@@ -98,19 +98,19 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   int testStringIndexOfChar() {
-    return "foo".indexOf('a', 1) - 1;
+    return Math.max(-1, "foo".indexOf('a', 1) - 1);
   }
 
   int testStringIndexOfString() {
-    return "foo".indexOf("bar", 1) - 1;
+    return Math.max(-1, "foo".indexOf("bar", 1) - 1);
   }
 
   int testStringLastIndexOfChar() {
-    return "foo".lastIndexOf('a', 1);
+    return "foo".lastIndexOf('a', 2 - 1);
   }
 
   int testStringLastIndexOfString() {
-    return "foo".lastIndexOf("bar", 1);
+    return "foo".lastIndexOf("bar", 2 - 1);
   }
 
   boolean testStringStartsWith() {
