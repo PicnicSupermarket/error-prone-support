@@ -106,10 +106,18 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   int testStringLastIndexOfChar() {
-    return "foo".substring(0, 2).lastIndexOf('a');
+    return "foo".substring(1).lastIndexOf('a');
   }
 
   int testStringLastIndexOfString() {
+    return "foo".substring(1).lastIndexOf("bar");
+  }
+
+  int testStringLastIndexOfCharWithIndex() {
+    return "foo".substring(0, 2).lastIndexOf('a');
+  }
+
+  int testStringLastIndexOfStringWithIndex() {
     return "foo".substring(0, 2).lastIndexOf("bar");
   }
 

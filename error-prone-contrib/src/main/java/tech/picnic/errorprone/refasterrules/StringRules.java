@@ -279,6 +279,34 @@ final class StringRules {
   /** Prefer {@link String#lastIndexOf(int, int)} over less efficient alternatives. */
   static final class StringLastIndexOfChar {
     @BeforeTemplate
+    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
+    int before(String string, int ch, int fromIndex) {
+      return string.substring(fromIndex).lastIndexOf(ch);
+    }
+
+    @AfterTemplate
+    int after(String string, int ch, int fromIndex) {
+      return Math.max(-1, string.lastIndexOf(ch) - fromIndex);
+    }
+  }
+
+  /** Prefer {@link String#lastIndexOf(String, int)} over less efficient alternatives. */
+  static final class StringLastIndexOfString {
+    @BeforeTemplate
+    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
+    int before(String string, String substring, int fromIndex) {
+      return string.substring(fromIndex).lastIndexOf(substring);
+    }
+
+    @AfterTemplate
+    int after(String string, String substring, int fromIndex) {
+      return Math.max(-1, string.lastIndexOf(substring) - fromIndex);
+    }
+  }
+
+  /** Prefer {@link String#lastIndexOf(int, int)} over less efficient alternatives. */
+  static final class StringLastIndexOfCharWithIndex {
+    @BeforeTemplate
     int before(String string, int ch, int fromIndex) {
       return string.substring(0, fromIndex).lastIndexOf(ch);
     }
@@ -292,7 +320,7 @@ final class StringRules {
   /** Prefer {@link String#lastIndexOf(String, int)} over less efficient alternatives. */
   // XXX: The replacement expression isn't fully equivalent: in case `substring` is empty, then
   // the replacement yields `fromIndex - 1` rather than `fromIndex`.
-  static final class StringLastIndexOfString {
+  static final class StringLastIndexOfStringWithIndex {
     @BeforeTemplate
     int before(String string, String substring, int fromIndex) {
       return string.substring(0, fromIndex).lastIndexOf(substring);
