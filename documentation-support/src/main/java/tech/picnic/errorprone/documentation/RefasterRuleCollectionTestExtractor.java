@@ -27,7 +27,7 @@ import tech.picnic.errorprone.utils.SourceCode;
  * An {@link Extractor} that describes how to extract data from Refaster rule input and output test
  * classes.
  */
-// XXX: Drop this extractor if/when the Refaster test framework is reimlemented such that tests can
+// XXX: Drop this extractor if/when the Refaster test framework is reimplemented such that tests can
 // be located alongside rules, rather than in two additional resource files as currently required by
 // `RefasterRuleCollection`.
 @Immutable
