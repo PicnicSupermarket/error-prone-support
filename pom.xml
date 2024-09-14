@@ -366,6 +366,11 @@
                 <version>0.12.9</version>
             </dependency>
             <dependency>
+                <groupId>io.github.java-diff-utils</groupId>
+                <artifactId>java-diff-utils</artifactId>
+                <version>4.12</version>
+            </dependency>
+            <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
                 <version>1.15.4</version>
@@ -1770,6 +1775,11 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-enforcer-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.4.1</version>
                     </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
