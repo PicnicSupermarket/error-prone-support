@@ -2,6 +2,7 @@ name: Update `error-prone.picnic.tech` website content
 on:
   pull_request:
   push:
+    # XXX: Drop/replace references to `website` in favour of `master`.
     branches: [ master, website ]
 permissions:
   contents: read
@@ -39,26 +40,30 @@ jobs:
             www.bestpractices.dev:443
             www.youtube.com:443
             youtrack.jetbrains.com:443
-      - name: Check out code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
-          persist-credentials: false
+          java-version: 21.0.7
+          java-distribution: temurin
+          maven-version: 3.9.11
       - uses: ruby/setup-ruby@ae195bbe749a7cef685ac729197124a48305c1cb # v1.276.0
         with:
           working-directory: ./website
           bundler-cache: true
       - name: Configure Github Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - name: Compile project and extract data
+        run: mvn -T1C clean install -DskipTests -Dverification.skip
       - name: Generate documentation
-        run: ./generate-docs.sh
+        run: mvn exec:java@generate-docs -pl documentation-support
       - name: Build website with Jekyll
         working-directory: ./website
         run: bundle exec jekyll build
       - name: Validate HTML output
         working-directory: ./website
-        # XXX: Drop `--disable_external true` once we fully adopted the
-        # "Refaster rules" terminology on our website and in the code.
-        run: bundle exec htmlproofer --disable_external true --check-external-hash false ./_site
+        # XXX: Bealdung and StackOverflow return HTTP 403 responses when run on
+        # a GitHub Action node.
+        run: bundle exec htmlproofer --no-check-external-hash --swap-url 'https\://error-prone.picnic.tech:' --ignore-urls '/^https:\/\/(www\.baeldung\.com|stackoverflow\.com)\/.*/' --ignore-status-codes 429 ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
         with:

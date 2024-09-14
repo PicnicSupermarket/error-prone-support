@@ -1,8 +1,27 @@
 ruby File.read(".ruby-version").strip
 
 source "https://rubygems.org"
-gem "html-proofer", "4.4.1"
-gem "jekyll", "4.2.2"
-gem "jekyll-sitemap", "1.4"
-gem "just-the-docs", "0.4.0.rc2"
-gem "webrick", "1.7"
+
+# XXX: This dependency group is declared to suppress Ruby depreciation
+# warnings. Drop once redundant.
+group :standard_library_replacements do
+  gem "base64", "0.2.0"
+  gem "csv", "3.3.0"
+  gem "logger", "1.6.1"
+end
+
+group :jekyll_site_dependencies do
+  gem "jekyll", "4.3.4"
+  gem "jekyll-sitemap", "1.4.0"
+  gem "just-the-docs", "0.10.0"
+  gem "rake", "13.2.1"
+  # XXX: Drop this `sass-embedded` version pinning once various parts of the
+  # ecosystem caught up. See
+  # https://github.com/just-the-docs/just-the-docs/issues/1541#issuecomment-2401649789.
+  gem "sass-embedded", "1.78.0"
+  gem "webrick", "1.9.0"
+end
+
+group :website_validation_dependencies do
+  gem "html-proofer", "5.0.9"
+end
