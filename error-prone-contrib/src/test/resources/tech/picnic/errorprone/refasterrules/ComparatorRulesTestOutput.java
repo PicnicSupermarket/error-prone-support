@@ -98,11 +98,20 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of("foo".compareTo("bar"), "qux".compareTo("baz"));
   }
 
+  void testCollectionsSort() {
+    Collections.sort(ImmutableList.of("foo", "bar"));
+  }
+
+  ImmutableSet<String> testCollectionsMin() {
+    return ImmutableSet.of(
+        Collections.min(ImmutableList.of("foo")), Collections.min(ImmutableList.of("bar")));
+  }
+
   String testMinOfArray() {
     return Collections.min(Arrays.asList(new String[0]), naturalOrder());
   }
 
-  String testMinOfCollection() {
+  String testCollectionsMinWithComparator() {
     return Collections.min(ImmutableSet.of("foo", "bar"), naturalOrder());
   }
 
@@ -134,11 +143,16 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparators.min("a", "b", (a, b) -> 1));
   }
 
+  ImmutableSet<String> testCollectionsMax() {
+    return ImmutableSet.of(
+        Collections.max(ImmutableList.of("foo")), Collections.max(ImmutableList.of("bar")));
+  }
+
   String testMaxOfArray() {
     return Collections.max(Arrays.asList(new String[0]), naturalOrder());
   }
 
-  String testMaxOfCollection() {
+  String testCollectionsMaxWithComparator() {
     return Collections.max(ImmutableSet.of("foo", "bar"), naturalOrder());
   }
 

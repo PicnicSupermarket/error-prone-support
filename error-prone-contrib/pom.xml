@@ -68,6 +68,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service-annotations</artifactId>
             <scope>provided</scope>
@@ -300,7 +305,7 @@
                         separately and to distinct output directories, as they
                         define the same set of class names. -->
                         <!-- XXX: Drop these executions if/when the Refaster
-                        test framework is reimlemented such that tests can be
+                        test framework is reimplemented such that tests can be
                         located alongside rules, rather than in two additional
                         resource files. -->
                         <execution>

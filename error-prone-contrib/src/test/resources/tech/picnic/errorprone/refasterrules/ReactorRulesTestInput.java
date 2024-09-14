@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.minBy;
 import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -662,6 +663,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Mono<Void> testMonoFromFutureSupplierBoolean() {
     return Mono.fromFuture(CompletableFuture.completedFuture(null), true);
+  }
+
+  Mono<String> testMonoFromFutureAsyncLoadingCacheGet() {
+    return Mono.fromFuture(() -> ((AsyncLoadingCache<Integer, String>) null).get(0));
   }
 
   Flux<Integer> testFluxFromStreamSupplier() {

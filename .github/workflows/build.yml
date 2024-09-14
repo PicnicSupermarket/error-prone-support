@@ -46,7 +46,7 @@ jobs:
         with:
           java-version: ${{ matrix.jdk }}
           java-distribution: ${{ matrix.distribution }}
-          maven-version: 3.9.8
+          maven-version: 3.9.9
       - name: Display build environment details
         run: mvn --version
       - name: Build project against vanilla Error Prone, compile Javadoc

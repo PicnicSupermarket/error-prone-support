@@ -27,7 +27,7 @@ import tech.picnic.errorprone.utils.SourceCode;
  * An {@link Extractor} that describes how to extract data from Refaster rule input and output test
  * classes.
  */
-// XXX: Drop this extractor if/when the Refaster test framework is reimlemented such that tests can
+// XXX: Drop this extractor if/when the Refaster test framework is reimplemented such that tests can
 // be located alongside rules, rather than in two additional resource files as currently required by
 // `RefasterRuleCollection`.
 @Immutable
@@ -70,7 +70,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
     String className = tree.getSimpleName().toString();
 
     // XXX: Instead of throwing an error here, it'd be nicer to have a bug checker validate key
-    // aspects of `RefasterRuleCollectionRefasterTestCase` subtypes.
+    // aspects of `RefasterRuleCollectionTestCase` subtypes.
     return tryExtractPatternGroup(className, TEST_CLASS_NAME_PATTERN)
         .orElseThrow(
             violation(
@@ -82,7 +82,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
     String path = sourceFile.getPath();
 
     // XXX: Instead of throwing an error here, it'd be nicer to have a bug checker validate key
-    // aspects of `RefasterRuleCollectionRefasterTestCase` subtypes.
+    // aspects of `RefasterRuleCollectionTestCase` subtypes.
     return "Input"
         .equals(
             tryExtractPatternGroup(path, TEST_CLASS_FILE_NAME_PATTERN)
@@ -122,7 +122,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
       return source;
     }
 
-    int indentation = source.substring(finalNewline).lastIndexOf(' ');
+    int indentation = Math.max(0, source.lastIndexOf(' ') - finalNewline);
     String prefixToStrip = " ".repeat(indentation);
 
     return LINE_SPLITTER

@@ -18,14 +18,12 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.refaster.Refaster;
-import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import java.util.Optional;
 import java.util.function.Supplier;
+import tech.picnic.errorprone.refaster.matchers.RequiresComputation;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -36,12 +34,12 @@ import tech.picnic.errorprone.utils.SourceCode;
  * it does, the suggested fix changes the program's semantics. Such fragile code must instead be
  * refactored such that the side-effectful code does not appear accidental.
  */
-// XXX: Consider also implementing the inverse, in which `.orElseGet(() -> someConstant)` is
-// flagged.
-// XXX: Once the `MethodReferenceUsageCheck` becomes generally usable, consider leaving the method
-// reference cleanup to that check, and express the remainder of the logic in this class using a
-// Refaster template, i.c.w. a `@Matches` constraint that implements the `requiresComputation`
-// logic.
+// XXX: This rule may introduce a compilation error: the `value` expression may reference a
+// non-effectively final variable, which is not allowed in the replacement lambda expression.
+// Review whether a `@Matcher` can be used to avoid this.
+// XXX: Once the `MethodReferenceUsageCheck` bug checker becomes generally usable, consider leaving
+// the method reference cleanup to that check, and express the remainder of the logic in this class
+// using a Refaster template, i.c.w. a `@NotMatches(RequiresComputation.class)` constraint.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
@@ -51,16 +49,17 @@ import tech.picnic.errorprone.utils.SourceCode;
     linkType = NONE,
     severity = WARNING,
     tags = PERFORMANCE)
-public final class OptionalOrElse extends BugChecker implements MethodInvocationTreeMatcher {
+public final class OptionalOrElseGet extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
+  private static final Matcher<ExpressionTree> REQUIRES_COMPUTATION = new RequiresComputation();
   private static final Matcher<ExpressionTree> OPTIONAL_OR_ELSE_METHOD =
       instanceMethod().onExactClass(Optional.class.getCanonicalName()).namedAnyOf("orElse");
   // XXX: Also exclude invocations of `@Placeholder`-annotated methods.
   private static final Matcher<ExpressionTree> REFASTER_METHOD =
       staticMethod().onClass(Refaster.class.getCanonicalName());
 
-  /** Instantiates a new {@link OptionalOrElse} instance. */
-  public OptionalOrElse() {}
+  /** Instantiates a new {@link OptionalOrElseGet} instance. */
+  public OptionalOrElseGet() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
@@ -69,7 +68,8 @@ public final class OptionalOrElse extends BugChecker implements MethodInvocation
     }
 
     ExpressionTree argument = Iterables.getOnlyElement(tree.getArguments());
-    if (!requiresComputation(argument) || REFASTER_METHOD.matches(argument, state)) {
+    if (!REQUIRES_COMPUTATION.matches(argument, state)
+        || REFASTER_METHOD.matches(argument, state)) {
       return Description.NO_MATCH;
     }
 
@@ -91,18 +91,6 @@ public final class OptionalOrElse extends BugChecker implements MethodInvocation
     return describeMatch(tree, fix);
   }
 
-  /**
-   * Tells whether the given expression contains anything other than a literal or a (possibly
-   * dereferenced) variable or constant.
-   */
-  private static boolean requiresComputation(ExpressionTree tree) {
-    return !(tree instanceof IdentifierTree
-        || tree instanceof LiteralTree
-        || (tree instanceof MemberSelectTree memberSelect
-            && !requiresComputation(memberSelect.getExpression()))
-        || ASTHelpers.constValue(tree) != null);
-  }
-
   /** Returns the nullary method reference matching the given expression, if any. */
   private static Optional<String> tryMethodReferenceConversion(
       ExpressionTree tree, VisitorState state) {
@@ -118,7 +106,7 @@ public final class OptionalOrElse extends BugChecker implements MethodInvocation
       return Optional.empty();
     }
 
-    if (requiresComputation(memberSelect.getExpression())) {
+    if (REQUIRES_COMPUTATION.matches(memberSelect.getExpression(), state)) {
       return Optional.empty();
     }
 
