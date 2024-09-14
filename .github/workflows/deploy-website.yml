@@ -2,6 +2,7 @@ name: Update `error-prone.picnic.tech` website content
 on:
   pull_request:
   push:
+    # XXX: Drop/replace references to `website` in favour of `master`.
     branches: [ master, website ]
 permissions:
   contents: read
@@ -38,10 +39,12 @@ jobs:
             www.bestpractices.dev:443
             www.youtube.com:443
             youtrack.jetbrains.com:443
-      - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
-          persist-credentials: false
+          java-version: 21.0.7
+          java-distribution: temurin
+          maven-version: 3.9.11
       - name: Set up Ruby
         uses: ruby/setup-ruby@97ecb7b512899eb71ab1bf2310a624c6f1589ac6 # v1.308.0
         with:
@@ -49,16 +52,18 @@ jobs:
           bundler-cache: true
       - name: Configure Github Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - name: Compile project and extract data
+        run: mvn -T1C clean install -DskipTests -Dverification.skip
       - name: Generate documentation
-        run: ./generate-docs.sh
+        run: mvn exec:java@generate-docs -pl documentation-support
       - name: Build website with Jekyll
         working-directory: ./website
         run: bundle exec jekyll build
       - name: Validate HTML output
         working-directory: ./website
-        # XXX: Drop `--disable_external true` once we fully adopted the
-        # "Refaster rules" terminology on our website and in the code.
-        run: bundle exec htmlproofer --disable_external true --check-external-hash false ./_site
+        # XXX: Bealdung and StackOverflow return HTTP 403 responses when run on
+        # a GitHub Action node.
+        run: bundle exec htmlproofer --no-check-external-hash --swap-url 'https\://error-prone.picnic.tech:' --ignore-urls '/^https:\/\/(www\.baeldung\.com|stackoverflow\.com)\/.*/' --ignore-status-codes 429 ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
