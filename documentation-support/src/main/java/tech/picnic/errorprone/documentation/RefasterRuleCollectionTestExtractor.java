@@ -118,7 +118,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
   private static String getFormattedSource(MethodTree method, VisitorState state) {
     String source = SourceCode.treeToString(method, state);
     int finalNewline = source.lastIndexOf(LINE_SEPARATOR);
-    if (finalNewline == -1) {
+    if (finalNewline < 0) {
       return source;
     }
 
