@@ -201,7 +201,7 @@
         </dependency>
         <dependency>
             <groupId>org.openrewrite</groupId>
-            <artifactId>rewrite-java-11</artifactId>
+            <artifactId>rewrite-java-17</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
