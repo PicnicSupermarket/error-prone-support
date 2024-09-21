@@ -126,7 +126,9 @@ public final class BugPatternLink extends BugChecker implements ClassTreeMatcher
             state,
             "link",
             ImmutableList.of(
-                linkPrefix + " + " + SourceCode.toStringConstantExpression(tree.getSimpleName()))));
+                linkPrefix
+                    + " + "
+                    + SourceCode.toStringConstantExpression(tree.getSimpleName(), state))));
 
     String linkType =
         SuggestedFixes.qualifyStaticImport(

@@ -149,7 +149,7 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
     SuggestedFix.Builder fix =
         SuggestedFix.builder()
             .replace(tree.getMethodSelect(), "String.join")
-            .replace(arguments.next(), SourceCode.toStringConstantExpression(separator));
+            .replace(arguments.next(), SourceCode.toStringConstantExpression(separator, state));
 
     while (arguments.hasNext()) {
       ExpressionTree argument = arguments.next();

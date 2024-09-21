@@ -14,7 +14,6 @@ import com.google.errorprone.util.ErrorProneToken;
 import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
-import com.sun.tools.javac.util.Convert;
 import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import com.sun.tools.javac.util.Position;
 import java.util.Optional;
@@ -46,22 +45,19 @@ public final class SourceCode {
   /**
    * Returns a Java string constant expression (i.e., a quoted string) representing the given input.
    *
-   * @apiNote This method differs from {@link com.sun.tools.javac.util.Constants#format(Object)} in
-   *     that it does not superfluously escape single quote characters.
-   * @param str The string of interest.
+   * @param value The value of interest.
+   * @param state A {@link VisitorState} describing the context in which the given {@link Tree} is
+   *     found.
    * @return A non-{@code null} string.
+   * @apiNote This method differs from {@link com.sun.tools.javac.util.Constants#format(Object)} in
+   *     that it does not superfluously escape single quote characters. It is different from {@link
+   *     VisitorState#getConstantExpression(Object)} in that it is more performant and accepts any
+   *     {@link CharSequence} instance.
    */
-  public static String toStringConstantExpression(CharSequence str) {
-    StringBuilder result = new StringBuilder("\"");
-    for (int i = 0; i < str.length(); i++) {
-      char c = str.charAt(i);
-      if (c == '\'') {
-        result.append('\'');
-      } else {
-        result.append(Convert.quote(c));
-      }
-    }
-    return result.append('"').toString();
+  // XXX: Drop this method if https://github.com/google/error-prone/pull/4586 is merged and released
+  // with the proposed `CharSequence` compatibility change.
+  public static String toStringConstantExpression(Object value, VisitorState state) {
+    return state.getConstantExpression(value instanceof CharSequence ? value.toString() : value);
   }
 
   /**

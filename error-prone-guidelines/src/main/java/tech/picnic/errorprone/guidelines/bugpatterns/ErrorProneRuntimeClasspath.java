@@ -123,7 +123,8 @@ public final class ErrorProneRuntimeClasspath extends BugChecker
         .setMessage("This type may not be on the runtime classpath; use a string literal instead")
         .addFix(
             SuggestedFix.replace(
-                tree, SourceCode.toStringConstantExpression(receiver.owner.getQualifiedName())))
+                tree,
+                SourceCode.toStringConstantExpression(receiver.owner.getQualifiedName(), state)))
         .build();
   }
 
@@ -150,7 +151,9 @@ public final class ErrorProneRuntimeClasspath extends BugChecker
             original,
             identifier
                 + ".class.getCanonicalName()"
-                + (suffix.isEmpty() ? "" : (" + " + SourceCode.toStringConstantExpression(suffix))))
+                + (suffix.isEmpty()
+                    ? ""
+                    : (" + " + SourceCode.toStringConstantExpression(suffix, state))))
         .build();
   }
 
