@@ -73,7 +73,7 @@ final class ThirdPartyLibraryTest {
   }
 
   @ParameterizedTest
-  @ValueSource(booleans = {true, false})
+  @ValueSource(booleans = {false, true})
   void isIntroductionAllowedIgnoreClasspathCompat(boolean ignoreClassPath) {
     CompilationTestHelper.newInstance(IsIntroductionAllowedTestChecker.class, getClass())
         .setArgs("-XepOpt:ErrorProneSupport:IgnoreClasspathCompat=" + ignoreClassPath)

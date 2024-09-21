@@ -163,7 +163,12 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
 
     /* For now we don't force sorting on numeric types. */
     return Stream.of(
-            symtab.annotationType, symtab.classType, symtab.enumSym.type, symtab.stringType)
+            symtab.annotationType,
+            symtab.booleanType,
+            symtab.charType,
+            symtab.classType,
+            symtab.enumSym.type,
+            symtab.stringType)
         .anyMatch(t -> ASTHelpers.isSubtype(elemType, t, state));
   }
 
