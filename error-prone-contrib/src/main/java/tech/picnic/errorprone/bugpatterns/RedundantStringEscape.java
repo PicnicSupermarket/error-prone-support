@@ -33,7 +33,7 @@ public final class RedundantStringEscape extends BugChecker implements LiteralTr
   @Override
   public Description matchLiteral(LiteralTree tree, VisitorState state) {
     String constant = ASTHelpers.constValue(tree, String.class);
-    if (constant == null || constant.indexOf('\'') == -1) {
+    if (constant == null || constant.indexOf('\'') < 0) {
       /* Fast path: this isn't a string constant with a single quote. */
       return Description.NO_MATCH;
     }
