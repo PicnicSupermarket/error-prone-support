@@ -1033,6 +1033,7 @@
                     </configuration>
                     <executions>
                         <execution>
+                            <id>set-additional-properties</id>
                             <goals>
                                 <goal>properties</goal>
                             </goals>
