@@ -111,6 +111,9 @@
             but also prevents excessive memory usage by heavily parallelized
             local builds. -->
             -Xmx${argLine.xmx}
+            <!-- Configure the Byte Buddy Java agent used by Mockito to create
+            mocks. -->
+            -javaagent:${org.mockito:mockito-core:jar}
             <!-- This argument cannot be set through Surefire's
             'systemPropertyVariables' configuration setting. Setting the file
             encoding is necessary because forked unit test invocations
@@ -523,6 +526,17 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <dependencies>
+        <!-- To avoid repetition of fairly complex configuration, Surefire
+        is configured to always load Mockito's Java agent. Declaring the
+        associated dependency here avoids additional repetition, and prevents
+        a slightly obscure error that happens if the dependency is absent. -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <pluginManagement>
@@ -1017,6 +1031,13 @@
                         <ignoreDirect>false</ignoreDirect>
                         <ignoreNonCompile>true</ignoreNonCompile>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>properties</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1554,6 +1575,10 @@
             <plugin>
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
