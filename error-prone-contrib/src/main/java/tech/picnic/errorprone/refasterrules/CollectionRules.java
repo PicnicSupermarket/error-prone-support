@@ -365,15 +365,20 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer {@link ImmutableCollection#iterator()} over more contrived alternatives. */
-  static final class ImmutableCollectionIterator<T> {
+  /** Prefer {@link Collection#iterator()} over more contrived or less efficient alternatives. */
+  static final class CollectionIterator<T> {
+    @BeforeTemplate
+    Iterator<T> before(Collection<T> collection) {
+      return collection.stream().iterator();
+    }
+
     @BeforeTemplate
     Iterator<T> before(ImmutableCollection<T> collection) {
-      return Refaster.anyOf(collection.stream().iterator(), collection.asList().iterator());
+      return collection.asList().iterator();
     }
 
     @AfterTemplate
-    Iterator<T> after(ImmutableCollection<T> collection) {
+    Iterator<T> after(Collection<T> collection) {
       return collection.iterator();
     }
   }
