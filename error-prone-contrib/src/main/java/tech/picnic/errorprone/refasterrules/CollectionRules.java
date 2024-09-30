@@ -365,14 +365,11 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#iterator()} is
-   * called on the result; call it directly.
-   */
+  /** Prefer {@link ImmutableCollection#iterator()} over more contrived alternatives. */
   static final class ImmutableCollectionIterator<T> {
     @BeforeTemplate
     Iterator<T> before(ImmutableCollection<T> collection) {
-      return collection.asList().iterator();
+      return Refaster.anyOf(collection.stream().iterator(), collection.asList().iterator());
     }
 
     @AfterTemplate

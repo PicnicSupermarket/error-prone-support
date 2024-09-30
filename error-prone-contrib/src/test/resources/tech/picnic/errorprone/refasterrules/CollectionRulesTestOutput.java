@@ -109,8 +109,8 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(1).toArray(Integer[]::new);
   }
 
-  Iterator<Integer> testImmutableCollectionIterator() {
-    return ImmutableSet.of(1).iterator();
+  ImmutableSet<Iterator<Integer>> testImmutableCollectionIterator() {
+    return ImmutableSet.of(ImmutableSet.of(1).iterator(), ImmutableSet.of(1).iterator());
   }
 
   ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
