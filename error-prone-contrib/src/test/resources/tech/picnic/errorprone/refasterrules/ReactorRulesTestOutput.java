@@ -586,6 +586,18 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).as(StepVerifier::create);
   }
 
+  Object testStepVerifierVerify() {
+    return Mono.empty().as(StepVerifier::create).expectError().verify();
+  }
+
+  Object testStepVerifierVerifyDuration() {
+    return Mono.empty().as(StepVerifier::create).expectError().verify(Duration.ZERO);
+  }
+
+  StepVerifier testStepVerifierVerifyLater() {
+    return Mono.empty().as(StepVerifier::create).expectError().verifyLater();
+  }
+
   ImmutableSet<StepVerifier.Step<Integer>> testStepVerifierStepIdentity() {
     return ImmutableSet.of(
         Mono.just(1).as(StepVerifier::create),
@@ -619,14 +631,34 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.empty().as(StepVerifier::create).verifyError(AssertionError.class));
   }
 
-  Duration testStepVerifierLastStepVerifyErrorMatches() {
-    return Mono.empty()
-        .as(StepVerifier::create)
-        .verifyErrorMatches(IllegalArgumentException.class::equals);
+  ImmutableSet<?> testStepVerifierLastStepVerifyErrorMatches() {
+    return ImmutableSet.of(
+        Mono.empty()
+            .as(StepVerifier::create)
+            .verifyErrorMatches(IllegalArgumentException.class::equals),
+        Mono.empty()
+            .as(StepVerifier::create)
+            .verifyErrorMatches(IllegalStateException.class::equals));
   }
 
   Duration testStepVerifierLastStepVerifyErrorSatisfies() {
     return Mono.empty().as(StepVerifier::create).verifyErrorSatisfies(t -> {});
+  }
+
+  ImmutableSet<?> testStepVerifierLastStepVerifyErrorSatisfiesAssertJ() {
+    return ImmutableSet.of(
+        Mono.empty()
+            .as(StepVerifier::create)
+            .verifyErrorSatisfies(
+                t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("foo")),
+        Mono.empty()
+            .as(StepVerifier::create)
+            .verifyErrorSatisfies(
+                t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("bar")),
+        Mono.empty()
+            .as(StepVerifier::create)
+            .verifyErrorSatisfies(
+                t -> assertThat(t).isInstanceOf(AssertionError.class).hasMessage("baz")));
   }
 
   Duration testStepVerifierLastStepVerifyErrorMessage() {
