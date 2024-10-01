@@ -38,7 +38,6 @@ import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.TypeSymbol;
-import com.sun.tools.javac.util.Constants;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,6 +48,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Modifier;
 import org.jspecify.annotations.Nullable;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that validates the claim made by {@link
@@ -129,7 +129,9 @@ public final class ExhaustiveRefasterTypeMigration extends BugChecker implements
                 migrationAnnotation,
                 state,
                 TYPE_MIGRATION_UNMIGRATED_METHODS_ELEMENT,
-                unmigratedMethods.stream().map(Constants::format).collect(toImmutableList()))
+                unmigratedMethods.stream()
+                    .map(m -> SourceCode.toStringConstantExpression(m, state))
+                    .collect(toImmutableList()))
             .build());
   }
 
