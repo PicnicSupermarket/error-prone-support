@@ -1938,6 +1938,11 @@
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->
                                     -Xep:Java8ApiChecker:OFF
+                                    <!-- This check also flags perfectly fine
+                                    type names. -->
+                                    <!-- XXX: File issue upstream, suggesting
+                                    that the check be split in two. -->
+                                    -Xep:MemberName:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
                                     <!-- We generally discourage `var` use. -->
