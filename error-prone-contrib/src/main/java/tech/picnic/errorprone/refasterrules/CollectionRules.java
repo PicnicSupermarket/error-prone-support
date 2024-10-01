@@ -365,18 +365,20 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#iterator()} is
-   * called on the result; call it directly.
-   */
-  static final class ImmutableCollectionIterator<T> {
+  /** Prefer {@link Collection#iterator()} over more contrived or less efficient alternatives. */
+  static final class CollectionIterator<T> {
+    @BeforeTemplate
+    Iterator<T> before(Collection<T> collection) {
+      return collection.stream().iterator();
+    }
+
     @BeforeTemplate
     Iterator<T> before(ImmutableCollection<T> collection) {
       return collection.asList().iterator();
     }
 
     @AfterTemplate
-    Iterator<T> after(ImmutableCollection<T> collection) {
+    Iterator<T> after(Collection<T> collection) {
       return collection.iterator();
     }
   }
