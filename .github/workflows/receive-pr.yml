@@ -40,7 +40,7 @@ jobs:
       - name: Remove pr_number.txt
         run: rm -f pr_number.txt
 
-      # Execute recipes
+      # Execute Error Prone
       - name: Run Error Prone
         run: mvn verify -Perror-prone -Ppatch
 
