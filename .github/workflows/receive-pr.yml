@@ -26,8 +26,8 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@489441643219d2b93ee2a127b2402eb640a1b947 # v1.13.0
         with:
-          java-version: ${{ matrix.jdk }}
-          java-distribution: ${{ matrix.distribution }}
+          java-version: 17.0.10
+          java-distribution: temurin
           maven-version: 3.9.9
 
       # Capture the PR number
