@@ -43,7 +43,7 @@ jobs:
 
       # Execute Error Prone
       - name: Run Error Prone
-        run: mvn verify -Perror-prone -Ppatch
+        run: mvn -T1C verify -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
 
       # Capture the diff
       - name: Create patch
