@@ -207,8 +207,8 @@
         <version.auto-service>1.1.1</version.auto-service>
         <version.auto-value>1.11.0</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
-        <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.32.0</version.error-prone-orig>
+        <version.error-prone-fork>v${version.error-prone-orig}-picnic-2</version.error-prone-fork>
+        <version.error-prone-orig>2.33.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.28</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>17</version.jdk>
@@ -1938,6 +1938,10 @@
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->
                                     -Xep:Java8ApiChecker:OFF
+                                    <!-- This check also flags perfectly fine
+                                    type names. See
+                                    https://github.com/google/error-prone/issues/4616. -->
+                                    -Xep:MemberName:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
                                     <!-- We generally discourage `var` use. -->
