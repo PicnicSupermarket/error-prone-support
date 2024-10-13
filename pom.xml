@@ -1939,9 +1939,8 @@
                                     <!-- We don't target JDK 8. -->
                                     -Xep:Java8ApiChecker:OFF
                                     <!-- This check also flags perfectly fine
-                                    type names. -->
-                                    <!-- XXX: File issue upstream, suggesting
-                                    that the check be split in two. -->
+                                    type names. See
+                                    https://github.com/google/error-prone/issues/4616. -->
                                     -Xep:MemberName:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
