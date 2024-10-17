@@ -109,14 +109,6 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return Double.hashCode(1);
   }
 
-  int testFloatCompare() {
-    return Float.compare(1, 2);
-  }
-
-  int testDoubleCompare() {
-    return Double.compare(1, 2);
-  }
-
   int testCharacterBytes() {
     return Character.BYTES;
   }
