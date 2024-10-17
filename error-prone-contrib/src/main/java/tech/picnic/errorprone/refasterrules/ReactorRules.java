@@ -1768,6 +1768,51 @@ final class ReactorRules {
     }
   }
 
+  /**
+   * Prefer {@link StepVerifier.LastStep#verify()} over a dangling {@link
+   * StepVerifier#verifyThenAssertThat()}.
+   */
+  static final class StepVerifierVerify {
+    @BeforeTemplate
+    StepVerifier.Assertions before(StepVerifier stepVerifier) {
+      return stepVerifier.verifyThenAssertThat();
+    }
+
+    @AfterTemplate
+    Duration after(StepVerifier stepVerifier) {
+      return stepVerifier.verify();
+    }
+  }
+
+  /**
+   * Prefer {@link StepVerifier.LastStep#verify(Duration)} over a dangling {@link
+   * StepVerifier#verifyThenAssertThat(Duration)}.
+   */
+  static final class StepVerifierVerifyDuration {
+    @BeforeTemplate
+    StepVerifier.Assertions before(StepVerifier stepVerifier, Duration duration) {
+      return stepVerifier.verifyThenAssertThat(duration);
+    }
+
+    @AfterTemplate
+    Duration after(StepVerifier stepVerifier, Duration duration) {
+      return stepVerifier.verify(duration);
+    }
+  }
+
+  /** Don't unnecessarily invoke {@link StepVerifier#verifyLater()} multiple times. */
+  static final class StepVerifierVerifyLater {
+    @BeforeTemplate
+    StepVerifier before(StepVerifier stepVerifier) {
+      return stepVerifier.verifyLater().verifyLater();
+    }
+
+    @AfterTemplate
+    StepVerifier after(StepVerifier stepVerifier) {
+      return stepVerifier.verifyLater();
+    }
+  }
+
   /** Don't unnecessarily have {@link StepVerifier.Step} expect no elements. */
   static final class StepVerifierStepIdentity<T> {
     @BeforeTemplate
@@ -1868,6 +1913,12 @@ final class ReactorRules {
       return step.expectErrorMatches(predicate).verify();
     }
 
+    @BeforeTemplate
+    @SuppressWarnings("StepVerifierVerify" /* This is a more specific template. */)
+    StepVerifier.Assertions before2(StepVerifier.LastStep step, Predicate<Throwable> predicate) {
+      return step.expectError().verifyThenAssertThat().hasOperatorErrorMatching(predicate);
+    }
+
     @AfterTemplate
     Duration after(StepVerifier.LastStep step, Predicate<Throwable> predicate) {
       return step.verifyErrorMatches(predicate);
@@ -1887,6 +1938,30 @@ final class ReactorRules {
     @AfterTemplate
     Duration after(StepVerifier.LastStep step, Consumer<Throwable> consumer) {
       return step.verifyErrorSatisfies(consumer);
+    }
+  }
+
+  /**
+   * Prefer {@link StepVerifier.LastStep#verifyErrorSatisfies(Consumer)} with AssertJ over more
+   * contrived alternatives.
+   */
+  static final class StepVerifierLastStepVerifyErrorSatisfiesAssertJ<T extends Throwable> {
+    @BeforeTemplate
+    @SuppressWarnings("StepVerifierVerify" /* This is a more specific template. */)
+    StepVerifier.Assertions before(StepVerifier.LastStep step, Class<T> clazz, String message) {
+      return Refaster.anyOf(
+          step.expectError()
+              .verifyThenAssertThat()
+              .hasOperatorErrorOfType(clazz)
+              .hasOperatorErrorWithMessage(message),
+          step.expectError(clazz).verifyThenAssertThat().hasOperatorErrorWithMessage(message),
+          step.expectErrorMessage(message).verifyThenAssertThat().hasOperatorErrorOfType(clazz));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Duration after(StepVerifier.LastStep step, Class<T> clazz, String message) {
+      return step.verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(clazz).hasMessage(message));
     }
   }
 
