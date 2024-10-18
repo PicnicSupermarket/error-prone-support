@@ -196,34 +196,6 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer {@link Float#compare(float, float)} over the Guava alternative. */
-  // XXX: Drop this rule once https://github.com/google/guava/pull/7371 is released.
-  static final class FloatCompare {
-    @BeforeTemplate
-    int before(float a, float b) {
-      return Floats.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(float a, float b) {
-      return Float.compare(a, b);
-    }
-  }
-
-  /** Prefer {@link Double#compare(double, double)} over the Guava alternative. */
-  // XXX: Drop this rule once https://github.com/google/guava/pull/7371 is released.
-  static final class DoubleCompare {
-    @BeforeTemplate
-    int before(double a, double b) {
-      return Doubles.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(double a, double b) {
-      return Double.compare(a, b);
-    }
-  }
-
   /** Prefer {@link Character#BYTES} over the Guava alternative. */
   static final class CharacterBytes {
     @BeforeTemplate
