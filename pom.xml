@@ -210,7 +210,7 @@
         <version.auto-service>1.1.1</version.auto-service>
         <version.auto-value>1.11.0</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
-        <version.error-prone-fork>v${version.error-prone-orig}-picnic-2</version.error-prone-fork>
+        <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.34.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.28</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
@@ -1960,14 +1960,14 @@
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF
+                                    <!-- This check flags bad member names, but
+                                    also perfectly fine type names. Consider
+                                    enabling it. -->
+                                    -Xep:IdentifierName:OFF
                                     <!-- We don't target JDK 7. -->
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->
                                     -Xep:Java8ApiChecker:OFF
-                                    <!-- This check also flags perfectly fine
-                                    type names. See
-                                    https://github.com/google/error-prone/issues/4616. -->
-                                    -Xep:MemberName:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
                                     <!-- We generally discourage `var` use. -->
@@ -1998,6 +1998,8 @@
                                 flag may be dropped after resolution of
                                 https://bugs.openjdk.java.net/browse/JDK-8155674. -->
                                 <arg>-XDcompilePolicy=simple</arg>
+                                <!-- XXX: Drop! This is a test. -->
+                                <arg>--should-stop=ifError=INIT</arg>
                             </compilerArgs>
                         </configuration>
                     </plugin>
