@@ -41,7 +41,7 @@ import tech.picnic.errorprone.utils.SourceCode;
     tags = LIKELY_ERROR)
 public final class Slf4jLogStatement extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<ExpressionTree> MARKER = isSubtypeOf("org.slf4j.Marker");
+  private static final Matcher<ExpressionTree> SLF4J_MARKER = isSubtypeOf("org.slf4j.Marker");
   private static final Matcher<ExpressionTree> THROWABLE = isSubtypeOf(Throwable.class);
   private static final Matcher<ExpressionTree> SLF4J_LOGGER_INVOCATION =
       instanceMethod()
@@ -71,7 +71,7 @@ public final class Slf4jLogStatement extends BugChecker implements MethodInvocat
      * SLF4J log statements may accept a "marker" as a first argument, before the format string.
      * We ignore such markers.
      */
-    int lTrim = MARKER.matches(args.get(0), state) ? 1 : 0;
+    int lTrim = SLF4J_MARKER.matches(args.get(0), state) ? 1 : 0;
     /*
      * SLF4J treats the final argument to a log statement specially if it is a `Throwabe`: it
      * will always choose to render the associated stacktrace, even if the argument has a

@@ -43,6 +43,24 @@ public final class SourceCode {
   }
 
   /**
+   * Returns a Java string constant expression (i.e., a quoted string) representing the given input.
+   *
+   * @param value The value of interest.
+   * @param state A {@link VisitorState} describing the context in which the given {@link Tree} is
+   *     found.
+   * @return A non-{@code null} string.
+   * @apiNote This method differs from {@link com.sun.tools.javac.util.Constants#format(Object)} in
+   *     that it does not superfluously escape single quote characters. It is different from {@link
+   *     VisitorState#getConstantExpression(Object)} in that it is more performant and accepts any
+   *     {@link CharSequence} instance.
+   */
+  // XXX: Drop this method if https://github.com/google/error-prone/pull/4586 is merged and released
+  // with the proposed `CharSequence` compatibility change.
+  public static String toStringConstantExpression(Object value, VisitorState state) {
+    return state.getConstantExpression(value instanceof CharSequence ? value.toString() : value);
+  }
+
+  /**
    * Creates a {@link SuggestedFix} for the deletion of the given {@link Tree}, including any
    * whitespace that follows it.
    *
