@@ -598,6 +598,18 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return StepVerifier.create(Flux.just(1));
   }
 
+  Object testStepVerifierVerify() {
+    return Mono.empty().as(StepVerifier::create).expectError().verifyThenAssertThat();
+  }
+
+  Object testStepVerifierVerifyDuration() {
+    return Mono.empty().as(StepVerifier::create).expectError().verifyThenAssertThat(Duration.ZERO);
+  }
+
+  StepVerifier testStepVerifierVerifyLater() {
+    return Mono.empty().as(StepVerifier::create).expectError().verifyLater().verifyLater();
+  }
+
   ImmutableSet<StepVerifier.Step<Integer>> testStepVerifierStepIdentity() {
     return ImmutableSet.of(
         Mono.just(1).as(StepVerifier::create).expectNext(),
@@ -638,15 +650,41 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
             .verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(AssertionError.class)));
   }
 
-  Duration testStepVerifierLastStepVerifyErrorMatches() {
-    return Mono.empty()
-        .as(StepVerifier::create)
-        .expectErrorMatches(IllegalArgumentException.class::equals)
-        .verify();
+  ImmutableSet<?> testStepVerifierLastStepVerifyErrorMatches() {
+    return ImmutableSet.of(
+        Mono.empty()
+            .as(StepVerifier::create)
+            .expectErrorMatches(IllegalArgumentException.class::equals)
+            .verify(),
+        Mono.empty()
+            .as(StepVerifier::create)
+            .expectError()
+            .verifyThenAssertThat()
+            .hasOperatorErrorMatching(IllegalStateException.class::equals));
   }
 
   Duration testStepVerifierLastStepVerifyErrorSatisfies() {
     return Mono.empty().as(StepVerifier::create).expectErrorSatisfies(t -> {}).verify();
+  }
+
+  ImmutableSet<?> testStepVerifierLastStepVerifyErrorSatisfiesAssertJ() {
+    return ImmutableSet.of(
+        Mono.empty()
+            .as(StepVerifier::create)
+            .expectError()
+            .verifyThenAssertThat()
+            .hasOperatorErrorOfType(IllegalArgumentException.class)
+            .hasOperatorErrorWithMessage("foo"),
+        Mono.empty()
+            .as(StepVerifier::create)
+            .expectError(IllegalStateException.class)
+            .verifyThenAssertThat()
+            .hasOperatorErrorWithMessage("bar"),
+        Mono.empty()
+            .as(StepVerifier::create)
+            .expectErrorMessage("baz")
+            .verifyThenAssertThat()
+            .hasOperatorErrorOfType(AssertionError.class));
   }
 
   Duration testStepVerifierLastStepVerifyErrorMessage() {
