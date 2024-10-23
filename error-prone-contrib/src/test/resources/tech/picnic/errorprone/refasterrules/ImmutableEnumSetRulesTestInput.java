@@ -11,36 +11,32 @@ final class ImmutableEnumSetRulesTest implements RefasterRuleCollectionTestCase 
     return ImmutableSet.of(EnumSet.class);
   }
 
-  ImmutableSet<ImmutableSet<RoundingMode>> testImmutableEnumSetIterable() {
-    return ImmutableSet.of(
-        ImmutableSet.copyOf(EnumSet.range(RoundingMode.UP, RoundingMode.UNNECESSARY)),
-        ImmutableSet.copyOf(EnumSet.allOf(RoundingMode.class)));
+  ImmutableSet<RoundingMode> testSetsImmutableEnumSetIterable() {
+    return ImmutableSet.copyOf(EnumSet.range(RoundingMode.UP, RoundingMode.UNNECESSARY));
   }
 
-  ImmutableSet<ImmutableSet<RoundingMode>> testImmutableEnumSetIterable1() {
-    return ImmutableSet.of(
-        ImmutableSet.copyOf(RoundingMode.values()),
-        ImmutableSet.copyOf(RoundingMode.class.getEnumConstants()));
+  ImmutableSet<RoundingMode> testSetsImmutableEnumSetIterableArray() {
+    return ImmutableSet.copyOf(RoundingMode.values());
   }
 
-  ImmutableSet<ImmutableSet<RoundingMode>> testImmutableEnumSetOneElement() {
+  ImmutableSet<ImmutableSet<RoundingMode>> testSetsImmutableEnumSet1() {
     return ImmutableSet.of(
         ImmutableSet.of(RoundingMode.UP), ImmutableSet.copyOf(EnumSet.of(RoundingMode.UP)));
   }
 
-  ImmutableSet<ImmutableSet<RoundingMode>> testImmutableEnumSetTwoElements() {
+  ImmutableSet<ImmutableSet<RoundingMode>> testSetsImmutableEnumSet2() {
     return ImmutableSet.of(
         ImmutableSet.of(RoundingMode.UP, RoundingMode.DOWN),
         ImmutableSet.copyOf(EnumSet.of(RoundingMode.UP, RoundingMode.DOWN)));
   }
 
-  ImmutableSet<ImmutableSet<RoundingMode>> testImmutableEnumSetThreeElements() {
+  ImmutableSet<ImmutableSet<RoundingMode>> testSetsImmutableEnumSet3() {
     return ImmutableSet.of(
         ImmutableSet.of(RoundingMode.UP, RoundingMode.DOWN, RoundingMode.CEILING),
         ImmutableSet.copyOf(EnumSet.of(RoundingMode.UP, RoundingMode.DOWN, RoundingMode.CEILING)));
   }
 
-  ImmutableSet<ImmutableSet<RoundingMode>> testImmutableEnumSetFourElements() {
+  ImmutableSet<ImmutableSet<RoundingMode>> testSetsImmutableEnumSet4() {
     return ImmutableSet.of(
         ImmutableSet.of(
             RoundingMode.UP, RoundingMode.DOWN, RoundingMode.CEILING, RoundingMode.FLOOR),
@@ -49,7 +45,7 @@ final class ImmutableEnumSetRulesTest implements RefasterRuleCollectionTestCase 
                 RoundingMode.UP, RoundingMode.DOWN, RoundingMode.CEILING, RoundingMode.FLOOR)));
   }
 
-  ImmutableSet<ImmutableSet<RoundingMode>> testImmutableEnumSetFiveElements() {
+  ImmutableSet<ImmutableSet<RoundingMode>> testSetsImmutableEnumSet5() {
     return ImmutableSet.of(
         ImmutableSet.of(
             RoundingMode.UP,
@@ -66,7 +62,7 @@ final class ImmutableEnumSetRulesTest implements RefasterRuleCollectionTestCase 
                 RoundingMode.UNNECESSARY)));
   }
 
-  ImmutableSet<RoundingMode> testImmutableEnumSetSixElements() {
+  ImmutableSet<RoundingMode> testSetsImmutableEnumSet6() {
     return ImmutableSet.of(
         RoundingMode.UP,
         RoundingMode.DOWN,
