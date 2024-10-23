@@ -13,48 +13,45 @@ final class MicrometerRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Iterable<Tag>> testTagsOf1() {
     return ImmutableSet.of(
-        ImmutableSet.of(Tag.of("foo", "bar")), ImmutableList.of(Tag.of("foo", "bar")));
+        ImmutableSet.of(Tag.of("foo", "v1")), ImmutableList.of(Tag.of("bar", "v2")));
   }
 
   ImmutableSet<Iterable<Tag>> testTagsOf2() {
     return ImmutableSet.of(
-        ImmutableSet.of(Tag.of("foo", "bar"), Tag.of("foo1", "bar1")),
-        ImmutableList.of(Tag.of("foo", "bar"), Tag.of("foo1", "bar1")));
+        ImmutableSet.of(Tag.of("foo", "v1"), Tag.of("bar", "v2")),
+        ImmutableList.of(Tag.of("baz", "v3"), Tag.of("qux", "v4")));
   }
 
   ImmutableSet<Iterable<Tag>> testTagsOf3() {
     return ImmutableSet.of(
-        ImmutableSet.of(Tag.of("foo", "bar"), Tag.of("foo1", "bar1"), Tag.of("foo2", "bar2")),
-        ImmutableList.of(Tag.of("foo", "bar"), Tag.of("foo1", "bar1"), Tag.of("foo2", "bar2")));
+        ImmutableSet.of(Tag.of("foo", "v1"), Tag.of("bar", "v2"), Tag.of("baz", "v3")),
+        ImmutableList.of(Tag.of("qux", "v4"), Tag.of("quux", "v5"), Tag.of("corge", "v6")));
   }
 
   ImmutableSet<Iterable<Tag>> testTagsOf4() {
     return ImmutableSet.of(
         ImmutableSet.of(
-            Tag.of("foo", "bar"),
-            Tag.of("foo1", "bar1"),
-            Tag.of("foo2", "bar2"),
-            Tag.of("foo3", "bar3")),
+            Tag.of("foo", "v1"), Tag.of("bar", "v2"), Tag.of("baz", "v3"), Tag.of("qux", "v4")),
         ImmutableList.of(
-            Tag.of("foo", "bar"),
-            Tag.of("foo1", "bar1"),
-            Tag.of("foo2", "bar2"),
-            Tag.of("foo3", "bar3")));
+            Tag.of("quux", "v5"),
+            Tag.of("corge", "v6"),
+            Tag.of("grault", "v7"),
+            Tag.of("garply", "v8")));
   }
 
   ImmutableSet<Iterable<Tag>> testTagsOf5() {
     return ImmutableSet.of(
         ImmutableSet.of(
-            Tag.of("foo", "bar"),
-            Tag.of("foo1", "bar1"),
-            Tag.of("foo2", "bar2"),
-            Tag.of("foo3", "bar3"),
-            Tag.of("foo4", "bar4")),
+            Tag.of("foo", "v1"),
+            Tag.of("bar", "v2"),
+            Tag.of("baz", "v3"),
+            Tag.of("qux", "v4"),
+            Tag.of("quux", "v5")),
         ImmutableList.of(
-            Tag.of("foo", "bar"),
-            Tag.of("foo1", "bar1"),
-            Tag.of("foo2", "bar2"),
-            Tag.of("foo3", "bar3"),
-            Tag.of("foo4", "bar4")));
+            Tag.of("corge", "v6"),
+            Tag.of("grault", "v7"),
+            Tag.of("garply", "v8"),
+            Tag.of("waldo", "v9"),
+            Tag.of("fred", "v10")));
   }
 }

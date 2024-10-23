@@ -15,7 +15,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class MicrometerRules {
   private MicrometerRules() {}
 
-  /** Prefer {@link Tags} over other immutable {@link Iterable}'s. */
+  /** Prefer using {@link Tags} over other immutable collections. */
   static final class TagsOf1 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag) {
@@ -28,7 +28,7 @@ final class MicrometerRules {
     }
   }
 
-  /** Prefer {@link Tags} over other immutable {@link Iterable}'s. */
+  /** Prefer using {@link Tags} over other immutable collections. */
   static final class TagsOf2 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag1, Tag tag2) {
@@ -41,7 +41,7 @@ final class MicrometerRules {
     }
   }
 
-  /** Prefer {@link Tags} over other immutable {@link Iterable}'s. */
+  /** Prefer using {@link Tags} over other immutable collections. */
   static final class TagsOf3 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag1, Tag tag2, Tag tag3) {
@@ -54,7 +54,7 @@ final class MicrometerRules {
     }
   }
 
-  /** Prefer {@link Tags} over other immutable {@link Iterable}'s. */
+  /** Prefer using {@link Tags} over other immutable collections. */
   static final class TagsOf4 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag1, Tag tag2, Tag tag3, Tag tag4) {
@@ -68,7 +68,7 @@ final class MicrometerRules {
     }
   }
 
-  /** Prefer {@link Tags} over other immutable {@link Iterable}'s. */
+  /** Prefer using {@link Tags} over other immutable collections. */
   static final class TagsOf5 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag1, Tag tag2, Tag tag3, Tag tag4, Tag tag5) {
