@@ -24,10 +24,6 @@ final class ClassRulesTest implements RefasterRuleCollectionTestCase {
     return s -> clazz.isInstance(s);
   }
 
-  Function<Number, Integer> testClassLiteralCast() {
-    return i -> (Integer) i;
-  }
-
   Function<Number, Integer> testClassReferenceCast() {
     return i -> Integer.class.cast(i);
   }

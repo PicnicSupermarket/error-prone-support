@@ -73,23 +73,25 @@ final class ClassRules {
     }
   }
 
-  /**
-   * Prefer {@link Class#cast(Object)} method references over lambda expressions that require naming
-   * a variable.
-   */
+  // XXX: This rule is temporarily disabled due to false positives with generic casts.
+  /// **
+  // * Prefer {@link Class#cast(Object)} method references over lambda expressions that require
+  // naming
+  // * a variable.
+  // */
   // XXX: Once the `ClassReferenceCast` rule is dropped, rename this rule to just `ClassCast`.
-  static final class ClassLiteralCast<T, S> {
-    @BeforeTemplate
-    @SuppressWarnings("unchecked")
-    Function<T, S> before() {
-      return t -> (S) t;
-    }
-
-    @AfterTemplate
-    Function<T, S> after() {
-      return Refaster.<S>clazz()::cast;
-    }
-  }
+  //  static final class ClassLiteralCast<T, S> {
+  //    @BeforeTemplate
+  //    @SuppressWarnings("unchecked")
+  //    Function<T, S> before() {
+  //      return t -> (S) t;
+  //    }
+  //
+  //    @AfterTemplate
+  //    Function<T, S> after() {
+  //      return Refaster.<S>clazz()::cast;
+  //    }
+  //  }
 
   /**
    * Prefer {@link Class#cast(Object)} method references over lambda expressions that require naming
