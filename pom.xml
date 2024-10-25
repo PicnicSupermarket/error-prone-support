@@ -1496,7 +1496,7 @@
                 <plugin>
                     <groupId>org.kordamp.maven</groupId>
                     <artifactId>pomchecker-maven-plugin</artifactId>
-                    <version>1.13.0</version>
+                    <version>1.14.0</version>
                     <configuration>
                         <failOnError>false</failOnError>
                         <release>false</release>
