@@ -59,6 +59,7 @@ final class RefasterRulesTest {
           LongStreamRules.class,
           MapEntryRules.class,
           MapRules.class,
+          MicrometerRules.class,
           MockitoRules.class,
           MultimapRules.class,
           NullRules.class,
