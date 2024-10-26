@@ -11,6 +11,9 @@ import io.micrometer.core.instrument.Tags;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with Micrometer. */
+// XXX: Consider replacing the `TagsOf[N]` rules with a bug checker, so that various other
+// expressions (e.g. those creating other collection types, those passing in tags some other way, or
+// those passing in more tags) can be replaced as wel.
 @OnlineDocumentation
 final class MicrometerRules {
   private MicrometerRules() {}
