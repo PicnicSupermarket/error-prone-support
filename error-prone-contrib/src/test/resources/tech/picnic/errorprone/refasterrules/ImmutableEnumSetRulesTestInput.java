@@ -1,21 +1,28 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+
+import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import java.math.RoundingMode;
 import java.util.EnumSet;
+import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ImmutableEnumSetRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(EnumSet.class);
+    return ImmutableSet.of(EnumSet.class, toImmutableSet());
   }
 
-  ImmutableSet<RoundingMode> testSetsImmutableEnumSetIterable() {
-    return ImmutableSet.copyOf(EnumSet.range(RoundingMode.UP, RoundingMode.UNNECESSARY));
+  ImmutableSet<ImmutableSet<RoundingMode>> testSetsImmutableEnumSetIterable() {
+    return ImmutableSet.of(
+        ImmutableSet.copyOf(Iterables.cycle(RoundingMode.UP)),
+        ImmutableSet.copyOf(EnumSet.allOf(RoundingMode.class)));
   }
 
-  ImmutableSet<RoundingMode> testSetsImmutableEnumSetIterableArray() {
+  ImmutableSet<RoundingMode> testSetsImmutableEnumSetArraysAsList() {
     return ImmutableSet.copyOf(RoundingMode.values());
   }
 
@@ -72,7 +79,7 @@ final class ImmutableEnumSetRulesTest implements RefasterRuleCollectionTestCase 
         RoundingMode.HALF_EVEN);
   }
 
-  ImmutableSet<RoundingMode> testImmutableEnumSetVarArgs() {
+  ImmutableSet<RoundingMode> testSetsImmutableEnumSetVarArgs() {
     return ImmutableSet.copyOf(
         EnumSet.of(
             RoundingMode.UP,
@@ -81,5 +88,9 @@ final class ImmutableEnumSetRulesTest implements RefasterRuleCollectionTestCase 
             RoundingMode.FLOOR,
             RoundingMode.UNNECESSARY,
             RoundingMode.HALF_EVEN));
+  }
+
+  ImmutableSet<BoundType> testStreamToImmutableEnumSet() {
+    return Stream.of(BoundType.OPEN).collect(toImmutableSet());
   }
 }

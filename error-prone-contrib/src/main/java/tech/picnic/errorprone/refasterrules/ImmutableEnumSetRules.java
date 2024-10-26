@@ -1,20 +1,32 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.Sets.toImmutableEnumSet;
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /**
  * Refaster rules related to expressions dealing with {@code
  * com.google.common.collect.ImmutableEnumSet}s.
  */
+// XXX: Some of the rules defined here impact iteration order. That's a rather subtle change. Should
+// we emit a comment warning about this fact? (This may produce a lot of noise. A bug checker could
+// in some cases determine whether iteration order is important.)
+// XXX: Consider replacing the `SetsImmutableEnumSet[N]` Refaster rules with a bug checker, such
+// that call to `ImmutableSet#of(Object, Object, Object, Object, Object, Object, Object[])` with
+// enum-typed values can also be rewritten.
 @OnlineDocumentation
 final class ImmutableEnumSetRules {
   private ImmutableEnumSetRules() {}
@@ -22,15 +34,24 @@ final class ImmutableEnumSetRules {
   /**
    * Prefer {@link Sets#immutableEnumSet(Iterable)} for enum collections to take advantage of the
    * internally used {@link EnumSet}.
+   *
+   * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the
+   * original code produces a set that iterates over its elements in the same order as the input
+   * {@link Iterable}, the replacement code iterates over the elements in enum definition order.
    */
   static final class SetsImmutableEnumSetIterable<T extends Enum<T>> {
+    @BeforeTemplate
+    ImmutableSet<T> before(Iterable<T> elements) {
+      return ImmutableSet.copyOf(elements);
+    }
+
     @BeforeTemplate
     ImmutableSet<T> before(Collection<T> elements) {
       return ImmutableSet.copyOf(elements);
     }
 
     @AfterTemplate
-    ImmutableSet<T> after(Collection<T> elements) {
+    ImmutableSet<T> after(Iterable<T> elements) {
       return Sets.immutableEnumSet(elements);
     }
   }
@@ -38,8 +59,12 @@ final class ImmutableEnumSetRules {
   /**
    * Prefer {@link Sets#immutableEnumSet(Iterable)} for enum collections to take advantage of the
    * internally used {@link EnumSet}.
+   *
+   * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the
+   * original code produces a set that iterates over its elements in the same order as defined in
+   * the array, the replacement code iterates over the elements in enum definition order.
    */
-  static final class SetsImmutableEnumSetIterableArray<T extends Enum<T>> {
+  static final class SetsImmutableEnumSetArraysAsList<T extends Enum<T>> {
     @BeforeTemplate
     ImmutableSet<T> before(T[] elements) {
       return ImmutableSet.copyOf(elements);
@@ -72,6 +97,10 @@ final class ImmutableEnumSetRules {
   /**
    * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
    * the internally used {@link EnumSet}.
+   *
+   * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the {@link
+   * ImmutableSet#of} expression produces a set that iterates over its elements in the listed order,
+   * the replacement code iterates over the elements in enum definition order.
    */
   static final class SetsImmutableEnumSet2<T extends Enum<T>> {
     @BeforeTemplate
@@ -90,6 +119,10 @@ final class ImmutableEnumSetRules {
   /**
    * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
    * the internally used {@link EnumSet}.
+   *
+   * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the {@link
+   * ImmutableSet#of} expression produces a set that iterates over its elements in the listed order,
+   * the replacement code iterates over the elements in enum definition order.
    */
   static final class SetsImmutableEnumSet3<T extends Enum<T>> {
     @BeforeTemplate
@@ -109,6 +142,10 @@ final class ImmutableEnumSetRules {
   /**
    * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
    * the internally used {@link EnumSet}.
+   *
+   * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the {@link
+   * ImmutableSet#of} expression produces a set that iterates over its elements in the listed order,
+   * the replacement code iterates over the elements in enum definition order.
    */
   static final class SetsImmutableEnumSet4<T extends Enum<T>> {
     @BeforeTemplate
@@ -128,6 +165,10 @@ final class ImmutableEnumSetRules {
   /**
    * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
    * the internally used {@link EnumSet}.
+   *
+   * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the {@link
+   * ImmutableSet#of} expression produces a set that iterates over its elements in the listed order,
+   * the replacement code iterates over the elements in enum definition order.
    */
   static final class SetsImmutableEnumSet5<T extends Enum<T>> {
     @BeforeTemplate
@@ -147,6 +188,10 @@ final class ImmutableEnumSetRules {
   /**
    * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
    * the internally used {@link EnumSet}.
+   *
+   * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the
+   * original code produces a set that iterates over its elements in the listed order, the
+   * replacement code iterates over the elements in enum definition order.
    */
   static final class SetsImmutableEnumSet6<T extends Enum<T>> {
     @BeforeTemplate
@@ -165,7 +210,7 @@ final class ImmutableEnumSetRules {
    * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
    * the internally used {@link EnumSet}.
    */
-  static final class ImmutableEnumSetVarArgs<T extends Enum<T>> {
+  static final class SetsImmutableEnumSetVarArgs<T extends Enum<T>> {
     @BeforeTemplate
     @SuppressWarnings("SetsImmutableEnumSetIterable" /* This is a more specific template. */)
     ImmutableSet<T> before(T e1, @Repeated T elements) {
@@ -175,6 +220,27 @@ final class ImmutableEnumSetRules {
     @AfterTemplate
     ImmutableSet<T> after(T e1, @Repeated T elements) {
       return Sets.immutableEnumSet(e1, Refaster.asVarargs(elements));
+    }
+  }
+
+  /**
+   * Use {@link Sets#toImmutableEnumSet()} when possible, as it is more efficient than {@link
+   * ImmutableSet#toImmutableSet()} and produces a more compact object.
+   *
+   * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the
+   * original code produces a set that iterates over its elements in encounter order, the
+   * replacement code iterates over the elements in enum definition order.
+   */
+  static final class StreamToImmutableEnumSet<T extends Enum<T>> {
+    @BeforeTemplate
+    ImmutableSet<T> before(Stream<T> stream) {
+      return stream.collect(toImmutableSet());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    ImmutableSet<T> after(Stream<T> stream) {
+      return stream.collect(toImmutableEnumSet());
     }
   }
 }

@@ -1,12 +1,9 @@
 package tech.picnic.errorprone.refasterrules;
 
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static com.google.common.collect.Sets.toImmutableEnumSet;
 import static java.util.Objects.checkIndex;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -27,8 +24,7 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
         Preconditions.class,
         Sets.class,
         Splitter.class,
-        Streams.class,
-        toImmutableSet());
+        Streams.class);
   }
 
   int testCheckIndex() {
@@ -37,10 +33,6 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
 
   void testCheckIndexConditional() {
     checkIndex(1, 2);
-  }
-
-  ImmutableSet<BoundType> testStreamToImmutableEnumSet() {
-    return Stream.of(BoundType.OPEN).collect(toImmutableEnumSet());
   }
 
   ImmutableSet<String> testIteratorGetNextOrDefault() {
