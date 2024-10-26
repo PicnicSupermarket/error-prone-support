@@ -378,11 +378,11 @@ public final class RedundantStringConversion extends BugChecker
 
   private static Matcher<MethodInvocationTree> createConversionMethodMatcher(
       ErrorProneFlags flags) {
-    // XXX: ErrorProneFlags#getList splits by comma, but method signatures may also contain commas.
-    // For this class methods accepting more than one argument are not valid, but still: not nice.
+    // XXX: `Flags#getSet` splits by comma, but method signatures may also contain commas. For this
+    // class methods accepting more than one argument are not valid, but still: not nice.
     return anyOf(
         WELL_KNOWN_STRING_CONVERSION_METHODS,
         new MethodMatcherFactory()
-            .create(Flags.getList(flags, EXTRA_STRING_CONVERSION_METHODS_FLAG)));
+            .create(Flags.getSet(flags, EXTRA_STRING_CONVERSION_METHODS_FLAG)));
   }
 }

@@ -14,6 +14,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
@@ -34,10 +35,8 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
@@ -230,10 +229,8 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
         excludedAnnotations(flags));
   }
 
-  private static ImmutableList<String> excludedAnnotations(ErrorProneFlags flags) {
-    Set<String> exclusions = new HashSet<>();
-    exclusions.addAll(Flags.getList(flags, EXCLUDED_ANNOTATIONS_FLAG));
-    exclusions.addAll(BLACKLISTED_ANNOTATIONS);
-    return ImmutableList.copyOf(exclusions);
+  private static ImmutableSet<String> excludedAnnotations(ErrorProneFlags flags) {
+    return Sets.union(BLACKLISTED_ANNOTATIONS, Flags.getSet(flags, EXCLUDED_ANNOTATIONS_FLAG))
+        .immutableCopy();
   }
 }
