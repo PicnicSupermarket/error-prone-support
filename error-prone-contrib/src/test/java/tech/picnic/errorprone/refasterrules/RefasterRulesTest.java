@@ -43,6 +43,7 @@ final class RefasterRulesTest {
           EqualityRules.class,
           FileRules.class,
           InputStreamRules.class,
+          ImmutableEnumSetRules.class,
           ImmutableListRules.class,
           ImmutableListMultimapRules.class,
           ImmutableMapRules.class,

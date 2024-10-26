@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.condition.OS.WINDOWS;
 import com.google.auto.service.AutoService;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import com.google.errorprone.VisitorState;
@@ -41,7 +40,8 @@ final class DocumentationGeneratorTaskListenerTest {
                 entry ->
                     AclEntry.newBuilder(entry)
                         .setPermissions(
-                            Sets.difference(entry.permissions(), ImmutableSet.of(ADD_SUBDIRECTORY)))
+                            Sets.difference(
+                                entry.permissions(), Sets.immutableEnumSet(ADD_SUBDIRECTORY)))
                         .build())
             .collect(toImmutableList()));
 
