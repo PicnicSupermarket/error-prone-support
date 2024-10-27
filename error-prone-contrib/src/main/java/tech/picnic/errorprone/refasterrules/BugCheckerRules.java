@@ -9,6 +9,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.sun.tools.javac.util.Constants;
 import com.sun.tools.javac.util.Convert;
+import javax.lang.model.element.Name;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to {@link com.google.errorprone.bugpatterns.BugChecker} classes. */
@@ -65,6 +66,24 @@ final class BugCheckerRules {
     @AfterTemplate
     String after(String value) {
       return Constants.format(value);
+    }
+  }
+
+  /** Prefer {@link Name#contentEquals(CharSequence)} over more verbose alternatives. */
+  static final class NameContentEquals {
+    @BeforeTemplate
+    boolean before(Name name, CharSequence string) {
+      return name.toString().equals(string.toString());
+    }
+
+    @BeforeTemplate
+    boolean before(Name name, String string) {
+      return name.toString().equals(string);
+    }
+
+    @AfterTemplate
+    boolean after(Name name, CharSequence string) {
+      return name.contentEquals(string);
     }
   }
 }
