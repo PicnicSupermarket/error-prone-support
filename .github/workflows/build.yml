@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-22.04 ]
-        jdk: [ 17.0.10, 21.0.2, 22.0.2, 23-ea ]
+        jdk: [ 17.0.13, 21.0.5, 23.0.1 ]
         distribution: [ temurin ]
         experimental: [ false ]
         include:
