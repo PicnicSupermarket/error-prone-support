@@ -47,6 +47,7 @@ import javax.lang.model.element.Modifier;
     linkType = CUSTOM,
     severity = WARNING,
     tags = STYLE)
+@SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
 public final class Slf4jLoggerDeclaration extends BugChecker implements VariableTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> IS_GET_LOGGER =
