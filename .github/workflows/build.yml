@@ -15,11 +15,11 @@ jobs:
         experimental: [ false ]
         include:
           - os: macos-14
-            jdk: 17.0.10
+            jdk: 17.0.13
             distribution: temurin
             experimental: false
           - os: windows-2022
-            jdk: 17.0.10
+            jdk: 17.0.13
             distribution: temurin
             experimental: false
     runs-on: ${{ matrix.os }}

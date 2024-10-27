@@ -36,7 +36,7 @@ jobs:
         uses: s4u/setup-maven-action@489441643219d2b93ee2a127b2402eb640a1b947 # v1.13.0
         with:
           checkout-ref: "refs/pull/${{ github.event.issue.number }}/head"
-          java-version: 17.0.10
+          java-version: 17.0.13
           java-distribution: temurin
           maven-version: 3.9.9
       - name: Install project to local Maven repository
