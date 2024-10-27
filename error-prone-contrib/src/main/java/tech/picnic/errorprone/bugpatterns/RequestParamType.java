@@ -15,8 +15,8 @@ import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
@@ -74,10 +74,10 @@ public final class RequestParamType extends BugChecker implements VariableTreeMa
     return allOf(
         annotations(AT_LEAST_ONE, isType("org.springframework.web.bind.annotation.RequestParam")),
         anyOf(isSubtypeOf(ImmutableCollection.class), isSubtypeOf(ImmutableMap.class)),
-        not(isSubtypeOfAny(Flags.getList(flags, SUPPORTED_CUSTOM_TYPES_FLAG))));
+        not(isSubtypeOfAny(Flags.getSet(flags, SUPPORTED_CUSTOM_TYPES_FLAG))));
   }
 
-  private static Matcher<Tree> isSubtypeOfAny(ImmutableList<String> inclusions) {
+  private static Matcher<Tree> isSubtypeOfAny(ImmutableSet<String> inclusions) {
     return anyOf(
         inclusions.stream()
             .map(inclusion -> isSubtypeOf(Suppliers.typeFromString(inclusion)))
