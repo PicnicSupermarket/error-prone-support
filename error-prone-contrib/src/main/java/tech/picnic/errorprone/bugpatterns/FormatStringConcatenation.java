@@ -36,6 +36,7 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -203,12 +204,8 @@ public final class FormatStringConcatenation extends BugChecker
 
     ExpressionTree argument = ASTHelpers.stripParentheses(arguments.get(argPosition));
     return argument instanceof BinaryTree
-        && isStringTyped(argument, state)
+        && MoreASTHelpers.isStringTyped(argument, state)
         && ASTHelpers.constValue(argument, String.class) == null;
-  }
-
-  private static boolean isStringTyped(ExpressionTree tree, VisitorState state) {
-    return ASTHelpers.isSameType(ASTHelpers.getType(tree), state.getSymtab().stringType, state);
   }
 
   private static class ReplacementArgumentsConstructor
@@ -223,7 +220,7 @@ public final class FormatStringConcatenation extends BugChecker
 
     @Override
     public @Nullable Void visitBinary(BinaryTree tree, VisitorState state) {
-      if (tree.getKind() == Kind.PLUS && isStringTyped(tree, state)) {
+      if (tree.getKind() == Kind.PLUS && MoreASTHelpers.isStringTyped(tree, state)) {
         tree.getLeftOperand().accept(this, state);
         tree.getRightOperand().accept(this, state);
       } else {

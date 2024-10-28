@@ -9,6 +9,7 @@ import static com.google.errorprone.matchers.Matchers.classLiteral;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -30,14 +31,13 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.ModifiersTree;
-import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
 import java.util.EnumSet;
-import java.util.Objects;
 import javax.inject.Inject;
 import javax.lang.model.element.Modifier;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
 
 /** A {@link BugChecker} that flags non-canonical SLF4J logger declarations. */
 @AutoService(BugChecker.class)
@@ -62,14 +62,14 @@ public final class Slf4jLoggerDeclaration extends BugChecker implements Variable
           MethodInvocationTree.class,
           allOf(
               instanceMethod().anyClass().named("getClass").withNoParameters(),
-              Slf4jLoggerDeclaration::receiverIsEnclosingClassInstance));
+              Slf4jLoggerDeclaration::getClassReceiverIsEnclosingClassInstance));
   private static final ImmutableSet<Modifier> INSTANCE_DECLARATION_MODIFIERS =
       Sets.immutableEnumSet(Modifier.PRIVATE, Modifier.FINAL);
   private static final ImmutableSet<Modifier> STATIC_DECLARATION_MODIFIERS =
       Sets.immutableEnumSet(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL);
 
-  private final String canonicalStaticName;
-  private final String canonicalInstanceName;
+  private final String canonicalStaticFieldName;
+  private final String canonicalInstanceFieldName;
 
   /** Instantiates a default {@link Slf4jLoggerDeclaration} instance. */
   public Slf4jLoggerDeclaration() {
@@ -83,10 +83,10 @@ public final class Slf4jLoggerDeclaration extends BugChecker implements Variable
    */
   @Inject
   Slf4jLoggerDeclaration(ErrorProneFlags flags) {
-    canonicalStaticName =
+    canonicalStaticFieldName =
         flags.get(CANONICAL_STATIC_LOGGER_NAME_FLAG).orElse(DEFAULT_CANONICAL_LOGGER_NAME);
-    canonicalInstanceName =
-        CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, canonicalStaticName);
+    canonicalInstanceFieldName =
+        CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, canonicalStaticFieldName);
   }
 
   @Override
@@ -104,19 +104,27 @@ public final class Slf4jLoggerDeclaration extends BugChecker implements Variable
 
     if (clazz.getModifiers().getFlags().contains(Modifier.ABSTRACT)
         && IS_DYNAMIC_ENCLOSING_CLASS_REFERENCE.matches(factoryArg, state)) {
+      /*
+       * While generally we prefer `Logger` declarations to be static and named after their
+       * enclosing class, we allow one exception: loggers in abstract classes with a name derived
+       * from `getClass()`.
+       */
       suggestModifiers(tree, INSTANCE_DECLARATION_MODIFIERS, fix, state);
-      suggestRename(tree, canonicalInstanceName, fix, state);
+      suggestRename(tree, canonicalInstanceFieldName, fix, state);
     } else {
       suggestModifiers(
           tree,
           clazz.getKind() == Kind.INTERFACE ? ImmutableSet.of() : STATIC_DECLARATION_MODIFIERS,
           fix,
           state);
-      suggestRename(tree, canonicalStaticName, fix, state);
+      suggestRename(tree, canonicalStaticFieldName, fix, state);
 
-      if (!ASTHelpers.isSameType(
-              ASTHelpers.getType(factoryArg), state.getSymtab().stringType, state)
+      if (!MoreASTHelpers.isStringTyped(factoryArg, state)
           && !IS_STATIC_ENCLOSING_CLASS_REFERENCE.matches(factoryArg, state)) {
+        /*
+         * Loggers with a custom string name are generally "special", but those with a name derived
+         * from a class other than the one that encloses it are likely in error.
+         */
         fix.merge(SuggestedFix.replace(factoryArg, clazz.getSimpleName() + ".class"));
       }
     }
@@ -125,12 +133,12 @@ public final class Slf4jLoggerDeclaration extends BugChecker implements Variable
   }
 
   private static void suggestModifiers(
-      Tree tree,
+      VariableTree tree,
       ImmutableSet<Modifier> modifiers,
       SuggestedFix.Builder fixBuilder,
       VisitorState state) {
-    ModifiersTree modifiersTree = ASTHelpers.getModifiers(tree);
-    verify(modifiersTree != null, "Given tree does not support modifiers");
+    ModifiersTree modifiersTree =
+        requireNonNull(ASTHelpers.getModifiers(tree), "`VariableTree` must have modifiers");
     SuggestedFixes.addModifiers(tree, modifiersTree, state, modifiers).ifPresent(fixBuilder::merge);
     SuggestedFixes.removeModifiers(
             modifiersTree, state, Sets.difference(EnumSet.allOf(Modifier.class), modifiers))
@@ -145,15 +153,19 @@ public final class Slf4jLoggerDeclaration extends BugChecker implements Variable
   }
 
   private static boolean isEnclosingClassReference(ExpressionTree tree, VisitorState state) {
-    ClassTree enclosing = state.findEnclosing(ClassTree.class);
-    return enclosing != null
-        && Objects.equals(ASTHelpers.getSymbol(tree), ASTHelpers.getSymbol(enclosing));
+    return ASTHelpers.getSymbol(getEnclosingClass(state)).equals(ASTHelpers.getSymbol(tree));
   }
 
-  private static boolean receiverIsEnclosingClassInstance(
-      MethodInvocationTree tree, VisitorState state) {
-    ExpressionTree receiver = ASTHelpers.getReceiver(tree);
+  private static boolean getClassReceiverIsEnclosingClassInstance(
+      MethodInvocationTree getClassInvocationTree, VisitorState state) {
+    ExpressionTree receiver = ASTHelpers.getReceiver(getClassInvocationTree);
     if (receiver == null) {
+      /*
+       * Method invocations without an explicit receiver either involve static methods (possibly
+       * statically imported), or instance methods invoked on the enclosing class. As the given
+       * `getClassInvocationTree` is guaranteed to be a nullary `#getClass()` invocation, the latter
+       * must be the case.
+       */
       return true;
     }
 

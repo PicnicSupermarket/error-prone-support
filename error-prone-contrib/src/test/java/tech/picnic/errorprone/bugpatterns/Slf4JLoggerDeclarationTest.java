@@ -12,6 +12,8 @@ final class Slf4JLoggerDeclarationTest {
     CompilationTestHelper.newInstance(Slf4jLoggerDeclaration.class, getClass())
         .addSourceLines(
             "A.java",
+            "import static java.lang.Class.forName;",
+            "",
             "import org.slf4j.Logger;",
             "import org.slf4j.LoggerFactory;",
             "",
@@ -37,6 +39,13 @@ final class Slf4JLoggerDeclarationTest {
             "",
             "  interface StaticLoggerForInterface {",
             "    Logger LOG = LoggerFactory.getLogger(StaticLoggerForInterface.class);",
+            "  }",
+            "",
+            "  abstract static class DynamicLoggerForWrongTypeWithoutReceiver {",
+            "    // BUG: Diagnostic contains:",
+            "    private final Logger log = LoggerFactory.getLogger(forName(\"A.class\"));",
+            "",
+            "    DynamicLoggerForWrongTypeWithoutReceiver() throws ClassNotFoundException {}",
             "  }",
             "",
             "  abstract static class DynamicLoggerForWrongTypeWithoutSymbol {",
