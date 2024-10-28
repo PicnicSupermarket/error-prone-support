@@ -9,10 +9,13 @@ import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ExpressionStatementTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.ReturnTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.VariableTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.ExpressionStatementTree;
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
@@ -137,6 +140,25 @@ final class MoreASTHelpersTest {
         .doTest();
   }
 
+  @Test
+  void isStringTyped() {
+    CompilationTestHelper.newInstance(IsStringTypedTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "class A {",
+            "  void m() {",
+            "    int foo = 1;",
+            "    // BUG: Diagnostic contains:",
+            "    String s = \"foo\";",
+            "",
+            "    hashCode();",
+            "    // BUG: Diagnostic contains:",
+            "    toString();",
+            "  }",
+            "}")
+        .doTest();
+  }
+
   private static String createMethodSearchDiagnosticsMessage(
       BiFunction<String, VisitorState, Object> valueFunction, VisitorState state) {
     return Maps.toMap(ImmutableSet.of("foo", "bar", "baz"), key -> valueFunction.apply(key, state))
@@ -222,6 +244,30 @@ final class MoreASTHelpersTest {
               .allMatch(p -> MoreASTHelpers.areSameType(p, parameters.get(0), state))
           ? describeMatch(tree)
           : Description.NO_MATCH;
+    }
+  }
+
+  /**
+   * A {@link BugChecker} that delegates to {@link MoreASTHelpers#isStringTyped(Tree,
+   * VisitorState)}.
+   */
+  @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
+  public static final class IsStringTypedTestChecker extends BugChecker
+      implements MethodInvocationTreeMatcher, VariableTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+      return getDescription(tree, state);
+    }
+
+    @Override
+    public Description matchVariable(VariableTree tree, VisitorState state) {
+      return getDescription(tree, state);
+    }
+
+    private Description getDescription(Tree tree, VisitorState state) {
+      return MoreASTHelpers.isStringTyped(tree, state) ? describeMatch(tree) : Description.NO_MATCH;
     }
   }
 }
