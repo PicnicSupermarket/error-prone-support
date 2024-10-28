@@ -6,7 +6,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class Slf4JLoggerDeclarationTest {
+final class Slf4jLoggerDeclarationTest {
   @Test
   void identification() {
     CompilationTestHelper.newInstance(Slf4jLoggerDeclaration.class, getClass())
