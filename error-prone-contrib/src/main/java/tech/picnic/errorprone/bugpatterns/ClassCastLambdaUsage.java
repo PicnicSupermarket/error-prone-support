@@ -17,27 +17,29 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.tree.VariableTree;
+import com.sun.tools.javac.code.Type;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags lambda expressions that can be replaced with a method reference
- * of the form {@code T.class::cast}, if applicable.
+ * of the form {@code T.class::cast}.
  */
 // XXX: Consider folding this logic into the `MethodReferenceUsage` check of the
 // `error-prone-experimental` module.
+// XXX: This check and its tests are structurally nearly identical to `IsInstanceLambdaUsage`.
+// Unless folded into `MethodReferenceUsage`, consider merging the two.
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary =
-        "Prefer `Class::cast` method reference over equivalent lambda expression, if applicable",
-    link = BUG_PATTERNS_BASE_URL + "ClassCast",
+    summary = "Prefer `Class::cast` method reference over equivalent lambda expression",
+    link = BUG_PATTERNS_BASE_URL + "ClassCastLambdaUsage",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
-public final class ClassCast extends BugChecker implements LambdaExpressionTreeMatcher {
+public final class ClassCastLambdaUsage extends BugChecker implements LambdaExpressionTreeMatcher {
   private static final long serialVersionUID = 1L;
 
-  /** Instantiates a new {@link ClassCast} instance. */
-  public ClassCast() {}
+  /** Instantiates a new {@link ClassCastLambdaUsage} instance. */
+  public ClassCastLambdaUsage() {}
 
   @Override
   public Description matchLambdaExpression(LambdaExpressionTree tree, VisitorState state) {
@@ -45,8 +47,8 @@ public final class ClassCast extends BugChecker implements LambdaExpressionTreeM
       return Description.NO_MATCH;
     }
 
-    String classCast = SourceCode.treeToString(typeCast.getType(), state);
-    if (isGenericCastExpression(classCast)) {
+    Type type = ASTHelpers.getType(typeCast);
+    if (type == null || type.isParameterized()) {
       return Description.NO_MATCH;
     }
 
@@ -55,10 +57,9 @@ public final class ClassCast extends BugChecker implements LambdaExpressionTreeM
       return Description.NO_MATCH;
     }
 
-    return describeMatch(tree, SuggestedFix.replace(tree, classCast + ".class::cast"));
-  }
-
-  private static boolean isGenericCastExpression(String expression) {
-    return expression.contains("<") && expression.contains(">");
+    return describeMatch(
+        tree,
+        SuggestedFix.replace(
+            tree, SourceCode.treeToString(typeCast.getType(), state) + ".class::cast"));
   }
 }

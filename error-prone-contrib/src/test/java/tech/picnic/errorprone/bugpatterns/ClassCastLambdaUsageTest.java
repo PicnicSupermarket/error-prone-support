@@ -5,36 +5,38 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class IsInstanceLambdaUsageTest {
+final class ClassCastLambdaUsageTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(IsInstanceLambdaUsage.class, getClass())
+    CompilationTestHelper.newInstance(ClassCastLambdaUsage.class, getClass())
         .addSourceLines(
             "A.java",
+            "import com.google.common.collect.ImmutableSet;",
             "import java.util.stream.Stream;",
-            "import reactor.core.publisher.Flux;",
             "",
             "class A {",
             "  void m() {",
-            "    Integer localVariable = 0;",
+            "    Number localVariable = 0;",
             "",
             "    Stream.of(0).map(i -> i);",
             "    Stream.of(1).map(i -> i + 1);",
-            "    Stream.of(2).filter(Integer.class::isInstance);",
-            "    Stream.of(3).filter(i -> i.getClass() instanceof Class);",
-            "    Stream.of(4).filter(i -> localVariable instanceof Integer);",
+            "    Stream.of(2).map(Integer.class::cast);",
+            "    Stream.of(3).map(i -> (Integer) 2);",
+            "    Stream.of(4).map(i -> (Integer) localVariable);",
             "    // XXX: Ideally this case is also flagged. Pick this up in the context of merging the",
-            "    // `IsInstanceLambdaUsage` and `MethodReferenceUsage` checks, or introduce a separate check that",
+            "    // `ClassCastLambdaUsage` and `MethodReferenceUsage` checks, or introduce a separate check that",
             "    // simplifies unnecessary block lambda expressions.",
             "    Stream.of(5)",
-            "        .filter(",
+            "        .map(",
             "            i -> {",
-            "              return i instanceof Integer;",
+            "              return (Integer) i;",
             "            });",
-            "    Flux.just(6, \"foo\").distinctUntilChanged(v -> v, (a, b) -> a instanceof Integer);",
+            "    Stream.<ImmutableSet>of(ImmutableSet.of(5)).map(l -> (ImmutableSet<Number>) l);",
+            "    Stream.of(ImmutableSet.of(6)).map(l -> (ImmutableSet<?>) l);",
+            "    Stream.of(7).reduce((a, b) -> (Integer) a);",
             "",
             "    // BUG: Diagnostic contains:",
-            "    Stream.of(7).filter(i -> i instanceof Integer);",
+            "    Stream.of(8).map(i -> (Integer) i);",
             "  }",
             "}")
         .doTest();
@@ -42,14 +44,14 @@ final class IsInstanceLambdaUsageTest {
 
   @Test
   void replacement() {
-    BugCheckerRefactoringTestHelper.newInstance(IsInstanceLambdaUsage.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(ClassCastLambdaUsage.class, getClass())
         .addInputLines(
             "A.java",
             "import java.util.stream.Stream;",
             "",
             "class A {",
             "  void m() {",
-            "    Stream.of(1).filter(i -> i instanceof Integer);",
+            "    Stream.of(1).map(i -> (Integer) i);",
             "  }",
             "}")
         .addOutputLines(
@@ -58,7 +60,7 @@ final class IsInstanceLambdaUsageTest {
             "",
             "class A {",
             "  void m() {",
-            "    Stream.of(1).filter(Integer.class::isInstance);",
+            "    Stream.of(1).map(Integer.class::cast);",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
