@@ -112,7 +112,7 @@ public final class ConstantNaming extends BugChecker implements VariableTreeMatc
         new TreeScanner<Boolean, @Nullable Void>() {
           @Override
           public Boolean visitVariable(VariableTree tree, @Nullable Void unused) {
-            return ASTHelpers.getSymbol(tree).getSimpleName().toString().equals(name)
+            return ASTHelpers.getSymbol(tree).getSimpleName().contentEquals(name)
                 || super.visitVariable(tree, null);
           }
 
