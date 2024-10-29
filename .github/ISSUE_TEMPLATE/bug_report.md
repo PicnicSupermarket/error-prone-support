@@ -44,7 +44,7 @@ Please replace this sentence with log output, if applicable.
 - Operating system (e.g. MacOS Monterey).
 - Java version (i.e. `java --version`, e.g. `17.0.13`).
 - Error Prone version (e.g. `2.35.1`).
-- Error Prone Support version (e.g. `0.18.0`).
+- Error Prone Support version (e.g. `0.19.0`).
 
 ### Additional context
 
