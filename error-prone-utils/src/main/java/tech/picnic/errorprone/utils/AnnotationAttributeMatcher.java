@@ -14,7 +14,6 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.tools.javac.code.Type;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -61,7 +60,7 @@ public final class AnnotationAttributeMatcher implements Serializable {
    * @return A non-{@code null} {@link AnnotationAttributeMatcher}.
    */
   public static AnnotationAttributeMatcher create(
-      Optional<? extends List<String>> inclusions, Iterable<String> exclusions) {
+      Optional<? extends Iterable<String>> inclusions, Iterable<String> exclusions) {
     Set<String> includedWholeTypes = new HashSet<>();
     Set<String> excludedWholeTypes = new HashSet<>();
     SetMultimap<String, String> includedAttributes = HashMultimap.create();

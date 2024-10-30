@@ -250,8 +250,8 @@ public final class DuplicateAnnotationAttributeListing extends BugChecker
       ErrorProneFlags flags) {
     return AnnotationAttributeMatcher.create(
         flags.get(INCLUDED_ANNOTATIONS_FLAG).isPresent()
-            ? Optional.of(flags.getListOrEmpty(INCLUDED_ANNOTATIONS_FLAG))
+            ? Optional.of(Flags.getSet(flags, INCLUDED_ANNOTATIONS_FLAG))
             : Optional.empty(),
-        Flags.getList(flags, EXCLUDED_ANNOTATIONS_FLAG));
+        Flags.getSet(flags, EXCLUDED_ANNOTATIONS_FLAG));
   }
 }
