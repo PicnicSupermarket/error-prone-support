@@ -48,7 +48,7 @@ public final class ClassCastLambdaUsage extends BugChecker implements LambdaExpr
     }
 
     Type type = ASTHelpers.getType(typeCast);
-    if (type == null || type.isParameterized()) {
+    if (type == null || type.isParameterized() || type.isPrimitive()) {
       return Description.NO_MATCH;
     }
 
