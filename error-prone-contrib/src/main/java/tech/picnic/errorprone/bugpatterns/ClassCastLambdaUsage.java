@@ -49,6 +49,13 @@ public final class ClassCastLambdaUsage extends BugChecker implements LambdaExpr
 
     Type type = ASTHelpers.getType(typeCast);
     if (type == null || type.isParameterized() || type.isPrimitive()) {
+      /*
+       * The method reference syntax does not support casting to parameterized types. Additionally,
+       * `Class#cast` does not support the same range of type conversions between (boxed) primitive
+       * types as the cast operator.
+       */
+      // XXX: Depending on the declared type of the value being cast, in some cases we _can_ rewrite
+      // primitive casts. Add support for this.
       return Description.NO_MATCH;
     }
 
