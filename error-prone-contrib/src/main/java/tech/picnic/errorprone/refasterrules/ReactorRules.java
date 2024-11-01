@@ -1772,6 +1772,9 @@ final class ReactorRules {
    * Prefer {@link StepVerifier.LastStep#verify()} over a dangling {@link
    * StepVerifier#verifyThenAssertThat()}.
    */
+  // XXX: This rule may break existing code. We want to explicitly nudge towards using {@link
+  // StepVerifier.Step#assertNext(Consumer)} or {@link StepVerifier.Step#expectNext(Object)}
+  // together with {@link Step#verifyComplete()}.
   static final class StepVerifierVerify {
     @BeforeTemplate
     StepVerifier.Assertions before(StepVerifier stepVerifier) {
