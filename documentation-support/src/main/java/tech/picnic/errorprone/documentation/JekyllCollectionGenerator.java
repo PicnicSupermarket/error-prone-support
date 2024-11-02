@@ -191,7 +191,7 @@ public final class JekyllCollectionGenerator {
                       b.severityLevel(),
                       b.tags(),
                       // XXX: Derive `Path` from filesytem.
-                      Path.of(b.source()).relativize(projectRoot).toString(),
+                      projectRoot.relativize(Path.of(b.source())).toString(),
                       bugPatternTestCases.get(b.fullyQualifiedName()).stream()
                           .filter(t -> t.type() == TestEntry.TestType.IDENTIFICATION)
                           .map(t -> ((IdentificationTestEntry) t).code())
