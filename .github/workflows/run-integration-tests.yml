@@ -16,7 +16,7 @@ jobs:
     name: On-demand integration test
     if: |
       github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
