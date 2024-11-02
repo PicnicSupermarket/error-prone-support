@@ -3,13 +3,17 @@ ruby File.read(".ruby-version").strip
 source "https://rubygems.org"
 
 group :jekyll_site_dependencies do
-  gem "jekyll", "4.3.2"
+  gem "jekyll", "4.3.4"
   gem "jekyll-sitemap", "1.4.0"
-  gem "just-the-docs", "0.6.2"
-  gem "rake", "13.0.6"
-  gem "webrick", "1.8.1"
+  gem "just-the-docs", "0.10.0"
+  gem "rake", "13.2.1"
+  # XXX: Drop this `sass-embedded` version pinning once various parts of the
+  # ecosystem caught up. See
+  # https://github.com/just-the-docs/just-the-docs/issues/1541#issuecomment-2401649789.
+  gem "sass-embedded", "1.78.0"
+  gem "webrick", "1.9.0"
 end
 
 group :website_validation_dependencies do
-  gem "html-proofer", "5.0.8"
+  gem "html-proofer", "5.0.9"
 end
