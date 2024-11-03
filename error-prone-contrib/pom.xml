@@ -55,7 +55,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-support</artifactId>
-            <scope>provided</scope>
+            <!-- XXX: One would expect this to be a `provided` dependency (as
+            Refaster rules are interpreted by the `refaster-runner` module),
+            but the `OptionalOrElseGet` bug checker defined by this module
+            depends on the `RequiresComputation` matcher that
+            `refaster-support` primarily exposes for use by Refaster rules.
+            Review this setup. (Should the matchers be moved elsewhere?) -->
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
