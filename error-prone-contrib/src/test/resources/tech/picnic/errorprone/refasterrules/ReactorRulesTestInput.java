@@ -264,6 +264,38 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         .single();
   }
 
+  Flux<String> testFluxUsing() {
+    return Mono.using(() -> new ByteArrayInputStream(new byte[] {}), s -> Mono.just("foo")).flux();
+  }
+
+  Flux<String> testFluxUsingEager() {
+    return Mono.using(() -> new ByteArrayInputStream(new byte[] {}), s -> Mono.just("foo"), false)
+        .flux();
+  }
+
+  Flux<String> testFluxUsing2() {
+    return Mono.using(() -> "foo", foo -> Mono.just("bar"), foo -> {}).flux();
+  }
+
+  Flux<String> testFluxUsing2Eager() {
+    return Mono.using(() -> "foo", foo -> Mono.just("bar"), foo -> {}, false).flux();
+  }
+
+  Flux<String> testFluxUsingWhen() {
+    return Mono.usingWhen(Mono.just("foo"), foo -> Mono.just("bar"), foo -> Mono.just("baz"))
+        .flux();
+  }
+
+  Flux<String> testFluxUsingWhen2() {
+    return Mono.usingWhen(
+            Mono.just("foo"),
+            foo -> Mono.just("bar"),
+            foo -> Mono.just("baz"),
+            (foo, e) -> Mono.just("qux"),
+            foo -> Mono.just("thud"))
+        .flux();
+  }
+
   ImmutableSet<Flux<Integer>> testFluxSwitchIfEmptyOfEmptyPublisher() {
     return ImmutableSet.of(
         Flux.just(1).switchIfEmpty(Mono.empty()), Flux.just(2).switchIfEmpty(Flux.empty()));
