@@ -1772,9 +1772,15 @@ final class ReactorRules {
    * Prefer {@link StepVerifier.LastStep#verify()} over a dangling {@link
    * StepVerifier#verifyThenAssertThat()}.
    */
-  // XXX: This rule may break existing code. We want to explicitly nudge towards using {@link
-  // StepVerifier.Step#assertNext(Consumer)} or {@link StepVerifier.Step#expectNext(Object)}
-  // together with {@link Step#verifyComplete()}.
+  // XXX: Application of this rule (and several others in this class) will cause invalid code if the
+  // result of the rewritten expression is dereferenced. Consider introducing a bug checker that
+  // identifies rules that change the return type of an expression and annotates them accordingly.
+  // The associated annotation can then be used to instruct an annotation processor to generate
+  // corresponding `void` rules that match only statements. This would allow the `Refaster` check to
+  // conditionally skip "not fully safe" rules. This allows conditionally flagging more dubious
+  // code, at the risk of compilation failures. With this rule, for example, we want to explicitly
+  // nudge users towards `StepVerifier.Step#assertNext(Consumer)` or
+  // `StepVerifier.Step#expectNext(Object)`, together with `Step#verifyComplete()`.
   static final class StepVerifierVerify {
     @BeforeTemplate
     StepVerifier.Assertions before(StepVerifier stepVerifier) {
