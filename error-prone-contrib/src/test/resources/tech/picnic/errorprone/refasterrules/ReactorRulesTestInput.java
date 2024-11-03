@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.io.ByteArrayInputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -201,6 +202,39 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Mono<Integer> testMonoSingle() {
     return Mono.just(1).flux().single();
+  }
+
+  Mono<String> testMonoUsing() {
+    return Flux.using(() -> new ByteArrayInputStream(new byte[] {}), s -> Mono.just("foo"))
+        .single();
+  }
+
+  Mono<String> testMonoUsingEager() {
+    return Flux.using(() -> new ByteArrayInputStream(new byte[] {}), s -> Mono.just("foo"), false)
+        .single();
+  }
+
+  Mono<String> testMonoUsing2() {
+    return Flux.using(() -> "foo", foo -> Mono.just("bar"), foo -> {}).single();
+  }
+
+  Mono<String> testMonoUsing2Eager() {
+    return Flux.using(() -> "foo", foo -> Mono.just("bar"), foo -> {}, false).single();
+  }
+
+  Mono<String> testMonoUsingWhen() {
+    return Flux.usingWhen(Mono.just("foo"), foo -> Mono.just("bar"), foo -> Mono.just("baz"))
+        .single();
+  }
+
+  Mono<String> testMonoUsingWhen2() {
+    return Flux.usingWhen(
+            Mono.just("foo"),
+            foo -> Mono.just("bar"),
+            foo -> Mono.just("baz"),
+            (foo, e) -> Mono.just("qux"),
+            foo -> Mono.just("thud"))
+        .single();
   }
 
   ImmutableSet<Flux<Integer>> testFluxSwitchIfEmptyOfEmptyPublisher() {
