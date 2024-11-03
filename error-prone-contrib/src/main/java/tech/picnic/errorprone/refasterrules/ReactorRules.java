@@ -586,6 +586,145 @@ final class ReactorRules {
     }
   }
 
+  /**
+   * Don't unnecessarily transform a {@link Flux#using(Callable, Function)} to a mono, instead use
+   * the equivalent API provided by {@link Mono}.
+   */
+  static final class MonoUsing<
+      D extends AutoCloseable, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
+    @BeforeTemplate
+    Mono<T> before(Callable<D> resourceSupplier, Function<D, P> sourceSupplier) {
+      return Flux.using(resourceSupplier, sourceSupplier).single();
+    }
+
+    @AfterTemplate
+    Mono<T> after(Callable<D> resourceSupplier, Function<D, M> sourceSupplier) {
+      return Mono.using(resourceSupplier, sourceSupplier);
+    }
+  }
+
+  /**
+   * Don't unnecessarily transform a {@link Flux#using(Callable, Function, boolean)} to a mono,
+   * instead use the equivalent API provided by {@link Mono}.
+   */
+  static final class MonoUsingEager<
+      D extends AutoCloseable, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
+    @BeforeTemplate
+    Mono<T> before(Callable<D> resourceSupplier, Function<D, P> sourceSupplier, boolean eager) {
+      return Flux.using(resourceSupplier, sourceSupplier, eager).single();
+    }
+
+    @AfterTemplate
+    Mono<T> after(Callable<D> resourceSupplier, Function<D, M> sourceSupplier, boolean eager) {
+      return Mono.using(resourceSupplier, sourceSupplier, eager);
+    }
+  }
+
+  /**
+   * Don't unnecessarily transform a {@link Flux#using(Callable, Function, Consumer)} to a mono,
+   * instead use the equivalent API provided by {@link Mono}.
+   */
+  static final class MonoUsing2<
+      D, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
+    @BeforeTemplate
+    Mono<T> before(
+        Callable<D> resourceSupplier, Function<D, P> sourceSupplier, Consumer<D> resourceCleanup) {
+      return Flux.using(resourceSupplier, sourceSupplier, resourceCleanup).single();
+    }
+
+    @AfterTemplate
+    Mono<T> after(
+        Callable<D> resourceSupplier, Function<D, M> sourceSupplier, Consumer<D> resourceCleanup) {
+      return Mono.using(resourceSupplier, sourceSupplier, resourceCleanup);
+    }
+  }
+
+  /**
+   * Don't unnecessarily transform a {@link Flux#using(Callable, Function, Consumer, boolean)} to a
+   * mono, instead use the equivalent API provided by {@link Mono}.
+   */
+  static final class MonoUsing2Eager<
+      D, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
+    @BeforeTemplate
+    Mono<T> before(
+        Callable<D> resourceSupplier,
+        Function<D, P> sourceSupplier,
+        Consumer<D> resourceCleanup,
+        boolean eager) {
+      return Flux.using(resourceSupplier, sourceSupplier, resourceCleanup, eager).single();
+    }
+
+    @AfterTemplate
+    Mono<T> after(
+        Callable<D> resourceSupplier,
+        Function<D, M> sourceSupplier,
+        Consumer<D> resourceCleanup,
+        boolean eager) {
+      return Mono.using(resourceSupplier, sourceSupplier, resourceCleanup, eager);
+    }
+  }
+
+  /**
+   * Don't unnecessarily transform a {@link Flux#usingWhen(Publisher, Function, Function)} to a
+   * mono, instead use the equivalent API provided by {@link Mono}.
+   */
+  static final class MonoUsingWhen<
+      D,
+      T,
+      P extends Publisher<? extends T>,
+      P2 extends Publisher<?>,
+      M extends Mono<? extends T>> {
+    @BeforeTemplate
+    Mono<T> before(
+        Publisher<D> resourceSupplier,
+        Function<D, P> resourceClosure,
+        Function<D, P2> asyncCleanup) {
+      return Flux.usingWhen(resourceSupplier, resourceClosure, asyncCleanup).single();
+    }
+
+    @AfterTemplate
+    Mono<T> after(
+        Publisher<D> resourceSupplier,
+        Function<D, M> resourceClosure,
+        Function<D, P2> asyncCleanup) {
+      return Mono.usingWhen(resourceSupplier, resourceClosure, asyncCleanup);
+    }
+  }
+
+  /**
+   * Don't unnecessarily transform a {@link Flux#usingWhen(Publisher, Function, Function,
+   * BiFunction, Function)} to a mono, instead use the equivalent API provided by {@link Mono}.
+   */
+  static final class MonoUsingWhen2<
+      D,
+      T,
+      P extends Publisher<? extends T>,
+      P2 extends Publisher<?>,
+      M extends Mono<? extends T>> {
+    @BeforeTemplate
+    Mono<T> before(
+        Publisher<D> resourceSupplier,
+        Function<D, P> resourceClosure,
+        Function<D, P2> asyncComplete,
+        BiFunction<D, ? super Throwable, P2> asyncError,
+        Function<D, P2> asyncCancel) {
+      return Flux.usingWhen(
+              resourceSupplier, resourceClosure, asyncComplete, asyncError, asyncCancel)
+          .single();
+    }
+
+    @AfterTemplate
+    Mono<T> after(
+        Publisher<D> resourceSupplier,
+        Function<D, M> resourceClosure,
+        Function<D, P2> asyncComplete,
+        BiFunction<D, ? super Throwable, ? extends Publisher<?>> asyncError,
+        Function<D, P2> asyncCancel) {
+      return Mono.usingWhen(
+          resourceSupplier, resourceClosure, asyncComplete, asyncError, asyncCancel);
+    }
+  }
+
   /** Don't unnecessarily pass an empty publisher to {@link Flux#switchIfEmpty(Publisher)}. */
   static final class FluxSwitchIfEmptyOfEmptyPublisher<T> {
     @BeforeTemplate
