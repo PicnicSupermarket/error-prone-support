@@ -66,6 +66,15 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
     return Instant.EPOCH.atZone(ZoneOffset.UTC).toOffsetDateTime();
   }
 
+  ImmutableSet<Instant> testInstantIdentity() {
+    return ImmutableSet.of(
+        Instant.EPOCH.plusMillis(1).plus(Duration.ZERO),
+        Instant.EPOCH.plusMillis(2).minus(Duration.ZERO),
+        Instant.parse(Instant.EPOCH.plusMillis(3).toString()),
+        Instant.ofEpochMilli(Instant.EPOCH.plusMillis(4).toEpochMilli()),
+        Instant.ofEpochSecond(Instant.EPOCH.plusMillis(5).getEpochSecond()));
+  }
+
   OffsetDateTime testInstantAtOffset() {
     return OffsetDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
   }

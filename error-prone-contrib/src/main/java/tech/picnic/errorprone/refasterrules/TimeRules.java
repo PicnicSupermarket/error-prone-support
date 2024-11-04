@@ -142,6 +142,24 @@ final class TimeRules {
     }
   }
 
+  /** Don't unnecessarily transform an {@link Instant} to an equivalent instance. */
+  static final class InstantIdentity {
+    @BeforeTemplate
+    Instant before(Instant instant) {
+      return Refaster.anyOf(
+          instant.plus(Duration.ZERO),
+          instant.minus(Duration.ZERO),
+          Instant.parse(instant.toString()),
+          Instant.ofEpochMilli(instant.toEpochMilli()),
+          Instant.ofEpochSecond(instant.getEpochSecond()));
+    }
+
+    @AfterTemplate
+    Instant after(Instant instant) {
+      return instant;
+    }
+  }
+
   /** Prefer {@link Instant#atOffset(ZoneOffset)} over more verbose alternatives. */
   static final class InstantAtOffset {
     @BeforeTemplate
