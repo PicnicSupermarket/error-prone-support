@@ -1465,27 +1465,6 @@
                     </configuration>
                 </plugin>
                 <plugin>
-<<<<<<< HEAD
-                    <groupId>org.kordamp.maven</groupId>
-                    <artifactId>pomchecker-maven-plugin</artifactId>
-                    <version>1.14.0</version>
-                    <configuration>
-                        <failOnError>false</failOnError>
-                        <release>false</release>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>check-maven-central-compliance</id>
-                            <goals>
-                                <goal>check-maven-central</goal>
-                            </goals>
-                            <phase>verify</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-=======
->>>>>>> 1d415add (Introduce `workshop` module)
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
                     <version>1.17.0</version>
