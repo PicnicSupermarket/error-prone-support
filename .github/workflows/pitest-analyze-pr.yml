@@ -22,7 +22,7 @@ jobs:
             objects.githubusercontent.com:443
             repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@489441643219d2b93ee2a127b2402eb640a1b947 # v1.13.0
+        uses: s4u/setup-maven-action@382542f77617f34e56bf83868920a4d45b7451e7 # v1.16.0
         with:
           checkout-fetch-depth: 2
           java-version: 17.0.13
