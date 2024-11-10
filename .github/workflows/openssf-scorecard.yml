@@ -31,7 +31,9 @@ jobs:
             api.scorecard.dev:443
             api.securityscorecards.dev:443
             github.com:443
+            index.docker.io:443
             oss-fuzz-build-logs.storage.googleapis.com:443
+            repo.maven.apache.org:443
             *.sigstore.dev:443
             www.bestpractices.dev:443
       - name: Check out code
