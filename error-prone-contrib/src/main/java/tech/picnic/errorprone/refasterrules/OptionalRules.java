@@ -279,6 +279,9 @@ final class OptionalRules {
    */
   // XXX: Do we need the `.filter(Optional::isPresent)`? If it's absent the caller probably assumed
   // that the values are present. (If we drop it, we should rewrite vacuous filter steps.)
+  // XXX: The rewritten `filter`/`map` expression may be more performant than its replacement. See
+  // https://github.com/palantir/gradle-baseline/pull/2946. (There are plans to pair Refaster rules
+  // with JMH benchmarks; this would be a great use case.)
   static final class StreamFlatMapOptional<T> {
     @BeforeTemplate
     Stream<T> before(Stream<Optional<T>> stream) {
