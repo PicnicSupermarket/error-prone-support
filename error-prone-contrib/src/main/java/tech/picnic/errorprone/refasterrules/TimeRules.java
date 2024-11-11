@@ -142,6 +142,63 @@ final class TimeRules {
     }
   }
 
+  /** Don't unnecessarily transform an {@link Instant} to an equivalent instance. */
+  static final class InstantIdentity {
+    @BeforeTemplate
+    Instant before(Instant instant, TemporalUnit temporalUnit) {
+      return Refaster.anyOf(
+          instant.plus(Duration.ZERO),
+          instant.plus(0, temporalUnit),
+          instant.plusNanos(0),
+          instant.plusMillis(0),
+          instant.plusSeconds(0),
+          instant.minus(Duration.ZERO),
+          instant.minus(0, temporalUnit),
+          instant.minusNanos(0),
+          instant.minusMillis(0),
+          instant.minusSeconds(0),
+          Instant.parse(instant.toString()),
+          instant.truncatedTo(ChronoUnit.NANOS),
+          Instant.ofEpochSecond(instant.getEpochSecond(), instant.getNano()));
+    }
+
+    @AfterTemplate
+    Instant after(Instant instant) {
+      return instant;
+    }
+  }
+
+  /**
+   * Prefer {@link Instant#truncatedTo(TemporalUnit)} over less obvious alternatives.
+   *
+   * <p>Note that {@link Instant#toEpochMilli()} throws an {@link ArithmeticException} for dates
+   * very far in the past or future, while the suggested alternative doesn't.
+   */
+  static final class InstantTruncatedToMilliseconds {
+    @BeforeTemplate
+    Instant before(Instant instant) {
+      return Instant.ofEpochMilli(instant.toEpochMilli());
+    }
+
+    @AfterTemplate
+    Instant after(Instant instant) {
+      return instant.truncatedTo(ChronoUnit.MILLIS);
+    }
+  }
+
+  /** Prefer {@link Instant#truncatedTo(TemporalUnit)} over less obvious alternatives. */
+  static final class InstantTruncatedToSeconds {
+    @BeforeTemplate
+    Instant before(Instant instant) {
+      return Instant.ofEpochSecond(instant.getEpochSecond());
+    }
+
+    @AfterTemplate
+    Instant after(Instant instant) {
+      return instant.truncatedTo(ChronoUnit.SECONDS);
+    }
+  }
+
   /** Prefer {@link Instant#atOffset(ZoneOffset)} over more verbose alternatives. */
   static final class InstantAtOffset {
     @BeforeTemplate
