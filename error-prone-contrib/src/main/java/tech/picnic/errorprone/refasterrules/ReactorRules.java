@@ -1769,7 +1769,7 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link StepVerifier.LastStep#verify()} over a dangling {@link
+   * Prefer {@link StepVerifier#verify()} over a dangling {@link
    * StepVerifier#verifyThenAssertThat()}.
    */
   // XXX: Application of this rule (and several others in this class) will cause invalid code if the
@@ -1794,7 +1794,7 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link StepVerifier.LastStep#verify(Duration)} over a dangling {@link
+   * Prefer {@link StepVerifier#verify(Duration)} over a dangling {@link
    * StepVerifier#verifyThenAssertThat(Duration)}.
    */
   static final class StepVerifierVerifyDuration {
