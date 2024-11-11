@@ -72,7 +72,23 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
         Instant.EPOCH.plusMillis(2),
         Instant.EPOCH.plusMillis(3),
         Instant.EPOCH.plusMillis(4),
-        Instant.EPOCH.plusMillis(5));
+        Instant.EPOCH.plusMillis(5),
+        Instant.EPOCH.plusMillis(6),
+        Instant.EPOCH.plusMillis(7),
+        Instant.EPOCH.plusMillis(8),
+        Instant.EPOCH.plusMillis(9),
+        Instant.EPOCH.plusMillis(10),
+        Instant.EPOCH.plusMillis(11),
+        Instant.EPOCH.plusMillis(12),
+        Instant.EPOCH.plusMillis(13));
+  }
+
+  Instant testInstantTruncatedToMilliseconds() {
+    return Instant.EPOCH.truncatedTo(ChronoUnit.MILLIS);
+  }
+
+  Instant testInstantTruncatedToSeconds() {
+    return Instant.EPOCH.truncatedTo(ChronoUnit.SECONDS);
   }
 
   OffsetDateTime testInstantAtOffset() {

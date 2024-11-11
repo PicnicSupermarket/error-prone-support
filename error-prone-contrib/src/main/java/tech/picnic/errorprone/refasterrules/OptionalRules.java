@@ -398,10 +398,7 @@ final class OptionalRules {
     }
   }
 
-  /**
-   * Avoid unnecessary operations on an {@link Optional} that ultimately result in that very same
-   * {@link Optional}.
-   */
+  /** Don't unnecessarily transform an {@link Optional} to an equivalent instance. */
   static final class OptionalIdentity<T> {
     @BeforeTemplate
     @SuppressWarnings("NestedOptionals")
