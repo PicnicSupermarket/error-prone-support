@@ -50,4 +50,4 @@ jobs:
           name: integration-test-checkstyle
           path: "${{ runner.temp }}/artifacts"
       - name: Remove installed project artifacts
-        run: mvn build-helper:remove-project-artifact
+        run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
