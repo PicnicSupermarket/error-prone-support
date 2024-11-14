@@ -62,7 +62,7 @@ public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {
   }
 
   private static boolean isInPossibleTestHelperClass(VisitorState state) {
-    return Optional.ofNullable(ASTHelpers.findEnclosingNode(state.getPath(), ClassTree.class))
+    return Optional.ofNullable(state.findEnclosing(ClassTree.class))
         .map(ClassTree::getSimpleName)
         .filter(name -> name.toString().contains("Test"))
         .isPresent();

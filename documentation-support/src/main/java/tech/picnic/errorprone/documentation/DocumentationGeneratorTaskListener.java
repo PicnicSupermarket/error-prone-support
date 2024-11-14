@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ServiceLoader;
 import javax.tools.JavaFileObject;
 
@@ -87,6 +86,6 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   }
 
   private static String getSimpleClassName(URI path) {
-    return Paths.get(path).getFileName().toString().replace(".java", "");
+    return Path.of(path).getFileName().toString().replace(".java", "");
   }
 }

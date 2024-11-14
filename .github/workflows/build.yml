@@ -9,30 +9,32 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-22.04 ]
-        jdk: [ 17.0.10, 21.0.2 ]
+        os: [ ubuntu-24.04 ]
+        jdk: [ 17.0.13, 21.0.5, 23.0.1 ]
         distribution: [ temurin ]
         experimental: [ false ]
         include:
           - os: macos-14
-            jdk: 17.0.10
+            jdk: 17.0.13
             distribution: temurin
             experimental: false
           - os: windows-2022
-            jdk: 17.0.10
+            jdk: 17.0.13
             distribution: temurin
             experimental: false
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
         with:
           disable-sudo: true
           egress-policy: block
           allowed-endpoints: >
+            api.adoptium.net:443
             github.com:443
             jitpack.io:443
+            objects.githubusercontent.com:443
             repo.maven.apache.org:443
       # We run the build twice for each supported JDK: once against the
       # original Error Prone release, using only Error Prone checks available
@@ -40,11 +42,11 @@ jobs:
       # additionally enabling all checks defined in this project and any Error
       # Prone checks available only from other artifact repositories.
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@6d44c18d67d9e1549907b8815efa5e4dada1801b # v1.12.0
+        uses: s4u/setup-maven-action@382542f77617f34e56bf83868920a4d45b7451e7 # v1.16.0
         with:
           java-version: ${{ matrix.jdk }}
           java-distribution: ${{ matrix.distribution }}
-          maven-version: 3.9.6
+          maven-version: 3.9.9
       - name: Display build environment details
         run: mvn --version
       - name: Build project against vanilla Error Prone, compile Javadoc
@@ -52,6 +54,6 @@ jobs:
       - name: Build project with self-check against Error Prone fork
         run: mvn -T1C clean verify -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
       - name: Remove installed project artifacts
-        run: mvn build-helper:remove-project-artifact
+        run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
 
 # XXX: Enable Codecov once we "go public".

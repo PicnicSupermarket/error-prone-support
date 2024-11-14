@@ -39,6 +39,7 @@ import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import tech.picnic.errorprone.utils.SourceCode;
@@ -51,6 +52,7 @@ import tech.picnic.errorprone.utils.SourceCode;
 // is effectively the identity operation.
 // XXX: Also flag nullary instance method invocations that represent an identity conversion, such as
 // `Boolean#booleanValue()`, `Byte#byteValue()` and friends.
+// XXX: Also flag redundant round-trip conversions such as `path.toFile().toPath()`.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid or clarify identity conversions",
@@ -83,6 +85,7 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
                   ImmutableSetMultimap.class.getCanonicalName(),
                   ImmutableTable.class.getCanonicalName())
               .named("copyOf"),
+          staticMethod().onClass(Instant.class.getCanonicalName()).namedAnyOf("from"),
           staticMethod().onClass(Matchers.class.getCanonicalName()).namedAnyOf("allOf", "anyOf"),
           staticMethod().onClass("reactor.adapter.rxjava.RxJava2Adapter"),
           staticMethod()

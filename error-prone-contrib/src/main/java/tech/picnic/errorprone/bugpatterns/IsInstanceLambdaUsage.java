@@ -25,6 +25,8 @@ import tech.picnic.errorprone.utils.SourceCode;
  */
 // XXX: Consider folding this logic into the `MethodReferenceUsage` check of the
 // `error-prone-experimental` module.
+// XXX: This check and its tests are structurally nearly identical to `ClassCastLambdaUsage`. Unless
+// folded into `MethodReferenceUsage`, consider merging the two.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `Class::isInstance` method reference over equivalent lambda expression",

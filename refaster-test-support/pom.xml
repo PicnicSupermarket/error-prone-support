@@ -5,7 +5,7 @@
     <parent>
         <groupId>tech.picnic.error-prone-support</groupId>
         <artifactId>error-prone-support</artifactId>
-        <version>0.16.2-SNAPSHOT</version>
+        <version>0.19.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>refaster-test-support</artifactId>
@@ -49,6 +49,11 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>

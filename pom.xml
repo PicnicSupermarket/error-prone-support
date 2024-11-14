@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.16.2-SNAPSHOT</version>
+    <version>0.19.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -111,6 +111,9 @@
             but also prevents excessive memory usage by heavily parallelized
             local builds. -->
             -Xmx${argLine.xmx}
+            <!-- Configure the Byte Buddy Java agent used by Mockito to create
+            mocks. -->
+            -javaagent:${org.mockito:mockito-core:jar}
             <!-- This argument cannot be set through Surefire's
             'systemPropertyVariables' configuration setting. Setting the file
             encoding is necessary because forked unit test invocations
@@ -148,7 +151,7 @@
         <groupId.error-prone>com.google.errorprone</groupId.error-prone>
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2024-03-15T12:04:44Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2024-11-03T15:58:19Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Glob pattern identifying Refaster rule definition files. These
         Java classes don't contain "regular" code, and thus require special
@@ -205,19 +208,19 @@
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.1.1</version.auto-service>
-        <version.auto-value>1.10.4</version.auto-value>
+        <version.auto-value>1.11.0</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.26.1</version.error-prone-orig>
-        <version.error-prone-slf4j>0.1.22</version.error-prone-slf4j>
+        <version.error-prone-orig>2.35.1</version.error-prone-orig>
+        <version.error-prone-slf4j>0.1.28</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>17</version.jdk>
-        <version.maven>3.9.5</version.maven>
-        <version.mockito>5.11.0</version.mockito>
+        <version.maven>3.9.9</version.maven>
+        <version.mockito>5.14.2</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
-        <version.nullaway>0.10.24</version.nullaway>
+        <version.nullaway>0.12.1</version.nullaway>
         <version.pitest-git>1.1.4</version.pitest-git>
-        <version.rewrite-templating>1.6.3</version.rewrite-templating>
+        <version.rewrite-templating>1.17.0</version.rewrite-templating>
         <version.surefire>3.2.3</version.surefire>
     </properties>
 
@@ -296,9 +299,14 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.17.0</version>
+                <version>2.18.1</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>3.1.8</version>
             </dependency>
             <dependency>
                 <groupId>com.google.auto</groupId>
@@ -328,7 +336,7 @@
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
-                <version>1.21.0</version>
+                <version>1.24.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -338,14 +346,14 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>33.0.0-jre</version>
+                <version>33.3.1-jre</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.google.truth</groupId>
                 <artifactId>truth</artifactId>
-                <version>1.4.2</version>
+                <version>1.4.4</version>
             </dependency>
             <dependency>
                 <groupId>com.jakewharton.nopen</groupId>
@@ -358,9 +366,14 @@
                 <version>${version.nullaway}</version>
             </dependency>
             <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-core</artifactId>
+                <version>1.13.6</version>
+            </dependency>
+            <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2023.0.4</version>
+                <version>2023.0.11</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -372,17 +385,22 @@
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>1.6.13</version>
+                <version>1.6.14</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.20</version>
+                <version>2.2.25</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
-                <version>6.0.0</version>
+                <version>6.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>1.3.2</version>
             </dependency>
             <dependency>
                 <groupId>javax.inject</groupId>
@@ -407,7 +425,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.14.12</version>
+                <version>1.15.10</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -420,24 +438,24 @@
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>1.9.21.2</version>
+                <version>1.9.22.1</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-bom</artifactId>
-                <version>3.25.3</version>
+                <version>3.26.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.42.0</version>
+                <version>3.48.2</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
                 <artifactId>hamcrest-core</artifactId>
-                <version>2.2</version>
+                <version>3.0</version>
             </dependency>
             <dependency>
                 <groupId>org.immutables</groupId>
@@ -447,12 +465,12 @@
             <dependency>
                 <groupId>org.jspecify</groupId>
                 <artifactId>jspecify</artifactId>
-                <version>0.3.0</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.10.2</version>
+                <version>5.11.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -466,7 +484,14 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-core</artifactId>
-                <version>5.0.0</version>
+                <version>5.2.0</version>
+            </dependency>
+            <!-- XXX: Drop this `rewrite-java-17` version declaration once
+            `rewrite-recipe-bom` pulls in version 8.39.1 or greater. -->
+            <dependency>
+                <groupId>org.openrewrite</groupId>
+                <artifactId>rewrite-java-17</artifactId>
+                <version>8.40.0</version>
             </dependency>
             <dependency>
                 <groupId>org.openrewrite</groupId>
@@ -476,43 +501,54 @@
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>2.8.1</version>
+                <version>2.21.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-bom</artifactId>
-                <version>2.0.12</version>
+                <version>2.0.16</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>6.1.5</version>
+                <version>6.1.14</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>3.2.3</version>
+                <version>3.3.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>6.2.2</version>
+                <version>6.3.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>7.9.0</version>
+                <version>7.10.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <dependencies>
+        <!-- To avoid repetition of fairly complex configuration, Surefire
+        is configured to always load Mockito's Java agent. Declaring the
+        associated dependency here avoids additional repetition, and prevents
+        a slightly obscure error that happens if the dependency is absent. -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <pluginManagement>
@@ -520,7 +556,7 @@
                 <plugin>
                     <groupId>com.github.ekryd.sortpom</groupId>
                     <artifactId>sortpom-maven-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>4.0.0</version>
                     <configuration>
                         <createBackupFile>false</createBackupFile>
                         <encoding>${project.build.sourceEncoding}</encoding>
@@ -557,7 +593,7 @@
                 <plugin>
                     <groupId>com.spotify.fmt</groupId>
                     <artifactId>fmt-maven-plugin</artifactId>
-                    <version>2.22.1</version>
+                    <version>2.25</version>
                     <configuration>
                         <additionalSourceDirectories>
                             <additionalSourceDirectory>${basedir}/src/test/resources</additionalSourceDirectory>
@@ -577,7 +613,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.6</version>
+                    <version>3.8</version>
                     <configuration>
                         <bundledSignatures>
                             <bundledSignature>jdk-internal</bundledSignature>
@@ -624,7 +660,7 @@
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
                     <artifactId>git-commit-id-maven-plugin</artifactId>
-                    <version>8.0.2</version>
+                    <version>9.0.1</version>
                     <configuration>
                         <injectAllReactorProjects>true</injectAllReactorProjects>
                         <runOnlyOnce>true</runOnlyOnce>
@@ -643,7 +679,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.6.0</version>
                     <configuration>
                         <checkstyleRules>
                             <!-- We only enable rules that are not enforced by
@@ -679,6 +715,7 @@
                                         <property name="allowNonPrintableEscapes" value="true" />
                                     </module>
                                     <module name="AvoidNoArgumentSuperConstructorCall" />
+                                    <module name="ConstructorsDeclarationGrouping" />
                                     <module name="DeclarationOrder">
                                         <!-- We don't enforce sorting fields by
                                         their visibility modifier, for two
@@ -891,7 +928,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.14.2</version>
+                            <version>10.20.1</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -911,12 +948,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.3.2</version>
+                    <version>3.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.12.1</version>
+                    <version>3.13.0</version>
                     <configuration>
                         <annotationProcessorPaths>
                             <!-- XXX: Inline and drop the version
@@ -959,11 +996,43 @@
                         https://issues.apache.org/jira/browse/MCOMPILER-209. -->
                         <useIncrementalCompilation>false</useIncrementalCompilation>
                     </configuration>
+                    <executions>
+                        <!-- OpenRewrite recipe sources, generated by the
+                        `rewrite-templating` annotation processor and
+                        identified as classes whose name ends in `Recipes`, are
+                        compiled to target Java 8 for compatibility with the
+                        wider OpenRewrite ecosystem. The `maven-jar-plugin` is
+                        configured to package these files into a separate JAR. -->
+                        <execution>
+                            <id>compile-recipes</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <compilerArgs combine.self="override">
+                                    <!-- When Java 8 is targeted we can't use
+                                    the `add-exports` flag. And since this goal
+                                    only recompiles already-compiled code,
+                                    static analysis is irrelevant. As such we
+                                    clear all compiler arguments, and only
+                                    suppress source/target/bootstrap classpath
+                                    warnings. -->
+                                    <arg>-Xlint:-options</arg>
+                                </compilerArgs>
+                                <source>8</source>
+                                <target>8</target>
+                                <includes>
+                                    <include>**/*Recipes.java</include>
+                                </includes>
+                                <outputDirectory>${project.build.directory}/openrewrite-recipes</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.8.1</version>
                     <configuration>
                         <!-- XXX: Drop `ignoreAllNonTestScoped` once
                         https://issues.apache.org/jira/browse/MNG-6058 is
@@ -974,11 +1043,19 @@
                         <ignoreDirect>false</ignoreDirect>
                         <ignoreNonCompile>true</ignoreNonCompile>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>set-additional-properties</id>
+                            <goals>
+                                <goal>properties</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.3</version>
                     <configuration>
                         <retryFailedDeploymentCount>3</retryFailedDeploymentCount>
                     </configuration>
@@ -986,7 +1063,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <fail>false</fail>
                         <rules>
@@ -1041,6 +1118,9 @@
                             <requireJavaVersion>
                                 <version>${version.jdk}</version>
                             </requireJavaVersion>
+                            <requireMatchingCoordinates>
+                                <moduleNameMustMatchArtifactId>true</moduleNameMustMatchArtifactId>
+                            </requireMatchingCoordinates>
                             <requireMavenVersion>
                                 <version>${version.maven}</version>
                             </requireMavenVersion>
@@ -1053,7 +1133,7 @@
                         <dependency>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>extra-enforcer-rules</artifactId>
-                            <version>1.8.0</version>
+                            <version>1.9.0</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1068,7 +1148,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.2.7</version>
                     <executions>
                         <execution>
                             <id>sign-artifacts</id>
@@ -1081,12 +1161,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.4.2</version>
                     <configuration>
                         <skipIfEmpty>true</skipIfEmpty>
                         <archive>
@@ -1104,6 +1184,39 @@
                     </configuration>
                     <executions>
                         <execution>
+                            <id>default-jar</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                            <configuration>
+                                <!-- These Java 17 bytecode classes are omitted
+                                from the default JAR, as instead we produce a
+                                separate artifact with Java 8 bytecode variants. -->
+                                <excludes>
+                                    <excludes>**/*Recipe$*.class</excludes>
+                                    <excludes>**/*Recipe.class</excludes>
+                                    <excludes>**/*Recipes.class</excludes>
+                                </excludes>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <!-- Creates a custom JAR with Java 8-compatible
+                            OpenRewrite recipe classes. -->
+                            <id>create-openrewrite-recipes-jar</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                            <configuration>
+                                <classesDirectory>${project.build.directory}/openrewrite-recipes</classesDirectory>
+                                <classifier>recipes</classifier>
+                                <includes>
+                                    <includes>**/*Recipe$*.class</includes>
+                                    <includes>**/*Recipe.class</includes>
+                                    <includes>**/*Recipes.class</includes>
+                                </includes>
+                            </configuration>
+                        </execution>
+                        <execution>
                             <id>create-test-jar</id>
                             <goals>
                                 <goal>test-jar</goal>
@@ -1114,7 +1227,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.6.3</version>
+                    <version>3.11.1</version>
                     <configuration>
                         <additionalJOptions>
                             <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</additionalJOption>
@@ -1143,7 +1256,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1.1</version>
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <preparationProfiles>release</preparationProfiles>
@@ -1165,12 +1278,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.12.1</version>
+                    <version>3.21.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.3.1</version>
                     <executions>
                         <execution>
                             <id>generate-source-jar</id>
@@ -1184,7 +1297,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.5.2</version>
                     <configuration>
                         <includes>
                             <include>**/*Test.java</include>
@@ -1196,11 +1309,6 @@
                         </properties>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1296,6 +1404,7 @@
                                 <!-- -->
                                 GPL-2.0-with-classpath-exception
                                 | CDDL/GPLv2+CE
+                                | CDDL + GPLv2 with classpath exception
                                 | GNU General Public License, version 2 (GPL2), with the classpath exception
                                 | GNU General Public License, version 2, with the Classpath Exception
                                 | GPL2 w/ CPE
@@ -1330,7 +1439,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>tidy-maven-plugin</artifactId>
-                    <version>1.2.0</version>
+                    <version>1.3.0</version>
                     <executions>
                         <execution>
                             <id>check-pom</id>
@@ -1343,7 +1452,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.16.2</version>
+                    <version>2.17.1</version>
                     <configuration>
                         <updateBuildOutputTimestampPolicy>never</updateBuildOutputTimestampPolicy>
                     </configuration>
@@ -1351,7 +1460,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>2.8.0</version>
+                    <version>2.9.0</version>
                     <configuration>
                         <exclusionPatterns>
                             <!-- The plugin suggests replacing usages of
@@ -1382,7 +1491,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.11</version>
+                    <version>0.8.12</version>
                     <configuration>
                         <excludes>
                             <!-- Refaster rules are tested using a custom method
@@ -1394,7 +1503,7 @@
                 <plugin>
                     <groupId>org.kordamp.maven</groupId>
                     <artifactId>pomchecker-maven-plugin</artifactId>
-                    <version>1.10.0</version>
+                    <version>1.14.0</version>
                     <configuration>
                         <failOnError>false</failOnError>
                         <release>false</release>
@@ -1412,7 +1521,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.15.8</version>
+                    <version>1.17.1</version>
                     <configuration>
                         <excludedClasses>
                             <!-- AutoValue generated classes. -->
@@ -1466,7 +1575,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.11.0.3922</version>
+                    <version>5.0.0.4389</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1474,6 +1583,10 @@
             <plugin>
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1854,6 +1967,12 @@
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF
+                                    <!-- This check flags bad member names, but
+                                    also type names that we may want to accept.
+                                    Consider contributing a flag to toggle this
+                                    behavior. See
+                                    https://github.com/google/error-prone/issues/4616 -->
+                                    -Xep:IdentifierName:OFF
                                     <!-- We don't target JDK 7. -->
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->

@@ -7,10 +7,10 @@ import java.net.URI;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestCase;
+import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestCases;
 import tech.picnic.errorprone.documentation.BugPatternTestExtractor.IdentificationTestEntry;
 import tech.picnic.errorprone.documentation.BugPatternTestExtractor.ReplacementTestEntry;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestCase;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestCases;
 
 final class BugPatternTestExtractorTest {
   @Test
@@ -269,11 +269,11 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "SingleFileCompilationTestHelperTest",
-        TestCases.create(
+        BugPatternTestCases.create(
             URI.create("file:///SingleFileCompilationTestHelperTest.java"),
             "SingleFileCompilationTestHelperTest",
             ImmutableList.of(
-                TestCase.create(
+                BugPatternTestCase.create(
                     "SingleFileCompilationTestHelperTest.TestChecker",
                     ImmutableList.of(
                         IdentificationTestEntry.create(
@@ -302,11 +302,11 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "SingleFileCompilationTestHelperWithSetArgsTest",
-        TestCases.create(
+        BugPatternTestCases.create(
             URI.create("file:///SingleFileCompilationTestHelperWithSetArgsTest.java"),
             "SingleFileCompilationTestHelperWithSetArgsTest",
             ImmutableList.of(
-                TestCase.create(
+                BugPatternTestCase.create(
                     "SingleFileCompilationTestHelperWithSetArgsTest.TestChecker",
                     ImmutableList.of(
                         IdentificationTestEntry.create(
@@ -335,11 +335,11 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "MultiFileCompilationTestHelperTest",
-        TestCases.create(
+        BugPatternTestCases.create(
             URI.create("file:///MultiFileCompilationTestHelperTest.java"),
             "MultiFileCompilationTestHelperTest",
             ImmutableList.of(
-                TestCase.create(
+                BugPatternTestCase.create(
                     "MultiFileCompilationTestHelperTest.TestChecker",
                     ImmutableList.of(
                         IdentificationTestEntry.create(
@@ -370,11 +370,11 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "SingleFileBugCheckerRefactoringTestHelperTest",
-        TestCases.create(
+        BugPatternTestCases.create(
             URI.create("file:///SingleFileBugCheckerRefactoringTestHelperTest.java"),
             "SingleFileBugCheckerRefactoringTestHelperTest",
             ImmutableList.of(
-                TestCase.create(
+                BugPatternTestCase.create(
                     "SingleFileBugCheckerRefactoringTestHelperTest.TestChecker",
                     ImmutableList.of(
                         ReplacementTestEntry.create(
@@ -408,12 +408,12 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest",
-        TestCases.create(
+        BugPatternTestCases.create(
             URI.create(
                 "file:///SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.java"),
             "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest",
             ImmutableList.of(
-                TestCase.create(
+                BugPatternTestCase.create(
                     "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.TestChecker",
                     ImmutableList.of(
                         ReplacementTestEntry.create(
@@ -444,11 +444,11 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "MultiFileBugCheckerRefactoringTestHelperTest",
-        TestCases.create(
+        BugPatternTestCases.create(
             URI.create("file:///MultiFileBugCheckerRefactoringTestHelperTest.java"),
             "MultiFileBugCheckerRefactoringTestHelperTest",
             ImmutableList.of(
-                TestCase.create(
+                BugPatternTestCase.create(
                     "MultiFileBugCheckerRefactoringTestHelperTest.TestChecker",
                     ImmutableList.of(
                         ReplacementTestEntry.create(
@@ -484,16 +484,16 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "CompilationAndBugCheckerRefactoringTestHelpersTest",
-        TestCases.create(
+        BugPatternTestCases.create(
             URI.create("file:///CompilationAndBugCheckerRefactoringTestHelpersTest.java"),
             "CompilationAndBugCheckerRefactoringTestHelpersTest",
             ImmutableList.of(
-                TestCase.create(
+                BugPatternTestCase.create(
                     "CompilationAndBugCheckerRefactoringTestHelpersTest.TestChecker",
                     ImmutableList.of(
                         IdentificationTestEntry.create(
                             "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))),
-                TestCase.create(
+                BugPatternTestCase.create(
                     "CompilationAndBugCheckerRefactoringTestHelpersTest.TestChecker",
                     ImmutableList.of(
                         ReplacementTestEntry.create(
@@ -532,17 +532,17 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest",
-        TestCases.create(
+        BugPatternTestCases.create(
             URI.create(
                 "file:///CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest.java"),
             "pkg.CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest",
             ImmutableList.of(
-                TestCase.create(
+                BugPatternTestCase.create(
                     "pkg.CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest.CustomTestChecker",
                     ImmutableList.of(
                         IdentificationTestEntry.create(
                             "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))),
-                TestCase.create(
+                BugPatternTestCase.create(
                     "pkg.CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest.CustomTestChecker2",
                     ImmutableList.of(
                         ReplacementTestEntry.create(
@@ -550,9 +550,9 @@ final class BugPatternTestExtractorTest {
   }
 
   private static void verifyGeneratedFileContent(
-      Path outputDirectory, String testClass, TestCases expected) {
+      Path outputDirectory, String testClass, BugPatternTestCases expected) {
     assertThat(outputDirectory.resolve(String.format("bugpattern-test-%s.json", testClass)))
         .exists()
-        .returns(expected, path -> Json.read(path, TestCases.class));
+        .returns(expected, path -> Json.read(path, BugPatternTestCases.class));
   }
 }

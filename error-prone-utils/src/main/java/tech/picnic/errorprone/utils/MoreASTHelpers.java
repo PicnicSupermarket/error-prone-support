@@ -78,4 +78,16 @@ public final class MoreASTHelpers {
   public static boolean areSameType(Tree treeA, Tree treeB, VisitorState state) {
     return ASTHelpers.isSameType(ASTHelpers.getType(treeA), ASTHelpers.getType(treeB), state);
   }
+
+  /**
+   * Tells whether the given tree is of type {@link String}.
+   *
+   * @param tree The tree of interest.
+   * @param state The {@link VisitorState} describing the context in which the given tree was found.
+   * @return Whether the specified tree has the same type as {@link
+   *     com.sun.tools.javac.code.Symtab#stringType}.
+   */
+  public static boolean isStringTyped(Tree tree, VisitorState state) {
+    return ASTHelpers.isSameType(ASTHelpers.getType(tree), state.getSymtab().stringType, state);
+  }
 }

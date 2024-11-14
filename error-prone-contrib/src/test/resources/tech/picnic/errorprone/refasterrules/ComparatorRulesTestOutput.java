@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
@@ -9,6 +10,7 @@ import static java.util.stream.Collectors.minBy;
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,6 +54,10 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.comparing(s -> "foo", Comparator.comparingInt(String::length)));
   }
 
+  Comparator<String> testComparingEnum() {
+    return comparing(s -> RoundingMode.valueOf(s));
+  }
+
   Comparator<String> testThenComparing() {
     return Comparator.<String>naturalOrder().thenComparing(String::isEmpty);
   }
@@ -92,6 +98,23 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of("foo".compareTo("bar"), "qux".compareTo("baz"));
   }
 
+  void testCollectionsSort() {
+    Collections.sort(ImmutableList.of("foo", "bar"));
+  }
+
+  ImmutableSet<String> testCollectionsMin() {
+    return ImmutableSet.of(
+        Collections.min(ImmutableList.of("foo")), Collections.min(ImmutableList.of("bar")));
+  }
+
+  String testMinOfArray() {
+    return Collections.min(Arrays.asList(new String[0]), naturalOrder());
+  }
+
+  String testCollectionsMinWithComparator() {
+    return Collections.min(ImmutableSet.of("foo", "bar"), naturalOrder());
+  }
+
   int testMinOfVarargs() {
     return Collections.min(Arrays.asList(1, 2), naturalOrder());
   }
@@ -118,6 +141,19 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparators.min("a", "b", (a, b) -> -1),
         Comparators.min("a", "b", (a, b) -> 0),
         Comparators.min("a", "b", (a, b) -> 1));
+  }
+
+  ImmutableSet<String> testCollectionsMax() {
+    return ImmutableSet.of(
+        Collections.max(ImmutableList.of("foo")), Collections.max(ImmutableList.of("bar")));
+  }
+
+  String testMaxOfArray() {
+    return Collections.max(Arrays.asList(new String[0]), naturalOrder());
+  }
+
+  String testCollectionsMaxWithComparator() {
+    return Collections.max(ImmutableSet.of("foo", "bar"), naturalOrder());
   }
 
   int testMaxOfVarargs() {
@@ -162,5 +198,17 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
 
   Collector<Integer, ?, Optional<Integer>> testMaxByNaturalOrder() {
     return maxBy(naturalOrder());
+  }
+
+  ImmutableSet<Boolean> testIsLessThan() {
+    return ImmutableSet.of(
+        RoundingMode.UP.compareTo(RoundingMode.DOWN) < 0,
+        RoundingMode.UP.compareTo(RoundingMode.DOWN) >= 0);
+  }
+
+  ImmutableSet<Boolean> testIsLessThanOrEqualTo() {
+    return ImmutableSet.of(
+        RoundingMode.UP.compareTo(RoundingMode.DOWN) <= 0,
+        RoundingMode.UP.compareTo(RoundingMode.DOWN) > 0);
   }
 }

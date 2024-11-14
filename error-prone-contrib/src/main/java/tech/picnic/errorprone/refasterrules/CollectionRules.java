@@ -8,7 +8,9 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
 
 /** Refaster rules related to expressions dealing with (arbitrary) collections. */
 // XXX: There are other Guava `Iterables` methods that should not be called if the input is known to
@@ -39,7 +42,7 @@ final class CollectionRules {
       "java:S1155" /* This violation will be rewritten. */,
       "LexicographicalAnnotationAttributeListing" /* `key-*` entry must remain last. */,
       "OptionalFirstCollectionElement" /* This is a more specific template. */,
-      "StreamIsEmpty" /* This is a more specific template. */,
+      "StreamFindAnyIsEmpty" /* This is a more specific template. */,
       "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     boolean before(Collection<T> collection) {
@@ -184,6 +187,24 @@ final class CollectionRules {
     }
   }
 
+  /** Don't unnecessarily call {@link Stream#distinct()} on an already-unique stream of elements. */
+  // XXX: This rule assumes that the `Set` relies on `Object#equals`, rather than a custom
+  // equivalence relation.
+  // XXX: Expressions that drop or reorder elements from the stream, such as `.filter`, `.skip` and
+  // `sorted`, can similarly be simplified. Covering all cases is better done using an Error Prone
+  // check.
+  static final class SetStream<T> {
+    @BeforeTemplate
+    Stream<?> before(Set<T> set) {
+      return set.stream().distinct();
+    }
+
+    @AfterTemplate
+    Stream<?> after(Set<T> set) {
+      return set.stream();
+    }
+  }
+
   /** Prefer {@link ArrayList#ArrayList(Collection)} over the Guava alternative. */
   @SuppressWarnings(
       "NonApiType" /* Matching against `List` would unnecessarily constrain the rule. */)
@@ -276,6 +297,23 @@ final class CollectionRules {
     }
   }
 
+  /** Prefer {@link Arrays#asList(Object[])} over more contrived alternatives. */
+  // XXX: Consider moving this rule to `ImmutableListRules` and having it suggest
+  // `ImmutableList#copyOf`. That would retain immutability, at the cost of no longer handling
+  // `null`s.
+  static final class ArraysAsList<T> {
+    // XXX: This expression produces an unmodifiable list, while the alternative doesn't.
+    @BeforeTemplate
+    List<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
+      return Arrays.stream(array).toList();
+    }
+
+    @AfterTemplate
+    List<T> after(T[] array) {
+      return Arrays.asList(array);
+    }
+  }
+
   /** Prefer calling {@link Collection#toArray()} over more contrived alternatives. */
   static final class CollectionToArray<T> {
     @BeforeTemplate
@@ -327,18 +365,20 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#iterator()} is
-   * called on the result; call it directly.
-   */
-  static final class ImmutableCollectionIterator<T> {
+  /** Prefer {@link Collection#iterator()} over more contrived or less efficient alternatives. */
+  static final class CollectionIterator<T> {
+    @BeforeTemplate
+    Iterator<T> before(Collection<T> collection) {
+      return collection.stream().iterator();
+    }
+
     @BeforeTemplate
     Iterator<T> before(ImmutableCollection<T> collection) {
       return collection.asList().iterator();
     }
 
     @AfterTemplate
-    Iterator<T> after(ImmutableCollection<T> collection) {
+    Iterator<T> after(Collection<T> collection) {
       return collection.iterator();
     }
   }
