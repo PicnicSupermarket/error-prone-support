@@ -51,8 +51,8 @@ case "$(uname -s)" in
     ;;
 esac
 
+# -Perror-prone-compile,error-prone-test-compile
 shared_build_flags="
-  -Perror-prone-compile,error-prone-test-compile
   -Derror-prone.version=$(
     mvn -f "${error_prone_support_root}" help:evaluate -Dexpression=version.error-prone -q -DforceStdout
   )
@@ -69,7 +69,10 @@ shared_build_flags="
 # `shared_build_flags`.
 format_goal='com.spotify.fmt:fmt-maven-plugin:2.21.1:format'
 
-error_prone_shared_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
+#error_prone_shared_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
+#error_prone_shared_flags="-XepExcludedPaths:.*[\\/]resources[\\/].*"
+error_prone_shared_flags=""
+
 
 error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE -XepPatchChecks:$(
    find "${error_prone_support_root}" \
@@ -133,13 +136,18 @@ git config user.name || git config user.name 'Integration Test'
 git clean -fdx
 git apply < "${integration_test_root}/${test_name}-init.patch"
 git commit -m 'dependency: Introduce Error Prone Support' .
-mvn ${shared_build_flags} "${format_goal}"
-git commit -m 'minor: Reformat using Google Java Format' .
+#mvn ${shared_build_flags} "${format_goal}"
+#git commit -m 'minor: Reformat using Google Java Format' .
 diff_base="$(git rev-parse HEAD)"
 
 # Apply Error Prone Support-suggested changes until a fixed point is reached.
 function apply_patch() {
   local extra_build_args="${1}"
+
+  echo "hier ${shared_build_flags} ${extra_build_args} \
+                 package "${format_goal}" \
+                 -Derror-prone.configuration-args="${error_prone_patch_flags}" \
+                 -DskipTests"
 
   mvn ${shared_build_flags} ${extra_build_args} \
     package "${format_goal}" \
@@ -163,6 +171,8 @@ function apply_patch() {
 }
 apply_patch ''
 
+
+echo "RUN ONE MORE FULL --------"
 # Run one more full build and log the output.
 #
 # By also running the tests, we validate that the (majority of) applied changes
