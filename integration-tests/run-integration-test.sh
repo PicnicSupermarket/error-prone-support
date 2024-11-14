@@ -1,15 +1,10 @@
 #!/usr/bin/env bash
 
-<<<<<<< HEAD
-# This script is not meant to be invoked manually, instead it should be invoked
-# through one of the integration test scripts such as the metrics or checkstyle one.
-=======
 # Integration test framework for Maven builds.
 #
 # This script is not meant to be invoked manually. Instead it should be invoked
 # through one of the top-level integration test scripts, such as
 # `checkstyle.sh`.
->>>>>>> master
 
 set -e -u -o pipefail
 
@@ -17,13 +12,8 @@ integration_test_root="$(cd "$(dirname -- "${0}")" && pwd)"
 error_prone_support_root="${integration_test_root}/.."
 repos_root="${integration_test_root}/.repos"
 
-<<<<<<< HEAD
-if [ "${#}" -ne 11 ]; then
-  >&2 echo "Usage $(basename "${0}") [TestName] [Project] [Repository] [Revision] [BuildFlags] [AdditionalSourceDirectories] [PatchFlags] [ValidationEpFlags] [ValidationMvnFlags] [DoSync] [ReportDirectory]"
-=======
 if [ "${#}" -lt 9 ] || [ "${#}" -gt 11 ] || ([ "${#}" = 11 ] && [ "${10:---sync}" != '--sync' ]); then
   >&2 echo "Usage: $(basename "${0}") <test_name> <project> <repository> <revision> <additional_build_flags> <additional_source_directories> <patch_error_prone_flags> <validation_error_prone_flags> <validation_build_flags> [--sync] [<report_directory>]"
->>>>>>> master
   exit 1
 fi
 
@@ -31,15 +21,6 @@ test_name="${1}"
 project="${2}"
 repository="${3}"
 revision="${4}"
-<<<<<<< HEAD
-build_flags="${5}"
-additional_src_directories="${6}"
-patch_flags="${7}"
-validation_ep_flags="${8}"
-validation_mvn_flags="${9}"
-do_sync="${10}"
-report_directory="${11}"
-=======
 additional_build_flags="${5}"
 additional_source_directories="${6}"
 patch_error_prone_flags="${7}"
@@ -47,7 +28,6 @@ validation_error_prone_flags="${8}"
 validation_build_flags="${9}"
 do_sync="$([ "${#}" = 9 ] || [ "${10:-}" != '--sync' ] || echo 1)"
 report_directory="$([ "${#}" = 9 ] || ([ -z "${do_sync}" ] && echo "${10}") || ([ "${#}" = 10 ] || echo "${11}"))"
->>>>>>> master
 
 if [ -n "${report_directory}" ]; then
   mkdir -p "${report_directory}"
@@ -79,13 +59,8 @@ shared_build_flags="
   -Derror-prone-support.version=$(
     mvn -f "${error_prone_support_root}" help:evaluate -Dexpression=project.version -q -DforceStdout
   )
-<<<<<<< HEAD
-  -DadditionalSourceDirectories=${additional_src_directories}
-  ${build_flags}
-=======
   -DadditionalSourceDirectories=${additional_source_directories}
   ${additional_build_flags}
->>>>>>> master
   "
 
 # XXX: Configure Renovate to manage the fmt-maven-plugin version declared here.
