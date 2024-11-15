@@ -7,9 +7,9 @@ project='metrics'
 repository='https://github.com/dropwizard/metrics.git'
 revision='v5.0.0-rc22'
 additional_build_flags=''
-additional_source_directories='${project.basedir}${file.separator}src${file.separator}it${file.separator}java,${project.basedir}${file.separator}src${file.separator}xdocs-examples${file.separator}java'
+additional_source_directories=''
 # XXX: These don't work...
-#patch_error_prone_flags="-Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern=^(?!FileRules\$).*"
+#patch_error_prone_flags='-Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern=^(?!FileRules\$).*'
 patch_error_prone_flags=''
 validation_error_prone_flags=''
 validation_build_flags=''
