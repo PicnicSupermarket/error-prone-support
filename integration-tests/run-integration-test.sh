@@ -71,7 +71,7 @@ format_goal='com.spotify.fmt:fmt-maven-plugin:2.21.1:format'
 
 #error_prone_shared_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
 #error_prone_shared_flags="-XepExcludedPaths:.*[\\/]resources[\\/].*"
-error_prone_shared_flags=""
+error_prone_shared_flags="-XepExcludedPaths:.*/target/generated-sources/.*"
 
 
 error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE -XepPatchChecks:$(
