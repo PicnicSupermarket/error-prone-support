@@ -486,13 +486,6 @@
                 <artifactId>mongodb-driver-core</artifactId>
                 <version>5.2.0</version>
             </dependency>
-            <!-- XXX: Drop this `rewrite-java-17` version declaration once
-            `rewrite-recipe-bom` pulls in version 8.39.1 or greater. -->
-            <dependency>
-                <groupId>org.openrewrite</groupId>
-                <artifactId>rewrite-java-17</artifactId>
-                <version>8.40.0</version>
-            </dependency>
             <dependency>
                 <groupId>org.openrewrite</groupId>
                 <artifactId>rewrite-templating</artifactId>
