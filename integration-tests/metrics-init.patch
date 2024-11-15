@@ -39,19 +39,6 @@ index 195619b..5584f91 100644
      protected TimeUnit parseTimeUnit(String value, TimeUnit defaultValue) {
          try {
              return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
-diff --git a/metrics-jcstress/pom.xml b/metrics-jcstress/pom.xml
-index b02832d..d9be879 100644
---- a/metrics-jcstress/pom.xml
-+++ b/metrics-jcstress/pom.xml
-@@ -41,7 +41,7 @@
-         <!--
-             Java source/target to use for compilation.
-           -->
--        <javac.target>1.8</javac.target>
-+        <javac.target>17</javac.target>
- 
-         <!--
-             Name of the test Uber-JAR to generate.
 diff --git a/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java b/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
 index fdce054..b2475d7 100644
 --- a/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
@@ -214,15 +201,6 @@ index 5318dac..709591f 100644
                              </annotationProcessorPaths>
                          </configuration>
                      </plugin>
-@@ -364,7 +338,7 @@
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-compiler-plugin</artifactId>
-                 <configuration>
--                    <release>8</release>
-+                    <release>17</release>
-                     <fork>true</fork>
-                     <parameters>true</parameters>
-                     <showWarnings>true</showWarnings>
 @@ -418,7 +392,7 @@
                          <id>enforce</id>
                          <configuration>
