@@ -52,18 +52,10 @@ index fdce054..b2475d7 100644
          try {
              return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
 diff --git a/pom.xml b/pom.xml
-index 5318dac..709591f 100644
+index 5318dac..8d678ea 100644
 --- a/pom.xml
 +++ b/pom.xml
-@@ -1,5 +1,6 @@
- <?xml version="1.0" encoding="UTF-8"?>
--<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-     <modelVersion>4.0.0</modelVersion>
- 
-     <groupId>io.dropwizard.metrics5</groupId>
-@@ -66,8 +67,12 @@
+@@ -66,8 +66,12 @@
          <mockito.version>5.14.1</mockito.version>
          <commons-lang3.version>3.17.0</commons-lang3.version>
          <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
@@ -77,7 +69,7 @@ index 5318dac..709591f 100644
  
          <sonar.projectKey>dropwizard_metrics</sonar.projectKey>
          <sonar.organization>dropwizard</sonar.organization>
-@@ -136,69 +141,28 @@
+@@ -136,6 +140,27 @@
          </repository>
      </distributionManagement>
  
@@ -103,72 +95,9 @@ index 5318dac..709591f 100644
 +    </dependencies>
 +
      <profiles>
--        <profile>
--            <id>jdk8</id>
--            <activation>
--                <jdk>1.8</jdk>
--            </activation>
--            <build>
--                <plugins>
--                    <plugin>
--                        <groupId>org.apache.maven.plugins</groupId>
--                        <artifactId>maven-compiler-plugin</artifactId>
--                        <configuration>
--                            <compilerId>javac-with-errorprone</compilerId>
--                            <forceJavacCompilerUse>true</forceJavacCompilerUse>
--                            <showWarnings>true</showWarnings>
--                            <compilerArgument>-Xlint:all</compilerArgument>
--                            <source>1.8</source>
--                            <target>1.8</target>
--                            <fork>true</fork>
--                            <compilerArgs combine.children="append">
--                                <arg>-XepExcludedPaths:.*/target/generated-sources/.*</arg>
--                                <arg>-J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${errorprone.javac.version}/javac-${errorprone.javac.version}.jar</arg>
--                            </compilerArgs>
--                        </configuration>
--                        <dependencies>
--                            <dependency>
--                                <groupId>org.codehaus.plexus</groupId>
--                                <artifactId>plexus-compiler-javac-errorprone</artifactId>
--                                <version>2.15.0</version>
--                            </dependency>
--                            <!-- override plexus-compiler-javac-errorprone's dependency on
--                                 Error Prone with the latest version -->
--                            <dependency>
--                                <groupId>com.google.errorprone</groupId>
--                                <artifactId>error_prone_core</artifactId>
--                                <version>${errorprone.version}</version>
--                            </dependency>
--                        </dependencies>
--                    </plugin>
--                </plugins>
--            </build>
--        </profile>
--        <profile>
--            <id>jdk11</id>
--            <activation>
--                <jdk>11</jdk>
--            </activation>
--            <build>
--                <plugins>
--                    <plugin>
--                        <groupId>org.apache.maven.plugins</groupId>
--                        <artifactId>maven-compiler-plugin</artifactId>
--                        <version>${maven-compiler-plugin.version}</version>
--                        <configuration>
--                            <source>1.8</source>
--                            <target>1.8</target>
--                            <forceJavacCompilerUse>true</forceJavacCompilerUse>
--                            <showWarnings>true</showWarnings>
--                        </configuration>
--                    </plugin>
--                </plugins>
--            </build>
--        </profile>
          <profile>
-             <id>jdk17</id>
-             <activation>
-@@ -218,7 +182,7 @@
+             <id>jdk8</id>
+@@ -218,7 +243,7 @@
                              <compilerArgs>
                                  <arg>-Xlint:all</arg>
                                  <arg>-XDcompilePolicy=simple</arg>
@@ -177,7 +106,7 @@ index 5318dac..709591f 100644
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-@@ -230,12 +194,22 @@
+@@ -230,12 +255,22 @@
                                  <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                                  <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
                              </compilerArgs>
@@ -201,12 +130,12 @@ index 5318dac..709591f 100644
                              </annotationProcessorPaths>
                          </configuration>
                      </plugin>
-@@ -418,7 +392,7 @@
-                         <id>enforce</id>
-                         <configuration>
-                             <rules>
--                                <DependencyConvergence />
-+                                <DependencyConvergence/>
-                             </rules>
-                         </configuration>
-                         <goals>
+@@ -371,7 +406,7 @@
+                     <compilerArgs>
+                         <arg>-Xlint:all</arg>
+                         <arg>-XDcompilePolicy=simple</arg>
+-                        <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.*</arg>
++                        <arg>${error-prone-support.flags}</arg>
+                     </compilerArgs>
+                     <annotationProcessorPaths>
+                         <path>
