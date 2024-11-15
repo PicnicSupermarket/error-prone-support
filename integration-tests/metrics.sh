@@ -9,6 +9,7 @@ repository='https://github.com/dropwizard/metrics.git'
 revision='v5.0.0-rc22'
 additional_build_flags=''
 additional_source_directories='${project.basedir}${file.separator}src${file.separator}it${file.separator}java,${project.basedir}${file.separator}src${file.separator}xdocs-examples${file.separator}java'
+#additional_source_directories=''
 # XXX: We exclude the `CollectorMutability` and the `Immutable*|Preconditions*|StringRules.StringIsNullOrEmpty` Refaster rules
 # as they introduce changes that expect Guava to be on the classpath.
 #patch_error_prone_flags="-Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern=^(?!.*File).*"

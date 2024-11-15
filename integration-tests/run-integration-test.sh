@@ -136,8 +136,8 @@ git config user.name || git config user.name 'Integration Test'
 git clean -fdx
 git apply < "${integration_test_root}/${test_name}-init.patch"
 git commit -m 'dependency: Introduce Error Prone Support' .
-#mvn ${shared_build_flags} "${format_goal}"
-#git commit -m 'minor: Reformat using Google Java Format' .
+mvn ${shared_build_flags} "${format_goal}"
+git commit -m 'minor: Reformat using Google Java Format' .
 diff_base="$(git rev-parse HEAD)"
 
 # Apply Error Prone Support-suggested changes until a fixed point is reached.
@@ -173,6 +173,8 @@ apply_patch ''
 
 
 echo "RUN ONE MORE FULL --------"
+echo "Version $(mvn --version)"
+echo "COMMANDO ${shared_build_flags} clean package -Derror-prone.configuration-args=${error_prone_validation_flags}. ${validation_build_flags} "
 # Run one more full build and log the output.
 #
 # By also running the tests, we validate that the (majority of) applied changes
