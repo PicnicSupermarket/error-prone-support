@@ -1801,6 +1801,32 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link PublisherProbe#assertWasRequested()} over more verbose alternatives. */
+  static final class PublisherProbeAssertWasRequested<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe) {
+      assertThat(probe.wasRequested()).isTrue();
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe) {
+      probe.assertWasRequested();
+    }
+  }
+
+  /** Prefer {@link PublisherProbe#assertWasNotRequested()} over more verbose alternatives. */
+  static final class PublisherProbeAssertWasNotRequested<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe) {
+      assertThat(probe.wasRequested()).isFalse();
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe) {
+      probe.assertWasNotRequested();
+    }
+  }
+
   /** Prefer {@link Mono#as(Function)} when creating a {@link StepVerifier}. */
   static final class StepVerifierFromMono<T> {
     @BeforeTemplate
