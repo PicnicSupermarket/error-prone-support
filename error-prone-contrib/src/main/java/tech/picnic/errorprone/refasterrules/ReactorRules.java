@@ -1775,6 +1775,32 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link PublisherProbe#assertWasCancelled()} over more verbose alternatives. */
+  static final class PublisherProbeAssertWasCancelled<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe) {
+      assertThat(probe.wasCancelled()).isTrue();
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe) {
+      probe.assertWasCancelled();
+    }
+  }
+
+  /** Prefer {@link PublisherProbe#assertWasNotCancelled()} over more verbose alternatives. */
+  static final class PublisherProbeAssertWasNotCancelled<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe) {
+      assertThat(probe.wasCancelled()).isFalse();
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe) {
+      probe.assertWasNotCancelled();
+    }
+  }
+
   /** Prefer {@link Mono#as(Function)} when creating a {@link StepVerifier}. */
   static final class StepVerifierFromMono<T> {
     @BeforeTemplate
