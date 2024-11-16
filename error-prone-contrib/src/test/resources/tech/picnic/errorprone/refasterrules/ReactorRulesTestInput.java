@@ -603,6 +603,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(PublisherProbe.of(Mono.just(3)).subscribeCount()).isNotPositive();
   }
 
+  void testPublisherProbeAssertWasCancelled() {
+    assertThat(PublisherProbe.empty().wasCancelled()).isTrue();
+  }
+
+  void testPublisherProbeAssertWasNotCancelled() {
+    assertThat(PublisherProbe.empty().wasCancelled()).isFalse();
+  }
+
   ImmutableSet<StepVerifier.FirstStep<Integer>> testStepVerifierFromMono() {
     return ImmutableSet.of(
         StepVerifier.create(Mono.just(1)), Mono.just(2).flux().as(StepVerifier::create));
