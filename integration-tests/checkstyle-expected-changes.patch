@@ -77,16 +77,7 @@
                String.format(
 --- a/src/it/java/com/google/checkstyle/test/chapter2filebasic/rule21filename/FileNameTest.java
 +++ b/src/it/java/com/google/checkstyle/test/chapter2filebasic/rule21filename/FileNameTest.java
-@@ -22,7 +22,7 @@ package com.google.checkstyle.test.chapter2filebasic.rule21filename;
- import com.google.checkstyle.test.base.AbstractGoogleModuleTestSupport;
- import org.junit.jupiter.api.Test;
- 
--public class FileNameTest extends AbstractGoogleModuleTestSupport {
-+final class FileNameTest extends AbstractGoogleModuleTestSupport {
- 
-   @Override
-   protected String getPackageLocation() {
-@@ -30,17 +30,17 @@ public class FileNameTest extends AbstractGoogleModuleTestSupport {
+@@ -32,17 +32,17 @@ public class FileNameTest extends AbstractGoogleModuleTestSupport {
    }
  
    @Test
@@ -414,16 +405,7 @@
  }
 --- a/src/it/java/com/google/checkstyle/test/chapter3filestructure/rule3sourcefile/SourceFileStructureTest.java
 +++ b/src/it/java/com/google/checkstyle/test/chapter3filestructure/rule3sourcefile/SourceFileStructureTest.java
-@@ -22,7 +22,7 @@ package com.google.checkstyle.test.chapter3filestructure.rule3sourcefile;
- import com.google.checkstyle.test.base.AbstractGoogleModuleTestSupport;
- import org.junit.jupiter.api.Test;
- 
--public class SourceFileStructureTest extends AbstractGoogleModuleTestSupport {
-+final class SourceFileStructureTest extends AbstractGoogleModuleTestSupport {
- 
-   @Override
-   protected String getPackageLocation() {
-@@ -30,12 +30,12 @@ public class SourceFileStructureTest extends AbstractGoogleModuleTestSupport {
+@@ -32,12 +32,12 @@ public class SourceFileStructureTest extends AbstractGoogleModuleTestSupport {
    }
  
    @Test
@@ -440,16 +422,7 @@
  }
 --- a/src/it/java/com/google/checkstyle/test/chapter3filestructure/toolongpackagetotestcoveragegooglesjavastylerule/PackageStatementTest.java
 +++ b/src/it/java/com/google/checkstyle/test/chapter3filestructure/toolongpackagetotestcoveragegooglesjavastylerule/PackageStatementTest.java
-@@ -22,7 +22,7 @@ package com.google.checkstyle.test.chapter3filestructure.toolongpackagetotestcov
- import com.google.checkstyle.test.base.AbstractGoogleModuleTestSupport;
- import org.junit.jupiter.api.Test;
- 
--public class PackageStatementTest extends AbstractGoogleModuleTestSupport {
-+final class PackageStatementTest extends AbstractGoogleModuleTestSupport {
- 
-   @Override
-   protected String getPackageLocation() {
-@@ -31,7 +31,7 @@ public class PackageStatementTest extends AbstractGoogleModuleTestSupport {
+@@ -33,7 +33,7 @@ public class PackageStatementTest extends AbstractGoogleModuleTestSupport {
    }
  
    @Test

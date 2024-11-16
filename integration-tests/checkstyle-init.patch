@@ -1,5 +1,3 @@
-diff --git a/pom.xml b/pom.xml
-index f1e3fbd..3ee8a58 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -368,6 +368,12 @@
@@ -60,8 +58,39 @@ index f1e3fbd..3ee8a58 100644
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
-diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
-index ccd5e54..db7ecd3 100644
+--- a/src/it/java/com/google/checkstyle/test/chapter2filebasic/rule21filename/FileNameTest.java
++++ b/src/it/java/com/google/checkstyle/test/chapter2filebasic/rule21filename/FileNameTest.java
+@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
+ 
+ import com.google.checkstyle.test.base.AbstractGoogleModuleTestSupport;
+ 
++// This class is referenced from another package.
++@SuppressWarnings("JUnitClassModifiers")
+ public class FileNameTest extends AbstractGoogleModuleTestSupport {
+ 
+     @Override
+--- a/src/it/java/com/google/checkstyle/test/chapter3filestructure/rule3sourcefile/SourceFileStructureTest.java
++++ b/src/it/java/com/google/checkstyle/test/chapter3filestructure/rule3sourcefile/SourceFileStructureTest.java
+@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
+ 
+ import com.google.checkstyle.test.base.AbstractGoogleModuleTestSupport;
+ 
++// This class is referenced from another package.
++@SuppressWarnings("JUnitClassModifiers")
+ public class SourceFileStructureTest extends AbstractGoogleModuleTestSupport {
+ 
+     @Override
+--- a/src/it/java/com/google/checkstyle/test/chapter3filestructure/toolongpackagetotestcoveragegooglesjavastylerule/PackageStatementTest.java
++++ b/src/it/java/com/google/checkstyle/test/chapter3filestructure/toolongpackagetotestcoveragegooglesjavastylerule/PackageStatementTest.java
+@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
+ 
+ import com.google.checkstyle.test.base.AbstractGoogleModuleTestSupport;
+ 
++// This class is referenced from another package.
++@SuppressWarnings("JUnitClassModifiers")
+ public class PackageStatementTest extends AbstractGoogleModuleTestSupport {
+ 
+     @Override
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
 @@ -63,6 +63,8 @@ public final class DetailNodeTreeStringPrinter {
@@ -73,8 +102,6 @@ index ccd5e54..db7ecd3 100644
      public static DetailNode parseJavadocAsDetailNode(DetailAST blockComment) {
          final JavadocDetailNodeParser parser = new JavadocDetailNodeParser();
          final ParseStatus status = parser.parseJavadocAsDetailNode(blockComment);
-diff --git a/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java b/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
-index 31bbea8..6fe2f48 100644
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
 @@ -157,6 +157,9 @@ public class SarifLogger extends AbstractAutomaticBean implements AuditListener
@@ -87,8 +114,6 @@ index 31bbea8..6fe2f48 100644
          final String rendered = report
              .replace(VERSION_PLACEHOLDER, String.valueOf(version))
              .replace(RESULTS_PLACEHOLDER, String.join(",\n", results));
-diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
-index de5fa7b..3edd76a 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
 @@ -97,6 +97,8 @@ import de.thetaphi.forbiddenapis.SuppressForbidden;
@@ -100,8 +125,6 @@ index de5fa7b..3edd76a 100644
  public class CheckerTest extends AbstractModuleTestSupport {
  
      @TempDir
-diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
-index c666228..85051f1 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
 @@ -47,6 +47,8 @@ import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
@@ -113,8 +136,6 @@ index c666228..85051f1 100644
  public class ConfigurationLoaderTest extends AbstractPathTestSupport {
  
      @Override
-diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
-index 3a4bf99..6def44c 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
 @@ -98,6 +98,8 @@ public class PackageObjectFactoryTest {
@@ -135,8 +156,6 @@ index 3a4bf99..6def44c 100644
              final Object test = new PackageObjectFactory(Collections.singleton(null), classLoader,
                      TRY_IN_ALL_REGISTERED_PACKAGES);
              assertWithMessage("Exception is expected but got " + test).fail();
-diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
-index ee7badb..4baeff4 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
 @@ -84,6 +84,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
@@ -148,8 +167,6 @@ index ee7badb..4baeff4 100644
  public class TreeWalkerTest extends AbstractModuleTestSupport {
  
      @TempDir
-diff --git a/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java b/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
-index b197c21..f464b04 100644
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
 @@ -47,6 +47,8 @@ import com.puppycrawl.tools.checkstyle.checks.coding.NestedIfDepthCheck;
