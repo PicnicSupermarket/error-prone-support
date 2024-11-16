@@ -1749,7 +1749,7 @@ final class ReactorRules {
       Refaster.anyOf(
           assertThat(probe.wasSubscribed()).isTrue(),
           assertThat(probe.subscribeCount()).isNotNegative(),
-          assertThat(probe.subscribeCount()).isNotZero(),
+          assertThat(probe.subscribeCount()).isNotEqualTo(0),
           assertThat(probe.subscribeCount()).isPositive());
     }
 
@@ -1765,7 +1765,7 @@ final class ReactorRules {
     void before(PublisherProbe<T> probe) {
       Refaster.anyOf(
           assertThat(probe.wasSubscribed()).isFalse(),
-          assertThat(probe.subscribeCount()).isZero(),
+          assertThat(probe.subscribeCount()).isEqualTo(0),
           assertThat(probe.subscribeCount()).isNotPositive());
     }
 
