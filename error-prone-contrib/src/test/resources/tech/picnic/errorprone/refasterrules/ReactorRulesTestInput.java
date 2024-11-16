@@ -593,13 +593,13 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   void testPublisherProbeAssertWasSubscribed() {
     assertThat(PublisherProbe.of(Mono.just(1)).wasSubscribed()).isTrue();
     assertThat(PublisherProbe.of(Mono.just(2)).subscribeCount()).isNotNegative();
-    assertThat(PublisherProbe.of(Mono.just(3)).subscribeCount()).isNotZero();
+    assertThat(PublisherProbe.of(Mono.just(3)).subscribeCount()).isNotEqualTo(0);
     assertThat(PublisherProbe.of(Mono.just(4)).subscribeCount()).isPositive();
   }
 
   void testPublisherProbeAssertWasNotSubscribed() {
     assertThat(PublisherProbe.of(Mono.just(1)).wasSubscribed()).isFalse();
-    assertThat(PublisherProbe.of(Mono.just(2)).subscribeCount()).isZero();
+    assertThat(PublisherProbe.of(Mono.just(2)).subscribeCount()).isEqualTo(0);
     assertThat(PublisherProbe.of(Mono.just(3)).subscribeCount()).isNotPositive();
   }
 
