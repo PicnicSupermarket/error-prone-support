@@ -1742,6 +1742,39 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link PublisherProbe#assertWasSubscribed()} over more verbose alternatives. */
+  static final class PublisherProbeAssertWasSubscribed<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe) {
+      Refaster.anyOf(
+          assertThat(probe.wasSubscribed()).isTrue(),
+          assertThat(probe.subscribeCount()).isNotNegative(),
+          assertThat(probe.subscribeCount()).isNotZero(),
+          assertThat(probe.subscribeCount()).isPositive());
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe) {
+      probe.assertWasSubscribed();
+    }
+  }
+
+  /** Prefer {@link PublisherProbe#assertWasNotSubscribed()} over more verbose alternatives. */
+  static final class PublisherProbeAssertWasNotSubscribed<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe) {
+      Refaster.anyOf(
+          assertThat(probe.wasSubscribed()).isFalse(),
+          assertThat(probe.subscribeCount()).isZero(),
+          assertThat(probe.subscribeCount()).isNotPositive());
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe) {
+      probe.assertWasNotSubscribed();
+    }
+  }
+
   /** Prefer {@link Mono#as(Function)} when creating a {@link StepVerifier}. */
   static final class StepVerifierFromMono<T> {
     @BeforeTemplate
