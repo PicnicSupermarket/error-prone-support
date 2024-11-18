@@ -8,9 +8,10 @@ repository='https://github.com/checkstyle/checkstyle.git'
 revision='checkstyle-10.14.0'
 # XXX: Configure Renovate to manage the AssertJ version declared here.
 additional_build_flags='-Perror-prone-compile,error-prone-test-compile -Dassertj.version=3.24.2 -Dmaven.compiler.failOnError=true'
-additional_source_directories='${project.basedir}${file.separator}src${file.separator}it${file.separator}java,${project.basedir}${file.separator}src${file.separator}xdocs-examples${file.separator}java'
-patch_error_prone_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
-validation_error_prone_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
+additional_source_directories="${project.basedir}${file.separator}src${file.separator}it${file.separator}java,${project.basedir}${file.separator}src${file.separator}xdocs-examples${file.separator}java"
+shared_error_prone_flags="-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*"
+patch_error_prone_flags=''
+validation_error_prone_flags=''
 # Validation skips some tests:
 # - The `metadataFilesGenerationAllFiles` test is skipped because it makes line
 #   number assertions that will fail when the code is formatted or patched.
@@ -30,6 +31,7 @@ fi
   "${revision}" \
   "${additional_build_flags}" \
   "${additional_source_directories}" \
+  "${shared_error_prone_flags}" \
   "${patch_error_prone_flags}" \
   "${validation_error_prone_flags}" \
   "${validation_build_flags}" \
