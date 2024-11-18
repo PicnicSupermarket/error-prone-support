@@ -144,15 +144,13 @@ diff_base="$(git rev-parse HEAD)"
 function apply_patch() {
   local extra_build_args="${1}"
 
-  echo "hier ${shared_build_flags} ${extra_build_args} \
-                 package "${format_goal}" \
-                 -Derror-prone.configuration-args="${error_prone_patch_flags}" \
-                 -DskipTests"
-
-  mvn ${shared_build_flags} ${extra_build_args} \
-    package "${format_goal}" \
-    -Derror-prone.configuration-args="${error_prone_patch_flags}" \
-    -DskipTests
+  (
+    set -x \
+      && mvn ${shared_build_flags} ${extra_build_args} \
+           package "${format_goal}" \
+           -Derror-prone.configuration-args="${error_prone_patch_flags}" \
+           -DskipTests
+  )
 
   if ! git diff --exit-code; then
     git commit -m 'minor: Apply patches' .
@@ -180,12 +178,13 @@ echo "COMMANDO ${shared_build_flags} clean package -Derror-prone.configuration-a
 # By also running the tests, we validate that the (majority of) applied changes
 # are behavior preserving.
 validation_build_log="${report_directory}/${test_name}-validation-build-log.txt"
-mvn ${shared_build_flags} \
-      clean package \
-      -Derror-prone.configuration-args="${error_prone_validation_flags}" \
-      ${validation_build_flags} \
-    | tee "${validation_build_log}" \
-  || failure=1
+(
+  set -x \
+    && mvn ${shared_build_flags} \
+         clean package \
+         -Derror-prone.configuration-args="${error_prone_validation_flags}" \
+         ${validation_build_flags}
+) | tee "${validation_build_log}" || failure=1
 
 # Collect the applied changes.
 expected_changes="${integration_test_root}/${test_name}-expected-changes.patch"
