@@ -62,11 +62,7 @@ shared_build_flags="
   ${additional_build_flags}
   "
 
-# XXX: Configure Renovate to manage the fmt-maven-plugin version declared here.
-# XXX: Once GitHub actions uses Maven 3.9.2+, we can inline this variable with
-# version reference `${fmt.version}`, and `-Dfmt.version=2.21.1` added to
-# `shared_build_flags`.
-format_goal='com.spotify.fmt:fmt-maven-plugin:2.21.1:format'
+format_goal='com.spotify.fmt:fmt-maven-plugin:2.25:format'
 
 error_prone_shared_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
 
@@ -124,14 +120,22 @@ pushd "${project_root}"
 git config user.email || git config user.email 'integration-test@example.com'
 git config user.name || git config user.name 'Integration Test'
 
-# Prepare the code for analysis by (a) applying the minimal set of changes
-# required to run Error Prone with Error Prone Support and (b) formatting the
-# code using the same method by which it will be formatted after each
-# compilation round. The initial formatting operation ensures that subsequent
-# modifications can be rendered in a clean manner.
+# Prepare the code for analysis by applying the minimal set of changes required
+# to run Error Prone with Error Prone Support.
+initial_patch="${integration_test_root}/${test_name}-init.patch"
 git clean -fdx
-git apply < "${integration_test_root}/${test_name}-init.patch"
+git apply < "${initial_patch}"
 git commit -m 'dependency: Introduce Error Prone Support' .
+if [ -n "${do_sync}" ]; then
+  # The initial patch applied successfully, but if it was created against a
+  # different version, then offsets may have changed. Here we update the patch
+  # to exactly match the new state.
+  git diff HEAD~1 | "${grep_command}" -vP '^(diff|index)' > "${initial_patch}"
+fi
+
+# Format the patched code using the same method by which it will be formatted
+# after each compilation round. This initial formatting operation ensures that
+# subsequent modifications can be rendered in a clean manner.
 mvn ${shared_build_flags} "${format_goal}"
 git commit -m 'minor: Reformat using Google Java Format' .
 diff_base="$(git rev-parse HEAD)"
