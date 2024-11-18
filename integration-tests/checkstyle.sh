@@ -5,7 +5,7 @@ set -e -u -o pipefail
 test_name="$(basename "${0}" .sh)"
 project='checkstyle'
 repository='https://github.com/checkstyle/checkstyle.git'
-revision='checkstyle-10.14.0'
+revision='checkstyle-10.20.1'
 # XXX: Configure Renovate to manage the AssertJ version declared here.
 additional_build_flags='-Perror-prone-compile,error-prone-test-compile -Dassertj.version=3.24.2 -Dmaven.compiler.failOnError=true'
 additional_source_directories='${project.basedir}${file.separator}src${file.separator}it${file.separator}java,${project.basedir}${file.separator}src${file.separator}xdocs-examples${file.separator}java'
