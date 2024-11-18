@@ -17,6 +17,12 @@ import com.sun.source.tree.LiteralTree;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /** A {@link BugChecker} that flags string constants with extraneous escaping. */
+// XXX: Also cover `\"` sequences inside text blocks. Note that this requires a more subtle
+// approach, as double-quote characters will need to remain escaped if removing the backslash would
+// create a new sequence of three or more double-quotes. (TBD whether we'd like to enforce a
+// "preferred" approach to escaping, e.g. by always escaping the last of a triplet, such that the
+// over-all number of escaped characters is minimized.)
+// XXX: Also flag `'\"'` char literals.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Inside string expressions single quotes do not need to be escaped",
