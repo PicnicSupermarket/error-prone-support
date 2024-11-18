@@ -93,6 +93,12 @@ final class FileRules {
   /**
    * Prefer {@link Files#createTempFile(String, String, FileAttribute[])} over alternatives that
    * create files with more liberal permissions.
+   *
+   * <p>Note that {@link File#createTempFile} treats the given prefix as a path, and ignores all but
+   * its file name. That is, the actual prefix used is derived from all characters following the
+   * final file separator (if any). This is not the case with {@link Files#createTempFile}, which
+   * will instead throw an {@link IllegalArgumentException} if the prefix contains any file
+   * separators.
    */
   static final class FilesCreateTempFileToFile {
     @BeforeTemplate
@@ -117,6 +123,12 @@ final class FileRules {
   /**
    * Prefer {@link Files#createTempFile(Path, String, String, FileAttribute[])} over alternatives
    * that create files with more liberal permissions.
+   *
+   * <p>Note that {@link File#createTempFile} treats the given prefix as a path, and ignores all but
+   * its file name. That is, the actual prefix used is derived from all characters following the
+   * final file separator (if any). This is not the case with {@link Files#createTempFile}, which
+   * will instead throw an {@link IllegalArgumentException} if the prefix contains any file
+   * separators.
    */
   static final class FilesCreateTempFileInCustomDirectoryToFile {
     @BeforeTemplate
