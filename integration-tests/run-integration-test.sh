@@ -51,7 +51,6 @@ case "$(uname -s)" in
     ;;
 esac
 
-# -Perror-prone-compile,error-prone-test-compile
 shared_build_flags="
   -Derror-prone.version=$(
     mvn -f "${error_prone_support_root}" help:evaluate -Dexpression=version.error-prone -q -DforceStdout
@@ -71,7 +70,8 @@ format_goal='com.spotify.fmt:fmt-maven-plugin:2.21.1:format'
 
 #error_prone_shared_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
 #error_prone_shared_flags="-XepExcludedPaths:.*[\\/]resources[\\/].*"
-error_prone_shared_flags="-XepExcludedPaths:.*/target/generated-sources/.*"
+#error_prone_shared_flags="-XepExcludedPaths:.*/target/generated-sources/.*"
+error_prone_shared_flags=""
 
 
 error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE -XepPatchChecks:$(
@@ -170,9 +170,6 @@ function apply_patch() {
 apply_patch ''
 
 
-echo "RUN ONE MORE FULL --------"
-echo "Version $(mvn --version)"
-echo "COMMANDO ${shared_build_flags} clean package -Derror-prone.configuration-args=${error_prone_validation_flags}. ${validation_build_flags} "
 # Run one more full build and log the output.
 #
 # By also running the tests, we validate that the (majority of) applied changes

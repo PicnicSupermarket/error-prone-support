@@ -10,8 +10,8 @@ additional_build_flags=''
 additional_source_directories=''
 # XXX: These don't work...
 #patch_error_prone_flags='-Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern=^(?!FileRules\$).*'
-patch_error_prone_flags=''
-validation_error_prone_flags=''
+patch_error_prone_flags='-XepExcludedPaths:.*/target/generated-sources/.*'
+validation_error_prone_flags='-XepExcludedPaths:.*/target/generated-sources/.*'
 validation_build_flags=''
 
 if [ "${#}" -gt 2 ] || ([ "${#}" = 2 ] && [ "${1:---sync}" != '--sync' ]); then
