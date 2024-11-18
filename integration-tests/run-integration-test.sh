@@ -164,7 +164,6 @@ function apply_patch() {
 }
 apply_patch ''
 
-
 # Run one more full build and log the output.
 #
 # By also running the tests, we validate that the (majority of) applied changes
