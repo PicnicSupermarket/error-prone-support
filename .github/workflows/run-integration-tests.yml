@@ -15,13 +15,13 @@ permissions:
   contents: read
 jobs:
   run-integration-tests:
+    name: On-demand integration test
+    if: |
+        github.event.issue.pull_request && contains(github.event.comment.body, '/integration-tests')
     runs-on: ubuntu-24.04
-    #    if: github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
-    # XXX: Configure permissions.
     strategy:
       matrix:
-        integration-test: [ "metrics", "checkstyle" ]
-    name: On-demand integration test
+        integration-test: [ "checkstyle", "metrics" ]
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
@@ -40,7 +40,6 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@382542f77617f34e56bf83868920a4d45b7451e7 # v1.16.0
         with:
-          #          checkout-ref: "refs/pull/894/head"
           checkout-ref: "refs/pull/${{ github.event.issue.number }}/head"
           java-version: 17.0.13
           java-distribution: temurin
