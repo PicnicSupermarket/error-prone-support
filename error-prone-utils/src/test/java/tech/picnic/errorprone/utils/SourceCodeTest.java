@@ -8,18 +8,49 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.LiteralTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.VariableTreeMatcher;
+import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.VariableTree;
+import java.util.Optional;
 import javax.lang.model.element.Name;
 import org.junit.jupiter.api.Test;
 
 final class SourceCodeTest {
+  @Test
+  void toStringConstantExpression() {
+    BugCheckerRefactoringTestHelper.newInstance(
+            ToStringConstantExpressionTestChecker.class, getClass())
+        .addInputLines(
+            "A.java",
+            "class A {",
+            "  String m() {",
+            "    char a = 'c';",
+            "    char b = '\\'';",
+            "    return \"foo\\\"bar\\'baz\\bqux\";",
+            "  }",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "class A {",
+            "  String m() {",
+            "    char a = 'c' /* 'c' */; /* \"a\" */",
+            "    char b = '\\'' /* '\\'' */; /* \"b\" */",
+            "    return \"foo\\\"bar\\'baz\\bqux\" /* \"foo\\\"bar'baz\\bqux\" */;",
+            "  }",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
   @Test
   void deleteWithTrailingWhitespaceAnnotations() {
     BugCheckerRefactoringTestHelper.newInstance(
@@ -226,6 +257,41 @@ final class SourceCodeTest {
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
+  }
+
+  /**
+   * A {@link BugChecker} that applies {@link SourceCode#toStringConstantExpression(Object,
+   * VisitorState)} to string literals.
+   */
+  @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
+  public static final class ToStringConstantExpressionTestChecker extends BugChecker
+      implements LiteralTreeMatcher, VariableTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchLiteral(LiteralTree tree, VisitorState state) {
+      // XXX: The character conversion is a workaround for the fact that `ASTHelpers#constValue`
+      // returns an `Integer` value for `char` constants.
+      return Optional.ofNullable(ASTHelpers.constValue(tree))
+          .map(
+              constant ->
+                  ASTHelpers.isSubtype(ASTHelpers.getType(tree), state.getSymtab().charType, state)
+                      ? (char) (int) constant
+                      : constant)
+          .map(constant -> describeMatch(tree, addComment(tree, constant, state)))
+          .orElse(Description.NO_MATCH);
+    }
+
+    @Override
+    public Description matchVariable(VariableTree tree, VisitorState state) {
+      return describeMatch(
+          tree, addComment(tree, ASTHelpers.getSymbol(tree).getSimpleName(), state));
+    }
+
+    private static SuggestedFix addComment(Tree tree, Object value, VisitorState state) {
+      return SuggestedFix.postfixWith(
+          tree, "/* %s */".formatted(SourceCode.toStringConstantExpression(value, state)));
+    }
   }
 
   /**
