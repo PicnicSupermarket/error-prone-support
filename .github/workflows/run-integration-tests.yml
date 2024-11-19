@@ -7,8 +7,12 @@
 # https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
 name: "Integration tests"
 on:
+  workflow_dispatch:
   issue_comment:
     types: [ created ]
+  push:
+    branches:
+      - rossendrijver/metrics_integration_test
 permissions:
   contents: read
 jobs:
