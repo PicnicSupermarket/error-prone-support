@@ -59,6 +59,7 @@ import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
+import tech.picnic.errorprone.refaster.matchers.IsFunctionReturningMono;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
@@ -593,7 +594,9 @@ final class ReactorRules {
   static final class MonoUsing<
       D extends AutoCloseable, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
     @BeforeTemplate
-    Mono<T> before(Callable<D> resourceSupplier, Function<D, P> sourceSupplier) {
+    Mono<T> before(
+        Callable<D> resourceSupplier,
+        @Matches(IsFunctionReturningMono.class) Function<D, P> sourceSupplier) {
       return Flux.using(resourceSupplier, sourceSupplier).single();
     }
 
@@ -610,7 +613,10 @@ final class ReactorRules {
   static final class MonoUsingEager<
       D extends AutoCloseable, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
     @BeforeTemplate
-    Mono<T> before(Callable<D> resourceSupplier, Function<D, P> sourceSupplier, boolean eager) {
+    Mono<T> before(
+        Callable<D> resourceSupplier,
+        @Matches(IsFunctionReturningMono.class) Function<D, P> sourceSupplier,
+        boolean eager) {
       return Flux.using(resourceSupplier, sourceSupplier, eager).single();
     }
 
@@ -628,7 +634,9 @@ final class ReactorRules {
       D, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
     @BeforeTemplate
     Mono<T> before(
-        Callable<D> resourceSupplier, Function<D, P> sourceSupplier, Consumer<D> resourceCleanup) {
+        Callable<D> resourceSupplier,
+        @Matches(IsFunctionReturningMono.class) Function<D, P> sourceSupplier,
+        Consumer<D> resourceCleanup) {
       return Flux.using(resourceSupplier, sourceSupplier, resourceCleanup).single();
     }
 
@@ -648,7 +656,7 @@ final class ReactorRules {
     @BeforeTemplate
     Mono<T> before(
         Callable<D> resourceSupplier,
-        Function<D, P> sourceSupplier,
+        @Matches(IsFunctionReturningMono.class) Function<D, P> sourceSupplier,
         Consumer<D> resourceCleanup,
         boolean eager) {
       return Flux.using(resourceSupplier, sourceSupplier, resourceCleanup, eager).single();
@@ -677,7 +685,7 @@ final class ReactorRules {
     @BeforeTemplate
     Mono<T> before(
         Publisher<D> resourceSupplier,
-        Function<D, P> resourceClosure,
+        @Matches(IsFunctionReturningMono.class) Function<D, P> resourceClosure,
         Function<D, P2> asyncCleanup) {
       return Flux.usingWhen(resourceSupplier, resourceClosure, asyncCleanup).single();
     }
@@ -704,7 +712,7 @@ final class ReactorRules {
     @BeforeTemplate
     Mono<T> before(
         Publisher<D> resourceSupplier,
-        Function<D, P> resourceClosure,
+        @Matches(IsFunctionReturningMono.class) Function<D, P> resourceClosure,
         Function<D, P2> asyncComplete,
         BiFunction<D, ? super Throwable, P2> asyncError,
         Function<D, P2> asyncCancel) {
