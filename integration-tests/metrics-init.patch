@@ -1,11 +1,12 @@
 diff --git a/metrics-caffeine3/pom.xml b/metrics-caffeine3/pom.xml
-index 1e7c155..fd441a4 100644
+index 1e7c155..fd5a6e3 100644
 --- a/metrics-caffeine3/pom.xml
 +++ b/metrics-caffeine3/pom.xml
-@@ -35,6 +35,12 @@
+@@ -35,6 +35,13 @@
                  <groupId>com.github.ben-manes.caffeine</groupId>
                  <artifactId>caffeine</artifactId>
                  <version>3.1.8</version>
++                <!-- To resolve version conflict flagged by the `maven-enforcer-plugin`. -->
 +                <exclusions>
 +                    <exclusion>
 +                        <groupId>com.google.errorprone</groupId>
@@ -28,31 +29,33 @@ index a9d5984..dd9ecd5 100644
          return new String(Files.readAllBytes(new File(dataDirectory, filename).toPath()), StandardCharsets.UTF_8);
      }
 diff --git a/metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java b/metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
-index 195619b..5584f91 100644
+index 195619b..76b31e1 100644
 --- a/metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
 +++ b/metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
-@@ -188,6 +188,7 @@ public class MetricsServlet extends HttpServlet {
+@@ -188,6 +188,8 @@ public class MetricsServlet extends HttpServlet {
          return mapper.writer();
      }
  
++    // XXX: Can't drop identity conversion as `value` can be `null`.
 +    @SuppressWarnings("IdentityConversion")
      protected TimeUnit parseTimeUnit(String value, TimeUnit defaultValue) {
          try {
              return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
 diff --git a/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java b/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
-index fdce054..b2475d7 100644
+index fdce054..b1cc73f 100644
 --- a/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
 +++ b/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
-@@ -188,6 +188,7 @@ public class MetricsServlet extends HttpServlet {
+@@ -188,6 +188,8 @@ public class MetricsServlet extends HttpServlet {
          return mapper.writer();
      }
  
++    // XXX: Can't drop identity conversion as `value` can be `null`.
 +    @SuppressWarnings("IdentityConversion")
      protected TimeUnit parseTimeUnit(String value, TimeUnit defaultValue) {
          try {
              return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
 diff --git a/pom.xml b/pom.xml
-index 5318dac..8d678ea 100644
+index 5318dac..3f27500 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -66,8 +66,12 @@
@@ -73,7 +76,7 @@ index 5318dac..8d678ea 100644
          </repository>
      </distributionManagement>
  
-+    <!-- Make sure the Guava changes are valid. -->
++    <!-- To ensure the Guava changes that will be introduced are valid. -->
 +    <dependencies>
 +        <dependency>
 +            <groupId>com.google.guava</groupId>
@@ -86,7 +89,7 @@ index 5318dac..8d678ea 100644
 +                </exclusion>
 +            </exclusions>
 +        </dependency>
-+        <!-- Pin this version to please the enforcer plugin. -->
++        <!-- To resolve version conflict flagged by the `maven-enforcer-plugin`. -->
 +        <dependency>
 +            <groupId>com.google.errorprone</groupId>
 +            <artifactId>error_prone_annotations</artifactId>
