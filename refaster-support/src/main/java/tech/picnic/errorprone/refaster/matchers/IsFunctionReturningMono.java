@@ -9,6 +9,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
+import java.util.function.Function;
 
 /**
  * A matcher of lambda expressions that are of type {@code java.util.function.Function} that returns
@@ -19,7 +20,7 @@ public final class IsFunctionReturningMono implements Matcher<ExpressionTree> {
   private static final Matcher<Tree> MONO_TYPE =
       isSameType(Suppliers.typeFromString("reactor.core.publisher.Mono"));
   private static final Matcher<Tree> FUNCTION_TYPE =
-      isSameType(Suppliers.typeFromString("java.util.function.Function"));
+      isSameType(Suppliers.typeFromString(Function.class.getCanonicalName()));
 
   /** Instantiates a new {@link IsFunctionReturningMono} instance. */
   public IsFunctionReturningMono() {}
