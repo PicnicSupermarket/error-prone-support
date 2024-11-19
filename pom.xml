@@ -1962,12 +1962,6 @@
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF
-                                    <!-- This check flags bad member names, but
-                                    also type names that we may want to accept.
-                                    Consider contributing a flag to toggle this
-                                    behavior. See
-                                    https://github.com/google/error-prone/issues/4616 -->
-                                    -Xep:IdentifierName:OFF
                                     <!-- We don't target JDK 7. -->
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->
@@ -1983,6 +1977,9 @@
                                     <!-- XXX: Enable once there are fewer
                                     false-positives.
                                     -XepOpt:CheckReturnValue:CheckAllMethods=true -->
+                                    <!-- XXX: Consider renaming flagged types
+                                    instead. -->
+                                    -XepOpt:IdentifierName:AllowInitialismsInTypeName=true
                                     -XepOpt:InlineMe:SkipInliningsWithComments=false
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
                                     -XepOpt:NullAway:AssertsEnabled=true
@@ -1997,11 +1994,18 @@
                                 </arg>
                                 <!-- The Error Prone plugin makes certain
                                 assumptions about the state of the AST at the
-                                moment it is invoked. Those assumptions are met
-                                when using the `simple` compile policy. This
-                                flag may be dropped after resolution of
+                                moment it is invoked. Those assumptions require
+                                the `simple` compile policy. This flag may be
+                                dropped after resolution of
                                 https://bugs.openjdk.java.net/browse/JDK-8155674. -->
                                 <arg>-XDcompilePolicy=simple</arg>
+                                <!-- Similarly, Error Prone requires that flow
+                                analysis has been performed, e.g. to determine
+                                whether variables are effectively final. This
+                                flag may be dropped if it ever becomes the
+                                default. See
+                                https://bugs.openjdk.org/browse/JDK-8134117. -->
+                                <arg>--should-stop=ifError=FLOW</arg>
                             </compilerArgs>
                         </configuration>
                     </plugin>
