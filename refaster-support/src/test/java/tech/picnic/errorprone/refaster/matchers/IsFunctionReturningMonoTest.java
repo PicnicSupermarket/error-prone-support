@@ -19,12 +19,12 @@ final class IsFunctionReturningMonoTest {
             "import reactor.core.publisher.Mono;",
             "",
             "class A {",
-            "// BUG: Diagnostic contains:",
-            " Function<String, Mono<String>> positive = s -> Mono.just(s);",
+            "  // BUG: Diagnostic contains:",
+            "  Function<String, Mono<String>> positive = s -> Mono.just(s);",
             "",
-            " Function<String, Flux<String>> negative = s -> Flux.just(s);",
+            "  Function<String, Flux<String>> negative = s -> Flux.just(s);",
             "",
-            " Supplier<Mono<String>> negative2 = () -> Mono.just(\"s\");",
+            "  Supplier<Mono<String>> negative2 = () -> Mono.just(\"s\");",
             "}")
         .doTest();
   }
