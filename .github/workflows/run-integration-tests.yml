@@ -7,18 +7,12 @@
 # https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
 name: "Integration tests"
 on:
-  issue_comment:
-    types: [ created ]
-  push:
-    branches:
-      - rossendrijver/metrics_integration_test
+  pull_request:
 permissions:
   contents: read
 jobs:
   run-integration-tests:
     name: On-demand integration test
-    if: |
-      github.event.issue.pull_request && contains(github.event.comment.body, '/integration-tests')
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -41,7 +35,6 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@382542f77617f34e56bf83868920a4d45b7451e7 # v1.16.0
         with:
-          checkout-ref: "refs/pull/${{ github.event.issue.number }}/head"
           java-version: 17.0.13
           java-distribution: temurin
           maven-version: 3.9.9
