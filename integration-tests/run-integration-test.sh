@@ -12,7 +12,7 @@ integration_test_root="$(cd "$(dirname -- "${0}")" && pwd)"
 error_prone_support_root="${integration_test_root}/.."
 repos_root="${integration_test_root}/.repos"
 
-if [ "${#}" -lt 9 ] || [ "${#}" -gt 11 ] || ([ "${#}" = 11 ] && [ "${10:---sync}" != '--sync' ]); then
+if [ "${#}" -lt 10 ] || [ "${#}" -gt 12 ] || ([ "${#}" = 12 ] && [ "${11:---sync}" != '--sync' ]); then
   >&2 echo "Usage: $(basename "${0}") <test_name> <project> <repository> <revision> <additional_build_flags> <additional_source_directories> <shared_error_prone_flags> <patch_error_prone_flags> <validation_error_prone_flags> <validation_build_flags> [--sync] [<report_directory>]"
   exit 1
 fi
