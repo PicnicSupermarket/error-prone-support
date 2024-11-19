@@ -228,33 +228,53 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.just(1).single();
   }
 
-  Mono<String> testMonoUsing() {
-    return Mono.using(() -> new ByteArrayInputStream(new byte[] {}), s -> Mono.just("foo"));
+  ImmutableSet<Mono<String>> testMonoUsing() {
+    return ImmutableSet.of(
+        Mono.using(() -> new ByteArrayInputStream(new byte[] {}), s -> Mono.just("foo")),
+        Flux.using(() -> new ByteArrayInputStream(new byte[] {}), s -> Flux.just("bar")).single());
   }
 
-  Mono<String> testMonoUsingEager() {
-    return Mono.using(() -> new ByteArrayInputStream(new byte[] {}), s -> Mono.just("foo"), false);
+  ImmutableSet<Mono<String>> testMonoUsingEager() {
+    return ImmutableSet.of(
+        Mono.using(() -> new ByteArrayInputStream(new byte[] {}), s -> Mono.just("foo"), false),
+        Flux.using(() -> new ByteArrayInputStream(new byte[] {}), s -> Flux.just("bar"), false)
+            .single());
   }
 
-  Mono<String> testMonoUsing2() {
-    return Mono.using(() -> "foo", foo -> Mono.just("bar"), foo -> {});
+  ImmutableSet<Mono<String>> testMonoUsing2() {
+    return ImmutableSet.of(
+        Mono.using(() -> "foo", foo -> Mono.just("bar"), foo -> {}),
+        Flux.using(() -> "foo", foo -> Flux.just("bar"), foo -> {}).single());
   }
 
-  Mono<String> testMonoUsing2Eager() {
-    return Mono.using(() -> "foo", foo -> Mono.just("bar"), foo -> {}, false);
+  ImmutableSet<Mono<String>> testMonoUsing2Eager() {
+    return ImmutableSet.of(
+        Mono.using(() -> "foo", foo -> Mono.just("bar"), foo -> {}, false),
+        Flux.using(() -> "foo", foo -> Flux.just("bar"), foo -> {}, false).single());
   }
 
-  Mono<String> testMonoUsingWhen() {
-    return Mono.usingWhen(Mono.just("foo"), foo -> Mono.just("bar"), foo -> Mono.just("baz"));
+  ImmutableSet<Mono<String>> testMonoUsingWhen() {
+    return ImmutableSet.of(
+        Mono.usingWhen(Mono.just("foo"), foo -> Mono.just("bar"), foo -> Mono.just("baz")),
+        Flux.usingWhen(Mono.just("foo"), foo -> Flux.just("bar"), foo -> Mono.just("baz"))
+            .single());
   }
 
-  Mono<String> testMonoUsingWhen2() {
-    return Mono.usingWhen(
-        Mono.just("foo"),
-        foo -> Mono.just("bar"),
-        foo -> Mono.just("baz"),
-        (foo, e) -> Mono.just("qux"),
-        foo -> Mono.just("thud"));
+  ImmutableSet<Mono<String>> testMonoUsingWhen2() {
+    return ImmutableSet.of(
+        Mono.usingWhen(
+            Mono.just("foo"),
+            foo -> Mono.just("bar"),
+            foo -> Mono.just("baz"),
+            (foo, e) -> Mono.just("qux"),
+            foo -> Mono.just("thud")),
+        Flux.usingWhen(
+                Mono.just("foo"),
+                foo -> Flux.just("bar"),
+                foo -> Mono.just("baz"),
+                (foo, e) -> Mono.just("qux"),
+                foo -> Mono.just("thud"))
+            .single());
   }
 
   ImmutableSet<Flux<Integer>> testFluxSwitchIfEmptyOfEmptyPublisher() {
