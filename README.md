@@ -13,7 +13,7 @@ Google's [Error Prone][error-prone-orig-repo]. It aims to improve code quality,
 focussing on maintainability, consistency and avoidance of common pitfalls.
 
 > Error Prone is a static analysis tool for Java that catches common
-> programming mistakes at compile-time.
+> programming mistakes at compile-time. test
 
 To learn more about Error Prone (Support), how you can start using Error Prone
 in practice, and how we use it at Picnic, watch the conference talk
