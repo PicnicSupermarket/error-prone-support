@@ -10,9 +10,10 @@ additional_build_flags=''
 additional_source_directories=''
 shared_error_prone_flags='-XepExcludedPaths:.*/target/generated-sources/.*'
 # XXX: These don't work...
-patch_error_prone_flags='-Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern=^(?!FileRules\$).*'
+patch_error_prone_flags='-Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern="^(?!FileRules\$).*"'
 validation_error_prone_flags=''
-validation_build_flags='-Dtest=!InstrumentedHttpClientsTest#registersExpectedMetricsGivenNameStrategy'
+#validation_build_flags='-Dtest=!InstrumentedHttpClientsTest#registersExpectedMetricsGivenNameStrategy'
+validation_build_flags=""
 
 if [ "${#}" -gt 2 ] || ([ "${#}" = 2 ] && [ "${1:---sync}" != '--sync' ]); then
   echo "Usage: ${0} [--sync] [<report_directory>]"
