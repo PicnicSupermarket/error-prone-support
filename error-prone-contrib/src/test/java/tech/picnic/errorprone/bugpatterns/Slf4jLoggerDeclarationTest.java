@@ -189,7 +189,7 @@ final class Slf4jLoggerDeclarationTest {
   @Test
   void replacementWithCustomLoggerName() {
     BugCheckerRefactoringTestHelper.newInstance(Slf4jLoggerDeclaration.class, getClass())
-        .setArgs(ImmutableList.of("-XepOpt:Slf4jLogDeclaration:CanonicalStaticLoggerName=FOO_BAR"))
+        .setArgs(ImmutableList.of("-XepOpt:Slf4jLoggerDeclaration:CanonicalStaticLoggerName=FOO_BAR"))
         .addInputLines(
             "A.java",
             "import org.slf4j.Logger;",

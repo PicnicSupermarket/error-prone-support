@@ -34,21 +34,16 @@
              return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
 --- a/pom.xml
 +++ b/pom.xml
-@@ -66,8 +66,12 @@
+@@ -66,7 +66,7 @@
          <mockito.version>5.14.1</mockito.version>
          <commons-lang3.version>3.17.0</commons-lang3.version>
          <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
 -        <errorprone.version>2.31.0</errorprone.version>
 +        <errorprone.version>${error-prone.version}</errorprone.version>
          <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
-+        <error-prone-support.flags>-Xplugin:ErrorProne \
-+            -XepDisableWarningsInGeneratedCode \
-+            ${error-prone.configuration-args}
-+        </error-prone-support.flags>
  
          <sonar.projectKey>dropwizard_metrics</sonar.projectKey>
-         <sonar.organization>dropwizard</sonar.organization>
-@@ -136,6 +140,27 @@
+@@ -136,6 +136,27 @@
          </repository>
      </distributionManagement>
  
@@ -76,16 +71,16 @@
      <profiles>
          <profile>
              <id>jdk8</id>
-@@ -218,7 +243,7 @@
+@@ -218,7 +239,7 @@
                              <compilerArgs>
                                  <arg>-Xlint:all</arg>
                                  <arg>-XDcompilePolicy=simple</arg>
 -                                <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.*</arg>
-+                                <arg>${error-prone-support.flags}</arg>
++                                <arg>-Xplugin:ErrorProne ${error-prone.configuration-args}</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-@@ -236,6 +261,16 @@
+@@ -236,6 +257,16 @@
                                      <artifactId>error_prone_core</artifactId>
                                      <version>${errorprone.version}</version>
                                  </path>
@@ -102,12 +97,3 @@
                              </annotationProcessorPaths>
                          </configuration>
                      </plugin>
-@@ -371,7 +406,7 @@
-                     <compilerArgs>
-                         <arg>-Xlint:all</arg>
-                         <arg>-XDcompilePolicy=simple</arg>
--                        <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.*</arg>
-+                        <arg>${error-prone-support.flags}</arg>
-                     </compilerArgs>
-                     <annotationProcessorPaths>
-                         <path>

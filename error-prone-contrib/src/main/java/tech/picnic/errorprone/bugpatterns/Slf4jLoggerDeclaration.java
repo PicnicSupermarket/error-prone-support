@@ -53,7 +53,7 @@ public final class Slf4jLoggerDeclaration extends BugChecker implements Variable
   private static final Matcher<ExpressionTree> IS_GET_LOGGER =
       staticMethod().onDescendantOf("org.slf4j.LoggerFactory").named("getLogger");
   private static final String CANONICAL_STATIC_LOGGER_NAME_FLAG =
-      "Slf4jLogDeclaration:CanonicalStaticLoggerName";
+      "Slf4jLoggerDeclaration:CanonicalStaticLoggerName";
   private static final String DEFAULT_CANONICAL_LOGGER_NAME = "LOG";
   private static final Matcher<ExpressionTree> IS_STATIC_ENCLOSING_CLASS_REFERENCE =
       classLiteral(Slf4jLoggerDeclaration::isEnclosingClassReference);
