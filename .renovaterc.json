@@ -3,6 +3,19 @@
   "extends": [
     "helpers:pinGitHubActionDigests"
   ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^integration-tests/.*(-init\\.patch|\\.sh)$"
+      ],
+      "matchStrings": [
+        "\\b(?<packageName>[a-z0-9_.-]+?:[a-z0-9_.-]+?):(?<currentValue>[^:]+?):[a-zA-Z0-9_-]+\\b",
+        "<version>(?<currentValue>.*?)<!-- Renovate: (?<packageName>.*?) --></version>"
+      ],
+      "datasourceTemplate": "maven"
+    }
+  ],
   "packageRules": [
     {
       "matchPackagePatterns": [

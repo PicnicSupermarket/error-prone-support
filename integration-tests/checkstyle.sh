@@ -6,8 +6,7 @@ test_name="$(basename "${0}" .sh)"
 project='checkstyle'
 repository='https://github.com/checkstyle/checkstyle.git'
 revision='checkstyle-10.20.1'
-# XXX: Configure Renovate to manage the AssertJ version declared here.
-additional_build_flags='-Perror-prone-compile,error-prone-test-compile -Dassertj.version=3.24.2 -Dmaven.compiler.failOnError=true'
+additional_build_flags='-Perror-prone-compile,error-prone-test-compile -Dmaven.compiler.failOnError=true'
 additional_source_directories='${project.basedir}${file.separator}src${file.separator}it${file.separator}java,${project.basedir}${file.separator}src${file.separator}xdocs-examples${file.separator}java'
 shared_error_prone_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
 patch_error_prone_flags=''
@@ -35,4 +34,4 @@ fi
   "${patch_error_prone_flags}" \
   "${validation_error_prone_flags}" \
   "${validation_build_flags}" \
-  $@
+  ${@}
