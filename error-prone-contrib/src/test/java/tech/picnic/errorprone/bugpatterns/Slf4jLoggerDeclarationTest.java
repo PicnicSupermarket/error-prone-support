@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
@@ -189,7 +188,7 @@ final class Slf4jLoggerDeclarationTest {
   @Test
   void replacementWithCustomLoggerName() {
     BugCheckerRefactoringTestHelper.newInstance(Slf4jLoggerDeclaration.class, getClass())
-        .setArgs(ImmutableList.of("-XepOpt:Slf4jLoggerDeclaration:CanonicalStaticLoggerName=FOO_BAR"))
+        .setArgs("-XepOpt:Slf4jLoggerDeclaration:CanonicalStaticLoggerName=FOO_BAR")
         .addInputLines(
             "A.java",
             "import org.slf4j.Logger;",
