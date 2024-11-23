@@ -9,8 +9,8 @@ revision='v5.0.0-rc22'
 additional_build_flags=''
 additional_source_directories=''
 shared_error_prone_flags='-XepExcludedPaths:.*/target/generated-sources/.*'
-# XXX: These don't work...
-patch_error_prone_flags="-Xep:CollectorMutability:OFF -XepOpt:Refaster:NamePattern='^(?!FileRules\$).*'"
+# XXX: Custom logger name isn't picked up.
+patch_error_prone_flags="-XepOpt:Slf4jLogDeclaration:CanonicalStaticLoggerName=LOGGER"
 validation_error_prone_flags=''
 #validation_build_flags='-Dtest=!InstrumentedHttpClientsTest#registersExpectedMetricsGivenNameStrategy'
 validation_build_flags=""
