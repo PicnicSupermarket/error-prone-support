@@ -34,15 +34,6 @@
              return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
 --- a/pom.xml
 +++ b/pom.xml
-@@ -66,7 +66,7 @@
-         <mockito.version>5.14.1</mockito.version>
-         <commons-lang3.version>3.17.0</commons-lang3.version>
-         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
--        <errorprone.version>2.31.0</errorprone.version>
-+        <errorprone.version>${error-prone.version}</errorprone.version>
-         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
- 
-         <sonar.projectKey>dropwizard_metrics</sonar.projectKey>
 @@ -136,6 +136,27 @@
          </repository>
      </distributionManagement>
@@ -52,7 +43,7 @@
 +            <dependency>
 +                <groupId>com.google.errorprone</groupId>
 +                <artifactId>error_prone_annotations</artifactId>
-+                <version>${errorprone.version}</version>
++                <version>${error-prone.version}</version>
 +            </dependency>
 +            <dependency>
 +                <groupId>com.google.guava</groupId>
@@ -80,10 +71,20 @@
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-@@ -236,6 +257,16 @@
+@@ -229,12 +250,24 @@
+                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                                 <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                                 <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
++                                <arg>-Xmaxwarns</arg>
++                                <arg>1000000</arg>
+                             </compilerArgs>
+                             <annotationProcessorPaths>
+                                 <path>
+                                     <groupId>com.google.errorprone</groupId>
                                      <artifactId>error_prone_core</artifactId>
-                                     <version>${errorprone.version}</version>
-                                 </path>
+-                                    <version>${errorprone.version}</version>
++                                    <version>${error-prone.version}</version>
++                                </path>
 +                                <path>
 +                                    <groupId>tech.picnic.error-prone-support</groupId>
 +                                    <artifactId>error-prone-contrib</artifactId>
@@ -93,7 +94,6 @@
 +                                    <groupId>tech.picnic.error-prone-support</groupId>
 +                                    <artifactId>refaster-runner</artifactId>
 +                                    <version>${error-prone-support.version}</version>
-+                                </path>
+                                 </path>
                              </annotationProcessorPaths>
                          </configuration>
-                     </plugin>
