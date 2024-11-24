@@ -1,20 +1,10 @@
-metrics-collectd/src/main/java/io/dropwizard/metrics5/collectd/CollectdReporter.java:[175,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
 metrics-collectd/src/main/java/io/dropwizard/metrics5/collectd/CollectdReporter.java:[306,57] [rawtypes] found raw type: Gauge
-metrics-core/src/main/java/io/dropwizard/metrics5/CsvReporter.java:[182,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
 metrics-core/src/main/java/io/dropwizard/metrics5/CsvReporter.java:[390,35] [FormatStringConcatenation] Defer string concatenation to the invoked method
 metrics-core/src/main/java/io/dropwizard/metrics5/InstrumentedExecutorService.java:[244,25] [try] auto-closeable resource durationContext is never referenced in body of corresponding try statement
 metrics-core/src/main/java/io/dropwizard/metrics5/InstrumentedExecutorService.java:[266,25] [try] auto-closeable resource context is never referenced in body of corresponding try statement
-metrics-core/src/main/java/io/dropwizard/metrics5/ScheduledReporter.java:[30,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
-metrics-core/src/test/java/io/dropwizard/metrics5/CachedGaugeTest.java:[18,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
-metrics-core/src/test/java/io/dropwizard/metrics5/InstrumentedExecutorServiceTest.java:[24,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
-metrics-core/src/test/java/io/dropwizard/metrics5/InstrumentedScheduledExecutorServiceTest.java:[17,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
-metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/Graphite.java:[35,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
-metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[250,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
 metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[431,14] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
 metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[436,16] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
 metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[449,17] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
-metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/PickledGraphite.java:[52,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
-metrics-healthchecks/src/main/java/io/dropwizard/metrics5/health/HealthCheckRegistry.java:[32,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
 metrics-healthchecks/src/test/java/io/dropwizard/metrics5/health/HealthCheckTest.java:[189,46] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
 metrics-healthchecks/src/test/java/io/dropwizard/metrics5/health/HealthCheckTest.java:[203,46] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
 metrics-httpclient/src/test/java/io/dropwizard/metrics5/httpclient/HttpClientMetricNameStrategiesTest.java:[124,22] [deprecation] rewriteURI(URI,HttpHost,boolean) in URIUtils has been deprecated
@@ -32,17 +22,12 @@ metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/Instrumente
 metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpRequestExecutor.java:[49,4] [deprecation] HttpRequestExecutor(Timeout,ConnectionReuseStrategy,Http1StreamListener) in HttpRequestExecutor has been deprecated
 metrics-httpclient5/src/test/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientsTest.java:[46,10] [deprecation] execute(ClassicHttpRequest) in HttpClient has been deprecated
 metrics-httpclient5/src/test/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientsTest.java:[68,12] [deprecation] execute(ClassicHttpRequest) in HttpClient has been deprecated
-metrics-influxdb/src/main/java/io/dropwizard/metrics5/influxdb/InfluxDbReporter.java:[199,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
 metrics-influxdb/src/main/java/io/dropwizard/metrics5/influxdb/InfluxDbReporter.java:[282,14] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
 metrics-influxdb/src/main/java/io/dropwizard/metrics5/influxdb/InfluxDbReporter.java:[287,16] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
-metrics-jcache/src/main/java/io/dropwizard/metrics5/jcache/JCacheGaugeSet.java:[36,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
 metrics-jdbi3/src/main/java/io/dropwizard/metrics5/jdbi3/InstrumentedTimingCollector.java:[10,33] [deprecation] TimingCollector in org.jdbi.v3.core.statement has been deprecated
 metrics-jdbi3/src/test/java/io/dropwizard/metrics5/jdbi3/strategies/SmartNameStrategyTest.java:[18,10] [deprecation] InstrumentedTimingCollector in io.dropwizard.metrics5.jdbi3 has been deprecated
 metrics-jdbi3/src/test/java/io/dropwizard/metrics5/jdbi3/strategies/SmartNameStrategyTest.java:[24,20] [deprecation] InstrumentedTimingCollector in io.dropwizard.metrics5.jdbi3 has been deprecated
 metrics-jdbi3/src/test/java/io/dropwizard/metrics5/jdbi3/strategies/SmartNameStrategyTest.java:[9,35] [deprecation] InstrumentedTimingCollector in io.dropwizard.metrics5.jdbi3 has been deprecated
-metrics-jmx/src/main/java/io/dropwizard/metrics5/jmx/DefaultObjectNameFactory.java:[13,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
-metrics-jmx/src/main/java/io/dropwizard/metrics5/jmx/JmxReporter.java:[163,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
-metrics-jvm/src/main/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSet.java:[23,30] [Slf4jLoggerDeclaration] SLF4J logger declarations should follow established best-practices
 metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSetTest.java:[101,74] [unchecked] unchecked cast
 metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSetTest.java:[56,74] [unchecked] unchecked cast
 metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSetTest.java:[65,74] [unchecked] unchecked cast
