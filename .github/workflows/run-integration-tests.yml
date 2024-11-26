@@ -16,9 +16,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        integration-test: [ "metrics" ]
-        # XXX: Enable.
-        # integration-test: [ "checkstyle", "metrics" ]
+        integration-test: [ "checkstyle", "metrics" ]
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
