@@ -1,4 +1,11 @@
 metrics-collectd/src/main/java/io/dropwizard/metrics5/collectd/CollectdReporter.java:[306,57] [rawtypes] found raw type: Gauge
+metrics-collectd/src/main/java/io/dropwizard/metrics5/collectd/PacketWriter.java:[164,12] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/io/dropwizard/metrics5/collectd/PacketWriter.java:[169,11] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/io/dropwizard/metrics5/collectd/PacketWriter.java:[175,17] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/io/dropwizard/metrics5/collectd/PacketWriter.java:[200,8] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/io/dropwizard/metrics5/collectd/PacketWriter.java:[203,21] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/io/dropwizard/metrics5/collectd/PacketWriter.java:[206,11] [cast] redundant cast to ByteBuffer
+metrics-collectd/src/main/java/io/dropwizard/metrics5/collectd/PacketWriter.java:[250,36] [cast] redundant cast to ByteBuffer
 metrics-core/src/main/java/io/dropwizard/metrics5/CsvReporter.java:[390,35] [FormatStringConcatenation] Defer string concatenation to the invoked method
 metrics-core/src/main/java/io/dropwizard/metrics5/InstrumentedExecutorService.java:[244,25] [try] auto-closeable resource durationContext is never referenced in body of corresponding try statement
 metrics-core/src/main/java/io/dropwizard/metrics5/InstrumentedExecutorService.java:[266,25] [try] auto-closeable resource context is never referenced in body of corresponding try statement
@@ -10,9 +17,6 @@ metrics-healthchecks/src/test/java/io/dropwizard/metrics5/health/HealthCheckTest
 metrics-httpclient/src/test/java/io/dropwizard/metrics5/httpclient/HttpClientMetricNameStrategiesTest.java:[124,22] [deprecation] rewriteURI(URI,HttpHost,boolean) in URIUtils has been deprecated
 metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedAsyncClientConnectionManager.java:[29,62] [deprecation] getDefault() in DefaultClientTlsStrategy has been deprecated
 metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[116,50] [deprecation] ConnectionSocketFactory in org.apache.hc.client5.http.socket has been deprecated
-metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[14,40] [deprecation] ConnectionSocketFactory in org.apache.hc.client5.http.socket has been deprecated
-metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[15,40] [deprecation] PlainConnectionSocketFactory in org.apache.hc.client5.http.socket has been deprecated
-metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[16,37] [deprecation] SSLConnectionSocketFactory in org.apache.hc.client5.http.ssl has been deprecated
 metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[160,12] [deprecation] DefaultHttpClientConnectionOperator(Lookup<ConnectionSocketFactory>,SchemePortResolver,DnsResolver) in DefaultHttpClientConnectionOperator has been deprecated
 metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[30,28] [deprecation] ConnectionSocketFactory in org.apache.hc.client5.http.socket has been deprecated
 metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[31,28] [deprecation] ConnectionSocketFactory in org.apache.hc.client5.http.socket has been deprecated
@@ -24,10 +28,9 @@ metrics-httpclient5/src/test/java/io/dropwizard/metrics5/httpclient5/Instrumente
 metrics-httpclient5/src/test/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientsTest.java:[68,12] [deprecation] execute(ClassicHttpRequest) in HttpClient has been deprecated
 metrics-influxdb/src/main/java/io/dropwizard/metrics5/influxdb/InfluxDbReporter.java:[282,14] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
 metrics-influxdb/src/main/java/io/dropwizard/metrics5/influxdb/InfluxDbReporter.java:[287,16] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
-metrics-jdbi3/src/main/java/io/dropwizard/metrics5/jdbi3/InstrumentedTimingCollector.java:[10,33] [deprecation] TimingCollector in org.jdbi.v3.core.statement has been deprecated
+metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/HealthCheckServletTest.java:[31,67] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
 metrics-jdbi3/src/test/java/io/dropwizard/metrics5/jdbi3/strategies/SmartNameStrategyTest.java:[18,10] [deprecation] InstrumentedTimingCollector in io.dropwizard.metrics5.jdbi3 has been deprecated
 metrics-jdbi3/src/test/java/io/dropwizard/metrics5/jdbi3/strategies/SmartNameStrategyTest.java:[24,20] [deprecation] InstrumentedTimingCollector in io.dropwizard.metrics5.jdbi3 has been deprecated
-metrics-jdbi3/src/test/java/io/dropwizard/metrics5/jdbi3/strategies/SmartNameStrategyTest.java:[9,35] [deprecation] InstrumentedTimingCollector in io.dropwizard.metrics5.jdbi3 has been deprecated
 metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSetTest.java:[101,74] [unchecked] unchecked cast
 metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSetTest.java:[56,74] [unchecked] unchecked cast
 metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSetTest.java:[65,74] [unchecked] unchecked cast

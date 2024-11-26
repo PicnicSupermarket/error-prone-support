@@ -34,4 +34,4 @@ fi
   "${patch_error_prone_flags}" \
   "${validation_error_prone_flags}" \
   "${validation_build_flags}" \
-  ${@}
+  $@
