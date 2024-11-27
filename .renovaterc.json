@@ -18,11 +18,11 @@
   ],
   "packageRules": [
     {
-      "matchPackagePatterns": [
-        "^org\\.springframework:spring-framework-bom$",
-        "^org\\.springframework\\.boot:spring-boot[a-z-]*$"
-      ],
-      "separateMinorPatch": true
+      "separateMinorPatch": true,
+      "matchPackageNames": [
+        "/^org\\.springframework:spring-framework-bom$/",
+        "/^org\\.springframework\\.boot:spring-boot[a-z-]*$/"
+      ]
     },
     {
       "matchPackageNames": [
