@@ -12,8 +12,8 @@ integration_test_root="$(cd "$(dirname -- "${0}")" && pwd)"
 error_prone_support_root="${integration_test_root}/.."
 repos_root="${integration_test_root}/.repos"
 
-if [ "${#}" -lt 9 ] || [ "${#}" -gt 11 ] || ([ "${#}" = 11 ] && [ "${10:---sync}" != '--sync' ]); then
-  >&2 echo "Usage: $(basename "${0}") <test_name> <project> <repository> <revision> <additional_build_flags> <additional_source_directories> <patch_error_prone_flags> <validation_error_prone_flags> <validation_build_flags> [--sync] [<report_directory>]"
+if [ "${#}" -lt 10 ] || [ "${#}" -gt 12 ] || ([ "${#}" = 12 ] && [ "${11:---sync}" != '--sync' ]); then
+  >&2 echo "Usage: $(basename "${0}") <test_name> <project> <repository> <revision> <additional_build_flags> <additional_source_directories> <shared_error_prone_flags> <patch_error_prone_flags> <validation_error_prone_flags> <validation_build_flags> [--sync] [<report_directory>]"
   exit 1
 fi
 
@@ -23,11 +23,12 @@ repository="${3}"
 revision="${4}"
 additional_build_flags="${5}"
 additional_source_directories="${6}"
-patch_error_prone_flags="${7}"
-validation_error_prone_flags="${8}"
-validation_build_flags="${9}"
-do_sync="$([ "${#}" = 9 ] || [ "${10:-}" != '--sync' ] || echo 1)"
-report_directory="$([ "${#}" = 9 ] || ([ -z "${do_sync}" ] && echo "${10}") || ([ "${#}" = 10 ] || echo "${11}"))"
+shared_error_prone_flags="${7}"
+patch_error_prone_flags="${8}"
+validation_error_prone_flags="${9}"
+validation_build_flags="${10}"
+do_sync="$([ "${#}" = 10 ] || [ "${11:-}" != '--sync' ] || echo 1)"
+report_directory="$([ "${#}" = 10 ] || ([ -z "${do_sync}" ] && echo "${11}") || ([ "${#}" = 11 ] || echo "${12}"))"
 
 if [ -n "${report_directory}" ]; then
   mkdir -p "${report_directory}"
@@ -64,9 +65,7 @@ shared_build_flags="
 
 format_goal='com.spotify.fmt:fmt-maven-plugin:2.25:format'
 
-error_prone_shared_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
-
-error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE -XepPatchChecks:$(
+error_prone_patch_flags="${shared_error_prone_flags} -XepPatchLocation:IN_PLACE -XepPatchChecks:$(
    find "${error_prone_support_root}" \
       -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" \
       -not -path "*/error-prone-experimental/*" \
@@ -76,7 +75,7 @@ error_prone_patch_flags="${error_prone_shared_flags} -XepPatchLocation:IN_PLACE 
     | paste -s -d ',' -
 ) ${patch_error_prone_flags}"
 
-error_prone_validation_flags="${error_prone_shared_flags} -XepDisableAllChecks $(
+error_prone_validation_flags="${shared_error_prone_flags} -XepDisableAllChecks $(
    find "${error_prone_support_root}" \
       -path "*/META-INF/services/com.google.errorprone.bugpatterns.BugChecker" \
       -not -path "*/error-prone-experimental/*" \
