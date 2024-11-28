@@ -367,8 +367,10 @@
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-core</artifactId>
-                <version>1.13.6</version>
+                <artifactId>micrometer-bom</artifactId>
+                <version>1.14.0</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
@@ -508,19 +510,19 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>6.1.14</version>
+                <version>6.2.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>3.3.5</version>
+                <version>3.4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>6.3.4</version>
+                <version>6.4.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
