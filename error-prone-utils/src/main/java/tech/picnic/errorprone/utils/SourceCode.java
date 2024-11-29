@@ -17,6 +17,7 @@ import com.sun.source.tree.Tree;
 import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import com.sun.tools.javac.util.Position;
 import java.util.Optional;
+import javax.lang.model.SourceVersion;
 
 /**
  * A collection of Error Prone utility methods for dealing with the source code representation of
@@ -27,6 +28,18 @@ public final class SourceCode {
   private static final CharMatcher NON_WHITESPACE_MATCHER = CharMatcher.whitespace().negate();
 
   private SourceCode() {}
+
+  /**
+   * Tells whether the given string is a valid identifier in the Java language.
+   *
+   * @param str The string of interest.
+   * @return {@code true} if the given string is a valid identifier in the Java language.
+   * @see <a href="https://docs.oracle.com/javase/specs/jls/se17/html/jls-3.html#jls-3.8">JDK 17 JLS
+   *     section 3.8: Identifiers</a>
+   */
+  public static boolean isValidIdentifier(String str) {
+    return str.indexOf('.') < 0 && SourceVersion.isName(str);
+  }
 
   /**
    * Returns a string representation of the given {@link Tree}, preferring the original source code
