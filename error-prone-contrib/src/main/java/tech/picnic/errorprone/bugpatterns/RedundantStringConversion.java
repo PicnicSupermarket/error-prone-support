@@ -44,7 +44,6 @@ import com.sun.source.tree.Tree.Kind;
 import java.io.Console;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Formattable;
 import java.util.Formatter;
 import java.util.List;
@@ -177,18 +176,18 @@ public final class RedundantStringConversion extends BugChecker
       return createDescription(tree, tryFix(rhs, state, STRING));
     }
 
-    List<SuggestedFix.Builder> fixes = new ArrayList<>();
+    SuggestedFix.Builder fix = SuggestedFix.builder();
 
     // XXX: Avoid trying to simplify the RHS twice.
     ExpressionTree preferredRhs = trySimplify(rhs, state).orElse(rhs);
     if (STRING.matches(preferredRhs, state)) {
-      tryFix(lhs, state, ANY_EXPR).ifPresent(fixes::add);
+      fix.merge(tryFix(lhs, state, ANY_EXPR));
     } else {
-      tryFix(lhs, state, STRING).ifPresent(fixes::add);
+      fix.merge(tryFix(lhs, state, STRING));
     }
-    tryFix(rhs, state, ANY_EXPR).ifPresent(fixes::add);
+    fix.merge(tryFix(rhs, state, ANY_EXPR));
 
-    return createDescription(tree, fixes.stream().reduce(SuggestedFix.Builder::merge));
+    return createDescription(tree, fix.build());
   }
 
   @Override
@@ -229,17 +228,18 @@ public final class RedundantStringConversion extends BugChecker
     return createDescription(tree, tryFix(tree, state, NON_NULL_STRING));
   }
 
-  private Optional<SuggestedFix.Builder> tryFixPositionalConverter(
+  private SuggestedFix tryFixPositionalConverter(
       List<? extends ExpressionTree> arguments, VisitorState state, int index) {
     return Optional.of(arguments)
         .filter(args -> args.size() > index)
-        .flatMap(args -> tryFix(args.get(index), state, ANY_EXPR));
+        .map(args -> tryFix(args.get(index), state, ANY_EXPR))
+        .orElseGet(SuggestedFix::emptyFix);
   }
 
   // XXX: Write another check that checks that Formatter patterns don't use `{}` and have a
   // matching number of arguments of the appropriate type. Also flag explicit conversions from
   // `Formattable` to string.
-  private Optional<SuggestedFix.Builder> tryFixFormatter(
+  private SuggestedFix tryFixFormatter(
       List<? extends ExpressionTree> arguments, VisitorState state) {
     /*
      * Formatter methods have an optional first `Locale` parameter; if present, it must be
@@ -258,7 +258,7 @@ public final class RedundantStringConversion extends BugChecker
     return tryFixFormatterArguments(arguments, state, LOCALE, NOT_FORMATTABLE);
   }
 
-  private Optional<SuggestedFix.Builder> tryFixGuavaGuard(
+  private SuggestedFix tryFixGuavaGuard(
       List<? extends ExpressionTree> arguments, VisitorState state) {
     /*
      * All Guava guard methods accept a value to be checked, a format string and zero or more
@@ -271,7 +271,7 @@ public final class RedundantStringConversion extends BugChecker
   // number of arguments of the appropriate type. Also flag explicit conversions from `Throwable` to
   // string as the last logger argument. Suggests either dropping the conversion or going with
   // `Throwable#getMessage()` instead.
-  private Optional<SuggestedFix.Builder> tryFixSlf4jLogger(
+  private SuggestedFix tryFixSlf4jLogger(
       List<? extends ExpressionTree> arguments, VisitorState state) {
     /*
      * SLF4J treats the final argument to a log statement specially if it is a `Throwable`: it
@@ -291,36 +291,34 @@ public final class RedundantStringConversion extends BugChecker
         omitLast ? arguments.subList(0, arguments.size() - 1) : arguments, state, MARKER, ANY_EXPR);
   }
 
-  private Optional<SuggestedFix.Builder> tryFixFormatterArguments(
+  private SuggestedFix tryFixFormatterArguments(
       List<? extends ExpressionTree> arguments,
       VisitorState state,
       Matcher<ExpressionTree> firstArgFilter,
       Matcher<ExpressionTree> remainingArgFilter) {
     if (arguments.isEmpty()) {
       /* This format method accepts no arguments. Some odd overload? */
-      return Optional.empty();
+      return SuggestedFix.emptyFix();
     }
 
     int patternIndex = firstArgFilter.matches(arguments.get(0), state) ? 1 : 0;
     if (arguments.size() <= patternIndex) {
       /* This format method accepts only an ignored parameter. Some odd overload? */
-      return Optional.empty();
+      return SuggestedFix.emptyFix();
     }
 
     /* Simplify the values to be plugged into the format pattern, if possible. */
     return arguments.stream()
         .skip(patternIndex + 1L)
         .map(arg -> tryFix(arg, state, remainingArgFilter))
-        .flatMap(Optional::stream)
-        .reduce(SuggestedFix.Builder::merge);
+        .collect(SuggestedFix.mergeFixes());
   }
 
-  private Optional<SuggestedFix.Builder> tryFix(
+  private SuggestedFix tryFix(
       ExpressionTree tree, VisitorState state, Matcher<ExpressionTree> filter) {
     return trySimplify(tree, state, filter)
-        .map(
-            replacement ->
-                SuggestedFix.builder().replace(tree, SourceCode.treeToString(replacement, state)));
+        .map(replacement -> SuggestedFix.replace(tree, SourceCode.treeToString(replacement, state)))
+        .orElseGet(SuggestedFix::emptyFix);
   }
 
   private Optional<ExpressionTree> trySimplify(
@@ -369,11 +367,8 @@ public final class RedundantStringConversion extends BugChecker
     return Optional.of(Iterables.getOnlyElement(methodInvocation.getArguments()));
   }
 
-  private Description createDescription(Tree tree, Optional<SuggestedFix.Builder> fixes) {
-    return fixes
-        .map(SuggestedFix.Builder::build)
-        .map(fix -> describeMatch(tree, fix))
-        .orElse(Description.NO_MATCH);
+  private Description createDescription(Tree tree, SuggestedFix fix) {
+    return fix.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fix);
   }
 
   private static Matcher<MethodInvocationTree> createConversionMethodMatcher(

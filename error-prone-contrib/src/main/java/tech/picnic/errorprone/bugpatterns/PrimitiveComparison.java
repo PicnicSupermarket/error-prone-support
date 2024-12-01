@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.StandardTags.PERFORMANCE;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -85,22 +86,22 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
     }
 
     return getPotentiallyBoxedReturnType(tree.getArguments().get(0))
-        .flatMap(cmpType -> attemptMethodInvocationReplacement(tree, cmpType, isStatic, state))
+        .map(cmpType -> attemptMethodInvocationReplacement(tree, cmpType, isStatic, state))
+        .filter(not(SuggestedFix::isEmpty))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 
-  private static Optional<Fix> attemptMethodInvocationReplacement(
+  private static SuggestedFix attemptMethodInvocationReplacement(
       MethodInvocationTree tree, Type cmpType, boolean isStatic, VisitorState state) {
     String actualMethodName = ASTHelpers.getSymbol(tree).getSimpleName().toString();
     String preferredMethodName = getPreferredMethod(cmpType, isStatic, state);
     if (actualMethodName.equals(preferredMethodName)) {
-      return Optional.empty();
+      return SuggestedFix.emptyFix();
     }
 
-    return Optional.of(
-        suggestFix(
-            tree, prefixTypeArgumentsIfRelevant(preferredMethodName, tree, cmpType, state), state));
+    return suggestFix(
+        tree, prefixTypeArgumentsIfRelevant(preferredMethodName, tree, cmpType, state), state);
   }
 
   /**
@@ -169,7 +170,7 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
   }
 
   // XXX: Use switch pattern matching once the targeted JDK supports this.
-  private static Fix suggestFix(
+  private static SuggestedFix suggestFix(
       MethodInvocationTree tree, String preferredMethodName, VisitorState state) {
     ExpressionTree expr = tree.getMethodSelect();
 

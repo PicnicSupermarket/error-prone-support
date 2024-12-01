@@ -105,22 +105,19 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
 
   @Override
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
-    return sortArrayElements(tree, state)
-        .map(fix -> describeMatch(tree, fix))
-        .orElse(Description.NO_MATCH);
+    Fix fix = sortArrayElements(tree, state);
+    return fix.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fix);
   }
 
-  private Optional<Fix> sortArrayElements(AnnotationTree tree, VisitorState state) {
+  private Fix sortArrayElements(AnnotationTree tree, VisitorState state) {
     /*
      * We loop over the array's attributes, trying to sort each array associated with a
      * non-blacklisted attribute. A single compound fix, if any, is returned.
      */
     return matcher
         .extractMatchingArguments(tree)
-        .map(expr -> extractArray(expr).flatMap(arr -> suggestSorting(arr, state)))
-        .flatMap(Optional::stream)
-        .reduce(SuggestedFix.Builder::merge)
-        .map(SuggestedFix.Builder::build);
+        .flatMap(expr -> extractArray(expr).map(arr -> suggestSorting(arr, state)).stream())
+        .collect(SuggestedFix.mergeFixes());
   }
 
   private static Optional<NewArrayTree> extractArray(ExpressionTree expr) {
@@ -129,18 +126,17 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
         : Optional.of(expr).filter(NewArrayTree.class::isInstance).map(NewArrayTree.class::cast);
   }
 
-  private static Optional<SuggestedFix.Builder> suggestSorting(
-      NewArrayTree array, VisitorState state) {
+  private static SuggestedFix suggestSorting(NewArrayTree array, VisitorState state) {
     if (array.getInitializers().size() < 2 || !canSort(array, state)) {
       /* There's nothing to sort, or we don't want to sort. */
-      return Optional.empty();
+      return SuggestedFix.emptyFix();
     }
 
     List<? extends ExpressionTree> actualOrdering = array.getInitializers();
     ImmutableList<? extends ExpressionTree> desiredOrdering = doSort(actualOrdering);
     if (actualOrdering.equals(desiredOrdering)) {
       /* In the (presumably) common case the elements are already sorted. */
-      return Optional.empty();
+      return SuggestedFix.emptyFix();
     }
 
     /* The elements aren't sorted. Suggest the sorted alternative. */
@@ -148,7 +144,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
         desiredOrdering.stream()
             .map(expr -> SourceCode.treeToString(expr, state))
             .collect(joining(", ", "{", "}"));
-    return Optional.of(SuggestedFix.builder().replace(array, suggestion));
+    return SuggestedFix.replace(array, suggestion);
   }
 
   private static boolean canSort(Tree array, VisitorState state) {

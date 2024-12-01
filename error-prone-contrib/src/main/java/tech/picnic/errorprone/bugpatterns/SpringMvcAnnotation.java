@@ -15,7 +15,6 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
-import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
@@ -65,16 +64,18 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
     return ARGUMENT_SELECTOR
         .extractMatchingArguments(tree)
         .findFirst()
-        .flatMap(arg -> trySimplification(tree, arg, state))
+        .map(arg -> trySimplification(tree, arg, state))
+        .filter(not(SuggestedFix::isEmpty))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 
-  private static Optional<Fix> trySimplification(
+  private static SuggestedFix trySimplification(
       AnnotationTree tree, ExpressionTree arg, VisitorState state) {
     return extractUniqueMethod(arg, state)
         .map(REPLACEMENTS::get)
-        .map(newAnnotation -> replaceAnnotation(tree, arg, newAnnotation, state));
+        .map(newAnnotation -> replaceAnnotation(tree, arg, newAnnotation, state))
+        .orElseGet(SuggestedFix::emptyFix);
   }
 
   private static Optional<String> extractUniqueMethod(ExpressionTree arg, VisitorState state) {
@@ -99,7 +100,7 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
     };
   }
 
-  private static Fix replaceAnnotation(
+  private static SuggestedFix replaceAnnotation(
       AnnotationTree tree, ExpressionTree argToRemove, String newAnnotation, VisitorState state) {
     String newArguments =
         tree.getArguments().stream()

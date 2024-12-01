@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static java.util.Objects.requireNonNull;
+import static java.util.function.Predicate.not;
 import static tech.picnic.errorprone.bugpatterns.NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS;
 import static tech.picnic.errorprone.bugpatterns.NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
@@ -34,7 +35,6 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MemberSelectTreeMatcher;
 import com.google.errorprone.bugpatterns.StaticImports;
 import com.google.errorprone.bugpatterns.StaticImports.StaticImportInfo;
-import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
@@ -203,7 +203,8 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
     }
 
     return getCandidateSimpleName(importInfo)
-        .flatMap(n -> tryStaticImport(tree, importInfo.canonicalName() + '.' + n, n, state))
+        .map(n -> tryStaticImport(tree, importInfo.canonicalName() + '.' + n, n, state))
+        .filter(not(SuggestedFix::isEmpty))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
@@ -240,15 +241,15 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
                     || STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(canonicalName, name));
   }
 
-  private static Optional<Fix> tryStaticImport(
+  private static SuggestedFix tryStaticImport(
       MemberSelectTree tree, String fullyQualifiedName, String simpleName, VisitorState state) {
     SuggestedFix.Builder fix = SuggestedFix.builder().replace(tree, simpleName);
 
     if (!simpleName.equals(SuggestedFixes.qualifyStaticImport(fullyQualifiedName, fix, state))) {
       /* Statically importing this symbol would clash with an existing import. */
-      return Optional.empty();
+      return SuggestedFix.emptyFix();
     }
 
-    return Optional.of(fix.build());
+    return fix.build();
   }
 }

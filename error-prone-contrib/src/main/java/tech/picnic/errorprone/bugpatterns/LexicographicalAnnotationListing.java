@@ -10,7 +10,6 @@ import static java.util.Comparator.comparing;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
@@ -105,10 +104,7 @@ public final class LexicographicalAnnotationListing extends BugChecker
             originalAnnotations.stream(),
             sortedAnnotations.stream(),
             (original, replacement) ->
-                SuggestedFix.builder()
-                    .replace(original, SourceCode.treeToString(replacement, state)))
-        .reduce(SuggestedFix.Builder::merge)
-        .map(SuggestedFix.Builder::build)
-        .orElseThrow(() -> new VerifyException("No annotations were provided"));
+                SuggestedFix.replace(original, SourceCode.treeToString(replacement, state)))
+        .collect(SuggestedFix.mergeFixes());
   }
 }

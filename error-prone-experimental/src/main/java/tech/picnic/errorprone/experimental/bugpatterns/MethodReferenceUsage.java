@@ -73,19 +73,18 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
      * because the latter are not syntactically valid or ambiguous. Rather than encoding all these
      * edge cases we try to compile the code with the suggested fix, to see whether this works.
      */
-    return constructMethodRef(tree, tree.getBody())
-        .map(SuggestedFix.Builder::build)
-        .filter(
-            fix ->
-                SuggestedFixes.compilesWithFix(
-                    fix, state, ImmutableList.of(), /* onlyInSameCompilationUnit= */ true))
-        .map(fix -> describeMatch(tree, fix))
-        .orElse(Description.NO_MATCH);
+    SuggestedFix fix = constructMethodRef(tree, tree.getBody());
+    if (fix.isEmpty()
+        || !SuggestedFixes.compilesWithFix(
+            fix, state, ImmutableList.of(), /* onlyInSameCompilationUnit= */ true)) {
+      return Description.NO_MATCH;
+    }
+
+    return describeMatch(tree, fix);
   }
 
   // XXX: Use switch pattern matching once the targeted JDK supports this.
-  private static Optional<SuggestedFix.Builder> constructMethodRef(
-      LambdaExpressionTree lambdaExpr, Tree subTree) {
+  private static SuggestedFix constructMethodRef(LambdaExpressionTree lambdaExpr, Tree subTree) {
     return switch (subTree.getKind()) {
       case BLOCK -> constructMethodRef(lambdaExpr, (BlockTree) subTree);
       case EXPRESSION_STATEMENT ->
@@ -94,27 +93,28 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
       case PARENTHESIZED ->
           constructMethodRef(lambdaExpr, ((ParenthesizedTree) subTree).getExpression());
       case RETURN -> constructMethodRef(lambdaExpr, ((ReturnTree) subTree).getExpression());
-      default -> Optional.empty();
+      default -> SuggestedFix.emptyFix();
     };
   }
 
-  private static Optional<SuggestedFix.Builder> constructMethodRef(
+  private static SuggestedFix constructMethodRef(
       LambdaExpressionTree lambdaExpr, BlockTree subTree) {
     return Optional.of(subTree.getStatements())
         .filter(statements -> statements.size() == 1)
-        .flatMap(statements -> constructMethodRef(lambdaExpr, statements.get(0)));
+        .map(statements -> constructMethodRef(lambdaExpr, statements.get(0)))
+        .orElseGet(SuggestedFix::emptyFix);
   }
 
-  // XXX: Replace nested `Optional` usage.
   @SuppressWarnings("NestedOptionals")
-  private static Optional<SuggestedFix.Builder> constructMethodRef(
+  private static SuggestedFix constructMethodRef(
       LambdaExpressionTree lambdaExpr, MethodInvocationTree subTree) {
     return matchArguments(lambdaExpr, subTree)
-        .flatMap(expectedInstance -> constructMethodRef(lambdaExpr, subTree, expectedInstance));
+        .map(expectedInstance -> constructMethodRef(lambdaExpr, subTree, expectedInstance))
+        .orElseGet(SuggestedFix::emptyFix);
   }
 
   // XXX: Review whether to use switch pattern matching once the targeted JDK supports this.
-  private static Optional<SuggestedFix.Builder> constructMethodRef(
+  private static SuggestedFix constructMethodRef(
       LambdaExpressionTree lambdaExpr,
       MethodInvocationTree subTree,
       Optional<Name> expectedInstance) {
@@ -123,7 +123,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
     if (methodSelect instanceof IdentifierTree) {
       if (expectedInstance.isPresent()) {
         /* Direct method call; there is no matching "implicit parameter". */
-        return Optional.empty();
+        return SuggestedFix.emptyFix();
       }
 
       Symbol sym = ASTHelpers.getSymbol(methodSelect);
@@ -139,7 +139,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
     throw new VerifyException("Unexpected type of expression: " + methodSelect.getKind());
   }
 
-  private static Optional<SuggestedFix.Builder> constructMethodRef(
+  private static SuggestedFix constructMethodRef(
       LambdaExpressionTree lambdaExpr, MemberSelectTree subTree, Optional<Name> expectedInstance) {
     if (!(subTree.getExpression() instanceof IdentifierTree identifier)) {
       // XXX: Could be parenthesized. Handle. Also in other classes.
@@ -147,7 +147,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
        * Only suggest a replacement if the method select's expression provably doesn't have
        * side-effects. Otherwise the replacement may not be behavior preserving.
        */
-      return Optional.empty();
+      return SuggestedFix.emptyFix();
     }
 
     Name lhs = identifier.getName();
@@ -157,7 +157,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
 
     Type lhsType = ASTHelpers.getType(identifier);
     if (lhsType == null || !expectedInstance.orElseThrow().equals(lhs)) {
-      return Optional.empty();
+      return SuggestedFix.emptyFix();
     }
 
     // XXX: Dropping generic type information is in most cases fine or even more likely to yield a
@@ -195,23 +195,23 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
 
   // XXX: Resolve this suppression.
   @SuppressWarnings("UnqualifiedSuggestedFixImport")
-  private static Optional<SuggestedFix.Builder> constructFix(
+  private static SuggestedFix constructFix(
       LambdaExpressionTree lambdaExpr, Symbol target, Object methodName) {
     Name sName = target.getSimpleName();
-    Optional<SuggestedFix.Builder> fix = constructFix(lambdaExpr, sName, methodName);
+    SuggestedFix fix = constructFix(lambdaExpr, sName, methodName);
 
     if (!"java.lang".equals(ASTHelpers.enclosingPackage(target).toString())) {
       Name fqName = target.getQualifiedName();
       if (!sName.equals(fqName)) {
-        return fix.map(b -> b.addImport(fqName.toString()));
+        return fix.toBuilder().addImport(fqName.toString()).build();
       }
     }
 
     return fix;
   }
 
-  private static Optional<SuggestedFix.Builder> constructFix(
+  private static SuggestedFix constructFix(
       LambdaExpressionTree lambdaExpr, Object target, Object methodName) {
-    return Optional.of(SuggestedFix.builder().replace(lambdaExpr, target + "::" + methodName));
+    return SuggestedFix.replace(lambdaExpr, target + "::" + methodName);
   }
 }

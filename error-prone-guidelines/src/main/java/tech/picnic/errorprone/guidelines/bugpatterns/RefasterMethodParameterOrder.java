@@ -35,7 +35,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 import javax.lang.model.element.Name;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.SourceCode;
@@ -74,12 +73,11 @@ public final class RefasterMethodParameterOrder extends BugChecker implements Cl
 
     Comparator<VariableTree> canonicalOrder = determineCanonicalParameterOrder(methods);
 
-    return methods.stream()
-        .flatMap(m -> tryReorderParameters(m, canonicalOrder, state))
-        .reduce(SuggestedFix.Builder::merge)
-        .map(SuggestedFix.Builder::build)
-        .map(fix -> describeMatch(tree, fix))
-        .orElse(Description.NO_MATCH);
+    SuggestedFix fix =
+        methods.stream()
+            .map(m -> tryReorderParameters(m, canonicalOrder, state))
+            .collect(SuggestedFix.mergeFixes());
+    return fix.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fix);
   }
 
   private static ImmutableList<MethodTree> getMethodsByPriority(
@@ -123,17 +121,18 @@ public final class RefasterMethodParameterOrder extends BugChecker implements Cl
     }.scan(method, null);
   }
 
-  private static Stream<SuggestedFix.Builder> tryReorderParameters(
+  private static SuggestedFix tryReorderParameters(
       MethodTree method, Comparator<VariableTree> canonicalOrder, VisitorState state) {
     List<? extends VariableTree> originalOrder = method.getParameters();
     ImmutableList<? extends VariableTree> orderedParams =
         ImmutableList.sortedCopyOf(canonicalOrder, originalOrder);
 
     return originalOrder.equals(orderedParams)
-        ? Stream.empty()
+        ? SuggestedFix.emptyFix()
         : Streams.zip(
-            originalOrder.stream(),
-            orderedParams.stream().map(p -> SourceCode.treeToString(p, state)),
-            SuggestedFix.builder()::replace);
+                originalOrder.stream(),
+                orderedParams.stream().map(p -> SourceCode.treeToString(p, state)),
+                SuggestedFix::replace)
+            .collect(SuggestedFix.mergeFixes());
   }
 }
